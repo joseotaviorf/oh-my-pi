@@ -7,8 +7,8 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.country_code
-    description: Country code of the listing.
+      - datalake_ebdb_listing.house_listing_status.country_code
+    description: Two-letter ISO country code for the market where this listing operates.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.
@@ -16,42 +16,42 @@ columns:
     description: Boolean indicating if the status is the last one of the day for this listing.
   revision_reason:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.revision_reason
+      - datalake_ebdb_listing.house_listing_status.revision_reason
     description: Reason why the status has changed.
   sk_first_publication_date:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_first_publication
+      - datalake_ebdb_listing.house_listing_status.ts_first_publication
     description: Date when house listing was first published.
   sk_house_listing:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.id_house_listing
+      - datalake_ebdb_listing.house_listing_status.id_house_listing
     description: Key of house listing. For house listing version rules, click here
       https://docs.google.com/presentation/d/1u4-p1tdzN5TRVfgtreH9thOfNr9O9pDrglah-XMUloQ/edit#slide=id.g41939e4bd1_0_115.
   sk_region:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.id_region
+      - datalake_ebdb_listing.house_listing_status.id_region
     description: Key of region where house listing is located in.
   sk_company_supply:
     lineage:
-    - datalake_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
   sk_status_end_date:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_ended
+      - datalake_ebdb_listing.house_listing_status.ts_status_ended
     description: Date when status ended. If it is equal to -1, it means the status
       is still current.
   sk_status_start_date:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_started
+      - datalake_ebdb_listing.house_listing_status.ts_status_started
     description: Date when status started.
   status_change_reason:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.status_change_reason
-    description: Status reason of house listing.
+      - datalake_ebdb_listing.house_listing_status.status_change_reason
+    description: Business reason code explaining why the listing status changed in this event.
   status_history:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.status_history
-    description: Status of house listing.
+      - datalake_ebdb_listing.house_listing_status.status_history
+    description: Listing status value effective during this status-change interval.
     categories:
       aguardando_publicacao: Waiting publication.
       alugado: Rented.
@@ -71,10 +71,10 @@ columns:
     description: Timestamp when the data was loaded.
   ts_status_end:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_ended
+      - datalake_ebdb_listing.house_listing_status.ts_status_ended
     description: Timestamp of when status ended. If it is equal NULL, it means the
       status is still current.
   ts_status_start:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_started
+      - datalake_ebdb_listing.house_listing_status.ts_status_started
     description: Timestamp of when status started.

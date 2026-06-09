@@ -2,12 +2,15 @@ database_name: datalake_ebdb_clean
 table_name: house_rating_rating_label
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the HouseRating_RatingLabel association table. One row per (rating, label) pair
-  (PK id_house_rating + id_rating_labels). Links each house rating to its rating labels.
+description: CDC mirror of the HouseRating_RatingLabel association table. One row
+  per (rating, label) pair (PK id_house_rating + id_rating_labels). Links each house
+  rating to its rating labels.
 columns:
   id_house_rating:
     lineage:
       - datalake_ebdb_raw.houserating_ratinglabel.houserating_id
+    description: Foreign key to the house rating in this rating-to-label association.
   id_rating_labels:
     lineage:
       - datalake_ebdb_raw.houserating_ratinglabel.ratinglabels_id
+    description: Foreign key to the rating label applied to the house rating.

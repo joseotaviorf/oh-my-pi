@@ -1,519 +1,536 @@
 database_name: datalake_listing_temp
 table_name: dim_house_listing_house
-description: "Information about property listings and some properties may be only available for sale. Each line is a listing version."
+description: Information about property listings and some properties may be only available
+  for sale. Each line is a listing version.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
-    - datalake_listing_temp.house_listing.id_house_listing
-    description: "Key of house listing."
+      - datalake_listing_temp.house_listing.id_house_listing
+    description: Surrogate key identifying one rental listing version. Stable across
+      republication within 12 weeks.
   id_house:
     lineage:
-    - datalake_ebdb_listing.house.id
-    description: "House id (the same house can have multiple listings)."
+      - datalake_ebdb_listing.house.id
+    description: House id (the same house can have multiple listings).
   short_id_house:
     lineage:
-    - datalake_ebdb_listing.house.id
-    description: "Short house id."
+      - datalake_ebdb_listing.house.id
+    description: Short numeric identifier of the house shown to users on the platform.
   country_code:
     lineage:
-    - datalake_ebdb_listing.house.country_code
-    description: "Country code related to the listing's country of origin."
+      - datalake_ebdb_listing.house.country_code
+    description: Country code related to the listing's country of origin.
     categories:
-      BR: "Brazil's country code."
-      MX: "Mexico's country code."
+      BR: Brazil's country code.
+      MX: Mexico's country code.
   version:
     lineage:
-    - datalake_listing_temp.house_listing.version
-    description: "House version (listing version)."
+      - datalake_listing_temp.house_listing.version
+    description: Sequential version number of the listing lifecycle for this house.
   consultant_type:
     lineage:
-    - datalake_big_agent.house_rent_listing_consultant.consultant_type
-    description: "Type of consultant responsible for this listing."
+      - datalake_big_agent.house_rent_listing_consultant.consultant_type
+    description: Type of consultant responsible for this listing.
   first_consultant_type:
     lineage:
-    - datalake_big_agent.house_rent_listing_consultant.first_consultant_type
-    description: "First type of consultant ever responsible for this listing."
+      - datalake_big_agent.house_rent_listing_consultant.first_consultant_type
+    description: First type of consultant ever responsible for this listing.
   first_key_location:
     lineage:
-    - datalake_ebdb_listing.agents_with_keys.first_key_location
-    description: "First declared location of this house's key for this listing."
+      - datalake_ebdb_listing.agents_with_keys.first_key_location
+    description: First declared location of this house's key for this listing.
   status:
     lineage:
-    - datalake_listing_temp.house_listing.status
-    description: "House listing status."
+      - datalake_listing_temp.house_listing.status
+    description: Operational status of this listing version in the rental publication
+      workflow.
     categories:
-      aguardando_publicacao: "Waiting publication."
-      alugado: "Rented."
-      despublicado: "Unpublished. If this house is published again in up to 12 weeks, the
-        listing will have the same sk_house_listing. Otherwise, it will have a new sk_house_listing."
-      edicao: "Listing is under edition."
-      edicaoSemUsuario: "No user editing."
-      edicaoUsuarioNaoConfirmado: "Unconfirmed user editing."
-      excluido: "Deleted."
-      publicado: "Published."
-      suspenso: "Suspended."
+      aguardando_publicacao: Waiting publication.
+      alugado: Rented.
+      despublicado: Unpublished. If this house is published again in up to 12 weeks,
+        the listing will have the same sk_house_listing. Otherwise, it will have a
+        new sk_house_listing.
+      edicao: Listing is under edition.
+      edicaoSemUsuario: No user editing.
+      edicaoUsuarioNaoConfirmado: Unconfirmed user editing.
+      excluido: Deleted.
+      publicado: Published.
+      suspenso: Suspended.
   status_reason:
-    description: "Status reason (it's initially empty to facilitate the questions migration.
-      It will be filled when versioning 2.0 is up and running)."
+    description: Status reason (it's initially empty to facilitate the questions migration.
+      It will be filled when versioning 2.0 is up and running).
   is_keys_with_agent_eligible:
     lineage:
-    - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible
-    description: "Boolean indicating if this house is eligible to have keys with agent."
+      - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible
+    description: Boolean indicating if this house is eligible to have keys with agent.
   ts_listing_version_start:
     lineage:
-    - datalake_listing_temp.house_listing.ts_listing_version_start
-    description: "House listing version start date."
+      - datalake_listing_temp.house_listing.ts_listing_version_start
+    description: House listing version start date.
   ts_listing_version_end:
     lineage:
-    - datalake_listing_temp.house_listing.ts_listing_version_end
-    description: "House listing version end date."
+      - datalake_listing_temp.house_listing.ts_listing_version_end
+    description: House listing version end date.
   ts_house_first_publication:
     lineage:
-    - datalake_ebdb_listing.house.dt_first_publication
-    description: "House first publication date."
+      - datalake_ebdb_listing.house.dt_first_publication
+    description: House first publication date.
   ts_house_last_publication:
     lineage:
-    - datalake_ebdb_listing.house.ts_last_publication
-    description: "House last publication date."
+      - datalake_ebdb_listing.house.ts_last_publication
+    description: House last publication date.
   ts_publication:
     lineage:
-    - datalake_listing_temp.house_listing.ts_listing_version_start
-    description: "House listing publication date of the version."
+      - datalake_listing_temp.house_listing.ts_listing_version_start
+    description: House listing publication date of the version.
   ts_last_de_publication:
     lineage:
-    - datalake_listing_temp.house_listing.ts_last_unpublished
-    description: "House listing last unpublished date."
+      - datalake_listing_temp.house_listing.ts_last_unpublished
+    description: House listing last unpublished date.
   rent:
     lineage:
-    - datalake_listing_temp.house_listing.rent
-    description: "House listing rent value in local currency."
+      - datalake_listing_temp.house_listing.rent
+    description: House listing rent value in local currency.
   house_rent:
     lineage:
-    - datalake_ebdb_listing.house.rent
-    description: "House latest rent value."
+      - datalake_ebdb_listing.house.rent
+    description: House latest rent value.
   house_neighborhood:
     lineage:
-    - datalake_ebdb_listing.house.neighborhood
-    description: "House listing nighborhood."
+      - datalake_ebdb_listing.house.neighborhood
+    description: House listing nighborhood.
   house_zipcode:
     lineage:
-    - datalake_ebdb_listing.house.zipcode
-    description: "House listing zipcode."
+      - datalake_ebdb_listing.house.zipcode
+    description: Postal code of the house address associated with this listing version.
   house_city:
     lineage:
-    - datalake_ebdb_listing.house.city
-    description: "House listing city."
+      - datalake_ebdb_listing.house.city
+    description: City where the house of this listing version is located.
   house_complement:
     lineage:
-    - datalake_ebdb_listing.house.complement
-    description: "House listing address complement."
+      - datalake_ebdb_listing.house.complement
+    description: House listing address complement.
   house_condo:
     lineage:
-    - datalake_ebdb_listing.house.condo
-    description: "House listing condo price in Brazilian Reais."
+      - datalake_ebdb_listing.house.condo
+    description: House listing condo price in Brazilian Reais.
   house_elevator:
     lineage:
-    - datalake_ebdb_listing.house.has_elevator
-    description: "Integer indicating if the house listing has elevator."
+      - datalake_ebdb_listing.house.has_elevator
+    description: Integer indicating if the house listing has elevator.
   house_address:
     lineage:
-    - datalake_ebdb_listing.house.address
-    description: "House listing address."
+      - datalake_ebdb_listing.house.address
+    description: Street address of the house associated with this listing version.
   house_iptu:
     lineage:
-    - datalake_ebdb_listing.house.iptu
-    description: "House listing IPTU (City Property Tax) price."
+      - datalake_ebdb_listing.house.iptu
+    description: House listing IPTU (City Property Tax) price.
   house_lat:
     lineage:
-    - datalake_ebdb_listing.house.lat
-    description: "House listing latitude."
+      - datalake_ebdb_listing.house.lat
+    description: Geographic latitude coordinate of the house for this listing version.
   house_lng:
     lineage:
-    - datalake_ebdb_listing.house.lng
-    description: "House listing longitude."
+      - datalake_ebdb_listing.house.lng
+    description: House listing longitude.
   is_house_furnished:
     lineage:
-    - datalake_ebdb_listing.house.is_furnished
-    description: "Boolean indicating if the house of this listing is furnished."
+      - datalake_ebdb_listing.house.is_furnished
+    description: Boolean indicating if the house of this listing is furnished.
   house_number:
     lineage:
-    - datalake_ebdb_listing.house.number
-    description: "House listing address street number."
+      - datalake_ebdb_listing.house.number
+    description: House listing address street number.
   house_bathrooms:
     lineage:
-    - datalake_ebdb_listing.house.bathrooms
-    description: "House listing number of bathrooms."
+      - datalake_ebdb_listing.house.bathrooms
+    description: House listing number of bathrooms.
   house_bedrooms:
     lineage:
-    - datalake_ebdb_listing.house.bedrooms
-    description: "House listing number of bedrooms."
+      - datalake_ebdb_listing.house.bedrooms
+    description: House listing number of bedrooms.
   house_suites:
     lineage:
-    - datalake_ebdb_listing.house.suites
-    description: "Number of bedrooms with bathroom (suites)."
+      - datalake_ebdb_listing.house.suites
+    description: Number of bedrooms with bathroom (suites).
   house_garages:
     lineage:
-    - datalake_ebdb_listing.house.parking_slots
-    description: "House listing number of car parking spots."
+      - datalake_ebdb_listing.house.parking_slots
+    description: House listing number of car parking spots.
   house_status:
     lineage:
-    - datalake_ebdb_listing.house.status
-    description: "Current house status."
+      - datalake_ebdb_listing.house.status
+    description: Current publication status of the underlying house entity in EBDB.
     categories:
-      aguardando_publicacao: "Waiting publication."
-      alugado: "Rented."
-      despublicado: "Unpublished. If this house is published again in up to 12 weeks, the
-        listing will have the same sk_house_listing. Otherwise, it will have a new sk_house_listing."
-      edicao: "Editing."
-      edicaoSemUsuario: "No user editing."
-      edicaoUsuarioNaoConfirmado: "Unconfirmed user editing."
-      excluido: "Excluded - when the house listing has been removed when it was in
-        the 'edicao' status (no photos)."
-      publicado: "Published."
-      suspenso: "Suspended."
+      aguardando_publicacao: Waiting publication.
+      alugado: Rented.
+      despublicado: Unpublished. If this house is published again in up to 12 weeks,
+        the listing will have the same sk_house_listing. Otherwise, it will have a
+        new sk_house_listing.
+      edicao: Editing.
+      edicaoSemUsuario: No user editing.
+      edicaoUsuarioNaoConfirmado: Unconfirmed user editing.
+      excluido: Excluded - when the house listing has been removed when it was in
+        the 'edicao' status (no photos).
+      publicado: Published.
+      suspenso: Suspended.
   house_type:
     lineage:
-    - datalake_ebdb_listing.house.type
-    description: "If it is an apartment, studio, house, or house in condominium."
+      - datalake_ebdb_listing.house.type
+    description: If it is an apartment, studio, house, or house in condominium.
     categories:
-      Apartamento: "Apartment."
-      Casa: "House."
-      CasaCondominio: "House in a residential condominuim."
-      StudioOuKitchenette: "Studio or kitchenette."
+      Apartamento: Apartment.
+      Casa: House.
+      CasaCondominio: House in a residential condominuim.
+      StudioOuKitchenette: Studio or kitchenette.
   house_entrance:
     lineage:
-    - datalake_ebdb_listing.house.doorman_type
-    description: "The entrance type (if has a doorman or not)."
+      - datalake_ebdb_listing.house.doorman_type
+    description: The entrance type (if has a doorman or not).
     categories:
-      Diurno: "Doorman present only during the day."
-      NaoHaPorteiro: "No doorman."
-      Noturno: "Doorman present only at night."
-      horas24: "Doorman present 24 hours a day."
+      Diurno: Doorman present only during the day.
+      NaoHaPorteiro: No doorman.
+      Noturno: Doorman present only at night.
+      horas24: Doorman present 24 hours a day.
   house_garage_type:
     lineage:
-    - datalake_ebdb_listing.house.parking_slot_type
-    description: "House listing type of garage (Opened, covered or both)."
+      - datalake_ebdb_listing.house.parking_slot_type
+    description: House listing type of garage (Opened, covered or both).
     categories:
-      Ambos: "Both covered and not covered car parking spots."
-      Cobertas: "Covered car parking."
-      NaoCobertas: "Not covered car parking."
+      Ambos: Both covered and not covered car parking spots.
+      Cobertas: Covered car parking.
+      NaoCobertas: Not covered car parking.
   administration_fee:
     lineage:
-    - datalake_listing_temp.house_listing_fees.administration_fee
-    description: "Fee of this listing's administration."
+      - datalake_listing_temp.house_listing_fees.administration_fee
+    description: Fee of this listing's administration.
   is_house_registration_verified:
     lineage:
-    - datalake_ebdb_listing.house.is_verified
-    description: "Boolean indicating if this house registration is verified."
+      - datalake_ebdb_listing.house.is_verified
+    description: Boolean indicating if this house registration is verified.
   house_total_value:
     lineage:
-    - datalake_ebdb_listing.house.total_value
-    description: "Total rental price (sum of rent, condo and IPTU) in local currency."
+      - datalake_ebdb_listing.house.total_value
+    description: Total rental price (sum of rent, condo and IPTU) in local currency.
   house_total_area:
     lineage:
-    - datalake_ebdb_listing.house.total_area
-    description: "Total area in squared meters."
+      - datalake_ebdb_listing.house.total_area
+    description: Total area in squared meters.
   house_construction_area:
     lineage:
-    - datalake_ebdb_listing.house.land_area
-    description: "House listing constructed area in squared meters."
+      - datalake_ebdb_listing.house.land_area
+    description: House listing constructed area in squared meters.
   house_condo_type:
     lineage:
-    - datalake_ebdb_listing.house.condo_type
-    description: "House listing condo value, regular or included in rent."
+      - datalake_ebdb_listing.house.condo_type
+    description: House listing condo value, regular or included in rent.
     categories:
-      IncluidoNoAluguel: "Condo fee is included in rent value."
-      NaoExiste: "There is no condo fee."
-      NaoInformado: "Condo fee has not been informed by owner."
-      Normal: "Standard case, where the condo fee is paid by tenant separately from
-        rent and other fees."
+      IncluidoNoAluguel: Condo fee is included in rent value.
+      NaoExiste: There is no condo fee.
+      NaoInformado: Condo fee has not been informed by owner.
+      Normal: Standard case, where the condo fee is paid by tenant separately from
+        rent and other fees.
   house_iptu_type:
     lineage:
-    - datalake_ebdb_listing.house.iptu_type
-    description: "House listing iptu value, regular or included in rent."
+      - datalake_ebdb_listing.house.iptu_type
+    description: House listing iptu value, regular or included in rent.
     categories:
-      IncluidoNoAluguel: "Included in the rent value."
-      NaoExiste: "Property not required to pay the IPTU tax."
-      NaoInformado: "The tax has not been informed by the owner."
-      Normal: "Standard case, where the tax is paid by tenant separately from rent
-        and other fees."
+      IncluidoNoAluguel: Included in the rent value.
+      NaoExiste: Property not required to pay the IPTU tax.
+      NaoInformado: The tax has not been informed by the owner.
+      Normal: Standard case, where the tax is paid by tenant separately from rent
+        and other fees.
   ts_house_create:
     lineage:
-    - datalake_ebdb_listing.house.dt_creation
-    description: "Date when house listing was created."
+      - datalake_ebdb_listing.house.dt_creation
+    description: Date when house listing was created.
   ts_house_update:
     lineage:
-    - datalake_ebdb_listing.house.ts_updated
-    description: "Date when house was last updated."
+      - datalake_ebdb_listing.house.ts_updated
+    description: Date when house was last updated.
   registration_abandoned_reason:
     lineage:
-    - datalake_ebdb_listing.house.registration_abandoned_reason
-    description: "Reason why the registration was abandoned."
+      - datalake_ebdb_listing.house.registration_abandoned_reason
+    description: Reason recorded when the owner abandoned the house registration before
+      publication.
     categories:
-      HOUSE_ALREADY_PUBLISHED: "House is already published."
-      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: "House price was out of bounds."
-      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: "House was a business real estate."
-      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: "House was out of apartment renting regions."
-      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: "House was out of house renting regions."
-      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: "House was out of house sale regions."
-      HOUSE_WAS_SOLD: "House was sold."
-      ISSUES_WITH_HOUSE_DOCUMENTATION: "Issues with house documentation."
-      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: "Owner considered administration fee too high."
-      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: "Owner considered brokerage fee too high."
-      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: "Owner didn't accept online process."
-      OWNER_DIDNT_ANSWER_PHONE: "Owner didn't answer phone."
-      OWNER_DIDNT_WANT_ADMINISTRATION: "Owner didn't want administration."
-      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: "Owner didn't want to list on Quinto Andar."
-      OWNER_DISAGREE_CHARGES_PAYMENTS: "Owner disagree with charges payment."
-      OWNER_GAVE_UP_RENTING: "Owner gave up renting."
-      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: "Owner had negative photographer experience."
-      OWNER_RENTED_EXTERNALLY: "Owner rented externally."
+      HOUSE_ALREADY_PUBLISHED: House is already published.
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: House price was out of bounds.
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: House was a business real estate.
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: House was out of apartment renting
+        regions.
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: House was out of house renting regions.
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: House was out of house sale regions.
+      HOUSE_WAS_SOLD: House was sold.
+      ISSUES_WITH_HOUSE_DOCUMENTATION: Issues with house documentation.
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: Owner considered administration
+        fee too high.
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: Owner considered brokerage fee too
+        high.
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: Owner didn't accept online process.
+      OWNER_DIDNT_ANSWER_PHONE: Owner didn't answer phone.
+      OWNER_DIDNT_WANT_ADMINISTRATION: Owner didn't want administration.
+      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: Owner didn't want to list on Quinto
+        Andar.
+      OWNER_DISAGREE_CHARGES_PAYMENTS: Owner disagree with charges payment.
+      OWNER_GAVE_UP_RENTING: Owner gave up renting.
+      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: Owner had negative photographer
+        experience.
+      OWNER_RENTED_EXTERNALLY: Owner rented externally.
   house_unpublished_reason:
     lineage:
-    - datalake_ebdb_listing.house.unpublished_reason
-    description: "House listing unpublishing reason (UNKNOWN_NULL_VALUE = null in EBDB
-      /  OTHER = does not fit to any pre-defined category)."
+      - datalake_ebdb_listing.house.unpublished_reason
+    description: House listing unpublishing reason (UNKNOWN_NULL_VALUE = null in EBDB
+      /  OTHER = does not fit to any pre-defined category).
     categories:
-      AUTO_CONTRACT_END_DEPUBLICATION: "AUTO_CONTRACT_END_DEPUBLICATION."
-      AUTO_OWNER_CONFIRMED_UNAVAILABILITY: "AUTO_OWNER_CONFIRMED_UNAVAILABILITY."
-      AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: "AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED."
-      DUPLICATED_HOUSE: "Duplicated house."
-      HOUSE_NOT_AVAILABLE: "House not available."
-      HOUSE_NOT_REACHABLE: "House not reachable."
-      OTHER: "Other."
-      OWNER_ALREADY_SOLD_HOUSE: "Owner already sold the house."
-      OWNER_CONSEQUENCES_MANAGEMENT: "Owner consequences management."
-      OWNER_DOESNT_AGREE: "Owner does't agree."
-      OWNER_GAVE_UP_RENTING: "Owner gave up renting."
-      OWNER_GAVE_UP_SALE: "Owner gave up sale."
-      OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: "A house is unpublished after the owner
-        doesn't answer 3 proposals within the deadline for responding/sending documents."
-      OWNER_OTHER: "Other reason presented by owner."
-      OWNER_RENTED_HOUSE: "Owner rented the house."
-      OWNER_RENTING_DIRECT_WITH_TENANT: "Owner is renting directly with tenant."
-      OWNER_RENTING_FOR_SHORT_PERIOD: "Owner is renting for short period."
-      OWNER_RENTING_WITH_OTHER_COMPANY: "Owner is renting with other company."
-      OWNER_REQUESTED_TERMINATION: "Owner requested termination."
-      OWNER_SELLING_HOUSE: "Owner is selling the house."
-      REMOVED_FROM_CONTEXT_BEFORE_PUBLISHING: "Removed from context before publishing."
-      UNKNOWN_NULL_VALUE: "Unknown or null value."
+      AUTO_CONTRACT_END_DEPUBLICATION: AUTO_CONTRACT_END_DEPUBLICATION.
+      AUTO_OWNER_CONFIRMED_UNAVAILABILITY: AUTO_OWNER_CONFIRMED_UNAVAILABILITY.
+      AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED.
+      DUPLICATED_HOUSE: Duplicated house.
+      HOUSE_NOT_AVAILABLE: House not available.
+      HOUSE_NOT_REACHABLE: House not reachable.
+      OTHER: Other.
+      OWNER_ALREADY_SOLD_HOUSE: Owner already sold the house.
+      OWNER_CONSEQUENCES_MANAGEMENT: Owner consequences management.
+      OWNER_DOESNT_AGREE: Owner does't agree.
+      OWNER_GAVE_UP_RENTING: Owner gave up renting.
+      OWNER_GAVE_UP_SALE: Owner gave up sale.
+      OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED: A house is unpublished after the owner
+        doesn't answer 3 proposals within the deadline for responding/sending documents.
+      OWNER_OTHER: Other reason presented by owner.
+      OWNER_RENTED_HOUSE: Owner rented the house.
+      OWNER_RENTING_DIRECT_WITH_TENANT: Owner is renting directly with tenant.
+      OWNER_RENTING_FOR_SHORT_PERIOD: Owner is renting for short period.
+      OWNER_RENTING_WITH_OTHER_COMPANY: Owner is renting with other company.
+      OWNER_REQUESTED_TERMINATION: Owner requested termination.
+      OWNER_SELLING_HOUSE: Owner is selling the house.
+      REMOVED_FROM_CONTEXT_BEFORE_PUBLISHING: Removed from context before publishing.
+      UNKNOWN_NULL_VALUE: Unknown or null value.
   partner_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.partner_3p_supply
-    description: "Third party partner in Rede QuintoAndar responsible for this supply."
+      - datalake_ebdb_listing.house.partner_3p_supply
+    description: Third party partner in Rede QuintoAndar responsible for this supply.
   partner_sale_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.partner_3p_supply
-    description: "Third party partner in Rede QuintoAndar responsible for this supply, in the context of ForSale."
+      - datalake_ebdb_listing.house.partner_3p_supply
+    description: Third party partner in Rede QuintoAndar responsible for this supply,
+      in the context of ForSale.
   partner_rent_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.partner_3p_supply
-    description: "Third party partner in Rede QuintoAndar responsible for this supply, in the context of ForRent."
+      - datalake_ebdb_listing.house.partner_3p_supply
+    description: Third party partner in Rede QuintoAndar responsible for this supply,
+      in the context of ForRent.
   listing_category_start:
     lineage:
-    - datalake_listing_temp.house_listing.listing_category
-    description: "Category that house listing started as."
+      - datalake_listing_temp.house_listing.listing_category
+    description: Category that house listing started as.
     categories:
-      First Listing: "The house is being listed for the first time."
-      Re-Listing: "Has had a previous listing."
-      Recovered: "Has had a previous listing and is being listed again after more than 84 days of being unpublished."
+      First Listing: The house is being listed for the first time.
+      Re-Listing: Has had a previous listing.
+      Recovered: Has had a previous listing and is being listed again after more than
+        84 days of being unpublished.
   is_last_version:
     lineage:
-    - datalake_listing_temp.house_listing.is_last_version
-    description: "Boolean indicating if this house listing is the last version."
+      - datalake_listing_temp.house_listing.is_last_version
+    description: Boolean indicating if this house listing is the last version.
   is_exclusive:
     lineage:
-    - datalake_listing_temp.house_listing.is_exclusive
-    description: "Boolean indicating if this house listing is exclusive with QuintoAndar."
+      - datalake_listing_temp.house_listing.is_exclusive
+    description: Boolean indicating if this house listing is exclusive with QuintoAndar.
   who_is_living:
     lineage:
-    - datalake_listing_temp.house_listing.who_is_living
-    description: "Who is living in this house listing."
+      - datalake_listing_temp.house_listing.who_is_living
+    description: Declared occupant profile of the house during the listing registration
+      process.
     categories:
-      Empty: "The house is empty."
-      None: "Unknown."
-      Owner: "Owner is living."
-      Tenant: "Tenant is living."
+      Empty: The house is empty.
+      None: Unknown.
+      Owner: Owner is living.
+      Tenant: Tenant is living.
   key_type:
     lineage:
-    - datalake_ebdb_listing.house.key_type
-    description: "What type of key is necessary to access the house."
+      - datalake_ebdb_listing.house.key_type
+    description: What type of key is necessary to access the house.
     categories:
-      Biometry: "Biometry."
-      Common: "Regular key."
-      None: "Unknown."
-      Password: "Password."
+      Biometry: Biometry.
+      Common: Regular key.
+      None: Unknown.
+      Password: Password.
   key_location:
     lineage:
-    - datalake_ebdb_listing.house.key_location
-    description: "Where the key is located."
+      - datalake_ebdb_listing.house.key_location
+    description: Where the key is located.
     categories:
-      LOCK_BOX: "There's a lock box"
-      FRONT_DOOR: "Front door"
-      PASSWORD: "Access through password"
-      BIOMETRY: "Access through biometry"
-      LOCKER: "Access through a locker"
-      OWNER: "The key is with the owner"
-      TENANT: "The key is with the tenant"
-      INSPECTOR: "The key is with the inspector"
-      PHOTOGRAPHER: "The key is with the photographer"
-      AGENT: "The key is with the agent"
-      EXTERNAL_RESPONSIBLE: "The key is with an external responsible"
-      PARTNER: "The key is with the partner"
+      LOCK_BOX: There's a lock box
+      FRONT_DOOR: Front door
+      PASSWORD: Access through password
+      BIOMETRY: Access through biometry
+      LOCKER: Access through a locker
+      OWNER: The key is with the owner
+      TENANT: The key is with the tenant
+      INSPECTOR: The key is with the inspector
+      PHOTOGRAPHER: The key is with the photographer
+      AGENT: The key is with the agent
+      EXTERNAL_RESPONSIBLE: The key is with an external responsible
+      PARTNER: The key is with the partner
   house_predicted_price:
     lineage:
-    - datalake_ebdb_listing.house.predicted_price
-    description: "House predicted rental price by the QuintoAndar price calculator,
-      in Brazilian Reais."
+      - datalake_ebdb_listing.house.predicted_price
+    description: House predicted rental price by the QuintoAndar price calculator,
+      in Brazilian Reais.
   is_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.is_3p_supply
-    description: "Boolean indicating if this is from Rede 3P supply."
+      - datalake_ebdb_listing.house.is_3p_supply
+    description: Boolean indicating if this is from Rede 3P supply.
   is_sale_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.is_sale_3p_supply
-    description: "Boolean indicating if this is from Rede 3P supply (For Sale)."
+      - datalake_ebdb_listing.house.is_sale_3p_supply
+    description: Boolean indicating if this is from Rede 3P supply (For Sale).
   is_rent_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.is_rent_3p_supply
-    description: "Boolean indicating if this is from Rede 3P supply (For Rent)."
+      - datalake_ebdb_listing.house.is_rent_3p_supply
+    description: Boolean indicating if this is from Rede 3P supply (For Rent).
   is_3p_supply_5a:
     lineage:
-    - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: "Boolean indicating if this is from Quinto Andar's Rede 3P supply."
+      - datalake_ebdb_listing.house.is_3p_supply_5a
+    description: Boolean indicating if this is from Quinto Andar's Rede 3P supply.
   is_3p_supply_bh:
     lineage:
-    - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: "Boolean indicating if this is from Casa Mineira's Rede 3P supply."
+      - datalake_ebdb_listing.house.is_3p_supply_bh
+    description: Boolean indicating if this is from Casa Mineira's Rede 3P supply.
   is_casa_mineira_migration:
     lineage:
-    - datalake_ebdb_listing.house.is_casa_mineira_migration
-    description: "Boolean indicating if this listing came from Casa Mineira's data
-      migration."
+      - datalake_ebdb_listing.house.is_casa_mineira_migration
+    description: Boolean indicating if this listing came from Casa Mineira's data
+      migration.
   is_sale_primary_market:
     lineage:
-    - datalake_ebdb_listing.house.is_sale_primary_market
-    description: "Boolean indicating if this is a sale primary market's house."
+      - datalake_ebdb_listing.house.is_sale_primary_market
+    description: Boolean indicating if this is a sale primary market's house.
   is_early_demand:
     lineage:
-    - datalake_listing_temp.house_listing.is_early_demand
-    description: "Boolean indicating if the listing is available for early demand,
-      that means it is available for visit/offer during contract termination."
+      - datalake_listing_temp.house_listing.is_early_demand
+    description: Boolean indicating if the listing is available for early demand,
+      that means it is available for visit/offer during contract termination.
   dt_last_exclusive_opted_in:
     lineage:
-    - datalake_listing_temp.house_listing.dt_last_exclusive_opted_in
-    description: "Last date when the listing opted in to be a QuintoAndar exclusive
-      listing."
+      - datalake_listing_temp.house_listing.dt_last_exclusive_opted_in
+    description: Last date when the listing opted in to be a QuintoAndar exclusive
+      listing.
   dt_last_exclusive_opted_out:
     lineage:
-    - datalake_listing_temp.house_listing.dt_last_exclusive_opted_out
-    description: "Last date when the listing opted out of being a QuintoAndar exclusive
-      listing."
+      - datalake_listing_temp.house_listing.dt_last_exclusive_opted_out
+    description: Last date when the listing opted out of being a QuintoAndar exclusive
+      listing.
   is_autonomous_agent:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_user
-    description: "Boolean indicating if there is an autonomous agent responsible."
+      - datalake_ebdb_clean.partner_agent.id_user
+    description: Boolean indicating if there is an autonomous agent responsible.
   sk_autonomous_agent:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_user
-    description: "Key of autonomous agent user described at datalake_ebdb_clean.partner_agent
-      table."
+      - datalake_ebdb_clean.partner_agent.id_user
+    description: Key of autonomous agent user described at datalake_ebdb_clean.partner_agent
+      table.
   is_originals_active:
     lineage:
-    - datalake_listing_temp.house_listing.is_originals_active
-    description: "Once the listing has been flagged as Originals, this boolean indicates
-      whether it is currently active."
+      - datalake_listing_temp.house_listing.is_originals_active
+    description: Once the listing has been flagged as Originals, this boolean indicates
+      whether it is currently active.
   last_originals_type:
     lineage:
-    - datalake_listing_temp.house_listing.last_originals_type
-    description: "Whether the listing is or was OriginalsReady, OriginalsReno or neither
-      of them (null)."
+      - datalake_listing_temp.house_listing.last_originals_type
+    description: Whether the listing is or was OriginalsReady, OriginalsReno or neither
+      of them (null).
     categories:
-      OriginalsReady: "OriginalsReady type."
-      OriginalsReno: "OriginalsReno type."
+      OriginalsReady: OriginalsReady type.
+      OriginalsReno: OriginalsReno type.
   dt_consultant_started:
     lineage:
-    - datalake_big_agent.house_rent_listing_consultant.dt_consultant_started
-    description: "Date when the consultant became responsible for this listing."
+      - datalake_big_agent.house_rent_listing_consultant.dt_consultant_started
+    description: Date when the consultant became responsible for this listing.
   dt_last_originals_opted_in:
     lineage:
-    - datalake_listing_temp.house_listing.dt_last_originals_opted_in
-    description: "Last optedin date of Special Condition OriginalsReady or OriginalsReno."
+      - datalake_listing_temp.house_listing.dt_last_originals_opted_in
+    description: Last optedin date of Special Condition OriginalsReady or OriginalsReno.
   dt_last_originals_opted_out:
     lineage:
-    - datalake_listing_temp.house_listing.dt_last_originals_opted_out
-    description: "Last optedout date of Special Condition OriginalsReady or OriginalsReno."
+      - datalake_listing_temp.house_listing.dt_last_originals_opted_out
+    description: Last optedout date of Special Condition OriginalsReady or OriginalsReno.
   is_iorent_active:
     lineage:
-    - datalake_listing_temp.house_listing.is_iorent_active
-    description: "Once the listing has been flagged as ioRent, this boolean indicates
-      whether it is currently active."
+      - datalake_listing_temp.house_listing.is_iorent_active
+    description: Once the listing has been flagged as ioRent, this boolean indicates
+      whether it is currently active.
   last_iorent_type:
     lineage:
-    - datalake_listing_temp.house_listing.last_iorent_type
-    description: "Whether the listing is or was IRent, ORent or neither of them (null)."
+      - datalake_listing_temp.house_listing.last_iorent_type
+    description: Whether the listing is or was IRent, ORent or neither of them (null).
     categories:
-      IRent: "IRent type."
-      ORent: "ORent type."
+      IRent: IRent type.
+      ORent: ORent type.
   dt_last_iorent_opted_in:
     lineage:
-    - datalake_listing_temp.house_listing.dt_last_iorent_opted_in
-    description: "Last optedin date of Special Condition IRent or ORent."
+      - datalake_listing_temp.house_listing.dt_last_iorent_opted_in
+    description: Last optedin date of Special Condition IRent or ORent.
   dt_last_iorent_opted_out:
     lineage:
-    - datalake_listing_temp.house_listing.dt_last_iorent_opted_out
-    description: "Last optedout date of Special Condition IRent or ORent."
+      - datalake_listing_temp.house_listing.dt_last_iorent_opted_out
+    description: Last optedout date of Special Condition IRent or ORent.
   ts_early_demand_started:
     lineage:
-    - datalake_listing_temp.house_listing.ts_early_demand_started
-    description: "Timestamp when this listing was first listed as early demand."
+      - datalake_listing_temp.house_listing.ts_early_demand_started
+    description: Timestamp when this listing was first listed as early demand.
   ts_consultant_deleted:
     lineage:
-    - datalake_big_agent.house_rent_listing_consultant.ts_consultant_deleted
-    description: "Timestamp when the consultant was deleted."
+      - datalake_big_agent.house_rent_listing_consultant.ts_consultant_deleted
+    description: Timestamp when the consultant was deleted.
   sale_price:
     lineage:
-    - datalake_ebdb_listing.house.sale_price
-    description: "The asked sale price for the house."
+      - datalake_ebdb_listing.house.sale_price
+    description: The asked sale price for the house.
   has_instant_offer_enabled:
     lineage:
-    - datalake_ebdb_listing.house.has_instant_offer_enabled
-    description: "Indicates if the instant offer is enabled on the house."
+      - datalake_ebdb_listing.house.has_instant_offer_enabled
+    description: Indicates if the instant offer is enabled on the house.
   ts_administrator_changed:
     lineage:
-    - datalake_ebdb_listing.rent_listing.ts_administrator_changed
-    description: "Timestamp when the house administrator changed (OWNER, QUINTOANDAR
-      or THIRD_PARTY)."
+      - datalake_ebdb_listing.rent_listing.ts_administrator_changed
+    description: Timestamp when the house administrator changed (OWNER, QUINTOANDAR
+      or THIRD_PARTY).
   b2b_prime_type:
-    description: "Case it's a b2b prime listing, it says whether it's standard, batch
-      or advanced negotiation."
+    description: Case it's a b2b prime listing, it says whether it's standard, batch
+      or advanced negotiation.
     categories:
-      advanced_negotiation: "Advanced negotiation."
-      batch: "Batch."
-      portability: "Portability."
-      standard: "Standard."
+      advanced_negotiation: Advanced negotiation.
+      batch: Batch.
+      portability: Portability.
+      standard: Standard.
   b2b_type:
-    description: "Case is_b2b columns is true, it says whether the listing is b2b prime
-      or online. If it's null, then the listing is from a inactive partner or it's not from b2b."
+    description: Case is_b2b columns is true, it says whether the listing is b2b prime
+      or online. If it's null, then the listing is from a inactive partner or it's
+      not from b2b.
     categories:
-      online: "Online type."
-      prime: "Prime type."
+      online: Online type.
+      prime: Prime type.
   has_visit_restriction:
-    description: "Boolean indicating if the house has visits restrictions related to its access."
+    description: Boolean indicating if the house has visits restrictions related to
+      its access.
   is_b2b:
-    description: "Boolean indicating if this house comes from a b2b partner and the
-      partner is active."
+    description: Boolean indicating if this house comes from a b2b partner and the
+      partner is active.
   is_for_rent:
-    description: "Boolean indicating if the listing is for rent."
+    description: Boolean indicating if the listing is for rent.
   is_for_sale:
-    description: "Boolean indicating if the listing is for sale."
+    description: Boolean indicating if the listing is for sale.
   rental_administrator:
-    description: "The rental administrator of the house within the listing period."
+    description: The rental administrator of the house within the listing period.
     categories:
-      OWNER: "Owner is the rental administrator, which means that the contract is brokerage-only."
-      QUINTOANDAR: "Default rental administrator, which is QuintoAndar."
-      THIRD_PARTY: "The rental administrator is a third party real estate agency."
+      OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar.
+      THIRD_PARTY: The rental administrator is a third party real estate agency.
   ts_load:
-    description: "Date when data was loaded."
+    description: Date when data was loaded.

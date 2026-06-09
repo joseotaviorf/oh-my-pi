@@ -1,18 +1,18 @@
 ---
 database_name: dw_sale
 table_name: dim_sale_price_segment
-owner: leonardo.soares@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
 description: Dimension table for ticket segmentation
 columns:
   sk_sale_price_segment:
     description: 'Surrogate key for ticket segmentation'
     lineage:
-    - datalake_sale_listings.sale_listing_price_changes.price_segment
+      - datalake_sale_listings.sale_listing_price_changes.price_segment
   price_segment:
     description: 'Ticket segmentation'
     lineage:
-    - datalake_sale_listings.sale_listing_price_changes.price_segment
+      - datalake_sale_listings.sale_listing_price_changes.price_segment
     categories:
       High Ticket: "If the listing is categorized as High Ticket, using the
         the rule sale_price bigger than BRL 1MM
@@ -22,7 +22,7 @@ columns:
   price_segment_short:
     description: 'Short ticket segmentation'
     lineage:
-    - datalake_sale_listings.sale_listing_price_changes.price_segment
+      - datalake_sale_listings.sale_listing_price_changes.price_segment
     categories:
       HT: High Ticket
       LT: Low Ticket

@@ -2,51 +2,73 @@ database_name: datalake_ebdb_clean
 table_name: special_condition_aud
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table for SpecialCondition. One row per change event (PK id_special_condition + rev). Tracks all historical
-  changes to special conditions per house. Sourced from specialcondition_aud in EBDB.
+description: Audit table for SpecialCondition. One row per change event (PK id_special_condition
+  + rev). Tracks all historical changes to special conditions per house. Sourced from
+  specialcondition_aud in EBDB.
 columns:
   id_special_condition:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.id
+    description: Primary key of the special condition record at this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   ts_opted_in:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.optedinat
+    description: Opt-in timestamp at this audit revision.
   ts_opted_out:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.optedoutat
+    description: Opt-out timestamp at this audit revision.
   special_condition_type:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.specialconditiontype
+    description: Special condition type at this audit revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.imovel_id
+    description: Foreign key to the house whose special condition changed in this
+      revision.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.expirationdate
+    description: Expiration timestamp at this audit revision.
   special_condition_status:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.specialconditionstatus
+    description: Special condition lifecycle status at this audit revision.
   mod_special_condition_status:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.specialconditionstatus_mod
+    description: Modification flag indicating whether special_condition_status changed
+      in this revision.
   mod_ts_opted_in:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.optedinat_mod
+    description: Modification flag indicating whether ts_opted_in changed in this
+      audit revision.
   mod_ts_opted_out:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.optedoutat_mod
+    description: Modification flag indicating whether ts_opted_out changed in this
+      audit revision.
   mod_ts_expired:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.expirationdate_mod
+    description: Modification flag indicating whether ts_expired changed in this audit
+      revision.
   id_partner:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.partner_id
+    description: Partner identifier at this audit revision.
   mod_partner:
     lineage:
       - datalake_ebdb_raw.specialcondition_aud.partner_mod
+    description: Modification flag indicating whether id_partner changed in this audit
+      revision.

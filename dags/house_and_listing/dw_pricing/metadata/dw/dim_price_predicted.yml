@@ -56,7 +56,7 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.business_context
-    description: Listing business context.
+    description: Commercial context of the listing that scopes this predicted price.
     categories:
       RENT: For rent.
       SALE: For sale.

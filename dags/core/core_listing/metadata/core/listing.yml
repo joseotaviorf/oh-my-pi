@@ -101,10 +101,11 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
-    description: Business context of the listing.
+    description: Commercial transaction line under which the listing operates on QuintoAndar,
+      distinguishing rental from sale listings.
     categories:
-      RENT: houses for rent.
-      SALE: houses for sale.
+      RENT: Listing configured for rental transactions.
+      SALE: Listing configured for sale transactions.
   is_extended_rental:
     lineage:
       - core_listing.aux__lbc_status_version_order.is_extended_rental

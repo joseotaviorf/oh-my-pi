@@ -6,40 +6,40 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smart price
+      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    description: Surrogate key of the smart price dimension. Joinable with dw_quintoandar.dim_smart_price.
   sk_house_listing:
     lineage:
-    - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.house_aud.id_house
     description: Key to identify house's listing in website
   sk_price_started_date:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: key to identify date when rent started
   sk_price_ended_date:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: key to identify date when rent ended
   is_smart_pricing_enabled:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
     description: is enabled signals if smart price is able to act as soon as the listing
       has status = published
   rent:
     lineage:
-    - datalake_ebdb_clean.house_aud.rent
+      - datalake_ebdb_clean.house_aud.rent
     description: Rental price of the listing at the time of this price change record.
   days_with_same_rent:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Number of days the house was in price
   ts_price_started:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Timestamp when rent started
   ts_price_ended:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Timestamp when rent ended
   price_change_reason:
     description: Reason that triggered this rental price change.

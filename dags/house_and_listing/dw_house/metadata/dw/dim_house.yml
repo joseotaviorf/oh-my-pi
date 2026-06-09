@@ -123,7 +123,7 @@ columns:
   lng:
     lineage:
       - datalake_ebdb_listing.house.lng
-    description: Longitude of the house.
+    description: Geographic longitude coordinate of the house location.
   neighborhood:
     lineage:
       - datalake_ebdb_listing.house.neighborhood
@@ -147,15 +147,15 @@ columns:
   registry:
     lineage:
       - datalake_ebdb_listing.house.registry
-    description: Registry of the house.
+    description: Property registry identification number associated with the house.
   sk_house:
     lineage:
       - datalake_ebdb_listing.house.id
-    description: Id of the house.
+    description: Surrogate key and primary key of this dimension table. One row per physical property in QuintoAndar.
   sk_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
-    description: Id of the region.
+    description: Surrogate key of the geographic region. Joinable with dw_public.dim_region.
   suites:
     lineage:
       - datalake_ebdb_listing.house.suites
@@ -185,7 +185,12 @@ columns:
   type:
     lineage:
       - datalake_ebdb_listing.house.type
-    description: Type of the house.
+    description: Physical property type classification used for search, pricing, and market segmentation.
+    categories:
+      Apartamento: Apartment unit within a multi-family building.
+      Casa: Standalone house not located in a gated condominium.
+      CasaCondominio: House located within a gated condominium or housing complex.
+      StudioOuKitchenette: Studio or kitchenette apartment, typically a single open space combining living and sleeping areas.
   zipcode:
     lineage:
       - datalake_ebdb_listing.house.zipcode

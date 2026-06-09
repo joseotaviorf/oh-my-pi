@@ -2,18 +2,24 @@ database_name: datalake_ebdb_clean
 table_name: house_guarantees_aud
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table for house guarantees. Tracks all historical changes to guarantee types associated with each house.
-  Sourced from imovel_garantias_aud in EBDB. Warning - the compound key (id_house + rev) is not unique.
+description: Audit table for house guarantees. Tracks all historical changes to guarantee
+  types associated with each house. Sourced from imovel_garantias_aud in EBDB. Warning
+  - the compound key (id_house + rev) is not unique.
 columns:
   id_house:
     lineage:
       - datalake_ebdb_raw.imovel_garantias_aud.imovel_id
+    description: Foreign key to the house whose guarantee configuration changed in
+      this revision.
   guarantee_type:
     lineage:
       - datalake_ebdb_raw.imovel_garantias_aud.garantias
+    description: Type of rental guarantee accepted for the house in this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.imovel_garantias_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.imovel_garantias_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.

@@ -2,18 +2,24 @@ database_name: datalake_ebdb_clean
 table_name: occupant_type
 owner: guilherme.rocha@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the OccupantType EBDB lookup table. One row per occupant type (PK id). Reference table listing
-  the types of occupants that can reside in a house.
+description: CDC mirror of the OccupantType EBDB lookup table. One row per occupant
+  type (PK id). Reference table listing the types of occupants that can reside in
+  a house.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.occupanttype.id
+    description: Primary key of the occupant type lookup record in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.occupanttype.atualizadoem
+    description: Timestamp when the occupant type record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.occupanttype.criadoem
+    description: Timestamp when the occupant type record was created.
   name:
     lineage:
       - datalake_ebdb_raw.occupanttype.name
+    description: Human-readable label for who occupies the house (owner, tenant, empty
+      or unknown).

@@ -6,11 +6,11 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smart price
+      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    description: Surrogate key of the smart price dimension. Joinable with dw_quintoandar.dim_smart_price.
   sk_house_listing:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.id_house_listing
+      - datalake_ebdb_smart_price.smart_price_versioning.id_house_listing
     description: Key to identify house's listing in website
   sk_user:
     lineage:
@@ -18,15 +18,15 @@ columns:
     description: ID of the user who made the change.
   sk_status_started_date:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
     description: key to identify date when status started
   sk_status_ended_date:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
     description: key to identify date when status ended
   status:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.status
+      - datalake_ebdb_smart_price.smart_price_versioning.status
     description: smart price status (ACTIVE / INACTIVE / PENDING (deprecated) - now
       PAUSED)
     categories:
@@ -36,7 +36,7 @@ columns:
       PENDING: Smart price is pending activation.
   operation_mode:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
     description: indicates from whom the initial rent value was taken
     categories:
       AUTO: Initial rent value was set automatically by the smart pricing model.
@@ -44,21 +44,21 @@ columns:
       MANUAL_INSIDE_SALES: Initial rent value was set manually by the inside sales team.
   is_enabled:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
     description: is enabled signals if smart price is able to act as soon as the listing
       has status = published
   days_in_status:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
     description: Number of days the house was in status
   ts_status_started:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
     description: timestamp of when status started
   ts_status_ended:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
     description: timestamp of when status ended
   status_change_reason:
     description: Reason for the smart pricing status change event.

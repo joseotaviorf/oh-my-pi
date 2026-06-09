@@ -2,81 +2,107 @@ database_name: datalake_ebdb_clean
 table_name: house_predicted_price_aud
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table for HousePredictedPrice. Tracks all historical changes to predicted prices per house. Sourced
-  from HousePredictedPrice_AUD in EBDB.
+description: Audit table for HousePredictedPrice. Tracks all historical changes to
+  predicted prices per house. Sourced from HousePredictedPrice_AUD in EBDB.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.id
+    description: Primary key of the predicted price record at this audit revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.houseId
+    description: Foreign key to the house whose predicted price changed in this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   business_context:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.businessContext
+    description: Business context of the predicted price at this audit revision.
   p_10:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p10
+    description: 10th percentile predicted price value at this audit revision.
   p_20:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p20
+    description: 20th percentile predicted price value at this audit revision.
   p_30:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p30
+    description: 30th percentile predicted price value at this audit revision.
   p_40:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p40
+    description: 40th percentile predicted price value at this audit revision.
   p_50:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p50
+    description: 50th percentile predicted price value at this audit revision.
   p_60:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p60
+    description: 60th percentile predicted price value at this audit revision.
   p_70:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p70
+    description: 70th percentile predicted price value at this audit revision.
   p_80:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p80
+    description: 80th percentile predicted price value at this audit revision.
   p_90:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p90
+    description: 90th percentile predicted price value at this audit revision.
   certainty:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.certainty
+    description: Pricing model certainty value at this audit revision.
   mod_p_10:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p10_MOD
+    description: Modification flag indicating whether p_10 changed in this audit revision.
   mod_p_20:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p20_MOD
+    description: Modification flag indicating whether p_20 changed in this audit revision.
   mod_p_30:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p30_MOD
+    description: Modification flag indicating whether p_30 changed in this audit revision.
   mod_p_40:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p40_MOD
+    description: Modification flag indicating whether p_40 changed in this audit revision.
   mod_p_50:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p50_MOD
+    description: Modification flag indicating whether p_50 changed in this audit revision.
   mod_p_60:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p60_MOD
+    description: Modification flag indicating whether p_60 changed in this audit revision.
   mod_p_70:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p70_MOD
+    description: Modification flag indicating whether p_70 changed in this audit revision.
   mod_p_80:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p80_MOD
+    description: Modification flag indicating whether p_80 changed in this audit revision.
   mod_p_90:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.p90_MOD
+    description: Modification flag indicating whether p_90 changed in this audit revision.
   mod_certainty:
     lineage:
       - datalake_ebdb_raw.housepredictedprice_aud.certainty_MOD
+    description: Modification flag indicating whether certainty changed in this audit
+      revision.

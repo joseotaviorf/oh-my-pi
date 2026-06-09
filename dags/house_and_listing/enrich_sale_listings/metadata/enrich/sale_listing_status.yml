@@ -1,9 +1,11 @@
 ---
 database_name: datalake_sale_listings
 table_name: sale_listing_status
-description: This table keeps track of every status change of For Sale listings.
-  Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any).
-  An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
+description: This table keeps track of every status change of For Sale listings. Therefore,
+  a listing can have multiple rows in this table, one for each status change, with
+  its start and end date (if any). An example would be the first row of a listing
+  where the first status is editing (pre-publication) and the second is published
+  (post-publication).
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -51,7 +53,8 @@ columns:
       - datalake_sale_listings.sale_status_version_order.status_closing_history
     description: The sale closing status of the sale listing at the time of the change.
     categories:
-      CCV_CANCELED: If the listing is in the process of sales cancellation during the change
+      CCV_CANCELED: If the listing is in the process of sales cancellation during
+        the change
       CCV_SIGNED: If the listing is in the process of being sold during the change
       SALE_COMPLETED: If the listing is already sold during the change
   status_change_reason:
@@ -61,7 +64,8 @@ columns:
   status_change_reason_detail:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_reason_detail
-    description: Detailed reason for the sale listing status change.
+    description: Additional detail text explaining the sale listing status change
+      beyond the primary reason.
   is_last_status:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new

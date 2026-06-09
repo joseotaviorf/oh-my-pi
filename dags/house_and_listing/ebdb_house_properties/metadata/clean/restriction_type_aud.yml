@@ -2,21 +2,26 @@ database_name: datalake_ebdb_clean
 table_name: restriction_type_aud
 owner: guilherme.rocha@quintoandar.com.br
 domain: House and Listing
-description: Audit table for RestrictionType. Tracks all historical changes to restriction type names (PK id_restriction_type + rev).
-  Sourced from restrictiontype_aud in EBDB.
+description: Audit table for RestrictionType. Tracks all historical changes to restriction
+  type names (PK id_restriction_type + rev). Sourced from restrictiontype_aud in EBDB.
 columns:
   id_restriction_type:
     lineage:
       - datalake_ebdb_raw.restrictiontype_aud.id
+    description: Primary key of the restriction type record at this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.restrictiontype_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.restrictiontype_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   name:
     lineage:
       - datalake_ebdb_raw.restrictiontype_aud.name
+    description: Restriction type name at this audit revision.
   mod_name:
     lineage:
       - datalake_ebdb_raw.restrictiontype_aud.name_mod
+    description: Modification flag indicating whether name changed in this audit revision.

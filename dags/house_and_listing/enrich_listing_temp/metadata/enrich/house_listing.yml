@@ -8,170 +8,172 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.country_code
-    description: "Country code."
+      - datalake_ebdb_listing.house_status_version_order.country_code
+    description: ISO country code of the market where this listing version operates.
   dt_contract_annulment:
     lineage:
-    - datalake_ebdb_contract.contract.dt_termination
-    description: "Date when the contract was terminated."
+      - datalake_ebdb_contract.contract.dt_termination
+    description: Date when the contract was terminated.
   dt_last_exclusive_opted_in:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    description: "Date when was the last time this listing had opted in to Exclusive."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+    description: Date when was the last time this listing had opted in to Exclusive.
   dt_last_exclusive_opted_out:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: "Date when was the last time this listing had opted out from
-      Exclusive."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+    description: Date when was the last time this listing had opted out from Exclusive.
   dt_last_iorent_opted_in:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    description: "Date when was the last time this listing had opted in to I/ORent
-      program (this program was deprecated in 2021 for new houses)."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+    description: Date when was the last time this listing had opted in to I/ORent
+      program (this program was deprecated in 2021 for new houses).
   dt_last_iorent_opted_out:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: "Date when was the last time this listing had opted out from
-      I/ORent program (this program was deprecated in 2021 for new houses)."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+    description: Date when was the last time this listing had opted out from I/ORent
+      program (this program was deprecated in 2021 for new houses).
   dt_last_originals_opted_in:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    description: "Date when was the last time this listing had opted in to Originals."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+    description: Date when was the last time this listing had opted in to Originals.
   dt_last_originals_opted_out:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: "Date when was the last time this listing had opted out from
-      Originals."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+    description: Date when was the last time this listing had opted out from Originals.
   dt_stranded:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.ts_status_started
-    - datalake_ebdb_listing.house_status_version_order.publication_version_date
-    description: "Date when this listing was stranded. A listing is considered stranded
-      after at least 8 week published and no contract signed."
+      - datalake_listing_temp.house_listing_status_house.ts_status_started
+      - datalake_ebdb_listing.house_status_version_order.publication_version_date
+    description: Date when this listing was stranded. A listing is considered stranded
+      after at least 8 week published and no contract signed.
   house_rental_administrator:
     lineage:
-    - datalake_ebdb_rental_administration.rental_administrator_change_history.rental_administrator
-    description: "Current house's rental administrator."
+      - datalake_ebdb_rental_administration.rental_administrator_change_history.rental_administrator
+    description: Current house's rental administrator.
     categories:
-      OWNER: "The owner is responsible for the rental administration (Brokerage Only)."
-      QUINTOANDAR: "QuintoAndar is responsible for the rental administration."
+      OWNER: The owner is responsible for the rental administration (Brokerage Only).
+      QUINTOANDAR: QuintoAndar is responsible for the rental administration.
   id_contract:
     lineage:
-    - datalake_ebdb_contract.contract.id
-    description: "Id of the contract."
+      - datalake_ebdb_contract.contract.id
+    description: Identifier of the active rental contract when the listing is in rented
+      status.
   id_house:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.id_house
-    description: "Id of the house."
+      - datalake_ebdb_listing.house_status_version_order.id_house
+    description: Identifier of the physical property backing this listing version.
   id_house_listing:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.id_house
-    - datalake_ebdb_listing.house_status_version_order.order_version
-    description: "Id of the house listing."
+      - datalake_ebdb_listing.house_status_version_order.id_house
+      - datalake_ebdb_listing.house_status_version_order.order_version
+    description: Surrogate identifier of the listing version in the listing_temp model.
   is_early_demand:
-    description: "Flag indicating if the listing is available for early demand, that
-      means it is available for visit/offer during contract termination."
+    description: Flag indicating if the listing is available for early demand, that
+      means it is available for visit/offer during contract termination.
   is_early_relisting:
-    description: "Flag indicating if the listing has passed by any early relisting
-      phase."
+    description: Flag indicating if the listing has passed by any early relisting
+      phase.
   is_exclusive:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    description: "Flag indicating if this is a Exclusive listing."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+    description: Flag indicating if this is a Exclusive listing.
   is_iorent_active:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: "Once the listing has been flagged as IORent, it says whether it is
-      current active."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+    description: Once the listing has been flagged as IORent, it says whether it is
+      current active.
   is_last_version:
-    description: "Flag indicating if this is the listing last version."
+    description: Flag indicating if this is the listing last version.
   is_originals_active:
     lineage:
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: "Once the listing has been flagged as Originals, it says whether it
-      is current active."
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+    description: Once the listing has been flagged as Originals, it says whether it
+      is current active.
   last_iorent_type:
     lineage:
-    - datalake_ebdb_clean.special_condition.special_condition_type
-    description: "Column indicating last type related to I/ORent program (this program
-      was deprecated in 2021 for new houses)."
+      - datalake_ebdb_clean.special_condition.special_condition_type
+    description: Column indicating last type related to I/ORent program (this program
+      was deprecated in 2021 for new houses).
     categories:
-      IRent: "Status related to I/ORent Program (this program was deprecated in 2021
-        for new houses)."
-      ORent: "Status related to I/ORent Program (this program was deprecated in 2021
-        for new houses)."
+      IRent: Status related to I/ORent Program (this program was deprecated in 2021
+        for new houses).
+      ORent: Status related to I/ORent Program (this program was deprecated in 2021
+        for new houses).
   last_originals_type:
     lineage:
-    - datalake_ebdb_clean.special_condition.special_condition_type
-    description: "Indicates the last Originals type of this listing."
+      - datalake_ebdb_clean.special_condition.special_condition_type
+    description: Indicates the last Originals type of this listing.
     categories:
-      OriginalsReady: "House is ready to be part of the Originals Program."
-      OriginalsReno: "House needs a remodeling to be part of the Originals Program."
+      OriginalsReady: House is ready to be part of the Originals Program.
+      OriginalsReno: House needs a remodeling to be part of the Originals Program.
   listing_category:
-    description: "Inform the relationship history of this house with the company."
+    description: Inform the relationship history of this house with the company.
     categories:
-      First Listing: "Is the first time this listing is being published on the platform."
-      Re-listing: "This house was listed before and is listed again after being rented."
-      Recovered: "This house was taken down from the platform and is being published
-        again."
+      First Listing: Is the first time this listing is being published on the platform.
+      Re-listing: This house was listed before and is listed again after being rented.
+      Recovered: This house was taken down from the platform and is being published
+        again.
   nr_renting:
     lineage:
-    - datalake_ebdb_contract.contract.id
-    description: "Number of rent contracts from this house."
+      - datalake_ebdb_contract.contract.id
+    description: Number of rent contracts from this house.
   order_renting:
-    description: "Is the position of this renting contract in this house's lifecycle."
+    description: Is the position of this renting contract in this house's lifecycle.
   rent:
     lineage:
-    - datalake_ebdb_clean.house_aud.rent
-    description: "Listing last rent price."
+      - datalake_ebdb_clean.house_aud.rent
+    description: Listing last rent price.
   rental_administrator:
     lineage:
-    - datalake_ebdb_rental_administration.rental_administrator_change_history.rental_administrator
-    description: "Listing's rental administrator."
+      - datalake_ebdb_rental_administration.rental_administrator_change_history.rental_administrator
+    description: Listing's rental administrator.
     categories:
-      OWNER: "The owner is responsible for the rental administration (Brokerage Only)."
-      QUINTOANDAR: "QuintoAndar is responsible for the rental administration."
+      OWNER: The owner is responsible for the rental administration (Brokerage Only).
+      QUINTOANDAR: QuintoAndar is responsible for the rental administration.
   status:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.status_history_new
-    description: "Listing status."
+      - datalake_ebdb_listing.house_status_version_order.status_history_new
+    description: Current operational status of the listing in the rental publication
+      workflow.
   ts_contract_signed:
     lineage:
-    - datalake_ebdb_contract.contract.ts_signed
-    description: "Timestamp when contract was signed."
+      - datalake_ebdb_contract.contract.ts_signed
+    description: Timestamp when contract was signed.
   ts_early_demand_started:
-    description: "Timestamp when the listing became early demand."
+    description: Timestamp when the listing became early demand.
   ts_entrance_started:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
-    description: "Timestamp when entrance started."
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
+    description: Timestamp when entrance started.
   ts_last_unpublished:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
-    description: "Timestamp when this listing was last unpublished."
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
+    description: Timestamp when this listing was last unpublished.
   ts_listing_version_end:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.ts_status_changed_next
-    description: "Timestamp when this listing version ended."
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_next
+    description: Timestamp when this listing version ended.
   ts_listing_version_start:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.publication_version_date
-    description: "Timestamp when this listing version started."
+      - datalake_ebdb_listing.house_status_version_order.publication_version_date
+    description: Timestamp when this listing version started.
   ts_next_contract_signed:
     lineage:
-    - datalake_ebdb_contract.contract.ts_signed
-    description: "Timestamp of when this house's next contract was signed."
+      - datalake_ebdb_contract.contract.ts_signed
+    description: Timestamp of when this house's next contract was signed.
   ts_rental_administrator_changed:
     lineage:
-    - datalake_ebdb_rental_administration.rental_administrator_change_history.ts_started
-    description: "Timestamp when the rental administrator has changed during the corresponding listing period."
+      - datalake_ebdb_rental_administration.rental_administrator_change_history.ts_started
+    description: Timestamp when the rental administrator has changed during the corresponding
+      listing period.
   version:
     lineage:
-    - datalake_ebdb_listing.house_status_version_order.order_version
-    description: "Listing version."
+      - datalake_ebdb_listing.house_status_version_order.order_version
+    description: Sequential version number assigned to this house listing lifecycle.
   who_is_living:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.occupant_type
-    description: "Who is living in the house."
+      - datalake_ebdb_listing.house_entrance_history.occupant_type
+    description: Declared occupant profile of the property at listing registration
+      time.

@@ -2,21 +2,27 @@ database_name: datalake_ebdb_clean
 table_name: house_maintenance_condition
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the HouseMaintenanceCondition EBDB table. One row per maintenance condition record (PK id).
-  Tracks the maintenance condition declared for each house. Sourced from the QuintoAndar operational database.
+description: CDC mirror of the HouseMaintenanceCondition EBDB table. One row per maintenance
+  condition record (PK id). Tracks the maintenance condition declared for each house.
+  Sourced from the QuintoAndar operational database.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition.id
+    description: Primary key of the maintenance condition record in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition.atualizadoem
+    description: Timestamp when the maintenance condition record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition.criadoem
+    description: Timestamp when the maintenance condition record was created.
   maintenance_condition:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition.maintenancecondition
+    description: Declared maintenance state or repair need for the property.
   id_house:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition.houseid
+    description: Foreign key to the house associated with this maintenance condition.

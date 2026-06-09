@@ -1,7 +1,8 @@
 ---
 database_name: datalake_listing_temp
 table_name: house_listing_status_house
-description: Information related to ForRent listings status. Each line represents a listing status change.
+description: Information related to ForRent listings status. Each line represents
+  a listing status change.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -9,31 +10,33 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.id_house
       - datalake_ebdb_listing.house_status_version_order.order_version
-    description: Id of the house listing.
+    description: Identifier of the listing version whose status change is recorded
+      in this row.
   id_house:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.id_house
-    description: Id of the house.
+    description: Identifier of the physical property whose listing status changed.
   id_region:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.id_region
-    description: Id of the region.
+    description: Identifier of the geographic region where the listing house is located.
   country_code:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.country_code
-    description: Country code.
+    description: ISO country code of the market where this listing status event occurred.
   version:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.order_version
-    description: Listing version.
+    description: Listing version number active when this status transition was recorded.
   status_history:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.status_history_new
-    description: Listing status.
+    description: Listing status before the transition captured in this history row.
   status_change_reason:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.reason
-    description: Listing status change reason.
+    description: Business reason explaining why the listing status changed in this
+      event.
   is_last_status_of_day:
     description: If this line is the last status of the current day.
   ts_first_publication:

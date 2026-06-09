@@ -2,21 +2,28 @@ database_name: datalake_ebdb_clean
 table_name: house_maintenance_condition_aud
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table for HouseMaintenanceCondition. Tracks all historical changes to maintenance conditions per house.
-  Sourced from HouseMaintenanceCondition_AUD in EBDB.
+description: Audit table for HouseMaintenanceCondition. Tracks all historical changes
+  to maintenance conditions per house. Sourced from HouseMaintenanceCondition_AUD
+  in EBDB.
 columns:
   id_house_maintenance_condition:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition_aud.id
+    description: Primary key of the maintenance condition record at this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   maintenance_condition:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition_aud.maintenancecondition
+    description: Maintenance condition value recorded at this audit revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.housemaintenancecondition_aud.houseid
+    description: Foreign key to the house whose maintenance condition changed in this
+      revision.

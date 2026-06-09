@@ -8,35 +8,35 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   sk_sale_listing:
     lineage:
-    - datalake_sale_listings.sale_listing.id_sale_listing
+      - datalake_sale_listings.sale_listing.id_sale_listing
     description: Identification of the listing version, which may be in edition (version
       0) or already published (version 1).
   sk_house:
     lineage:
-    - datalake_sale_listings.sale_listing.id_house
+      - datalake_sale_listings.sale_listing.id_house
     description: Foreign key referring to the house ID. Can be joined with dw_house.dim_house
       and all other sale modeling tables.
   sk_owner:
     lineage:
-    - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.house.id_user
     description: Foreign key referring to the seller user ID. Can be joined with dw_public.dim_user
   sk_company_hubspot:
     lineage:
-    - datalake_ebdb_listing.house.id_company_hubspot
+      - datalake_ebdb_listing.house.id_company_hubspot
     description: Foreign key referring to the company ID on Hubspot. Can be joined with dw_quintoandar.dim_company and all other sale modeling tables.
   sk_user_consultant:
     lineage:
-    - datalake_big_agent.house_sale_listing_consultant.id_user
+      - datalake_big_agent.house_sale_listing_consultant.id_user
     description: Foreign key referring to the consultant user ID. Consultant we are referring to the CIQ (Consultor Imobiliário QuintoAndar), which is responsible for capturing
       the owner and registering the property in QuintoAndar's platform. Can be joined with dw_public.dim_user to retrieve CIQ information.
   sk_region:
     lineage:
-    - datalake_ebdb_clean.house.id_region
+      - datalake_ebdb_clean.house.id_region
     description: Foreign key of region where house listing is located in. Can be joined
       with dw_public.dim_region.
   sk_company:
     lineage:
-    - datalake_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Foreign key of the company associated with the event. Can be joined with
       dw_rede.dim_company.
   sk_broker:
@@ -46,116 +46,116 @@ columns:
       is_sale_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
   price:
     lineage:
-    - datalake_ebdb_clean.house.sale_price
+      - datalake_ebdb_clean.house.sale_price
     description: Current selling price in listing publication.
-  price_m2: 
+  price_m2:
     description: The price per square meter of listing. That is, the current selling price divided by the total area of the property.
   sk_first_publication_date:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_publication
+      - datalake_sale_listings.sale_listing.ts_first_publication
     description: Foreing key referring to the date of the first publication in the Sale context of this listing. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_last_publication_date:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_last_publication
+      - datalake_sale_listings.sale_listing.ts_last_publication
     description: Foreign key referring to the last date that the listing in question was published in Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_first_depublication_date:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_depublication
+      - datalake_sale_listings.sale_listing.ts_first_depublication
     description: Date of first depublication in the Sale context. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_last_depublication_date:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_last_depublication
+      - datalake_sale_listings.sale_listing.ts_last_depublication
     description: Date of last depublication in the Sale context. Can be joined with dw_public.dim_date to retrieve in date format.
-  sk_first_visit_completed: 
+  sk_first_visit_completed:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.ts_first_visit_completed
+      - datalake_sale_listing_demand.sale_listing_demand.ts_first_visit_completed
     description: Date of the first visit completed by the listing in the context of Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_first_offer_submitted_date:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.ts_first_offer_submitted
+      - datalake_sale_listing_demand.sale_listing_demand.ts_first_offer_submitted
     description: Date of the first offer received by the listing in the context of Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_first_offer_accepted:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.dt_first_offer_accepted
+      - datalake_sale_listing_demand.sale_listing_demand.dt_first_offer_accepted
     description: Date of the first offer accepted by the listing in the context of Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   days_last_publication_to_depublication:
     lineage:
-    - datalake_sale_listings.sale_listing.days_last_publication_to_depublication
-    description: Listings that were previously published and are currently published, we calculate the difference in days between the two dates. 
+      - datalake_sale_listings.sale_listing.days_last_publication_to_depublication
+    description: Listings that were previously published and are currently published, we calculate the difference in days between the two dates.
       Difference of days between the last publication date and the current unpublishing of the listing.
   days_first_publication_to_first_depublication:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_first_depublication
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_depublication
     description: Difference of days between the first publication and the first unpublishing
       of the listing, in the context of Sale.
   days_first_publication_to_last_depublication:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_last_depublication
+      - datalake_sale_listings.sale_listing.days_first_publication_to_last_depublication
     description: Difference of days between the first publication and the last depublication
       of the listing, in the context of Sale.
   days_first_publication_to_first_sale_flow:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_sale_flow
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_sale_flow
     description: Difference of days between the first publication and listing first sale flow.
   days_first_publication_to_first_booking:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_booking
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_booking
     description: Number of days between the first publication and listing first booking in Sale.
   days_first_publication_to_visit_completed:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_visit_completed
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_visit_completed
     description: Number of days between the first publication and listing first visit completed in Sale.
   days_first_publication_to_first_offer_submitted:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_submitted
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_submitted
     description: Number of days between the listing's first publication and the first offer submission.
   days_first_publication_to_first_offer_accepted:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_accepted
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_accepted
     description: Number of days between the first publication and listing first offer accepted in Sale.
   days_first_publication_to_first_sale_agreement_signed:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_sale_agreement_signed
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_sale_agreement_signed
     description: Number of days between the first publication and listing first CCV in Sale.
   days_first_publication_to_house_registry_ended:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_house_registry_ended
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_house_registry_ended
     description: Number of days between the listing's first publication and the end of the house registry process.
   days_first_booking_to_first_visit_completed:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_booking_to_first_visit_completed
-    description: Number of days between the first booking and the first completed visit.
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_booking_to_first_visit_completed
+    description: Number of days from the listing's first scheduled visit booking until the first visit that was actually completed.
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_visit_completed_to_first_offer_submitted
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_visit_completed_to_first_offer_submitted
     description: Number of days between the first completed visit and the first offer submission.
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_submitted_to_first_offer_accepted
-    description: Number of days between the first submitted offer and the first accepted offer.
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_submitted_to_first_offer_accepted
+    description: Number of days from the listing's first submitted sale offer until the first offer accepted by the seller.
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_accepted_to_first_sale_agreement_signed
-    description: Number of days between the first accepted offer and the first signed sale agreement.
+      - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_accepted_to_first_sale_agreement_signed
+    description: Number of days from the listing's first accepted offer until the first signed sale agreement (CCV).
   total_depublications:
     lineage:
-    - datalake_sale_listings.sale_listing.unpublications
+      - datalake_sale_listings.sale_listing.unpublications
     description: Number of times that listings was unpublished.
   total_listings_visit_completed:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.total_listings_visit_completed
+      - datalake_sale_listing_demand.sale_listing_demand.total_listings_visit_completed
     description: Quantity of completed visits generated by listing.
   total_listings_offer_submited:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.total_listings_offer_submited
+      - datalake_sale_listing_demand.sale_listing_demand.total_listings_offer_submited
     description: Quantity of submitted offers generated by listing.
   total_listings_offer_accepted:
     lineage:
-    - datalake_sale_listing_demand.sale_listing_demand.total_listings_offer_accepted
+      - datalake_sale_listing_demand.sale_listing_demand.total_listings_offer_accepted
     description: Quantity of accepted offers generated by listing.
   days_as_published:
     lineage:
-    - datalake_sale_listings.sale_listing.days_as_published
+      - datalake_sale_listings.sale_listing.days_as_published
     description: Number of days the property was published in the context of Sale. With published, we say that it is visible on the QuintoAndar platform.
   ts_load:
     description: Timestamp when the data was processed.

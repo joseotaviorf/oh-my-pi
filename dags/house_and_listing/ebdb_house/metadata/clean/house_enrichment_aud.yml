@@ -3,50 +3,75 @@ database_name: datalake_ebdb_clean
 table_name: house_enrichment_aud
 owner: gustavo.miller@quintoandar.com.br
 domain: House and Listing
-description: Audit table of house_enrichment.
+description: Audit table for HouseEnrichment. One row per change event (PK id + rev).
+  Tracks all historical revisions of house enrichment requests processed by the Vespúcio
+  service, including status, Dejavu job identifiers, event triggers and model versions.
+  Sourced from houseenrichment_aud in EBDB.
 columns:
   id:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.id
+      - datalake_ebdb_raw.houseenrichment_aud.id
+    description: Primary key of the house enrichment record at this audit revision.
   id_house:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.house_id
+      - datalake_ebdb_raw.houseenrichment_aud.house_id
+    description: Foreign key to the house whose enrichment configuration changed in
+      this revision.
   id_dejavu:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id
+      - datalake_ebdb_raw.houseenrichment_aud.dejavu_id
+    description: Dejavu job identifier captured in this enrichment audit revision.
   status:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.status
+      - datalake_ebdb_raw.houseenrichment_aud.status
+    description: Enrichment processing status at the time of this audit revision.
   event_trigger:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.event_trigger
+      - datalake_ebdb_raw.houseenrichment_aud.event_trigger
+    description: Business event that triggered the enrichment change in this revision.
   version_id_dejavu:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_version
+      - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_version
+    description: Dejavu model version applied when this audit revision was recorded.
   rev:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.rev
+      - datalake_ebdb_raw.houseenrichment_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.REVTYPE
+      - datalake_ebdb_raw.houseenrichment_aud.REVTYPE
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   mod_id_house:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.house_id_MOD
+      - datalake_ebdb_raw.houseenrichment_aud.house_id_MOD
+    description: Modification flag indicating whether id_house changed in this audit
+      revision.
   mod_id_dejavu:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_MOD
+      - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_MOD
+    description: Modification flag indicating whether id_dejavu changed in this audit
+      revision.
   mod_status:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.status_MOD
+      - datalake_ebdb_raw.houseenrichment_aud.status_MOD
+    description: Modification flag indicating whether status changed in this audit
+      revision.
   mod_event_trigger:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.event_trigger_MOD
+      - datalake_ebdb_raw.houseenrichment_aud.event_trigger_MOD
+    description: Modification flag indicating whether event_trigger changed in this
+      audit revision.
   mod_version_id_dejavu:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_version_MOD
+      - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_version_MOD
+    description: Modification flag indicating whether version_id_dejavu changed in
+      this audit revision.
   ts_created:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.created_at
+      - datalake_ebdb_raw.houseenrichment_aud.created_at
+    description: Timestamp when the enrichment record was created in the source system.
   ts_updated:
     lineage:
-    - datalake_ebdb_raw.houseenrichment_aud.updated_at
+      - datalake_ebdb_raw.houseenrichment_aud.updated_at
+    description: Timestamp when the enrichment record was last updated in the source
+      system.

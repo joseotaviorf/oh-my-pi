@@ -542,7 +542,7 @@ columns:
   sk_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
-    description: Key of house listing.
+    description: Surrogate key of the rent listing dimension, one row per listing version.
   short_id_house:
     lineage:
       - datalake_ebdb_listing.house.id
@@ -550,19 +550,7 @@ columns:
   status:
     lineage:
       - datalake_ebdb_listing.house_listing.status
-    description: House listing status.
-    categories:
-      aguardando_publicacao: Waiting publication
-      alugado: Rented
-      despublicado:
-        Unpublished. If this house is published again in up to 12 weeks, the
-        listing will have the same sk_house_listing. Otherwise, it will have a new sk_house_listing.
-      edicao: Editing
-      edicaoSemUsuario: No user editing
-      edicaoUsuarioNaoConfirmado: Unconfirmed user editing
-      excluido: Deleted
-      publicado: Published
-      suspenso: Suspended
+    description: Current publication lifecycle status of the rent listing (e.g., published, suspended).
   status_reason:
     lineage:
       - datalake_ebdb_listing.house_listing.status_reason

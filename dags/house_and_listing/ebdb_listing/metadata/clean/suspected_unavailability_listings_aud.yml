@@ -1,6 +1,8 @@
 database_name: datalake_ebdb_clean
 table_name: suspected_unavailability_listings_aud
-description: Audit table for all HSM submissions of sanitization of ongoing listings. This HSM consists in sending a message via Whatsapp to listings potentially unavailable for the visit in ForSale. Each row is a different send .
+description: Audit table for all HSM submissions of sanitization of ongoing listings.
+  This HSM consists in sending a message via Whatsapp to listings potentially unavailable
+  for the visit in ForSale. Each row is a different send .
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -23,7 +25,7 @@ columns:
   rev_type:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.REVTYPE
-    description: Revision type
+    description: Type of Envers revision operation (insert, update or delete) on the HSM send record.
   contact_attempts:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.contact_attempts
@@ -31,7 +33,8 @@ columns:
   is_confirmed:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.listing_confirmed
-    description: Boolean indicating whether the owner has responded that the listing is still active and available for sale.
+    description: Boolean indicating whether the owner has responded that the listing
+      is still active and available for sale.
   mod_id_listing_business_context:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.id_listing_business_context_MOD
@@ -55,7 +58,8 @@ columns:
   ts_last_contact_attempt:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.last_contact_attempt_at
-    description: Timestamp o f the last time that Whatsapp has sent a message to the listing owner.
+    description: Timestamp o f the last time that Whatsapp has sent a message to the
+      listing owner.
   ts_created:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.created_at
@@ -72,7 +76,8 @@ columns:
   ts_cdc_transaction:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.ts_cdc_transaction
-    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
   ts_database_transaction:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing_AUD.ts_database_transaction

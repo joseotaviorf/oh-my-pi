@@ -2,13 +2,15 @@ database_name: datalake_ebdb_clean
 table_name: restriction_type
 owner: guilherme.rocha@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the RestrictionType EBDB lookup table. One row per restriction type (PK id). Reference table
-  listing the types of visit or access restrictions applicable to a house.
+description: CDC mirror of the RestrictionType EBDB lookup table. One row per restriction
+  type (PK id). Reference table listing the types of visit or access restrictions
+  applicable to a house.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.restrictiontype.id
-    description: Id of the restriction type.
+    description: Primary key of the visit or access restriction type in the EBDB lookup
+      table.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.restrictiontype.atualizadoem
@@ -20,4 +22,22 @@ columns:
   name:
     lineage:
       - datalake_ebdb_raw.restrictiontype.name
-    description: Name of the restriction type.
+    description: Human-readable label describing the visit or access restriction rule.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

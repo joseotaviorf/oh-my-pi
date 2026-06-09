@@ -2,48 +2,69 @@ database_name: datalake_ebdb_clean
 table_name: house_registration_status_aud
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table for HouseRegistrationStatus. Tracks all historical changes to registration statuses per house.
-  Sourced from HouseRegistrationStatus_AUD in EBDB.
+description: Audit table for HouseRegistrationStatus. Tracks all historical changes
+  to registration statuses per house. Sourced from HouseRegistrationStatus_AUD in
+  EBDB.
 columns:
   id_house_registration_status:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.id
+    description: Primary key of the registration status record at this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   photo_shoot_schedule_reason:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.photoshootschedulingreason
+    description: Photo shoot scheduling reason at this audit revision.
   mod_photo_shoot_schedule_reason:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.photoshootschedulingreason_mod
+    description: Modification flag indicating whether photo_shoot_schedule_reason
+      changed in this revision.
   registration_abandoned_reason:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.registrationabandonedreason
+    description: Registration abandoned reason at this audit revision.
   mod_registration_abandoned_reason:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.registrationabandonedreason_mod
+    description: Modification flag indicating whether registration_abandoned_reason
+      changed in this revision.
   status:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.status
+    description: Registration workflow status at this audit revision.
   mod_status:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.status_mod
+    description: Modification flag indicating whether status changed in this audit
+      revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.house_id
+    description: Foreign key to the house whose registration status changed in this
+      revision.
   id_photo_shoot:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.photoshoot_id
+    description: Photo shoot identifier at this audit revision.
   mod_photo_shoot:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.photoshoot_mod
+    description: Modification flag indicating whether id_photo_shoot changed in this
+      audit revision.
   id_assignee:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.assignee_id
+    description: Assignee user identifier at this audit revision.
   mod_assignee:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus_aud.assignee_mod
+    description: Modification flag indicating whether id_assignee changed in this
+      audit revision.

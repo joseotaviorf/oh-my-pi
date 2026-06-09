@@ -7,93 +7,95 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
-    - datalake_listing_temp.house_listing.id_house_listing
-    description: Key of house listing.
+      - datalake_listing_temp.house_listing.id_house_listing
+    description: Surrogate key of the listing version associated with this publication
+      fact row.
   sk_owner:
     lineage:
-    - datalake_ebdb_listing.house.id_user
+      - datalake_ebdb_listing.house.id_user
     description: Key of user who's the house owner/responsible, the key can be the
       partner's user.
   sk_region:
     lineage:
-    - datalake_ebdb_listing.house.id_region
+      - datalake_ebdb_listing.house.id_region
     description: Key of region where house listing is located in.
   sk_user_registration:
     lineage:
-    - datalake_ebdb_listing.house.id_user_registrant
+      - datalake_ebdb_listing.house.id_user_registrant
     description: Key of user who created the house listing.
   sk_contract:
     lineage:
-    - datalake_ebdb_clean.contract.id
+      - datalake_ebdb_clean.contract.id
     description: Key of rental contract for house listing.
   sk_condo:
     lineage:
-    - datalake_ebdb_clean.condo.id
+      - datalake_ebdb_clean.condo.id
     description: Key of condominum building where house listing is located.
   sk_user_partner_agent:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_user
+      - datalake_ebdb_clean.partner_agent.id_user
     description: If house listing was added by a partner, key of user who's the partner's
       agent. So if this key and sk_owner are equal, then the sk_owner is actually
       from the partner.
   sk_partner:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_partner
+      - datalake_ebdb_clean.partner_agent.id_partner
     description: If house listing was added by a partner, key of partner.
   sk_autonomous_agent:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_user
+      - datalake_ebdb_clean.partner_agent.id_user
     description: Key of autonomous agent user described at datalake_ebdb_clean.partner_agent
       table.
   sk_user_consultant:
     lineage:
-    - datalake_big_agent.house_rent_listing_consultant.id_user
-    description: User key of consultant.
+      - datalake_big_agent.house_rent_listing_consultant.id_user
+    description: Surrogate key of the consultant user responsible for this listing
+      publication.
   sk_stranded_date:
     lineage:
-    - datalake_listing_temp.house_listing.dt_stranded
+      - datalake_listing_temp.house_listing.dt_stranded
     description: Key of listing stranded date. A listing is considered stranded after
       at least 8 week published and no contract signed.
   country_code:
-    lineage: 
-    - datalake_ebdb_listing.house.country_code
-    description: Country code of the listing.
+    lineage:
+      - datalake_ebdb_listing.house.country_code
+    description: ISO country code of the market where this listing was published.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   days_listing_to_contract_signed:
     lineage:
-    - datalake_ebdb_clean.contract.ts_signed
-    - datalake_listing_temp.house_listing.ts_listing_version_start
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_listing_temp.house_listing.ts_listing_version_start
     description: Number of days between the listing's publication and the signature
       of a rental contract for the listing.
   days_listing_to_depublication:
     lineage:
-    - datalake_listing_temp.house_listing.ts_last_unpublished
-    - datalake_listing_temp.house_listing.ts_listing_version_start
+      - datalake_listing_temp.house_listing.ts_last_unpublished
+      - datalake_listing_temp.house_listing.ts_listing_version_start
     description: Number of days between the listing's publication and the depublication
       of the listing.
   days_ended_rental_to_relisting:
     lineage:
-    - datalake_ebdb_clean.contract.dt_termination
-    - datalake_listing_temp.house_listing.ts_listing_version_start
+      - datalake_ebdb_clean.contract.dt_termination
+      - datalake_listing_temp.house_listing.ts_listing_version_start
     description: Number of days between the end of the rental contract for the listing.
       and the relisting
   days_relisting_to_re_rental:
     lineage:
-    - datalake_ebdb_clean.contract.ts_signed
-    - datalake_listing_temp.house_listing.ts_listing_version_end
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_listing_temp.house_listing.ts_listing_version_end
     description: Number of days between the relisting and a new rental contract for
       the listing.
   days_ended_rental_to_re_rented:
     lineage:
-    - datalake_ebdb_clean.contract.ts_signed
-    - datalake_ebdb_clean.contract.dt_termination
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_clean.contract.dt_termination
     description: Number of days between the end of the rental contract and a new rental.
       contract for the listing
   nr_renting:
     lineage:
-    - datalake_ebdb_clean.contract.id
+      - datalake_ebdb_clean.contract.id
     description: Number of different rental contracts that have been signed for the
       house, including the current contract if exists.
   order_renting:

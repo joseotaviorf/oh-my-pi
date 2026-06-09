@@ -2,36 +2,47 @@ database_name: datalake_ebdb_clean
 table_name: special_condition
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the SpecialCondition EBDB table. One row per special condition record (PK id). Tracks special
-  commercial conditions (e.g., partner agreements, opt-in/out periods) applied to each house.
+description: CDC mirror of the SpecialCondition EBDB table. One row per special condition
+  record (PK id). Tracks special commercial conditions (e.g., partner agreements,
+  opt-in/out periods) applied to each house.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.specialcondition.id
+    description: Primary key of the special condition record in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.specialcondition.atualizadoem
+    description: Timestamp when the special condition record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.specialcondition.criadoem
+    description: Timestamp when the special condition record was created.
   ts_opted_in:
     lineage:
       - datalake_ebdb_raw.specialcondition.optedinat
+    description: Timestamp when the house owner opted into the special condition.
   ts_opted_out:
     lineage:
       - datalake_ebdb_raw.specialcondition.optedoutat
+    description: Timestamp when the house owner opted out of the special condition.
   id_house:
     lineage:
       - datalake_ebdb_raw.specialcondition.imovel_id
+    description: Foreign key to the house subject to this commercial special condition.
   special_condition_type:
     lineage:
       - datalake_ebdb_raw.specialcondition.specialconditiontype
+    description: Commercial program or promotional condition type applied to the house.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.specialcondition.expirationdate
+    description: Expiration timestamp of the special condition agreement.
   special_condition_status:
     lineage:
       - datalake_ebdb_raw.specialcondition.specialconditionstatus
+    description: Lifecycle status of the special condition on this house.
   id_partner:
     lineage:
       - datalake_ebdb_raw.specialcondition.partner_id
+    description: Partner company identifier associated with this special condition.

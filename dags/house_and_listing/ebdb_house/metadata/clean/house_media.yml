@@ -2,24 +2,32 @@ database_name: datalake_ebdb_clean
 table_name: house_media
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the HouseMedia EBDB table. One row per media asset (PK id). Contains photos, videos and other
-  media items associated with each house. Multiple media items can exist per house.
+description: CDC mirror of the HouseMedia EBDB table. One row per media asset (PK
+  id). Contains photos, videos and other media items associated with each house. Multiple
+  media items can exist per house.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.housemedia.id
+    description: Primary key of the media asset record in EBDB.
   id_house:
     lineage:
       - datalake_ebdb_raw.housemedia.house_id
+    description: Foreign key to the house that owns this photo, video or other media
+      item.
   type:
     lineage:
       - datalake_ebdb_raw.housemedia.type
+    description: Media category such as photo, video or floor plan.
   url:
     lineage:
       - datalake_ebdb_raw.housemedia.url
+    description: Storage URL or CDN path of the media file.
   ts_created:
     lineage:
       - datalake_ebdb_raw.housemedia.created_on
+    description: Timestamp when the media asset was created in the source system.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.housemedia.updated_on
+    description: Timestamp when the media asset was last updated in the source system.

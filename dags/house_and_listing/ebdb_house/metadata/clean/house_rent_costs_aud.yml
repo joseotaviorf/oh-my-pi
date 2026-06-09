@@ -3,33 +3,44 @@ database_name: datalake_ebdb_clean
 table_name: house_rent_costs_aud
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table for HouseRentCosts. Tracks all historical changes to rental costs and price trends per house.
-  Sourced from HouseRentCosts_AUD in EBDB.
+description: Audit table for HouseRentCosts. Tracks all historical changes to rental
+  costs and price trends per house. Sourced from HouseRentCosts_AUD in EBDB.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.id
+    description: Primary key of the house rent costs record at this audit revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.house_id
+    description: Foreign key to the house whose rental costs changed in this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.rev
+    description: Revision number from the Hibernate Envers audit entity.
   rev_type:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.revtype
+    description: Type of Envers revision operation (insert, update or delete) for this change event.
   price_trend:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.pricetrend
+    description: Market price trend indicator computed for the rental listing at this
+      revision.
   mod_price_trend:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.pricetrend_mod
+    description: Modification flag indicating whether price_trend changed in this
+      audit revision.
   ts_created:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.criadoem
-  ts_last_price_udpated:
+    description: Timestamp when the rent costs record was created.
+  ts_last_price_updated:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.lastpriceupdate
+    description: Timestamp of the most recent rental price update for this house.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.houserentcosts_aud.atualizadoem
+    description: Timestamp when the rent costs record was last updated.

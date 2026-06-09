@@ -38,6 +38,11 @@ with open(f"{Path(__file__).parent}/skip_list.yml") as f:
 
 SKIP_LIST_PATH_REGEX = re.compile(r"(?:.*/)?dags/(?P<path>.*)")
 
+# Injected at runtime by ``load_cdc_clean`` (see dags/cross/base/spark_jobs/load_cdc_clean.py).
+CDC_CLEAN_INJECTED_COLUMNS = frozenset(
+    {"op_cdc", "ts_cdc_transaction", "ts_database_transaction"}
+)
+
 metadata_file_service = MetadataFileService()
 
 
@@ -270,6 +275,31 @@ def get_metadata_path_from_sql(sql_path: str) -> str:
         return yml_path  # Return default even if doesn't exist
 
 
+def _declaration_path_from_sql(sql_path: str) -> Path | None:
+    """Resolve ``*_declaration.yml`` for a query under ``dags/<domain>/<dag>/queries/``."""
+    normalized = sql_path.replace("\\", "/")
+    match = re.match(r"^(dags/[^/]+/[^/]+)/queries/", normalized)
+    if not match:
+        return None
+    dag_dir = Path(match.group(1))
+    declarations = sorted(dag_dir.glob("*_declaration.yml"))
+    return declarations[0] if declarations else None
+
+
+def cdc_injected_columns_for_sql(sql_path: str) -> Set[str]:
+    """Columns appended to clean-layer SELECT by ``load_cdc_clean`` for CDC workflows."""
+    if "/queries/clean/" not in sql_path.replace("\\", "/"):
+        return set()
+    declaration_path = _declaration_path_from_sql(sql_path)
+    if declaration_path is None or not declaration_path.is_file():
+        return set()
+    with open(declaration_path) as f:
+        declaration = yaml.safe_load(f) or {}
+    if declaration.get("workflow", {}).get("type") == "cdc":
+        return set(CDC_CLEAN_INJECTED_COLUMNS)
+    return set()
+
+
 def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
     """
     Validates that a metadata file is consistent with its SQL query.
@@ -327,7 +357,9 @@ def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
             )
 
         # Check for columns in metadata but not in SQL
-        missing_in_sql = metadata_columns - sql_columns
+        missing_in_sql = (
+            metadata_columns - sql_columns - cdc_injected_columns_for_sql(sql_path)
+        )
         if missing_in_sql:
             result["valid"] = False
             result["error_type"] = "consistency"

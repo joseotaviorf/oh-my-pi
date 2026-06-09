@@ -2,33 +2,43 @@ database_name: datalake_ebdb_clean
 table_name: house_registration_status
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the HouseRegistrationStatus EBDB table. One row per registration status record (PK id).
-  Tracks the registration workflow status for each house, including photo shoot scheduling and assignee.
+description: CDC mirror of the HouseRegistrationStatus EBDB table. One row per registration
+  status record (PK id). Tracks the registration workflow status for each house, including
+  photo shoot scheduling and assignee.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.id
+    description: Primary key of the house registration status record in EBDB.
   id_house:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.house_id
+    description: Foreign key to the house tracked in the registration workflow.
   photo_shoot_schedule_reason:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.photoshootschedulingreason
+    description: Reason recorded when scheduling a photo shoot during house registration.
   registration_abandoned_reason:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.registrationabandonedreason
+    description: Reason why the owner abandoned the house registration flow.
   status:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.status
+    description: Current step in the house registration workflow.
   id_photo_shoot:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.photoshoot_id
+    description: Foreign key to the photo shoot session linked to this registration.
   id_assignee:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.assignee_id
+    description: User identifier of the consultant or agent assigned to this registration.
   ts_created:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.criadoem
+    description: Timestamp when the registration status record was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.houseregistrationstatus.atualizadoem
+    description: Timestamp when the registration status record was last updated.

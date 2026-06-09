@@ -7,37 +7,38 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.id_house_listing
+      - datalake_listing_temp.house_listing_status_house.id_house_listing
     description: Key of house listing. For house listing version rules, click here
       https://docs.google.com/presentation/d/1u4-p1tdzN5TRVfgtreH9thOfNr9O9pDrglah-XMUloQ/edit#slide=id.g41939e4bd1_0_115.
   sk_region:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.id_region
+      - datalake_listing_temp.house_listing_status_house.id_region
     description: Key of region where house listing is located in.
   sk_first_publication_date:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.ts_first_publication
+      - datalake_listing_temp.house_listing_status_house.ts_first_publication
     description: Date when house listing was first published.
   sk_status_start_date:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.ts_status_started
+      - datalake_listing_temp.house_listing_status_house.ts_status_started
     description: Date when status started.
   sk_status_end_date:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.ts_status_ended
+      - datalake_listing_temp.house_listing_status_house.ts_status_ended
     description: Date when status ended. If it is equal to -1, it means the status
       is still current.
   country_code:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.country_code
-    description: Country code of the listing.
+      - datalake_listing_temp.house_listing_status_house.country_code
+    description: ISO country code indicating where the listing operates (Brazil or
+      Mexico).
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   status_history:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.status_history
-    description: Status of house listing.
+      - datalake_listing_temp.house_listing_status_house.status_history
+    description: Listing status value at the start of this status-change event.
     categories:
       aguardando_publicacao: Waiting publication
       alugado: Rented
@@ -50,18 +51,19 @@ columns:
       suspenso: Suspended
   status_change_reason:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.status_change_reason
+      - datalake_listing_temp.house_listing_status_house.status_change_reason
     description: Reason why status changed.
   is_last_status_of_day:
-    description: Boolean indicating if the status is the last one of the day for this listing.
+    description: Boolean indicating if the status is the last one of the day for this
+      listing.
   ts_load:
     description: Timestamp when the data was loaded.
   ts_status_start:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.ts_status_started
+      - datalake_listing_temp.house_listing_status_house.ts_status_started
     description: Timestamp of when status started.
   ts_status_end:
     lineage:
-    - datalake_listing_temp.house_listing_status_house.ts_status_ended
+      - datalake_listing_temp.house_listing_status_house.ts_status_ended
     description: Timestamp of when status ended. If it is equal NULL, it means the
       status is still current.

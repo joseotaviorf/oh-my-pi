@@ -57,7 +57,7 @@ columns:
   entry_model_type:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.entry_model_type
-    description: Type of entry model.
+    description: Classification of how visitors access the property.
     categories:
       ASSISTED_ENTRANCE: When a third person is needed to enter.
       EASY_ENTRANCE: When no third person is needed to enter.
@@ -90,7 +90,15 @@ columns:
   event_type:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.event_type
-    description: Type of event.
+    description: Category of the entrance configuration change captured in this history row.
+    categories:
+      ENTRY_ACCESS_CREATED: New entry access configuration recorded in the unified entry model.
+      ENTRY_ACCESS_UPDATED: Existing entry access configuration was updated.
+      ENTRY_ACCESS_VALIDATED: Entry access configuration was validated.
+      KEY_HOLDER_ALLOCATED: A key holder (e.g. agent) was assigned to the property; keys not yet delivered.
+      KEY_HOLDER_VALIDATED: Keys were delivered to the assigned key holder.
+      KEY_HOLDER_DEALLOCATED: Key holder was deallocated; keys returned or agent access ended.
+      KEY_HOLDER_UPDATED: Key holder details were updated without a full allocation lifecycle change.
   mod_authorization:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.mod_authorization

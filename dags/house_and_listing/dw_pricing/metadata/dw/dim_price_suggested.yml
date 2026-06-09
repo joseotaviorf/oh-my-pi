@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
   business_context:
-    description: Business context for which the price was suggested.
+    description: Commercial context of the listing for which the price was suggested.
     categories:
       RENT: Rental property context.
       SALE: Sale property context.

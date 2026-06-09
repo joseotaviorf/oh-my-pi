@@ -2,21 +2,27 @@ database_name: datalake_ebdb_clean
 table_name: house_rating
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the HouseRating EBDB table. One row per rating record (PK id). Contains quality ratings assigned
-  to houses during the registration process.
+description: CDC mirror of the HouseRating EBDB table. One row per rating record (PK
+  id). Contains quality ratings assigned to houses during the registration process.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.houserating.id
+    description: Primary key of the house rating record in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.houserating.atualizadoem
+    description: Timestamp when the rating record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.houserating.criadoem
+    description: Timestamp when the rating record was created.
   complementary_info:
     lineage:
       - datalake_ebdb_raw.houserating.complementaryinfo
+    description: Free-text notes supporting the quality rating decision during registration.
   rating:
     lineage:
       - datalake_ebdb_raw.houserating.rating
+    description: Quality score assigned to the house during the registration review
+      process.

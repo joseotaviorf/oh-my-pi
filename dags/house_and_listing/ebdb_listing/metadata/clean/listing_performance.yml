@@ -1,7 +1,8 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: listing_performance
-description: Table related to the Performance & Score project, which brings information about the Demand Score, created by the OwnerXP team.
+description: Table related to the Performance & Score project, which brings information
+  about the Demand Score, created by the OwnerXP team.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -12,7 +13,8 @@ columns:
   id_listing_business_context:
     lineage:
       - datalake_ebdb_raw.ListingPerformance.listing_business_context_id
-    description: ID of the listing in a specific business context. It can be joined with listing_business_context.
+    description: ID of the listing in a specific business context. It can be joined
+      with listing_business_context.
   traffic_count:
     lineage:
       - datalake_ebdb_raw.ListingPerformance.traffic_count
@@ -88,7 +90,8 @@ columns:
   score_type:
     lineage:
       - datalake_ebdb_raw.ListingPerformance.score_type
-    description: Type of the score.
+    description: Scoring dimension measured in this performance snapshot, such as
+      demand score.
     categories:
       DEMAND_SCORE: The score is calculated according to demand metrics.
   ts_created:
@@ -111,7 +114,8 @@ columns:
   ts_cdc_transaction:
     lineage:
       - datalake_ebdb_raw.ListingPerformance.ts_cdc_transaction
-    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
   ts_database_transaction:
     lineage:
       - datalake_ebdb_raw.ListingPerformance.ts_database_transaction

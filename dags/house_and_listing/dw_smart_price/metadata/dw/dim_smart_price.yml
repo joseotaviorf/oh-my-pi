@@ -6,20 +6,20 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smart price
+      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    description: Surrogate key of the smart price dimension.
   id_smart_price:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smart price
+      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+    description: Natural key of the smart pricing configuration in the source system.
   is_enabled:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
     description: is enabled signals if smart price is able to act as soon as the listing
       has status = published
   operation_mode:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
     description: indicates from whom the initial rent value was taken
     categories:
       AUTO: Initial rent value was set automatically by the smart pricing model.
@@ -27,7 +27,7 @@ columns:
       MANUAL_INSIDE_SALES: Initial rent value was set manually by the inside sales team.
   status:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house_aud.status
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.status
     description: last smart price status in the smart price flow
     categories:
       ACTIVE: Smart price is active and applying price changes to the listing.
@@ -36,7 +36,7 @@ columns:
       PENDING: Smart price is pending activation.
   house_last_status:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house.status
+      - datalake_ebdb_clean.dynamic_pricing_house.status
     description: Last known operational status of the house at the time of smart price calculation.
     categories:
       ACTIVE: Smart price is active and applying price changes to the listing.
@@ -45,41 +45,41 @@ columns:
       PENDING: Smart price is pending activation.
   house_min_rent:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house.min_rent
+      - datalake_ebdb_clean.dynamic_pricing_house.min_rent
     description: Minimum rent price boundary used in the smart pricing model for this house.
   house_max_rent:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_house.initial_rent
+      - datalake_ebdb_clean.dynamic_pricing_house.initial_rent
     description: Maximum rent price boundary used in the smart pricing model for this house.
   min_rent_percentile:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_parameters.min_rent_percentile
+      - datalake_ebdb_clean.dynamic_pricing_parameters.min_rent_percentile
     description: minimum percentile from calculator predicted range
   max_rent_percentile:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_parameters.initial_rent_percentile
+      - datalake_ebdb_clean.dynamic_pricing_parameters.initial_rent_percentile
     description: maximum percentile from calculator predicted range
   offers_threshold:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_parameters.offers_threshold
+      - datalake_ebdb_clean.dynamic_pricing_parameters.offers_threshold
     description: number of offers to avoid price drop
   days_threshold:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_parameters.days_threshold
+      - datalake_ebdb_clean.dynamic_pricing_parameters.days_threshold
     description: number of days between visit and the price drop
   visits_days_threshold:
     lineage:
-    - datalake_ebdb_clean.dynamic_pricing_parameters.visits_days_threshold
+      - datalake_ebdb_clean.dynamic_pricing_parameters.visits_days_threshold
     description: number of visits to avoid price drop
   ts_first_activation:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.status
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+      - datalake_ebdb_smart_price.smart_price_versioning.status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
     description: first smart price activation timestamp
   ts_last_deactivation:
     lineage:
-    - datalake_ebdb_smart_price.smart_price_versioning.status
-    - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+      - datalake_ebdb_smart_price.smart_price_versioning.status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
     description: Last smart price deactivation date
   ts_load:
     description: Timestamp when this smart price record was loaded into the data warehouse.

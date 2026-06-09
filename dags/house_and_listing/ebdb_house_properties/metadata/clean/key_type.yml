@@ -2,18 +2,23 @@ database_name: datalake_ebdb_clean
 table_name: key_type
 owner: guilherme.rocha@quintoandar.com.br
 domain: House and Listing
-description: CDC mirror of the KeyType EBDB lookup table. One row per key type (PK id). Reference table listing the types
-  of keys associated with a house.
+description: CDC mirror of the KeyType EBDB lookup table. One row per key type (PK
+  id). Reference table listing the types of keys associated with a house.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.keytype.id
+    description: Primary key of the key type lookup record in EBDB.
   name:
     lineage:
       - datalake_ebdb_raw.keytype.name
+    description: Human-readable label describing how visitors access the property
+      (e.g. password, biometry).
   ts_updated:
     lineage:
       - datalake_ebdb_raw.keytype.atualizadoem
+    description: Timestamp when the key type record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.keytype.criadoem
+    description: Timestamp when the key type record was created.

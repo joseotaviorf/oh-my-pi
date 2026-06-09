@@ -1,9 +1,12 @@
 ---
 database_name: datalake_sale_ongoing_listings
 table_name: ongoing_listings_daily_info
-description: Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED" at that day, no matter
-  for how long, it will appear here, along with some metrics such as search, listing page viewed, visit booked, and other demand data.
-  DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE 15, 2025. Data before this date was obtained through the fact table, whose code is not the same.
+description: Every row of this table is a snapshot of one sale ongoing listing per
+  day. If it had the status="PUBLISHED" at that day, no matter for how long, it will
+  appear here, along with some metrics such as search, listing page viewed, visit
+  booked, and other demand data. DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE
+  15, 2025. Data before this date was obtained through the fact table, whose code
+  is not the same.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -13,7 +16,7 @@ columns:
       - datalake_ebdb_clean.listing_business_context_aud.id_house
       - datalake_quintoandar.aux_date.id_date
   id_snapshot_date:
-    description:  Date ID (%Y%m%d format) of the snapshot.
+    description: Date ID (%Y%m%d format) of the snapshot.
     lineage:
       - datalake_quintoandar.aux_date.id_date
   id_sale_listing:
@@ -21,7 +24,8 @@ columns:
     lineage:
       - datalake_sale_listings.sale_listing.id_sale_listing
   id_house:
-    description: Identifier of the house being tracked as an ongoing sale listing on this day.
+    description: Identifier of the house being tracked as an ongoing sale listing
+      on this day.
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.id_house
   id_region:
@@ -29,7 +33,8 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id_region
   sk_company:
-    description: Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
+    description: Key of the company in Rede QuintoAndar associated with the house.
+      Can be joined with dw_rede.dim_company.
     lineage:
       - datalake_company.company_sks.sk_company
   id_suggestion_change:
@@ -41,39 +46,48 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_price_change.price
   calculator_min_price:
-    description: Minimum price estimated by the calculator output. May also be referred as 'p_10'.
+    description: Minimum price estimated by the calculator output. May also be referred
+      as 'p_10'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
   calculator_p20_price:
-    description: Estimated price related to the 20% percentile of the calculator's output. May also be referred as 'p_20'.
+    description: Estimated price related to the 20% percentile of the calculator's
+      output. May also be referred as 'p_20'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p20_price
   calculator_p30_price:
-    description: Estimated price related to the 30% percentile of the calculator's output. May also be referred as 'p_30'.
+    description: Estimated price related to the 30% percentile of the calculator's
+      output. May also be referred as 'p_30'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p30_price
   calculator_p40_price:
-    description: Estimated price related to the 40% percentile of the calculator's output. May also be referred as 'p_40'.
+    description: Estimated price related to the 40% percentile of the calculator's
+      output. May also be referred as 'p_40'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p40_price
   calculator_price:
-    description: Most likely price for the listing estimated by the calculator output. May also be referred as 'p_50'.
+    description: Most likely price for the listing estimated by the calculator output.
+      May also be referred as 'p_50'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_price
   calculator_p60_price:
-    description: Estimated price related to the 60% percentile of the calculator's output. May also be referred as 'p_60'.
+    description: Estimated price related to the 60% percentile of the calculator's
+      output. May also be referred as 'p_60'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p60_price
   calculator_p70_price:
-    description: Estimated price related to the 70% percentile of the calculator's output. May also be referred as 'p_70'.
+    description: Estimated price related to the 70% percentile of the calculator's
+      output. May also be referred as 'p_70'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p70_price
   calculator_p80_price:
-    description: Estimated price related to the 80% percentile of the calculator's output. May also be referred as 'p_80'.
+    description: Estimated price related to the 80% percentile of the calculator's
+      output. May also be referred as 'p_80'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p80_price
   calculator_max_price:
-    description: Maximum price estimated by the calculator output. May also be referred as 'p_90'.
+    description: Maximum price estimated by the calculator output. May also be referred
+      as 'p_90'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
   lower_bound_limit:
@@ -93,11 +107,13 @@ columns:
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.upper_bound_limit
   suggestion_certainty:
-    description: Level of certainty or confidence associated with the pricing suggestion from the pricing model.
+    description: Level of certainty or confidence associated with the pricing suggestion
+      from the pricing model.
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
   qt_search_results_page_viewed:
-    description: Amount of times the house was shown in the search results in that day.
+    description: Amount of times the house was shown in the search results in that
+      day.
   qt_listing_page_viewed:
     description: Amount of times the listing page was viewed in that day.
   qt_favorites:
@@ -115,7 +131,8 @@ columns:
   qt_sale_agreements_signed:
     description: Amount of sale agreements signed in that day.
   days_published:
-    description: Number of days the listing has been published. It starts counting from the day of publication.
+    description: Number of days the listing has been published. It starts counting
+      from the day of publication.
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.ts_last_publication
       - datalake_quintoandar.aux_date.date
@@ -128,14 +145,17 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.ts_last_publication
   year:
-    description: Year of the snapshot.
+    description: Calendar year of the daily snapshot partition for this ongoing listing
+      row.
     lineage:
       - datalake_quintoandar.aux_date.year
   month:
-    description: Month of the snapshot.
+    description: Calendar month of the daily snapshot partition for this ongoing listing
+      row.
     lineage:
       - datalake_quintoandar.aux_date.month
   day:
-    description: Day of the snapshot.
+    description: Calendar day of the daily snapshot partition for this ongoing listing
+      row.
     lineage:
       - datalake_quintoandar.aux_date.day
