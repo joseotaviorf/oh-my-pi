@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: sale_comission_for_strategic_region
+domain: Agents
