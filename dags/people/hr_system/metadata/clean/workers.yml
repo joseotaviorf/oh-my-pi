@@ -73,18 +73,10 @@ columns:
     description: All data related to addresses of workers
     lineage:
     - datalake_hr_system_raw.workers.addresses
-  citizenships:
-    description: Citizenship information and nationality details for the worker
-    lineage:
-    - datalake_hr_system_raw.workers.citizenships
   disabilities:
     description: Disability information and accessibility requirements for the worker
     lineage:
     - datalake_hr_system_raw.workers.disabilities
-  driver_licenses:
-    description: All data related to driver licenses of workers
-    lineage:
-    - datalake_hr_system_raw.workers.driverLicenses
   emails:
     description: All data related to emails of workers
     lineage:
@@ -101,54 +93,22 @@ columns:
     description: All legislative information of the worker
     lineage:
     - datalake_hr_system_raw.workers.legislativeInfo
-  messages:
-    description: System messages and notifications related to the worker record
-    lineage:
-    - datalake_hr_system_raw.workers.messages
-  names:
-    description: All information on names of the worker
-    lineage:
-    - datalake_hr_system_raw.workers.names
   national_identifiers:
     description: Information about national documents of the worker
     lineage:
     - datalake_hr_system_raw.workers.nationalIdentifiers
-  other_communication_accounts:
-    description: All communication accounts of the worker, except emails and phones
-    lineage:
-    - datalake_hr_system_raw.workers.otherCommunicationAccounts
-  passports:
-    description: All information on passports of the worker
-    lineage:
-    - datalake_hr_system_raw.workers.passports
   phones:
     description: All data related to phones of the workers
     lineage:
     - datalake_hr_system_raw.workers.phones
-  photos:
-    description: Link of the photo of the worker
-    lineage:
-    - datalake_hr_system_raw.workers.photos
   religions:
     description: All data related to religions of the worker
     lineage:
     - datalake_hr_system_raw.workers.religions
-  visas_permits:
-    description: Visa and permits of the worker
-    lineage:
-    - datalake_hr_system_raw.workers.visasPermits
   work_relationships:
-    description: All information on work relationships of the worker
+    description: Work relationships and assignments of the worker
     lineage:
     - datalake_hr_system_raw.workers.workRelationships
-  workers_dff:
-    description: Flexible data fields of the worker
-    lineage:
-    - datalake_hr_system_raw.workers.workersDFF
-  workers_eff:
-    description: Flexible effective data fields of the worker
-    lineage:
-    - datalake_hr_system_raw.workers.workersEFF
   dt_effective:
     description: Column description to be added.
     lineage:

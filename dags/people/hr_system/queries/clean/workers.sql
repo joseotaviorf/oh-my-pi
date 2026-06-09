@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   PersonId AS id_person,
   PersonNumber AS person_number,
   ApplicantNumber AS applicant_number,
@@ -16,30 +16,20 @@ SELECT
   FullName AS fullname,
   ListName AS list_name,
   addresses AS addresses,
-  citizenships AS citizenships,
   disabilities AS disabilities,
-  driverLicenses AS driver_licenses,
   emails AS emails,
   ethnicities AS ethnicities,
   externalIdentifiers AS external_identifiers,
   legislativeInfo AS legislative_info,
-  messages AS messages,
-  names AS names,
   nationalIdentifiers AS national_identifiers,
-  otherCommunicationAccounts AS other_communication_accounts,
-  passports AS passports,
   phones AS phones,
-  photos AS photos,
   religions AS religions,
-  visasPermits AS visas_permits,
   workRelationships AS work_relationships,
-  workersDFF AS workers_dff,
-  workersEFF AS workers_eff,
   dt_effective,
   to_date(DateOfBirth, 'yyyy-MM-dd') AS dt_birth,
   to_date(DateOfDeath, 'yyyy-MM-dd') AS dt_death,
   to_timestamp(substr(replace(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
   to_timestamp(substr(replace(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
   ts_load
-FROM 
+FROM
   datalake_hr_system_raw.workers
