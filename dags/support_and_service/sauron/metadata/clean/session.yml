@@ -1,66 +1,133 @@
 database_name: datalake_sauron_clean
 table_name: session
+description: |
+  Clean table with session records from Sauron, QuintoAndar's internal
+  human interaction orchestration service that manages customer support sessions.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_sauron_raw.session.id
+    description: |
+      Session identifier for the Sauron service, for the Customer Support context.
+  public_id:
+    lineage:
+      - datalake_sauron_raw.session.public_id
+    description: |
+      New session identifier for the Sauron service, using Support Session service format.
   agent:
     lineage:
       - datalake_sauron_raw.session.agent
+    description: |
+      Indicates which agent the session is with (Greenseer, QuintoAndar, QuintoAndarAI)
   status:
     lineage:
       - datalake_sauron_raw.session.status
+    description: |
+      Session status, can be active or expired.
   user_data:
     lineage:
       - datalake_sauron_raw.session.user_data
+    description: |
+      User data in JSON format.
   user_phone:
     lineage:
       - datalake_sauron_raw.session.user_phone
+    description: |
+      User phone number in E.164 format with country code (e.g., +5511998491750).
+      Used to identify the user in the source communication channel.
   source:
     lineage:
       - datalake_sauron_raw.session.source
+    description: |
+      Communication channel through which the session takes place (e.g., whatsapp).
   source_environment:
     lineage:
       - datalake_sauron_raw.session.source_env
+    description: |
+      Source environment / routing context that originated the session
+      (e.g., for_sale, forsale_buyer_activation, so_vistoria_e_chaves,
+      cx_back_offboarding, default).
   department:
     lineage:
       - datalake_sauron_raw.session.department
+    description: |
+      Department / service queue responsible for handling the session
+      (e.g., "ForSale Buyer Activation (POA 051)",
+      "CX Atendimento Escalado Receptivo [OFF] [POS] [BACK]"). Null when
+      the session has not been routed to a department yet.
   tags:
     lineage:
       - datalake_sauron_raw.session.tags
+    description: |
+      JSON-encoded array of tags applied to the session, typically used to
+      flag routing reasons (e.g., bot_direct_transfer_*). Can be an empty array.
   context:
     lineage:
       - datalake_sauron_raw.session.context
+    description: |
+      Additional free-form context associated with the session. Frequently null.
   source_identity:
     lineage:
       - datalake_sauron_raw.session.source_identity
+    description: |
+      Identifier of the user within the source channel (e.g., phone number
+      for WhatsApp). Typically matches user_phone when source is whatsapp.
   created_by:
     lineage:
       - datalake_sauron_raw.session.created_by
+    description: |
+      Origin that triggered the session creation. Common values: 'user'
+      (user-initiated message) and 'hsm_sent' (outbound HSM template
+      message sent by an agent or automation).
   ticket_comments:
     lineage:
       - datalake_sauron_raw.session.ticket_comments
+    description: |
+      Comments associated with the ticket linked to the session. Mostly null.
   metadata:
     lineage:
       - datalake_sauron_raw.session.metadata
+    description: |
+      JSON-encoded object with extra session attributes. Common keys include
+      is_orchestrator_session (boolean — whether the session is handled by
+      the orchestrator/AI), hsm (template name, author and message_content
+      for HSM-initiated sessions), worker / worker_sid (Twilio worker info),
+      user_persona (e.g., BUYER, SELLER), extra_params (referral/campaign
+      attribution) and conversation_summary (AI-generated summary).
   ts_last_message:
     lineage:
       - datalake_sauron_raw.session.last_message_at
+    description: |
+      Timestamp of the most recent message exchanged in the session.
   ts_first_message:
     lineage:
       - datalake_sauron_raw.session.first_message_at
+    description: |
+      Timestamp of the first message exchanged in the session.
   ts_created:
     lineage:
       - datalake_sauron_raw.session.created_at
+    description: |
+      Timestamp when the session was created in Sauron.
   ts_updated:
     lineage:
       - datalake_sauron_raw.session.updated_at
+    description: |
+      Timestamp when the session was last updated in Sauron.
   year:
     lineage:
       - datalake_sauron_raw.session.year
+    description: |
+      Partition column. Year of the CDC ingestion event.
   month:
     lineage:
       - datalake_sauron_raw.session.month
+    description: |
+      Partition column. Month of the CDC ingestion event.
   day:
     lineage:
       - datalake_sauron_raw.session.day
+    description: |
+      Partition column. Day of the CDC ingestion event.

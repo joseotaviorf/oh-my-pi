@@ -1,42 +1,78 @@
 database_name: datalake_sauron_clean
 table_name: bot_outgoing_messages
+description: |
+  Clean table with outbound bot messages sent through Sauron in response
+  to user interactions within a support session.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.id
+    description: |
+      Primary key of the bot outgoing message record in Sauron.
   id_session:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.session_id
+    description: |
+      Foreign key to the Sauron session in which the bot message was sent.
   id_message:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.message_id
+    description: |
+      Unique identifier of the outgoing bot message (UUID-based).
   id_incoming_message:
     lineage:
-      - datalake_sauron_raw.botoutgoingmessages.id_incoming_message
+      - datalake_sauron_raw.botoutgoingmessages.incoming_message_id
+    description: |
+      Identifier of the incoming user message that triggered the bot response.
   message_payload:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.message_payload
+    description: |
+      Text content sent to the user as the bot response (plain text or
+      JSON-encoded string).
   bot_response:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.bot_response
+    description: |
+      JSON-encoded full bot response payload, including action details
+      (e.g., SEND_RESPONSE_TO_USER), fulfillment messages, source info
+      (e.g., AI-core) and session reference.
   user_phone:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.user_phone
+    description: |
+      User phone number in E.164 format with country code, identifying
+      the recipient of the bot message.
   year_month:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.year_month
+    description: |
+      Year and month concatenated as YYYYMM (e.g., 202606), used for
+      time-based grouping in the source system.
   ts_created:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.created_at
+    description: |
+      Timestamp when the bot outgoing message record was created in Sauron.
   ts_updated:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.updated_at
+    description: |
+      Timestamp when the bot outgoing message record was last updated in Sauron.
   year:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.year
+    description: |
+      Partition column. Year of the CDC ingestion event.
   month:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.month
+    description: |
+      Partition column. Month of the CDC ingestion event.
   day:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.day
+    description: |
+      Partition column. Day of the CDC ingestion event.

@@ -1,36 +1,68 @@
 database_name: datalake_sauron_clean
 table_name: call_events
+description: |
+  Clean table with voice call events from Sauron, capturing call lifecycle
+  events such as CALL_ENDED and CALL_OVERFLOWN within customer support.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_sauron_raw.incomingmessages.id
+      - datalake_sauron_raw.callevents.id
+    description: |
+      Primary key of the call event record in Sauron.
   id_call:
     lineage:
-      - datalake_sauron_raw.incomingmessages.call_id
+      - datalake_sauron_raw.callevents.call_id
+    description: |
+      Unique identifier of the voice call (Twilio call SID / UUID).
   id_message:
     lineage:
-      - datalake_sauron_raw.incomingmessages.message_id
+      - datalake_sauron_raw.callevents.message_id
+    description: |
+      Unique identifier of the message associated with the call event.
   call_payload:
     lineage:
-      - datalake_sauron_raw.incomingmessages.call_payload
+      - datalake_sauron_raw.callevents.call_payload
+    description: |
+      JSON-encoded call event payload. Common keys include event_type
+      (e.g., CALL_ENDED, CALL_OVERFLOWN), event_data (call direction,
+      start_time, caller/destination phone numbers, department, observation,
+      terminated_by) and message_id.
   user_phone:
     lineage:
-      - datalake_sauron_raw.incomingmessages.user_phone
+      - datalake_sauron_raw.callevents.user_phone
+    description: |
+      User phone number in E.164 format. For outbound calls, this is the
+      destination number; for inbound calls, the caller number.
   year_month:
     lineage:
-      - datalake_sauron_raw.incomingmessages.year_month
+      - datalake_sauron_raw.callevents.year_month
+    description: |
+      Year and month concatenated as YYYYMM (e.g., 202604), used for
+      time-based grouping in the source system.
   ts_created:
     lineage:
-      - datalake_sauron_raw.incomingmessages.created_at
+      - datalake_sauron_raw.callevents.created_at
+    description: |
+      Timestamp when the call event record was created in Sauron.
   ts_updated:
     lineage:
-      - datalake_sauron_raw.incomingmessages.updated_at
+      - datalake_sauron_raw.callevents.updated_at
+    description: |
+      Timestamp when the call event record was last updated in Sauron.
   year:
     lineage:
-      - datalake_sauron_raw.incomingmessages.year
+      - datalake_sauron_raw.callevents.year
+    description: |
+      Partition column. Year of the CDC ingestion event.
   month:
     lineage:
-      - datalake_sauron_raw.incomingmessages.month
+      - datalake_sauron_raw.callevents.month
+    description: |
+      Partition column. Month of the CDC ingestion event.
   day:
     lineage:
-      - datalake_sauron_raw.incomingmessages.day
+      - datalake_sauron_raw.callevents.day
+    description: |
+      Partition column. Day of the CDC ingestion event.

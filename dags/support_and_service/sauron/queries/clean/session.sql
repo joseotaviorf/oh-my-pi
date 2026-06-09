@@ -1,5 +1,6 @@
 SELECT
   id,
+  public_id,
   agent,
   status,
   user_data,
