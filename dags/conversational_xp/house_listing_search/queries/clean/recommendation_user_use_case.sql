@@ -4,6 +4,7 @@ SELECT
   recommendation_id AS id_recommendation,
   filter,
   use_case,
+  origin,
   displayed_order,
   created_at AS ts_created,
   updated_at AS ts_updated

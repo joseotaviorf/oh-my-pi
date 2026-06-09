@@ -29,6 +29,10 @@ columns:
     description: "The name of the use case being performed"
     lineage:
     - datalake_house_listing_search_raw.recommendation_user_use_case.use_case
+  origin:
+    description: "The origin surface that triggered this recommendation use case"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation_user_use_case.origin
   ts_created:
     description: "The date when recommendation user use case was performed"
     lineage:
