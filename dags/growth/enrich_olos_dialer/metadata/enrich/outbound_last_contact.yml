@@ -1,8 +1,8 @@
 ---
 database_name: datalake_olos_dialer
 table_name: outbound_last_contact
-owner: arthur.gonzaga@quintoandar.com.br
-domain: growth
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
 description: A compilation of the last contact for each lead/prospect. With this table we want to know what was the operation that had the most recent contact with the prospect.
 columns:
   id_call:

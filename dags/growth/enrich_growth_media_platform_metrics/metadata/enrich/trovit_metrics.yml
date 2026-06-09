@@ -1,7 +1,7 @@
 ---
 database_name: datalake_growth_media_platform
 table_name: trovit_metrics
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Data Growth
 description: This table contains metrics like clicks and cost from Trovit campaigns.
 columns:

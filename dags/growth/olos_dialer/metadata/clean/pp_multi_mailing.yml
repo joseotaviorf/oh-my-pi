@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer_clean
 table_name: pp_multi_mailing
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Contains information about the contacts that will be dialed for PP Multi / IS Expert. This table contains the list of leads and which who will contact them.
 columns:

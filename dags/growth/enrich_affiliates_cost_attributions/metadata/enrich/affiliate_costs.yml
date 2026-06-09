@@ -1,55 +1,55 @@
 ---
 database_name: datalake_robin_hood
 table_name: affiliate_costs
-owner: arthur.gonzaga@quintoandar.com.br
-domain: Data Growth
-description: Affiliate costs enriched data from Robin Hood.
+owner: gabriel.salla@quintoandar.com
+domain: Growth
+description: Affiliate commission costs from Robin Hood accounting entries for Indica Aí, Indica Aí Agents, and Doorman programs. Each row is one payable accounting entry attributed to an affiliate payee.
 columns:
   source_name:
     lineage:
       - datalake_robin_hood_clean.accounting_entry_source.source_name
-    description: The source of the accounting entry.
+    description: Robin Hood accounting source program that generated the payable entry, such as Indica Aí or Doorman.
   id_rh_accounting_entry:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id
-    description: RH accounting entry id.
+    description: Primary identifier of the Robin Hood accounting entry representing the affiliate payable.
   id_external:
     lineage:
       - datalake_robin_hood_clean.payee.id_external
-    description: External id.
+    description: External identifier of the affiliate payee in the upstream Robin Hood system.
   id_payee:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_payee
-    description: Payee id.
+    description: Internal Robin Hood identifier linking the accounting entry to the affiliate payee record.
   city_group:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.locale
-    description: City group.
+    description: Geographic city group associated with the affiliate commission entry in Robin Hood.
   description:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.description
-    description: Description.
+    description: Free-text narrative describing the Robin Hood accounting entry and its business purpose.
   source_bill_item:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.source_bill_item
-    description: Source bill item.
+    description: Raw Robin Hood bill item code that defines how the affiliate commission was calculated.
   commission_type:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.source_bill_item
-    description: Commission type.
+    description: Standardized commission category derived from the source bill item, such as listing, rent, sale, or MGM.
   cost_center_code:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.cost_center_code
-    description: Cost center code.
+    description: Finance cost center code assigned to the affiliate commission accounting entry.
   mkt_origin:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_source
-    description: Mkt origin.
+    description: Marketing origin channel mapped from the Robin Hood source identifier, such as Indica Aí or Doorman.
   cost:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.due_amount
-    description: Cost.
+    description: Payable commission amount in Brazilian reais recorded for the affiliate accounting entry.
   dt_transaction:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.dt_occurrence
-    description: Transaction date.
+    description: Transaction date of the affiliate commission entry formatted as yyyyMMdd integer.

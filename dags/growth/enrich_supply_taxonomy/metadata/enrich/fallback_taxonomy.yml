@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: fallback_taxonomy
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: This table is repsonsible for storing the fallback taxonomy for the supply flows, ie, |
   the taxonomy that is used when the supply flow does not have a original taxonomy associated with it |
   and we want to enrich it with a other events.

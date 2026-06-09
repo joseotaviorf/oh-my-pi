@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: leads_sks
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: 'This table generate the SKs for the leads in the supply tables.'
 columns:
   sk_supply_lead:

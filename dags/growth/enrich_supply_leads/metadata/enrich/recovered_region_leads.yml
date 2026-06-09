@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: recovered_region_leads
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: 'Table with the leads that were recovered from the region enrichment process, only for 1P leads'
 columns:
   id_lead:

@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: conversion_tracking
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: |
   This table is responsible for storing the taxonomy and conversion events in the supply flows, i.e., 
   the taxonomy joined with manually reprocessed events and direct flows.

@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows_migrate
 table_name: prospects_events
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: This table is responsible to generate P2Q/Q2AQ/AQ2O drop events on funnel.
 columns:
   id_entity:

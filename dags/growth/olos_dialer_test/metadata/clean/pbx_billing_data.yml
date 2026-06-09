@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer_clean
 table_name: pbx_billing_data
-owner: ana.araujo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Contains information about pbx billing data in the olos dialer system.
 columns:

@@ -1,7 +1,7 @@
 database_name: datalake_olos_dialer
 table_name: reprocessing_mailing
-owner: arthur.gonzaga@quintoandar.com.br
-domain: growth
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
 description: This table contains information about the reprocessing mailing that happened in the Olos Dialer. 
   It is used to capture all leads that can be converted by IS team in reprocessing events.
 columns:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer_clean
 table_name: agent_supervisor
-owner: ana.araujo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Contains information about agent supervisor in the olos dialer system.
 columns:

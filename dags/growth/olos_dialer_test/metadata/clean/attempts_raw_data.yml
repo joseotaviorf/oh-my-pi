@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer_clean
 table_name: attempts_raw_data
-owner: ana.araujo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Contains information about attempts raw data in the olos dialer system.
 columns:

@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: leads_ciq
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: This table contains information about leads extracted from the Bob service that will be used to track our leads in the CIQ source.
 columns:
   sk_supply_lead:

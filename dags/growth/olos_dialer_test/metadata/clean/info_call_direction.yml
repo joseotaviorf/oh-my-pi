@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer_clean
 table_name: info_call_direction
-owner: ana.araujo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Contains information about info call direction in the olos dialer system.
 columns:

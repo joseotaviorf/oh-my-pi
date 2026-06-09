@@ -1,7 +1,7 @@
 ---
 database_name: datalake_google_ads_clean
 table_name: campaigns_geo_performance
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
   Table load Ads Performance Report from Google Ads API extraction for geographic view (city and region). 

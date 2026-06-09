@@ -1,8 +1,8 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: dict_taxonomy_supply
-owner: arthur.gonzaga@quintoandar.com
-domain: growth
+owner: gabriel.salla@quintoandar.com
+domain: Growth
 description: This table serves as a data dictionary designed to categorize, segment, and organize information related to leads within the Supply Context. It provides a standard framework for classifying and understanding data attributes, facilitating data analysis, and enhancing the management and utilization of lead-related information within the Supply Context.
 columns:
   id:

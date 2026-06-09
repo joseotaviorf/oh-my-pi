@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: leads_3p
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 description: This table contains transformed data from the 3P tables that will be used to track the status of leads in Supply pipeline.
 columns:
   sk_supply_lead:

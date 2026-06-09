@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer_clean
 table_name: reprocessing_mailing
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Contains information about the contacts that will be dialed and attempt to convert after drop. This table contains the list of leads and which sales_company will contact them.
 columns:

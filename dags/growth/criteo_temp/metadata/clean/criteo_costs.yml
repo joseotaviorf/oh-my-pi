@@ -1,6 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: criteo_costs  
-owner: 'arthur.gonzaga@quintoandar.com.br'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table load Criteo Costs Report by region from gsheets sent by Criteo team.
 columns:

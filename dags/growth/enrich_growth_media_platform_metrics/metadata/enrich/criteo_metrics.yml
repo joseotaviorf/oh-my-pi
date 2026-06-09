@@ -1,7 +1,7 @@
 ---
 database_name: datalake_growth_media_platform
 table_name: criteo_metrics
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Data Growth
 description: This table contains consolidated metrics like clicks, impressions and cost from Media Platforms from Criteo.
 columns:
