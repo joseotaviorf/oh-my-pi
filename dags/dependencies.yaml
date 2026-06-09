@@ -1504,14 +1504,6 @@ bietlejuice.enrich_agent_reports:
 bietlejuice.enrich_agents_matias:
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
   - bietlejuice.jaiminho:load-clean-notifications:first-run-of-day
-bietlejuice.enrich_agents_validation:
-  - bietlejuice.ebdb_agent:load-clean-agent-data-types-aud:first-run-of-day
-  - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
-  - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
-  - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
-  - bietlejuice.enrich_big_agent:load-enrich-agency:first-run-of-day
-  - bietlejuice.enrich_big_agent:load-enrich-house:first-run-of-day
-  - bietlejuice.enrich_ciq:load-enrich-ciq-agents:first-run-of-day
 bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation
