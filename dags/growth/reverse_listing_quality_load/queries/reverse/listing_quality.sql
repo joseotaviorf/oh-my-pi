@@ -1,24 +1,6 @@
 -- Ver.  Trino
 WITH
-    base_fl AS (
-        SELECT
-            sk_house AS id_house,
-            MIN(date) AS dt_fl, -- NOTA: acho que não precisa desse dado
-            MIN_BY(planning_operation, date) AS planning_operation -- NOTA: acho que não precisa desse dado
-        FROM
-            dw_growth.obt_supply
-        WHERE
-            cd_funnel_step = 'first_listing'
-        GROUP BY
-            sk_house
-        HAVING
-            MIN_BY(planning_operation, date) NOT IN ('Rede', 'Mercado Primário BH')
-            AND MIN(date) >= DATE('{load_start_date}')
-            AND MIN(date) < DATE('{load_end_date}')
-    ), -- ids de imóveis de 1p publicados em first listing no intervalo
-
-
-    base_geral_last_job AS (
+    base_recent_job AS (
         SELECT
             id_house,
             MAX(id) AS id_job,
@@ -31,63 +13,13 @@ WITH
             status IN ('Publicado', 'Completado')
         GROUP BY
             id_house
-    ), -- registro de todos os ids de imóveis com job, puxando o id do job mais recente, a respectiva data de upload, e o id_photographer_data do FT do job
+        HAVING
+            CAST(MAX_BY(ts_photos_uploaded, id) AS DATE) >= DATE('{load_start_date}')
+            AND CAST(MAX_BY(ts_photos_uploaded, id) AS DATE) < DATE('{load_end_date}')
+    ), -- imóveis com job publicado/completado cujo upload de fotos ocorreu no intervalo da DAG
 
 
--- nota: substitui a base_fl_sem_job_sem_ticket
-    base_fl_sem_job AS (
-        SELECT DISTINCT
-            a.id_house,
-            a.dt_fl,
-            b.id_job,
-            b.ts_photos_uploaded
-        -- c.sk_ticket
-        FROM base_fl a
-                 LEFT JOIN base_geral_last_job b ON (a.id_house = b.id_house)
-        WHERE b.id_job IS NULL -- condição para considerar o que não tem job
-          -- AND c.sk_ticket IS NULL -- condição para considerar o que não passou por LQ
-
-          AND b.user_sender_type IS DISTINCT FROM 'OWNER' -- condição para considerar o que não é de FotosPP
-    ), -- ids dos imóveis publicados em first listing que não tiveram job, não vieram de FotosPP
-
-
--- nota: substitui a base_last_job_sem_ticket
-    base_recent_job AS (
-        SELECT
-            id_house,
-            id_job,
-            ts_photos_uploaded,
-            id_photographer_data,
-            user_sender_type
-        FROM base_geral_last_job
-        WHERE CAST(ts_photos_uploaded AS DATE) >= DATE('{load_start_date}')
-          AND CAST(ts_photos_uploaded AS DATE) < DATE('{load_end_date}')
-    ), -- puxa os ids de imóveis e jobs que tiveram o upload de fotos (trigger para publicação) ainda não processados pela DAG
-
-
-    base_ims_completa AS (
-        SELECT
-            id_house,
-            -- 'fl_sem_job' AS "type",
-            NULL AS id_job,
-            NULL AS ts_photos_uploaded,
-            NULL AS id_photographer_data,
-            NULL AS user_sender_type
-        FROM base_fl_sem_job
-
-        UNION ALL
-
-        SELECT
-            id_house,
-            -- 'com_job' AS "type",
-            id_job,
-            ts_photos_uploaded,
-            id_photographer_data,
-            user_sender_type
-        FROM base_recent_job
-    ),
-
--- 5. Join com 'base_ims_completa'
+-- 5. Join com 'base_recent_job'
     ims_details AS (
         SELECT
             a.id_house,
@@ -99,7 +31,7 @@ WITH
             CASE WHEN e.type = 'StudioOuKitchenette' THEN true ELSE false END AS studio_kitnet,
             e.internal_admin_info
 
-        FROM base_ims_completa a
+        FROM base_recent_job a
 
             LEFT JOIN datalake_ebdb_clean.house e
             ON a.id_house = e.id
@@ -270,10 +202,21 @@ FROM details_inspection a
     LEFT JOIN images_x_rooms b ON (a.id_house = b.id_house)
     LEFT JOIN placas_check c ON (a.id_house = c.id_house)
     LEFT JOIN basic_room_bathroom d ON (a.id_house = d.id_house)
-    ) -- consolida as informações relacionadas à inspeção do restb e cria as regras de verificação, incluindo em todos os cenários que casos em que a data da inspeção vem antes da data da última publicação, será tratado como se não houvesse inspeção
+    ), -- consolida as informações relacionadas à inspeção do restb e cria as regras de verificação, incluindo em todos os cenários que casos em que a data da inspeção vem antes da data da última publicação, será tratado como se não houvesse inspeção
+
+    base_analysis_request AS (
+        SELECT
+            id_house
+        FROM datalake_ebdb_clean.listing_quality_analysis_request
+        WHERE ts_created >= DATE('{load_start_date}')
+          AND ts_created < DATE('{load_end_date}')
+          AND analysis_requested = true
+          AND id_house NOT IN (SELECT id_house FROM ims_details)
+    ) -- requisições de análise submetidas no magiclink (após enviar fotos pelo magiclink)
 
 
 SELECT
+    -- temporary uuid, used only on hightouch (for handling key|duplicates)
     cast(uuid() AS string) AS uuid_listing_quality,
     t.house_id,
     t.job_id,
@@ -309,5 +252,20 @@ FROM (
     FROM ims_details a
         LEFT JOIN base_formatada_kodak b ON (a.id_house = b.id_house)
         LEFT JOIN videos c ON (c.id_external_domain = a.id_house)
+
+    UNION ALL
+
+    SELECT DISTINCT
+        ar.id_house AS house_id,
+        NULL AS job_id,
+        NULL AS photographer_comment,
+        NULL AS link_video,
+        NULL AS num_internal_photos,
+        NULL AS num_bathroom_photos,
+        NULL AS images_per_room,
+        NULL AS property_condition,
+        NULL AS has_plaque,
+        0 AS analyst_queue
+    FROM base_analysis_request ar
 ) t
 ORDER BY t.analyst_queue ASC, t.property_condition ASC
