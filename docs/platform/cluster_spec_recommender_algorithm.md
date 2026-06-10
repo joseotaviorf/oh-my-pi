@@ -39,7 +39,9 @@ ARM runs are identified with a case-insensitive Graviton regex:
 
 This covers `m6g`, `m6gd`, `m7g`, `c6g`, `r6gd`, `a1`, and mixed-case node types from Databricks.
 
-The query selects the **total-cost-dominant** ARM cluster config per DAG (`SUM(total_cost_usd)`). If one config does not account for at least `--dominant-config-share-min` of runs **and** cost share (default **0.50**), the DAG goes to `mixed_config_review`.
+The query anchors each DAG on its **latest-era** ARM cluster config — the config key of the most recent run (`MAX(dt_dag_run_started)`), with ties broken by run count. All utilization percentiles, wall times, and the cost basis are computed **only** from runs on that config. This prevents a recent team downsize from being overridden by an older, more expensive config that still dominates total cost in the lookback window.
+
+`dominant_config_run_share` / `dominant_config_cost_share` now describe how established the **current** config is within the window. If the latest config differs from the cost-dominant one, `config_changed_in_window` is true. When a config switch is recent and the new era has fewer than `--min-runs` or `--min-days`, the DAG goes to `recent_config_change` (no recommendation until the new config accrues telemetry). Otherwise, if the current config does not account for at least `--dominant-config-share-min` of runs **and** cost share (default **0.50**) **and** there was no recent switch, the DAG goes to `mixed_config_review`.
 
 ### Cost Attribution
 
@@ -52,7 +54,7 @@ dim_ec2_price (on_demand USD/hr) ────┼──► fact_databricks_task_r
 
 | Column | Unit | Aggregation | Use |
 | --- | --- | --- | --- |
-| `total_cost_usd` | USD | `SUM` (period), `AVG` (per run) | Cost basis, dominant-config ranking |
+| `total_cost_usd` | USD | `SUM` (period), `AVG` (per run) | Cost basis; latest-era anchoring for metrics |
 | `total_dbu_cost_usd` | USD | `SUM`, `AVG` | DBU component in cost projection |
 | `total_ec2_cost_calculated_usd` | USD | `SUM`, `AVG` | EC2 component in cost projection |
 | `total_dbu_consumed` | DBU (scalar) | `AVG` only | Sanity vs `dim_dbu_price`; never summed with USD |
@@ -94,7 +96,8 @@ Quality gates still run first:
 | --- | --- |
 | Below `--min-days` or `--min-runs` | `needs_more_arm_data` |
 | Autoscale topology | `autoscale_review` |
-| Mixed dominant config (below `--dominant-config-share-min`, default 0.50) | `mixed_config_review` |
+| Recent config switch with thin new-era telemetry | `recent_config_change` |
+| Mixed current config (below `--dominant-config-share-min`, default 0.50; skipped when `config_changed_in_window`) | `mixed_config_review` |
 | Missing required metrics | `needs_more_telemetry` |
 | Any spill | `spill_pressure_review` |
 | EC2 or DBU pricing confidence gap | `cost_confidence_review` |
@@ -113,7 +116,7 @@ Multi-node branch (bidirectional candidate selection, `_decide_multi`):
 2. Build the **refined-multi** candidate: independently minimize the driver and resize the worker type/count, floored at two workers (`build_current_refined_candidate`). A 1-worker shape is strictly dominated by single-node, so it folds into the collapse comparison.
 3. Filter each candidate:
    - **Core cap** — candidate total cores must not exceed observed total cores (never upsize).
-   - **SLA** — projected p95 wall must be `<= max(0.80 * schedule_interval_minutes, observed wall_p95)` (never regress beyond the larger of the SLA target and what the DAG already runs at).
+   - **SLA** — projected p95 wall must be `<= min(cadence_cap, soft_cap)` where `cadence_cap = 0.80 * schedule_interval` only for cadence-bound DAGs (`runs_per_day >= 12`), and `soft_cap = min(2 * wall_p95, max(120 min, wall_p95))`.
    - **Memory feasibility** for the collapse candidate.
    - The refined candidate must be a **genuine reduction** (driver, worker type, or count shrinks) — an unchanged shape is not a recommendation.
 4. For an accelerator-enabled DAG, build each shape candidate in **both Photon worlds**: a *keep-Photon* variant sized on raw observed demand (the box stays as fast as it ran), and a *drop-Photon* variant sized on inflated demand. Also add the **Q4 candidate** — the observed shape with Photon dropped (NVMe stripped), i.e. "remove the accelerators only". A non-Photon DAG has only the single drop-Photon world.
@@ -177,10 +180,17 @@ projected_wall_p95 =
 A candidate passes when:
 
 ```text
-projected_wall_p95 <= max(0.80 * schedule_interval_minutes, observed wall_p95)
+projected_wall_p95 <= min(cadence_cap, soft_cap)
+
+cadence_cap = 0.80 * schedule_interval_minutes   # only when runs_per_day >= 12
+            = +inf                               # otherwise (no cadence SLA)
+
+soft_cap    = min(2.0 * wall_p95_min, max(120 min, wall_p95_min))
 ```
 
-The `max(..., observed)` ceiling is deliberate: a same-parallelism worker-type downsize keeps wall unchanged, so it must not be blocked just because the DAG already runs over its SLA target. Only candidates that **regress** wall (collapse, fewer workers, Photon-off) are held to the schedule target. This keeps hourly CDC shapes like `opa`/`istio` multi-node when collapsing, while still allowing a worker-type refinement.
+**Cadence-bound hard SLA** (`runs_per_day >= 12`, roughly every 2h or tighter): the DAG must finish within 80% of its schedule interval so the next run is not blocked. This is the real production SLA for hourly CDC shapes like `opa`/`istio`.
+
+**Soft runtime sanity guard** (all DAGs): projected wall may grow up to 2× the observed p95, but never past the default 2h Databricks job timeout. DAGs that already run longer than 2h are not capped below their own p95 (they likely have a non-default timeout).
 
 `collapse_wall_inflation` keeps the calibrated `0.67` worker-activity term (from the fast_lane full worker-removal experience) plus a small `worker_burst` penalty for spiky p95 worker CPU. Near-hourly observed cadence is capped at 60 minutes when missed runs make `1440 / runs_per_day` look longer than the actual schedule.
 

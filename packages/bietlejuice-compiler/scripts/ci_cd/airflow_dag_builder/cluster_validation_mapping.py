@@ -823,6 +823,37 @@ def compute_validation_overrides(
     return _deep_config_diff(target, validation_resolved)
 
 
+_SINGLE_NODE_SPARK_CONF_KEYS = frozenset(
+    {"spark.databricks.cluster.profile", "spark.master"}
+)
+
+
+def _strip_single_node_topology_overrides(
+    custom_configurations: dict, recommended_preset: str
+) -> dict:
+    """Remove singleNode topology settings that bled in from a single-node prod base.
+
+    When prod uses a *_single_node_cluster preset as its base but the validation
+    targets a multi-node preset, _deep_config_diff propagates singleNode spark_conf
+    and ResourceClass into custom_configurations.  Strip them.
+    """
+    if recommended_preset.endswith("_single_node_cluster"):
+        return custom_configurations
+    result = copy.deepcopy(custom_configurations)
+    spark_conf = result.get("spark_conf")
+    if isinstance(spark_conf, dict):
+        for key in _SINGLE_NODE_SPARK_CONF_KEYS:
+            spark_conf.pop(key, None)
+        if not spark_conf:
+            result.pop("spark_conf", None)
+    custom_tags = result.get("custom_tags")
+    if isinstance(custom_tags, dict):
+        custom_tags.pop("ResourceClass", None)
+        if not custom_tags:
+            result.pop("custom_tags", None)
+    return result
+
+
 def _recommended_topology(
     *,
     recommended_preset: str,
@@ -1030,6 +1061,9 @@ def build_rightsizing_validation_cluster_spec(
         prod_cluster_type=prod_cluster_type,
         num_workers=num_workers,
         recommended_runtime_engine=recommended_runtime_engine,
+    )
+    custom_configurations = _strip_single_node_topology_overrides(
+        custom_configurations, recommended_preset
     )
     custom_configurations = merge_declaration_validation_custom_configurations(
         declaration, custom_configurations

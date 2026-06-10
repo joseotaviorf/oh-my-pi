@@ -134,6 +134,9 @@ _SPOT_TO_ON_DEMAND_RATIO = 0.37
 _SINGLE_NODE_MEM_TARGET = 0.82
 _SINGLE_NODE_CPU_TARGET = 0.85
 _SLA_INTERVAL_TARGET = 0.80
+_CADENCE_RUNS_PER_DAY_MIN = 12.0  # ~every 2h or tighter = cadence-bound hard SLA
+_SOFT_WALL_REGRESSION_MAX = 2.0
+_SOFT_WALL_CEILING_MIN = 120.0  # default Databricks job timeout (minutes)
 
 # Negotiated JOBS $/DBU from dim_dbu_price (cost-attribution seed).
 # TODO: source dynamically from fact_databricks_dag_run.dbu_rate_usd.
@@ -304,6 +307,9 @@ class DagMetrics:
     arm_avg_total_cost_estimate_usd: float | None = None
     dominant_config_run_share: float = 1.0
     dominant_config_cost_share: float = 1.0
+    config_changed_in_window: bool = False
+    latest_config_runs: int = 0
+    latest_config_days: int = 0
     runs_per_day: float | None = None
     schedule_interval_minutes: float | None = None
     arm_total_ec2_cost_usd: float | None = None
@@ -1127,13 +1133,26 @@ def _projected_wall_for_sla(
 
 
 def _sla_limit_minutes(m: DagMetrics) -> float:
-    """SLA ceiling: the larger of the schedule-based target and the observed p95.
+    """SLA ceiling: cadence-bound hard cap plus a soft runtime sanity guard.
 
-    Never regress a DAG's wall beyond what it already runs at, but also never use
-    a candidate that would push wall past the schedule SLA target.
+    Cadence-bound DAGs (``runs_per_day >= _CADENCE_RUNS_PER_DAY_MIN``) must finish
+    within ``_SLA_INTERVAL_TARGET`` of their schedule interval. All DAGs are also
+    capped by a soft ceiling: at most ``2 * wall_p95`` and never past the default
+    2h job timeout (unless the DAG already runs longer, in which case we do not
+    cap below its observed p95).
     """
-    sla_cap = _SLA_INTERVAL_TARGET * _schedule_interval_minutes(m)
-    return max(sla_cap, m.wall_p95_min or 0.0)
+    wall_p95 = m.wall_p95_min or 0.0
+    soft_cap = min(
+        _SOFT_WALL_REGRESSION_MAX * wall_p95,
+        max(_SOFT_WALL_CEILING_MIN, wall_p95),
+    )
+    cadence_bound = (m.runs_per_day or 0.0) >= _CADENCE_RUNS_PER_DAY_MIN
+    cadence_cap = (
+        _SLA_INTERVAL_TARGET * _schedule_interval_minutes(m)
+        if cadence_bound
+        else float("inf")
+    )
+    return min(cadence_cap, soft_cap)
 
 
 @dataclass(frozen=True)
@@ -1267,12 +1286,25 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     return MultiDecision(_keep_multi_reason(m, sizing), None, blocked_cost=blocked_cost)
 
 
+def _recent_config_change_thin(
+    m: DagMetrics, min_days: int, min_runs: int
+) -> bool:
+    """True when the DAG switched configs recently but the new era lacks telemetry."""
+    return m.config_changed_in_window and (
+        m.latest_config_runs < min_runs or m.latest_config_days < min_days
+    )
+
+
 def classify(
     m: DagMetrics,
     min_days: int = 3,
     min_runs: int = 3,
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
 ) -> str:
+    # arm_runs/arm_days are era-scoped (latest config only). Check the thin-switch
+    # cohort before needs_more_arm_data so a fresh downsize is not mislabeled.
+    if _recent_config_change_thin(m, min_days, min_runs):
+        return "recent_config_change"
     if m.arm_days < min_days or m.arm_runs < min_runs:
         return "needs_more_arm_data"
 
@@ -1280,7 +1312,7 @@ def classify(
 
     if topo == "autoscale":
         return "autoscale_review"
-    if (
+    if not m.config_changed_in_window and (
         m.dominant_config_run_share < dominant_config_share_min
         or m.dominant_config_cost_share < dominant_config_share_min
     ):
@@ -1386,6 +1418,7 @@ def recommend_preset(
     if cohort in (
         "needs_more_arm_data",
         "needs_more_telemetry",
+        "recent_config_change",
         "mixed_config_review",
         "cost_confidence_review",
         "spill_pressure_review",
@@ -1542,6 +1575,9 @@ class Recommendation:
     ec2_on_demand_hours: float | None = None
     dominant_config_run_share: float = 1.0
     dominant_config_cost_share: float = 1.0
+    config_changed_in_window: bool = False
+    latest_config_runs: int = 0
+    latest_config_days: int = 0
     driver_action: str | None = None
     worker_action: str | None = None
     blocking_reason: str | None = None
@@ -1994,6 +2030,9 @@ def build_recommendation(
         wrk_wait_p95=m.wrk_wait_p95,
         dominant_config_run_share=m.dominant_config_run_share,
         dominant_config_cost_share=m.dominant_config_cost_share,
+        config_changed_in_window=m.config_changed_in_window,
+        latest_config_runs=m.latest_config_runs,
+        latest_config_days=m.latest_config_days,
         driver_action=cohort if cohort.startswith("driver_") else None,
         worker_action=cohort if not cohort.startswith("driver_") else None,
         blocking_reason=projected.blocked_reason,
@@ -2088,6 +2127,8 @@ config_runs AS (
         primary_max_autoscale_workers,
         COUNT(*)                                                                  AS config_run_count,
         COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                          AS config_day_count,
+        MIN(dt_dag_run_started)                                                   AS config_first_run,
+        MAX(dt_dag_run_started)                                                   AS config_last_run,
         SUM(total_cost_usd)                                                       AS config_total_cost_usd
     FROM arm_runs
     GROUP BY
@@ -2115,8 +2156,12 @@ dominant_config AS (
                                                                                   AS dominant_config_cost_share,
         ROW_NUMBER() OVER (
             PARTITION BY config_runs.airflow_dag_id
+            ORDER BY config_runs.config_last_run DESC, config_runs.config_run_count DESC
+        )                                                                         AS rn_recent,
+        ROW_NUMBER() OVER (
+            PARTITION BY config_runs.airflow_dag_id
             ORDER BY config_runs.config_total_cost_usd DESC, config_runs.config_run_count DESC
-        )                                                                         AS rn
+        )                                                                         AS rn_cost
     FROM config_runs
     JOIN dag_totals
         ON config_runs.airflow_dag_id = dag_totals.airflow_dag_id
@@ -2125,7 +2170,10 @@ dominant_runs AS (
     SELECT
         arm_runs.*,
         dominant_config.dominant_config_run_share,
-        dominant_config.dominant_config_cost_share
+        dominant_config.dominant_config_cost_share,
+        dominant_config.config_run_count                                            AS latest_config_runs,
+        dominant_config.config_day_count                                            AS latest_config_days,
+        (dominant_config.rn_cost <> 1)                                              AS config_changed_in_window
     FROM arm_runs
     JOIN dominant_config
         ON arm_runs.airflow_dag_id = dominant_config.airflow_dag_id
@@ -2138,13 +2186,18 @@ dominant_runs AS (
             = COALESCE(CAST(dominant_config.primary_min_autoscale_workers AS VARCHAR), '__fixed__')
         AND COALESCE(CAST(arm_runs.primary_max_autoscale_workers AS VARCHAR), '__fixed__')
             = COALESCE(CAST(dominant_config.primary_max_autoscale_workers AS VARCHAR), '__fixed__')
-        AND dominant_config.rn = 1
+        AND dominant_config.rn_recent = 1
 ),
-per_dag AS (
+eligible_dags AS (
+    SELECT airflow_dag_id
+    FROM arm_runs
+    GROUP BY airflow_dag_id
+    HAVING COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)) >= {min_days}
+       AND COUNT(*) >= {min_runs}
+),
+dag_cadence AS (
     SELECT
         airflow_dag_id,
-        COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                          AS arm_days,
-        COUNT(*)                                                                   AS arm_runs,
         ROUND(
             COUNT(*) / CAST(NULLIF(COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)), 0) AS DOUBLE),
             3
@@ -2155,7 +2208,15 @@ per_dag AS (
                 0
             ),
             1
-        )                                                                          AS schedule_interval_minutes,
+        )                                                                          AS schedule_interval_minutes
+    FROM arm_runs
+    GROUP BY airflow_dag_id
+),
+per_dag AS (
+    SELECT
+        airflow_dag_id,
+        COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                          AS arm_days,
+        COUNT(*)                                                                   AS arm_runs,
         ARBITRARY(driver_node_type)                                                 AS driver_node_type,
         ARBITRARY(worker_node_type)                                                 AS worker_node_type,
         ARBITRARY(worker_count)                                                     AS worker_count,
@@ -2174,6 +2235,9 @@ per_dag AS (
         ROUND(SUM(ec2_on_demand_hours), 4)                                         AS ec2_on_demand_hours,
         ARBITRARY(dominant_config_run_share)                                       AS dominant_config_run_share,
         ARBITRARY(dominant_config_cost_share)                                      AS dominant_config_cost_share,
+        BOOL_OR(config_changed_in_window)                                          AS config_changed_in_window,
+        ARBITRARY(latest_config_runs)                                              AS latest_config_runs,
+        ARBITRARY(latest_config_days)                                              AS latest_config_days,
         ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.5)  / 60.0, 1)        AS wall_p50_min,
         ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.95) / 60.0, 1)        AS wall_p95_min,
         ROUND(APPROX_PERCENTILE(drv_cpu_p50, 0.5), 1)                             AS drv_cpu_p50,
@@ -2201,10 +2265,16 @@ per_dag AS (
         BOOL_OR(is_any_local_nvme)                                                AS is_any_local_nvme
     FROM dominant_runs
     GROUP BY airflow_dag_id
-    HAVING COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)) >= {min_days}
-       AND COUNT(*) >= {min_runs}
 )
-SELECT * FROM per_dag
+SELECT
+    per_dag.*,
+    dag_cadence.runs_per_day,
+    dag_cadence.schedule_interval_minutes
+FROM per_dag
+JOIN dag_cadence
+    ON per_dag.airflow_dag_id = dag_cadence.airflow_dag_id
+JOIN eligible_dags
+    ON per_dag.airflow_dag_id = eligible_dags.airflow_dag_id
 ORDER BY arm_total_cost_usd DESC
 """
 
@@ -2302,6 +2372,9 @@ config_runs AS (
         primary_min_autoscale_workers,
         primary_max_autoscale_workers,
         COUNT(*)                                                                  AS config_run_count,
+        COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                          AS config_day_count,
+        MIN(dt_dag_run_started)                                                   AS config_first_run,
+        MAX(dt_dag_run_started)                                                   AS config_last_run,
         SUM(total_cost_usd)                                                       AS config_total_cost_usd
     FROM amd_pool
     GROUP BY
@@ -2329,8 +2402,12 @@ dominant_config AS (
                                                                                   AS dominant_config_cost_share,
         ROW_NUMBER() OVER (
             PARTITION BY config_runs.airflow_dag_id
+            ORDER BY config_runs.config_last_run DESC, config_runs.config_run_count DESC
+        )                                                                         AS rn_recent,
+        ROW_NUMBER() OVER (
+            PARTITION BY config_runs.airflow_dag_id
             ORDER BY config_runs.config_total_cost_usd DESC, config_runs.config_run_count DESC
-        )                                                                         AS rn
+        )                                                                         AS rn_cost
     FROM config_runs
     JOIN dag_totals
         ON config_runs.airflow_dag_id = dag_totals.airflow_dag_id
@@ -2339,7 +2416,10 @@ dominant_runs AS (
     SELECT
         amd_pool.*,
         dominant_config.dominant_config_run_share,
-        dominant_config.dominant_config_cost_share
+        dominant_config.dominant_config_cost_share,
+        dominant_config.config_run_count                                            AS latest_config_runs,
+        dominant_config.config_day_count                                            AS latest_config_days,
+        (dominant_config.rn_cost <> 1)                                              AS config_changed_in_window
     FROM amd_pool
     JOIN dominant_config
         ON amd_pool.airflow_dag_id = dominant_config.airflow_dag_id
@@ -2352,7 +2432,13 @@ dominant_runs AS (
             = COALESCE(CAST(dominant_config.primary_min_autoscale_workers AS VARCHAR), '__fixed__')
         AND COALESCE(CAST(amd_pool.primary_max_autoscale_workers AS VARCHAR), '__fixed__')
             = COALESCE(CAST(dominant_config.primary_max_autoscale_workers AS VARCHAR), '__fixed__')
-        AND dominant_config.rn = 1
+        AND dominant_config.rn_recent = 1
+),
+eligible_dags AS (
+    SELECT airflow_dag_id
+    FROM amd_pool
+    GROUP BY airflow_dag_id
+    HAVING COUNT(*) >= {amd_min_runs}
 ),
 per_dag AS (
     SELECT
@@ -2366,6 +2452,9 @@ per_dag AS (
         ROUND(AVG(total_cost_usd), 6)                                              AS arm_avg_cost_per_run_usd,
         ARBITRARY(dominant_config_run_share)                                       AS dominant_config_run_share,
         ARBITRARY(dominant_config_cost_share)                                      AS dominant_config_cost_share,
+        BOOL_OR(config_changed_in_window)                                          AS config_changed_in_window,
+        ARBITRARY(latest_config_runs)                                              AS latest_config_runs,
+        ARBITRARY(latest_config_days)                                              AS latest_config_days,
         ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.5)  / 60.0, 1)        AS wall_p50_min,
         ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.95) / 60.0, 1)        AS wall_p95_min,
         ROUND(APPROX_PERCENTILE(drv_cpu_p50, 0.5), 1)                             AS drv_cpu_p50,
@@ -2380,9 +2469,11 @@ per_dag AS (
         BOOL_OR(is_any_local_nvme)                                                AS is_any_local_nvme
     FROM dominant_runs
     GROUP BY airflow_dag_id
-    HAVING COUNT(*) >= {amd_min_runs}
 )
-SELECT * FROM per_dag
+SELECT per_dag.*
+FROM per_dag
+JOIN eligible_dags
+    ON per_dag.airflow_dag_id = eligible_dags.airflow_dag_id
 ORDER BY arm_total_cost_usd DESC
 """
 
@@ -2831,6 +2922,8 @@ def fetch_amd_candidates(
 def build_amd_recommendation(
     m: DagMetrics,
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
+    min_days: int = 3,
+    min_runs: int = 3,
 ) -> Recommendation | None:
     """Build a collapse_to_single recommendation from AMD data, or None if not eligible.
 
@@ -2840,7 +2933,9 @@ def build_amd_recommendation(
     """
     if not classify_amd_for_collapse(m):
         return None
-    if (
+    if _recent_config_change_thin(m, min_days, min_runs):
+        return None
+    if not m.config_changed_in_window and (
         m.dominant_config_run_share < dominant_config_share_min
         or m.dominant_config_cost_share < dominant_config_share_min
     ):
@@ -2997,6 +3092,9 @@ def _row_to_metrics(row: dict[str, Any]) -> DagMetrics:
         arm_avg_total_cost_estimate_usd=_f(row.get("arm_avg_total_cost_estimate_usd")),
         dominant_config_run_share=_f(row.get("dominant_config_run_share")) or 1.0,
         dominant_config_cost_share=_f(row.get("dominant_config_cost_share")) or 1.0,
+        config_changed_in_window=_b(row.get("config_changed_in_window")),
+        latest_config_runs=_i(row.get("latest_config_runs")),
+        latest_config_days=_i(row.get("latest_config_days")),
         runs_per_day=_f(row.get("runs_per_day")),
         schedule_interval_minutes=_f(row.get("schedule_interval_minutes")),
         arm_total_ec2_cost_usd=_f(row.get("arm_total_ec2_cost_usd")),
@@ -3112,6 +3210,9 @@ _CSV_FIELDS = [
     "ec2_on_demand_hours",
     "dominant_config_run_share",
     "dominant_config_cost_share",
+    "config_changed_in_window",
+    "latest_config_runs",
+    "latest_config_days",
     "wall_p50_min",
     "wall_p95_min",
     # Current metrics
@@ -3493,7 +3594,14 @@ def main(argv: list[str] | None = None) -> int:
         amd_recs = [
             r
             for m in amd_pool
-            if (r := build_amd_recommendation(m, args.dominant_config_share_min))
+            if (
+                r := build_amd_recommendation(
+                    m,
+                    args.dominant_config_share_min,
+                    args.min_days,
+                    args.min_runs,
+                )
+            )
             is not None
         ]
         print(

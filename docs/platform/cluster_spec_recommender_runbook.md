@@ -93,6 +93,7 @@ Non-actionable cohorts (no shape change — kept as observed):
 - `keep_multi_sla`, `keep_multi_memory`, `keep_multi_compute`, `keep_multi_balanced`, `keep_multi_cost` (no candidate beat cost-or-SLA; `blocked_cost` shows the cheapest rejected alternative)
 - `needs_more_arm_data`
 - `needs_more_telemetry`
+- `recent_config_change` (team switched config recently; wait for new-era telemetry)
 - `mixed_config_review`
 - `spill_pressure_review`
 - `cost_confidence_review`

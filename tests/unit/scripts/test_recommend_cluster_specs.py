@@ -111,6 +111,50 @@ class TestClassifyQualityGates:
             == "mixed_config_review"
         )
 
+    def test_recent_config_change_waits_for_telemetry(self):
+        thin_switch = _m(
+            arm_days=1,
+            arm_runs=1,
+            config_changed_in_window=True,
+            latest_config_runs=1,
+            latest_config_days=1,
+            dominant_config_run_share=0.1,
+            dominant_config_cost_share=0.05,
+        )
+        assert classify(thin_switch, min_days=2, min_runs=2) == "recent_config_change"
+        assert classify(thin_switch, min_days=2, min_runs=2) != "needs_more_arm_data"
+        assert recommend_preset("recent_config_change", thin_switch) == (None, None)
+
+    def test_recent_config_change_skips_mixed_config_review(self):
+        switched = _m(
+            config_changed_in_window=True,
+            latest_config_runs=5,
+            latest_config_days=3,
+            dominant_config_run_share=0.2,
+            dominant_config_cost_share=0.1,
+        )
+        assert classify(switched, min_days=2, min_runs=2) != "mixed_config_review"
+
+    def test_recent_downsize_does_not_recommend_old_expensive_era(self):
+        """Regression: team shrinks cluster; thin new era must not upsize to old XL."""
+        rec = build_recommendation(
+            _m(
+                dag_id="bietlejuice.enrich_amplitude_page_viewed_events",
+                config_changed_in_window=True,
+                latest_config_runs=1,
+                latest_config_days=1,
+                dominant_config_run_share=0.1,
+                dominant_config_cost_share=0.05,
+                driver_node_type="r6g.xlarge",
+                worker_node_type="r6g.xlarge",
+                worker_count=2,
+            ),
+            min_days=2,
+            min_runs=2,
+        )
+        assert rec.cohort == "recent_config_change"
+        assert rec.recommended_preset is None
+
     def test_missing_metrics_and_cost_confidence_review(self):
         assert classify(_m(drv_cpu_p95=None)) == "needs_more_telemetry"
         assert classify(_m(ec2_pricing_missing=True)) == "cost_confidence_review"
@@ -345,6 +389,24 @@ class TestAdditiveSingleNodeSizing:
         assert rec.rec_driver_node_type is not None
 
 
+class TestSlaLimitMinutes:
+    def test_cadence_bound_uses_schedule_target(self):
+        m = _m(runs_per_day=18.0, schedule_interval_minutes=60.0, wall_p95_min=30.0)
+        assert rcs._sla_limit_minutes(m) == pytest.approx(48.0)
+
+    def test_low_cadence_uses_soft_cap_not_observed_wall(self):
+        m = _m(runs_per_day=1.0, schedule_interval_minutes=1440.0, wall_p95_min=20.0)
+        assert rcs._sla_limit_minutes(m) == pytest.approx(40.0)
+
+    def test_soft_cap_respects_two_hour_timeout(self):
+        m = _m(runs_per_day=1.0, wall_p95_min=90.0)
+        assert rcs._sla_limit_minutes(m) == pytest.approx(120.0)
+
+    def test_already_long_job_not_capped_below_observed_p95(self):
+        m = _m(runs_per_day=1.0, wall_p95_min=150.0)
+        assert rcs._sla_limit_minutes(m) == pytest.approx(150.0)
+
+
 class TestSingleNodeFirstKeepMultiGuards:
     def test_keep_multi_driver_minimize_can_shift_to_compute_family(self):
         m = _m(
@@ -501,6 +563,7 @@ class TestSingleNodeFirstKeepMultiGuards:
             wrk_mem_p95=25.0,
             wall_p50_min=30.0,
             wall_p95_min=30.0,
+            runs_per_day=18.0,
             schedule_interval_minutes=40.0,
             arm_avg_total_cost_estimate_usd=40.0,
             arm_avg_ec2_cost_usd=15.0,
@@ -537,7 +600,7 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         # On a near-zero baseline every refined/collapse candidate costs more, so
         # nothing wins: keep the observed shape and surface the rejected cost.
-        assert rec.cohort == "keep_multi_sla"
+        assert rec.cohort == "keep_multi_cost"
         assert rec.rec_worker_node_type == "r6g.4xlarge"
         assert rec.rec_worker_count == 2
         assert rec.actions == "keep_multi_node"
@@ -1129,6 +1192,12 @@ class TestSqlAndRowMapping:
         assert "total_dbu_list_cost_usd" not in sql
         assert "total_dbu_list_cost_usd" not in amd_sql
         assert "config_total_cost_usd" in sql
+        assert "config_last_run" in sql
+        assert "rn_recent" in sql
+        assert "rn_cost" in sql
+        assert "config_changed_in_window" in sql
+        assert "dag_cadence" in sql
+        assert "eligible_dags" in sql
         assert "is_job_on_interactive = FALSE" in sql
         assert "is_any_task_failed = FALSE" in sql
         assert "is_any_databricks_run_failed = FALSE" in sql
@@ -1149,6 +1218,9 @@ class TestSqlAndRowMapping:
         assert "dominant_runs" in amd_sql
         assert "dominant_config_run_share" in amd_sql
         assert "dominant_config_cost_share" in amd_sql
+        assert "config_changed_in_window" in amd_sql
+        assert "rn_recent" in amd_sql
+        assert "eligible_dags" in amd_sql
         assert "FROM dominant_runs" in amd_sql
         assert "MAX(driver_node_type)" not in amd_sql
 
@@ -1194,6 +1266,37 @@ class TestSqlAndRowMapping:
         assert metrics.arm_avg_ec2_cost_usd == pytest.approx(3.0)
         assert metrics.ec2_spot_hours == pytest.approx(20.0)
         assert metrics.arm_avg_dbu_consumed == pytest.approx(2.5)
+
+    def test_row_to_metrics_maps_recent_config_fields(self):
+        metrics = rcs._row_to_metrics(
+            {
+                "airflow_dag_id": "bietlejuice.test_dag",
+                "arm_days": "5",
+                "arm_runs": "10",
+                "driver_node_type": "m6g.xlarge",
+                "worker_node_type": "m6g.xlarge",
+                "worker_count": "2",
+                "arm_total_cost_usd": "100",
+                "arm_avg_cost_per_run_usd": "10",
+                "wall_p50_min": "20",
+                "wall_p95_min": "30",
+                "drv_cpu_p50": "20",
+                "drv_cpu_p95": "40",
+                "drv_mem_p95": "40",
+                "drv_wait_p95": "1",
+                "wrk_cpu_p50": "10",
+                "wrk_cpu_p95": "30",
+                "wrk_mem_p95": "30",
+                "wrk_wait_p95": "1",
+                "config_changed_in_window": "true",
+                "latest_config_runs": "2",
+                "latest_config_days": "2",
+            }
+        )
+
+        assert metrics.config_changed_in_window is True
+        assert metrics.latest_config_runs == 2
+        assert metrics.latest_config_days == 2
 
     def test_current_cost_basis_uses_negotiated_total_only(self):
         m = _m(

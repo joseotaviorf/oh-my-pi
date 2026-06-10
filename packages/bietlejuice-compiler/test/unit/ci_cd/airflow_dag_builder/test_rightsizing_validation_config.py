@@ -99,6 +99,57 @@ class TestGenerateValidationConfig:
         assert "driver_node_type_id" not in custom
         assert custom == {}
 
+    def test_multi_node_rec_strips_inherited_single_node_settings(self, tmp_path):
+        """Regression: prod on a single-node preset must not bleed singleNode spark_conf
+        into validation when the recommendation targets a multi-node preset."""
+        dag_dir = tmp_path / "dags" / "fintech" / "dw_collections_landlord"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "dw_collections_landlord_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_xl_general_single_node_cluster\n"
+            "  databricks_conn_id: databricks_new_env\n"
+            "  custom_configurations:\n"
+            "    driver_node_type_id: m6g.12xlarge\n"
+            "    spark_version: 16.4.x-scala2.12\n"
+            "    num_workers: 4\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "dw_collections_landlord_declaration.yml").write_text(
+            "dag:\n  name: dw_collections_landlord\n"
+            "workflow:\n  type: query_delta\n  layer: dw\n",
+            encoding="utf-8",
+        )
+
+        rec = _Rec(
+            dag_id="bietlejuice.dw_collections_landlord",
+            cohort="right_size_multi",
+            confidence="high",
+            actions="keep_multi_node|reduce_driver|keep_worker_type|keep_worker_count",
+            current_preset="consolidation_xl_general_single_node_cluster",
+            current_driver_node_type="m6g.12xlarge",
+            current_worker_node_type="m6g.12xlarge",
+            current_worker_count=4,
+            recommended_preset="consolidation_m_general_cluster",
+            rec_driver_node_type="r6g.xlarge",
+            rec_worker_node_type="m6g.2xlarge",
+            rec_worker_count=4,
+            num_workers_override=4,
+            driver_override_node_type_id="r6g.xlarge",
+        )
+
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
+
+        assert cfg is not None
+        cluster = cfg["validation"]["cluster"]
+        assert cluster["type"] == "consolidation_m_general_cluster"
+        custom = cluster.get("custom_configurations", {})
+        spark_conf = custom.get("spark_conf", {})
+        assert "spark.databricks.cluster.profile" not in spark_conf
+        assert "spark.master" not in spark_conf
+        custom_tags = custom.get("custom_tags", {})
+        assert custom_tags.get("ResourceClass") != "SingleNode"
+        assert "ResourceClass" not in custom_tags
+
     def test_larger_single_node_driver_override_only(self, tmp_path):
         dag_dir = tmp_path / "dags" / "for_sale" / "ebdb_visit_fast_lane"
         dag_dir.mkdir(parents=True)

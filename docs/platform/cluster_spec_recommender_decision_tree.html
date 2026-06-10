@@ -446,7 +446,7 @@
         </foreignObject>
 
         <foreignObject x="720" y="578" width="400" height="60">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Filter survivors<small>core cap (never upsize) · SLA ceiling max(80% interval, observed wall) · collapse memory feasibility</small></div>
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Filter survivors<small>core cap (never upsize) · SLA min(cadence 80% interval, soft 2×/2h) · collapse memory feasibility</small></div>
         </foreignObject>
 
         <foreignObject x="700" y="658" width="440" height="60">
@@ -512,8 +512,8 @@
   <!-- ENTRY -->
   <section class="phase">
     <div class="node start">
-      <div class="label">Per-DAG input: cost-dominant ARM cluster config</div>
-      <div class="sub">From <code>dw_databricks_health.fact_databricks_dag_run</code> — successful orchestrated <code>bietlejuice.%</code> runs (non-interactive, no failed tasks/runs). Excludes <code>*__validation</code> DAGs and rows with <code>COALESCE(total_cost_usd, 0) = 0</code>.</div>
+      <div class="label">Per-DAG input: latest-era ARM cluster config</div>
+      <div class="sub">From <code>dw_databricks_health.fact_databricks_dag_run</code> — metrics anchored on the most recent config key (<code>MAX(dt_dag_run_started)</code>), not the highest-cost historical config. Eligibility still requires enough total ARM runs in the window.</div>
     </div>
   </section>
 
@@ -541,8 +541,17 @@
 
     <div class="guard-row">
       <div class="guard-test">
-        <div class="cond">dominant_config_run_share &lt; --dominant-config-share-min  OR  dominant_config_cost_share &lt; --dominant-config-share-min</div>
-        <div class="why">No single config accounts for ≥ threshold (default 0.50) of runs and cost.</div>
+        <div class="cond">config_changed_in_window  AND  (latest_config_runs &lt; --min-runs  OR  latest_config_days &lt; --min-days)</div>
+        <div class="why">Team switched config recently; new era lacks enough telemetry.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">recent_config_change<span class="meaning">Wait for runs on the new config.</span></div>
+    </div>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">NOT config_changed_in_window  AND  (dominant_config_run_share &lt; --dominant-config-share-min  OR  dominant_config_cost_share &lt; --dominant-config-share-min)</div>
+        <div class="why">Current config is unstable within the window (not a clean recent switch).</div>
       </div>
       <div class="arrow-yes">YES<span>→</span></div>
       <div class="cohort c-review">mixed_config_review<span class="meaning">Stabilize on one config first.</span></div>
@@ -639,7 +648,7 @@
 
           <div class="step test">
             <div class="cond">Filter each candidate</div>
-            <div class="why">core cap: candidate cores ≤ observed cores (never upsize). SLA: projected p95 wall ≤ max(0.80 × interval, observed wall_p95). Memory feasibility for collapse.</div>
+            <div class="why">core cap: candidate cores ≤ observed cores (never upsize). SLA: projected p95 wall ≤ min(cadence 80% interval when runs/day ≥ 12, soft min(2× wall_p95, max(120 min, wall_p95))). Memory feasibility for collapse.</div>
           </div>
 
           <div class="step test">
@@ -659,7 +668,7 @@
             <div>
               <div class="cohort c-noop">keep_multi_memory / keep_multi_compute<span class="meaning"><code>size_single_node</code> blocked: additive demand exceeds the largest single node at target utilization.</span></div>
               <div class="cohort c-noop" style="margin-top:6px">keep_multi_balanced<span class="meaning">Hot driver (drv_cpu_p95 ≥ 70%) with busy workers (wrk_cpu_p50 ≥ 50%, wrk_mem_p95 ≥ 60%), or sizing blocked as balanced.</span></div>
-              <div class="cohort c-noop" style="margin-top:6px">keep_multi_sla<span class="meaning">Projected collapse wall (<code>_projected_wall_for_sla(m, 0)</code>) exceeds SLA ceiling max(80% interval, observed wall_p95).</span></div>
+              <div class="cohort c-noop" style="margin-top:6px">keep_multi_sla<span class="meaning">Projected collapse wall exceeds cadence or soft SLA ceiling (cadence-bound DAGs only for the hard interval cap).</span></div>
               <div class="cohort c-noop" style="margin-top:6px">keep_multi_cost<span class="meaning">Default when no survivor wins and no higher-priority keep reason applies; <code>blocked_cost</code> = cheapest filter-passing option that still ≥ observed cost (null if none passed filters).</span></div>
             </div>
           </div>
@@ -705,7 +714,9 @@
           <tr><td>_RELAXED_DOWNSIZE_MEM_P95_MAX</td><td><code>70.0%</code></td><td>driver_downsize (single-node)</td></tr>
           <tr><td>_SINGLE_NODE_MEM_TARGET</td><td><code>0.82</code></td><td>candidate sizers / keep_multi_memory</td></tr>
           <tr><td>_SINGLE_NODE_CPU_TARGET</td><td><code>0.85</code></td><td>candidate sizers / keep_multi_compute</td></tr>
-          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>SLA gate (ceiling = max(target × interval, observed wall_p95))</td></tr>
+          <tr><td>_CADENCE_RUNS_PER_DAY_MIN</td><td><code>12.0</code></td><td>Hard cadence SLA only when runs/day ≥ this (~every 2h)</td></tr>
+          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>Cadence-bound hard SLA: 80% of schedule interval</td></tr>
+          <tr><td>_SOFT_WALL_REGRESSION_MAX / _SOFT_WALL_CEILING_MIN</td><td><code>2.0</code> / <code>120</code> min</td><td>Soft runtime guard for all DAGs</td></tr>
           <tr><td>_DRIVER_CPU_BOUND_P95</td><td><code>70.0%</code></td><td>keep_multi_balanced</td></tr>
           <tr><td>_PHOTON_OFF_WALL_INFLATION</td><td><code>2.0</code></td><td>cost/SLA when Photon normalized off (drop-Photon candidates only)</td></tr>
           <tr><td>_PHOTON_DBU_PREMIUM</td><td><code>3.0</code></td><td>offline DBU proxy divides observed DBU by this when projecting Photon off</td></tr>
