@@ -66,13 +66,6 @@ sheets_info:
     clean_table_name: ind_agents_partner_allocation
     sheet_context: agents
 
-  pp_multi_cluster:
-    sheet_id: 1LlbYqd6atdjrwpIxT_r1p_nrp2wnzrz69Lfa18Moi5M
-    sheet_name: pp_multi_cluster
-    clean_table_name: pp_multi_cluster
-    sheet_context: agents
-    partitioned: true
-
   sale_listings_date:
     sheet_id: 1beK8cE7kXJ-fdbrJQB6LkdPtVxhMG7jsoQmNEkpSGXQ
     sheet_name: listings_date

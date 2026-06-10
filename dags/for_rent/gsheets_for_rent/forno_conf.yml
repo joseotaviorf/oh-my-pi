@@ -53,3 +53,10 @@ sheets_info:
     sheet_name: ppmulti_goals_am
     clean_table_name: ppmulti_goals_am
     sheet_context: for_rent
+
+  pp_multi_cluster:
+    sheet_id: 1LlbYqd6atdjrwpIxT_r1p_nrp2wnzrz69Lfa18Moi5M
+    sheet_name: pp_multi_cluster
+    clean_table_name: pp_multi_cluster
+    sheet_context: for_rent
+    partitioned: true
