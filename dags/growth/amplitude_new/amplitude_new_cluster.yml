@@ -12,3 +12,15 @@ cluster:
     driver_node_type_id: r6g.2xlarge
     node_type_id: r6gd.4xlarge
     num_workers: 5
+validation:
+  cluster:
+    type: consolidation_l_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 500
+      spark_conf:
+        spark.driver.maxResultSize: '0'
+      num_workers: 5
+      driver_node_type_id: r6g.xlarge
+  allow_custom_spark_job: true

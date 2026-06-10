@@ -71,6 +71,22 @@ def _strip_prod_topology_for_consolidation_validation(
     return stripped
 
 
+def validation_cluster_has_distinguishing_overrides(
+    prod_cluster: dict, validation_cluster: dict
+) -> bool:
+    """Return True when validation.cluster adds overrides beyond matching prod preset type."""
+    validation_custom = validation_cluster.get("custom_configurations")
+    if validation_custom:
+        return True
+
+    for key, value in validation_cluster.items():
+        if key == "type":
+            continue
+        if prod_cluster.get(key) != value:
+            return True
+    return False
+
+
 def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) -> dict:
     """Overlay validation.cluster on prod cluster, deep-merging custom_configurations."""
     merged = {**prod_cluster, **validation_cluster}

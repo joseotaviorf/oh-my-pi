@@ -9,3 +9,9 @@ cluster:
     runtime_engine: PHOTON
     node_type_id: r6gd.2xlarge
     driver_node_type_id: r6gd.2xlarge
+validation:
+  cluster:
+    type: consolidation_m_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      runtime_engine: PHOTON

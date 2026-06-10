@@ -13,3 +13,15 @@ cluster:
       spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     aws_attributes:
       ebs_volume_size: 500
+validation:
+  cluster:
+    type: consolidation_l_compute_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 500
+      spark_conf:
+        spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment}}
+        spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
+        spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
+      num_workers: 3

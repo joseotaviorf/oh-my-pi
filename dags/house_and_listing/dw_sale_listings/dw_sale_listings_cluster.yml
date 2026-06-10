@@ -13,3 +13,14 @@ cluster:
     node_type_id: m6gd.xlarge
     driver_node_type_id: m6gd.xlarge
     runtime_engine: PHOTON
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      data_security_mode: USER_ISOLATION
+      num_workers: 3
+      runtime_engine: PHOTON

@@ -35,7 +35,7 @@ validation:
 
 **Skip validation** when prod is already the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r6g.2xlarge` worker and driver). The generator omits the `validation:` block entirely.
 
-When validation is emitted, `validation.cluster.type` must still differ from prod `cluster.type` (enforced by `DAGDeclarationValidator`).
+When validation is emitted, `validation.cluster.type` may match prod `cluster.type` when `validation.cluster` specifies distinguishing overrides (for example `custom_configurations`). It must still differ from prod when no overrides are present (enforced by `DAGDeclarationValidator`).
 
 Existing validation blocks are also checked against generator output. `validate-cluster-validation-files` fails when a validation-stage `*_cluster.yml` is missing generated effective-prod overrides, so stale blocks should be regenerated instead of relying on runtime fallback behavior.
 
@@ -71,7 +71,7 @@ Implementation: `packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder
 Rules enforced by `DAGDeclarationValidator`:
 
 - `validation.cluster.type` must start with `consolidation_`
-- Must differ from prod `cluster.type`
+- Must differ from prod `cluster.type` when `validation.cluster` has no distinguishing overrides; same preset is allowed with explicit override fields (for example `custom_configurations`)
 - DAGs with `load_spark_job` need `validation.allow_custom_spark_job: true`
 
 ## Generated Airflow DAG

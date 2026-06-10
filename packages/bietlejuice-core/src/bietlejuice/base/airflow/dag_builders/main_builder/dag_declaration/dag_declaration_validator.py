@@ -25,6 +25,9 @@ from bietlejuice.base.pipeline.query_view_sync import (
     normalize_query_view_sync_config,
 )
 from bietlejuice.base.udfs.udf_enum import UDFEnum
+from bietlejuice.base.validation.cluster_args import (
+    validation_cluster_has_distinguishing_overrides,
+)
 
 
 class DAGDeclarationValidator(Validator):
@@ -625,11 +628,17 @@ class DAGDeclarationValidator(Validator):
         if not validation_cluster_type:
             return
 
-        prod_cluster_type = dag_declaration.get("cluster", {}).get("type")
-        if validation_cluster_type == prod_cluster_type:
+        prod_cluster = dag_declaration.get("cluster", {})
+        prod_cluster_type = prod_cluster.get("type")
+        if validation_cluster_type == prod_cluster_type and not (
+            validation_cluster_has_distinguishing_overrides(
+                prod_cluster, validation.get("cluster", {})
+            )
+        ):
             raise AssertionError(
                 "m=_check_cluster_validation_config, "
-                "msg='validation.cluster.type' must differ from prod 'cluster.type'"
+                "msg='validation.cluster.type' must differ from prod 'cluster.type' "
+                "or 'validation.cluster' must specify distinguishing overrides"
             )
 
     @staticmethod

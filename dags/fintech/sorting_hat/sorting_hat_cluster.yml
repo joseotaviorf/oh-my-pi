@@ -9,3 +9,7 @@ cluster:
     spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_xl_memory_single_node_cluster
+    databricks_conn_id: databricks_new

@@ -17,3 +17,19 @@ cluster:
     runtime_engine: PHOTON
     aws_attributes:
       ebs_volume_size: 200
+validation:
+  cluster:
+    type: consolidation_l_general_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.sql.sources.partitionOverwriteMode: static
+        spark.sql.shuffle.partitions: 256
+      data_security_mode: USER_ISOLATION
+      num_workers: 3
+      driver_node_type_id: m6g.2xlarge

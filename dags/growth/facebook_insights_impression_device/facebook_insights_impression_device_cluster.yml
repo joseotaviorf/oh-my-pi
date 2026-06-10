@@ -14,3 +14,18 @@ cluster:
       ebs_volume_size: 200
     spark_version: 13.3.x-scala2.12
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - pypi:
+        package: facebook-business==23.0.1
+    custom_configurations:
+      aws_attributes:
+        availability: ON_DEMAND
+        ebs_volume_size: 200
+      spark_version: 13.3.x-scala2.12
+      num_workers: 3
+      driver_node_type_id: r6g.xlarge
+  allow_custom_spark_job: true

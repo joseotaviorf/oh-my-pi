@@ -18,3 +18,18 @@ cluster:
       ebs_volume_size: 200
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
+validation:
+  cluster:
+    type: consolidation_xl_general_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: data-products
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.metrics.namespace: data_products.enrich_base_metrics_service
+      num_workers: 3
+      runtime_engine: PHOTON
+      driver_node_type_id: r6g.2xlarge

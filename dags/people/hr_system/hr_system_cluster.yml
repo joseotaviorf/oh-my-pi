@@ -19,7 +19,7 @@ cluster:
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
 validation:
   cluster:
-    type: consolidation_l_memory_single_node_cluster
+    type: consolidation_s_memory_cluster
     databricks_conn_id: databricks_new
     access_control_list:
       group_name: people-analytics
@@ -30,4 +30,5 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
         instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
+      driver_node_type_id: r6g.2xlarge
   allow_custom_spark_job: true

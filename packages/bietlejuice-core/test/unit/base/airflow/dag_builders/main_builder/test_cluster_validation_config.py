@@ -45,12 +45,24 @@ class TestClusterValidationConfig:
         with pytest.raises(AssertionError, match="consolidation_"):
             validator.validate(declaration)
 
-    def test_rejects_same_cluster_as_prod(self, validator):
+    def test_rejects_same_cluster_as_prod_without_overrides(self, validator):
         declaration = _base_declaration(type="databricks_16_4_med_general_fleet")
         declaration["cluster"]["type"] = "consolidation_s_general_cluster"
         declaration["validation"]["cluster"]["type"] = "consolidation_s_general_cluster"
-        with pytest.raises(AssertionError, match="differ"):
+        with pytest.raises(AssertionError, match="distinguishing overrides"):
             validator.validate(declaration)
+
+    def test_allows_same_cluster_as_prod_with_overrides(self, validator):
+        declaration = _base_declaration(type="consolidation_s_general_cluster")
+        declaration["cluster"]["type"] = "consolidation_s_general_cluster"
+        declaration["cluster"]["custom_configurations"] = {
+            "num_workers": 2,
+            "runtime_engine": "PHOTON",
+        }
+        declaration["validation"]["cluster"]["custom_configurations"] = {
+            "runtime_engine": "PHOTON",
+        }
+        validator.validate(declaration)
 
     def test_rejects_load_spark_job_without_opt_in(self, validator):
         declaration = _base_declaration(type="consolidation_s_general_cluster")
