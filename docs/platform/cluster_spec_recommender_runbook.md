@@ -39,6 +39,7 @@ Useful flags:
 | `--days` | `90` | Lookback window |
 | `--min-days` | `3` | Minimum ARM calendar days |
 | `--min-runs` | `3` | Minimum ARM runs |
+| `--dominant-config-share-min` | `0.50` | Min dominant-config run **and** cost share to pass `mixed_config_review` |
 | `--trino-host` | prod Trino hostname | Trino endpoint; overridden by `TRINO_HOST` env var when set |
 | `--use-amd-history` | off | Optional AMD fallback for collapse-only candidates |
 | `--validation-outcomes` | off | Write `validation_outcomes.csv` comparing recommendations vs existing `__validation` runs (requires `--trino`) |
@@ -70,7 +71,7 @@ Examples:
 - `collapse_to_single|disable_photon|drop_nvme`
 - `keep_multi_node`
 
-The first `est` percentage is the accepted recommendation's estimated per-run delta. A percentage in parentheses is the cheapest rejected candidate. For example, `est 0% (+35%)` means no candidate beat the observed cost basis and the cheapest rejected one was estimated to increase cost by 35%. `disable_photon` and `drop_nvme` are normalizations the recommender always applies when the observed runs used Photon or local NVMe. When Photon ran, sizing also uses **effective demand** (CPU ×1.20, memory ×1.30 on p50/p95) so recommendations assume STANDARD-runtime headroom; observed `drv_*` / `wrk_*` columns in the CSV remain the raw telemetry.
+The first `est` percentage is the accepted recommendation's estimated per-run delta. A percentage in parentheses is the cheapest rejected candidate. For example, `est 0% (+35%)` means no candidate beat the observed cost basis and the cheapest rejected one was estimated to increase cost by 35%. `drop_nvme` is applied on every actionable recommendation that observed local NVMe. `disable_photon` is **cost-gated** — it appears only when dropping Photon actually beats keeping it (the recommender prices both worlds; see the "Photon quadrant search" section of the algorithm doc). When a *drop-Photon* candidate is sized, sizing uses **effective demand** (CPU ×1.20, memory ×1.30 on p50/p95) so it assumes STANDARD-runtime headroom; a keep-Photon candidate sizes on raw demand. Observed `drv_*` / `wrk_*` columns in the CSV remain the raw telemetry.
 
 ---
 
@@ -85,7 +86,7 @@ Actionable cohorts:
 | `protect_oom_risk` | Promote single-node to a higher-memory family before any downsizing wave (size up only when already on `r6g`) |
 | `driver_downsize` | Downsize single-node driver |
 
-A `disable_photon` and/or `drop_nvme` action can appear on any cohort above — and can make an otherwise `healthy_single`/`keep_multi_*` DAG actionable on its own.
+A `drop_nvme` action can appear on any actionable cohort above. `disable_photon` appears only when dropping Photon beats keeping it. When dropping the accelerators is what makes an otherwise-healthy DAG worth changing, it surfaces as an actionable `right_size_multi` (multi) or `healthy_single` (single) with a real, negative delta and a validation config — not a 0%-delta `keep_multi`. A `keep_multi_*` pick is now a true no-change (Photon and NVMe kept, because dropping Photon competed and lost).
 
 Non-actionable cohorts (no shape change — kept as observed):
 
@@ -172,7 +173,7 @@ Start with:
 - `collapse_to_single` and `right_size_multi`
 - `confidence = high`
 - clear negative `est_cost_delta_pct`
-- stable dominant config shares (`>= 0.80`)
+- stable dominant config shares (`>=` `--dominant-config-share-min`, default `0.50`)
 
 Review carefully:
 
@@ -385,7 +386,7 @@ make create-dag-files
 
 - **Bidirectional, cost-truthful:** the cheapest candidate that beats the observed cost basis within SLA wins — neither single-node nor multi-node is privileged. **SLA and the core cap always win.**
 - **Driver on-demand, workers spot:** recommendations never price or emit on-demand workers.
-- **Always normalize:** Photon (`disable_photon`, `runtime_engine: STANDARD`, +100% wall, CPU ×1.20 / memory ×1.30 effective demand for sizing) and local NVMe (`drop_nvme`, `*gd`→`*g`) are removed in every recommendation; the cost model prices the normalized shape.
+- **Photon quadrant + NVMe strip:** local NVMe (`drop_nvme`, `*gd`→`*g`) is removed on every actionable recommendation. Photon is a costed dimension — the recommender prices keep-Photon (raw demand, observed-anchored DBU, observed wall) and drop-Photon (`disable_photon`, `runtime_engine: STANDARD`, +100% wall, CPU ×1.20 / memory ×1.30 demand, non-Photon fleet DBU) across both the original and right-sized shapes (Q1-Q4) and keeps the globally cheapest that beats the observed cost. The offline DBU proxy divides observed DBU by `_PHOTON_DBU_PREMIUM = 3.0` when projecting Photon off.
 - **Cost authority:** `arm_avg_cost_per_run_usd` = negotiated `total_cost_usd` per run (DBU USD + EC2 USD). `arm_avg_dbu_cost_usd` and `arm_avg_ec2_cost_usd` are components. `arm_avg_dbu_consumed` is a DBU scalar for sanity checks only — never sum USD and DBU columns. List DBU (`total_dbu_list_cost_usd`) is not used.
 - **EC2 pricing:** on-demand USD/hour comes from [`dim_ec2_price.sql`](../../dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql) via the generated catalog. Spot = `0.37 × on_demand`. Do not use external Amazon CSV prices in the pipeline.
 - **ARM detection:** Graviton types match `^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1).` (case-insensitive), including `m6gd`, `m7g`, and `a1`.

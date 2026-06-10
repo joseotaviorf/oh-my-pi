@@ -112,14 +112,15 @@
       "is_any_local_nvme": true
     },
     "expected": {
-      "cohort": "keep_multi_compute",
-      "actions": "keep_multi_node|disable_photon|drop_nvme",
+      "cohort": "right_size_multi",
+      "actions": "keep_multi_node|keep_driver|keep_worker_type|keep_worker_count|disable_photon|drop_nvme",
       "recommended_preset": "consolidation_l_general_cluster",
       "rec_driver_node_type": "m6g.xlarge",
       "rec_worker_node_type": "m6g.4xlarge",
       "rec_worker_count": 4,
       "rec_runtime_engine": "STANDARD"
-    }
+    },
+    "note": "Photon+NVMe DAG. Dropping Photon at the observed shape (Q4: all keeps + disable_photon|drop_nvme) beats the observed cost (est -11.4%), so it surfaces as an actionable right_size_multi instead of a 0%-delta keep_multi."
   },
   "langfuse": {
     "kwargs": {
@@ -478,14 +479,14 @@
       "is_any_local_nvme": true
     },
     "expected": {
-      "cohort": "keep_multi_cost",
-      "actions": "keep_multi_node|disable_photon|drop_nvme",
+      "cohort": "right_size_multi",
+      "actions": "keep_multi_node|reduce_driver|keep_worker_type|keep_worker_count|disable_photon|drop_nvme",
       "recommended_preset": "consolidation_l_general_cluster",
-      "rec_driver_node_type": "m6g.2xlarge",
+      "rec_driver_node_type": "r6g.xlarge",
       "rec_worker_node_type": "m6g.4xlarge",
       "rec_worker_count": 3,
       "rec_runtime_engine": "STANDARD"
     },
-    "note": "ARM migration started 2026-06-06; utilization/cost from 2 live ARM runs, eligibility counters bumped to pass min_days/min_runs. Refined driver downsize no longer wins after worker-count SLA gate aligns with _decide_multi."
+    "note": "ARM migration started 2026-06-06; utilization/cost from live ARM runs, eligibility counters bumped to pass min_days/min_runs. Photon+NVMe DAG: dropping Photon plus a memory-family driver downsize (m6gd.2xlarge -> r6g.xlarge) now wins the quadrant search at est -30.9%, surfacing as an actionable right_size_multi."
   }
 }

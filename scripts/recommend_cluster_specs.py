@@ -145,6 +145,12 @@ _PHOTON_OFF_WALL_INFLATION = 2.0
 # (web-research midpoints: CPU 1.15-1.25, mem 1.25-1.35).
 _PHOTON_OFF_CPU_INFLATION = 1.20
 _PHOTON_OFF_MEM_INFLATION = 1.30
+# Photon DBU/node-hour premium over the STANDARD runtime. Photon has no separate
+# charge — it consumes more DBU at the same $/DBU — so this premium is already
+# baked into the observed DBU consumption. Verified fleet-wide (~2.8-3.1x on
+# matched instance types). Used only by the offline DBU fallback to credit the
+# lower STANDARD DBU rate when no per-instance non-Photon fleet rate is known.
+_PHOTON_DBU_PREMIUM = 3.0
 # Fleet-derived DBU consumed per node-hour, per instance type (non-Photon runs).
 # Populated once at runtime (main); empty in offline/unit contexts, where the
 # cost engine degrades to a vCPU-scaled observed-DBU proxy.
@@ -355,9 +361,23 @@ def _photon_adjust_pct(value: float | None, factor: float) -> float | None:
     return round(value * factor, 1)
 
 
-def effective_demand(m: DagMetrics) -> EffectiveDemand:
-    """Observed utilization inflated for STANDARD-runtime sizing when Photon ran."""
-    if not m.is_any_photon:
+def effective_demand(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> EffectiveDemand:
+    """Observed utilization, inflated for STANDARD-runtime sizing when Photon is
+    normalized off.
+
+    ``photon_off`` selects the demand world: ``None`` (default) preserves the
+    historical behavior — inflate iff the observed config ran Photon; ``True``
+    forces the inflated Photon-off demand; ``False`` returns the raw observed
+    demand, used to size a keep-Photon candidate (the box stays as fast as it
+    ran, so no CPU/memory inflation).
+    """
+    # Inflation models *removing* Photon, so it only applies when the observed
+    # config actually ran Photon. ``photon_off=None`` keeps the historical
+    # behavior (inflate iff Photon ran); an explicit value selects the world.
+    inflate = m.is_any_photon and (True if photon_off is None else photon_off)
+    if not inflate:
         return EffectiveDemand(
             drv_cpu_p50=m.drv_cpu_p50,
             drv_cpu_p95=m.drv_cpu_p95,
@@ -384,7 +404,7 @@ def effective_demand(m: DagMetrics) -> EffectiveDemand:
 # Classifier
 # ---------------------------------------------------------------------------
 
-_DOMINANT_CONFIG_SHARE_MIN = 0.80
+_DEFAULT_DOMINANT_CONFIG_SHARE_MIN = 0.50
 _DRIVER_CPU_BOUND_P95 = 70.0
 _DRIVER_WAIT_P95 = 10.0
 _DRIVER_MEM_PRESSURE_P95 = 75.0
@@ -474,8 +494,10 @@ def _single_node_candidates() -> list[tuple[str, InstanceSpec, float]]:
     )
 
 
-def _additive_memory_gb(m: DagMetrics) -> float | None:
-    d = effective_demand(m)
+def _additive_memory_gb(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> float | None:
+    d = effective_demand(m, photon_off=photon_off)
     driver_spec = INSTANCE_CATALOG.get(m.driver_node_type)
     if not driver_spec or d.drv_mem_p95 is None:
         return None
@@ -488,8 +510,8 @@ def _additive_memory_gb(m: DagMetrics) -> float | None:
     return round(used, 4)
 
 
-def _additive_cores(m: DagMetrics) -> float | None:
-    d = effective_demand(m)
+def _additive_cores(m: DagMetrics, *, photon_off: bool | None = None) -> float | None:
+    d = effective_demand(m, photon_off=photon_off)
     driver_spec = INSTANCE_CATALOG.get(m.driver_node_type)
     if not driver_spec or d.drv_cpu_p95 is None:
         return None
@@ -533,9 +555,11 @@ def _node_for_demand(required_mem_gb: float, required_cores: float) -> str | Non
     return None
 
 
-def size_single_node(m: DagMetrics) -> SingleNodeSizing:
-    required_mem_gb = _additive_memory_gb(m)
-    required_cores = _additive_cores(m)
+def size_single_node(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> SingleNodeSizing:
+    required_mem_gb = _additive_memory_gb(m, photon_off=photon_off)
+    required_cores = _additive_cores(m, photon_off=photon_off)
     if required_mem_gb is None or required_cores is None:
         return SingleNodeSizing(
             None, required_mem_gb, required_cores, None, None, "needs_more_telemetry"
@@ -595,8 +619,8 @@ def _schedule_interval_minutes(m: DagMetrics) -> float:
     return 1440.0
 
 
-def _collapse_wall_inflation(m: DagMetrics) -> float:
-    d = effective_demand(m)
+def _collapse_wall_inflation(m: DagMetrics, *, photon_off: bool | None = None) -> float:
+    d = effective_demand(m, photon_off=photon_off)
     worker_activity = max(
         (d.wrk_cpu_p50 or 0.0) / 85.0,
         (d.wrk_cpu_p95 or 0.0) / 85.0,
@@ -629,37 +653,53 @@ def _wall_minutes_for_cost(m: DagMetrics) -> float | None:
     return None
 
 
-def _shape_wall_minutes(m: DagMetrics, rec_workers: int) -> float | None:
+def _shape_wall_minutes(
+    m: DagMetrics, rec_workers: int, *, keep_photon: bool = False
+) -> float | None:
     """Observed wall with topology-shape inflation only (no Photon term).
 
     Conservative inflation when collapsing a multi-node cluster onto a single
     node, or when reducing the worker count below the observed count.
+
+    ``keep_photon`` selects the demand world used to size the topology inflation,
+    mirroring ``_projected_wall_for_sla``: a keep-Photon candidate stays as fast
+    as it ran, so the inflation is computed on raw (un-inflated) demand; the
+    default drops Photon and uses the inflated STANDARD-runtime demand. (For a
+    non-Photon DAG ``effective_demand`` never inflates, so this is a no-op.)
     """
     base = _wall_minutes_for_cost(m)
     if base is None:
         return None
+    photon_off = not keep_photon
     current_workers = m.worker_count or 0
     if rec_workers == 0 and m.topology == "multi":
-        return base * _collapse_wall_inflation(m)
+        return base * _collapse_wall_inflation(m, photon_off=photon_off)
     if rec_workers and current_workers and rec_workers < current_workers:
-        return base * _worker_reduction_wall_inflation(m, current_workers, rec_workers)
+        return base * _worker_reduction_wall_inflation(
+            m, current_workers, rec_workers, photon_off=photon_off
+        )
     return base
 
 
 def _legacy_dbu_projection(
-    m: DagMetrics, nodes: list[str], wall_minutes: float
+    m: DagMetrics, nodes: list[str], wall_minutes: float, *, photon_off: bool = False
 ) -> float | None:
     """Offline fallback: scale observed DBU USD by vCPU ratio and wall factor.
 
     Used only when the fleet DBU-rate map cannot price the candidate (no fleet
-    data, e.g. offline/CSV/unit runs). Does not credit Photon-off DBU savings —
-    that truthful reprojection requires the non-Photon fleet rate.
+    data, e.g. offline/CSV/unit runs). When ``photon_off`` and the observed run
+    used Photon, the baked-in Photon DBU premium (``_PHOTON_DBU_PREMIUM``,
+    verified fleet-wide at ~2.8-3.1x) is removed first, so the fallback still
+    credits the lower STANDARD-runtime DBU rate; the truthful per-instance
+    reprojection is the non-Photon fleet rate, used whenever it is available.
     """
     current_dbu_usd = (
         m.arm_avg_dbu_cost_usd
         if m.arm_avg_dbu_cost_usd is not None
         else max(_current_cost_basis(m) - (m.arm_avg_ec2_cost_usd or 0.0), 0.0)
     )
+    if photon_off and m.is_any_photon:
+        current_dbu_usd /= _PHOTON_DBU_PREMIUM
     current_vcpus = _vcpus(m.driver_node_type) + (m.worker_count or 0) * _vcpus(
         _worker_node_type(m)
     )
@@ -678,15 +718,25 @@ def estimate_projected_total_cost(
     *,
     rec_worker: str | None = None,
     fleet_dbu_rate: dict[str, float] | None = None,
+    keep_photon: bool = False,
 ) -> float | None:
     """Explicit per-run cost of a candidate shape (USD).
 
     EC2 = on-demand driver + spot workers, priced over the projected wall-clock.
-    DBU = fleet non-Photon DBU/node-hour x node-hours x negotiated $/DBU.
     Workers are *always* priced spot (the preset default), regardless of the
-    DAG's current availability override. When the observed config ran Photon and
-    the fleet can reprice DBU, the projected wall is inflated by
-    ``_PHOTON_OFF_WALL_INFLATION`` (cost reflects the normalized Photon-off run).
+    DAG's current availability override.
+
+    Two accelerator scenarios:
+
+    - **Drop Photon** (``keep_photon=False``, the default): when the observed
+      config ran Photon the projected wall is inflated by
+      ``_PHOTON_OFF_WALL_INFLATION`` and DBU is priced at the *non-Photon* fleet
+      rate (``_FLEET_DBU_RATE``) — the cost of the normalized STANDARD run.
+    - **Keep Photon** (``keep_photon=True``): no wall inflation (the box stays
+      as fast as it ran) and DBU is anchored on the DAG's *own* observed DBU
+      scaled to the candidate node-hours. Photon has no separate charge — its
+      premium is already baked into the observed DBU consumption — so the
+      observed-DBU anchor is the truthful keep-Photon DBU rate.
     """
     fleet = _FLEET_DBU_RATE if fleet_dbu_rate is None else fleet_dbu_rate
     rec_worker_type = (rec_worker or _worker_node_type(m)) if rec_workers > 0 else None
@@ -696,7 +746,7 @@ def estimate_projected_total_cost(
     if rec_workers > 0 and _instance_price(rec_worker_type) is None:
         return None
 
-    base_wall = _shape_wall_minutes(m, rec_workers)
+    base_wall = _shape_wall_minutes(m, rec_workers, keep_photon=keep_photon)
     if base_wall is None:
         return None
 
@@ -704,10 +754,7 @@ def estimate_projected_total_cost(
     if rec_workers > 0 and rec_worker_type:
         nodes.extend([rec_worker_type] * rec_workers)
 
-    fleet_rates = [fleet_dbu_per_node_hour(node, fleet) for node in nodes]
-    fleet_priced = bool(fleet_rates) and all(rate is not None for rate in fleet_rates)
-
-    photon_off = bool(m.is_any_photon)
+    photon_off = bool(m.is_any_photon) and not keep_photon
     wall_minutes = base_wall * (_PHOTON_OFF_WALL_INFLATION if photon_off else 1.0)
     wall_h = wall_minutes / 60.0
 
@@ -721,12 +768,23 @@ def estimate_projected_total_cost(
             return None
         ec2 += worker_price * wall_h * rec_workers
 
-    if fleet_priced:
-        dbu = sum(fleet_rates) * wall_h * _USD_PER_DBU
-    else:
-        dbu = _legacy_dbu_projection(m, nodes, wall_minutes)
+    if keep_photon and m.is_any_photon:
+        # Photon DBU is baked into the observed consumption; anchor on it
+        # directly (keep the premium — the box still runs Photon).
+        dbu = _legacy_dbu_projection(m, nodes, wall_minutes, photon_off=False)
         if dbu is None:
             return None
+    else:
+        fleet_rates = [fleet_dbu_per_node_hour(node, fleet) for node in nodes]
+        fleet_priced = bool(fleet_rates) and all(
+            rate is not None for rate in fleet_rates
+        )
+        if fleet_priced:
+            dbu = sum(fleet_rates) * wall_h * _USD_PER_DBU
+        else:
+            dbu = _legacy_dbu_projection(m, nodes, wall_minutes, photon_off=photon_off)
+            if dbu is None:
+                return None
 
     return round(ec2 + dbu, 6)
 
@@ -754,8 +812,10 @@ def _multi_preset_for_worker(worker_node_type: str | None) -> str | None:
     return name if name in PRESET_CATALOG else None
 
 
-def _driver_minimize_node(m: DagMetrics) -> str | None:
-    d = effective_demand(m)
+def _driver_minimize_node(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> str | None:
+    d = effective_demand(m, photon_off=photon_off)
     if d.drv_mem_p95 is None:
         return None
     current_spec = INSTANCE_CATALOG.get(m.driver_node_type)
@@ -780,10 +840,12 @@ def _worker_reduction_wall_inflation(
     m: DagMetrics,
     old_count: int,
     new_count: int,
+    *,
+    photon_off: bool | None = None,
 ) -> float:
     if new_count >= old_count or old_count <= 0 or new_count <= 0:
         return 1.0
-    d = effective_demand(m)
+    d = effective_demand(m, photon_off=photon_off)
     worker_activity = max(
         (d.wrk_cpu_p50 or 0.0) / (_SINGLE_NODE_CPU_TARGET * 100.0),
         (d.wrk_cpu_p95 or 0.0) / (_SINGLE_NODE_CPU_TARGET * 100.0),
@@ -794,8 +856,10 @@ def _worker_reduction_wall_inflation(
     return 1.0 + parallelism_loss * worker_activity
 
 
-def _worker_resize(m: DagMetrics) -> WorkerResize | None:
-    d = effective_demand(m)
+def _worker_resize(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> WorkerResize | None:
+    d = effective_demand(m, photon_off=photon_off)
     if (
         m.topology != "multi"
         or not m.worker_count
@@ -852,6 +916,9 @@ class ShapeCandidate:
     worker_node_type: str | None
     worker_count: int  # 0 = single node
     label: str
+    keep_photon: bool = (
+        False  # True → priced with Photon kept on (no STANDARD normalize)
+    )
 
 
 def observed_total_cores(m: DagMetrics) -> int:
@@ -869,15 +936,21 @@ def candidate_total_cores(candidate: ShapeCandidate) -> int:
     return cores
 
 
-def build_best_single_candidate(m: DagMetrics) -> ShapeCandidate | None:
+def build_best_single_candidate(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> ShapeCandidate | None:
     """Smallest single on-demand node that holds the additive demand."""
-    sizing = size_single_node(m)
+    sizing = size_single_node(m, photon_off=photon_off)
     if not sizing.node_type:
         return None
-    return ShapeCandidate(sizing.node_type, None, 0, "best_single")
+    return ShapeCandidate(
+        sizing.node_type, None, 0, "best_single", keep_photon=photon_off is False
+    )
 
 
-def build_current_refined_candidate(m: DagMetrics) -> ShapeCandidate | None:
+def build_current_refined_candidate(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> ShapeCandidate | None:
     """Refined multi-node: demand-sized OD driver + >=2 right-sized spot workers.
 
     The driver and worker levers are evaluated independently from their own p95
@@ -887,15 +960,16 @@ def build_current_refined_candidate(m: DagMetrics) -> ShapeCandidate | None:
     """
     if m.topology != "multi":
         return None
-    worker_resize = _worker_resize(m)
+    worker_resize = _worker_resize(m, photon_off=photon_off)
     if worker_resize is None or worker_resize.worker_count < 2:
         return None
-    driver = _driver_minimize_node(m) or m.driver_node_type
+    driver = _driver_minimize_node(m, photon_off=photon_off) or m.driver_node_type
     return ShapeCandidate(
         driver,
         worker_resize.node_type,
         worker_resize.worker_count,
         "right_size_multi",
+        keep_photon=photon_off is False,
     )
 
 
@@ -943,9 +1017,9 @@ def _spill_pressure(m: DagMetrics) -> bool:
 
 
 def _projected_driver_mem_after_collapse(
-    m: DagMetrics, rec_driver: str | None
+    m: DagMetrics, rec_driver: str | None, *, photon_off: bool | None = None
 ) -> float | None:
-    d = effective_demand(m)
+    d = effective_demand(m, photon_off=photon_off)
     if (
         rec_driver is None
         or d.drv_mem_p95 is None
@@ -965,8 +1039,12 @@ def _projected_driver_mem_after_collapse(
     return round((driver_used_gb + worker_used_gb) / rec_mem.memory_gb * 100.0, 1)
 
 
-def _collapse_memory_feasible(m: DagMetrics, rec_driver: str | None) -> bool:
-    projected = _projected_driver_mem_after_collapse(m, rec_driver)
+def _collapse_memory_feasible(
+    m: DagMetrics, rec_driver: str | None, *, photon_off: bool | None = None
+) -> bool:
+    projected = _projected_driver_mem_after_collapse(
+        m, rec_driver, photon_off=photon_off
+    )
     return projected is None or projected < _COLLAPSE_DRIVER_MEM_PROJECTED_MAX
 
 
@@ -984,14 +1062,16 @@ _RELAXED_DOWNSIZE_CPU_P95_MAX = 40.0
 _RELAXED_DOWNSIZE_MEM_P95_MAX = 70.0
 
 
-def _single_node_downsize_node(m: DagMetrics) -> str | None:
+def _single_node_downsize_node(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> str | None:
     """Relaxed single-node downsize candidate.
 
     A same-family one-tier-down node, accepted only when CPU/mem headroom allows
     it (projected memory must stay under the single-node memory target). Returns
     None when no safe downsize exists.
     """
-    d = effective_demand(m)
+    d = effective_demand(m, photon_off=photon_off)
     if d.drv_cpu_p95 is None or d.drv_mem_p95 is None:
         return None
     if (
@@ -1018,24 +1098,30 @@ def _single_node_downsize_node(m: DagMetrics) -> str | None:
     return downsize
 
 
-def _projected_wall_for_sla(m: DagMetrics, rec_workers: int) -> float | None:
+def _projected_wall_for_sla(
+    m: DagMetrics, rec_workers: int, *, keep_photon: bool = False
+) -> float | None:
     """Projected p95 wall used for the SLA guard.
 
     Built on the SLA-relevant p95 wall (not the p50-preferred cost wall), with
-    topology-shape inflation (collapse / worker-count reduction) plus the
-    Photon-off normalization the recommender always applies. A same-parallelism
-    change (worker-type swap at equal count) leaves wall unchanged.
+    topology-shape inflation (collapse / worker-count reduction). A same-
+    parallelism change (worker-type swap at equal count) leaves wall unchanged.
+    The Photon-off normalization (``_PHOTON_OFF_WALL_INFLATION``) is applied only
+    when the candidate drops Photon; a keep-Photon candidate keeps observed wall.
     """
     base = m.wall_p95_min if (m.wall_p95_min and m.wall_p95_min > 0) else m.wall_p50_min
     if not base or base <= 0:
         return None
     wall = base
+    photon_off = bool(m.is_any_photon) and not keep_photon
     current_workers = m.worker_count or 0
     if rec_workers == 0 and m.topology == "multi":
-        wall *= _collapse_wall_inflation(m)
+        wall *= _collapse_wall_inflation(m, photon_off=not keep_photon)
     elif rec_workers and current_workers and rec_workers < current_workers:
-        wall *= _worker_reduction_wall_inflation(m, current_workers, rec_workers)
-    if m.is_any_photon:
+        wall *= _worker_reduction_wall_inflation(
+            m, current_workers, rec_workers, photon_off=not keep_photon
+        )
+    if photon_off:
         wall *= _PHOTON_OFF_WALL_INFLATION
     return wall
 
@@ -1111,45 +1197,82 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
 
     options: list[tuple[float, str, ShapeCandidate]] = []
 
-    best_single = build_best_single_candidate(m)
-    if (
-        best_single is not None
-        and candidate_total_cores(best_single) <= observed_cores
-        and _collapse_memory_feasible(m, best_single.driver_node_type)
-    ):
-        wall = _projected_wall_for_sla(m, 0)
-        cost = estimate_projected_total_cost(m, best_single.driver_node_type, 0)
-        if wall is not None and wall <= sla_limit and cost is not None:
-            options.append((cost, "collapse_to_single", best_single))
+    # Enumerate shape candidates across both Photon worlds. A non-Photon DAG has
+    # only the drop-Photon world (keep_photon is a no-op there); a Photon DAG
+    # also gets keep-Photon candidates, sized on raw (un-inflated) demand so an
+    # oversized-but-fast box can shrink while staying on Photon.
+    photon_worlds = [False, True] if m.is_any_photon else [False]
+    for keep_photon in photon_worlds:
+        photon_off = not keep_photon
 
-    refined = build_current_refined_candidate(m)
-    if (
-        refined is not None
-        and candidate_total_cores(refined) <= observed_cores
-        and _candidate_is_reduction(m, refined)
-    ):
-        wall = _projected_wall_for_sla(m, refined.worker_count)
+        best_single = build_best_single_candidate(m, photon_off=photon_off)
+        if (
+            best_single is not None
+            and candidate_total_cores(best_single) <= observed_cores
+            and _collapse_memory_feasible(
+                m, best_single.driver_node_type, photon_off=photon_off
+            )
+        ):
+            wall = _projected_wall_for_sla(m, 0, keep_photon=keep_photon)
+            cost = estimate_projected_total_cost(
+                m, best_single.driver_node_type, 0, keep_photon=keep_photon
+            )
+            if wall is not None and wall <= sla_limit and cost is not None:
+                options.append((cost, "collapse_to_single", best_single))
+
+        refined = build_current_refined_candidate(m, photon_off=photon_off)
+        if (
+            refined is not None
+            and candidate_total_cores(refined) <= observed_cores
+            and _candidate_is_reduction(m, refined)
+        ):
+            wall = _projected_wall_for_sla(
+                m, refined.worker_count, keep_photon=keep_photon
+            )
+            cost = estimate_projected_total_cost(
+                m,
+                refined.driver_node_type,
+                refined.worker_count,
+                rec_worker=refined.worker_node_type,
+                keep_photon=keep_photon,
+            )
+            if wall is not None and wall <= sla_limit and cost is not None:
+                options.append((cost, "right_size_multi", refined))
+
+    # Q4: drop Photon at the observed shape (NVMe stripped) — the "remove the
+    # accelerators only" candidate. Competes in the same pool, so dropping
+    # Photon wins only when it genuinely beats keeping it at every shape.
+    if m.is_any_photon:
+        same_driver = _strip_nvme(m.driver_node_type)
+        same_worker = _strip_nvme(_worker_node_type(m))
+        same_count = m.worker_count or 0
+        wall = _projected_wall_for_sla(m, same_count, keep_photon=False)
         cost = estimate_projected_total_cost(
-            m,
-            refined.driver_node_type,
-            refined.worker_count,
-            rec_worker=refined.worker_node_type,
+            m, same_driver, same_count, rec_worker=same_worker, keep_photon=False
         )
-        if wall is not None and wall <= sla_limit and cost is not None:
-            options.append((cost, "right_size_multi", refined))
+        if same_driver and wall is not None and wall <= sla_limit and cost is not None:
+            q4 = ShapeCandidate(
+                same_driver, same_worker, same_count, "drop_photon_same_shape"
+            )
+            options.append((cost, "right_size_multi", q4))
 
     viable = [option for option in options if baseline <= 0 or option[0] < baseline]
     if viable:
         cost, cohort, candidate = min(viable, key=lambda option: option[0])
         return MultiDecision(cohort, candidate)
 
-    # Nothing beats the observed cost — keep multi, but surface the cheapest
-    # feasible candidate cost (if any) as the rejected/blocked alternative.
+    # Nothing beats the observed cost — keep multi (including Photon, which was
+    # in the pool), and surface the cheapest feasible alternative as blocked.
     blocked_cost = min((option[0] for option in options), default=None)
     return MultiDecision(_keep_multi_reason(m, sizing), None, blocked_cost=blocked_cost)
 
 
-def classify(m: DagMetrics, min_days: int = 3, min_runs: int = 3) -> str:
+def classify(
+    m: DagMetrics,
+    min_days: int = 3,
+    min_runs: int = 3,
+    dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
+) -> str:
     if m.arm_days < min_days or m.arm_runs < min_runs:
         return "needs_more_arm_data"
 
@@ -1158,8 +1281,8 @@ def classify(m: DagMetrics, min_days: int = 3, min_runs: int = 3) -> str:
     if topo == "autoscale":
         return "autoscale_review"
     if (
-        m.dominant_config_run_share < _DOMINANT_CONFIG_SHARE_MIN
-        or m.dominant_config_cost_share < _DOMINANT_CONFIG_SHARE_MIN
+        m.dominant_config_run_share < dominant_config_share_min
+        or m.dominant_config_cost_share < dominant_config_share_min
     ):
         return "mixed_config_review"
     if not _required_metrics_present(m):
@@ -1448,26 +1571,13 @@ def _cost_delta_pct(
     return round((projected_cost - current_cost) / current_cost * 100, 1)
 
 
-def _has_accepted_resize(actions: list[str] | str) -> bool:
-    if isinstance(actions, str):
-        action_set = set(actions.split("|"))
-    else:
-        action_set = set(actions)
-    return bool(
-        {
-            "collapse_to_single",
-            "reduce_driver",
-            "reduce_worker_type",
-            "reduce_worker_count",
-        }
-        & action_set
-    )
-
-
 def build_recommendation(
-    m: DagMetrics, min_days: int = 3, min_runs: int = 3
+    m: DagMetrics,
+    min_days: int = 3,
+    min_runs: int = 3,
+    dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
 ) -> Recommendation:
-    cohort = classify(m, min_days, min_runs)
+    cohort = classify(m, min_days, min_runs, dominant_config_share_min)
     current_preset = infer_current_preset(
         m.driver_node_type, m.worker_node_type, m.worker_count
     )
@@ -1490,24 +1600,43 @@ def build_recommendation(
     decision = _decide_multi(m) if m.topology == "multi" else None
     candidate = decision.candidate if decision else None
 
+    cost_basis = (
+        m.arm_avg_total_cost_estimate_usd
+        if m.arm_avg_total_cost_estimate_usd is not None
+        else m.arm_avg_cost_per_run_usd
+    )
+
+    # Whether the recommended plan keeps Photon on. Defaults to keeping it;
+    # flipped to drop only when dropping Photon is the cost-justified winner.
+    winner_keep_photon = True
+    multi_winner = (
+        cohort in ("collapse_to_single", "right_size_multi") and candidate is not None
+    )
+
     if cohort == "collapse_to_single" and candidate is not None:
         actions = ["collapse_to_single"]
         rec_driver = candidate.driver_node_type
         rec_worker = None
         rec_workers = 0
+        winner_keep_photon = candidate.keep_photon
     elif cohort == "right_size_multi" and candidate is not None:
         current_worker = _worker_node_type(m)
         current_workers = m.worker_count or 0
-        worker_resize = _worker_resize(m)
+        winner_keep_photon = candidate.keep_photon
+        worker_resize = _worker_resize(m, photon_off=not winner_keep_photon)
         actions = ["keep_multi_node"]
+        # Compare NVMe-stripped types, so a pure NVMe strip (m6gd -> m6g, same
+        # tier) reads as "keep" (the drop_nvme action covers it) while a genuine
+        # type/family/tier change still reads as "reduce".
         actions.append(
             "reduce_driver"
-            if candidate.driver_node_type != m.driver_node_type
+            if _strip_nvme(candidate.driver_node_type)
+            != _strip_nvme(m.driver_node_type)
             else "keep_driver"
         )
         actions.append(
             "reduce_worker_type"
-            if candidate.worker_node_type != current_worker
+            if _strip_nvme(candidate.worker_node_type) != _strip_nvme(current_worker)
             else "keep_worker_type"
         )
         if candidate.worker_count != current_workers:
@@ -1526,8 +1655,9 @@ def build_recommendation(
         else:
             num_workers_override = None
     elif cohort in _KEEP_MULTI_COHORTS:
-        # No candidate beat the observed cost-or-SLA — keep the observed shape and
-        # surface the rejected single-node collapse cost for transparency.
+        # Nothing — including dropping Photon, which competed in the candidate
+        # pool — beat the observed cost: keep the observed shape exactly as-is
+        # (Photon and NVMe included). Surface the rejected collapse cost.
         actions = ["keep_multi_node"]
         rec_driver = m.driver_node_type
         rec_worker = _worker_node_type(m)
@@ -1548,53 +1678,80 @@ def build_recommendation(
     if cohort == "driver_downsize" and rec_preset_name:
         actions = ["reduce_driver"]
         rec_driver = _single_node_downsize_node(m) or _driver_downsize_node(m)
+    elif cohort == "protect_oom_risk" and rec_preset_name:
+        # Safety upsize to a higher-memory family/tier; the explicit action keeps
+        # the report honest (the shape does change even though cost may rise).
+        actions = ["promote_driver_memory"]
 
-    # Cost-neutral normalizations the cost engine already assumes: drop Photon
-    # (DBU ~3x) and local NVMe (EC2 ~+20%). They make an otherwise-healthy DAG
-    # actionable and never pin workers to on-demand.
+    # --- Accelerator (Photon / NVMe) decision + normalization emission ---------
+    # NVMe is stripped on every actionable recommendation (spill-pressure DAGs
+    # are already parked upstream). Photon is dropped only when it is the chosen,
+    # cost-justified plan: multi winners carry the decision on the candidate;
+    # other actionable cohorts compare keep- vs drop-Photon at the rec shape.
     rec_runtime_engine: str | None = None
-    if m.is_any_photon:
-        rec_runtime_engine = "STANDARD"
-        actions.append("disable_photon")
-    if m.is_any_local_nvme:
-        rec_driver = _strip_nvme(rec_driver)
-        rec_worker = _strip_nvme(rec_worker)
-        actions.append("drop_nvme")
+    keep_multi_no_change = cohort in _KEEP_MULTI_COHORTS
 
-    # For healthy cohorts where only normalizations apply (disable_photon /
-    # drop_nvme), fill the current shape so projected metrics and validation
-    # YAML can be generated.
-    if rec_preset_name is None and any(
-        a in actions for a in ("disable_photon", "drop_nvme")
-    ):
-        rec_preset_name = current_preset
-        if rec_driver is None:
-            rec_driver = _strip_nvme(m.driver_node_type)
-        if rec_worker is None and m.topology == "multi":
-            rec_worker = _strip_nvme(_worker_node_type(m))
-        if rec_workers is None:
-            rec_workers = m.worker_count if m.topology == "multi" else 0
-        rec_spec = PRESET_CATALOG.get(rec_preset_name) if rec_preset_name else None
+    if not keep_multi_no_change:
+        # Fill the observed shape when a cohort has no resize of its own but the
+        # accelerators may still be removable (e.g. healthy_single, NVMe-only).
+        if rec_preset_name is None and (m.is_any_photon or m.is_any_local_nvme):
+            rec_preset_name = current_preset
+            if rec_driver is None:
+                rec_driver = m.driver_node_type
+            if rec_worker is None and m.topology == "multi":
+                rec_worker = _worker_node_type(m)
+            if rec_workers is None:
+                rec_workers = m.worker_count if m.topology == "multi" else 0
+            rec_spec = PRESET_CATALOG.get(rec_preset_name) if rec_preset_name else None
+
+        if (
+            not multi_winner
+            and cohort != "protect_oom_risk"
+            and m.is_any_photon
+            and rec_driver is not None
+            and rec_workers is not None
+        ):
+            keep_cost = estimate_projected_total_cost(
+                m, rec_driver, rec_workers, rec_worker=rec_worker, keep_photon=True
+            )
+            drop_cost = estimate_projected_total_cost(
+                m, rec_driver, rec_workers, rec_worker=rec_worker, keep_photon=False
+            )
+            winner_keep_photon = not (
+                drop_cost is not None and (keep_cost is None or drop_cost < keep_cost)
+            )
+
+        if m.is_any_photon and not winner_keep_photon:
+            rec_runtime_engine = "STANDARD"
+            actions.append("disable_photon")
+        if m.is_any_local_nvme and rec_driver is not None:
+            rec_driver = _strip_nvme(rec_driver)
+            rec_worker = _strip_nvme(rec_worker)
+            actions.append("drop_nvme")
+
+        # A same-shape fill that ended up keeping everything is a true no-change.
+        if not actions:
+            rec_preset_name = None
+            rec_driver = None
+            rec_worker = None
+            rec_workers = None
 
     if rec_spec and rec_driver and rec_driver != rec_spec.driver_node_type:
         driver_override_node_type_id = rec_driver
     if not actions:
         actions = ["no_change"]
 
-    # Build projected metrics (sizing bases use effective demand when Photon ran)
+    # Build projected metrics. Sizing/utilization bases use the demand world that
+    # matches the chosen Photon plan (inflated only when Photon is dropped).
     projected = ProjectedMetrics()
-    demand = effective_demand(m)
+    demand = effective_demand(m, photon_off=not winner_keep_photon)
     if rec_preset_name and rec_driver is not None and rec_workers is not None:
-        cost_basis = (
-            m.arm_avg_total_cost_estimate_usd
-            if m.arm_avg_total_cost_estimate_usd is not None
-            else m.arm_avg_cost_per_run_usd
-        )
         projected.est_cost_per_run_usd = estimate_projected_total_cost(
             m,
             rec_driver,
             rec_workers,
             rec_worker=rec_worker,
+            keep_photon=winner_keep_photon,
         )
         if projected.est_cost_per_run_usd is None:
             projected.est_cost_per_run_usd = estimate_cost(
@@ -1611,7 +1768,9 @@ def build_recommendation(
                 projected.est_cost_per_run_usd,
                 cost_basis,
             )
-        if cohort in _KEEP_MULTI_COHORTS and not _has_accepted_resize(actions):
+        if keep_multi_no_change:
+            # Genuine no-change: dropping Photon and every resize competed in the
+            # candidate pool and lost, so the observed cost is the truth.
             projected.est_cost_per_run_usd = cost_basis
             projected.est_cost_delta_pct = 0.0
         if blocked_cost_per_run is not None and cost_basis:
@@ -2669,7 +2828,10 @@ def fetch_amd_candidates(
     return [m for m in amd_rows if m.dag_id not in arm_dag_ids]
 
 
-def build_amd_recommendation(m: DagMetrics) -> Recommendation | None:
+def build_amd_recommendation(
+    m: DagMetrics,
+    dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
+) -> Recommendation | None:
     """Build a collapse_to_single recommendation from AMD data, or None if not eligible.
 
     The DAG's wall_p95 is corrected by AMD_WALL_CORRECTION before testing the
@@ -2679,8 +2841,8 @@ def build_amd_recommendation(m: DagMetrics) -> Recommendation | None:
     if not classify_amd_for_collapse(m):
         return None
     if (
-        m.dominant_config_run_share < _DOMINANT_CONFIG_SHARE_MIN
-        or m.dominant_config_cost_share < _DOMINANT_CONFIG_SHARE_MIN
+        m.dominant_config_run_share < dominant_config_share_min
+        or m.dominant_config_cost_share < dominant_config_share_min
     ):
         return None
 
@@ -3171,6 +3333,16 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Lookback window in days for Trino query (default 90)",
     )
     parser.add_argument(
+        "--dominant-config-share-min",
+        type=float,
+        default=_DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
+        metavar="FRACTION",
+        help=(
+            "Min dominant-config run AND cost share to pass mixed_config_review "
+            "gate (default 0.50)"
+        ),
+    )
+    parser.add_argument(
         "--out-dir",
         type=Path,
         default=Path("."),
@@ -3299,7 +3471,15 @@ def main(argv: list[str] | None = None) -> int:
             )
 
     # Build recommendations from ARM data
-    recs = [build_recommendation(m, args.min_days, args.min_runs) for m in metrics]
+    recs = [
+        build_recommendation(
+            m,
+            args.min_days,
+            args.min_runs,
+            args.dominant_config_share_min,
+        )
+        for m in metrics
+    ]
 
     # Optionally extend with collapse candidates from AMD history
     if getattr(args, "use_amd_history", False) and args.trino:
@@ -3311,7 +3491,10 @@ def main(argv: list[str] | None = None) -> int:
         )
         amd_pool = fetch_amd_candidates(metrics, amd_sql, trino_host)
         amd_recs = [
-            r for m in amd_pool if (r := build_amd_recommendation(m)) is not None
+            r
+            for m in amd_pool
+            if (r := build_amd_recommendation(m, args.dominant_config_share_min))
+            is not None
         ]
         print(
             f"AMD correction: {len(amd_pool)} candidates, {len(amd_recs)} collapse-eligible.",

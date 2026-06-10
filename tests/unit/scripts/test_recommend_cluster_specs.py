@@ -96,7 +96,20 @@ class TestClassifyQualityGates:
 
     def test_autoscale_and_mixed_config_review(self):
         assert classify(_m(worker_count=None)) == "autoscale_review"
-        assert classify(_m(dominant_config_run_share=0.5)) == "mixed_config_review"
+        assert classify(_m(dominant_config_run_share=0.49)) == "mixed_config_review"
+        assert classify(_m(dominant_config_cost_share=0.49)) == "mixed_config_review"
+
+    def test_dominant_config_share_min_boundary(self):
+        at_threshold = _m(dominant_config_run_share=0.5, dominant_config_cost_share=0.5)
+        below_threshold = _m(
+            dominant_config_run_share=0.49, dominant_config_cost_share=0.9
+        )
+        assert classify(at_threshold) != "mixed_config_review"
+        assert classify(below_threshold) == "mixed_config_review"
+        assert (
+            classify(_m(dominant_config_run_share=0.5), dominant_config_share_min=0.80)
+            == "mixed_config_review"
+        )
 
     def test_missing_metrics_and_cost_confidence_review(self):
         assert classify(_m(drv_cpu_p95=None)) == "needs_more_telemetry"
@@ -803,7 +816,7 @@ class TestCostProjection:
         # +100% wall when Photon is normalized off; cost scales linearly with wall.
         assert cost_photon == pytest.approx(cost_no_photon * 2.0)
 
-    def test_photon_off_applies_wall_inflation_without_fleet_rates(self):
+    def test_photon_off_credits_dbu_premium_without_fleet_rates(self):
         common = dict(
             driver_node_type="m6g.xlarge",
             worker_node_type=None,
@@ -813,6 +826,7 @@ class TestCostProjection:
             arm_avg_dbu_cost_usd=5.0,
             arm_avg_ec2_cost_usd=3.0,
         )
+        od = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.xlarge"]
 
         cost_no_photon = estimate_projected_total_cost(
             _m(is_any_photon=False, **common), "m6g.xlarge", 0, fleet_dbu_rate={}
@@ -821,8 +835,50 @@ class TestCostProjection:
             _m(is_any_photon=True, **common), "m6g.xlarge", 0, fleet_dbu_rate={}
         )
 
-        assert cost_no_photon is not None
-        assert cost_photon == pytest.approx(cost_no_photon * 2.0)
+        # Non-Photon: wall 30 min, DBU = observed 5.0 (vCPU ratio 1, wall factor 1).
+        assert cost_no_photon == pytest.approx(round(od * 0.5 + 5.0, 6))
+        # Dropping Photon: EC2 doubles with the 2x normalized wall, but the offline
+        # DBU fallback first removes the baked-in Photon premium (/3.0), so DBU nets
+        # to 5.0/3 * 2 (premium removed, then 2x wall) rather than naively doubling.
+        assert cost_photon == pytest.approx(round(od * 1.0 + 5.0 / 3.0 * 2.0, 6))
+        # The premium credit makes Photon-off cheaper than a naive 2x projection.
+        assert cost_photon < cost_no_photon * 2.0
+
+    def test_keep_photon_collapse_wall_uses_raw_demand(self):
+        """Regression: a keep-Photon candidate must be priced on raw-demand
+        topology inflation, mirroring ``_projected_wall_for_sla``. Previously
+        ``_shape_wall_minutes`` always sized the collapse / worker-reduction
+        inflation on the Photon-off (inflated) demand, overstating keep-Photon
+        wall — and hence EC2 + the wall-scaled observed-DBU anchor — which could
+        skew the cheapest-feasible quadrant pick toward dropping Photon.
+        """
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            is_any_photon=True,
+        )
+
+        keep_wall = rcs._shape_wall_minutes(m, 0, keep_photon=True)
+        drop_wall = rcs._shape_wall_minutes(m, 0, keep_photon=False)
+        assert keep_wall is not None and drop_wall is not None
+        # Raw demand → smaller collapse inflation than the Photon-off world.
+        assert keep_wall < drop_wall
+        assert keep_wall == pytest.approx(
+            30.0 * rcs._collapse_wall_inflation(m, photon_off=False)
+        )
+        # The cost wall now matches the SLA gate for keep-Photon (both raw).
+        assert keep_wall == pytest.approx(rcs._projected_wall_for_sla(m, 0, keep_photon=True))
+
+        # The priced keep-Photon collapse tracks the raw-demand wall end to end.
+        expected_ec2 = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.xlarge"] * (keep_wall / 60.0)
+        expected_dbu = rcs._legacy_dbu_projection(
+            m, ["m6g.xlarge"], keep_wall, photon_off=False
+        )
+        keep_cost = estimate_projected_total_cost(m, "m6g.xlarge", 0, keep_photon=True)
+        assert keep_cost == pytest.approx(round(expected_ec2 + expected_dbu, 6))
 
     def test_cost_falls_back_to_observed_dbu_proxy_without_fleet(self):
         m = _m(
@@ -1504,7 +1560,7 @@ class TestAmdCorrection:
         assert (
             build_amd_recommendation(
                 self._amd_m(
-                    dominant_config_run_share=0.5, dominant_config_cost_share=0.9
+                    dominant_config_run_share=0.49, dominant_config_cost_share=0.9
                 )
             )
             is None
@@ -1512,7 +1568,7 @@ class TestAmdCorrection:
         assert (
             build_amd_recommendation(
                 self._amd_m(
-                    dominant_config_run_share=0.9, dominant_config_cost_share=0.5
+                    dominant_config_run_share=0.9, dominant_config_cost_share=0.49
                 )
             )
             is None
@@ -1714,3 +1770,141 @@ class TestRealDagAcceptance:
         assert rec.rec_worker_node_type == expected["rec_worker_node_type"]
         assert rec.rec_worker_count == expected["rec_worker_count"]
         assert rec.rec_runtime_engine == expected["rec_runtime_engine"]
+
+
+class TestPhotonQuadrantSearch:
+    """Photon on/off is a costed dimension explored against the observed cost.
+
+    Dropping Photon/NVMe is only recommended when it genuinely beats keeping it
+    (the cost gate), and when it wins it surfaces as an actionable recommendation
+    with a real delta and a validation config -- never a 0%-delta keep_multi.
+    """
+
+    def test_healthy_single_drops_photon_when_dbu_heavy(self):
+        # DBU-dominated single node: removing the Photon premium beats the 2x
+        # STANDARD wall, so the drop is recommended with a real saving.
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p95=30.0,
+            drv_mem_p95=40.0,
+            arm_avg_total_cost_estimate_usd=2.5,
+            arm_avg_ec2_cost_usd=0.25,
+            arm_avg_dbu_cost_usd=2.25,
+            is_any_photon=True,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "healthy_single"
+        assert "disable_photon" in rec.actions.split("|")
+        assert rec.rec_runtime_engine == "STANDARD"
+        assert rec.projected.est_cost_delta_pct is not None
+        assert rec.projected.est_cost_delta_pct < 0.0
+
+    def test_healthy_single_keeps_photon_when_ec2_heavy(self):
+        # EC2-dominated single node: the 2x STANDARD wall outweighs the DBU
+        # premium credit, so dropping Photon would cost more -> keep it.
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p95=30.0,
+            drv_mem_p95=40.0,
+            arm_avg_total_cost_estimate_usd=2.5,
+            arm_avg_ec2_cost_usd=2.4,
+            arm_avg_dbu_cost_usd=0.1,
+            is_any_photon=True,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "healthy_single"
+        assert "disable_photon" not in rec.actions.split("|")
+        assert rec.rec_runtime_engine is None
+        assert rec.actions == "no_change"
+
+    def test_protect_oom_emits_promote_driver_memory_action(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            drv_mem_p95=90.0,
+            arm_avg_total_cost_estimate_usd=2.0,
+            arm_avg_ec2_cost_usd=0.154,
+            arm_avg_dbu_cost_usd=1.846,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "protect_oom_risk"
+        assert "promote_driver_memory" in rec.actions.split("|")
+        # Safety upsize keeps the runtime engine untouched.
+        assert rec.rec_runtime_engine is None
+
+    def test_keep_multi_does_not_bolt_on_normalization_at_zero_delta(self):
+        # Near-zero baseline: every candidate (incl. dropping Photon at the
+        # observed shape, which now competes in the pool) costs more, so nothing
+        # wins -> a true no-change keep_multi with NO normalization bolted on.
+        m = _m(
+            driver_node_type="m6gd.large",
+            worker_node_type="r6gd.4xlarge",
+            worker_count=2,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p50_min=18.0,
+            wall_p95_min=18.0,
+            schedule_interval_minutes=20.0,
+            arm_avg_total_cost_estimate_usd=0.01,
+            arm_avg_ec2_cost_usd=0.005,
+            arm_avg_dbu_cost_usd=0.005,
+            is_any_photon=True,
+            is_any_local_nvme=True,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort in rcs._KEEP_MULTI_COHORTS
+        assert rec.actions == "keep_multi_node"
+        assert "disable_photon" not in rec.actions.split("|")
+        assert "drop_nvme" not in rec.actions.split("|")
+        assert rec.rec_runtime_engine is None
+        assert rec.projected.est_cost_delta_pct == pytest.approx(0.0)
+        assert generate_validation_config(rec) is None
+
+    def test_drop_photon_winner_is_actionable_and_emits_validation(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        # Idle, DBU-heavy Photon+NVMe multi: dropping Photon/NVMe wins the
+        # quadrant search and must surface as an actionable recommendation.
+        m = _m(
+            driver_node_type="m6gd.2xlarge",
+            worker_node_type="m6gd.2xlarge",
+            worker_count=2,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=25.0,
+            wrk_cpu_p50=8.0,
+            wrk_cpu_p95=15.0,
+            wrk_mem_p95=18.0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            schedule_interval_minutes=1440.0,
+            arm_avg_total_cost_estimate_usd=10.0,
+            arm_avg_ec2_cost_usd=1.0,
+            arm_avg_dbu_cost_usd=9.0,
+            is_any_photon=True,
+            is_any_local_nvme=True,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort not in rcs._KEEP_MULTI_COHORTS
+        assert "disable_photon" in rec.actions.split("|")
+        assert "drop_nvme" in rec.actions.split("|")
+        assert rec.rec_runtime_engine == "STANDARD"
+        assert rec.rec_driver_node_type is not None
+        assert "gd." not in rec.rec_driver_node_type
+        assert rec.projected.est_cost_delta_pct < 0.0
+        assert generate_validation_config(rec) is not None
