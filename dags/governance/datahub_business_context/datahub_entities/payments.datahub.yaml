@@ -1,0 +1,221 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Payments"
+product_description: |
+  Payments is the transactional domain tracking every charge processed through QuintoAndar's
+  payment platform — from creation to settlement, refund, or cancellation. The primary system
+  is Checkout, which orchestrates the majority of payment transactions across all methods.
+
+  Payment methods (fact_payment.payment_method):
+  - BOLETO: traditional Brazilian bank slip (most common for rental invoices).
+  - CREDIT_CARD: transactions via acquirers (Getnet/Wall Street).
+  - PIX: instant payment via Brazilian Central Bank.
+  - BOLECODE: hybrid boleto+code; distinguish subtypes using
+    datalake_checkout_clean.charge.paid_via: BOLECODE-QRCODE (paid via QR code, effectively PIX)
+    vs BOLECODE-BARCODE (paid via barcode).
+
+  Three independent source systems unified into dw_payments_platform:
+  - Checkout: primary orchestrator — boletos, bolecodes, credit cards, PIX.
+  - Wall Street: credit-card acquirer hub (Getnet integration), chargebacks, subscriptions.
+    IMPORTANT: Wall Street amounts stored in CENTS — divide by 100.
+  - Vans: VAN (Value Added Network) — boleto exchange with banking agents (Itaú, BB, etc.).
+
+  Integration pattern in the golden query:
+  - Checkout ↔ Wall Street joined via FULL OUTER JOIN on (id_finance_entity, code).
+  - Vans is UNION ALL'd separately (no overlap with Checkout/Wall Street on join keys).
+
+  Table grain:
+  - fact_payment: 1 row per payment, deduplicated by id_business_key. Starting point.
+  - fact_payment_timeline: 1 row per payment × timeline step (state transition). Use
+    MAX(timeline_order) per payment to resolve last known payment method when
+    successfull_method is NULL.
+
+  Product origin mapping (product_origin column) — the internal system or product that
+  originated the charge:
+  - Rental: seubarriga, seubarriga-checkout, rent-invoice-payment, rental-recurrent-creditcard-payment.
+  - Rental Offer: rental-offer, rental-offer-checkout.
+  - Rental Guarantee: pro-guarantor-checkout, pro-guarantor, rental-guarantee.
+  - Collections: trato-feito, trato-feito-cyber, trato-feito-5a-collector, collections, seumadruga.
+  - Reservation: reservation.
+  - Quintocred: rental-guarantee-platform.
+
+  Normalized status mapping:
+  PAID (PAID/CAPTURED), PROCESSING (PENDING_REGISTER_PAYMENT/PROCESSING_REFUND/etc.),
+  WRITTEN_DOWN, OPEN (REQUESTED/CREATED/CHANGED), CHARGEBACK (CHARGEBACK_CAPTURED),
+  ERROR (CAPTURE_DENIED/etc.), CANCELED, REFUNDED.
+
+  Key metrics: transaction volume by method/status/product_origin, success rate (PAID/total),
+  payment method distribution, average latency (method_created_to_paid_latency_seconds),
+  credit-card fee margin (convenience_fee + installment_fee - acquire_fee), chargeback rate
+  (Wall Street only), refund amount, payment punctuality (diff_days = date_diff vs dt_business_due).
+  Payment segmentation: A (8d+ early) → F (1d+ late).
+
+  Critical rules:
+  - Use dt_business_due (weekend-adjusted) NOT raw dt_due for punctuality metrics.
+  - Filter id_requester NOT IN ('4', '10') to exclude internal/test requesters.
+  - Wall Street amounts stored in CENTS — always divide by 100.
+  - Checkout ↔ Wall Street FULL OUTER JOIN on (id_finance_entity, code) — NOT just one field.
+  - BOLECODE subtypes require joining datalake_checkout_clean.charge.paid_via.
+  - Chargeback data exists ONLY in Wall Street — Checkout and Vans have none.
+  - For recurrent payments: system_origin = 'rental-recurrent-creditcard-payment' → is_recurrent.
+  - Exclude Wall Street subscription-management records (filter out charges matching
+    subscription.code || '|default-item' or subscription.code || '_item' patterns).
+  - Trato Feito (id_requester = '3') requires joining datalake_debt_recovery.negotiation for
+    collector attribution.
+
+  Further detail and table routing: docs/llm_context/business_entities/payments.md
+
+data_product_id: payments
+domain_urn: urn:li:domain:fintech
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.payments.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.payments.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:5435fc04-87b6-4b2a-8bd6-72ed0ac21c60
+  name: "Query 1 — Unified payments (Checkout + Wall Street + Vans)"
+  description: >-
+    Consolidates all three payment sources with normalized statuses, product origins, fee
+    calculations, and payment punctuality segmentation. Wall Street amounts divided by 100
+    (stored in cents). BOLECODE subtypes resolved from charge.paid_via. Weekend-adjusted
+    dt_business_due used for punctuality. Filters id_requester NOT IN ('4','10').
+    Source: docs/llm_context/business_entities/payments.md
+  subjects:
+    - schema: dw_payments_platform
+      table: fact_payment
+    - schema: dw_payments_platform
+      table: fact_payment_timeline
+    - schema: datalake_checkout_clean
+      table: charge
+    - schema: datalake_wall_street_clean
+      table: charge
+    - schema: datalake_vans_clean
+      table: boleto
+  sql: |
+    SELECT
+        fp.id_charge,
+        fp.id_contract,
+        fp.id_finance_entity,
+        fp.id_requester,
+        fp.payment_status,
+        fp.successfull_method AS payment_method,
+        fp.datasource,
+        fp.due_amount,
+        fp.ts_method_created,
+        fp.ts_charge_paid,
+        fp.dt_due,
+        CASE
+            WHEN day_of_week(fp.dt_due) = 6 THEN date_add('day', 2, fp.dt_due)
+            WHEN day_of_week(fp.dt_due) = 7 THEN date_add('day', 1, fp.dt_due)
+            ELSE fp.dt_due
+        END AS dt_business_due
+    FROM dw_payments_platform.fact_payment fp
+    WHERE DATE(fp.ts_order_created) >= DATE('2025-01-01')
+        AND fp.id_requester NOT IN ('4', '10')
+
+datasets:
+  - schema: dw_payments_platform
+    table: fact_payment
+  - schema: dw_payments_platform
+    table: fact_payment_timeline
+  - schema: datalake_checkout_clean
+    table: charge
+  - schema: datalake_checkout_clean
+    table: credit_card
+  - schema: datalake_checkout_clean
+    table: boleto
+  - schema: datalake_checkout_clean
+    table: bolecode
+  - schema: datalake_checkout_clean
+    table: pix
+  - schema: datalake_wall_street_clean
+    table: charge
+  - schema: datalake_wall_street_clean
+    table: chargeback_notification
+  - schema: datalake_vans_clean
+    table: boleto
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:fintech
+  terms:
+    - id: payment_entity
+      name: "Payment (Pagamento / Cobrança)"
+      description: >-
+        A transactional charge processed through QuintoAndar's payment platform from
+        creation to settlement, refund, or cancellation. Unified in dw_payments_platform.fact_payment.
+        Also called pagamento or cobrança (in the Checkout context).
+    - id: pix_payment
+      name: "PIX"
+      description: >-
+        Instant payment method via the Brazilian Central Bank. Fast (usually seconds).
+        In fact_payment: payment_method = 'PIX'. In Checkout clean layer: datalake_checkout_clean.pix.
+      related_terms:
+        - urn: urn:li:glossaryTerm:payment_entity
+          relationship: isA
+    - id: boleto_payment
+      name: "Boleto"
+      description: >-
+        Traditional Brazilian bank slip. Most common payment method for rental invoices.
+        In fact_payment: payment_method = 'BOLETO'. Vans boletos processed via datalake_vans_clean.
+        Always filter Vans: requested_by = 'seubarriga' AND related_document_type = 'invoice'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:payment_entity
+          relationship: isA
+    - id: bolecode_payment
+      name: "Bolecode"
+      description: >-
+        Hybrid boleto that can be paid via QR code (effectively PIX) or barcode.
+        payment_method = 'BOLECODE'. Distinguish subtypes by joining datalake_checkout_clean.charge.paid_via:
+        'QRCODE' → BOLECODE-QRCODE; 'BARCODE' → BOLECODE-BARCODE.
+      related_terms:
+        - urn: urn:li:glossaryTerm:payment_entity
+          relationship: isA
+    - id: credit_card_payment
+      name: "Cartão de Crédito (Credit Card)"
+      description: >-
+        Credit-card transactions processed via acquirers (Getnet/Wall Street).
+        payment_method = 'CREDIT_CARD'. Wall Street amounts stored in CENTS — divide by 100.
+        Chargeback data only available from Wall Street (datalake_wall_street_clean.chargeback_notification).
+      related_terms:
+        - urn: urn:li:glossaryTerm:payment_entity
+          relationship: isA
+    - id: payment_chargeback
+      name: "Chargeback (Contestação de Cartão)"
+      description: >-
+        Disputed credit-card transaction. Wall Street only — Checkout and Vans have no
+        chargeback data. Table: datalake_wall_street_clean.chargeback_notification.
+        Fields: reason_code, chargeback_amount (in cents), dt_request, dt_return.
+        Chargeback reasons: Fraude (4837/104/83), Desacordo Comercial (4853/131/4860),
+        Erro de processamento (4831/1262/4834).
+    - id: payment_status_enum
+      name: "Payment Status (Normalized)"
+      description: >-
+        Normalized payment status across all sources: PAID, PROCESSING, WRITTEN_DOWN, OPEN,
+        CHARGEBACK, ERROR, CANCELED, REFUNDED. Raw statuses vary by source and are
+        normalized in the golden query's CASE expression. Always use the normalized value.
+    - id: payment_product_origin
+      name: "Product Origin"
+      description: >-
+        Business-friendly grouping of the internal system that originated the charge
+        (derived from system_origin / id_requester). Values: Rental, Rental Offer, Rental
+        Guarantee, Collections, Reservation, Quintocred. Use for product-level analytics.
+    - id: trato_feito
+      name: "Trato Feito (Collections Negotiation)"
+      description: >-
+        Collections negotiation system; appears as system_origin on payments with
+        id_requester = '3'. Join datalake_debt_recovery.negotiation on id_contract =
+        id_negotiation to resolve collector attribution. Maps to product_origin = 'Collections'.
+    - id: seu_barriga
+      name: "Seu Barriga / Seubarriga"
+      description: >-
+        Retsuko billing system — the main rental invoice payment requester. Appears as
+        requested_by = 'seubarriga' in Vans boletos and as system_origin in Checkout.
+        Maps to product_origin = 'Rental'.
+
+documentation_link:
+  label: "Business entity documentation (payments.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/payments.md

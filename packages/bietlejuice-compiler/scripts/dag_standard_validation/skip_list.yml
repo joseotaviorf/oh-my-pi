@@ -59,6 +59,10 @@ dags_not_using_builder:
   - platform/notify_stale_dags/notify_stale_dags.py
   - platform/notify_airbyte_key_rotation/notify_airbyte_key_rotation.py
   - governance/notify_dag_rotation/notify_dag_rotation.py
+  - governance/datahub_business_context/datahub_curated_urns.py
+  - governance/datahub_business_context/load_collections_context.py
+  - governance/datahub_business_context/push_all_entities.py
+  - governance/datahub_business_context/smoke_test_datahub.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
 
 database_ingestion_without_cdc:

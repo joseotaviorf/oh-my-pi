@@ -1,0 +1,925 @@
+{
+  "run_ts": "2026-05-12T21:29:29Z",
+  "cases": [
+    {
+      "id": "Q1",
+      "text": "What tables track overdue invoices?",
+      "complexity": "Entity routing only",
+      "score": 16,
+      "max_score": 16,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "id_invoice",
+          "payment_status",
+          "delay_contamined_range",
+          "due_amount"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "dt_month_start",
+          "is_most_recent_record_month"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 9,
+        "max_score": 9
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "id_invoice": true,
+          "payment_status": true,
+          "delay_contamined_range": true,
+          "due_amount": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 5,
+        "max_score": 5
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 10,
+        "columns_returned": [
+          "id_invoice",
+          "payment_status",
+          "delay_contamined_range",
+          "due_amount",
+          "dt_reference"
+        ],
+        "latency_ms": 2124.3177500000456,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "Q2",
+      "text": "What does the delay_contamined_range column mean?",
+      "complexity": "Column lookup",
+      "score": 14,
+      "max_score": 14,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "delay_contamined_range",
+          "id_invoice",
+          "due_amount"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "dt_month_start",
+          "is_most_recent_record_month"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 8,
+        "max_score": 8
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "delay_contamined_range": true,
+          "id_invoice": true,
+          "due_amount": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 4,
+        "max_score": 4
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 11,
+        "columns_returned": [
+          "delay_contamined_range",
+          "invoice_count",
+          "total_due_amount"
+        ],
+        "latency_ms": 4868.606291998731,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "Q3",
+      "text": "Give me the AR recovery rate query split by OKR bucket",
+      "complexity": "Golden query retrieval",
+      "score": 12,
+      "max_score": 12,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline",
+          "dw_losses.fact_accounts_receivable"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "delay_contamined_range"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "is_most_recent_record_month",
+          "okr_bucket",
+          "ar_recovery_rate"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 7,
+        "max_score": 7
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline",
+          "dw_losses.fact_accounts_receivable"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "delay_contamined_range": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 3,
+        "max_score": 3
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 26,
+        "columns_returned": [
+          "dt_closing",
+          "okr_bucket",
+          "ar_recovery_rate"
+        ],
+        "latency_ms": 4954.0016669998295,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "Q4",
+      "text": "How do I join fact_negotiation to fact_debt?",
+      "complexity": "Cross-table join",
+      "score": 18,
+      "max_score": 18,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_collection_recovery_quintoandar.fact_negotiation",
+          "dw_collection_recovery_quintoandar.fact_debt",
+          "dw_collection_recovery_quintoandar.bridge_map_debt_negotiation"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "sk_negotiation",
+          "sk_debt",
+          "id_invoice",
+          "negotiation_classification"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "bridge_map_debt_negotiation"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 9,
+        "max_score": 9
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_collection_recovery_quintoandar.fact_negotiation",
+          "dw_collection_recovery_quintoandar.fact_debt",
+          "dw_collection_recovery_quintoandar.bridge_map_debt_negotiation"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "sk_negotiation": true,
+          "sk_debt": true,
+          "id_invoice": true,
+          "negotiation_classification": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 7,
+        "max_score": 7
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 10,
+        "columns_returned": [
+          "sk_negotiation",
+          "negotiation_status",
+          "negotiation_classification",
+          "original_debt_amount",
+          "negotiated_amount",
+          "sk_debt",
+          "id_invoice",
+          "id_contract"
+        ],
+        "latency_ms": 3344.521082999563,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "Q5",
+      "text": "What is the difference between Acordo and Promessa?",
+      "complexity": "Glossary / synonym",
+      "score": 14,
+      "max_score": 14,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_collection_recovery_quintoandar.fact_negotiation"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "negotiation_classification",
+          "original_debt_amount",
+          "negotiated_amount"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "negotiation_classification",
+          "(?i)ACORDO|Acordo",
+          "(?i)PROMESSA|Promessa"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 8,
+        "max_score": 8
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_collection_recovery_quintoandar.fact_negotiation"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "negotiation_classification": true,
+          "original_debt_amount": true,
+          "negotiated_amount": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 4,
+        "max_score": 4
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 32,
+        "columns_returned": [
+          "negotiation_classification",
+          "negotiation_status",
+          "negotiation_count",
+          "total_original_debt",
+          "total_negotiated_amount"
+        ],
+        "latency_ms": 1483.038791000581,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "OB1",
+      "text": "Em que tabela posso encontrar informa\u00e7\u00f5es sobre vistorias de sa\u00edda?",
+      "complexity": "Entity routing (Inspection)",
+      "score": 17,
+      "max_score": 19,
+      "pct": 89.5,
+      "static": {
+        "tables_found": [
+          "dw_inspections.fact_inspection",
+          "dw_inspections.dim_inspection"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "sk_inspection",
+          "sk_contract",
+          "ts_inspected",
+          "inspection_type"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)inspection_type.*offboarding|offboarding",
+          "ROW_NUMBER"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 11,
+        "max_score": 11
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_inspections.fact_inspection",
+          "dw_inspections.dim_inspection"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "sk_inspection": true,
+          "sk_contract": true,
+          "ts_inspected": true,
+          "inspection_type": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 6,
+        "max_score": 6
+      },
+      "execution": {
+        "status": "error",
+        "rows_returned": 0,
+        "columns_returned": [],
+        "latency_ms": 3764.233374997275,
+        "error_message": "Execution failed on sql: SELECT sub.*\nFROM (\n  SELECT\n    fi.sk_inspection,\n    fi.sk_contract,\n    fi.sk_house,\n    fi.ts_booking_created,\n    fi.ts_inspected,\n    di.inspection_type,\n    di.inspection_status,\n    fri.has_agreement,\n    fri.total_cost,\n    fri.ts_sent_to_repair_analysis,\n    ROW_NUMBER() OVER (PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni\n  FROM dw_inspections.fact_inspection AS fi\n  LEFT JOIN dw_inspections.dim_inspection AS di\n    ON fi.sk_inspection = di.sk_inspection\n  LEFT JOIN dw_inspections.fact_report_inspections AS fri\n    ON fi.sk_inspection = CAST(fri.sk_inspection AS VARCHAR)\n  WHERE di.inspection_type = 'offboarding'\n) AS sub\nWHERE sub.rni = 1\nLIMIT 10\n\nTrinoUserError(type=USER_ERROR, name=COLUMN_NOT_FOUND, message=\"line 10:5: Column 'di.inspection_status' cannot be resolved\", query_id=20260512_212836_39135_jiza4)\nunable to rollback",
+        "meets_min_rows": false,
+        "score": 0,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "OB2",
+      "text": "Gere uma query para contabilizar rescis\u00f5es com isen\u00e7\u00e3o de vistoria de sa\u00edda",
+      "complexity": "Medium query (Offboarding \u2014 fact_terminations opt-out)",
+      "score": 16,
+      "max_score": 16,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_offboarding.fact_terminations",
+          "dw_offboarding.dim_termination"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "is_exit_inspection_opt_out",
+          "ts_termination_request",
+          "sk_termination"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)is_exit_inspection_opt_out",
+          "(?i)CANCELED|status.*<>"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 9,
+        "max_score": 9
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_offboarding.fact_terminations",
+          "dw_offboarding.dim_termination"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "is_exit_inspection_opt_out": true,
+          "ts_termination_request": true,
+          "sk_termination": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 5,
+        "max_score": 5
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 13,
+        "columns_returned": [
+          "month_request",
+          "total_terminations",
+          "total_inspection_exempt",
+          "pct_inspection_exempt"
+        ],
+        "latency_ms": 2050.0411249995523,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "OB3",
+      "text": "Gere uma query para contabilizar offboardings sem reparos",
+      "complexity": "Medium query (Offboarding \u2014 obt_offboarding has_repairs)",
+      "score": 12,
+      "max_score": 12,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_offboarding.obt_offboarding"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "has_repairs",
+          "ts_termination_finished"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)has_repairs",
+          "(?i)ts_termination_finished"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 7,
+        "max_score": 7
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_offboarding.obt_offboarding"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "has_repairs": true,
+          "ts_termination_finished": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 3,
+        "max_score": 3
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 16,
+        "columns_returned": [
+          "mes",
+          "total_offboardings",
+          "sem_reparos",
+          "com_reparos",
+          "taxa_sem_reparos"
+        ],
+        "latency_ms": 1623.1698330011568,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "OB4",
+      "text": "Gere query para analisar se fluxo autom\u00e1tico de AR est\u00e1 relacionado com menos aprova\u00e7\u00f5es de IQ e PP",
+      "complexity": "Hard query (Offboarding \u2014 auto AR approval comparison)",
+      "score": 18,
+      "max_score": 18,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_offboarding.obt_offboarding"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "is_automated_ar",
+          "has_tenant_approved_review",
+          "has_owner_approved_review",
+          "has_tenant_approved_budget_approval",
+          "has_owner_approved_budget_approval"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)is_automated_ar",
+          "(?i)has_repairs.*TRUE|has_repairs.*=.*true"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 10,
+        "max_score": 10
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_offboarding.obt_offboarding"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "is_automated_ar": true,
+          "has_tenant_approved_review": true,
+          "has_owner_approved_review": true,
+          "has_tenant_approved_budget_approval": true,
+          "has_owner_approved_budget_approval": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 6,
+        "max_score": 6
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 2,
+        "columns_returned": [
+          "fluxo_ar",
+          "total",
+          "iq_aprovou_review",
+          "iq_taxa_aprovacao_review_pct",
+          "pp_aprovou_review",
+          "pp_taxa_aprovacao_review_pct",
+          "iq_aprovou_budget",
+          "iq_taxa_aprovacao_budget_pct",
+          "pp_aprovou_budget",
+          "pp_taxa_aprovacao_budget_pct",
+          "total_com_acordo",
+          "taxa_acordo_pct"
+        ],
+        "latency_ms": 1985.3714579985535,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "OB5",
+      "text": "Gere uma query que mostre por termination se houve agreement, relistagem e rerental",
+      "complexity": "Hard query (Offboarding \u2014 obt + fact_house_listing_terminations)",
+      "score": 19,
+      "max_score": 19,
+      "pct": 100.0,
+      "static": {
+        "tables_found": [
+          "dw_offboarding.obt_offboarding",
+          "dw_offboarding.fact_house_listing_terminations"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "has_agreement",
+          "has_early_agreement",
+          "has_late_agreement",
+          "ts_termination_finished",
+          "sk_next_contract"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)fact_house_listing_terminations",
+          "(?i)ts_termination_finished"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 10,
+        "max_score": 10
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_offboarding.obt_offboarding",
+          "dw_offboarding.fact_house_listing_terminations"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "has_agreement": true,
+          "has_early_agreement": true,
+          "has_late_agreement": true,
+          "ts_termination_finished": true,
+          "sk_next_contract": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 7,
+        "max_score": 7
+      },
+      "execution": {
+        "status": "success",
+        "rows_returned": 100,
+        "columns_returned": [
+          "sk_termination",
+          "sk_contract",
+          "termination_status",
+          "termination_reason",
+          "has_agreement",
+          "has_early_agreement",
+          "has_late_agreement",
+          "has_discount_agreement",
+          "is_relisting",
+          "is_rerental",
+          "days_termination_to_contract_signed",
+          "ts_termination_finished"
+        ],
+        "latency_ms": 1997.6323330010928,
+        "error_message": null,
+        "meets_min_rows": true,
+        "score": 2,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "SU1",
+      "text": "Em que tabela posso encontrar informa\u00e7\u00f5es sobre leads de supply?",
+      "complexity": "Entity routing (Supply)",
+      "score": 14,
+      "max_score": 16,
+      "pct": 87.5,
+      "static": {
+        "tables_found": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "sk_lead",
+          "cd_funnel_step",
+          "nm_business_context",
+          "company_report_origin"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)nm_business_context",
+          "(?i)obt_supply"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 9,
+        "max_score": 9
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "sk_lead": true,
+          "cd_funnel_step": true,
+          "nm_business_context": true,
+          "company_report_origin": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 5,
+        "max_score": 5
+      },
+      "execution": {
+        "status": "error",
+        "rows_returned": 0,
+        "columns_returned": [],
+        "latency_ms": 1453.9645000004384,
+        "error_message": "/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py:28: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.\n  df = pd.read_sql_query(query, conn)\nTraceback (most recent call last):\n  File \"/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py\", line 82, in <module>\n    print(json.dumps(res))\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/__init__.py\", line 231, in dumps\n    return _default_encoder.encode(obj)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 199, in encode\n    chunks = self.iterencode(o, _one_shot=True)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 257, in iterencode\n    return _iterencode(o, 0)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 179, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type date is not JSON serializable",
+        "meets_min_rows": false,
+        "score": 0,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "SU2",
+      "text": "Gere uma query para contabilizar todos os first listings que vieram das calculadoras",
+      "complexity": "Medium query (Supply \u2014 calculator acquisition_origin)",
+      "score": 14,
+      "max_score": 16,
+      "pct": 87.5,
+      "static": {
+        "tables_found": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "cd_funnel_step",
+          "acquisition_origin",
+          "sk_lead",
+          "nm_business_context"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)first_listing",
+          "(?i)pricesuggestion|calculadora"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 9,
+        "max_score": 9
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "cd_funnel_step": true,
+          "acquisition_origin": true,
+          "sk_lead": true,
+          "nm_business_context": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 5,
+        "max_score": 5
+      },
+      "execution": {
+        "status": "error",
+        "rows_returned": 0,
+        "columns_returned": [],
+        "latency_ms": 2325.0769170008425,
+        "error_message": "/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py:28: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.\n  df = pd.read_sql_query(query, conn)\nTraceback (most recent call last):\n  File \"/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py\", line 82, in <module>\n    print(json.dumps(res))\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/__init__.py\", line 231, in dumps\n    return _default_encoder.encode(obj)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 199, in encode\n    chunks = self.iterencode(o, _one_shot=True)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 257, in iterencode\n    return _iterencode(o, 0)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 179, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type date is not JSON serializable",
+        "meets_min_rows": false,
+        "score": 0,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "SU3",
+      "text": "Gere uma query para contabilizar todos os opportunities gerados pelo Isa\u00edas",
+      "complexity": "Medium query (Supply \u2014 Isaias tp_origin_acquisition)",
+      "score": 11,
+      "max_score": 13,
+      "pct": 84.6,
+      "static": {
+        "tables_found": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "cd_funnel_step",
+          "tp_origin_acquisition",
+          "sk_lead"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)tp_origin_acquisition.*isaias|isaias.*tp_origin_acquisition",
+          "(?i)opportunity"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 7,
+        "max_score": 7
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "cd_funnel_step": true,
+          "tp_origin_acquisition": true,
+          "sk_lead": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 4,
+        "max_score": 4
+      },
+      "execution": {
+        "status": "error",
+        "rows_returned": 0,
+        "columns_returned": [],
+        "latency_ms": 1812.0070830009354,
+        "error_message": "/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py:28: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.\n  df = pd.read_sql_query(query, conn)\nTraceback (most recent call last):\n  File \"/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py\", line 82, in <module>\n    print(json.dumps(res))\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/__init__.py\", line 231, in dumps\n    return _default_encoder.encode(obj)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 199, in encode\n    chunks = self.iterencode(o, _one_shot=True)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 257, in iterencode\n    return _iterencode(o, 0)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 179, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type date is not JSON serializable",
+        "meets_min_rows": false,
+        "score": 0,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "SU4",
+      "text": "Gere uma query para analisar a taxa de convers\u00e3o de lead para opportunity dos leads inbound",
+      "complexity": "Medium query (Supply \u2014 coincident date conversion rate)",
+      "score": 9,
+      "max_score": 13,
+      "pct": 69.2,
+      "static": {
+        "tables_found": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "cd_funnel_step",
+          "planning_operation"
+        ],
+        "columns_missing": [
+          "sk_lead"
+        ],
+        "patterns_matched": [
+          "(?i)planning_operation.*Inbound|Inbound.*planning_operation"
+        ],
+        "patterns_missing": [
+          "(?i)lead.*opportunity|opportunity.*lead"
+        ],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 5,
+        "max_score": 7
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_growth.obt_supply"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "cd_funnel_step": true,
+          "planning_operation": true,
+          "sk_lead": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 4,
+        "max_score": 4
+      },
+      "execution": {
+        "status": "error",
+        "rows_returned": 0,
+        "columns_returned": [],
+        "latency_ms": 2142.9419579981186,
+        "error_message": "/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py:28: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.\n  df = pd.read_sql_query(query, conn)\nTraceback (most recent call last):\n  File \"/Users/aurelio.nogueira/Documents/projects/bi-etl-ejuice/.cursor/skills/trino/scripts/execute_trino.py\", line 82, in <module>\n    print(json.dumps(res))\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/__init__.py\", line 231, in dumps\n    return _default_encoder.encode(obj)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 199, in encode\n    chunks = self.iterencode(o, _one_shot=True)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 257, in iterencode\n    return _iterencode(o, 0)\n  File \"/Users/aurelio.nogueira/pyenv/versions/3.8.12/lib/python3.8/json/encoder.py\", line 179, in default\n    raise TypeError(f'Object of type {o.__class__.__name__} '\nTypeError: Object of type date is not JSON serializable",
+        "meets_min_rows": false,
+        "score": 0,
+        "max_score": 2
+      }
+    },
+    {
+      "id": "SU5",
+      "text": "Gere uma query para comparar volumes de motivos de descarte entre canais de opera\u00e7\u00f5es e self-service",
+      "complexity": "Hard query (Supply \u2014 discard reasons by channel)",
+      "score": 13,
+      "max_score": 15,
+      "pct": 86.7,
+      "static": {
+        "tables_found": [
+          "dw_growth.obt_supply",
+          "dw_growth.dim_supply_discards"
+        ],
+        "tables_missing": [],
+        "forbidden_found": [],
+        "columns_found": [
+          "company_report_origin",
+          "cd_discard_reason",
+          "sk_discard"
+        ],
+        "columns_missing": [],
+        "patterns_matched": [
+          "(?i)dim_supply_discards",
+          "(?i)company_report_origin"
+        ],
+        "patterns_missing": [],
+        "parse_ok": true,
+        "parse_error": null,
+        "score": 8,
+        "max_score": 8
+      },
+      "schema": {
+        "tables_checked": [
+          "dw_growth.obt_supply",
+          "dw_growth.dim_supply_discards"
+        ],
+        "tables_missing": [],
+        "columns_valid": {
+          "company_report_origin": true,
+          "cd_discard_reason": true,
+          "sk_discard": true
+        },
+        "columns_missing": {},
+        "errors": [],
+        "score": 5,
+        "max_score": 5
+      },
+      "execution": {
+        "status": "error",
+        "rows_returned": 0,
+        "columns_returned": [],
+        "latency_ms": 1529.8559589973593,
+        "error_message": "Execution failed on sql: SELECT\n  obt.company_report_origin,\n  dsd.cd_discard_reason,\n  dsd.nm_discard_reason,\n  COUNT(DISTINCT obt.sk_lead) AS total_discards\nFROM dw_growth.obt_supply AS obt\nJOIN dw_growth.dim_supply_discards AS dsd\n  ON obt.sk_discard = dsd.sk_discard\nWHERE obt.nm_business_context = 'RENT'\n  AND obt.company_report_origin IN (\n    'Opera\u00e7\u00f5es',\n    'Ownerlanding',\n    'Homelanding',\n    'Calculadora'\n  )\n  AND obt.date >= DATE '2025-01-01'\nGROUP BY obt.company_report_origin, dsd.cd_discard_reason, dsd.nm_discard_reason\nORDER BY obt.company_report_origin, total_discards DESC\nLIMIT 100\nTrinoUserError(type=USER_ERROR, name=COLUMN_NOT_FOUND, message=\"line 8:6: Column 'obt.sk_discard' cannot be resolved\", query_id=20260512_212928_39189_jiza4)\nunable to rollback",
+        "meets_min_rows": false,
+        "score": 0,
+        "max_score": 2
+      }
+    }
+  ]
+}

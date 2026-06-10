@@ -1,0 +1,517 @@
+{
+  "run_ts": "2026-05-12T21:27:06Z",
+  "config": {
+    "price_per_m_tokens": 3.0,
+    "daily_questions": 100
+  },
+  "questions": [
+    {
+      "id": "Q1",
+      "text": "What tables track overdue invoices?",
+      "complexity": "Entity routing only",
+      "old": {
+        "bytes_consumed": 32643,
+        "files_or_calls": 2,
+        "latency_ms": 0.4365829999999904,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 26802
+        },
+        "errors": [],
+        "tokens": 8160
+      },
+      "new": {
+        "bytes_consumed": 2598,
+        "files_or_calls": 2,
+        "latency_ms": 1236.42325,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 1561,
+          "search_hits": 5,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events,PROD)"
+          ],
+          "get_entities_bytes": 1037
+        },
+        "errors": [],
+        "tokens": 649
+      }
+    },
+    {
+      "id": "Q2",
+      "text": "What does the delay_contamined_range column mean?",
+      "complexity": "Column lookup",
+      "old": {
+        "bytes_consumed": 52861,
+        "files_or_calls": 4,
+        "latency_ms": 2391.7223750000003,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 26802,
+          "grep_bytes": 3350,
+          "yaml_bytes": 16868
+        },
+        "errors": [],
+        "tokens": 13215
+      },
+      "new": {
+        "bytes_consumed": 1986,
+        "files_or_calls": 3,
+        "latency_ms": 1192.645916,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 955,
+          "search_hits": 5,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,dw_losses.fact_delay,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,datalake_losses.delay,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_losses.fact_delay,PROD)"
+          ],
+          "get_entities_bytes": 924,
+          "schema_filtered_bytes": 107,
+          "schema_total_fields": 50,
+          "schema_matched_fields": 1
+        },
+        "errors": [],
+        "tokens": 496
+      }
+    },
+    {
+      "id": "Q3",
+      "text": "Give me the AR recovery rate query split by OKR bucket",
+      "complexity": "Golden query retrieval",
+      "old": {
+        "bytes_consumed": 59983,
+        "files_or_calls": 5,
+        "latency_ms": 1020.672458,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 26802,
+          "grep_bytes": 3350,
+          "yaml_bytes": 16868,
+          "sql_bytes": 7122
+        },
+        "errors": [],
+        "tokens": 14995
+      },
+      "new": {
+        "bytes_consumed": 1965,
+        "files_or_calls": 2,
+        "latency_ms": 471.8401659999998,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 59,
+          "search_hits": 0,
+          "search_top_urns": [],
+          "query_bytes": 1906
+        },
+        "errors": [],
+        "tokens": 491
+      }
+    },
+    {
+      "id": "Q4",
+      "text": "How do I join fact_negotiation to fact_debt?",
+      "complexity": "Cross-table join",
+      "old": {
+        "bytes_consumed": 56196,
+        "files_or_calls": 4,
+        "latency_ms": 995.8538750000008,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 26802,
+          "grep_bytes": 5042,
+          "yaml_bytes": 18511
+        },
+        "errors": [],
+        "tokens": 14049
+      },
+      "new": {
+        "bytes_consumed": 2609,
+        "files_or_calls": 3,
+        "latency_ms": 868.7225839999994,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 1054,
+          "search_hits": 5,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_debt_recovery.fact_negotiation,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,dw_collection_recovery_quintoandar.fact_negotiation,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,dw_collection_recovery_quintocred.fact_negotiation,PROD)"
+          ],
+          "get_entities_bytes": 1188,
+          "schema_filtered_bytes": 367,
+          "schema_total_fields": 58,
+          "schema_matched_fields": 4
+        },
+        "errors": [],
+        "tokens": 652
+      }
+    },
+    {
+      "id": "Q5",
+      "text": "What is the difference between Acordo and Promessa?",
+      "complexity": "Glossary / synonym",
+      "old": {
+        "bytes_consumed": 32643,
+        "files_or_calls": 2,
+        "latency_ms": 0.3707500000000863,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 26802
+        },
+        "errors": [],
+        "tokens": 8160
+      },
+      "new": {
+        "bytes_consumed": 3074,
+        "files_or_calls": 2,
+        "latency_ms": 523.0257920000004,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 556,
+          "search_hits": 1,
+          "search_top_urns": [
+            "urn:li:dataProduct:collections-recovery"
+          ],
+          "get_entities_bytes": 2518
+        },
+        "errors": [],
+        "tokens": 768
+      }
+    },
+    {
+      "id": "OBQ1",
+      "text": "Em que tabela posso encontrar informa\u00e7\u00f5es sobre vistorias de sa\u00edda?",
+      "complexity": "Entity routing (Inspection)",
+      "old": {
+        "bytes_consumed": 17845,
+        "files_or_calls": 2,
+        "latency_ms": 0.8734170000010977,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 12004
+        },
+        "errors": [],
+        "tokens": 4461
+      },
+      "new": {
+        "bytes_consumed": 13015,
+        "files_or_calls": 3,
+        "latency_ms": 879.3147080000008,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 4554,
+          "search_hits": 1,
+          "search_top_urns": [
+            "urn:li:dataProduct:repairs"
+          ],
+          "get_entities_bytes": 8366,
+          "query_bytes": 95
+        },
+        "errors": [],
+        "tokens": 3253
+      }
+    },
+    {
+      "id": "OBQ2",
+      "text": "Gere uma query para contabilizar rescis\u00f5es com isen\u00e7\u00e3o de vistoria de sa\u00edda",
+      "complexity": "Medium query (Offboarding \u2014 opt-out flag)",
+      "old": {
+        "bytes_consumed": 29087,
+        "files_or_calls": 3,
+        "latency_ms": 0.7786669999987339,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 12004,
+          "entity_md_2_bytes": 11242
+        },
+        "errors": [],
+        "tokens": 7271
+      },
+      "new": {
+        "bytes_consumed": 59,
+        "files_or_calls": 1,
+        "latency_ms": 433.4074999999995,
+        "coverage": false,
+        "detail": {
+          "search_bytes": 59,
+          "search_hits": 0,
+          "search_top_urns": []
+        },
+        "errors": [],
+        "tokens": 14
+      }
+    },
+    {
+      "id": "OBQ3",
+      "text": "Gere uma query para contabilizar offboardings sem reparos",
+      "complexity": "Medium query (Offboarding \u2014 has_repairs OBT)",
+      "old": {
+        "bytes_consumed": 17845,
+        "files_or_calls": 2,
+        "latency_ms": 0.45654200000022627,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 12004
+        },
+        "errors": [],
+        "tokens": 4461
+      },
+      "new": {
+        "bytes_consumed": 1985,
+        "files_or_calls": 2,
+        "latency_ms": 1025.244666999999,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 1130,
+          "search_hits": 5,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:trino,hive.datalake_offboarding.consolidate_data,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:superset,1833,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:superset,15110,PROD)"
+          ],
+          "get_entities_bytes": 855
+        },
+        "errors": [],
+        "tokens": 496
+      }
+    },
+    {
+      "id": "OBQ4",
+      "text": "Gere query para analisar se fluxo autom\u00e1tico de AR reduz aprova\u00e7\u00f5es de IQ e PP",
+      "complexity": "Hard query (Offboarding \u2014 auto AR approval comparison)",
+      "old": {
+        "bytes_consumed": 17845,
+        "files_or_calls": 2,
+        "latency_ms": 0.35245800000005545,
+        "coverage": false,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 12004
+        },
+        "errors": [],
+        "tokens": 4461
+      },
+      "new": {
+        "bytes_consumed": 2561,
+        "files_or_calls": 2,
+        "latency_ms": 644.4902499999987,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 1072,
+          "search_hits": 5,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_offboarding.obt_offboarding,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:databricks,dw_offboarding.obt_offboarding,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:superset,19578,PROD)"
+          ],
+          "get_entities_bytes": 1489
+        },
+        "errors": [],
+        "tokens": 640
+      }
+    },
+    {
+      "id": "OBQ5",
+      "text": "Gere query por termination mostrando agreement, relistagem e rerental",
+      "complexity": "Hard query (Offboarding \u2014 obt + fact_house_listing_terminations)",
+      "old": {
+        "bytes_consumed": 29087,
+        "files_or_calls": 3,
+        "latency_ms": 0.42700000000017724,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 12004,
+          "entity_md_2_bytes": 11242
+        },
+        "errors": [],
+        "tokens": 7271
+      },
+      "new": {
+        "bytes_consumed": 59,
+        "files_or_calls": 1,
+        "latency_ms": 471.3787919999994,
+        "coverage": false,
+        "detail": {
+          "search_bytes": 59,
+          "search_hits": 0,
+          "search_top_urns": []
+        },
+        "errors": [],
+        "tokens": 14
+      }
+    },
+    {
+      "id": "SQ1",
+      "text": "Em que tabela posso encontrar informa\u00e7\u00f5es sobre leads de supply?",
+      "complexity": "Entity routing (Supply)",
+      "old": {
+        "bytes_consumed": 70208,
+        "files_or_calls": 2,
+        "latency_ms": 0.9464999999995172,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 64367
+        },
+        "errors": [],
+        "tokens": 17552
+      },
+      "new": {
+        "bytes_consumed": 154,
+        "files_or_calls": 2,
+        "latency_ms": 563.4267919999995,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 59,
+          "search_hits": 0,
+          "search_top_urns": [],
+          "query_bytes": 95
+        },
+        "errors": [],
+        "tokens": 38
+      }
+    },
+    {
+      "id": "SQ2",
+      "text": "Gere uma query para contabilizar first listings vindos das calculadoras",
+      "complexity": "Medium query (Supply \u2014 calculator acquisition_origin)",
+      "old": {
+        "bytes_consumed": 70208,
+        "files_or_calls": 2,
+        "latency_ms": 0.39316700000036064,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 64367
+        },
+        "errors": [],
+        "tokens": 17552
+      },
+      "new": {
+        "bytes_consumed": 59,
+        "files_or_calls": 1,
+        "latency_ms": 371.55020799999863,
+        "coverage": false,
+        "detail": {
+          "search_bytes": 59,
+          "search_hits": 0,
+          "search_top_urns": []
+        },
+        "errors": [],
+        "tokens": 14
+      }
+    },
+    {
+      "id": "SQ3",
+      "text": "Gere uma query para contabilizar opportunities gerados pelo Isa\u00edas",
+      "complexity": "Medium query (Supply \u2014 Isaias tp_origin_acquisition)",
+      "old": {
+        "bytes_consumed": 70208,
+        "files_or_calls": 2,
+        "latency_ms": 0.7473329999996281,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 64367
+        },
+        "errors": [],
+        "tokens": 17552
+      },
+      "new": {
+        "bytes_consumed": 1707,
+        "files_or_calls": 2,
+        "latency_ms": 612.4352910000006,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 976,
+          "search_hits": 5,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:superset,19693,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:superset,18646,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:superset,15213,PROD)"
+          ],
+          "get_entities_bytes": 731
+        },
+        "errors": [],
+        "tokens": 426
+      }
+    },
+    {
+      "id": "SQ4",
+      "text": "Gere query para taxa de convers\u00e3o lead para opportunity dos leads inbound",
+      "complexity": "Medium query (Supply \u2014 coincident date conversion)",
+      "old": {
+        "bytes_consumed": 70208,
+        "files_or_calls": 2,
+        "latency_ms": 0.1814170000002946,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 64367
+        },
+        "errors": [],
+        "tokens": 17552
+      },
+      "new": {
+        "bytes_consumed": 1291,
+        "files_or_calls": 2,
+        "latency_ms": 545.5941670000009,
+        "coverage": true,
+        "detail": {
+          "search_bytes": 503,
+          "search_hits": 2,
+          "search_top_urns": [
+            "urn:li:dataset:(urn:li:dataPlatform:trino,hive.datalake_gsheets.rental_supply_coincident_targets,PROD)",
+            "urn:li:dataset:(urn:li:dataPlatform:trino,hive.datalake_gsheets.rental_supply_cohort_targets,PROD)"
+          ],
+          "get_entities_bytes": 788
+        },
+        "errors": [],
+        "tokens": 322
+      }
+    },
+    {
+      "id": "SQ5",
+      "text": "Compare volumes de motivos de descarte entre canais de opera\u00e7\u00f5es e self-service",
+      "complexity": "Hard query (Supply \u2014 discard reasons by channel)",
+      "old": {
+        "bytes_consumed": 70208,
+        "files_or_calls": 2,
+        "latency_ms": 0.35150000000072623,
+        "coverage": true,
+        "detail": {
+          "intro_bytes": 5841,
+          "entity_md_bytes": 64367
+        },
+        "errors": [],
+        "tokens": 17552
+      },
+      "new": {
+        "bytes_consumed": 59,
+        "files_or_calls": 1,
+        "latency_ms": 360.79237500000085,
+        "coverage": false,
+        "detail": {
+          "search_bytes": 59,
+          "search_hits": 0,
+          "search_top_urns": []
+        },
+        "errors": [],
+        "tokens": 14
+      }
+    }
+  ]
+}

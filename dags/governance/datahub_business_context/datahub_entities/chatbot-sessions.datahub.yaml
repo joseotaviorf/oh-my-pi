@@ -1,0 +1,246 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Chatbot Sessions"
+product_description: |
+  A chatbot session represents a conversation between a user and one of QuintoAndar's
+  AI agents (bots/hosts) through WhatsApp or in-app channels. Sessions are orchestrated
+  by Sauron and executed by Copilot Service, with LLM observability captured in Langfuse.
+
+  Session lifecycle:
+  1. Session creation — user contacts QuintoAndar through a channel.
+  2. AI conversation — the bot handles the request (messages.conversation_type = 'HUMAN-AI').
+  3. Bypass check — pre-bot rules may route the user directly to a queue (bypass.bypass).
+  4. Escalation — bot hands off to human analyst (sessions.is_escalated = true).
+  5. Human conversation (if escalated) — analyst takes over (conversation_type = 'HUMAN-HUMAN').
+  6. Evaluation — LLM-as-a-judge scores assess session quality (evals.evals MAP column).
+
+  Bots / hosts (filter by sessions.bot):
+  - sonia: rent-focused WhatsApp bot
+  - wall-e: support bot (in-app and WhatsApp)
+  - isaias: landlord lead qualification bot; funnel flags in isaias_conversational_flow
+  - matthew: collections-related WhatsApp bot (see matthew entity for collections context)
+  - concierge: demand/search concierge bot
+  - vandinha: for-sale transaction EOP bot
+  - old bot: legacy Greenseer sessions — no id_langfuse_session
+
+  Three session IDs (critical distinction):
+  - id_sauron_session: always present — the stable universal key.
+  - id_session: Copilot key, NULL for legacy (old bot) sessions.
+  - id_langfuse_session: Langfuse key, NULL for legacy sessions. Required for evals, bypass,
+    isaias_conversational_flow, and datalake_langfuse_clean joins.
+  Prefer id_langfuse_session for session-level analysis; fallback to id_sauron_session
+  when id_langfuse_session is missing (e.g. datalake_chatbot.messages).
+
+  Table grain:
+  - datalake_chatbot.sessions: 1 row per session; merge key id_sauron_session.
+  - datalake_chatbot.messages: 1 row per message; merge key id_message. Excludes SPOC sessions.
+  - datalake_chatbot.evals: 1 row per Langfuse session. evals is a MAP column.
+  - datalake_chatbot.bypass: 1 row per bypass per session (1:N per session).
+  - datalake_chatbot.isaias_conversational_flow: 1 row per Langfuse session (bot = 'isaias' only).
+  - datalake_langfuse_clean.traces: 1 row per LLM trace. JOIN via t.id_session = s.id_langfuse_session.
+  - datalake_langfuse_clean.observations: 1 row per span/generation. JOIN via o.id_trace = t.id_trace.
+
+  Key metrics: session volume (count id_sauron_session), escalation rate
+  (COUNT_IF(is_escalated) / COUNT(*)), escalation error rate
+  (first_queue != last_queue among escalated), bypass rate, AI response time
+  (messages.reply_time where role = 'AI'), LLM eval scores (element_at(evals, 'score')),
+  Isaias funnel conversion (has_*_success flags), bot version distribution (sessions.version).
+
+  Critical rules:
+  - No partition columns on datalake_chatbot or datalake_langfuse_clean tables — filter on
+    ts_created (or ts_started for langfuse) for time range; tables are z-ordered.
+  - Evals MAP access: use element_at(evals, 'score_name').value in Trino. Never use
+    evals['key'] subscript syntax — throws an error if the key is missing.
+  - SPOC sessions are excluded from datalake_chatbot.messages — do not assume messages
+    covers all sessions.
+  - Do not join messages to evals directly (different session ID types: id_sauron_session
+    vs id_langfuse_session) — bridge through sessions.
+  - Do not use id_session as a universal key — it is NULL for all legacy (old bot) rows.
+  - Do not confuse first_queue (escalation target from Langfuse) with Sauron department.
+
+  Query 2 (Escalation error rate) from the source doc:
+    SELECT s.bot, s.first_queue, s.last_queue,
+        COUNT_IF(s.first_queue != s.last_queue) AS escalated_error,
+        ROUND(COUNT_IF(s.first_queue != s.last_queue) / CAST(COUNT_IF(s.is_escalated) AS DOUBLE), 2)
+    FROM datalake_chatbot.sessions AS s
+    WHERE s.ts_created >= TIMESTAMP '{start_date}' AND s.ts_created < TIMESTAMP '{end_date}'
+      AND s.is_escalated = true
+    GROUP BY s.bot, s.first_queue, s.last_queue
+
+  Further detail and table routing: docs/llm_context/business_entities/chatbot_sessions.md
+
+data_product_id: chatbot-sessions
+domain_urn: urn:li:domain:support_and_services
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.chatbot_sessions.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.chatbot_sessions.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:9caa43c4-7476-45ae-9462-9f1963302d86
+  name: "Query 1 — Session volume by bot and channel"
+  description: >-
+    Daily session counts broken down by bot persona and communication channel, with
+    escalation rate. Filters by ts_created for time range (no partition columns — tables
+    are z-ordered on ts_created).
+    Source: docs/llm_context/business_entities/chatbot_sessions.md
+  subjects:
+    - schema: datalake_chatbot
+      table: sessions
+  sql: |
+    SELECT
+        DATE(s.ts_created) AS dt_session,
+        s.bot,
+        s.channel,
+        COUNT(*) AS total_sessions,
+        COUNT_IF(s.is_escalated) AS escalated_sessions,
+        ROUND(CAST(COUNT_IF(s.is_escalated) AS DOUBLE) / COUNT(*), 2) AS escalation_rate
+    FROM datalake_chatbot.sessions AS s
+    WHERE s.ts_created >= TIMESTAMP '{start_date}'
+        AND s.ts_created < TIMESTAMP '{end_date}'
+    GROUP BY DATE(s.ts_created), s.bot, s.channel
+    ORDER BY dt_session DESC, total_sessions DESC
+
+datasets:
+  - schema: datalake_chatbot
+    table: sessions
+  - schema: datalake_chatbot
+    table: messages
+  - schema: datalake_chatbot
+    table: evals
+  - schema: datalake_chatbot
+    table: bypass
+  - schema: datalake_chatbot
+    table: isaias_conversational_flow
+  - schema: datalake_langfuse_clean
+    table: traces
+  - schema: datalake_langfuse_clean
+    table: observations
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:customer_support
+  terms:
+    - id: chatbot_host
+      name: "Host / Bot / Agente (Chatbot)"
+      description: >-
+        The AI persona that handles a chatbot session (sessions.bot). Current hosts: sonia,
+        wall-e, isaias, matthew, concierge, vandinha, old bot. Note: 'agente' can refer to
+        a host (e.g. wall-e) or to a specific AI sub-agent called within a host (e.g.
+        HumanEscalationAgent) — context determines meaning.
+    - id: chatbot_sonia
+      name: "Sonia (Bot)"
+      description: >-
+        Rent-focused WhatsApp bot. Handles rental-related inquiries via WhatsApp.
+        Filter: sessions.bot = 'sonia'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_wall_e
+      name: "Wall-E (Bot)"
+      description: >-
+        General-purpose support bot available on both in-app and WhatsApp channels.
+        Matthew may run as a sub-agent inside Wall-E for collections-related sessions.
+        Filter: sessions.bot = 'wall-e'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_isaias
+      name: "Isaias (Bot)"
+      description: >-
+        Landlord lead qualification bot for property acquisition (supply). Qualification
+        funnel flags live in datalake_chatbot.isaias_conversational_flow. Join supply leads
+        via obt_supply.sk_chat_session = sessions.id_sauron_session.
+        Filter: sessions.bot = 'isaias'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_matthew_bot
+      name: "Matthew (Bot)"
+      description: >-
+        Collections-related WhatsApp bot (standalone host). Runs as bot = 'matthew' on
+        WhatsApp or as a sub-agent inside Wall-E in-app. For full collections context
+        and escalation pillar analysis, use datalake_ai_collections_quintoandar.sessions
+        (see matthew entity). Filter: sessions.bot = 'matthew'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_concierge
+      name: "Concierge (Bot)"
+      description: >-
+        Demand and property search concierge bot. Helps prospective tenants/buyers discover
+        and evaluate properties. Filter: sessions.bot = 'concierge'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_vandinha
+      name: "Vandinha (Bot)"
+      description: >-
+        For-sale transaction EOP (end-of-process) bot. Handles for-sale transaction
+        workflows. Filter: sessions.bot = 'vandinha'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_old_bot
+      name: "Old Bot (Legacy Greenseer)"
+      description: >-
+        Legacy Greenseer chatbot sessions. These rows have id_langfuse_session = NULL —
+        Langfuse-dependent analysis (evals, bypass, isaias_conversational_flow, traces)
+        is unavailable for them. Should be a negligible fraction of total sessions.
+        Filter: sessions.bot = 'old bot'. Add WHERE id_langfuse_session IS NOT NULL to
+        exclude from Langfuse-dependent queries.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_host
+          relationship: isA
+    - id: chatbot_escalation
+      name: "Escalation (Chatbot)"
+      description: >-
+        The bot hands off to a human analyst because it cannot resolve the issue or the
+        user explicitly requested it (sessions.is_escalated = true). After escalation,
+        messages.conversation_type transitions from HUMAN-AI to HUMAN-HUMAN.
+        sessions.first_queue is the target queue; sessions.last_queue is where the ticket
+        ended up. Formerly called 'transbordo' — current business term is 'escalation'.
+    - id: chatbot_transbordo
+      name: "Transbordo (Escalation synonym)"
+      description: >-
+        Old Portuguese name for escalation to human support. Current business terminology
+        is 'escalation'. Both terms mean sessions.is_escalated = true. Do not use
+        'transbordo' in new code or documentation — prefer 'escalation'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:chatbot_escalation
+          relationship: isA
+    - id: chatbot_bypass
+      name: "Bypass"
+      description: >-
+        Pre-bot routing rule that sends the user directly to a human support queue before
+        the AI bot engages (bypass.bypass). One session may have multiple bypass records
+        (1:N). Only available for non-legacy sessions (id_langfuse_session IS NOT NULL).
+        JOIN: sessions.id_langfuse_session = bypass.id_langfuse_session.
+    - id: chatbot_evals_map
+      name: "Evals (LLM-as-a-Judge Scores)"
+      description: >-
+        LLM-as-a-judge evaluation scores per Langfuse session stored in
+        datalake_chatbot.evals.evals as a MAP column (1 row per Langfuse session).
+        In Trino: use element_at(evals, 'score_name').value for a specific score; use
+        CROSS JOIN UNNEST(evals) AS t(eval_name, eval_struct) to flatten all scores.
+        Never use MAP subscript evals['key'] — throws an error when the key is absent.
+    - id: chatbot_spoc
+      name: "SPOC"
+      description: >-
+        A session category excluded from datalake_chatbot.messages. Do not assume the
+        messages table covers all sessions — SPOC sessions are filtered out at the
+        source and will produce no message rows when joined.
+    - id: chatbot_fila_queue
+      name: "Fila / Departamento (Queue)"
+      description: >-
+        The support queue or department the session is routed to after escalation.
+        sessions.first_queue = escalation target queue (from Langfuse observations).
+        sessions.last_queue = final queue where the ticket was resolved. Do not confuse
+        first_queue with the Sauron department attribute — first_queue reflects the actual
+        escalation routing.
+
+documentation_link:
+  label: "Business entity documentation (chatbot_sessions.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/chatbot_sessions.md

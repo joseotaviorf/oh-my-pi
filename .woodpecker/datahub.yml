@@ -1,0 +1,61 @@
+# DataHub governance pipeline — independent of the main code release.
+#
+# Triggers on changes to:
+#   • docs/llm_context/business_entities/**  (Markdown entity docs)
+#   • dags/governance/datahub_business_context/datahub_entities/**  (YAML entity configs)
+#   • dags/governance/datahub_business_context/load_collections_context.py  (loader logic)
+#   • dags/governance/datahub_business_context/push_all_entities.py  (push runner)
+#   • dags/governance/datahub_business_context/smoke_test_datahub.py  (smoke test)
+#
+# Steps:
+#   validate-datahub-entities — runs smoke_test_datahub.py on push + pull_request events
+#                                to confirm every *.datahub.yaml entity is reachable in DataHub.
+#   push-datahub-business-context — runs push_all_entities.py on push to master / hotfix/*
+#                                    to publish all entity configs to production DataHub.
+#
+# Secrets required (configure in Woodpecker repo settings):
+#   datahub_graphql_url — full URL to the DataHub GraphQL endpoint
+#   datahub_token       — DataHub personal access token with editor role
+#
+# This pipeline does NOT depend on lint / tests / validations so it can run
+# independently on documentation-only changes.
+
+steps:
+  validate-datahub-entities:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url
+      DATAHUB_TOKEN:
+        from_secret: datahub_token
+    commands:
+      - pip install --quiet acryl-datahub
+      - python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
+    when:
+      event: [push, pull_request]
+      path: &datahub_path
+        include:
+          - "docs/llm_context/business_entities/**"
+          - "dags/governance/datahub_business_context/datahub_entities/**"
+          - "dags/governance/datahub_business_context/load_collections_context.py"
+          - "dags/governance/datahub_business_context/push_all_entities.py"
+          - "dags/governance/datahub_business_context/smoke_test_datahub.py"
+        on_empty: false
+
+  push-datahub-business-context:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url
+      DATAHUB_TOKEN:
+        from_secret: datahub_token
+    commands:
+      - pip install --quiet acryl-datahub
+      - python dags/governance/datahub_business_context/push_all_entities.py
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: *datahub_path
+    depends_on: [validate-datahub-entities]

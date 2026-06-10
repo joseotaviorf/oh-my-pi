@@ -4,13 +4,29 @@ You are being provided with structured context about QuintoAndar's data platform
 
 ## How to Use This Context
 
-The `business_entities/` folder contains **one markdown file per business entity**. These provide detailed context about specific domains. **Consult an entity file when the user's question may be related to that entity**. When in doubt, it is better to check the entity file than to miss relevant context. Avoid loading entity files only when the question is clearly unrelated to any listed entity.
+### Primary source — DataHub catalog
+
+The **DataHub MCP** is the authoritative source for schema, column definitions, glossary terms, and golden queries. Before reading any entity file, query DataHub:
+
+| MCP tool | Use it to |
+|---|---|
+| `search(query=<entity_or_synonym>, entity_types=["DATA_PRODUCT","DATASET"])` | Find the Data Product or datasets for an entity |
+| `get_entities(urns=[<urn>])` | Get descriptions, glossary terms, owners, and linked assets |
+| `list_schema_fields(urn=<dataset_urn>)` | Enumerate columns with types and descriptions |
+| `get_dataset_queries(urn=<dataset_urn>)` | Retrieve validated golden queries |
+
+### Supplementary source — entity MD files
+
+The `business_entities/` folder contains **one markdown file per business entity** with business rules, mandatory dos/don'ts, JOIN recipes, and edge cases not yet encoded in DataHub. Consult an entity file **after DataHub** when the user's question requires domain patterns or nuances. Every entity file includes a **DataHub catalog** section **after Overview** with direct links to its DataHub **Data Product**, **golden query** (`Query` entity), and YAML preset under `dags/governance/datahub_business_context/datahub_entities/` used by [`load_collections_context.py`](../../dags/governance/datahub_business_context/load_collections_context.py); some domains (e.g. collections) also list dataset schema links inline.
+
+When in doubt, it is better to check both sources than to miss relevant context.
 
 Each entity file follows a standard structure:
 
 | Section | What it gives you |
 |---------|-------------------|
 | **Overview** | What the entity is, its lifecycle stages, and key timestamps — use this to understand the domain before answering |
+| **DataHub catalog** | Direct UI links to the Data Product and golden Query entity, plus structured-property and loader YAML references |
 | **Glossary and Synonyms** | Domain-specific jargon, common names, and terms — use this to map the user's question to the right technical term |
 | **Tables** | Available tables by layer (DW, Enrich) with aliases, descriptions, key fields, and type caveats — use this to pick the right table |
 | **Key Metrics** | Common KPIs and which columns compute them — use this to answer metric questions correctly |
@@ -29,6 +45,7 @@ Each entity file follows a standard structure:
 - `business_entities/chatbot_sessions.md` — AI chatbot conversation sessions (sessões de chatbot / atendimento bot)
 - `business_entities/closing.md` — For Rent contract closing / CC2CS journey: draft → sent → signed (fechamento, assinatura de contrato)
 - `business_entities/collections.md` — Overdue payment recovery operations (cobrança)
+- `business_entities/contact.md` — Voice and chat contacts with support agents — Front Office interactions (BigFone, Twilio, Sauron) before ticket creation (contato / ligação / reserva / tarefa)
 - `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
 - `business_entities/fs-transact.md` — FS Transact — For Sale transaction funnel: EoF (OS → CCV → Closed Deal) and EoP (CCV → CRI → key delivery), 1P scope, Buyer Prospect, lead times by payment track (funil de transação de venda / CCV / Closed Deal / EoP)
@@ -37,12 +54,14 @@ Each entity file follows a standard structure:
 - `business_entities/matthew.md` — Collections AI agent for tenants with open balances (agente Matthew / cobrança IA)
 - `business_entities/nps.md` — Net Promoter Score campaigns via Tracksale (NPS)
 - `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
+- `business_entities/recovery_collections_fr_tenants.md` — Overdue debt recovery rate analytics for For-Rent tenants (recuperação / cobrança FR / wallet / recovery rate)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/recs.md` — Recommendation exposures and downstream journey attribution (recomendacoes / carrossel de recomendacao)
 - `business_entities/search.md` — Search result impressions, CTR, ranking, and downstream journey attribution (busca / resultado de busca)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
 - `business_entities/seo.md` — SEO performance, keyword clusters and demand top-of-funnel metrics (SEO / Search Engine Optimization)
 - `business_entities/supply.md` — Property owner acquisition funnel from lead to first listing (captação / supply / aquisição de proprietários)
+- `business_entities/ticket.md` — Zendesk support tickets — central anchor for Support & Services metrics (ticket / chamado / demanda)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
 - `business_entities/visits.md` — Visit requests and scheduled property visits, capturing the full journey from visit intention to completion (agendamentos e realização de visitas a imóveis)
 
@@ -66,3 +85,5 @@ If no entity file is relevant, proceed normally using your general knowledge of 
 ## SQL Conventions, Layer Priority, and Response Guidelines
 
 These topics are defined in `.cursor/rules/data_exploration.mdc`, which is loaded automatically when the Data Analyst (TARS) subagent is active. Use `@tars` to activate exploration mode.
+
+`data_exploration.mdc` also defines the full **Entity Discovery** sequence (DataHub MCP → entity MD files) and the **Column Verification** flow (DataHub `list_schema_fields` → fallback to repo metadata YAMLs).

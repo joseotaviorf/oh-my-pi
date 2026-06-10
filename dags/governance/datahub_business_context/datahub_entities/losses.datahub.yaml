@@ -1,0 +1,187 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Losses (Credit Provisions & Write-offs)"
+product_description: |
+  Losses represent the accounting and financial phase of the credit lifecycle — when a company
+  determines that a specific debt is unlikely to be collected and must be recognized as an
+  expense on the P&L. This ensures financial health accuracy by removing uncollectible assets
+  from the books.
+
+  Objective: provide an accurate financial health picture by removing uncollectible assets.
+  Asset status: value removed from Balance Sheet (asset) and recorded as a loss in P&L.
+  Common actions: write-offs (removing debt from books) and PDD provisions (allowance for
+  doubtful accounts).
+
+  The dw_losses schema is built by the dw_losses DAG (Databricks, layer dw, query_delta workflow,
+  runs the day after the first business day of the month). Full-load tables: fact_closing,
+  fact_delay, fact_provision, fact_losses, dim_provision_factor, dim_bill_items.
+
+  Table grain:
+  - Primary key for time-series facts: (sk_invoice, sk_contract, dt_closing) where
+    dt_closing is the LAST DAY OF THE MONTH (closing date).
+  - fact_losses: curated analysis-ready table with MoM loss = change in provision_balance
+    from current month to previous month for the same invoice/contract. Applies all standard
+    business filters.
+  - fact_provision: monthly PDD balances and provision factors per invoice.
+  - fact_closing: monthly closing snapshot of invoices (amounts, payment state, dates).
+  - fact_delay: delay contamination rules A–E and day ranges (PD buckets).
+  - dim_bill_items: bill lines per invoice with cluster for provision attribution.
+  - dim_provision_factor: versioned provision factor lookup by risk × rule × PD range.
+  - fact_accounts_receivable: from dw_accounts_receivable DAG (recovery-oriented view).
+
+  Delay contamination rules (fact_delay):
+  - A: contaminate all deal invoices from negotiation anchor; rolling even if deal is paid.
+  - B: if deal is broken, worsen roll only when invoice delay > delay at negotiation.
+  - C: if deal broken → contaminate like A; otherwise keep delay as at negotiation.
+  - D: if deal broken → contaminated delay = invoice delay + delay at negotiation.
+  - E: if ANY invoice is delayed AND contract has active negotiation → contaminated delay = sum.
+
+  bill_item_cluster_name (official clusters in dim_bill_items):
+  ACORDO, CONDOMINIO, MULTA-RECISORIA, MULTAS ONGOING, RENTAL-CORE, REPAROS,
+  UTILIDADES, GUARANTEE-RENOVATION, OUTROS.
+
+  Standard losses filters applied in fact_losses:
+  due_amount < 0, exclude payment_status = 'canceled', is_writtendown_in_dead_time = FALSE,
+  is_international = FALSE, is_before_started = FALSE, repair_offboarding logic
+  (pre/post Feb 2024 boundary).
+
+  Key metrics: monthly losses (MoM provision_balance delta), provision_balance by risk_group/
+  guarantee_group, write-off volume (is_write_off, dt_write_off), delay contamination impact
+  (delay_contamined_range vs delay_invoice_range), bill item cluster distribution for losses,
+  net charge-off (NCO = total write-offs minus subsequent recoveries from fact_accounts_receivable).
+
+  Critical rules:
+  - Always partition-join time-series facts: (sk_invoice, sk_contract, dt_closing).
+  - fact_losses already applies all standard filters — prefer it over rebuilding from fact_provision
+    + fact_closing for standard loss metrics.
+  - deal_status in fact_provision drives contamination rule behavior — include it in complex joins.
+  - Provision balance grid (provision_balance_p{1..7}_delay_{a|b|c|d|e}) in fact_provision allows
+    scenario modeling — the column provision_balance is the CHOSEN/applied combination.
+  - dw_losses ≠ dw_collection_recovery_quintoandar (recovery = operational collections actions;
+    losses = accounting recognition). They are related but separate domains.
+
+  Further detail and table routing: docs/llm_context/business_entities/losses.md
+
+data_product_id: losses
+domain_urn: urn:li:domain:fintech
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.losses.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.losses.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:03ec6ba5-e9c7-4051-9944-5ed9cb466695
+  name: "Query 1 — Monthly losses by bill item cluster"
+  description: >-
+    Monthly MoM losses from fact_losses broken down by bill_item_cluster and risk_group.
+    fact_losses already applies all standard business filters (no additional filtering needed).
+    Joins to dim_bill_items for cluster attribution on dt_closing.
+    Source: docs/llm_context/business_entities/losses.md
+  subjects:
+    - schema: dw_losses
+      table: fact_losses
+    - schema: dw_losses
+      table: dim_bill_items
+  sql: |
+    SELECT
+        fl.dt_closing,
+        fl.risk_group,
+        fl.guarantee_group,
+        dbi.bill_item_cluster_name,
+        SUM(fl.losses) AS total_losses,
+        SUM(fl.provision_balance) AS total_provision_balance
+    FROM dw_losses.fact_losses AS fl
+    LEFT JOIN dw_losses.dim_bill_items AS dbi
+        ON fl.sk_invoice = dbi.sk_invoice
+        AND fl.dt_closing = dbi.dt_closing
+    WHERE fl.dt_closing >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '12' MONTHS
+    GROUP BY 1, 2, 3, 4
+    ORDER BY fl.dt_closing DESC, total_losses ASC
+
+datasets:
+  - schema: dw_losses
+    table: fact_losses
+  - schema: dw_losses
+    table: fact_provision
+  - schema: dw_losses
+    table: fact_closing
+  - schema: dw_losses
+    table: fact_delay
+  - schema: dw_losses
+    table: dim_bill_items
+  - schema: dw_losses
+    table: dim_provision_factor
+  - schema: dw_losses
+    table: fact_accounts_receivable
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:fintech
+  terms:
+    - id: losses_entity
+      name: "Losses (Bad Debt)"
+      description: >-
+        Accounting recognition of uncollectible debt, removing it from the Balance Sheet
+        and recording it as a P&L expense. Also called bad debt. Schema: dw_losses.
+        Primary analytical table: fact_losses (curated with all standard filters applied).
+    - id: pdd_provision
+      name: "PDD / Provision (Allowance for Doubtful Accounts)"
+      description: >-
+        Monthly allowance for doubtful accounts per invoice. Stored as provision_balance in
+        fact_provision and fact_losses. The PDD is built from provision factors (dim_provision_factor)
+        applied to the invoice balance based on delay range and risk type. MoM change in
+        provision_balance = the monthly losses figure.
+      related_terms:
+        - urn: urn:li:glossaryTerm:losses_entity
+          relationship: hasA
+    - id: write_off
+      name: "Write-off / Charge-off"
+      description: >-
+        Final accounting step: removing the debt from the primary ledger because it is deemed
+        permanently uncollectible. is_write_off = TRUE and dt_write_off populated in
+        fact_provision. is_contract_write_off applies when the entire contract is written off.
+      related_terms:
+        - urn: urn:li:glossaryTerm:losses_entity
+          relationship: hasA
+    - id: net_charge_off
+      name: "NCO (Net Charge-off)"
+      description: >-
+        Total write-offs minus subsequent recoveries. The net financial impact of bad debt.
+        Write-off data from fact_provision; recovery data from dw_losses.fact_accounts_receivable
+        (built by the dw_accounts_receivable DAG — different from the losses DAG).
+      related_terms:
+        - urn: urn:li:glossaryTerm:write_off
+          relationship: hasA
+    - id: delay_contamination
+      name: "Delay Contamination Rules (A–E)"
+      description: >-
+        Methodology that adjusts an invoice's effective delay based on deal/negotiation status.
+        Five rules (A through E) in fact_delay. The chosen applied rule produces
+        delay_contamined_range. Delay contamination is the operational standard (DT2) used
+        for provisioning and recovery analytics.
+    - id: delay_rules_a_e
+      name: "Delay Rules A, B, C, D, E"
+      description: >-
+        The five contamination rule variants:
+        A = contaminate all deal invoices from anchor (natural debt keeps rolling).
+        B = worsen roll only when invoice delay > delay at negotiation if deal broken.
+        C = contaminate like A if broken; keep as at negotiation otherwise.
+        D = contaminated delay = invoice delay + delay at negotiation if broken.
+        E = if ANY invoice delayed AND active negotiation → contaminated = sum of delays.
+        The applied rule and its delay range: fact_delay.delay_contamined_range.
+      related_terms:
+        - urn: urn:li:glossaryTerm:delay_contamination
+          relationship: isA
+    - id: bill_item_cluster
+      name: "Bill Item Cluster"
+      description: >-
+        Analytics grouping of invoice bill lines for provision attribution. Official clusters
+        in dim_bill_items.bill_item_cluster_name: ACORDO, CONDOMINIO, MULTA-RECISORIA,
+        MULTAS ONGOING, RENTAL-CORE, REPAROS, UTILIDADES, GUARANTEE-RENOVATION, OUTROS.
+        Join: fact_losses.sk_invoice + dt_closing = dim_bill_items.sk_invoice + dt_closing.
+
+documentation_link:
+  label: "Business entity documentation (losses.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/losses.md

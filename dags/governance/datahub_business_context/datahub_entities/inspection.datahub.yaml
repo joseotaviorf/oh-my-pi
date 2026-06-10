@@ -1,0 +1,224 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Inspection"
+product_description: |
+  An inspection (vistoria) is a technical assessment of a property's condition performed
+  at key moments of the rental lifecycle. Two types, determined by dim_inspection.inspection_type:
+  - onboarding (entry inspection): at the start of a rental contract.
+  - offboarding (exit inspection): at the end of a rental contract, linked to a termination.
+
+  IMPORTANT distinction: "Inspection" (vistoria) is a technical property assessment.
+  "Visit" (visita) is when a prospective tenant views the property before renting.
+  They are completely different entities with different tables.
+
+  Exit inspection lifecycle:
+  1. Scheduling — appointment created (fact_inspection.ts_booking_created).
+  2. Execution (VT) — inspector visits and documents property condition
+     (fact_inspection.ts_inspected).
+  3. Repair Analysis (AR) — damages identified; repair requests generated automatically or
+     manually (fact_report_inspections.ts_sent_to_repair_analysis).
+  4. Owner and tenant review (1st review) — parties see the report; may agree or contest.
+     Access vs approval: has_*_access_review (opened) vs has_*_approved_review (clicked approve).
+  5. Contestation Analysis (AC) — if tenant contests, dedicated team analyzes the dispute
+     (fact_report_inspections.ts_sent_to_contestation_analysis).
+  6. Budget approval (2nd review) — final budget presented; same access/approval pattern.
+  7. Report closure — has_agreement = TRUE when early agreement, late agreement (both approved
+     budget), or discount agreement (bandaid).
+
+  Table grain:
+  - fact_inspection: 1 row per inspection (with potential duplicates per contract — apply
+    Dedup rule: ROW_NUMBER() OVER(PARTITION BY sk_contract ORDER BY ts_updated DESC) = 1).
+  - dim_inspection: 1 row per inspection (type, status).
+  - fact_report_inspections: 1 row per inspection report (stage timestamps and party approvals).
+  - fact_appointments: 1 row per scheduling appointment.
+  - fact_repair_request: 1 row per repair (fans out from inspection grain — aggregate back).
+  - obt_offboarding: pre-joined termination + inspection + repairs + report (no manual JOINs).
+
+  Critical rules:
+  - CAST rule: fact_inspection.sk_inspection is VARCHAR. Always apply CAST on the other side:
+    fi.sk_inspection = CAST(other.sk_inspection AS VARCHAR).
+  - Dedup rule: fact_inspection may have duplicates per contract. Always add:
+    ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni
+    and filter WHERE rni = 1.
+  - Always filter by di.inspection_type ('onboarding' / 'offboarding') when starting from inspections.
+  - Joining fact_inspection → fact_repair_request fans out to repair grain (1:N). Aggregate
+    back when the desired output grain is per inspection.
+
+  Key metrics: termination-anchored metrics (has_repairs, has_agreement, leadtime_vt, leadtime_ar,
+  final_tenant_inspection_cost) via obt_offboarding; inspection-only metrics (report access rate,
+  volume by type, SLA compliance via fact_inspection.is_sla_execution).
+
+  Query 2 (Exit inspection volume and agreement rate) from source doc:
+    SELECT DATE_TRUNC('month', fi.ts_inspected) AS month_inspected,
+        COUNT(*) AS total_exit_inspections,
+        SUM(CASE WHEN fri.has_agreement = TRUE THEN 1 ELSE 0 END) AS with_agreement,
+        AVG(CAST(fri.has_agreement AS DOUBLE)) AS agreement_rate
+    FROM dw_inspections.fact_inspection AS fi
+    INNER JOIN dw_inspections.dim_inspection AS di ON fi.sk_inspection = di.sk_inspection
+    LEFT JOIN dw_inspections.fact_report_inspections AS fri
+        ON fi.sk_inspection = CAST(fri.sk_inspection AS VARCHAR)
+    WHERE di.inspection_type = 'offboarding' AND fi.ts_inspected IS NOT NULL
+        AND ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) = 1
+    GROUP BY 1 ORDER BY 1 DESC
+
+  Further detail and table routing: docs/llm_context/business_entities/inspection.md
+
+data_product_id: inspection
+domain_urn: urn:li:domain:for_rent
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.inspection.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.inspection.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:41049d19-cfb6-4561-8dfb-edd8bf43caaa
+  name: "Query 1 — Exit inspections with report data"
+  description: >-
+    Exit inspections (offboarding) with their report data, including party access and
+    approval flags for review and budget approval stages. Applies the Dedup rule on
+    fact_inspection. CAST rule applied to report JOIN.
+    Source: docs/llm_context/business_entities/inspection.md
+  subjects:
+    - schema: dw_inspections
+      table: fact_inspection
+    - schema: dw_inspections
+      table: dim_inspection
+    - schema: dw_inspections
+      table: fact_report_inspections
+  sql: |
+    SELECT
+        sub.sk_inspection,
+        sub.sk_contract,
+        sub.ts_booking_created,
+        sub.ts_inspected,
+        sub.is_sla_execution,
+        sub.ldt_hours_execution,
+        fri.has_tenant_access_review,
+        fri.has_owner_access_review,
+        fri.has_tenant_approved_review,
+        fri.has_owner_approved_review,
+        fri.has_tenant_access_budget_approval,
+        fri.has_owner_access_budget_approval,
+        fri.has_tenant_approved_budget_approval,
+        fri.has_owner_approved_budget_approval,
+        fri.has_agreement,
+        fri.ts_sent_to_repair_analysis,
+        fri.ts_sent_to_contestation_analysis
+    FROM (
+        SELECT fi.*,
+               ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni
+        FROM dw_inspections.fact_inspection AS fi
+        INNER JOIN dw_inspections.dim_inspection AS di
+            ON fi.sk_inspection = di.sk_inspection
+        WHERE di.inspection_type = 'offboarding'
+    ) AS sub
+    LEFT JOIN dw_inspections.fact_report_inspections AS fri
+        ON sub.sk_inspection = CAST(fri.sk_inspection AS VARCHAR)
+    WHERE sub.rni = 1
+        AND sub.ts_inspected >= DATE '2025-01-01'
+
+datasets:
+  - schema: dw_inspections
+    table: fact_inspection
+  - schema: dw_inspections
+    table: dim_inspection
+  - schema: dw_inspections
+    table: fact_report_inspections
+  - schema: dw_inspections
+    table: fact_appointments
+  - schema: dw_inspections
+    table: fact_repair_request
+  - schema: dw_inspections
+    table: dim_repair_request
+  - schema: dw_inspections
+    table: fact_contestation
+  - schema: dw_offboarding
+    table: obt_offboarding
+  - schema: datalake_inspections
+    table: automatic_discounts
+  - schema: datalake_inspection_services_clean
+    table: repair_request
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:offboarding
+  terms:
+    - id: inspection_entity
+      name: "Inspection (Vistoria)"
+      description: >-
+        Technical assessment of a property's condition at contract start (onboarding) or end
+        (offboarding). Also called vistoria or inspeção. Table: dw_inspections.fact_inspection.
+        Distinct from visita (visit), which is a property viewing by a prospective tenant.
+    - id: inspection_onboarding
+      name: "Vistoria de Entrada (Entry Inspection)"
+      description: >-
+        Inspection at the start of a rental contract documenting the initial property condition
+        as baseline for future comparison. Filter: dim_inspection.inspection_type = 'onboarding'.
+        Entry inspections do NOT generate repair requests.
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_entity
+          relationship: isA
+    - id: inspection_offboarding
+      name: "Vistoria de Saída (Exit Inspection)"
+      description: >-
+        Inspection at the end of a rental contract documenting damages and generating repair
+        requests. Linked to a termination via fact_terminations.sk_exit_inspection.
+        Filter: dim_inspection.inspection_type = 'offboarding'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_entity
+          relationship: isA
+    - id: inspection_ar_stage
+      name: "AR — Análise de Reparos (Repair Analysis Stage)"
+      description: >-
+        First stage after an exit inspection where damages are automatically or manually
+        analyzed and repair requests are generated. Columns with _ar suffix in fact_report_inspections
+        and obt_offboarding. Timestamp: fact_report_inspections.ts_sent_to_repair_analysis.
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_offboarding
+          relationship: hasA
+    - id: inspection_ac_stage
+      name: "AC — Análise de Contestação (Contestation Analysis Stage)"
+      description: >-
+        Stage where a dedicated team analyzes a dispute raised by the tenant after the first
+        review. Columns with _ac suffix. Timestamp: ts_sent_to_contestation_analysis.
+        Table for contestation details: dw_inspections.fact_contestation.
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_offboarding
+          relationship: hasA
+    - id: inspection_vt_stage
+      name: "VT — Vistoria Técnica (Technical Inspection Execution)"
+      description: >-
+        The physical inspection execution moment when the inspector visits the property.
+        Timestamp: fact_inspection.ts_inspected. SLA columns: ldt_hours_execution and
+        is_sla_execution in fact_inspection.
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_entity
+          relationship: hasA
+    - id: inspection_laudo_budget_approval
+      name: "Budget Approval (Aprovação do Orçamento)"
+      description: >-
+        Second review stage after contestation analysis. A final budget is presented to
+        both landlord and tenant for approval. Access vs approval pattern:
+        has_*_access_budget_approval (opened the link) vs has_*_approved_budget_approval
+        (clicked approve). Late agreement occurs when both parties approve the budget.
+        Do NOT confuse with the first review — the inspection goes through REVIEW first,
+        then BUDGET_APPROVAL.
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_offboarding
+          relationship: hasA
+    - id: inspection_laudo
+      name: "Laudo (Repair Report)"
+      description: >-
+        The repair report document produced after an exit inspection. Contains timestamps
+        for each stage (AR, Review, Budget Approval) and per-party access/approval flags.
+        Table: dw_inspections.fact_report_inspections. has_agreement = TRUE indicates
+        the report was closed with agreement (early, late, or discount agreement).
+      related_terms:
+        - urn: urn:li:glossaryTerm:inspection_offboarding
+          relationship: hasA
+
+documentation_link:
+  label: "Business entity documentation (inspection.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/inspection.md

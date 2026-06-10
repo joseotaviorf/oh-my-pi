@@ -1,0 +1,588 @@
+# TARS SQL Quality Evaluation — Test Cases
+#
+# Each case maps to one of the 5 benchmark questions and contains:
+#   golden_sql               — reference SQL that represents a correct TARS answer
+#   expected_tables          — fully-qualified tables that must appear in the SQL
+#   forbidden_tables         — table name fragments from wrong layers (raw/clean/enrich)
+#                              that must NOT appear
+#   expected_columns         — key column names that must appear in the SQL text
+#   mandatory_filter_patterns— regex patterns for mandatory clauses (partition, dedup)
+#   expected_min_rows        — Trino execution must return at least this many rows
+#                              (0 = only check SQL executes without error)
+#
+# Trino catalog: hive (default for bi-etl-ejuice queries).
+# Partition columns: year, month, day (on all DW fact tables in this schema).
+# Dedup sentinel: is_most_recent_record_month = true (one row per invoice per month).
+
+- id: Q1
+  text: "What tables track overdue invoices?"
+  complexity: "Entity routing only"
+  golden_sql: |
+    SELECT
+        id_invoice,
+        payment_status,
+        delay_contamined_range,
+        due_amount,
+        CAST(dt_reference AS VARCHAR) AS dt_reference
+    FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+    WHERE dt_month_start = date_trunc('month', CURRENT_DATE)
+      AND is_most_recent_record_month = true
+    LIMIT 10
+  expected_tables:
+    - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+  forbidden_tables:
+    # Raw / enrich schemas must not appear — wrong layer
+    - datalake_collections_quintoandar
+    - datalake_collection_recovery_quintoandar
+  expected_columns:
+    - id_invoice
+    - payment_status
+    - delay_contamined_range
+    - due_amount
+  mandatory_filter_patterns:
+    - 'dt_month_start'                   # date partition filter required
+    - 'is_most_recent_record_month'      # dedup sentinel required
+  expected_min_rows: 1
+
+- id: Q2
+  text: "What does the delay_contamined_range column mean?"
+  complexity: "Column lookup"
+  golden_sql: |
+    SELECT
+        delay_contamined_range,
+        COUNT(DISTINCT id_invoice)  AS invoice_count,
+        SUM(due_amount)             AS total_due_amount
+    FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+    WHERE dt_month_start = date_trunc('month', CURRENT_DATE)
+      AND is_most_recent_record_month = true
+    GROUP BY delay_contamined_range
+    ORDER BY delay_contamined_range
+  expected_tables:
+    - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+  forbidden_tables:
+    - datalake_collections_quintoandar
+    - datalake_collection_recovery_quintoandar
+  expected_columns:
+    - delay_contamined_range
+    - id_invoice
+    - due_amount
+  mandatory_filter_patterns:
+    - 'dt_month_start'
+    - 'is_most_recent_record_month'
+  expected_min_rows: 1
+
+- id: Q3
+  text: "Give me the AR recovery rate query split by OKR bucket"
+  complexity: "Golden query retrieval"
+  # Exact SQL stored in DataHub as the validated golden query.
+  # The query spans two schemas: dw_losses (accounts receivable) and
+  # dw_collection_recovery_quintoandar (overdue timeline).
+  golden_sql: |
+    WITH fact_ar_consolidated AS (
+        SELECT
+            sk_invoice,
+            delay_contamined_range AS delay_range,
+            invoice_amount AS due_amount,
+            COALESCE(net_recovered, 0) AS net_recovered_amount,
+            date_add('day', -1, date_trunc('month', dt_month_recovery)) AS dt_closing
+        FROM dw_losses.fact_accounts_receivable
+
+        UNION ALL
+
+        SELECT
+            a.id_invoice,
+            COALESCE(c.delay_contamined_range, a.delay_contract_range),
+            a.due_amount,
+            COALESCE(a.net_recovered_amount, 0),
+            COALESCE(c.dt_closing, date_add('day', -1, a.dt_month_start))
+        FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline AS a
+        LEFT JOIN dw_losses.fact_accounts_receivable AS b
+            ON a.id_invoice = b.sk_invoice
+            AND last_day_of_month(b.dt_month_recovery) = a.dt_month_end
+        LEFT JOIN dw_losses.fact_delay AS c
+            ON a.sk_contract = c.sk_contract
+            AND date_add('day', -1, a.dt_month_start) = c.dt_closing
+        WHERE b.sk_invoice IS NULL
+          AND a.is_most_recent_record_month = true
+    )
+
+    SELECT
+        date_trunc('day', CAST(dt_closing AS TIMESTAMP)) AS dt_closing,
+        CASE
+            WHEN delay_range IN ('a. Current', 'b. 1-30', 'c. 31-60', 'd. 61-90')
+                THEN 'AR 0-90'
+            ELSE 'AR 90+'
+        END AS okr_bucket,
+        SUM(net_recovered_amount) / NULLIF(SUM(due_amount), 0) AS ar_recovery_rate
+    FROM fact_ar_consolidated
+    WHERE dt_closing BETWEEN last_day_of_month(date_add('month', -13, current_date))
+                        AND last_day_of_month(date_add('month', -1, current_date))
+    GROUP BY 1, 2
+    ORDER BY 1 DESC, 2
+    LIMIT 100
+  expected_tables:
+    - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+    - dw_losses.fact_accounts_receivable
+  forbidden_tables:
+    - datalake_collections_quintoandar
+  expected_columns:
+    # Physical columns only — computed aliases (okr_bucket, ar_recovery_rate)
+    # are verified by mandatory_filter_patterns in Phase 1 instead.
+    - delay_contamined_range
+  mandatory_filter_patterns:
+    - 'is_most_recent_record_month'      # dedup sentinel
+    - 'okr_bucket'                       # OKR bucket alias must be computed
+    - 'ar_recovery_rate'                 # recovery rate alias must be computed
+  expected_min_rows: 1
+
+- id: Q4
+  text: "How do I join fact_negotiation to fact_debt?"
+  complexity: "Cross-table join"
+  # Correct join pattern uses the bridge table — direct SK join does not exist.
+  golden_sql: |
+    SELECT
+        n.sk_negotiation,
+        n.negotiation_status,
+        n.negotiation_classification,
+        n.original_debt_amount,
+        n.negotiated_amount,
+        d.sk_debt,
+        d.id_invoice,
+        d.id_contract
+    FROM dw_collection_recovery_quintoandar.fact_negotiation        AS n
+    JOIN dw_collection_recovery_quintoandar.bridge_map_debt_negotiation AS b
+        ON n.sk_negotiation = b.sk_negotiation
+    JOIN dw_collection_recovery_quintoandar.fact_debt               AS d
+        ON b.sk_debt = d.sk_debt
+    LIMIT 10
+  expected_tables:
+    - dw_collection_recovery_quintoandar.fact_negotiation
+    - dw_collection_recovery_quintoandar.fact_debt
+    - dw_collection_recovery_quintoandar.bridge_map_debt_negotiation
+  forbidden_tables:
+    - datalake_collections_quintoandar
+  expected_columns:
+    - sk_negotiation
+    - sk_debt
+    - id_invoice
+    - negotiation_classification
+  mandatory_filter_patterns:
+    - 'bridge_map_debt_negotiation'      # bridge table is mandatory for this join
+  expected_min_rows: 1
+
+- id: Q5
+  text: "What is the difference between Acordo and Promessa?"
+  complexity: "Glossary / synonym"
+  # Demonstrates the negotiation_classification column which encodes both values.
+  # Acordo = payment plan with >1 installment; Promessa = promise to pay (started status).
+  golden_sql: |
+    SELECT
+        negotiation_classification,
+        negotiation_status,
+        COUNT(*)                     AS negotiation_count,
+        SUM(original_debt_amount)    AS total_original_debt,
+        SUM(negotiated_amount)       AS total_negotiated_amount
+    FROM dw_collection_recovery_quintoandar.fact_negotiation
+    WHERE negotiation_classification IN (
+        'ACORDO',
+        'PROMESSA',
+        'PROMESSA QUEBRADA',
+        'QUITAÇÃO',
+        'SUBSTITUIÇÃO'
+    )
+    GROUP BY negotiation_classification, negotiation_status
+    ORDER BY negotiation_classification, negotiation_status
+  expected_tables:
+    - dw_collection_recovery_quintoandar.fact_negotiation
+  forbidden_tables:
+    - datalake_collections_quintoandar
+  expected_columns:
+    - negotiation_classification
+    - original_debt_amount
+    - negotiated_amount
+  mandatory_filter_patterns:
+    - 'negotiation_classification'       # must reference the classification column
+    - '(?i)ACORDO|Acordo'                # must mention Acordo
+    - '(?i)PROMESSA|Promessa'            # must mention Promessa
+  expected_min_rows: 1
+
+# ---------------------------------------------------------------------------
+# Offboarding domain — sourced from PDF "Tars MVP Evaluation" (Offboarding tab)
+# Golden SQL = TARS branch answers (scored 9.5/10 in the evaluation).
+# ---------------------------------------------------------------------------
+
+- id: OB1
+  text: "Em que tabela posso encontrar informações sobre vistorias de saída?"
+  complexity: "Entity routing (Inspection)"
+  # TARS Q1 answer: prioritises dw_inspections + obt_offboarding, applies Dedup rule.
+  golden_sql: |
+    SELECT sub.*
+    FROM (
+      SELECT
+        fi.sk_inspection,
+        fi.sk_contract,
+        fi.sk_house,
+        fi.ts_booking_created,
+        fi.ts_inspected,
+        di.inspection_type,
+        di.inspection_status,
+        fri.has_agreement,
+        fri.total_cost,
+        fri.ts_sent_to_repair_analysis,
+        ROW_NUMBER() OVER (PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni
+      FROM dw_inspections.fact_inspection AS fi
+      LEFT JOIN dw_inspections.dim_inspection AS di
+        ON fi.sk_inspection = di.sk_inspection
+      LEFT JOIN dw_inspections.fact_report_inspections AS fri
+        ON fi.sk_inspection = CAST(fri.sk_inspection AS VARCHAR)
+      WHERE di.inspection_type = 'offboarding'
+    ) AS sub
+    WHERE sub.rni = 1
+    LIMIT 10
+  expected_tables:
+    - dw_inspections.fact_inspection
+    - dw_inspections.dim_inspection
+  forbidden_tables:
+    - datalake_inspections
+    - datalake_ebdb_clean
+    - datalake_inspection_services_clean
+  expected_columns:
+    - sk_inspection
+    - sk_contract
+    - ts_inspected
+    - inspection_type
+  mandatory_filter_patterns:
+    - "(?i)inspection_type.*offboarding|offboarding"    # must filter by type
+    - "ROW_NUMBER"                                       # Dedup rule mandatory
+  expected_min_rows: 1
+
+- id: OB2
+  text: "Gere uma query para contabilizar rescisões com isenção de vistoria de saída"
+  complexity: "Medium query (Offboarding — fact_terminations opt-out)"
+  # TARS Q4 answer: uses fact_terminations + dim_termination, flag is_exit_inspection_opt_out.
+  golden_sql: |
+    SELECT
+      DATE_TRUNC('month', ft.ts_termination_request) AS month_request,
+      COUNT(*)                                         AS total_terminations,
+      COUNT_IF(ft.is_exit_inspection_opt_out)          AS total_inspection_exempt,
+      ROUND(
+        CAST(COUNT_IF(ft.is_exit_inspection_opt_out) AS DOUBLE)
+          / NULLIF(COUNT(*), 0) * 100,
+        2
+      )                                                AS pct_inspection_exempt
+    FROM dw_offboarding.fact_terminations AS ft
+    LEFT JOIN dw_offboarding.dim_termination AS dt
+      ON ft.sk_termination = dt.sk_termination
+    WHERE dt.status <> 'CANCELED'
+      AND ft.ts_termination_request >= DATE '2025-01-01'
+      AND ft.ts_termination_request < DATE '2026-01-01'
+    GROUP BY DATE_TRUNC('month', ft.ts_termination_request)
+    ORDER BY month_request
+  expected_tables:
+    - dw_offboarding.fact_terminations
+    - dw_offboarding.dim_termination
+  forbidden_tables:
+    - datalake_terminator
+    - datalake_ebdb_clean
+  expected_columns:
+    - is_exit_inspection_opt_out
+    - ts_termination_request
+    - sk_termination
+  mandatory_filter_patterns:
+    - "(?i)is_exit_inspection_opt_out"                  # key exemption flag
+    - "(?i)CANCELED|status.*<>"                         # must exclude cancelled
+  expected_min_rows: 1
+
+- id: OB3
+  text: "Gere uma query para contabilizar offboardings sem reparos"
+  complexity: "Medium query (Offboarding — obt_offboarding has_repairs)"
+  # TARS Q5 answer: uses obt_offboarding + has_repairs boolean, monthly breakdown.
+  golden_sql: |
+    SELECT
+      DATE_TRUNC('month', obt.ts_termination_finished) AS mes,
+      COUNT(*)                                           AS total_offboardings,
+      SUM(CASE WHEN NOT obt.has_repairs THEN 1 ELSE 0 END) AS sem_reparos,
+      SUM(CASE WHEN obt.has_repairs THEN 1 ELSE 0 END)     AS com_reparos,
+      CAST(SUM(CASE WHEN NOT obt.has_repairs THEN 1 ELSE 0 END) AS DOUBLE)
+        / NULLIF(COUNT(*), 0)                               AS taxa_sem_reparos
+    FROM dw_offboarding.obt_offboarding AS obt
+    WHERE obt.ts_termination_finished >= DATE '2025-01-01'
+      AND obt.ts_termination_finished < DATE '2026-04-01'
+    GROUP BY DATE_TRUNC('month', obt.ts_termination_finished)
+    ORDER BY mes
+  expected_tables:
+    - dw_offboarding.obt_offboarding
+  forbidden_tables:
+    - datalake_terminator
+    - datalake_inspections
+  expected_columns:
+    - has_repairs
+    - ts_termination_finished
+  mandatory_filter_patterns:
+    - "(?i)has_repairs"                                  # boolean flag for repairs
+    - "(?i)ts_termination_finished"                      # must scope by termination date
+  expected_min_rows: 1
+
+- id: OB4
+  text: "Gere query para analisar se fluxo automático de AR está relacionado com menos aprovações de IQ e PP"
+  complexity: "Hard query (Offboarding — auto AR approval comparison)"
+  # TARS Q9 answer: uses obt_offboarding + is_automated_ar + review/budget_approval flags.
+  golden_sql: |
+    WITH base AS (
+      SELECT
+        CASE WHEN obt.is_automated_ar = TRUE THEN 'Automático' ELSE 'Manual' END AS fluxo_ar,
+        obt.has_tenant_access_review,
+        obt.has_tenant_approved_review,
+        obt.has_owner_access_review,
+        obt.has_owner_approved_review,
+        obt.has_tenant_access_budget_approval,
+        obt.has_tenant_approved_budget_approval,
+        obt.has_owner_access_budget_approval,
+        obt.has_owner_approved_budget_approval,
+        obt.has_agreement,
+        obt.has_early_agreement
+      FROM dw_offboarding.obt_offboarding AS obt
+      WHERE obt.ts_termination_finished >= DATE '2025-01-01'
+        AND obt.sk_inspection IS NOT NULL
+        AND obt.has_repairs = TRUE
+    )
+    SELECT
+      fluxo_ar,
+      COUNT(*)                                                  AS total,
+      COUNT_IF(has_tenant_approved_review)                      AS iq_aprovou_review,
+      ROUND(100.0 * COUNT_IF(has_tenant_approved_review) / COUNT(*), 2) AS iq_taxa_aprovacao_review_pct,
+      COUNT_IF(has_owner_approved_review)                       AS pp_aprovou_review,
+      ROUND(100.0 * COUNT_IF(has_owner_approved_review)  / COUNT(*), 2) AS pp_taxa_aprovacao_review_pct,
+      COUNT_IF(has_tenant_approved_budget_approval)             AS iq_aprovou_budget,
+      ROUND(100.0 * COUNT_IF(has_tenant_approved_budget_approval) / COUNT(*), 2) AS iq_taxa_aprovacao_budget_pct,
+      COUNT_IF(has_owner_approved_budget_approval)              AS pp_aprovou_budget,
+      ROUND(100.0 * COUNT_IF(has_owner_approved_budget_approval) / COUNT(*), 2) AS pp_taxa_aprovacao_budget_pct,
+      COUNT_IF(has_agreement)                                   AS total_com_acordo,
+      ROUND(100.0 * COUNT_IF(has_agreement) / COUNT(*), 2)     AS taxa_acordo_pct
+    FROM base
+    GROUP BY fluxo_ar
+    ORDER BY fluxo_ar
+  expected_tables:
+    - dw_offboarding.obt_offboarding
+  forbidden_tables:
+    - datalake_inspections.reviewer
+    - datalake_inspection_services_clean
+  expected_columns:
+    - is_automated_ar
+    - has_tenant_approved_review
+    - has_owner_approved_review
+    - has_tenant_approved_budget_approval
+    - has_owner_approved_budget_approval
+  mandatory_filter_patterns:
+    - "(?i)is_automated_ar"                              # automation group flag
+    - "(?i)has_repairs.*TRUE|has_repairs.*=.*true"       # scope to cases with repairs
+  expected_min_rows: 1
+
+- id: OB5
+  text: "Gere uma query que mostre por termination se houve agreement, relistagem e rerental"
+  complexity: "Hard query (Offboarding — obt + fact_house_listing_terminations)"
+  # TARS Q8 answer: uses obt_offboarding + fact_house_listing_terminations for relisting/rerental.
+  golden_sql: |
+    SELECT
+      obt.sk_termination,
+      obt.sk_contract,
+      obt.termination_status,
+      obt.termination_reason,
+      obt.has_agreement,
+      obt.has_early_agreement,
+      obt.has_late_agreement,
+      obt.has_discount_agreement,
+      fhlt.sk_next_house_listing_consolidated <> -1 AS is_relisting,
+      fhlt.sk_next_contract <> -1                   AS is_rerental,
+      fhlt.days_termination_to_contract_signed,
+      obt.ts_termination_finished
+    FROM dw_offboarding.obt_offboarding AS obt
+    LEFT JOIN dw_offboarding.fact_house_listing_terminations AS fhlt
+      ON obt.sk_termination = fhlt.sk_termination
+    WHERE obt.ts_termination_finished >= DATE '2025-01-01'
+    ORDER BY obt.ts_termination_finished DESC
+    LIMIT 100
+  expected_tables:
+    - dw_offboarding.obt_offboarding
+    - dw_offboarding.fact_house_listing_terminations
+  forbidden_tables:
+    - datalake_terminator
+  expected_columns:
+    - has_agreement
+    - has_early_agreement
+    - has_late_agreement
+    - ts_termination_finished
+    - sk_next_contract
+  mandatory_filter_patterns:
+    - "(?i)fact_house_listing_terminations"              # relisting/rerental bridge table
+    - "(?i)ts_termination_finished"
+  expected_min_rows: 1
+
+# ---------------------------------------------------------------------------
+# Supply / Isaias domain — sourced from PDF "Tars MVP Evaluation" (Supply/Isaias tab)
+# TARS branch scored 10/10; questions and representative golden SQL below.
+# ---------------------------------------------------------------------------
+
+- id: SU1
+  text: "Em que tabela posso encontrar informações sobre leads de supply?"
+  complexity: "Entity routing (Supply)"
+  # Primary supply table is dw_growth.obt_supply (1 row per lead × funnel step × business context).
+  golden_sql: |
+    SELECT
+      obt.sk_lead,
+      obt.cd_funnel_step,
+      obt.nm_business_context,
+      obt.company_report_origin,
+      obt.tp_origin_acquisition,
+      obt.date
+    FROM dw_growth.obt_supply AS obt
+    WHERE obt.nm_business_context = 'RENT'
+      AND obt.date >= DATE '2025-01-01'
+    LIMIT 10
+  expected_tables:
+    - dw_growth.obt_supply
+  forbidden_tables:
+    - datalake_sauron_clean
+    - datalake_chatbot.isaias_conversational_flow
+  expected_columns:
+    - sk_lead
+    - cd_funnel_step
+    - nm_business_context
+    - company_report_origin
+  mandatory_filter_patterns:
+    - "(?i)nm_business_context"                         # always filter business context
+    - "(?i)obt_supply"
+  expected_min_rows: 1
+
+- id: SU2
+  text: "Gere uma query para contabilizar todos os first listings que vieram das calculadoras"
+  complexity: "Medium query (Supply — calculator acquisition_origin)"
+  # TARS Q4 answer: uses obt_supply, filters acquisition_origin for calculator channels.
+  golden_sql: |
+    SELECT
+      DATE_TRUNC('month', obt.date)  AS month_ref,
+      obt.acquisition_origin,
+      COUNT(DISTINCT obt.sk_lead)    AS total_first_listings
+    FROM dw_growth.obt_supply AS obt
+    WHERE obt.cd_funnel_step = 'first_listing'
+      AND obt.nm_business_context = 'RENT'
+      AND obt.acquisition_origin IN (
+        'pricesuggestion',
+        'pricesuggestionhome',
+        'pricesuggestionsale'
+      )
+      AND obt.date >= DATE '2025-01-01'
+    GROUP BY DATE_TRUNC('month', obt.date), obt.acquisition_origin
+    ORDER BY month_ref DESC
+  expected_tables:
+    - dw_growth.obt_supply
+  forbidden_tables:
+    - datalake_sauron_clean
+    - fact_supply_events
+  expected_columns:
+    - cd_funnel_step
+    - acquisition_origin
+    - sk_lead
+    - nm_business_context
+  mandatory_filter_patterns:
+    - "(?i)first_listing"                               # funnel step filter
+    - "(?i)pricesuggestion|calculadora"                # calculator channel
+  expected_min_rows: 1
+
+- id: SU3
+  text: "Gere uma query para contabilizar todos os opportunities gerados pelo Isaías"
+  complexity: "Medium query (Supply — Isaias tp_origin_acquisition)"
+  # TARS Q5 answer: uses tp_origin_acquisition = 'isaias' (never acquisition_origin = 'operations').
+  golden_sql: |
+    SELECT
+      DATE_TRUNC('month', obt.date) AS month_ref,
+      COUNT(DISTINCT obt.sk_lead)   AS total_opportunities
+    FROM dw_growth.obt_supply AS obt
+    WHERE obt.cd_funnel_step = 'opportunity'
+      AND obt.nm_business_context = 'RENT'
+      AND obt.tp_origin_acquisition = 'isaias'
+      AND obt.date >= DATE '2025-01-01'
+    GROUP BY DATE_TRUNC('month', obt.date)
+    ORDER BY month_ref DESC
+  expected_tables:
+    - dw_growth.obt_supply
+  forbidden_tables:
+    - datalake_sauron_clean
+  expected_columns:
+    - cd_funnel_step
+    - tp_origin_acquisition
+    - sk_lead
+  mandatory_filter_patterns:
+    - "(?i)tp_origin_acquisition.*isaias|isaias.*tp_origin_acquisition"  # correct Isaias filter (NOT acquisition_origin)
+    - "(?i)opportunity"                                                   # funnel step
+  expected_min_rows: 1
+
+- id: SU4
+  text: "Gere uma query para analisar a taxa de conversão de lead para opportunity dos leads inbound"
+  complexity: "Medium query (Supply — coincident date conversion rate)"
+  # TARS Q6 answer: coincident date method, planning_operation = 'Inbound'.
+  golden_sql: |
+    SELECT
+      DATE_TRUNC('month', obt.date)                           AS month_ref,
+      COUNT_IF(obt.cd_funnel_step = 'lead')                   AS total_leads,
+      COUNT_IF(obt.cd_funnel_step = 'opportunity')            AS total_opportunities,
+      ROUND(
+        CAST(COUNT_IF(obt.cd_funnel_step = 'opportunity') AS DOUBLE)
+          / NULLIF(COUNT_IF(obt.cd_funnel_step = 'lead'), 0) * 100,
+        2
+      )                                                       AS conversion_pct
+    FROM dw_growth.obt_supply AS obt
+    WHERE obt.nm_business_context = 'RENT'
+      AND obt.planning_operation = 'Inbound'
+      AND obt.date >= DATE '2025-01-01'
+    GROUP BY DATE_TRUNC('month', obt.date)
+    ORDER BY month_ref DESC
+  expected_tables:
+    - dw_growth.obt_supply
+  forbidden_tables:
+    - datalake_sauron_clean
+  expected_columns:
+    - cd_funnel_step
+    - planning_operation
+    - sk_lead
+  mandatory_filter_patterns:
+    - "(?i)planning_operation.*Inbound|Inbound.*planning_operation"  # inbound filter
+    - "(?i)lead.*opportunity|opportunity.*lead"                       # both funnel steps
+  expected_min_rows: 1
+
+- id: SU5
+  text: "Gere uma query para comparar volumes de motivos de descarte entre canais de operações e self-service"
+  complexity: "Hard query (Supply — discard reasons by channel)"
+  # TARS Q7 answer: uses company_report_origin + dim_supply_discards for reason labels.
+  golden_sql: |
+    SELECT
+      obt.company_report_origin,
+      dsd.cd_discard_reason,
+      dsd.nm_discard_reason,
+      COUNT(DISTINCT obt.sk_lead) AS total_discards
+    FROM dw_growth.obt_supply AS obt
+    JOIN dw_growth.dim_supply_discards AS dsd
+      ON obt.sk_discard = dsd.sk_discard
+    WHERE obt.nm_business_context = 'RENT'
+      AND obt.company_report_origin IN (
+        'Operações',
+        'Ownerlanding',
+        'Homelanding',
+        'Calculadora'
+      )
+      AND obt.date >= DATE '2025-01-01'
+    GROUP BY obt.company_report_origin, dsd.cd_discard_reason, dsd.nm_discard_reason
+    ORDER BY obt.company_report_origin, total_discards DESC
+  expected_tables:
+    - dw_growth.obt_supply
+    - dw_growth.dim_supply_discards
+  forbidden_tables:
+    - datalake_sauron_clean
+  expected_columns:
+    - company_report_origin
+    - cd_discard_reason
+    - sk_discard
+  mandatory_filter_patterns:
+    - "(?i)dim_supply_discards"                        # must use discards dimension table
+    - "(?i)company_report_origin"                      # canonical channel column
+  expected_min_rows: 1

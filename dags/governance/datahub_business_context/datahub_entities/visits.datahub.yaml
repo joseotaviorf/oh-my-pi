@@ -1,0 +1,174 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Visits"
+product_description: |
+  Visit analytics track the entire journey from a property visit booking (schedule) to the
+  actual event, consolidating interactions between prospective tenants/buyers (demand),
+  brokers, and landlords (supply).
+
+  IMPORTANT distinction:
+  - Visit (visita): a prospective tenant/buyer physically viewing a property before renting or
+    buying. This is what this entity covers.
+  - Inspection (vistoria): a technical property assessment at contract start or end.
+  These are completely different entities with different tables. Never confuse them.
+
+  A visit is the strongest signal of transaction intent. The Visit Entity groups multiple
+  rescheduling events to provide a true conversion view per customer/property.
+
+  Two analytical lenses:
+  - Visit View (use for conversion): what is the rate from completed visits to proposals?
+    Use dw_visits.fact_visits.
+  - Schedule View (use for operations): how many times was a booking canceled or rescheduled?
+    Use dw_visits.fact_visit_schedules.
+
+  Funnel notation:
+  VB (Visit Booked) → VCf (Visit Confirmed) → VC (Visit Completed) → OS (Offer Sent) →
+  OA (Offer Accepted) → CS (Contract Signed) / CCV (Compromisso de Compra e Venda for sale).
+  VCc = Visit Canceled. VU = Visit Unsuccessful (parties arrived but could not enter).
+  No-show = one party failed to appear at the scheduled time.
+
+  Table grain:
+  - fact_visits: 1 row per consolidated visit (sk_visit). The Visit entity — groups all
+    schedules for the same property/customer interaction.
+  - fact_visit_schedules: 1 row per individual booking attempt (sk_schedule). Multiple
+    reschedules for the same visit generate multiple schedule rows. Use is_last_schedule = TRUE
+    to see only the final/valid attempt.
+  - dim_visit: 1 row per visit (source, cancel reason, context).
+  - dim_visit_schedule: 1 row per schedule (confirmation details, lifecycle timestamps).
+  - dim_post_visit_demand: 1 row per completed visit (post-visit feedback from demand).
+  - fact_house_entrance: property entrance and key management data.
+
+  Key metrics: VB2VC rate (Visit Booked to Visit Completed), conversion from visit to proposal,
+  cancellation rate by reason (demand-led/supply-led/broker-led), rescheduling frequency
+  (schedules per visit), house entrance method distribution.
+
+  Critical rules:
+  - Do NOT count sk_schedule as unique visits — one visit can have multiple schedules from
+    rescheduling. Always use sk_visit for visit-level counting.
+  - Always filter is_last_schedule = TRUE in fact_visit_schedules for the final/valid attempt.
+  - Include partition guard: dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS for performance.
+  - fact_visits covers both RENT and SALE contexts — always filter when modality-specific.
+  - visit_status = 'cancelled' ≠ system error; use cancel_reason to identify demand/supply/
+    broker-led cancellations.
+  - Do not mix house_entrance data with visit status without validating entrance model availability
+    at time of visit.
+
+  Further detail and table routing: docs/llm_context/business_entities/visits.md
+
+data_product_id: visits
+domain_urn: urn:li:domain:growth
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.visits.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.visits.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:a4ca3f3e-2b13-4021-bf43-582e5916c7ac
+  name: "Query 1 — Visit Booked to Visit Completed (VB2VC) Rate"
+  description: >-
+    Primary scheduling efficiency metric: monthly VB2VC rate from fact_visits. Uses
+    num_visit_booked and num_visit_completed columns. Includes partition guard on dt_visit.
+    Source: docs/llm_context/business_entities/visits.md
+  subjects:
+    - schema: dw_visit
+      table: fact_visits
+  sql: |
+    SELECT
+        DATE_TRUNC('month', dt_visit) AS month_ref,
+        SUM(num_visit_booked) AS total_visits_booked,
+        SUM(num_visit_completed) AS completed_visits,
+        ROUND(
+            CAST(SUM(num_visit_completed) AS DOUBLE) / NULLIF(SUM(num_visit_booked), 0),
+            3
+        ) AS vb2vc_rate
+    FROM dw_visit.fact_visits
+    WHERE dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS
+    GROUP BY 1
+    ORDER BY 1 DESC
+
+datasets:
+  - schema: dw_visit
+    table: fact_visits
+  - schema: dw_visit
+    table: fact_visit_schedules
+  - schema: dw_visit
+    table: dim_visit
+  - schema: dw_visit
+    table: dim_visit_schedule
+  - schema: dw_visit
+    table: dim_post_visit_demand
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:growth
+  terms:
+    - id: visit_entity
+      name: "Visit (Visita)"
+      description: >-
+        A prospective tenant or buyer physically viewing a property before renting or buying.
+        The consolidated business entity (can contain one or more schedules for the same
+        property/customer interaction). Table: dw_visits.fact_visits. NOT the same as
+        inspection (vistoria), which is a technical property assessment.
+    - id: visit_vb
+      name: "VB (Visit Booked)"
+      description: >-
+        A visit that has been scheduled — a booking exists. Numerator field:
+        num_visit_booked in fact_visits. First step of the VB2VC funnel.
+      related_terms:
+        - urn: urn:li:glossaryTerm:visit_entity
+          relationship: hasA
+    - id: visit_vc
+      name: "VC (Visit Completed)"
+      description: >-
+        A visit where all parties arrived and the property viewing was completed successfully.
+        flag: is_completed = TRUE or visit_status = 'completed'. Numerator for VB2VC.
+        num_visit_completed in fact_visits.
+      related_terms:
+        - urn: urn:li:glossaryTerm:visit_entity
+          relationship: isA
+    - id: visit_vcc
+      name: "VCc (Visit Canceled)"
+      description: >-
+        A visit that was canceled before it occurred. is_cancelled = TRUE or
+        visit_status = 'cancelled'. Use cancel_reason to distinguish demand-led,
+        supply-led, or broker-led cancellations — not all cancellations are system errors.
+      related_terms:
+        - urn: urn:li:glossaryTerm:visit_entity
+          relationship: isA
+    - id: visit_no_show
+      name: "No-Show"
+      description: >-
+        One of the parties (demand, broker, or supply) failed to appear at the scheduled time.
+        A no-show is counted as a canceled or unsuccessful visit depending on whether the other
+        party was present. Impacts VB2VC rate negatively.
+      related_terms:
+        - urn: urn:li:glossaryTerm:visit_entity
+          relationship: hasA
+    - id: visit_unsuccessful
+      name: "Visita Malsucedida (Unsuccessful Visit)"
+      description: >-
+        A visit where the parties arrived but could not enter the property (e.g. missing keys,
+        wrong access code, lockbox issue). is_unsuccessful = TRUE. Distinct from no-show and
+        from completed visits. Use visit_status = 'unsuccessful'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:visit_entity
+          relationship: isA
+    - id: visit_house_entrance
+      name: "House Entrance"
+      description: >-
+        The method of access to the property for the visit (Frontdoor, Owner, Lockbox,
+        Broker-held keys, etc.). Table: dw_visits.fact_house_entrance. Join via sk_house_entrance.
+        Validate entrance model availability at time of visit before mixing with visit status.
+    - id: vb2vc_rate
+      name: "VB2VC (Visit Booked to Visit Completed)"
+      description: >-
+        Primary scheduling efficiency metric: completed visits / booked visits.
+        Measures the operational effectiveness of converting a scheduled visit into an
+        actual completed interaction. Pre-aggregated columns in fact_visits: num_visit_booked,
+        num_visit_completed.
+
+documentation_link:
+  label: "Business entity documentation (visits.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/visits.md

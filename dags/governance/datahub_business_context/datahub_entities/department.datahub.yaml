@@ -1,0 +1,184 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Department (Customer Support)"
+product_description: |
+  A department (also called queue, "caixa", or "fila") is the organizational unit responsible
+  for handling a specific type of customer support request. Departments determine routing,
+  SLA targets, and journey classification for tickets and contacts.
+
+  Routing logic:
+  1. Customer initiates contact (call, chat, email).
+  2. Chatbot or IVR identifies the topic.
+  3. Interaction routed to the appropriate department/queue.
+  4. If the topic cannot be identified, a default queue is used.
+
+  Department → journey_step → team hierarchy:
+    Journey step (e.g., Offboarding)
+      └── Department (e.g., Offboarding Reparos)
+           └── Team (e.g., Offboarding Reparos Team A)
+
+  Key routing nuances:
+  - Some routings are non-trivial (e.g. a customer requesting registration changes is routed
+    to the repairs queue).
+  - Hefesto manages all Twilio queues (Front Office). Some queues exist ONLY in Zendesk
+    (Back Office queues without a Twilio counterpart).
+  - The primary source of queue definitions is the "Controle de Departamentos" Google Sheet
+    (gsheets_clean.department_control).
+
+  Table grain:
+  - dim_department: 1 row per department. Primary department dimension for all S&S queries.
+  - gsheets_clean.department_control: source of truth for department → journey_step → team
+    mapping for both Twilio and Zendesk queues.
+  - hefesto_clean.queue: Twilio queue definitions (Front Office only).
+
+  Key columns in dim_department:
+  - sk_department: surrogate key.
+  - department: department/queue name (use this, not 'department_name').
+  - board: board classification.
+  - team: operational team within the department.
+  - journey_step: journey grouping (most common business aggregation).
+  - channel: channel associated with this department.
+  - front_or_back: Front Office or Back Office.
+  - is_active / is_concentrix / is_partner: operational flags.
+
+  Join to tickets: ft.sk_main_department = dd.sk_department
+  (use sk_main_department, NOT sk_department on the fact table).
+
+  Key metrics: ticket volume by department, SLA compliance by department
+  (fact_tickets_backlog.is_backlog_within_sla), backlog by department,
+  CSAT by department (fact_ticket_csat joined to tickets), AHT by department (FO).
+
+  SLA target hierarchy: tag (most specific) > theme (taxonomy) > journey
+  (dim_department.journey_step). Offboarding queues: 21-day default SLA.
+
+  Critical rules:
+  - Join tickets on ft.sk_main_department (not ft.sk_department — that field doesn't exist).
+  - Column is 'department' not 'department_name'.
+  - "Controle de Departamentos" GSheet is the primary source of truth — dim_department is
+    derived from it.
+  - Hefesto queues are Front Office only — Back Office queues exist only in Zendesk.
+
+  Further detail and table routing: docs/llm_context/business_entities/department.md
+
+data_product_id: department
+domain_urn: urn:li:domain:support_and_services
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.department.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.department.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:5230993c-e5ff-4cf0-b3fa-d012921dcba5
+  name: "Query 1 — Ticket volume and SLA compliance by department"
+  description: >-
+    Monthly ticket volume and SLA compliance per department. Joins fact_tickets to
+    dim_department via sk_main_department, and to fact_tickets_backlog to compute the
+    SLA rate (tickets resolved within SLA target).
+    Source: docs/llm_context/business_entities/department.md
+  subjects:
+    - schema: dw_customer_support
+      table: fact_tickets
+    - schema: dw_customer_support
+      table: dim_department
+    - schema: dw_customer_support
+      table: fact_tickets_backlog
+  sql: |
+    SELECT
+        DATE_TRUNC('month', CAST(ft.ts_created AS TIMESTAMP)) AS month_created,
+        dd.department,
+        dd.journey_step,
+        dd.front_or_back,
+        COUNT(*) AS ticket_volume,
+        SUM(CASE WHEN fb.is_backlog_within_sla THEN 1 ELSE 0 END) AS tickets_in_sla,
+        CAST(SUM(CASE WHEN fb.is_backlog_within_sla THEN 1 ELSE 0 END) AS DOUBLE)
+            / COUNT(*) AS sla_rate
+    FROM dw_customer_support.fact_tickets AS ft
+    LEFT JOIN dw_customer_support.dim_department AS dd
+        ON ft.sk_main_department = dd.sk_department
+    LEFT JOIN dw_customer_support.fact_tickets_backlog AS fb
+        ON ft.sk_ticket = fb.sk_ticket
+    WHERE ft.ts_created >= DATE '2025-01-01'
+    GROUP BY 1, 2, 3, 4
+    ORDER BY month_created DESC, ticket_volume DESC
+
+datasets:
+  - schema: dw_customer_support
+    table: dim_department
+  - schema: dw_customer_support
+    table: fact_tickets
+  - schema: dw_customer_support
+    table: fact_tickets_backlog
+  - schema: datalake_hefesto_clean
+    table: queue
+  - schema: datalake_hefesto_clean
+    table: queue_type
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:customer_support
+  terms:
+    - id: department_entity
+      name: "Department (Queue / Fila / Caixa)"
+      description: >-
+        Organizational unit responsible for handling a specific type of customer support request.
+        Also called fila, caixa, or queue. Determines routing, SLA targets, and journey
+        classification. Table: dw_customer_support.dim_department.
+    - id: department_fila
+      name: "Fila / Caixa (Queue synonyms)"
+      description: >-
+        Portuguese synonyms for department/queue in the support context. Fila and caixa both
+        refer to dw_customer_support.dim_department. Often used interchangeably with
+        'departamento'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:department_entity
+          relationship: isA
+    - id: department_journey_step
+      name: "Journey Step (Jornada)"
+      description: >-
+        The business-level grouping of departments into customer journey stages
+        (e.g. Onboarding, Offboarding, Reparos, Pagamentos). Column: dim_department.journey_step.
+        The most common business aggregation for S&S analytics. Used as the SLA fallback
+        level in the hierarchy: tag > theme > journey.
+      related_terms:
+        - urn: urn:li:glossaryTerm:department_entity
+          relationship: hasA
+    - id: department_front_back
+      name: "Front Office / Back Office (Department)"
+      description: >-
+        Column: dim_department.front_or_back. Front Office = real-time channels (calls/chats
+        via Twilio/Hefesto). Back Office = asynchronous Zendesk-only queues. Some Back Office
+        queues have no Twilio counterpart and appear only in Zendesk.
+      related_terms:
+        - urn: urn:li:glossaryTerm:department_entity
+          relationship: hasA
+    - id: department_controle_sheet
+      name: "Controle de Departamentos (GSheet)"
+      description: >-
+        The "Controle de Departamentos" Google Sheet is the PRIMARY source of truth for
+        department definitions, including the department → journey_step → team hierarchy.
+        DataHub table: gsheets_clean.department_control. dim_department is derived from this sheet.
+    - id: department_hefesto
+      name: "Hefesto (Twilio Queue Manager)"
+      description: >-
+        System that manages all Twilio queues (Front Office channels). Hefesto queue data:
+        hefesto_clean.queue, hefesto_clean.queue_type, hefesto_clean.queue_event.
+        Back Office queues (Zendesk-only) are NOT in Hefesto — find them only via
+        gsheets_clean.department_control.
+      related_terms:
+        - urn: urn:li:glossaryTerm:department_entity
+          relationship: hasA
+    - id: department_time_equipe
+      name: "Time / Equipe (Team)"
+      description: >-
+        Operational team within a department. Column: dim_department.team. The finest
+        granularity in the department hierarchy: Journey Step > Department > Team. Used for
+        capacity planning and operational team-level metrics.
+      related_terms:
+        - urn: urn:li:glossaryTerm:department_entity
+          relationship: hasA
+
+documentation_link:
+  label: "Business entity documentation (department.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/department.md

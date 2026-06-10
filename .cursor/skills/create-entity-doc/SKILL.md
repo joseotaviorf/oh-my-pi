@@ -17,6 +17,7 @@ Entity docs are **routing guides** — they explain concepts, point to tables, g
 2. **One-line summary** — what the entity represents in the business.
 3. **Primary DW tables** — which `dw_*` tables are the main source for analysts. If unknown, proceed to Step 2 to discover them.
 4. **Common questions** — what analysts typically ask about this entity. These drive the Golden Queries and Dos/Don'ts sections.
+5. **DataHub domain URN** — the `urn:li:domain:{domain}` for this entity (e.g., `urn:li:domain:growth`, `urn:li:domain:fintech`, `urn:li:domain:supply`). This is required for the companion YAML in Step 6. Common values: `urn:li:domain:fintech`, `urn:li:domain:growth`, `urn:li:domain:people`, `urn:li:domain:supply`, `urn:li:domain:rent`, `urn:li:domain:sale`.
 
 Do NOT infer these from context — misalignment here propagates through the entire document.
 
@@ -102,6 +103,10 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 ```sql
 {Validated SQL pattern — use SELECT * for brevity in base patterns}
 ```
+
+## DataHub catalog
+
+> Added automatically by the agent after Step 7 — do not fill in manually.
 ```
 
 ### Section-by-section guidance
@@ -183,3 +188,54 @@ Before presenting to the user, verify:
 - [ ] Related entity docs updated with cross-references (if applicable)
 - [ ] Critical rules section present when CAST, Dedup, or mandatory filters apply
 - [ ] No information that doesn't fill a gap — if something is redundant, remove it
+
+---
+
+## Step 6 — Generate the companion DataHub YAML
+
+After the Markdown is written and self-reviewed, generate the companion YAML at:
+`dags/governance/datahub_business_context/datahub_entities/{entity_slug}.datahub.yaml`
+
+Use the skill at `.cursor/skills/md-to-datahub-yaml/SKILL.md` — load and follow it now. You already have all the required inputs from Steps 1–5:
+- The entity Markdown you just wrote
+- The `domain_urn` collected in Step 1
+- The Golden Queries from the Markdown (adapt the first one as the DataHub `golden_query`)
+
+Key rules when generating the YAML:
+- `data_product_id`: kebab-case slug derived from the filename (e.g., `broker-xp` from `broker_xp.md`)
+- `golden_query.stable_urn`: generate a new UUID4 — `python -c "import uuid; print(uuid.uuid4())"`. **Never reuse** an existing URN from another entity.
+- `product_description`: condense the `## Overview` section into 3–5 focused paragraphs covering scope, grain, critical rules, and key metrics. End with `Further detail and table routing: docs/llm_context/business_entities/{entity}.md`.
+- `glossary_terms`: expand the `## Glossary and Synonyms` bullet list into full DataHub term entries with `id` (snake_case slug), `name`, and `description` (plain-language definition referencing the column/table where the concept lives). Add `related_terms` where applicable.
+- `datasets`: extract all `schema.table` pairs from the `## Tables` section.
+
+---
+
+## Step 7 — Offer to push to DataHub and back-fill the MD
+
+After generating the YAML, offer the user two follow-up actions:
+
+### 7a — Push to DataHub (optional)
+
+If the user says yes, run:
+
+```bash
+python dags/governance/datahub_business_context/push_all_entities.py {entity_slug}
+```
+
+Prerequisites: `DATAHUB_GRAPHQL_URL` and `DATAHUB_TOKEN` must be set in the shell. If they are not set, tell the user to export them and retry.
+
+Verify the push with:
+```bash
+python dags/governance/datahub_business_context/smoke_test_datahub.py
+```
+
+### 7b — Back-fill the DataHub catalog section in the MD (after successful push)
+
+Once the push succeeds, replace the `## DataHub catalog` placeholder in the Markdown with:
+
+```markdown
+## DataHub catalog
+
+- **Data Product:** [urn:li:dataProduct:{entity_slug}](https://datahub.apps.data-prd.habitat.zone/dataProducts/urn%3Ali%3AdataProduct%3A{entity_slug})
+- **Datasets:** listed in `dags/governance/datahub_business_context/datahub_entities/{entity_slug}.datahub.yaml`
+```

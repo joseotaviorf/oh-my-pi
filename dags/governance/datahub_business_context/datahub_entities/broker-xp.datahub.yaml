@@ -1,0 +1,199 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Broker XP (Marketplace)"
+product_description: |
+  Broker XP is QuintoAndar's Marketplace operation — a B2B2C model where partner real-estate
+  companies (imobiliárias) and autonomous agents transact through QuintoAndar's platform.
+  Known internally as 3P Partners / Broker XP; externally as Marketplace; legacy names Rede and
+  For Brokers. Three business models coexist: 3P Supply (TSI — partner brings inventory),
+  3P Demand (TSC — partner brings buyer/tenant), and 3P Lead Gen (CQA — QuintoAndar generates
+  lead and hands it off to partner).
+
+  The authoritative model is dw_brokers (DAG dags/broker_xp/dw_brokers), composed of eight
+  dimensions: dim_broker (partner identity and activity flags), dim_broker_products (fees, banking,
+  tier, integrator per product), dim_broker_regions (geographic coverage per product), and five
+  SCD2 history dims (status, account manager, profile, tier, integrator partner). All carry
+  has_3p_access_control = TRUE.
+
+  Key identifiers: sk_broker (never use the legacy sk_company / dw_company schema). Active-now
+  questions: use is_3p_active_broker / is_3p_active_sale_broker / is_3p_active_rent_broker on
+  dim_broker — these reflect product-level credentialing, not generic registry status. Sentinel
+  -1 marks unattributed keys throughout; filter sk_broker <> -1 before counting real partners.
+
+  Partner agents (corretores da Rede) are identified by dim_agent.agent_type = 'CORRETOR_REDE'
+  or is_3p_agent = TRUE. SCD2 history in dw_agent.dim_agent_3p_history. Monthly-active 3P
+  agent volume follows the any-overlap rule against dim_agent_3p_history (ts_started ≤ EOM
+  AND (ts_ended IS NULL OR ts_ended > BOM)).
+
+  The business_model field (from enrich_business_model) is the routing key for 3P transactions
+  across Visits, Offers, and Listings. Prefer the boolean flags (is_3p_supply, is_3p_demand,
+  is_3p_lead_gen) over enumerating business_model values. sk_broker_supply and sk_broker_demand
+  can co-exist on one transaction — decide upfront which side answers the question.
+
+  Further detail and table routing: docs/llm_context/business_entities/broker_xp.md
+
+data_product_id: broker-xp
+domain_urn: urn:li:domain:growth
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.broker-xp.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.broker-xp.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:71dc73cd-a819-4a9c-9c23-381023ca5e57
+  name: "Query 1 — Active 3P brokers by product, business context, and state"
+  description: >-
+    Lists currently active partner imobiliárias along with their main product and operating state.
+    Uses current-state flags on dim_broker / dim_broker_products, joined to one region per product.
+    Source: docs/llm_context/business_entities/broker_xp.md
+  subjects:
+    - schema: dw_brokers
+      table: dim_broker
+    - schema: dw_brokers
+      table: dim_broker_products
+  sql: |
+    WITH active_brokers AS (
+        SELECT
+            b.sk_broker,
+            b.broker_name,
+            b.broker_trade_name,
+            b.broker_city,
+            b.broker_state,
+            b.is_3p_active_sale_broker,
+            b.is_3p_active_rent_broker
+        FROM dw_brokers.dim_broker AS b
+        WHERE b.is_3p_active_broker = TRUE
+    ),
+    products AS (
+        SELECT
+            p.sk_broker,
+            p.product_name,
+            p.business_context,
+            p.tier_name,
+            p.integrator_partner
+        FROM dw_brokers.dim_broker_products AS p
+        WHERE p.is_3p_active_broker = TRUE
+    )
+    SELECT
+        ab.sk_broker,
+        ab.broker_name,
+        ab.broker_trade_name,
+        ab.broker_state,
+        p.business_context,
+        p.product_name,
+        p.tier_name,
+        p.integrator_partner
+    FROM active_brokers AS ab
+    INNER JOIN products AS p ON ab.sk_broker = p.sk_broker
+    ORDER BY ab.broker_state, ab.broker_name, p.business_context
+
+datasets:
+  - schema: dw_brokers
+    table: dim_broker
+  - schema: dw_brokers
+    table: dim_broker_products
+  - schema: dw_brokers
+    table: dim_broker_regions
+  - schema: dw_brokers
+    table: dim_broker_status_history
+  - schema: dw_brokers
+    table: dim_broker_account_manager_history
+  - schema: dw_brokers
+    table: dim_broker_profile_history
+  - schema: dw_brokers
+    table: dim_broker_tier_history
+  - schema: dw_brokers
+    table: dim_broker_integrator_partner_history
+  - schema: dw_agent
+    table: dim_agent_3p_history
+  - schema: dw_agent
+    table: fact_visit_agent_performance
+  - schema: datalake_amplitude_agents_app
+    table: agents_native_events
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:growth
+  terms:
+    - id: marketplace_3p
+      name: "Marketplace (3P Partners / Broker XP)"
+      description: >-
+        QuintoAndar's B2B2C partner-network operation. A partner real-estate company (imobiliária)
+        is registered in the platform and can operate as supply-side (3P Supply), demand-side
+        (3P Demand / Lead Gen), or both. The central dimension is dw_brokers.dim_broker (sk_broker).
+        Also known as Rede, For Brokers (legacy). Do not use sk_company or dw_company — they are
+        deprecated in favour of sk_broker / dw_brokers.
+    - id: imobiliaria_broker
+      name: "Imobiliária / Broker (parceiro)"
+      description: >-
+        A partner real-estate company in the Marketplace. Represented by one row in dw_brokers.dim_broker
+        (PK sk_broker). Registered via Magic Link, backed by the internal Company service. Use
+        broker_name (legal name) or broker_trade_name (trade name) — there is no company_name column.
+      related_terms:
+        - urn: urn:li:glossaryTerm:marketplace_3p
+          relationship: hasA
+    - id: three_p_supply_tsi
+      name: "3P Supply / TSI (Traga Seus Imóveis)"
+      description: >-
+        Business model where the partner brings the inventory. The listing originates from the broker's
+        BSP (Broker Supply Platform). Flag: is_3p_supply = TRUE on Visits, Offers, and Listings.
+        Supply-side broker: sk_broker_supply on fact tables. Full coverage in 3p_supply.md.
+      related_terms:
+        - urn: urn:li:glossaryTerm:marketplace_3p
+          relationship: isA
+    - id: three_p_demand_tsc
+      name: "3P Demand / TSC (Traga Seus Clientes)"
+      description: >-
+        Business model where the partner brings the buyer or tenant. Flag: is_3p_demand = TRUE.
+        Demand-side broker: sk_broker_demand on fact_visits / fact_offers.
+      related_terms:
+        - urn: urn:li:glossaryTerm:marketplace_3p
+          relationship: isA
+    - id: three_p_lead_gen_cqa
+      name: "3P Lead Gen / CQA (Clientes QuintoAndar)"
+      description: >-
+        Business model where QuintoAndar generates the lead from its own traffic and hands it off
+        to a partner's passive-lead-receiver agent. Flag: is_3p_lead_gen = TRUE. Demand-side broker:
+        sk_broker_demand on fact tables. Agent eligibility flag: is_passive_lead_receiver = TRUE.
+      related_terms:
+        - urn: urn:li:glossaryTerm:marketplace_3p
+          relationship: isA
+    - id: account_manager_am
+      name: "Account Manager (AM)"
+      description: >-
+        The HubSpot owner currently assigned to the broker. Stored as sk_person_account_manager
+        on dw_brokers.dim_broker (current state) and dw_brokers.dim_broker_account_manager_history
+        (full timeline). This is the only HubSpot-derived attribute still valid; all other HubSpot
+        fields (cluster, tag, member status, tier) are deprecated.
+    - id: three_p_agent_corretor_rede
+      name: "3P Agent (Corretor da Rede)"
+      description: >-
+        An autonomous broker working at a partner imobiliária. Identified by dim_agent.agent_type =
+        'CORRETOR_REDE' or is_3p_agent = TRUE. SCD2 history in dw_agent.dim_agent_3p_history.
+        Lead Gen-eligible agents: is_passive_lead_receiver = TRUE.
+      related_terms:
+        - urn: urn:li:glossaryTerm:imobiliaria_broker
+          relationship: hasA
+    - id: business_model_3p
+      name: "business_model (3P routing key)"
+      description: >-
+        Categorical field on Visits and Offers that encodes which sides of a transaction are served
+        by 3P partners. Eight values (BM_1P through BM_3P_LEAD_GEN_3P_SUPPLY_6P). Prefer boolean
+        flags (is_3p_supply, is_3p_demand, is_3p_lead_gen) in queries rather than enumerating
+        business_model values. Source: datalake_visit.visit_business_model (enrich_business_model DAG).
+    - id: active_3p_broker_flag
+      name: "is_3p_active_broker"
+      description: >-
+        Boolean on dw_brokers.dim_broker indicating the partner has at least one active product
+        (Rede Sale or Rede Rent) with completed credentialing. Prefer this flag over reconstructing
+        from dim_broker_status_history for current-state questions. Variants:
+        is_3p_active_sale_broker, is_3p_active_rent_broker.
+      related_terms:
+        - urn: urn:li:glossaryTerm:imobiliaria_broker
+          relationship: hasA
+
+documentation_link:
+  label: "Business entity documentation (broker_xp.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/broker_xp.md

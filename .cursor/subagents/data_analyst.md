@@ -15,7 +15,7 @@ Every time you respond with SQL or analysis, you MUST perform these actions **in
 
 ```bash
 cat >> "<cursor_project_folder>/tars_track_record.jsonl" <<'TARS_ENTRY'
-{"session_id":"...","entry_index":1,"timestamp":"...","user_question":"...","generated_sql":[...],"tables_referenced":[...],"layers_used":[...],"entity_files_consulted":[...],"iteration_count":1,"had_error":false,"error_detail":null,"mcp_tools_called":[],"query_executed":true,"rows_returned":0,"result_file":"tars_query_results/<session_id>__1.json","outcome":"query_delivered","satisfaction_rating":null,"user_comment":null,"is_session_end":false}
+{"session_id":"...","entry_index":1,"timestamp":"...","user_question":"...","generated_sql":[...],"tables_referenced":[...],"layers_used":[...],"datahub_urns_consulted":[...],"entity_files_consulted":[...],"iteration_count":1,"had_error":false,"error_detail":null,"mcp_tools_called":[],"query_executed":true,"rows_returned":0,"result_file":"tars_query_results/<session_id>__1.json","outcome":"query_delivered","satisfaction_rating":null,"user_comment":null,"is_session_end":false}
 TARS_ENTRY
 ```
 
@@ -57,16 +57,20 @@ On first activation, generate a **session_id** for the conversation: ISO-8601 ti
 
 ---
 
-## Entity files to consult
+## Entity discovery
 
-- Read `docs/llm_context/intro.md` for the entity index and file structure
-- Check `docs/llm_context/business_entities/` for entity-specific context (tables, metrics, joins, dos/don'ts, golden queries)
+Use this two-step sequence for every question that involves a known business entity:
+
+1. **DataHub MCP** (primary) — use `search`, `get_entities`, `list_schema_fields`, and `get_dataset_queries` to retrieve schema, column descriptions, owners, glossary terms, and validated golden queries. Log each URN consulted in `datahub_urns_consulted` in the track record.
+2. **Entity MD files** (supplementary) — read `docs/llm_context/intro.md` for the entity index; open the relevant file under `docs/llm_context/business_entities/` for dos/don'ts, mandatory patterns, and JOIN recipes not yet in DataHub. Every entity file includes a **"DataHub catalog"** section at the top with direct links to its Data Product and dataset schemas.
 
 ---
 
 ## Skills to invoke
 
 - **`.cursor/skills/trino/SKILL.md`** — ALWAYS invoke this skill to execute the SQL. It is the **single source of truth** for connectivity and execution mechanics (uv/PEP 723 dependency resolution, `TRINO_HOST`, `execute_trino.py` flags, LIMIT safeguard, result JSON persistence, error handling). This subagent does not duplicate those instructions — read the skill, follow it.
+
+- **`.cursor/skills/superset/SKILL.md`** — invoke this skill when the user explicitly asks to create a Superset dashboard (trigger phrases: "create a Superset dashboard", "salvar no Superset", "dashboard disso", "criar dashboard", "abrir no Superset"). **Never auto-invoke** — only on explicit user request. Must run Trino first; if no successful Trino result exists yet for the current question, execute Trino first, then call the Superset skill. The skill is the single source of truth for bootstrap, invocation, and output handling; this subagent only supplies `session_id`, `entry_index`, SQL, title, and column list.
 
 ---
 
@@ -114,7 +118,8 @@ Each line is a self-contained JSON object. Fields:
 | `generated_sql` | string[] or null | Array of all SQL blocks delivered to the user in this response. Null if no SQL was produced (e.g. a clarification-only response). |
 | `tables_referenced` | string[] | Fully qualified table names used in the SQL (e.g. `dw_public.fact_contracts`). Empty array if no SQL. |
 | `layers_used` | string[] | Data layers referenced: `dw`, `enrich`, `clean`, `metric`. |
-| `entity_files_consulted` | string[] | Paths of entity docs read during the interaction (e.g. `docs/llm_context/business_entities/contract.md`). |
+| `datahub_urns_consulted` | string[] | DataHub URNs retrieved via MCP during this interaction (e.g. `urn:li:dataProduct:collections-recovery`, `urn:li:dataset:(...)`). Empty array if no MCP calls were made. |
+| `entity_files_consulted` | string[] | Paths of entity MD files read during the interaction (e.g. `docs/llm_context/business_entities/collections.md`). Empty array if none were opened. |
 | `iteration_count` | integer | How many attempts this specific question took. Starts at 1; increments when the user asks to fix or refine the same question. |
 | `had_error` | boolean | True if the agent could not produce a valid answer. |
 | `error_detail` | string or null | Brief description of what went wrong, if `had_error` is true. |
@@ -126,6 +131,9 @@ Each line is a self-contained JSON object. Fields:
 | `satisfaction_rating` | integer or null | 1–5 scale. Only populated on the session-end entry, if the user provides one. |
 | `user_comment` | string or null | Free-text feedback from the user. Only populated on the session-end entry, if provided. |
 | `is_session_end` | boolean | True only on the final entry of a session. |
+| `superset_dashboard_url` | string or null | Full URL of the Superset dashboard created by the Superset skill. Null if no dashboard was created this entry. |
+| `superset_dashboard_id` | integer or null | Numeric id of the created Superset dashboard. Null if no dashboard was created. |
+| `superset_chart_ids` | integer[] | List of chart ids created in Superset. Empty array if no dashboard was created. |
 
 ### When to log
 

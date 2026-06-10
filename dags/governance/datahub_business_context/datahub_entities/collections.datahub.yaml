@@ -1,0 +1,229 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Collections"
+product_description: |
+  Collections (Cobrança) is the operational domain focused on recovering overdue payments
+  from tenants and landlords: reminders, outbound contact, deal structuring (acordos),
+  self-service negotiation (SSN), and legal/eviction tracks. The debt remains accounts
+  receivable on the balance sheet but is flagged as past due until paid, renegotiated,
+  or written off.
+
+  Four DW schemas power this domain. dw_collection_recovery_quintoandar is the primary
+  recovery model — it holds the daily overdue invoice timeline (fact_overdue_portfolio_timeline),
+  collection touches (fact_collection), debt at invoice grain (fact_debt), negotiation headers
+  and installments (fact_negotiation / fact_negotiation_installment), a bridge table linking
+  debts to negotiations, and a renegotiation chain fact. dw_collections_landlord covers
+  landlord-side overdue invoices (Retsuko), bill-item decomposition, and deal installment
+  matching. dw_collections_segmentation provides wallet segmentation and the three delay
+  methodologies (T1 / T2 / T3) via invoice-day, contract-day, and ML-oriented feature
+  timelines. dw_evictions models Cyber Legal eviction cases with stage SLAs, expenses, alerts,
+  and juridical log actions.
+
+  Key metrics: DSO (days sales outstanding), roll rates between delay buckets, recovery rates
+  (including net_recovered_amount for negotiation-adjusted write-downs), contact KPIs (CPC,
+  ALO, promessas), eviction lead times, and segmentation-driven queue routing
+  (segmentation_queue, agreement_queue, eviction_queue).
+
+  Critical rules:
+  - Use is_most_recent_record_month = true on fact_overdue_portfolio_timeline for one row
+    per invoice per month when deduplicating to the latest day in the month.
+  - Specify T1 vs T2 vs T3 explicitly in dw_collections_segmentation — column names encode
+    the methodology and mixing them silently changes metric definitions.
+  - Schema is dw_collection_recovery_quintoandar (not dw_collections_recovery_quintoandar).
+  - When mixing AR and pre-PDD invoices, document whether net_recovered_amount vs
+    recovered_amount is required (negotiation-adjusted written-down logic).
+  - Matthew (AI collections agent) interaction flags such as has_matthew_interaction appear
+    on the overdue portfolio timeline; for session-grain AI analytics see matthew.md.
+
+  Further detail and table routing: docs/llm_context/business_entities/collections.md
+
+data_product_id: collections
+domain_urn: urn:li:domain:fintech
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.collections.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.collections.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:f04e12aa-b3d5-41cb-8f81-ad11c2392168
+  name: "Query 1 — AR recovery rate (overdue portfolio consolidated)"
+  description: >-
+    Consolidates dw_losses.fact_accounts_receivable with overdue invoices not yet on that
+    table for the same month using fact_overdue_portfolio_timeline, computing AR recovery
+    rate by delay bucket (AR 0-90 vs AR 90+) over the trailing 13 month-ends.
+    Source: docs/llm_context/business_entities/collections.md
+  subjects:
+    - schema: dw_losses
+      table: fact_accounts_receivable
+    - schema: dw_collection_recovery_quintoandar
+      table: fact_overdue_portfolio_timeline
+    - schema: dw_losses
+      table: fact_delay
+  sql: |
+    WITH fact_ar_consolidated AS (
+        SELECT
+            sk_invoice,
+            delay_contamined_range AS delay_range,
+            invoice_amount AS due_amount,
+            COALESCE(net_recovered, 0) AS net_recovered_amount,
+            date_add('day', -1, date_trunc('month', dt_month_recovery)) AS dt_closing
+        FROM dw_losses.fact_accounts_receivable
+
+        UNION ALL
+
+        SELECT
+            a.id_invoice,
+            COALESCE(c.delay_contamined_range, a.delay_contract_range),
+            a.due_amount,
+            COALESCE(a.net_recovered_amount, 0),
+            COALESCE(c.dt_closing, date_add('day', -1, a.dt_month_start))
+        FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline AS a
+        LEFT JOIN dw_losses.fact_accounts_receivable AS b
+            ON a.id_invoice = b.sk_invoice
+            AND last_day_of_month(b.dt_month_recovery) = a.dt_month_end
+        LEFT JOIN dw_losses.fact_delay AS c
+            ON a.sk_contract = c.sk_contract
+            AND date_add('day', -1, a.dt_month_start) = c.dt_closing
+        WHERE b.sk_invoice IS NULL
+          AND a.is_most_recent_record_month = true
+    )
+
+    SELECT
+        date_trunc('day', CAST(dt_closing AS TIMESTAMP)) AS dt_closing,
+        CASE
+            WHEN delay_range IN ('a. Current', 'b. 1-30', 'c. 31-60', 'd. 61-90') THEN 'AR 0-90'
+            ELSE 'AR 90+'
+        END AS okr_bucket,
+        SUM(net_recovered_amount) / NULLIF(SUM(due_amount), 0) AS ar_recovery_rate
+    FROM fact_ar_consolidated
+    WHERE dt_closing BETWEEN last_day_of_month(date_add('month', -13, current_date))
+                        AND last_day_of_month(date_add('month', -1, current_date))
+    GROUP BY 1, 2
+    ORDER BY 1 DESC, 2
+
+datasets:
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_overdue_portfolio_timeline
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_collection
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_debt
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_negotiation
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_negotiation_installment
+  - schema: dw_collection_recovery_quintoandar
+    table: bridge_map_debt_negotiation
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_renegotiations
+  - schema: dw_collection_recovery_quintoandar
+    table: dim_agency
+  - schema: dw_collection_recovery_quintoandar
+    table: dim_operator
+  - schema: dw_collections_landlord
+    table: fact_invoice_landlord_portfolio
+  - schema: dw_collections_landlord
+    table: fact_landlord_deal_installment_match
+  - schema: dw_collections_landlord
+    table: fact_overdue_portfolio_timeline
+  - schema: dw_collections_segmentation
+    table: fact_invoice_wallet_timeline
+  - schema: dw_collections_segmentation
+    table: fact_contract_wallet_timeline
+  - schema: dw_collections_segmentation
+    table: fact_contract_features_timeline
+  - schema: dw_evictions
+    table: fact_evictions
+  - schema: dw_evictions
+    table: fact_action
+  - schema: dw_evictions
+    table: fact_alerts
+  - schema: dw_evictions
+    table: fact_expenses
+  - schema: dw_losses
+    table: fact_accounts_receivable
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:fintech
+  terms:
+    - id: collections_overdue_portfolio
+      name: "Overdue Portfolio (Carteira Inadimplente)"
+      description: >-
+        The set of invoices that are past due but not yet written off, tracked daily in
+        dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline. Each invoice
+        enters the portfolio one day after its due date and is replicated daily until paid,
+        renegotiated, or written down. Use is_most_recent_record_month = true to collapse
+        to one row per invoice per month-end.
+    - id: acordo
+      name: "Acordo (Negotiated Payment Plan)"
+      description: >-
+        A structured payment agreement between QuintoAndar and the debtor, typically covering
+        multiple installments. Created in Trato Feito and tracked in
+        dw_collection_recovery_quintoandar.fact_negotiation (negotiation_classification = 'ACORDO').
+        Installments are stored in fact_negotiation_installment. A broken acordo can trigger
+        renegotiation, tracked in fact_renegotiations.
+      related_terms:
+        - urn: urn:li:glossaryTerm:collections_overdue_portfolio
+          relationship: hasA
+    - id: promessa
+      name: "Promessa (Promise to Pay)"
+      description: >-
+        A debtor's commitment to pay before the first installment of an acordo is confirmed.
+        Encoded as negotiation_classification = 'PROMESSA' in fact_negotiation and as
+        total_promisse in fact_collection. A broken promise (PROMESSA QUEBRADA) may transition
+        to a new negotiation or eviction track.
+    - id: ssn_bossn
+      name: "SSN / BOSSN (Self-Service Negotiation)"
+      description: >-
+        Digital self-service negotiation flows that allow debtors to propose and accept
+        payment plans without agent intervention. Identified by is_ssn = true on
+        dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline. BOSSN is the
+        back-office variant of the same flow.
+    - id: assessoria
+      name: "Assessoria (Third-Party Advisory Collection)"
+      description: >-
+        External collection agencies (e.g. Cyber, Paschoalotto, Webhelp) engaged for
+        advanced-stage or legal recovery. Indicated by the advisory flag on fact_negotiation
+        and the recovery_channel / segmentation_queue columns on fact_overdue_portfolio_timeline.
+        Agency metadata is in dim_agency; operator metadata in dim_operator.
+    - id: delay_methodology_t1_t2_t3
+      name: "Delay Methodology T1 / T2 / T3"
+      description: >-
+        Three distinct delay calculation methodologies used in dw_collections_segmentation.
+        T1 is the baseline invoice delay. T2 adds deal/negotiation contamination and aligns
+        with operational roll-rate metrics. T3 applies contract-level contamination used for
+        wallet and losses views. Column names in fact_invoice_wallet_timeline and
+        fact_contract_wallet_timeline explicitly encode the methodology
+        (e.g. invoice_delay_t1, invoice_delay_t2, max_delay_contaminated_contract_t2).
+        Always specify which methodology a metric uses.
+    - id: flow_stock_debtor
+      name: "Flow vs Stock (Debtor Type)"
+      description: >-
+        Operational segmentation of overdue invoices. Flow (Fluxo) = invoices that became
+        overdue in the current month (new entries). Stock (Estoque) = invoices already
+        overdue from prior months. Encoded as debtor_type on
+        dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline. Used in roll-rate
+        and recovery-rate dashboards to separate new delinquency from accumulated debt.
+    - id: net_recovered_amount
+      name: "Net Recovered Amount"
+      description: >-
+        Recovery amount adjusted for the negotiation net rate when the invoice was
+        previously written down (PDD). Differs from recovered_amount, which reflects
+        nominal cash received. Use net_recovered_amount when computing recovery rates
+        against provisioned AR (dw_losses universe) to avoid overstating recovery on
+        discounted deals. Column on fact_overdue_portfolio_timeline.
+    - id: fpd_first_payment_default
+      name: "FPD (First Payment Default)"
+      description: >-
+        Indicator that the first installment of a new rental contract was not paid on time.
+        Stored as delay_first_payment_default on
+        dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline and as an
+        FPD flag on dw_collections_segmentation.fact_contract_wallet_timeline. A key
+        early-warning signal for tenant credit risk.
+
+documentation_link:
+  label: "Business entity documentation (collections.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/collections.md

@@ -1,0 +1,239 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Repairs"
+product_description: |
+  A repair is a request to fix, clean, remove, or replace an item in a rental property.
+  Two distinct universes with different schemas, ID spaces, and data models:
+
+  1. Offboarding repairs — arise from exit inspections (vistoria de saída) when damages are
+     found. Tables: dw_inspections.fact_repair_request + dim_repair_request.
+  2. Ongoing repairs — maintenance issues reported by tenants during the active contract.
+     Tables: dw_repairs.fact_ongoing_repairs + dim_ongoing_repairs.
+
+  Entry inspections do NOT generate repairs — they only document item conditions as baseline.
+
+  Offboarding repair lifecycle:
+  1. Identification — inspector finds damages; repair requests created
+     (fact_repair_request.ts_created).
+  2. AR (Repair Analysis) — costs estimated, responsibility assigned
+     (dim_repair_request.cost, responsibility).
+  3. Review (1st review) — tenant and owner review the repair list; may contest
+     (fact_repair_request.has_tenant_contestation).
+  4. AC (Contestation Analysis) — if contested, dedicated team analyzes
+     (fact_contestation).
+  5. Budget Approval (2nd review) — final budget presented to both parties.
+  6. Exemption / Resolution — repairs may be exempted (dim_repair_exempted.is_exempted);
+     report finalized.
+
+  Ongoing repair lifecycle:
+  1. Opening — tenant reports issue via app or web (fact_ongoing_repairs.ts_created_local).
+  2. Triage — classified by criticality and repair type (dim_ongoing_repairs.criticality,
+     repair_class).
+  3. Service provider assignment — provider chosen by tenant (PS IQ), owner (PS PP),
+     or compulsory (ts_compulsory).
+  4. Execution — repair performed; owner approval may be required.
+  5. Resolution — ticket solved (fact_ongoing_repairs.ts_solved_local).
+
+  Note: ongoing timestamps in fact_ongoing_repairs are adjusted -3h from UTC to São Paulo
+  local time — ts_created_local and ts_solved_local are already localized.
+
+  Table grain:
+  - fact_repair_request: 1 row per repair request from exit inspections.
+  - dim_repair_request: 1 row per repair request (deduped by ROW_NUMBER PARTITION BY
+    id_repair_request ORDER BY ts_updated DESC — no additional dedup needed).
+  - fact_contestation: 1 row per contestation event.
+  - dim_repair_exempted: latest exemption per repair request.
+  - fact_ongoing_repairs: 1 row per Zendesk ticket (deduped by ROW_NUMBER PARTITION BY
+    id_ticket ORDER BY ts_updated DESC — no additional dedup needed).
+  - dim_ongoing_repairs: 1 row per Zendesk ticket.
+
+  CAST rule: fact_inspection.sk_inspection is VARCHAR. Always apply CAST when joining
+  fact_repair_request to fact_inspection:
+  fi.sk_inspection = CAST(rr.sk_inspection AS VARCHAR)
+
+  Grain change: joining fact_inspection → fact_repair_request fans out from inspection grain
+  to repair grain (1:N). Always aggregate back when the desired output grain is per inspection.
+
+  Key metrics: repair volume per inspection (COUNT from fact_repair_request per sk_inspection),
+  total repair cost (SUM drr.cost), contestation rate (has_tenant_contestation = TRUE),
+  exemption rate (is_exempted = TRUE), cost absorption distribution (is_cost_absorbed_by_*),
+  agreement rate (obt_offboarding.has_agreement), ongoing FRT (fact_ongoing_repairs.frt),
+  ongoing CSAT (fact_ongoing_repairs.csat_score).
+
+  Critical rules:
+  - NEVER mix offboarding and ongoing repair tables in the same query without clearly labeling
+    the context — they have different schemas, ID spaces, and semantics.
+  - CAST rule when joining fact_repair_request.sk_inspection to fact_inspection.sk_inspection.
+  - dim_repair_request.cost is estimated cost at AR time; NOT the final cost (which may differ
+    after exemptions and contestations).
+  - Do NOT confuse repair COUNTS per stage (total_tentant_repair_ar/review/ac on fact_terminations)
+    with monetary COSTS — those are counts, not currency.
+  - is_contestation in ongoing repairs is a tag-derived boolean on a Zendesk ticket;
+    fact_contestation in offboarding is a formal contestation table with cost and stage data.
+
+  Query 2 (Repairs in context of termination) and Query 3 (Ongoing repairs with classification)
+  and Query 4 (Monthly repair cost via obt_offboarding) are detailed in source doc.
+
+  Further detail and table routing: docs/llm_context/business_entities/repairs.md
+
+data_product_id: repairs
+domain_urn: urn:li:domain:for_rent
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.repairs.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.repairs.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:546edc0e-59dc-4411-8079-aac8905bda62
+  name: "Query 1 — Offboarding repairs with descriptive attributes"
+  description: >-
+    Individual repair requests from exit inspections with type, cost, item, room, and
+    responsibility. Joins fact_repair_request (fact) with dim_repair_request (dimension).
+    dim_repair_request is already deduped — no additional dedup needed.
+    Source: docs/llm_context/business_entities/repairs.md
+  subjects:
+    - schema: dw_inspections
+      table: fact_repair_request
+    - schema: dw_inspections
+      table: dim_repair_request
+  sql: |
+    SELECT
+        rr.sk_repair_request,
+        rr.sk_inspection,
+        rr.sk_contract,
+        drr.type,
+        drr.cost,
+        drr.item_name,
+        drr.room_name,
+        drr.responsibility,
+        rr.has_tenant_contestation,
+        rr.is_exempted,
+        rr.is_cost_absorbed_by_tenant,
+        rr.is_cost_absorbed_by_owner,
+        rr.is_cost_absorbed_by_company,
+        rr.ts_created
+    FROM dw_inspections.fact_repair_request AS rr
+    LEFT JOIN dw_inspections.dim_repair_request AS drr
+        ON rr.sk_repair_request = drr.id_repair_request
+
+datasets:
+  - schema: dw_inspections
+    table: fact_repair_request
+  - schema: dw_inspections
+    table: dim_repair_request
+  - schema: dw_inspections
+    table: fact_contestation
+  - schema: dw_inspections
+    table: dim_repair_exempted
+  - schema: dw_repairs
+    table: fact_ongoing_repairs
+  - schema: dw_repairs
+    table: dim_ongoing_repairs
+  - schema: dw_offboarding
+    table: obt_offboarding
+  - schema: datalake_inspection_services_clean
+    table: repair_request
+  - schema: datalake_inspections
+    table: repair_request
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:offboarding
+  terms:
+    - id: repair_entity
+      name: "Repair (Reparo / Solicitação de Reparo)"
+      description: >-
+        A request to fix, clean, remove, or replace an item in a rental property.
+        Two separate universes: offboarding repairs (from exit inspection, dw_inspections)
+        and ongoing repairs (from active contract, dw_repairs). Never mix them.
+    - id: repair_offboarding
+      name: "Offboarding Repair (Reparo de Saída)"
+      description: >-
+        Repair arising from an exit inspection (vistoria de saída) when damages are found.
+        Also called reparo de offboarding. Tables: dw_inspections.fact_repair_request +
+        dim_repair_request. Linked to inspection via sk_inspection (CAST rule applies).
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_entity
+          relationship: isA
+    - id: repair_ongoing
+      name: "Ongoing Repair (Reparo Ongoing / Reparo de Manutenção)"
+      description: >-
+        Maintenance issue reported by the tenant during the active rental contract via
+        app or web; tracked as a Zendesk ticket. Tables: dw_repairs.fact_ongoing_repairs +
+        dim_ongoing_repairs. Completely separate schema from offboarding repairs.
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_entity
+          relationship: isA
+    - id: repair_contestacao
+      name: "Contestação (Repair Dispute)"
+      description: >-
+        Formal dispute of a repair item by tenant or owner in the offboarding universe.
+        Table: dw_inspections.fact_contestation. Triggers the AC (Contestation Analysis)
+        stage. Distinct from is_contestation in ongoing repairs (a tag-derived boolean on
+        the Zendesk ticket, not a formal dispute with cost and stage data).
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_offboarding
+          relationship: hasA
+    - id: repair_isencao
+      name: "Isenção (Exemption)"
+      description: >-
+        Owner or analyst exempts a repair from the tenant's responsibility. Table:
+        dw_inspections.dim_repair_exempted (latest exemption per repair request).
+        Flag: fact_repair_request.is_exempted. Reduces the tenant's final repair cost.
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_offboarding
+          relationship: hasA
+    - id: repair_benfeitoria
+      name: "Benfeitoria (Tenant Improvement)"
+      description: >-
+        A change or addition made by the tenant that improves the property — NOT a defect.
+        In ongoing repairs: dim_ongoing_repairs.criticality = 'Benfeitoria'. Not subject to
+        repair charges; filtered out of defect-based analysis.
+    - id: repair_ps_iq
+      name: "PS IQ (Prestador do Inquilino)"
+      description: >-
+        Service provider chosen by the tenant for an ongoing repair. Column:
+        fact_ongoing_repairs.ts_ps_iq (timestamp when provider was assigned).
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_ongoing
+          relationship: hasA
+    - id: repair_ps_pp
+      name: "PS PP (Prestador do Proprietário)"
+      description: >-
+        Service provider chosen by the landlord for an ongoing repair. Column:
+        fact_ongoing_repairs.ts_ps_pp.
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_ongoing
+          relationship: hasA
+    - id: repair_compulsoria
+      name: "Compulsória (Compulsory Repair)"
+      description: >-
+        Ongoing repair execution ordered by QuintoAndar regardless of tenant or owner
+        preference. Column: fact_ongoing_repairs.ts_compulsory.
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_ongoing
+          relationship: hasA
+    - id: repair_frt
+      name: "FRT (Full Repair Time)"
+      description: >-
+        Days from ticket creation to resolution for ongoing repairs.
+        Column: fact_ongoing_repairs.frt. Key SLA metric for ongoing repair performance.
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_ongoing
+          relationship: hasA
+    - id: inspection_ar_stage
+      name: "AR — Análise de Reparos (Repair Analysis Stage)"
+      description: >-
+        First review stage after an exit inspection where offboarding repairs are assessed,
+        costs estimated, and responsibility assigned. Columns with _ar suffix in
+        fact_terminations (total_tentant_repair_ar). The AR cost in dim_repair_request
+        is the ESTIMATED cost, not the final cost after exemptions and contestations.
+      related_terms:
+        - urn: urn:li:glossaryTerm:repair_offboarding
+          relationship: hasA
+
+documentation_link:
+  label: "Business entity documentation (repairs.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/repairs.md

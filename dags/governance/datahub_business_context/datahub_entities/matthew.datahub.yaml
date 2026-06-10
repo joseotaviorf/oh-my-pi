@@ -1,0 +1,214 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Matthew (Collections AI Agent)"
+product_description: |
+  Matthew is the AI agent dedicated to tenants with open balances — overdue invoices or
+  invoices not yet due — helping them regularize debts via direct payment, payment-method
+  support, or full-debt negotiation (installments / discounts). It is the collections
+  counterpart to the general-purpose support bot Wall-E.
+
+  Matthew operates in two environments:
+  1. WhatsApp — Matthew runs as a standalone host (bot = 'matthew').
+  2. In-app chat — Matthew runs as a sub-agent inside the Wall-E host (bot = 'wall-e'
+     plus a Matthew-specific observation signal). Canonical attribution:
+     ai_agent_source IN ('Matthew in Whatsapp', 'Matthew in Chat').
+
+  Conversation flows:
+  - Inbound (in-app and WhatsApp) — user organically reaches out to regularize a debt.
+  - Outbound (WhatsApp only) — QuintoAndar sends a debt-reminder notification; user replies.
+    Detect via: is_notification_reply = 1 (presence of outbound_payload_from_dto observation).
+
+  Matthew version taxonomy (matthew_version column):
+  - V1: DebtFinderTool (legacy entrypoint).
+  - V1.5: DebtRetrieverTool / UserDebtClassifierTool entrypoint.
+  - V2 (CollectionsInput): flag_collectionsinput_agent = 1. Current canonical version.
+
+  Matthew session lifecycle:
+  1. Session creation — user opens WhatsApp or in-app chat (sessions.ts_created).
+  2. Matthew detection — observation-based (ai_agent_source; preferred) or
+     score-based (ai_agent_source_legacy; for historical back-comparison only).
+  3. Tools and helpers — debt retrieval, payment allegation, negotiation proposer,
+     yearly invoices report (Imposto de Renda).
+  4. Negotiation — proposals sent (send_proposal_count), confirmed (confirm_negotiation_count,
+     flag_create_negotiation).
+  5. Resolution or escalation — session ends; escalation to human support:
+     is_escalation = TRUE; reason: matthew_declared_escalation_reason.
+
+  Mandatory filter: ALWAYS filter flag_session_with_trace = TRUE before aggregating.
+  Sessions without trace record only outbound send-offs (no user reply) and contain no
+  analysable interaction. Skip them in every analysis except outbound funnel volume.
+
+  Table grain:
+  - datalake_ai_collections_quintoandar.sessions: 1 row per session; merge key id_sauron_session.
+    ALWAYS filter flag_session_with_trace = TRUE.
+  - datalake_ai_collections_quintoandar.observation: 1 row per Langfuse session (milestones,
+    tools, helpers, data errors, escalation reason). JOIN via o.id_langfuse_session = s.id_external.
+  - datalake_ai_collections_quintoandar.messages: 1 row per Matthew session (full conversation
+    text for LLM/regex analysis). Covers only Matthew sessions — NOT Wall-E-only sessions.
+  - dw_collection_ai_agents.fact_ai_agents_interaction: OBT (sessions + observations +
+    messages + user wallet context). Default starting point for analytical questions.
+  - dw_collection_ai_agents.fact_user_wallet_timeline: daily user-grain wallet snapshot.
+
+  Key metrics: session volume (COUNT DISTINCT id_session by ai_agent_source), escalation rate
+  (COUNT_IF is_escalation / COUNT all), outbound reply rate (is_notification_reply = 1 on WhatsApp),
+  negotiation rate (flag_create_negotiation = 1 or confirm_negotiation_count > 0), tool-usage
+  rates per tool flag, data-failure escalation rate (Pillar A proxy).
+
+  Escalation pillars:
+  - Pillar A (deterministic): data failures — flag_has_collections_data_error = 1 OR
+    flag_handle_no_contracts = 1 OR flag_has_finance_fetch_error = 1.
+  - Pillar B (LLM required): out-of-scope user themes (NON_TENANT_PROFILE, CREDIT_GUARANTEE,
+    CONTRACT_TERMINATION, REIMBURSEMENT_*, NON_RECURRING_FINANCE, SERVICE_BILLS,
+    PROPERTY_OPERATIONS, CONTRACT_CHANGES). Analyze on full_conversation.
+  - Pillar C (LLM required): conversation-driven failures despite in-scope topic.
+
+  Critical rules:
+  - ai_agent_source (observation-based) is the correct, deterministic view for current metrics.
+  - ai_agent_source_legacy (score-based) is only for reproducing historical metrics that
+    pre-date the observation logic — non-deterministic and incomplete.
+  - is_matthew_in_session is strictly narrower than ai_agent_source. For the canonical
+    'Matthew was involved' filter: ai_agent_source <> 'Wall-e'.
+  - Always include id_external (Langfuse session ID) in analytical exports for traceability.
+  - messages only includes Matthew sessions — do NOT assume it covers all chatbot sessions.
+
+  Query 2 (Matthew sessions OBT with wallet context) in source doc:
+    SELECT f.*, c.* FROM dw_collection_ai_agents.fact_ai_agents_interaction AS f
+    LEFT JOIN dw_rent.dim_contract AS c ON f.sk_contract = c.sk_contract
+    WHERE f.flag_session_with_trace = TRUE AND DATE(f.dt_session_created) >= DATE '2025-01-01'
+
+  Further detail and table routing: docs/llm_context/business_entities/matthew.md
+
+data_product_id: matthew
+domain_urn: urn:li:domain:fintech
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.matthew.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.matthew.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:560863e3-96a4-4b6f-a40f-f8b96ab1ffb4
+  name: "Query 1 — Escalation rate by month and agent source"
+  description: >-
+    Monthly Matthew escalation rate broken down by ai_agent_source. Always filters
+    flag_session_with_trace = TRUE. Uses observation-based ai_agent_source for current metrics.
+    Source: docs/llm_context/business_entities/matthew.md
+  subjects:
+    - schema: datalake_ai_collections_quintoandar
+      table: sessions
+    - schema: datalake_ai_collections_quintoandar
+      table: observation
+  sql: |
+    SELECT
+        DATE_TRUNC('month', DATE(s.dt_session_created)) AS month_ref,
+        s.ai_agent_source,
+        COUNT(DISTINCT s.id_session) AS total_sessions,
+        COUNT(DISTINCT CASE WHEN s.is_escalation THEN s.id_session END) AS escalated_sessions,
+        ROUND(
+            CAST(COUNT(DISTINCT CASE WHEN s.is_escalation THEN s.id_session END) AS DOUBLE)
+            / NULLIF(COUNT(DISTINCT s.id_session), 0), 3
+        ) AS escalation_rate
+    FROM datalake_ai_collections_quintoandar.sessions AS s
+    WHERE s.flag_session_with_trace = TRUE
+        AND s.ai_agent_source <> 'Wall-e'
+        AND DATE(s.dt_session_created) >= DATE '2025-01-01'
+    GROUP BY 1, 2
+    ORDER BY 1 DESC, 2
+
+datasets:
+  - schema: datalake_ai_collections_quintoandar
+    table: sessions
+  - schema: datalake_ai_collections_quintoandar
+    table: observation
+  - schema: datalake_ai_collections_quintoandar
+    table: messages
+  - schema: dw_collection_ai_agents
+    table: fact_ai_agents_interaction
+  - schema: dw_collection_ai_agents
+    table: fact_user_wallet_timeline
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:fintech
+  terms:
+    - id: matthew_agent
+      name: "Matthew (Collections AI Agent)"
+      description: >-
+        The AI agent dedicated to tenants with open balances. Helps regularize debts via
+        direct payment, payment-method support, or full negotiation. Two environments:
+        WhatsApp (standalone bot) and in-app (sub-agent inside Wall-E).
+        Canonical attribution: ai_agent_source IN ('Matthew in Whatsapp', 'Matthew in Chat').
+    - id: matthew_in_whatsapp
+      name: "Matthew in WhatsApp"
+      description: >-
+        Matthew running as a standalone WhatsApp host (bot = 'matthew').
+        Filter: ai_agent_source = 'Matthew in Whatsapp'. Supports both inbound and
+        outbound (notification reply) flows.
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_agent
+          relationship: isA
+    - id: matthew_in_chat
+      name: "Matthew in Chat"
+      description: >-
+        Matthew running as a sub-agent inside the Wall-E in-app host (bot = 'wall-e' +
+        Matthew observation signal). Filter: ai_agent_source = 'Matthew in Chat'. Inbound only.
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_agent
+          relationship: isA
+    - id: matthew_v1
+      name: "Matthew V1"
+      description: >-
+        Legacy Matthew version identified by the DebtFinderTool entrypoint observation.
+        Filter: matthew_version = 'V1' or flag_debt_finder_tool = 1.
+        Deprecated — use V2 (CollectionsInput) for current analysis.
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_agent
+          relationship: isA
+    - id: matthew_v15
+      name: "Matthew V1.5"
+      description: >-
+        Intermediate Matthew version identified by DebtRetrieverTool or
+        UserDebtClassifierTool observation. Filter: matthew_version = 'V1.5'.
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_agent
+          relationship: isA
+    - id: matthew_v2
+      name: "Matthew V2 (CollectionsInput)"
+      description: >-
+        Current canonical Matthew version identified by the CollectionsInput agent
+        observation. Filter: matthew_version = 'V2' or flag_collectionsinput_agent = 1.
+        Use this for all current-state analyses.
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_agent
+          relationship: isA
+    - id: matthew_outbound
+      name: "Matthew Outbound"
+      description: >-
+        QuintoAndar-initiated WhatsApp debt-reminder notification that triggers a Matthew
+        conversation when the user replies. Detect: is_notification_reply = 1.
+        Notification content: notif_text_extracted / notif_template_extracted.
+        WhatsApp only (outbound is not available in-app).
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_in_whatsapp
+          relationship: hasA
+    - id: matthew_negotiation
+      name: "Acordo / Negociação (Matthew Negotiation)"
+      description: >-
+        Debt negotiation (installment or discount) facilitated by Matthew. Tracked by
+        flag_create_negotiation (negotiation created), confirm_negotiation_count
+        (user confirmed), send_proposal_count (proposals sent per session).
+      related_terms:
+        - urn: urn:li:glossaryTerm:matthew_agent
+          relationship: hasA
+    - id: matthew_sessao_com_trace
+      name: "Sessão com Trace (Session with Trace)"
+      description: >-
+        A Matthew session with at least one Langfuse trace recorded
+        (flag_session_with_trace = TRUE). Sessions WITHOUT trace exist only to record
+        outbound send-offs where the user has not yet replied — they contain no
+        analysable interaction and must be excluded from all analyses.
+
+documentation_link:
+  label: "Business entity documentation (matthew.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/matthew.md

@@ -1,0 +1,178 @@
+# ==============================================================================
+# DataHub business-context push — spec_version: 1
+# ==============================================================================
+#
+# TEMPLATE — copy to {entity}.datahub.yaml, fill placeholders, delete comments.
+#
+# ==============================================================================
+# AUTHORING CONTRACT — three steps, always in this order
+# ==============================================================================
+#
+# 1. Write / update  docs/llm_context/business_entities/{entity}.md
+#      The .md is the human-authored source of truth: lifecycle, glossary,
+#      dos/don'ts, JOIN recipes, golden queries, table grain.
+#
+# 2. Write / update  dags/governance/datahub_business_context/datahub_entities/{entity}.datahub.yaml
+#      Translate the .md into this YAML: product_description, datasets,
+#      glossary_terms (with related_terms), golden_query SQL + subjects.
+#      Verify every schema.table pair exists in DataHub before adding it.
+#      NEVER change a golden_query.stable_urn after the first successful push.
+#
+# 3. Push to DataHub
+#      python dags/governance/datahub_business_context/push_all_entities.py {entity}
+#
+#      Or push all entities at once:
+#      python dags/governance/datahub_business_context/push_all_entities.py
+#
+#      Verify with:
+#      python dags/governance/datahub_business_context/smoke_test_datahub.py
+#
+# Skipping step 3 means DataHub metadata is stale and TARS will return outdated
+# context. Run the push every time the YAML changes.
+#
+# ==============================================================================
+#
+# Run with:
+#   python dags/governance/datahub_business_context/load_collections_context.py \
+#     --config dags/governance/datahub_business_context/datahub_entities/{entity}.datahub.yaml
+#
+# This file drives everything pushed to DataHub for this data product:
+#   • Data Product entity (name, description, domain, glossary terms)
+#   • Dataset links (URNs built automatically from schema + table pairs)
+#   • Glossary terms (created/updated in the configured parent node)
+#   • Golden query entity (SQL visible in DataHub "Queries" tab)
+#   • Structured property on the Data Product sidebar (URN pointer to the query)
+#   • Documentation link (points at the .md on GitHub)
+#
+# The companion .md file (docs/llm_context/business_entities/{entity}.md) is
+# the human-authored business context document. It contains NO DataHub URNs —
+# those are all generated from this YAML by the loader.
+#
+# ==============================================================================
+
+spec_version: 1
+kind: data_product_curated_entity
+
+# Display name shown in the DataHub UI.
+product_display_name: "{Display Name}"
+
+# Multi-line description shown on the Data Product page.
+# Summarise scope; refer to the .md for full narrative (loader adds a link).
+product_description: |
+  {One-paragraph description of what this data product covers and who uses it.}
+
+  {Optional second paragraph on key tables, grain, or operational context.}
+
+  Further detail and table routing: docs/llm_context/business_entities/{entity}.md
+
+# Slug used to build the Data Product URN: urn:li:dataProduct:{data_product_id}
+# Must be kebab-case and match the filename prefix ({entity}.datahub.yaml).
+data_product_id: {entity-slug}
+
+# DataHub domain URN. Ask your DataHub admin for the correct URN for your domain.
+# Common examples: urn:li:domain:fintech  urn:li:domain:people  urn:li:domain:supply
+domain_urn: urn:li:domain:{domain}
+
+# Structured property wired to the Data Product sidebar so the golden query
+# appears as an entity link (not just plain text).
+# Naming convention: br.com.quintoandar.datahub.{bundle_id}.golden_query
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.{bundle_id}.golden_query
+  # List any old qualified names that should be removed from the product on load.
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.{bundle_id}.golden_query_url
+
+# Golden query registered as a DataHub Query entity and linked to the product.
+golden_query:
+  # Generate once: python -c "import uuid; print(uuid.uuid4())"
+  # Never change after the first successful push — DataHub tracks this URN.
+  # To recreate: generate a new UUID and add it under the uris: override block.
+  stable_urn: urn:li:query:{00000000-0000-0000-0000-000000000000}
+
+  name: "Query 1 — {Short descriptive name}"
+
+  description: >-
+    {One-line description of what this query computes.}
+    Source: docs/llm_context/business_entities/{entity}.md
+
+  # Tables this query reads from (loader builds the full dataset URNs).
+  subjects:
+    - schema: {dw_schema}
+      table: {primary_table}
+    # Add more subjects if the query joins across tables:
+    # - schema: {other_schema}
+    #   table: {other_table}
+
+  sql: |
+    SELECT
+        {date_or_group_column},
+        {dimension_column},
+        {metric_expression}           AS {metric_alias}
+    FROM {dw_schema}.{primary_table}
+    WHERE {dedup_flag} = true
+      AND {date_column} BETWEEN {start_expr} AND {end_expr}
+    GROUP BY 1, 2
+    ORDER BY 1 DESC, 2;
+
+# All datasets (tables) belonging to this Data Product.
+# The loader builds urn:li:dataset:(urn:li:dataPlatform:databricks,{schema}.{table},PROD)
+# automatically — you only need schema + table pairs.
+#
+# Optional per-dataset documentation (pushed to DataHub as editable descriptions):
+#   description: >-
+#     {One-paragraph plain-language description of this table's grain and purpose.}
+#
+# Optional per-field documentation (pushed to DataHub as column-level descriptions):
+#   fields:
+#     {column_name}: "{Short description of what this column contains.}"
+#
+datasets:
+  # Source / datalake tables (optional — include if the product should surface them)
+  - schema: {datalake_schema}
+    table: {source_table}
+  # DW tables (primary output)
+  - schema: {dw_schema}
+    table: {fact_table}
+  - schema: {dw_schema}
+    table: {dim_table}
+  # Add as many as needed:
+  # - schema: {schema}
+  #   table: {table}
+
+# Glossary terms created/updated in DataHub and attached to this Data Product.
+# Remove the whole block if there are no domain-specific terms to register.
+glossary_terms:
+  # glossary_parent_node_urn controls where terms are nested in the glossary.
+  parent_node_urn: urn:li:glossaryNode:{domain}
+  terms:
+    - id: {term_slug}              # becomes urn:li:glossaryTerm:{term_slug}
+      name: "{PT or EN term}"
+      description: >-
+        {Plain-language definition. Reference the column or table where this
+        concept is encoded, e.g. "Identified by is_ssn = true in fact_overdue_portfolio_timeline."}
+      # Optional: declare Glossary Related Term relationships visible in the
+      # DataHub "Related Terms" panel.  Only two relationship types exist in
+      # the DataHub API (TermRelationshipType enum):
+      #   isA  — "Is A" / Inherits: this term is a sub-type of the other term
+      #   hasA — "Has A" / Contains: this term contains / encompasses the other
+      # Human-friendly aliases are also accepted:
+      #   inherits     → isA  (this term inherits from the target)
+      #   inherited_by → isA  (the target inherits from this term; direction reversed)
+      #   contains     → hasA (this term contains the target)
+      #   contained_by → hasA (the target contains this term; direction reversed)
+      # related_terms:
+      #   - urn: urn:li:glossaryTerm:{other_term_slug}
+      #     relationship: isA        # isA | inherits | inherited_by | hasA | contains | contained_by
+    # - id: {term_slug_2}
+    #   name: "{Term 2}"
+    #   description: >-
+    #     {Definition 2.}
+    #   # related_terms:
+    #   #   - urn: urn:li:glossaryTerm:{parent_term_slug}
+    #   #     relationship: isA
+
+# Documentation link added to the Data Product "Resources" section in DataHub.
+documentation_link:
+  label: "Business entity documentation ({entity}.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/{entity}.md

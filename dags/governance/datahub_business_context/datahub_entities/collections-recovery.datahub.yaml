@@ -1,0 +1,581 @@
+# ============================================================================
+# DataHub business-context push — spec_version: 1
+# ============================================================================
+# Run with:
+#   python dags/governance/datahub_business_context/load_collections_context.py \
+#     --config dags/governance/datahub_business_context/datahub_entities/collections-recovery.datahub.yaml
+#
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Collections Recovery"
+product_description: |
+  Collections domain data product for QuintoAndar. Covers the full operational
+  recovery lifecycle: overdue portfolio timeline, collection touches, debt and
+  negotiation management, landlord-side invoices, wallet segmentation, and eviction
+  cases; plus dw_losses AR/delay tables used by the canonical AR Recovery Rate golden
+  query attached to this product. Primary entry point for recovery rate OKRs,
+  roll-rate analysis, and collections operations reporting. Supplementary narrative:
+  docs/llm_context/business_entities/collections.md.
+
+data_product_id: collections-recovery
+domain_urn: urn:li:domain:fintech
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.collections_recovery.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.collections_recovery.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:19c18c4b-2604-4020-b925-4d312b5f7874
+  name: "AR Recovery Rate (C&E / Neotribe-style)"
+  description: >-
+    Consolidates dw_losses.fact_accounts_receivable with overdue invoices not yet on that
+    table for the same month. Splits by OKR bucket: AR 0-90 vs AR 90+.
+    Source: docs/llm_context/business_entities/collections.md
+  subjects:
+    - schema: dw_losses
+      table: fact_accounts_receivable
+    - schema: dw_collection_recovery_quintoandar
+      table: fact_overdue_portfolio_timeline
+    - schema: dw_losses
+      table: fact_delay
+  sql: |
+    WITH fact_ar_consolidated AS (
+        SELECT
+            sk_invoice,
+            delay_contamined_range AS delay_range,
+            invoice_amount AS due_amount,
+            COALESCE(net_recovered, 0) AS net_recovered_amount,
+            date_add('day', -1, date_trunc('month', dt_month_recovery)) AS dt_closing
+        FROM dw_losses.fact_accounts_receivable
+
+        UNION ALL
+
+        SELECT
+            a.id_invoice,
+            COALESCE(c.delay_contamined_range, a.delay_contract_range),
+            a.due_amount,
+            COALESCE(a.net_recovered_amount, 0),
+            COALESCE(c.dt_closing, date_add('day', -1, a.dt_month_start))
+        FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline AS a
+        LEFT JOIN dw_losses.fact_accounts_receivable AS b
+            ON a.id_invoice = b.sk_invoice
+            AND last_day_of_month(b.dt_month_recovery) = a.dt_month_end
+        LEFT JOIN dw_losses.fact_delay AS c
+            ON a.sk_contract = c.sk_contract
+            AND date_add('day', -1, a.dt_month_start) = c.dt_closing
+        WHERE b.sk_invoice IS NULL
+          AND a.is_most_recent_record_month = true
+    )
+
+    SELECT
+        date_trunc('day', CAST(dt_closing AS TIMESTAMP)) AS dt_closing,
+        CASE
+            WHEN delay_range IN ('a. Current', 'b. 1-30', 'c. 31-60', 'd. 61-90')
+                THEN 'AR 0-90'
+            ELSE 'AR 90+'
+        END AS okr_bucket,
+        SUM(net_recovered_amount) / NULLIF(SUM(due_amount), 0) AS ar_recovery_rate
+    FROM fact_ar_consolidated
+    WHERE dt_closing BETWEEN last_day_of_month(date_add('month', -13, current_date))
+                        AND last_day_of_month(date_add('month', -1, current_date))
+    GROUP BY 1, 2
+    ORDER BY 1 DESC, 2
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:fintech
+  terms:
+    - id: cobranca_fintech
+      name: "Cobrança"
+      description: >-
+        Collections. The operational phase focused on recovering overdue payments through
+        reminders, outbound contact, restructuring, and negotiations. Synonymous with
+        'collections' in the Fintech domain.
+      related_terms:
+        - urn: urn:li:glossaryTerm:assessoria_fintech
+          relationship: contains
+        - urn: urn:li:glossaryTerm:acordo_fintech
+          relationship: contains
+        - urn: urn:li:glossaryTerm:promessa_fintech
+          relationship: contains
+        - urn: urn:li:glossaryTerm:fpd_fintech
+          relationship: contains
+        - urn: urn:li:glossaryTerm:ssn_fintech
+          relationship: contains
+    - id: assessoria_fintech
+      name: "Assessoria"
+      description: >-
+        Third-party advisory collection. External agency (e.g., Cyber, Recupera,
+        Paschoalotto) contracted to contact debtors and negotiate on behalf of
+        QuintoAndar. See advisory column in fact_overdue_portfolio_timeline.
+    - id: acordo_fintech
+      name: "Acordo"
+      description: >-
+        Negotiated payment plan, often in multiple installments. In fact_negotiation,
+        negotiation_classification = 'ACORDO' when total invoices negotiated >= 1 and
+        number_of_installments > 1.
+      related_terms:
+        - urn: urn:li:glossaryTerm:promessa_fintech
+          relationship: contains
+    - id: promessa_fintech
+      name: "Promessa"
+      description: >-
+        Promise to pay: the debtor agreed to the negotiation but has not yet paid the first
+        installment. negotiation_status = 'started' in fact_negotiation;
+        negotiation_classification = 'PROMESSA'. Becomes 'PROMESSA QUEBRADA' (canceled) if
+        the first installment is not paid by its due date.
+      related_terms:
+        - urn: urn:li:glossaryTerm:fpd_fintech
+          relationship: contains
+    - id: fpd_fintech
+      name: "FPD"
+      description: >-
+        First Payment Default. The first time a debtor misses a payment after entering a
+        negotiation. Tracked by delay_first_payment_default in fact_overdue_portfolio_timeline
+        and is_first_payment_default boolean.
+    - id: ssn_fintech
+      name: "SSN / BOSSN"
+      description: >-
+        Self-Service Negotiation. Digital flows where the debtor negotiates without a human
+        operator (portal or app). Identified by is_ssn = true in
+        fact_overdue_portfolio_timeline. BOSSN is the written-down variant of the SSN
+        payment flow.
+
+datasets:
+  # --- dw_collection_recovery_quintoandar ---
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_collection
+    description: >-
+      One row per collection occurrence (action on a contract/customer). Covers contacts
+      and results from Cyber and Recupera sources. sk_collection hashes customer, contract,
+      creditor, operator, action, and occurrence time. Use to measure contact KPIs:
+      total_alo, total_cpc, total_promisse, total_agreement.
+    fields:
+      sk_collection: >-
+        Surrogate key of the collection action. Unique hash generated from customer ID,
+        contract ID, creditor, operator ID, action, and occurrence date.
+      sk_debtor: "Customer document (CPF). Foreign key to dim_debtor table."
+      sk_contract: "Contract ID related to the collection action."
+      sk_operator: >-
+        ID of the operator who performed the collection occurrence. Foreign key to
+        dim_operator table.
+      operator_agency: "Registration code or agency associated with the operator."
+      source: "Source system from which collection data originated: 'Cyber' or 'Recupera'."
+      action: "Primary action performed during the collection attempt."
+      action_code_type: "Type code of the collection action (Cyber source only)."
+      action_description: >-
+        Descriptive text for the collection action (e.g., ACORDO PARCELADO, EM NEGOCIACAO).
+      result: "Result of the collection action (Cyber source only)."
+      result_code_type: "Type code of the collection result (Cyber source only)."
+      result_description: "Descriptive text for the collection result (Cyber source only)."
+      complement: "Complementary information for the collection action (Cyber source only)."
+      complement_code_type: "Type code of the complement information (Cyber source only)."
+      complement_description: >-
+        Descriptive text for the complement information (Cyber source only).
+      total_esforco: >-
+        Total number of dialer attempts made during collection for a specific occurrence.
+        Used to calculate the spin rate.
+      total_alo: >-
+        Total number of times a call was answered (by the correct person or not) at the
+        contact provided by the debtor.
+      total_cpc: >-
+        Total number of times the operator successfully contacted the correct person
+        (Correct Party Contact).
+      total_promisse: "Total number of times the debtor made a promise to pay the debt."
+      total_agreement: "Total number of times an agreement/negotiation was created."
+      total_failure: >-
+        Total number of times an error occurred during the collection attempt (e.g., call
+        failures). Occurrence IDs typically categorized as 'insucesso': CLNLOCAL, NATENDE,
+        OCUPADO, FAX, LIGAMUDA, QUEDALIG.
+      dt_occurrence: "Date when the collection occurrence happened."
+      year: "Year of the collection occurrence (partition column)."
+      month: "Month of the collection occurrence (partition column)."
+      day: "Day of the collection occurrence (partition column)."
+      ts_load: "Timestamp when this record was loaded or last updated."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_debt
+    description: >-
+      Invoice × contract grain in the recovery model, including negotiated invoices and
+      installments not yet due. One invoice can appear in multiple negotiations if promises
+      break; one negotiation can cover multiple invoices. Source systems: Trato Feito,
+      Cyber, Recupera, Retsuko (Seu Barriga).
+    fields:
+      sk_debt: >-
+        Surrogate key of the debt: concatenation of contract ID and invoice ID. Primary
+        key of this table.
+      id_contract: "Unique identifier for the contract associated with the debt."
+      id_invoice: "Seu Barriga (SeuBarriga) original invoice ID."
+      creditor: "Creditor for this debt (e.g., IQ QuintoAndar, PP QuintoAndar)."
+      payment_status: "Retsuko's payment status for the invoice."
+      invoice_status: >-
+        Current status of the invoice from Retsuko. Values: open, paid, written-down,
+        canceled, not-payable, divergent-payment.
+      sub_status: "Retsuko's current invoice sub-status. Values: debt, ongoing-negotiation, none."
+      due_amount: "Original due amount of the invoice."
+      interest_fee_amount: "Interest fee amount (juros) applied to the debt."
+      fine_fee_amount: "Fine fee amount (multa) applied to the debt."
+      discount_amount: "Total discount amount applied to the debt."
+      debt_amount: "Total debt amount: due_amount + interest_fee_amount + fine_fee_amount - discount_amount."
+      paid_amount: >-
+        Total amount paid for this invoice. Populated when original invoice is paid or
+        written-down with an associated negotiation.
+      source: "Primary source system for the debt: 'Trato Feito', 'Cyber', 'Recupera', 'Retsuko', or a combination."
+      dt_due: "Original due date of the invoice."
+      dt_paid: >-
+        Date when the invoice was paid. Populated for paid or written-down rows with an
+        associated negotiation.
+      ts_load: "Timestamp when this record was loaded or last updated."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_negotiation
+    description: >-
+      Negotiation header from Trato Feito / collections stack. One row per negotiation.
+      Tracks negotiation_status (started, offset, broken, finished, canceled),
+      negotiation_classification (ACORDO, QUITAÇÃO, SUBSTITUIÇÃO, PROMESSA, PROMESSA QUEBRADA),
+      amounts, discounts, and all key lifecycle dates.
+    fields:
+      sk_negotiation: "Negotiation surrogate key: concatenation of contract ID and negotiation ID."
+      sk_contract: "Contract surrogate key."
+      sk_debtor: "Debtor surrogate key identifying the unique debtor."
+      sk_operator: "Surrogate key for the operator responsible for the negotiation."
+      id_negotiation: "Unique identifier for the negotiation."
+      id_negotiation_trato_feito: "Trato-Feito negotiation ID."
+      creditor: "Creditor involved in the negotiation."
+      source: "Source system or origin of the negotiation data."
+      agreement_type: >-
+        Type of agreement establishing context: internal operator, advisory operator, or
+        outside advisory.
+      advisory: "Advisory code responsible for the negotiation."
+      origin_agreement: >-
+        Origin of the agreement: Assessoria, Carta_Campanha, Portal_Autonegociacao, or
+        Operador.
+      negotiation_status: >-
+        Current status from Trato Feito: started, offset, broken, finished, canceled,
+        ignored, invalid, failed, manual-action-required, broken-by-client.
+      negotiation_classification: >-
+        Classification based on status and invoice/installment counts: ACORDO (>=1 invoice,
+        >1 installment), QUITACAO (>1 invoice, 1 installment), SUBSTITUICAO (1 invoice, 1
+        installment), PROMESSA (started), PROMESSA QUEBRADA (canceled).
+      is_renegotiation: "Boolean: negotiation is a renegotiation of a previous broken deal."
+      has_been_renegotiated: "Boolean: negotiation has already been renegotiated after being broken."
+      delay_contamined_range: >-
+        Delay Contaminated Range at negotiation time, based on the difference between the
+        promise date and the anchor invoice due date.
+      total_invoices_negotiated: "Total original invoices included in the negotiation."
+      number_of_installments: "Total installments agreed upon."
+      paid_installments: "Number of installments successfully paid."
+      original_debt_amount: >-
+        Original total due amount from Seu Barriga for all invoices included.
+      negotiated_amount: "Final amount agreed after all discounts."
+      net_paid_amount: >-
+        Total net amount paid for the negotiation, considering payment method and
+        installment type.
+      paid_amount: "Total cumulative amount paid for all installments."
+      dt_promisse: "Date when the negotiation promise was made or negotiation created."
+      dt_due_promisse: "Due date of the first installment (promise to pay)."
+      dt_down_payment: "Date when the first installment (down payment) was paid."
+      dt_paid_all_installments: "Date when all installments were fully paid."
+      ts_load: "Timestamp when this record was loaded or last updated."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_negotiation_installment
+    description: >-
+      One row per installment of a negotiation. Links to sk_negotiation and id_invoice_extra
+      (Seu Barriga extra invoice). Tracks installment_status (pending, registered, paid,
+      expired, canceled), payment_method, amounts, and key dates (dt_due, dt_paid).
+    fields:
+      sk_negotiation_installment: "Surrogate key: concatenation of contract ID and negotiation installment ID."
+      sk_negotiation: "Surrogate key of the parent negotiation. Foreign key to fact_negotiation."
+      sk_contract: "Surrogate key for the contract. Links to dim_contract."
+      id_negotiation: "Unique identifier of the negotiation this installment belongs to."
+      id_installment: "Unique identifier for this negotiation installment."
+      id_invoice_extra: "ID of the extra invoice created in Seu Barriga as part of this installment."
+      installment_number: "Sequential number within its negotiation (1-based)."
+      installment_status: "Current status: expired, paid, pending, registered, canceled, failed, ignored."
+      payment_method: "Payment method: 'CARTAO DE CREDITO', 'BOLETO', or 'PIX'."
+      main_amount: "Principal amount of the debt for this installment."
+      debt_amount: "Total debt amount: main_amount + debts_fee_amount."
+      discount_amount: "Total discount applied to this installment."
+      net_amount: "Net amount after applying discount to the original amount."
+      amount_to_pay: "Final total amount due for this installment after all calculations."
+      paid_amount: "Actual amount paid for this installment."
+      dt_due: "Official due date for this installment."
+      dt_paid: "Date when this installment was paid."
+      ts_load: "Timestamp when this record was loaded or last updated."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: bridge_map_debt_negotiation
+    description: >-
+      Bridge table mapping sk_debt ↔ sk_negotiation when a negotiation exists. Source
+      indicates priority: Trato Feito > Cyber > Recupera. Use to join fact_debt to
+      fact_negotiation at invoice-level granularity.
+    fields:
+      sk_debt: >-
+        Surrogate key representing a unique debt (contract ID + invoice ID). Links to
+        fact_debt.
+      sk_negotiation: >-
+        Surrogate key representing a unique negotiation (contract ID + negotiation ID).
+        Links to fact_negotiation.
+      source: >-
+        Source of the debt-negotiation mapping: 'Trato Feito', 'Cyber', or 'Recupera'.
+        Indicates priority when multiple sources have data.
+      ts_load: "Timestamp when the record was loaded into this bridge table."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_overdue_portfolio_timeline
+    description: >-
+      Daily overdue invoice timeline: invoice × contract × dt_reference grain. Invoice
+      enters one day after due date and is replicated daily until paid or written down.
+      Key operational table for recovery metrics, queue routing
+      (segmentation_queue, agreement_queue, eviction_queue), and OKR buckets. Use
+      is_most_recent_record_month = true to deduplicate to one row per invoice per month.
+    fields:
+      sk_overdue_portfolio_timeline: >-
+        Surrogate key: concatenation of invoice ID, contract ID, and reference date
+        (formatted as yyyyMMdd).
+      sk_region: "Region ID associated with the contract."
+      sk_contract: "Contract ID."
+      sk_negotiation: >-
+        Surrogate key of the negotiation. Populated when payment_status is 'written-down'
+        and there is an associated negotiation.
+      sk_origin_negotiation: >-
+        Surrogate key for the original negotiation from which an extra invoice (installment)
+        originated. Populated only for 'extra' type invoices.
+      sk_agency: >-
+        Surrogate key for the agency. Reflects the agency from 'last valid partner' logic
+        when dt_reference >= dt_invoice_paid.
+      id_invoice: "Invoice ID."
+      id_proposal: "Proposal ID."
+      negotiation_installment_number: >-
+        Installment number of the negotiation. Populated only for 'extra' type invoices
+        that are part of a negotiation.
+      contract_status: "Contract status."
+      invoice_type: >-
+        Invoice type or frequency (e.g., monthly, extra, pos rental, onboarding, early
+        termination).
+      payment_status: "Payment status of the invoice on the reference date."
+      reason: "Reason for the current state or action related to the invoice."
+      paid_via: "Method by which the invoice was paid (e.g., Pix, Boleto, Credit Card)."
+      is_ssn: >-
+        Boolean: invoice was paid through Self Service Negotiation (SSN). Includes
+        app-action-event payments and BOSSN written-down payments.
+      recovery_channel: "Channel through which the debt recovery attempt was made."
+      debtor_type: >-
+        Debtor type: Flow (new to portfolio this month) or Stock (already in portfolio last
+        month).
+      delay_contamined_at_closure: >-
+        Delay in days at closure, used to derive delay_contract_range and
+        delay_contamined_range.
+      delay_contamined_range: >-
+        Delay range based on the contract's overall overdue status (not just individual
+        invoices). Used for OKR buckets.
+      delay_contract_range: >-
+        Same delay range as delay_contamined_range. Used for PDD (Provision for Doubtful
+        Debts) calculations.
+      delay_invoice_at_reference: "Delay in days of the specific invoice at the given reference date."
+      delay_first_payment_default: "Delay in days since the first payment default occurred for the contract."
+      contract_overdue_invoices: "Total number of overdue invoices for the contract on the reference date."
+      due_amount: "Original due amount of the invoice."
+      paid_amount: "Amount that has been paid for the invoice."
+      recovered_amount: >-
+        Gross amount recovered between the start of the reference month and the reference
+        date.
+      net_recovered_amount: >-
+        Net amount recovered. Accounts for the negotiation net rate if the invoice was
+        written down and part of a negotiation.
+      contract_debt: "Total outstanding debt for the contract on the reference date."
+      business_day: "Count of working days accumulated up to the reference date."
+      is_last_business_days: >-
+        Boolean: most recent record among those with the same business day, invoice, and
+        month. Used for deduplication per business day.
+      is_write_off: "Boolean: invoice has been written off."
+      is_contract_write_off: "Boolean: entire contract has been written off."
+      is_first_payment_default: "Boolean: invoice represents the first payment default for the contract."
+      has_app_action_event: >-
+        Boolean: app action event (e.g., opening app, viewing invoice page) occurred within
+        5 days before the invoice payment date.
+      advisory: >-
+        Name of the advisory firm responsible for the contract on the reference date.
+        Fallback logic based on Cyber agencies and Recupera partners.
+      segmentation_queue: >-
+        ID of the segmentation queue the contract belonged to on the reference date.
+        Reflects 'last valid partner' logic when dt_reference >= dt_invoice_paid.
+      segmentation_queue_description: "Description of the segmentation queue."
+      agreement_queue: "ID of the agreement queue the contract belonged to on the reference date."
+      agreement_queue_description: "Description of the agreement queue."
+      eviction_queue: "ID of the eviction queue the contract belonged to on the reference date."
+      eviction_queue_description: "Description of the eviction queue."
+      is_most_recent_record_month: >-
+        Boolean: invoice record is the most recent (last dt_reference) within its contract,
+        invoice, and month combination. IMPORTANT: filter on is_most_recent_record_month =
+        true for month-end dashboard cuts to get one row per invoice per month.
+      dt_invoice_paid: "Date when the invoice was paid."
+      dt_invoice_due: "Original due date of the invoice."
+      dt_invoice_due_adjust: "Invoice due date adjusted to the next business day, if applicable."
+      dt_write_off: "Date when the invoice was written off as unrecoverable."
+      dt_month_start: "First day of the month corresponding to dt_reference."
+      dt_month_end: "Last day of the month corresponding to dt_reference."
+      dt_reference: "Daily reference date for the overdue portfolio snapshot."
+      ts_load: "Timestamp when the record was loaded into this table."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_overdue_portfolio_timeline_incremental
+    description: >-
+      Incremental variant of fact_overdue_portfolio_timeline. Same grain and semantics;
+      partitioned by year, month, day for efficient partition-scoped queries. Prefer this
+      table when filtering to a specific date range.
+
+  - schema: dw_collection_recovery_quintoandar
+    table: fact_renegotiations
+    description: >-
+      Anchor invoice per renegotiation hierarchy. Tracks renegotiation_level (depth from
+      anchor), parent/child negotiation keys, and the adjusted anchor due date. Use to
+      trace the full renegotiation chain for a contract.
+    fields:
+      sk_contract: "Surrogate key of the contract in the renegotiation hierarchy."
+      sk_invoice: "Surrogate key of the invoice being evaluated."
+      sk_anchor_invoice: >-
+        Anchor invoice: oldest or latest due date among root invoices in the renegotiation
+        hierarchy.
+      renegotiation_level: >-
+        Depth of renegotiation. Level 0 = no parent; Level N = N steps from the anchor
+        invoice.
+      sk_negotiation_parent: "Surrogate key of the negotiation that originated this invoice."
+      sk_negotiation_child: >-
+        Surrogate key of the negotiation that generated a new invoice from a previous one.
+      dt_due_adjusted_anchor: >-
+        Adjusted due date of the anchor invoice. Tracks the start of the renegotiation
+        chain.
+
+  - schema: dw_collection_recovery_quintoandar
+    table: dim_agency
+    description: >-
+      Dimension table: Cyber agency groups. Contains sk_agency, sk_main_agency,
+      main_agency_name, main_agency_type, and the sorted agencies_name_group array. Join
+      to fact_collection or fact_overdue_portfolio_timeline via sk_agency.
+    fields:
+      sk_agency: "Surrogate key for the agency, derived from id_agency."
+      sk_main_agency: "Surrogate key for the main agency within the group."
+      id_agencies_group: "Identifier for the group: sorted array of all agency IDs in the group."
+      main_agency_name: "Name of the main agency within the group."
+      main_agency_type: "Type classification of the main agency."
+      agencies_name_group: "Sorted array of names of all agencies in this group."
+      ts_start: "Start timestamp of the main agency as recorded in the source system."
+      ts_load: "Timestamp when the record was loaded into this dimension table."
+
+  - schema: dw_collection_recovery_quintoandar
+    table: dim_operator
+    description: >-
+      Dimension table: normalized operators across Recupera, Cyber, Paschoalotto, Webhelp,
+      Bulgarelli, and MeetCall. Provides user_name, user_email, user_type, agency_name,
+      and company_name. Join via sk_operator.
+    fields:
+      sk_operator: "Surrogate key for the operator, derived from id_operator."
+      id_agency: "Agency identifier associated with the operator."
+      user_name: "Full name of the operator (uppercase)."
+      user_email: "Email address of the operator (lowercase)."
+      user_type: "Operator type: internal or external."
+      user_department: "Department (typically 'Assessoria' for external operators)."
+      agency_type: "Agency type (typically 'Assessoria Convencional' for external)."
+      agency_name: "Standardized agency name (e.g., PASCHOALOTTO, WEBHELP)."
+      company_name: "Standardized company name: PASCHOALOTTO, PORTAL_QUINTOANDAR, SYSOPEN, MEETCALL."
+      source: "Origin of the operator record: Recupera, Paschoalotto, Webhelp, Cyber, Bulgarelli, or MeetCall."
+      ts_user_created: "Timestamp when the operator record was created in the source system."
+      ts_load: "Timestamp when the record was loaded into the data warehouse."
+
+  # --- dw_collections_landlord ---
+  - schema: dw_collections_landlord
+    table: fact_invoice_landlord_portfolio
+    description: >-
+      Landlord invoice spine from Retsuko (invoice_user = landlord). Contains tipo_fat
+      (original vs deal), bill-item decomposition (has_bi_* flags and balance_* amounts),
+      lifecycle dates, and payment/status fields. Source for landlord-side overdue
+      analytics.
+
+  - schema: dw_collections_landlord
+    table: fact_landlord_deal_installment_match
+    description: >-
+      Maps original landlord invoices (id_invoice_original) to deal installment invoices
+      (id_invoice_deal). Includes deal status, amounts, dates, and rn_deal_order for
+      ordering multiple deals.
+
+  - schema: dw_collections_landlord
+    table: fact_overdue_portfolio_timeline
+    description: >-
+      Landlord daily overdue timeline. Extends fact_invoice_landlord_portfolio with delay
+      flags (flag_delay_t1, delay_t2), invoice_status_timeline, recovered_amount,
+      delay_range_contract_t2, and max_delay_t2_contract_level.
+
+  # --- dw_collections_segmentation ---
+  - schema: dw_collections_segmentation
+    table: fact_invoice_wallet_timeline
+    description: >-
+      Daily invoice grain wallet timeline. Tracks T1/T2/T3 delay methodologies
+      (is_invoice_overdue_t1/t2/t3, invoice_delay_t1/t2/t3), bill-item presence and
+      balances (condomínio, multa rescisória, acordo, reparos), and wallet ordering fields.
+      T1 = baseline, T2 = with deal contamination, T3 = contract-level contamination for
+      losses views.
+
+  - schema: dw_collections_segmentation
+    table: fact_contract_wallet_timeline
+    description: >-
+      Daily contract grain wallet rollup. Aggregates invoice wallet data: max delays by
+      T1/T2/T3, overdue invoice counts, open wallet and wallet amounts, CPC/ALO from
+      fact_collection, promise and agreement counters, eviction flags, bill-cluster
+      balances, and FPD / negativable flags.
+
+  - schema: dw_collections_segmentation
+    table: fact_contract_features_timeline
+    description: >-
+      Stable monthly contract segmentation features for ML and operations. Adds accumulated
+      (acc_*) and rolling (L12M, L90, L180) features to the wallet timeline, plus frozen
+      prob_payment, tree_class, segmentation, macro_segmentation, and delay buckets
+      (t1_delay_bucket, t2_delay_bucket).
+
+  # --- dw_evictions ---
+  - schema: dw_evictions
+    table: fact_evictions
+    description: >-
+      Cyber Legal eviction case fact. Case-level grain with stages, costs, lead times
+      (ldt_* SLAs in business days), extensive stage start/end dates, financial totals, and
+      flags (is_reincident, is_reopened). Includes contract_category_at_registration and
+      overdue_days_at_registration for context at time of filing.
+
+  - schema: dw_evictions
+    table: fact_action
+    description: >-
+      Juridical log actions per eviction case. One row per logged action with sk_case,
+      contract, action/result/complement codes and descriptions, and ts_activity.
+
+  - schema: dw_evictions
+    table: fact_alerts
+    description: >-
+      Cyber legal alerts. Links sk_alert to sk_case with alert type, review, task, aging,
+      and dates. Use for operational follow-up on case milestones.
+
+  - schema: dw_evictions
+    table: fact_expenses
+    description: >-
+      Custas / expenses by eviction case and stage. Tracks amounts,
+      authorization/reimbursement flags, attorney ids, and expense dates.
+
+  # --- dw_losses (linked to Collections Recovery Data Product for AR golden query) ---
+  - schema: dw_losses
+    table: fact_accounts_receivable
+    description: >-
+      Formal accounts receivable in the losses / PDD universe (monthly grain). Union with
+      fact_overdue_portfolio_timeline for full AR recovery metrics; see the Collections
+      Recovery golden query.
+
+  - schema: dw_losses
+    table: fact_delay
+    description: >-
+      Contract-level delay snapshot in dw_losses. Join to the overdue timeline for delay
+      buckets and dt_closing in AR consolidation SQL.
+
+documentation_link:
+  label: "Business entity documentation (collections.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/collections.md
