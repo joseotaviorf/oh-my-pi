@@ -1,7 +1,0 @@
-dag:
-  name: dw_sale_flow
-  owner: Data ForSale
-workflow:
-  type: query_delta
-  layer: dw
-  custom_schema: sale
