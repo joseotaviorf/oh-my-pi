@@ -19,19 +19,19 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_first_region_booking:
-    description: Booking first region ID.
+    description: QuintoAndar region identifier of the property linked to the user's earliest visit booking in Casa Mineira.
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_last_region_booking:
-    description: Booking last region ID.
+    description: QuintoAndar region identifier of the property linked to the user's most recent visit booking in Casa Mineira.
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_first_region_offer:
-    description: Offer first region ID.
+    description: QuintoAndar region identifier of the property associated with the user's first submitted offer.
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_last_region_offer:
-    description: Offer last region ID.
+    description: QuintoAndar region identifier of the property associated with the user's most recent submitted offer.
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_first_house_5a_secretariat_contact:
@@ -51,27 +51,27 @@ columns:
     lineage:
       - datalake_casa_mineira_crm_clean.house.id
   id_first_house_5a_booking:
-    description: 5A house ID for this user first booking
+    description: QuintoAndar house identifier for the listing where the user scheduled their first visit booking.
     lineage:
       - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
   id_first_house_cm_booking:
-    description: Casa Mineira house ID for this user first booking
+    description: Casa Mineira house identifier for the listing where the user scheduled their first visit booking.
     lineage:
       - datalake_casa_mineira_crm_clean.house.id
   id_last_house_5a_booking:
-    description: 5A house ID for this user last booking
+    description: QuintoAndar house identifier for the listing where the user scheduled their most recent visit booking.
     lineage:
       - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
   id_last_house_cm_booking:
-    description: Casa Mineira house ID for this user last booking
+    description: Casa Mineira house identifier for the listing where the user scheduled their most recent visit booking.
     lineage:
       - datalake_casa_mineira_crm_clean.house.id
   id_first_house_cm_offer:
-    description: Casa Mineira house ID for this user first offer
+    description: Casa Mineira house identifier for the listing where the user submitted their first purchase offer.
     lineage:
       - datalake_casa_mineira_crm_clean.house.id
   id_last_house_cm_offer:
-    description: Casa Mineira house ID for this user last offer
+    description: Casa Mineira house identifier for the listing where the user submitted their most recent purchase offer.
     lineage:
       - datalake_casa_mineira_crm_clean.house.id
   id_first_house_cm_sale_agreement:
@@ -83,7 +83,7 @@ columns:
     lineage:
       - datalake_casa_mineira_crm_clean.house.id
   list_emails:
-    description: User list of emails.
+    description: Aggregated list of email addresses registered for the user across Casa Mineira CRM client and contact records.
     lineage:
       - datalake_casa_mineira_crm_clean.client.email
       - datalake_casa_mineira_crm_clean.contact.email
@@ -110,27 +110,27 @@ columns:
     lineage:
       - datalake_casa_mineira_crm_clean.city.city_name
   first_secretariat_contact_origin:
-    description: Origin first secretariat contact
+    description: Lead acquisition channel recorded for the user's first secretariat contact in Casa Mineira CRM.
     lineage:
       - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
   last_secretariat_contact_origin:
-    description: Origin last secretariat contact
+    description: Lead acquisition channel recorded for the user's most recent secretariat contact in Casa Mineira CRM.
     lineage:
       - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
   first_secretariat_contact_media:
-    description: Media first secretariat contact
+    description: Marketing or communication medium recorded for the user's first secretariat contact in Casa Mineira CRM.
     lineage:
       - datalake_casa_mineira_crm_clean.media_contact
   last_secretariat_contact_media:
-    description: Media last secretariat contact
+    description: Marketing or communication medium recorded for the user's most recent secretariat contact in Casa Mineira CRM.
     lineage:
       - datalake_casa_mineira_crm_clean.media_contact
   first_city_booking:
-    description: First booking city name
+    description: City name of the property where the user scheduled their first visit booking in Casa Mineira.
     lineage:
       - datalake_casa_mineira_crm_clean.city.city_name
   last_city_booking:
-    description: Last booking city name
+    description: City name of the property where the user scheduled their most recent visit booking in Casa Mineira.
     lineage:
       - datalake_casa_mineira_crm_clean.city.city_name
   first_offer_flow:

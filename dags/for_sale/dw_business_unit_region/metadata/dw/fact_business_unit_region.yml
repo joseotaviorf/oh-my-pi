@@ -19,7 +19,7 @@ columns:
   business_model:
     lineage:
     - datalake_sale_visit_hubs.business_unit_region_history.business_model
-    description: BU business model.
+    description: Secretariat (SDR) work type or commercial model applied by the business unit while covering the region.
   business_unit:
     lineage:
     - datalake_sale_visit_hubs.business_unit_region_history.hub_name
