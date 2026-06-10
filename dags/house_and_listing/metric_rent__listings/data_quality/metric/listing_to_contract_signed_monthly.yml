@@ -1,6 +1,0 @@
----
-table_name: metric_rent.listing_to_contract_signed_monthly
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  month:
-    is_complete:

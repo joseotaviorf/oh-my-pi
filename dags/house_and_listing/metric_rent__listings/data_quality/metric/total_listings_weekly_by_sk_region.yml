@@ -1,8 +1,0 @@
----
-table_name: metric_rent.total_listings_weekly_by_sk_region
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  week:
-    is_complete:
-  sk_region:
-    is_complete:

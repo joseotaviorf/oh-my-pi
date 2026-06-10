@@ -1,6 +1,0 @@
----
-table_name: metric_rent.listing_to_rental_8w
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  dt_week_started:
-    is_unique:

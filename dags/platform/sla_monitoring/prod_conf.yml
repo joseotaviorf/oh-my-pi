@@ -455,7 +455,6 @@ expected_times_to_finish:
   bietlejuice.metric_rent__contracts: 08:49
   bietlejuice.metric_rent__demand_events: 09:38
   bietlejuice.metric_rent__demand_targets: 05:15
-  bietlejuice.metric_rent__listings: 08:10
   bietlejuice.metric_rent__nps: 09:27
 
   bietlejuice.metric_rent__tickets: 08:59

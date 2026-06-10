@@ -1,8 +1,0 @@
----
-table_name: metric_rent.listing_to_contract_signed_monthly_by_sk_region
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  publication_month:
-    is_complete:
-  sk_region:
-    is_complete:

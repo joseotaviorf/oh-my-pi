@@ -4422,13 +4422,6 @@ bietlejuice.metric_rent__demand_targets:
 bietlejuice.metric_rent__gross_profit:
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day
-bietlejuice.metric_rent__listings:
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
-  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
-  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows:first-run-of-day
 bietlejuice.metric_rent__nps:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign:first-run-of-day

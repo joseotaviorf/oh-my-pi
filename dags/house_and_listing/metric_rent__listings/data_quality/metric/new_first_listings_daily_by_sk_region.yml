@@ -1,8 +1,0 @@
----
-table_name: metric_rent.new_first_listings_daily_by_sk_region
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  first_listing_date:
-    is_complete:
-  sk_region:
-    is_complete:
