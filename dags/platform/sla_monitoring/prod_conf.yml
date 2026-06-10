@@ -70,7 +70,6 @@ expected_times_to_finish:
   bietlejuice.dw_customer_support: 08:34
   bietlejuice.dw_data_quality: "10:38"
   bietlejuice.dw_datamarts_cross: 08:53
-  bietlejuice.dw_datamarts_for_rent_cross: 09:53
   bietlejuice.dw_datamarts_for_sale: 08:35
   bietlejuice.dw_datamarts_for_sale_cross: 09:17
   bietlejuice.dw_datamarts_growth_cross: "11:12"

@@ -49,7 +49,6 @@ metadata_files_out_of_pattern:
   - growth/dw_datamarts_growth_cross/metadata/dw/performance_marketing_cluster_promotional_bonus_costs.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/performance_marketing_metrics_demand.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/plaquinhas_users_metrics_demand.yml
-  - growth/dw_datamarts_growth_cross/metadata/dw/pricing_rent_categorization.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/rent_flow_interactions.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/rental_cohort_conversions.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/rental_marketplace_flows.yml
