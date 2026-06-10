@@ -1,6 +1,6 @@
 database_name: enrich_ai_collections_quintoandar
 table_name: sessions
-description: Universe of chatbot sessions that could contain Matthew (collections AI agent) interactions, with the AI agent source derived from Langfuse observation flags and trace presence.
+description: Universe of chatbot sessions that could contain Matthew (collections AI agent) interactions, with the AI agent source derived from Langfuse observation flags and trace presence. One row per SSS session (id_sss_session), falling back to id_session when SSS id is absent.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_chatbot.sessions.id_sauron_session
     description: "Sauron session ID associated with the chatbot session."
+  id_sss_session:
+    lineage:
+      - datalake_chatbot.sessions.id_sss_session
+    description: "Support Session Service (SSS) public_id propagated from chatbot sessions. Primary deduplication key for this table; falls back to id_session when absent."
   id_external:
     lineage:
       - datalake_chatbot.sessions.id_langfuse_session

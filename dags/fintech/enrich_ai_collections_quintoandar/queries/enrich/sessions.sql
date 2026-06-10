@@ -48,6 +48,7 @@ score_matthew AS (
 SELECT
     m.id_session,
     m.id_sauron_session,
+    m.id_sss_session,
     m.id_langfuse_session AS id_external,
     m.id_ticket,
     IF(m.id_user = '', NULL, m.id_user) AS id_user,
@@ -120,6 +121,6 @@ WHERE
     AND m.ts_updated >= '{load_start_date}'
 QUALIFY
     ROW_NUMBER() OVER (
-        PARTITION BY COALESCE(CAST(m.id_sauron_session AS STRING), CONCAT('id:', CAST(m.id_session AS STRING)))
+        PARTITION BY COALESCE(CAST(m.id_sss_session AS STRING), CONCAT('id:', CAST(m.id_session AS STRING)))
         ORDER BY m.ts_updated DESC NULLS LAST, m.id_session DESC NULLS LAST
     ) = 1

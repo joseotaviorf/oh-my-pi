@@ -16,14 +16,14 @@ workflow:
   default_partitions: [year, month, day]
   tables_customization:
     sessions:
-      merge_on: [id_sauron_session]
-      z_order_by: [ts_updated, id_sauron_session]
+      merge_on: [id_external]
+      z_order_by: [ts_updated, id_external]
     observation:
       merge_on: [id_langfuse_session]
       z_order_by: [id_langfuse_session]
     messages:
-      merge_on: [id_sauron_session]
-      z_order_by: [id_sauron_session]
+      merge_on: [id_external]
+      z_order_by: [id_external]
     mcp_tool_logs:
       merge_on: [id_request, id_trace, call_index]
       partitions: [year, month, day]
@@ -39,4 +39,3 @@ workflow:
       - sessions
     matthew_mcp_observations:
       - mcp_tool_logs
-
