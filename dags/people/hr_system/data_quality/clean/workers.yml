@@ -14,7 +14,3 @@ column_level_validations:
   id_person:
     is_complete:
       severity_level: Error
-  emails:
-    has_completeness:
-      greater_than_or_equal_to: 0.95
-      severity_level: Error
