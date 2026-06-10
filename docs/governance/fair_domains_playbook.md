@@ -4,14 +4,14 @@ How **domains and product lines** **audit** and **fix** metadata in bi-etl-ejuic
 
 ## One rule
 
-**FAIR audit or remediation → start with `@tars`.** Same thread: after the first `@tars` message you can say `pode executar` without repeating it.
+**FAIR audit or remediation → start with `@tars`.** Same thread: after the first `@tars` message you can say `go ahead` without repeating it.
 
 ## Three flows
 
 | Goal | What to do | Cursor mode |
 |------|------------|-------------|
-| **Audit** by domain or owner | `@tars Audite FAIR do domain {folder}` (e.g. `for_rent`, `governance`) — escopo padrão: pasta `dags/{folder}/`; campo YAML: ver tabela em `fair-metadata/reference/domain_disambiguation.md` | Agent or Ask |
-| **Fix** after reviewing the plan | `pode executar` (same thread, after plan posted) | **Agent** |
+| **Audit** by domain or owner | `@tars Audit FAIR for domain {folder}` (e.g. `for_rent`, `governance`) — default scope: folder `dags/{folder}/`; YAML `domain:` field: see mapping table in `fair-metadata/reference/domain_disambiguation.md` | Agent or Ask |
+| **Fix** after reviewing the plan | `go ahead` (same thread, after plan posted) | **Agent** |
 | **New table** in your PR | `create-metadata-files` + validators below | Any |
 
 Skill: `.cursor/skills/fair-metadata/SKILL.md`
@@ -39,7 +39,7 @@ Perfect metadata in a PR can still show tier &lt; 2 in the lake if Platform-owne
 
 ## Owner ACTIVE — important
 
-**CI verde ≠ owner ACTIVE.** Woodpecker does not call `org_chart`. Before merge, verify with `@tars` + `fair-metadata/sql/check_owner_active.sql`.
+**Green CI ≠ ACTIVE owner.** Woodpecker does not call `org_chart`. Before merge, verify with `@tars` + `fair-metadata/sql/check_owner_active.sql`.
 
 ## CI failed on one file?
 
