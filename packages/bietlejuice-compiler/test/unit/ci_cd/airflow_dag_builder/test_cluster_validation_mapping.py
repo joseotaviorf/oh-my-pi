@@ -261,6 +261,27 @@ class TestComputeValidationOverrides:
         )
         assert overrides["aws_attributes"] == {"ebs_volume_size": 200}
 
+    def test_photon_prod_emits_photon_without_normalization(self):
+        overrides = compute_validation_overrides(
+            effective_prod={"runtime_engine": "PHOTON"},
+            mapped_worker="m6g.xlarge",
+            mapped_driver=None,
+            validation_resolved={"node_type_id": "m6g.xlarge"},
+        )
+        assert overrides.get("runtime_engine") == "PHOTON"
+
+    def test_disable_photon_drops_runtime_engine_from_validation(self):
+        overrides = compute_validation_overrides(
+            effective_prod={"runtime_engine": "PHOTON"},
+            mapped_worker="m6g.xlarge",
+            mapped_driver=None,
+            validation_resolved={"node_type_id": "m6g.xlarge"},
+            recommended_runtime_engine="STANDARD",
+        )
+        # Normalizing Photon off must not carry PHOTON into the validation run;
+        # the recommended preset already defaults to STANDARD.
+        assert "runtime_engine" not in overrides
+
     def test_omits_aws_attributes_when_prod_matches_preset(self):
         overrides = compute_validation_overrides(
             effective_prod={

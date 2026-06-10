@@ -315,17 +315,18 @@
 <div class="wrap">
   <header>
     <h1>Cluster Spec Recommender — Decision Tree</h1>
-    <p>Single-node-first cluster right-sizing for <code>bi-etl-ejuice</code> DAGs. Source of truth: <code>scripts/recommend_cluster_specs.py</code> (<code>classify()</code>).</p>
-    <p>A multi-node cluster is a cost smell unless measured demand proves it needs multiple machines.</p>
+    <p>Bidirectional, cost-truthful cluster right-sizing for <code>bi-etl-ejuice</code> DAGs. Source of truth: <code>scripts/recommend_cluster_specs.py</code> (<code>classify()</code> / <code>_decide_multi()</code>).</p>
+    <p>For each DAG it builds the feasible candidate shapes, prices them under one model (on-demand driver + spot workers + fleet DBU, Photon &amp; NVMe normalized off), and keeps the cheapest that beats observed cost within SLA. The cohort is the reason for the pick.</p>
   </header>
 
   <div class="legend">
     <div class="item"><span class="swatch" style="background:var(--guard)"></span> Guard / test condition</div>
-    <div class="item"><span class="swatch" style="background:var(--action)"></span> Actionable cohort (emits validation config)</div>
+    <div class="item"><span class="swatch" style="background:var(--action)"></span> Actionable cohort (shape change or normalization-only)</div>
     <div class="item"><span class="swatch" style="background:var(--review)"></span> Review cohort (needs data / stability first)</div>
-    <div class="item"><span class="swatch" style="background:var(--noop)"></span> No-op (already healthy)</div>
-    <div class="item"><span class="swatch" style="background:var(--single)"></span> Single-node branch</div>
-    <div class="item"><span class="swatch" style="background:var(--multi)"></span> Multi-node branch</div>
+    <div class="item"><span class="swatch" style="background:var(--noop)"></span> No shape change (healthy_single, keep_multi_*)</div>
+    <div class="item"><span class="swatch" style="background:var(--single)"></span> Single-node branch (worker_count = 0)</div>
+    <div class="item"><span class="swatch" style="background:var(--multi)"></span> Multi-node branch (worker_count ≥ 1)</div>
+    <div class="item"><span class="swatch" style="background:var(--noop)"></span> keep_multi_* may still emit validation YAML with observed shape + keep_multi_node</div>
   </div>
 
   <!-- PLAIN-LANGUAGE GRAPH -->
@@ -334,160 +335,146 @@
     <p class="glance-intro">
       For each DAG the tool looks at the <strong>cluster that actually ran the job</strong> (driver + worker
       instance types, worker count) and the <strong>utilization it observed</strong> over recent runs
-      (CPU and memory, plus wall-clock time against the schedule). The guiding bias is
-      <strong>single-node-first</strong>: a multi-node Spark cluster is treated as a cost smell unless the
-      measured demand proves it genuinely needs more than one machine. Follow the arrows — each box is a
-      question about the workload, and the coloured boxes are the resulting recommendation.
+      (CPU and memory, plus wall-clock time against the schedule). It is <strong>bidirectional</strong>: it
+      builds the candidate shapes (collapse to one node, or a smaller multi-node with a small on-demand
+      driver + spot workers), <strong>prices them under one model</strong>, and keeps the cheapest that beats
+      today's cost without missing the SLA. Neither single-node nor multi-node is privileged. Follow the
+      arrows — each box is a question about the workload, and the coloured boxes are the resulting recommendation.
     </p>
 
-    <div class="flow-fig" role="img" aria-label="Flowchart of the cluster right-sizing decision process">
-      <svg viewBox="0 0 1300 1140" xmlns="http://www.w3.org/2000/svg">
+    <div class="flow-fig" role="img" aria-label="Flowchart of the bidirectional cluster right-sizing decision process">
+      <svg viewBox="0 0 1320 1260" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L7,3 L0,6 Z" fill="#5b6675"/>
           </marker>
         </defs>
 
-        <!-- ===== EDGES (drawn first, under the nodes) ===== -->
-        <!-- start -> D1 -->
-        <line class="edge" x1="650" y1="76" x2="650" y2="96" marker-end="url(#arrow)"/>
-        <!-- D1 down (trustworthy) -> D2 -->
-        <line class="edge" x1="650" y1="202" x2="650" y2="236" marker-end="url(#arrow)"/>
-        <!-- D1 right (not trustworthy) -> review -->
-        <line class="edge" x1="830" y1="150" x2="1038" y2="150" marker-end="url(#arrow)"/>
-        <!-- D2 left (single) -->
-        <path class="edge" d="M470,290 L160,290 L160,362" marker-end="url(#arrow)"/>
-        <!-- D2 right (multi) -->
-        <path class="edge" d="M830,290 L1000,290 L1000,360" marker-end="url(#arrow)"/>
+        <!-- ===== EDGES ===== -->
+        <line class="edge" x1="660" y1="68" x2="660" y2="88" marker-end="url(#arrow)"/>
+        <line class="edge" x1="660" y1="194" x2="660" y2="218" marker-end="url(#arrow)"/>
+        <line class="edge" x1="840" y1="142" x2="1048" y2="142" marker-end="url(#arrow)"/>
+        <path class="edge" d="M480,268 L200,268 L200,318" marker-end="url(#arrow)"/>
+        <path class="edge" d="M840,268 L920,268 L920,318" marker-end="url(#arrow)"/>
 
-        <!-- single column -->
-        <line class="edge" x1="280" y1="408" x2="298" y2="408" marker-end="url(#arrow)"/>
-        <line class="edge" x1="160" y1="452" x2="160" y2="510" marker-end="url(#arrow)"/>
-        <line class="edge" x1="280" y1="556" x2="298" y2="556" marker-end="url(#arrow)"/>
-        <line class="edge" x1="160" y1="600" x2="160" y2="630" marker-end="url(#arrow)"/>
+        <!-- single branch -->
+        <line class="edge" x1="200" y1="378" x2="200" y2="398" marker-end="url(#arrow)"/>
+        <line class="edge" x1="310" y1="352" x2="328" y2="352" marker-end="url(#arrow)"/>
+        <line class="edge" x1="200" y1="458" x2="200" y2="478" marker-end="url(#arrow)"/>
+        <line class="edge" x1="310" y1="432" x2="328" y2="432" marker-end="url(#arrow)"/>
+        <line class="edge" x1="200" y1="538" x2="200" y2="558" marker-end="url(#arrow)"/>
 
-        <!-- multi column -->
-        <line class="edge" x1="850" y1="408" x2="832" y2="408" marker-end="url(#arrow)"/>
-        <line class="edge" x1="1000" y1="454" x2="1000" y2="500" marker-end="url(#arrow)"/>
-        <line class="edge" x1="850" y1="548" x2="832" y2="548" marker-end="url(#arrow)"/>
-        <line class="edge" x1="1000" y1="594" x2="1000" y2="640" marker-end="url(#arrow)"/>
-        <line class="edge" x1="850" y1="688" x2="832" y2="688" marker-end="url(#arrow)"/>
-        <line class="edge" x1="1000" y1="734" x2="1000" y2="780" marker-end="url(#arrow)"/>
-        <line class="edge" x1="850" y1="828" x2="832" y2="828" marker-end="url(#arrow)"/>
-        <line class="edge" x1="1000" y1="874" x2="1000" y2="900" marker-end="url(#arrow)"/>
+        <!-- multi branch: entry -> candidates -> filter -> price -> pick -->
+        <line class="edge" x1="920" y1="378" x2="920" y2="408" marker-end="url(#arrow)"/>
+        <line class="edge" x1="760" y1="448" x2="760" y2="478" marker-end="url(#arrow)"/>
+        <line class="edge" x1="1080" y1="448" x2="1080" y2="478" marker-end="url(#arrow)"/>
+        <path class="edge" d="M760,538 L760,558 L920,558 L920,578" marker-end="url(#arrow)"/>
+        <path class="edge" d="M1080,538 L1080,558 L920,558" marker-end="url(#arrow)"/>
+        <line class="edge" x1="920" y1="638" x2="920" y2="658" marker-end="url(#arrow)"/>
+        <line class="edge" x1="920" y1="718" x2="920" y2="738" marker-end="url(#arrow)"/>
+        <path class="edge" d="M800,818 L470,818 L470,838" marker-end="url(#arrow)"/>
+        <path class="edge" d="M920,818 L920,838" marker-end="url(#arrow)"/>
+        <path class="edge" d="M1040,818 L1160,818 L1160,838" marker-end="url(#arrow)"/>
+        <path class="edge" d="M200,598 L200,900 L660,900 L660,920" marker-end="url(#arrow)"/>
+        <path class="edge" d="M470,898 L660,920" marker-end="url(#arrow)"/>
+        <path class="edge" d="M920,898 L660,920" marker-end="url(#arrow)"/>
+        <path class="edge" d="M1160,898 L1160,910 L660,910 L660,920" marker-end="url(#arrow)"/>
 
-        <!-- keep-multi + collapse -> follow-up note -->
-        <path class="edge dash" d="M715,862 L715,994" marker-end="url(#arrow)"/>
-        <path class="edge dash" d="M1000,962 L1000,994" marker-end="url(#arrow)"/>
-
-        <!-- ===== EDGE LABELS ===== -->
-        <text class="elabel" x="662" y="222">yes</text>
-        <text class="elabel" x="934" y="142" text-anchor="middle">not trustworthy</text>
-        <text class="elabel" x="320" y="282" text-anchor="middle">yes · single-node</text>
-        <text class="elabel" x="915" y="282" text-anchor="middle">no · multi-node</text>
-
-        <text class="elabel" x="292" y="402" text-anchor="middle">yes</text>
-        <text class="elabel" x="172" y="486">no</text>
-        <text class="elabel" x="292" y="550" text-anchor="middle">yes</text>
-        <text class="elabel" x="172" y="628">no</text>
-
-        <text class="elabel" x="843" y="400" text-anchor="end">no</text>
-        <text class="elabel" x="1012" y="482">yes</text>
-        <text class="elabel" x="843" y="540" text-anchor="end">no</text>
-        <text class="elabel" x="1012" y="622">yes</text>
-        <text class="elabel" x="843" y="680" text-anchor="end">yes</text>
-        <text class="elabel" x="1012" y="762">no</text>
-        <text class="elabel" x="843" y="820" text-anchor="end">yes</text>
-        <text class="elabel" x="1012" y="892">no</text>
+        <!-- edge labels -->
+        <text class="elabel" x="672" y="210">pass</text>
+        <text class="elabel" x="944" y="134" text-anchor="middle">fail</text>
+        <text class="elabel" x="340" y="260" text-anchor="middle">yes · single</text>
+        <text class="elabel" x="880" y="260" text-anchor="middle">no · multi</text>
+        <text class="elabel" x="318" y="346" text-anchor="middle">yes</text>
+        <text class="elabel" x="212" y="420">no</text>
+        <text class="elabel" x="318" y="426" text-anchor="middle">yes</text>
+        <text class="elabel" x="212" y="500">no</text>
+        <text class="elabel" x="800" y="832">A wins</text>
+        <text class="elabel" x="920" y="832">B wins</text>
+        <text class="elabel" x="1080" y="832">none</text>
 
         <!-- ===== DIAMONDS ===== -->
-        <polygon class="dia" points="650,98 830,150 650,202 470,150"/>
-        <polygon class="dia" points="650,238 830,290 650,342 470,290"/>
-        <polygon class="dia" points="160,364 280,408 160,452 40,408"/>
-        <polygon class="dia" points="160,512 280,556 160,600 40,556"/>
-        <polygon class="dia" points="1000,362 1150,408 1000,454 850,408"/>
-        <polygon class="dia" points="1000,502 1150,548 1000,594 850,548"/>
-        <polygon class="dia" points="1000,642 1150,688 1000,734 850,688"/>
-        <polygon class="dia" points="1000,782 1150,828 1000,874 850,828"/>
+        <polygon class="dia" points="660,90 840,142 660,194 480,142"/>
+        <polygon class="dia" points="660,218 840,268 660,318 480,268"/>
+        <polygon class="dia" points="200,318 310,352 200,386 90,352"/>
+        <polygon class="dia" points="200,398 310,432 200,466 90,432"/>
+        <polygon class="dia" points="920,738 1060,778 920,818 780,778"/>
 
-        <!-- ===== NODE LABELS (foreignObject) ===== -->
-        <!-- start -->
-        <foreignObject x="490" y="20" width="320" height="56">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo start">A DAG's typical cluster + the utilization it actually used</div>
+        <!-- ===== NODES ===== -->
+        <foreignObject x="500" y="16" width="320" height="52">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo start">Dominant ARM cluster config + utilization telemetry</div>
         </foreignObject>
 
-        <!-- D1 -->
-        <foreignObject x="510" y="112" width="280" height="76">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Is the run history trustworthy and the cluster config stable?</div>
+        <foreignObject x="520" y="104" width="280" height="72">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Guards pass?<small>min days/runs · stable config · metrics · no spill · pricing OK</small></div>
         </foreignObject>
-        <!-- review exit -->
-        <foreignObject x="1040" y="104" width="250" height="92">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo rev">Park for review<small>too few runs · autoscale · mixed configs · missing metrics · memory spill · price unknown</small></div>
+        <foreignObject x="1050" y="98" width="250" height="88">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo rev">Review cohort<small>needs_more_arm_data · autoscale · mixed_config · telemetry · spill · cost_confidence</small></div>
         </foreignObject>
 
-        <!-- D2 -->
-        <foreignObject x="510" y="252" width="280" height="76">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Is it already a single-node cluster?</div>
+        <foreignObject x="520" y="232" width="280" height="84">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Already single-node?<small>worker_count = 0 only; 1-worker is still multi (candidate B skipped, collapse-only)</small></div>
         </foreignObject>
 
-        <!-- single-node decisions -->
-        <foreignObject x="50" y="378" width="220" height="60">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Driver memory almost full? (≥ 88%)</div>
+        <!-- single branch -->
+        <foreignObject x="90" y="332" width="220" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">drv_mem_p95 ≥ 88%?</div>
         </foreignObject>
-        <foreignObject x="50" y="524" width="220" height="64">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Driver barely used? (CPU &lt; 20% and mem &lt; 35%)</div>
+        <foreignObject x="330" y="326" width="210" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">protect_oom_risk<small>promote memory family / size</small></div>
         </foreignObject>
-
-        <!-- single-node outcomes (to the right) -->
-        <foreignObject x="300" y="372" width="230" height="72">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Move to a higher-memory node<small>protect against out-of-memory</small></div>
+        <foreignObject x="90" y="412" width="220" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">CPU ≤ 40% and mem ≤ 70%?</div>
         </foreignObject>
-        <foreignObject x="300" y="520" width="230" height="72">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Shrink the node by one size<small>reclaim idle headroom</small></div>
+        <foreignObject x="330" y="406" width="210" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">driver_downsize<small>one safe tier down</small></div>
         </foreignObject>
-        <foreignObject x="40" y="632" width="240" height="56">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo noop">Leave it as-is — already healthy</div>
+        <foreignObject x="90" y="558" width="220" height="52">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo noop">healthy_single<small>no shape change</small></div>
         </foreignObject>
 
-        <!-- multi-node decisions -->
-        <foreignObject x="872" y="376" width="256" height="64">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Would the whole job fit on one node? (≤ 82% mem, ≤ 85% CPU)</div>
-        </foreignObject>
-        <foreignObject x="872" y="516" width="256" height="64">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Would it still finish within ~80% of the schedule gap?</div>
-        </foreignObject>
-        <foreignObject x="872" y="656" width="256" height="64">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Are the driver AND the workers both busy?</div>
-        </foreignObject>
-        <foreignObject x="872" y="796" width="256" height="64">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Would one big node cost more than today's spot mix?</div>
+        <!-- multi: _decide_multi -->
+        <foreignObject x="780" y="318" width="280" height="60">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo note"><strong>_decide_multi()</strong> — build two candidates in parallel</div>
         </foreignObject>
 
-        <!-- multi-node outcomes (to the left of the multi decisions) -->
-        <foreignObject x="600" y="374" width="230" height="68">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>too big for one machine</small></div>
+        <foreignObject x="640" y="408" width="240" height="88">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Candidate A · collapse<small>build_best_single_candidate — cheapest single node holding additive demand (≤82% mem, ≤85% CPU)</small></div>
         </foreignObject>
-        <foreignObject x="600" y="514" width="230" height="68">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>collapsing would miss its SLA</small></div>
-        </foreignObject>
-        <foreignObject x="600" y="654" width="230" height="68">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>genuinely parallel work</small></div>
-        </foreignObject>
-        <foreignObject x="600" y="794" width="230" height="68">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>cheaper on spot workers</small></div>
+        <foreignObject x="960" y="408" width="240" height="100">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Candidate B · refined multi<small>build_current_refined_candidate — minimize driver + resize workers (floor 2); skipped when worker_count &lt; 2; must shrink vs observed</small></div>
         </foreignObject>
 
-        <!-- collapse terminal -->
-        <foreignObject x="875" y="902" width="250" height="60">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo collapse">Collapse to a single node</div>
+        <foreignObject x="720" y="578" width="400" height="60">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Filter survivors<small>core cap (never upsize) · SLA ceiling max(80% interval, observed wall) · collapse memory feasibility</small></div>
         </foreignObject>
 
-        <!-- follow-up note -->
-        <foreignObject x="160" y="994" width="980" height="120">
+        <foreignObject x="700" y="658" width="440" height="60">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Price each survivor<small>OD driver + spot workers (0.37×) + fleet DBU; Photon-off doubles wall when observed</small></div>
+        </foreignObject>
+
+        <foreignObject x="780" y="748" width="280" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Pick cheapest survivor vs observed cost</div>
+        </foreignObject>
+
+        <foreignObject x="360" y="838" width="220" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo collapse">collapse_to_single<small>candidate A wins</small></div>
+        </foreignObject>
+        <foreignObject x="810" y="838" width="220" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo collapse">right_size_multi<small>candidate B wins</small></div>
+        </foreignObject>
+        <foreignObject x="1050" y="838" width="220" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">keep_multi_*<small>memory · compute · balanced · sla · cost</small></div>
+        </foreignObject>
+
+        <!-- normalization (all paths) -->
+        <foreignObject x="360" y="920" width="600" height="72">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo note"><strong>Always normalize when observed:</strong> <code>disable_photon</code> (runtime STANDARD) · <code>drop_nvme</code> (*gd→*g) · workers priced/emitted as spot (never ON_DEMAND)</div>
+        </foreignObject>
+
+        <foreignObject x="120" y="1020" width="1080" height="88">
           <div xmlns="http://www.w3.org/1999/xhtml" class="fo note">
-            <span><strong>Follow-up for every "keep multi-node" result:</strong> the tool still tries to trim the cluster
-            without removing it — shrink the driver, swap workers to a cheaper/smaller instance type, and reduce the
-            worker count — keeping only the changes that stay within the SLA and lower the estimated cost.</span>
+            <span><strong>Cohort = reason.</strong> Multi-node is not collapse-first: both shapes compete on cost under the same model. A <code>keep_multi_*</code> label means no survivor won; <code>blocked_cost</code> is the cheapest option that passed filters but did not beat observed cost (null when no option survived filters). Sections below list exact thresholds and guard conditions.</span>
           </div>
         </foreignObject>
       </svg>
@@ -501,7 +488,7 @@
   <section class="phase">
     <div class="node start">
       <div class="label">Per-DAG input: cost-dominant ARM cluster config</div>
-      <div class="sub">From <code>dw_databricks_health.fact_databricks_dag_run</code> — successful orchestrated <code>bietlejuice.%</code> runs (non-interactive, no failed tasks/runs).</div>
+      <div class="sub">From <code>dw_databricks_health.fact_databricks_dag_run</code> — successful orchestrated <code>bietlejuice.%</code> runs (non-interactive, no failed tasks/runs). Excludes <code>*__validation</code> DAGs and rows with <code>COALESCE(total_cost_usd, 0) = 0</code>.</div>
     </div>
   </section>
 
@@ -573,7 +560,7 @@
 
       <!-- SINGLE -->
       <div class="branch single">
-        <div class="branch-head"><span class="pill">topology == single</span> Single-node branch</div>
+        <div class="branch-head"><span class="pill">topology == single</span> Single-node branch (worker_count = 0)</div>
         <div class="branch-body">
 
           <div class="step test">
@@ -586,8 +573,8 @@
           </div>
 
           <div class="step test">
-            <div class="cond">drv_cpu_p95 &lt; 20%  AND  drv_mem_p95 &lt; 35%  AND  a lower tier exists</div>
-            <div class="why">Excess headroom on a single node.</div>
+            <div class="cond">drv_cpu_p95 &lt;= 40%  AND  drv_mem_p95 &lt;= 70%  AND  a safe one-tier downsize exists</div>
+            <div class="why">Spare headroom; projected mem/CPU must stay under the 82%/85% single-node targets.</div>
           </div>
           <div class="leads">
             <div class="tick">→</div>
@@ -596,72 +583,60 @@
 
           <div class="fallthrough">
             <div class="tick">▼</div>
-            <div class="cohort c-noop">healthy_single<span class="meaning">Single-node is acceptable — no validation config.</span></div>
+            <div class="cohort c-noop">healthy_single<span class="meaning">Single-node is acceptable — no shape change (Photon/NVMe normalization may still apply).</span></div>
           </div>
         </div>
       </div>
 
       <!-- MULTI -->
       <div class="branch multi">
-        <div class="branch-head"><span class="pill">topology == multi</span> Multi-node branch</div>
+        <div class="branch-head"><span class="pill">topology == multi</span> Multi-node branch — <code>_decide_multi()</code> (worker_count ≥ 1)</div>
         <div class="branch-body">
 
-          <div class="step">
-            <div class="cond">size_single_node(m) — additive demand sizer</div>
-            <div class="why">required_mem = Σ(node_mem × mem_p95); required_cores = Σ(node_vcpu × cpu_p95). Accept a node only when mem ≤ 82% and cores ≤ 85%. Family chosen from GiB/core demand.</div>
-          </div>
-
           <div class="step test">
-            <div class="cond">additive demand metrics missing</div>
+            <div class="cond">size_single_node blocked → needs_more_telemetry</div>
+            <div class="why">Secondary guard inside <code>_decide_multi()</code> when additive-demand sizing cannot run (e.g. missing worker metrics for collapse math).</div>
           </div>
           <div class="leads">
             <div class="tick">→</div>
-            <div class="cohort c-review">needs_more_telemetry</div>
+            <div class="cohort c-review">needs_more_telemetry<span class="meaning">Same label as guard-chain exit; emitted from multi path only when sizing blocks.</span></div>
+          </div>
+
+          <div class="step">
+            <div class="cond">Build candidate A — collapse to single (<code>build_best_single_candidate</code>)</div>
+            <div class="why">Additive demand: required_mem = Σ(node_mem × mem_p95); required_cores = Σ(node_vcpu × cpu_p95). Cheapest node holding mem ≤ 82% and cores ≤ 85%. Family from GiB/core demand.</div>
+          </div>
+
+          <div class="step">
+            <div class="cond">Build candidate B — refined multi (<code>build_current_refined_candidate</code>)</div>
+            <div class="why">Independent levers: minimize the driver, resize the worker type/count (floor of 2 workers). Returns <code>None</code> when <code>worker_count &lt; 2</code> (1-worker clusters compete on collapse only). Must be a genuine reduction in driver, worker type, or count.</div>
           </div>
 
           <div class="step test">
-            <div class="cond">no single node fits demand</div>
-            <div class="why">Classify which dimension overflowed the largest node.</div>
+            <div class="cond">Filter each candidate</div>
+            <div class="why">core cap: candidate cores ≤ observed cores (never upsize). SLA: projected p95 wall ≤ max(0.80 × interval, observed wall_p95). Memory feasibility for collapse.</div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">Price survivors; keep the cheapest that &lt; observed cost basis</div>
+            <div class="why">OD driver + spot workers + fleet DBU; Photon normalized off (+100% wall). The winning candidate's label becomes the cohort.</div>
           </div>
           <div class="leads">
             <div class="tick">→</div>
             <div>
-              <div class="cohort c-action">keep_multi_memory<span class="meaning">mem ratio &gt; 0.82 over largest node.</span></div>
-              <div class="cohort c-action" style="margin-top:6px">keep_multi_compute<span class="meaning">cores ratio &gt; 0.85 over largest node.</span></div>
-              <div class="cohort c-action" style="margin-top:6px">keep_multi_balanced<span class="meaning">neither single dimension overflows.</span></div>
+              <div class="cohort c-action">collapse_to_single<span class="meaning">Candidate A is cheapest within SLA.</span></div>
+              <div class="cohort c-action" style="margin-top:6px">right_size_multi<span class="meaning">Candidate B (smaller multi-node) is cheapest within SLA.</span></div>
             </div>
-          </div>
-
-          <div class="step test">
-            <div class="cond">projected_wall_p95 is None  OR  &gt; 0.80 × schedule_interval_minutes</div>
-            <div class="why">SLA guard — collapse would burn too much of the cadence.</div>
-          </div>
-          <div class="leads">
-            <div class="tick">→</div>
-            <div class="cohort c-action">keep_multi_sla<span class="meaning">Cadence at risk; keep multi-node.</span></div>
-          </div>
-
-          <div class="step test">
-            <div class="cond">drv_cpu_p95 ≥ 70  AND  wrk_cpu_p50 ≥ 50  AND  wrk_mem_p95 ≥ 60</div>
-            <div class="why">Driver and workers are both hot.</div>
-          </div>
-          <div class="leads">
-            <div class="tick">→</div>
-            <div class="cohort c-action">keep_multi_balanced</div>
-          </div>
-
-          <div class="step test">
-            <div class="cond">collapse cost increases vs. blended spot/on-demand</div>
-            <div class="why">Spot is ~0.37× on-demand, so busy spot clusters can be cheaper multi-node.</div>
-          </div>
-          <div class="leads">
-            <div class="tick">→</div>
-            <div class="cohort c-action">keep_multi_cost</div>
           </div>
 
           <div class="fallthrough">
             <div class="tick">▼</div>
-            <div class="cohort c-action">collapse_to_single<span class="meaning">Demand fits a single node within SLA and cost — collapse.</span></div>
+            <div>
+              <div class="cohort c-noop">keep_multi_memory / keep_multi_compute<span class="meaning"><code>size_single_node</code> blocked: additive demand exceeds the largest single node at target utilization.</span></div>
+              <div class="cohort c-noop" style="margin-top:6px">keep_multi_balanced<span class="meaning">Hot driver (drv_cpu_p95 ≥ 70%) with busy workers (wrk_cpu_p50 ≥ 50%, wrk_mem_p95 ≥ 60%), or sizing blocked as balanced.</span></div>
+              <div class="cohort c-noop" style="margin-top:6px">keep_multi_sla<span class="meaning">Projected collapse wall (<code>_projected_wall_for_sla(m, 0)</code>) exceeds SLA ceiling max(80% interval, observed wall_p95).</span></div>
+              <div class="cohort c-noop" style="margin-top:6px">keep_multi_cost<span class="meaning">Default when no survivor wins and no higher-priority keep reason applies; <code>blocked_cost</code> = cheapest filter-passing option that still ≥ observed cost (null if none passed filters).</span></div>
+            </div>
           </div>
 
         </div>
@@ -673,16 +648,18 @@
   <!-- POST PROCESSING -->
   <section class="phase">
     <div class="post">
-      <h3>3 · After classification — right-sizing &amp; the actions trace</h3>
-      <p>Every <code>keep_multi_*</code> exit independently right-sizes the driver and workers (same 82% mem / 85% CPU targets, same GiB/core family ordering), keeping only changes that pass the SLA guard and reduce projected blended cost. The <code>cohort</code> says <em>why</em> a path was taken; the <code>actions</code> column is the decision trace of what was attempted, accepted, or blocked.</p>
+      <h3>3 · Normalizations &amp; the actions trace</h3>
+      <p>The cost model assumes Photon and local NVMe are removed, so the recommender <strong>always normalizes</strong> them on the emitted shape when observed: <code>disable_photon</code> sets <code>runtime_engine: STANDARD</code> and <code>drop_nvme</code> swaps <code>*gd</code> nodes to their non-NVMe (<code>*g</code>) equivalents whenever <code>is_any_local_nvme</code>. When <code>is_any_photon</code>, sizing uses <code>effective_demand()</code> (CPU p50/p95 ×1.20, memory p50/p95 ×1.30) in addition to wall ×2.0 for cost/SLA — observed CSV columns stay raw. These can make an otherwise-healthy DAG actionable on their own. Recommended workers are always spot — the tool never emits <code>ON_DEMAND</code> for workers. The <code>cohort</code> says which candidate won (or why none did); the <code>actions</code> column is the decision trace. <code>keep_multi_*</code> cohorts keep the observed shape (<code>keep_multi_node</code>) but may still appear in validation YAML.</p>
       <div class="actions-flow">
         <span class="tok ok">collapse_to_single</span>
+        <span class="tok ok">right_size_multi</span>
         <span class="tok">keep_multi_node</span>
         <span class="tok ok">reduce_driver</span> / <span class="tok">keep_driver</span>
         <span class="tok ok">reduce_worker_type</span> / <span class="tok">keep_worker_type</span>
         <span class="tok ok">reduce_worker_count</span> / <span class="tok">keep_worker_count</span>
         <span class="tok block">worker_count_blocked_sla</span>
-        <span class="tok block">resize_blocked_cost</span>
+        <span class="tok ok">disable_photon</span>
+        <span class="tok ok">drop_nvme</span>
         <span class="tok">no_change</span>
       </div>
     </div>
@@ -698,12 +675,18 @@
           <tr><td>min_days / min_runs</td><td><code>3 / 3</code></td><td>needs_more_arm_data</td></tr>
           <tr><td>_DOMINANT_CONFIG_SHARE_MIN</td><td><code>0.80</code></td><td>mixed_config_review</td></tr>
           <tr><td>_DRIVER_OOM_P95</td><td><code>88.0%</code></td><td>protect_oom_risk</td></tr>
-          <tr><td>_DRIVER_DOWNSIZE_CPU_P95_MAX</td><td><code>20.0%</code></td><td>driver_downsize</td></tr>
-          <tr><td>_DRIVER_DOWNSIZE_MEM_P95_MAX</td><td><code>35.0%</code></td><td>driver_downsize</td></tr>
-          <tr><td>_SINGLE_NODE_MEM_TARGET</td><td><code>0.82</code></td><td>single-node sizer / keep_multi_memory</td></tr>
-          <tr><td>_SINGLE_NODE_CPU_TARGET</td><td><code>0.85</code></td><td>single-node sizer / keep_multi_compute</td></tr>
-          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>keep_multi_sla</td></tr>
+          <tr><td>_RELAXED_DOWNSIZE_CPU_P95_MAX</td><td><code>40.0%</code></td><td>driver_downsize (single-node)</td></tr>
+          <tr><td>_RELAXED_DOWNSIZE_MEM_P95_MAX</td><td><code>70.0%</code></td><td>driver_downsize (single-node)</td></tr>
+          <tr><td>_SINGLE_NODE_MEM_TARGET</td><td><code>0.82</code></td><td>candidate sizers / keep_multi_memory</td></tr>
+          <tr><td>_SINGLE_NODE_CPU_TARGET</td><td><code>0.85</code></td><td>candidate sizers / keep_multi_compute</td></tr>
+          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>SLA gate (ceiling = max(target × interval, observed wall_p95))</td></tr>
           <tr><td>_DRIVER_CPU_BOUND_P95</td><td><code>70.0%</code></td><td>keep_multi_balanced</td></tr>
+          <tr><td>_PHOTON_OFF_WALL_INFLATION</td><td><code>2.0</code></td><td>cost/SLA when Photon normalized off</td></tr>
+          <tr><td>_PHOTON_OFF_CPU_INFLATION</td><td><code>1.20</code></td><td>effective_demand CPU p50/p95 when is_any_photon</td></tr>
+          <tr><td>_PHOTON_OFF_MEM_INFLATION</td><td><code>1.30</code></td><td>effective_demand memory p50/p95 when is_any_photon</td></tr>
+          <tr><td>_USD_PER_DBU</td><td><code>0.114</code></td><td>cost engine (negotiated DBU price)</td></tr>
+          <tr><td>spot multiplier</td><td><code>0.37 × on_demand</code></td><td>worker EC2 pricing</td></tr>
+          <tr><td>worker floor</td><td><code>2</code></td><td>right_size_multi; worker_count = 1 skips candidate B (collapse-only)</td></tr>
           <tr><td>GiB/core family order</td><td><code>≤2 → compute,general,memory · ≤4 → general,memory · &gt;4 → memory</code></td><td>family selection</td></tr>
         </tbody>
       </table>

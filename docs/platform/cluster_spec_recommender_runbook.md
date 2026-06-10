@@ -1,6 +1,6 @@
 # Cluster Spec Recommender - Runbook
 
-Step-by-step guide for generating single-node-first cluster recommendations and shadow validation configs.
+Step-by-step guide for generating bidirectional (cost-truthful) cluster recommendations and shadow validation configs.
 
 **Script:** [`scripts/recommend_cluster_specs.py`](../../scripts/recommend_cluster_specs.py)  
 **Validation YAML builder:** [`rightsizing_validation_config.py`](../../packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/rightsizing_validation_config.py) (same preset-diff rules as [`extract_cluster_validation_files.py`](../../packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py))  
@@ -56,20 +56,21 @@ Example output:
 
 ```text
 [collapse_to_single] bietlejuice.some_dag  -> consolidation_m_general_single_node_cluster  est -38%
-[keep_multi_sla] bietlejuice.hourly_cdc  -> consolidation_s_general_cluster  est -9%
+[right_size_multi] bietlejuice.busy_dag  -> consolidation_s_general_cluster  est -22%
 [keep_multi_cost] bietlejuice.blocked_dag  -> consolidation_m_general_cluster  est 0% (+35%)
 ```
 
-Use the `actions` column in `recommendations.csv` / JSON to understand the decision trace. `cohort` explains why the DAG landed on a path; `actions` explains what changed or was blocked.
+Use the `actions` column in `recommendations.csv` / JSON to understand the decision trace. `cohort` explains which candidate won (or why none did); `actions` explains what changed, was blocked, or was normalized.
 
 Examples:
 
 - `collapse_to_single`
 - `keep_multi_node|reduce_driver|reduce_worker_type|reduce_worker_count`
-- `keep_multi_node|reduce_driver|reduce_worker_type|worker_count_blocked_sla`
-- `keep_multi_node|resize_blocked_cost`
+- `keep_multi_node|keep_driver|reduce_worker_type|worker_count_blocked_sla`
+- `collapse_to_single|disable_photon|drop_nvme`
+- `keep_multi_node`
 
-The first `est` percentage is the accepted recommendation's estimated per-run delta. A percentage in parentheses is the rejected cost-guard candidate. For example, `est 0% (+35%)` means no resize was accepted and the blocked candidate was estimated to increase cost by 35%.
+The first `est` percentage is the accepted recommendation's estimated per-run delta. A percentage in parentheses is the cheapest rejected candidate. For example, `est 0% (+35%)` means no candidate beat the observed cost basis and the cheapest rejected one was estimated to increase cost by 35%. `disable_photon` and `drop_nvme` are normalizations the recommender always applies when the observed runs used Photon or local NVMe. When Photon ran, sizing also uses **effective demand** (CPU ×1.20, memory ×1.30 on p50/p95) so recommendations assume STANDARD-runtime headroom; observed `drv_*` / `wrk_*` columns in the CSV remain the raw telemetry.
 
 ---
 
@@ -80,16 +81,15 @@ Actionable cohorts:
 | Cohort | What to do |
 | --- | --- |
 | `collapse_to_single` | Validate the recommended single-node cluster |
-| `keep_multi_sla` | Keep multi-node; validate emitted driver, worker type, and worker count changes |
-| `keep_multi_memory` | Keep multi-node; validate emitted driver, worker type, and worker count changes |
-| `keep_multi_compute` | Keep multi-node; validate emitted driver, worker type, and worker count changes |
-| `keep_multi_balanced` | Keep multi-node; validate emitted driver, worker type, and worker count changes |
-| `keep_multi_cost` | Keep multi-node; validate cheaper emitted changes, or skip when `actions` shows `resize_blocked_cost` |
+| `right_size_multi` | Validate the smaller multi-node shape (emitted driver, worker type, and/or worker count) |
 | `protect_oom_risk` | Promote single-node to a higher-memory family before any downsizing wave (size up only when already on `r6g`) |
 | `driver_downsize` | Downsize single-node driver |
 
-Non-actionable cohorts:
+A `disable_photon` and/or `drop_nvme` action can appear on any cohort above — and can make an otherwise `healthy_single`/`keep_multi_*` DAG actionable on its own.
 
+Non-actionable cohorts (no shape change — kept as observed):
+
+- `keep_multi_sla`, `keep_multi_memory`, `keep_multi_compute`, `keep_multi_balanced`, `keep_multi_cost` (no candidate beat cost-or-SLA; `blocked_cost` shows the cheapest rejected alternative)
 - `needs_more_arm_data`
 - `needs_more_telemetry`
 - `mixed_config_review`
@@ -98,7 +98,7 @@ Non-actionable cohorts:
 - `healthy_single`
 - `autoscale_review`
 
-The older keep/downsize cohort names are not the target decision surface for the single-node-first model. A driver-bound or I/O-waiting multi-node cluster is now still evaluated through additive sizing, SLA, and cost.
+Under the bidirectional model the `keep_multi_*` cohorts no longer emit driver/worker resizes — a refinement that wins is reported as `right_size_multi` instead.
 
 ---
 
@@ -169,16 +169,17 @@ Open `recommendations.csv`.
 
 Start with:
 
-- `collapse_to_single`
+- `collapse_to_single` and `right_size_multi`
 - `confidence = high`
 - clear negative `est_cost_delta_pct`
 - stable dominant config shares (`>= 0.80`)
 
 Review carefully:
 
+- `right_size_multi`: a smaller multi-node shape (small OD driver + spot workers) beat both collapse and the observed cost.
 - `keep_multi_sla`: usually high-frequency DAGs. `opa`/`istio` are the reference shape.
-- `keep_multi_cost`: collapse would move cheap spot worker capacity to an on-demand single node.
-- `actions`: decision trace. Look for `reduce_driver`, `reduce_worker_type`, `reduce_worker_count`, `worker_count_blocked_sla`, and `resize_blocked_cost`.
+- `keep_multi_cost`: a feasible candidate exists but does not beat the observed cost basis (`blocked_cost`).
+- `actions`: decision trace. Look for `reduce_driver`, `reduce_worker_type`, `reduce_worker_count`, `worker_count_blocked_sla`, `disable_photon`, and `drop_nvme`.
 - `protect_oom_risk`: handle before cost-saving waves; expect `m6g→r6g` at the same tier, not a same-family size-up.
 - `medium-x86`: AMD fallback only.
 
@@ -324,8 +325,8 @@ Check:
 - No task failures or retries beyond normal noise.
 - No OOM or executor loss.
 - Wall p95 still fits the schedule, especially for hourly jobs.
-- Cost delta is negative for `collapse_to_single`.
-- For `keep_multi_*`, the worker count is preserved and only driver capacity changed unless intentionally reviewed.
+- Cost delta is negative for `collapse_to_single` and `right_size_multi`.
+- For `right_size_multi`, confirm the emitted driver, worker type, and worker count match the intended shape and parallelism is preserved where wall matters.
 - If `validation_outcomes.csv` was generated, review `outcome` and `delta_*` columns for DAGs with prior shadow runs.
 
 Promotion helper:
@@ -382,11 +383,13 @@ make create-dag-files
 
 ## Guardrails
 
-- Single-node is the default target, but **SLA and cost gates win**.
+- **Bidirectional, cost-truthful:** the cheapest candidate that beats the observed cost basis within SLA wins — neither single-node nor multi-node is privileged. **SLA and the core cap always win.**
+- **Driver on-demand, workers spot:** recommendations never price or emit on-demand workers.
+- **Always normalize:** Photon (`disable_photon`, `runtime_engine: STANDARD`, +100% wall, CPU ×1.20 / memory ×1.30 effective demand for sizing) and local NVMe (`drop_nvme`, `*gd`→`*g`) are removed in every recommendation; the cost model prices the normalized shape.
 - **Cost authority:** `arm_avg_cost_per_run_usd` = negotiated `total_cost_usd` per run (DBU USD + EC2 USD). `arm_avg_dbu_cost_usd` and `arm_avg_ec2_cost_usd` are components. `arm_avg_dbu_consumed` is a DBU scalar for sanity checks only — never sum USD and DBU columns. List DBU (`total_dbu_list_cost_usd`) is not used.
 - **EC2 pricing:** on-demand USD/hour comes from [`dim_ec2_price.sql`](../../dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql) via the generated catalog. Spot = `0.37 × on_demand`. Do not use external Amazon CSV prices in the pipeline.
 - **ARM detection:** Graviton types match `^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1).` (case-insensitive), including `m6gd`, `m7g`, and `a1`.
-- Do not reduce worker count for `keep_multi_*`; preserve current worker count and minimize driver only.
+- A `right_size_multi` recommendation floors workers at two; a 1-worker shape folds into single-node.
 - Treat `core` and `fast_lane` as evidence that hot single-node can be acceptable.
 - Treat `opa` and `istio` as evidence that hourly wall-clock pressure can require multi-node even for small data volumes.
 - Never promote without a successful shadow validation run.

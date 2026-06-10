@@ -27,6 +27,7 @@ LOGGER = QuintoAndarLogger("rightsizing_validation_config")
 _ACTIONABLE_COHORTS = frozenset(
     {
         "collapse_to_single",
+        "right_size_multi",
         "downsize_workers",
         "driver_downsize",
         "protect_oom_risk",
@@ -36,8 +37,11 @@ _ACTIONABLE_COHORTS = frozenset(
         "keep_multi_compute",
         "keep_multi_balanced",
         "keep_multi_cost",
+        "healthy_single",
     }
 )
+
+_NORMALIZATION_ACTIONS = frozenset({"disable_photon", "drop_nvme"})
 
 _KEEP_MULTI_COHORTS = frozenset(
     {
@@ -68,6 +72,7 @@ class RightsizingRecommendation(Protocol):
     rec_worker_count: int | None
     num_workers_override: int | None
     driver_override_node_type_id: str | None
+    rec_runtime_engine: str | None
     driver_action: str | None
     worker_action: str | None
     projected: Any
@@ -185,7 +190,11 @@ def generate_validation_config(
 
     dag_name = rec.dag_id.removeprefix("bietlejuice.")
     prod_type = get_current_cluster_type(dag_name, dags_root) or rec.current_preset
-    if prod_type and rec.recommended_preset == prod_type:
+    has_normalization = bool(
+        getattr(rec, "rec_runtime_engine", None)
+        or _NORMALIZATION_ACTIONS.intersection(rec.actions.split("|"))
+    )
+    if prod_type and rec.recommended_preset == prod_type and not has_normalization:
         return None
 
     prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)
@@ -205,6 +214,7 @@ def generate_validation_config(
             rec.driver_override_node_type_id or rec.rec_driver_node_type
         ),
         recommended_worker_node_type=rec.rec_worker_node_type,
+        recommended_runtime_engine=getattr(rec, "rec_runtime_engine", None),
         databricks_conn_id_fallback=databricks_conn_id,
     )
     if spec is None:

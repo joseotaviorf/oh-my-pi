@@ -1,12 +1,14 @@
 """Unit tests for scripts/recommend_cluster_specs.py.
 
-The recommender is intentionally single-node-first: multi-node clusters are
-collapsed when additive CPU/memory demand, schedule SLA, and cost all fit.
-Multi-node recommendations are now narrow keep exits plus driver minimization.
+The recommender is bidirectional and cost-truthful: it builds collapse and
+refined-multi candidates, prices them under one model, and keeps the cheapest
+that beats observed cost within SLA. Normalizations (Photon off, NVMe off) apply
+on every recommendation when the observed runs used those features.
 """
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -29,6 +31,7 @@ from scripts.recommend_cluster_specs import (  # noqa: E402
     build_validation_sql,
     classify,
     classify_amd_for_collapse,
+    effective_demand,
     estimate_cost,
     estimate_drv_cpu_after_collapse,
     estimate_projected_total_cost,
@@ -82,9 +85,7 @@ def _m(**kwargs) -> DagMetrics:
         "arm_avg_total_cost_estimate_usd" in kwargs
         and "arm_avg_cost_per_run_usd" not in kwargs
     ):
-        defaults["arm_avg_cost_per_run_usd"] = kwargs[
-            "arm_avg_total_cost_estimate_usd"
-        ]
+        defaults["arm_avg_cost_per_run_usd"] = kwargs["arm_avg_total_cost_estimate_usd"]
     return DagMetrics(**defaults)
 
 
@@ -204,7 +205,7 @@ class TestSingleNodeBranch:
 
 
 class TestAdditiveSingleNodeSizing:
-    def test_driver_bound_idle_workers_collapse_to_sized_single_node(self):
+    def test_driver_bound_idle_workers_refine_to_cheap_spot_multi(self):
         m = _m(
             driver_node_type="m6g.xlarge",
             worker_node_type="m6g.xlarge",
@@ -218,12 +219,21 @@ class TestAdditiveSingleNodeSizing:
             wall_p95_min=12.0,
         )
 
+        sizing = size_single_node(m)
         rec = build_recommendation(m)
 
-        assert rec.cohort == "collapse_to_single"
-        assert rec.rec_driver_node_type == "m6g.2xlarge"
-        assert rec.rec_worker_count == 0
-        assert rec.projected.est_drv_mem_p95 == "projected 27.5%"
+        # The additive sizer still sizes the collapse candidate correctly,
+        assert sizing.node_type == "m6g.2xlarge"
+        assert sizing.projected_mem_pct == pytest.approx(27.5)
+        assert rcs.build_best_single_candidate(m).driver_node_type == "m6g.2xlarge"
+        # but a small compute driver plus idle spot workers is cheaper than the
+        # on-demand single node, so the bidirectional pick refines the multi shape.
+        assert rec.cohort == "right_size_multi"
+        assert rec.rec_driver_node_type == "c6g.xlarge"
+        assert rec.rec_worker_node_type == "m6g.large"
+        assert rec.rec_worker_count == 2
+        assert rec.projected.est_cost_delta_pct is not None
+        assert rec.projected.est_cost_delta_pct < 0
 
     def test_sizer_uses_actual_gib_per_core_not_current_family(self):
         m = _m(
@@ -239,10 +249,14 @@ class TestAdditiveSingleNodeSizing:
         sizing = size_single_node(m)
         rec = build_recommendation(m)
 
+        # The additive sizer picks the family by actual GiB/core, not the
+        # current node's family — m6g (4 GiB/core) here, not r6g.
         assert sizing.node_type == "m6g.2xlarge"
         assert sizing.projected_mem_pct == pytest.approx(50.0)
-        assert rec.cohort == "collapse_to_single"
-        assert rec.rec_driver_node_type == "m6g.2xlarge"
+        # Cheapest feasible shape is a refined spot multi, not the OD single node.
+        assert rec.cohort == "right_size_multi"
+        assert rec.rec_driver_node_type == "m6g.large"
+        assert rec.rec_worker_node_type == "m6g.large"
 
     def test_memory_pressure_collapses_to_memory_single_node_when_additive_load_fits(
         self,
@@ -264,10 +278,10 @@ class TestAdditiveSingleNodeSizing:
         assert rec.rec_driver_node_type == "r6g.xlarge"
         assert rec.projected.est_drv_mem_p95 == "projected 77.3%"
 
-    def test_large_single_node_without_exact_preset_uses_driver_override(self):
-        import os
-
-        os.environ["ENVIRONMENT"] = "prod"
+    def test_large_single_node_without_exact_preset_uses_driver_override(
+        self, monkeypatch
+    ):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
         m = _m(
             driver_node_type="r6g.8xlarge",
             worker_node_type="r6g.8xlarge",
@@ -310,7 +324,10 @@ class TestAdditiveSingleNodeSizing:
 
         rec = build_recommendation(m)
 
-        assert rec.cohort == "collapse_to_single"
+        # The collapse candidate still maps to a valid single-node node type,
+        assert rcs.build_best_single_candidate(m).driver_node_type == "r6g.2xlarge"
+        # but the refined spot multi is cheaper and maps to a valid preset.
+        assert rec.cohort == "right_size_multi"
         assert rec.recommended_preset is not None
         assert rec.rec_driver_node_type is not None
 
@@ -332,7 +349,9 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
-        assert rec.cohort == "keep_multi_memory"
+        # Memory-bound workers pin the worker type; the driver still minimizes to
+        # the compute family, which the bidirectional pick keeps as a refined multi.
+        assert rec.cohort == "right_size_multi"
         assert rec.rec_driver_node_type == "c6g.2xlarge"
         assert "reduce_driver" in rec.actions.split("|")
 
@@ -358,10 +377,10 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert rec.rec_driver_node_type == "m6g.large"
         assert "reduce_driver" not in rec.actions.split("|")
 
-    def test_hourly_opa_istio_shape_stays_multi_for_sla_and_minimizes_driver(self):
-        import os
-
-        os.environ["ENVIRONMENT"] = "prod"
+    def test_hourly_opa_istio_shape_stays_multi_for_sla_and_minimizes_driver(
+        self, monkeypatch
+    ):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
         m = _m(
             driver_node_type="m6g.large",
             worker_node_type="m6g.2xlarge",
@@ -382,7 +401,9 @@ class TestSingleNodeFirstKeepMultiGuards:
         rec = build_recommendation(m)
         cfg = generate_validation_config(rec)
 
-        assert rec.cohort == "keep_multi_sla"
+        # Stays multi (collapsing the 5-worker shape would blow the hourly SLA),
+        # but refines the worker type down while keeping the driver and count.
+        assert rec.cohort == "right_size_multi"
         assert rec.recommended_preset == "consolidation_s_general_cluster"
         assert rec.rec_driver_node_type == "m6g.large"
         assert rec.rec_worker_node_type == "m6g.xlarge"
@@ -393,10 +414,8 @@ class TestSingleNodeFirstKeepMultiGuards:
             "driver_node_type_id": "m6g.large",
         }
 
-    def test_keep_multi_downsizes_worker_type_without_reducing_count(self):
-        import os
-
-        os.environ["ENVIRONMENT"] = "prod"
+    def test_keep_multi_downsizes_worker_type_without_reducing_count(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
         m = _m(
             driver_node_type="m6g.large",
             worker_node_type="r6g.4xlarge",
@@ -417,7 +436,8 @@ class TestSingleNodeFirstKeepMultiGuards:
         rec = build_recommendation(m)
         cfg = generate_validation_config(rec)
 
-        assert rec.cohort == "keep_multi_sla"
+        # Same parallelism (count kept), worker type shrunk — a refined multi.
+        assert rec.cohort == "right_size_multi"
         assert rec.rec_worker_node_type == "r6g.large"
         assert rec.rec_worker_count == 2
         assert (
@@ -449,7 +469,8 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
-        assert rec.cohort == "keep_multi_memory"
+        # Generous SLA budget lets the refined multi cut both worker type and count.
+        assert rec.cohort == "right_size_multi"
         assert rec.rec_worker_node_type == "r6g.4xlarge"
         assert rec.rec_worker_count == 6
         assert "reduce_worker_count" in rec.actions.split("|")
@@ -475,7 +496,8 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
-        assert rec.cohort == "keep_multi_memory"
+        # Tight SLA blocks the count reduction, but the worker type still shrinks.
+        assert rec.cohort == "right_size_multi"
         assert rec.rec_worker_node_type == "r6g.4xlarge"
         assert rec.rec_worker_count == 8
         assert "worker_count_blocked_sla" in rec.actions.split("|")
@@ -500,10 +522,12 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
+        # On a near-zero baseline every refined/collapse candidate costs more, so
+        # nothing wins: keep the observed shape and surface the rejected cost.
         assert rec.cohort == "keep_multi_sla"
         assert rec.rec_worker_node_type == "r6g.4xlarge"
         assert rec.rec_worker_count == 2
-        assert "resize_blocked_cost" in rec.actions.split("|")
+        assert rec.actions == "keep_multi_node"
         assert generate_validation_config(rec) is None
         assert rec.projected.est_cost_delta_pct == pytest.approx(0.0)
         assert rec.projected.blocked_cost_delta_pct is not None
@@ -533,7 +557,11 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
-        assert rec.cohort == "keep_multi_sla"
+        # Collapsing the spiky hourly shape would blow the SLA, so it stays multi,
+        # but the busy workers' type is refined down — a cheaper refined multi.
+        assert rec.cohort == "right_size_multi"
+        assert rec.rec_worker_count == 2
+        assert rec.rec_worker_node_type == "m6g.2xlarge"
 
     def test_busy_spot_cluster_stays_multi_when_on_demand_collapse_costs_more(self):
         m = _m(
@@ -595,6 +623,95 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert classify(m) == "keep_multi_balanced"
 
 
+class TestNormalizationActions:
+    def test_strip_nvme_maps_gd_family_to_non_gd(self):
+        assert rcs._strip_nvme("m6gd.2xlarge") == "m6g.2xlarge"
+        assert rcs._strip_nvme("r6gd.xlarge") == "r6g.xlarge"
+        assert rcs._strip_nvme("c6gd.4xlarge") == "c6g.4xlarge"
+        # Already non-NVMe and unknown shapes pass through unchanged.
+        assert rcs._strip_nvme("m6g.large") == "m6g.large"
+        assert rcs._strip_nvme(None) is None
+
+    def test_disable_photon_emits_standard_runtime_and_action(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p95=30.0,
+            drv_mem_p95=40.0,
+            is_any_photon=True,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "healthy_single"
+        assert "disable_photon" in rec.actions.split("|")
+        assert rec.rec_runtime_engine == "STANDARD"
+        assert rec.recommended_preset == "consolidation_m_general_single_node_cluster"
+        assert rec.rec_driver_node_type == "m6g.2xlarge"
+
+    def test_no_photon_leaves_runtime_engine_unset(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p95=30.0,
+            drv_mem_p95=40.0,
+            is_any_photon=False,
+        )
+
+        rec = build_recommendation(m)
+
+        assert "disable_photon" not in rec.actions.split("|")
+        assert rec.rec_runtime_engine is None
+
+    def test_drop_nvme_emits_action_and_recommends_non_gd_nodes(self):
+        m = _m(
+            driver_node_type="m6gd.2xlarge",
+            worker_node_type="m6gd.2xlarge",
+            worker_count=2,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            is_any_local_nvme=True,
+        )
+
+        rec = build_recommendation(m)
+
+        assert "drop_nvme" in rec.actions.split("|")
+        assert rec.rec_driver_node_type is None or "gd." not in rec.rec_driver_node_type
+        assert rec.rec_worker_node_type is None or "gd." not in rec.rec_worker_node_type
+
+    def test_validation_config_forces_spot_workers_never_on_demand(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.4xlarge",
+            worker_count=2,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p50_min=18.0,
+            wall_p95_min=18.0,
+            schedule_interval_minutes=20.0,
+            arm_avg_total_cost_estimate_usd=8.0,
+            arm_avg_ec2_cost_usd=1.5,
+            arm_avg_dbu_cost_usd=6.5,
+        )
+
+        rec = build_recommendation(m)
+        cfg = generate_validation_config(rec)
+
+        assert cfg is not None
+        custom = cfg["validation"]["cluster"]["custom_configurations"]
+        aws = custom.get("aws_attributes", {})
+        # Workers must never be pinned to ON_DEMAND in a recommendation.
+        assert aws.get("availability", "SPOT") != "ON_DEMAND"
+
+
 class TestCostProjection:
     def test_legacy_estimate_cost_still_scales_by_vcpu_for_fallbacks(self):
         result = estimate_cost(
@@ -627,60 +744,175 @@ class TestCostProjection:
             driver_node_type="m6g.large",
             worker_node_type="m6g.large",
             worker_count=8,
-            drv_cpu_p95=20.0,
-            drv_mem_p95=20.0,
-            wrk_cpu_p50=5.0,
-            wrk_cpu_p95=10.0,
-            wrk_mem_p95=20.0,
             wall_p50_min=5.0,
             wall_p95_min=7.0,
-            arm_avg_total_cost_estimate_usd=0.20,
             arm_avg_ec2_cost_usd=0.04,
             arm_avg_dbu_cost_usd=0.16,
         )
 
-        projected = estimate_projected_total_cost(m, "m6g.2xlarge", 0)
-        rec = build_recommendation(m)
+        # A 5-minute run on one m6g.2xlarge must cost a small fraction of its
+        # hourly price, not a whole hour.
+        projected = estimate_projected_total_cost(
+            m, "m6g.2xlarge", 0, fleet_dbu_rate={"m6g.2xlarge": 1.0}
+        )
+        full_hour = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.2xlarge"]
 
         assert projected is not None
-        assert projected < 0.20
-        assert rec.cohort == "collapse_to_single"
+        assert 0.0 < projected < full_hour
 
-    def test_projected_multi_node_cost_accounts_for_worker_type_and_count_resize(self):
+    def test_cost_prices_od_driver_and_spot_workers_with_fleet_dbu(self):
         m = _m(
             driver_node_type="m6g.large",
-            worker_node_type="r6g.8xlarge",
-            worker_count=8,
-            drv_cpu_p95=20.0,
-            drv_mem_p95=20.0,
-            wrk_cpu_p50=5.0,
-            wrk_cpu_p95=10.0,
-            wrk_mem_p95=25.0,
+            worker_node_type="m6g.2xlarge",
+            worker_count=4,
             wall_p50_min=30.0,
             wall_p95_min=30.0,
-            schedule_interval_minutes=240.0,
-            arm_avg_total_cost_estimate_usd=40.0,
-            arm_avg_ec2_cost_usd=15.0,
-            arm_avg_dbu_cost_usd=25.0,
+            is_any_photon=False,
+        )
+        fleet = {"m6g.large": 1.0, "m6g.2xlarge": 4.0}
+
+        projected = estimate_projected_total_cost(
+            m, "m6g.large", 4, rec_worker="m6g.2xlarge", fleet_dbu_rate=fleet
+        )
+
+        wall_h = 0.5
+        od_drv = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.large"]
+        spot_wrk = round(rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.2xlarge"] * 0.37, 6)
+        ec2 = od_drv * wall_h + spot_wrk * wall_h * 4
+        dbu = (1.0 + 4 * 4.0) * wall_h * 0.114  # driver + 4 workers, $0.114/DBU
+
+        assert projected == pytest.approx(round(ec2 + dbu, 6))
+
+    def test_photon_off_applies_wall_inflation_when_fleet_priced(self):
+        common = dict(
+            driver_node_type="m6g.xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+        )
+        fleet = {"m6g.xlarge": 2.0}
+
+        cost_no_photon = estimate_projected_total_cost(
+            _m(is_any_photon=False, **common), "m6g.xlarge", 0, fleet_dbu_rate=fleet
+        )
+        cost_photon = estimate_projected_total_cost(
+            _m(is_any_photon=True, **common), "m6g.xlarge", 0, fleet_dbu_rate=fleet
+        )
+
+        # +100% wall when Photon is normalized off; cost scales linearly with wall.
+        assert cost_photon == pytest.approx(cost_no_photon * 2.0)
+
+    def test_photon_off_applies_wall_inflation_without_fleet_rates(self):
+        common = dict(
+            driver_node_type="m6g.xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            arm_avg_dbu_cost_usd=5.0,
+            arm_avg_ec2_cost_usd=3.0,
+        )
+
+        cost_no_photon = estimate_projected_total_cost(
+            _m(is_any_photon=False, **common), "m6g.xlarge", 0, fleet_dbu_rate={}
+        )
+        cost_photon = estimate_projected_total_cost(
+            _m(is_any_photon=True, **common), "m6g.xlarge", 0, fleet_dbu_rate={}
+        )
+
+        assert cost_no_photon is not None
+        assert cost_photon == pytest.approx(cost_no_photon * 2.0)
+
+    def test_cost_falls_back_to_observed_dbu_proxy_without_fleet(self):
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            arm_avg_dbu_cost_usd=5.0,
+            arm_avg_ec2_cost_usd=3.0,
         )
 
         projected = estimate_projected_total_cost(
-            m,
-            "m6g.large",
-            6,
-            rec_worker="r6g.4xlarge",
-        )
-        worker_activity = max(5.0 / 85.0, 10.0 / 85.0, 25.0 / 82.0)
-        wall_inflation = 1.0 + (8 / 6 - 1.0) * worker_activity
-        current_driver_ec2 = 0.077 * 30.0 / 60.0
-        measured_worker_ec2 = 15.0 - current_driver_ec2
-        expected = (
-            25.0 * (2 + 6 * 16) / (2 + 8 * 32) * wall_inflation
-            + measured_worker_ec2 * ((6 * 0.8064) / (8 * 1.6128)) * wall_inflation
-            + 0.077 * (30.0 * wall_inflation) / 60.0
+            m, "m6g.xlarge", 2, rec_worker="m6g.xlarge", fleet_dbu_rate={}
         )
 
-        assert projected == pytest.approx(expected)
+        assert projected is not None
+        assert projected > 0.0
+
+
+class TestPhotonEffectiveDemand:
+    def test_effective_demand_passthrough_without_photon(self):
+        m = _m(drv_cpu_p95=40.0, drv_mem_p95=50.0, is_any_photon=False)
+        d = effective_demand(m)
+        assert d.drv_cpu_p95 == 40.0
+        assert d.drv_mem_p95 == 50.0
+
+    def test_effective_demand_inflates_cpu_and_mem_when_photon(self):
+        m = _m(
+            drv_cpu_p50=40.0,
+            drv_cpu_p95=50.0,
+            drv_mem_p95=50.0,
+            wrk_cpu_p50=30.0,
+            wrk_cpu_p95=40.0,
+            wrk_mem_p95=50.0,
+            is_any_photon=True,
+        )
+        d = effective_demand(m)
+        assert d.drv_cpu_p95 == pytest.approx(60.0)
+        assert d.drv_mem_p95 == pytest.approx(65.0)
+        assert d.wrk_cpu_p95 == pytest.approx(48.0)
+        assert d.wrk_mem_p95 == pytest.approx(65.0)
+
+    def test_photon_blocks_single_node_downsize_at_relaxed_gates(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            drv_cpu_p95=10.0,
+            drv_mem_p95=40.0,
+            is_any_photon=True,
+        )
+        assert classify(m) == "healthy_single"
+
+        without_photon = _m(
+            worker_count=0,
+            worker_node_type=None,
+            drv_cpu_p95=10.0,
+            drv_mem_p95=40.0,
+            is_any_photon=False,
+        )
+        assert classify(without_photon) == "driver_downsize"
+
+    def test_photon_triggers_oom_at_inflated_memory(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            drv_mem_p95=70.0,
+            drv_cpu_p95=30.0,
+            is_any_photon=True,
+        )
+        assert classify(m) == "protect_oom_risk"
+
+    def test_photon_sizes_larger_collapse_node_when_demand_crosses_tier(self):
+        base = dict(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_cpu_p95=50.0,
+            drv_mem_p95=60.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=40.0,
+        )
+        without = size_single_node(_m(**base, is_any_photon=False))
+        with_photon = size_single_node(_m(**base, is_any_photon=True))
+        assert without.node_type is not None
+        assert with_photon.node_type is not None
+        without_spec = rcs.INSTANCE_CATALOG[without.node_type]
+        with_spec = rcs.INSTANCE_CATALOG[with_photon.node_type]
+        assert with_spec.memory_gb >= without_spec.memory_gb
+        assert with_spec.vcpus >= without_spec.vcpus
 
 
 class TestPresetAndValidation:
@@ -721,6 +953,83 @@ class TestPresetAndValidation:
 
         assert rec.cohort == "healthy_single"
         assert generate_validation_config(rec) is None
+
+    def test_healthy_single_photon_emits_validation_config(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        dag_dir = tmp_path / "dags" / "platform" / "photon_dag"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "photon_dag_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_m_general_single_node_cluster\n"
+            "  databricks_conn_id: databricks_new\n"
+            "  custom_configurations:\n"
+            "    runtime_engine: PHOTON\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "photon_dag_declaration.yml").write_text(
+            "dag:\n  name: photon_dag\n"
+            "workflow:\n  type: query_delta\n  layer: enrich\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(rcs, "DAGS_ROOT", tmp_path / "dags")
+
+        m = _m(
+            dag_id="bietlejuice.photon_dag",
+            driver_node_type="m6g.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p95=30.0,
+            drv_mem_p95=40.0,
+            is_any_photon=True,
+        )
+        rec = build_recommendation(m)
+        cfg = generate_validation_config(rec)
+
+        assert rec.cohort == "healthy_single"
+        assert cfg is not None
+        assert cfg["validation"]["cluster"]["type"] == (
+            "consolidation_m_general_single_node_cluster"
+        )
+        custom = cfg["validation"]["cluster"].get("custom_configurations", {})
+        assert "runtime_engine" not in custom
+
+    def test_healthy_single_nvme_emits_validation_config(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        dag_dir = tmp_path / "dags" / "platform" / "nvme_dag"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "nvme_dag_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_m_general_single_node_cluster\n"
+            "  databricks_conn_id: databricks_new\n"
+            "  custom_configurations:\n"
+            "    driver_node_type_id: m6gd.2xlarge\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "nvme_dag_declaration.yml").write_text(
+            "dag:\n  name: nvme_dag\nworkflow:\n  type: query_delta\n  layer: enrich\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(rcs, "DAGS_ROOT", tmp_path / "dags")
+
+        m = _m(
+            dag_id="bietlejuice.nvme_dag",
+            driver_node_type="m6gd.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p95=70.0,
+            drv_mem_p95=50.0,
+            is_any_local_nvme=True,
+        )
+        rec = build_recommendation(m)
+        cfg = generate_validation_config(rec)
+
+        assert rec.cohort == "healthy_single"
+        assert "drop_nvme" in rec.actions.split("|")
+        assert rec.recommended_preset == "consolidation_m_general_single_node_cluster"
+        assert cfg is not None
+        assert cfg["validation"]["cluster"]["type"] == (
+            "consolidation_m_general_single_node_cluster"
+        )
 
     def test_preset_catalog_sanity(self):
         assert PRESET_CATALOG["consolidation_m_general_cluster"].num_workers == 2
@@ -952,9 +1261,7 @@ class TestGenerateValidationConfigContract:
     """Smoke test that recommend_cluster_specs delegates to ci_cd validation module."""
 
     def test_delegates_to_ci_cd_module(self, tmp_path, monkeypatch):
-        import os
-
-        os.environ["ENVIRONMENT"] = "prod"
+        monkeypatch.setenv("ENVIRONMENT", "prod")
         dag_dir = tmp_path / "dags" / "growth" / "enrich_semrush_classified"
         dag_dir.mkdir(parents=True)
         (dag_dir / "enrich_semrush_classified_cluster.yml").write_text(
@@ -1210,3 +1517,200 @@ class TestAmdCorrection:
             )
             is None
         )
+
+
+class TestDataLayerPhotonNvme:
+    def test_sql_selects_photon_and_nvme_flags(self):
+        sql = build_sql(days=90, min_days=3, min_runs=3)
+        amd_sql = rcs.build_amd_sql(days=90, min_days=3, min_runs=3, amd_min_runs=3)
+
+        assert "is_any_photon" in sql
+        assert "is_any_local_nvme" in sql
+        assert "is_any_photon" in amd_sql
+        assert "is_any_local_nvme" in amd_sql
+
+    def test_dag_metrics_photon_nvme_default_false(self):
+        m = _m()
+
+        assert m.is_any_photon is False
+        assert m.is_any_local_nvme is False
+
+    def test_row_to_metrics_maps_photon_and_nvme_flags(self):
+        m = rcs._row_to_metrics(
+            {
+                "airflow_dag_id": "bietlejuice.test_dag",
+                "driver_node_type": "m6gd.xlarge",
+                "worker_node_type": "m6gd.xlarge",
+                "worker_count": "2",
+                "is_any_photon": "true",
+                "is_any_local_nvme": "true",
+            }
+        )
+
+        assert m.is_any_photon is True
+        assert m.is_any_local_nvme is True
+
+
+class TestSizingLevers:
+    def test_observed_total_cores_counts_driver_plus_workers(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+        )
+        # m6g.large=2 vCPU, m6g.xlarge=4 vCPU -> 2 + 2*4 = 10
+        assert rcs.observed_total_cores(m) == 10
+
+    def test_observed_total_cores_single_node(self):
+        m = _m(driver_node_type="m6g.2xlarge", worker_node_type=None, worker_count=0)
+        assert rcs.observed_total_cores(m) == 8
+
+    def test_best_single_candidate_sizes_to_additive_demand(self):
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_cpu_p95=55.0,
+            drv_mem_p95=35.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+        )
+
+        cand = rcs.build_best_single_candidate(m)
+
+        assert cand is not None
+        assert cand.worker_count == 0
+        assert cand.worker_node_type is None
+        assert cand.driver_node_type == size_single_node(m).node_type
+
+    def test_current_refined_candidate_keeps_two_or_more_workers(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type="r6g.4xlarge",
+            worker_count=4,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+        )
+
+        cand = rcs.build_current_refined_candidate(m)
+
+        assert cand is not None
+        assert cand.worker_count >= 2
+        # driver lever shrinks the idle on-demand driver
+        assert rcs._vcpus(cand.driver_node_type) <= rcs._vcpus("m6g.2xlarge")
+
+    def test_current_refined_candidate_none_for_single_node(self):
+        m = _m(worker_count=0, worker_node_type=None)
+
+        assert rcs.build_current_refined_candidate(m) is None
+
+    def test_candidate_total_cores_never_exceeds_observed(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type="m6g.2xlarge",
+            worker_count=2,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p95=20.0,
+            wrk_mem_p95=20.0,
+        )
+        observed = rcs.observed_total_cores(m)
+
+        best = rcs.build_best_single_candidate(m)
+        refined = rcs.build_current_refined_candidate(m)
+
+        assert best is not None
+        assert rcs.candidate_total_cores(best) <= observed
+        if refined is not None:
+            assert rcs.candidate_total_cores(refined) <= observed
+
+
+class TestFleetDbuRate:
+    def test_fleet_dbu_rate_sql_aggregates_non_photon_dbu_per_node_hour(self):
+        sql = rcs.build_fleet_dbu_rate_sql(days=90)
+
+        assert "is_any_photon = FALSE" in sql
+        assert "total_dbu_consumed" in sql
+        assert "ec2_spot_hours" in sql
+        assert "ec2_on_demand_hours" in sql
+        assert "instance_type" in sql
+        assert "dbu_per_node_hour" in sql
+        assert "GROUP BY" in sql
+
+    def test_fleet_dbu_rate_from_rows_builds_per_instance_map(self):
+        rows = [
+            {"instance_type": "m6g.xlarge", "dbu_per_node_hour": "1.6"},
+            {"instance_type": "r6g.2xlarge", "dbu_per_node_hour": "3.0"},
+        ]
+
+        fleet = rcs.fleet_dbu_rate_from_rows(rows)
+
+        assert fleet["m6g.xlarge"] == pytest.approx(1.6)
+        assert fleet["r6g.2xlarge"] == pytest.approx(3.0)
+
+    def test_fleet_dbu_per_node_hour_uses_observed_value(self):
+        fleet = {"m6g.xlarge": 1.6}
+
+        assert rcs.fleet_dbu_per_node_hour("m6g.xlarge", fleet) == pytest.approx(1.6)
+
+    def test_fleet_dbu_per_node_hour_falls_back_to_vcpu_proportional(self):
+        # m6g.xlarge = 4 vCPU -> 0.4 DBU/vCPU-hr; m6g.2xlarge = 8 vCPU -> 3.2.
+        fleet = {"m6g.xlarge": 1.6}
+
+        assert rcs.fleet_dbu_per_node_hour("m6g.2xlarge", fleet) == pytest.approx(3.2)
+
+    def test_fleet_dbu_per_node_hour_returns_none_when_no_observations(self):
+        assert rcs.fleet_dbu_per_node_hour("m6g.xlarge", {}) is None
+
+
+_ACCEPTANCE_FIXTURES_PATH = (
+    REPO_ROOT / "tests" / "fixtures" / "recommend_cluster_specs_acceptance.json"
+)
+
+
+class TestRealDagAcceptance:
+    """Regression locks from live Trino telemetry (90-day window, 2026-06-09).
+
+    Each fixture encodes dominant-config metrics for a production DAG and the
+    recommender output that was observed when the fixture was generated. Re-run
+    Trino + regenerate tests/fixtures/recommend_cluster_specs_acceptance.json if
+    the algorithm changes intentionally.
+    """
+
+    @pytest.fixture(scope="class")
+    def acceptance_fixtures(self) -> dict:
+        return json.loads(_ACCEPTANCE_FIXTURES_PATH.read_text())
+
+    @pytest.mark.parametrize(
+        "dag_key",
+        [
+            "istio",
+            "emlio",
+            "jaiminho",
+            "langfuse",
+            "enrich_search",
+            "enrich_tracked_events",
+            "enrich_access_logs",
+            "opa",
+        ],
+    )
+    def test_live_dag_recommendation(self, acceptance_fixtures, dag_key: str):
+        fixture = acceptance_fixtures[dag_key]
+        m = DagMetrics(**fixture["kwargs"])
+        expected = fixture["expected"]
+        rec = build_recommendation(m)
+
+        assert rec.cohort == expected["cohort"], (
+            f"{dag_key}: cohort {rec.cohort!r} != {expected['cohort']!r}"
+        )
+        assert rec.actions == expected["actions"], (
+            f"{dag_key}: actions {rec.actions!r} != {expected['actions']!r}"
+        )
+        assert rec.recommended_preset == expected["recommended_preset"]
+        assert rec.rec_driver_node_type == expected["rec_driver_node_type"]
+        assert rec.rec_worker_node_type == expected["rec_worker_node_type"]
+        assert rec.rec_worker_count == expected["rec_worker_count"]
+        assert rec.rec_runtime_engine == expected["rec_runtime_engine"]

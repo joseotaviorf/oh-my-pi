@@ -775,6 +775,7 @@ def _effective_validation_target(
     mapped_worker: str,
     mapped_driver: Optional[str],
     prod_cluster_type: str,
+    recommended_runtime_engine: Optional[str] = None,
 ) -> dict:
     target = copy.deepcopy(effective_prod)
 
@@ -785,7 +786,15 @@ def _effective_validation_target(
     if mapped_driver:
         target["driver_node_type_id"] = mapped_driver
 
-    if _uses_photon(effective_prod, prod_cluster_type):
+    # A rightsizing recommendation may normalize Photon off (runtime_engine
+    # STANDARD); in that case the validation cluster must NOT carry the prod
+    # PHOTON engine — the recommended preset already defaults to STANDARD.
+    normalize_photon_off = str(recommended_runtime_engine or "").upper() == "STANDARD"
+    if normalize_photon_off:
+        # Drop any prod PHOTON engine so it isn't carried into the validation run;
+        # the recommended preset already defaults to STANDARD.
+        target.pop("runtime_engine", None)
+    elif _uses_photon(effective_prod, prod_cluster_type):
         target["runtime_engine"] = "PHOTON"
 
     return target
@@ -799,6 +808,7 @@ def compute_validation_overrides(
     validation_resolved: dict,
     prod_cluster_type: str = "",
     num_workers: Optional[int] = None,
+    recommended_runtime_engine: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Emit only cluster fields where effective prod differs from validation defaults."""
     target = _effective_validation_target(
@@ -806,6 +816,7 @@ def compute_validation_overrides(
         mapped_worker=mapped_worker,
         mapped_driver=mapped_driver,
         prod_cluster_type=prod_cluster_type,
+        recommended_runtime_engine=recommended_runtime_engine,
     )
     if num_workers is not None:
         target["num_workers"] = num_workers
@@ -991,6 +1002,7 @@ def build_rightsizing_validation_cluster_spec(
     recommended_num_workers: Optional[int] = None,
     recommended_driver_node_type: Optional[str] = None,
     recommended_worker_node_type: Optional[str] = None,
+    recommended_runtime_engine: Optional[str] = None,
     config_service: Optional[ConfigurationService] = None,
     databricks_conn_id_fallback: Optional[str] = None,
 ) -> Optional[ValidationClusterSpec]:
@@ -1017,6 +1029,7 @@ def build_rightsizing_validation_cluster_spec(
         validation_resolved=validation_resolved,
         prod_cluster_type=prod_cluster_type,
         num_workers=num_workers,
+        recommended_runtime_engine=recommended_runtime_engine,
     )
     custom_configurations = merge_declaration_validation_custom_configurations(
         declaration, custom_configurations

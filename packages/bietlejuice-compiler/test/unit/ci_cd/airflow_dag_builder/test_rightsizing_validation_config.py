@@ -35,6 +35,7 @@ class _Rec:
     rec_worker_count: int | None = None
     num_workers_override: int | None = None
     driver_override_node_type_id: str | None = None
+    rec_runtime_engine: str | None = None
     driver_action: str | None = ""
     worker_action: str | None = ""
     projected: _Projected = field(default_factory=_Projected)
@@ -159,6 +160,41 @@ class TestGenerateValidationConfig:
         )
 
         assert generate_validation_config(rec, dags_root=tmp_path / "dags") is None
+
+    def test_healthy_single_drop_nvme_same_preset_emits_validation(self, tmp_path):
+        dag_dir = tmp_path / "dags" / "platform" / "nvme_dag"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "nvme_dag_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_m_general_single_node_cluster\n"
+            "  databricks_conn_id: databricks_new\n"
+            "  custom_configurations:\n"
+            "    driver_node_type_id: m6gd.2xlarge\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "nvme_dag_declaration.yml").write_text(
+            "dag:\n  name: nvme_dag\nworkflow:\n  type: query_delta\n  layer: enrich\n",
+            encoding="utf-8",
+        )
+
+        rec = _Rec(
+            dag_id="bietlejuice.nvme_dag",
+            cohort="healthy_single",
+            confidence="high",
+            actions="drop_nvme",
+            current_preset="consolidation_m_general_single_node_cluster",
+            recommended_preset="consolidation_m_general_single_node_cluster",
+            rec_driver_node_type="m6g.2xlarge",
+            driver_override_node_type_id="m6g.2xlarge",
+            rec_worker_count=0,
+        )
+
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
+
+        assert cfg is not None
+        assert cfg["validation"]["cluster"]["type"] == (
+            "consolidation_m_general_single_node_cluster"
+        )
 
     def test_emits_allow_custom_spark_job(self, tmp_path):
         dag_dir = tmp_path / "dags" / "growth" / "hubspot"

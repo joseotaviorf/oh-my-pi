@@ -8,15 +8,16 @@ Operational steps live in [`cluster_spec_recommender_runbook.md`](cluster_spec_r
 
 ## Philosophy
 
-The recommender is now **single-node-first**. A multi-node cluster is treated as a cost smell unless measured demand proves it needs multiple machines.
+The recommender is **bidirectional and cost-truthful**. It does not assume single-node is always better, nor multi-node. For every DAG it generates the feasible candidate shapes, prices each under one consistent model, and keeps the cheapest that does not regress the SLA. The cohort *is* the reason for the pick.
 
 The reason is empirical:
 
-- `core` and `fast_lane` have run predominantly single-node since April/May and stayed stable while running hot: p95 CPU/memory often lands around 80-97%.
-- `opa` and `istio` tried single-node and reverted. Their blocker is not I/O wait; it is wall-clock versus hourly cadence. Their p95 wall time is already around 34-44 minutes of a 60 minute interval.
-- Fleet data showed most spend has low worker CPU, and driver-bound plus idle-worker clusters are prime collapse candidates rather than keep-multi candidates.
+- A multi-node cluster with a small **on-demand driver** plus a few **spot workers** can be cheaper than collapsing to a large on-demand single node, because spot is ~37% of on-demand. So collapse is not automatically a win.
+- `core` and `fast_lane` run hot single-node (p95 CPU/memory ~80-97%) — genuinely good single nodes.
+- `opa` and `istio` tried single-node and reverted. Their blocker is wall-clock versus hourly cadence, not I/O wait. Their p95 wall is already ~34-44 minutes of a 60 minute interval, so collapse breaks the SLA but a worker-type refinement does not.
+- Photon (DBU ~3x) and local NVMe (EC2 ~+20%) are treated as cost-impacting and **normalized off** in every recommendation; the cost model prices the normalized shape.
 
-Multi-node is kept only for narrow evidence exits: capacity over the largest single node, projected SLA breach, balanced hot driver and workers, or a spot/on-demand cost increase.
+Two independent levers drive the decision — one for the driver, one for the workers. If they converge on a single node, the pick is `collapse_to_single`; if they converge on a smaller multi-node shape, the pick is `right_size_multi`; if nothing beats the observed cost-or-SLA, the DAG is kept with a `keep_multi_*` reason.
 
 ---
 
@@ -73,6 +74,8 @@ dim_ec2_price (on_demand USD/hr) ────┼──► fact_databricks_task_r
 | `arm_avg_ec2_cost_usd`, `arm_avg_dbu_cost_usd` | Cost guard components |
 | `arm_avg_dbu_consumed` | Per-run DBU intensity (sanity only) |
 | `ec2_spot_hours`, `ec2_on_demand_hours` | Evidence of spot/on-demand blend |
+| `is_any_photon` | Any run used Photon; recommendation normalizes it off (DBU ~3x) |
+| `is_any_local_nvme` | Any run used a local-NVMe (`*gd`) node; recommendation normalizes it off (EC2 ~+20%) |
 | spill and pricing flags | Quality gates |
 
 ### Instance Catalog
@@ -101,21 +104,22 @@ Single-node branch:
 | Guard | Cohort | Action |
 | --- | --- | --- |
 | `drv_mem_p95 >= 88%` | `protect_oom_risk` | Promote single-node to a higher-memory family at the same tier (`compute→general→memory`); if already on memory, step up one size tier |
-| `drv_cpu_p95 < 20%` and `drv_mem_p95 < 35%` | `driver_downsize` | Downsize single-node one tier |
+| `drv_cpu_p95 <= 40%` and `drv_mem_p95 <= 70%` and a safe one-tier downsize exists | `driver_downsize` | Downsize single-node one tier (relaxed thresholds; projected mem/CPU must stay under the 82%/85% single-node targets) |
 | Otherwise | `healthy_single` | No validation config |
 
-Multi-node branch:
+Multi-node branch (bidirectional candidate selection, `_decide_multi`):
 
-1. Compute additive memory and core demand.
-2. Pick the cheapest single node that holds demand at about 82% memory and 85% CPU.
-3. If no single node fits, return `keep_multi_memory`, `keep_multi_compute`, or `keep_multi_balanced`.
-4. Project post-collapse wall p95 and require it to be <= 80% of `schedule_interval_minutes`; otherwise `keep_multi_sla`.
-5. If driver and workers are both hot, return `keep_multi_balanced`.
-6. Compare projected single-node on-demand EC2 + DBU against actual blended cost. If collapse costs more, return `keep_multi_cost`.
-7. Otherwise return `collapse_to_single`.
-8. For every `keep_multi_*` exit, independently right-size the driver and workers, then keep only changes that reduce projected blended cost.
+1. Build the **collapse** candidate: the cheapest single node holding additive demand at ~82% memory / ~85% CPU (`build_best_single_candidate`).
+2. Build the **refined-multi** candidate: independently minimize the driver and resize the worker type/count, floored at two workers (`build_current_refined_candidate`). A 1-worker shape is strictly dominated by single-node, so it folds into the collapse comparison.
+3. Filter each candidate:
+   - **Core cap** — candidate total cores must not exceed observed total cores (never upsize).
+   - **SLA** — projected p95 wall must be `<= max(0.80 * schedule_interval_minutes, observed wall_p95)` (never regress beyond the larger of the SLA target and what the DAG already runs at).
+   - **Memory feasibility** for the collapse candidate.
+   - The refined candidate must be a **genuine reduction** (driver, worker type, or count shrinks) — an unchanged shape is not a recommendation.
+4. Price every surviving candidate (OD driver + spot workers + fleet DBU, Photon normalized off) and keep the **cheapest that beats the observed cost basis**. That candidate's label (`collapse_to_single` or `right_size_multi`) becomes the cohort.
+5. If nothing beats cost-or-SLA, keep multi-node with the most informative reason: `keep_multi_memory` / `keep_multi_compute` / `keep_multi_balanced` (from the sizer), else `keep_multi_balanced` (hot driver + busy workers), else `keep_multi_sla` (collapse breaks cadence), else `keep_multi_cost`. The rejected candidate cost is surfaced as `blocked_cost`.
 
-I/O wait is no longer an automatic keep gate. `opa`/`istio` showed that the real production blocker for small-file CDC jobs is cadence and wall-clock, not high CPU wait.
+I/O wait is not an automatic keep gate. `opa`/`istio` showed the real production blocker for small-file CDC jobs is cadence and wall-clock, not high CPU wait.
 
 ---
 
@@ -158,34 +162,32 @@ The sizer includes larger single-node candidates (`12xlarge`, `16xlarge`) even w
 
 ## SLA Guard
 
-The recommender estimates wall-clock inflation after removing workers:
+The SLA guard works on the **p95** wall (`_projected_wall_for_sla`), inflated for the shape change plus the Photon-off normalization the recommender always applies:
 
 ```text
 projected_wall_p95 =
-  wall_p95_min * (1 + (0.67 * worker_activity + 0.15 * worker_burst) * worker_multiplier)
+  wall_p95_min
+  * shape_inflation        # 1.0 for a same-parallelism worker-type swap;
+                           # collapse_wall_inflation for collapse;
+                           # worker_reduction_wall_inflation for fewer workers
+  * (2.0 if is_any_photon else 1.0)   # Photon normalized off doubles wall
 ```
 
-Where:
-
-- `0.67` is calibrated from the fast_lane full worker-removal experience.
-- `worker_activity` uses worker p50/p95 CPU and p95 memory pressure.
-- `worker_burst` adds a small penalty for spiky p95 worker CPU, which protects OPA-like small-file CDC jobs.
-- `worker_multiplier` scales with worker count and caps at 1.
-- Near-hourly observed cadence is capped at 60 minutes when missed runs make `1440 / runs_per_day` look longer than the actual schedule.
-
-Collapse is allowed only when:
+A candidate passes when:
 
 ```text
-projected_wall_p95 <= 0.80 * schedule_interval_minutes
+projected_wall_p95 <= max(0.80 * schedule_interval_minutes, observed wall_p95)
 ```
 
-This keeps hourly CDC shapes like `opa` and `istio` multi-node when they are already using most of the interval.
+The `max(..., observed)` ceiling is deliberate: a same-parallelism worker-type downsize keeps wall unchanged, so it must not be blocked just because the DAG already runs over its SLA target. Only candidates that **regress** wall (collapse, fewer workers, Photon-off) are held to the schedule target. This keeps hourly CDC shapes like `opa`/`istio` multi-node when collapsing, while still allowing a worker-type refinement.
+
+`collapse_wall_inflation` keeps the calibrated `0.67` worker-activity term (from the fast_lane full worker-removal experience) plus a small `worker_burst` penalty for spiky p95 worker CPU. Near-hourly observed cadence is capped at 60 minutes when missed runs make `1440 / runs_per_day` look longer than the actual schedule.
 
 ---
 
-## Multi-Node Right-Sizing
+## Multi-Node Right-Sizing (refined-multi candidate)
 
-When the single-node path is rejected, the recommender keeps the DAG multi-node but still looks for independent savings on the driver and workers.
+`build_current_refined_candidate` builds the smaller multi-node shape that competes against collapse. It uses two independent levers and floors workers at two (a 1-worker shape is dominated by single-node):
 
 Driver:
 
@@ -211,34 +213,31 @@ Where `worker_activity` is the max of worker p50/p95 CPU and p95 memory pressure
 
 ---
 
-## Cost Guard
+## Cost Engine
 
-Single-node clusters are on-demand. Multi-node workers are often spot. The cost guard compares the rejected single-node candidate against `arm_avg_cost_per_run_usd` (negotiated total USD per run from telemetry):
-
-```text
-single_node_projected_cost =
-  single_node_on_demand_ec2_per_run
-  + projected_dbu_cost
-
-single_node_on_demand_ec2_per_run =
-  single_node_on_demand_ec2_per_hour * projected_runtime_hours
-
-projected_runtime_hours =
-  current_wall_p50_hours * collapse_wall_inflation
-
-projected_dbu_cost =
-  current_dbu_cost
-  * recommended_vcpus / current_vcpus
-  * projected_runtime_hours / current_wall_p50_hours
-```
-
-The break-even intuition is:
+Every candidate is priced by `estimate_projected_total_cost` under one consistent model, so collapse and refined-multi are compared apples-to-apples:
 
 ```text
-single_OD < driver_OD + worker_count * worker_OD * 0.37
+projected_cost =
+    on_demand_driver_ec2_per_hour * wall_hours
+  + spot_worker_ec2_per_hour * worker_count * wall_hours      # spot = 0.37 * on_demand
+  + dbu_per_run * negotiated_usd_per_dbu                      # _USD_PER_DBU = 0.114
 ```
 
-Because spot is only 37% of on-demand, busy spot-heavy clusters can be cheaper as multi-node. Those land in `keep_multi_cost`.
+Key rules:
+
+- **Driver is on-demand, workers are spot.** Recommendations never price (or emit) on-demand workers.
+- **EC2 scales with runtime**, not a whole hour — a 5-minute run pays ~1/12 of the hourly price.
+- **DBU per run** uses the fleet-derived non-Photon DBU/node-hour (`_FLEET_DBU_RATE`, loaded once at runtime from telemetry of non-Photon homogeneous clusters). When the fleet map cannot price a node it falls back to a vCPU-proportional estimate, and when the map is empty (offline/unit runs) it degrades to the legacy observed-DBU proxy so the tool still produces a cost.
+- **Photon normalized off** multiplies the projected wall by `_PHOTON_OFF_WALL_INFLATION = 2.0` (the recommendation always assumes Photon is removed; DBU drops to the non-Photon fleet rate).
+- **Photon demand adjustment** (`effective_demand()` when `is_any_photon`): sizing gates and additive-demand math use inflated CPU/memory telemetry — `_PHOTON_OFF_CPU_INFLATION = 1.20` on p50/p95 CPU, `_PHOTON_OFF_MEM_INFLATION = 1.30` on p50/p95 memory — so collapse, downsize, OOM, and multi levers assume STANDARD-runtime headroom. CSV observed columns stay raw; only decision logic uses effective demand.
+- **NVMe normalized off** is implicit: recommended node types are the non-`gd` equivalents, so the ~20% NVMe EC2 premium is gone.
+
+The break-even intuition is unchanged — because spot is only 37% of on-demand, a small OD driver plus spot workers can beat a large OD single node:
+
+```text
+single_OD  vs  driver_OD + worker_count * worker_OD * 0.37
+```
 
 Example:
 
@@ -247,34 +246,19 @@ Current: m6g.large OD driver + 2 x m6g.2xlarge spot workers
 EC2/hr: 0.077 + 2 * 0.308 * 0.37 = 0.305
 
 Collapse candidate: m6g.4xlarge OD
-EC2/hr: 0.616
+EC2/hr: 0.616  → collapse more than doubles EC2; refined-multi wins.
 ```
 
-That collapse more than doubles EC2 before DBU effects, so it is blocked.
+## Candidate Selection and the Cost Basis
 
-For kept multi-node recommendations, the cost guard evaluates the actual driver/worker resize:
-
-```text
-multi_node_projected_cost =
-  projected_dbu_cost
-  + projected_driver_ec2_per_run
-  + projected_worker_ec2_per_run
-
-projected_worker_ec2_per_run =
-  measured_worker_ec2_per_run
-  * (new_worker_count * new_worker_on_demand_price)
-    / (old_worker_count * old_worker_on_demand_price)
-  * worker_reduction_wall_inflation
-```
-
-This preserves the observed spot/on-demand blend from telemetry while scaling it by the recommended worker type, worker count, and projected runtime. If the combined driver/worker proposal is not cheaper, the recommender falls back to the current multi-node shape plus any driver-only minimization and records `resize_blocked_cost` in `actions`.
+`_decide_multi` keeps the cheapest surviving candidate whose projected cost is **below the observed cost basis** (`arm_avg_cost_per_run_usd`, the true blended USD/run from telemetry). A candidate that does not beat the basis is rejected, and its cost is surfaced as the blocked alternative.
 
 The report keeps accepted and blocked cost estimates separate:
 
 - `est_cost_delta_pct` is the accepted recommendation's estimated per-run delta.
-- `blocked_cost_delta_pct` is the rejected cost-guard candidate's estimated per-run delta.
+- `blocked_cost_delta_pct` is the cheapest rejected candidate's estimated per-run delta.
 - `--list` renders both as `est -12% (+35%)`: accepted savings first, blocked increase in parentheses.
-- If no resize is accepted, the accepted delta is `0%`, for example `est 0% (+35%)`.
+- When nothing is accepted (a `keep_multi_*` pick), the accepted delta is `0%`, for example `est 0% (+35%)`.
 
 ---
 
@@ -288,16 +272,20 @@ Vocabulary:
 - Driver: `reduce_driver`, `keep_driver`
 - Worker type: `reduce_worker_type`, `keep_worker_type`
 - Worker count: `reduce_worker_count`, `keep_worker_count`
-- Blocked levers: `worker_count_blocked_sla`, `resize_blocked_cost`
+- Blocked levers: `worker_count_blocked_sla`
+- Normalizations: `disable_photon` (also sets `runtime_engine: STANDARD`), `drop_nvme` (recommended nodes use the non-`gd` family)
 - No-op fallthrough: `no_change`
+
+Normalizations are appended to whatever shape decision was made (including an otherwise-healthy DAG), because the cost model already assumes Photon and NVMe are removed. Recommended workers are always spot — the recommender never emits `ON_DEMAND` for workers.
 
 Examples:
 
 ```text
 collapse_to_single
 keep_multi_node|reduce_driver|reduce_worker_type|reduce_worker_count
-keep_multi_node|reduce_driver|reduce_worker_type|worker_count_blocked_sla
-keep_multi_node|resize_blocked_cost
+keep_multi_node|keep_driver|reduce_worker_type|worker_count_blocked_sla
+collapse_to_single|disable_photon|drop_nvme
+keep_multi_node
 ```
 
 ---
@@ -327,17 +315,20 @@ validation:
 
 | Cohort | Actionable | Meaning |
 | --- | ---: | --- |
-| `collapse_to_single` | Yes | Multi-node demand fits single-node, SLA, and cost |
-| `keep_multi_sla` | Yes | Collapse would violate cadence guard; keep multi-node and right-size driver/workers |
-| `keep_multi_memory` | Yes | Additive memory exceeds largest single node; keep multi-node and right-size driver/workers |
-| `keep_multi_compute` | Yes | Additive cores exceed largest single node; keep multi-node and right-size driver/workers |
-| `keep_multi_balanced` | Yes | Driver and workers are both hot; keep multi-node and right-size driver/workers when headroom exists |
-| `keep_multi_cost` | Yes | Single-node on-demand would cost more; keep multi-node and right-size driver/workers when cheaper |
+| `collapse_to_single` | Yes | The cheapest surviving candidate is a single node that beats observed cost within SLA |
+| `right_size_multi` | Yes | The cheapest surviving candidate is a genuinely smaller multi-node shape (driver/worker type/count) that beats observed cost within SLA |
+| `keep_multi_sla` | No change | Nothing beat cost-or-SLA; collapse would break cadence |
+| `keep_multi_memory` | No change | Additive memory exceeds the largest single node and no refinement wins |
+| `keep_multi_compute` | No change | Additive cores exceed the largest single node and no refinement wins |
+| `keep_multi_balanced` | No change | Driver and workers are both hot; no candidate beats cost-or-SLA |
+| `keep_multi_cost` | No change | A feasible candidate exists but does not beat the observed cost basis |
 | `protect_oom_risk` | Yes | Single-node near OOM; promote to a higher-memory family (size up only when already on `r6g`) |
-| `driver_downsize` | Yes | Single-node driver has excess headroom; downsize |
+| `driver_downsize` | Yes | Single-node driver has excess headroom; downsize one tier |
 | `healthy_single` | No | Single-node is acceptable |
 | quality review cohorts | No | Need data, stable config, or price confidence first |
 | `autoscale_review` | No | Fixed-size recommender does not alter autoscale clusters |
+
+`keep_multi_*` cohorts still surface a `blocked_cost` (the cheapest rejected candidate) but emit no shape change — only `disable_photon`/`drop_nvme` may still apply. A standalone Photon/NVMe normalization can make an otherwise-healthy DAG actionable.
 
 The old `driver_cpu_bound_keep`, `driver_memory_pressure`, `io_bound_keep`, `memory_bound_keep`, `downsize_workers`, and `healthy_multi` paths are no longer the normal multi-node decision surface. Their names may remain in historical output but are not the target flow for new ARM recommendations.
 
@@ -379,6 +370,10 @@ validation:
       driver_node_type_id: m6g.large
       node_type_id: m6g.xlarge
 ```
+
+### Normalization in the validation block
+
+When the observed runs used Photon, the validation config drops the prod `runtime_engine: PHOTON` so the validation cluster runs `STANDARD` (the recommended preset's default) — `compute_validation_overrides` is passed `recommended_runtime_engine="STANDARD"` and removes the engine from the diff. NVMe normalization is reflected directly in the recommended node types (`*gd` → `*g`). Worker availability is never pinned to `ON_DEMAND` in a generated validation block.
 
 ---
 
