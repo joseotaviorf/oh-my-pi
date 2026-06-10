@@ -3344,11 +3344,11 @@ bietlejuice.enrich_planner_emlio_logs:
   - bietlejuice.emlio:load-clean-emlio-logs:first-run-of-day
 bietlejuice.enrich_pp_multi:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
   - bietlejuice.rental_management:load-clean-pp-multi-user:first-run-of-day
 bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb_administration:load-clean-pro-owner-fee-aud:first-run-of-day

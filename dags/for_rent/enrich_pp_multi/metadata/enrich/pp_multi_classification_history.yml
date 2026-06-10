@@ -73,12 +73,12 @@ columns:
     description: Maximum total distinct houses over the owner's lifetime (post-deduplication) up to the anchor day.
   total_visits:
     lineage:
-      - datalake_booking.booking.id
+      - datalake_visit.visits.id_visit
     description: Number of visits in the last 150 days (ending on anchor day) across active, 2 years max and lifetime max houses.
   canceled_visits:
     lineage:
-      - datalake_booking.booking.status
-      - datalake_booking.booking.reason_category
+      - datalake_visit.visits.is_canceled
+      - datalake_visit.visits.cancellation_on_behalf_of
     description: Number of visits canceled by Owner in the last 150 days (ending on anchor day) across the considered houses.
   owner_cancellation_rate:
     description: Ratio of canceled to total visits (0 when there are no visits) computed as of the anchor day.
@@ -98,4 +98,3 @@ columns:
     description: Partition month of the anchor day.
   day:
     description: Partition day of the anchor day.
-

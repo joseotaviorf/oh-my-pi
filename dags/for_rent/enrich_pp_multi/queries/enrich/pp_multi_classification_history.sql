@@ -29,10 +29,10 @@ daily_house_listing AS (
     hldi.id_owner,
     CONCAT(
       COALESCE(l.dejavuid, CAST(hldi.id_house AS STRING)),
-      CASE 
+      CASE
         -- Only process complement if it exists and is not empty after trimming
-        WHEN h.complement IS NOT NULL AND TRIM(h.complement) != '' 
-        THEN CONCAT('.', 
+        WHEN h.complement IS NOT NULL AND TRIM(h.complement) != ''
+        THEN CONCAT('.',
           -- Remove multiple consecutive spaces and replace with empty string
           -- This cleans up any extra spaces left after removing keywords
           REGEXP_REPLACE(
@@ -228,22 +228,21 @@ pp_multi_houses AS (
 pp_multi_visits AS (
   SELECT
     pmh.id_owner,
-    COALESCE(NULLIF(COUNT(b.id), 0), 0) AS total_visits,
+    COALESCE(NULLIF(COUNT(v.id_visit), 0), 0) AS total_visits,
     COALESCE(
       COUNT_IF(
-        b.status = 'Cancelado'
-        AND b.reason_category = 'Owner'
+        v.is_canceled
+        AND v.cancellation_on_behalf_of = 'SUPPLY'
       ),
       0
     ) AS canceled_visits,
     COALESCE(canceled_visits / total_visits, 0) AS owner_cancellation_rate
   FROM
     pp_multi_houses AS pmh
-      LEFT JOIN 
-        datalake_booking.booking AS b
-        ON pmh.id_house = b.id_house
-        AND b.is_visit = TRUE
-        AND b.ts_booking_utc >= DATE('{load_start_date}') - INTERVAL '150' DAYS
+      LEFT JOIN
+        datalake_visit.visits AS v
+        ON pmh.id_house = v.id_house
+        AND v.ts_visit >= DATE('{load_start_date}') - INTERVAL '150' DAYS
   GROUP BY
     pmh.id_owner
 ),
@@ -295,7 +294,7 @@ possible_fraud AS (
     pmv.owner_cancellation_rate,
     kls.agent_had_key,
     cs.has_owner_singed_contract,
-    IF(pmv.total_visits - pmv.canceled_visits <= 0 
+    IF(pmv.total_visits - pmv.canceled_visits <= 0
       AND kls.agent_had_key = FALSE
       AND cs.has_owner_singed_contract = FALSE, TRUE, FALSE
     ) AS is_possible_fraud
