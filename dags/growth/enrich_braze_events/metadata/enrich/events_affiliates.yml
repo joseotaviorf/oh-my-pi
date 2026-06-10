@@ -2,7 +2,7 @@
 database_name: datalake_braze
 table_name: events_affiliates
 owner: leticia.lima@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: This table contains details about event related/realized by affiliates, e.g. disptaches or clicks.
 columns:
   id_event:

@@ -1,8 +1,8 @@
 ---
 database_name: datalake_growth_media_platform
 table_name: google_metrics
+domain: Growth
 owner: henrique.paulo@quintoandar.com.br
-domain: Data Growth
 description: This table contains metrics like clicks, impressions, and cost from Google Ads with geo-level granularity.
 columns:
   id_account:

@@ -1,7 +1,7 @@
 database_name: datalake_braze_dispatches
 table_name: email_owners
 owner: leticia.lima@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: This table contains data about events related to emails sent to owners.
 columns:
   id_user_dispatch:

@@ -11,16 +11,17 @@ WITH reprocessing_flow AS (
 )
 
 SELECT
-  id_level,
-  ds_level,
-  tp_reprocessing,
-  tp_reprocessing_entity,
-  nm_mailing_table,
-  ts_updated,
+  reprocessing_flow.id_level,
+  reprocessing_flow.ds_level,
+  reprocessing_flow.tp_reprocessing,
+  reprocessing_flow.tp_reprocessing_entity,
+  reprocessing_flow.nm_mailing_table,
+  reprocessing_flow.ts_updated,
   CONCAT_WS(
     '#',
-    tp_reprocessing,
-    tp_reprocessing_entity,
-    nm_mailing_table
+    reprocessing_flow.tp_reprocessing,
+    reprocessing_flow.tp_reprocessing_entity,
+    reprocessing_flow.nm_mailing_table
   ) AS bk_recovery
-FROM reprocessing_flow
+FROM
+  reprocessing_flow

@@ -4,300 +4,375 @@ table_name: obt_supply
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Table with joined information about the supply events (our facts and dimensions).
+  One-big-table view of supply funnel events with denormalized dimensions,
+  discard history, affiliate classification, PP Multi flags, and planning
+  clusters used in Growth supply reporting.
 columns:
-  sk_date:
-    description: Surrogate key for the date of the event, linking to the dim_date table for more date details.
+  date:
+    description: Calendar date of the supply event, joined from dim_date on the fact event date key.
     lineage:
-      - dw_public.dim_date.sk_date
+      - dw_public.dim_date.date
+      - dw_growth.fact_supply_events.sk_date
+  week_start:
+    description: First day of the week containing the supply event date.
+    lineage:
+      - dw_public.dim_date.week_start
+      - dw_growth.fact_supply_events.sk_date
+  month_start:
+    description: First day of the month containing the supply event date.
+    lineage:
+      - dw_public.dim_date.month_start
+      - dw_growth.fact_supply_events.sk_date
+  year_month:
+    description: Year and month of the supply event formatted as YYYY-MM for monthly aggregations.
+    lineage:
+      - dw_public.dim_date.year_month
+      - dw_growth.fact_supply_events.sk_date
+  sk_date:
+    description: Date surrogate key of the supply event for joining to dim_date.
+    lineage:
+      - dw_growth.fact_supply_events.sk_date
   city_group:
-    description: Categorization of cities into groups based on geographical data.
+    description: Geographic city group of the lead or house region linked to the supply event.
     lineage:
       - dw_public.dim_region.city_group
-  nm_business_context:
-    description: Describes the business context of the lead, indicating if this lead is for rent or for sale.
+      - dw_growth.fact_supply_events.sk_region
+  city_name:
+    description: Name of the city where the lead or house associated with the supply event is located.
     lineage:
-      - dw_growth.fact_supply_events.nm_business_context
-  nm_supply_source:
-    description: Source of the lead information, describing where the lead data originated.
+      - dw_public.dim_region.city_name
+      - dw_growth.fact_supply_events.sk_region
+  neighborhood:
+    description: Neighborhood or locality of the lead or house region linked to the supply event.
     lineage:
-      - dw_growth.fact_supply_events.nm_supply_source
-  nm_source:
-    description: The source medium of the lead, typically indicating the originating platform or channel.
+      - dw_public.dim_region.name
+      - dw_growth.fact_supply_events.sk_region
+  country_code:
+    description: ISO country code of the region linked to the supply event.
     lineage:
-      - dw_growth.fact_supply_events.utm_source
-  nm_medium:
-    description: The medium through which the lead was acquired.
+      - dw_public.dim_region.country_code
+      - dw_growth.fact_supply_events.sk_region
+  id_country:
+    description: Identifier of the country where the supply event region is located.
     lineage:
-      - dw_growth.fact_supply_events.utm_medium
-  nm_campaign:
-    description: Name of the marketing campaign associated with the lead.
-    lineage:
-      - dw_growth.fact_supply_events.utm_campaign
-  nm_content:
-    description: Name of the marketing content associated with the lead.
-    lineage:
-      - dw_growth.fact_supply_events.utm_content
-  nm_term:
-    description: Name of the marketing term associated with the lead.
-    lineage:
-      - dw_growth.fact_supply_events.utm_term
+      - dw_public.dim_region.id_country
+      - dw_growth.fact_supply_events.sk_region
   sk_lead:
-    description: Unique identifier for the lead.
+    description: Surrogate key of the lead in EBDB associated with the supply event.
     lineage:
       - dw_growth.fact_supply_events.sk_lead
   sk_house:
-    description: Surrogate key linked to the house involved in the supply flow.
+    description: Surrogate key of the house listing associated with the supply event, when applicable.
     lineage:
       - dw_growth.fact_supply_events.sk_house
   sk_region:
-    description: Identifier for the regional division where the lead or house is located, linked to the dim_region table.
+    description: Surrogate key of the geographic region linked to the lead or house in the supply event.
     lineage:
-      - dw_public.dim_region.sk_region
+      - dw_growth.fact_supply_events.sk_region
   sk_funnel_step:
-    description: Identifier for the step in the supply funnel that the lead currently resides in.
+    description: Surrogate key of the funnel step and business event reached in the supply flow.
     lineage:
-      - dw_growth.dim_funnel_step.sk_funnel_step
+      - dw_growth.fact_supply_events.sk_funnel_step
   sk_user_affiliate:
-    description: Surrogate key representing an affiliate user associated with the lead.
+    description: Surrogate key of the affiliate user who referred the lead in the supply event.
     lineage:
-      - dw_growth.dim_affiliate_tracking.sk_user_affiliate
+      - dw_growth.fact_supply_events.sk_user_affiliate
   sk_user_conversion:
-    description: Identifier for the user who converted the lead.
+    description: Surrogate key of the user credited with converting the lead in the supply event.
     lineage:
       - dw_growth.fact_supply_events.sk_user_conversion
   sk_user_registrant:
-    description: Identifier for the user who initially registered the lead.
+    description: Surrogate key of the user who registered the supply event in the product.
     lineage:
       - dw_growth.fact_supply_events.sk_user_registrant
   sk_owner:
-    description: Surrogate key for the owner of the house.
+    description: Surrogate key of the house owner linked to the listing in the supply event.
     lineage:
       - dw_growth.fact_supply_events.sk_owner
-  tp_lead:
-    description: Type of the lead, categorizing the lead based on its characteristics and origin.
+  nm_business_context:
+    description: Business context of the supply event, indicating whether the flow is for rent or for sale.
     lineage:
-      - dw_growth.dim_acquisition_lead.tp_lead
+      - dw_growth.fact_supply_events.nm_business_context
+  nm_supply_source:
+    description: Origin channel of the supply record, such as first-party (1P), third-party (3P), or CIQ.
+    lineage:
+      - dw_growth.fact_supply_events.nm_supply_source
+  nm_source:
+    description: UTM source parameter captured for the marketing channel of the supply event.
+    lineage:
+      - dw_growth.fact_supply_events.utm_source
+  nm_medium:
+    description: UTM medium parameter captured for the marketing touchpoint of the supply event.
+    lineage:
+      - dw_growth.fact_supply_events.utm_medium
+  nm_campaign:
+    description: UTM campaign parameter associated with the marketing campaign of the supply event.
+    lineage:
+      - dw_growth.fact_supply_events.utm_campaign
+  nm_content:
+    description: UTM content parameter associated with the ad creative of the supply event.
+    lineage:
+      - dw_growth.fact_supply_events.utm_content
+  nm_term:
+    description: UTM term parameter associated with the paid keyword or ad group of the supply event.
+    lineage:
+      - dw_growth.fact_supply_events.utm_term
   nm_detailed_route:
-    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
+    description: Product route and A/B experiment path the lead followed before triggering listing creation.
     lineage:
       - dw_growth.fact_supply_events.nm_detailed_route
   sk_task:
-    description: The ID for the lead creation task.
+    description: Identifier of the lead creation task associated with the supply event.
     lineage:
       - dw_growth.fact_supply_events.sk_task
   sk_chat_session:
-    description: The ID for the lead creation session in Sauron.
+    description: Identifier of the Sauron chat session in which the lead was created.
     lineage:
       - dw_growth.fact_supply_events.sk_chat_session
   quinto_andar_phone_number:
-    description: QuintoAndar phone number the client used to get in touch and have their lead created.
+    description: QuintoAndar phone number the client used when the lead was created through inbound contact.
     lineage:
       - dw_growth.fact_supply_events.quinto_andar_phone_number
+  tp_lead:
+    description: Acquisition lead type classifying the supply record by origin and characteristics.
+    lineage:
+      - dw_growth.dim_acquisition_lead.tp_lead
   cd_funnel_step:
-    description: Code representing the step in the sales funnel, providing additional granularity to sk_funnel_step.
+    description: Code of the supply funnel step reached in the event, such as lead, prospect, or opportunity.
     lineage:
       - dw_growth.dim_funnel_step.cd_funnel_step
   tp_business_event:
-    description: Type of business event associated with the flow.
+    description: Type of business event at the funnel step, such as advance or drop.
     lineage:
       - dw_growth.dim_funnel_step.tp_business_event
   business_event:
-    description: Description of the business event associated with the flow.
+    description: Combined label of business event type and intermediate funnel step code for the supply event.
     lineage:
-      - dw_growth.dim_funnel_step.cd_funnel_inter_step
       - dw_growth.dim_funnel_step.tp_business_event
+      - dw_growth.dim_funnel_step.cd_funnel_inter_step
   campaign_strategy_intent:
-    description: Strategic intent of the campaign associated with the lead.
+    description: Strategic intent of the media setup campaign matched to the supply event UTM taxonomy.
     lineage:
       - dw_growth.dim_media_setup.campaign_strategy_intent
   campaign_business_context:
-    description: Business context of the campaign, providing insight into the campaign's targeted business area.
+    description: Business context targeted by the media setup campaign linked to the supply event.
     lineage:
       - dw_growth.dim_media_setup.campaign_business_context
   campaign_landing_page:
-    description: Landing page associated with the campaign from which the lead originated.
+    description: Landing page defined in the media setup taxonomy for the campaign of the supply event.
     lineage:
       - dw_growth.dim_media_setup.campaign_landing_page
   source:
-    description: The originating source of the lead within the marketing campaign context.
+    description: Normalized marketing source from the media setup taxonomy linked to the supply event.
     lineage:
       - dw_growth.dim_media_setup.source
   medium:
-    description: The marketing medium used to generate the lead, such as PPC, affiliate marketing, etc.
+    description: Normalized marketing medium from the media setup taxonomy linked to the supply event.
     lineage:
       - dw_growth.dim_media_setup.medium
   behavior_type:
-    description: Describes the behavior type of the lead, such as organic or non-organic.
+    description: Organic or non-organic behavior classification from the media setup taxonomy.
     lineage:
       - dw_growth.dim_media_setup.behavior_type
   funnel_side:
-    description: Indicates which side of the marketing funnel the lead is associated with, such as supply or demand.
+    description: Marketing funnel side from the media setup taxonomy, such as supply or demand.
     lineage:
       - dw_growth.dim_media_setup.funnel_side
-  company_report_origin:
-    description: Indicates the origin within the company that the report targets.
-  full_conversion_origin:
-    description: Aggregated field representing the full history of conversion origins for the lead.
-  full_operation_channel:
-    description: Detailed representation of the operational channel over the history of the lead.
-  status:
-    description: Current status of the lead based on business rules.
-  date:
-    description: The exact date related to the lead event.
-    lineage:
-      - dw_public.dim_date.date
-  week_start:
-    description: The start of the week related to the lead event.
-    lineage:
-      - dw_public.dim_date.week_start
-  month_start:
-    description: The start of the month related to the lead event.
-    lineage:
-      - dw_public.dim_date.month_start
-  year_month:
-    description: The year and month combination related to the lead event.
-    lineage:
-      - dw_public.dim_date.year_month
-  city_name:
-    description: Name of the city where the lead is located.
-    lineage:
-      - dw_public.dim_region.city_name
-  neighborhood:
-    description: The neighborhood or locality of the lead.
-    lineage:
-      - dw_public.dim_region.neighborhood
-  country_code:
-    description: ISO country code where the lead is located.
-    lineage:
-      - dw_public.dim_region.country_code
-  id_country:
-    description: Unique identifier for the country of the lead.
-    lineage:
-      - dw_public.dim_region.id_country
   cd_discard_reason:
-    description: Code for the reason a lead was discarded.
+    description: Code of the discard reason when the lead or house dropped at a funnel step.
     lineage:
       - dw_growth.dim_supply_discards.cd_discard_reason
   ds_discard_reason:
-    description: Description of why the lead was discarded.
+    description: Descriptive label of the discard reason for the most recent drop event in the supply journey.
     lineage:
       - dw_growth.dim_supply_discards.ds_discard_reason
   discard_funnel_step:
-    description: Funnel step at the time of lead discard.
+    description: Funnel step code at which the most recent discard event occurred for the supply journey.
     lineage:
-      - dw_growth.dim_funnel_step.discard_funnel_step
-  discard_date:
-    description: The date when the lead was discarded.
-    lineage:
-      - dw_public.dim_date.discard_date
-  discard_year_month:
-    description: The year and month when the lead was discarded.
-    lineage:
-      - dw_public.dim_date.discard_year_month
+      - dw_growth.dim_supply_discards.cd_funnel_step
   discard_agent:
-    description: Name of the agent that has discarded the user.
+    description: Operations agent associated with the most recent discard event for the supply journey.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_agent
   discard_partner:
-    description: Name of the partner that has discarded the user.
+    description: Operations partner associated with the most recent discard event for the supply journey.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_partner
   discard_assigned_partner:
-    description: Name of the assigned partner that has discarded the user.
+    description: Assigned operations partner at the most recent discard event for the supply journey.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_assigned_partner
   discard_opp_user:
-    description: Surrogate key of the user who converted the lead at the discard opportunity step.
+    description: Surrogate key of the conversion user recorded at the most recent discard event.
     lineage:
-      - dw_growth.dim_supply_discards.sk_user_conversion
+      - dw_growth.fact_supply_events.sk_user_conversion
+  discard_date:
+    description: Calendar date of the most recent discard event for the supply journey.
+    lineage:
+      - dw_public.dim_date.date
+      - dw_growth.fact_supply_events.sk_date
+  discard_year_month:
+    description: Year and month of the most recent discard event for the supply journey.
+    lineage:
+      - dw_public.dim_date.year_month
+      - dw_growth.fact_supply_events.sk_date
   ds_objective:
-    description: Objective associated with the lead according to business rules.
+    description: Operations objective assigned to the supply event handling flow.
     lineage:
       - dw_growth.dim_supply_operation_flow.ds_objective
   nm_agent:
-    description: Name of the agent associated with the lead.
+    description: Operations team or channel responsible for handling the supply event.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_agent
   nm_partner:
-    description: Name of the partner related to the lead.
+    description: Operations partner company assigned to handle the supply event.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_partner
   nm_assigned_partner:
-    description: Name of the assigned partner for the lead.
+    description: Partner company designated to receive the lead for outbound or dialer workflows.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_assigned_partner
   cd_contact_medium:
-    description: The medium of contact used for communication with the lead.
+    description: Code of the contact medium used in the operations flow for the supply event.
     lineage:
       - dw_growth.dim_supply_operation_flow.cd_contact_medium
   cd_approach:
-    description: The approach type used in the lead handling process.
+    description: Code of the operations approach applied when handling the supply event.
     lineage:
       - dw_growth.dim_supply_operation_flow.cd_approach
   tp_reprocessing:
-    description: Type of reprocessing done on the lead, if applicable.
+    description: Type of manual reprocessing or recovery flow applied to the supply event, when applicable.
     lineage:
       - dw_growth.dim_supply_recovery_flow.tp_reprocessing
   nm_mailing_table:
-    description: Name of the mailing table used for the lead.
+    description: Name of the mailing table used in the recovery or reprocessing flow for the supply event.
     lineage:
       - dw_growth.dim_supply_recovery_flow.nm_mailing_table
   tp_origin_acquisition:
-    description: Type of origin for the acquisition phase of the lead.
+    description: PWA or channel origin where the lead was acquired at acquisition user path level 1.
     lineage:
-      - dw_growth.dim_supply_user_path.tp_origin_acquisition
+      - dw_growth.dim_supply_user_path.tp_origin
   tp_origin_conversion:
-    description: Type of origin for the conversion phase of the lead.
+    description: PWA or channel origin where the conversion occurred in the supply user path.
     lineage:
-      - dw_growth.dim_supply_user_path.tp_origin_conversion
+      - dw_growth.dim_supply_user_path.tp_origin
   full_tp_origin_conversion:
-    description: Aggregated type of origin for conversion covering full lead history.
-  affiliate_type_adjusted:
-    description: Adjusted type of the affiliate based on business rules.
-  conversion_origin:
-    description: The origin of conversion, detailing how the lead moved through the funnel.
-  acquisition_origin:
-    description: Describes the origin of lead acquisition.
-  operation_channel:
-    description: The operational channel through which the lead was managed.
-  funnel_order:
-    description: Order of stages in the marketing/sales funnel the lead has moved through.
+    description: Last conversion origin across all user path levels for the supply journey within the same context.
     lineage:
-      - dw_growth.dim_funnel_step.funnel_order
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_user_path.id_level
+  affiliate_type_adjusted:
+    description: Affiliate type normalized for reporting, applying partner overrides and doorman post-2023 rules.
+    lineage:
+      - dw_growth.dim_affiliate_tracking.affiliate_type
+      - dw_growth.fact_supply_events.sk_user_affiliate
+      - dw_public.dim_date.sk_date
+  conversion_origin:
+    description: Reporting bucket for how the lead converted, derived from conversion path and operations agent.
+    lineage:
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_operation_flow.nm_agent
+  acquisition_origin:
+    description: Reporting bucket for how the lead was acquired, derived from supply source and acquisition path.
+    lineage:
+      - dw_growth.fact_supply_events.nm_supply_source
+      - dw_growth.fact_supply_events.sk_user_affiliate
+      - dw_growth.dim_supply_user_path.tp_origin
+  operation_channel:
+    description: Operational channel that handled the supply event, such as inbound, CIQ, or account manager.
+    lineage:
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_operation_flow.nm_agent
+  funnel_order:
+    description: Numeric order of the funnel step in the supply journey, from lead through first listing.
+    lineage:
+      - dw_growth.dim_funnel_step.cd_funnel_step
+  is_hybrid_listing:
+    description: Indicates whether the house listing spans more than one business context at the same funnel step.
+    lineage:
+      - dw_growth.fact_supply_events.sk_house
+      - dw_growth.fact_supply_events.nm_business_context
+      - dw_growth.dim_funnel_step.cd_funnel_step
+  is_converted_by_ciq:
+    description: Indicates whether the user who converted the supply event is registered as a CIQ agent.
+    lineage:
+      - dw_growth.fact_supply_events.sk_user_conversion
+      - datalake_ebdb_agents.ciq_users.id_user
   sk_supply:
-    description: Surrogate key for the supply related to the lead.
+    description: Surrogate key that uniquely identifies the supply event in the fact table.
     lineage:
       - dw_growth.fact_supply_events.sk_supply
   affiliate_campaign:
-    description: Campaign associated with the affiliate managing the lead.
+    description: Campaign name assigned to the affiliate in the Growth taxonomy classification.
     lineage:
       - datalake_growth_taxonomy.affiliates_classification.affiliate_campaign
   affiliate_objective:
-    description: Objective or target of the affiliate campaign.
+    description: Objective or target defined for the affiliate campaign in the Growth taxonomy.
     lineage:
       - datalake_growth_taxonomy.affiliates_classification.affiliate_objective
   pp_multi_conversion_flag:
-    description: Indicates whether the owner had an active PP Multi conversion flag on the event date.
+    description: Indicates whether the owner had an active PP Multi conversion flag on the event date for rent flows.
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history.is_pp_multi_active
+      - dw_growth.fact_supply_events.sk_owner
   is_pp_multi_active:
     description: Indicates whether the owner was classified as active in PP Multi segmentation on the event date.
     lineage:
       - datalake_pp_multi.pp_multi_classification_history.pp_multi_classification
-  is_hybrid_listing:
-    description: Indicates whether the house is listed in more than one business context at the same funnel step.
-  is_converted_by_ciq:
-    description: Indicates whether the conversion user belongs to the CIQ user base.
+      - dw_growth.fact_supply_events.sk_owner
+  company_report_origin:
+    description: Company reporting channel assigned to the supply event based on funnel stage, origins, and media setup.
     lineage:
-      - datalake_ebdb_agents.ciq_users.id_user
+      - dw_growth.dim_funnel_step.cd_funnel_step
+      - dw_growth.dim_media_setup.medium
+      - dw_growth.dim_media_setup.source
+      - dw_growth.dim_media_setup.behavior_type
+      - dw_growth.dim_supply_recovery_flow.tp_reprocessing
+      - dw_growth.fact_supply_events.nm_business_context
+  full_conversion_origin:
+    description: Last conversion origin reached across all funnel steps for the supply journey in the same context.
+    lineage:
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_operation_flow.nm_agent
+      - dw_growth.dim_funnel_step.cd_funnel_step
+  full_operation_channel:
+    description: Last operational channel applied across all funnel steps for the supply journey in the same context.
+    lineage:
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_operation_flow.nm_agent
+      - dw_growth.dim_funnel_step.cd_funnel_step
+  status:
+    description: Lead lifecycle status at the funnel step, such as new lead, prospecting started, converted, or discarded.
+    lineage:
+      - dw_growth.fact_supply_events.sk_funnel_step
+      - dw_growth.fact_supply_events.sk_supply
+      - dw_growth.fact_supply_events.sk_lead
   planning_cluster:
-    description: Marketing planning cluster derived from company report origin and affiliate volumetry rules.
+    description: Planning cluster derived from company report origin with affiliate volumetry and paid media splits.
+    lineage:
+      - dw_growth.dim_media_setup.medium
+      - dw_growth.dim_media_setup.source
+      - dw_growth.dim_media_setup.behavior_type
+      - dw_datamarts.affiliates_clusters.affiliate_volumetry
+      - datalake_gsheets_clean.affiliate_volumetry_cluster.affiliate_volumetry
   planning_operation:
-    description: Operational planning label derived from conversion origin and operation channel rules.
+    description: Planning operation channel derived from full conversion and acquisition origins and reprocessing type.
+    lineage:
+      - dw_growth.dim_supply_recovery_flow.tp_reprocessing
+      - dw_growth.dim_supply_operation_flow.nm_assigned_partner
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_operation_flow.nm_agent
   planning_conversion_cluster:
-    description: Conversion planning cluster derived from company report origin and affiliate volumetry rules.
+    description: Planning conversion priority cluster derived from company report origin and affiliate volumetry tier.
+    lineage:
+      - dw_datamarts.affiliates_clusters.affiliate_volumetry
+      - datalake_gsheets_clean.affiliate_volumetry_cluster.affiliate_volumetry
   planning_conversion:
-    description: Conversion planning label derived from conversion origin and operation channel rules.
+    description: Planning conversion channel derived from full conversion origin, operation channel, and reprocessing.
+    lineage:
+      - dw_growth.dim_supply_recovery_flow.tp_reprocessing
+      - dw_growth.dim_supply_operation_flow.nm_assigned_partner
+      - dw_growth.dim_supply_user_path.tp_origin
+      - dw_growth.dim_supply_operation_flow.nm_agent
   ts_load:
-    description: Timestamp when the obt_supply row was loaded into the data warehouse.
+    description: Timestamp when the row was loaded into the data warehouse.

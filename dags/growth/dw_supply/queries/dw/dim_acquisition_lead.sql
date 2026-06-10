@@ -23,26 +23,27 @@ WITH acq_lead AS (
 )
 
 SELECT
-  sk_supply_lead,
-  cd_supply_source,
-  nm_business_context,
-  id_lead,
-  id_lead_ebdb,
-  id_original_lead,
-  id_prospect,
-  id_house,
-  tp_track_campaign,
-  tp_track_medium,
-  tp_track_source,
-  nm_medium,
-  nm_source,
-  nm_campaign,
-  tp_lead,
-  ts_updated,
+  acq_lead.sk_supply_lead,
+  acq_lead.cd_supply_source,
+  acq_lead.nm_business_context,
+  acq_lead.id_lead,
+  acq_lead.id_lead_ebdb,
+  acq_lead.id_original_lead,
+  acq_lead.id_prospect,
+  acq_lead.id_house,
+  acq_lead.tp_track_campaign,
+  acq_lead.tp_track_medium,
+  acq_lead.tp_track_source,
+  acq_lead.nm_medium,
+  acq_lead.nm_source,
+  acq_lead.nm_campaign,
+  acq_lead.tp_lead,
+  acq_lead.ts_updated,
   CONCAT_WS(
     '#',
-    sk_supply_lead,
-    cd_supply_source,
-    nm_business_context
+    acq_lead.sk_supply_lead,
+    acq_lead.cd_supply_source,
+    acq_lead.nm_business_context
   ) AS bk_acq_lead
-FROM acq_lead
+FROM
+  acq_lead

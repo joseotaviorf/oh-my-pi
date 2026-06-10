@@ -2,7 +2,7 @@
 database_name: datalake_demand_score_report
 table_name: demand_score_report
 owner: henrique.paulo@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: This table contains snapshot of reverse from demand_score in Masterfeed.
 columns:
   id_house:

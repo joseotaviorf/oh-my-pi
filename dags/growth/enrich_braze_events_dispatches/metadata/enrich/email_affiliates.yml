@@ -2,7 +2,7 @@
 database_name: datalake_braze_dispatches
 table_name: email_affiliates
 owner: data-growth@quintoandar.com
-domain: Data Growth
+domain: Growth
 description: Table with details about communications sent through email to affiliates. Joins multiple event types to give a complete picture of the email lifecycle for each user on a given day.
 
 columns:

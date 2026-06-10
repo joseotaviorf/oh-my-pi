@@ -1,5 +1,5 @@
 database_name: datalake_rene_descartes_raw
 table_name: house_lead
-owner: marcio.gomes@quintoandar.com.br
-domain: Data Growth
+owner: gabriel.salla@quintoandar.com
+domain: Growth
 description: The table stores information related to leads or prospects interested in purchasing a house.

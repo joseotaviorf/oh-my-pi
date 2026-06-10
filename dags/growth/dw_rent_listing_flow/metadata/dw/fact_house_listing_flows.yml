@@ -572,7 +572,7 @@ columns:
   is_ops_direct_register:
     description: Boolean flag which identifies if the house was directly registered via Admin by the Ops team.
   ops_agent:
-    description: Operations team associated with the lead when the origin is OwnerConversionPWA in Rene Descartes acquisition metadata.
+    description: Operations team agent associated with the lead, extracted from Rene Descartes acquisition campaign metadata.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   mkt_branded:

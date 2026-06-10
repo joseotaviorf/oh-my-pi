@@ -4,61 +4,60 @@ table_name: fact_supply_events
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  This table contains the events related to the supply flow, each row is an event
-  in the funnel step for one business context in Supply Flow.
+  Fact table with one row per supply funnel event. Each record represents a step
+  in the acquisition or conversion flow for a lead or house, enriched with
+  dimension surrogate keys for funnel step, operations, discards, user paths,
+  media setup, and ownership.
 columns:
   sk_supply:
+    description: Surrogate key that uniquely identifies a supply event, derived from the supply lead and house identifiers.
     lineage:
       - datalake_supply_flows.supply_events_tracking.sk_supply_lead
       - datalake_supply_flows.supply_events_tracking.id_house
-    description: Unique primary key that identifies each supply event.
   nm_business_context:
+    description: Business context of the supply event, indicating whether the flow is for rent or for sale.
     lineage:
       - datalake_supply_flows.supply_events_tracking.business_context
-    description: Business context associated with the supply event.
   nm_supply_source:
+    description: Origin channel of the supply record, such as first-party (1P), third-party (3P), or CIQ.
     lineage:
       - datalake_supply_flows.supply_events_tracking.supply_source
-    description: Supply source associated with the event.
   sk_supply_lead:
+    description: Surrogate key of the supply lead in the acquisition funnel, used to link events from the same lead journey.
     lineage:
       - datalake_supply_flows.supply_events_tracking.sk_supply_lead
-    description: Key from the dw_growth.dim_lead dimension associated with the supply.
   sk_lead:
+    description: Surrogate key of the lead in EBDB, shared across 1P, 3P, and CIQ supply sources.
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_lead_ebdb
-    description: Key from the dw_growth.dim_lead dimension associated with the supply event.
-  sk_region:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.id_region
-    description: Key from the dw_growth.dim_region dimension associated with the supply event.
-  sk_house:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.id_house
-    description: Key from the dw_growth.dim_house dimension associated with the supply event.
-  sk_user_registrant:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.id_user_registrant
-    description: Key from the dw_growth.dim_user dimension associated with the user who registered the supply event.
-  sk_user_conversion:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.id_user_conversion
-    description: Key from the dw_growth.dim_user dimension associated with the conversion user of the supply event.
   sk_lead_3p:
+    description: Surrogate key of the third-party lead identifier, populated only when the supply source is 3P.
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_lead
-    description: Key from the dw_growth.dim_lead dimension associated with third-party supply (if `supply_source` is '3P').
+      - datalake_supply_flows.supply_events_tracking.supply_source
+  sk_house:
+    description: Surrogate key of the house associated with the supply event, when the entity in the funnel is a listing.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_house
+  sk_region:
+    description: Surrogate key of the geographic region linked to the lead or house in the supply event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_region
+  sk_user_registrant:
+    description: Surrogate key of the user who registered the supply event in the product.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_user_registrant
+  sk_user_conversion:
+    description: Surrogate key of the user credited with converting the lead in the supply funnel.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_user_conversion
   sk_funnel_step:
+    description: Surrogate key of the funnel step and business event combination reached in the supply flow.
     lineage:
       - datalake_supply_flows.supply_events_tracking.funnel_step
       - datalake_supply_flows.supply_events_tracking.business_event
-    description: Concatenation of `funnel_step` and `business_event` in lowercase.
-  sk_discard:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.funnel_step
-      - datalake_supply_flows.supply_events_tracking.drop_step_reason
-    description: Concatenation of `funnel_step` and `drop_step_reason` in lowercase.
   sk_ops:
+    description: Surrogate key of the operations flow attributes applied to the event, including agent, partner, and contact details.
     lineage:
       - datalake_supply_flows.supply_events_tracking.ops_objective
       - datalake_supply_flows.supply_events_tracking.ops_agent
@@ -66,103 +65,109 @@ columns:
       - datalake_supply_flows.supply_events_tracking.ops_contact_medium
       - datalake_supply_flows.supply_events_tracking.ops_approach
       - datalake_supply_flows.supply_events_tracking.ops_assigned
-    description: Concatenation of various columns related to operations.
-  sk_recovery:
+  sk_discard:
+    description: Surrogate key of the discard reason when the lead or house drops at a funnel step.
     lineage:
-      - datalake_supply_flows.supply_events_tracking.reprocessed
-      - datalake_supply_flows.supply_events_tracking.reprocessing_entity_type
-      - datalake_supply_flows.supply_events_tracking.reprocessing_table_name
-    description: Concatenation of various columns related to recovery.
-  sk_conversion_user_path:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.application
-      - datalake_supply_flows.supply_events_tracking.lead_application
-      - datalake_supply_flows.supply_events_tracking.platform
-    description: Surrogate key for the conversion user path dimension.
-  sk_acquisition_user_path:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.lead_application
-      - datalake_supply_flows.supply_events_tracking.platform
-    description: Surrogate key for the acquisition user path dimension.
+      - datalake_supply_flows.supply_events_tracking.funnel_step
+      - datalake_supply_flows.supply_events_tracking.drop_step_reason
   sk_user_affiliate:
+    description: Surrogate key of the affiliate user who referred the lead that generated the supply event.
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_referred_by
-    description: Key from the dw_growth.dim_user dimension associated with the affiliate user of the supply event.
   sk_acquisition_lead:
+    description: Surrogate key of the acquisition lead profile, built from supply lead, source, and business context.
     lineage:
       - datalake_supply_flows.supply_events_tracking.sk_supply_lead
       - datalake_supply_flows.supply_events_tracking.supply_source
       - datalake_supply_flows.supply_events_tracking.business_context
-    description: Concatenation of various columns related to the acquisition of the supply event lead.
-  sk_date:
+  sk_recovery:
+    description: Surrogate key of the manual reprocessing or recovery flow applied to the supply event.
     lineage:
-      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    description: Key from the dw_growth.dim_date dimension associated with the event date.
-  ts_event_original:
+      - datalake_supply_flows.supply_events_tracking.reprocessed
+      - datalake_supply_flows.supply_events_tracking.reprocessing_entity_type
+      - datalake_supply_flows.supply_events_tracking.reprocessing_table_name
+  sk_acquisition_user_path:
+    description: Surrogate key of the acquisition user path, derived from lead application and registration platform at level 1.
     lineage:
-      - datalake_supply_flows.supply_events_tracking.ts_event_original
-    description: Original timestamp of the supply event.
-  ts_event:
+      - datalake_supply_flows.supply_events_tracking.lead_application
+      - datalake_supply_flows.supply_events_tracking.platform
+  sk_conversion_user_path:
+    description: Surrogate key of the conversion user path, derived from the PWA application where the conversion occurred.
     lineage:
-      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    description: Adjusted timestamp of the supply event.
+      - datalake_supply_flows.supply_events_tracking.application
   sk_media_setup:
+    description: Surrogate key of the media setup taxonomy entry matched to the event UTM naming convention suffix.
     lineage:
-      - datalake_supply_flows.dict_taxonomy.id_media_setup
-    description: Key from the dw_growth.dim_media_setup dimension associated with the media setup.
+      - datalake_growth_taxonomy.media_setup.id_media_setup
+      - datalake_supply_flows.supply_events_tracking.campaign
   sk_owner:
+    description: Surrogate key of the house owner linked to the listing involved in the supply event.
     lineage:
       - datalake_ebdb_listing.house.id_user
-    description: Surrogate key for the owner of the house associated with the supply event.
+      - datalake_supply_flows.supply_events_tracking.id_house
   nm_media_setup:
+    description: Media setup naming convention suffix resolved for the event from campaign UTM or taxonomy exception rules.
     lineage:
-      - datalake_growth_taxonomy.media_setup.naming_convention_sufix
-    description: Media setup naming convention suffix derived from campaign taxonomy rules.
+      - datalake_supply_flows.supply_events_tracking.campaign
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.naming_convention_sufix
   tp_flow_media_setup:
+    description: Rule that selected the media setup suffix, such as exception flow, taxonomy dictionary, or raw campaign UTM.
     lineage:
       - datalake_supply_flows.supply_events_tracking.campaign
       - datalake_gsheets_clean.taxonomy_demand_exception_flow.utm_campaign
       - datalake_growth_taxonomy.unified_taxonomy_dictionary.utm_campaign
-    description: Rule used to derive the media setup suffix for the supply event.
-  utm_medium:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.medium
-    description: UTM medium captured for the supply event.
-  utm_source:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.source
-    description: UTM source captured for the supply event.
-  utm_campaign:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.campaign
-    description: UTM campaign captured for the supply event.
-  utm_term:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.term
-    description: UTM term captured for the supply event.
-  utm_content:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.content
-    description: UTM content captured for the supply event.
-  ts_first_event_date:
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    description: Timestamp of the first supply event for the lead and business context.
-  ts_load:
-    description: Timestamp when the fact row was loaded into the data warehouse.
   nm_detailed_route:
-    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
+    description: Product route and A/B experiment path the lead followed before triggering listing creation, separated by a hyphen.
     lineage:
       - datalake_supply_flows.supply_events_tracking.detailed_route
   sk_task:
-    description: The ID for the lead creation task.
+    description: Identifier of the lead creation task associated with the supply event in the operations workflow.
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_task
   sk_chat_session:
-    description: The ID for the lead creation session in Sauron.
+    description: Identifier of the Sauron chat session in which the lead was created during the supply event.
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_chat_session
   quinto_andar_phone_number:
-    description: QuintoAndar phone number the client used to get in touch and have their lead created.
+    description: QuintoAndar phone number the client dialed or messaged when the lead was created through inbound contact.
     lineage:
       - datalake_supply_flows.supply_events_tracking.quinto_andar_phone_number
+  utm_medium:
+    description: UTM medium parameter captured for the marketing touchpoint that originated the supply event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.medium
+  utm_source:
+    description: UTM source parameter captured for the marketing channel that originated the supply event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.source
+  utm_campaign:
+    description: UTM campaign parameter captured for the marketing campaign associated with the supply event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.campaign
+  utm_term:
+    description: UTM term parameter captured for the paid keyword or ad group linked to the supply event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.term
+  utm_content:
+    description: UTM content parameter captured for the ad creative or placement linked to the supply event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.content
+  sk_date:
+    description: Date surrogate key of the adjusted event timestamp, formatted as YYYYMMDD for joining to dim_date.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+  ts_first_event_date:
+    description: Earliest adjusted event timestamp for the same lead, house, business context, and supply source combination.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+  ts_event_original:
+    description: Original timestamp of the supply event before timezone or pipeline adjustments.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_original
+  ts_event:
+    description: Adjusted timestamp of the supply event used for funnel sequencing and date partitioning.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+  ts_load:
+    description: Timestamp when the fact row was loaded into the data warehouse.

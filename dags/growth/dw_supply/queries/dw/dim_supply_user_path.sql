@@ -19,16 +19,17 @@ WITH base AS (
 )
 
 SELECT
-  id_level,
-  ds_level,
-  tp_origin,
-  tp_platform,
-  nm_content_page,
+  base.id_level,
+  base.ds_level,
+  base.tp_origin,
+  base.tp_platform,
+  base.nm_content_page,
   CONCAT_WS(
     '#',
-    tp_origin,
-    tp_platform,
-    nm_content_page
+    base.tp_origin,
+    base.tp_platform,
+    base.nm_content_page
   ) AS bk_user_path,
   NOW() AS ts_updated
-FROM base
+FROM
+  base

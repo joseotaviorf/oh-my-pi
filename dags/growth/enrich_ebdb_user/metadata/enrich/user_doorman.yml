@@ -1,8 +1,8 @@
 database_name: datalake_ebdb_user
 table_name: user_doorman
+description: Enriched doorman affiliate profile data from EBDB, including work location, occupation, subscription source, and active status. Each row represents one doorman affiliate record linked to its affiliate data.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
-description: Enriched profile of doorman affiliates, combining doorman registration data, affiliate linkage, occupation, work location, and user country context from EBDB.
 columns:
   id:
     description: Primary key of the doorman affiliate data record in EBDB.
@@ -21,9 +21,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.id_place
   country_code:
-    description: Country code of the linked user, defaulting to Undefined when not available.
     lineage:
       - datalake_ebdb_country.user.country_code
+    description: ISO country code of the doorman affiliate user, defaulting to Undefined when not available.
   work_address:
     description: Full work address reported by the doorman affiliate.
     lineage:
@@ -33,9 +33,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_street
   work_house_number:
-    description: Street number of the doorman work address.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_house_number
+    description: House or building number of the doorman work location.
   work_neighborhood:
     description: Neighborhood of the doorman work address.
     lineage:
