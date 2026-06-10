@@ -39,6 +39,10 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 - **Isaias-only conversion** (FP Only) → a subset of Full Process conversions where Isaias completed the entire flow autonomously, including photo scheduling and draft submission, with no human analyst involvement. Identified in `obt_supply` by `tp_origin_conversion = 'isaias'`, or in the ledger by `is_full_process = TRUE AND tp_origin_conversion = 'isaias' AND is_valid_attribution = TRUE`. Always a Full Process session — SDR sessions never produce `tp_origin_conversion = 'isaias'`.
 - **Isaias Full Process + Escalation conversion** → the total conversion volume from Full Process sessions, encompassing both the Isaias-only (autonomous) subset and conversions completed by an inbound human analyst after escalation. Isaias-only is a strict subset: every Isaias-only conversion is also counted in FP+Escalation. Ledger pattern: `is_full_process = TRUE AND is_valid_attribution = TRUE AND (tp_origin_conversion = 'isaias' OR (is_converted_within_24h = TRUE AND planning_operation = 'Inbound'))`.
 - **Isaias SDR conversion** → a conversion where Isaias SDR qualified the lead and the final conversion was completed by the inbound human analysts team within 24 h after the session. The conversion origin is always human (Inbound), never Isaias itself. Requires the ledger pattern: `is_full_process = FALSE AND is_converted_within_24h = TRUE AND is_valid_attribution = TRUE AND planning_operation = 'Inbound'`.
+- **Transbordo**, **escalation** → handoff of a session to a human queue when Isaias cannot or should not continue autonomously. Two distinct types: (1) **transbordo para Inside Sales** (`escalate_when_qualified` node visited — Isaias determined the lead is qualified and hands off to Inbound analysts) and (2) **transbordo para outras filas** (`escalation_node` visited — non-IS queues such as support). Never conflate the two: each has its own volume and rate metric.
+- **Sessão ociosa**, **idle session** → a Full Process session that reached no terminal state: no successful submission, no escalation (IS or other), and no disqualification. Computed as: `NOT has_successful_submission AND NOT has_inside_sales_esc AND NOT has_other_esc AND NOT has_disqualification`.
+- **Disqualification** → a session where Isaias determined the lead or property does not meet eligibility criteria, triggering a `%.disqualification` Langfuse observation. The prefix varies per qualification step; always filter with `o.name LIKE '%.disqualification'` — the only Isaias Langfuse filter that requires LIKE rather than an exact match.
+- **Successful Submission** → a Full Process session where Isaias autonomously completed the entire conversational flow and booked a photo session; confirmed by `Submission.post_clarification` observation with `json_extract_scalar(o.output, '$.photo_session_successfully_scheduled') = 'true'`.
 - **RENT / SALE**, **aluguel / venda** → `nm_business_context` values; always filter when the question is modality-specific
 - **acquisition_origin** → classifies HOW the lead entered the funnel (channel/product). Built from `nm_supply_source` and the acquisition-side user path (`dim_supply_user_path`, `id_level = 1`). Use for top-of-funnel breakdowns. **Never use this field to identify Isaias leads** — `'operations'` groups Isaias with other ops channels; use `tp_origin_acquisition = 'isaias'` instead.
 
@@ -197,6 +201,8 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 | Isaias session-level data (contact, status, timestamps) | `datalake_sauron_clean.session` (`sau`) — one row per Sauron session. Filter on explicit `source_environment` values (see Critical Rules). Join to supply via `sk_chat_session` (session path) or via ICF (lead path). |
 | Copilot Service session bridge | `datalake_copilot_service_clean.session` (`cs`) — links `id_sauron_session` (VARCHAR) to `id_external` (Langfuse session ID). Required to connect Sauron sessions to Langfuse traces and ICF rows. Join: `cs.id_sauron_session = CAST(sau.id AS VARCHAR)` and `cs.id_external = icf.id_langfuse_session`. |
 | Isaias funnel qualification flags | `datalake_chatbot.isaias_conversational_flow` (`icf`) — one row per Langfuse session with boolean `has_*` flags per qualification step. Join to supply (retrieved path): `icf.id_lead_retrieved = CAST(obt.sk_lead AS VARCHAR)`. |
+| Isaias session traces (Langfuse) | `datalake_langfuse_clean.traces` (`t`) — one row per Langfuse session; join to observations via `o.id_trace = t.id_trace`. Always filter `CONTAINS(t.tags, 'isaias')` and `t.environment = 'prod'`. Bridge to Sauron/supply via `datalake_copilot_service_clean.session` (`cs.id_external = t.id_session`). |
+| Isaias node-level events, feature flags, escalations (transbordos), disqualifications (Langfuse) | `datalake_langfuse_clean.observations` (`o`) — one row per observation event; integer partitions `year` and `month` (always apply both). Extract feature flags from `orchestrator_init` output JSON via `json_extract_scalar(o.output, '$.flag_name')`; detect node visits via `BOOL_OR(o.name = '...')`; detect IS escalation (transbordo para IS) via `o.name = 'escalate_when_qualified'`; detect other-queue escalation via `o.name = 'escalation_node'`; detect disqualification via `o.name LIKE '%.disqualification'`. Always pair the LIKE with an explicit `o.name IN (...)` whitelist to prevent full table scans. |
 
 **Critical rules:**
 - `sk_chat_session` in `obt_supply` is **VARCHAR** (built from `COALESCE(id_chat_session, '-1')`). The sentinel `'-1'` means no session. The ledger uses two paths to link supply events to sessions: **session path** (`obt_session_filtered` where `sk_chat_session IS NOT NULL AND sk_chat_session != '-1'`, joined to the session directly) and **lead path** (`obt_lead_filtered` where `sk_lead IS NOT NULL AND sk_lead != '-1'`, joined via ICF). Both paths are UNION ALL'd in `unified_supply_events` before being joined to `base_sessions`.
@@ -207,15 +213,16 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
   - *Touchpoint* (union): a lead is "touched" by Isaias if it was created by it **or** retrieved in a session. A created lead can be retrieved again later — the populations overlap.
 - **Session-based metrics require the UNION ALL event-ledger pattern.** Queries that compute `sessions → conversions` rates use a `UNION ALL` of two event types per session: `inicio_sessao` (always present) and `conversao` (only when a lead/supply is linked). The denominator is always session count (`tipo_evento = 'inicio_sessao'`); the numerator counts distinct converted supply IDs (`tipo_evento = 'conversao'`). The `is_valid_attribution` flag must be `TRUE` in the numerator to avoid crediting multiple sessions for the same lead (only the most recent session touching a lead is valid). See Golden Query 7.
 - **`is_full_process` must be derived from Langfuse, not from `icf`.** `isaias_conversational_flow.is_full_process` is incomplete for sessions before the field was consistently populated. The authoritative source is the `orchestrator_init` observation in Langfuse. Always compute it with this CTE and join via `cs.id_external = fps.id_session` (where `cs` is `datalake_copilot_service_clean.session`):
+  > Set `{start_year}` and `{start_month}` to integer values from your analysis start date. Keep the Langfuse window short (days to a few weeks) — wide scans are expensive.
   ```sql
   full_process_sessions AS (
       SELECT
           t.id_session,
-          MAX(CAST(json_extract_scalar(o.output, '$.is_draft_enabled') AS BOOLEAN) = TRUE) AS is_full_process
+          COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process
       FROM datalake_langfuse_clean.observations o
       LEFT JOIN datalake_langfuse_clean.traces t ON o.id_trace = t.id_trace
-      WHERE o.year = 2026
-          AND o.month >= 3
+      WHERE o.year = {start_year}
+          AND o.month >= {start_month}
           AND CONTAINS(t.tags, 'isaias')
           AND t.environment = 'prod'
           AND o.name IN ('orchestrator_init')
@@ -233,6 +240,11 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 - **`is_valid_attribution` uses `last_session_retrieved`, not ROW_NUMBER.** For the session path (lead created in session): `TRUE` when `lsr.last_session IS NULL` (no retrieval ever recorded, so the originating session is always valid) OR when `lsr.last_session = id_sauron_session_varchar`. For the lead path (retrieved lead): `TRUE` only when `lsr.last_session = id_sauron_session_varchar`. The `last_session_retrieved` CTE is: `SELECT id_lead_retrieved, MAX(id_sauron_session) AS last_session FROM isaias_conversational_flow LEFT JOIN datalake_copilot_service_clean.session ON id_external = id_langfuse_session GROUP BY 1`.
 - **`is_converted_within_24h` uses the QUALIFIED event timestamp from `supply_events_tracking`, not `obt.ts_event`.** CTE: `SELECT id_lead_ebdb, business_context, MIN(ts_event_adjusted) FROM datalake_supply_flows.supply_events_tracking WHERE funnel_step = 'QUALIFIED' GROUP BY 1, 2`. Compare: `ct.ts_event_adjusted <= bs.ts_created_session + INTERVAL '24' HOUR`.
 - `id_lead_retrieved` in `isaias_conversational_flow` is NULL when Isaias didn't retrieve a lead. Use LEFT JOIN to keep all supply rows and INNER JOIN only when requiring a matched lead.
+- **`obt_supply.sk_lead` equals `id_lead_ebdb` in source systems.** When joining `obt_supply` to raw source tables (Wololo via `id_reference`, OLOS via `id_lead`, `supply_events_tracking` via `id_lead_ebdb`, Rene via `id_lead_ebdb`), use `sk_lead` as the equivalent of `id_lead_ebdb`. This equivalence is used explicitly in `conversion_time` joins: `ct.id_lead_ebdb = obt.sk_lead`.
+- **`datalake_copilot_service_clean.session` is the only bridge between Sauron and Langfuse.** `id_sauron_session` (VARCHAR) in that table equals `CAST(datalake_sauron_clean.session.id AS VARCHAR)`; `id_external` equals `datalake_langfuse_clean.traces.id_session`. There is no direct join path between the two systems — always route through `copilot_service_clean.session`. Standard join pattern: `cs.id_sauron_session = CAST(sau.id AS VARCHAR)` (Sauron side) and `cs.id_external = t.id_session` (Langfuse side).
+- **Disqualification node pattern requires LIKE.** Disqualification events in Langfuse use the pattern `o.name LIKE '%.disqualification'` because the node name prefix varies per qualification step. This is the only Isaias Langfuse observation filter that cannot use exact `IN` matching. Always combine it with an explicit `o.name IN (...)` whitelist for all other nodes in the same query to avoid full table scans (see Query 10 for the correct `AND (o.name IN (...) OR o.name LIKE '%.disqualification')` pattern).
+- **Escalation node semantics (transbordos).** Two distinct escalation observations: `escalate_when_qualified` = transbordo para Inside Sales (Isaias hands off a qualified lead to Inbound analysts); `escalation_node` = transbordo para outras filas (non-IS queues). Never aggregate them without distinguishing the type. Both must be listed explicitly in the `o.name IN (...)` whitelist.
+- **Isaias conversion deduplication key is `(sk_supply, nm_business_context)` — never include `cd_funnel_step`.** A single supply can appear at both `opportunity` and `first_listing` funnel steps; including `cd_funnel_step` in a `COUNT(DISTINCT ...)` key double-counts it. Always use `CAST(sk_supply AS VARCHAR) || '_' || nm_business_context` as the composite key when counting converted supplies in Isaias ledger queries.
 - `obt_supply` has no partition columns — filter on `obt.date` (a `DATE` column) for time-bounded queries (table is full-refresh daily). Use `DATE '...'` literals, e.g. `obt.date >= DATE '2026-01-01'`.
 - For enriched Isaias session metadata (bot persona, escalation, queue), prefer `datalake_chatbot.sessions` over raw `datalake_sauron_clean.session`: join via `sessions.id_sauron_session = obt.sk_chat_session`.
 
@@ -252,15 +264,28 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 - **Isaias touchpoint conversion** (any Isaias-created or retrieved lead that converted — broadest Isaias impact measure)
 - **Session → opportunity rate** (`COUNT(DISTINCT converted supply IDs where is_valid_attribution AND cd_funnel_step = 'opportunity') / COUNT(DISTINCT session IDs)` — requires UNION ALL event-ledger approach, see Query 7)
 - **Session → first listing rate** (same pattern, filter `cd_funnel_step = 'first_listing'`)
-- **Full Process Sessions Volume** (Volume of sessions that had the full process option ENABLED, Distinct id in `datalake_sauron_clean.session` where `is_full_process = TRUE` ledger: `is_full_process = TRUE` )
-- **SDR Sessions Volume** (Volume of sessions that had the full process option DISABLED, distinct id in `datalake_sauron_clean.session` where `is_full_process = FALSE` ledger: `is_full_process = FALSE` )
-- **Isaias-only conversion volume** (FP Only — subset of FP+Escalation; ledger: `is_full_process = TRUE AND tp_origin_conversion = 'isaias' AND is_valid_attribution = TRUE`)
-- **Full Process + Escalation conversion volume** (total FP conversions = FP Only + human-closed after escalation; ledger: `is_full_process = TRUE AND is_valid_attribution = TRUE AND (tp_origin_conversion = 'isaias' OR (is_converted_within_24h = TRUE AND planning_operation = 'Inbound'))`)
-- **SDR conversion volume** (ledger: `(is_full_process = FALSE OR is_full_process IS NULL) AND is_converted_within_24h = TRUE AND is_valid_attribution = TRUE AND planning_operation = 'Inbound'` — Inbound only, never `tp_origin_conversion = 'isaias'`)
+- **Full Process Sessions Volume** — count of distinct Isaias sessions with `is_full_process = TRUE`. `is_full_process` is NOT a column in `datalake_sauron_clean.session`; it must be derived from Langfuse via the `full_process_sessions` CTE (see Critical Rules) joined through `datalake_copilot_service_clean.session`. In ledger queries, count as `COUNT(DISTINCT CASE WHEN is_full_process = TRUE THEN id_sauron_session END)`.
+- **SDR Sessions Volume** — count of distinct Isaias sessions with `is_full_process = FALSE OR is_full_process IS NULL`. Same derivation requirement — must come from Langfuse, not from `datalake_sauron_clean.session` directly. In ledger queries, count as `COUNT(DISTINCT CASE WHEN (is_full_process = FALSE OR is_full_process IS NULL) THEN id_sauron_session END)`.
+- **Isaias-only conversion volume** (FP Only — subset of FP+Escalation; ledger: `is_full_process = TRUE AND tp_origin_conversion = 'isaias' AND is_valid_attribution = TRUE`; deduplicate on `CAST(sk_supply AS VARCHAR) || '_' || nm_business_context` — never include `cd_funnel_step` in the key, as a supply can appear at both opportunity and first_listing)
+- **Full Process + Escalation conversion volume** (total FP conversions = FP Only + human-closed after escalation; ledger: `is_full_process = TRUE AND is_valid_attribution = TRUE AND (tp_origin_conversion = 'isaias' OR (is_converted_within_24h = TRUE AND planning_operation = 'Inbound'))`; deduplicate on `CAST(sk_supply AS VARCHAR) || '_' || nm_business_context`)
+- **SDR conversion volume** (ledger: `(is_full_process = FALSE OR is_full_process IS NULL) AND is_converted_within_24h = TRUE AND is_valid_attribution = TRUE AND planning_operation = 'Inbound'` — Inbound only, never `tp_origin_conversion = 'isaias'`; deduplicate on `CAST(sk_supply AS VARCHAR) || '_' || nm_business_context`)
 - **Isaias-only conversion rate** (Isaias-only conversion volume divided by Full Process Sessions Volume)
 - **Full Process + Escalation conversion rate** (Full Process + Escalation conversion volume divided by Full Process Sessions Volume)
 - **SDR conversion rate** (SDR conversion volume divided by SDR Sessions Volume)
 - **Isaias lead retrieval rate** (`COUNT_IF(icf.has_retrieved_lead) / NULLIF(COUNT(*), 0)`)
+- **Successful Submission volume** — count of Full Process sessions where Isaias completed photo scheduling: `BOOL_OR(o.name = 'Submission.post_clarification' AND json_extract_scalar(o.output, '$.photo_session_successfully_scheduled') = 'true') = TRUE`. Denominator for rate: Full Process Sessions Volume.
+- **Successful Submission rate** — Successful Submission volume / Full Process Sessions Volume
+- **Escalation to Inside Sales volume** (transbordo para IS) — Full Process sessions with `escalate_when_qualified` node visited (`has_inside_sales_esc = TRUE`)
+- **Escalation to Inside Sales rate** (taxa de transbordo para IS) — Escalation to Inside Sales volume / Full Process Sessions Volume
+- **Escalation to Other Queues volume** (transbordo para outras filas) — Full Process sessions with `escalation_node` visited (`has_other_esc = TRUE`)
+- **Escalation to Other Queues rate** (taxa de transbordo para outras filas) — Escalation to Other Queues volume / Full Process Sessions Volume
+- **Total Escalation rate** (taxa total de transbordo) — (IS escalations + other escalations) / Full Process Sessions Volume
+- **Disqualification volume** — Full Process sessions where any `%.disqualification` node was visited (`has_disqualification = TRUE`)
+- **Disqualification rate** — Disqualification volume / Full Process Sessions Volume
+- **Idle Session volume** (sessões ociosas) — Full Process sessions with no terminal state: `NOT has_successful_submission AND NOT has_inside_sales_esc AND NOT has_other_esc AND NOT has_disqualification`
+- **Idle Session rate** — Idle Session volume / Full Process Sessions Volume
+- **Funnel Progression per step** — for each conversational step N (1 = Address … 10 = Entry Model), `SUM(sessions with last_step >= N) / SUM(total Full Process sessions)`. Reports what fraction of all sessions reached at least step N.
+- **Step Progression (step-to-step rate)** — for step N, `SUM(sessions with last_step >= N+1) / SUM(sessions with last_step >= N)`. Reports what fraction of sessions that reached step N advanced to the next step. Compute via `LEAD()` window function ordered by step within the same time period (see Query 11).
 
 ## Relationships with Other Entities
 
@@ -328,7 +353,7 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 
 ### Query 1 — Funnel breakdown by channel and business context
 
-**Date anchor: coincident date (default).** Filters `ts_event` to the analysis window on all funnel steps — a given day's counts reflect whatever events occurred on that day, regardless of when the lead was originally created. For cohort analysis (only when explicitly requested), filter `ts_event` only on the `cd_funnel_step = 'lead'` rows to define the cohort, then remove the date filter on conversion-step rows to capture all subsequent conversions for those leads.
+**Date anchor: coincident date (default).** Filters `obt.date` to the analysis window on all funnel steps — a given day's counts reflect whatever events occurred on that day, regardless of when the lead was originally created. For cohort analysis (only when explicitly requested), filter `obt.date` only on the `cd_funnel_step = 'lead'` rows to define the cohort, then remove the date filter on conversion-step rows to capture all subsequent conversions for those leads.
 
 ```sql
 SELECT
@@ -339,8 +364,8 @@ SELECT
     COUNT(DISTINCT obt.sk_supply) AS total_leads
 FROM dw_growth.obt_supply AS obt
 WHERE
-    obt.ts_event >= TIMESTAMP '{start_date}'
-    AND obt.ts_event < TIMESTAMP '{end_date}'
+    obt.date >= DATE '{start_date}'
+    AND obt.date < DATE '{end_date}'
 GROUP BY
     obt.nm_business_context,
     obt.acquisition_origin,
@@ -354,7 +379,7 @@ ORDER BY
 
 ### Query 2 — Lead to first listing conversion rate by reporting channel
 
-**Date anchor: coincident date (default).** Both lead and conversion counts are filtered to the same `ts_event` window — the denominator (leads) and numerator (first listings) both count events that occurred within the window, mixing leads of different ages. For cohort analysis (only when explicitly requested), fix the lead population to those created in the window (`cd_funnel_step = 'lead'`) and remove the `ts_event` constraint from the first-listing rows so all eventual conversions from that cohort are counted.
+**Date anchor: coincident date (default).** Both lead and conversion counts are filtered to the same `obt.date` window — the denominator (leads) and numerator (first listings) both count events that occurred within the window, mixing leads of different ages. For cohort analysis (only when explicitly requested), fix the lead population to those created in the window (`cd_funnel_step = 'lead'`) and remove the `obt.date` constraint from the first-listing rows so all eventual conversions from that cohort are counted.
 
 ```sql
 SELECT
@@ -370,8 +395,8 @@ SELECT
     4) AS lead_to_first_listing_rate
 FROM dw_growth.obt_supply AS obt
 WHERE
-    obt.ts_event >= TIMESTAMP '{start_date}'
-    AND obt.ts_event < TIMESTAMP '{end_date}'
+    obt.date >= DATE '{start_date}'
+    AND obt.date < DATE '{end_date}'
 GROUP BY
     obt.nm_business_context,
     obt.company_report_origin
@@ -385,14 +410,15 @@ ORDER BY
 Step-by-step conversion through Isaias's conversational flow, split by operating mode. `is_full_process` is derived from Langfuse (authoritative) rather than from `icf` directly.
 
 ```sql
+-- Set {start_year} and {start_month} to integer values from your analysis start date. Keep the window short.
 WITH full_process_sessions AS (
     SELECT
         t.id_session,
-        MAX(CAST(json_extract_scalar(o.output, '$.is_draft_enabled') AS BOOLEAN) = TRUE) AS is_full_process
+        COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process
     FROM datalake_langfuse_clean.observations AS o
     LEFT JOIN datalake_langfuse_clean.traces AS t ON o.id_trace = t.id_trace
-    WHERE o.year = 2026
-        AND o.month >= 3
+    WHERE o.year = {start_year}
+        AND o.month >= {start_month}
         AND CONTAINS(t.tags, 'isaias')
         AND t.environment = 'prod'
         AND o.name IN ('orchestrator_init')
@@ -434,8 +460,8 @@ SELECT
 FROM dw_growth.obt_supply AS obt
 WHERE
     obt.tp_origin_acquisition = 'isaias'
-    AND obt.ts_event >= TIMESTAMP '{start_date}'
-    AND obt.ts_event < TIMESTAMP '{end_date}'
+    AND obt.date >= DATE '{start_date}'
+    AND obt.date < DATE '{end_date}'
 GROUP BY
     obt.nm_business_context,
     obt.cd_funnel_step,
@@ -450,14 +476,15 @@ ORDER BY
 Leads from other acquisition channels that Isaias re-engaged in a session, with qualification funnel progress.
 
 ```sql
+-- Set {start_year} and {start_month} to integer values from your analysis start date. Keep the window short.
 WITH full_process_sessions AS (
     SELECT
         t.id_session,
-        MAX(CAST(json_extract_scalar(o.output, '$.is_draft_enabled') AS BOOLEAN) = TRUE) AS is_full_process
+        COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process
     FROM datalake_langfuse_clean.observations AS o
     LEFT JOIN datalake_langfuse_clean.traces AS t ON o.id_trace = t.id_trace
-    WHERE o.year = 2026
-        AND o.month >= 3
+    WHERE o.year = {start_year}
+        AND o.month >= {start_month}
         AND CONTAINS(t.tags, 'isaias')
         AND t.environment = 'prod'
         AND o.name IN ('orchestrator_init')
@@ -478,8 +505,8 @@ LEFT JOIN full_process_sessions AS fps
     ON icf.id_langfuse_session = fps.id_session
 WHERE
     obt.tp_origin_acquisition != 'isaias'
-    AND obt.ts_event >= TIMESTAMP '{start_date}'
-    AND obt.ts_event < TIMESTAMP '{end_date}'
+    AND obt.date >= DATE '{start_date}'
+    AND obt.date < DATE '{end_date}'
 GROUP BY
     obt.nm_business_context,
     obt.tp_origin_acquisition,
@@ -506,8 +533,8 @@ created AS (
     FROM dw_growth.obt_supply AS obt
     WHERE
         obt.tp_origin_acquisition = 'isaias'
-        AND obt.ts_event >= TIMESTAMP '{start_date}'
-        AND obt.ts_event < TIMESTAMP '{end_date}'
+        AND obt.date >= DATE '{start_date}'
+        AND obt.date < DATE '{end_date}'
 ),
 retrieved AS (
     SELECT DISTINCT
@@ -520,8 +547,8 @@ retrieved AS (
         ON icf.id_lead_retrieved = CAST(obt.sk_lead AS VARCHAR)
     WHERE
         obt.tp_origin_acquisition != 'isaias'
-        AND obt.ts_event >= TIMESTAMP '{start_date}'
-        AND obt.ts_event < TIMESTAMP '{end_date}'
+        AND obt.date >= DATE '{start_date}'
+        AND obt.date < DATE '{end_date}'
 ),
 touchpoint AS (
     SELECT sk_supply, nm_business_context, cd_funnel_step FROM created
@@ -565,14 +592,15 @@ Two paths connect sessions to supply events:
 - **Lead path** (`source_path = 'retrieved_lead'`): lead linked via `icf.id_lead_retrieved` → `cs.id_sauron_session` — lead existed before and was retrieved by Isaias
 
 ```sql
+-- Set {start_year} and {start_month} to integer values from your analysis start date. Keep the window short.
 WITH full_process_sessions AS (
     SELECT 
         t.id_session,
-        MAX(CAST(json_extract_scalar(o.output, '$.is_draft_enabled') AS BOOLEAN) = TRUE) AS is_full_process
+        COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process
     FROM datalake_langfuse_clean.observations o
     LEFT JOIN datalake_langfuse_clean.traces t ON o.id_trace = t.id_trace
-    WHERE o.year = 2026
-        AND o.month >= 3
+    WHERE o.year = {start_year}
+        AND o.month >= {start_month}
         AND CONTAINS(t.tags, 'isaias')
         AND t.environment = 'prod'
         AND o.name IN ('orchestrator_init')
@@ -612,7 +640,7 @@ base_sessions AS (
         'isaias_home', 'isaias_opr', 'isaias_calculadora', 'isaias_inbound_c2wa_camp_3', 
         'isaias_inbound_c2wa_camp_1', 'isaias_inbound_c2wa_camp_2', 'isaias_inbound_c2wa_camp_4'
     )
-    AND s.year >= 2026
+    AND s.year >= {start_year}
 ),
 obt_session_filtered AS (
     SELECT date, city_group, cd_discard_reason, discard_funnel_step, operation_channel,
@@ -773,7 +801,7 @@ SELECT
          AND is_full_process = TRUE
          AND is_valid_attribution = TRUE
          AND tp_origin_conversion = 'isaias'
-        THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context || '_' || cd_funnel_step
+        THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context
     END) AS isaias_only_conversions,
 
     -- Type 2: Full Process + Escalation — total FP conversions: FP-only (autonomous) + escalated to Inbound within 24h
@@ -783,7 +811,7 @@ SELECT
          AND is_full_process = TRUE
          AND is_valid_attribution = TRUE
          AND (tp_origin_conversion = 'isaias' OR (is_converted_within_24h = TRUE AND planning_operation = 'Inbound'))
-        THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context || '_' || cd_funnel_step
+        THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context
     END) AS fp_plus_escalation_conversions,
 
     -- Type 3: SDR conversion — SDR session, Inbound analysts closed within 24h (Inbound only)
@@ -794,7 +822,7 @@ SELECT
          AND is_valid_attribution = TRUE
          AND is_converted_within_24h = TRUE
          AND planning_operation = 'Inbound'
-        THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context || '_' || cd_funnel_step
+        THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context
     END) AS sdr_conversions,
 
     -- Rates: FP-type conversions / FP sessions; SDR conversions / SDR sessions
@@ -803,7 +831,7 @@ SELECT
             WHEN date IS NOT NULL AND cd_funnel_step IN ('opportunity', 'first_listing')
              AND is_full_process = TRUE AND is_valid_attribution = TRUE
              AND tp_origin_conversion = 'isaias'
-            THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context || '_' || cd_funnel_step
+            THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context
         END) AS DOUBLE)
         / NULLIF(COUNT(DISTINCT CASE WHEN is_full_process = TRUE THEN id_sauron_session END), 0),
     4) AS isaias_only_rate,
@@ -812,7 +840,7 @@ SELECT
             WHEN date IS NOT NULL AND cd_funnel_step IN ('opportunity', 'first_listing')
              AND is_full_process = TRUE AND is_valid_attribution = TRUE
              AND (tp_origin_conversion = 'isaias' OR (is_converted_within_24h = TRUE AND planning_operation = 'Inbound'))
-            THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context || '_' || cd_funnel_step
+            THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context
         END) AS DOUBLE)
         / NULLIF(COUNT(DISTINCT CASE WHEN is_full_process = TRUE THEN id_sauron_session END), 0),
     4) AS fp_plus_escalation_rate,
@@ -822,7 +850,7 @@ SELECT
              AND (is_full_process = FALSE OR is_full_process IS NULL)
              AND is_valid_attribution = TRUE AND is_converted_within_24h = TRUE
              AND planning_operation = 'Inbound'
-            THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context || '_' || cd_funnel_step
+            THEN CAST(sk_supply AS VARCHAR) || '_' || nm_business_context
         END) AS DOUBLE)
         / NULLIF(COUNT(DISTINCT CASE WHEN (is_full_process = FALSE OR is_full_process IS NULL) THEN id_sauron_session END), 0),
     4) AS sdr_rate
@@ -1033,3 +1061,215 @@ SELECT * FROM data_modeled
 | 8 | `ListAvailablePhotoTimeNode.pre_clarification` | PHOTO |
 | 9 | `PhotoSessionSchedulingAuth.pre_clarification` | AUTH |
 | 10 | `EntryAccessModelNode.pre_clarification` | ENTRY MODEL |
+
+> **Schema version note — two `last_step` scales exist.** The table above documents **Query 9's scale (0–10)**, which includes `DraftConfirmation.pre_clarification` at step 6 and is required for analysing older sessions where that node was part of the flow. **Queries 10 and 11 use a different scale (1–10)** that reflects the current flow after DraftConfirmation was removed: Pricing = 6, Photo = 7, Auth = 8, Successful Submission = 9, Entry Model = 10. Never cross-reference step numbers between Q9 and Q10/11 — the same integer means different things in each scale.
+
+### Query 10 — Isaias Full Process session terminal states (escalações/transbordos, idle, disqualifications, successful submissions)
+
+> **Scoped to Full Process sessions only** (`is_full_process = TRUE`). Terminal state flags are derived from Langfuse observation node names. The LIKE pattern for disqualification is intentional — node name prefixes vary per qualification step; it is paired with an `IN` whitelist to prevent full table scans.
+
+```sql
+WITH
+filtered_session AS (
+    SELECT id_external, id_sauron_session, ts_created
+    FROM datalake_copilot_service_clean.session
+    WHERE ts_created >= CURRENT_DATE - INTERVAL '42' DAY
+),
+sessions AS (
+    SELECT
+        t.id_session,
+        COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process,
+        -- Transbordo para Inside Sales
+        COALESCE(BOOL_OR(o.name = 'escalate_when_qualified'), FALSE)       AS has_inside_sales_esc,
+        -- Transbordo para outras filas
+        COALESCE(BOOL_OR(o.name = 'escalation_node'), FALSE)               AS has_other_esc,
+        COALESCE(BOOL_OR(o.name LIKE '%.disqualification'), FALSE)         AS has_disqualification,
+        COALESCE(BOOL_OR(
+            o.name = 'Submission.post_clarification'
+            AND json_extract_scalar(o.output, '$.photo_session_successfully_scheduled') = 'true'
+        ), FALSE) AS has_successful_submission
+    FROM datalake_langfuse_clean.observations AS o
+    INNER JOIN datalake_langfuse_clean.traces AS t ON o.id_trace = t.id_trace
+    INNER JOIN filtered_session AS fs ON t.id_session = fs.id_external
+    WHERE o.id_trace IS NOT NULL
+      AND CAST(o.year AS VARCHAR) || LPAD(CAST(o.month AS VARCHAR), 2, '0') >= DATE_FORMAT(CURRENT_DATE - INTERVAL '42' DAY, '%Y%m')
+      AND t.id_session IS NOT NULL
+      AND t.environment = 'prod'
+      AND CONTAINS(t.tags, 'isaias')
+      AND (
+          o.name IN (
+              'orchestrator_init',
+              'AddressCollectorAgent.pre_clarification',
+              'ListingType.pre_clarification', 'PropertyAvailability.pre_clarification',
+              'PropertySubtype.pre_clarification',
+              'PropertyVacancy.pre_clarification',
+              'PropertyDetailsNode.pre_clarification', 'PropertyDetailsAgent.pre_clarification',
+              'SalePricingSuggestion.pre_clarification', 'RentPricingSuggestion.pre_clarification',
+              'PricingNegotiatorAgent.pre_clarification',
+              'ListAvailablePhotoTimeNode.pre_clarification',
+              'PhotoSessionSchedulingAuth.pre_clarification',
+              'Submission.post_clarification',
+              'EntryAccessModelNode.pre_clarification',
+              'escalate_when_qualified',
+              'escalation_node'
+          )
+          OR o.name LIKE '%.disqualification'
+      )
+    GROUP BY t.id_session
+)
+SELECT
+    DATE(DATE_TRUNC('week', cs.ts_created))                              AS dt_week,
+    COUNT(*)                                                             AS total_sessions,
+    COUNT_IF(s.has_successful_submission)                                AS successful_submissions,
+    COUNT_IF(s.has_disqualification)                                     AS disqualified_sessions,
+    COUNT_IF(s.has_inside_sales_esc)                                     AS escalations_inside_sales,
+    COUNT_IF(s.has_other_esc)                                            AS escalations_other,
+    COUNT_IF(
+        NOT s.has_successful_submission
+        AND NOT s.has_inside_sales_esc
+        AND NOT s.has_other_esc
+        AND NOT s.has_disqualification
+    )                                                                    AS idled_sessions,
+    ROUND(CAST(COUNT_IF(s.has_successful_submission) AS DOUBLE)          / NULLIF(COUNT(*), 0), 4) AS successful_submission_rate,
+    ROUND(CAST(COUNT_IF(s.has_inside_sales_esc) AS DOUBLE)               / NULLIF(COUNT(*), 0), 4) AS escalation_is_rate,
+    ROUND(CAST(COUNT_IF(s.has_other_esc) AS DOUBLE)                      / NULLIF(COUNT(*), 0), 4) AS escalation_other_rate,
+    ROUND(CAST(COUNT_IF(s.has_disqualification) AS DOUBLE)               / NULLIF(COUNT(*), 0), 4) AS disqualification_rate,
+    ROUND(CAST(COUNT_IF(
+        NOT s.has_successful_submission AND NOT s.has_inside_sales_esc
+        AND NOT s.has_other_esc AND NOT s.has_disqualification
+    ) AS DOUBLE) / NULLIF(COUNT(*), 0), 4)                               AS idle_rate
+FROM sessions AS s
+INNER JOIN filtered_session AS cs ON s.id_session = cs.id_external
+WHERE s.is_full_process = TRUE
+GROUP BY 1
+ORDER BY dt_week DESC
+```
+
+### Query 11 — Isaias conversational funnel progression (step reach and step-to-step rates)
+
+> **Scoped to Full Process sessions only.** `last_step` ranks node visits to find the furthest step reached per session. **Funnel Progression** for step N = `SUM(sessions reaching step N) / SUM(total sessions)`; **Step Progression** for step N = `SUM(advanced_to_next_step) / SUM(total_step)`. Both aggregations apply after unnesting.
+
+```sql
+WITH
+filtered_session AS (
+    SELECT id_external, id_sauron_session, ts_created
+    FROM datalake_copilot_service_clean.session
+    WHERE ts_created >= CURRENT_DATE - INTERVAL '42' DAY
+),
+sessions AS (
+    SELECT
+        t.id_session,
+        COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process,
+        COALESCE(BOOL_OR(o.name = 'escalate_when_qualified'), FALSE) AS has_inside_sales_esc,
+        COALESCE(BOOL_OR(o.name = 'escalation_node'), FALSE)         AS has_other_esc,
+        MAX(CASE
+            WHEN o.name = 'AddressCollectorAgent.pre_clarification'                                                                          THEN 1
+            WHEN o.name IN ('ListingType.pre_clarification', 'PropertyAvailability.pre_clarification')                                       THEN 2
+            WHEN o.name = 'PropertySubtype.pre_clarification'                                                                                THEN 3
+            WHEN o.name = 'PropertyVacancy.pre_clarification'                                                                                THEN 4
+            WHEN o.name IN ('PropertyDetailsNode.pre_clarification', 'PropertyDetailsAgent.pre_clarification')                               THEN 5
+            WHEN o.name IN ('SalePricingSuggestion.pre_clarification', 'RentPricingSuggestion.pre_clarification',
+                            'PricingNegotiatorAgent.pre_clarification')                                                                      THEN 6
+            WHEN o.name = 'ListAvailablePhotoTimeNode.pre_clarification'                                                                     THEN 7
+            WHEN o.name = 'PhotoSessionSchedulingAuth.pre_clarification'                                                                     THEN 8
+            WHEN o.name = 'Submission.post_clarification'
+                 AND json_extract_scalar(o.output, '$.photo_session_successfully_scheduled') = 'true'                                        THEN 9
+            WHEN o.name = 'EntryAccessModelNode.pre_clarification'                                                                           THEN 10
+            ELSE 0
+        END) AS last_step
+    FROM datalake_langfuse_clean.observations AS o
+    INNER JOIN datalake_langfuse_clean.traces AS t ON o.id_trace = t.id_trace
+    INNER JOIN filtered_session AS fs ON t.id_session = fs.id_external
+    WHERE o.id_trace IS NOT NULL
+      AND CAST(o.year AS VARCHAR) || LPAD(CAST(o.month AS VARCHAR), 2, '0') >= DATE_FORMAT(CURRENT_DATE - INTERVAL '42' DAY, '%Y%m')
+      AND t.id_session IS NOT NULL
+      AND t.environment = 'prod'
+      AND CONTAINS(t.tags, 'isaias')
+      AND o.name IN (
+          'orchestrator_init',
+          'AddressCollectorAgent.pre_clarification',
+          'ListingType.pre_clarification', 'PropertyAvailability.pre_clarification',
+          'PropertySubtype.pre_clarification',
+          'PropertyVacancy.pre_clarification',
+          'PropertyDetailsNode.pre_clarification', 'PropertyDetailsAgent.pre_clarification',
+          'SalePricingSuggestion.pre_clarification', 'RentPricingSuggestion.pre_clarification',
+          'PricingNegotiatorAgent.pre_clarification',
+          'ListAvailablePhotoTimeNode.pre_clarification',
+          'PhotoSessionSchedulingAuth.pre_clarification',
+          'Submission.post_clarification',
+          'EntryAccessModelNode.pre_clarification',
+          'escalate_when_qualified',
+          'escalation_node'
+      )
+    GROUP BY t.id_session
+),
+data_modeled AS (
+    SELECT s.*, cs.ts_created AS ts_session
+    FROM sessions AS s
+    INNER JOIN filtered_session AS cs ON s.id_session = cs.id_external
+),
+weekly_base AS (
+    SELECT
+        DATE(DATE_TRUNC('week', ts_session)) AS dt_week,
+        COUNT(*)                             AS total_sessoes,
+        COUNT_IF(last_step >= 1)             AS n_1,
+        COUNT_IF(last_step >= 2)             AS n_2,
+        COUNT_IF(last_step >= 3)             AS n_3,
+        COUNT_IF(last_step >= 4)             AS n_4,
+        COUNT_IF(last_step >= 5)             AS n_5,
+        COUNT_IF(last_step >= 6)             AS n_6,
+        COUNT_IF(last_step >= 7)             AS n_7,
+        COUNT_IF(last_step >= 8)             AS n_8,
+        COUNT_IF(last_step >= 9)             AS n_9,
+        COUNT_IF(last_step >= 10)            AS n_10,
+        COUNT_IF(last_step = 1  AND has_inside_sales_esc) AS is_esc_1,
+        COUNT_IF(last_step = 2  AND has_inside_sales_esc) AS is_esc_2,
+        COUNT_IF(last_step = 3  AND has_inside_sales_esc) AS is_esc_3,
+        COUNT_IF(last_step = 4  AND has_inside_sales_esc) AS is_esc_4,
+        COUNT_IF(last_step = 5  AND has_inside_sales_esc) AS is_esc_5,
+        COUNT_IF(last_step = 6  AND has_inside_sales_esc) AS is_esc_6,
+        COUNT_IF(last_step = 7  AND has_inside_sales_esc) AS is_esc_7,
+        COUNT_IF(last_step = 8  AND has_inside_sales_esc) AS is_esc_8,
+        COUNT_IF(last_step = 9  AND has_inside_sales_esc) AS is_esc_9,
+        COUNT_IF(last_step = 10 AND has_inside_sales_esc) AS is_esc_10,
+        COUNT_IF(last_step = 1  AND has_other_esc)        AS oth_esc_1,
+        COUNT_IF(last_step = 2  AND has_other_esc)        AS oth_esc_2,
+        COUNT_IF(last_step = 3  AND has_other_esc)        AS oth_esc_3,
+        COUNT_IF(last_step = 4  AND has_other_esc)        AS oth_esc_4,
+        COUNT_IF(last_step = 5  AND has_other_esc)        AS oth_esc_5,
+        COUNT_IF(last_step = 6  AND has_other_esc)        AS oth_esc_6,
+        COUNT_IF(last_step = 7  AND has_other_esc)        AS oth_esc_7,
+        COUNT_IF(last_step = 8  AND has_other_esc)        AS oth_esc_8,
+        COUNT_IF(last_step = 9  AND has_other_esc)        AS oth_esc_9,
+        COUNT_IF(last_step = 10 AND has_other_esc)        AS oth_esc_10
+    FROM data_modeled
+    WHERE is_full_process = TRUE
+    GROUP BY 1
+)
+SELECT
+    wb.dt_week,
+    u.step,
+    wb.total_sessoes,
+    u.cnt                                                              AS total_step,
+    u.is_esc_cnt                                                       AS escalation_to_inside_sales,
+    u.oth_esc_cnt                                                      AS other_escalations,
+    LEAD(u.cnt) OVER (PARTITION BY wb.dt_week ORDER BY u.step_order)   AS advanced_to_next_step,
+    ROUND(
+        CAST(LEAD(u.cnt) OVER (PARTITION BY wb.dt_week ORDER BY u.step_order) AS DOUBLE)
+        / NULLIF(u.cnt, 0) * 100, 2
+    )                                                                  AS step_progression_pct
+FROM weekly_base wb
+CROSS JOIN UNNEST(
+    ARRAY['#1 Address', '#2 Business Context', '#3 Property Type', '#4 Property Vacancy',
+          '#5 Property Details', '#6 Pricing', '#7 Photo', '#8 Auth',
+          '#9 Successful Submission', '#10 Entry Model'],
+    ARRAY[n_1, n_2, n_3, n_4, n_5, n_6, n_7, n_8, n_9, n_10],
+    ARRAY[is_esc_1, is_esc_2, is_esc_3, is_esc_4, is_esc_5, is_esc_6, is_esc_7, is_esc_8, is_esc_9, is_esc_10],
+    ARRAY[oth_esc_1, oth_esc_2, oth_esc_3, oth_esc_4, oth_esc_5, oth_esc_6, oth_esc_7, oth_esc_8, oth_esc_9, oth_esc_10]
+) WITH ORDINALITY AS u(step, cnt, is_esc_cnt, oth_esc_cnt, step_order)
+ORDER BY u.step_order, wb.dt_week
+
+-- Aggregated metrics (apply as outer query or compute separately):
+-- Funnel Progression for step N:  SUM(CAST(total_step AS DOUBLE)) / SUM(total_sessoes)
+-- Step Progression for step N:    SUM(CAST(advanced_to_next_step AS DOUBLE)) / SUM(total_step)
+```
