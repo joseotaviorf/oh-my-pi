@@ -1,0 +1,37 @@
+---
+database_name: dw_liquidity
+table_name: fact_house_listing_rent_liquidity
+owner: andressa.apio@quintoandar.com.br
+domain: Fintech
+description: Fact table containing the latest rent liquidity score per house listing, enriched with listing publication timestamp and status.
+columns:
+  sk_house_listing:
+    description: Surrogate key of the house listing associated with the liquidity score.
+    lineage:
+      - wonka.house_listing_rent_liquidity.id
+  sk_house:
+    description: Surrogate key of the house.
+    lineage:
+      - wonka.house_listing_rent_liquidity.id_house
+  rent_liquidity_model_version:
+    description: Version of the rent liquidity model used to generate the score.
+    lineage:
+      - wonka.house_listing_rent_liquidity.model_version
+  listing_status:
+    description: Current status of the house listing (e.g., published, unpublished, rented).
+    lineage:
+      - datalake_ebdb_listing.house_listing.status
+  rent_liquidity_score:
+    description: Liquidity score calculated by the rent liquidity model for the house listing.
+    lineage:
+      - wonka.house_listing_rent_liquidity.rent_liquidity_score
+  ts_publicated:
+    description: Timestamp indicating when the house listing was published.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_publicated
+  ts_created:
+    description: Timestamp indicating when the liquidity score record was created.
+    lineage:
+      - wonka.house_listing_rent_liquidity.timestamp
+  ts_load:
+    description: Timestamp indicating when the data was loaded into the data warehouse.

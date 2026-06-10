@@ -803,6 +803,8 @@ bietlejuice.dw_lead:
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead:first-run-of-day
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking:first-run-of-day
   - bietlejuice.enrich_wololo:load-enrich-lead-sales-company:first-run-of-day
+bietlejuice.dw_liquidity:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
 bietlejuice.dw_listing:
   - bietlejuice.ebdb_administration:load-clean-rental-administrator-change-request:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-condo:first-run-of-day
