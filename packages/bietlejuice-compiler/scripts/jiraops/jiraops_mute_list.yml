@@ -1,8 +1,6 @@
 DAG:
   equals:
-    - bietlejuice.authx_scim
     - bietlejuice.check_dags_dataset_queue
-    - bietlejuice.cloudfront
     - bietlejuice.clustering_image_model
     - bietlejuice.consorcio
     - bietlejuice.conversation_explorer
@@ -10,12 +8,10 @@ DAG:
     - bietlejuice.core_region_history
     - bietlejuice.core_support_journey
     - bietlejuice.cyber_bureau
-    - bietlejuice.cypress_reports
     - bietlejuice.demand_balancer_service
     - bietlejuice.dw_buyer_prospect
     - bietlejuice.dw_collections_landlord
     - bietlejuice.dw_recon_quintocred_snapshot
-    - bietlejuice.enrich_access_logs
     - bietlejuice.enrich_ai_collections_quintoandar
     - bietlejuice.enrich_atlas_db_quality_metrics
     - bietlejuice.enrich_agents_matias
@@ -34,8 +30,6 @@ DAG:
     - bietlejuice.enrich_sonia_journeys
     - bietlejuice.grb
     - bietlejuice.iaf
-    - bietlejuice.identitynow
-    - bietlejuice.istio
     - bietlejuice.itbi_sp
     - bietlejuice.journey_optimizer
     - bietlejuice.knowledge_base
@@ -44,19 +38,15 @@ DAG:
     - bietlejuice.metric_fintech__collections_segmentation
     - bietlejuice.metric_sale__experiment
     - bietlejuice.offboarding_categorization
-    - bietlejuice.opa
     - bietlejuice.partner_payment
     - bietlejuice.partner_payment_fast_lane
     - bietlejuice.payable_accounts_transactions
     - bietlejuice.quires
-    - bietlejuice.release_validations_tests
-    - bietlejuice.reverse_integration_cloudzero
     - bietlejuice.reverse_sale_listings_report
     - bietlejuice.salesforce_cdc
     - bietlejuice.search_metrics_service
     - bietlejuice.services_integration_validations
     - bietlejuice.signup
-    - bietlejuice.zordon
   contains:
     - bietlejuice.qube_
     - bietlejuice.gsheets_
@@ -90,4 +80,7 @@ DAGOwner:
     - Data Life Cycle
     - Data People
     - Ops POC
+    - Tech Platform Cyber Security
+    - Tech Platform Dev Foundation
+    - Tech Platform Engineering Productivity
     - Tech Platform Workforce Productivity

@@ -34,17 +34,32 @@ DAGOwner:
       created_by: user@quintoandar.com.br
       approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
     Data People:
-      reason: "TODO: document why alerts for this DAGOwner are muted."
+      reason: "People Data pipelines handle sensitive HR, compensation, and payroll data. Access to the data and code is strictly restricted to the People Data squad, so DE on-call engineers cannot investigate or remediate failures without violating access controls."
       deadline: Never
-      created_by: user@quintoandar.com.br
-      approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
+      created_by: isabella.araujo@quintoandar.com.br
+      approved_by: pedro.prates@quintoandar.com.br
     Ops POC:
       reason: "TODO: document why alerts for this DAGOwner are muted."
       deadline: Never
       created_by: user@quintoandar.com.br
       approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
-    Tech Platform Workforce Productivity:
-      reason: "TODO: document why alerts for this DAGOwner are muted."
+    Tech Platform Cyber Security:
+      reason: "Security and identity management pipelines are fully owned by the Tech Platform Cyber Security squad; DE on-call engineers have no context, access, or accountability over this domain."
       deadline: Never
-      created_by: user@quintoandar.com.br
-      approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
+      created_by: isabella.araujo@quintoandar.com.br
+      approved_by: pedro.prates@quintoandar.com.br
+    Tech Platform Dev Foundation:
+      reason: "Cost intelligence and equipment management pipelines are fully owned by the Tech Platform Dev Foundation squad; DE on-call engineers have no context, access, or accountability over this domain."
+      deadline: Never
+      created_by: isabella.araujo@quintoandar.com.br
+      approved_by: pedro.prates@quintoandar.com.br
+    Tech Platform Engineering Productivity:
+      reason: "Engineering productivity pipelines are fully owned by the Tech Platform Engineering Productivity squad; DE on-call engineers have no context, access, or accountability over this domain."
+      deadline: Never
+      created_by: isabella.araujo@quintoandar.com.br
+      approved_by: pedro.prates@quintoandar.com.br
+    Tech Platform Workforce Productivity:
+      reason: "Workforce productivity and device management pipelines are fully owned by the Tech Platform Workforce Productivity squad; DE on-call engineers have no context, access, or accountability over this domain."
+      deadline: Never
+      created_by: isabella.araujo@quintoandar.com.br
+      approved_by: pedro.prates@quintoandar.com.br
