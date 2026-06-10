@@ -1,0 +1,44 @@
+---
+database_name: datalake_agents_validation
+table_name: agents_accreditation_database_manual_intervention
+description: |
+  Table that identifies agent data records of type 'Visita' that exist in the main agent_data_types table 
+  but are missing or improperly recorded in the audit table (agent_data_types_aud). This validation 
+  specifically targets agents of type 'CORRETOR_5A' to identify data synchronization issues that require 
+  manual intervention for audit trail completeness.
+  The data quality alert rule is configured with a threshold of 518 records, which represents the current 
+  baseline count of records that exhibit this behavior (existing in the default table (DadosAgente_tipo) but not in the audit table (DadosAgente_tipo_AUD)).
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_agent_data:
+    description: Unique identifier of the agent data record from the main agent_data_types table.
+    lineage:
+      - datalake_ebdb_clean.agent_data_types.id_agent_data
+      - datalake_ebdb_clean.agent_data.id
+  types:
+    description: Type of agent data from the main table, specifically filtered to 'Visita' types.
+    lineage:
+      - datalake_ebdb_clean.agent_data_types.types
+  last_type_in_aud:
+    description: Last type recorded in the audit table for this agent data record. Will be NULL for records missing from audit.
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.types
+  agent_type:
+    description: Type classification of the agent, specifically filtered to 'CORRETOR_5A'.
+    lineage:
+      - datalake_ebdb_clean.agent_data.agent_type
+  is_active:
+    description: Boolean flag indicating if the agent is currently active.
+    lineage:
+      - datalake_ebdb_clean.agent_data.is_active
+  is_ciq:
+    description: Boolean flag indicating if the agent is a CIQ agent (derived from presence in ciq_agents table).
+    lineage:
+      - datalake_ebdb_agents.ciq_agents.id_agent
+  ts_created:
+    description: Timestamp when the agent data record was originally created.
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_created
+  dt_validated:
+    description: Date when this validation was performed (always current date).

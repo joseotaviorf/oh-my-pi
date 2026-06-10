@@ -1,0 +1,16 @@
+dag:
+  name: enrich_agents_validation
+  schedule_start_date: 2025, 1, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich Tables that generate integrity validation results for other tables in the Agents context. 
+      Currently, it is not possible to apply data quality rules that involve more than one table. 
+      The enrich_agents_validation DAG brings together tables specifically focused on validating these rules and if any of them meet the declared condition, 
+      a notification will be sent to the pre-configured gchat channel (agents-data-alarms).
+workflow:
+  type: query_delta
+  layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
