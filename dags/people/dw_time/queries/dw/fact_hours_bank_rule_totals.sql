@@ -35,18 +35,6 @@ closed_balance_snapshots AS (
     WHERE
         row_number_latest = 1
 ),
-latest_closed_balance_by_employee AS (
-    SELECT
-        id_employee_profile,
-        MAX(dt_hours_bank_balanced) AS dt_latest_closed_balance
-    FROM
-        closed_balance_snapshots
-    WHERE
-        hours_bank_totals_map IS NOT NULL
-        AND SIZE(hours_bank_totals_map) > 0
-    GROUP BY
-        id_employee_profile
-),
 open_balance_snapshots_ranked AS (
     SELECT
         id_employee_profile,
@@ -82,14 +70,12 @@ open_balance_snapshots AS (
     FROM
         open_balance_snapshots_ranked AS open_balance
     LEFT JOIN
-        latest_closed_balance_by_employee AS latest_closed
-            ON latest_closed.id_employee_profile = open_balance.id_employee_profile
+        closed_balance_snapshots AS existing_closed
+            ON existing_closed.id_employee_profile = open_balance.id_employee_profile
+            AND existing_closed.dt_hours_bank_balanced = open_balance.dt_hours_bank_balanced
     WHERE
         open_balance.row_number_latest = 1
-        AND open_balance.dt_hours_bank_balanced > COALESCE(
-            latest_closed.dt_latest_closed_balance,
-            DATE('1900-01-01')
-        )
+        AND existing_closed.id_employee_profile IS NULL
 ),
 hours_bank_snapshots AS (
     SELECT
