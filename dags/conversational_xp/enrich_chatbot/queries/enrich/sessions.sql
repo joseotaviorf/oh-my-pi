@@ -66,7 +66,7 @@ chatbot_sessions AS (
       ON sss.public_id = cs.id_sauron_session
   LEFT JOIN
     datalake_sauron_clean.session AS s
-      ON s.id = CAST(cs.id_sauron_session AS BIGINT)
+      ON s.id = TRY_CAST(cs.id_sauron_session AS BIGINT)
   WHERE
     cs.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
   QUALIFY
@@ -76,6 +76,7 @@ chats_by_sauron AS (
   SELECT
     c.id_task,
     c.id_session AS id_sauron_session,
+    c.id_sss_session,
     c.queue_name AS last_queue
   FROM
     datalake_customer_support.chats AS c
@@ -116,7 +117,7 @@ SELECT
   s.id_sauron_session,
   s.id_langfuse_session,
   s.id_sss_session,
-  COALESCE(c_sss.id_task, c_sauron.id_task) AS id_task,
+  COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task) AS id_task,
   tk.id_ticket,
   s.id_user,
   s.user_phone_number,
@@ -133,16 +134,19 @@ SELECT
   END AS whatsapp_number,
   s.status,
   lf.version,
-  CASE WHEN COALESCE(c_sss.id_task, c_sauron.id_task) IS NOT NULL THEN lf.queue_name END AS first_queue,
-  REPLACE(COALESCE(c_sss.last_queue, c_sauron.last_queue), '[AeC] ', '') AS last_queue,
-  COALESCE(c_sss.id_task, c_sauron.id_task) IS NOT NULL AS is_escalated,
+  CASE WHEN COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task) IS NOT NULL THEN lf.queue_name END AS first_queue,
+  REPLACE(COALESCE(c_sss.last_queue, c_sauron.last_queue, c_sauron_sss.last_queue), '[AeC] ', '') AS last_queue,
+  COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task) IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
 FROM
   chatbot_sessions AS s
 LEFT JOIN
   chats_by_sauron AS c_sauron
-    ON c_sauron.id_sauron_session = s.id_sauron_session
+    ON c_sauron.id_sauron_session = TRY_CAST(s.id_sauron_session AS BIGINT)
+LEFT JOIN
+  chats_by_sss AS c_sauron_sss
+    ON c_sauron_sss.id_sss_session = s.id_sauron_session
 LEFT JOIN
   chats_by_sss AS c_sss
     ON c_sss.id_sss_session = s.id_sss_session
@@ -151,4 +155,4 @@ LEFT JOIN
     ON lf.id_session = s.id_langfuse_session
 LEFT JOIN
   tickets AS tk
-    ON tk.id_twilio = COALESCE(c_sss.id_task, c_sauron.id_task)
+    ON tk.id_twilio = COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task)
