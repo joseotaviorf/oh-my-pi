@@ -152,7 +152,7 @@ SELECT
   event_name,
   origin,
   CASE 
-    WHEN channel = 'Facebook' THEN 'ZEBRA.hybr.acq.nonorg.na.d.webdisplay.facebook'
+    WHEN channel = 'Facebook' THEN 'ZEBRA.hybr.acq.nonorg.na.d.appdisplay.facebook'
     WHEN channel = 'Placas' THEN CONCAT('ZEBRA.', CASE WHEN LOWER(business_context) = 'hybrid' THEN 'hybr' ELSE LOWER(business_context) END, '.acq.nonorg.na.d.placas.na')
     WHEN channel = 'Online Classifieds' THEN CONCAT(
       'ZEBRA.', 
