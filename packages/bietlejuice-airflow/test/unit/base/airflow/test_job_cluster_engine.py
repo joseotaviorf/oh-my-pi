@@ -251,6 +251,96 @@ class TestEmrJobClusterEngineRetries:
             assert "retry_delay" not in kwargs
 
 
+class TestValidationEventLogOverrides:
+    _CLUSTER_TEMPLATE = {
+        "spark_version": "16.4.x-scala2.12",
+        "data_security_mode": "SINGLE_USER",
+        "spark_conf": {
+            "spark.eventLog.enabled": "true",
+            "spark.eventLog.dir": "s3a://bucket/spark-event-logs/dag",
+        },
+        "spark_env_vars": {},
+    }
+
+    @pytest.fixture
+    def dbr_ctx(self):
+        dag = DAG(dag_id="bietlejuice.foo__validation", schedule=None)
+        return DagExecutionContext(
+            dag=dag,
+            environment="forno",
+            bucket="b",
+            base_spark_jobs_path="/x/",
+            dag_args={},
+            workflow_args={},
+            cluster_args={"type": "cluster_key"},
+            is_validation=True,
+        )
+
+    def test_databricks_validation_disables_event_log(self, dbr_ctx):
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.side_effect = lambda key: {
+            "cluster_key": dict(self._CLUSTER_TEMPLATE),
+            "default_libraries": [],
+            "artifacts_bucket": "art",
+            "databricks_default_service_credential_name": "x",
+            "default_access_control_list": [
+                {"group_name": "g", "permission_level": "CAN_MANAGE"}
+            ],
+        }.get(key, [])
+
+        mock_operator = MagicMock()
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine."
+            "QuintoAndarDatabricksExecuteJobClusterOperator",
+            mock_operator,
+        ):
+            engine = DatabricksJobClusterEngine(dbr_ctx, config)
+            engine.create_execute_cluster_task(
+                config_service=config,
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+
+        cluster_configuration = mock_operator.call_args.kwargs["cluster_configuration"]
+        assert cluster_configuration["spark_conf"]["spark.eventLog.enabled"] == "false"
+
+    def test_emr_validation_disables_event_log_via_build_engine(self):
+        dag = DAG(dag_id="bietlejuice.foo__validation", schedule=None)
+        ctx = DagExecutionContext(
+            dag=dag,
+            environment="forno",
+            bucket="b",
+            base_spark_jobs_path="/x/",
+            dag_args={},
+            workflow_args={},
+            cluster_args={"type": "emr_cluster"},
+            is_validation=True,
+        )
+        merged = {
+            "spark_version": "emr-7-0",
+            "spark_conf": {
+                "spark.eventLog.enabled": "true",
+                "spark.eventLog.dir": "s3a://bucket/spark-event-logs-emr/dag",
+            },
+        }
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.return_value = merged
+
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine.resolve_airflow_compute_mode",
+            return_value=(True, dict(merged)),
+        ):
+            engine = build_job_cluster_engine(ctx, config)
+
+        assert isinstance(engine, EmrJobClusterEngine)
+        assert (
+            engine._merged_cluster_configuration["spark_conf"]["spark.eventLog.enabled"]
+            == "false"
+        )
+
+
 class TestDatabricksJobClusterEngineAcl:
     """ACL resolution moved from ExecuteJobClusterTaskCreator to DatabricksJobClusterEngine."""
 

@@ -20,6 +20,9 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
 from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
+from bietlejuice.base.databricks.spark_event_log_cluster import (
+    apply_validation_event_log_overrides,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 _EXECUTE_JOB_CLUSTER_TASK_ID = "execute-job-cluster"
@@ -187,6 +190,10 @@ class DatabricksJobClusterEngine(JobClusterEngine):
         _ = config_service
         cluster_configuration = self._get_cluster_configuration()
         cluster_configuration = self._input_spark_env_vars(cluster_configuration)
+        if self._ctx.is_validation:
+            cluster_configuration = apply_validation_event_log_overrides(
+                cluster_configuration
+            )
         self._validate_minimum_cluster_runtime_version(
             cluster_configuration, minimum_cluster_runtime_version
         )
@@ -428,6 +435,8 @@ def build_job_cluster_engine(
         "aws_conn_id", "aws_default"
     )
     if use_emr:
+        if dag_execution_context.is_validation:
+            merged = apply_validation_event_log_overrides(merged)
         return EmrJobClusterEngine(dag_execution_context, merged, config_service)
     return DatabricksJobClusterEngine(dag_execution_context, config_service)
 
