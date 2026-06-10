@@ -10,12 +10,17 @@ WITH reprocessing_flow AS (
   WHERE reprocessed IS NOT NULL
 )
 
-SELECT 
-  *,
+SELECT
+  id_level,
+  ds_level,
+  tp_reprocessing,
+  tp_reprocessing_entity,
+  nm_mailing_table,
+  ts_updated,
   CONCAT_WS(
     '#',
-    tp_reprocessing, 
-    tp_reprocessing_entity, 
+    tp_reprocessing,
+    tp_reprocessing_entity,
     nm_mailing_table
   ) AS bk_recovery
 FROM reprocessing_flow

@@ -118,12 +118,68 @@ discards AS (
   WHERE ce.weight > 3
 ),
 joined_events AS (
-  SELECT 
-    *
+  SELECT
+    id_lead,
+    id_entity,
+    id_user_registrant,
+    id_user_conversion,
+    id_region,
+    business_context,
+    supply_source,
+    step,
+    weight,
+    rev,
+    business_event,
+    reason,
+    aux_group,
+    aux_data_event,
+    application,
+    ops_objective,
+    ops_agent,
+    ops_partner,
+    ops_approach,
+    ops_contact_medium,
+    reprocessed,
+    reprocessing_entity_type,
+    reprocessing_table_name,
+    reprocessing_id_user_registrant,
+    ts_event_original,
+    ts_event_adjusted,
+    ts_first_discard,
+    ts_last_discard,
+    ts_reprocessing_event
   FROM conversions
   UNION ALL
-  SELECT 
-    *
+  SELECT
+    id_lead,
+    id_entity,
+    id_user_registrant,
+    id_user_conversion,
+    id_region,
+    business_context,
+    supply_source,
+    step,
+    weight,
+    rev,
+    business_event,
+    reason,
+    aux_group,
+    aux_data_event,
+    application,
+    ops_objective,
+    ops_agent,
+    ops_partner,
+    ops_approach,
+    ops_contact_medium,
+    reprocessed,
+    reprocessing_entity_type,
+    reprocessing_table_name,
+    reprocessing_id_user_registrant,
+    ts_event_original,
+    ts_event_adjusted,
+    ts_first_discard,
+    ts_last_discard,
+    ts_reprocessing_event
   FROM discards
 ),
 applied_rules AS (
@@ -180,23 +236,51 @@ applied_rules AS (
       ON (cf.id_entity = h.id)
 ),
 conversion_final AS (
-  SELECT 
-    *,   
+  SELECT
+    id_lead,
+    id_entity,
+    id_user_registrant,
+    id_user_conversion,
+    business_context,
+    supply_source,
+    step,
+    weight,
+    ts_event_original,
+    ts_event_adjusted,
+    ts_first_discard,
+    ts_last_discard,
+    rev,
+    business_event,
+    reason,
+    aux_group,
+    aux_data_event,
+    reprocessed,
+    reprocessing_entity_type,
+    reprocessing_table_name,
+    ts_reprocessing_event,
+    reprocessing_id_user_registrant,
+    id_region,
+    application_staging,
+    ops_agent,
+    ops_approach,
+    ops_contact_medium,
+    ops_objective,
+    ops_partner,
     /*
       Cases created by data lose the tracking of application
       I changed the previous CTE with the name APPLICATION_STAGING
       If it is an event created by data, I look for the most "important" event -> FIRST LISTING -> OPPORTUNITY
     */
-    CASE 
+    CASE
       WHEN aux_group = 'T6.0'
-        THEN 
+        THEN
           FIRST_VALUE(application_staging) OVER (
             PARTITION BY id_entity, business_context
             ORDER BY aux_group ASC, ts_event_adjusted ASC
-          ) 
+          )
         ELSE application_staging
     END AS application
-  FROM 
+  FROM
     applied_rules
 ),
 house_supply_source AS (
@@ -254,8 +338,36 @@ aux_tab AS (
       AND (h.supply_source = cl.supply_source)
 )
 
-SELECT 
-  *
-FROM 
+SELECT
+  id_lead_ebdb,
+  id_entity,
+  id_house,
+  id_prospect,
+  id_region,
+  id_user_registrant,
+  id_user_conversion,
+  business_context,
+  supply_source,
+  funnel_step,
+  business_event,
+  application,
+  reason,
+  ops_agent,
+  ops_approach,
+  ops_contact_medium,
+  ops_objective,
+  ops_partner,
+  reprocessed,
+  reprocessing_entity_type,
+  reprocessing_table_name,
+  aux_group,
+  aux_data_event,
+  ts_event_original,
+  ts_event_adjusted,
+  ts_first_discard,
+  ts_last_discard,
+  ts_reprocessing_event,
+  ts_load
+FROM
   aux_tab
 QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead_ebdb, id_house, business_context, funnel_step, business_event ORDER BY ts_event_adjusted) = 1 

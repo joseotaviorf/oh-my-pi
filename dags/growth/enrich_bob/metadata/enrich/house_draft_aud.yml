@@ -9,11 +9,11 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.id_house_draft
   id_client_side:
-    description: Identifier for client
+    description: Client-generated identifier used by the Bob frontend to track the draft session.
     lineage:
       - datalake_bob_clean.house_draft_aud.id_client_side
   id_original_lead:
-    description: Identifier for lead
+    description: Lead identifier from the acquisition source linked when the draft was created.
     lineage:
       - datalake_bob_clean.house_draft_aud.id_original_lead
   id_main_administrator:
@@ -21,27 +21,27 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.administrators
   rev:
-    description: Revision information
+    description: Hibernate Envers revision number identifying this historical snapshot of the draft.
     lineage:
       - datalake_bob_clean.house_draft_aud.rev
   rev_type:
-    description: Type of revision
+    description: Envers operation type for the revision, such as insert, update, or delete.
     lineage:
       - datalake_bob_clean.house_draft_aud.rev_type
   registrar:
-    description: Registrar information that matches with EBDB user
+    description: JSON struct with the EBDB user who started the house draft registration in Bob.
     lineage:
       - datalake_bob_clean.house_draft_aud.registrar
   owners_informations:
-    description: Information about owners
+    description: Raw JSON payload listing property owners and contact details captured during draft submission.
     lineage:
       - datalake_bob_clean.house_draft_aud.owners
   house_access_informations:
-    description: Information about house access
+    description: Raw JSON payload describing how photographers and agents can access the property.
     lineage:
       - datalake_bob_clean.house_draft_aud.access
   administrators_informations:
-    description: Information about administrators
+    description: Raw JSON payload listing building administrators and their contact details.
     lineage:
       - datalake_bob_clean.house_draft_aud.administrators
   main_administrator_name:
@@ -56,32 +56,20 @@ columns:
     description: Main administrator's phone number
     lineage:
       - datalake_bob_clean.house_draft_aud.administrators
-  main_owner_name:
-    description: Main owner's name
-    lineage:
-      - datalake_bob_clean.house_draft_aud.owners
-  main_owner_email:
-    description: Main owner's email
-    lineage:
-      - datalake_bob_clean.house_draft_aud.owners
-  main_owner_phone_number:
-    description: Main owner's phone number
-    lineage:
-      - datalake_bob_clean.house_draft_aud.owners
   house_appliances:
-    description: Information about house appliances
+    description: JSON list of appliances present in the property as reported in the draft form.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   house_description:
-    description: Description of the house
+    description: Free-text property description entered by the owner during the Bob draft flow.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   front_door_type:
-    description: Type of front door
+    description: Entry access method for the property, such as keys, lockbox, or doorman.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   installations:
-    description: Information about house installations
+    description: JSON list of built-in installations reported in the draft, such as air conditioning.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   acessibility_items:
@@ -93,27 +81,27 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   availability_type:
-    description: Type of availability
+    description: Vacancy classification selected for the property move-out timeline.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   awaiting_availability_reason:
-    description: Reason for awaiting availability
+    description: Standard reason code when the property is not yet available for visits.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   awaiting_availability_custom_reason:
-    description: Custom reason for awaiting availability
+    description: Free-text explanation when the owner selects a custom availability reason.
     lineage:
       - datalake_bob_clean.house_draft_aud.details
   rent_price:
-    description: Rent price for the house
+    description: Monthly rent amount proposed by the owner in the draft pricing section.
     lineage:
       - datalake_bob_clean.house_draft_aud.pricing
   sale_price:
-    description: Sale price for the house
+    description: Asking sale price proposed by the owner in the draft pricing section.
     lineage:
       - datalake_bob_clean.house_draft_aud.pricing
   condo_price:
-    description: Condo price for the house
+    description: Monthly condominium fee amount reported in the draft pricing section.
     lineage:
       - datalake_bob_clean.house_draft_aud.pricing
   iptu_installment_informations:
@@ -121,7 +109,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.pricing
   custom_administration_fee:
-    description: Custom administration fee for the house
+    description: Optional administration fee percentage negotiated outside standard QuintoAndar rates.
     lineage:
       - datalake_bob_clean.house_draft_aud.pricing
   special_conditions:
@@ -137,7 +125,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.blueprint
   garages_description:
-    description: Description of garages
+    description: Free-text details about parking spots when the owner provides extra garage context.
     lineage:
       - datalake_bob_clean.house_draft_aud.blueprint
   bedrooms:
@@ -149,23 +137,15 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.blueprint
   house_type:
-    description: Type of the house
+    description: Property category in the blueprint section, such as apartment, house, or studio.
     lineage:
       - datalake_bob_clean.house_draft_aud.blueprint
   total_area:
-    description: Total area of the house
+    description: Total usable area of the property in square meters from the draft blueprint.
     lineage:
       - datalake_bob_clean.house_draft_aud.blueprint
   business_context_type:
-    description: Type of business context
-    lineage:
-      - datalake_bob_clean.house_draft_aud.business_context
-  is_for_sale:
-    description: Whether the house is for sale
-    lineage:
-      - datalake_bob_clean.house_draft_aud.business_context
-  is_for_rent:
-    description: Whether the house is for rent
+    description: Raw list of listing intents selected for the draft, such as RENT or SALE.
     lineage:
       - datalake_bob_clean.house_draft_aud.business_context
   status:
@@ -173,7 +153,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.status
   type:
-    description: Type of the house
+    description: Bob draft workflow type indicating how the listing was initiated, such as CIQ or portfolio manager.
     lineage:
       - datalake_bob_clean.house_draft_aud.type
   is_furnished:
@@ -241,7 +221,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.mod_administrators
   mod_details:
-    description: Modified house details
+    description: Envers flag indicating whether the property details JSON changed in this revision.
     lineage:
       - datalake_bob_clean.house_draft_aud.mod_details
   mod_pricing:
@@ -261,7 +241,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft_aud.mod_status
   mod_type:
-    description: Modified type
+    description: Envers flag indicating whether the draft workflow type changed in this revision.
     lineage:
       - datalake_bob_clean.house_draft_aud.mod_type
   mod_attendance_info:

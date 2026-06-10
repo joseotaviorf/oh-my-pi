@@ -32,9 +32,9 @@ columns:
     description: The business context of the prospect, referring to the business context where the prospect originated.
     lineage: 
       - datalake_bob.house_draft_business_context.business_context
-    category: 
-      - SALE: The CIQ prospect is for sale.
-      - RENT: The CIQ prospect is for rent.
+    categories:
+      SALE: The CIQ prospect is for sale.
+      RENT: The CIQ prospect is for rent.
   business_event:
     description: The business event of the prospect, referring which action was taken in the business context.
   funnel_step:
@@ -56,16 +56,4 @@ columns:
   ts_load:
     description: Timestamp indicating creation time of register.
     lineage: 
-      - datalake_bob.house_draft_business_context.ts_created
-  year:
-    description: Column for partition table derived from the ts_created column.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-  month:
-    description: Column for partition table derived from the ts_created column.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-  day:
-    description: Column for partition table derived from the ts_created column.
-    lineage:
       - datalake_bob.house_draft_business_context.ts_created

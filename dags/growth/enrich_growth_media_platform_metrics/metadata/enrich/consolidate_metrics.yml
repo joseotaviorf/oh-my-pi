@@ -2,7 +2,7 @@
 database_name: datalake_growth_media_platform
 table_name: consolidated_metrics
 owner: henrique.paulo@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: This table contains consolidated metrics like clicks, impressions and cost from Media Platforms like Google, Facebook, Criteo and Trovit.
 columns:
   id_account:
@@ -11,39 +11,39 @@ columns:
       - datalake_growth_media_platform.facebook_metrics.id_account
       - datalake_growth_media_platform.google_metrics.id_account
       - datalake_growth_media_platform.trovit_metrics.id_account
-    description: The account id of the media platform.
+    description: Numeric advertiser account identifier in the paid media platform API.
   id_campaign:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.id_campaign
       - datalake_growth_media_platform.facebook_metrics.id_campaign
       - datalake_growth_media_platform.google_metrics.id_campaign
       - datalake_growth_media_platform.trovit_metrics.id_campaign
-    description: The id of the campaign in media platform.
+    description: Numeric campaign identifier assigned by the paid media platform API.
   id_adset:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.id_adset
       - datalake_growth_media_platform.facebook_metrics.id_adset
       - datalake_growth_media_platform.google_metrics.id_adset
       - datalake_growth_media_platform.trovit_metrics.id_adset
-    description: The id of the adset in media platform.
+    description: Numeric ad set identifier assigned by the paid media platform API.
   id_ad:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.id_ad
       - datalake_growth_media_platform.facebook_metrics.id_ad
       - datalake_growth_media_platform.google_metrics.id_ad
       - datalake_growth_media_platform.trovit_metrics.id_ad
-    description: The id of the ad in media platform.
+    description: Numeric ad creative identifier assigned by the paid media platform API.
   id_region:
     lineage:
       - datalake_region.region
-    description: Id of the region. 
+    description: QuintoAndar internal region identifier mapped to the geographic spend row.
   account_name:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.account_name
       - datalake_growth_media_platform.facebook_metrics.account_name
       - datalake_growth_media_platform.google_metrics.account_name
       - datalake_growth_media_platform.trovit_metrics.account_name
-    description: The name of the account in media platform.
+    description: Human-readable paid media account label shown in the platform reporting UI.
   origin:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.origin
@@ -64,21 +64,21 @@ columns:
       - datalake_growth_media_platform.facebook_metrics.utm_campaign
       - datalake_growth_media_platform.google_metrics.utm_campaign
       - datalake_growth_media_platform.trovit_metrics.utm_campaign
-    description: The utm_campaign of the media platform.
+    description: UTM campaign value parsed from the platform naming convention for attribution.
   utm_term:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.utm_term
       - datalake_growth_media_platform.facebook_metrics.utm_term
       - datalake_growth_media_platform.google_metrics.utm_term
       - datalake_growth_media_platform.trovit_metrics.utm_term
-    description: The utm_term of the media platform.
+    description: UTM term value parsed from the platform naming convention for attribution.
   utm_content:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.utm_content
       - datalake_growth_media_platform.facebook_metrics.utm_content
       - datalake_growth_media_platform.google_metrics.utm_content
       - datalake_growth_media_platform.trovit_metrics.utm_content
-    description: The utm_content of the media platform.
+    description: UTM content value parsed from the platform naming convention for attribution.
   country_code:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.country_code
@@ -131,7 +131,7 @@ columns:
   current_campaign_name:
     lineage:
       - datalake_growth_media_platform.campaign_name_history
-    description: Current campaign name. 
+    description: Latest campaign label recorded in the campaign name history dimension.
   last_campaign_name:
     lineage:
       - datalake_growth_media_platform.campaign_name_history
@@ -146,7 +146,7 @@ columns:
       - datalake_growth_media_platform.facebook_metrics.dt_cost
       - datalake_growth_media_platform.google_metrics.dt_cost
       - datalake_growth_media_platform.trovit_metrics.dt_cost
-    description: Date of the cost.
+    description: Calendar date when the paid media spend metrics in this row were recorded.
   year:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.year

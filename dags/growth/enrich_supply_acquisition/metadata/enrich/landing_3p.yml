@@ -45,7 +45,7 @@ columns:
         QUEUE: 'Lead awaiting in the duplicate queue'
         NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
     city:
-      description: 'City of the lead.'
+      description: Brazilian municipality where the third-party lead property is located.
       lineage:
         - datalake_3p_supply.lead_3p.city
     reason:
@@ -65,6 +65,6 @@ columns:
     aux_hash:
       description: 'Auxiliary column to deduplicate the data. Its a MD5 hash of the columns id_lead_3p, business_context.'
     ts_event:
-      description: 'Timestamp of the event.'
+      description: Timestamp when the third-party lead status change occurred in Brokers Supply Processor.
       lineage:
         - datalake_3p_supply.lead_3p_status_changes.ts_start

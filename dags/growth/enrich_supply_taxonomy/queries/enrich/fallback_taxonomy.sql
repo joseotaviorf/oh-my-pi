@@ -72,17 +72,71 @@ fallback_fl AS (
     WHERE ce.step = 'FIRST_LISTING'
 ),
 joined_tb AS (
-    SELECT *
+    SELECT
+        id_lead,
+        id_house,
+        business_context,
+        id_user_registrant,
+        id_region,
+        source,
+        application,
+        funnel_step,
+        ops_objective,
+        ops_agent,
+        ops_partner,
+        ops_approach,
+        ops_contact_medium,
+        ts_event
     FROM fallback_lbc
     UNION ALL
-    SELECT *
+    SELECT
+        id_lead,
+        id_entity,
+        business_context,
+        id_user_registrant,
+        id_region,
+        source,
+        application,
+        funnel_step,
+        ops_objective,
+        ops_agent,
+        ops_partner,
+        ops_approach,
+        ops_contact_medium,
+        ts_event
     FROM fallback_opp
     UNION ALL
-    SELECT *
+    SELECT
+        id_lead,
+        id_entity,
+        business_context,
+        id_user_registrant,
+        id_region,
+        source,
+        application,
+        step AS funnel_step,
+        ops_objective,
+        ops_agent,
+        ops_partner,
+        ops_approach,
+        ops_contact_medium,
+        ts_event
     FROM fallback_fl
 )
-
-SELECT 
-    *,
+SELECT
+    id_lead,
+    id_house,
+    business_context,
+    id_user_registrant,
+    id_region,
+    source,
+    application,
+    funnel_step,
+    ops_objective,
+    ops_agent,
+    ops_partner,
+    ops_approach,
+    ops_contact_medium,
+    ts_event,
     NOW() AS ts_load
 FROM joined_tb

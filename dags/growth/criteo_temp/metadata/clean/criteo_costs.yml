@@ -17,23 +17,23 @@ columns:
     lineage:
       - datalake_gsheets_raw.criteo_costs.campaign_id
   advertiser_name:
-    description: Name of the Advertiser
+    description: Display name of the Criteo advertiser account that owns the campaign spend.
     lineage:
       - datalake_gsheets_raw.criteo_costs.advertiser
   ad_set:
-    description: Name of the campaign
+    description: Display name of the ad set within the Criteo campaign.
     lineage:
       - datalake_gsheets_raw.criteo_costs.ad_set
   campaign_name:
-    description: Name of the campaign
+    description: Display name of the Criteo campaign reported in the regional cost extract.
     lineage:
       - datalake_gsheets_raw.criteo_costs.campaign
   region:
-    description: Region of the campaign
+    description: Geographic region targeted by the Criteo campaign ad set on the report date.
     lineage:
       - datalake_gsheets_raw.criteo_costs.region
   zip_code:
-    description: Zip code of the region
+    description: Brazilian postal code of the geographic region targeted by the campaign.
     lineage:
       - datalake_gsheets_raw.criteo_costs.zip_code
   cost:
@@ -53,6 +53,6 @@ columns:
     lineage:
       - datalake_gsheets_raw.criteo_costs.day
   ts_load:
-    description: Timestamp of the load
+    description: Timestamp when the Criteo regional cost row was ingested into the data lake.
     lineage:
       - datalake_gsheets_raw.criteo_costs.ts_load

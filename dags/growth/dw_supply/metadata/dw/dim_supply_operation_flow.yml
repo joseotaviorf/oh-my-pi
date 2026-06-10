@@ -6,8 +6,6 @@ domain: Growth
 description: |
   Table with information about the operations related to supply events, such as the objective, agent, partner, contact medium, and approach.
 columns:
-  sk_ops:
-    description: Autoincremental surrogate key for the dim_supply_operation_flow dimension.
   bk_ops:
     lineage:
       - datalake_supply_flows.supply_events_tracking.ops_objective
@@ -24,11 +22,11 @@ columns:
   nm_agent:
     lineage:
       - datalake_supply_flows.supply_events_tracking.ops_agent
-    description: Name of the agent.
+    description: Operations team or channel responsible for handling the supply event, such as inbound, outbound, CIQ, or Capta Aí.
   nm_partner:
     lineage:
       - datalake_supply_flows.supply_events_tracking.ops_partner
-    description: Name of the partner.
+    description: Operations partner company assigned to the supply event, such as Atento, ActionLine, or QuintoAndar.
   nm_assigned_partner:
     lineage:
       - datalake_supply_flows.supply_events_tracking.ops_assigned

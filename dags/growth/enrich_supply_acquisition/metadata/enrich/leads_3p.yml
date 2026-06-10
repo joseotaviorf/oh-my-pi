@@ -26,9 +26,9 @@ columns:
     description: The business context of the lead, referring to the business context where the lead originated.
     lineage: 
       - datalake_supply_flows.landing_3p.business_context
-    category: 
-      - SALE: The 3P lead is for sale.
-      - RENT: The 3P lead is for rent.
+    categories:
+      SALE: The 3P lead is for sale.
+      RENT: The 3P lead is for rent.
   business_event:
     description: The business event of the lead, referring to the business event in supply funnel. In this table is always acquisition_tof2l.
   funnel_step:
@@ -40,7 +40,7 @@ columns:
     lineage: 
       - datalake_supply_flows.landing_3p.status
   aux_hash:
-    description: The hash of the lead.
+    description: MD5 deduplication key built from third-party lead identifier and business context.
     lineage: 
       - datalake_supply_flows.landing_3p.aux_hash
   ts_event:
@@ -49,15 +49,3 @@ columns:
       - datalake_supply_flows.landing_3p.ts_event
   ts_load:
     description: The timestamp of the load.
-  year:
-    description: The year of the event.
-    lineage: 
-      - datalake_supply_flows.landing_3p.ts_event
-  month:
-    description: The month of the event.
-    lineage: 
-      - datalake_supply_flows.landing_3p.ts_event
-  day:
-    description: The day of the event.
-    lineage: 
-      - datalake_supply_flows.landing_3p.ts_event

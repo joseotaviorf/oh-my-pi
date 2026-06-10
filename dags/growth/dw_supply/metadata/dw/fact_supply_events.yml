@@ -73,17 +73,17 @@ columns:
       - datalake_supply_flows.supply_events_tracking.reprocessing_entity_type
       - datalake_supply_flows.supply_events_tracking.reprocessing_table_name
     description: Concatenation of various columns related to recovery.
-  sk_conversion_path:
+  sk_conversion_user_path:
     lineage:
       - datalake_supply_flows.supply_events_tracking.application
       - datalake_supply_flows.supply_events_tracking.lead_application
       - datalake_supply_flows.supply_events_tracking.platform
-    description: Concatenation of various columns related to the conversion path.
-  sk_acquisition_path:
+    description: Surrogate key for the conversion user path dimension.
+  sk_acquisition_user_path:
     lineage:
       - datalake_supply_flows.supply_events_tracking.lead_application
       - datalake_supply_flows.supply_events_tracking.platform
-    description: Concatenation of various columns related to the acquisition path.
+    description: Surrogate key for the acquisition user path dimension.
   sk_user_affiliate:
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_referred_by
@@ -110,6 +110,46 @@ columns:
     lineage:
       - datalake_supply_flows.dict_taxonomy.id_media_setup
     description: Key from the dw_growth.dim_media_setup dimension associated with the media setup.
+  sk_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+    description: Surrogate key for the owner of the house associated with the supply event.
+  nm_media_setup:
+    lineage:
+      - datalake_growth_taxonomy.media_setup.naming_convention_sufix
+    description: Media setup naming convention suffix derived from campaign taxonomy rules.
+  tp_flow_media_setup:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.campaign
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.utm_campaign
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.utm_campaign
+    description: Rule used to derive the media setup suffix for the supply event.
+  utm_medium:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.medium
+    description: UTM medium captured for the supply event.
+  utm_source:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.source
+    description: UTM source captured for the supply event.
+  utm_campaign:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.campaign
+    description: UTM campaign captured for the supply event.
+  utm_term:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.term
+    description: UTM term captured for the supply event.
+  utm_content:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.content
+    description: UTM content captured for the supply event.
+  ts_first_event_date:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: Timestamp of the first supply event for the lead and business context.
+  ts_load:
+    description: Timestamp when the fact row was loaded into the data warehouse.
   nm_detailed_route:
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
     lineage:

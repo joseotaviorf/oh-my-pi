@@ -808,7 +808,21 @@ original_events_reorg AS (
   FROM 
     t5
 )
-
-SELECT 
-  *
+SELECT
+  id_lead,
+  id_entity,
+  id_user_registrant,
+  business_context,
+  supply_source,
+  step,
+  weight,
+  ts_event_original,
+  ts_event_adjusted,
+  ts_first_discard,
+  ts_last_discard,
+  rev,
+  business_event,
+  reason,
+  aux_group,
+  aux_data_event
 FROM original_events_reorg

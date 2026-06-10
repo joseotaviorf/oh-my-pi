@@ -18,15 +18,15 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.dispositiondetail.dispositiontypeid
   disposition_code:
-    description: Disposition code information.
+    description: Olos disposition code describing the outcome of the customer interaction.
     lineage:
       - datalake_olos_dialer_raw.dispositiondetail.dispositioncode
   business_success:
-    description: Business success information.
+    description: Flag indicating whether Olos classified the disposition as a business success outcome.
     lineage:
       - datalake_olos_dialer_raw.dispositiondetail.businesssuccess
   customer_finisher:
-    description: Customer finisher information.
+    description: Flag indicating whether the customer ended the interaction in Olos Dialer.
     lineage:
       - datalake_olos_dialer_raw.dispositiondetail.customerfinisher
   phone_finisher:

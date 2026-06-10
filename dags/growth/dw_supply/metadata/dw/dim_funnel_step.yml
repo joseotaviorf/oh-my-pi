@@ -6,8 +6,6 @@ domain: Growth
 description: |
   Dimensional table containing information about the funnel steps in supply funnel.
 columns:
-  sk_funnel_step:
-    description: Auto increment surrogate key for the dim_funnel_step dimension.
   bk_funnel_step:
     lineage:
       - datalake_supply_flows.supply_events_tracking.funnel_step

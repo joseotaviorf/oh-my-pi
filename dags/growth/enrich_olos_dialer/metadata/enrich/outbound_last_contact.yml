@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_olos_dialer_clean.customer.name
   duration_in_seconds:
-    description: Contact duration in seconds.
+    description: Elapsed time in seconds between call start and call end for the most recent outbound contact.
     lineage:
       - datalake_olos_dialer_clean.attempts_raw_data.ts_started
       - datalake_olos_dialer_clean.attempts_raw_data.ts_call_ended

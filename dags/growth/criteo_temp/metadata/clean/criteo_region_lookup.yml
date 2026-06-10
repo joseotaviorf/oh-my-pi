@@ -7,7 +7,7 @@ columns:
   postcode_range:
     lineage: 
       - datalake_gsheets_raw.criteo_region_lookup.postcode_range
-    description: Postcode range of the region
+    description: Human-readable Brazilian postal code interval used to map Criteo spend to a locality.
   start_range:
     lineage: 
       - datalake_gsheets_raw.criteo_region_lookup.start_range

@@ -34,14 +34,14 @@ columns:
       - datalake_wololo_clean.context_discard.id_user
       - datalake_supply_flows.fallback_taxonomy.id_user_registrant
   source:
-    description: Source of information of the taxonomy.
+    description: Upstream system that supplied the conversion taxonomy attributes for this row.
   application:
     description: Origin of conversion in the PWAs.
     lineage:
       - datalake_bob.house_draft_business_context.type
       - datalake_supply_flows.fallback_taxonomy.application
   funnel_step:
-    description: The funnel step of the taxonomy, referring to the funnel step in supply funnel.
+    description: Supply funnel stage associated with the conversion taxonomy event, such as lead or qualified.
     lineage:
       - datalake_supply_flows.supply_discards_settings.funnel_step
       - datalake_supply_flows.fallback_taxonomy.funnel_step
@@ -82,28 +82,10 @@ columns:
   has_ops_agents_table:
     description: If we gathering data from datalake_supply_flows.operations_agents table.
   ts_event:
-    description: Timestamp of the event.
+    description: Timestamp when the conversion taxonomy event occurred in the upstream supply system.
     lineage:
       - datalake_bob.house_draft_business_context.ts_created
       - datalake_wololo_clean.context_discard.ts_created
       - datalake_supply_flows.fallback_taxonomy.ts_event
   ts_load:
-    description: Timestamp of the load.
-  year:
-    description: Year of the event.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-      - datalake_wololo_clean.context_discard.ts_created
-      - datalake_supply_flows.fallback_taxonomy.ts_event
-  month:
-    description: Month of the event.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-      - datalake_wololo_clean.context_discard.ts_created
-      - datalake_supply_flows.fallback_taxonomy.ts_event
-  day:
-    description: Day of the event.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-      - datalake_wololo_clean.context_discard.ts_created
-      - datalake_supply_flows.fallback_taxonomy.ts_event
+    description: Timestamp when the conversion taxonomy row was loaded into the enrich layer.

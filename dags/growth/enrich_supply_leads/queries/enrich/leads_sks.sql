@@ -55,11 +55,23 @@ ciq_tb AS (
     GROUP BY ALL
 )
 
-SELECT *
+SELECT
+  id_lead,
+  source,
+  ts_created,
+  is_backfill
 FROM 1p_tb
 UNION ALL
-SELECT *
+SELECT
+  id_lead,
+  source,
+  ts_created,
+  is_backfill
 FROM 3p_tb
 UNION ALL
-SELECT *
+SELECT
+  id_lead,
+  source,
+  ts_created,
+  is_backfill
 FROM ciq_tb

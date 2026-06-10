@@ -22,15 +22,15 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.campaign.description
   campaign_code:
-    description: Campaign code information.
+    description: Internal Olos campaign code used for dialer billing and routing configuration.
     lineage:
       - datalake_olos_dialer_raw.campaign.campaigncode
   billing_code:
-    description: Billing code information.
+    description: Olos billing code linked to the campaign for cost allocation.
     lineage:
       - datalake_olos_dialer_raw.campaign.billingcode
   is_activated:
-    description: Is activated information.
+    description: Indicates whether the Olos Dialer configuration record is currently active and selectable.
     lineage:
       - datalake_olos_dialer_raw.campaign.activated
   year:

@@ -18,6 +18,18 @@ columns:
       other: 'Non classified type of reprocessing event'
     lineage:
       - datalake_olos_dialer_clean.reprocessing_mailing.table_name
+  id_campaign:
+    description: Identifier of the Olos campaign associated with the reprocessing mailing.
+    lineage:
+      - datalake_olos_dialer_clean.reprocessing_mailing.id_campaign
+  table_name:
+    description: Name of the Olos mailing table where the lead was uploaded.
+    lineage:
+      - datalake_olos_dialer_clean.reprocessing_mailing.table_name
+  description:
+    description: Description of the Olos campaign linked to the reprocessing mailing.
+    lineage:
+      - datalake_olos_dialer_clean.campaign.description
   business_context:
     description: Business context of the reprocessing event, should be Rent or Sale.
     categories:
@@ -39,8 +51,6 @@ columns:
     description: Medium of the reprocessing event, is always phone call.
   application: 
     description: Application that reprocessed the lead, for reprocessing events is always Olos Dialer.
-  weight:
-    description: Weight of the reprocessing event, is always 2 for Olos and 1 for Rene Descartes.
   ts_created:
     description: Timestamp of the creation demand for reprocessing event.
     lineage:
@@ -50,3 +60,15 @@ columns:
       - datalake_olos_dialer_clean.reprocessing_mailing.day
   ts_load:
     description: Timestamp of the load table
+  year:
+    description: Year partition of the reprocessing mailing record.
+    lineage:
+      - datalake_olos_dialer_clean.reprocessing_mailing.year
+  month:
+    description: Month partition of the reprocessing mailing record.
+    lineage:
+      - datalake_olos_dialer_clean.reprocessing_mailing.month
+  day:
+    description: Day partition of the reprocessing mailing record.
+    lineage:
+      - datalake_olos_dialer_clean.reprocessing_mailing.day

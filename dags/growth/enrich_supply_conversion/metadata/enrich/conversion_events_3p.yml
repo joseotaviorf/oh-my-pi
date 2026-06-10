@@ -31,6 +31,10 @@ columns:
     description: Identifier indicating the lead was referred by another entity. Its always -1.
   business_event:
     description: Specifies the type of business event associated with the lead, such as inquiry, purchase, partnership, etc.
+  funnel_step:
+    description: Funnel step reached by the 3P lead at the time of the event, such as QUALIFIED or OPPORTUNITY.
+    lineage:
+      - datalake_supply_flows.landing_3p.growth_status
   funnel_level:
     description: Specifies the level or depth of the lead within the supply funnel.
   supply_source:
@@ -57,16 +61,4 @@ columns:
       - datalake_supply_flows.landing_3p.ts_event
   ts_load:
     description: Timestamp indicating the time the record was loaded into the table.
-  year:
-    description: Year of the event.
-    lineage: 
-      - datalake_supply_flows.landing_3p.ts_event
-  month:
-    description: Month of the event.  
-    lineage: 
-      - datalake_supply_flows.landing_3p.ts_event
-  day:
-    description: Day of the event.
-    lineage: 
-      - datalake_supply_flows.landing_3p.ts_event
 

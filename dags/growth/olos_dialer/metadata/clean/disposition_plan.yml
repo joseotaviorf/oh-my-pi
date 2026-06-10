@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.description
   is_activated:
-    description: Is activated information.
+    description: Indicates whether the Olos Dialer configuration record is currently active and selectable.
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.activated
   ts_last_modified:

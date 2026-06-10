@@ -18,8 +18,12 @@ WITH base AS (
   WHERE aux_origin_table = 'conversion'
 )
 
-SELECT 
-  *,
+SELECT
+  id_level,
+  ds_level,
+  tp_origin,
+  tp_platform,
+  nm_content_page,
   CONCAT_WS(
     '#',
     tp_origin,

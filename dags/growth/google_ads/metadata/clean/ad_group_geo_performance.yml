@@ -8,15 +8,15 @@ description: |
   Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v13/overview
 columns:
   id_external_customer:
-    description: Customer identificator
+    description: Google Ads customer resource identifier extracted from the API performance report.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.customer
   id_campaign:
-    description: Campaign identificator
+    description: Google Ads campaign resource identifier for the geographic performance row.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.campaign
   id_ad_group:
-    description: Ad group identificator
+    description: Google Ads ad group resource identifier for the geographic performance row.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.adGroup
   campaign_name:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.campaign
   ad_group_name:
-    description: Ad group name from google ads platform
+    description: Human-readable ad group label from Google Ads used to attribute geographic performance.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.adGroup
   clicks:
@@ -56,7 +56,7 @@ columns:
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.segments
   ad_network_type:
-    description: Ad network type
+    description: Google Ads network where the impression was served, such as Search or Display.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.segments
   impressions:
@@ -88,16 +88,16 @@ columns:
     description: Country code the account belongs to.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.account_snake_case
-  geo_target_city:
+  geoTargetCity:
     description: City of the campaign target
     lineage:    
       - datalake_google_ads_raw.ad_group_geo_performance.segments.geoTargetCity
-  geo_target_region:
+  geoTargetRegion:
     description: Region of the campaign target
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.segments.geoTargetRegion
   dt_loaded:
-    description: Date of loaded data
+    description: Calendar date of the Google Ads performance metrics included in this geographic report row.
     lineage:
       - datalake_google_ads_raw.ad_group_geo_performance.segments
   dt_created:

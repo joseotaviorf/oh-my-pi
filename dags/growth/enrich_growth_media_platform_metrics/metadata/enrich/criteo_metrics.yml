@@ -2,27 +2,27 @@
 database_name: datalake_growth_media_platform
 table_name: criteo_metrics
 owner: henrique.paulo@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: This table contains consolidated metrics like clicks, impressions and cost from Media Platforms from Criteo.
 columns:
   id_account:
     lineage:
       - datalake_criteo.criteo_campaigns.id_advertiser
-    description: The account id of the media platform.
+    description: Numeric Criteo advertiser account identifier from the regional campaigns report.
   id_campaign:
     lineage:
       - datalake_criteo.criteo_campaigns.id_ad_set
-    description: The id of the campaign in media platform.
+    description: Numeric Criteo ad set identifier used as the campaign key in this report.
   id_adset:
     lineage:
       - datalake_criteo.criteo_campaigns.id_ad_set
-    description: The id of the adset in media platform.
+    description: Numeric Criteo ad set identifier grouping creatives within the campaign.
   id_ad:
     description: The id of the ad in media platform, for this table is null.
   account_name:
     lineage:
       - datalake_criteo.criteo_campaigns.advertiser_name
-    description: The name of the account in media platform.
+    description: Human-readable Criteo advertiser label from the regional campaigns report.
   origin:
     description: The origin of the data, its always Criteo.
   report_type:
@@ -30,7 +30,7 @@ columns:
   utm_campaign:
     lineage:
       - datalake_criteo.criteo_campaigns.ad_set
-    description: The utm_campaign of the media platform.
+    description: UTM campaign value derived from the Criteo ad set naming convention.
   utm_term:
     description: The utm_term of the media platform. For this table is null.
   utm_content:
@@ -62,7 +62,7 @@ columns:
   dt_cost:
     lineage:
       - datalake_criteo.criteo_campaigns.dt_report
-    description: Date of the cost.
+    description: Calendar date when the Criteo spend metrics in this row were recorded.
   year:
     lineage:
       - datalake_criteo.criteo_campaigns.dt_report

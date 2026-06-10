@@ -75,13 +75,43 @@ qualified_events AS (
     WHERE hda.id_house IS NOT NULL
 ),
 all_events AS (
-  SELECT *
+  SELECT
+    id_entity,
+    id_source,
+    id_user_registrant,
+    rev,
+    business_context,
+    status,
+    source,
+    step,
+    weight,
+    ts_event
   FROM listing_events
   UNION ALL
-  SELECT *
+  SELECT
+    id_entity,
+    id_source,
+    id_user_registrant,
+    rev,
+    business_context,
+    status,
+    source,
+    step,
+    weight,
+    ts_event
   FROM opp_events
   UNION ALL
-  SELECT *
+  SELECT
+    id_entity,
+    id_source,
+    id_user_registrant,
+    rev,
+    business_context,
+    status,
+    source,
+    step,
+    weight,
+    ts_event
   FROM qualified_events
 ),
 conversion_lookup AS (
@@ -132,6 +162,20 @@ events_and_discards AS (
   FROM datalake_supply_flows.prospects_events
 )
 
-SELECT *
+SELECT
+  id_entity,
+  id_source,
+  id_user_registrant,
+  id_lead,
+  supply_source,
+  rev,
+  business_context,
+  status,
+  source,
+  step,
+  weight,
+  reason,
+  drop_step,
+  ts_event
 FROM events_and_discards
 WHERE id_entity IS NOT NULL

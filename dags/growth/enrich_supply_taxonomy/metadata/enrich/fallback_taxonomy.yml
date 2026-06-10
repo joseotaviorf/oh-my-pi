@@ -27,11 +27,11 @@ columns:
       - datalake_ebdb_listing.listing_business_context.id_user_registrant
       - datalake_supply_flows.conversion_events.id_user_registrant
   source:
-    description: Source of information of the taxonomy.
+    description: Upstream system that supplied the fallback taxonomy attributes for this row.
   application:
     description: Origin of conversion in the PWAs.
   funnel_step:
-    description: The funnel step of the lead, referring to the funnel step in supply funnel.
+    description: Supply funnel stage inferred for the fallback taxonomy enrichment event.
     lineage:
       - datalake_supply_flows.conversion_events.step
   id_region:
@@ -60,24 +60,9 @@ columns:
     lineage:
       - datalake_supply_flows.operations_agents.ops_contact_medium
   ts_event:
-    description: Timestamp of the event.
+    description: Timestamp when the fallback taxonomy event occurred in the upstream listing or conversion flow.
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_supply_flows.conversion_events.ts_event_adjusted
   ts_load:
-    description: Timestamp of the load.
-  year:
-    description: Year of the event.
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_supply_flows.conversion_events.ts_event_adjusted
-  month:
-    description: Month of the event.
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_supply_flows.conversion_events.ts_event_adjusted
-  day:
-    description: Day of the event.
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_supply_flows.conversion_events.ts_event_adjusted
+    description: Timestamp when the fallback taxonomy row was loaded into the enrich layer.

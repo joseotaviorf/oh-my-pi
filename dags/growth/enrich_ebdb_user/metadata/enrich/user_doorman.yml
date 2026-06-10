@@ -2,61 +2,83 @@ database_name: datalake_ebdb_user
 table_name: user_doorman
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
+description: Enriched profile of doorman affiliates, combining doorman registration data, affiliate linkage, occupation, work location, and user country context from EBDB.
 columns:
   id:
+    description: Primary key of the doorman affiliate data record in EBDB.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.id
   id_affiliate_data:
+    description: Identifier of the affiliate record linked to the doorman profile.
     lineage:
       - datalake_ebdb_clean.affiliate_data.id
   id_doorman_occupation:
+    description: Identifier of the doorman occupation category assigned to the affiliate.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.id_doorman_occupation
   id_place:
+    description: Identifier of the place associated with the doorman work location.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.id_place
   country_code:
+    description: Country code of the linked user, defaulting to Undefined when not available.
     lineage:
       - datalake_ebdb_country.user.country_code
   work_address:
+    description: Full work address reported by the doorman affiliate.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_address
   work_street:
+    description: Street name of the doorman work address.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_street
   work_house_number:
+    description: Street number of the doorman work address.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_house_number
   work_neighborhood:
+    description: Neighborhood of the doorman work address.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_neighborhood
   work_city:
+    description: City of the doorman work address.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_city
   work_state:
+    description: State of the doorman work address.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.work_state
   lat:
+    description: Latitude coordinate of the doorman work location.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.lat
   lng:
+    description: Longitude coordinate of the doorman work location.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.lng
   recruiter:
+    description: Name of the recruiter responsible for onboarding the doorman affiliate.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.recrutier
   subscription_source:
+    description: Channel or source through which the doorman affiliate subscribed to the program.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.subscription_source
   occupation_name:
+    description: Human-readable name of the doorman occupation category.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_occupation.name
+  is_active:
+    description: Indicates whether the affiliate is an active doorman with a valid join date.
   ts_joined:
+    description: Timestamp when the doorman affiliate joined the program.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.ts_joined
   ts_created:
+    description: Timestamp when the doorman affiliate record was created in EBDB.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.ts_created
   ts_updated:
+    description: Timestamp when the doorman affiliate record was last updated in EBDB.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.ts_updated

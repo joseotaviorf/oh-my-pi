@@ -57,7 +57,7 @@ columns:
     lineage:
       - datalake_supply_flows.conversion_events.step
   business_event:
-    description: Type of business event.
+    description: Supply business event type that classifies the conversion tracking row in the funnel.
     lineage:
       - datalake_supply_flows.conversion_events.business_event
   application:
@@ -136,15 +136,3 @@ columns:
     description: Auxiliary data event information.
     lineage:
       - datalake_supply_flows.conversion_events.aux_data_event
-  year:
-    description: Year of the event.
-    lineage:
-      - datalake_supply_flows.conversion_events.ts_event_adjusted
-  month:
-    description: Month of the event.
-    lineage:
-      - datalake_supply_flows.conversion_events.ts_event_adjusted
-  day:
-    description: Day of the event.
-    lineage:
-      - datalake_supply_flows.conversion_events.ts_event_adjusted

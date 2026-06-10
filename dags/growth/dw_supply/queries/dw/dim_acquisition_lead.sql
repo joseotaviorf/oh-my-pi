@@ -22,12 +22,27 @@ WITH acq_lead AS (
   QUALIFY ROW_NUMBER() OVER (PARTITION BY sk_supply_lead, supply_source, business_context ORDER BY ts_event_adjusted DESC) = 1
 )
 
-SELECT 
-  *,
+SELECT
+  sk_supply_lead,
+  cd_supply_source,
+  nm_business_context,
+  id_lead,
+  id_lead_ebdb,
+  id_original_lead,
+  id_prospect,
+  id_house,
+  tp_track_campaign,
+  tp_track_medium,
+  tp_track_source,
+  nm_medium,
+  nm_source,
+  nm_campaign,
+  tp_lead,
+  ts_updated,
   CONCAT_WS(
     '#',
-    sk_supply_lead, 
-    cd_supply_source, 
+    sk_supply_lead,
+    cd_supply_source,
     nm_business_context
   ) AS bk_acq_lead
 FROM acq_lead

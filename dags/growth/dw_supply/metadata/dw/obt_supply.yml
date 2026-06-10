@@ -6,10 +6,6 @@ domain: Growth
 description: |
   Table with joined information about the supply events (our facts and dimensions).
 columns:
-  sk_supply_lead:
-    description: Unique identifier for the supply lead associated with the acquisition.
-    lineage:
-      - datalake_supply_flows.supply_events_tracking.sk_supply_lead
   sk_date:
     description: Surrogate key for the date of the event, linking to the dim_date table for more date details.
     lineage:
@@ -211,10 +207,10 @@ columns:
     description: Name of the assigned partner that has discarded the user.
     lineage:
       - dw_growth.dim_supply_operation_flow.nm_assigned_partner
-  discard_ops_user:
-    description: Sk user of the attendant that has discarded the user.
+  discard_opp_user:
+    description: Surrogate key of the user who converted the lead at the discard opportunity step.
     lineage:
-      - dw_growth.dim_supply_operation_flow.nm_assigned_partner
+      - dw_growth.dim_supply_discards.sk_user_conversion
   ds_objective:
     description: Objective associated with the lead according to business rules.
     lineage:
@@ -281,3 +277,27 @@ columns:
     description: Objective or target of the affiliate campaign.
     lineage:
       - datalake_growth_taxonomy.affiliates_classification.affiliate_objective
+  pp_multi_conversion_flag:
+    description: Indicates whether the owner had an active PP Multi conversion flag on the event date.
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.is_pp_multi_active
+  is_pp_multi_active:
+    description: Indicates whether the owner was classified as active in PP Multi segmentation on the event date.
+    lineage:
+      - datalake_pp_multi.pp_multi_classification_history.pp_multi_classification
+  is_hybrid_listing:
+    description: Indicates whether the house is listed in more than one business context at the same funnel step.
+  is_converted_by_ciq:
+    description: Indicates whether the conversion user belongs to the CIQ user base.
+    lineage:
+      - datalake_ebdb_agents.ciq_users.id_user
+  planning_cluster:
+    description: Marketing planning cluster derived from company report origin and affiliate volumetry rules.
+  planning_operation:
+    description: Operational planning label derived from conversion origin and operation channel rules.
+  planning_conversion_cluster:
+    description: Conversion planning cluster derived from company report origin and affiliate volumetry rules.
+  planning_conversion:
+    description: Conversion planning label derived from conversion origin and operation channel rules.
+  ts_load:
+    description: Timestamp when the obt_supply row was loaded into the data warehouse.

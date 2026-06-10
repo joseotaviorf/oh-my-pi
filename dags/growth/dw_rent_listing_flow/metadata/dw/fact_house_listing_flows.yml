@@ -571,6 +571,10 @@ columns:
     description: Boolean flag which identifies if the house was directly registered in the platform by the Inside Sales team.
   is_ops_direct_register:
     description: Boolean flag which identifies if the house was directly registered via Admin by the Ops team.
+  ops_agent:
+    description: Operations team associated with the lead when the origin is OwnerConversionPWA in Rene Descartes acquisition metadata.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   mkt_branded:
     description: The lead's marketing label of a branded campaign as defined by the lead taxonomy.
     categories:

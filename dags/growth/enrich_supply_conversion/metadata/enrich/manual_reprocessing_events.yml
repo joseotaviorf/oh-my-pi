@@ -53,7 +53,11 @@ columns:
   description:
     description: Description of the mailing table.description
     lineage:
-      - datalake_olos_dialer.reprocessing_mailing.
+      - datalake_olos_dialer.reprocessing_mailing.description
+  ops_partner:
+    description: Partner that reprocessed the lead, such as Atento, ActionLine, or QuintoAndar.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ops_partner
   ops_agent:
     description: Agent that reprocessed the lead. For this scenario is always outbound team.
     lineage:
@@ -84,18 +88,5 @@ columns:
     lineage:
       - datalake_olos_dialer.reprocessing_mailing.ts_created
       - datalake_supply_flows.acquisition_tracking.ts_event
-  year:
-    description: Year of entry into the reprocessing mailing
-    lineage:
-      - datalake_olos_dialer.reprocessing_mailing.ts_created
-      - datalake_supply_flows.acquisition_tracking.ts_event
-  month:
-    description: Month of entry into the reprocessing mailing
-    lineage:
-      - datalake_olos_dialer.reprocessing_mailing.ts_created
-      - datalake_supply_flows.acquisition_tracking.ts_event
-  day:
-    description: Day of entry into the reprocessing mailing
-    lineage:
-      - datalake_olos_dialer.reprocessing_mailing.ts_created
-      - datalake_supply_flows.acquisition_tracking.ts_event
+  ts_load:
+    description: Timestamp when the manual reprocessing event row was loaded into the enrich layer.

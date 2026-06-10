@@ -2,7 +2,7 @@
 database_name: datalake_rene_descartes_clean
 table_name: house_lead_conversion
 owner: gabriel.salla@quintoandar.com
-domain: Data Growth
+domain: Growth
 description: This table has data about events of lead conversion in houses.
 columns:
   id:

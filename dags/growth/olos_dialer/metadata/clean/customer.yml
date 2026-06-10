@@ -14,11 +14,11 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.customer.customercode
   name:
-    description: Name of the customer.
+    description: Organization or business unit name configured in Olos Dialer for the campaign.
     lineage:
       - datalake_olos_dialer_raw.customer.name
   is_activated:
-    description: Is activated information.
+    description: Indicates whether the Olos Dialer configuration record is currently active and selectable.
     lineage:
       - datalake_olos_dialer_raw.customer.activated
   year:

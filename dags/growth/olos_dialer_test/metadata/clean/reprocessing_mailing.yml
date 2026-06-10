@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.endereco
   advertiser_name:
-    description: Name of the advertiser.
+    description: Advertiser or brand label associated with the Olos mailing campaign.
     lineage:
       - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.nomeanunciante
   phone1:
@@ -66,7 +66,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.canal
   table_name:
-    description: Name of the source table.
+    description: Olos mailing layout table identifier that originated the exported record.
     lineage:
       - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.tablename
   category:

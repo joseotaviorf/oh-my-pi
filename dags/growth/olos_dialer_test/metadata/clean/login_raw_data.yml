@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.campaignid
   insert_time:
-    description: Insert time information.
+    description: Timestamp when the Olos Dialer event row was inserted in the source export.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.inserttime
   ts_login_started:

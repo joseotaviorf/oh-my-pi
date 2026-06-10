@@ -4,8 +4,6 @@ domain: Growth
 owner: gabriel.salla@quintoandar.com
 description: 'This table generate the SKs for the leads in the supply tables.'
 columns:
-  sk_supply_lead:
-    description: The unique identifier for each lead in the supply tables.
   id_lead:
     lineage: 
       - datalake_rene_descartes.house_lead.id

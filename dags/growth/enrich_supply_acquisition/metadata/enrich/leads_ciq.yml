@@ -32,9 +32,9 @@ columns:
     description: The business context of the lead, referring to the business context where the lead originated.
     lineage: 
       - datalake_bob.house_draft_business_context.business_context
-    category: 
-      - SALE: The CIQ lead is for sale.
-      - RENT: The CIQ lead is for rent.
+    categories:
+      SALE: The CIQ lead is for sale.
+      RENT: The CIQ lead is for rent.
   business_event:
     description: The business event of the lead, referring which action was taken in the business context.
   funnel_step:
@@ -57,15 +57,3 @@ columns:
     description: Timestamp indicating last update time of register.
     lineage: 
       - datalake_bob.house_draft_business_context.ts_updated
-  year:
-    description: Column for partition table derived from the ts_created column.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-  month:
-    description: Column for partition table derived from the ts_created column.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created
-  day:
-    description: Column for partition table derived from the ts_created column.
-    lineage:
-      - datalake_bob.house_draft_business_context.ts_created

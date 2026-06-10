@@ -145,17 +145,52 @@ lead_conversion_ciq AS (
 ),
 
 all_conversions AS (
-  SELECT *
+  SELECT
+    id,
+    id_lead,
+    id_house,
+    business_context,
+    has_listing,
+    has_draft,
+    ts_conversion,
+    db_source,
+    supply_source
   FROM lead_conversion_ciq
   UNION ALL
-  SELECT *
+  SELECT
+    id,
+    id_lead,
+    id_house,
+    business_context,
+    has_listing,
+    has_draft,
+    ts_conversion,
+    db_source,
+    supply_source
   FROM lead_conversion_3p
   UNION ALL
-  SELECT *
+  SELECT
+    id,
+    id_lead,
+    id_house,
+    business_context,
+    has_listing,
+    has_draft,
+    ts_conversion,
+    db_source,
+    supply_source
   FROM lead_conversion_1p
 )
 
-SELECT 
-  *
+SELECT
+  id,
+  id_lead,
+  id_house,
+  business_context,
+  has_listing,
+  has_draft,
+  ts_conversion,
+  db_source,
+  supply_source
 FROM all_conversions
 QUALIFY ROW_NUMBER() OVER (PARTITION BY id_house, business_context ORDER BY db_source, ts_conversion) = 1

@@ -18,39 +18,39 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.users.userpermissionid
   user_name:
-    description: User name information.
+    description: Login username assigned to the Olos Dialer agent or supervisor account.
     lineage:
       - datalake_olos_dialer_raw.users.username
   email:
-    description: Email information.
+    description: Corporate email address registered for the Olos Dialer user account.
     lineage:
       - datalake_olos_dialer_raw.users.email
   login:
-    description: Login information.
+    description: Authentication login identifier used to access the Olos Dialer platform.
     lineage:
       - datalake_olos_dialer_raw.users.login
   agent_profile:
-    description: Agent profile information.
+    description: Role profile assigned to the Olos Dialer user, such as agent or supervisor.
     lineage:
       - datalake_olos_dialer_raw.users.permissiondesc
   is_activated:
-    description: Is activated information.
+    description: Indicates whether the Olos Dialer configuration record is currently active and selectable.
     lineage:
       - datalake_olos_dialer_raw.users.activated
   is_enable_personal_transfer:
-    description: Is enable personal transfer information.
+    description: Indicates whether the Olos Dialer user may transfer calls to a personal phone line.
     lineage:
       - datalake_olos_dialer_raw.users.enablepersonaltransfer
   is_agent:
-    description: Is agent information.
+    description: Indicates whether the Olos Dialer user operates as a frontline dialing agent.
     lineage:
       - datalake_olos_dialer_raw.users.flag_agent
   is_manager:
-    description: Is manager information.
+    description: Indicates whether the Olos Dialer user has manager permissions in the platform.
     lineage:
       - datalake_olos_dialer_raw.users.flag_manager
   is_supervisor:
-    description: Is supervisor information.
+    description: Indicates whether the Olos Dialer user supervises agents and monitors campaigns.
     lineage:
       - datalake_olos_dialer_raw.users.flag_supervisor
   ts_last_login:

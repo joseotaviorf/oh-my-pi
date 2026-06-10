@@ -25,3 +25,15 @@ columns:
       - datalake_olos_dialer_clean.outbound_contact_attempts.ts_call_ended
   ts_load:
     description: Timestamp of the load table
+  year:
+    description: Year partition of the reprocessing event.
+    lineage:
+      - datalake_olos_dialer_clean.outbound_contact_attempts.year
+  month:
+    description: Month partition of the reprocessing event.
+    lineage:
+      - datalake_olos_dialer_clean.outbound_contact_attempts.month
+  day:
+    description: Day partition of the reprocessing event.
+    lineage:
+      - datalake_olos_dialer_clean.outbound_contact_attempts.day

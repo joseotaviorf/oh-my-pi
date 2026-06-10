@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.agentstaterawdataid
   agent_status:
-    description: Agent status information.
+    description: Operational status of the dialer agent at the time of the state change event.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.agentstatus
   id_call:
@@ -30,11 +30,11 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.campaignid
   reason:
-    description: Reason information.
+    description: Olos reason code explaining why the agent entered the reported status.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.reason
   insert_time:
-    description: Insert time information.
+    description: Timestamp when the Olos Dialer event row was inserted in the source export.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.inserttime
   ts_state_started:
