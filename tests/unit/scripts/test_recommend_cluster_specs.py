@@ -23,6 +23,7 @@ from scripts.recommend_cluster_specs import (  # noqa: E402
     AMD_WALL_CORRECTION,
     PRESET_CATALOG,
     DagMetrics,
+    _apply_amd_wall_correction,
     _current_cost_basis,
     build_amd_recommendation,
     build_recommendation,
@@ -30,7 +31,6 @@ from scripts.recommend_cluster_specs import (  # noqa: E402
     build_validation_outcomes,
     build_validation_sql,
     classify,
-    classify_amd_for_collapse,
     effective_demand,
     estimate_cost,
     estimate_drv_cpu_after_collapse,
@@ -1231,6 +1231,14 @@ class TestSqlAndRowMapping:
         assert "config_changed_in_window" in sql
         assert "dag_cadence" in sql
         assert "eligible_dags" in sql
+        assert "runs_per_day" in amd_sql
+        assert "schedule_interval_minutes" in amd_sql
+        assert "dag_cadence" in amd_sql
+        assert "amd_history_eligible" in amd_sql
+        assert "eligible_dags" in amd_sql
+        assert "dominant_era_eligible" not in amd_sql
+        assert "total_memory_bytes_spilled" in amd_sql
+        assert "arm_avg_dbu_consumed" in amd_sql
         assert "is_job_on_interactive = FALSE" in sql
         assert "is_any_task_failed = FALSE" in sql
         assert "is_any_databricks_run_failed = FALSE" in sql
@@ -1253,9 +1261,14 @@ class TestSqlAndRowMapping:
         assert "dominant_config_cost_share" in amd_sql
         assert "config_changed_in_window" in amd_sql
         assert "rn_recent" in amd_sql
+        assert "amd_history_eligible" in amd_sql
         assert "eligible_dags" in amd_sql
+        assert "dominant_era_eligible" not in amd_sql
         assert "FROM dominant_runs" in amd_sql
         assert "MAX(driver_node_type)" not in amd_sql
+        assert "primary_min_autoscale_workers" in amd_sql
+        assert "drv_mem_p50" in amd_sql
+        assert "wrk_mem_p50" in amd_sql
 
     def test_row_to_metrics_maps_cadence_and_cost_authority_inputs(self):
         metrics = rcs._row_to_metrics(
@@ -1628,13 +1641,23 @@ class TestAmdCorrection:
     def _amd_m(self, **kwargs) -> DagMetrics:
         defaults = dict(
             dag_id="bietlejuice.test_amd_dag",
-            arm_days=1,
-            arm_runs=2,
+            arm_days=5,
+            arm_runs=10,
             driver_node_type="m6g.xlarge",
             worker_node_type="m6g.xlarge",
             worker_count=2,
-            arm_total_cost_usd=20.0,
-            arm_avg_cost_per_run_usd=0.4,
+            arm_total_cost_usd=80.0,
+            arm_avg_cost_per_run_usd=8.0,
+            arm_total_cost_estimate_usd=80.0,
+            arm_avg_total_cost_estimate_usd=8.0,
+            arm_total_ec2_cost_usd=30.0,
+            arm_avg_ec2_cost_usd=3.0,
+            arm_total_dbu_cost_usd=50.0,
+            arm_avg_dbu_cost_usd=5.0,
+            ec2_spot_hours=20.0,
+            ec2_on_demand_hours=10.0,
+            runs_per_day=1.0,
+            schedule_interval_minutes=1440.0,
             wall_p50_min=25.0,
             wall_p95_min=35.0,
             drv_cpu_p50=10.0,
@@ -1649,20 +1672,63 @@ class TestAmdCorrection:
         defaults.update(kwargs)
         return DagMetrics(**defaults)
 
-    def test_correction_factor_and_classifier(self):
+    def test_correction_factor_and_wall_scaling(self):
         assert AMD_WALL_CORRECTION == pytest.approx(0.735)
-        assert classify_amd_for_collapse(self._amd_m()) is True
-        assert classify_amd_for_collapse(self._amd_m(wall_p95_min=50.0)) is False
+        m = self._amd_m(wall_p50_min=40.0, wall_p95_min=50.0)
+        corrected = _apply_amd_wall_correction(m)
+
+        assert corrected.wall_p50_min == pytest.approx(40.0 * AMD_WALL_CORRECTION, abs=0.1)
+        assert corrected.wall_p95_min == pytest.approx(50.0 * AMD_WALL_CORRECTION, abs=0.1)
+
+    def test_amd_wall_correction_preserves_observed_walls_in_output(self):
+        m = self._amd_m(wall_p50_min=40.0, wall_p95_min=50.0)
+        rec = build_amd_recommendation(m)
+
+        assert rec.wall_p50_min == 40.0
+        assert rec.wall_p95_min == 50.0
+        assert rec.confidence == "medium-x86"
 
     def test_build_amd_recommendation_returns_collapse_when_eligible(self):
-        rec = build_amd_recommendation(self._amd_m())
+        m = self._amd_m(
+            drv_cpu_p95=35.0,
+            drv_mem_p95=78.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=8.0,
+            wrk_mem_p95=38.3,
+            wall_p95_min=15.0,
+        )
+        rec = build_amd_recommendation(m)
 
-        assert rec is not None
         assert rec.cohort == "collapse_to_single"
         assert rec.confidence == "medium-x86"
         assert rec.recommended_preset is not None
 
-    def test_build_amd_recommendation_uses_additive_sized_driver_override(self):
+    def test_build_amd_recommendation_right_size_multi(self):
+        m = self._amd_m(
+            driver_node_type="m5a.xlarge",
+            worker_node_type="m5a.xlarge",
+            drv_cpu_p50=55.0,
+            drv_cpu_p95=82.0,
+            drv_mem_p95=35.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p95_min=12.0,
+        )
+        rec = build_amd_recommendation(m)
+
+        assert rec.cohort == "right_size_multi"
+        assert rec.confidence == "medium-x86"
+        assert rec.rec_driver_node_type == "c6g.xlarge"
+        assert rec.rec_worker_node_type == "m6g.large"
+        assert rec.rec_worker_count == 2
+        assert rec.projected.est_cost_delta_pct is not None
+        assert rec.projected.est_cost_delta_pct < 0
+
+    def test_build_amd_recommendation_uses_additive_sized_driver_override(
+        self, monkeypatch
+    ):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
         m = self._amd_m(
             driver_node_type="r6g.8xlarge",
             worker_node_type="r6g.8xlarge",
@@ -1672,12 +1738,16 @@ class TestAmdCorrection:
             wrk_cpu_p95=5.0,
             wrk_mem_p95=30.0,
             wall_p95_min=20.0,
+            arm_avg_total_cost_estimate_usd=100.0,
+            arm_avg_cost_per_run_usd=100.0,
+            arm_avg_ec2_cost_usd=40.0,
+            arm_avg_dbu_cost_usd=60.0,
         )
 
         rec = build_amd_recommendation(m)
         cfg = generate_validation_config(rec)
 
-        assert rec is not None
+        assert rec.cohort == "collapse_to_single"
         assert rec.rec_driver_node_type == "r6g.12xlarge"
         assert rec.driver_override_node_type_id == "r6g.12xlarge"
         assert rec.recommended_preset == "consolidation_xl_memory_single_node_cluster"
@@ -1686,29 +1756,36 @@ class TestAmdCorrection:
             "driver_node_type_id": "r6g.12xlarge"
         }
 
-    def test_build_amd_recommendation_returns_none_for_unknown_worker_type(self):
-        assert (
-            build_amd_recommendation(self._amd_m(worker_node_type="unknown.type"))
-            is None
+    def test_build_amd_recommendation_unknown_worker_needs_telemetry(self):
+        rec = build_amd_recommendation(self._amd_m(worker_node_type="unknown.type"))
+
+        assert rec.cohort == "needs_more_telemetry"
+        assert rec.confidence == "medium-x86"
+
+    def test_build_amd_recommendation_mixed_config_review(self):
+        rec = build_amd_recommendation(
+            self._amd_m(dominant_config_run_share=0.49, dominant_config_cost_share=0.9)
         )
 
-    def test_build_amd_recommendation_returns_none_for_mixed_config(self):
-        assert (
-            build_amd_recommendation(
-                self._amd_m(
-                    dominant_config_run_share=0.49, dominant_config_cost_share=0.9
-                )
-            )
-            is None
+        assert rec.cohort == "mixed_config_review"
+        assert rec.confidence == "medium-x86"
+
+    def test_build_amd_recommendation_thin_dominant_era_guard_cohorts(self):
+        needs_more = build_amd_recommendation(
+            self._amd_m(arm_days=2, arm_runs=2, config_changed_in_window=False)
         )
-        assert (
-            build_amd_recommendation(
-                self._amd_m(
-                    dominant_config_run_share=0.9, dominant_config_cost_share=0.49
-                )
+        recent_change = build_amd_recommendation(
+            self._amd_m(
+                config_changed_in_window=True,
+                latest_config_days=1,
+                latest_config_runs=1,
             )
-            is None
         )
+
+        assert needs_more.cohort == "needs_more_arm_data"
+        assert recent_change.cohort == "recent_config_change"
+        assert needs_more.confidence == "medium-x86"
+        assert recent_change.confidence == "medium-x86"
 
 
 class TestDataLayerPhotonNvme:

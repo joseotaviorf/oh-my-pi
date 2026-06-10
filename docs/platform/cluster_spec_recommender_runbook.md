@@ -43,7 +43,8 @@ Useful flags:
 | `--recent-era-min-runs` | `2` | Min runs on latest config era before sizing after a switch |
 | `--dominant-config-share-min` | `0.50` | Min dominant-config run **and** cost share to pass `mixed_config_review` |
 | `--trino-host` | prod Trino hostname | Trino endpoint; overridden by `TRINO_HOST` env var when set |
-| `--use-amd-history` | off | Optional AMD fallback for collapse-only candidates |
+| `--use-amd-history` | off | Optional AMD (x86) fallback for DAGs below ARM eligibility; same cohort/preset logic as ARM |
+| `--amd-min-runs` | `10` | Minimum total x86 run count for AMD history pool |
 | `--validation-outcomes` | off | Write `validation_outcomes.csv` comparing recommendations vs existing `__validation` runs (requires `--trino`) |
 | `--validation-min-runs` | `1` | Minimum validation runs per DAG for outcome comparison |
 
@@ -185,7 +186,7 @@ Review carefully:
 - `keep_multi_cost`: a feasible candidate exists but does not beat the observed cost basis (`blocked_cost`).
 - `actions`: decision trace. Look for `reduce_driver`, `reduce_worker_type`, `reduce_worker_count`, `worker_count_blocked_sla`, `disable_photon`, and `drop_nvme`.
 - `protect_oom_risk`: handle before cost-saving waves; expect `m6g→r6g` at the same tier, not a same-family size-up.
-- `medium-x86`: AMD fallback only.
+- `medium-x86`: recommendation derived from AMD (x86) history via `--use-amd-history`. Same cohorts as ARM (`collapse_to_single`, `right_size_multi`, `keep_multi_*`, etc.); lower confidence because telemetry is pre-Graviton. Wall times in the report are observed (uncorrected); SLA/collapse math applies a 26.5% ARM speedup factor (`AMD_WALL_CORRECTION = 0.735`) before sizing.
 
 Do not promote directly from the report. Every change needs a validation DAG run.
 

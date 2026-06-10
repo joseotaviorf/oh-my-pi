@@ -86,6 +86,21 @@ EC2 on-demand USD/hour is generated from [`dim_ec2_price.sql`](../../dags/platfo
 
 Spot is modeled as `0.37 × on_demand` (a 63% discount), matching `dim_ec2_price` seed derivation and `daily_cluster_health`.
 
+### AMD history fallback (`--use-amd-history`)
+
+For DAGs that have **not** yet met ARM eligibility (`--min-days` / `--min-runs` on Graviton runs), an optional second query pulls x86 history from the same `fact_databricks_dag_run` table. DAGs with sufficient ARM data are excluded.
+
+| Gate | Rule |
+| --- | --- |
+| Pool | `arch = 'x86'` and DAG not in ARM-eligible set |
+| Total history | `COUNT(*) >= --amd-min-runs` (default 10) across all x86 runs in the window |
+| Window eligibility | `eligible_dags` on all x86 runs (`--min-days` / `--min-runs`), same as ARM; thin dominant eras are surfaced via `classify()` guard cohorts (`needs_more_arm_data`, `recent_config_change`) |
+| SQL parity | AMD query emits the same telemetry columns as the ARM query (cadence, DBU/EC2 split, spill, autoscale keys) |
+
+**Engine:** `build_amd_recommendation()` applies `AMD_WALL_CORRECTION` (0.735 — fleet median: ARM p95 wall is 26.5% shorter than AMD) to `wall_p50_min` and `wall_p95_min`, then calls the same `classify()` → `build_recommendation()` path as ARM. CPU and memory percentiles are used as observed (conservative). Recommended presets remain **Graviton** `consolidation_*` shapes; x86 node types supply demand and cost baseline only.
+
+**Output:** `confidence = medium-x86`. Report columns `wall_p50_min` / `wall_p95_min` show **uncorrected** observed AMD walls; projected SLA math used the corrected values internally.
+
 ---
 
 ## Guard Chain

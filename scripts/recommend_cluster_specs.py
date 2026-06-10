@@ -69,7 +69,7 @@ import re
 import subprocess
 import sys
 import tempfile
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -2310,33 +2310,28 @@ def build_sql(days: int, min_days: int, min_runs: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# AMD correction — collapse-only classification from x86 history
+# AMD history — same recommendation engine as ARM with wall-clock correction
 # ---------------------------------------------------------------------------
 
 
-def classify_amd_for_collapse(m: DagMetrics) -> bool:
-    """Return True if AMD metrics + wall-clock correction suggest collapse_to_single.
-
-    Applies AMD_WALL_CORRECTION to wall_p95_min before testing the collapse gate.
-    All other conditions use AMD metric values directly (conservative: ARM CPU is
-    typically equal or lower, memory is flat).  Only the collapse cohort is inferred
-    from AMD history; all other cohorts require ARM data.
-    """
-    corrected_wall = m.wall_p95_min * AMD_WALL_CORRECTION
-    return (
-        m.topology == "multi"
-        and corrected_wall <= 30
-        and (m.wrk_cpu_p50 or 100) < 20
-        and (m.wrk_cpu_p95 or 100) < 55
-        and (m.wrk_mem_p95 or 100) < 60
-        and (m.drv_mem_p95 or 100) < 75
-        and (m.wrk_wait_p95 or 100) < 10  # ensure not io-bound on AMD either
+def _apply_amd_wall_correction(m: DagMetrics) -> DagMetrics:
+    """Scale wall-clock metrics for ARM-equivalent SLA and collapse sizing."""
+    wall_p50 = (
+        round(m.wall_p50_min * AMD_WALL_CORRECTION, 1)
+        if m.wall_p50_min
+        else m.wall_p50_min
     )
+    wall_p95 = (
+        round(m.wall_p95_min * AMD_WALL_CORRECTION, 1)
+        if m.wall_p95_min
+        else m.wall_p95_min
+    )
+    return replace(m, wall_p50_min=wall_p50, wall_p95_min=wall_p95)
 
 
 _AMD_SQL_TEMPLATE = """\
 -- AMD (x86) metrics for DAGs that have not yet met the ARM eligibility threshold.
--- Used with AMD_WALL_CORRECTION to identify additional collapse_to_single candidates.
+-- Feeds the same classifier as ARM; AMD_WALL_CORRECTION is applied in Python.
 WITH runs AS (
     SELECT
         airflow_dag_id,
@@ -2346,16 +2341,34 @@ WITH runs AS (
         worker_count,
         primary_min_autoscale_workers,
         primary_max_autoscale_workers,
+        total_dbu_cost_usd                               AS dbu_cost_usd,
+        total_dbu_consumed,
+        total_ec2_cost_calculated_usd                    AS ec2_cost_usd,
+        ec2_spot_hours,
+        ec2_on_demand_hours,
         total_cost_usd,
         total_wall_clock_seconds,
         weighted_avg_p50_driver_cpu_busy_percent         AS drv_cpu_p50,
         weighted_avg_p95_driver_cpu_busy_percent         AS drv_cpu_p95,
+        weighted_avg_p50_driver_mem_used_percent         AS drv_mem_p50,
         weighted_avg_p95_driver_mem_used_percent         AS drv_mem_p95,
         weighted_avg_p95_driver_cpu_wait_percent         AS drv_wait_p95,
         weighted_avg_p50_worker_cpu_busy_percent         AS wrk_cpu_p50,
         weighted_avg_p95_worker_cpu_busy_percent         AS wrk_cpu_p95,
+        weighted_avg_p50_worker_mem_used_percent         AS wrk_mem_p50,
         weighted_avg_p95_worker_mem_used_percent         AS wrk_mem_p95,
         weighted_avg_p95_worker_cpu_wait_percent         AS wrk_wait_p95,
+        weighted_avg_local_disk_utilization_pct_p95      AS local_disk_p95,
+        total_memory_bytes_spilled,
+        total_disk_bytes_spilled,
+        max_peak_execution_memory_bytes,
+        max_jvm_heap_bytes,
+        total_gc_time_ms,
+        total_executor_run_time_ms,
+        max_task_skew_ratio,
+        is_ec2_estimated,
+        ec2_pricing_missing,
+        dbu_negotiated_price_missing,
         is_any_photon,
         is_any_local_nvme,
         CASE
@@ -2464,18 +2477,53 @@ eligible_dags AS (
     SELECT airflow_dag_id
     FROM amd_pool
     GROUP BY airflow_dag_id
+    HAVING COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)) >= {min_days}
+       AND COUNT(*) >= {min_runs}
+),
+amd_history_eligible AS (
+    SELECT airflow_dag_id
+    FROM amd_pool
+    GROUP BY airflow_dag_id
     HAVING COUNT(*) >= {amd_min_runs}
+),
+dag_cadence AS (
+    SELECT
+        airflow_dag_id,
+        ROUND(
+            COUNT(*) / CAST(NULLIF(COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)), 0) AS DOUBLE),
+            3
+        )                                                                          AS runs_per_day,
+        ROUND(
+            1440.0 / NULLIF(
+                COUNT(*) / CAST(NULLIF(COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)), 0) AS DOUBLE),
+                0
+            ),
+            1
+        )                                                                          AS schedule_interval_minutes
+    FROM amd_pool
+    GROUP BY airflow_dag_id
 ),
 per_dag AS (
     SELECT
         airflow_dag_id,
-        COUNT(*)                                                                   AS arm_runs,
         COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                          AS arm_days,
+        COUNT(*)                                                                   AS arm_runs,
         ARBITRARY(driver_node_type)                                                 AS driver_node_type,
         ARBITRARY(worker_node_type)                                                 AS worker_node_type,
         ARBITRARY(worker_count)                                                     AS worker_count,
+        ARBITRARY(primary_min_autoscale_workers)                                    AS primary_min_autoscale_workers,
+        ARBITRARY(primary_max_autoscale_workers)                                    AS primary_max_autoscale_workers,
         ROUND(SUM(total_cost_usd), 4)                                              AS arm_total_cost_usd,
         ROUND(AVG(total_cost_usd), 6)                                              AS arm_avg_cost_per_run_usd,
+        ROUND(SUM(total_cost_usd), 4)                                              AS arm_total_cost_estimate_usd,
+        ROUND(AVG(total_cost_usd), 6)                                              AS arm_avg_total_cost_estimate_usd,
+        ROUND(SUM(ec2_cost_usd), 4)                                                AS arm_total_ec2_cost_usd,
+        ROUND(AVG(ec2_cost_usd), 6)                                                AS arm_avg_ec2_cost_usd,
+        ROUND(SUM(dbu_cost_usd), 4)                                                AS arm_total_dbu_cost_usd,
+        ROUND(AVG(dbu_cost_usd), 6)                                                AS arm_avg_dbu_cost_usd,
+        ROUND(AVG(total_dbu_consumed), 6)                                          AS arm_avg_dbu_consumed,
+        ROUND(SUM(ec2_spot_hours), 4)                                              AS ec2_spot_hours,
+        ROUND(SUM(ec2_on_demand_hours), 4)                                         AS ec2_on_demand_hours,
         ARBITRARY(dominant_config_run_share)                                       AS dominant_config_run_share,
         ARBITRARY(dominant_config_cost_share)                                      AS dominant_config_cost_share,
         BOOL_OR(config_changed_in_window)                                          AS config_changed_in_window,
@@ -2485,21 +2533,41 @@ per_dag AS (
         ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.95) / 60.0, 1)        AS wall_p95_min,
         ROUND(APPROX_PERCENTILE(drv_cpu_p50, 0.5), 1)                             AS drv_cpu_p50,
         ROUND(APPROX_PERCENTILE(drv_cpu_p95, 0.95), 1)                            AS drv_cpu_p95,
+        ROUND(APPROX_PERCENTILE(drv_mem_p50, 0.5), 1)                             AS drv_mem_p50,
         ROUND(APPROX_PERCENTILE(drv_mem_p95, 0.95), 1)                            AS drv_mem_p95,
         ROUND(APPROX_PERCENTILE(drv_wait_p95, 0.95), 1)                           AS drv_wait_p95,
         ROUND(APPROX_PERCENTILE(wrk_cpu_p50, 0.5), 1)                             AS wrk_cpu_p50,
         ROUND(APPROX_PERCENTILE(wrk_cpu_p95, 0.95), 1)                            AS wrk_cpu_p95,
+        ROUND(APPROX_PERCENTILE(wrk_mem_p50, 0.5), 1)                             AS wrk_mem_p50,
         ROUND(APPROX_PERCENTILE(wrk_mem_p95, 0.95), 1)                            AS wrk_mem_p95,
         ROUND(APPROX_PERCENTILE(wrk_wait_p95, 0.95), 1)                           AS wrk_wait_p95,
+        ROUND(APPROX_PERCENTILE(local_disk_p95, 0.95), 1)                         AS local_disk_p95,
+        SUM(total_memory_bytes_spilled)                                           AS total_memory_bytes_spilled,
+        SUM(total_disk_bytes_spilled)                                             AS total_disk_bytes_spilled,
+        MAX(max_peak_execution_memory_bytes)                                      AS max_peak_execution_memory_bytes,
+        MAX(max_jvm_heap_bytes)                                                   AS max_jvm_heap_bytes,
+        SUM(total_gc_time_ms)                                                     AS total_gc_time_ms,
+        SUM(total_executor_run_time_ms)                                           AS total_executor_run_time_ms,
+        MAX(max_task_skew_ratio)                                                  AS max_task_skew_ratio,
+        BOOL_OR(is_ec2_estimated)                                                 AS is_ec2_estimated,
+        BOOL_OR(ec2_pricing_missing)                                              AS ec2_pricing_missing,
+        BOOL_OR(dbu_negotiated_price_missing)                                     AS dbu_negotiated_price_missing,
         BOOL_OR(is_any_photon)                                                    AS is_any_photon,
         BOOL_OR(is_any_local_nvme)                                                AS is_any_local_nvme
     FROM dominant_runs
     GROUP BY airflow_dag_id
 )
-SELECT per_dag.*
+SELECT
+    per_dag.*,
+    dag_cadence.runs_per_day,
+    dag_cadence.schedule_interval_minutes
 FROM per_dag
+JOIN dag_cadence
+    ON per_dag.airflow_dag_id = dag_cadence.airflow_dag_id
 JOIN eligible_dags
     ON per_dag.airflow_dag_id = eligible_dags.airflow_dag_id
+JOIN amd_history_eligible
+    ON per_dag.airflow_dag_id = amd_history_eligible.airflow_dag_id
 ORDER BY arm_total_cost_usd DESC
 """
 
@@ -2939,7 +3007,7 @@ def fetch_amd_candidates(
     sql: str,
     trino_host: str | None = None,
 ) -> list[DagMetrics]:
-    """Query AMD-era metrics and return collapse candidates not in the ARM pool."""
+    """Query AMD-era metrics and return DAGs not in the ARM pool."""
     arm_dag_ids = {m.dag_id for m in metrics}
     amd_rows = fetch_from_trino(sql, resolve_trino_host(trino_host))
     return [m for m in amd_rows if m.dag_id not in arm_dag_ids]
@@ -2952,111 +3020,29 @@ def build_amd_recommendation(
     min_runs: int = 3,
     recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
     recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
-) -> Recommendation | None:
-    """Build a collapse_to_single recommendation from AMD data, or None if not eligible.
+) -> Recommendation:
+    """Build a recommendation from AMD (x86) history using the same engine as ARM.
 
-    The DAG's wall_p95 is corrected by AMD_WALL_CORRECTION before testing the
-    collapse gate.  Returned Recommendation has confidence='medium-x86' to signal
-    it relies on AMD history.
+    Wall p50/p95 are scaled by ``AMD_WALL_CORRECTION`` before classify/sizing;
+    output rows preserve the observed (uncorrected) wall times.
+    ``confidence='medium-x86'`` signals AMD-derived telemetry.
     """
-    if not classify_amd_for_collapse(m):
-        return None
-    if _recent_config_change_thin(m, recent_era_min_days, recent_era_min_runs):
-        return None
-    if not m.config_changed_in_window and (
-        m.dominant_config_run_share < dominant_config_share_min
-        or m.dominant_config_cost_share < dominant_config_share_min
-    ):
-        return None
-
-    # Force worker_count=2 for projection purposes if unknown from AMD data
-    worker_count = m.worker_count if m.worker_count and m.worker_count > 0 else 2
-    sizing = size_single_node(m)
-    if sizing.blocked_reason == "needs_more_telemetry" or not sizing.node_type:
-        return None
-
-    rec_preset, _ = _single_node_preset_for_node(sizing.node_type)
-    if not rec_preset:
-        return None
-    rec_spec = PRESET_CATALOG.get(rec_preset)
-    rec_driver = sizing.node_type
-    rec_workers = 0  # single-node
-    driver_override_node_type_id = None
-    if rec_spec and rec_driver != rec_spec.driver_node_type:
-        driver_override_node_type_id = rec_driver
-
-    projected = ProjectedMetrics()
-    if rec_driver:
-        projected.est_cost_per_run_usd = estimate_cost(
-            m.arm_avg_cost_per_run_usd,
-            m.driver_node_type,
-            m.worker_node_type,
-            worker_count,
-            rec_driver,
-            None,
-            rec_workers,
-        )
-        if projected.est_cost_per_run_usd is not None and m.arm_avg_cost_per_run_usd:
-            projected.est_cost_delta_pct = round(
-                (projected.est_cost_per_run_usd - m.arm_avg_cost_per_run_usd)
-                / m.arm_avg_cost_per_run_usd
-                * 100,
-                1,
-            )
-        amd_demand = effective_demand(m)
-        est_cpu, uncertain = estimate_drv_cpu_after_collapse(
-            amd_demand.drv_cpu_p50,
-            amd_demand.wrk_cpu_p50,
-            m.driver_node_type,
-            m.worker_node_type,
-            worker_count,
-        )
-        projected.est_drv_cpu_p50 = est_cpu
-        projected.est_drv_cpu_p50_uncertain = uncertain
-        projected.est_drv_cpu_p95 = sizing.projected_cpu_pct
-        projected.est_drv_mem_p95 = (
-            f"projected {sizing.projected_mem_pct:.1f}%"
-            if sizing.projected_mem_pct is not None
-            else "⚠ may rise"
-        )
-        projected.est_wrk_cpu_p50 = None
-        projected.est_wrk_cpu_p95 = None
-        projected.est_wrk_mem_p95 = "N/A"
-
-    return Recommendation(
-        dag_id=m.dag_id,
-        cohort="collapse_to_single",
+    observed_wall_p50 = m.wall_p50_min
+    observed_wall_p95 = m.wall_p95_min
+    corrected = _apply_amd_wall_correction(m)
+    rec = build_recommendation(
+        corrected,
+        min_days,
+        min_runs,
+        dominant_config_share_min,
+        recent_era_min_days,
+        recent_era_min_runs,
+    )
+    return replace(
+        rec,
         confidence="medium-x86",
-        actions="collapse_to_single",
-        current_preset=infer_current_preset(
-            m.driver_node_type, m.worker_node_type, worker_count
-        ),
-        current_driver_node_type=m.driver_node_type,
-        current_worker_node_type=m.worker_node_type,
-        current_worker_count=m.worker_count,
-        arm_days=m.arm_days,
-        arm_runs=m.arm_runs,
-        arm_total_cost_usd=m.arm_total_cost_usd,
-        arm_avg_cost_per_run_usd=m.arm_avg_cost_per_run_usd,
-        arm_total_cost_estimate_usd=m.arm_total_cost_estimate_usd,
-        arm_avg_total_cost_estimate_usd=m.arm_avg_total_cost_estimate_usd,
-        wall_p50_min=m.wall_p50_min,
-        wall_p95_min=m.wall_p95_min,
-        drv_cpu_p50=m.drv_cpu_p50,
-        drv_cpu_p95=m.drv_cpu_p95,
-        drv_mem_p95=m.drv_mem_p95,
-        drv_wait_p95=m.drv_wait_p95,
-        wrk_cpu_p50=m.wrk_cpu_p50,
-        wrk_cpu_p95=m.wrk_cpu_p95,
-        wrk_mem_p95=m.wrk_mem_p95,
-        wrk_wait_p95=m.wrk_wait_p95,
-        recommended_preset=rec_preset,
-        rec_driver_node_type=rec_driver,
-        rec_worker_node_type=None,
-        rec_worker_count=rec_workers,
-        num_workers_override=None,
-        driver_override_node_type_id=driver_override_node_type_id,
-        projected=projected,
+        wall_p50_min=observed_wall_p50,
+        wall_p95_min=observed_wall_p95,
     )
 
 
@@ -3533,8 +3519,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help=(
             "Also query AMD (x86) history for DAGs below the ARM threshold. "
-            "Only collapse_to_single is inferred from AMD data, using a "
-            f"{AMD_WALL_CORRECTION:.0%} wall-clock correction. "
+            "Uses the same cohort/preset logic as ARM with a "
+            f"{AMD_WALL_CORRECTION:.0%} wall-clock correction for SLA sizing. "
             "Recommendations are labelled confidence=medium-x86."
         ),
     )
@@ -3632,32 +3618,31 @@ def main(argv: list[str] | None = None) -> int:
         for m in metrics
     ]
 
-    # Optionally extend with collapse candidates from AMD history
+    # Optionally extend with recommendations from AMD (x86) history
     if getattr(args, "use_amd_history", False) and args.trino:
-        print(
-            "Querying AMD history for additional collapse candidates …", file=sys.stderr
-        )
+        print("Querying AMD history for additional recommendations …", file=sys.stderr)
         amd_sql = build_amd_sql(
             args.days, args.min_days, args.min_runs, args.amd_min_runs
         )
         amd_pool = fetch_amd_candidates(metrics, amd_sql, trino_host)
         amd_recs = [
-            r
-            for m in amd_pool
-            if (
-                r := build_amd_recommendation(
-                    m,
-                    args.dominant_config_share_min,
-                    args.min_days,
-                    args.min_runs,
-                    args.recent_era_min_days,
-                    args.recent_era_min_runs,
-                )
+            build_amd_recommendation(
+                m,
+                args.dominant_config_share_min,
+                args.min_days,
+                args.min_runs,
+                args.recent_era_min_days,
+                args.recent_era_min_runs,
             )
-            is not None
+            for m in amd_pool
         ]
+        from collections import Counter
+
+        amd_cohorts = Counter(r.cohort for r in amd_recs)
+        cohort_summary = ", ".join(f"{c}={n}" for c, n in sorted(amd_cohorts.items()))
         print(
-            f"AMD correction: {len(amd_pool)} candidates, {len(amd_recs)} collapse-eligible.",
+            f"AMD history: {len(amd_pool)} DAGs, {len(amd_recs)} recommendations"
+            + (f" ({cohort_summary})" if cohort_summary else ""),
             file=sys.stderr,
         )
         recs.extend(amd_recs)
