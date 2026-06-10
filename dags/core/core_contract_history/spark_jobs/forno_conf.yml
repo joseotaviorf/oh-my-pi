@@ -70,9 +70,6 @@ event_configs:
   - tracked_col: tenantServiceFee
     target_col: tenant_service_fee
     target_type: double
-  - tracked_col: estateAgentBrokerageShare
-    target_col: agent_brokerage_share
-    target_type: double
   - tracked_col: dataInicio
     target_col: dt_started
     target_type: date

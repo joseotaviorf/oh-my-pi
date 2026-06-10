@@ -161,7 +161,6 @@ class CoreContractSparkJob(BaseCoreModelSparkJob):
             col("ct.home_insurance_value"),
             col("ct.fist_rent_comission_fee").alias("first_rent_comission_fee"),
             col("ct.tenant_service_fee"),
-            col("ct.agent_brokerage_share"),
             col("ct.dt_started"),
             col("ct.dt_entered"),
             col("ct.dt_termination"),

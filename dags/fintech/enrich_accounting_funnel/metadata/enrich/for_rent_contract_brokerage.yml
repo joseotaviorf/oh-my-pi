@@ -9,6 +9,10 @@ columns:
    lineage:
      - datalake_ebdb_clean.contract.id
    description: "ID contract from Main"
+ rental_administrator:
+   lineage:
+     - datalake_ebdb_clean.contract.contract_rent_model
+   description: "Rental administrator type extracted from contract_rent_model.rentalAdministrator."
  rent:
    lineage:
      - datalake_ebdb_clean.contract_aud.rent
@@ -21,8 +25,10 @@ columns:
    description: "Indicates 5A brokerage split share in percentage"
  agent_brokerage_share:
    lineage:
-     - datalake_ebdb_clean.contract.agent_brokerage_share
-   description: "Indicates AGENT brokerage split share in percentage"
+     - datalake_big_agent.brokerage_share_history.agent_brokerage_share
+   description: |
+     Agent brokerage split share at first brokerage invoice date, from brokerage_share_history
+     point-in-time (revision on or before invoice date).
  ciq_brokerage_share:
    lineage:
      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
@@ -40,9 +46,9 @@ columns:
    description: "Indicates 5A brokerage split share in percentage in amount of cash"
  agent_brokerage_amount:
    lineage:
-     - datalake_ebdb_clean.contract.agent_brokerage_share
+     - datalake_big_agent.brokerage_share_history.agent_brokerage_share
      - datalake_ebdb_clean.contract_aud.rent
-   description: "Indicates AGENT brokerage split share in percentage in amount of cash"
+   description: "Agent brokerage amount derived from first rent and agent_brokerage_share at signature."
  ciq_brokerage_amount:
    lineage:
      - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
@@ -64,3 +70,7 @@ columns:
    lineage:
      - datalake_ebdb_clean.contract.dt_started
    description: "Indicates when the contract started"
+ dt_contract_annulment:
+   lineage:
+     - datalake_ebdb_clean.contract.dt_termination
+   description: "Contract termination date used for annulment brokerage adjustments."

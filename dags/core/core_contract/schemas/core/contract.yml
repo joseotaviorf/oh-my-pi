@@ -106,10 +106,6 @@ columns:
     type: double
     required: false
 
-  agent_brokerage_share:
-    type: double
-    required: false
-
   # Contract dates
   dt_started:
     type: date
@@ -168,6 +164,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 37
-max_columns: 37
+min_columns: 36
+max_columns: 36
 strict: true

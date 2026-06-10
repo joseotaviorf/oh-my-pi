@@ -18,10 +18,10 @@ brokerage_fee AS (
             c.guarantee AS contract_guarantee,
             di.payment_status AS invoice_payment_status,
             c.first_rental_commission,
-            ct.agent_brokerage_share AS agent_brokerage_share,
+            c.agent_brokerage_share AS agent_brokerage_share,
             p.brokerage_split_percentage,
             pp.brokerage_split_percentage AS select_agent_brokerage_split_percentage,
-            ROUND(c.rent * c.first_rental_commission * (1.00 - COALESCE(ct.agent_brokerage_share,0.00) - COALESCE(p.brokerage_split_percentage,0.00) - COALESCE(pp.brokerage_split_percentage,0.00)),2) AS prod_theorical_amount,
+            ROUND(c.rent * c.first_rental_commission * (1.00 - COALESCE(c.agent_brokerage_share,0.00) - COALESCE(p.brokerage_split_percentage,0.00) - COALESCE(pp.brokerage_split_percentage,0.00)),2) AS prod_theorical_amount,
             ROUND(SUM(fie.brl_entry_due_amount),2) AS invoice_theorical_amount,
             ROUND(SUM(fie.brl_entry_paid_amount),2) AS invoice_paid_amount,
             i.accrual_year_month AS accrual_year_month,
@@ -43,8 +43,6 @@ brokerage_fee AS (
         LEFT JOIN contract_partnership_data pp
             ON c.sk_contract = pp.id_contract
             AND pp.partner_type = 'EXECUTIVE_FOR_RENT'
-        LEFT JOIN datalake_ebdb_clean.contract ct
-            ON c.sk_contract = ct.id
         WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
             AND di.payment_status <> 'canceled'
@@ -60,10 +58,10 @@ brokerage_fee AS (
             c.guarantee AS contract_guarantee,
             di.payment_status AS invoice_payment_status,
             c.first_rental_commission,
-            ct.agent_brokerage_share AS agent_brokerage_share,
+            c.agent_brokerage_share AS agent_brokerage_share,
             p.brokerage_split_percentage,
             pp.brokerage_split_percentage AS select_agent_brokerage_split_percentage,
-            ROUND(c.rent * c.first_rental_commission * COALESCE(ct.agent_brokerage_share,0.00),2) AS prod_theorical_amount,
+            ROUND(c.rent * c.first_rental_commission * COALESCE(c.agent_brokerage_share,0.00),2) AS prod_theorical_amount,
             ROUND(SUM(fie.brl_entry_due_amount),2) AS invoice_theorical_amount,
             ROUND(SUM(fie.brl_entry_paid_amount),2) AS invoice_paid_amount,
             i.accrual_year_month AS accrual_year_month,
@@ -85,8 +83,6 @@ brokerage_fee AS (
         LEFT JOIN contract_partnership_data pp
             ON c.sk_contract = pp.id_contract
             AND pp.partner_type = 'EXECUTIVE_FOR_RENT'
-        LEFT JOIN datalake_ebdb_clean.contract ct
-            ON c.sk_contract = ct.id
         WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
             AND di.payment_status <> 'canceled'
@@ -103,7 +99,7 @@ brokerage_fee AS (
             c.guarantee AS contract_guarantee,
             di.payment_status AS invoice_payment_status,
             c.first_rental_commission,
-            ct.agent_brokerage_share AS agent_brokerage_share,
+            c.agent_brokerage_share AS agent_brokerage_share,
             p.brokerage_split_percentage,
             pp.brokerage_split_percentage AS select_agent_brokerage_split_percentage,
             ROUND(c.rent * c.first_rental_commission * COALESCE(p.brokerage_split_percentage,0.00),2) AS prod_theorical_amount,
@@ -128,8 +124,6 @@ brokerage_fee AS (
         LEFT JOIN contract_partnership_data pp
             ON c.sk_contract = pp.id_contract
             AND pp.partner_type = 'EXECUTIVE_FOR_RENT'
-        LEFT JOIN datalake_ebdb_clean.contract ct
-            ON c.sk_contract = ct.id
         WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
             AND di.payment_status <> 'canceled'
@@ -146,7 +140,7 @@ brokerage_fee AS (
             c.guarantee AS contract_guarantee,
             di.payment_status AS invoice_payment_status,
             c.first_rental_commission,
-            ct.agent_brokerage_share AS agent_brokerage_share,
+            c.agent_brokerage_share AS agent_brokerage_share,
             p.brokerage_split_percentage,
             pp.brokerage_split_percentage AS select_agent_brokerage_split_percentage,
             ROUND(c.rent * c.first_rental_commission * COALESCE(p.brokerage_split_percentage,0.00),2) AS prod_theorical_amount,
@@ -171,8 +165,6 @@ brokerage_fee AS (
         LEFT JOIN contract_partnership_data pp
             ON c.sk_contract = pp.id_contract
             AND pp.partner_type = 'EXECUTIVE_FOR_RENT'
-        LEFT JOIN datalake_ebdb_clean.contract ct
-            ON c.sk_contract = ct.id
         WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
             AND di.payment_status <> 'canceled'
@@ -189,7 +181,7 @@ brokerage_fee AS (
             c.guarantee AS contract_guarantee,
             di.payment_status AS invoice_payment_status,
             c.first_rental_commission,
-            ct.agent_brokerage_share AS agent_brokerage_share,
+            c.agent_brokerage_share AS agent_brokerage_share,
             p.brokerage_split_percentage,
             pp.brokerage_split_percentage AS select_agent_brokerage_split_percentage,
             ROUND(c.rent * c.first_rental_commission * COALESCE(pp.brokerage_split_percentage,0.00),2) AS prod_theorical_amount,
@@ -214,8 +206,6 @@ brokerage_fee AS (
         LEFT JOIN contract_partnership_data pp
             ON c.sk_contract = pp.id_contract
             AND pp.partner_type = 'EXECUTIVE_FOR_RENT'
-        LEFT JOIN datalake_ebdb_clean.contract ct
-            ON c.sk_contract = ct.id
         WHERE
             die.from_account_type NOT IN ('quinto andar', 'contract expenses')
             AND di.payment_status <> 'canceled'

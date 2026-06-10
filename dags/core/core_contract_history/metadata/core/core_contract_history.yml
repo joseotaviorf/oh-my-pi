@@ -72,7 +72,6 @@ columns:
       ev_home_insurance_value: Change detected in the home insurance value (seguroResidencial_valor) column.
       ev_first_rent_comission_fee: Change detected in the first rent commission fee (taxaComissaoPrimeiroAluguel) column.
       ev_tenant_service_fee: Change detected in the tenant service fee (tenantServiceFee) column.
-      ev_agent_brokerage_share: Change detected in the agent brokerage share (estateAgentBrokerageShare) column.
       ev_dt_started: Change detected in the contract start date (dataInicio) column.
       ev_dt_entered: Change detected in the entry date (dataEntrada) column.
       ev_dt_termination: Change detected in the termination date (dataRescisao) column.

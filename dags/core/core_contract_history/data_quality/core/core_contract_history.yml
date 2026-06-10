@@ -42,7 +42,6 @@ column_level_validations:
         - ev_home_insurance_value
         - ev_first_rent_comission_fee
         - ev_tenant_service_fee
-        - ev_agent_brokerage_share
         - ev_dt_started
         - ev_dt_entered
         - ev_dt_termination

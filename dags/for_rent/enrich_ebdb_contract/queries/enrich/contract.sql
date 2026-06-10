@@ -183,6 +183,14 @@ last_status_condo_monitoring AS (
     datalake_rental_management_clean.condo_monitoring_actions
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_updated DESC) = 1
+),
+last_brokerage_share_revision AS (
+  SELECT
+    id_contract,
+    agent_brokerage_share,
+    ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_revision DESC) = 1 AS is_last_revision
+  FROM
+    datalake_big_agent.brokerage_share_history
 )
 SELECT
   c.id,
@@ -221,7 +229,7 @@ SELECT
   c.condo_price,
   c.iptu,
   c.tenant_service_fee,
-  c.agent_brokerage_share,
+  bsh.agent_brokerage_share,
   (sfo.id_contract is not null) as is_tenant_service_fee_opt_out,
   dt_last_tenant_service_fee_change as ts_tenant_service_fee_opt_out,
   c.is_exit_inspection_opted_out,
@@ -255,6 +263,10 @@ SELECT
   DATE(COALESCE(aad.ts_analyst_annulment_input, IF(t.status = 'DONE' AND c.dt_termination > DATE('2020-01-07'), t.dt_vacancy, c.dt_termination))) AS dt_ended_rental_confirmed
 FROM
   datalake_ebdb_clean.contract AS c
+LEFT JOIN
+  last_brokerage_share_revision AS bsh
+    ON bsh.id_contract = c.id
+    AND bsh.is_last_revision IS TRUE
 LEFT JOIN
   contract_cancellation_reason AS ccr
     ON ccr.id_contract = c.id

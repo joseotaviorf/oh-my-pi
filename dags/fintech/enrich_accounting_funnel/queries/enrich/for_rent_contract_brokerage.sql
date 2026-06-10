@@ -53,20 +53,17 @@ GROUP BY 1
 
 brokerage_share_from_contract_at_signature AS (
     SELECT
-        id_contract,
-        agent_brokerage_share
-    FROM 
-        datalake_ebdb_clean.contract_aud AS ca
-    LEFT JOIN 
-        datalake_ebdb_clean.user_revision_entity AS ur
-            ON ca.rev = ur.id
-    LEFT JOIN 
+        bsh.id_contract,
+        bsh.agent_brokerage_share
+    FROM
+        datalake_big_agent.brokerage_share_history AS bsh
+    LEFT JOIN
         dt_brokerage_share_from_contract AS dt
-            ON dt.sk_contract = ca.id_contract
-    WHERE 
-        DATE(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) <= DATE(dt.invoice_created_date)
-    QUALIFY 
-        ROW_NUMBER() OVER (PARTITION BY ca.id_contract ORDER BY rev DESC) = 1
+            ON dt.sk_contract = bsh.id_contract
+    WHERE
+        DATE(bsh.ts_revision) <= DATE(dt.invoice_created_date)
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY bsh.id_contract ORDER BY bsh.id_revision DESC) = 1
 ),
 
 agents_by_contract AS (

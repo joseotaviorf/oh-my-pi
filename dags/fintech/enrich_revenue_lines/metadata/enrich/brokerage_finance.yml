@@ -2,11 +2,11 @@
 database_name: datalake_revenue_lines
 table_name: brokerage_finance
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This For Rent addon makes it possible to our clients to split brokeragefee - BFI"
 columns:
   id_bfi:
-    description: "BFI ID"
+    description: "Identifier of the contract brokerage fee installment (BFI)."
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.id
   id_contract_ebdb:
@@ -42,7 +42,7 @@ columns:
       "It's the agent brokerage share. Important because in BFI V1 we only
       finance 5A brokerage share"
     lineage:
-      - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_ebdb_contract.contract.agent_brokerage_share
       - datalake_owner_fees_clean.contract.real_state_agent_share
   accrual_year_month:
     description: "Reference year-month"

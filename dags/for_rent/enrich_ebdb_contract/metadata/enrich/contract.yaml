@@ -151,8 +151,10 @@ columns:
     description: Rent percentage paid monthly by the tenant as a Service Fee.
   agent_brokerage_share:
     lineage:
-      - datalake_ebdb_clean.contract.agent_brokerage_share
-    description: The monthly value splitted between QuintoAndar/Brokerage Partners (CIQ and Partner), in decimals.
+      - datalake_big_agent.brokerage_share_history.agent_brokerage_share
+    description: |
+      Agent brokerage share in decimals from the latest revision in brokerage_share_history
+      per contract; null when no history row exists for the contract.
   is_tenant_service_fee_opt_out:
     lineage:
       - datalake_ebdb_clean.contract_aud.id_contract
