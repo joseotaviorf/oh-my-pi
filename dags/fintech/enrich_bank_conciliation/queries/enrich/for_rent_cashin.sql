@@ -161,11 +161,6 @@ sap_base AS (
                 dt_reference >= DATE('2024-01-01')
                 AND account_number = '11004X'
             )
-            OR
-            (
-                dt_reference < DATE('2024-01-01')
-                AND account_number = '11102.01.11'
-            )
         )
         AND id_finance_entity <> ''
         AND id_finance_entity IS NOT NULL
