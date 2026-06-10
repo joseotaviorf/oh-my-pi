@@ -4,7 +4,7 @@
 
 Do **not** substitute PR diff, CI-changed files, or BugBot comment paths for scope.
 
-> **Repo folder vs YAML `domain:`** — the CLI `--domain` flag is a **folder basename** (`for_rent`, `governance`, …); metadata `domain:` is an **allowlist** value (`For Rent`, `Data Ops & Governance`, …). Read [`domain_disambiguation.md`](domain_disambiguation.md) before Step 0 for **any** squad domain request.
+> **Repo folder vs YAML `domain:`** — the CLI `--domain` flag is a **folder basename** (`for_rent`, `governance`, …); metadata `domain:` is an **allowlist** value (`For Rent`, `Data Ops & Governance`, …). Read [`domain_disambiguation.md`](domain_disambiguation.md) before Step 0 for **any** domain or product line request.
 
 ---
 
@@ -52,7 +52,7 @@ Read `database_name` + `table_name` from each YAML. Cross-check `dags/${DOMAIN}/
 
 ### Lake (supplementary, `@tars`)
 
-[`sql/list_tables_for_remediation.sql`](../sql/list_tables_for_remediation.sql) — production `checks_result_json` for priority and Platform vs squad failures. **Does not replace** local Gates A/B/C on the full repo inventory.
+[`sql/list_tables_for_remediation.sql`](../sql/list_tables_for_remediation.sql) — production `checks_result_json` for priority and Platform vs domain-remediable failures. **Does not replace** local Gates A/B/C on the full repo inventory.
 
 ---
 

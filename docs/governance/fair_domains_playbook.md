@@ -1,6 +1,6 @@
-# FAIR metadata — squad playbook
+# FAIR metadata — domains playbook
 
-How squads **audit** and **fix** metadata in bi-etl-ejuice.
+How **domains and product lines** **audit** and **fix** metadata in bi-etl-ejuice.
 
 ## One rule
 

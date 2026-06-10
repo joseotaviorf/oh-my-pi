@@ -1,15 +1,15 @@
 # Domain disambiguation — repo folder vs YAML `domain:`
 
-Whenever the user asks to audit or remediate FAIR metadata **by domain**, resolve **two different concepts** before building the inventory. This applies to **every squad folder** under `dags/`, not only governance.
+Whenever the user asks to audit or remediate FAIR metadata **by domain**, resolve **two different concepts** before building the inventory. This applies to **every domain folder** under `dags/`, not only governance.
 
 ## Two concepts (do not conflate)
 
 | Concept | Meaning | How to scope | CLI today |
 |---------|---------|--------------|-----------|
-| **Repo folder** | Top-level (or nested) squad path under `dags/` | `dags/{folder}/**/metadata/**/*.yml` | `make audit-fair-metadata-scope domain={folder}` |
+| **Repo folder** | Top-level (or nested) domain folder path under `dags/` | `dags/{folder}/**/metadata/**/*.yml` | `make audit-fair-metadata-scope domain={folder}` |
 | **YAML `domain:` field (F2-01)** | Allowlisted catalog domain **inside** metadata YAML | All YAML with `domain: {Allowlist Value}` repo-wide | **No flag** — use `rg` (see below) |
 
-**Default for squad work:** user says “domain X” → scope the **repo folder** `dags/{folder}/`.  
+**Default for domain work:** user says “domain X” → scope the **repo folder** `dags/{folder}/`.  
 **Exception:** user explicitly names the **allowlist string** (e.g. “tabelas com domain For Rent no catálogo”) → scope by **YAML field** repo-wide.
 
 Inventories **overlap but differ** whenever tables in other folders use the same YAML `domain:` (common for `Data Ops & Governance`, `Data Platform`, `Cross`).
@@ -57,7 +57,7 @@ Cross-reference: domain mapping in [`create-dag/SKILL.md`](../../create-dag/SKIL
 
 Apply Step 0 below when **any** of these hold:
 
-1. User says a **squad / domain name** without specifying repo folder vs catalog field.
+1. User says a **domain or product line name** without specifying repo folder vs catalog field.
 2. Repo folder name **does not appear verbatim** in the FAIR allowlist (most folders).
 3. Folder has **multiple valid** YAML domains (`platform`, `core`).
 4. User uses a **colloquial alias** (“data governance”, “rent”, “listing”, “ops”).
@@ -67,7 +67,7 @@ Apply Step 0 below when **any** of these hold:
 
 - Ambiguous phrasing: “corrigir domain for rent”, “governance no catálogo”, “platform tables”.
 - `platform` or `core` scope without a DAG name.
-- User says allowlist value but might mean only one squad folder.
+- User says allowlist value but might mean only one domain folder.
 
 ### When default is enough (no AskQuestion)
 
@@ -87,7 +87,7 @@ Still **publish both** in the plan: repo folder scope **and** expected YAML `dom
 
 | Signal | Likely scope |
 |--------|--------------|
-| Folder name, snake_case, “squad”, “pasta `dags/…`” | **Repo folder** |
+| Folder name, snake_case, “domain folder”, “pasta `dags/…`” | **Repo folder** |
 | Exact allowlist string (“For Rent”, “Data Ops & Governance”) | **YAML field** repo-wide |
 | DAG name only | **`--dag {folder}/{dag}`** — infer folder from path |
 | Owner email | **`--owner`** — optional `--domain` intersect |
@@ -107,7 +107,7 @@ Replace values per mapping table. For `platform` / `core`, note “per-DAG — s
 
 > Escopo FAIR para “{user_domain_label}”:
 >
-> 1. **Pasta `dags/{folder}/`** — padrão squad no monorepo (~N YAML)  
+> 1. **Pasta `dags/{folder}/`** — padrão domain no monorepo (~N YAML)  
 > 2. **Campo `domain: {Allowlist Value}`** em todo o repo (~M YAML, pode incluir outras pastas)  
 > 3. **DAG específico** — qual? (`{folder}/{dag}`)  
 > 4. **Interseção** com owner (email)

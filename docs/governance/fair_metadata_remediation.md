@@ -1,6 +1,6 @@
 # FAIR metadata remediation — lake reference
 
-Lake-side detail for **metadata agents** and engineers. Squads start at **`fair_squad_playbook.md`**.
+Lake-side detail for **metadata agents** and engineers. Domains and product lines start at **`fair_domains_playbook.md`**.
 
 **Out of scope (Platform):** F4-01, I1-02, A1.2-03, I3-01, I3-02 — escalate when metadata is correct and only these fail. See `fair_requirement_glossary.md`.
 
@@ -17,10 +17,10 @@ Always parse **`checks_result_json`** from the latest `ts_assessed` per FQN. Do 
 
 | Situation | Source |
 |-----------|--------|
-| Row in latest `enrich_fairness_assessment` run | `checks_result_json` + glossary (metadata-squad IDs only) |
+| Row in latest `enrich_fairness_assessment` run | `checks_result_json` + glossary (domain-remediable metadata IDs only) |
 | No assessment row | `make validate-fair-metadata` / `validate-lineage-consistency` for that FQN only |
 
-## Metadata-squad IDs in `checks_result_json`
+## Domain-remediable IDs in `checks_result_json`
 
 See **`fair_requirement_glossary.md`** for business names and fix guidance (F2-01, F2-02, I1-01, F1-*).
 

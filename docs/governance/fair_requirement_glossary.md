@@ -1,6 +1,6 @@
 # FAIR requirement glossary (IDs → business language)
 
-Technical IDs (`F2-01`, `I1-01`, …) appear in `checks_result_json` and lake tables. **Agents and squad comms should prefer the business names below** when explaining gaps to non-engineers. Keep IDs in logs, SQL exports, and PR comments for engineers.
+Technical IDs (`F2-01`, `I1-01`, …) appear in `checks_result_json` and lake tables. **Agents and domain / product line comms should prefer the business names below** when explaining gaps to non-engineers. Keep IDs in logs, SQL exports, and PR comments for engineers.
 
 ## FAIR letter prefix
 
@@ -22,7 +22,7 @@ Technical IDs (`F2-01`, `I1-01`, …) appear in `checks_result_json` and lake ta
 
 A table can have perfect metadata and still show tier &lt; 2 if **platform-owned** checks fail — that is not a metadata-PR action item.
 
-## Metadata squad scope (remediate in bi-etl-ejuice)
+## Domain metadata scope (remediate in bi-etl-ejuice)
 
 | ID | Business name | Typical fix |
 |----|---------------|-------------|
@@ -31,7 +31,7 @@ A table can have perfect metadata and still show tier &lt; 2 if **platform-owned
 | **I1-01** | Documentation matches physical table | `columns:` vs SQL / metastore; `validate-lineage-consistency` |
 | **F1-01** | Table has a stable identity | `database_name`, `table_name` in metadata |
 
-Often squad + platform together:
+Often domain + platform together:
 
 | ID | Business name | Who |
 |----|---------------|-----|
@@ -71,14 +71,14 @@ Still scored in `fairness_assessment`; **escalate to Platform** — no Cursor sk
 | **I3-01** | Ownership in DataHub UI | Platform (observability; not MVP tier driver alone) |
 | **I3-02** | Lineage in DataHub UI | Platform (same) |
 
-When reporting to squads: *“Metadata fixes are done; remaining gaps are Platform catalog/contract — open Platform request.”*
+When reporting to domains / product lines: *“Metadata fixes are done; remaining gaps are Platform catalog/contract — open Platform request.”*
 
 ## Agent communication rule
 
 1. Read `checks_result_json` using **IDs** (machine source of truth).
 2. For humans, use **business names** from the tables above; separate metadata vs platform actions.
 3. Example: “**Column descriptions are not useful enough** — update `id_order`, `dt_signed` in metadata YAML.” Not: “fix F4-01”.
-4. Remediation playbook (metadata only): `fair_metadata_remediation.md`, skill `fair-metadata/`, squad entry `fair_squad_playbook.md`.
+4. Remediation playbook (metadata only): `fair_metadata_remediation.md`, skill `fair-metadata/`, domains entry `fair_domains_playbook.md`.
 
 ## Related docs
 

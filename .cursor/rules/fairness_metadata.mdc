@@ -7,7 +7,7 @@ description: FAIR Findable metadata (F2-01, F2-02) for governance YAML; I1-01 af
 
 Governance YAML under `dags/**/metadata/` feeds **fairness assessment** and downstream catalog pipelines. DataHub indexing and data contracts are **Platform-owned** — not remediated via metadata skills.
 
-**Requirement IDs (`F2-01`, `I1-01`, …):** machine keys in `checks_result_json`. For explanations to squads, use business names in **`docs/governance/fair_requirement_glossary.md`** — do not lead with raw IDs in user-facing text.
+**Requirement IDs (`F2-01`, `I1-01`, …):** machine keys in `checks_result_json`. For explanations to domains and product lines, use business names in **`docs/governance/fair_requirement_glossary.md`** — do not lead with raw IDs in user-facing text.
 
 | Lifecycle stage | What to validate | Tool |
 |-----------------|------------------|------|
@@ -103,11 +103,11 @@ uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.f
 
 ## Remediation source of truth
 
-Prefer **`fairness_assessment.checks_result_json`** from the **most recent run** per FQN (`max ts_assessed`). Remediate only metadata-squad IDs; see `docs/governance/fair_metadata_remediation.md`.
+Prefer **`fairness_assessment.checks_result_json`** from the **most recent run** per FQN (`max ts_assessed`). Remediate only domain-remediable metadata IDs; see `docs/governance/fair_metadata_remediation.md`.
 
-## Agents and squads
+## Agents and domains
 
-- **Humans:** `docs/governance/fair_squad_playbook.md`
+- **Humans:** `docs/governance/fair_domains_playbook.md`
 - **Agents:** `.cursor/skills/fair-metadata/SKILL.md` + `reference/plan_gate.md`
 - **Glossary:** `docs/governance/fair_requirement_glossary.md`
 

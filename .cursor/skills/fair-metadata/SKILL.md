@@ -1,6 +1,6 @@
 ---
 name: fair-metadata
-description: "FAIR metadata audit and remediation by user scope (repo folder, YAML domain allowlist, owner, table). Disambiguate repo folder vs YAML domain: for any squad. PLAN default — no metadata YAML edits until explicit execute approval. Read reference/plan_gate.md first."
+description: "FAIR metadata audit and remediation by user scope (repo folder, YAML domain allowlist, owner, table). Disambiguate repo folder vs YAML domain: for any domain or product line. PLAN default — no metadata YAML edits until explicit execute approval. Read reference/plan_gate.md first."
 ---
 
 # FAIR metadata
@@ -20,7 +20,7 @@ Single skill for **audit** and **remediation** of governance YAML. Read [`refere
 | Single DAG | All `dags/{folder}/{dag}/metadata/**/*.yml` |
 | **PR / branch validation** | Files changed vs `origin/master` — use **`make validate-fair-metadata`**, not a wide `--audit --domain …` |
 
-**Repo folder vs YAML `domain:`:** `--domain` on the CLI is the **folder basename** under `dags/`; metadata `domain:` must be an **allowlist** value (often different — e.g. `for_rent` → `For Rent`, `governance` → `Data Ops & Governance`). Default to **folder** when the user names a squad; use **AskQuestion** when ambiguous. See [`reference/domain_disambiguation.md`](reference/domain_disambiguation.md).
+**Repo folder vs YAML `domain:`:** `--domain` on the CLI is the **folder basename** under `dags/`; metadata `domain:` must be an **allowlist** value (often different — e.g. `for_rent` → `For Rent`, `governance` → `Data Ops & Governance`). Default to **folder** when the user names a domain folder; use **AskQuestion** when ambiguous. See [`reference/domain_disambiguation.md`](reference/domain_disambiguation.md).
 
 Resolve scope first → publish **closed inventory** (`N files`) → run **Gates A and B** on that inventory only.
 
@@ -86,7 +86,7 @@ Ambiguous replies (“ok”, “continua”) → stay in PLAN.
 
 ### Step 0 — Resolve scope and audit
 
-1. **Disambiguate domain names** for **any** squad/domain request — [`reference/domain_disambiguation.md`](reference/domain_disambiguation.md) (repo folder vs YAML allowlist).
+1. **Disambiguate domain names** for **any** domain or product line request — [`reference/domain_disambiguation.md`](reference/domain_disambiguation.md) (repo folder vs YAML allowlist).
 2. **Scope:** [`reference/scoping.md`](reference/scoping.md) — match user intent exactly.
 3. **Inventory:** list all YAML paths; count `N files`; show in plan (include repo folder vs YAML `domain:` in the plan header).
 4. **Gates A/B:** run `make audit-fair-metadata-scope …` (or CLI `--audit` with scope flags).
@@ -131,12 +131,12 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-conte
 |------|---------|
 | **`reference/plan_gate.md`** | Mandatory gate |
 | `reference/scoping.md` | Scope resolution |
-| `reference/domain_disambiguation.md` | Repo folder vs YAML `domain:` allowlist (all squads) |
+| `reference/domain_disambiguation.md` | Repo folder vs YAML `domain:` allowlist (all domains) |
 | `reference/remediation_plan.md` | Plan template |
 | `reference/owner_remediation.md` | Gate A |
 | `reference/description_remediation.md` | Gate B |
 | `reference/woodpecker_layer_gates.md` | Layer rules + CI |
-| `docs/governance/fair_squad_playbook.md` | Squad entry point |
+| `docs/governance/fair_domains_playbook.md` | Domains playbook entry point |
 
 ## Do not
 
