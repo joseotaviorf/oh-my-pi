@@ -130,6 +130,35 @@ Custom SQL/DSL constraint. Use for complex business rules.
 
 **Always add a comment** before the `custom` block explaining what the validation checks — this makes failures easier to diagnose and the intent clear to reviewers.
 
+#### Naming — use a descriptive key
+
+The key under `column_level_validations` is used as the check's identifier in alert messages. Choose it to describe **what the rule validates**, not just which column is involved. This is especially important for referential integrity and cross-table checks:
+
+```yaml
+# Good: key name describes the business rule; alert says "matching_sk_hours_bank_rule_fact_and_dimension failed"
+column_level_validations:
+  matching_sk_hours_bank_rule_fact_and_dimension:
+    custom:
+      # Ensure every non-null sk_hours_bank_rule matches a row in dw_time.dim_hours_bank_rule (no orphan FKs).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_time.fact_hours_bank_rule_totals f
+         WHERE f.sk_hours_bank_rule IS NOT NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM dw_time.dim_hours_bank_rule d
+           WHERE d.sk_hours_bank_rule = f.sk_hours_bank_rule
+         )) = 0
+      severity_level: Error
+
+# Avoid: key is the FK column name — alert says "sk_hours_bank_rule failed", which is ambiguous
+column_level_validations:
+  sk_hours_bank_rule:
+    custom:
+      ...
+```
+
+Column-scoped value checks (range validation, format) should still use the actual column name as the key:
+
 ```yaml
 column_level_validations:
   reference_year:
@@ -143,6 +172,41 @@ column_level_validations:
         ) = 0
       severity_level: Error
 ```
+
+## Deequ Limitation — Deeply Nested Column Types
+
+Deequ's `isNotNested` precondition **rejects any column with more than one level of nesting**. Applying any column-level check (`has_completeness`, `is_complete`, `has_null_count`, etc.) to such a column throws `WrongColumnTypeException` at runtime and crashes the entire data quality run for that table — not just the offending check.
+
+### Affected column shapes
+
+| Column type | Nesting depth | Deequ |
+|---|---|---|
+| `StringType`, `IntegerType`, `DateType` | 0 | ✅ Supported |
+| `ArrayType(StringType)` | 1 | ✅ Supported |
+| `StructType(StructField(x, StringType))` | 1 | ✅ Supported |
+| `ArrayType(StructType(...))` | 2 | ❌ Not supported |
+| `ArrayType(StructType(..., fieldN: ArrayType(MapType(...))))` | 3 | ❌ Not supported |
+
+### Common culprits in clean/raw tables
+
+HR/API columns that are typically arrays of structs where the inner struct contains further nested arrays:
+
+- `emails`, `phones`, `addresses`, `disabilities`, `ethnicities`, `religions`, `national_identifiers`, `legislative_info`, `work_relationships` — HR System / Oracle HCM clean tables often carry `*DFF` / `*DDF` fields like `emailsDFF: array<map<string,string>>` nested inside the struct, making them doubly-nested.
+- Greenhouse v3 custom-field columns serialized as `array<struct<...>>`.
+
+### What to do
+
+- **Never add a column-level check on a doubly-nested column.** Remove the entry from `column_level_validations`.
+- **Table-level checks** (`has_size`, `has_size_variation`) operate at the row level and are not affected by column type constraints — keep using them.
+- If the business need is to assert that a worker has at least one email, express it as a `custom` table-level SQL constraint (use a descriptive key per the naming rule above).
+
+### Diagnosing the error at runtime
+
+```
+WrongColumnTypeException: Unsupported nested column type of column <col>: ArrayType(StructType(...),true)
+```
+
+Find the column name in the error, locate it in `column_level_validations` in the YAML, and remove that block.
 
 ## DW Dimension Tables — Unknown Row (-1)
 
@@ -240,7 +304,9 @@ column_level_validations:
 - [ ] Primary key columns have `is_complete` and `is_unique` with `severity_level: Error`
 - [ ] **DW dimensions**: Non-SK columns use `has_null_count` with `less_than_or_equal_to: 1` (not `is_complete`) due to the -1 unknown row
 - [ ] `custom` validations have a comment above explaining what is being validated
+- [ ] `custom` checks for referential integrity or cross-table rules use a **descriptive key name** (e.g. `matching_sk_x_fact_and_dimension`), not the FK column name
 - [ ] `is_contained_in` used only when nulls are not allowed (otherwise use `custom`)
+- [ ] No column-level check targets a doubly-nested column (`ArrayType(StructType(...nested array/map...))`) — Deequ throws `WrongColumnTypeException` and crashes the entire run; use table-level `custom` SQL instead
 
 ## Pre-merge: run custom constraints against Trino
 

@@ -55,11 +55,12 @@ Data is organized by functional domain for schema-level governance and access co
 | Schema | Scope |
 |--------|-------|
 | `dw_organization` | Cost centers, BUs, teams, job structure, Codex, business partners |
-| `dw_employee_details` | PII, lifecycle events (admissions/exits), documentation, vacation, leaves, dependents, education |
+| `dw_employee_details` | PII, lifecycle events (admissions/exits), documentation, dependents, education |
 | `dw_compensation` | Salary history, job level, pay-tables, merits/promotions, variable pay |
 | `dw_demographics` | DE&I (diversity, equity, inclusion) and related sociodemographic dimensions |
 | `dw_performance` | Performance and talent cycles |
 | `dw_people` | Public profile (name, email, hierarchy, location, role) |
+| `dw_time` | Vacations (`fact_vacation_balances`), absences/leaves (`fact_absence_requests`, `dim_absence_type`), time-attendance requests, hours-bank rules and balances. DAG: `dw_time` (`custom_schema: time`; the `dw_` layer prefix is added automatically). |
 | `dw_learning` | Learning & Development data |
 | `dw_payroll` | Data from Payroll provider |
 | `dw_hiring` | Talent Acquisition (TA) data |
@@ -156,18 +157,61 @@ When creating new DAGs in `dags/people/`, use the following configuration patter
 | Cluster (gsheets) | `databricks_16_4_medium_general_people_cluster` | GSheets DAGs need general + gsheets library |
 | Cluster (heavier pin_*) | `databricks_16_4_medium_memory_people_cluster` | pin_talent, pin_performance (larger datasets) |
 | Cluster (custom_ingestion) | `custom_cluster` or `databricks_16_4_small_memory_people_cluster` | API DAGs (greenhouse, degreed) often use custom; pin_* use smaller preset |
-| Cluster (`api_ingestion`, raw) | `databricks_16_4_small_memory_people_cluster` (or heavier `*_people_cluster` if needed) | Same sizing idea as custom API pulls; must remain a **`*_people_cluster`** preset |
-| `databricks_conn_id` | `databricks_new_env` | For raw, clean, enrich, dw layers |
-| `credentials_scope` | `people` | For gsheets DAGs |
+| Cluster (`api_ingestion`, raw) | `consolidation_xs_memory_cluster` | See **api_ingestion cluster note** below — must use `databricks_conn_id: databricks_new` |
+| `databricks_conn_id` | `databricks_new_env` (standard) / `databricks_new` (api_ingestion) | Standard for query_delta, enrich, dw; **`api_ingestion` DAGs with `credentials_scope: people` must use `databricks_new`** — `databricks_new_env` cannot read the `people` Databricks secret scope |
+| `credentials_scope` | `people` | For gsheets DAGs and api_ingestion DAGs with OAuth secrets |
 
 **Rule:** People domain DAGs must use `*_people_cluster` variants (see `.cursor/rules/dag_build.mdc`). Never use generic clusters outside the People IAM scope.
+
+### api_ingestion Cluster — Secret Access and Silent Failure Risk
+
+For `workflow.type: api_ingestion` DAGs that use `authentication.credentials_scope: people` (OAuth secrets stored in the `people` Databricks scope), the `_cluster.yml` **must** use `databricks_conn_id: databricks_new`. Using `databricks_new_env` will cause the secret lookup to silently fail.
+
+**Reference config** (mirror `oitchau_api_cluster.yml`):
+
+```yaml
+cluster:
+  type: consolidation_xs_memory_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: r6g.2xlarge
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
+```
+
+**Silent failure pattern:** When the secret is inaccessible, the framework skips every API entity and exits with code 0 ("Succeeded"), writing no data. The raw table is never created. The downstream clean task then fails with `TABLE_OR_VIEW_NOT_FOUND`. Watch for this signature in logs:
+
+```
+Secret does not exist with scope: people and key: <SECRET_KEY>
+m=_fetch_with_id_expansion, uuid=..., msg=Skipping entity after error
+m=main, table_name=... msg=No data returned from API. Skipping load.
+```
+
+### `_cluster.yml` — Validation Cluster Type Must Differ
+
+If the `_cluster.yml` includes a `validation:` block, `validation.cluster.type` **must differ** from `cluster.type`. Identical values fail CI with:
+
+```
+m=_check_cluster_validation_config, msg='validation.cluster.type' must differ from prod 'cluster.type'
+```
+
+If no distinct lighter cluster type is needed for validation, **omit the `validation:` block entirely** (as `oitchau_api_cluster.yml` does).
 
 ### Mandatory Declaration for New People DAGs
 
 Every new People DAG declaration **must** include:
 
 - `bucket_config_name: people_bucket`
-- `databricks_conn_id: databricks_new_env` (for raw, clean, enrich, dw; use `databricks_new` only for reverse layer per core rules)
+- `databricks_conn_id: databricks_new_env` (for query_delta, enrich, dw; **`api_ingestion` with `credentials_scope: people` must use `databricks_new`** — see api_ingestion cluster note above; use `databricks_new` for reverse layer per core rules)
 - `has_hive_sync: false`
 - **`dag.callback_by_task: False`** — set under the top-level `dag:` block (not under `workflow:`). Disables per-task failure callbacks so alerting stays at DAG level. **Required** for **raw** and **clean** layers (many parallel tasks would otherwise spam GChat/Jira). **Optional** for enrich, dw, metric, reverse, and other layers; use when you prefer DAG-level alerts. Default in the builder is per-task callbacks when omitted — see `.cursor/rules/dag_build.mdc` for placement.
 - `access_control_list` with `group_name: people-analytics` and `permission_level: CAN_MANAGE`
@@ -235,6 +279,21 @@ For date columns in fact tables, include **both**:
 - **`dt_{event}`**: The date column itself (e.g. `dt_hired`)
 
 Example: `sk_hired_date` and `dt_hired`; `sk_termination_date` and `dt_termination`.
+
+### Surrogate Keys — Hashing Convention
+
+Fact-table surrogate keys computed from natural key components (grain columns) must use **`MD5(CONCAT_WS(',', ...))`**. Do not use `XXHASH64` — `MD5(CONCAT_WS)` is the repo convention and is preferred for readability.
+
+```sql
+MD5(CONCAT_WS(
+    ',',
+    CAST(col1 AS STRING),
+    CAST(col2 AS STRING),
+    col3
+)) AS sk_entity
+```
+
+`MD5` returns a 32-char hex STRING. That is the expected type for hash-based surrogate keys in this repo.
 
 ### Foreign Keys — Only Existing DW 2.0 Tables
 
@@ -403,8 +462,26 @@ Governance metadata (`metadata/{layer}/{table}.yml`) must clearly document **bus
 - **Lineage**: Keep lineage accurate, but descriptions should focus on what the data represents for the business
 - **Column order**: Column order in metadata must match the SQL query order (helps consumers and lineage validation)
 
+### Column Descriptions — Single-Line Only
+
+Column `description` values must be **single-line strings**. Do not use multi-line YAML pipe blocks (`|` or `|-`). Write the full sentence on one line.
+
+```yaml
+# Good
+columns:
+  sk_employee:
+    description: "Employee surrogate key; join dw_people.dim_employee for name, email, and hierarchy."
+
+# Bad — do not use pipe blocks
+columns:
+  sk_employee:
+    description: |
+      Employee surrogate key shared across People marts; join
+      dw_people.dim_employee for name, email, and hierarchy.
+```
+
 ### Calculated Columns — No Lineage
 
-Columns calculated in the query (e.g., `CURRENT_TIMESTAMP()`, `NOW()`, `CASE` expressions with no source reference) must **not** have a `lineage` block. Example: `ts_load` when defined as `NOW() AS ts_load`.
+Columns calculated in the query (e.g., `CURRENT_TIMESTAMP()`, `NOW()`, `CASE` expressions with no source reference, hash-based surrogate keys such as `MD5(CONCAT_WS(...))`) must **not** have a `lineage` block. The value is not derived from a specific source column.
 
 The metadata is the primary documentation for data consumers; it must be self-explanatory without reading the SQL.
