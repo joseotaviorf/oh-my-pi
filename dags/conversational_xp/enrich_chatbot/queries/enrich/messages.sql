@@ -1,6 +1,10 @@
 WITH ai_messages AS (
   SELECT DISTINCT
-    s.id_sauron_session,
+    -- copilot key is either the numeric sauron id or the SSS public id (uuid)
+    TRY_CAST(s.id_sauron_session AS BIGINT) AS id_sauron_session,
+    CASE
+      WHEN TRY_CAST(s.id_sauron_session AS BIGINT) IS NULL THEN s.id_sauron_session
+    END AS id_sss_session,
     m.id AS id_message,
     CASE
       WHEN m.role != 'HUMAN' THEN -1
@@ -23,7 +27,7 @@ WITH ai_messages AS (
 ),
 ai_message_count AS (
   SELECT
-    id_sauron_session,
+    COALESCE(CAST(id_sauron_session AS STRING), id_sss_session) AS id_session_key,
     COUNT(*) AS total_messages
   FROM
     ai_messages
@@ -31,10 +35,39 @@ ai_message_count AS (
     role != 'HARDCODED'
   GROUP BY 1
 ),
+-- chat.id_session for source = 'sauron' holds either the numeric sauron id
+-- or sauron's public_id (uuid); resolve hashes to the numeric id
+sauron_chats AS (
+  SELECT DISTINCT
+    c.id_channel,
+    COALESCE(TRY_CAST(c.id_session AS BIGINT), srn.id) AS id_sauron_session,
+    CASE
+      WHEN TRY_CAST(c.id_session AS BIGINT) IS NULL THEN c.id_session
+    END AS id_sauron_session_hash
+  FROM
+    datalake_quinto_messenger_clean.chat AS c
+  LEFT JOIN
+    datalake_sauron_clean.session AS srn
+      ON srn.public_id = c.id_session
+  WHERE
+    c.source = 'sauron'
+),
+-- chat.id_session for source = 'support_session' is the SSS public_id (uuid)
+sss_chats AS (
+  SELECT DISTINCT
+    c.id_channel,
+    c.id_session AS id_sss_session
+  FROM
+    datalake_quinto_messenger_clean.chat AS c
+  WHERE
+    c.source = 'support_session'
+),
 whatsapp_messages AS (
   SELECT DISTINCT
+    ce.id_channel,
     ce.id AS id_message,
-    COALESCE(c.id_session, chat.id_session) AS id_sauron_session,
+    COALESCE(schat.id_sauron_session, TRY_CAST(c.id_session AS BIGINT)) AS id_sauron_session,
+    COALESCE(sschat.id_sss_session, schat.id_sauron_session_hash) AS id_sss_session,
     REPLACE(REPLACE(REPLACE(ce.from_phone_number, 'whatsapp:', ''), '_2E', '.'), '_40', '@') AS user_sender,
     ce.message_body AS message,
     ce.ts_created,
@@ -48,19 +81,25 @@ whatsapp_messages AS (
   FROM
     datalake_quinto_messenger_clean.channel_event AS ce
   LEFT JOIN
+    -- legacy source kept as fallback: some channels never receive a chat row,
+    -- so chat-derived keys take precedence and channel.id_session fills gaps
     datalake_quinto_messenger_clean.channel AS c
       ON c.id_channel = ce.id_channel
   LEFT JOIN
-    datalake_quinto_messenger_clean.chat AS chat
-      ON ce.id_channel = chat.id_channel
-      AND ce.ts_created > "2026-02-23T14:00:00.000+00:00"
+    sauron_chats AS schat
+      ON schat.id_channel = ce.id_channel
+  LEFT JOIN
+    sss_chats AS sschat
+      ON sschat.id_channel = ce.id_channel
   WHERE
     MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
 ),
 inapp_messages AS (
   SELECT DISTINCT
+    icm.id_channel,
     icm.id_message,
-    MAX(c.id_session) AS id_sauron_session,
+    MAX(schat.id_sauron_session) AS id_sauron_session,
+    MAX(COALESCE(sschat.id_sss_session, schat.id_sauron_session_hash)) AS id_sss_session,
     REPLACE(REPLACE(icm.id_user_external,'_2E', '.'), '_40', '@') AS user_sender,
     icm.message,
     icm.ts_created,
@@ -73,16 +112,23 @@ inapp_messages AS (
   FROM
     datalake_internal_chat_clean.internal_chat_messages AS icm
   LEFT JOIN
-    datalake_quinto_messenger_clean.chat AS c
-      ON c.id_channel = icm.id_channel
+    sauron_chats AS schat
+      ON schat.id_channel = icm.id_channel
+  LEFT JOIN
+    sss_chats AS sschat
+      ON sschat.id_channel = icm.id_channel
   WHERE
     MAKE_DATE(icm.year, icm.month, icm.day) >= '{load_start_date}'
   GROUP BY ALL
 ),
+-- id_session_key is the unified session identity: the numeric sauron id when
+-- known, otherwise the hash (SSS public id or unresolved sauron public id)
 messages AS (
   SELECT
     id_message,
     id_sauron_session,
+    id_sss_session,
+    COALESCE(CAST(id_sauron_session AS STRING), id_sss_session) AS id_session_key,
     user_sender,
     message,
     role,
@@ -93,6 +139,8 @@ messages AS (
   SELECT
     id_message,
     id_sauron_session,
+    id_sss_session,
+    COALESCE(CAST(id_sauron_session AS STRING), id_sss_session) AS id_session_key,
     user_sender,
     message,
     role,
@@ -102,24 +150,33 @@ messages AS (
 ),
 messages_trimmed AS (
   SELECT
-    m.*
+    m.id_message,
+    m.id_sauron_session,
+    m.id_sss_session,
+    m.id_session_key,
+    m.user_sender,
+    m.message,
+    m.role,
+    m.ts_created
   FROM
     messages AS m
   LEFT JOIN
     ai_message_count AS amc
-      ON amc.id_sauron_session = m.id_sauron_session
+      ON amc.id_session_key = m.id_session_key
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY m.id_sauron_session ORDER BY m.ts_created) > COALESCE(total_messages, 0)
+    ROW_NUMBER() OVER(PARTITION BY m.id_session_key ORDER BY m.ts_created) > COALESCE(amc.total_messages, 0)
 ),
 messages_w_users AS (
   SELECT DISTINCT
     m.id_message,
     m.id_sauron_session,
+    m.id_sss_session,
+    m.id_session_key,
     CASE
       WHEN m.user_sender = 'system' THEN -1
       WHEN m.role = 'ANALYST' THEN u1.id
-      WHEN s.user_data:["user_id"] IS NOT NULL 
-        AND m.role = 'HUMAN' THEN s.user_data:["user_id"]
+      WHEN COALESCE(s.user_data:["user_id"], sss.user_data:["user_id"]) IS NOT NULL 
+        AND m.role = 'HUMAN' THEN COALESCE(s.user_data:["user_id"], sss.user_data:["user_id"])
       WHEN u1.id IS NOT NULL THEN u1.id
       WHEN STARTSWITH(m.user_sender, '+') THEN NULL
     END AS id_user,
@@ -132,6 +189,9 @@ messages_w_users AS (
     datalake_sauron_clean.session AS s
       ON s.id = m.id_sauron_session
   LEFT JOIN
+    datalake_support_session_service_clean.support_session AS sss
+      ON sss.public_id = m.id_sss_session
+  LEFT JOIN
     datalake_ebdb_user.user AS u1
       ON u1.email = m.user_sender
       AND CONTAINS(m.user_sender, '@')
@@ -141,13 +201,15 @@ all_messages AS (
   SELECT
     id_message,
     id_sauron_session,
+    id_sss_session,
+    id_session_key,
     id_user,
     message,
     CASE
       WHEN MIN(CASE WHEN role = 'ANALYST' THEN ts_created END)
-        OVER(PARTITION BY id_sauron_session) IS NULL THEN 'HUMAN-AI'
+        OVER(PARTITION BY id_session_key) IS NULL THEN 'HUMAN-AI'
       WHEN ts_created < MIN(CASE WHEN role = 'ANALYST' THEN ts_created END)
-        OVER(PARTITION BY id_sauron_session) THEN 'HUMAN-AI'
+        OVER(PARTITION BY id_session_key) THEN 'HUMAN-AI'
       ELSE 'HUMAN-HUMAN'
     END AS conversation_type,
     role,
@@ -158,6 +220,8 @@ all_messages AS (
   SELECT 
     id_message,
     id_sauron_session,
+    id_sss_session,
+    COALESCE(CAST(id_sauron_session AS STRING), id_sss_session) AS id_session_key,
     id_user,
     message,
     'HUMAN-AI' AS conversation_type,
@@ -166,30 +230,44 @@ all_messages AS (
   FROM 
     ai_messages
 ),
+-- spoc flag aggregated per session key; sauron ids (numeric) and
+-- sss ids (hash) are disjoint key spaces, so both live in one column
 spoc_sessions AS (
   SELECT
-    id_session,
+    id_session AS id_chat_session,
     MAX(is_spoc_task) AS is_spoc_session
   FROM
     datalake_customer_support.chats
   WHERE
     ts_created >= '{load_start_date}'
+    AND id_session IS NOT NULL
+  GROUP BY 1
+  UNION ALL
+  SELECT
+    id_sss_session AS id_chat_session,
+    MAX(is_spoc_task) AS is_spoc_session
+  FROM
+    datalake_customer_support.chats
+  WHERE
+    ts_created >= '{load_start_date}'
+    AND id_sss_session IS NOT NULL
   GROUP BY 1
 )
 SELECT DISTINCT
   am.id_message,
-  am.id_sauron_session,
+  CAST(am.id_sauron_session AS STRING) AS id_sauron_session,
+  am.id_sss_session,
   am.id_user,
   am.message,
-  ROW_NUMBER() OVER(PARTITION BY am.id_sauron_session ORDER BY am.ts_created) AS message_index,
+  ROW_NUMBER() OVER(PARTITION BY am.id_session_key ORDER BY am.ts_created) AS message_index,
   am.conversation_type,
   am.role,
   CASE
-    WHEN LAG(am.ts_created) OVER(PARTITION BY am.id_sauron_session ORDER BY am.ts_created) IS NOT NULL
-      AND LAG(am.role) OVER(PARTITION BY am.id_sauron_session ORDER BY am.ts_created) != role
+    WHEN LAG(am.ts_created) OVER(PARTITION BY am.id_session_key ORDER BY am.ts_created) IS NOT NULL
+      AND LAG(am.role) OVER(PARTITION BY am.id_session_key ORDER BY am.ts_created) != role
         THEN DATE_DIFF(
           SECOND,
-          LAG(am.ts_created) OVER (PARTITION BY am.id_sauron_session ORDER BY am.ts_created),
+          LAG(am.ts_created) OVER (PARTITION BY am.id_session_key ORDER BY am.ts_created),
           am.ts_created
         )
     ELSE NULL
@@ -199,7 +277,7 @@ FROM
   all_messages AS am
 LEFT JOIN
   spoc_sessions AS ss
-    ON ss.id_session = am.id_sauron_session
+    ON ss.id_chat_session = am.id_session_key
 WHERE
-  am.id_sauron_session IS NOT NULL
+  am.id_session_key IS NOT NULL
   AND ss.is_spoc_session IS NOT TRUE

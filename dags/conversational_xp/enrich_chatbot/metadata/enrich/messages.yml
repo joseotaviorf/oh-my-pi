@@ -6,18 +6,23 @@ domain: Conversational XP
 description: Table containing message data, includes both human-human and human-AI conversations with message sequencing and timing information.
 columns:
   id_message:
-    description: 'Message identifier'
+    description: 'Unique key for an individual chat message within a session'
     lineage:
     - datalake_copilot_service_clean.message.id
     - datalake_quinto_messenger_clean.channel_event.id
     - datalake_internal_chat_clean.internal_chat_messages.id_message
   id_sauron_session:
-    description: 'Sauron session ID associated with the message'
+    description: 'Numeric sauron session ID associated with the message. Hash-keyed sauron chats are resolved to the numeric id via sauron public_id. NULL when the session is tracked only by a hash id (see id_sss_session)'
     lineage:
     - datalake_copilot_service_clean.session.id_sauron_session
     - datalake_quinto_messenger_clean.channel.id_session
     - datalake_quinto_messenger_clean.chat.id_session
     - datalake_sauron_clean.session.id
+  id_sss_session:
+    description: 'Hash (UUID) session identifier when the session is keyed by a public id: the Support Session Service public id, or the sauron public_id for hash-keyed sauron chats. NULL when the session is identified only by the numeric sauron id'
+    lineage:
+    - datalake_copilot_service_clean.session.id_sauron_session
+    - datalake_quinto_messenger_clean.chat.id_session
   id_user:
     description: 'User ID associated with the message. -1 for bot/system messages, NULL for users without account'
     lineage:
@@ -37,7 +42,7 @@ columns:
     - datalake_quinto_messenger_clean.channel_event.ts_created
     - datalake_internal_chat_clean.internal_chat_messages.ts_created
   conversation_type:
-    description: 'Type of conversation'
+    description: 'Flags whether the exchange happened between two people or with the AI assistant'
     categories:
       HUMAN-HUMAN: 'Human-to-human conversation (support chat)'
       HUMAN-AI: 'Human-to-AI conversation (chatbot)'

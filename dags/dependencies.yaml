@@ -1833,7 +1833,6 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.langfuse:load-clean-scores:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
-  - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-chat:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
   - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
