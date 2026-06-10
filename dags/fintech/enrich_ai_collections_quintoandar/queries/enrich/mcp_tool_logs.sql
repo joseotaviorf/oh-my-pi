@@ -16,9 +16,6 @@ WITH collections AS (
             'ARRAY<STRUCT<client:STRING, function:STRING, outcome:STRING, http_status:INT, reason:STRING, contract_id:LONG, order_id:STRING, house_ids:ARRAY<LONG>, attempt:INT>>'
         ) AS calls_array,
         c.ts_request,
-        c.year,
-        c.month,
-        c.day,
         ROW_NUMBER() OVER (
             PARTITION BY c.id_trace, LOWER(c.tool_name)
             ORDER BY c.ts_request ASC, c.id_request ASC
@@ -29,6 +26,7 @@ WITH collections AS (
         MAKE_DATE(c.year, c.month, c.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
         AND c.ts_request >= TIMESTAMP('{load_start_date}')
         AND c.tool_name IS NOT NULL
+        AND c.id_event = CONCAT('MCP_TOOL_', c.tool_name)
 ),
 tool_observations AS (
     SELECT
@@ -76,9 +74,6 @@ mcp_with_obs AS (
         m.calls_array,
         m.calls_json_str,
         m.ts_request,
-        m.year,
-        m.month,
-        m.day,
         (m.mcp_http_status_code BETWEEN 200 AND 299) AS is_mcp_success,
         t.obs_input AS mcp_input,
         CASE
@@ -127,9 +122,9 @@ SELECT
     p.ts_request,
     call.house_ids AS call_house_ids,
     TO_JSON(call) AS call_payload_json,
-    p.year,
-    p.month,
-    p.day
+    YEAR(p.ts_request) AS year,
+    MONTH(p.ts_request) AS month,
+    DAYOFMONTH(p.ts_request) AS day
 FROM
     mcp_with_obs AS p
 LATERAL VIEW POSEXPLODE(p.calls_array) AS pos, call

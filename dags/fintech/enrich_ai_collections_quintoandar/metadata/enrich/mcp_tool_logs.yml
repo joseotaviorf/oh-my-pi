@@ -159,13 +159,16 @@ columns:
       ad-hoc exploration. Does not include the response field; use call_response instead.
   year:
     lineage:
-      - datalake_request_logging_clean.collections.year
-    description: Year partition from the parent collections clean row.
+      - datalake_request_logging_clean.collections.ts_request
+    description: Year partition derived from ts_request (the raw collections year/month/day
+      can differ from when the request was actually made).
   month:
     lineage:
-      - datalake_request_logging_clean.collections.month
-    description: Month partition from the parent collections clean row.
+      - datalake_request_logging_clean.collections.ts_request
+    description: Month partition derived from ts_request (the raw collections year/month/day
+      can differ from when the request was actually made).
   day:
     lineage:
-      - datalake_request_logging_clean.collections.day
-    description: Day partition from the parent collections clean row.
+      - datalake_request_logging_clean.collections.ts_request
+    description: Day partition derived from ts_request (the raw collections year/month/day
+      can differ from when the request was actually made).
