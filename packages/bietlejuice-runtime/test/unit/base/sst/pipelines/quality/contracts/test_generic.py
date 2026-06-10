@@ -122,7 +122,7 @@ class TestCheckEmptyPartitions:
         self, mock_pyspark_functions, spark_table_chain
     ):
         spark, df = spark_table_chain(count=3, last_ts="2026-04-07 12:34:56")
-        checks = _make_checks(spark)
+        checks = _make_checks(spark, threshold_time_hours=24)
 
         with patch.object(checks.logger, "info") as mock_info:
             checks._freshness_check()
@@ -200,7 +200,8 @@ class TestRun:
 
         with patch.object(checks.logger, "info"):
             with patch.object(checks.logger, "warning"):
-                checks.run()
+                with pytest.raises(ValueError, match="Failed contract checks"):
+                    checks.run()
 
         spark.createDataFrame.assert_called_once()
         mock_validate_and_write.assert_called_once()

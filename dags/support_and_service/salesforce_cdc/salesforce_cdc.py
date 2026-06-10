@@ -33,7 +33,8 @@ BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/sst_pipelines/"
 RELATIVE_DAG_PATH = "dags/support_and_service/salesforce_cdc"
 EVENTS_CONFIG = CONFIG_SERVICE.get_config("events_config")
 SALESFORCE_ENDPOINT = CONFIG_SERVICE.get_config("salesforce_endpoint")
-
+THRESHOLD_PARTITION_HOURS = CONFIG_SERVICE.get_config("threshold_partition_hours")
+THRESHOLD_TIME_HOURS = CONFIG_SERVICE.get_config("threshold_time_hours")
 
 # Use config and DAG constants so the DAG works without requiring Airflow Variables
 # (bucket/dag_name/environment). Config is loaded per environment (forno_conf vs prod_conf).
@@ -173,8 +174,13 @@ with DAG(
         for event in pool_events:
             parameters = EVENTS_CONFIG[event]
             event_table = f"events_{event.lower()}"
-            threshold_time_hours = parameters.get("threshold_time_hours", 24)
             parameters["salesforce_endpoint"] = SALESFORCE_ENDPOINT
+            threshold_time_hours = parameters.get(
+                "threshold_time_hours", THRESHOLD_TIME_HOURS
+            )
+            threshold_partition_hours = parameters.get(
+                "threshold_partition_hours", THRESHOLD_PARTITION_HOURS
+            )
 
             raw_task = create_sst_task(
                 target_schema="datalake_salesforce_raw",
@@ -210,6 +216,7 @@ with DAG(
                     entry_point="quality/contracts/generic",
                     parameters={
                         "threshold_time_hours": threshold_time_hours,
+                        "threshold_partition_hours": threshold_partition_hours,
                     },
                     task_id=f"quality_contract_checks_raw_{event_table}",
                 )
@@ -219,6 +226,7 @@ with DAG(
                     entry_point="quality/contracts/generic",
                     parameters={
                         "threshold_time_hours": threshold_time_hours,
+                        "threshold_partition_hours": threshold_partition_hours,
                     },
                     task_id=f"quality_contract_checks_clean_{event_table}",
                 )

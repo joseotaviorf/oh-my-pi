@@ -13,6 +13,8 @@ dag_documentation:
 
 
 datalake_bucket: "5a-datalake-forno"
+threshold_partition_hours: 24
+threshold_time_hours: 48
 events_config:
   case:
     event_path: "raw/salesforce/CaseEvent"

@@ -53,3 +53,29 @@ def build_hour_window(partition_date: str, partition_hour: str) -> tuple[str, st
         base.isoformat().replace("+00:00", "Z"),
         end.isoformat().replace("+00:00", "Z"),
     )
+
+
+def build_partition_time_window(
+    partition_date: str,
+    partition_hour: str,
+    threshold_time_hours: int,
+) -> tuple[datetime, datetime, str, str, str, str]:
+    """
+    Build an hourly partition window ending at ``partition_date`` + ``partition_hour``.
+
+    Returns:
+        ``(window_start, window_end, partition_date_start, partition_hour_start,
+        partition_date_end, partition_hour_end)``
+    """
+    window_end = datetime.strptime(
+        f"{partition_date} {partition_hour.zfill(2)}", "%Y-%m-%d %H"
+    )
+    window_start = window_end - timedelta(hours=threshold_time_hours)
+    return (
+        window_start,
+        window_end,
+        window_start.strftime("%Y-%m-%d"),
+        window_start.strftime("%H"),
+        window_end.strftime("%Y-%m-%d"),
+        window_end.strftime("%H"),
+    )

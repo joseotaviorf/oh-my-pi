@@ -11,6 +11,8 @@ dag_documentation:
     3. Health checks and Metrics in future."
 
 datalake_bucket: "5a-datalake-prod"
+threshold_partition_hours: 24
+threshold_time_hours: 48
 events_config:
   case:
     event_path: "raw/salesforce/CaseEvent"
