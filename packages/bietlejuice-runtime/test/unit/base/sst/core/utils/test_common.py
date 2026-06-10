@@ -11,6 +11,10 @@ _STUB_MODULES = [
 for _mod in _STUB_MODULES:
     sys.modules.setdefault(_mod, mock.MagicMock())
 
+_secondary_catalog_sync_module = sys.modules[
+    "bietlejuice.base.spark.delta_secondary_catalog_sync"
+]
+
 common_module = importlib.import_module("bietlejuice.base.sst.core.utils.common")
 
 
@@ -67,7 +71,13 @@ def _mock_df_writer():
 
 
 class TestValidateAndWriteCatalogSync:
-    @mock.patch.object(common_module, "sync_delta_write_to_secondary_catalog")
+    def test_common_module_lazy_loads_secondary_catalog_sync(self):
+        assert not hasattr(common_module, "sync_delta_write_to_secondary_catalog")
+
+    @mock.patch.object(
+        _secondary_catalog_sync_module,
+        "sync_delta_write_to_secondary_catalog",
+    )
     @mock.patch.object(common_module, "sync_trino_metadata")
     @mock.patch.object(common_module, "_table_exists")
     def test_create_branch_syncs_trino_and_secondary_catalog(
@@ -103,7 +113,10 @@ class TestValidateAndWriteCatalogSync:
             partition_col_names=["partition_date", "partition_hour"],
         )
 
-    @mock.patch.object(common_module, "sync_delta_write_to_secondary_catalog")
+    @mock.patch.object(
+        _secondary_catalog_sync_module,
+        "sync_delta_write_to_secondary_catalog",
+    )
     @mock.patch.object(common_module, "sync_trino_metadata")
     @mock.patch.object(common_module, "_table_exists")
     def test_overwrite_branch_syncs_secondary_catalog(
@@ -141,7 +154,10 @@ class TestValidateAndWriteCatalogSync:
             partition_col_names=["partition_date", "partition_hour"],
         )
 
-    @mock.patch.object(common_module, "sync_delta_write_to_secondary_catalog")
+    @mock.patch.object(
+        _secondary_catalog_sync_module,
+        "sync_delta_write_to_secondary_catalog",
+    )
     @mock.patch.object(common_module, "sync_trino_metadata")
     @mock.patch.object(common_module, "_table_exists")
     def test_skips_secondary_sync_when_disabled(

@@ -17,8 +17,8 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.sst.configs.salesforce import QUERY_ENDPOINT
 from bietlejuice.base.sst.core.api.request import get_request
+from bietlejuice.base.sst.core.utils.collections import get_chunks
 from bietlejuice.base.sst.core.utils.time import build_start_end_date
-from bietlejuice.base.sst.core.utils.transforms import get_chunks
 from bietlejuice.base.sst.domains.salesforce.api.headers import (
     build_authorization_header,
 )

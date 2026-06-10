@@ -13,9 +13,6 @@ from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark.delta_secondary_catalog_sync import (
-    sync_delta_write_to_secondary_catalog,
-)
 from bietlejuice.base.sst.core.metadata.sync_metadata import sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
@@ -390,6 +387,11 @@ def _post_write_catalog_sync(
             f"m=validate_and_write, target_table={target_table}, "
             "msg=table_location is required when sync_secondary_catalog=True"
         )
+
+    # Lazy import: avoids pulling SparkContext into worker-side module loads.
+    from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+        sync_delta_write_to_secondary_catalog,
+    )
 
     glue_table_name = _resolve_glue_table_name(target_table)
     sync_delta_write_to_secondary_catalog(
