@@ -129,7 +129,7 @@ business_unit_region_relations AS (
         DATE(bur.ts_start_coverage) AS dt_start,
         COALESCE(DATE(bur.ts_end_coverage), CURRENT_DATE) AS dt_end
     FROM
-        datalake_hub_services.business_unit_region AS bur
+        datalake_sale_visit_hubs.business_unit_region_history AS bur
     WHERE
         NOT (bur.hub_name LIKE '%[For rent]%' OR bur.hub_name LIKE '%HUB FR%')
 ),

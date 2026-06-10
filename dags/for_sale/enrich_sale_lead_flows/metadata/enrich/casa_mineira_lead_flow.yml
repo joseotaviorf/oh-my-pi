@@ -2,7 +2,7 @@
 database_name: datalake_sale_lead_flows
 table_name: casa_mineira_lead_flow
 description: Enriched table to track the lead from Casa Mineira journey.
-domain: Data ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id_secretariat_client:
@@ -92,6 +92,15 @@ columns:
     lineage:
       - datalake_casa_mineira_crm_clean.client.phone_number
       - datalake_casa_mineira_crm_clean.contact.phone_number
+  further_funnel_step:
+    description: The furthest step the user has reached in the Casa Mineira sale funnel.
+    categories:
+      lead_submission: User has submitted a secretariat contact (lead).
+      sale_agreement_signed: User has signed a sale agreement (CCV).
+      offer_submitted: User has submitted an offer.
+      visit_completed: User has completed a visit.
+      booking_created: User has created a booking.
+      not_mapped: Event not mapped to a funnel step.
   first_city_contact_prospect:
     description: City name which this user first contact.
     lineage:
@@ -124,18 +133,70 @@ columns:
     description: Last booking city name
     lineage:
       - datalake_casa_mineira_crm_clean.city.city_name
+  first_offer_flow:
+    description: Offer flow label for the user's first offer (Casa Mineira context).
+  last_offer_flow:
+    description: Offer flow label for the user's last offer (Casa Mineira context).
+  first_ccv_flow:
+    description: Offer flow label for the user's first signed sale agreement (CCV).
+  last_ccv_flow:
+    description: Offer flow label for the user's last signed sale agreement (CCV).
   first_business_unit_region_intent_lead:
-    description: BU region ID for the lead first contact
+    description: Business unit name for the lead first secretariat contact.
     lineage:
-      - datalake_hub_services.business_unit_region.hub_name
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   last_business_unit_region_intent_lead:
-    description: BU region ID for the lead last contact
+    description: Business unit name for the lead last secretariat contact.
     lineage:
-      - datalake_hub_services.business_unit_region.hub_name
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   first_business_unit_region_new_buyer_prospect:
-    description: BU region ID for the lead first booking
+    description: Business unit name for the lead first booking.
     lineage:
-      - datalake_hub_services.business_unit_region.hub_name
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+  first_offer_business_unit:
+    description: Business unit name where the user's first offer was served.
+    lineage:
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+  last_offer_business_unit:
+    description: Business unit name where the user's last offer was served.
+    lineage:
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+  first_ccv_business_unit:
+    description: Business unit name where the user's first sale agreement was signed.
+    lineage:
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+  last_ccv_business_unit:
+    description: Business unit name where the user's last sale agreement was signed.
+    lineage:
+      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+  has_first_booking:
+    description: Flag indicating whether the user created at least one booking.
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.id
+  has_secretariat_contact_created:
+    description: Flag indicating whether the user has at least one secretariat contact record.
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.id_client
+  total_bookings_created:
+    description: Total number of bookings created by the user in Casa Mineira CRM.
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.id
+  total_bookings_canceled:
+    description: Total number of bookings canceled by the user in Casa Mineira CRM.
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.id
+  total_visits_completed:
+    description: Total number of visits completed by the user in Casa Mineira CRM.
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.ts_visited
+  total_offers_submitted:
+    description: Total number of offers submitted by the user in Casa Mineira CRM.
+    lineage:
+      - datalake_casa_mineira_crm_clean.sale.ts_created
+  total_sale_agreements_signed:
+    description: Total number of sale agreements (CCV) signed by the user in Casa Mineira CRM.
+    lineage:
+      - datalake_casa_mineira_crm_clean.sale.ts_sold
   ts_first_contact_prospect:
     description: Timestamp indicating this user first secretariat contact
     lineage:

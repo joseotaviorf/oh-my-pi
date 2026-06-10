@@ -2,20 +2,24 @@
 database_name: datalake_hub_services
 table_name: business_unit
 description: |
-  Hub Services business units enriched with region linkage and canonical region attributes.
-  Each row represents a business unit in a given business context combined with one associated
-  region (deduplicated by latest business_unit_region update). Use is_last_region_associated
-  to identify the most recent region row per business unit when multiple region associations exist over time.
+  Hub Services business units enriched with historical region linkage and canonical region attributes.
+  Each row represents one business unit–region association period from Hub Services audit data,
+  including region dimension attributes. Use is_last_region_associated to identify the most recent
+  region link per business unit when multiple associations exist over time.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
+  id_business_unit_region:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.id
+    description: Unique identifier of the business unit–region association record.
   id_business_unit:
     lineage:
       - datalake_hub_services_clean.business_unit.id
     description: Unique identifier of the performance hub (business unit).
   id_region:
     lineage:
-      - datalake_hub_services_clean.business_unit_region.id_region
+      - datalake_hub_services_clean.business_unit_region_aud.id_region
     description: Region identifier linked to the business unit for this row.
   hub_name:
     lineage:
@@ -51,6 +55,7 @@ columns:
     description: Negotiation model applied by the hub.
   business_context:
     lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.business_context
       - datalake_hub_services_clean.business_unit.business_context
     description: Commercial line of the hub (e.g. sale or rent).
     categories:
@@ -64,14 +69,18 @@ columns:
     description: |
       True for the single row per business unit id whose region link has the most recent
       business_unit_region update timestamp; false for all other region associations of the same unit.
-  ts_region_association_created:
+  ts_business_unit_region_started:
     lineage:
-      - datalake_hub_services_clean.business_unit_region.ts_created
-    description: Timestamp when the business unit–region association row was created in Hub Services clean.
-  ts_region_association_updated:
+      - datalake_hub_services_clean.business_unit_region_aud.ts_created
+    description: Timestamp when the business unit started covering the region.
+  ts_business_unit_region_ended:
     lineage:
-      - datalake_hub_services_clean.business_unit_region.ts_updated
-    description: Timestamp when the business unit–region association row was last updated in Hub Services clean.
+      - datalake_hub_services_clean.business_unit_region_aud.ts_created
+    description: Timestamp when the business unit stopped covering the region (end revision).
+  ts_business_unit_region_updated:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.ts_updated
+    description: Timestamp when the business unit–region association was last updated.
   ts_business_unit_created:
     lineage:
       - datalake_hub_services_clean.business_unit.ts_created

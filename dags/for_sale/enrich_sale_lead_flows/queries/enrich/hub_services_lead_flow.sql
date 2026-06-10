@@ -142,7 +142,7 @@ leads AS (
       ON l.id_business_unit = bu.id
       AND bu.rw_hub_desc = 1
   LEFT JOIN
-    datalake_hub_services.business_unit_region AS bur
+    datalake_sale_visit_hubs.business_unit_region_history AS bur
       ON h.id_region = bur.id_region
       AND (DATE(l.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
   WHERE

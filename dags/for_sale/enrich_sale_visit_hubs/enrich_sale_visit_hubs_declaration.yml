@@ -9,3 +9,6 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    sale_visit_hubs:
+      - business_unit_region_history

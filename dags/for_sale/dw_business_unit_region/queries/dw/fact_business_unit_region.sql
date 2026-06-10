@@ -8,4 +8,4 @@ SELECT
     DATE(ts_end_coverage) AS dt_coverage_ended,
     NOW() AS ts_load
 FROM
-    datalake_hub_services.business_unit_region
+    datalake_sale_visit_hubs.business_unit_region_history

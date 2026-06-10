@@ -1,37 +1,37 @@
 database_name: dw_sale
 table_name: fact_business_unit_region
 description: Table indicating BUs coverage on each region over the time.
-domain: Data ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 columns:
   sk_region:
     lineage:
-    - datalake_hub_services.business_unit_region.id_region
+    - datalake_sale_visit_hubs.business_unit_region_history.id_region
     description: 5A Region ID that this BU is attending.
   sk_coverage_started_date:
     lineage:
-    - datalake_hub_services.business_unit_region.ts_start_coverage
+    - datalake_sale_visit_hubs.business_unit_region_history.ts_start_coverage
     description: Timestamp indicating when this BU started attending this region.
   sk_coverage_ended_date:
     lineage:
-    - datalake_hub_services.business_unit_region.ts_end_coverage
+    - datalake_sale_visit_hubs.business_unit_region_history.ts_end_coverage
     description: Timestamp indicating when this BU stopped attending this region.
   business_model:
     lineage:
-    - datalake_hub_services.business_unit_region.business_model
+    - datalake_sale_visit_hubs.business_unit_region_history.business_model
     description: BU business model.
   business_unit:
     lineage:
-    - datalake_hub_services.business_unit_region.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
     description: Last BU name. So if this BU had a different name in the past it won't
       be considered.
   dt_coverage_started:
     lineage:
-    - datalake_hub_services.business_unit_region.ts_start_coverage
+    - datalake_sale_visit_hubs.business_unit_region_history.ts_start_coverage
     description: Timestamp indicating when this BU started attending this region.
   dt_coverage_ended:
     lineage:
-    - datalake_hub_services.business_unit_region.ts_end_coverage
+    - datalake_sale_visit_hubs.business_unit_region_history.ts_end_coverage
     description: Timestamp indicating when this BU stopped attending this region.
   ts_load:
     description: Timestamp indicating when this table data was last refreshed.

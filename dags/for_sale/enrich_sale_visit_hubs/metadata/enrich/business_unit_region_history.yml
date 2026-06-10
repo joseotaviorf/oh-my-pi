@@ -1,0 +1,55 @@
+---
+database_name: datalake_sale_visit_hubs
+table_name: business_unit_region_history
+description: |
+  Historical business unit coverage by region, combining Hub Services enrich data with legacy
+  Gsheet records prior to 2022-05. Each row represents one coverage period for a business unit
+  in a region. Gsheet-sourced rows prior to the Hub Services cutoff may lack some attributes.
+domain: For Sale
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_business_unit_region:
+    lineage:
+      - datalake_hub_services.business_unit.id_business_unit_region
+    description: Unique identifier of the business unit–region association (-1 for legacy Gsheet rows).
+  id_business_unit:
+    lineage:
+      - datalake_hub_services.business_unit.id_business_unit
+    description: Business unit identifier (-1 for legacy Gsheet rows without Hub Services ID).
+  id_region:
+    lineage:
+      - datalake_hub_services.business_unit.id_region
+      - datalake_gsheets_clean.business_unit_region.id_region
+    description: QuintoAndar region identifier covered by the business unit.
+  business_context:
+    lineage:
+      - datalake_hub_services.business_unit.business_context
+    description: Commercial line served by the business unit (e.g. sale or rent); null for legacy Gsheet rows.
+  hub_name:
+    lineage:
+      - datalake_hub_services.business_unit.hub_name
+      - datalake_gsheets_clean.business_unit_region.business_unit
+    description: Display name of the business unit (hub).
+  business_model:
+    lineage:
+      - datalake_hub_services.business_unit.sdr_type
+      - datalake_gsheets_clean.business_unit_region.business_model
+    description: Secretariat (SDR) work type or business model of the hub.
+  lead_types:
+    lineage:
+      - datalake_hub_services.business_unit.lead_types
+    description: Lead types the hub serves; null for legacy Gsheet rows.
+  negotiation_type:
+    lineage:
+      - datalake_hub_services.business_unit.negotiation_type
+    description: Negotiation model applied by the hub; null for legacy Gsheet rows.
+  ts_start_coverage:
+    lineage:
+      - datalake_hub_services.business_unit.ts_business_unit_region_started
+      - datalake_gsheets_clean.business_unit_region.dt_start
+    description: Timestamp when the business unit started covering the region.
+  ts_end_coverage:
+    lineage:
+      - datalake_hub_services.business_unit.ts_business_unit_region_ended
+      - datalake_gsheets_clean.business_unit_region.dt_end
+    description: Timestamp when the business unit stopped covering the region.

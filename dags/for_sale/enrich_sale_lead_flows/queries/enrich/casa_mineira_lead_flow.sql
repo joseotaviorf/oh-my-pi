@@ -117,7 +117,7 @@ secretariat_contact AS (
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
     LEFT JOIN
-        datalake_hub_services.business_unit_region AS bur
+        datalake_sale_visit_hubs.business_unit_region_history AS bur
             ON qah.id_region = bur.id_region
             AND (DATE(c.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
 ),
@@ -199,7 +199,7 @@ booking AS (
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
     LEFT JOIN
-        datalake_hub_services.business_unit_region AS bur
+        datalake_sale_visit_hubs.business_unit_region_history AS bur
             ON qah.id_region = bur.id_region
             AND (DATE(v.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
 ),

@@ -43,7 +43,7 @@ booking AS (
         datalake_ebdb_clean.house AS h
             ON h.id = b.id_house
     LEFT JOIN
-        datalake_hub_services.business_unit_region AS bur
+        datalake_sale_visit_hubs.business_unit_region_history AS bur
             ON h.id_region = bur.id_region
             AND (DATE(b.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
     WHERE
@@ -288,7 +288,7 @@ visit_intent AS (
         datalake_ebdb_clean.house AS h
             ON e.id_house = h.id
     LEFT JOIN
-        datalake_hub_services.business_unit_region AS bur
+        datalake_sale_visit_hubs.business_unit_region_history AS bur
             ON h.id_region = bur.id_region
 ),
 

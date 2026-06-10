@@ -28,6 +28,10 @@ workflow:
     agent_hub_alocation:
       extraction_type: incremental
       partitions: [year, month, day]
+    business_unit:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [id_business_unit_region, id_business_unit, id_region]
     member_hub_allocation:
       extraction_type: incremental
       partitions: [year, month, day]
