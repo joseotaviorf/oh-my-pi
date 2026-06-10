@@ -1,0 +1,64 @@
+database_name: datalake_big_agent_clean
+table_name: partner_metric_manual_ingestion_info_aud
+description: |
+  Envers audit records for partner_metric_manual_ingestion_info, with revision
+  metadata, modification markers, and partitions.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.id
+    description: Manual ingestion info record identifier (audited).
+  rev:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.revend
+    description: End revision marker.
+  id_partner_metric:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.partner_metric_id
+    description: FK to the newly created active partner metric (audited value).
+  id_replaced_partner_metric:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.replaced_partner_metric_id
+    description: FK to the superseded partner metric (audited value), if any.
+  author:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.author
+    description: JSONB metadata of the operations actor (audited value).
+  mod_id_partner_metric:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.partner_metric_id_mod
+    description: Modification flag for partner_metric_id.
+  mod_id_replaced_partner_metric:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.replaced_partner_metric_id_mod
+    description: Modification flag for replaced_partner_metric_id.
+  mod_author:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.author_mod
+    description: Modification flag for author.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.created_at
+    description: Creation timestamp of the raw audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_manual_ingestion_info_aud.day
+    description: Partition day.

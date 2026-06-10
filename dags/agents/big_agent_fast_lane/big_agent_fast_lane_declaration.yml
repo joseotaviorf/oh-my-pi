@@ -57,6 +57,8 @@ workflow:
     partner_classification_schedule_aud: {}
     partner_metric: {}
     partner_metric_aud: {}
+    partner_metric_manual_ingestion_info: {}
+    partner_metric_manual_ingestion_info_aud: {}
     partner_tier: {}
     partner_tier_aud: {}
     points_rule: {}
