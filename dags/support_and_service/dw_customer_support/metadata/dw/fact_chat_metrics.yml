@@ -11,6 +11,10 @@ columns:
     lineage:
       - datalake_chatbot.messages.id_sauron_session
     description: Identifier of the chat session in Sauron.
+  sk_support_session:
+    lineage:
+      - datalake_chatbot.messages.id_sss_session
+    description: Support session (SSS) identifier associated with the chat session.
   total_messages:
     lineage:
       - datalake_chatbot.messages.id_message

@@ -1,6 +1,7 @@
 WITH session_metrics AS (
   SELECT 
     cm.id_sauron_session,
+    cm.id_sss_session,
     DATE_DIFF(SECOND, MIN(cm.ts_created), MAX(cm.ts_created)) AS talk_time,
     ROUND(AVG(cm.reply_time), 2) AS avg_reply_time,
     COUNT(DISTINCT cm.id_message) AS messages,
@@ -10,11 +11,12 @@ WITH session_metrics AS (
     datalake_chatbot.messages AS cm
   WHERE 
     cm.role IN ('HUMAN', 'ANALYST', 'AI')
-  GROUP BY 1
+  GROUP BY 1, 2
 ),
 conversations_type_metrics AS (
   SELECT 
     cm.id_sauron_session,
+    cm.id_sss_session,
     cm.conversation_type,
     DATE_DIFF(SECOND, MIN(cm.ts_created), MAX(cm.ts_created)) AS talk_time,
     ROUND(AVG(CASE WHEN cm.role <> 'HUMAN' THEN cm.reply_time END), 2) AS avg_reply_time_message_handler,
@@ -36,34 +38,35 @@ conversations_type_metrics AS (
     datalake_chatbot.messages AS cm
   WHERE 
     cm.role IN ('HUMAN', 'ANALYST', 'AI')
-  GROUP BY 1, 2
+  GROUP BY 1, 2, 3
 )
 SELECT 
   sm.id_sauron_session AS sk_session,
+  sm.id_sss_session AS sk_support_session,
   sm.messages as total_messages,
   sm.talk_time as total_talk_time,
-  ai.talk_time AS total_talk_time_with_ai,
-  ai.messages AS total_messages_with_ai,
-  ai.human_messages AS total_human_messages_with_ai,
-  ai.messages_by_handler AS total_ai_messages,
-  ai.avg_reply_time_message_handler AS avg_reply_time_ai,
-  ai.ai_first_reply_time AS first_reply_time_ai,
-  CASE WHEN ai.id_sauron_session IS NOT NULL AND ai.human_first_reply_time IS NULL THEN True ELSE False END AS is_first_message_idled_with_ai,
-  analyst.talk_time AS total_talk_time_with_analyst,
-  analyst.messages AS total_messages_with_analyst,
-  analyst.messages_by_handler AS total_analyst_messages,
+  COALESCE(ai.talk_time, ai_sss.talk_time) AS total_talk_time_with_ai,
+  COALESCE(ai.messages, ai_sss.messages) AS total_messages_with_ai,
+  COALESCE(ai.human_messages, ai_sss.human_messages) AS total_human_messages_with_ai,
+  COALESCE(ai.messages_by_handler, ai_sss.messages_by_handler) AS total_ai_messages,
+  COALESCE(ai.avg_reply_time_message_handler, ai_sss.avg_reply_time_message_handler) AS avg_reply_time_ai,
+  COALESCE(ai.ai_first_reply_time, ai_sss.ai_first_reply_time) AS first_reply_time_ai,
+  CASE WHEN COALESCE(ai.id_sauron_session, ai_sss.id_sauron_session) IS NOT NULL AND COALESCE(ai.human_first_reply_time, ai_sss.human_first_reply_time) IS NULL THEN True ELSE False END AS is_first_message_idled_with_ai,
+  COALESCE(analyst.talk_time, analyst_sss.talk_time) AS total_talk_time_with_analyst,
+  COALESCE(analyst.messages, analyst_sss.messages) AS total_messages_with_analyst,
+  COALESCE(analyst.messages_by_handler, analyst_sss.messages_by_handler) AS total_analyst_messages,
   analyst.avg_reply_time_message_handler AS avg_reply_time_analyst,
-  analyst.human_messages AS total_human_messages_with_analyst,
-  analyst.analyst_first_reply_time AS first_reply_time_analyst,
-  CASE WHEN analyst.id_sauron_session IS NOT NULL AND analyst.human_first_reply_time IS NULL THEN True ELSE False END AS is_first_message_idled_with_analyst,
-  ai.ts_first_message AS ts_first_message_on_ai_handler,
-  ai.ts_last_message AS ts_last_message_on_ai_handler,
-  ai.ts_human_first_message AS ts_first_message_human_on_ai_handler,
-  ai.ts_first_message_handler AS ts_first_message_sent_by_ai,
-  analyst.ts_first_message AS ts_first_message_on_analyst_handler,
-  analyst.ts_last_message AS ts_last_message_on_analyst_handler,
-  analyst.ts_human_first_message AS ts_first_message_human_on_analyst_handler,
-  analyst.ts_first_message_handler AS ts_first_message_sent_by_analyst,
+  COALESCE(analyst.human_messages, analyst_sss.human_messages) AS total_human_messages_with_analyst,
+  COALESCE(analyst.analyst_first_reply_time, analyst_sss.analyst_first_reply_time) AS first_reply_time_analyst,
+  CASE WHEN COALESCE(analyst.id_sauron_session, analyst_sss.id_sauron_session) IS NOT NULL AND COALESCE(analyst.human_first_reply_time, analyst_sss.human_first_reply_time) IS NULL THEN True ELSE False END AS is_first_message_idled_with_analyst,
+  COALESCE(ai.ts_first_message, ai_sss.ts_first_message) AS ts_first_message_on_ai_handler,
+  COALESCE(ai.ts_last_message, ai_sss.ts_last_message) AS ts_last_message_on_ai_handler,
+  COALESCE(ai.ts_human_first_message, ai_sss.ts_human_first_message) AS ts_first_message_human_on_ai_handler,
+  COALESCE(ai.ts_first_message_handler, ai_sss.ts_first_message_handler) AS ts_first_message_sent_by_ai,
+  COALESCE(analyst.ts_first_message, analyst_sss.ts_first_message) AS ts_first_message_on_analyst_handler,
+  COALESCE(analyst.ts_last_message, analyst_sss.ts_last_message) AS ts_last_message_on_analyst_handler,
+  COALESCE(analyst.ts_human_first_message, analyst_sss.ts_human_first_message) AS ts_first_message_human_on_analyst_handler,
+  COALESCE(analyst.ts_first_message_handler, analyst_sss.ts_first_message_handler) AS ts_first_message_sent_by_analyst,
   COALESCE(ai.ts_human_first_message, analyst.ts_human_first_message) AS ts_first_message_session_human,
   sm.ts_first_message AS ts_first_message_session,
   sm.ts_last_message AS ts_last_message_session
@@ -73,7 +76,15 @@ LEFT JOIN
   conversations_type_metrics AS ai
     ON sm.id_sauron_session = ai.id_sauron_session
       AND ai.conversation_type = 'HUMAN-AI'
+  LEFT JOIN
+    conversations_type_metrics AS ai_sss
+      ON sm.id_sss_session = ai_sss.id_sss_session
+        AND ai_sss.conversation_type = 'HUMAN-AI'
 LEFT JOIN 
   conversations_type_metrics AS analyst
     ON sm.id_sauron_session = analyst.id_sauron_session
       AND analyst.conversation_type = 'HUMAN-HUMAN'
+LEFT JOIN 
+  conversations_type_metrics AS analyst_sss
+    ON sm.id_sss_session = analyst_sss.id_sss_session
+      AND analyst_sss.conversation_type = 'HUMAN-HUMAN'

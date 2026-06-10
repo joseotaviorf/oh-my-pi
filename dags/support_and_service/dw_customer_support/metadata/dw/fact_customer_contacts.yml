@@ -29,6 +29,12 @@ columns:
       - datalake_customer_support.calls.id_session
       - datalake_customer_support.chats.id_session
     description: Session identifier associated with the contact.
+  sk_support_session:
+    lineage:
+      - datalake_customer_support.calls.id_sss_session
+      - datalake_customer_support.chats.id_sss_session
+      - datalake_customer_support.tickets.sk_support_session
+    description: Support session (SSS) identifier associated with the contact, defaulting to '-1' when absent.
   sk_task:
     lineage:
       - datalake_customer_support.calls.id_task

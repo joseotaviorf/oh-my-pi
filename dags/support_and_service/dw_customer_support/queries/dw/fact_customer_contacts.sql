@@ -40,6 +40,7 @@ twilio_demand AS (
     id_session,
     id_call,
     id_task,
+    id_sss_session,
     id_reservation,
     id_user,
     queue_name,
@@ -89,6 +90,7 @@ twilio_demand AS (
     id_session,
     NULL AS id_call,
     id_task,
+    id_sss_session,
     NULL AS id_reservation,
     id_user,
     queue_name,
@@ -146,9 +148,10 @@ twilio_contacts AS (
     MD5(d.worker_email) AS sk_analyst,
     d.id_session AS sk_session,
     d.id_task AS sk_task,
+    d.id_sss_session AS sk_support_session,
     d.id_call AS sk_call,
     d.id_reservation AS sk_reservation,
-    MAX(CAST(COALESCE(t1.id_ticket, t2.id_ticket, t3.id_ticket) AS BIGINT)) OVER (PARTITION BY d.id_task) AS sk_ticket,
+    MAX(CAST(COALESCE(t1.id_ticket, t2.id_ticket, t_cast.id_ticket, t_hash.id_ticket, t_sss.id_ticket) AS BIGINT)) OVER (PARTITION BY d.id_task) AS sk_ticket,
     CAST(d.id_user AS BIGINT) AS sk_user,
     d.worker_email,
     d.queue_name,
@@ -197,9 +200,19 @@ twilio_contacts AS (
       AND STARTSWITH(t2.id_twilio, "WT")
       AND d.channel = 'call'
   LEFT JOIN
-    datalake_customer_support.tickets AS t3
-      ON t3.id_session = d.id_session
-      AND t3.id_user_main = d.id_user
+    datalake_customer_support.tickets AS t_cast
+      ON t_cast.id_session = CAST(d.id_session AS BIGINT)
+      AND t_cast.id_user_main = d.id_user
+      AND d.channel = 'chat'
+  LEFT JOIN
+    datalake_customer_support.tickets AS t_hash
+      ON t_hash.id_session = d.id_session
+      AND t_hash.id_user_main = d.id_user
+      AND d.channel = 'chat'
+  LEFT JOIN
+    datalake_customer_support.tickets AS t_sss
+      ON t_sss.id_sss_session = d.id_sss_session
+      AND t_sss.id_user_main = d.id_user
       AND d.channel = 'chat'
   LEFT JOIN
     chat_reservation_timestamp AS crt
@@ -212,6 +225,7 @@ front_contacts AS (
     sk_interaction,
     sk_session,
     sk_task,
+    COALESCE(sk_support_session, '-1') AS sk_support_session,
     sk_call,
     sk_reservation,
     COALESCE(sk_ticket, -1) AS sk_ticket,
@@ -272,6 +286,7 @@ front_contacts AS (
     MD5(CONCAT(t.id_ticket, 'email')) AS sk_interaction,
     NULL AS sk_session,
     NULL AS sk_task,
+    COALESCE(t.sk_support_session, '-1') AS sk_support_session,
     NULL AS sk_call,
     NULL AS sk_reservation,
     CAST(t.id_ticket AS BIGINT) AS sk_ticket,
@@ -329,6 +344,7 @@ SELECT DISTINCT
   sk_contact,
   sk_interaction,
   sk_session,
+  sk_support_session,
   sk_task,
   sk_call,
   sk_reservation,

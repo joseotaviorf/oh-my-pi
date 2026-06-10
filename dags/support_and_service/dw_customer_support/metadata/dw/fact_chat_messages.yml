@@ -8,47 +8,59 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.id_channel
       - datalake_internal_chat_clean.internal_chat_messages.id_channel
+      - datalake_customer_support.chats.id_channel
     description: Twilio channel identifier.
   sk_session:
     lineage:
       - datalake_quinto_messenger_clean.channel.id_session
       - datalake_quinto_messenger_clean.chat.id_session
-      - datalake_sauron_clean.session.id
       - datalake_chatbot.messages.id_sauron_session
-    description: Session identifier.
+    description: Sauron session identifier.
+  sk_support_session:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.id_session
+      - datalake_chatbot.messages.id_sss_session
+    description: Support Session Service (SSS) session identifier; populated only for SSS-originated sessions after the engineering migration.
   sk_task:
     lineage:
       - datalake_customer_support.chats.id_task
     description: Twilio task identifier.
   sk_message:
     lineage:
-      - datalake_quinto_messenger_clean.channel_event.event_payload
+      - datalake_quinto_messenger_clean.channel_event.id
       - datalake_internal_chat_clean.internal_chat_messages.id_message
+      - datalake_chatbot.messages.id_message
     description: Message identifier.
   sk_user_sender:
     lineage:
       - datalake_ebdb_user.user.id
       - datalake_quinto_messenger_clean.channel_event.from_phone_number
       - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+      - datalake_sauron_clean.session.user_data
+      - datalake_support_session_service_clean.support_session.user_data
       - datalake_chatbot.messages.id_user
       - datalake_customer_support.chats.id_user
     description: Identifier of the user who sent the message.
   origin:
     lineage:
+      - datalake_sauron_clean.session.source
+      - datalake_support_session_service_clean.support_session.source
       - datalake_customer_support.chats.origin
     description: The source of the message, either 'in_app' or 'whatsapp'.
   message:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.message_body
       - datalake_internal_chat_clean.internal_chat_messages.message
+      - datalake_chatbot.messages.message
     description: Content of the message.
   message_index:
     lineage: 
       - datalake_quinto_messenger_clean.chat.id_session
       - datalake_quinto_messenger_clean.channel.id_session
+      - datalake_chatbot.messages.id_sauron_session
       - datalake_quinto_messenger_clean.channel_event.ts_created
       - datalake_internal_chat_clean.internal_chat_messages.ts_created
-      - datalake_chatbot.messages.message_index
+      - datalake_chatbot.messages.ts_created
     description: Message index.
   reply_time:
     lineage:
