@@ -8,7 +8,7 @@ columns:
   sk_booking:
     lineage:
     - datalake_sale_visit.sale_visit.id_booking
-    description: ID of the booking.
+    description: Surrogate key of the For Sale visit booking in the transactional visit system. Joinable with dw_public.dim_booking.
   sk_sale_flow:
     lineage:
     - datalake_sale_visit.sale_visit.id_sale_flow
@@ -16,7 +16,7 @@ columns:
   sk_house:
     lineage:
     - datalake_sale_visit.sale_visit.id_house
-    description: ID of the house.
+    description: Surrogate key of the property associated with the booking. Joinable with dw_house.dim_house for listing attributes.
   sk_region:
     lineage:
     - datalake_sale_visit.sale_visit.id_region
@@ -92,11 +92,11 @@ columns:
   sk_visit:
     lineage:
     - datalake_sale_visit.sale_visit.id_visit
-    description: ID of the visit.
+    description: Surrogate key of the underlying visit entity in the visit platform, when a visit record exists for the booking.
   sk_visit_code:
     lineage:
     - datalake_sale_visit.sale_visit.visit_code
-    description: Code of the visit.
+    description: Human-readable visit code assigned by the booking platform to identify the scheduled visit in operational tools.
   sk_offer:
     lineage:
     - datalake_sale_offer.sale_offer.id_offer
@@ -151,6 +151,14 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.hub_agent_region
     description: Name of the contract of the agent associated with the booking, if the contract is from a hub.
+  partner_3p_demand:
+    lineage:
+    - datalake_sale_visit.sale_visit.partner_3p_demand
+    description: Name of the 3P demand partner associated with the booking.
+  partner_3p_supply:
+    lineage:
+    - datalake_sale_visit.sale_visit.partner_3p_supply
+    description: Name of the 3P supply partner associated with the booking.
   is_hub_flow:
     lineage:
     - datalake_sale_visit.sale_visit.is_hub_flow
@@ -183,11 +191,11 @@ columns:
   days_visit_cancelled_to_visit:
     lineage:
     - datalake_sale_visit.sale_visit.days_visit_cancelled_to_visit
-    description: Days between the visit cancelled and the visit.
+    description: Elapsed calendar days between the originally scheduled visit date and the cancellation timestamp when the booking is canceled after scheduling.
   days_visit_booked_to_visit:
     lineage:
     - datalake_sale_visit.sale_visit.days_visit_booked_to_visit
-    description: Days between the visit booked and the visit.
+    description: Elapsed calendar days between booking creation and the scheduled visit date, measuring lead time from reservation to appointment.
   days_visit_booked_to_visit_cancelled:
     lineage:
     - datalake_sale_visit.sale_visit.days_visit_booked_to_visit_cancelled
@@ -227,7 +235,7 @@ columns:
   ts_visit_checkin:
     lineage:
     - datalake_sale_visit.sale_visit.ts_visit_checkin
-    description: Visit checkin timestamp
+    description: Timestamp when the buyer or agent checked in at the property for the scheduled For Sale visit, when check-in was recorded.
   ts_buyer_review_rating:
     lineage:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating

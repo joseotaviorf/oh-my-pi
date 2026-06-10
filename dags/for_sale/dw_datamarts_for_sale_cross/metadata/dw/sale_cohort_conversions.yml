@@ -35,15 +35,15 @@ columns:
     lineage:
       - dw_datamarts.lead_listing_flows.lead_context_origin
   mkt_origin:
-    description: Marketing origin source
+    description: Top-level acquisition taxonomy label from the demand marketing taxonomy Google Sheet (e.g., Owner PWA, B2B, CIQ).
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
   mkt_channel:
-    description: Marketing channel
+    description: Channel classification from the demand marketing taxonomy (e.g., Paid, Organic, CRM/Notification) describing how the lead was acquired.
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_channel
   mkt_medium:
-    description: Marketing medium
+    description: Medium classification from the demand marketing taxonomy describing the paid media or touchpoint strategy behind the lead.
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_medium
   mkt_type:
@@ -95,13 +95,13 @@ columns:
     lineage:
       - dw_brokers.dim_broker.broker_name
       - dw_rent.dim_house_listing.partner_3p_supply
-      - dw_public.dim_booking.partner_3p_supply
+      - dw_sale.fact_visits.partner_3p_supply
       - dw_sale.dim_offer.partner_3p_supply
   demand_3p_partner:
     description: 3P partner name for demand side
     lineage:
       - dw_brokers.dim_broker.broker_name
-      - dw_public.dim_booking.partner_3p_demand
+      - dw_sale.fact_visits.partner_3p_demand
       - dw_sale.dim_offer.partner_3p_demand
   is_3pbh_supply:
     description: Flag indicating if supply is 3P BH partner (1 = yes, 0 = no)
@@ -111,12 +111,12 @@ columns:
     description: Flag indicating if supply is 3P partner (1 = yes, 0 = no)
     lineage:
       - dw_rent.dim_house_listing.is_3p_supply
-      - dw_public.dim_booking.is_3p_supply
+      - dw_sale.fact_visits.is_3p_supply
       - dw_sale.dim_offer.is_3p_supply
   is_3p_demand:
     description: Flag indicating if demand is 3P partner (1 = yes, 0 = no)
     lineage:
-      - dw_public.dim_booking.is_3p_demand
+      - dw_sale.fact_visits.is_3p_demand
       - dw_sale.dim_offer.is_3p_demand
   p2fc:
     description: Prospect to First Contact conversion count

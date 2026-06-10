@@ -44,6 +44,8 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(ts_buyer_review_rating, 'yyyyMMdd')), -1) AS sk_buyer_review_rating_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_checkin, 'yyyyMMdd')), -1) AS sk_visit_checkin_date,
     hub_agent_region,
+    partner_3p_demand,
+    partner_3p_supply,
     is_hub_flow,
     is_house_rented,
     is_virtual_visit,

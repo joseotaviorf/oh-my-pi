@@ -135,10 +135,10 @@ SELECT
     fv.is_hub_flow,
 	hs.hub_name AS hub_visit,
     dr.city_group,
-	COALESCE(db.is_3p_demand, FALSE) AS is_3p_demand,
-	COALESCE(db.partner_3p_demand, '') AS demand_3p_partner,
-	COALESCE(db.is_3p_supply, FALSE) AS is_3p_supply,
-	COALESCE(db.partner_3p_supply, '') AS supply_3p_partner,
+	COALESCE(fv.is_3p_demand, FALSE) AS is_3p_demand,
+	COALESCE(fv.partner_3p_demand, '') AS demand_3p_partner,
+	COALESCE(fv.is_3p_supply, FALSE) AS is_3p_supply,
+	COALESCE(fv.partner_3p_supply, '') AS supply_3p_partner,
     DATE(NULLIF(CONCAT(SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 1, 4), '-', SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 5, 2), '-', SUBSTRING(CAST(fv.sk_booking_created_date AS VARCHAR(8)), 7, 2)), -1)) AS dt_created,
     DATE(NULLIF(CONCAT(SUBSTRING(CAST(fv.sk_visit_completed_date AS VARCHAR(8)), 1, 4), '-', SUBSTRING(CAST(fv.sk_visit_completed_date AS VARCHAR(8)), 5, 2), '-', SUBSTRING(CAST(fv.sk_visit_completed_date AS VARCHAR(8)), 7, 2)), -1)) AS dt_completed,
     ROW_NUMBER() OVER (PARTITION BY fv.sk_booking ORDER BY COALESCE(hs.ts_updated,current_date) DESC ) AS order_booking
@@ -146,8 +146,6 @@ FROM
     dw_sale.fact_visits fv
 JOIN dw_public.dim_region dr
     ON fv.sk_region = dr.sk_region
-JOIN dw_public.dim_booking AS db
-    ON db.sk_booking = fv.sk_booking
 LEFT JOIN
 	datalake_hub_services_clean.business_unit AS hs
 		ON hs.id = fv.sk_business_unit

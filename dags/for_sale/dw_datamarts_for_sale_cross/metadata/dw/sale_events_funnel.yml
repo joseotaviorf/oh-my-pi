@@ -12,7 +12,7 @@ columns:
   date:
     lineage:
       - dw_public.dim_date.date
-    description: Date of the event.
+    description: Calendar reference date used to aggregate supply and demand funnel metrics at daily grain in this table.
   month:
     lineage:
       - dw_public.dim_date.month
@@ -20,7 +20,7 @@ columns:
   quarter:
     lineage:
       - dw_public.dim_date.quarter
-    description: Quarter of the event.
+    description: Calendar quarter derived from the reference date, used to roll up funnel volumes for quarterly performance reporting.
   city_group:
     lineage:
       - dw_public.dim_region.city_group
@@ -92,13 +92,13 @@ columns:
     lineage:
       - dw_brokers.dim_broker.broker_name
       - dw_rent.dim_house_listing.partner_3p_supply
-      - dw_public.dim_booking.partner_3p_supply
+      - dw_sale.fact_visits.partner_3p_supply
       - dw_sale.dim_offer.partner_3p_supply
     description: Name of the 3P supply partner.
   demand_3p_partner:
     lineage:
       - dw_brokers.dim_broker.broker_name
-      - dw_public.dim_booking.partner_3p_demand
+      - dw_sale.fact_visits.partner_3p_demand
       - dw_sale.dim_offer.partner_3p_demand
     description: Name of the 3P demand partner.
   supply_3pbh_partner:
@@ -108,12 +108,12 @@ columns:
   is_3p_supply:
     lineage:
       - dw_rent.dim_house_listing.is_3p_supply
-      - dw_public.dim_booking.is_3p_supply
+      - dw_sale.fact_visits.is_3p_supply
       - dw_sale.dim_offer.is_3p_supply
     description: Flag indicating if the transaction has a 3P supply partner.
   is_3p_demand:
     lineage:
-      - dw_public.dim_booking.is_3p_demand
+      - dw_sale.fact_visits.is_3p_demand
       - dw_sale.dim_offer.is_3p_demand
     description: Flag indicating if the transaction has a 3P demand partner.
   is_3pbh_supply:
@@ -123,7 +123,7 @@ columns:
   leads:
     description: Count of leads generated.
   prospects:
-    description: Count of prospects.
+    description: Count of distinct buyer prospects registered on the reference date at the prospect stage of the For Sale funnel.
   first_contacts:
     description: Count of first contacts made.
   qualifieds:
@@ -139,7 +139,7 @@ columns:
   tta_completed:
     description: Count of Talk to Agent conversations completed.
   visits_booked:
-    description: Count of visits booked.
+    description: Count of For Sale property visit bookings created on the reference date, regardless of later completion or cancellation.
   visits_completed:
     description: Count of visits completed.
   offer_submitted:

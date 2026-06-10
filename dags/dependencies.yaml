@@ -564,7 +564,6 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.kodak:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.kodak:load-clean-video:first-run-of-day
 bietlejuice.dw_datamarts_for_sale_cross:
-  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_brokers:load-dw-brokers-dim-broker:first-run-of-day
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region:first-run-of-day
   - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters:first-run-of-day
