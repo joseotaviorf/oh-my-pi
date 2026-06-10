@@ -1,0 +1,32 @@
+---
+table_name: datalake_pin_performance_clean.check_in_meeting
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  id_check_in_meeting:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_worker_person:
+    is_complete:
+      severity_level: Error
+  id_manager_person:
+    is_complete:
+      severity_level: Warning
+  id_check_in_template:
+    is_complete:
+      severity_level: Error
+  dt_check_in:
+    is_complete:
+      severity_level: Error

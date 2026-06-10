@@ -1,0 +1,29 @@
+---
+table_name: datalake_pin_talent_clean.note
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  id_note:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_object:
+    is_complete:
+      severity_level: Error
+  id_author_person:
+    is_complete:
+      severity_level: Warning
+  object_type:
+    is_complete:
+      severity_level: Warning

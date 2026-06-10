@@ -1,0 +1,25 @@
+SELECT
+    check_in_meeting_id AS id_check_in_meeting,
+    business_group_id AS id_business_group,
+    manager_person_id AS id_manager_person,
+    worker_person_id AS id_worker_person,
+    worker_assignment_id AS id_worker_assignment,
+    created_by_person_id AS id_created_by_person,
+    check_in_template_id AS id_check_in_template,
+    review_period_id AS id_review_period,
+    document_name,
+    template_type_code,
+    CAST(object_version_number AS INT) AS object_version_number,
+    created_by,
+    last_updated_by AS updated_by,
+    worker_qstnr_discussed_flag = 'Y' AS is_worker_questionnaire_discussed,
+    manager_qstnr_discussed_flag = 'Y' AS is_manager_questionnaire_discussed,
+    CAST(check_in_date AS DATE) AS dt_check_in,
+    CAST(creation_date AS TIMESTAMP) AS ts_created,
+    CAST(last_update_date AS TIMESTAMP) AS ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_pin_performance_raw.hra_check_in_meetings

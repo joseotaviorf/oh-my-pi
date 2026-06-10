@@ -1,0 +1,102 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: check_in_meeting
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Stores one row per Check-In meeting created in Oracle HCM (HRA_CHECK_IN_MEETINGS). A check-in meeting represents a continuous management interaction (one-on-one, mid-year checkpoint, or PDI) between a manager and a worker within a specific review period.
+columns:
+  id_check_in_meeting:
+    description: Primary key. Unique identifier of the check-in meeting in Oracle HCM.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.check_in_meeting_id
+  id_business_group:
+    description: Foreign key referencing the business group. Always 1 for QuintoAndar.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.business_group_id
+  id_manager_person:
+    description: Oracle HCM internal person ID of the manager who conducted the check-in meeting. Join with datalake_pin_core_clean.all_people to resolve person_number.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.manager_person_id
+  id_worker_person:
+    description: Oracle HCM internal person ID of the worker (employee) who participated in the check-in meeting. Join with datalake_pin_core_clean.all_people to resolve person_number.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.worker_person_id
+  id_worker_assignment:
+    description: Foreign key referencing the worker's active assignment at the time of the check-in meeting.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.worker_assignment_id
+  id_created_by_person:
+    description: Oracle HCM internal person ID of the person who created this check-in meeting record.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.created_by_person_id
+  id_check_in_template:
+    description: |-
+      Foreign key referencing the check-in document template. Determines the document type (one_on_one, mid_year_checkpoint, pdi). Known template IDs at QuintoAndar — 300000008306049 = one_on_one, 300000008306046 = mid_year_checkpoint, 300000116219293 = mid_year_checkpoint, 300000087654297 = pdi.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.check_in_template_id
+  id_review_period:
+    description: Foreign key referencing the review period this check-in belongs to. Join with datalake_pin_talent_clean.review_period_translation to resolve the period name.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.review_period_id
+  document_name:
+    description: Free-text name given to this check-in document by the creator, for example '1:1 10/01/2024' or 'Mid-Year Checkpoint 16/07/2025'.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.document_name
+  template_type_code:
+    description: Oracle HCM code identifying the template type. At QuintoAndar, always ORA_PERFORMANCE for continuous management documents.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.template_type_code
+    categories:
+      ORA_PERFORMANCE: Standard Oracle HCM performance template type used for all continuous management documents at QuintoAndar.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to the record.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.object_version_number
+  created_by:
+    description: Email of the Oracle HCM user who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.created_by
+  updated_by:
+    description: Email of the Oracle HCM user who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.last_updated_by
+  is_worker_questionnaire_discussed:
+    description: True when the worker's questionnaire was discussed during the meeting (WORKER_QSTNR_DISCUSSED_FLAG = Y in Oracle HCM).
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.worker_qstnr_discussed_flag
+    categories:
+      'true': Worker questionnaire was discussed in the meeting.
+      'false': Worker questionnaire was not discussed.
+  is_manager_questionnaire_discussed:
+    description: True when the manager's questionnaire was discussed during the meeting (MANAGER_QSTNR_DISCUSSED_FLAG = Y in Oracle HCM).
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.manager_qstnr_discussed_flag
+    categories:
+      'true': Manager questionnaire was discussed in the meeting.
+      'false': Manager questionnaire was not discussed.
+  dt_check_in:
+    description: Date on which the check-in meeting took place, sourced from CHECK_IN_DATE in Oracle HCM.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.check_in_date
+  ts_created:
+    description: Timestamp when this record was created in Oracle HCM.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.creation_date
+  ts_updated:
+    description: Timestamp of the last update to this record in Oracle HCM.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.last_update_date
+  ts_load:
+    description: Timestamp when this record was loaded into the clean table by the Spark job. Produced using NOW() and changes on reprocessing.
+  year:
+    description: Year partition derived from last_update_date, used for partition pruning.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.year
+  month:
+    description: Month partition derived from last_update_date, used for partition pruning.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.month
+  day:
+    description: Day partition derived from last_update_date, used for partition pruning.
+    lineage:
+      - datalake_pin_performance_raw.hra_check_in_meetings.day

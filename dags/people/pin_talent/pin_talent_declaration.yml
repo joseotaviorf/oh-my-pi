@@ -31,6 +31,13 @@ workflow:
     people-team:
       - ALL PRIVILEGES
   tables_customization:
+    hrt_notes:
+      clean_table_name: note
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_talent
+          date_column_to_partition: last_update_date
     hrt_content_items_tl:
       clean_table_name: content_item_translation
       vacuum_retention_hours: 168
