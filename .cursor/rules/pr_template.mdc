@@ -43,3 +43,5 @@ description: Follow this template for PR descriptions. Use when writing or editi
 - [ ] My code follows the style guidelines and [name conventions](https://docs.google.com/document/d/1mPPA716eoT3EZSqY0gA8a9ao4ObMyI9Y8QNd7CzlWWY) for DAGs, databases, columns, etc.
 - [ ] I have made corresponding changes to the documentation;
 - [ ] I have added tests that prove my fix is effective or that my feature works.
+- [ ] This PR removes or deprecates a table/pipeline _(check if applicable)_
+  - [ ] The removal is related to a Core Model implementation or migration
