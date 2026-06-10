@@ -57,6 +57,7 @@ dags_not_using_builder:
   - tech_platform/dw_devlake/validation/test_with_fixtures.py
   - tech_platform/dw_devlake/validation/validate_structure.py
   - platform/notify_stale_dags/notify_stale_dags.py
+  - platform/notify_airbyte_key_rotation/notify_airbyte_key_rotation.py
   - governance/notify_dag_rotation/notify_dag_rotation.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
 
