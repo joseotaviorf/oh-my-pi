@@ -62,20 +62,116 @@ sss_chats AS (
   WHERE
     c.source = 'support_session'
 ),
+-- a channel maps to many chat sessions over time; pick the one whose active
+-- window contains the message timestamp so each id_message resolves to a single
+-- session and the downstream MERGE on id_message never sees duplicate keys
+whatsapp_channel_session AS (
+  SELECT
+    id_message,
+    id_session
+  FROM (
+    SELECT
+      ce.id AS id_message,
+      c.id_session,
+      ROW_NUMBER() OVER (
+        PARTITION BY ce.id
+        ORDER BY
+          CASE
+            WHEN ce.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
+            ELSE 1
+          END,
+          c.ts_created DESC
+      ) AS session_rank
+    FROM
+      datalake_quinto_messenger_clean.channel_event AS ce
+    INNER JOIN
+      datalake_quinto_messenger_clean.channel AS c
+        ON c.id_channel = ce.id_channel
+    WHERE
+      MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
+  ) AS ranked_channel
+  WHERE
+    session_rank = 1
+),
+whatsapp_sauron_session AS (
+  SELECT
+    id_message,
+    id_sauron_session,
+    id_sauron_session_hash
+  FROM (
+    SELECT
+      ce.id AS id_message,
+      COALESCE(TRY_CAST(c.id_session AS BIGINT), srn.id) AS id_sauron_session,
+      CASE
+        WHEN TRY_CAST(c.id_session AS BIGINT) IS NULL THEN c.id_session
+      END AS id_sauron_session_hash,
+      ROW_NUMBER() OVER (
+        PARTITION BY ce.id
+        ORDER BY
+          CASE
+            WHEN ce.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
+            ELSE 1
+          END,
+          c.ts_created DESC
+      ) AS session_rank
+    FROM
+      datalake_quinto_messenger_clean.channel_event AS ce
+    INNER JOIN
+      datalake_quinto_messenger_clean.chat AS c
+        ON c.id_channel = ce.id_channel
+        AND c.source = 'sauron'
+    LEFT JOIN
+      datalake_sauron_clean.session AS srn
+        ON srn.public_id = c.id_session
+    WHERE
+      MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
+  ) AS ranked_sauron_chat
+  WHERE
+    session_rank = 1
+),
+whatsapp_sss_session AS (
+  SELECT
+    id_message,
+    id_sss_session
+  FROM (
+    SELECT
+      ce.id AS id_message,
+      c.id_session AS id_sss_session,
+      ROW_NUMBER() OVER (
+        PARTITION BY ce.id
+        ORDER BY
+          CASE
+            WHEN ce.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
+            ELSE 1
+          END,
+          c.ts_created DESC
+      ) AS session_rank
+    FROM
+      datalake_quinto_messenger_clean.channel_event AS ce
+    INNER JOIN
+      datalake_quinto_messenger_clean.chat AS c
+        ON c.id_channel = ce.id_channel
+        AND c.source = 'support_session'
+    WHERE
+      MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
+  ) AS ranked_sss_chat
+  WHERE
+    session_rank = 1
+),
 whatsapp_messages AS (
   SELECT DISTINCT
     ce.id_channel,
     ce.id AS id_message,
-    COALESCE(schat.id_sauron_session, TRY_CAST(c.id_session AS BIGINT)) AS id_sauron_session,
-    COALESCE(sschat.id_sss_session, schat.id_sauron_session_hash) AS id_sss_session,
+    COALESCE(wss.id_sauron_session, TRY_CAST(wcs.id_session AS BIGINT)) AS id_sauron_session,
+    COALESCE(wsss.id_sss_session, wss.id_sauron_session_hash) AS id_sss_session,
     REPLACE(REPLACE(REPLACE(ce.from_phone_number, 'whatsapp:', ''), '_2E', '.'), '_40', '@') AS user_sender,
     ce.message_body AS message,
     ce.ts_created,
     CASE
-        WHEN from_phone_number = 'system' THEN 'SYSTEM'
-        WHEN from_phone_number LIKE '%whatsapp%' THEN 'HUMAN'
-        WHEN REPLACE(REPLACE(from_phone_number,'_2E', '.'), '_40', '@')  LIKE '%@%' THEN 'ANALYST'
-        WHEN from_phone_number LIKE '%@%' THEN 'ANALYST'
+        WHEN ce.from_phone_number = 'system' THEN 'SYSTEM'
+        WHEN ce.from_phone_number LIKE '%whatsapp%' THEN 'HUMAN'
+        WHEN REPLACE(REPLACE(ce.from_phone_number,'_2E', '.'), '_40', '@')  LIKE '%@%' THEN 'ANALYST'
+        WHEN ce.from_phone_number LIKE '%@%' THEN 'ANALYST'
         ELSE NULL
       END AS role
   FROM
@@ -83,14 +179,14 @@ whatsapp_messages AS (
   LEFT JOIN
     -- legacy source kept as fallback: some channels never receive a chat row,
     -- so chat-derived keys take precedence and channel.id_session fills gaps
-    datalake_quinto_messenger_clean.channel AS c
-      ON c.id_channel = ce.id_channel
+    whatsapp_channel_session AS wcs
+      ON wcs.id_message = ce.id
   LEFT JOIN
-    sauron_chats AS schat
-      ON schat.id_channel = ce.id_channel
+    whatsapp_sauron_session AS wss
+      ON wss.id_message = ce.id
   LEFT JOIN
-    sss_chats AS sschat
-      ON sschat.id_channel = ce.id_channel
+    whatsapp_sss_session AS wsss
+      ON wsss.id_message = ce.id
   WHERE
     MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
 ),
