@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: house_enrichment_aud
-owner: gustavo.miller@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
 description: Audit table for HouseEnrichment. One row per change event (PK id + rev).
   Tracks all historical revisions of house enrichment requests processed by the Vespúcio
@@ -75,3 +75,21 @@ columns:
       - datalake_ebdb_raw.houseenrichment_aud.updated_at
     description: Timestamp when the enrichment record was last updated in the source
       system.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.houseenrichment_aud.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.houseenrichment_aud.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.houseenrichment_aud.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: house_enrichment
-owner: gustavo.miller@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
 description: The enrichment service is responsible for enriching house information,
   especially amenities, using Vespúcio as source. These are the houses that were or
@@ -49,3 +49,21 @@ columns:
       - datalake_ebdb_raw.houseenrichment.updated_at
     description: Timestamp when the enrichment request was last updated in the source
       system.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.houseenrichment.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.houseenrichment.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.houseenrichment.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.
