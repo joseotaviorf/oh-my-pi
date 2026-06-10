@@ -54,7 +54,7 @@ workflow:
           - ALL PRIVILEGES
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
-    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     environment:     "{{ var.value.environment }}"
 cluster:
   type: consolidation_s_memory_single_node_cluster
