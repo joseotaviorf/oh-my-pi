@@ -5,6 +5,7 @@ SELECT
   ticket_id AS id_ticket,
   attachments,
   body,
+  html_body,
   plain_body,
   event_type,
   type,

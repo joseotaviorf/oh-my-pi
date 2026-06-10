@@ -1,51 +1,74 @@
 database_name: datalake_zendesk_clean
 table_name: ticket_comments
+description: Zendesk ticket comments with one row per comment or reply on a support ticket, extracted daily from Airbyte raw.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
+    description: Unique Zendesk identifier for this ticket comment record.
     lineage:
-      - datalake_zendesk_raw.ticket_comments.assignee_id
+      - datalake_zendesk_raw.ticket_comments.id
   id_audit:
+    description: Zendesk audit event identifier linked to the comment creation event.
     lineage:
-      - datalake_zendesk_raw.ticket_comments.brand_id
+      - datalake_zendesk_raw.ticket_comments.audit_id
   id_author:
+    description: Zendesk user ID of the agent or requester who wrote the comment.
     lineage:
-      - datalake_zendesk_raw.ticket_comments.ids_collaborator
+      - datalake_zendesk_raw.ticket_comments.author_id
   id_ticket:
+    description: Zendesk ticket ID that this comment belongs to.
     lineage:
-      - datalake_zendesk_raw.ticket_comments.group_id
+      - datalake_zendesk_raw.ticket_comments.ticket_id
   attachments:
+    description: List of file attachments included with the comment, as returned by Zendesk.
     lineage:
       - datalake_zendesk_raw.ticket_comments.attachments
   body:
+    description: Raw comment text content from the Zendesk API.
     lineage:
       - datalake_zendesk_raw.ticket_comments.body
+  html_body:
+    description: HTML-formatted rendering of the comment body.
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.html_body
   plain_body:
+    description: Plain-text rendering of the comment body with markup removed.
     lineage:
       - datalake_zendesk_raw.ticket_comments.plain_body
   event_type:
+    description: Audit event type that produced this comment record in Zendesk.
     lineage:
       - datalake_zendesk_raw.ticket_comments.event_type
   type:
+    description: Zendesk comment class, such as a standard comment or voice comment.
     lineage:
       - datalake_zendesk_raw.ticket_comments.type
   via:
+    description: Channel metadata describing how the comment was submitted (email, web, API, etc.).
     lineage:
       - datalake_zendesk_raw.ticket_comments.via
   is_public:
+    description: Whether the comment is visible to the ticket requester (true) or internal only (false).
     lineage:
       - datalake_zendesk_raw.ticket_comments.public
   dt_extracted:
+    description: Calendar date when this comment was extracted from Zendesk into the lake.
     lineage:
       - datalake_zendesk_raw.ticket_comments.dt
   ts_created:
+    description: Timestamp when the comment was created in Zendesk.
     lineage:
       - datalake_zendesk_raw.ticket_comments.created_at
   year:
+    description: Year partition derived from the comment extraction date.
     lineage:
       - datalake_zendesk_raw.ticket_comments.dt
   month:
+    description: Month partition derived from the comment extraction date.
     lineage:
       - datalake_zendesk_raw.ticket_comments.dt
   day:
+    description: Day partition derived from the comment extraction date.
     lineage:
       - datalake_zendesk_raw.ticket_comments.dt
