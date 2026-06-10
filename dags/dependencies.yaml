@@ -527,11 +527,8 @@ bietlejuice.dw_customer_support_views:
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
 bietlejuice.dw_data_quality:
   - bietlejuice.enrich_data_quality:load-enrich-validations:first-run-of-day
-bietlejuice.dw_databricks_costs:
-  - bietlejuice.databricks_usage:load-clean-billable-usage
 bietlejuice.dw_databricks_health:
   - bietlejuice.enrich_databricks_health:load-enrich-daily-cluster-health
-  - bietlejuice.enrich_spark_event_logs:load-enrich-spark-stage-metrics
 bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
@@ -2237,11 +2234,6 @@ bietlejuice.enrich_data_exposure:
   - bietlejuice.enrich_databricks:load-enrich-daily-group-members:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-daily-table-privileges:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-daily-users:first-run-of-day
-bietlejuice.enrich_databricks_health:
-  - bietlejuice.databricks_usage:load-clean-billable-usage
-  - bietlejuice.enrich_databricks:load-enrich-daily-clusters
-bietlejuice.enrich_spark_event_logs:
-  - bietlejuice.enrich_databricks_health:load-enrich-daily-cluster-health
 bietlejuice.enrich_databricks_job_runs:
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-unique-clusters:first-run-of-day

@@ -1,15 +1,15 @@
 dag:
   name: enrich_databricks_health
+  schedule_interval: "0 9 * * *"
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
       Daily per-cluster health snapshot from Databricks system tables
       (system.compute.node_timeline, system.compute.clusters) plus SQL
-      dependencies datalake_databricks_usage_clean.billable_usage and
-      datalake_databricks.daily_clusters. Dataset-triggered after
-      databricks_usage (09:00 UTC) and enrich_databricks (midnight UTC) so
-      upstream tables are fresh before this DAG reads lagged system tables
-      for calendar day D on D+1.
+      reads of datalake_databricks_usage_clean.billable_usage (EC2 estimate
+      only before node_timeline retention) and datalake_databricks.daily_clusters
+      (init-script timing). Scheduled at 09:00 UTC on D+1 so lagged system
+      tables are settled for calendar day D before this DAG runs.
 
       One row per (cluster_id, dt_cluster_run). Captures P50/P95 of CPU,
       memory, I/O wait and NVMe utilization plus cluster shape for every

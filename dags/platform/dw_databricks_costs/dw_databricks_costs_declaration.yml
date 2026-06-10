@@ -1,5 +1,6 @@
 dag:
   name: dw_databricks_costs
+  schedule_interval: "0 9 * * *"
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
@@ -11,9 +12,9 @@ dag:
       dw_databricks_health.fact_databricks_task_run, which covers only Lakeflow
       job clusters (~80% DBU, Forno ~54%).
 
-      Dataset-triggered after databricks_usage (09:00 UTC cron) so
-      billable_usage and system.billing.usage are settled for calendar day D
-      before this DAG runs on D+1. Reads Databricks system tables
+      Scheduled at 09:00 UTC on D+1 so system.billing.usage and
+      system.compute.node_timeline are settled for calendar day D before this
+      DAG runs. Reads Databricks system tables
       (system.billing.usage, system.compute.*, system.lakeflow.*) plus the
       static datalake_databricks_pricing price seeds.
 

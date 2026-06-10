@@ -1,5 +1,6 @@
 dag:
   name: enrich_spark_event_logs
+  schedule_interval: "0 9 * * *"
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
@@ -28,11 +29,17 @@ dag:
       spark_app_id → cluster_id (more reliable than parsing the
       SparkListenerEnvironmentUpdate event, which can be missing on
       short-lived apps).
+
+      Scheduled at 09:00 UTC on D+1. Reads S3 event logs only (no
+      cross-DAG dependency on enrich_databricks_health). Downstream DW
+      LEFT JOINs stage metrics when present; failures here do not block
+      dag_health.
 workflow:
   type: query_delta
   layer: enrich
   custom_schema: databricks_health
   default_extraction_type: incremental
+  execution_timeout_hours: 6
   has_hive_sync: true
   tables_customization:
     spark_stage_metrics:
