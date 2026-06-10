@@ -165,98 +165,122 @@ OS2CCV_BY_compound_metric AS (
     GROUP BY ALL
 ),
 combined_agent_performance AS (
-SELECT
-    id_user,
-    id_agent,
-    uuid_person,
-    id_metric_period,
-    metric AS metric_name,
-    value AS metric_value,
-    is_valid,
-    dt_metric_period_started,
-    dt_metric_period_ended,
-    dt_last_processing
-FROM simple_metrics
-UNION ALL
-SELECT
-    id_user,
-    id_agent,
-    uuid_person,
-    id_metric_period,
-    metric AS metric_name,
-    value AS metric_value,
-    is_valid,
-    dt_metric_period_started,
-    dt_metric_period_ended,
-    dt_last_processing
-FROM cumulative_metrics
-UNION ALL
-SELECT
-    id_user,
-    id_agent,
-    uuid_person,
-    id_metric_period,
-    metric AS metric_name,
-    value AS metric_value,
-    is_valid,
-    dt_metric_period_started,
-    dt_metric_period_ended,
-    dt_last_processing
-FROM BP2CCV_compound_metric
-UNION ALL
-SELECT
-    id_user,
-    id_agent,
-    uuid_person,
-    id_metric_period,
-    metric AS metric_name,
-    value AS metric_value,
-    is_valid,
-    dt_metric_period_started,
-    dt_metric_period_ended,
-    dt_last_processing
-FROM TP2CS_compound_metric
-UNION ALL
-SELECT
-    id_user,
-    id_agent,
-    uuid_person,
-    id_metric_period,
-    metric AS metric_name,
-    value AS metric_value,
-    is_valid,
-    dt_metric_period_started,
-    dt_metric_period_ended,
-    dt_last_processing
-FROM OS2CCV_BY_compound_metric
+    SELECT
+        id_user,
+        id_agent,
+        uuid_person,
+        id_metric_period,
+        metric AS metric_name,
+        value AS metric_value,
+        is_valid,
+        dt_metric_period_started,
+        dt_metric_period_ended,
+        dt_last_processing
+    FROM simple_metrics
+    UNION ALL
+    SELECT
+        id_user,
+        id_agent,
+        uuid_person,
+        id_metric_period,
+        metric AS metric_name,
+        value AS metric_value,
+        is_valid,
+        dt_metric_period_started,
+        dt_metric_period_ended,
+        dt_last_processing
+    FROM cumulative_metrics
+    UNION ALL
+    SELECT
+        id_user,
+        id_agent,
+        uuid_person,
+        id_metric_period,
+        metric AS metric_name,
+        value AS metric_value,
+        is_valid,
+        dt_metric_period_started,
+        dt_metric_period_ended,
+        dt_last_processing
+    FROM BP2CCV_compound_metric
+    UNION ALL
+    SELECT
+        id_user,
+        id_agent,
+        uuid_person,
+        id_metric_period,
+        metric AS metric_name,
+        value AS metric_value,
+        is_valid,
+        dt_metric_period_started,
+        dt_metric_period_ended,
+        dt_last_processing
+    FROM TP2CS_compound_metric
+    UNION ALL
+    SELECT
+        id_user,
+        id_agent,
+        uuid_person,
+        id_metric_period,
+        metric AS metric_name,
+        value AS metric_value,
+        is_valid,
+        dt_metric_period_started,
+        dt_metric_period_ended,
+        dt_last_processing
+    FROM OS2CCV_BY_compound_metric
+),
+latest_agent_by_metric_period AS (
+    SELECT
+        mpp.id_metric_period,
+        a.id_user,
+        a.id_agent,
+        a.uuid_person,
+        mpp.metric_name,
+        ROW_NUMBER() OVER (
+            PARTITION BY a.id_user, mpp.id_metric_period
+            ORDER BY IF(a.status = 'ACTIVE', 1, 0) DESC, a.ts_updated DESC
+        ) = 1 AS is_latest,
+        (
+            a.status != "INACTIVE"
+            OR (a.status == "INACTIVE" AND a.ts_last_status_changed >= ADD_MONTHS(mpp.dt_metric_period_ended, -6))
+        ) AS is_status_valid_by_metric_period,
+        mpp.dt_metric_period_started,
+        mpp.dt_metric_period_ended,
+        -- keeping partitions immutable for the merge pipeline (aligned with metric_events / agent_allocation)
+        YEAR(mpp.dt_metric_period_started) AS year,
+        MONTH(mpp.dt_metric_period_started) AS month,
+        DAY(mpp.dt_metric_period_started) AS day
+    FROM
+        datalake_agent_accreditation.agent AS a
+    JOIN
+        metric_period_process AS mpp
+            ON DATE(a.ts_created) <= mpp.dt_metric_period_ended
 )
 SELECT
-    acc.id_user,
-    acc.id_agent,
-    acc.uuid_person,
-    mpp.id_metric_period,
-    mpp.metric_name,
+    lmp.id_user,
+    lmp.id_agent,
+    lmp.uuid_person,
+    lmp.id_metric_period,
+    lmp.metric_name,
     COALESCE(cap.metric_value, 0) AS metric_value,
     COALESCE(cap.is_valid, TRUE) AS is_valid,
-    mpp.dt_metric_period_started,
-    mpp.dt_metric_period_ended,
+    lmp.dt_metric_period_started,
+    lmp.dt_metric_period_ended,
     COALESCE(cap.dt_last_processing, CURRENT_DATE) AS dt_last_processing,
     -- keeping partitions immutable for the merge pipeline (aligned with metric_events / agent_allocation)
-    YEAR(mpp.dt_metric_period_started) AS year,
-    MONTH(mpp.dt_metric_period_started) AS month,
-    DAY(mpp.dt_metric_period_started) AS day
+    lmp.year,
+    lmp.month,
+    lmp.day
 FROM
-    datalake_agent_accreditation.agent AS acc
-CROSS JOIN
-    metric_period_process AS mpp
+    latest_agent_by_metric_period AS lmp
 LEFT JOIN
     combined_agent_performance AS cap
-        ON cap.id_user = acc.id_user
-        AND cap.id_metric_period = mpp.id_metric_period
-        AND cap.metric_name = mpp.metric_name
-WHERE
-    acc.id_user IS NOT NULL
-    AND (
-        acc.status != "INACTIVE"
-        OR (acc.status == "INACTIVE" AND acc.ts_last_status_changed >= ADD_MONTHS(DATE('{load_end_date}'), -6))
-    )
+        ON cap.id_user = lmp.id_user
+        AND cap.id_metric_period = lmp.id_metric_period
+        AND cap.metric_name = lmp.metric_name
+WHERE 
+    lmp.is_latest IS TRUE
+    AND lmp.is_status_valid_by_metric_period IS TRUE
+    AND lmp.id_user IS NOT NULL
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
