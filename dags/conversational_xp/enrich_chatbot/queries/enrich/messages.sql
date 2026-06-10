@@ -35,32 +35,29 @@ ai_message_count AS (
     role != 'HARDCODED'
   GROUP BY 1
 ),
--- chat.id_session for source = 'sauron' holds either the numeric sauron id
--- or sauron's public_id (uuid); resolve hashes to the numeric id
-sauron_chats AS (
-  SELECT DISTINCT
-    c.id_channel,
-    COALESCE(TRY_CAST(c.id_session AS BIGINT), srn.id) AS id_sauron_session,
-    CASE
-      WHEN TRY_CAST(c.id_session AS BIGINT) IS NULL THEN c.id_session
-    END AS id_sauron_session_hash
-  FROM
-    datalake_quinto_messenger_clean.chat AS c
-  LEFT JOIN
-    datalake_sauron_clean.session AS srn
-      ON srn.public_id = c.id_session
+-- sauron session table carries cdc versions (multiple rows per id); keep the
+-- latest one so lookups never fan messages out
+sauron_sessions AS (
+  SELECT
+    id,
+    public_id,
+    user_data
+  FROM (
+    SELECT
+      id,
+      public_id,
+      user_data,
+      ROW_NUMBER() OVER (
+        PARTITION BY id
+        ORDER BY
+          ts_updated DESC,
+          ts_cdc_transaction DESC
+      ) AS version_rank
+    FROM
+      datalake_sauron_clean.session
+  ) AS ranked_session
   WHERE
-    c.source = 'sauron'
-),
--- chat.id_session for source = 'support_session' is the SSS public_id (uuid)
-sss_chats AS (
-  SELECT DISTINCT
-    c.id_channel,
-    c.id_session AS id_sss_session
-  FROM
-    datalake_quinto_messenger_clean.chat AS c
-  WHERE
-    c.source = 'support_session'
+    version_rank = 1
 ),
 -- a channel maps to many chat sessions over time; pick the one whose active
 -- window contains the message timestamp so each id_message resolves to a single
@@ -80,7 +77,8 @@ whatsapp_channel_session AS (
             WHEN ce.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
             ELSE 1
           END,
-          c.ts_created DESC
+          c.ts_created DESC,
+          c.id_session DESC
       ) AS session_rank
     FROM
       datalake_quinto_messenger_clean.channel_event AS ce
@@ -112,7 +110,8 @@ whatsapp_sauron_session AS (
             WHEN ce.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
             ELSE 1
           END,
-          c.ts_created DESC
+          c.ts_created DESC,
+          c.id_session DESC
       ) AS session_rank
     FROM
       datalake_quinto_messenger_clean.channel_event AS ce
@@ -121,7 +120,7 @@ whatsapp_sauron_session AS (
         ON c.id_channel = ce.id_channel
         AND c.source = 'sauron'
     LEFT JOIN
-      datalake_sauron_clean.session AS srn
+      sauron_sessions AS srn
         ON srn.public_id = c.id_session
     WHERE
       MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
@@ -144,7 +143,8 @@ whatsapp_sss_session AS (
             WHEN ce.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
             ELSE 1
           END,
-          c.ts_created DESC
+          c.ts_created DESC,
+          c.id_session DESC
       ) AS session_rank
     FROM
       datalake_quinto_messenger_clean.channel_event AS ce
@@ -190,12 +190,79 @@ whatsapp_messages AS (
   WHERE
     MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
 ),
+inapp_sauron_session AS (
+  SELECT
+    id_message,
+    id_sauron_session,
+    id_sauron_session_hash
+  FROM (
+    SELECT
+      icm.id_message,
+      COALESCE(TRY_CAST(c.id_session AS BIGINT), srn.id) AS id_sauron_session,
+      CASE
+        WHEN TRY_CAST(c.id_session AS BIGINT) IS NULL THEN c.id_session
+      END AS id_sauron_session_hash,
+      ROW_NUMBER() OVER (
+        PARTITION BY icm.id_message
+        ORDER BY
+          CASE
+            WHEN icm.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
+            ELSE 1
+          END,
+          c.ts_created DESC,
+          c.id_session DESC
+      ) AS session_rank
+    FROM
+      datalake_internal_chat_clean.internal_chat_messages AS icm
+    INNER JOIN
+      datalake_quinto_messenger_clean.chat AS c
+        ON c.id_channel = icm.id_channel
+        AND c.source = 'sauron'
+    LEFT JOIN
+      sauron_sessions AS srn
+        ON srn.public_id = c.id_session
+    WHERE
+      MAKE_DATE(icm.year, icm.month, icm.day) >= '{load_start_date}'
+  ) AS ranked_sauron_chat
+  WHERE
+    session_rank = 1
+),
+inapp_sss_session AS (
+  SELECT
+    id_message,
+    id_sss_session
+  FROM (
+    SELECT
+      icm.id_message,
+      c.id_session AS id_sss_session,
+      ROW_NUMBER() OVER (
+        PARTITION BY icm.id_message
+        ORDER BY
+          CASE
+            WHEN icm.ts_created BETWEEN c.ts_created AND c.ts_updated THEN 0
+            ELSE 1
+          END,
+          c.ts_created DESC,
+          c.id_session DESC
+      ) AS session_rank
+    FROM
+      datalake_internal_chat_clean.internal_chat_messages AS icm
+    INNER JOIN
+      datalake_quinto_messenger_clean.chat AS c
+        ON c.id_channel = icm.id_channel
+        AND c.source = 'support_session'
+    WHERE
+      MAKE_DATE(icm.year, icm.month, icm.day) >= '{load_start_date}'
+  ) AS ranked_sss_chat
+  WHERE
+    session_rank = 1
+),
 inapp_messages AS (
   SELECT DISTINCT
     icm.id_channel,
     icm.id_message,
-    MAX(schat.id_sauron_session) AS id_sauron_session,
-    MAX(COALESCE(sschat.id_sss_session, schat.id_sauron_session_hash)) AS id_sss_session,
+    iss.id_sauron_session,
+    COALESCE(isss.id_sss_session, iss.id_sauron_session_hash) AS id_sss_session,
     REPLACE(REPLACE(icm.id_user_external,'_2E', '.'), '_40', '@') AS user_sender,
     icm.message,
     icm.ts_created,
@@ -208,14 +275,13 @@ inapp_messages AS (
   FROM
     datalake_internal_chat_clean.internal_chat_messages AS icm
   LEFT JOIN
-    sauron_chats AS schat
-      ON schat.id_channel = icm.id_channel
+    inapp_sauron_session AS iss
+      ON iss.id_message = icm.id_message
   LEFT JOIN
-    sss_chats AS sschat
-      ON sschat.id_channel = icm.id_channel
+    inapp_sss_session AS isss
+      ON isss.id_message = icm.id_message
   WHERE
     MAKE_DATE(icm.year, icm.month, icm.day) >= '{load_start_date}'
-  GROUP BY ALL
 ),
 -- id_session_key is the unified session identity: the numeric sauron id when
 -- known, otherwise the hash (SSS public id or unresolved sauron public id)
@@ -282,7 +348,7 @@ messages_w_users AS (
   FROM
     messages_trimmed AS m
   LEFT JOIN
-    datalake_sauron_clean.session AS s
+    sauron_sessions AS s
       ON s.id = m.id_sauron_session
   LEFT JOIN
     datalake_support_session_service_clean.support_session AS sss
