@@ -23,6 +23,7 @@ Each entity file follows a standard structure:
 
 - `business_entities/3p_demand.md` — 3P Demand — Broker XP: 3P demand funnel (Visit → Offer → CCV) and Buyer Prospects (TSC / 3P Demand / 3P Lead Gen / CQA)
 - `business_entities/3p_supply.md` — 3P Supply — Broker XP: funnel for capturing leads from commercial partners up to the first listing, covering the entire 3P supply journey (e.g., BSP, partner leads, partner network, and marketplace). Related to partner operations (see also `broker_xp.md` for details on the real estate and partner 3P Partners ecosystem).
+- `business_entities/accounting_funnel.md` — Accounting Funnel / Canudo Contábil (Accounting Straw): financial reconciliation between product systems and SAP, tie-out methodology (Straw vs Reverse Straw), ISA 315 assertions — completeness, correctness, temporality, compliance (canudo contábil / batida / conciliação contábil / SAP)
 - `business_entities/broker_xp.md` — Partner real estate agencies (Brokers) and 3P Partners / Marketplace operation (Rede / 3P partners / Marketplace)
 - `business_entities/chatbot_sessions.md` — AI chatbot conversation sessions (sessões de chatbot / atendimento bot)
 - `business_entities/closing.md` — For Rent contract closing / CC2CS journey: draft → sent → signed (fechamento, assinatura de contrato)
