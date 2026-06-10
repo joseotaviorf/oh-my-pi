@@ -1,0 +1,71 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quality_closing_ongoing
+description: >-
+  Monthly closing quality analysis records tracked in the Fechamento mensal
+  Google Sheet tab for Fintech closing operations monitoring.
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+columns:
+  competence:
+    description: Accrual period associated with the monthly closing quality record.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.competencia
+  id_contract:
+    description: QuintoAndar rental contract identifier related to the monthly case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.contrato
+  error_type:
+    description: Category or type of error identified in the monthly closing analysis.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.tipo_de_erro
+  error:
+    description: Error label recorded for the monthly closing quality case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.erro
+  description:
+    description: Detailed description of the identified monthly closing issue.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.descricao
+  amount:
+    description: Monetary value associated with the monthly closing quality error.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.valor
+  analysis:
+    description: Analysis outcome or classification for the monthly closing case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.analise
+  standard_quality_error:
+    description: Standardized quality error label used for monthly closing reporting.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.erro_padrao_quality
+  period:
+    description: Reference period for the monthly closing quality analysis.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.periodo
+  correction:
+    description: Correction action or status applied to the monthly closing case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.correcao
+  root_cause_offender:
+    description: Root cause offender accountable for the monthly closing quality issue.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.ofensor_causa_raiz
+  correction_sent:
+    description: Correction submission date or status for the monthly closing case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.envio_correcao
+  correction_description:
+    description: Description of the correction sent for the monthly closing case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.descricao1
+  notes:
+    description: Additional observations recorded for the monthly closing quality case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.obs
+  team:
+    description: Team responsible for the monthly closing quality case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_ongoing.time
+  ts_load:
+    description: Timestamp when the sheet row was loaded into the clean layer.

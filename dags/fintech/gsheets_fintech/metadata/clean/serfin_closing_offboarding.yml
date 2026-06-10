@@ -1,6 +1,6 @@
 ---
 database_name: datalake_gsheets_clean
-table_name: closing_quality
+table_name: serfin_closing_offboarding
 description: >-
   Quality analysis records for rental contract closing operations, sourced from
   the Qualidade Fechamento Google Sheet tab for Fintech ops monitoring.
@@ -10,82 +10,82 @@ columns:
   duplicate_check:
     description: Flag or label indicating whether the quality check is duplicated.
     lineage:
-      - datalake_gsheets_raw.closing_quality.check_duplicados
+      - datalake_gsheets_raw.serfin_closing_offboarding.check_duplicados
   analysis_category:
     description: Category assigned during the closing quality analysis review.
     lineage:
-      - datalake_gsheets_raw.closing_quality.categoria_analise
+      - datalake_gsheets_raw.serfin_closing_offboarding.categoria_analise
   analysis_period:
     description: Reference period for the closing quality analysis.
     lineage:
-      - datalake_gsheets_raw.closing_quality.periodo_da_analise
+      - datalake_gsheets_raw.serfin_closing_offboarding.periodo_da_analise
   id_contract:
     description: QuintoAndar rental contract identifier related to the quality record.
     lineage:
-      - datalake_gsheets_raw.closing_quality.contrato
+      - datalake_gsheets_raw.serfin_closing_offboarding.contrato
   demand_origin:
     description: Source or origin of the demand that triggered the quality review.
     lineage:
-      - datalake_gsheets_raw.closing_quality.origem_da_demanda
+      - datalake_gsheets_raw.serfin_closing_offboarding.origem_da_demanda
   problem_description:
     description: Description of the problem identified during the quality analysis.
     lineage:
-      - datalake_gsheets_raw.closing_quality.descricao_do_problema
+      - datalake_gsheets_raw.serfin_closing_offboarding.descricao_do_problema
   notes:
     description: Additional observations recorded for the quality analysis case.
     lineage:
-      - datalake_gsheets_raw.closing_quality.observacoes
+      - datalake_gsheets_raw.serfin_closing_offboarding.observacoes
   error_competence:
     description: Team or competence area accountable for the identified error.
     lineage:
-      - datalake_gsheets_raw.closing_quality.competencia_do_erro
+      - datalake_gsheets_raw.serfin_closing_offboarding.competencia_do_erro
   id:
     description: Unique identifier of the quality analysis record in the spreadsheet.
     lineage:
-      - datalake_gsheets_raw.closing_quality.id
+      - datalake_gsheets_raw.serfin_closing_offboarding.id
   check_id:
     description: Identifier of the quality check associated with the record.
     lineage:
-      - datalake_gsheets_raw.closing_quality.check_id
+      - datalake_gsheets_raw.serfin_closing_offboarding.check_id
   client:
     description: Client name or label associated with the closing quality record.
     lineage:
-      - datalake_gsheets_raw.closing_quality.cliente
+      - datalake_gsheets_raw.serfin_closing_offboarding.cliente
   dt_inclusion:
     description: Date when the record was included in the quality tracking sheet.
     lineage:
-      - datalake_gsheets_raw.closing_quality.data_de_inclusao
+      - datalake_gsheets_raw.serfin_closing_offboarding.data_de_inclusao
   has_zendesk_demand:
     description: Indicates whether a related demand exists in Zendesk.
     lineage:
-      - datalake_gsheets_raw.closing_quality.demanda_no_zendesk
+      - datalake_gsheets_raw.serfin_closing_offboarding.demanda_no_zendesk
   id_ticket_zendesk:
     description: Zendesk ticket identifier linked to the quality analysis case.
     lineage:
-      - datalake_gsheets_raw.closing_quality.ticket_zendesk
+      - datalake_gsheets_raw.serfin_closing_offboarding.ticket_zendesk
   dt_created:
     description: Date when the related demand or ticket was created.
     lineage:
-      - datalake_gsheets_raw.closing_quality.data_de_criacao
+      - datalake_gsheets_raw.serfin_closing_offboarding.data_de_criacao
   dt_resolution:
     description: Date when the related demand or issue was resolved.
     lineage:
-      - datalake_gsheets_raw.closing_quality.data_de_resolucao
+      - datalake_gsheets_raw.serfin_closing_offboarding.data_de_resolucao
   sla:
     description: SLA status or metric associated with the quality analysis case.
     lineage:
-      - datalake_gsheets_raw.closing_quality.sla
+      - datalake_gsheets_raw.serfin_closing_offboarding.sla
   sf_pending:
     description: Salesforce pending status captured for the closing quality case.
     lineage:
-      - datalake_gsheets_raw.closing_quality.sf_pendencia
+      - datalake_gsheets_raw.serfin_closing_offboarding.sf_pendencia
   sf_intermittency:
     description: Salesforce intermittency flag captured for the closing quality case.
     lineage:
-      - datalake_gsheets_raw.closing_quality.sf_intermitencia_
+      - datalake_gsheets_raw.serfin_closing_offboarding.sf_intermitencia_
   sf_intermittency_root_cause:
     description: Root cause of intermittency recorded in Salesforce for the case.
     lineage:
-      - datalake_gsheets_raw.closing_quality.sf_causa_raiz_da_intermitencia
+      - datalake_gsheets_raw.serfin_closing_offboarding.sf_causa_raiz_da_intermitencia
   ts_load:
     description: Timestamp when the sheet row was loaded into the clean layer.

@@ -1,6 +1,6 @@
 ---
 database_name: datalake_gsheets_clean
-table_name: closing_ongoing
+table_name: serfin_closing_ongoing
 description: >-
   Ongoing closing analysis records tracked in the Fechamento - ongoing Google
   Sheet tab for Fintech closing operations monitoring.
@@ -10,86 +10,86 @@ columns:
   closing_analysis_category:
     description: Category assigned during the ongoing closing analysis review.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.categoria_analise_fechamento
+      - datalake_gsheets_raw.serfin_closing_ongoing.categoria_analise_fechamento
   analysis_period:
     description: Reference period for the ongoing closing analysis.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.periodo_da_analise
+      - datalake_gsheets_raw.serfin_closing_ongoing.periodo_da_analise
   id_contract:
     description: QuintoAndar rental contract identifier related to the ongoing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.contrato
+      - datalake_gsheets_raw.serfin_closing_ongoing.contrato
   demand_origin:
     description: Source or origin of the demand that triggered the ongoing review.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.origem_da_demanda
+      - datalake_gsheets_raw.serfin_closing_ongoing.origem_da_demanda
   problem_description:
     description: Description of the problem identified in the ongoing closing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.descricao_do_problema
+      - datalake_gsheets_raw.serfin_closing_ongoing.descricao_do_problema
   notes:
     description: Additional observations recorded for the ongoing closing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.observacoes
+      - datalake_gsheets_raw.serfin_closing_ongoing.observacoes
   error_competence:
     description: Team or competence area accountable for the identified error.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.competencia_do_erro
+      - datalake_gsheets_raw.serfin_closing_ongoing.competencia_do_erro
   id:
     description: Unique identifier of the ongoing closing record in the spreadsheet.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.id
+      - datalake_gsheets_raw.serfin_closing_ongoing.id
   check_id:
     description: Identifier of the quality check associated with the ongoing record.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.check_id
+      - datalake_gsheets_raw.serfin_closing_ongoing.check_id
   dt_inclusion:
     description: Date when the record was included in the ongoing tracking sheet.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.data_de_inclusao
+      - datalake_gsheets_raw.serfin_closing_ongoing.data_de_inclusao
   has_zendesk_demand:
     description: Indicates whether a related demand exists in Zendesk.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.demanda_no_zendesk
+      - datalake_gsheets_raw.serfin_closing_ongoing.demanda_no_zendesk
   id_ticket_zendesk:
     description: Zendesk ticket identifier linked to the ongoing closing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.ticket_zendesk
+      - datalake_gsheets_raw.serfin_closing_ongoing.ticket_zendesk
   dt_created:
     description: Date when the related demand or ticket was created.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.data_de_criacao
+      - datalake_gsheets_raw.serfin_closing_ongoing.data_de_criacao
   dt_resolution:
     description: Date when the related demand or issue was resolved.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.data_de_resolucao
+      - datalake_gsheets_raw.serfin_closing_ongoing.data_de_resolucao
   sla:
     description: SLA status or metric associated with the ongoing closing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.sla
+      - datalake_gsheets_raw.serfin_closing_ongoing.sla
   sf_pending:
     description: Salesforce pending status captured for the ongoing closing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.sf_pendencia
+      - datalake_gsheets_raw.serfin_closing_ongoing.sf_pendencia
   sf_intermittency:
     description: Salesforce intermittency flag captured for the ongoing closing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.sf_intermitencia_
+      - datalake_gsheets_raw.serfin_closing_ongoing.sf_intermitencia_
   sf_intermittency_root_cause:
     description: Root cause of intermittency recorded in Salesforce for the case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.sf_causa_raiz_da_intermitencia
+      - datalake_gsheets_raw.serfin_closing_ongoing.sf_causa_raiz_da_intermitencia
   is_retask:
     description: Indicates whether the case required a retask during closing analysis.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.retarefa
+      - datalake_gsheets_raw.serfin_closing_ongoing.retarefa
   closing_check:
     description: Result or status of the closing check for the ongoing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.check_fechamento
+      - datalake_gsheets_raw.serfin_closing_ongoing.check_fechamento
   intermittency_check:
     description: Result or status of the intermittency check for the ongoing case.
     lineage:
-      - datalake_gsheets_raw.closing_ongoing.check_intermitencia
+      - datalake_gsheets_raw.serfin_closing_ongoing.check_intermitencia
   ts_load:
     description: Timestamp when the sheet row was loaded into the clean layer.

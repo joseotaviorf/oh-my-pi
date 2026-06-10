@@ -53,16 +53,28 @@ sheets_info:
     clean_table_name: closing_analysts_hierarchy
     sheet_context: fintech
 
-  closing_quality:
+  serfin_closing_offboarding:
     sheet_id: 1TbW40MjXaYwSqgiLG6eKe3YORDPNMw_qOIaxk65QNeU
     sheet_name: Qualidade Fechamento
-    clean_table_name: closing_quality
+    clean_table_name: serfin_closing_offboarding
     sheet_context: fintech
 
-  closing_ongoing:
+  serfin_closing_ongoing:
     sheet_id: 150z6ojSH6X97uL1twf-sO-Dpx9w0IvwoHVtuWuFHe-M
     sheet_name: Fechamento - ongoing
-    clean_table_name: closing_ongoing
+    clean_table_name: serfin_closing_ongoing
+    sheet_context: fintech
+
+  quality_closing_ongoing:
+    sheet_id: 1QCgT0yYBU1kTsKDY6Y9oblJAnC34m9XjsghnjS4Oa4g
+    sheet_name: Fechamento mensal
+    clean_table_name: quality_closing_ongoing
+    sheet_context: fintech
+
+  quality_closing_offboarding:
+    sheet_id: 1CaVJ1CCha6BwAnx7cy_GcegN8dgyfmarxm8qRUt7NIE
+    sheet_name: Dados
+    clean_table_name: quality_closing_offboarding
     sheet_context: fintech
 
   cod_locale:

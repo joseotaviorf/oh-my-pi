@@ -22,4 +22,4 @@ SELECT
     NULLIF(TRIM(check_intermitencia), '') AS intermittency_check,
     NOW() AS ts_load
 FROM
-    datalake_gsheets_raw.closing_ongoing
+    datalake_gsheets_raw.serfin_closing_ongoing

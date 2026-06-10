@@ -21,4 +21,4 @@ SELECT
     NULLIF(TRIM(sf_causa_raiz_da_intermitencia), '') AS sf_intermittency_root_cause,
     NOW() AS ts_load
 FROM
-    datalake_gsheets_raw.closing_quality
+    datalake_gsheets_raw.serfin_closing_offboarding

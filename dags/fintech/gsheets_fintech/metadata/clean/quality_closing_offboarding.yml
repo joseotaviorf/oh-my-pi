@@ -1,0 +1,79 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quality_closing_offboarding
+description: >-
+  Offboarding closing quality analysis records sourced from the Dados Google
+  Sheet tab for Fintech ops monitoring.
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+columns:
+  competence:
+    description: Accrual period associated with the offboarding quality record.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.competencia
+  id_contract:
+    description: QuintoAndar rental contract identifier related to the offboarding record.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.contrato
+  error_type:
+    description: Category or type of error identified in the offboarding analysis.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.tipo_de_erro
+  error:
+    description: Error label recorded for the offboarding quality case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.erro
+  description:
+    description: Detailed description of the identified offboarding issue.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.descricao
+  amount:
+    description: Monetary value associated with the offboarding quality error.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.valor
+  analysis:
+    description: Analysis outcome or classification for the offboarding case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.analise
+  standard_quality_error:
+    description: Standardized quality error label used for offboarding reporting.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.erro_padrao_quality
+  period:
+    description: Reference period for the offboarding quality analysis.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.periodo
+  correction:
+    description: Correction action or status applied to the offboarding case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.correcao
+  bill_item:
+    description: Bill item related to the offboarding quality error.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.billitem
+  status:
+    description: Current situation or status of the offboarding quality case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.situacao
+  root_cause_offender:
+    description: Root cause offender accountable for the offboarding quality issue.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.ofensor_causa_raiz
+  is_contract_blocked:
+    description: Indicates whether the contract is blocked due to the quality issue.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.contrato_travado
+  notes:
+    description: Additional observations recorded for the offboarding quality case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.obs
+  open_ticket:
+    description: Indicates whether an open support ticket exists for the case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.chamado_aberto
+  termination:
+    description: Termination information associated with the offboarding case.
+    lineage:
+      - datalake_gsheets_raw.quality_closing_offboarding.rescisao
+  ts_load:
+    description: Timestamp when the sheet row was loaded into the clean layer.
