@@ -37,8 +37,10 @@ Useful flags:
 | Flag | Default | Purpose |
 | --- | ---: | --- |
 | `--days` | `90` | Lookback window |
-| `--min-days` | `3` | Minimum ARM calendar days |
-| `--min-runs` | `3` | Minimum ARM runs |
+| `--min-days` | `3` | Minimum ARM calendar days (window eligibility) |
+| `--min-runs` | `3` | Minimum ARM runs (window eligibility) |
+| `--recent-era-min-days` | `1` | Min days on latest config era before sizing after a switch |
+| `--recent-era-min-runs` | `2` | Min runs on latest config era before sizing after a switch |
 | `--dominant-config-share-min` | `0.50` | Min dominant-config run **and** cost share to pass `mixed_config_review` |
 | `--trino-host` | prod Trino hostname | Trino endpoint; overridden by `TRINO_HOST` env var when set |
 | `--use-amd-history` | off | Optional AMD fallback for collapse-only candidates |

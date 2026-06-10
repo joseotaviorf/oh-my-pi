@@ -121,9 +121,42 @@ class TestClassifyQualityGates:
             dominant_config_run_share=0.1,
             dominant_config_cost_share=0.05,
         )
-        assert classify(thin_switch, min_days=2, min_runs=2) == "recent_config_change"
-        assert classify(thin_switch, min_days=2, min_runs=2) != "needs_more_arm_data"
+        assert classify(
+            thin_switch,
+            min_days=3,
+            min_runs=3,
+            recent_era_min_days=2,
+            recent_era_min_runs=2,
+        ) == "recent_config_change"
+        assert classify(
+            thin_switch,
+            min_days=3,
+            min_runs=3,
+            recent_era_min_days=2,
+            recent_era_min_runs=2,
+        ) != "needs_more_arm_data"
         assert recommend_preset("recent_config_change", thin_switch) == (None, None)
+
+    def test_established_config_switch_evaluates_on_latest_era(self):
+        """Default recent-era thresholds (1 day, 2 runs) → size on new config."""
+        established = _m(
+            arm_days=2,
+            arm_runs=2,
+            config_changed_in_window=True,
+            latest_config_runs=2,
+            latest_config_days=2,
+            dominant_config_run_share=0.4,
+            dominant_config_cost_share=0.2,
+            driver_node_type="r6g.2xlarge",
+            worker_node_type="r6gd.4xlarge",
+            worker_count=5,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=25.0,
+            wall_p95_min=30.0,
+        )
+        assert classify(established, min_days=3, min_runs=3) != "recent_config_change"
+        assert classify(established, min_days=3, min_runs=3) != "needs_more_arm_data"
 
     def test_recent_config_change_skips_mixed_config_review(self):
         switched = _m(

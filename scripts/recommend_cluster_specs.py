@@ -137,6 +137,8 @@ _SLA_INTERVAL_TARGET = 0.80
 _CADENCE_RUNS_PER_DAY_MIN = 12.0  # ~every 2h or tighter = cadence-bound hard SLA
 _SOFT_WALL_REGRESSION_MAX = 2.0
 _SOFT_WALL_CEILING_MIN = 120.0  # default Databricks job timeout (minutes)
+_DEFAULT_RECENT_ERA_MIN_DAYS = 1
+_DEFAULT_RECENT_ERA_MIN_RUNS = 2
 
 # Negotiated JOBS $/DBU from dim_dbu_price (cost-attribution seed).
 # TODO: source dynamically from fact_databricks_dag_run.dbu_rate_usd.
@@ -1286,12 +1288,22 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     return MultiDecision(_keep_multi_reason(m, sizing), None, blocked_cost=blocked_cost)
 
 
-def _recent_config_change_thin(
-    m: DagMetrics, min_days: int, min_runs: int
+def _recent_era_established(
+    m: DagMetrics, recent_era_min_days: int, recent_era_min_runs: int
 ) -> bool:
-    """True when the DAG switched configs recently but the new era lacks telemetry."""
-    return m.config_changed_in_window and (
-        m.latest_config_runs < min_runs or m.latest_config_days < min_days
+    """True when the latest config era has enough telemetry to size on."""
+    return (
+        m.latest_config_runs >= recent_era_min_runs
+        and m.latest_config_days >= recent_era_min_days
+    )
+
+
+def _recent_config_change_thin(
+    m: DagMetrics, recent_era_min_days: int, recent_era_min_runs: int
+) -> bool:
+    """True when the DAG switched configs but the new era is still too thin to size."""
+    return m.config_changed_in_window and not _recent_era_established(
+        m, recent_era_min_days, recent_era_min_runs
     )
 
 
@@ -1300,12 +1312,17 @@ def classify(
     min_days: int = 3,
     min_runs: int = 3,
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
+    recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
+    recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
 ) -> str:
-    # arm_runs/arm_days are era-scoped (latest config only). Check the thin-switch
-    # cohort before needs_more_arm_data so a fresh downsize is not mislabeled.
-    if _recent_config_change_thin(m, min_days, min_runs):
+    # arm_runs/arm_days are era-scoped (latest config only). Wait until the new era
+    # meets --recent-era-min-*; then size on those runs. Window min_days/min_runs
+    # (eligible_dags) does not apply to an established switch.
+    if _recent_config_change_thin(m, recent_era_min_days, recent_era_min_runs):
         return "recent_config_change"
-    if m.arm_days < min_days or m.arm_runs < min_runs:
+    if not m.config_changed_in_window and (
+        m.arm_days < min_days or m.arm_runs < min_runs
+    ):
         return "needs_more_arm_data"
 
     topo = m.topology
@@ -1612,8 +1629,17 @@ def build_recommendation(
     min_days: int = 3,
     min_runs: int = 3,
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
+    recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
+    recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
 ) -> Recommendation:
-    cohort = classify(m, min_days, min_runs, dominant_config_share_min)
+    cohort = classify(
+        m,
+        min_days,
+        min_runs,
+        dominant_config_share_min,
+        recent_era_min_days,
+        recent_era_min_runs,
+    )
     current_preset = infer_current_preset(
         m.driver_node_type, m.worker_node_type, m.worker_count
     )
@@ -2924,6 +2950,8 @@ def build_amd_recommendation(
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
     min_days: int = 3,
     min_runs: int = 3,
+    recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
+    recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
 ) -> Recommendation | None:
     """Build a collapse_to_single recommendation from AMD data, or None if not eligible.
 
@@ -2933,7 +2961,7 @@ def build_amd_recommendation(
     """
     if not classify_amd_for_collapse(m):
         return None
-    if _recent_config_change_thin(m, min_days, min_runs):
+    if _recent_config_change_thin(m, recent_era_min_days, recent_era_min_runs):
         return None
     if not m.config_changed_in_window and (
         m.dominant_config_run_share < dominant_config_share_min
@@ -3427,6 +3455,26 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Minimum ARM run count for eligibility (default 3)",
     )
     parser.add_argument(
+        "--recent-era-min-days",
+        type=int,
+        default=_DEFAULT_RECENT_ERA_MIN_DAYS,
+        metavar="N",
+        help=(
+            "Min distinct days on the latest config era before sizing after a "
+            "config switch (default 1)"
+        ),
+    )
+    parser.add_argument(
+        "--recent-era-min-runs",
+        type=int,
+        default=_DEFAULT_RECENT_ERA_MIN_RUNS,
+        metavar="N",
+        help=(
+            "Min runs on the latest config era before sizing after a config "
+            "switch (default 2)"
+        ),
+    )
+    parser.add_argument(
         "--days",
         type=int,
         default=90,
@@ -3578,6 +3626,8 @@ def main(argv: list[str] | None = None) -> int:
             args.min_days,
             args.min_runs,
             args.dominant_config_share_min,
+            args.recent_era_min_days,
+            args.recent_era_min_runs,
         )
         for m in metrics
     ]
@@ -3600,6 +3650,8 @@ def main(argv: list[str] | None = None) -> int:
                     args.dominant_config_share_min,
                     args.min_days,
                     args.min_runs,
+                    args.recent_era_min_days,
+                    args.recent_era_min_runs,
                 )
             )
             is not None
