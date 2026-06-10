@@ -8,7 +8,7 @@ columns:
   id_owner:
     lineage:
       - datalake_gsheets_raw.pp_multi_cluster.id_owner
-    description: Id of the PP Multi
+    description: Unique identifier of the PP Multi owner (landlord) used to map the account to a cluster segment.
   cluster:
     lineage:
       - datalake_gsheets_raw.pp_multi_cluster.cluster
