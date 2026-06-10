@@ -21,7 +21,6 @@ dags_out_of_pattern:
         "cyber_complement",
         "dw_contract_test",
         "dw_datamarts_cross",
-        "dw_datamarts_for_rent",
         "dw_datamarts_growth_cross",
         "dw_datamarts_spark.for_sale",
         "dw_datamarts_spark.for_sale_cross",

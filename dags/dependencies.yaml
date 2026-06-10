@@ -557,9 +557,6 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-affiliate-volumetry-cluster:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
-bietlejuice.dw_datamarts_for_rent:
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
 bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand:first-run-of-day
