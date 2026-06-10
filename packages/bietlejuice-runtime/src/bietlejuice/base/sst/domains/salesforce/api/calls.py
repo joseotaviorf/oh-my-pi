@@ -12,6 +12,7 @@ import json
 import time
 
 import pandas as pd
+import pyspark.sql.functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.sst.configs.salesforce import QUERY_ENDPOINT
@@ -21,7 +22,17 @@ from bietlejuice.base.sst.core.utils.transforms import get_chunks
 from bietlejuice.base.sst.domains.salesforce.api.headers import (
     build_authorization_header,
 )
+from bietlejuice.base.sst.domains.salesforce.api.schemas import (
+    API_RESPONSE_SCHEMA,
+)
+from bietlejuice.base.sst.domains.salesforce.api.transform import (
+    build_change_events_fields,
+)
+from bietlejuice.base.sst.domains.salesforce.common.types import (
+    build_salesforce_type_schema,
+)
 
+DEFAULT_PARALLELISM = 8
 logger = QuintoAndarLogger("sst.domains.salesforce.api.calls")
 
 
@@ -193,6 +204,25 @@ def build_fetch_partition_closure(base_endpoint, access_token):
     return fetch_partition_iterator
 
 
+def uuid_from_sha256_hex(hash_col: str):
+    """Format the first 32 chars of a sha256 hex digest as a UUID string.
+
+    ``build_change_events_fields`` populates ``transaction_key`` with a sha256
+    hex digest; the live CDC stream emits transaction keys in UUID form. Apply
+    this on the conformed DataFrame so recovered rows match the CDC contract.
+    """
+    return F.lower(
+        F.concat_ws(
+            "-",
+            F.substring(hash_col, 1, 8),
+            F.substring(hash_col, 9, 4),
+            F.substring(hash_col, 13, 4),
+            F.substring(hash_col, 17, 4),
+            F.substring(hash_col, 21, 12),
+        )
+    )
+
+
 def get_change_lst(endpoint, access_token, start_ts, end_ts):
     """
     Hit /updates or /Delete endpoint and retrieve the list of changed records
@@ -305,3 +335,108 @@ def get_updated_deleted_lst(endpoint, partition_date, access_token, days=1):
         f"m=get_updated_deleted_lst, msg={len(deleted_lst)} DELETED ROWS found at time range"
     )
     return list(set(deleted_lst + updated_lst))
+
+
+@logger(exclude_return=True, exclude=["access_token"])
+def get_updated_ids(
+    subject_url: str, access_token: str, start_ts: str, end_ts: str
+) -> list[str]:
+    """Fetch IDs updated in ``[start_ts, end_ts]`` from SF ``/updated``."""
+    response = get_request(
+        endpoint=f"{subject_url}/updated",
+        params={
+            "start": start_ts,
+            "end": end_ts,
+        },
+        headers=build_authorization_header(access_token),
+    )
+    ids = response.get("ids", [])
+    logger.info(f"m=get_updated_ids, msg={len(ids)} updated IDs found")
+    return ids
+
+
+@logger(exclude_return=True, exclude=["access_token"])
+def get_deleted_ids(
+    subject_url: str, access_token: str, start_ts: str, end_ts: str
+) -> list[str]:
+    """Fetch IDs deleted in ``[start_ts, end_ts]`` from SF ``/deleted``."""
+    response = get_request(
+        endpoint=f"{subject_url}/deleted",
+        params={
+            "start": start_ts,
+            "end": end_ts,
+        },
+        headers=build_authorization_header(access_token),
+    )
+    ids = [item["id"] for item in response.get("deletedRecords", [])]
+    logger.info(f"m=get_deleted_ids, msg={len(ids)} deleted IDs found")
+    return ids
+
+
+def retrieve_from_query_lst(
+    spark,
+    queries,
+    api_schema,
+    base_endpoint,
+    access_token,
+):
+    """
+    This is for this flow only, send a list, wrap all the necessary functions inside it
+    From a list of queries, return a api_result_df
+    """
+    request_df = paralelize_queries(
+        spark=spark,
+        queries=queries,
+        paralelism=DEFAULT_PARALLELISM,
+    )
+
+    fetch_partition = build_fetch_partition_closure(
+        base_endpoint=base_endpoint,
+        access_token=access_token,
+    )
+    record_schema = build_salesforce_type_schema(api_schema)
+
+    api_result_df = (
+        request_df.select("idx", "query")
+        .repartition(DEFAULT_PARALLELISM)
+        .mapInPandas(fetch_partition, schema=API_RESPONSE_SCHEMA)
+        .withColumn("record", F.from_json(F.col("record_json"), record_schema))
+        .cache()
+    )
+    return api_result_df
+
+
+def retrieve_salesforce_event(
+    spark,
+    api_entity,
+    queries,
+    event_type,
+    api_schema,
+    base_endpoint,
+    access_token,
+    last_modified_date_col,
+    recovery_source_file,
+):
+    api_result_df = retrieve_from_query_lst(
+        spark=spark,
+        queries=queries,
+        api_schema=api_schema,
+        base_endpoint=base_endpoint,
+        access_token=access_token,
+    )
+
+    record_df = api_result_df.select("record.*").withColumnRenamed("Id", "id_record")
+    conformed_df = (
+        build_change_events_fields(
+            df=record_df,
+            id_col="id_record",
+            event_type=event_type,
+            entity_name=api_entity,
+            date_col=last_modified_date_col,
+            source_file=recovery_source_file,
+            layer="raw",
+        )
+        .withColumn("transaction_key", uuid_from_sha256_hex("transaction_key"))
+        .withColumn("commit_ts", (F.unix_timestamp("commit_ts") * 1000).cast("long"))
+    )
+    return conformed_df

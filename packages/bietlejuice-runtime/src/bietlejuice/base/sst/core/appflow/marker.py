@@ -24,9 +24,15 @@ Payload (JSON)::
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Optional, Union
 
 import boto3
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.sst.core.utils.time import build_hour_window
+
+logger = QuintoAndarLogger("sst.core.appflow.marker")
 
 ACTIVE_STATUS = "Active"
 DEFAULT_REGION = "us-east-1"
@@ -85,6 +91,70 @@ def describe_flow_status(flow_name: str, region_name: str = DEFAULT_REGION) -> s
     client = boto3.client("appflow", region_name=region_name)
     response = client.describe_flow(flowName=flow_name)
     return response.get("flowStatus", "")
+
+
+def parse_utc_ts(value: Optional[Union[str, datetime]]) -> Optional[datetime]:
+    if value is None:
+        return None
+
+    if isinstance(value, datetime):
+        return value.astimezone(timezone.utc)
+
+    return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
+
+
+def appflow_has_completed_hour(
+    appflow_status: dict,
+    partition_date: str,
+    partition_hour: str,
+) -> bool:
+    _, expected_end_ts = build_hour_window(
+        partition_date=partition_date,
+        partition_hour=partition_hour,
+    )
+
+    last_execution_ts = parse_utc_ts(appflow_status.get("last_execution_timestamp"))
+
+    expected_end_ts = parse_utc_ts(expected_end_ts)
+
+    if last_execution_ts is None:
+        logger.info(
+            "m=appflow_has_completed_hour, msg=No last_execution_timestamp; "
+            f"partition={partition_date} {partition_hour}"
+        )
+        return False
+
+    completed_hour = last_execution_ts >= expected_end_ts
+    logger.info(
+        f"m=appflow_has_completed_hour, msg=partition={partition_date} {partition_hour} "
+        f"last_execution_ts={last_execution_ts.isoformat()} "
+        f"expected_end_ts={expected_end_ts.isoformat()} "
+        f"flow_status={appflow_status.get('flow_status')!r} "
+        f"last_execution_status={appflow_status.get('last_execution_status')!r} "
+        f"completed_hour={completed_hour}"
+    )
+
+    return (
+        appflow_status.get("flow_status") == ACTIVE_STATUS
+        and appflow_status.get("last_execution_status") == "Successful"
+        and completed_hour
+    )
+
+
+def get_latest_appflow_run(flow_name: str, region_name: str = DEFAULT_REGION) -> dict:
+    client = boto3.client("appflow", region_name=region_name)
+
+    response = client.describe_flow(flowName=flow_name)
+    last_run = response.get("lastRunExecutionDetails", {})
+
+    return {
+        "flow_status": response.get("flowStatus", ""),
+        "last_execution_status": last_run.get("mostRecentExecutionStatus"),
+        "last_execution_timestamp": last_run.get("mostRecentExecutionTime").astimezone(
+            timezone.utc
+        ),
+        "last_execution_message": last_run.get("mostRecentExecutionMessage"),
+    }
 
 
 def save_status_marker_as_table(

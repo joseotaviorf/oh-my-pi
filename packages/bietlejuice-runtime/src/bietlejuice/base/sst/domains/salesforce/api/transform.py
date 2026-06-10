@@ -10,6 +10,7 @@ def build_change_events_fields(
     entity_name: str,
     date_col: str,
     source_file: str,
+    layer="raw",
 ) -> DataFrame:
     """Shape API backfill rows so they satisfy the CDC table contract.
 
@@ -36,11 +37,14 @@ def build_change_events_fields(
     """
     parsed_commit_ts = F.to_timestamp(date_col, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
+    change_event_header = (
+        "change_event_header" if layer == "clean" else "ChangeEventHeader"
+    )
     new_first_columns = [
         F.col(id_col).alias("id_record"),
         F.lit(entity_name).alias("entity_name"),
         F.lit(event_type).alias("event_type"),
-        F.lit(None).alias("change_event_header"),
+        F.lit(None).alias(change_event_header),
         F.sha2(
             F.concat_ws(
                 "||",
@@ -53,7 +57,7 @@ def build_change_events_fields(
         F.lit(1).cast("bigint").alias("commit_number"),
         parsed_commit_ts.alias("commit_ts"),
         F.col("CreatedById").alias("commit_user"),
-        F.array(F.lit("")).alias("changed_field"),
+        F.array().alias("changed_field"),
         F.lit(source_file).alias("source_file"),
     ]
 
@@ -74,7 +78,6 @@ def build_change_events_fields(
     original_columns = [
         F.col(col_name) for col_name in df.columns if col_name not in new_col_names
     ]
-
     return df.select(*new_first_columns, *original_columns)
 
 

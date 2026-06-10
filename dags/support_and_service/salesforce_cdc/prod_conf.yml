@@ -14,36 +14,54 @@ datalake_bucket: "5a-datalake-prod"
 events_config:
   case:
     event_path: "raw/salesforce/CaseEvent"
+    api_entity: "Case"
   case_mediation:
     event_path: "raw/salesforce/CaseMediationEvent"
+    api_entity: "CaseMediation__c"
   case_member:
     event_path: "raw/salesforce/CaseMemberEvent"
+    api_entity: "CaseMember__c"
   case_plates_lockbox:
     event_path: "raw/salesforce/CasePlatesLockboxEvent"
+    api_entity: "CasePlatesLockbox__c"
   case_inspection:
     event_path: "raw/salesforce/CaseInspectionEvent"
+    api_entity: "CaseInspection__c"
   case_repair_analysis:
     event_path: "raw/salesforce/CaseRepairAnalysisEvent"
+    api_entity: "CaseRepairAnalysis__c"
   case_repair_budget:
     event_path: "raw/salesforce/CaseRepairBudgetEvent"
+    api_entity: "CaseRepairBudget__c"
   case_repair_follow_up:
     event_path: "raw/salesforce/CaseRepairFollowUpEvent"
+    api_entity: "CaseRepairFollowUp__c"
   case_repair_item:
     event_path: "raw/salesforce/CaseRepairItemEvent"
+    api_entity: "CaseRepairItem__c"
   case_repair_request:
     event_path: "raw/salesforce/CaseRepairRequestEvent"
+    api_entity: "CaseRepairRequest__c"
   comment:
     event_path: "raw/salesforce/CommentEvent"
+    api_entity: "Comment__c"
   dynamic_form:
     event_path: "raw/salesforce/DynamicFormEvent"
+    api_entity: "DynamicForm__c"
   email_message:
     event_path: "raw/salesforce/EmailMessageEvent"
+    api_entity: "EmailMessage"
   mkt_cloud_trigger:
     event_path: "raw/salesforce/MktCloudTriggerEvent"
+    api_entity: "MktCloudTrigger__c"
   opportunity:
     event_path: "raw/salesforce/OpportunityEvent"
+    api_entity: "Opportunity"
   user:
     event_path: "raw/salesforce/UserEvent"
+    api_entity: "User"
+
+salesforce_endpoint: "https://quintoandar.my.salesforce.com"
 
 custom_cluster:
   driver_node_type_id: c5a.2xlarge

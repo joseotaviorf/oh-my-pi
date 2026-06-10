@@ -2,12 +2,20 @@ from typing import List, Optional, Union
 
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.sst.core.utils.common import _table_exists, compare_schema_types
+from bietlejuice.base.sst.core.utils.common import (
+    _table_exists,
+    compare_schema_types,
+    conforming_schema,
+)
 from bietlejuice.base.sst.domains.salesforce.api.transform import (
     cast_string_to_boolean,
     parse_struct_column,
+    remap_struct_expr,
 )
+
+logger = QuintoAndarLogger("sst.transforms")
 
 
 def nullify_fields_on_delete(
@@ -182,11 +190,25 @@ def get_rows_to_update(
     return target_historical_df.join(unique_rows, on=context_col_name, how="inner")
 
 
+def salesforce_name_type(name_col="name"):
+
+    name_col = F.split(F.trim(F.col("name")), " ")
+    return F.struct(
+        name_col[0].alias("FirstName"),
+        F.when(
+            F.size(name_col) > 1,
+            F.array_join(F.slice(name_col, 2, F.size(name_col)), " "),
+        ).alias("LastName"),
+        F.lit(None).alias("MiddleName"),
+    )
+
+
 def apply_schema_remaps(
     spark: SparkSession,
     df: DataFrame,
     target_table: Union[str, DataFrame],
-    accept_new_cols: bool = False,
+    skip_new_columns: bool = True,
+    api_to_cdc_struct: bool = False,
 ) -> DataFrame:
     """
     Since API and CDC may have different types, we're making sure we're matching the types
@@ -194,40 +216,51 @@ def apply_schema_remaps(
     """
 
     if isinstance(target_table, str):
-        if _table_exists(spark, target_table):
-            target_table = spark.table(target_table)
-        else:
+        if not _table_exists(spark, target_table):
             return df
+        target_table_df = spark.table(target_table)
+    else:
+        target_table_df = target_table
+
+    target_columns = set(target_table_df.columns)
 
     # This return a list of tuple with column_name, type_left, type_right and if type is matching
-    type_mistmatches = compare_schema_types(df, target_table).collect()
-
+    type_mistmatches = compare_schema_types(df, target_table_df).collect()
     for col in type_mistmatches:
         column_name = col["column_name"]
         left_type = col["left_type"]
         right_type = col["right_type"]
 
-        if column_name not in df.columns or not accept_new_cols:
+        if column_name not in df.columns:
             continue
 
-        elif right_type is None and accept_new_cols:
-            expr = F.col(column_name)
+        if skip_new_columns and column_name not in target_columns:
+            logger.info(
+                f"m=apply_schema_remaps, msg=Skipping column not in target table "
+                f"{column_name=}"
+            )
+            continue
 
+        if column_name == "name" and api_to_cdc_struct:
+            expr = salesforce_name_type(column_name)
+        elif right_type is None and not skip_new_columns:
+            expr = F.col(column_name)
         elif left_type == right_type:
             # Avoid casting or other expressions
             expr = F.col(column_name)
-
-        elif right_type.startswith("struct<"):
-            expr = parse_struct_column(left_type, column_name, right_type)
-
+        elif right_type and right_type.startswith("struct<"):
+            if api_to_cdc_struct:
+                expr = remap_struct_expr(column_name, right_type)
+            else:
+                expr = parse_struct_column(left_type, column_name, right_type)
         # Missing value or unable to convert it
         elif left_type is None:
             expr = F.lit(None).cast(right_type)
         elif left_type == "string" and right_type == "boolean":
             expr = cast_string_to_boolean(column_name)
-
         else:
             expr = F.col(column_name).cast(right_type)
 
         df = df.withColumn(column_name, expr)
-    return df
+
+    return conforming_schema(spark, df, target_table)

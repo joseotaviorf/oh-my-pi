@@ -10,11 +10,15 @@ dag_documentation:
     2. Clean ingestion: This step will clean the data from the raw ingestion and store it in the Data Lake.
     3. Health checks and Metrics in future."
 
+
+
 datalake_bucket: "5a-datalake-forno"
 events_config:
   case:
     event_path: "raw/salesforce/CaseEvent"
+    api_entity: Case
 
+salesforce_endpoint: "https://quintoandar--fornov1.sandbox.my.salesforce.com"
 custom_cluster:
   driver_node_type_id: c5a.2xlarge
   node_type_id: c5a.2xlarge

@@ -1,11 +1,13 @@
 # Handle utils to be used across multiple jobs
 
+
 import re
 from argparse import ArgumentParser
 from collections import Counter
 from functools import wraps
 from typing import Callable, List, Optional, Tuple, Union
 
+from delta.tables import DeltaTable as DT
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
@@ -545,6 +547,73 @@ def validate_and_write(
     )
 
 
+@logger(exclude_return=True, exclude=["spark", "source_df"])
+def validate_and_upsert(
+    spark: SparkSession,
+    target_table: str,
+    source_df: DataFrame,
+    match_fields: List[str],
+    update_fields: Optional[List[str]] = None,
+    insert_fields: Optional[List[str]] = None,
+) -> None:
+    """
+    Generic Delta Lake upsert.
+
+    Args:
+        spark: SparkSession.
+        target_tables: Target table name or list of target tables.
+        source_df: Source DataFrame containing updates/inserts.
+        match_fields: Columns used to match source and target records.
+        update_fields: Columns to update when matched. If None, update all.
+        insert_fields: Columns to insert when not matched. If None, insert all.
+    """
+
+    assert match_fields and isinstance(match_fields, list), ValueError(
+        f"Match Fields should be a List[str] type -> {match_fields=}"
+    )
+    # Make sure the table exists and is delta
+    # We could use _table_exists here, but it doesn't check for delta (in case of future migration)
+    assert _table_exists(spark, target_table=target_table), ValueError(
+        f"{target_table=} is not Delta Table/Doesn't exists"
+    )
+    source_df = conforming_schema(spark, source_df, target_table)
+
+    match_condition = " AND ".join(
+        [f"target.{field} = source.{field}" for field in match_fields]
+    )
+    logger.info(f"m=validate_and_upsert, msg={match_condition=}")
+    delta_table = DT.forName(spark, target_table)
+
+    # Build the match condition in the SQL format
+    # target.id = source.id
+    # AND target.partition_date = source.partition
+    merge_builder = delta_table.alias("target").merge(
+        source_df.alias("source"), match_condition
+    )
+    if update_fields is None:
+        merge_builder = merge_builder.whenMatchedUpdateAll()
+        logger.info("m=validate_and_upsert, msg=When Matched updating all columns")
+    else:
+        update_expr = {
+            field: f"source.{field}"
+            for field in update_fields
+            if field not in match_fields
+        }
+        logger.info(
+            f"m=validate_and_upsert, msg=When matching updating {update_fields}\t{update_expr}"
+        )
+        merge_builder = merge_builder.whenMatchedUpdate(set=update_expr)
+
+    if insert_fields is None:
+        merge_builder = merge_builder.whenNotMatchedInsertAll()
+        logger.info("m=validate_and_upsert, msg=When NOT Matched Insert all columns")
+    else:
+        insert_expr = {field: f"source.{field}" for field in insert_fields}
+        merge_builder = merge_builder.whenNotMatchedInsert(values=insert_expr)
+    merge_builder.execute()
+    logger.info("m=validate and upsert, msg=All good!")
+
+
 def normalize_column_name(col: str) -> str:
     """
     Normalize column names according to the SSt team naming conventions.
@@ -701,6 +770,29 @@ def retrieve_spark_session(job_name: str) -> SparkSession:
         .config("spark.hadoop.fs.s3a.socket.timeout", "20000")
         .getOrCreate()
     )
+
+
+@logger(exclude_return=True, exclude=["spark", "df"])
+def conforming_schema(spark: SparkSession, df: DataFrame, table: str) -> DataFrame:
+    """
+    We're just ensuring we have the columns we need,
+    for those we don't we're adding as null
+    """
+
+    logger.info(f"m=conforming_schema, msg=Checking for missing columns in {table}")
+
+    target_table = spark.read.table(table)
+    target_schema = {field.name: field.dataType for field in target_table.schema}
+    missing_columns = set(target_schema.keys()) - set(df.columns)
+
+    # Conform DF to avoid overwriting schema with missing column or incorrect type
+    if missing_columns:
+        logger.info(f"m=conforming_schema, msg=Adding missing columns to {table}")
+        logger.info(f"m=conforming_schema, msg=Adding columns {missing_columns=}")
+        for col in missing_columns:
+            if col not in df.columns:
+                df = df.withColumn(col, F.lit(None).cast(target_schema[col]))
+    return df
 
 
 def get_latest_version_from_df(
