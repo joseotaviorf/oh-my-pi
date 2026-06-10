@@ -3,13 +3,12 @@ from datetime import datetime
 import pyspark.sql.functions as F
 from quintoandar_logger import QuintoAndarLogger
 
-# TODO: Re-enable when AppFlow integration is ready for production.
-# from bietlejuice.base.sst.core.appflow.marker import (
-#     ACTIVE_STATUS,
-#     appflow_has_completed_hour,
-#     extract_flow_name,
-#     get_latest_appflow_run,
-# )
+from bietlejuice.base.sst.core.appflow.marker import (
+    ACTIVE_STATUS,
+    appflow_has_completed_hour,
+    extract_flow_name,
+    get_latest_appflow_run,
+)
 from bietlejuice.base.sst.core.observability.metrics import save_volume_metric
 from bietlejuice.base.sst.core.observability.sensors import (
     partition_has_data,
@@ -27,6 +26,7 @@ from bietlejuice.base.sst.domains.salesforce.raw.io import read_sf_cdc_json
 from bietlejuice.base.sst.domains.salesforce.raw.transform import (
     sf_cdc_mandatory_fields,
 )
+from bietlejuice.base.sst.pipelines.salesforce.recovery_flow import events_case_recovery
 
 logger = QuintoAndarLogger("sst.pipelines.salesforce_raw")
 
@@ -117,67 +117,62 @@ def salesforce_raw_pipeline(cfg):
     # We're not sure we'll be using sensors now.
     # We'll be passing through if we don't have data in S3 (bad practice)
     # We'll keep an eye on pattern for this pipeline and adjust if needed
-
     has_data = sensor_s3_file_exists(cfg.bucket, file_key, fail=False)
 
-    # TODO: Re-enable when AppFlow integration is ready for production.
-    # flow_name = extract_flow_name(cfg.event_path)
-    # try:
-    #     appflow_status = get_latest_appflow_run(flow_name)
-    # except Exception as exc:
-    #     logger.warning(
-    #         f"m=salesforce_raw_pipeline, msg=describe_flow failed for {flow_name}: "
-    #         f"{exc}. Treating AppFlow as unavailable for recovery decision."
-    #     )
-    #     appflow_status = {
-    #         "flow_status": "",
-    #         "last_execution_status": None,
-    #         "last_execution_timestamp": None,
-    #         "last_execution_message": str(exc),
-    #     }
-    #
-    # appflow_completed_hour = appflow_has_completed_hour(
-    #     appflow_status, cfg.partition_date, cfg.partition_hour
-    # )
-    # logger.info(f"m=salesforce_raw_pipeline, msg=AppFlow status: {appflow_status}")
-    # logger.info(
-    #     f"m=salesforce_raw_pipeline, msg=AppFlow completed partition hour: "
-    #     f"{appflow_completed_hour}"
-    # )
-    #
-    # # Recovery only when AppFlow is down, the partition hour is not covered by a
-    # # successful run, and CDC files are not already in S3.
-    # should_run_recovery = (
-    #     appflow_status["flow_status"] != ACTIVE_STATUS
-    #     and not appflow_completed_hour
-    #     and not has_data
-    # )
-    # if should_run_recovery:
-    #     last_execution_ts = appflow_status.get("last_execution_timestamp")
-    #     last_execution_ts_str = (
-    #         last_execution_ts.isoformat() if last_execution_ts is not None else None
-    #     )
-    #     logger.warning(
-    #         f"m=salesforce_raw_pipeline, msg=AppFlow {flow_name} "
-    #         f"flow_status={appflow_status.get('flow_status')!r} "
-    #         f"last_execution_status={appflow_status.get('last_execution_status')!r} "
-    #         f"last_execution_timestamp={last_execution_ts_str} "
-    #         f"last_execution_message={appflow_status.get('last_execution_message')!r}. "
-    #         f"Running recovery for {target_table}."
-    #     )
-    #     events_case_recovery(
-    #         spark=spark,
-    #         api_entity=cfg.api_entity,
-    #         salesforce_endpoint=cfg.salesforce_endpoint,
-    #         dag_name=cfg.dag_name,
-    #         job_name=cfg.job_name,
-    #         target_schema=cfg.target_schema,
-    #         target_table=cfg.target_table,
-    #         env=cfg.env,
-    #         partition_date=cfg.partition_date,
-    #         partition_hour=cfg.partition_hour,
-    #     )
-    #     return
+    flow_name = extract_flow_name(cfg.event_path)
+    try:
+        appflow_status = get_latest_appflow_run(flow_name)
+    except Exception as exc:
+        logger.warning(
+            f"m=salesforce_raw_pipeline, msg=describe_flow failed for {flow_name}: "
+            f"{exc}. Treating AppFlow as unavailable for recovery decision."
+        )
+        appflow_status = {
+            "flow_status": "",
+            "last_execution_status": None,
+            "last_execution_timestamp": None,
+            "last_execution_message": str(exc),
+        }
+
+    appflow_completed_hour = appflow_has_completed_hour(
+        appflow_status, cfg.partition_date, cfg.partition_hour
+    )
+    logger.info(f"m=salesforce_raw_pipeline, msg=AppFlow status: {appflow_status}")
+    logger.info(
+        f"m=salesforce_raw_pipeline, msg=AppFlow completed partition hour: "
+        f"{appflow_completed_hour}"
+    )
+
+    # Recovery only when AppFlow is down and the last execution timestamp is before the expected end of the partition hour.
+    should_run_recovery = (
+        appflow_status["flow_status"] != ACTIVE_STATUS and not appflow_completed_hour
+    )
+    if should_run_recovery:
+        last_execution_ts = appflow_status.get("last_execution_timestamp")
+        last_execution_ts_str = (
+            last_execution_ts.isoformat() if last_execution_ts is not None else None
+        )
+        logger.warning(
+            f"m=salesforce_raw_pipeline, msg=AppFlow {flow_name} "
+            f"flow_status={appflow_status.get('flow_status')!r} "
+            f"last_execution_status={appflow_status.get('last_execution_status')!r} "
+            f"last_execution_timestamp={last_execution_ts_str} "
+            f"last_execution_message={appflow_status.get('last_execution_message')!r}. "
+            f"Running recovery for {target_table}."
+        )
+        events_case_recovery(
+            spark=spark,
+            api_entity=cfg.api_entity,
+            salesforce_endpoint=cfg.salesforce_endpoint,
+            dag_name=cfg.dag_name,
+            job_name=cfg.job_name,
+            target_schema=cfg.target_schema,
+            target_table=cfg.target_table,
+            env=cfg.env,
+            partition_date=cfg.partition_date,
+            partition_hour=cfg.partition_hour,
+        )
+        return None
 
     if not has_data:
         logger.info(f"m=salesforce_raw_pipeline, msg=No data found for {s3_file_path}")

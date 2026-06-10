@@ -114,7 +114,6 @@ def appflow_has_completed_hour(
     )
 
     last_execution_ts = parse_utc_ts(appflow_status.get("last_execution_timestamp"))
-
     expected_end_ts = parse_utc_ts(expected_end_ts)
 
     if last_execution_ts is None:
@@ -134,11 +133,7 @@ def appflow_has_completed_hour(
         f"completed_hour={completed_hour}"
     )
 
-    return (
-        appflow_status.get("flow_status") == ACTIVE_STATUS
-        and appflow_status.get("last_execution_status") == "Successful"
-        and completed_hour
-    )
+    return completed_hour
 
 
 def get_latest_appflow_run(flow_name: str, region_name: str = DEFAULT_REGION) -> dict:
