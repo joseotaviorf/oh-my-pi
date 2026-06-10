@@ -17,3 +17,4 @@ FROM
     datalake_people.event_definition AS ed
 WHERE
     ed.is_current = TRUE
+    AND ed.id_event_definition IS NOT NULL

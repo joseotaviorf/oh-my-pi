@@ -47,8 +47,8 @@ column_level_validations:
       severity_level: Error
   codex_owner_l1_name:
     has_completeness:
-      # Baseline (Databricks prod, 2026-03-25): ~0.989 complete; cap if null share stays >=75% of baseline (25% margin). Same patamar as pin_name_owner_l1.
-      less_than_or_equal_to: 0.9915
+      # Baseline (Databricks prod, 2026-06-09): 1.000 complete. Lower bound protects against regression.
+      greater_than_or_equal_to: 0.99
       severity_level: Warning
   codex_chapter:
     has_completeness:
@@ -82,28 +82,28 @@ column_level_validations:
       severity_level: Warning
   pin_name_owner_l1:
     has_completeness:
-      # Baseline (Databricks prod, 2026-03-25): ~0.989 complete; cap if null share stays >=75% of baseline (25% margin).
-      less_than_or_equal_to: 0.9915
+      # Baseline (Databricks prod, 2026-06-09): ~0.9993 complete. Lower bound protects against regression.
+      greater_than_or_equal_to: 0.99
       severity_level: Warning
   codex_owner_l2_name:
     has_completeness:
-      # Baseline (Databricks prod, 2026-03-25): ~0.959 complete; cap if null share stays >=75% of baseline (25% margin).
-      less_than_or_equal_to: 0.9689
+      # Baseline (Databricks prod, 2026-06-09): ~0.9941 complete. Lower bound protects against regression.
+      greater_than_or_equal_to: 0.99
       severity_level: Warning
   pin_name_owner_l2:
     has_completeness:
-      # Baseline (Databricks prod, 2026-03-25): ~0.959 complete; cap if null share stays >=75% of baseline (25% margin).
-      less_than_or_equal_to: 0.9689
+      # Baseline (Databricks prod, 2026-06-09): ~0.9934 complete. Lower bound protects against regression.
+      greater_than_or_equal_to: 0.99
       severity_level: Warning
   codex_owner_l3_name:
     has_completeness:
-      # Baseline (Databricks prod, 2026-03-25): ~0.918 complete; cap if null share stays >=75% of baseline (25% margin).
-      less_than_or_equal_to: 0.9383
+      # Baseline (Databricks prod, 2026-06-09): ~0.9571 complete. Lower bound protects against regression.
+      greater_than_or_equal_to: 0.94
       severity_level: Warning
   pin_name_owner_l3:
     has_completeness:
-      # Baseline (Databricks prod, 2026-03-25): ~0.918 complete; cap if null share stays >=75% of baseline (25% margin).
-      less_than_or_equal_to: 0.9383
+      # Baseline (Databricks prod, 2026-06-09): ~0.9564 complete. Lower bound protects against regression.
+      greater_than_or_equal_to: 0.94
       severity_level: Warning
   is_drift_business:
     is_complete:
