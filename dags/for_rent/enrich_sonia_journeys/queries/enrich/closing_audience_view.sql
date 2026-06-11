@@ -14,6 +14,7 @@ raw_sent_events AS (
     CAST(event_properties:person_uuid AS STRING) AS uuid_person,
     TRY_CAST(event_properties:id_house AS INT) AS id_house,
     ABS(CRC32(ENCODE(CONCAT(CAST(TRY_CAST(event_properties:id_house AS INT) AS STRING), '-', CAST(event_properties:id_tenant AS STRING)), 'utf-8'))) % 100 AS binning_value,
+    TRY_CAST(event_properties:id_contract AS INT) % 100 AS binning_value_contract_id,
     CASE
       WHEN event_name = 'rent_flow_tenant_contract_sent' THEN 'tenant'
       ELSE 'owner'
@@ -33,6 +34,7 @@ contract_person_sent_events AS (
     uuid_person,
     id_house,
     binning_value,
+    binning_value_contract_id,
     user_role,
     MIN(ts_event) AS ts_first_sent,
     MAX(ts_event) AS ts_last_sent,
@@ -40,7 +42,7 @@ contract_person_sent_events AS (
   FROM
     raw_sent_events
   GROUP BY
-    id_rent_flow, id_contract, id_contract_person, uuid_person, id_house, binning_value, user_role
+    id_rent_flow, id_contract, id_contract_person, uuid_person, id_house, binning_value, binning_value_contract_id, user_role
 ),
 contract_signatories AS (
   SELECT
@@ -103,12 +105,13 @@ SELECT
   signed.id_contract_person IS NOT NULL AS is_signed,
   (
     -- Gate 0: exactly 2 signatories (main tenant and main owner), graduated rollout by first-sent date
+    -- binning_value_contract_id (id_contract % 100) is to be deprecated in favour of binning_value
     (sig.number_of_signatories = 2 AND (
-      (sent.binning_value < 1  AND sent.ts_first_sent >= TIMESTAMP '2026-04-27 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-04-28 00:00:00')
-      OR (sent.binning_value < 3  AND sent.ts_first_sent >= TIMESTAMP '2026-04-28 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-07 00:00:00')
-      OR (sent.binning_value < 30 AND sent.ts_first_sent >= TIMESTAMP '2026-05-07 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-09 00:00:00')
-      OR (sent.binning_value < 50 AND sent.ts_first_sent >= TIMESTAMP '2026-05-09 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-06-02 00:00:00')
-      OR (sent.binning_value < 10 AND sent.ts_first_sent >= TIMESTAMP '2026-06-02 00:00:00')
+      (sent.binning_value_contract_id < 1  AND sent.ts_first_sent >= TIMESTAMP '2026-04-27 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-04-28 00:00:00')
+      OR (sent.binning_value_contract_id < 3  AND sent.ts_first_sent >= TIMESTAMP '2026-04-28 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-07 00:00:00')
+      OR (sent.binning_value_contract_id < 30 AND sent.ts_first_sent >= TIMESTAMP '2026-05-07 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-09 00:00:00')
+      OR (sent.binning_value_contract_id < 50 AND sent.ts_first_sent >= TIMESTAMP '2026-05-09 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-06-02 00:00:00')
+      OR (sent.binning_value_contract_id < 10 AND sent.ts_first_sent >= TIMESTAMP '2026-06-02 00:00:00')
     ))
     -- Gate 1: all signatories in this contract are registered
     OR (crs.all_signatories_registered AND sent.binning_value < 0)
