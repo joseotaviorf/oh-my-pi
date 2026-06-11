@@ -162,14 +162,14 @@ columns:
       ContractMobileAPI.GetContracts response in get_financial_context_v1 (array length
       of the JSON-stringified contract ID array); NULL when no successful GetContracts call
       exists in the session.
-  all_empty_invoices:
+  flag_all_empty_invoices:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
     description: Indicates the person had nothing to be collected — none of their contracts
       had any invoices or bills, so there was no outstanding debt to negotiate in this
-      session. Technically, TRUE when every GetInvoicesForContract and GetDetailedBills
-      downstream call in the session returned an empty response; FALSE when at least one
+      session. Technically, 1 when every GetInvoicesForContract and GetDetailedBills
+      downstream call in the session returned an empty response; 0 when at least one
       returned a non-empty response; NULL when neither of those call types appears in the
       session.
   user_segment:
@@ -181,6 +181,16 @@ columns:
       should approach the debt (e.g. EVICTIONS means the case is already in an eviction
       process). Technically, the ChargeHub customer segment from a successful
       GetCustomerSegment call in the session; NULL when no such call exists.
+  flag_fetch_financial_data_error:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_http_status
+    description: 1 when at least one downstream service call made by get_financial_context_v1
+      failed in the session (is_call_success = false), excluding HTTP 404 (a not-found result
+      is an absence-of-data signal, not a fetch error); 0 otherwise. Unifies the data/finance
+      fetch failure signal and is the V3 source for fact_ai_agents_interaction.flag_fetch_financial_data_error
+      (the merged equivalent of the V2 flag_has_collections_data_error / flag_has_finance_fetch_error).
   n_contracts_distribution_error:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_call
@@ -259,14 +269,14 @@ columns:
       simulate_negotiation_v1 succeeded; used as a proxy for the number of proposals
       presented to the user (distinct-trace deduplication avoids overcounting when the
       agent simulates multiple times within the same message).
-  is_negotiation_created:
+  flag_create_negotiation:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
     description: Whether the customer actually closed a deal — a debt negotiation was
       successfully created in this session. This is the main success outcome of a collection
-      conversation. Technically, TRUE when at least one create_negotiation_v1 call succeeded
-      in the session.
+      conversation. Technically, 1 when at least one create_negotiation_v1 call succeeded
+      in the session, else 0.
   created_negotiation_option_key:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_option_key
@@ -285,15 +295,7 @@ columns:
       credit card). Technically, the payment method used when the agent successfully created
       a negotiation (BOLETO, PIX, or CREDIT_CARD); sourced from domain_info.payment_method
       in the request log. NULL when no successful create_negotiation_v1 call occurred.
-  is_negotiation_flow_partial:
-    lineage:
-      - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
-      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Whether the customer was close to closing a deal but dropped off — they
-      had a proposal simulated yet no agreement was ultimately created (an abandoned
-      negotiation). Technically, TRUE when simulate_negotiation_v1 succeeded at least once
-      but create_negotiation_v1 never succeeded.
-  is_negotiation_created_missing_payment_info:
+  flag_negotiation_created_missing_payment_info:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
@@ -302,9 +304,10 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
     description: Whether a deal was closed but the customer was likely never shown the final
       payment instructions (such as the boleto or Pix to actually pay), so they may not know
-      how to complete the payment. Technically, TRUE when a negotiation was created but no
+      how to complete the payment. Technically, 1 when a negotiation was created but no
       successful TratoFeito.GetOngoingNegotiation call without an empty response was recorded
-      in the session, indicating the payment confirmation info was not retrieved for display.
+      in the session, indicating the payment confirmation info was not retrieved for display;
+      else 0.
   ts_first_mcp_call:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.ts_request

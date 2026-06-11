@@ -1,6 +1,3 @@
--- Read the full 3-day history for all sessions once. A window flag marks sessions
--- that had at least one call in the current load window; the outer WHERE then keeps
--- only those, so cross-day sessions are always re-aggregated from their earliest log.
 WITH base AS (
     SELECT
         mtl.id_langfuse_session,
@@ -35,10 +32,8 @@ WITH base AS (
 )
 SELECT
     b.id_langfuse_session,
-    -- Group 1: Identity (first non-null per session)
     MAX(b.id_user) AS id_user,
     MAX(b.uuid_person_mcp) AS uuid_person_mcp,
-    -- Group 2: Tool invocation counts (COUNT DISTINCT id_request per tool)
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_financial_context_v1' THEN b.id_request END) AS n_financial_context_calls,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_financial_context_v1' AND b.is_mcp_success = false THEN b.id_request END) AS n_financial_context_errors,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_debt_breakdown_v1' THEN b.id_request END) AS n_debt_breakdown_calls,
@@ -60,7 +55,6 @@ SELECT
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_original_invoices_by_status_v1' THEN b.id_request END) AS n_original_invoices_calls,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_original_invoices_by_status_v1' AND b.is_mcp_success = false THEN b.id_request END) AS n_original_invoices_errors,
     COUNT(DISTINCT CASE WHEN b.is_mcp_success = false THEN b.id_request END) AS n_mcp_tool_errors,
-    -- Group 3: Financial context signals (from get_financial_context_v1 downstream calls)
     MAX(
         CASE
             WHEN b.call_function_name = 'GetContracts'
@@ -83,9 +77,9 @@ SELECT
                 THEN 1
             END
         ) = 0
-            THEN TRUE
-        ELSE FALSE
-    END AS all_empty_invoices,
+            THEN 1
+        ELSE 0
+    END AS flag_all_empty_invoices,
     MAX(
         CASE
             WHEN b.call_function_name = 'GetCustomerSegment'
@@ -93,7 +87,15 @@ SELECT
             THEN b.call_response
         END
     ) AS user_segment,
-    -- Group 4: Contract-level aggregates
+    MAX(
+        CASE
+            WHEN b.mcp_tool_name = 'get_financial_context_v1'
+                AND b.is_call_success = false
+                AND (b.call_http_status IS NULL OR b.call_http_status <> 404)
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_fetch_financial_data_error,
     COUNT(
         DISTINCT CASE
             WHEN b.call_function_name = 'GetDebtBreakdown'
@@ -137,7 +139,6 @@ SELECT
             THEN b.id_contract_mcp
         END
     ) AS n_contracts_negotiation_not_found_ongoing_negotiation,
-    -- Group 5: Negotiation outcome signals
     MAX(
         CASE
             WHEN b.call_function_name = 'GetNegotiationOptions'
@@ -160,7 +161,7 @@ SELECT
             THEN 1
             ELSE 0
         END
-    ) = 1 AS is_negotiation_created,
+    ) AS flag_create_negotiation,
     MAX(
         CASE
             WHEN b.mcp_tool_name = 'create_negotiation_v1'
@@ -175,43 +176,26 @@ SELECT
             THEN b.mcp_payment_method
         END
     ) AS created_negotiation_payment_method,
-    (
-        MAX(
-            CASE
-                WHEN b.mcp_tool_name = 'simulate_negotiation_v1'
-                    AND b.is_mcp_success = true
-                THEN 1
-                ELSE 0
-            END
-        ) = 1
-        AND MAX(
-            CASE
-                WHEN b.mcp_tool_name = 'create_negotiation_v1'
-                    AND b.is_mcp_success = true
-                THEN 1
-                ELSE 0
-            END
-        ) = 0
-    ) AS is_negotiation_flow_partial,
-    (
-        MAX(
-            CASE
-                WHEN b.mcp_tool_name = 'create_negotiation_v1'
-                    AND b.is_mcp_success = true
-                THEN 1
-                ELSE 0
-            END
-        ) = 1
-        AND COUNT(
-            DISTINCT CASE
-                WHEN b.call_function_name = 'GetOngoingNegotiation'
-                    AND b.call_outcome = 'success'
-                    AND (b.call_response IS NULL OR b.call_response != 'empty')
-                THEN b.id_contract_call
-            END
-        ) = 0
-    ) AS is_negotiation_created_missing_payment_info,
-    -- Group 6: Temporal
+    CASE
+        WHEN MAX(
+                CASE
+                    WHEN b.mcp_tool_name = 'create_negotiation_v1'
+                        AND b.is_mcp_success = true
+                    THEN 1
+                    ELSE 0
+                END
+            ) = 1
+            AND COUNT(
+                DISTINCT CASE
+                    WHEN b.call_function_name = 'GetOngoingNegotiation'
+                        AND b.call_outcome = 'success'
+                        AND (b.call_response IS NULL OR b.call_response != 'empty')
+                    THEN b.id_contract_call
+                END
+            ) = 0
+        THEN 1
+        ELSE 0
+    END AS flag_negotiation_created_missing_payment_info,
     MIN(b.ts_request) AS ts_first_mcp_call,
     MAX(b.ts_request) AS ts_last_mcp_call,
     YEAR(MAX(b.ts_request)) AS year,
