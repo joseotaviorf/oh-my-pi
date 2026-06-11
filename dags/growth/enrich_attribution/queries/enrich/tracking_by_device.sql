@@ -77,6 +77,7 @@ tracking_by_device_union AS (
     utm_hash,
     ts_tracking
   FROM tracking
+  WHERE id_device IS NOT NULL
 
   UNION
 
