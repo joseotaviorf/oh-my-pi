@@ -421,7 +421,7 @@ def fetch_from_s3(
     if not valid_files:
         raise RuntimeError(
             "No data found in S3 bucket from Langfuse export. "
-            "Access https://langfuse.apps.core-prd-green.habitat.zone/project/cma4b5v5l000f2n07551cc2v8/settings/integrations/blobstorage "
+            "Access https://langfuse.apps.core-prd.habitat.zone/project/cma4b5v5l000f2n07551cc2v8/settings/integrations/blobstorage "
             "and click run now or contact the Conversational Platform Team"
         )
 
