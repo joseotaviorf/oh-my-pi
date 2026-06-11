@@ -166,4 +166,4 @@ columns:
 # Schema constraints
 min_columns: 36
 max_columns: 36
-strict: true
+strict: true 
