@@ -35,7 +35,7 @@ workflow:
     agent_support_tickets_by_month:
       load_spark_job: load_agent_support_tickets_by_month
       extra_spark_job_arguments:
-        - "18"
+        - "2"
     agent_independent_campinas_metrics:
       load_spark_job: load_agent_independent_campinas_metrics
       extra_spark_job_arguments:
@@ -43,4 +43,4 @@ workflow:
     agent_new_agent_activation_metrics:
       load_spark_job: load_agent_new_agent_activation_metrics
       extra_spark_job_arguments:
-        - "18"
+        - "2"

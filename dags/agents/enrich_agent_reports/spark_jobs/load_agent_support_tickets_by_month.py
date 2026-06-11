@@ -122,7 +122,7 @@ ARG_SPEC = [
         "Interval end YYYY-MM-DD (window end date)",
     ),
     ("run_mode", str, "dev", "Run mode: prod/dev"),
-    ("months_window", int, 18, "Number of months in the lookback window"),
+    ("months_window", int, 2, "Number of months in the lookback window"),
 ]
 
 
@@ -150,7 +150,7 @@ def parse_args() -> Namespace:
 
 
 # DBTITLE 1,Helper functions
-def _month_range(load_end_date: str, months_window: int = 18) -> tuple[date, date]:
+def _month_range(load_end_date: str, months_window: int = 2) -> tuple[date, date]:
     """Return (month_start, month_end) as Python dates (first day of each month) for the lookback window."""
     num_months = int(months_window)
     end_date = datetime.strptime(load_end_date, "%Y-%m-%d").date()
@@ -193,7 +193,7 @@ def _filter_in_month_window(
 
 # DBTITLE 1,Business rules
 def _qualified_active_ciqs_by_month(
-    load_end_date: str, months_window: int = 18
+    load_end_date: str, months_window: int = 2
 ) -> DataFrame:
     """Agent-months where the agent has a valid first listing in a 3-month window (first listing month + 2 following)."""
     month_start, month_end = _month_range(load_end_date, months_window)
@@ -225,7 +225,7 @@ def _qualified_active_ciqs_by_month(
     )
 
 
-def _all_listings_by_month(load_end_date: str, months_window: int = 18) -> DataFrame:
+def _all_listings_by_month(load_end_date: str, months_window: int = 2) -> DataFrame:
     """Count of all CIQ listings per (id_user, reference_month) in the window."""
     month_start, month_end = _month_range(load_end_date, months_window)
     ciq_listings_with_month = (
@@ -246,7 +246,7 @@ def _all_listings_by_month(load_end_date: str, months_window: int = 18) -> DataF
 
 # --- Visits: each completed visit counts for its month and the next (2-month window) ---
 def _all_agents_visits_by_month(
-    load_end_date: str, months_window: int = 18
+    load_end_date: str, months_window: int = 2
 ) -> DataFrame:
     """Count distinct visits per (id_agent, reference_month); visits counts for the month that they were made and the following month"""
     month_start, month_end = _month_range(load_end_date, months_window)
@@ -377,7 +377,7 @@ def _business_context() -> DataFrame:
 
 
 # DBTITLE 1,Tickets related to agents
-def _tickets_by_user_monthly(load_end_date: str, months_window: int = 18) -> DataFrame:
+def _tickets_by_user_monthly(load_end_date: str, months_window: int = 2) -> DataFrame:
     """(sk_user, reference_month, total_tickets, sum_reopens, ticket_breakdown_aggregated)."""
     month_start, month_end = _month_range(load_end_date, months_window)
     fact_tickets = spark.table(TABLE_FACT_TICKETS).alias("fact_tickets")
@@ -552,7 +552,7 @@ def build_agent_support_tickets_by_month(args: Namespace) -> DataFrame:
     Build the final agent_support_tickets_by_month: base status + listings, visits, tickets,
     and eligibility/activity flags.
     """
-    months_window = int(getattr(args, "months_window", 18))
+    months_window = int(getattr(args, "months_window", 2))
     month_start, month_end = _month_range(args.load_end_date, months_window)
 
     status_by_month = spark.table(TABLE_STATUS_BY_MONTH)

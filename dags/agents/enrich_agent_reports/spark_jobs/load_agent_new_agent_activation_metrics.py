@@ -83,7 +83,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 JOB_NAME = "load_agent_new_agent_activation_metrics"
 logger = QuintoAndarLogger(JOB_NAME)
 
-MONTHS_WINDOW_DEFAULT = 18
+MONTHS_WINDOW_DEFAULT = 2
 NEW_AGENT_MAX_DAYS = 60
 
 TABLE_STATUS_BY_MONTH = "datalake_agent_reports.agent_status_by_month"
