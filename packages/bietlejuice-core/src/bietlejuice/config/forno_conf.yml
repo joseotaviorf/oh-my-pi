@@ -1876,7 +1876,7 @@ emr_cluster_base: &emr_cluster_anchor
         - Classification: spark-defaults
           Properties:
               spark.databricks.delta.vacuum.parallelDelete.enabled: "true"
-    spark_conf:
+    spark_conf: &emr_cluster_spark_conf_anchor
         spark.dynamicAllocation.enabled: "true"
         spark.shuffle.service.enabled: "true"
         spark.dynamicAllocation.minExecutors: "1"
@@ -2608,3 +2608,33 @@ vespucio_output_path: "s3://5a-vespucio-forno"
 ### Datazord Configs
 datazord_kafka_bootstrap_servers: "lkc-2yo85o-j29g53.us-east-1.aws.glb.confluent.cloud:9092"
 datazord_base_checkpoint_location: "s3://wonka.s3.forno.data.quintoandar.com.br/checkpoints/cdf-to-kafka"
+
+wonka_cluster_emr:
+    <<: *emr_cluster_anchor
+    init_scripts:
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
+          args:
+              - "{{ var.value.artifacts_bucket }}"
+              - "{{ var.value.databricks_s3_bucket }}"
+              - "{{ dag.dag_id }}"
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
+          args: []
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
+          args:
+              - "{{ var.value.environment }}"
+              - "" # Empty for now, as it isn't used. In the future, something like "{{ var.value.wonka_vault_approle_secret_id }}"
+    spark_conf:
+        <<: *emr_cluster_spark_conf_anchor
+        spark.pyspark.driver.python: /home/hadoop/venv/bin/python
+        spark.pyspark.python: /home/hadoop/venv/bin/python
+        spark.jars.packages: "org.apache.kafka:kafka-clients:3.5.1"
+    spark_env_vars:
+        DATA_INTERVAL_START: "{{ data_interval_start | ds }}"
+        DATA_INTERVAL_END: "{{ data_interval_end }}"
+        ENVIRONMENT: "{{ var.value.environment }}"
+        ARTIFACTS_BUCKET: *artifacts_bucket
+        SPARK_RUNTIME: "emr"
+        SPARK_VERSION: "3.5"

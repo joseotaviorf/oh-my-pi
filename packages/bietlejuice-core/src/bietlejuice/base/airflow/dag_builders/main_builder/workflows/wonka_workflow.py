@@ -1,6 +1,7 @@
 import copy
 import logging
 
+from bietlejuice.base.airflow.cluster_config_resolver import is_airflow_emr_cluster
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -17,6 +18,7 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
+from bietlejuice.base.pipeline.environment_enum import EnvironmentEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 logger = logging.getLogger("WonkaWorkflow")
@@ -28,7 +30,8 @@ class WonkaWorkflow(BaseWorkflow):
     """
 
     _WONKA_CUSTOM_SCHEMA = "wonka"
-    _WONKA_CLUSTER_CONFIG_KEY = "wonka_cluster"
+    _WONKA_DEFAULT_CLUSTER_CONFIG_KEY = "wonka_cluster"
+    _INSTALL_PEX_GENERIC_SCRIPT = "install_pex_generic.sh"
 
     def __init__(
         self, dag_args, workflow_args, cluster_args, dataset_dependencies, **kwargs
@@ -41,17 +44,26 @@ class WonkaWorkflow(BaseWorkflow):
             **kwargs,
         )
 
+        if (
+            self.env == EnvironmentEnum.PROD
+            and self.cluster_args.get("type") == "wonka_cluster_emr"
+        ):
+            raise RuntimeError(
+                "Wonka EMR is not enabled in prod; use cluster.type: wonka_cluster"
+            )
+
         wonka_dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
         if self.is_validation:
             self.dag_id = f"{wonka_dag_id}{self.VALIDATION_DAG_SUFFIX}"
         else:
             self.dag_id = wonka_dag_id
 
-        # Merge prod `wonka_cluster` preset with the DAG declaration `cluster:` block into
-        # `self.cluster_args` (non-mutating; does not alter ConfigurationService caches).
-        wonka_cluster_preset = self.config_service.get_config(
-            self._WONKA_CLUSTER_CONFIG_KEY
+        # Merge the Wonka cluster preset (from declaration `type`, default `wonka_cluster`)
+        # with the DAG declaration `cluster:` block into `self.cluster_args`.
+        wonka_cluster_config_key = self.cluster_args.get(
+            "type", self._WONKA_DEFAULT_CLUSTER_CONFIG_KEY
         )
+        wonka_cluster_preset = self.config_service.get_config(wonka_cluster_config_key)
         self.cluster_args = self._get_deep_updated_dict(
             wonka_cluster_preset, self.cluster_args
         )
@@ -144,10 +156,26 @@ class WonkaWorkflow(BaseWorkflow):
             "m=_initialize_task_creators, msg=All task creators initialized successfully for DAG {self.dag_id}"
         )
 
+    @staticmethod
+    def _patch_emr_install_pex_bootstrap_args(
+        cluster_configuration: dict, artifact_path: str
+    ) -> None:
+        for init_script in cluster_configuration.get("init_scripts", []):
+            destination = init_script.get("s3", {}).get("destination", "")
+            if destination.endswith(WonkaWorkflow._INSTALL_PEX_GENERIC_SCRIPT):
+                init_script["args"] = [artifact_path]
+                return
+
     def __set_env_vars_from_dag_args(self, task, dag_args):
-        task.cluster_configuration["spark_env_vars"]["PACKAGE_PATH"] = dag_args[
-            "artifact_path"
-        ]
+        cluster_configuration = task.cluster_configuration
+        spark_env_vars = cluster_configuration.setdefault("spark_env_vars", {})
+        artifact_path = dag_args["artifact_path"]
+        spark_env_vars["PACKAGE_PATH"] = artifact_path
+
+        if is_airflow_emr_cluster(cluster_configuration.get("spark_version", "")):
+            self._patch_emr_install_pex_bootstrap_args(
+                cluster_configuration, artifact_path
+            )
 
     def _create_all_tasks(self) -> None:
         """
