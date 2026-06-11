@@ -1,4 +1,40 @@
 WITH 
+sap_entity AS (
+    SELECT
+        id_finance_entity,
+        e.event,
+        e.status,
+        e.failed_reason,
+        e.ts_created,
+        e.id_sap_gateway_feature
+    FROM  datalake_retsuko_clean.sap_entity e
+    WHERE event = 'payment-accounting-entries'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY ts_created DESC) = 1
+),
+sap_gateway AS (
+    SELECT
+        f.id_finance_entity,
+        s.id_feature,
+        s.hash,
+        s.type,
+        s.status as sync_sap_job_status,
+        w.status as sap_send_status,
+        w.webhook_status as sap_processed_status,
+        w.errors AS webhook_error
+    FROM
+        datalake_sap_gateway_clean.feature f
+    LEFT JOIN
+        datalake_sap_gateway_clean.sync_sap_job s
+          ON f.id_feature = s.id_feature
+    LEFT JOIN
+        datalake_sap_gateway_clean.webhook_log w
+          ON s.idoc = w.idoc
+    WHERE
+        s.erp_solution IN ('S4')
+        AND s.type IN ('LCM')
+        AND s.status NOT IN ('ignore', 'ignored')
+        AND DATE(f.ts_created) >= DATE('2025-01-01')
+),
 pre_francesinha AS (
     SELECT
         ext.origin_complement AS id_bank,
@@ -359,9 +395,9 @@ df AS (
 )
 
 SELECT
-    id_our_number,
-    id_invoice,
-    hash,
+    df.id_our_number,
+    df.id_invoice,
+    df.hash,
     bank_number,
     bank_account_number,
     sap_account_number,
@@ -389,6 +425,14 @@ SELECT
         WHEN status_checkout IN ('recorded on the wrong date and value','recorded on the wrong date','recorded on the wrong value') THEN 'Not Concilied - Payment source divergent'
         ELSE 'Not Concilied - other'
     END AS is_bank_concilied_detail,
+    CASE 
+        WHEN status_sap = 'not recorded' AND id_invoice IS NULL THEN 'retsuko not found'
+        WHEN status_sap = 'not recorded' AND e.id_finance_entity IS NULL THEN 'sap entity not found'
+        WHEN status_sap = 'not recorded' AND e.status = 'failed' THEN CONCAT('sap_entity failed:',e.failed_reason)
+        WHEN status_sap = 'not recorded' AND sg.id_feature IS NULL THEN 'gateway not found'
+        WHEN status_sap = 'not recorded' AND sg.sync_sap_job_status = 'error' THEN sg.webhook_error
+        WHEN status_sap = 'not recorded' AND e.id_finance_entity IS NOT NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
+    END AS sap_error_detail,
     dt_bank_paid,
     dt_billing_paid,
     dt_checkout_paid,
@@ -396,3 +440,9 @@ SELECT
     id_pix_payment
 FROM
     df
+LEFT JOIN 
+        sap_entity e
+            ON df.id_invoice = e.id_finance_entity
+LEFT JOIN 
+        sap_gateway sg
+            ON e.id_sap_gateway_feature = sg.id_feature

@@ -47,7 +47,9 @@ columns:
     - datalake_checkout_clean.bolecode
     - datalake_checkout_clean.pix
   payment_status:
-    description: 'Checkout payment status'
+    description: >-
+      Lifecycle state of the charge in Checkout (boleto, bolecode, or pix),
+      such as PAID or PAID_AFTER_DUE_DATE; canceled charges are excluded upstream.
     lineage:
     - datalake_checkout_clean.boleto.status
     - datalake_checkout_clean.bolecode.status
@@ -129,6 +131,17 @@ columns:
       - datalake_trato_feito_clean.bill
       - datalake_trato_feito_clean.installment_charges
       - datalake_retsuko.invoice
+  sap_error_detail:
+    description: >-
+      When SAP is not recorded, explains diagnosis from Retsuko invoice presence,
+      sap_entity status, and SAP gateway sync or webhook errors.
+    lineage:
+      - datalake_retsuko.invoice.id_external
+      - datalake_retsuko_clean.sap_entity.status
+      - datalake_retsuko_clean.sap_entity.failed_reason
+      - datalake_sap_gateway_clean.feature
+      - datalake_sap_gateway_clean.sync_sap_job.status
+      - datalake_sap_gateway_clean.webhook_log.errors
   dt_bank_paid:
     description: "Date when the payment was received in bank statements"
     lineage:

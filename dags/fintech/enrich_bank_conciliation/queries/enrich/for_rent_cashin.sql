@@ -74,7 +74,14 @@ francesinha_base AS (
 ),
 
 francesinha AS (
-    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    SELECT
+        *,
+        YEAR(dt_paid) AS pay_year,
+        MONTH(dt_paid) AS pay_month,
+        ROW_NUMBER() OVER(
+            PARTITION BY company_use, YEAR(dt_paid), MONTH(dt_paid)
+            ORDER BY dt_paid
+        ) AS rn
     FROM francesinha_base
 ),
 
@@ -108,7 +115,14 @@ seu_barriga_base AS (
 ),
 
 seu_barriga AS (
-    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    SELECT
+        *,
+        YEAR(dt_paid) AS pay_year,
+        MONTH(dt_paid) AS pay_month,
+        ROW_NUMBER() OVER(
+            PARTITION BY company_use, YEAR(dt_paid), MONTH(dt_paid)
+            ORDER BY dt_paid
+        ) AS rn
     FROM seu_barriga_base
 ),
 
@@ -173,7 +187,14 @@ sap_base AS (
 ),
 
 sap AS (
-    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    SELECT
+        *,
+        YEAR(dt_paid) AS pay_year,
+        MONTH(dt_paid) AS pay_month,
+        ROW_NUMBER() OVER(
+            PARTITION BY company_use, YEAR(dt_paid), MONTH(dt_paid)
+            ORDER BY dt_paid
+        ) AS rn
     FROM sap_base
 ),
 
@@ -348,6 +369,7 @@ pre_vans_checkout AS (
         id_invoice,
         payment_method,
         payment_status,
+        payment_source,
         dt_paid,
         paid_amount,
         our_number
@@ -377,6 +399,7 @@ vans_checkout_base AS (
         id_invoice,
         payment_method,
         payment_status,
+        payment_source,
         dt_paid,
         our_number,
         paid_amount AS amount
@@ -385,7 +408,14 @@ vans_checkout_base AS (
 ),
 
 vans_checkout AS (
-    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    SELECT
+        *,
+        YEAR(dt_paid) AS pay_year,
+        MONTH(dt_paid) AS pay_month,
+        ROW_NUMBER() OVER(
+            PARTITION BY company_use, YEAR(dt_paid), MONTH(dt_paid)
+            ORDER BY dt_paid
+        ) AS rn
     FROM vans_checkout_base
 ),
 
@@ -398,6 +428,8 @@ vans_checkout_for_join AS (
         payment_method,
         payment_status,
         dt_paid,
+        pay_year,
+        pay_month,
         amount,
         rn
     FROM
@@ -412,6 +444,8 @@ vans_checkout_for_join AS (
         payment_method,
         payment_status,
         dt_paid,
+        pay_year,
+        pay_month,
         amount,
         rn
     FROM
@@ -419,6 +453,15 @@ vans_checkout_for_join AS (
     WHERE
         our_number IS NOT NULL
         AND CAST(our_number AS STRING) != company_use
+        -- Checkout: bank/retsuko often key by our_number while company_use is CK/*C## or BL substring.
+        -- Vans legacy: only BL barcodes need our_number fallback (avoids false match e.g. 64726B2001 → 852858).
+        AND (
+            payment_source IN ('checkout_bolecode', 'checkout_boleto')
+            OR (
+                payment_source = 'vans_boleto'
+                AND UPPER(company_use) LIKE '%BL%'
+            )
+        )
 ),
 
 vans_checkout_matched AS (
@@ -429,13 +472,15 @@ vans_checkout_matched AS (
         payment_method,
         payment_status,
         dt_paid,
+        pay_year,
+        pay_month,
         amount,
         rn
     FROM
         vans_checkout_for_join
     QUALIFY
         ROW_NUMBER() OVER (
-            PARTITION BY join_key, rn
+            PARTITION BY join_key, pay_year, pay_month, rn
             ORDER BY
                 CASE WHEN payment_method = 'PIX' THEN 0 WHEN payment_method = 'BOLETO' THEN 1 ELSE 2 END,
                 company_use
@@ -451,14 +496,14 @@ known_company_use AS (
 ),
 
 df_all AS (
-    SELECT company_use, rn FROM seu_barriga
+    SELECT company_use, pay_year, pay_month, rn FROM seu_barriga
     UNION DISTINCT
-    SELECT company_use, rn FROM francesinha
+    SELECT company_use, pay_year, pay_month, rn FROM francesinha
     UNION DISTINCT
-    SELECT company_use, rn FROM sap
+    SELECT company_use, pay_year, pay_month, rn FROM sap
     UNION DISTINCT
     -- FIX: drop checkout-only orphan keys (e.g. our_number 483365 with no bank/retsuko match)
-    SELECT vc.company_use, vc.rn
+    SELECT vc.company_use, vc.pay_year, vc.pay_month, vc.rn
     FROM vans_checkout vc
     INNER JOIN known_company_use kcu
         ON kcu.company_use = vc.company_use
@@ -511,16 +556,28 @@ df AS (
         df_all cs
     LEFT JOIN
         francesinha f
-            ON f.company_use = cs.company_use AND f.rn = cs.rn
+            ON f.company_use = cs.company_use
+            AND f.pay_year = cs.pay_year
+            AND f.pay_month = cs.pay_month
+            AND f.rn = cs.rn
     LEFT JOIN
         vans_checkout_matched vc
-            ON vc.join_key = cs.company_use AND vc.rn = cs.rn
+            ON vc.join_key = cs.company_use
+            AND vc.pay_year = cs.pay_year
+            AND vc.pay_month = cs.pay_month
+            AND vc.rn = cs.rn
     LEFT JOIN
         seu_barriga sb
-            ON sb.company_use = cs.company_use AND sb.rn = cs.rn
+            ON sb.company_use = cs.company_use
+            AND sb.pay_year = cs.pay_year
+            AND sb.pay_month = cs.pay_month
+            AND sb.rn = cs.rn
     LEFT JOIN
         sap s
-            ON s.company_use = cs.company_use AND s.rn = cs.rn
+            ON s.company_use = cs.company_use
+            AND s.pay_year = cs.pay_year
+            AND s.pay_month = cs.pay_month
+            AND s.rn = cs.rn
     WHERE
         cs.company_use IS NOT NULL
     AND
