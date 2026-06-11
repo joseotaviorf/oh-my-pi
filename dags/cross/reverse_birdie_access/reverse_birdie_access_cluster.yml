@@ -12,6 +12,5 @@ validation:
     type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
-      num_workers: 3
       driver_node_type_id: r6g.xlarge
   allow_custom_spark_job: true

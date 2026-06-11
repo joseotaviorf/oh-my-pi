@@ -14,5 +14,4 @@ validation:
     databricks_conn_id: databricks_new_env
     custom_configurations:
       data_security_mode: USER_ISOLATION
-      num_workers: 3
       driver_node_type_id: r6g.2xlarge

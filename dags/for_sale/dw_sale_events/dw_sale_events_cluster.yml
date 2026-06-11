@@ -27,5 +27,4 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
       data_security_mode: USER_ISOLATION
-      num_workers: 3
       runtime_engine: PHOTON

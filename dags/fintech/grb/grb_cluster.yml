@@ -14,7 +14,7 @@ cluster:
     driver_node_type_id: r6g.2xlarge
 validation:
   cluster:
-    type: consolidation_s_general_cluster
+    type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new
     custom_libraries:
     - jar: '{artifacts_bucket}/jars/mssql-jdbc-12.8.1.jre8.jar'

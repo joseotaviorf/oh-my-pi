@@ -11,5 +11,4 @@ validation:
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
-      num_workers: 3
       driver_node_type_id: m6g.2xlarge

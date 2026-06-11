@@ -19,7 +19,7 @@ cluster:
       spark.sql.files.openCostInBytes: '1048576'
 validation:
   cluster:
-    type: consolidation_m_general_cluster
+    type: consolidation_s_memory_cluster
     databricks_conn_id: databricks_new
     access_control_list:
       group_name: auditlogs
@@ -32,5 +32,4 @@ validation:
         spark.sql.sources.parallelPartitionDiscovery.parallelism: '400'
         spark.sql.files.maxPartitionBytes: '67108864'
         spark.sql.files.openCostInBytes: '1048576'
-      driver_node_type_id: r6g.2xlarge
   allow_custom_spark_job: true

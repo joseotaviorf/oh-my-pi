@@ -17,7 +17,7 @@ cluster:
       ebs_volume_size: 200
 validation:
   cluster:
-    type: consolidation_s_general_cluster
+    type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new_env
     access_control_list:
       group_name: analytics-engineers

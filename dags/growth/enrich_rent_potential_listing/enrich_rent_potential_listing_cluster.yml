@@ -14,11 +14,11 @@ cluster:
     driver_node_type_id: r6gd.2xlarge
 validation:
   cluster:
-    type: consolidation_s_general_cluster
+    type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
       num_workers: 3
       runtime_engine: PHOTON
-      driver_node_type_id: r6g.2xlarge
+      driver_node_type_id: r6g.xlarge

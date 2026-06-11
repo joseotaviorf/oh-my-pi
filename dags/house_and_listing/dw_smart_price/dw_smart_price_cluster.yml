@@ -11,3 +11,12 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     num_workers: 3
     driver_node_type_id: r6g.xlarge
+validation:
+  cluster:
+    type: consolidation_s_memory_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      num_workers: 3

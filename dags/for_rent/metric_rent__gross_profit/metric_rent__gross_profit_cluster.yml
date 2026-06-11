@@ -14,3 +14,14 @@ cluster:
     runtime_engine: PHOTON
     aws_attributes:
       ebs_volume_size: 200
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      runtime_engine: PHOTON

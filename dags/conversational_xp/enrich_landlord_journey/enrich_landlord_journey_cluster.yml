@@ -18,3 +18,13 @@ cluster:
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_s_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      data_security_mode: USER_ISOLATION
+      num_workers: 4
+      runtime_engine: PHOTON

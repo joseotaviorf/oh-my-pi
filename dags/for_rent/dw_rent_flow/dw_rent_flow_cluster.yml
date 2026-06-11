@@ -19,7 +19,7 @@ cluster:
       ebs_volume_size: 200
 validation:
   cluster:
-    type: consolidation_l_general_cluster
+    type: consolidation_m_general_cluster
     databricks_conn_id: databricks_new_env
     access_control_list:
       group_name: analytics-engineers
@@ -32,4 +32,5 @@ validation:
         spark.sql.shuffle.partitions: 256
       data_security_mode: USER_ISOLATION
       num_workers: 3
-      driver_node_type_id: m6g.2xlarge
+      runtime_engine: PHOTON
+      driver_node_type_id: r6g.xlarge

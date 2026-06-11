@@ -12,3 +12,15 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - pypi:
+        package: ftfy
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      num_workers: 3
+  allow_custom_spark_job: true

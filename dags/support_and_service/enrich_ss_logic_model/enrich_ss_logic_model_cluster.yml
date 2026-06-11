@@ -20,10 +20,10 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 validation:
   cluster:
-    type: consolidation_l_general_cluster
+    type: consolidation_m_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
-      num_workers: 5
-      driver_node_type_id: r6g.2xlarge
+      num_workers: 3
+      runtime_engine: PHOTON

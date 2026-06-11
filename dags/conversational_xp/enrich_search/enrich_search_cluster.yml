@@ -18,7 +18,7 @@ cluster:
   databricks_conn_id: databricks_new_env
 validation:
   cluster:
-    type: consolidation_l_general_cluster
+    type: consolidation_m_memory_cluster
     databricks_conn_id: databricks_new_env
     access_control_list:
       group_name: data-products
@@ -30,4 +30,4 @@ validation:
         spark.metrics.namespace: data_products.enrich_search
       num_workers: 4
       runtime_engine: PHOTON
-      driver_node_type_id: m6g.xlarge
+      driver_node_type_id: r6g.large

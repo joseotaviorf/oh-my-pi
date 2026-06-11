@@ -31,5 +31,4 @@ validation:
       spark_conf:
         spark.metrics.namespace: data_products.enrich_base_metrics_service
       num_workers: 3
-      runtime_engine: PHOTON
       driver_node_type_id: r6g.2xlarge

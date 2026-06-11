@@ -19,5 +19,4 @@ validation:
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
-      num_workers: 3
       runtime_engine: PHOTON

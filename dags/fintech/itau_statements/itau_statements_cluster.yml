@@ -13,3 +13,18 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.sql.execution.arrow.pyspark.enabled: 'false'
+      num_workers: 3
+      driver_node_type_id: m6g.xlarge
+  allow_custom_spark_job: true

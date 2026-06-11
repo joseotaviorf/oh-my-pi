@@ -19,6 +19,6 @@ validation:
       group_name: mlops
       permission_level: CAN_MANAGE
     custom_configurations:
-      num_workers: 4
-      driver_node_type_id: c6g.xlarge
+      num_workers: 3
+      driver_node_type_id: r6g.large
   allow_custom_spark_job: true

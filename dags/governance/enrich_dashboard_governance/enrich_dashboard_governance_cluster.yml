@@ -6,3 +6,10 @@ cluster:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      driver_node_type_id: m6g.xlarge

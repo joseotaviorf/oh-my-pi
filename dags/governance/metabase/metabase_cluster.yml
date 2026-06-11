@@ -2,3 +2,10 @@ cluster:
   type: consolidation_s_general_cluster
   custom_configurations:
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      num_workers: 3
+      driver_node_type_id: m6g.xlarge

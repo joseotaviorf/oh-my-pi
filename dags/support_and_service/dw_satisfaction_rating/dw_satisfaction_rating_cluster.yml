@@ -18,4 +18,4 @@ validation:
     custom_configurations:
       aws_attributes:
         availability: ON_DEMAND
-      driver_node_type_id: m6g.2xlarge
+      driver_node_type_id: r6g.xlarge

@@ -14,3 +14,15 @@ cluster:
     node_type_id: m6gd.xlarge
     driver_node_type_id: m6gd.xlarge
     runtime_engine: PHOTON
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      spark_version: 13.3.x-scala2.12
+      num_workers: 3
+      runtime_engine: PHOTON
+      driver_node_type_id: m6g.xlarge

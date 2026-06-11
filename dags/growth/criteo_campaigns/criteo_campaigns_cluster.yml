@@ -21,5 +21,4 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
       spark_version: 13.3.x-scala2.12
-      driver_node_type_id: m6g.xlarge
   allow_custom_spark_job: true

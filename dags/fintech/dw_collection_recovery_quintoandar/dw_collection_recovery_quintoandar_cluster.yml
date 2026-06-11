@@ -16,3 +16,12 @@ cluster:
       zone_id: us-east-1d
       ebs_volume_size: 200
       availability: SPOT_WITH_FALLBACK
+validation:
+  cluster:
+    type: consolidation_l_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      num_workers: 3
+      driver_node_type_id: r6g.2xlarge

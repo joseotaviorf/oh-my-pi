@@ -9,3 +9,10 @@ cluster:
     spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_l_general_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      num_workers: 3
+      driver_node_type_id: r6g.2xlarge

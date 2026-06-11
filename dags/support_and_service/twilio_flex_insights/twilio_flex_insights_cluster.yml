@@ -10,3 +10,12 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - whl: '{artifacts_bucket}/twilio-flex-insights-api-client-python/quintoandar_twilio_flex_insights_api_client-0.1.0-py2.py3-none-any.whl'
+    custom_configurations:
+      driver_node_type_id: m6g.xlarge
+  allow_custom_spark_job: true

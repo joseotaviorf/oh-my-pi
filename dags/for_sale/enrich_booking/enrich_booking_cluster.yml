@@ -9,3 +9,13 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     num_workers: 4
+validation:
+  cluster:
+    type: consolidation_m_general_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      data_security_mode: USER_ISOLATION
+      num_workers: 4
+      driver_node_type_id: r6g.2xlarge
