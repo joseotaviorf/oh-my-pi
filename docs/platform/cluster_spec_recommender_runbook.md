@@ -74,7 +74,7 @@ Examples:
 - `collapse_to_single|disable_photon|drop_nvme`
 - `keep_multi_node`
 
-The first `est` percentage is the accepted recommendation's estimated per-run delta. A percentage in parentheses is the cheapest rejected candidate. For example, `est 0% (+35%)` means no candidate beat the observed cost basis and the cheapest rejected one was estimated to increase cost by 35%. `drop_nvme` is applied on every actionable recommendation that observed local NVMe. `disable_photon` is **cost-gated** — it appears only when dropping Photon actually beats keeping it (the recommender prices both worlds; see the "Photon quadrant search" section of the algorithm doc). When a *drop-Photon* candidate is sized, sizing uses **effective demand** (CPU ×1.20, memory ×1.30 on p50/p95) so it assumes STANDARD-runtime headroom; a keep-Photon candidate sizes on raw demand. Observed `drv_*` / `wrk_*` columns in the CSV remain the raw telemetry.
+The first `est` percentage is the accepted recommendation's estimated per-run delta. A percentage in parentheses is the cheapest rejected candidate. For example, `est 0% (+35%)` means no candidate beat the observed cost basis and the cheapest rejected one was estimated to increase cost by 35%. `drop_nvme` is applied on every actionable recommendation that observed local NVMe. `disable_photon` is **cost-gated, with one hard exception** — Photon is force-dropped when the winning shape lands on compute-family (`c*`) nodes, which Databricks rejects for Photon. Otherwise it — it appears only when dropping Photon actually beats keeping it (the recommender prices both worlds; see the "Photon quadrant search" section of the algorithm doc). When a *drop-Photon* candidate is sized, sizing uses **effective demand** (CPU ×1.20, memory ×1.30 on p50/p95) so it assumes STANDARD-runtime headroom; a keep-Photon candidate sizes on raw demand. Observed `drv_*` / `wrk_*` columns in the CSV remain the raw telemetry.
 
 ---
 
@@ -102,6 +102,8 @@ Non-actionable cohorts (no shape change — kept as observed):
 - `cost_confidence_review`
 - `healthy_single`
 - `autoscale_review`
+
+Orthogonal to cohorts, `review_flags` (`io_scan_review`, `driver_bound_review`) marks DAGs needing Spark-job-level review — see `docs/platform/cluster_rightsizing_spark_review_backlog.md` and `docs/platform/cluster_rightsizing_low_cpu_dag_analysis.md`. Flags never block a recommendation.
 
 Under the bidirectional model the `keep_multi_*` cohorts no longer emit driver/worker resizes — a refinement that wins is reported as `right_size_multi` instead.
 
@@ -329,7 +331,7 @@ Check:
 
 - No task failures or retries beyond normal noise.
 - No OOM or executor loss.
-- Wall p95 still fits the schedule, especially for hourly jobs.
+- Wall p95 still fits the schedule for cadence-bound (≤2h interval) jobs; for everything else a wall increase is acceptable by policy as long as the cost delta is negative.
 - Cost delta is negative for `collapse_to_single` and `right_size_multi`.
 - For `right_size_multi`, confirm the emitted driver, worker type, and worker count match the intended shape and parallelism is preserved where wall matters.
 - If `validation_outcomes.csv` was generated, review `outcome` and `delta_*` columns for DAGs with prior shadow runs.
@@ -388,7 +390,7 @@ make create-dag-files
 
 ## Guardrails
 
-- **Bidirectional, cost-truthful:** the cheapest candidate that beats the observed cost basis within SLA wins — neither single-node nor multi-node is privileged. **SLA and the core cap always win.**
+- **Bidirectional, cost-truthful:** the cheapest candidate that beats the observed cost basis within SLA wins — neither single-node nor multi-node is privileged. **Memory, the core cap, and (for ≤2h schedules) the cadence SLA always win.** CPU is elastic: sizing uses `cpu_eff = p50 + 0.3·(p95−p50)` and the work-conserving wall model (`1 + f·(old/new cores − 1)`, f = p50-busy fraction) prices the stretch into projected cost. DAGs scheduled less often than every 2h have **no wall cap by policy** — the cost gate is the only brake.
 - **Driver on-demand, workers spot:** recommendations never price or emit on-demand workers.
 - **Photon quadrant + NVMe strip:** local NVMe (`drop_nvme`, `*gd`→`*g`) is removed on every actionable recommendation. Photon is a costed dimension — the recommender prices keep-Photon (raw demand, observed-anchored DBU, observed wall) and drop-Photon (`disable_photon`, `runtime_engine: STANDARD`, +100% wall, CPU ×1.20 / memory ×1.30 demand, non-Photon fleet DBU) across both the original and right-sized shapes (Q1-Q4) and keeps the globally cheapest that beats the observed cost. The offline DBU proxy divides observed DBU by `_PHOTON_DBU_PREMIUM = 3.0` when projecting Photon off.
 - **Cost authority:** `arm_avg_cost_per_run_usd` = negotiated `total_cost_usd` per run (DBU USD + EC2 USD). `arm_avg_dbu_cost_usd` and `arm_avg_ec2_cost_usd` are components. `arm_avg_dbu_consumed` is a DBU scalar for sanity checks only — never sum USD and DBU columns. List DBU (`total_dbu_list_cost_usd`) is not used.

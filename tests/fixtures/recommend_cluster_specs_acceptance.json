@@ -58,7 +58,8 @@
       "rec_worker_node_type": "m7g.xlarge",
       "rec_worker_count": 5,
       "rec_runtime_engine": null
-    }
+    },
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "enrich_search": {
     "kwargs": {
@@ -113,14 +114,15 @@
     },
     "expected": {
       "cohort": "right_size_multi",
-      "actions": "keep_multi_node|keep_driver|keep_worker_type|keep_worker_count|drop_nvme",
-      "recommended_preset": "consolidation_l_general_cluster",
-      "rec_driver_node_type": "m6g.xlarge",
-      "rec_worker_node_type": "m6g.4xlarge",
+      "actions": "keep_multi_node|reduce_driver|reduce_worker_type|keep_worker_count|drop_nvme",
+      "recommended_preset": "consolidation_m_memory_cluster",
+      "rec_driver_node_type": "r6g.large",
+      "rec_worker_node_type": "r6g.2xlarge",
       "rec_worker_count": 4,
       "rec_runtime_engine": null
     },
-    "note": "Photon+NVMe DAG at wall_p95 ~121 min. Soft SLA cap binds at 121 min, so Photon-off (2x wall inflation) is rejected; NVMe strip alone wins as right_size_multi."
+    "note": "Photon+NVMe DAG at wall_p95 ~121 min. Soft SLA cap binds at 121 min, so Photon-off (2x wall inflation) is rejected; NVMe strip alone wins as right_size_multi.",
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "langfuse": {
     "kwargs": {
@@ -181,7 +183,8 @@
       "rec_worker_node_type": "m6g.2xlarge",
       "rec_worker_count": 6,
       "rec_runtime_engine": null
-    }
+    },
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "emlio": {
     "kwargs": {
@@ -236,13 +239,14 @@
     },
     "expected": {
       "cohort": "right_size_multi",
-      "actions": "keep_multi_node|keep_driver|reduce_worker_type|keep_worker_count",
+      "actions": "keep_multi_node|reduce_driver|reduce_worker_type|reduce_worker_count",
       "recommended_preset": "consolidation_l_compute_cluster",
-      "rec_driver_node_type": "c6g.xlarge",
+      "rec_driver_node_type": "r6g.large",
       "rec_worker_node_type": "c6g.4xlarge",
-      "rec_worker_count": 4,
+      "rec_worker_count": 3,
       "rec_runtime_engine": null
-    }
+    },
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "jaiminho": {
     "kwargs": {
@@ -296,14 +300,15 @@
       "is_any_local_nvme": false
     },
     "expected": {
-      "cohort": "keep_multi_sla",
+      "cohort": "keep_multi_cost",
       "actions": "keep_multi_node",
       "recommended_preset": "consolidation_m_memory_cluster",
       "rec_driver_node_type": "r6g.2xlarge",
       "rec_worker_node_type": "r6g.2xlarge",
       "rec_worker_count": 2,
       "rec_runtime_engine": null
-    }
+    },
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "enrich_access_logs": {
     "kwargs": {
@@ -364,7 +369,8 @@
       "rec_worker_node_type": "m6g.2xlarge",
       "rec_worker_count": 2,
       "rec_runtime_engine": null
-    }
+    },
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "opa": {
     "kwargs": {
@@ -419,13 +425,14 @@
     },
     "expected": {
       "cohort": "right_size_multi",
-      "actions": "keep_multi_node|keep_driver|reduce_worker_type|keep_worker_count",
-      "recommended_preset": "consolidation_m_general_cluster",
-      "rec_driver_node_type": "r6g.2xlarge",
-      "rec_worker_node_type": "m6g.2xlarge",
+      "actions": "keep_multi_node|reduce_driver|reduce_worker_type|keep_worker_count",
+      "recommended_preset": "consolidation_s_memory_cluster",
+      "rec_driver_node_type": "r6g.xlarge",
+      "rec_worker_node_type": "r6g.xlarge",
       "rec_worker_count": 2,
       "rec_runtime_engine": null
-    }
+    },
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   },
   "enrich_tracked_events": {
     "kwargs": {
@@ -480,13 +487,14 @@
     },
     "expected": {
       "cohort": "right_size_multi",
-      "actions": "keep_multi_node|reduce_driver|keep_worker_type|keep_worker_count|drop_nvme",
+      "actions": "keep_multi_node|reduce_driver|keep_worker_type|keep_worker_count|disable_photon|drop_nvme",
       "recommended_preset": "consolidation_l_general_cluster",
       "rec_driver_node_type": "r6g.xlarge",
       "rec_worker_node_type": "m6g.4xlarge",
       "rec_worker_count": 3,
-      "rec_runtime_engine": null
+      "rec_runtime_engine": "STANDARD"
     },
-    "note": "ARM migration started 2026-06-06; wall_p95 ~111 min binds the soft SLA cap, so Photon-off is rejected while NVMe strip plus driver downsize wins."
+    "note": "ARM migration started 2026-06-06; wall_p95 ~111 min binds the soft SLA cap, so Photon-off is rejected while NVMe strip plus driver downsize wins.",
+    "regenerated": "2026-06-11 cpu_eff + work-conserving wall model + interval-only SLA"
   }
 }

@@ -121,20 +121,26 @@ class TestClassifyQualityGates:
             dominant_config_run_share=0.1,
             dominant_config_cost_share=0.05,
         )
-        assert classify(
-            thin_switch,
-            min_days=3,
-            min_runs=3,
-            recent_era_min_days=2,
-            recent_era_min_runs=2,
-        ) == "recent_config_change"
-        assert classify(
-            thin_switch,
-            min_days=3,
-            min_runs=3,
-            recent_era_min_days=2,
-            recent_era_min_runs=2,
-        ) != "needs_more_arm_data"
+        assert (
+            classify(
+                thin_switch,
+                min_days=3,
+                min_runs=3,
+                recent_era_min_days=2,
+                recent_era_min_runs=2,
+            )
+            == "recent_config_change"
+        )
+        assert (
+            classify(
+                thin_switch,
+                min_days=3,
+                min_runs=3,
+                recent_era_min_days=2,
+                recent_era_min_runs=2,
+            )
+            != "needs_more_arm_data"
+        )
         assert recommend_preset("recent_config_change", thin_switch) == (None, None)
 
     def test_established_config_switch_evaluates_on_latest_era(self):
@@ -312,16 +318,15 @@ class TestAdditiveSingleNodeSizing:
         sizing = size_single_node(m)
         rec = build_recommendation(m)
 
-        # The additive sizer still sizes the collapse candidate correctly,
-        assert sizing.node_type == "m6g.2xlarge"
-        assert sizing.projected_mem_pct == pytest.approx(27.5)
-        assert rcs.build_best_single_candidate(m).driver_node_type == "m6g.2xlarge"
-        # but a small compute driver plus idle spot workers is cheaper than the
-        # on-demand single node, so the bidirectional pick refines the multi shape.
-        assert rec.cohort == "right_size_multi"
-        assert rec.rec_driver_node_type == "c6g.xlarge"
-        assert rec.rec_worker_node_type == "m6g.large"
-        assert rec.rec_worker_count == 2
+        # Effective CPU demand (p50-anchored) sizes the idle workers near their
+        # p50, so the whole additive load fits the driver-sized single node…
+        assert sizing.node_type == "m6g.xlarge"
+        assert sizing.projected_mem_pct == pytest.approx(55.0)
+        assert rcs.build_best_single_candidate(m).driver_node_type == "m6g.xlarge"
+        # …and the collapse beats every refined-multi candidate on cost.
+        assert rec.cohort == "collapse_to_single"
+        assert rec.rec_driver_node_type == "m6g.xlarge"
+        assert rec.rec_worker_count == 0
         assert rec.projected.est_cost_delta_pct is not None
         assert rec.projected.est_cost_delta_pct < 0
 
@@ -344,8 +349,10 @@ class TestAdditiveSingleNodeSizing:
         assert sizing.node_type == "m6g.2xlarge"
         assert sizing.projected_mem_pct == pytest.approx(50.0)
         # Cheapest feasible shape is a refined spot multi, not the OD single node.
+        # (The default p50 fixtures exceed the synthetic p95s, so cpu_eff == p50
+        # and the driver lands one tier above the old p95-only pick.)
         assert rec.cohort == "right_size_multi"
-        assert rec.rec_driver_node_type == "m6g.large"
+        assert rec.rec_driver_node_type == "m6g.xlarge"
         assert rec.rec_worker_node_type == "m6g.large"
 
     def test_memory_pressure_collapses_to_memory_single_node_when_additive_load_fits(
@@ -415,7 +422,7 @@ class TestAdditiveSingleNodeSizing:
         rec = build_recommendation(m)
 
         # The collapse candidate still maps to a valid single-node node type,
-        assert rcs.build_best_single_candidate(m).driver_node_type == "r6g.2xlarge"
+        assert rcs.build_best_single_candidate(m).driver_node_type == "r6g.4xlarge"
         # but the refined spot multi is cheaper and maps to a valid preset.
         assert rec.cohort == "right_size_multi"
         assert rec.recommended_preset is not None
@@ -427,17 +434,20 @@ class TestSlaLimitMinutes:
         m = _m(runs_per_day=18.0, schedule_interval_minutes=60.0, wall_p95_min=30.0)
         assert rcs._sla_limit_minutes(m) == pytest.approx(48.0)
 
-    def test_low_cadence_uses_soft_cap_not_observed_wall(self):
+    def test_interval_above_two_hours_is_unbounded(self):
+        # Wall regressions are acceptable by policy outside the <=2h cadence
+        # band; the projected cost (with wall inflation) is the only brake.
         m = _m(runs_per_day=1.0, schedule_interval_minutes=1440.0, wall_p95_min=20.0)
-        assert rcs._sla_limit_minutes(m) == pytest.approx(40.0)
+        assert rcs._sla_limit_minutes(m) == float("inf")
 
-    def test_soft_cap_respects_two_hour_timeout(self):
-        m = _m(runs_per_day=1.0, wall_p95_min=90.0)
-        assert rcs._sla_limit_minutes(m) == pytest.approx(120.0)
+    def test_two_hour_schedule_is_cadence_bound(self):
+        m = _m(runs_per_day=12.0, schedule_interval_minutes=120.0, wall_p95_min=30.0)
+        assert rcs._sla_limit_minutes(m) == pytest.approx(96.0)
 
-    def test_already_long_job_not_capped_below_observed_p95(self):
-        m = _m(runs_per_day=1.0, wall_p95_min=150.0)
-        assert rcs._sla_limit_minutes(m) == pytest.approx(150.0)
+    def test_cadence_limit_floors_at_observed_p95(self):
+        # A DAG already past the 80% target keeps wall-neutral candidates.
+        m = _m(runs_per_day=72.0, schedule_interval_minutes=20.0, wall_p95_min=18.0)
+        assert rcs._sla_limit_minutes(m) == pytest.approx(18.0)
 
 
 class TestSingleNodeFirstKeepMultiGuards:
@@ -458,9 +468,11 @@ class TestSingleNodeFirstKeepMultiGuards:
         rec = build_recommendation(m)
 
         # Memory-bound workers pin the worker type; the driver still minimizes to
-        # the compute family, which the bidirectional pick keeps as a refined multi.
+        # the compute family, which the bidirectional pick keeps as a refined
+        # multi. (cpu_eff sizes the driver at p50+0.3*(p95-p50), one tier below
+        # the old p95-only pick.)
         assert rec.cohort == "right_size_multi"
-        assert rec.rec_driver_node_type == "c6g.2xlarge"
+        assert rec.rec_driver_node_type == "c6g.xlarge"
         assert "reduce_driver" in rec.actions.split("|")
 
     def test_keep_multi_never_upsizes_hot_driver_as_reduce_driver(self):
@@ -509,18 +521,14 @@ class TestSingleNodeFirstKeepMultiGuards:
         rec = build_recommendation(m)
         cfg = generate_validation_config(rec)
 
-        # Stays multi (collapsing the 5-worker shape would blow the hourly SLA),
-        # but refines the worker type down while keeping the driver and count.
-        assert rec.cohort == "right_size_multi"
-        assert rec.recommended_preset == "consolidation_s_general_cluster"
-        assert rec.rec_driver_node_type == "m6g.large"
-        assert rec.rec_worker_node_type == "m6g.xlarge"
-        assert rec.num_workers_override == 5
-        assert cfg is not None
-        assert cfg["validation"]["cluster"]["custom_configurations"] == {
-            "num_workers": 5,
-            "driver_node_type_id": "m6g.large",
-        }
+        # Hourly cadence with wall_p95 44min vs a 48min limit: under the
+        # work-conserving wall model every core cut projects past the limit,
+        # so the cadence-bound shape is kept as-is (no validation config).
+        assert rec.cohort == "keep_multi_sla"
+        assert rec.actions == "keep_multi_node"
+        assert rec.rec_worker_node_type == "m6g.2xlarge"
+        assert rec.rec_worker_count == 5
+        assert cfg is None
 
     def test_keep_multi_downsizes_worker_type_without_reducing_count(self, monkeypatch):
         monkeypatch.setenv("ENVIRONMENT", "prod")
@@ -535,7 +543,7 @@ class TestSingleNodeFirstKeepMultiGuards:
             wrk_mem_p95=10.0,
             wall_p50_min=18.0,
             wall_p95_min=18.0,
-            schedule_interval_minutes=20.0,
+            schedule_interval_minutes=600.0,
             arm_avg_total_cost_estimate_usd=8.0,
             arm_avg_ec2_cost_usd=1.5,
             arm_avg_dbu_cost_usd=6.5,
@@ -623,7 +631,7 @@ class TestSingleNodeFirstKeepMultiGuards:
             wrk_mem_p95=10.0,
             wall_p50_min=18.0,
             wall_p95_min=18.0,
-            schedule_interval_minutes=20.0,
+            schedule_interval_minutes=600.0,
             arm_avg_total_cost_estimate_usd=0.01,
             arm_avg_ec2_cost_usd=0.005,
             arm_avg_dbu_cost_usd=0.005,
@@ -667,12 +675,13 @@ class TestSingleNodeFirstKeepMultiGuards:
         rec = build_recommendation(m)
 
         # Collapsing the spiky hourly shape would blow the SLA, so it stays multi,
-        # but the busy workers' type is refined down — a cheaper refined multi.
+        # but the spiky-idle workers (p50 14.5 / p95 75.9) size near their p50
+        # under cpu_eff — a much cheaper refined multi.
         assert rec.cohort == "right_size_multi"
         assert rec.rec_worker_count == 2
-        assert rec.rec_worker_node_type == "m6g.2xlarge"
+        assert rec.rec_worker_node_type == "r6g.xlarge"
 
-    def test_busy_spot_cluster_stays_multi_when_on_demand_collapse_costs_more(self):
+    def test_busy_spot_cluster_collapses_when_cpu_eff_makes_single_node_cheaper(self):
         m = _m(
             driver_node_type="m6g.large",
             worker_node_type="m6g.2xlarge",
@@ -689,10 +698,12 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
-        assert rec.cohort == "keep_multi_cost"
-        assert rec.recommended_preset == "consolidation_m_general_cluster"
-        assert rec.projected.est_cost_delta_pct == pytest.approx(0.0)
-        assert rec.projected.blocked_cost_delta_pct > 0
+        # p95-bursty (80%) but p50-idle (default 20%) workers size near p50, so
+        # a single memory node holds the additive demand and wins on cost.
+        assert rec.cohort == "collapse_to_single"
+        assert rec.rec_driver_node_type == "r6g.2xlarge"
+        assert rec.projected.est_cost_delta_pct is not None
+        assert rec.projected.est_cost_delta_pct < 0
 
     def test_demand_over_largest_single_node_stays_multi_memory(self):
         m = _m(
@@ -714,7 +725,7 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert rec.cohort == "keep_multi_memory"
         assert rec.recommended_preset == "consolidation_xl_memory_cluster"
 
-    def test_driver_and_workers_both_hot_stays_multi_balanced(self):
+    def test_driver_and_workers_hot_at_p95_but_idle_at_p50_collapses(self):
         m = _m(
             driver_node_type="m6g.2xlarge",
             worker_node_type="m6g.2xlarge",
@@ -729,7 +740,70 @@ class TestSingleNodeFirstKeepMultiGuards:
             arm_avg_dbu_cost_usd=60.0,
         )
 
-        assert classify(m) == "keep_multi_balanced"
+        # Sustained p50 load is moderate (drv 30 / wrk 55 on 8-core nodes), so
+        # the additive cpu_eff demand fits one r6g.4xlarge and the collapse is
+        # cost-justified; CPU burst alone no longer pins the multi shape.
+        assert classify(m) == "collapse_to_single"
+
+
+class TestReviewFlags:
+    def test_io_scan_review_flags_high_wait_low_cpu_base(self):
+        # langfuse/enrich_search shape: workers babysit S3 (high IO-wait, low p50).
+        m = _m(wrk_wait_p95=67.0, wrk_cpu_p50=14.0)
+        assert rcs.review_flags(m) == ["io_scan_review"]
+
+    def test_driver_bound_review_flags_idle_workers_without_io_wait(self):
+        # greenhouse_v3 shape: driver paginates an API while workers idle.
+        m = _m(wrk_wait_p95=1.2, wrk_cpu_p50=2.2)
+        assert rcs.review_flags(m) == ["driver_bound_review"]
+
+    def test_no_flags_for_healthy_or_single_node_shapes(self):
+        assert rcs.review_flags(_m(wrk_wait_p95=12.0, wrk_cpu_p50=30.0)) == []
+        assert rcs.review_flags(_m(worker_count=0, worker_node_type=None)) == []
+
+    def test_flags_surface_on_recommendation_without_blocking_it(self):
+        m = _m(wrk_wait_p95=67.0, wrk_cpu_p50=14.0)
+        rec = build_recommendation(m)
+        assert rec.review_flags == "io_scan_review"
+        assert rec.cohort not in ("", None)
+
+
+class TestPhotonComputeFamilyExclusion:
+    def test_keep_photon_candidates_never_pick_compute_family(self):
+        # Databricks rejects Photon on c* nodes (core/RAM ratio too low). A
+        # compute-leaning demand must land on general family when Photon stays.
+        order = rcs._family_order_for_demand(8.0, 6.0, exclude_compute=True)
+        assert "compute" not in order
+        node = rcs._node_for_demand(8.0, 6.0, exclude_compute=True)
+        assert node is not None and rcs._node_family(node) != "compute"
+
+    def test_recommendation_never_keeps_photon_on_compute_nodes(self):
+        # CPU-heavy Photon DAG whose cheapest shape is compute-family: either
+        # the shape avoids c* nodes, or Photon is dropped — never both kept.
+        m = _m(
+            driver_node_type="c6g.4xlarge",
+            worker_node_type="c6g.4xlarge",
+            worker_count=4,
+            drv_cpu_p50=60.0,
+            drv_cpu_p95=80.0,
+            drv_mem_p95=30.0,
+            wrk_cpu_p50=50.0,
+            wrk_cpu_p95=70.0,
+            wrk_mem_p95=25.0,
+            is_any_photon=True,
+            arm_avg_total_cost_estimate_usd=20.0,
+            arm_avg_ec2_cost_usd=8.0,
+            arm_avg_dbu_cost_usd=12.0,
+        )
+        rec = build_recommendation(m)
+        keeps_photon = rec.rec_runtime_engine is None
+        rec_nodes = [
+            n
+            for n in (rec.rec_driver_node_type, rec.rec_worker_node_type)
+            if n is not None
+        ]
+        if keeps_photon and rec_nodes:
+            assert all(rcs._node_family(n) != "compute" for n in rec_nodes)
 
 
 class TestNormalizationActions:
@@ -805,7 +879,7 @@ class TestNormalizationActions:
             wrk_mem_p95=10.0,
             wall_p50_min=18.0,
             wall_p95_min=18.0,
-            schedule_interval_minutes=20.0,
+            schedule_interval_minutes=600.0,
             arm_avg_total_cost_estimate_usd=8.0,
             arm_avg_ec2_cost_usd=1.5,
             arm_avg_dbu_cost_usd=6.5,
@@ -957,16 +1031,18 @@ class TestCostProjection:
             is_any_photon=True,
         )
 
-        keep_wall = rcs._shape_wall_minutes(m, 0, keep_photon=True)
-        drop_wall = rcs._shape_wall_minutes(m, 0, keep_photon=False)
+        keep_wall = rcs._shape_wall_minutes(m, 0, keep_photon=True, rec_total_cores=4)
+        drop_wall = rcs._shape_wall_minutes(m, 0, keep_photon=False, rec_total_cores=4)
         assert keep_wall is not None and drop_wall is not None
-        # Raw demand → smaller collapse inflation than the Photon-off world.
+        # Raw demand → smaller wall inflation than the Photon-off world.
         assert keep_wall < drop_wall
         assert keep_wall == pytest.approx(
-            30.0 * rcs._collapse_wall_inflation(m, photon_off=False)
+            30.0 * rcs._wall_inflation(m, 4, photon_off=False)
         )
         # The cost wall now matches the SLA gate for keep-Photon (both raw).
-        assert keep_wall == pytest.approx(rcs._projected_wall_for_sla(m, 0, keep_photon=True))
+        assert keep_wall == pytest.approx(
+            rcs._projected_wall_for_sla(m, 0, keep_photon=True, rec_total_cores=4)
+        )
 
         # The priced keep-Photon collapse tracks the raw-demand wall end to end.
         expected_ec2 = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.xlarge"] * (keep_wall / 60.0)
@@ -1677,8 +1753,12 @@ class TestAmdCorrection:
         m = self._amd_m(wall_p50_min=40.0, wall_p95_min=50.0)
         corrected = _apply_amd_wall_correction(m)
 
-        assert corrected.wall_p50_min == pytest.approx(40.0 * AMD_WALL_CORRECTION, abs=0.1)
-        assert corrected.wall_p95_min == pytest.approx(50.0 * AMD_WALL_CORRECTION, abs=0.1)
+        assert corrected.wall_p50_min == pytest.approx(
+            40.0 * AMD_WALL_CORRECTION, abs=0.1
+        )
+        assert corrected.wall_p95_min == pytest.approx(
+            50.0 * AMD_WALL_CORRECTION, abs=0.1
+        )
 
     def test_amd_wall_correction_preserves_observed_walls_in_output(self):
         m = self._amd_m(wall_p50_min=40.0, wall_p95_min=50.0)
@@ -1703,7 +1783,7 @@ class TestAmdCorrection:
         assert rec.confidence == "medium-x86"
         assert rec.recommended_preset is not None
 
-    def test_build_amd_recommendation_right_size_multi(self):
+    def test_build_amd_recommendation_collapses_driver_bound_shape(self):
         m = self._amd_m(
             driver_node_type="m5a.xlarge",
             worker_node_type="m5a.xlarge",
@@ -1717,11 +1797,11 @@ class TestAmdCorrection:
         )
         rec = build_amd_recommendation(m)
 
-        assert rec.cohort == "right_size_multi"
+        # Idle workers (p50 5%) size near p50 under cpu_eff: the hot driver plus
+        # worker remainder fits one ARM general node, mirroring the ARM engine.
+        assert rec.cohort == "collapse_to_single"
         assert rec.confidence == "medium-x86"
-        assert rec.rec_driver_node_type == "c6g.xlarge"
-        assert rec.rec_worker_node_type == "m6g.large"
-        assert rec.rec_worker_count == 2
+        assert rec.rec_worker_count == 0
         assert rec.projected.est_cost_delta_pct is not None
         assert rec.projected.est_cost_delta_pct < 0
 

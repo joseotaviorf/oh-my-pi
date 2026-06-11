@@ -439,18 +439,18 @@
         </foreignObject>
 
         <foreignObject x="640" y="408" width="240" height="88">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Candidate A · collapse<small>build_best_single_candidate — cheapest single node holding additive demand (≤82% mem, ≤85% CPU)</small></div>
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Candidate A · collapse<small>build_best_single_candidate — cheapest single node holding additive demand (≤82% mem p95, ≤85% cpu_eff = p50 + 0.3·(p95−p50))</small></div>
         </foreignObject>
         <foreignObject x="960" y="408" width="240" height="100">
           <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Candidate B · refined multi<small>build_current_refined_candidate — minimize driver + resize workers (floor 2); skipped when worker_count &lt; 2; must shrink vs observed</small></div>
         </foreignObject>
 
         <foreignObject x="720" y="578" width="400" height="60">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Filter survivors<small>core cap (never upsize) · SLA min(cadence 80% interval, soft 2×/2h) · collapse memory feasibility</small></div>
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Filter survivors<small>core cap (never upsize) · SLA max(80% interval, wall p95) only when schedule ≤ 2h, else unbounded · collapse memory feasibility</small></div>
         </foreignObject>
 
         <foreignObject x="700" y="658" width="440" height="60">
-          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Price each survivor in both Photon worlds + Q4<small>OD driver + spot workers (0.37×); keep-Photon = observed wall + observed-anchored DBU; drop-Photon = 2× wall + non-Photon fleet DBU · see Q1–Q4 matrix below</small></div>
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Price each survivor in both Photon worlds + Q4<small>OD driver + spot workers (0.37×); wall ×= 1 + f·(old/new cores − 1), f = p50-busy fraction; keep-Photon = observed-anchored DBU (never on c* nodes); drop-Photon = 2× wall + non-Photon fleet DBU · see Q1–Q4 matrix below</small></div>
         </foreignObject>
 
         <foreignObject x="780" y="748" width="280" height="56">
@@ -607,7 +607,7 @@
           </div>
 
           <div class="step test">
-            <div class="cond">drv_cpu_p95 &lt;= 40%  AND  drv_mem_p95 &lt;= 70%  AND  a safe one-tier downsize exists</div>
+            <div class="cond">drv_cpu_eff &lt;= 40%  AND  drv_mem_p95 &lt;= 70%  AND  a safe one-tier downsize exists</div>
             <div class="why">Spare headroom; projected mem/CPU must stay under the 82%/85% single-node targets.</div>
           </div>
           <div class="leads">
@@ -638,7 +638,7 @@
 
           <div class="step">
             <div class="cond">Build candidate A — collapse to single (<code>build_best_single_candidate</code>)</div>
-            <div class="why">Additive demand: required_mem = Σ(node_mem × mem_p95); required_cores = Σ(node_vcpu × cpu_p95). Cheapest node holding mem ≤ 82% and cores ≤ 85%. Family from GiB/core demand.</div>
+            <div class="why">Additive demand: required_mem = Σ(node_mem × mem_p95); required_cores = Σ(node_vcpu × cpu_eff), cpu_eff = p50 + 0.3·(p95−p50) — memory is the only hard cap, CPU is elastic. Cheapest node holding mem ≤ 82% and cores ≤ 85%. Family from GiB/core demand; compute family excluded for keep-Photon candidates (Databricks rejects Photon on c*).</div>
           </div>
 
           <div class="step">
@@ -648,7 +648,7 @@
 
           <div class="step test">
             <div class="cond">Filter each candidate</div>
-            <div class="why">core cap: candidate cores ≤ observed cores (never upsize). SLA: projected p95 wall ≤ min(cadence 80% interval when runs/day ≥ 12, soft min(2× wall_p95, max(120 min, wall_p95))). Memory feasibility for collapse.</div>
+            <div class="why">core cap: candidate cores ≤ observed cores (never upsize). SLA: projected p95 wall × (1 + f·(old_cores/new_cores − 1)), f = p50-busy fraction, must fit max(80% interval, wall_p95) — applied only when schedule interval ≤ 120 min; all other DAGs have no wall cap (the cost gate prices the inflated wall). Memory feasibility for collapse.</div>
           </div>
 
           <div class="step test">
@@ -668,7 +668,7 @@
             <div>
               <div class="cohort c-noop">keep_multi_memory / keep_multi_compute<span class="meaning"><code>size_single_node</code> blocked: additive demand exceeds the largest single node at target utilization.</span></div>
               <div class="cohort c-noop" style="margin-top:6px">keep_multi_balanced<span class="meaning">Hot driver (drv_cpu_p95 ≥ 70%) with busy workers (wrk_cpu_p50 ≥ 50%, wrk_mem_p95 ≥ 60%), or sizing blocked as balanced.</span></div>
-              <div class="cohort c-noop" style="margin-top:6px">keep_multi_sla<span class="meaning">Projected collapse wall exceeds cadence or soft SLA ceiling (cadence-bound DAGs only for the hard interval cap).</span></div>
+              <div class="cohort c-noop" style="margin-top:6px">keep_multi_sla<span class="meaning">Projected collapse wall exceeds the cadence SLA (only exists for schedules ≤ 2h; floored at observed wall p95).</span></div>
               <div class="cohort c-noop" style="margin-top:6px">keep_multi_cost<span class="meaning">Default when no survivor wins and no higher-priority keep reason applies; <code>blocked_cost</code> = cheapest filter-passing option that still ≥ observed cost (null if none passed filters).</span></div>
             </div>
           </div>
@@ -714,9 +714,10 @@
           <tr><td>_RELAXED_DOWNSIZE_MEM_P95_MAX</td><td><code>70.0%</code></td><td>driver_downsize (single-node)</td></tr>
           <tr><td>_SINGLE_NODE_MEM_TARGET</td><td><code>0.82</code></td><td>candidate sizers / keep_multi_memory</td></tr>
           <tr><td>_SINGLE_NODE_CPU_TARGET</td><td><code>0.85</code></td><td>candidate sizers / keep_multi_compute</td></tr>
-          <tr><td>_CADENCE_RUNS_PER_DAY_MIN</td><td><code>12.0</code></td><td>Hard cadence SLA only when runs/day ≥ this (~every 2h)</td></tr>
-          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>Cadence-bound hard SLA: 80% of schedule interval</td></tr>
-          <tr><td>_SOFT_WALL_REGRESSION_MAX / _SOFT_WALL_CEILING_MIN</td><td><code>2.0</code> / <code>120</code> min</td><td>Soft runtime guard for all DAGs</td></tr>
+          <tr><td>_SLA_CADENCE_MAX_INTERVAL_MIN</td><td><code>120</code> min</td><td>Cadence SLA only when schedule interval ≤ this; longer schedules have no wall cap</td></tr>
+          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>Cadence-bound hard SLA: 80% of schedule interval, floored at observed wall p95</td></tr>
+          <tr><td>_CPU_EFF_BURST_WEIGHT</td><td><code>0.3</code></td><td>cpu_eff = p50 + w·(p95−p50): elastic CPU sizing demand (2026-06 calibration)</td></tr>
+          <tr><td>_WALL_CPU_BOUND_FRACTION_CAP</td><td><code>1.0</code></td><td>wall_ratio = 1 + f·(old/new cores − 1), f = p50-busy fraction clipped here</td></tr>
           <tr><td>_DRIVER_CPU_BOUND_P95</td><td><code>70.0%</code></td><td>keep_multi_balanced</td></tr>
           <tr><td>_PHOTON_OFF_WALL_INFLATION</td><td><code>2.0</code></td><td>cost/SLA when Photon normalized off (drop-Photon candidates only)</td></tr>
           <tr><td>_PHOTON_DBU_PREMIUM</td><td><code>3.0</code></td><td>offline DBU proxy divides observed DBU by this when projecting Photon off</td></tr>

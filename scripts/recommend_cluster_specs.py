@@ -134,9 +134,23 @@ _SPOT_TO_ON_DEMAND_RATIO = 0.37
 _SINGLE_NODE_MEM_TARGET = 0.82
 _SINGLE_NODE_CPU_TARGET = 0.85
 _SLA_INTERVAL_TARGET = 0.80
-_CADENCE_RUNS_PER_DAY_MIN = 12.0  # ~every 2h or tighter = cadence-bound hard SLA
-_SOFT_WALL_REGRESSION_MAX = 2.0
-_SOFT_WALL_CEILING_MIN = 120.0  # default Databricks job timeout (minutes)
+# Cadence-bound SLA applies only to schedules at or under this interval: the
+# previous run must not outlive the next trigger. Longer schedules accept wall
+# regressions by policy (the cost gate is the only brake); main-path speedups
+# are a deliberate, separate workstream.
+_SLA_CADENCE_MAX_INTERVAL_MIN = 120.0
+# Burst weight for effective CPU demand: cpu_eff = p50 + w * (p95 - p50).
+# CPU is elastic (over-commit stretches wall; it never kills the job the way
+# OOM does), so sizing uses a p50-anchored blend instead of a p95 hard cap.
+# Calibration (140 prod->validation shrunk pairs, 2026-06): implied CPU-bound
+# wall fraction was 0 for 75% of pairs; median wall ratio 0.87 at median 1.6x
+# core cuts. w=0.3 keeps modest burst headroom.
+_CPU_EFF_BURST_WEIGHT = 0.3
+# Work-conserving wall model: wall_ratio = 1 + f * (old_cores/new_cores - 1),
+# with f = aggregate p50-busy fraction of the observed cluster, capped here.
+# f=p50 was the best-accuracy conservative fit (83% coverage, median +0.24
+# overestimate) on the 2026-06 validation calibration set.
+_WALL_CPU_BOUND_FRACTION_CAP = 1.0
 _DEFAULT_RECENT_ERA_MIN_DAYS = 1
 _DEFAULT_RECENT_ERA_MIN_RUNS = 2
 
@@ -160,8 +174,8 @@ _PHOTON_DBU_PREMIUM = 3.0
 # Populated once at runtime (main); empty in offline/unit contexts, where the
 # cost engine degrades to a vCPU-scaled observed-DBU proxy.
 _FLEET_DBU_RATE: dict[str, float] = {}
-_COLLAPSE_WALL_INFLATION_MAX = 0.67
-_COLLAPSE_WALL_BURST_INFLATION_MAX = 0.15
+
+
 _KEEP_MULTI_COHORTS = {
     "keep_multi_sla",
     "keep_multi_memory",
@@ -369,6 +383,20 @@ def _photon_adjust_pct(value: float | None, factor: float) -> float | None:
     return round(value * factor, 1)
 
 
+def _cpu_effective_pct(p50: float | None, p95: float | None) -> float | None:
+    """Effective CPU demand: p50 anchored with dampened burst headroom.
+
+    CPU is elastic — undersizing stretches wall instead of failing the job — so
+    sizing demand blends ``p50 + _CPU_EFF_BURST_WEIGHT * (p95 - p50)`` rather
+    than holding the full p95 burst. Falls back to p95 when p50 is missing.
+    """
+    if p95 is None:
+        return None
+    if p50 is None:
+        return p95
+    return round(p50 + _CPU_EFF_BURST_WEIGHT * max(p95 - p50, 0.0), 4)
+
+
 def effective_demand(
     m: DagMetrics, *, photon_off: bool | None = None
 ) -> EffectiveDemand:
@@ -521,33 +549,46 @@ def _additive_memory_gb(
 def _additive_cores(m: DagMetrics, *, photon_off: bool | None = None) -> float | None:
     d = effective_demand(m, photon_off=photon_off)
     driver_spec = INSTANCE_CATALOG.get(m.driver_node_type)
-    if not driver_spec or d.drv_cpu_p95 is None:
+    drv_cpu_eff = _cpu_effective_pct(d.drv_cpu_p50, d.drv_cpu_p95)
+    if not driver_spec or drv_cpu_eff is None:
         return None
-    cores = driver_spec.vcpus * d.drv_cpu_p95 / 100.0
+    cores = driver_spec.vcpus * drv_cpu_eff / 100.0
     if m.topology == "multi":
         worker_spec = INSTANCE_CATALOG.get(_worker_node_type(m))
-        if not worker_spec or d.wrk_cpu_p95 is None or not m.worker_count:
+        wrk_cpu_eff = _cpu_effective_pct(d.wrk_cpu_p50, d.wrk_cpu_p95)
+        if not worker_spec or wrk_cpu_eff is None or not m.worker_count:
             return None
-        cores += worker_spec.vcpus * d.wrk_cpu_p95 / 100.0 * m.worker_count
+        cores += worker_spec.vcpus * wrk_cpu_eff / 100.0 * m.worker_count
     return round(cores, 4)
 
 
 def _family_order_for_demand(
-    required_mem_gb: float, required_cores: float
+    required_mem_gb: float, required_cores: float, *, exclude_compute: bool = False
 ) -> tuple[str, ...]:
     if required_cores <= 0:
-        return ("general", "memory")
-    gib_per_core = required_mem_gb / required_cores
-    if gib_per_core <= 2:
-        return ("compute", "general", "memory")
-    if gib_per_core <= 4:
-        return ("general", "memory")
-    return ("memory",)
+        order: tuple[str, ...] = ("general", "memory")
+    else:
+        gib_per_core = required_mem_gb / required_cores
+        if gib_per_core <= 2:
+            order = ("compute", "general", "memory")
+        elif gib_per_core <= 4:
+            order = ("general", "memory")
+        else:
+            order = ("memory",)
+    if exclude_compute:
+        # Databricks rejects Photon on compute-family (c*) nodes: the core/RAM
+        # ratio is too low. Keep-Photon candidates must avoid the family.
+        order = tuple(f for f in order if f != "compute")
+    return order
 
 
-def _node_for_demand(required_mem_gb: float, required_cores: float) -> str | None:
+def _node_for_demand(
+    required_mem_gb: float, required_cores: float, *, exclude_compute: bool = False
+) -> str | None:
     """Pick the cheapest ARM node that fits demand at target utilization."""
-    for family in _family_order_for_demand(required_mem_gb, required_cores):
+    for family in _family_order_for_demand(
+        required_mem_gb, required_cores, exclude_compute=exclude_compute
+    ):
         family_candidates = [
             (node_type, spec, price)
             for node_type, spec, price in _single_node_candidates()
@@ -573,7 +614,10 @@ def size_single_node(
             None, required_mem_gb, required_cores, None, None, "needs_more_telemetry"
         )
 
-    family_order = _family_order_for_demand(required_mem_gb, required_cores)
+    exclude_compute = _keep_photon_world(m, photon_off)
+    family_order = _family_order_for_demand(
+        required_mem_gb, required_cores, exclude_compute=exclude_compute
+    )
     feasible: list[tuple[str, InstanceSpec, float]] = []
     for family in family_order:
         family_candidates = [
@@ -627,25 +671,43 @@ def _schedule_interval_minutes(m: DagMetrics) -> float:
     return 1440.0
 
 
-def _collapse_wall_inflation(m: DagMetrics, *, photon_off: bool | None = None) -> float:
+def _keep_photon_world(m: DagMetrics, photon_off: bool | None) -> bool:
+    """True when sizing a candidate that keeps Photon running."""
+    return bool(m.is_any_photon) and photon_off is False
+
+
+def _p50_busy_cores(m: DagMetrics, *, photon_off: bool | None = None) -> float:
+    """Aggregate p50-busy vCPUs of the observed shape (driver + workers)."""
     d = effective_demand(m, photon_off=photon_off)
-    worker_activity = max(
-        (d.wrk_cpu_p50 or 0.0) / 85.0,
-        (d.wrk_cpu_p95 or 0.0) / 85.0,
-        (d.wrk_mem_p95 or 0.0) / 82.0,
-    )
-    worker_activity = min(max(worker_activity, 0.0), 1.0)
-    worker_burst = min(max((d.wrk_cpu_p95 or 0.0) / 85.0, 0.0), 1.0)
-    worker_multiplier = min((m.worker_count or 0) / 2.0, 1.0)
-    inflation = (
-        1.0
-        + (
-            _COLLAPSE_WALL_INFLATION_MAX * worker_activity
-            + _COLLAPSE_WALL_BURST_INFLATION_MAX * worker_burst
+    busy = _vcpus(m.driver_node_type) * (d.drv_cpu_p50 or 0.0) / 100.0
+    if m.topology == "multi" and m.worker_count:
+        busy += (
+            _vcpus(_worker_node_type(m))
+            * (d.wrk_cpu_p50 or 0.0)
+            / 100.0
+            * m.worker_count
         )
-        * worker_multiplier
+    return busy
+
+
+def _wall_inflation(
+    m: DagMetrics, rec_total_cores: int | None, *, photon_off: bool | None = None
+) -> float:
+    """Calibrated work-conserving wall stretch for a core reduction.
+
+    ``wall_ratio = 1 + f * (old_cores / new_cores - 1)`` where ``f`` is the
+    aggregate p50-busy fraction of the observed cluster: only the CPU-busy
+    share of the wall stretches when cores shrink; idle (I/O, API, scheduler)
+    time does not. Growth or equal capacity never deflates (ratio floors at 1).
+    """
+    old_cores = observed_total_cores(m)
+    if not old_cores or not rec_total_cores or rec_total_cores >= old_cores:
+        return 1.0
+    f = min(
+        max(_p50_busy_cores(m, photon_off=photon_off) / old_cores, 0.0),
+        _WALL_CPU_BOUND_FRACTION_CAP,
     )
-    return inflation
+    return 1.0 + f * (old_cores / rec_total_cores - 1.0)
 
 
 def _current_cost_basis(m: DagMetrics) -> float:
@@ -662,7 +724,11 @@ def _wall_minutes_for_cost(m: DagMetrics) -> float | None:
 
 
 def _shape_wall_minutes(
-    m: DagMetrics, rec_workers: int, *, keep_photon: bool = False
+    m: DagMetrics,
+    rec_workers: int,
+    *,
+    keep_photon: bool = False,
+    rec_total_cores: int | None = None,
 ) -> float | None:
     """Observed wall with topology-shape inflation only (no Photon term).
 
@@ -679,14 +745,11 @@ def _shape_wall_minutes(
     if base is None:
         return None
     photon_off = not keep_photon
-    current_workers = m.worker_count or 0
-    if rec_workers == 0 and m.topology == "multi":
-        return base * _collapse_wall_inflation(m, photon_off=photon_off)
-    if rec_workers and current_workers and rec_workers < current_workers:
-        return base * _worker_reduction_wall_inflation(
-            m, current_workers, rec_workers, photon_off=photon_off
+    if rec_total_cores is None:
+        rec_total_cores = (
+            _vcpus(m.driver_node_type) + _vcpus(_worker_node_type(m)) * rec_workers
         )
-    return base
+    return base * _wall_inflation(m, rec_total_cores, photon_off=photon_off)
 
 
 def _legacy_dbu_projection(
@@ -754,13 +817,18 @@ def estimate_projected_total_cost(
     if rec_workers > 0 and _instance_price(rec_worker_type) is None:
         return None
 
-    base_wall = _shape_wall_minutes(m, rec_workers, keep_photon=keep_photon)
-    if base_wall is None:
-        return None
-
     nodes = [rec_driver]
     if rec_workers > 0 and rec_worker_type:
         nodes.extend([rec_worker_type] * rec_workers)
+
+    base_wall = _shape_wall_minutes(
+        m,
+        rec_workers,
+        keep_photon=keep_photon,
+        rec_total_cores=sum(_vcpus(node) for node in nodes),
+    )
+    if base_wall is None:
+        return None
 
     photon_off = bool(m.is_any_photon) and not keep_photon
     wall_minutes = base_wall * (_PHOTON_OFF_WALL_INFLATION if photon_off else 1.0)
@@ -830,8 +898,11 @@ def _driver_minimize_node(
     if not current_spec:
         return None
     used_mem_gb = current_spec.memory_gb * d.drv_mem_p95 / 100.0
-    used_cores = current_spec.vcpus * (d.drv_cpu_p95 or 0.0) / 100.0
-    candidate = _node_for_demand(used_mem_gb, used_cores)
+    drv_cpu_eff = _cpu_effective_pct(d.drv_cpu_p50, d.drv_cpu_p95) or 0.0
+    used_cores = current_spec.vcpus * drv_cpu_eff / 100.0
+    candidate = _node_for_demand(
+        used_mem_gb, used_cores, exclude_compute=_keep_photon_world(m, photon_off)
+    )
     current_price = _instance_price(m.driver_node_type)
     candidate_price = _instance_price(candidate)
     if (
@@ -842,26 +913,6 @@ def _driver_minimize_node(
     ):
         return m.driver_node_type
     return candidate
-
-
-def _worker_reduction_wall_inflation(
-    m: DagMetrics,
-    old_count: int,
-    new_count: int,
-    *,
-    photon_off: bool | None = None,
-) -> float:
-    if new_count >= old_count or old_count <= 0 or new_count <= 0:
-        return 1.0
-    d = effective_demand(m, photon_off=photon_off)
-    worker_activity = max(
-        (d.wrk_cpu_p50 or 0.0) / (_SINGLE_NODE_CPU_TARGET * 100.0),
-        (d.wrk_cpu_p95 or 0.0) / (_SINGLE_NODE_CPU_TARGET * 100.0),
-        (d.wrk_mem_p95 or 0.0) / (_SINGLE_NODE_MEM_TARGET * 100.0),
-    )
-    worker_activity = min(max(worker_activity, 0.0), 1.0)
-    parallelism_loss = old_count / new_count - 1.0
-    return 1.0 + parallelism_loss * worker_activity
 
 
 def _worker_resize(
@@ -882,10 +933,15 @@ def _worker_resize(
     if not current_spec or current_price is None:
         return None
 
+    wrk_cpu_eff = _cpu_effective_pct(d.wrk_cpu_p50, d.wrk_cpu_p95) or 0.0
     per_node_mem_gb = current_spec.memory_gb * d.wrk_mem_p95 / 100.0
-    per_node_cores = current_spec.vcpus * d.wrk_cpu_p95 / 100.0
+    per_node_cores = current_spec.vcpus * wrk_cpu_eff / 100.0
+    exclude_compute = _keep_photon_world(m, photon_off)
     candidate_worker = (
-        _node_for_demand(per_node_mem_gb, per_node_cores) or current_worker
+        _node_for_demand(
+            per_node_mem_gb, per_node_cores, exclude_compute=exclude_compute
+        )
+        or current_worker
     )
     candidate_price = _instance_price(candidate_worker)
     if candidate_price is None or candidate_price >= current_price:
@@ -907,7 +963,12 @@ def _worker_resize(
     count_blocked_sla = False
     if min_count < m.worker_count and m.worker_count > 2:
         candidate_count = max(min_count, m.worker_count - 2, 2)
-        projected_wall = _projected_wall_for_sla(m, candidate_count)
+        candidate_cores = (
+            _vcpus(m.driver_node_type) + candidate_spec.vcpus * candidate_count
+        )
+        projected_wall = _projected_wall_for_sla(
+            m, candidate_count, rec_total_cores=candidate_cores
+        )
         if projected_wall is None or projected_wall > _sla_limit_minutes(m):
             count_blocked_sla = True
         else:
@@ -1080,10 +1141,11 @@ def _single_node_downsize_node(
     None when no safe downsize exists.
     """
     d = effective_demand(m, photon_off=photon_off)
-    if d.drv_cpu_p95 is None or d.drv_mem_p95 is None:
+    drv_cpu_eff = _cpu_effective_pct(d.drv_cpu_p50, d.drv_cpu_p95)
+    if drv_cpu_eff is None or d.drv_mem_p95 is None:
         return None
     if (
-        d.drv_cpu_p95 > _RELAXED_DOWNSIZE_CPU_P95_MAX
+        drv_cpu_eff > _RELAXED_DOWNSIZE_CPU_P95_MAX
         or d.drv_mem_p95 > _RELAXED_DOWNSIZE_MEM_P95_MAX
     ):
         return None
@@ -1096,7 +1158,7 @@ def _single_node_downsize_node(
         return None
     used_mem_gb = current_spec.memory_gb * d.drv_mem_p95 / 100.0
     projected_mem_pct = used_mem_gb / downsize_spec.memory_gb
-    used_cores = current_spec.vcpus * (d.drv_cpu_p95 or 0.0) / 100.0
+    used_cores = current_spec.vcpus * drv_cpu_eff / 100.0
     projected_cpu_pct = used_cores / downsize_spec.vcpus if downsize_spec.vcpus else 1.0
     if (
         projected_mem_pct > _SINGLE_NODE_MEM_TARGET
@@ -1107,7 +1169,11 @@ def _single_node_downsize_node(
 
 
 def _projected_wall_for_sla(
-    m: DagMetrics, rec_workers: int, *, keep_photon: bool = False
+    m: DagMetrics,
+    rec_workers: int,
+    *,
+    keep_photon: bool = False,
+    rec_total_cores: int | None = None,
 ) -> float | None:
     """Projected p95 wall used for the SLA guard.
 
@@ -1120,41 +1186,32 @@ def _projected_wall_for_sla(
     base = m.wall_p95_min if (m.wall_p95_min and m.wall_p95_min > 0) else m.wall_p50_min
     if not base or base <= 0:
         return None
-    wall = base
     photon_off = bool(m.is_any_photon) and not keep_photon
-    current_workers = m.worker_count or 0
-    if rec_workers == 0 and m.topology == "multi":
-        wall *= _collapse_wall_inflation(m, photon_off=not keep_photon)
-    elif rec_workers and current_workers and rec_workers < current_workers:
-        wall *= _worker_reduction_wall_inflation(
-            m, current_workers, rec_workers, photon_off=not keep_photon
+    if rec_total_cores is None:
+        rec_total_cores = (
+            _vcpus(m.driver_node_type) + _vcpus(_worker_node_type(m)) * rec_workers
         )
+    wall = base * _wall_inflation(m, rec_total_cores, photon_off=not keep_photon)
     if photon_off:
         wall *= _PHOTON_OFF_WALL_INFLATION
     return wall
 
 
 def _sla_limit_minutes(m: DagMetrics) -> float:
-    """SLA ceiling: cadence-bound hard cap plus a soft runtime sanity guard.
+    """SLA ceiling: cadence-bound DAGs only (schedule interval <= 2h).
 
-    Cadence-bound DAGs (``runs_per_day >= _CADENCE_RUNS_PER_DAY_MIN``) must finish
-    within ``_SLA_INTERVAL_TARGET`` of their schedule interval. All DAGs are also
-    capped by a soft ceiling: at most ``2 * wall_p95`` and never past the default
-    2h job timeout (unless the DAG already runs longer, in which case we do not
-    cap below its observed p95).
+    A tightly scheduled DAG must finish within ``_SLA_INTERVAL_TARGET`` of its
+    own interval so the previous run never outlives the next trigger. For
+    everything else wall regressions are acceptable by policy — the projected
+    cost (which already carries the wall-inflation term) is the only brake.
+    Main-path/critical-chain speedups are handled as a separate workstream.
     """
-    wall_p95 = m.wall_p95_min or 0.0
-    soft_cap = min(
-        _SOFT_WALL_REGRESSION_MAX * wall_p95,
-        max(_SOFT_WALL_CEILING_MIN, wall_p95),
-    )
-    cadence_bound = (m.runs_per_day or 0.0) >= _CADENCE_RUNS_PER_DAY_MIN
-    cadence_cap = (
-        _SLA_INTERVAL_TARGET * _schedule_interval_minutes(m)
-        if cadence_bound
-        else float("inf")
-    )
-    return min(cadence_cap, soft_cap)
+    interval = _schedule_interval_minutes(m)
+    if interval <= _SLA_CADENCE_MAX_INTERVAL_MIN:
+        # Floor at the observed p95: a DAG already past the 80% target keeps its
+        # wall-neutral candidates instead of blocking every change.
+        return max(_SLA_INTERVAL_TARGET * interval, m.wall_p95_min or 0.0)
+    return float("inf")
 
 
 @dataclass(frozen=True)
@@ -1193,7 +1250,9 @@ def _keep_multi_reason(m: DagMetrics, sizing: SingleNodeSizing) -> str:
         and (d.wrk_mem_p95 or 0.0) >= 60.0
     ):
         return "keep_multi_balanced"
-    wall = _projected_wall_for_sla(m, 0)
+    wall = _projected_wall_for_sla(
+        m, 0, rec_total_cores=_vcpus(sizing.node_type) if sizing.node_type else None
+    )
     if wall is None or wall > _sla_limit_minutes(m):
         return "keep_multi_sla"
     return "keep_multi_cost"
@@ -1234,7 +1293,12 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
                 m, best_single.driver_node_type, photon_off=photon_off
             )
         ):
-            wall = _projected_wall_for_sla(m, 0, keep_photon=keep_photon)
+            wall = _projected_wall_for_sla(
+                m,
+                0,
+                keep_photon=keep_photon,
+                rec_total_cores=candidate_total_cores(best_single),
+            )
             cost = estimate_projected_total_cost(
                 m, best_single.driver_node_type, 0, keep_photon=keep_photon
             )
@@ -1248,7 +1312,10 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
             and _candidate_is_reduction(m, refined)
         ):
             wall = _projected_wall_for_sla(
-                m, refined.worker_count, keep_photon=keep_photon
+                m,
+                refined.worker_count,
+                keep_photon=keep_photon,
+                rec_total_cores=candidate_total_cores(refined),
             )
             cost = estimate_projected_total_cost(
                 m,
@@ -1357,6 +1424,38 @@ def classify(
         return _decide_multi(m).cohort
 
     return "autoscale_review"
+
+
+# Spark-level review flags (orthogonal to the cohort; never block a
+# recommendation). Flagged DAGs feed the Spark-job review backlog:
+# docs/platform/cluster_rightsizing_spark_review_backlog.md
+_IO_SCAN_WAIT_P95_MIN = 40.0
+_IO_SCAN_CPU_P50_MAX = 25.0
+_DRIVER_BOUND_WAIT_P95_MAX = 10.0
+_DRIVER_BOUND_CPU_P50_MAX = 5.0
+
+
+def review_flags(m: DagMetrics) -> list[str]:
+    """Spark-job review markers for pathological worker-utilization shapes.
+
+    - ``io_scan_review``: workers spend the wall waiting on I/O with a low CPU
+      base — small-file S3 scans, unpruned partition reads, or skewed shuffles.
+      Right-sizing helps, but the real fix is in the Spark job / SQL.
+    - ``driver_bound_review``: workers are idle with near-zero I/O wait — the
+      driver is doing the work (API pagination, collect-heavy logic). The
+      cluster shape is wrong in kind, not in size.
+    """
+    if m.topology != "multi":
+        return []
+    wait = m.wrk_wait_p95
+    cpu_p50 = m.wrk_cpu_p50
+    if wait is None or cpu_p50 is None:
+        return []
+    if wait > _IO_SCAN_WAIT_P95_MIN and cpu_p50 < _IO_SCAN_CPU_P50_MAX:
+        return ["io_scan_review"]
+    if wait < _DRIVER_BOUND_WAIT_P95_MAX and cpu_p50 < _DRIVER_BOUND_CPU_P50_MAX:
+        return ["driver_bound_review"]
+    return []
 
 
 # ---------------------------------------------------------------------------
@@ -1607,6 +1706,7 @@ class Recommendation:
     num_workers_override: int | None = None  # set when different from preset default
     driver_override_node_type_id: str | None = None
     rec_runtime_engine: str | None = None  # "STANDARD" when normalizing Photon off
+    review_flags: str = ""  # "|"-joined Spark-review markers (io_scan_review, ...)
     projected: ProjectedMetrics = field(default_factory=ProjectedMetrics)
 
 
@@ -1782,6 +1882,14 @@ def build_recommendation(
             winner_keep_photon = not (
                 drop_cost is not None and (keep_cost is None or drop_cost < keep_cost)
             )
+
+        # Databricks rejects Photon on compute-family (c*) nodes (core/RAM ratio
+        # too low); a keep-Photon plan on such a shape is an invalid spec, so
+        # Photon is force-dropped — never silently shipped.
+        if winner_keep_photon and m.is_any_photon:
+            rec_nodes = [n for n in (rec_driver, rec_worker) if n]
+            if any(_node_family(n) == "compute" for n in rec_nodes):
+                winner_keep_photon = False
 
         if m.is_any_photon and not winner_keep_photon:
             rec_runtime_engine = "STANDARD"
@@ -2026,6 +2134,7 @@ def build_recommendation(
         cohort=cohort,
         confidence=_confidence(m),
         actions="|".join(actions),
+        review_flags="|".join(review_flags(m)),
         current_preset=current_preset,
         current_driver_node_type=m.driver_node_type,
         current_worker_node_type=m.worker_node_type,
@@ -3202,6 +3311,7 @@ _CSV_FIELDS = [
     "cohort",
     "confidence",
     "actions",
+    "review_flags",
     # Current spec
     "current_preset",
     "current_driver_node_type",

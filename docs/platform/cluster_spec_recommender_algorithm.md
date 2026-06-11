@@ -131,7 +131,7 @@ Multi-node branch (bidirectional candidate selection, `_decide_multi`):
 2. Build the **refined-multi** candidate: independently minimize the driver and resize the worker type/count, floored at two workers (`build_current_refined_candidate`). A 1-worker shape is strictly dominated by single-node, so it folds into the collapse comparison.
 3. Filter each candidate:
    - **Core cap** — candidate total cores must not exceed observed total cores (never upsize).
-   - **SLA** — projected p95 wall must be `<= min(cadence_cap, soft_cap)` where `cadence_cap = 0.80 * schedule_interval` only for cadence-bound DAGs (`runs_per_day >= 12`), and `soft_cap = min(2 * wall_p95, max(120 min, wall_p95))`.
+   - **SLA** — projected p95 wall must be `<= max(0.80 * schedule_interval, wall_p95)`, applied only when the schedule interval is ≤ 2h; all other DAGs have no wall cap (the cost gate, which prices the projected wall, is the only brake).
    - **Memory feasibility** for the collapse candidate.
    - The refined candidate must be a **genuine reduction** (driver, worker type, or count shrinks) — an unchanged shape is not a recommendation.
 4. For an accelerator-enabled DAG, build each shape candidate in **both Photon worlds**: a *keep-Photon* variant sized on raw observed demand (the box stays as fast as it ran), and a *drop-Photon* variant sized on inflated demand. Also add the **Q4 candidate** — the observed shape with Photon dropped (NVMe stripped), i.e. "remove the accelerators only". A non-Photon DAG has only the single drop-Photon world.
@@ -144,19 +144,28 @@ I/O wait is not an automatic keep gate. `opa`/`istio` showed the real production
 
 ## Additive Single-Node Sizer
 
-Demand is computed from observed p95 utilization:
+Memory demand is computed from observed p95 utilization — memory is a hard cap
+(undersizing OOMs the job). CPU demand is **effective CPU** — CPU is elastic
+(undersizing only stretches the wall, which the wall model + cost gate price):
 
 ```text
 required_mem_gb =
   driver_memory_gb * drv_mem_p95
   + worker_count * worker_memory_gb * wrk_mem_p95
 
+cpu_eff = cpu_p50 + 0.3 * max(cpu_p95 - cpu_p50, 0)   # per driver / worker
+
 required_cores =
-  driver_vcpus * drv_cpu_p95
-  + worker_count * worker_vcpus * wrk_cpu_p95
+  driver_vcpus * drv_cpu_eff
+  + worker_count * worker_vcpus * wrk_cpu_eff
 ```
 
-Percent values are divided by 100 in the implementation.
+Percent values are divided by 100 in the implementation. The 0.3 burst weight
+comes from the 2026-06 validation calibration (140 prod→validation shrunk
+pairs): the implied CPU-bound wall fraction was 0 for 75% of pairs and the
+median wall ratio was 0.87 even at a median 1.6× core cut — p95 bursts almost
+never translate into wall regressions, so holding full p95 capacity was the
+single biggest source of false `keep_multi_*` decisions.
 
 Candidate acceptance:
 
@@ -181,33 +190,38 @@ The sizer includes larger single-node candidates (`12xlarge`, `16xlarge`) even w
 
 ## SLA Guard
 
-The SLA guard works on the **p95** wall (`_projected_wall_for_sla`), inflated for the shape change plus the Photon-off normalization **only when the candidate drops Photon** (a keep-Photon candidate runs at the observed wall):
+The SLA guard works on the **p95** wall (`_projected_wall_for_sla`), inflated by the work-conserving wall model plus the Photon-off normalization **only when the candidate drops Photon** (a keep-Photon candidate runs at the observed wall):
 
 ```text
 projected_wall_p95 =
   wall_p95_min
-  * shape_inflation        # 1.0 for a same-parallelism worker-type swap;
-                           # collapse_wall_inflation for collapse;
-                           # worker_reduction_wall_inflation for fewer workers
+  * wall_inflation(rec_total_cores)                       # see below
   * (2.0 if (is_any_photon and dropping_photon) else 1.0)  # Photon-off doubles wall
+
+wall_inflation = 1 + f * (old_total_cores / rec_total_cores - 1)
+f              = aggregate p50-busy vCPUs / old_total_cores   # clipped to [0, 1]
 ```
+
+Only the CPU-busy share of the wall stretches when cores shrink; idle (I/O,
+API, scheduler) time does not. One model covers collapse, worker-count
+reduction, and worker-type shrink uniformly — there is no separate collapse
+heuristic. Calibration (2026-06, 140 shrunk pairs): `f = p50` was the
+best-accuracy conservative fit (83% coverage, median +0.24 wall-ratio
+overestimate).
 
 A candidate passes when:
 
 ```text
-projected_wall_p95 <= min(cadence_cap, soft_cap)
+projected_wall_p95 <= sla_limit
 
-cadence_cap = 0.80 * schedule_interval_minutes   # only when runs_per_day >= 12
-            = +inf                               # otherwise (no cadence SLA)
-
-soft_cap    = min(2.0 * wall_p95_min, max(120 min, wall_p95_min))
+sla_limit = max(0.80 * schedule_interval_minutes, wall_p95_min)
+                                  # when schedule_interval <= 120 min
+          = +inf                  # otherwise (no SLA — wall regressions accepted)
 ```
 
-**Cadence-bound hard SLA** (`runs_per_day >= 12`, roughly every 2h or tighter): the DAG must finish within 80% of its schedule interval so the next run is not blocked. This is the real production SLA for hourly CDC shapes like `opa`/`istio`.
+**Cadence-bound hard SLA** (schedule interval ≤ 2h): the DAG must finish within 80% of its own interval so the previous run never outlives the next trigger — the real production SLA for hourly CDC shapes like `opa`/`istio`. The limit floors at the observed p95 so a DAG already past the 80% target keeps its wall-neutral candidates.
 
-**Soft runtime sanity guard** (all DAGs): projected wall may grow up to 2× the observed p95, but never past the default 2h Databricks job timeout. DAGs that already run longer than 2h are not capped below their own p95 (they likely have a non-default timeout).
-
-`collapse_wall_inflation` keeps the calibrated `0.67` worker-activity term (from the fast_lane full worker-removal experience) plus a small `worker_burst` penalty for spiky p95 worker CPU. Near-hourly observed cadence is capped at 60 minutes when missed runs make `1440 / runs_per_day` look longer than the actual schedule.
+**Everything else is unbounded by policy.** A wall increase on a daily DAG is acceptable; the projected cost — which already carries the wall-inflation term (a slower cluster runs longer and can cost *more*) — is the only brake. Speeding up main-path/critical-chain DAGs is a deliberate, separate workstream. Near-hourly observed cadence is capped at 60 minutes when missed runs make `1440 / runs_per_day` look longer than the actual schedule.
 
 ---
 
@@ -217,25 +231,16 @@ soft_cap    = min(2.0 * wall_p95_min, max(120 min, wall_p95_min))
 
 Driver:
 
-- Compute observed driver memory/core demand from p95 utilization.
+- Compute observed driver memory demand from p95 and CPU demand from `cpu_eff` (p50-anchored).
 - Choose the cheapest ARM node that holds that demand at the 82% memory / 85% CPU targets.
 - Use the same GiB-per-core family ordering as the single-node sizer, so a memory-family driver can move to general or compute when the observed demand allows it.
 
 Workers:
 
-- Compute per-node worker memory/core demand from p95 utilization.
+- Compute per-node worker memory demand from p95 and CPU demand from `cpu_eff` (p50-anchored).
 - Pick the cheapest ARM worker type that holds the per-node demand at the same 82%/85% targets.
 - Compute aggregate worker demand and conservatively reduce worker count by at most two nodes at a time, with a floor of two workers.
-- Block the count reduction if the projected wall p95 exceeds 80% of schedule interval. Worker type changes may still proceed because they preserve parallelism.
-
-Worker count wall inflation is intentionally simpler than full collapse:
-
-```text
-worker_reduction_wall_p95 =
-  wall_p95_min * (1 + (old_worker_count / new_worker_count - 1) * worker_activity)
-```
-
-Where `worker_activity` is the max of worker p50/p95 CPU and p95 memory pressure normalized to the 85%/82% targets.
+- Block the count reduction if the projected wall p95 (work-conserving model above) exceeds the SLA limit — which only exists for ≤2h schedules. Worker type changes at equal count still shrink cores and are inflated by the same model.
 
 ---
 
@@ -275,6 +280,32 @@ EC2/hr: 0.077 + 2 * 0.308 * 0.37 = 0.305
 Collapse candidate: m6g.4xlarge OD
 EC2/hr: 0.616  → collapse more than doubles EC2; refined-multi wins.
 ```
+
+## Photon × Instance-Family Constraint
+
+Databricks rejects Photon on compute-family (`c*`) nodes — the core/RAM ratio
+is too low (observed 2026-06: every recommended `c6g` + `PHOTON` validation
+spec failed to launch). The recommender enforces this in two places:
+
+- Candidate generation: keep-Photon candidates exclude the compute family from
+  the GiB-per-core ordering (`_family_order_for_demand(exclude_compute=True)`),
+  for the single-node sizer, the refined driver, and the refined worker type.
+- Final guard: if a winning plan would keep Photon on a compute-family node
+  (e.g. via a preset fallback), Photon is force-dropped (`disable_photon`).
+
+---
+
+## Spark-Review Flags (`review_flags` column)
+
+Orthogonal to the cohort — they never block a recommendation. They feed the
+backlog in `docs/platform/cluster_rightsizing_spark_review_backlog.md`:
+
+| Flag | Trigger (multi-node only) | Meaning |
+| --- | --- | --- |
+| `io_scan_review` | `wrk_wait_p95 > 40` and `wrk_cpu_p50 < 25` | Workers wait on I/O: small-file S3 scans, unpruned partition reads, skewed shuffles. Fix the Spark job/SQL, not (only) the cluster |
+| `driver_bound_review` | `wrk_wait_p95 < 10` and `wrk_cpu_p50 < 5` | Workers idle with no I/O wait: the driver does the work (API pagination, collect-heavy logic). The shape is wrong in kind |
+
+---
 
 ## Photon Quadrant Search
 
