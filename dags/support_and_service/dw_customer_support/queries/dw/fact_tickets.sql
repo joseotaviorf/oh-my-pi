@@ -167,7 +167,7 @@ SELECT
   COALESCE(CAST(tc.id_assignee AS BIGINT), -1) AS sk_zendesk_assignee_user,
   CAST(COALESCE(tc.id_problem_ticket, -1) AS BIGINT) AS sk_problem_ticket,
   COALESCE(CAST(t.id_session AS BIGINT), -1) AS sk_session,
-  COALESCE(CAST(t.id_sss_session AS STRING), '-1') AS sk_sss_session,
+  COALESCE(CAST(t.id_sss_session AS STRING), '-1') AS sk_support_session,
   COALESCE(t.id_contract, -1) AS sk_contract,
   tc.offer_ids[0] AS sk_sale_offer,
   COALESCE(CAST(t.id_house AS BIGINT), -1) AS sk_house,
