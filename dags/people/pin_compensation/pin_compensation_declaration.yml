@@ -45,13 +45,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_compensation
           date_column_to_partition: last_update_date
-    cmp_salary_bases_tl:
-      clean_table_name: salary_bases_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_compensation
-          date_column_to_partition: last_update_date
     pay_element_entries_f:
       clean_table_name: element_entry
       vacuum_retention_hours: 168
@@ -73,22 +66,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_compensation
           date_column_to_partition: last_update_date
-    pay_element_types_tl:
-      clean_table_name: element_type_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_compensation
-          date_column_to_partition: last_update_date
     pay_input_values_f:
       clean_table_name: element_input_value
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_compensation
-          date_column_to_partition: last_update_date
-    pay_input_values_tl:
-      clean_table_name: element_input_value_translation
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:

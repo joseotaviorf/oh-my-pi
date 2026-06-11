@@ -38,34 +38,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_talent
           date_column_to_partition: last_update_date
-    hrt_content_items_tl:
-      clean_table_name: content_item_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_talent
-          date_column_to_partition: last_update_date
-    hrt_profile_items:
-      clean_table_name: profile_item
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_talent
-          date_column_to_partition: last_update_date
-    hrt_profile_sections_b:
-      clean_table_name: profile_section_base
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_talent
-          date_column_to_partition: last_update_date
-    hrt_profile_typ_sections_tl:
-      clean_table_name: profile_type_sections_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_talent
-          date_column_to_partition: last_update_date
     hrt_profiles_b:
       clean_table_name: profile_base
       vacuum_retention_hours: 168
@@ -110,13 +82,6 @@ workflow:
           date_column_to_partition: last_update_date
     hrt_review_periods_tl:
       clean_table_name: review_period_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_talent
-          date_column_to_partition: last_update_date
-    hrt_pool_members:
-      clean_table_name: pool_member
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:

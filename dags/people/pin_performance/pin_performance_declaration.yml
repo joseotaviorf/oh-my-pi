@@ -42,13 +42,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_performance
           date_column_to_partition: last_update_date
-    hra_discussion_topics:
-      clean_table_name: discussion_topic
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
     hra_eval_items:
       clean_table_name: evaluation_item
       vacuum_retention_hours: 168
@@ -70,22 +63,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_performance
           date_column_to_partition: last_update_date
-    hra_eval_roles:
-      clean_table_name: evaluation_role
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
     hra_eval_sections:
       clean_table_name: evaluation_section
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_eval_steps:
-      clean_table_name: evaluation_step
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
@@ -98,57 +77,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_performance
           date_column_to_partition: last_update_date
-    hra_pf_task_roles_b:
-      clean_table_name: task_role_base
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_pf_task_roles_tl:
-      clean_table_name: task_role_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_role_defns_tl:
-      clean_table_name: role_definition_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
     hra_section_defns_tl:
       clean_table_name: section_definition_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_tmpl_defns_b:
-      clean_table_name: template_definition_base
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_tmpl_defns_tl:
-      clean_table_name: template_definition_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_tmpl_periods_tl:
-      clean_table_name: template_period_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_performance
-          date_column_to_partition: last_update_date
-    hra_tmpl_roles:
-      clean_table_name: template_role
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:

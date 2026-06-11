@@ -31,20 +31,6 @@ workflow:
     people-team:
       - ALL PRIVILEGES
   tables_customization:
-    hrq_qstn_answers_b:
-      clean_table_name: question_answer_base
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_qstn_answers_tl:
-      clean_table_name: question_answer_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
     hrq_qstn_responses:
       clean_table_name: question_response
       vacuum_retention_hours: 168
@@ -61,55 +47,6 @@ workflow:
           date_column_to_partition: last_update_date
     hrq_qstnr_responses:
       clean_table_name: questionnaire_response
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_qstnr_sections_b:
-      clean_table_name: questionnaire_section_base
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_qstnr_sections_tl:
-      clean_table_name: questionnaire_section_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_qstnr_questions:
-      clean_table_name: questionnaire_question
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_questionnaires_b:
-      clean_table_name: questionnaire_base
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_questionnaires_tl:
-      clean_table_name: questionnaire_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_questions_b:
-      clean_table_name: question_base
-      vacuum_retention_hours: 168
-      vacuum_lite: trueð
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_questionnaires
-          date_column_to_partition: last_update_date
-    hrq_questions_tl:
-      clean_table_name: question_translation
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:

@@ -42,22 +42,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
-    fnd_df_contexts_tl:
-      clean_table_name: flexfield_context_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     fnd_setid_sets:
       clean_table_name: set_identifiers
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    hcm_extended_lookup_codes_tl:
-      clean_table_name: hcm_extended_lookup_code_translation
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
@@ -77,22 +63,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
-    hr_org_unit_classifications_f:
-      clean_table_name: organization_unit_classification
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     hr_organization_v:
       clean_table_name: hr_organization
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    hr_organization_units_f_tl:
-      clean_table_name: organization_unit_translation
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
@@ -154,20 +126,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
-    per_allocated_tasks_tl:
-      clean_table_name: allocated_task_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    per_asg_representatives:
-      clean_table_name: assignment_representative
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     per_asg_responsibilities:
       clean_table_name: assignment_responsibility
       extra_spark_job_arguments:
@@ -180,22 +138,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
-    per_assignment_status_types_tl:
-      clean_table_name: assignment_status_type_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     per_assignment_supervisors_f:
       clean_table_name: assignment_supervisor
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    per_contact_relships_f:
-      clean_table_name: contact_relationship
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
@@ -271,13 +215,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date     
-    per_job_family_f:
-      clean_table_name: job_family
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     per_job_family_f_tl:
       clean_table_name: job_family_translation
       vacuum_retention_hours: 168
@@ -301,20 +238,6 @@ workflow:
           date_column_to_partition: last_update_date
     per_jobs_f_tl:
       clean_table_name: job_translation
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    per_legislative_data_groups:
-      clean_table_name: legislative_data_group
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    per_legislative_data_groups_tl:
-      clean_table_name: legislative_data_group_translation
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
@@ -348,13 +271,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
-    per_person_addr_usages_f:
-      clean_table_name: person_address_usage
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     per_persons:
       clean_table_name: person
       vacuum_retention_hours: 168
@@ -376,20 +292,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date    
-    per_seniority_dates_f:
-      clean_table_name: seniority_date
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    per_users:
-      clean_table_name: user
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     per_valid_grades_f:
       clean_table_name: valid_grades
       vacuum_retention_hours: 168
@@ -399,13 +301,6 @@ workflow:
           date_column_to_partition: last_update_date
     per_national_identifiers:
       clean_table_name: national_identifiers
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
-    xle_entity_profiles:
-      clean_table_name: entity_profile
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
