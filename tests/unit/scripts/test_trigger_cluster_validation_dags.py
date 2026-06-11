@@ -470,6 +470,77 @@ class TestResolveRunAction:
         assert action.action == "monitor"
         assert action.dag_run_id == "run__active"
 
+    def test_recent_success_within_cooldown_skips_even_with_force_retrigger(
+        self,
+    ) -> None:
+        now = datetime(2026, 6, 11, 16, 0, 0, tzinfo=timezone.utc)
+        client = MagicMock()
+        client.list_dag_runs.return_value = [
+            {
+                "dag_run_id": "run__recent_ok",
+                "state": "success",
+                "start_date": "2026-06-11T14:30:00+00:00",
+                "end_date": "2026-06-11T15:30:00+00:00",
+                "conf": EXPECTED_CONF,
+            }
+        ]
+        action = trigger_script._resolve_run_action(
+            client,
+            _sample_dag(),
+            force_retrigger=True,
+            dag_runs_lookback=25,
+            validation_cooldown_hours=2,
+            now=now,
+        )
+        assert action.action == "skip"
+        assert "recent success run within 2h" in action.reason
+
+    def test_old_success_triggers_with_force_retrigger(self) -> None:
+        now = datetime(2026, 6, 11, 16, 0, 0, tzinfo=timezone.utc)
+        client = MagicMock()
+        client.list_dag_runs.return_value = [
+            {
+                "dag_run_id": "run__old_ok",
+                "state": "success",
+                "start_date": "2026-06-11T10:00:00+00:00",
+                "end_date": "2026-06-11T11:00:00+00:00",
+                "conf": EXPECTED_CONF,
+            }
+        ]
+        action = trigger_script._resolve_run_action(
+            client,
+            _sample_dag(),
+            force_retrigger=True,
+            dag_runs_lookback=25,
+            validation_cooldown_hours=2,
+            now=now,
+        )
+        assert action.action == "trigger"
+        assert action.reason == "force-retrigger"
+
+    def test_recent_failed_within_cooldown_skips(self) -> None:
+        now = datetime(2026, 6, 11, 16, 0, 0, tzinfo=timezone.utc)
+        client = MagicMock()
+        client.list_dag_runs.return_value = [
+            {
+                "dag_run_id": "run__recent_bad",
+                "state": "failed",
+                "start_date": "2026-06-11T15:00:00+00:00",
+                "end_date": "2026-06-11T15:30:00+00:00",
+                "conf": EXPECTED_CONF,
+            }
+        ]
+        action = trigger_script._resolve_run_action(
+            client,
+            _sample_dag(),
+            force_retrigger=False,
+            dag_runs_lookback=25,
+            validation_cooldown_hours=2,
+            now=now,
+        )
+        assert action.action == "skip"
+        assert "recent failed run within 2h" in action.reason
+
     def test_active_run_without_conf_match_still_monitors(self) -> None:
         client = MagicMock()
         client.list_dag_runs.return_value = [
@@ -527,9 +598,76 @@ class TestDatabricksDagIdLength:
         assert "too long for Databricks" in (plans[0].skip_reason or "")
         client.list_dag_runs.assert_not_called()
 
+    def test_force_retrigger_still_skips_too_long_dag_id(self) -> None:
+        dag_id = (
+            "bietlejuice.arquivo_confidencial_integration_report__validation"
+        )
+        client = MagicMock()
+        action = trigger_script._resolve_run_action(
+            client,
+            _validation_dag_with_id(dag_id),
+            force_retrigger=True,
+            dag_runs_lookback=25,
+        )
+        assert action.action == "skip"
+        assert "too long for Databricks" in action.reason
+        client.list_dag_runs.assert_not_called()
+
+    def test_force_retrigger_does_not_trigger_too_long_dag(self) -> None:
+        dag_id = (
+            "bietlejuice.arquivo_confidencial_integration_report__validation"
+        )
+        client = MagicMock()
+        plan = trigger_script.DagExecutionPlan(
+            dag=_validation_dag_with_id(dag_id),
+            conf=EXPECTED_CONF,
+            validation_action=trigger_script.RunAction(
+                action="trigger",
+                dag_run_id=None,
+                reason="force-retrigger",
+            ),
+        )
+
+        outcomes = asyncio.run(
+            trigger_script.trigger_and_monitor(
+                client,
+                [plan],
+                max_parallel=1,
+                max_runs=1,
+                force_retrigger=True,
+                dag_runs_lookback=25,
+                poll_interval=0,
+                timeout=30,
+                verbose=False,
+                log_tail_lines=20,
+            )
+        )
+
+        assert outcomes[0].final_state == "skipped"
+        assert "too long for Databricks" in (outcomes[0].error_message or "")
+        client.trigger_dag_run.assert_not_called()
+
+    def test_arquivo_confidencial_length_skipped(self) -> None:
+        dag_id = (
+            "bietlejuice.arquivo_confidencial_integration_report__validation"
+        )
+        assert len(dag_id) == 63
+        assert trigger_script._dag_id_exceeds_databricks_limit(dag_id)
+
+        client = MagicMock()
+        args = trigger_script._parse_args(["--from-prod-run"])
+        plans = trigger_script._build_execution_plans(
+            client,
+            [_validation_dag_with_id(dag_id)],
+            args,
+        )
+        assert plans[0].conf is None
+        assert "too long for Databricks" in (plans[0].skip_reason or "")
+        client.list_dag_runs.assert_not_called()
+
     def test_dag_id_at_limit_allowed(self) -> None:
-        dag_id = _dag_id_with_length(64)
-        assert len(dag_id) == 64
+        dag_id = _dag_id_with_length(56)
+        assert len(dag_id) == 56
         assert not trigger_script._dag_id_exceeds_databricks_limit(dag_id)
 
         client = MagicMock()
@@ -550,8 +688,8 @@ class TestDatabricksDagIdLength:
         assert plans[0].skip_reason is None
 
     def test_dag_id_one_over_limit_skipped(self) -> None:
-        dag_id = _dag_id_with_length(65)
-        assert len(dag_id) == 65
+        dag_id = _dag_id_with_length(57)
+        assert len(dag_id) == 57
         assert trigger_script._dag_id_exceeds_databricks_limit(dag_id)
 
         client = MagicMock()
@@ -562,7 +700,7 @@ class TestDatabricksDagIdLength:
             args,
         )
         assert plans[0].conf is None
-        assert "limit 64" in (plans[0].skip_reason or "")
+        assert "limit 56" in (plans[0].skip_reason or "")
 
 
 class TestTransientApiError:
@@ -648,6 +786,53 @@ class TestMonitorRun:
 
         assert outcome.final_state == "success"
         assert client.get_dag_run.call_count == 2
+
+    def test_skip_increments_skipped_without_touching_active(self) -> None:
+        progress = trigger_script.ProgressTracker(total=10)
+        asyncio.run(progress.mark_triggered())
+        asyncio.run(progress.mark_triggered())
+        asyncio.run(progress.mark_outcome("skipped", release_active_slot=False))
+        successful, failed, skipped, total, active = asyncio.run(progress.snapshot())
+        assert successful == 0
+        assert failed == 0
+        assert skipped == 1
+        assert active == 2
+        assert total == 10
+
+    def test_failure_marks_completed_before_status_event(self) -> None:
+        client = MagicMock()
+        client.get_dag_run.return_value = {"state": "failed"}
+        client.list_task_instances.return_value = []
+
+        stdout = io.StringIO()
+        printer = trigger_script.EventPrinter(stdout=stdout, stderr=io.StringIO())
+        progress = trigger_script.ProgressTracker(total=131)
+        asyncio.run(progress.mark_triggered())
+
+        outcome = asyncio.run(
+            trigger_script.monitor_run(
+                client,
+                asyncio.Semaphore(1),
+                printer,
+                progress,
+                _sample_dag(),
+                "manual__test",
+                poll_interval=0,
+                timeout=30,
+                verbose=False,
+                log_tail_lines=20,
+                fetch_failure_logs=False,
+            )
+        )
+
+        assert outcome.final_state == "failed"
+        successful, failed, skipped, total, active = asyncio.run(progress.snapshot())
+        assert successful == 0
+        assert failed == 1
+        assert skipped == 0
+        assert active == 0
+        assert total == 131
+        assert "0/1/0/131" in stdout.getvalue()
 
     def test_monitor_failure_fetches_logs(self) -> None:
         client = MagicMock()
@@ -736,21 +921,28 @@ class TestProdRunResolution:
                 "end_date": "2026-05-28T04:00:00+00:00",
             },
             {
-                "dag_run_id": "fast",
+                "dag_run_id": "too_fast",
                 "start_date": "2026-05-29T03:00:00+00:00",
                 "end_date": "2026-05-29T03:05:00+00:00",
             },
             {
-                "dag_run_id": "medium",
+                "dag_run_id": "fastest_qualifying",
                 "start_date": "2026-05-30T03:00:00+00:00",
-                "end_date": "2026-05-30T03:10:00+00:00",
+                "end_date": "2026-05-30T03:12:00+00:00",
+            },
+            {
+                "dag_run_id": "medium",
+                "start_date": "2026-05-31T03:00:00+00:00",
+                "end_date": "2026-05-31T03:20:00+00:00",
             },
         ]
         selected = trigger_script._select_reference_prod_run(
             runs, lookback_days=14, now=now
         )
         assert selected is not None
-        assert trigger_script._dag_run_id_from_payload(selected) == "fast"
+        assert (
+            trigger_script._dag_run_id_from_payload(selected) == "fastest_qualifying"
+        )
 
     def test_tie_duration_prefers_latest_start(self) -> None:
         now = datetime(2026, 6, 2, tzinfo=timezone.utc)
@@ -758,12 +950,12 @@ class TestProdRunResolution:
             {
                 "dag_run_id": "older",
                 "start_date": "2026-05-28T03:00:00+00:00",
-                "end_date": "2026-05-28T03:10:00+00:00",
+                "end_date": "2026-05-28T03:12:00+00:00",
             },
             {
                 "dag_run_id": "newer",
                 "start_date": "2026-05-30T03:00:00+00:00",
-                "end_date": "2026-05-30T03:10:00+00:00",
+                "end_date": "2026-05-30T03:12:00+00:00",
             },
         ]
         selected = trigger_script._select_reference_prod_run(
@@ -784,6 +976,50 @@ class TestProdRunResolution:
         ]
         args = trigger_script._parse_args(["--from-prod-run"])
         plan = trigger_script._resolve_prod_run_plan(client, _sample_dag(), args)
+        assert plan.conf is None
+        assert "past 7 days" in (plan.skip_reason or "")
+
+    def test_ignores_prod_runs_shorter_than_eight_minutes(self) -> None:
+        now = datetime(2026, 6, 2, tzinfo=timezone.utc)
+        runs = [
+            {
+                "dag_run_id": "noop",
+                "start_date": "2026-06-01T03:00:00+00:00",
+                "end_date": "2026-06-01T03:00:30+00:00",
+                "conf": EXPECTED_CONF,
+            }
+        ]
+        selected = trigger_script._select_reference_prod_run(
+            runs, lookback_days=14, now=now
+        )
+        assert selected is None
+
+        client = MagicMock()
+        client.list_dag_runs.return_value = runs
+        args = trigger_script._parse_args(
+            ["--from-prod-run", "--no-prod-run-recency-filter"]
+        )
+        plan = trigger_script._resolve_prod_run_plan(
+            client, _sample_dag(), args, now=now
+        )
+        assert plan.conf is None
+        assert "at least 8m" in (plan.skip_reason or "")
+
+    def test_recency_ignores_short_prod_runs(self) -> None:
+        now = datetime(2026, 6, 2, tzinfo=timezone.utc)
+        client = MagicMock()
+        client.list_dag_runs.return_value = [
+            {
+                "dag_run_id": "noop",
+                "start_date": "2026-06-01T03:00:00+00:00",
+                "end_date": "2026-06-01T03:00:30+00:00",
+                "conf": EXPECTED_CONF,
+            }
+        ]
+        args = trigger_script._parse_args(["--from-prod-run"])
+        plan = trigger_script._resolve_prod_run_plan(
+            client, _sample_dag(), args, now=now
+        )
         assert plan.conf is None
         assert "past 7 days" in (plan.skip_reason or "")
 
@@ -831,6 +1067,69 @@ class TestDryRunTable:
         assert "2024-01-01" in output
         assert "TRIGGER" in output
         assert "scheduled__2026-06-01" in output
+
+
+class TestTriggerAndMonitorFailureHandling:
+    def test_failure_frees_parallel_slot_before_log_fetch(self) -> None:
+        log_fetch_started = threading.Event()
+        release_log_fetch = threading.Event()
+
+        def get_dag_run(dag_id: str, dag_run_id: str) -> dict:
+            return {"state": "failed"}
+
+        def list_task_instances(dag_id: str, dag_run_id: str) -> list[dict]:
+            log_fetch_started.set()
+            release_log_fetch.wait(timeout=5)
+            return [{"task_id": "load", "state": "failed", "try_number": 1}]
+
+        client = MagicMock()
+        client.list_dag_runs.return_value = []
+        client.ensure_dag_unpaused.return_value = False
+        client.trigger_dag_run.side_effect = (
+            lambda dag_id, conf: {"dag_run_id": f"run__{dag_id}"}
+        )
+        client.get_dag_run.side_effect = get_dag_run
+        client.list_task_instances.side_effect = list_task_instances
+        client.get_task_log.return_value = "boom"
+
+        dags = [
+            discovery.ValidationDag(
+                line="agents",
+                dag_name=f"dag_{index}",
+                dag_id=f"bietlejuice.dag_{index}__validation",
+                cluster_path=Path(f"dags/agents/dag_{index}/dag_{index}_cluster.yml"),
+            )
+            for index in range(3)
+        ]
+
+        async def run_batch() -> list[trigger_script.RunOutcome]:
+            task = asyncio.create_task(
+                trigger_script.trigger_and_monitor(
+                    client,
+                    [_plan_with_conf(dag=dag) for dag in dags],
+                    max_parallel=2,
+                    max_runs=1,
+                    force_retrigger=False,
+                    dag_runs_lookback=25,
+                    poll_interval=0,
+                    timeout=30,
+                    verbose=False,
+                    log_tail_lines=20,
+                )
+            )
+            for _ in range(50):
+                await asyncio.sleep(0.01)
+                if log_fetch_started.is_set():
+                    break
+            assert log_fetch_started.is_set()
+            assert client.trigger_dag_run.call_count == 3
+            release_log_fetch.set()
+            return await task
+
+        outcomes = asyncio.run(run_batch())
+
+        assert len(outcomes) == 3
+        assert all(outcome.final_state == "failed" for outcome in outcomes)
 
 
 class TestTriggerAndMonitorResume:

@@ -39,11 +39,15 @@ FAILURE_STATES = frozenset({"failed", "upstream_failed"})
 ACTIVE_DAG_RUN_STATES = frozenset({"queued", "running", "deferred"})
 CONF_MATCH_KEYS = ("run_type", "load_start_date", "load_end_date")
 DATABRICKS_MAX_CLUSTER_NAME_LENGTH = 100
-# Reserve for "_" + typical Airflow run_id on cluster_name (prod_conf cluster_name template).
-DATABRICKS_RUN_ID_SUFFIX_RESERVE = 35
+# prod_conf cluster_name: "{{ dag.dag_id }}_{{ run_id }}" (also used as Databricks job_cluster_key).
+# Worst common run_id: scheduled__ + ISO-8601 with microseconds + timezone (43 chars).
+DATABRICKS_RUN_ID_SUFFIX_RESERVE = 43
 DATABRICKS_MAX_VALIDATION_DAG_ID_LENGTH = (
     DATABRICKS_MAX_CLUSTER_NAME_LENGTH - 1 - DATABRICKS_RUN_ID_SUFFIX_RESERVE
 )
+# Ignore prod runs shorter than this when picking a reference window (--from-prod-run).
+MIN_PROD_RUN_DURATION_SECONDS = 8 * 60
+DEFAULT_VALIDATION_COOLDOWN_HOURS = 2.0
 TRANSIENT_HTTP_STATUS_CODES = frozenset({408, 429, 502, 503, 504})
 DATE_PARAM_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LoadWindowSource = Literal["conf", "data_interval"]
@@ -79,7 +83,9 @@ class DagExecutionPlan:
 @dataclass
 class ProgressTracker:
     total: int
-    completed: int = 0
+    successful: int = 0
+    failed: int = 0
+    skipped: int = 0
     active: int = 0
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
@@ -87,14 +93,22 @@ class ProgressTracker:
         async with self.lock:
             self.active += 1
 
-    async def mark_completed(self) -> None:
+    async def mark_outcome(
+        self, final_state: str, *, release_active_slot: bool = True
+    ) -> None:
         async with self.lock:
-            self.completed += 1
-            self.active = max(0, self.active - 1)
+            if final_state == "success":
+                self.successful += 1
+            elif final_state == "skipped":
+                self.skipped += 1
+            else:
+                self.failed += 1
+            if release_active_slot and self.active > 0:
+                self.active -= 1
 
-    async def snapshot(self) -> tuple[int, int, int]:
+    async def snapshot(self) -> tuple[int, int, int, int, int]:
         async with self.lock:
-            return self.completed, self.active, self.total
+            return self.successful, self.failed, self.skipped, self.total, self.active
 
 
 class EventPrinter:
@@ -122,8 +136,11 @@ class EventPrinter:
         timestamp = datetime.now().strftime("%H:%M:%S")
         suffix = ""
         if progress is not None:
-            completed, active, total = await progress.snapshot()
-            suffix = f"  ({completed}/{total} complete, {active} active)"
+            successful, failed, skipped, total, active = await progress.snapshot()
+            suffix = f"  ({successful}/{failed}/{skipped}/{total}"
+            if active:
+                suffix += f", {active} active"
+            suffix += ")"
         detail_part = f"  {detail}" if detail else ""
         await self.emit(
             f"[{timestamp}] {label:<9} {dag_id}{detail_part}{suffix}",
@@ -184,7 +201,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--force-retrigger",
         action="store_true",
-        help="Always trigger; ignore existing runs in Airflow",
+        help=(
+            "Trigger again after prior success; still respects "
+            "--validation-cooldown-hours and active-run resume"
+        ),
+    )
+    parser.add_argument(
+        "--validation-cooldown-hours",
+        type=float,
+        default=DEFAULT_VALIDATION_COOLDOWN_HOURS,
+        help=(
+            "Skip when a terminal validation run finished within this many hours "
+            f"(default {DEFAULT_VALIDATION_COOLDOWN_HOURS:g}; applies even with "
+            "--force-retrigger; use 0 to disable)"
+        ),
     )
     parser.add_argument(
         "--dag-runs-lookback",
@@ -458,12 +488,17 @@ def _has_prod_success_within_days(
     *,
     recency_days: int,
     now: datetime,
+    min_duration_seconds: float = MIN_PROD_RUN_DURATION_SECONDS,
 ) -> bool:
     cutoff = now - timedelta(days=recency_days)
     for run in runs:
         end = _parse_airflow_timestamp(run.get("end_date"))
-        if end is not None and end >= cutoff:
-            return True
+        if end is None or end < cutoff:
+            continue
+        duration = _dag_run_duration_seconds(run)
+        if duration is None or duration < min_duration_seconds:
+            continue
+        return True
     return False
 
 
@@ -472,6 +507,7 @@ def _select_reference_prod_run(
     *,
     lookback_days: int,
     now: datetime,
+    min_duration_seconds: float = MIN_PROD_RUN_DURATION_SECONDS,
 ) -> dict[str, Any] | None:
     cutoff = now - timedelta(days=lookback_days)
     candidates: list[tuple[float, datetime, dict[str, Any]]] = []
@@ -483,7 +519,7 @@ def _select_reference_prod_run(
         if reference is None or reference < cutoff:
             continue
         duration = _dag_run_duration_seconds(run)
-        if duration is None:
+        if duration is None or duration < min_duration_seconds:
             continue
         tie_break = start or end or reference
         candidates.append((duration, tie_break, run))
@@ -541,11 +577,13 @@ def _resolve_prod_run_plan(
         now=reference_now,
     )
     if reference_run is None:
+        min_minutes = MIN_PROD_RUN_DURATION_SECONDS // 60
         return DagExecutionPlan(
             dag=dag,
             conf=None,
             skip_reason=(
-                f"no successful prod run in past {args.prod_run_lookback_days} days"
+                f"no successful prod run of at least {min_minutes}m "
+                f"in past {args.prod_run_lookback_days} days"
             ),
         )
 
@@ -579,6 +617,7 @@ def _attach_validation_action(
         plan.dag,
         force_retrigger=args.force_retrigger,
         dag_runs_lookback=args.dag_runs_lookback,
+        validation_cooldown_hours=args.validation_cooldown_hours,
     )
     return plan
 
@@ -590,15 +629,19 @@ def _dag_id_exceeds_databricks_limit(dag_id: str) -> bool:
     )
 
 
+def _dag_id_too_long_skip_reason(dag_id: str) -> str:
+    return (
+        f"dag_id too long for Databricks cluster_name "
+        f"(len={len(dag_id)}, limit {DATABRICKS_MAX_VALIDATION_DAG_ID_LENGTH} "
+        f"for dag_id)"
+    )
+
+
 def _skip_plan_too_long_dag_id(dag: ValidationDag) -> DagExecutionPlan:
     return DagExecutionPlan(
         dag=dag,
         conf=None,
-        skip_reason=(
-            f"dag_id too long for Databricks cluster_name "
-            f"(len={len(dag.dag_id)}, limit {DATABRICKS_MAX_VALIDATION_DAG_ID_LENGTH} "
-            f"for dag_id)"
-        ),
+        skip_reason=_dag_id_too_long_skip_reason(dag.dag_id),
     )
 
 
@@ -701,16 +744,46 @@ def _dag_run_start_sort_key(run: dict[str, Any]) -> str:
     return str(run.get("start_date") or "")
 
 
+def _latest_terminal_run(runs: list[dict[str, Any]]) -> dict[str, Any] | None:
+    terminal_runs = [run for run in runs if run.get("state") in TERMINAL_STATES]
+    if not terminal_runs:
+        return None
+    return max(terminal_runs, key=_dag_run_start_sort_key)
+
+
+def _run_finished_within_hours(
+    run: dict[str, Any],
+    *,
+    hours: float,
+    now: datetime,
+) -> bool:
+    if hours <= 0:
+        return False
+    end = _parse_airflow_timestamp(run.get("end_date"))
+    start = _parse_airflow_timestamp(run.get("start_date"))
+    reference = end or start
+    if reference is None:
+        return False
+    return reference >= now - timedelta(hours=hours)
+
+
 def _resolve_run_action(
     client: AirflowRestClient,
     dag: ValidationDag,
     *,
     force_retrigger: bool,
     dag_runs_lookback: int,
+    validation_cooldown_hours: float = DEFAULT_VALIDATION_COOLDOWN_HOURS,
+    now: datetime | None = None,
 ) -> RunAction:
-    if force_retrigger:
-        return RunAction(action="trigger", dag_run_id=None, reason="force-retrigger")
+    if _dag_id_exceeds_databricks_limit(dag.dag_id):
+        return RunAction(
+            action="skip",
+            dag_run_id=None,
+            reason=_dag_id_too_long_skip_reason(dag.dag_id),
+        )
 
+    reference_now = now or datetime.now(timezone.utc)
     runs = client.list_dag_runs(
         dag.dag_id,
         limit=dag_runs_lookback,
@@ -729,16 +802,33 @@ def _resolve_run_action(
             reason=f"active run ({latest.get('state')})",
         )
 
-    terminal_runs = [run for run in runs if run.get("state") in TERMINAL_STATES]
-    if terminal_runs:
-        latest_terminal = max(terminal_runs, key=_dag_run_start_sort_key)
-        if latest_terminal.get("state") == "success":
-            run_id = _dag_run_id_from_payload(latest_terminal)
-            return RunAction(
-                action="skip",
-                dag_run_id=run_id,
-                reason=f"already validated (last run success: {run_id})",
-            )
+    latest_terminal = _latest_terminal_run(runs)
+    if latest_terminal is not None and _run_finished_within_hours(
+        latest_terminal,
+        hours=validation_cooldown_hours,
+        now=reference_now,
+    ):
+        run_id = _dag_run_id_from_payload(latest_terminal)
+        state = str(latest_terminal.get("state") or "terminal")
+        return RunAction(
+            action="skip",
+            dag_run_id=run_id,
+            reason=(
+                f"recent {state} run within {validation_cooldown_hours:g}h "
+                f"({run_id})"
+            ),
+        )
+
+    if force_retrigger:
+        return RunAction(action="trigger", dag_run_id=None, reason="force-retrigger")
+
+    if latest_terminal is not None and latest_terminal.get("state") == "success":
+        run_id = _dag_run_id_from_payload(latest_terminal)
+        return RunAction(
+            action="skip",
+            dag_run_id=run_id,
+            reason=f"already validated (last run success: {run_id})",
+        )
 
     return RunAction(
         action="trigger",
@@ -897,6 +987,38 @@ async def _fetch_failure_logs(
     return logs
 
 
+async def _publish_failure_logs(
+    client: AirflowRestClient,
+    semaphore: asyncio.Semaphore,
+    printer: EventPrinter,
+    progress: ProgressTracker,
+    dag: ValidationDag,
+    dag_run_id: str,
+    *,
+    started_at: float,
+    timeout: int,
+    poll_interval: float,
+    poll_max_interval: float,
+    poll_jitter: float,
+    log_tail_lines: int,
+) -> None:
+    logs = await _fetch_failure_logs(
+        client,
+        semaphore,
+        printer,
+        progress,
+        dag.dag_id,
+        dag_run_id,
+        started_at=started_at,
+        timeout=timeout,
+        poll_interval=poll_interval,
+        poll_max_interval=poll_max_interval,
+        poll_jitter=poll_jitter,
+        log_tail_lines=log_tail_lines,
+    )
+    await _print_failure_logs(printer, dag, dag_run_id, logs, log_tail_lines)
+
+
 async def monitor_run(
     client: AirflowRestClient,
     semaphore: asyncio.Semaphore,
@@ -911,6 +1033,7 @@ async def monitor_run(
     timeout: int,
     verbose: bool,
     log_tail_lines: int,
+    fetch_failure_logs: bool = True,
 ) -> RunOutcome:
     started_at = time.monotonic()
     previous_state: str | None = "queued"
@@ -928,28 +1051,28 @@ async def monitor_run(
     while True:
         elapsed = time.monotonic() - started_at
         if elapsed >= timeout:
+            await progress.mark_outcome("timeout")
             await printer.emit_event(
                 "TIMEOUT",
                 dag.dag_id,
                 _format_duration(elapsed),
                 progress=progress,
             )
-            logs = await _fetch_failure_logs(
-                client,
-                semaphore,
-                printer,
-                progress,
-                dag.dag_id,
-                dag_run_id,
-                started_at=started_at,
-                timeout=timeout,
-                poll_interval=poll_interval,
-                poll_max_interval=poll_max_interval,
-                poll_jitter=poll_jitter,
-                log_tail_lines=log_tail_lines,
-            )
-            await _print_failure_logs(printer, dag, dag_run_id, logs, log_tail_lines)
-            await progress.mark_completed()
+            if fetch_failure_logs:
+                await _publish_failure_logs(
+                    client,
+                    semaphore,
+                    printer,
+                    progress,
+                    dag,
+                    dag_run_id,
+                    started_at=started_at,
+                    timeout=timeout,
+                    poll_interval=poll_interval,
+                    poll_max_interval=poll_max_interval,
+                    poll_jitter=poll_jitter,
+                    log_tail_lines=log_tail_lines,
+                )
             return RunOutcome(
                 dag=dag,
                 dag_run_id=dag_run_id,
@@ -971,6 +1094,35 @@ async def monitor_run(
             poll_jitter=poll_jitter,
         )
         state = run_payload.get("state", "unknown")
+
+        if state in TERMINAL_STATES:
+            duration = time.monotonic() - started_at
+            await progress.mark_outcome(state)
+            if state != previous_state:
+                detail = f"{previous_state} -> {state}"
+                label = "RUNNING" if state == "running" else state.upper()
+                await printer.emit_event(label, dag.dag_id, detail, progress=progress)
+            if fetch_failure_logs and state in FAILURE_STATES:
+                await _publish_failure_logs(
+                    client,
+                    semaphore,
+                    printer,
+                    progress,
+                    dag,
+                    dag_run_id,
+                    started_at=started_at,
+                    timeout=timeout,
+                    poll_interval=poll_interval,
+                    poll_max_interval=poll_max_interval,
+                    poll_jitter=poll_jitter,
+                    log_tail_lines=log_tail_lines,
+                )
+            return RunOutcome(
+                dag=dag,
+                dag_run_id=dag_run_id,
+                final_state=state,
+                duration_seconds=duration,
+            )
 
         if state != previous_state:
             detail = f"{previous_state} -> {state}"
@@ -1005,34 +1157,6 @@ async def monitor_run(
                     progress=progress,
                 )
                 previous_running_task = running_label
-
-        if state in TERMINAL_STATES:
-            duration = time.monotonic() - started_at
-            if state in FAILURE_STATES:
-                logs = await _fetch_failure_logs(
-                    client,
-                    semaphore,
-                    printer,
-                    progress,
-                    dag.dag_id,
-                    dag_run_id,
-                    started_at=started_at,
-                    timeout=timeout,
-                    poll_interval=poll_interval,
-                    poll_max_interval=poll_max_interval,
-                    poll_jitter=poll_jitter,
-                    log_tail_lines=log_tail_lines,
-                )
-                await _print_failure_logs(
-                    printer, dag, dag_run_id, logs, log_tail_lines
-                )
-            await progress.mark_completed()
-            return RunOutcome(
-                dag=dag,
-                dag_run_id=dag_run_id,
-                final_state=state,
-                duration_seconds=duration,
-            )
 
         delay = _compute_poll_delay(
             poll_attempt,
@@ -1078,6 +1202,7 @@ async def trigger_and_monitor(
     max_runs: int,
     force_retrigger: bool,
     dag_runs_lookback: int,
+    validation_cooldown_hours: float = DEFAULT_VALIDATION_COOLDOWN_HOURS,
     poll_interval: float,
     poll_max_interval: float = 300.0,
     poll_jitter: float = 0.25,
@@ -1105,8 +1230,10 @@ async def trigger_and_monitor(
                 timeout=timeout,
                 verbose=verbose,
                 log_tail_lines=log_tail_lines,
+                fetch_failure_logs=False,
             )
         except (AirflowApiError, requests.RequestException) as exc:
+            await progress.mark_outcome("monitor_failed")
             await printer.emit_event(
                 "ERROR",
                 dag.dag_id,
@@ -1121,23 +1248,49 @@ async def trigger_and_monitor(
                 error_message=str(exc),
             )
 
+    async def _publish_outcome_failure_logs(outcome: RunOutcome) -> None:
+        if not outcome.dag_run_id:
+            return
+        if outcome.final_state not in FAILURE_STATES and outcome.final_state != "timeout":
+            return
+        await _publish_failure_logs(
+            client,
+            api_semaphore,
+            printer,
+            progress,
+            outcome.dag,
+            outcome.dag_run_id,
+            started_at=time.monotonic(),
+            timeout=timeout,
+            poll_interval=poll_interval,
+            poll_max_interval=poll_max_interval,
+            poll_jitter=poll_jitter,
+            log_tail_lines=log_tail_lines,
+        )
+
     async def process_one(plan: DagExecutionPlan) -> RunOutcome:
         dag = plan.dag
-        if plan.conf is None:
+        if plan.conf is None or _dag_id_exceeds_databricks_limit(dag.dag_id):
+            skip_reason = plan.skip_reason or (
+                _dag_id_too_long_skip_reason(dag.dag_id)
+                if _dag_id_exceeds_databricks_limit(dag.dag_id)
+                else "skipped"
+            )
+            await progress.mark_outcome("skipped", release_active_slot=False)
             await printer.emit_event(
                 "SKIPPED",
                 dag.dag_id,
-                plan.skip_reason or "skipped",
+                skip_reason,
                 progress=progress,
             )
-            await progress.mark_completed()
             return RunOutcome(
                 dag=dag,
                 dag_run_id=None,
                 final_state="skipped",
-                error_message=plan.skip_reason,
+                error_message=skip_reason,
             )
 
+        outcome: RunOutcome
         async with run_slots:
             action = plan.validation_action
             if action is None:
@@ -1147,16 +1300,17 @@ async def trigger_and_monitor(
                     dag,
                     force_retrigger=force_retrigger,
                     dag_runs_lookback=dag_runs_lookback,
+                    validation_cooldown_hours=validation_cooldown_hours,
                 )
 
             if action.action == "skip":
+                await progress.mark_outcome("skipped", release_active_slot=False)
                 await printer.emit_event(
                     "SKIPPED",
                     dag.dag_id,
                     action.reason,
                     progress=progress,
                 )
-                await progress.mark_completed()
                 return RunOutcome(
                     dag=dag,
                     dag_run_id=action.dag_run_id,
@@ -1165,6 +1319,9 @@ async def trigger_and_monitor(
 
             if action.action == "monitor":
                 if not action.dag_run_id:
+                    await progress.mark_outcome(
+                        "monitor_failed", release_active_slot=False
+                    )
                     return RunOutcome(
                         dag=dag,
                         dag_run_id=None,
@@ -1178,46 +1335,52 @@ async def trigger_and_monitor(
                     f"run={action.dag_run_id}  {action.reason}",
                     progress=progress,
                 )
-                return await _monitor(dag, action.dag_run_id)
-
-            try:
-                unpaused = await asyncio.to_thread(
-                    client.ensure_dag_unpaused, dag.dag_id
-                )
-                if unpaused:
-                    await printer.emit_event(
-                        "UNPAUSED",
-                        dag.dag_id,
-                        "was paused",
-                        progress=progress,
+                outcome = await _monitor(dag, action.dag_run_id)
+            else:
+                try:
+                    unpaused = await asyncio.to_thread(
+                        client.ensure_dag_unpaused, dag.dag_id
                     )
-                payload = await asyncio.to_thread(
-                    client.trigger_dag_run, dag.dag_id, plan.conf
-                )
-                dag_run_id = payload["dag_run_id"]
-            except (AirflowApiError, KeyError, requests.RequestException) as exc:
-                await printer.emit_event(
-                    "ERROR",
-                    dag.dag_id,
-                    str(exc),
-                    progress=progress,
-                    stream=printer.stderr,
-                )
-                return RunOutcome(
-                    dag=dag,
-                    dag_run_id=None,
-                    final_state="trigger_failed",
-                    error_message=str(exc),
-                )
+                    if unpaused:
+                        await printer.emit_event(
+                            "UNPAUSED",
+                            dag.dag_id,
+                            "was paused",
+                            progress=progress,
+                        )
+                    payload = await asyncio.to_thread(
+                        client.trigger_dag_run, dag.dag_id, plan.conf
+                    )
+                    dag_run_id = payload["dag_run_id"]
+                except (AirflowApiError, KeyError, requests.RequestException) as exc:
+                    await progress.mark_outcome(
+                        "trigger_failed", release_active_slot=False
+                    )
+                    await printer.emit_event(
+                        "ERROR",
+                        dag.dag_id,
+                        str(exc),
+                        progress=progress,
+                        stream=printer.stderr,
+                    )
+                    return RunOutcome(
+                        dag=dag,
+                        dag_run_id=None,
+                        final_state="trigger_failed",
+                        error_message=str(exc),
+                    )
 
-            await progress.mark_triggered()
-            await printer.emit_event(
-                "TRIGGERED",
-                dag.dag_id,
-                f"run={dag_run_id}",
-                progress=progress,
-            )
-            return await _monitor(dag, dag_run_id)
+                await progress.mark_triggered()
+                await printer.emit_event(
+                    "TRIGGERED",
+                    dag.dag_id,
+                    f"run={dag_run_id}",
+                    progress=progress,
+                )
+                outcome = await _monitor(dag, dag_run_id)
+
+        await _publish_outcome_failure_logs(outcome)
+        return outcome
 
     results = await asyncio.gather(
         *(process_one(plan) for plan in plans),
@@ -1320,6 +1483,7 @@ async def async_main(args: argparse.Namespace) -> int:
         max_runs=args.max_runs,
         force_retrigger=args.force_retrigger,
         dag_runs_lookback=args.dag_runs_lookback,
+        validation_cooldown_hours=args.validation_cooldown_hours,
         poll_interval=args.poll_interval,
         poll_max_interval=args.poll_max_interval,
         poll_jitter=args.poll_jitter,
