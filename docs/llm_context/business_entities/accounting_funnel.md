@@ -21,7 +21,7 @@ An account is only considered **reconciled / "batida" (ties out)** when there is
 | **Straw** (`type = 'straw'`) | Origin (Product) → Destination (SAP) | Every event created in the product reached SAP correctly |
 | **Reverse Straw** (`type = 'reverse straw'`) | Destination (SAP) → Origin (Product) | Every entry in SAP has a backing event in the product — detects accounting "noise" / entries that should **not** exist in a given account |
 
-Accounts that reach **continuous conformity in both views** are classified as **self-reconciling**.
+Accounts that reach **continuous conformity in both views** are classified as **self-reconciling**. Partial reconciliation is expressed as **Straw Compliance %** and **Reverse Straw Compliance %** (amount-weighted — see [Compliance Metrics](#compliance-metrics-amount-weighted)).
 
 ### The four "Golden Rules" (audit assertions)
 
@@ -64,6 +64,9 @@ All enrich models are unified into the DW table **`dw_sap_accounting_process.fac
 | **Monopoly** | ForSale payments system (source, since Sep–Oct 2025) |
 | **ISA 315** | Auditing standard for identifying risks of material misstatement that the methodology aligns to |
 | **Ruído contábil** | Accounting "noise" — entries in SAP without a backing product event (caught by Reverse Straw) |
+| **Straw Compliance** | Amount-weighted % of compliant straw volume (origin → SAP) |
+| **Reverse Straw Compliance** | Compliant straw volume / (non-compliant reverse-straw noise + compliant straw volume) — only for selected accounts |
+| **Compliance % / conciliada** | Always refers to the amount-weighted formulas above — not event counts |
 
 ## Tables
 
@@ -115,7 +118,7 @@ Grain: **one row per accounting event × view** (a single event can appear once 
 | `type` | View: `'straw'` (origin → SAP) or `'reverse straw'` (SAP → origin) |
 | `accounting_process_status` | Status of the accounting process (NULL for kill-queue / bank settlement) |
 | `error_description` | Description of any error in the process |
-| `accrual_year_month` | Accrual period of the accounting entry |
+| `accrual_year_month` | Accrual period of the accounting entry (integer `YYYYMM`, e.g. `202605` for May 2026) |
 | `dt_source_trigger` | Date that **starts** the funnel in the source (`dt_billing` for bank settlement) |
 | `dt_sap_reference` | Date referenced in SAP |
 | `dt_sap_created` | Date the entry was created in SAP |
@@ -124,11 +127,66 @@ Grain: **one row per accounting event × view** (a single event can appear once 
 
 ## Key Metrics
 
-- **Tie-out / reconciliation rate** — share of events with `is_compliance = TRUE` (ideally measured per `account_number` across **both** `straw` and `reverse straw`).
+> **Compliance vs diagnostic metrics:** When a user asks about **compliance**, **Straw Compliance**, **Reverse Straw Compliance**, or whether an account is **conciliada / batida**, always use the **amount-weighted formulas** in the section below — **never** event counts or a simple `COUNT(is_compliance) / COUNT(*)`. Compliance is measured by **monetary volume**, grouped by `accrual_year_month` and `account_number`.
+
+### Compliance Metrics (amount-weighted)
+
+The official **Straw Compliance** and **Reverse Straw Compliance** metrics are **amount-weighted percentages** per `account_number` × `accrual_year_month`.
+
+| Metric | What it measures |
+|--------|------------------|
+| **Straw Compliance** | Share of **straw** monetary volume that is compliant (origin → SAP) |
+| **Reverse Straw Compliance** | Share of **compliant straw volume** out of the total of compliant straw + non-compliant reverse-straw noise (SAP → origin) — **only defined for a fixed list of accounts** (see below) |
+
+#### Straw Compliance (all accounts)
+
+```sql
+100.0 * SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(source_amount), ABS(sap_amount)), 0))
+  / NULLIF(SUM(IF(type = 'straw', COALESCE(ABS(source_amount), ABS(sap_amount)), 0)), 0)
+```
+
+- Uses **only** `type = 'straw'` rows.
+- Amount priority: `COALESCE(ABS(source_amount), ABS(sap_amount))`.
+- 100% = all product-originated volume for the period reached SAP correctly; below 100% = partial straw reconciliation.
+
+#### Reverse Straw Compliance (selected accounts only)
+
+Defined **only** when `account_number` is in:
+
+`'113404'`, `'113406'`, `'113411'`, `'113412'`, `'113480'`, `'211406'`, `'211413'`, `'211415'`, `'420001'`, `'420002'`, `'420003'`, `'420004'`, `'420005'`, `'420006'`, `'420007'`, `'420008'`, `'420019'`, `'513020'`, `'420020'`, `'420025'`, `'611012'`, `'700004'`, `'700005'`, `'700006'`, `'700007'`, `'700008'`, `'700009'`, `'700010'`, `'700011'`, `'700013'`, `'420021'`, `'420022'`, `'420023'`, `'420032'`
+
+For all other accounts, Reverse Straw Compliance is **NULL** (not applicable).
+
+```sql
+100.0 * SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(sap_amount), ABS(source_amount)), 0))
+  / NULLIF(
+      SUM(IF(is_compliance = FALSE AND type = 'reverse straw', COALESCE(ABS(sap_amount), ABS(source_amount)), 0))
+      + SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(sap_amount), ABS(source_amount)), 0)),
+      0
+    )
+```
+
+- **Numerator:** compliant **straw** volume — amount priority `COALESCE(ABS(sap_amount), ABS(source_amount))`.
+- **Denominator:** non-compliant **reverse straw** volume (accounting noise in SAP) **plus** compliant **straw** volume.
+- This formula **intentionally mixes both views** in the denominator; do **not** compute it as `compliant reverse straw / total reverse straw`.
+- Lower % = more SAP noise relative to compliant product volume. Example: account `113406` in `202605` yields **97.079%** Straw Compliance and **79.903%** Reverse Straw Compliance.
+
+#### Interpreting compliance together
+
+| Straw Compliance | Reverse Straw Compliance | Typical reading |
+|------------------|--------------------------|-----------------|
+| ~100% | ~100% | Fully reconciled in both directions |
+| < 100% | any | Product events not landing correctly in SAP |
+| ~100% | < 100% | Product → SAP is fine, but SAP has accounting noise without product backing |
+| < 100% | < 100% | Breaks in both directions |
+
+### Diagnostic metrics (root-cause analysis)
+
+- **Event tie-out rate** — share of **events** (row count) with `is_compliance = TRUE`; useful for drill-down, **not** for answering compliance % questions.
 - **Completeness / correctness / temporality rates** — share of `TRUE` per assertion, by source, account, or accrual period.
 - **System divergence (`diff_systems`)** — `ABS(source_amount) - COALESCE(ABS(sap_amount), 0)`; amount mismatch between origin and SAP (≠ 0 signals a break).
 - **Timing divergence (`diff_days`)** — `ABS(date_diff('day', dt_sap_reference, dt_source_trigger))`; lag between source trigger and SAP reference.
-- **Reverse-straw noise** — `reverse straw` rows failing `is_compliance` flag accounting entries in SAP without a backing product event.
+- **Reverse-straw noise volume** — `SUM(COALESCE(ABS(sap_amount), ABS(source_amount)))` on `type = 'reverse straw' AND NOT is_compliance`; the non-compliant reverse-straw component in the Reverse Straw Compliance denominator.
 - **Reconciled amount** — `SUM(source_amount)` / `SUM(sap_amount)` filtered by compliance status, by `accrual_year_month`.
 
 ## Relationships with Other Entities
@@ -154,16 +212,21 @@ Provision and write-off accounting events relate to the losses / AR domain (`dw_
 **Do:**
 
 - Use `dw_sap_accounting_process.fact_sap_accounting_process` as the single entry point — it already unifies every source and both views.
+- When answering **compliance %** questions, use the **amount-weighted formulas** (Straw Compliance / Reverse Straw Compliance) grouped by `accrual_year_month` and `account_number`.
 - Always be explicit about the **view**: filter `type = 'straw'` for origin→SAP analysis and `type = 'reverse straw'` for SAP→origin traceability. An account "ties out" only when conformity holds in **both**.
 - Use `dt_filter` (`COALESCE(dt_sap_reference, dt_source_trigger)`) as the canonical date for period filters; `CAST` it to `DATE` when grouping by day.
-- Use `ABS()` on amounts when computing `diff_systems` — straw vs reverse-straw and debit/credit signs can flip, so compare magnitudes.
+- Use `ABS()` on amounts when computing compliance or `diff_systems` — straw vs reverse-straw and debit/credit signs can flip, so compare magnitudes.
 - Wrap `date_diff` in `ABS()` for `diff_days` — source and SAP dates are not guaranteed to be ordered.
 - `COALESCE(ABS(sap_amount), 0)` when computing divergences — `sap_amount` is NULL when nothing was accounted in SAP (a completeness break).
 - Treat `is_compliance` as the master flag, but drill into `is_completeness` / `is_correctness` / `is_temporality` to explain **why** an account did not tie out.
+- Respect the **COALESCE order** in compliance formulas: Straw Compliance uses `COALESCE(ABS(source_amount), ABS(sap_amount))`; Reverse Straw Compliance uses `COALESCE(ABS(sap_amount), ABS(source_amount))`.
 
 **Don't:**
 
-- Don't mix `straw` and `reverse straw` rows in a single amount aggregation without intent — the same event can appear in both views and will be double-counted.
+- Don't answer compliance % questions with **event counts** (`COUNT(*)`, `SUM(IF(is_compliance, 1, 0))`) — compliance is **amount-weighted**.
+- Don't compute Reverse Straw Compliance as `compliant reverse straw / total reverse straw` — the official formula mixes compliant **straw** (numerator) with non-compliant **reverse straw** + compliant **straw** (denominator).
+- Don't report Reverse Straw Compliance for accounts outside the fixed list — it is **NULL** / not applicable.
+- Don't mix `straw` and `reverse straw` rows in a single amount aggregation **unless** you are explicitly implementing the Reverse Straw Compliance formula.
 - Don't assume `sap_amount` is populated — NULL means the entry never reached SAP (this is itself a finding).
 - Don't filter on raw `dt_source_trigger` alone for SAP-period analysis — reverse and SAP-driven flows are better filtered by `dt_filter` / `dt_sap_reference`.
 - Don't forget that certain technical/contra accounts (e.g. `'11036X'`, `'11004X'`) are typically excluded from reconciliation analyses — confirm the exclusion list with the finance owners.
@@ -212,9 +275,9 @@ WHERE account_number NOT IN ('11036X', '11004X')
 - `type` distinguishes the Straw vs Reverse Straw view — keep it in the SELECT so downstream analysis can require conformity in both.
 - The `account_number NOT IN ('11036X', '11004X')` filter drops technical contra accounts from the reconciliation universe.
 
-### Query 2 — Account tie-out ("batida") by accrual period
+### Query 2 — Event tie-out ("batida") by accrual period (diagnostic)
 
-An account ties out for a period only when **every** event is compliant in **both** views.
+Counts **events** (not amounts). Use for root-cause drill-down; for compliance % use **Query 3** instead.
 
 ```sql
 SELECT
@@ -241,3 +304,54 @@ ORDER BY accrual_year_month DESC, reverse_straw_breaks DESC, straw_breaks DESC
 
 - `straw_breaks` point to events that originated in the product but did not land correctly in SAP; `reverse_straw_breaks` point to SAP "noise" without a product backing.
 - An account that consistently shows `tie_out_status = 'ties out'` across periods is a **self-reconciling** account.
+- This query does **not** reproduce Straw / Reverse Straw Compliance percentages — see Query 3.
+
+### Query 3 — Straw & Reverse Straw Compliance by account and period
+
+Computes the official **amount-weighted** Straw and Reverse Straw Compliance percentages. Filter `account_number` and `accrual_year_month` as needed.
+
+```sql
+SELECT
+  accrual_year_month,
+  account_number,
+  accounting_name,
+  100.0 * SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(source_amount), ABS(sap_amount)), 0))
+    / NULLIF(SUM(IF(type = 'straw', COALESCE(ABS(source_amount), ABS(sap_amount)), 0)), 0)
+    AS straw_compliance_pct,
+  IF(
+    account_number IN (
+      '113404', '113406', '113411', '113412', '113480', '211406', '211413', '211415',
+      '420001', '420002', '420003', '420004', '420005', '420006', '420007', '420008',
+      '420019', '513020', '420020', '420025', '611012', '700004', '700005', '700006',
+      '700007', '700008', '700009', '700010', '700011', '700013', '420021', '420022',
+      '420023', '420032'
+    ),
+    100.0 * SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(sap_amount), ABS(source_amount)), 0))
+      / NULLIF(
+          SUM(IF(is_compliance = FALSE AND type = 'reverse straw', COALESCE(ABS(sap_amount), ABS(source_amount)), 0))
+          + SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(sap_amount), ABS(source_amount)), 0)),
+          0
+        ),
+    NULL
+  ) AS reverse_straw_compliance_pct
+FROM
+  dw_sap_accounting_process.fact_sap_accounting_process
+WHERE account_number NOT IN ('11036X', '11004X')
+GROUP BY 1, 2, 3
+ORDER BY accrual_year_month DESC, account_number
+```
+
+**Example filter** for a single account and month:
+
+```sql
+-- account 113406, May 2026 → expect ~97.079% straw, ~79.903% reverse straw
+WHERE account_number = '113406'
+  AND accrual_year_month = 202605
+```
+
+**Notes:**
+
+- `straw_compliance_pct` uses `COALESCE(ABS(source_amount), ABS(sap_amount))` — source amount first.
+- `reverse_straw_compliance_pct` uses `COALESCE(ABS(sap_amount), ABS(source_amount))` — SAP amount first.
+- Reverse Straw Compliance is **NULL** for accounts outside the `IN (...)` list.
+- Group by `accrual_year_month` for monthly compliance reporting.
