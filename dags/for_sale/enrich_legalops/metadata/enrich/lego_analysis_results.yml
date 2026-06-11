@@ -1,0 +1,38 @@
+---
+database_name: datalake_legalops
+table_name: lego_analysis_results
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >
+  Enriched table with LegoContract assessment results, exploded from the contract
+  analysis result JSON. Each row represents one assessment within a contract analysis
+  request (each contract analysis have many different assessments), enabling tracking of validation outcomes by assessment type over time.
+columns:
+  id_sales_flow:
+    description: Foreign key to the sales flow associated with this contract analysis. Joins with all id_sales_flow from datalake_sales_flow_clean tables.
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.id_sales_flow
+  analysis_date:
+    description: Date when the contract analysis request was created.
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.ts_created
+  validation_id:
+    description: Identifier of the Rule ID of the validation associated with this assessment (e.g. B01, SL01, HA12, H05). Comes from nested json attribute validation_id
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.contract_analysis_result
+  assessment_name:
+    description: Name of the assessment for the given valudation evaluated by LegoContract (e.g. house_address_number, is_non_residential_suspicion, seller_is_house_holder).  Comes from nested json attribute assessment_name
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.contract_analysis_result
+  assessment_status:
+    description: Status of the individual assessment returned by LegoContract (e.g. MATCH, CHECK_PASS, CHECK_WARNING, DIFFERENT). Comes from nested json attribute assessment_status
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.contract_analysis_result
+  assessment_consolidated_status:
+    description: Final status of the assessment, indicates ACTION_NEEDED, OK or UNAVAILABLE.
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.contract_analysis_result
+  assessment_confidence:
+    description: Confidence level of the validation assessment indicates if the validation has HIGH/LOW/MEDIUM confidence in its result.
+    lineage:
+      - datalake_legalops_clean.contract_analysis_request.contract_analysis_result

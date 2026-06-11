@@ -64,7 +64,9 @@ O funil tem dois grandes blocos:
 | **Credit Model** | Modelo de financiamento | `dim_sale_agreement.credit_model` |
 | **Payment Method** | Método de pagamento da transação | `dim_sale_agreement.payment_method` |
 | **Domi / Vandinha** | Agente conversacional de AI em desenvolvimento para suporte EoP | — |
-| **Lego Contract** | Sistema de geração automatizada de CCV (Legal Ops) | — |
+| **Lego Contract** | Sistema de validação e geração automatizada de CCV (Legal Ops). Recebe dados do formulário do SalesFlow (imóvel, compradores, vendedores) e documentos enviados pelo EN, extrai informações dos documentos via API e compara com os dados do formulário. O resultado de cada validação (assessment) é exibido no Copilot/Drawer do SalesFlow para revisão dos analistas. | `datalake_legalops_clean.contract_analysis_request`, `datalake_legalops.lego_analysis_results` |
+| **Contract Analysis** | Processo de análise automática dos dados do contrato pelo LegoContract. Cada contrato tem no mínimo uma análise obrigatória; analistas podem disparar análises adicionais sob demanda. Cada execução retorna um resultado JSON com assessments por seção (house, buyers, sellers). | `datalake_legalops_clean.contract_analysis_request` |
+| **Assessment** | Unidade atômica de validação dentro de uma análise de contrato. Cada assessment verifica uma regra específica (ex: `house_address_number`, `seller_is_house_holder`) e retorna um `validation_id` (ex: H05, SL01, B01), `assessment_status` e `assessment_consolidated_status`. | `datalake_legalops.lego_analysis_results` |
 | **Legaut** | Sistema interno de automações e crawlers de Due Diligence | — |
 
 ---
@@ -371,8 +373,35 @@ Fibonacci (Mar/26, 5 cidades): NBP = 20.715, RBP = 9.138, Total = 29.853.
 | `fact_tickets` | `dw_customer_support` | Tickets Zendesk | Join via `sk_sale_offer`. `group_name` = queue (classifica divisão). |
 | `dim_ticket` | `dw_customer_support` | Atributos de ticket | `group_name`, `subject`. |
 | `closing_flow` | `datalake_sale_closing_flows` | Raw EoP (camada datalake) | Preferir `dw_sale.fact_closing_flows` para análises DW. |
+| `contract_analysis_request` | `datalake_legalops_clean` | 1 linha por execução de análise | Fonte raw das análises do LegoContract. Contém o JSON completo `contract_analysis_result` com todos os assessments aninhados. Usar `status = 'DONE'` para filtrar análises concluídas. |
+| `lego_analysis_results` | `datalake_legalops` | 1 linha por assessment por id_sales_flow por execução de análise | **Tabela enrich** — assessments já explodidos do JSON. Fonte principal para métricas de performance do LegoContract (confiabilidade, taxa de falha, evolução por validation_id). Join com tabelas EoF via `id_sales_flow`. |
 
 > ⚠️ `dim_sale_agreement` só tem linhas para ofertas que **chegaram à etapa de acordo**. Sempre LEFT JOIN a partir de `fact_offers`.
+
+### 6.5 Colunas de `lego_analysis_results` (datalake_legalops)
+
+Grain: 1 linha por assessment por `id_sales_flow` por `analysis_date`. Um mesmo `id_sales_flow` pode ter múltiplas linhas por dia se mais de uma análise foi executada (análises on-demand do analista geram novos registros).
+
+| Coluna | Tipo | Descrição |
+|--------|------|-----------|
+| `id_sales_flow` | string | FK para o sales flow (contrato). Join com `fact_offers` e demais tabelas EoF via este campo. |
+| `analysis_date` | date | Data de criação da análise (`DATE(ts_created)` da `contract_analysis_request`). |
+| `validation_id` | string | ID da regra de validação (ex: `H05`, `SL01`, `B01`). Identifica qual checagem foi executada. |
+| `assessment_name` | string | Nome descritivo do assessment (ex: `house_address_number`, `seller_is_house_holder`, `is_non_residential_suspicion`). |
+| `assessment_status` | string | Status granular retornado pelo LegoContract (ex: `MATCH`, `CHECK_PASS`, `CHECK_WARNING`, `DIFFERENT`). |
+| `assessment_consolidated_status` | string | Status consolidado do assessment: `OK`, `ACTION_NEEDED`, ou `UNAVAILABLE`. Métrica principal de qualidade. |
+| `assessment_confidence` | string | Nível de confiança da validação: `HIGH`, `MEDIUM`, ou `LOW`. |
+
+**Seções de assessments:** A tabela agrega assessments de 5 seções do JSON do LegoContract:
+- `house` — validações do imóvel
+- `buyers.section_assessments` — validações da seção compradores (nível agregado)
+- `sellers.section_assessments` — validações da seção vendedores (nível agregado)
+- `buyers.parties[*].assessments` — validações por comprador individual
+- `sellers.parties[*].assessments` — validações por vendedor individual
+
+**Join com EoF:** `id_sales_flow` é a chave de join. Para obter a chave `id_offer` a partir do `id_sales_flow` pode-se utilizar a tabela `datalake_sale_offer.sale_offer`. Em `fact_offers`, a coluna correspondente pode ser derivada via `dim_sale_agreement` (possui id_offer) ou tabelas do salesflow. Confirmar a coluna de join correta antes de cruzar com o DW.
+
+> ⚠️ **Grain importante:** um `id_sales_flow` com análises on-demand terá múltiplas linhas por `analysis_date` e por `assessment_name`. Para métricas de "última análise", filtrar pela maior `analysis_date` por `id_sales_flow`.
 
 ### 6.2 Colunas-chave em `fact_offers`
 
@@ -654,6 +683,80 @@ LEFT JOIN ic_latest                                 ic   ON disp.sk_offer       
 WHERE disp.is_answered    = true
   AND dnc.metric_group   IN ('buyerendofprocess','sellerendofprocess')
 GROUP BY 1, 2 ORDER BY 1, 2
+```
+
+### Performance dos assessments do LegoContract por mês (taxa ACTION_NEEDED e confiança)
+```sql
+-- Evolução mensal da qualidade dos assessments — fonte principal de métricas de produto LegoContract.
+-- ⚠️ Um id_sales_flow pode ter múltiplas análises por dia; esta query agrega tudo sem deduplicar.
+--    Para métricas de "última análise por contrato", ver query abaixo.
+SELECT
+    DATE_TRUNC('month', analysis_date)                                                 AS month,
+    validation_id,
+    assessment_name,
+    COUNT(*)                                                                            AS total_executions,
+    COUNT(*) FILTER (WHERE assessment_consolidated_status = 'ACTION_NEEDED')           AS action_needed,
+    COUNT(*) FILTER (WHERE assessment_consolidated_status = 'OK')                      AS ok,
+    COUNT(*) FILTER (WHERE assessment_consolidated_status = 'UNAVAILABLE')             AS unavailable,
+    ROUND(
+        COUNT(*) FILTER (WHERE assessment_consolidated_status = 'ACTION_NEEDED') * 100.0
+        / NULLIF(COUNT(*) FILTER (WHERE assessment_consolidated_status <> 'UNAVAILABLE'), 0),
+    1)                                                                                  AS action_needed_pct,
+    ROUND(
+        COUNT(*) FILTER (WHERE assessment_confidence = 'HIGH') * 100.0
+        / NULLIF(COUNT(*), 0),
+    1)                                                                                  AS high_confidence_pct
+FROM datalake_legalops.lego_analysis_results
+GROUP BY 1, 2, 3
+ORDER BY 1 DESC, 5 DESC
+```
+
+### Última análise por contrato — assessments mais recentes por id_sales_flow
+```sql
+-- Deduplicado pela análise mais recente por sales_flow. Usar para análises de "estado atual" do contrato.
+WITH latest AS (
+    SELECT
+        id_sales_flow,
+        MAX(analysis_date) AS last_analysis_date
+    FROM datalake_legalops.lego_analysis_results
+    GROUP BY 1
+)
+SELECT
+    r.id_sales_flow,
+    r.analysis_date,
+    r.validation_id,
+    r.assessment_name,
+    r.assessment_status,
+    r.assessment_consolidated_status,
+    r.assessment_confidence
+FROM datalake_legalops.lego_analysis_results r
+JOIN latest l
+    ON r.id_sales_flow = l.id_sales_flow
+    AND r.analysis_date = l.last_analysis_date
+ORDER BY r.id_sales_flow, r.assessment_name
+```
+
+### Ranking de validações com maior dificuldade de acerto (ACTION_NEEDED rate)
+```sql
+-- Identifica quais assessments estão falhando mais — útil para priorizar investigação e melhoria.
+SELECT
+    validation_id,
+    assessment_name,
+    COUNT(*)                                                                     AS total,
+    COUNT(*) FILTER (WHERE assessment_consolidated_status = 'ACTION_NEEDED')    AS action_needed,
+    ROUND(
+        COUNT(*) FILTER (WHERE assessment_consolidated_status = 'ACTION_NEEDED') * 100.0
+        / NULLIF(COUNT(*) FILTER (WHERE assessment_consolidated_status <> 'UNAVAILABLE'), 0),
+    1)                                                                           AS action_needed_pct,
+    ROUND(
+        COUNT(*) FILTER (WHERE assessment_confidence = 'LOW') * 100.0
+        / NULLIF(COUNT(*), 0),
+    1)                                                                           AS low_confidence_pct
+FROM datalake_legalops.lego_analysis_results
+WHERE analysis_date >= DATE_ADD('month', -3, CURRENT_DATE)  -- últimos 3 meses
+GROUP BY 1, 2
+HAVING COUNT(*) >= 30  -- excluir assessments com poucos dados
+ORDER BY action_needed_pct DESC
 ```
 
 ### Motivos de cancelamento de CCV
