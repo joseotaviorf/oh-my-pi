@@ -286,7 +286,7 @@ front_contacts AS (
     MD5(CONCAT(t.id_ticket, 'email')) AS sk_interaction,
     NULL AS sk_session,
     NULL AS sk_task,
-    COALESCE(t.sk_support_session, '-1') AS sk_support_session,
+    COALESCE(t.id_sss_session, '-1') AS sk_support_session,
     NULL AS sk_call,
     NULL AS sk_reservation,
     CAST(t.id_ticket AS BIGINT) AS sk_ticket,
