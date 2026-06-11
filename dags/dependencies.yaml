@@ -2758,9 +2758,7 @@ bietlejuice.enrich_hefesto:
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity:first-run-of-day
 bietlejuice.enrich_hightouch:
-  - bietlejuice.hightouch_logs:load-clean-audience-membership-databricks
   - bietlejuice.hightouch_logs:load-clean-audience-membership-trino
-  - bietlejuice.hightouch_logs:load-clean-sync-runs-databricks
   - bietlejuice.hightouch_logs:load-clean-sync-runs-trino
 bietlejuice.enrich_hiring:
   - bietlejuice.greenhouse_v3:load-clean-close-reasons:first-run-of-day

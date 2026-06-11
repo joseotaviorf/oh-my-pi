@@ -1,55 +1,102 @@
 ---
 database_name: datalake_hightouch
 table_name: sync_changelog
-owner: eduardo.soares@quintoandar.com.br
+owner: marcio.gomes@quintoandar.com.br
 domain: Growth
-description: Detailed changelog tracking individual row-level operations executed during Hightouch reverse ETL sync runs, including operation type, status, and failure reasons for each record
+description: |
+  Enrich layer for Hightouch reverse ETL row-level operation log. One row per record
+  processed during a sync run, capturing the operation type (add/change/remove), its
+  execution status, and failure details when applicable. Built by joining
+  datalake_hightouch.sync_runs (enrich) with hightouch_audit.sync_changelog on
+  id_sync and id_sync_run. Use this table to investigate per-record failures, compute
+  row-level success/failure rates, and diagnose destination errors.
+  Partitioned by year, month, day — inherited from sync_runs and derived from ts_started
+  (the sync run start timestamp). Always filter on year, month, and day together to enable
+  partition pruning. Example: WHERE year = 2026 AND month = 6 AND day = 9.
+  Combine with id_sync or id_sync_run when drilling into a specific integration or run
+  to avoid scanning the full table.
 columns:
   id_sync:
-    description: Unique identifier for the sync configuration that executed this operation
+    description: |
+      Hightouch sync configuration identifier, inherited from the parent sync run. Use to
+      filter all changelog entries for a specific sync integration.
     lineage:
       - datalake_hightouch.sync_runs.id_sync
   id_sync_run:
-    description: Unique identifier for the specific sync run execution that processed this row-level change
+    description: |
+      Unique identifier for the sync run execution that produced this changelog entry.
+      Join to datalake_hightouch.sync_runs on id_sync and id_sync_run for run-level context.
     lineage:
       - datalake_hightouch.sync_runs.id_sync_run
   ts_started:
-    description: Timestamp when the parent sync run was initiated, inherited from the sync run execution
+    description: |
+      Timestamp when the parent sync run started, inherited from sync_runs. Drives the
+      year / month / day partition values. Use for chronological ordering of changelog entries.
     lineage:
       - datalake_hightouch.sync_runs.ts_started
   ts_finished:
-    description: Timestamp when the parent sync run completed, inherited from the sync run execution
+    description: |
+      Timestamp when the parent sync run finished, inherited from sync_runs. Null if the
+      run terminated without a clean finish.
     lineage:
       - datalake_hightouch.sync_runs.ts_finished
-  year:
-    description: Partition column representing the year of the sync run start date
-    lineage:
-      - datalake_hightouch.sync_runs.year
-  month:
-    description: Partition column representing the month of the sync run start date
-    lineage:
-      - datalake_hightouch.sync_runs.month
-  day:
-    description: Partition column representing the day of the sync run start date
-    lineage:
-      - datalake_hightouch.sync_runs.day
   row_id:
-    description: Unique identifier for the individual record that was processed in the destination system
+    description: |
+      Hightouch-internal identifier for the individual destination record that was processed.
+      Not the QuintoAndar id_user. Use together with id_sync_run to uniquely identify a
+      row-level operation within a run.
     lineage:
       - hightouch_audit.sync_changelog.row_id
   op_type:
-    description: Type of operation performed on the row (added, changed, removed) during the sync execution
+    description: |
+      Type of operation Hightouch attempted on the destination record during the sync.
+      added means the record was new; changed means an existing record was updated;
+      removed means the record was deleted from the destination.
     lineage:
       - hightouch_audit.sync_changelog.op_type
+    categories:
+      added: Record was new and inserted into the destination.
+      changed: Existing destination record was updated.
+      removed: Record was deleted from the destination.
   status:
-    description: Execution status of the row-level operation (success, failed)
+    description: |
+      Execution status of the individual row-level operation. success means the destination
+      acknowledged the write; failed means the destination rejected it — inspect
+      failure_reason for the error detail.
     lineage:
       - hightouch_audit.sync_changelog.status
+    categories:
+      success: The destination acknowledged the operation.
+      failed: The destination rejected the operation; see failure_reason for details.
   failure_reason:
-    description: Detailed error message or reason explaining why the row operation failed, null if successful
+    description: |
+      Full error message returned by the destination when the row operation failed. Null
+      for successful operations. Contains structured information such as error code and
+      message separated by a colon — parse with failure_type for high-level categorization.
     lineage:
       - hightouch_audit.sync_changelog.failure_reason
   failure_type:
-    description: High-level failure category for the row operation. Built by extracting the substring before the first colon in failure_reason.
+    description: |
+      High-level failure category extracted from failure_reason by splitting on the first
+      colon (SPLIT(failure_reason, ':')[0]). Null when the operation succeeded. Use to
+      group and count failures by error type without parsing the full failure_reason string.
     lineage:
       - hightouch_audit.sync_changelog.failure_reason
+  year:
+    description: |
+      Partition column (year). Inherited from the parent sync run (ts_started). Always
+      include in WHERE clause together with month and day to enable partition pruning.
+    lineage:
+      - datalake_hightouch.sync_runs.year
+  month:
+    description: |
+      Partition column (month, 1–12). Inherited from ts_started. Must be filtered together
+      with year and day in every query to enable partition pruning.
+    lineage:
+      - datalake_hightouch.sync_runs.month
+  day:
+    description: |
+      Partition column (day, 1–31). Inherited from ts_started. Always the last partition
+      column — filter with year and month to narrow the scan to specific days.
+    lineage:
+      - datalake_hightouch.sync_runs.day
