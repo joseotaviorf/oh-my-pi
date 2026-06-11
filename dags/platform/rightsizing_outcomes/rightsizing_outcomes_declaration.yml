@@ -1,0 +1,31 @@
+dag:
+  name: rightsizing_outcomes
+  schedule_interval: "0 9 * * *"
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Daily prod vs `__validation` twin comparison for cluster right-sizing feedback
+      (Track D1). One row per (prod airflow_dag_id, dt) joining
+      dw_databricks_health.fact_databricks_dag_run production runs with their
+      shadow validation DAGs. Feeds the promotion gate
+      (scripts/promote_rightsizing_validations.py) and post-promotion watch.
+
+      Uses per-task-health percentiles (p50/p95 CPU busy/wait, memory), wall
+      durations, peak_concurrent_workers, and result-state flags only — stage-
+      derived task_run columns are not load-bearing (~0% populated).
+
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  has_hive_sync: true
+  tables_customization:
+    enrich_rightsizing_outcomes:
+      partitions: [dt]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1),  'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"

@@ -1,0 +1,196 @@
+---
+database_name: datalake_rightsizing_outcomes
+table_name: enrich_rightsizing_outcomes
+description: |
+  Daily prod vs `__validation` twin comparison for cluster right-sizing feedback
+  (Track D1). One row per (prod_airflow_dag_id, dt) joining production and shadow
+  validation runs from dw_databricks_health.fact_databricks_dag_run.
+
+  Feeds scripts/promote_rightsizing_validations.py (promotion gate) and the
+  post-promotion watch ledger. Uses per-task health percentiles rolled up to
+  dag_run grain — stage-derived task_run columns are not load-bearing.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  prod_airflow_dag_id:
+    description: Production Airflow DAG identifier (validation twins strip the `__validation` suffix).
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
+  dt:
+    description: UTC calendar date of the logical DAG runs compared. Partition column.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+  schedule_interval_minutes:
+    description: |
+      Estimated schedule interval in minutes from successful prod runs in the load
+      window (`1440 * distinct_days / run_count`). Used for cadence-bound wall SLA.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+  prod_run_count:
+    description: Count of prod-side logical DAG runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
+  val_run_count:
+    description: Count of `__validation` twin logical DAG runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
+  prod_failure_count:
+    description: Prod runs on `dt` with task or Databricks parent failure.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+      - dw_databricks_health.fact_databricks_dag_run.is_any_databricks_run_failed
+  val_failure_count:
+    description: Validation runs on `dt` with task or Databricks parent failure.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+      - dw_databricks_health.fact_databricks_dag_run.is_any_databricks_run_failed
+  val_clean_run_count:
+    description: Validation runs on `dt` that completed without task or Databricks failure.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+      - dw_databricks_health.fact_databricks_dag_run.is_any_databricks_run_failed
+  prod_avg_cost_usd:
+    description: Average negotiated total USD per prod run on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
+  val_avg_cost_usd:
+    description: Average negotiated total USD per validation run on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
+  prod_wall_p50_min:
+    description: P50 wall-clock minutes for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
+  prod_wall_p95_min:
+    description: P95 wall-clock minutes for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
+  val_wall_p50_min:
+    description: P50 wall-clock minutes for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
+  val_wall_p95_min:
+    description: P95 wall-clock minutes for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
+  prod_drv_cpu_p50:
+    description: P50 driver CPU busy percent (duration-weighted) for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
+  prod_drv_cpu_p95:
+    description: P95 driver CPU busy percent for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
+  prod_drv_mem_p95:
+    description: P95 driver memory used percent for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
+  prod_wrk_cpu_p50:
+    description: P50 worker CPU busy percent for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
+  prod_wrk_cpu_p95:
+    description: P95 worker CPU busy percent for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
+  prod_wrk_mem_p95:
+    description: P95 worker memory used percent for prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
+  val_drv_cpu_p50:
+    description: P50 driver CPU busy percent for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
+  val_drv_cpu_p95:
+    description: P95 driver CPU busy percent for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
+  val_drv_mem_p95:
+    description: P95 driver memory used percent for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
+  val_wrk_cpu_p50:
+    description: P50 worker CPU busy percent for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
+  val_wrk_cpu_p95:
+    description: P95 worker CPU busy percent for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
+  val_wrk_mem_p95:
+    description: P95 worker memory used percent for validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
+  prod_peak_concurrent_workers:
+    description: Max peak concurrent workers observed across prod runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.peak_concurrent_workers
+  val_peak_concurrent_workers:
+    description: Max peak concurrent workers observed across validation runs on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.peak_concurrent_workers
+  prod_driver_node_type:
+    description: Representative prod driver instance type on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.driver_node_type
+  prod_worker_node_type:
+    description: Representative prod worker instance type on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.worker_node_type
+  prod_worker_count:
+    description: Representative prod worker count on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.worker_count
+  prod_dbr_version:
+    description: Representative prod DBR version on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.primary_dbr_version
+  val_driver_node_type:
+    description: Representative validation driver instance type on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.driver_node_type
+  val_worker_node_type:
+    description: Representative validation worker instance type on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.worker_node_type
+  val_worker_count:
+    description: Representative validation worker count on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.worker_count
+  val_dbr_version:
+    description: Representative validation DBR version on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.primary_dbr_version
+  delta_cost_pct:
+    description: Percent change of validation vs prod average cost on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
+  delta_wall_p50_pct:
+    description: Percent change of validation vs prod wall P50 on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
+  delta_wall_p95_min:
+    description: Absolute minutes delta of validation vs prod wall P95 on `dt`.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
+  val_mem_p95_max:
+    description: Max of validation driver/worker P95 memory percent on `dt` (OOM guard).
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
+  is_promote_eligible:
+    description: |
+      True when validation has ≥1 clean run, costs less than prod, and wall time
+      passes the cadence-aware threshold (1.5× prod P50 when interval > 2h, else
+      max(0.8×interval, prod P95)).
+  outcome:
+    description: |
+      pass / warn / fail / extend classification for the day. `warn` when the mem
+      guard (val mem P95 > 82) fires; `fail` on failures, cost regression, or wall
+      breach; `extend` when validation has not completed a clean run.
+  promotion_action:
+    description: |
+      Recommended gate action for the day — promote, reject, or extend — aligned
+      with scripts/promote_rightsizing_validations.py.
+  ts_load:
+    description: Timestamp the row was written by the DAG.

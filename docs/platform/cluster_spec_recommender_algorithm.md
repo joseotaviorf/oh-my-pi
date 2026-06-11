@@ -145,7 +145,24 @@ I/O wait is not an automatic keep gate. `opa`/`istio` showed the real production
 ## Additive Single-Node Sizer
 
 Memory demand is computed from observed p95 utilization — memory is a hard cap
-(undersizing OOMs the job). CPU demand is **effective CPU** — CPU is elastic
+(undersizing OOMs the job). Two optional inputs sharpen it:
+
+- **Long-window memory history** (`--memory-history-csv`, from
+  `build_memory_history_sql(days=90)`, ARM + AMD): per (dag, node config) p99
+  mem%% converted to absolute GB against the node it was measured on; the
+  per-DAG max across configs floors the demand — insurance against month-end
+  seasonality the 14-day window misses.
+- **Per-task telemetry** (`--task-metrics-csv`, from `build_task_sql(days)`,
+  `fact_databricks_task_run` health percentiles): sizing uses the
+  **critical task** — max-over-tasks p95 memory and max-over-tasks `cpu_eff`
+  — instead of the dag-level duration-weighted blend, which dilutes a short
+  memory-hungry task behind long cheap ones. The wall model's busy fraction
+  becomes the duration-weighted per-task p50 duty cycle with a
+  `peak_concurrent_workers` denominator correction. Review flags name the
+  worst task (`io_scan_review:task=<id>`). DAGs without task rows (or rows
+  missing health percentiles — ~26%% of task runs) fall back to the dag_run
+  path wholesale. Stage-derived columns (executor CPU time, skew, spill) are
+  ~0%% populated and are never used. CPU demand is **effective CPU** — CPU is elastic
 (undersizing only stretches the wall, which the wall model + cost gate price):
 
 ```text
@@ -239,7 +256,7 @@ Workers:
 
 - Compute per-node worker memory demand from p95 and CPU demand from `cpu_eff` (p50-anchored).
 - Pick the cheapest ARM worker type that holds the per-node demand at the same 82%/85% targets.
-- Compute aggregate worker demand and conservatively reduce worker count by at most two nodes at a time, with a floor of two workers.
+- Compute aggregate worker demand and jump straight to the demand-derived worker count (no per-cycle step limit — validation + the post-promotion watch catch errors), floored at two workers AND at the measured-demand cores floor: total cores never drop below `ceil(p50_busy_cores / 0.85)`.
 - Block the count reduction if the projected wall p95 (work-conserving model above) exceeds the SLA limit — which only exists for ≤2h schedules. Worker type changes at equal count still shrink cores and are inflated by the same model.
 
 ---

@@ -585,12 +585,12 @@ class TestSingleNodeFirstKeepMultiGuards:
 
         rec = build_recommendation(m)
 
-        # Generous SLA budget lets the refined multi cut both worker type and count.
+        # Track C: jump straight to demand-derived min_count (5 here), not -2/step.
         assert rec.cohort == "right_size_multi"
         assert rec.rec_worker_node_type == "r6g.4xlarge"
-        assert rec.rec_worker_count == 6
+        assert rec.rec_worker_count == 5
         assert "reduce_worker_count" in rec.actions.split("|")
-        assert rec.num_workers_override == 6
+        assert rec.num_workers_override == 5
 
     def test_keep_multi_worker_count_reduction_is_blocked_by_sla(self):
         m = _m(
@@ -2201,3 +2201,190 @@ class TestPhotonQuadrantSearch:
         assert "gd." not in rec.rec_driver_node_type
         assert rec.projected.est_cost_delta_pct < 0.0
         assert generate_validation_config(rec) is not None
+
+
+class TestTracksABC:
+    def setup_method(self) -> None:
+        self._saved_memory_history = dict(rcs._MEMORY_HISTORY)
+        self._saved_task_metrics = {k: list(v) for k, v in rcs._TASK_METRICS.items()}
+        self._saved_demand_override = dict(rcs._DEMAND_OVERRIDE)
+
+    def teardown_method(self) -> None:
+        rcs._MEMORY_HISTORY.clear()
+        rcs._MEMORY_HISTORY.update(self._saved_memory_history)
+        rcs._TASK_METRICS.clear()
+        for dag_id, tasks in self._saved_task_metrics.items():
+            rcs._TASK_METRICS[dag_id] = list(tasks)
+        rcs._DEMAND_OVERRIDE.clear()
+        rcs._DEMAND_OVERRIDE.update(self._saved_demand_override)
+
+    def test_cores_floor_guard_blocks_over_aggressive_worker_cut(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="m6g.xlarge",
+            worker_count=8,
+            drv_cpu_p50=10.0,
+            drv_cpu_p95=15.0,
+            wrk_cpu_p50=30.0,
+            wrk_cpu_p95=40.0,
+            wrk_mem_p95=10.0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            schedule_interval_minutes=240.0,
+        )
+
+        resize = rcs._worker_resize(m)
+
+        assert resize is not None
+        # Demand alone would land on 2 workers; cores floor keeps measured busy demand.
+        assert resize.worker_count == 4
+        assert resize.worker_count < m.worker_count
+
+    def test_memory_history_max_blending_raises_additive_demand(self):
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_mem_p95=30.0,
+            wrk_mem_p95=30.0,
+        )
+        baseline = rcs._additive_memory_gb(m)
+        rcs._MEMORY_HISTORY[m.dag_id] = (999.0, None)
+
+        blended = rcs._additive_memory_gb(m)
+
+        assert baseline is not None
+        assert blended is not None
+        assert blended > baseline
+
+    def test_task_override_sizing_uses_critical_task_memory(self):
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_mem_p95=30.0,
+            wrk_mem_p95=30.0,
+            wrk_cpu_p50=10.0,
+            wrk_cpu_p95=15.0,
+        )
+        baseline = rcs._additive_memory_gb(m)
+        rcs._TASK_METRICS[m.dag_id] = [
+            rcs.TaskMetrics(
+                dag_id=m.dag_id,
+                airflow_task_id="light_task",
+                task_runs=10,
+                wall_p50_min=20.0,
+                wall_p95_min=25.0,
+                drv_cpu_p50=5.0,
+                drv_cpu_p95=8.0,
+                drv_cpu_wait_p50=None,
+                drv_cpu_wait_p95=None,
+                drv_mem_p50=20.0,
+                drv_mem_p95=35.0,
+                wrk_cpu_p50=5.0,
+                wrk_cpu_p95=8.0,
+                wrk_cpu_wait_p50=None,
+                wrk_cpu_wait_p95=None,
+                wrk_mem_p50=20.0,
+                wrk_mem_p95=35.0,
+                peak_concurrent_workers=2,
+            ),
+            rcs.TaskMetrics(
+                dag_id=m.dag_id,
+                airflow_task_id="heavy_task",
+                task_runs=5,
+                wall_p50_min=5.0,
+                wall_p95_min=8.0,
+                drv_cpu_p50=5.0,
+                drv_cpu_p95=8.0,
+                drv_cpu_wait_p50=None,
+                drv_cpu_wait_p95=None,
+                drv_mem_p50=20.0,
+                drv_mem_p95=95.0,
+                wrk_cpu_p50=60.0,
+                wrk_cpu_p95=90.0,
+                wrk_cpu_wait_p50=None,
+                wrk_cpu_wait_p95=None,
+                wrk_mem_p50=20.0,
+                wrk_mem_p95=95.0,
+                peak_concurrent_workers=2,
+            ),
+        ]
+        rcs._apply_task_demand_overrides(m.dag_id, rcs._TASK_METRICS[m.dag_id])
+
+        overridden = rcs._additive_memory_gb(m)
+
+        assert baseline is not None
+        assert overridden is not None
+        assert overridden > baseline
+
+    def test_task_named_review_flag_pins_worst_io_scan_task(self):
+        m = _m(wrk_wait_p95=5.0, wrk_cpu_p50=30.0)
+        rcs._TASK_METRICS[m.dag_id] = [
+            rcs.TaskMetrics(
+                dag_id=m.dag_id,
+                airflow_task_id="ok_task",
+                task_runs=10,
+                wall_p50_min=10.0,
+                wall_p95_min=12.0,
+                drv_cpu_p50=20.0,
+                drv_cpu_p95=30.0,
+                drv_cpu_wait_p50=None,
+                drv_cpu_wait_p95=None,
+                drv_mem_p50=20.0,
+                drv_mem_p95=30.0,
+                wrk_cpu_p50=30.0,
+                wrk_cpu_p95=40.0,
+                wrk_cpu_wait_p50=None,
+                wrk_cpu_wait_p95=10.0,
+                wrk_mem_p50=20.0,
+                wrk_mem_p95=30.0,
+                peak_concurrent_workers=2,
+            ),
+            rcs.TaskMetrics(
+                dag_id=m.dag_id,
+                airflow_task_id="scan_partitions",
+                task_runs=10,
+                wall_p50_min=15.0,
+                wall_p95_min=20.0,
+                drv_cpu_p50=10.0,
+                drv_cpu_p95=15.0,
+                drv_cpu_wait_p50=None,
+                drv_cpu_wait_p95=None,
+                drv_mem_p50=10.0,
+                drv_mem_p95=15.0,
+                wrk_cpu_p50=12.0,
+                wrk_cpu_p95=18.0,
+                wrk_cpu_wait_p50=None,
+                wrk_cpu_wait_p95=72.0,
+                wrk_mem_p50=10.0,
+                wrk_mem_p95=15.0,
+                peak_concurrent_workers=2,
+            ),
+        ]
+
+        assert rcs.review_flags(m) == ["io_scan_review:task=scan_partitions"]
+
+    def test_task_duty_cycle_fallback_matches_dag_blend_without_task_rows(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_cpu_p50=20.0,
+            wrk_cpu_p50=40.0,
+        )
+
+        assert rcs._task_duty_cycle(m.dag_id, m) is None
+        dag_busy = rcs._p50_busy_cores(m)
+        assert dag_busy == pytest.approx(3.6)
+
+    def test_build_task_and_memory_history_sql(self):
+        task_sql = rcs.build_task_sql(days=14)
+        mem_sql = rcs.build_memory_history_sql(days=90)
+
+        assert "fact_databricks_task_run" in task_sql
+        assert "task_result_state = 'SUCCEEDED'" in task_sql
+        assert "peak_concurrent_workers" in task_sql
+        assert "fact_databricks_dag_run" in mem_sql
+        assert "driver_mem_p99" in mem_sql
+        assert "0-9]g" not in mem_sql

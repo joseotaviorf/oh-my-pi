@@ -4903,6 +4903,8 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-vistoria-spoc:first-run-of-day
+bietlejuice.rightsizing_outcomes:
+  - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run:first-run-of-day
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:first-run-of-day
 bietlejuice.survicate_respondent_attributes:

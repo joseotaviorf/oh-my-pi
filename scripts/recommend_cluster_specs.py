@@ -174,6 +174,12 @@ _PHOTON_DBU_PREMIUM = 3.0
 # Populated once at runtime (main); empty in offline/unit contexts, where the
 # cost engine degrades to a vCPU-scaled observed-DBU proxy.
 _FLEET_DBU_RATE: dict[str, float] = {}
+# Long-window (90d ARM+AMD) per-DAG absolute memory demand in GiB.
+_MEMORY_HISTORY: dict[str, tuple[float | None, float | None]] = {}
+# Per-DAG task telemetry loaded from --task-metrics-csv.
+_TASK_METRICS: dict[str, list[TaskMetrics]] = {}
+# Task-derived sizing overrides (critical-task p95 mem + max cpu_eff).
+_DEMAND_OVERRIDE: dict[str, EffectiveDemand] = {}
 
 
 _KEEP_MULTI_COHORTS = {
@@ -436,6 +442,57 @@ def effective_demand(
     )
 
 
+def _sizing_demand(m: DagMetrics, *, photon_off: bool | None = None) -> EffectiveDemand:
+    """Demand for sizing levers, with optional per-task overrides."""
+    override = _DEMAND_OVERRIDE.get(m.dag_id)
+    if override is None:
+        return effective_demand(m, photon_off=photon_off)
+    patched = replace(
+        m,
+        drv_cpu_p50=override.drv_cpu_p50
+        if override.drv_cpu_p50 is not None
+        else m.drv_cpu_p50,
+        drv_cpu_p95=override.drv_cpu_p95
+        if override.drv_cpu_p95 is not None
+        else m.drv_cpu_p95,
+        drv_mem_p95=override.drv_mem_p95
+        if override.drv_mem_p95 is not None
+        else m.drv_mem_p95,
+        wrk_cpu_p50=override.wrk_cpu_p50
+        if override.wrk_cpu_p50 is not None
+        else m.wrk_cpu_p50,
+        wrk_cpu_p95=override.wrk_cpu_p95
+        if override.wrk_cpu_p95 is not None
+        else m.wrk_cpu_p95,
+        wrk_mem_p95=override.wrk_mem_p95
+        if override.wrk_mem_p95 is not None
+        else m.wrk_mem_p95,
+    )
+    return effective_demand(patched, photon_off=photon_off)
+
+
+@dataclass(frozen=True)
+class TaskMetrics:
+    dag_id: str
+    airflow_task_id: str
+    task_runs: int
+    wall_p50_min: float | None
+    wall_p95_min: float | None
+    drv_cpu_p50: float | None
+    drv_cpu_p95: float | None
+    drv_cpu_wait_p50: float | None
+    drv_cpu_wait_p95: float | None
+    drv_mem_p50: float | None
+    drv_mem_p95: float | None
+    wrk_cpu_p50: float | None
+    wrk_cpu_p95: float | None
+    wrk_cpu_wait_p50: float | None
+    wrk_cpu_wait_p95: float | None
+    wrk_mem_p50: float | None
+    wrk_mem_p95: float | None
+    peak_concurrent_workers: int | None
+
+
 # ---------------------------------------------------------------------------
 # Classifier
 # ---------------------------------------------------------------------------
@@ -533,21 +590,28 @@ def _single_node_candidates() -> list[tuple[str, InstanceSpec, float]]:
 def _additive_memory_gb(
     m: DagMetrics, *, photon_off: bool | None = None
 ) -> float | None:
-    d = effective_demand(m, photon_off=photon_off)
+    d = _sizing_demand(m, photon_off=photon_off)
     driver_spec = INSTANCE_CATALOG.get(m.driver_node_type)
     if not driver_spec or d.drv_mem_p95 is None:
         return None
-    used = driver_spec.memory_gb * d.drv_mem_p95 / 100.0
+    driver_gb = driver_spec.memory_gb * d.drv_mem_p95 / 100.0
+    hist = _MEMORY_HISTORY.get(m.dag_id)
+    if hist and hist[0] is not None:
+        driver_gb = max(driver_gb, hist[0])
+    used = driver_gb
     if m.topology == "multi":
         worker_spec = INSTANCE_CATALOG.get(_worker_node_type(m))
         if not worker_spec or d.wrk_mem_p95 is None or not m.worker_count:
             return None
-        used += worker_spec.memory_gb * d.wrk_mem_p95 / 100.0 * m.worker_count
+        worker_gb = worker_spec.memory_gb * d.wrk_mem_p95 / 100.0
+        if hist and hist[1] is not None:
+            worker_gb = max(worker_gb, hist[1])
+        used += worker_gb * m.worker_count
     return round(used, 4)
 
 
 def _additive_cores(m: DagMetrics, *, photon_off: bool | None = None) -> float | None:
-    d = effective_demand(m, photon_off=photon_off)
+    d = _sizing_demand(m, photon_off=photon_off)
     driver_spec = INSTANCE_CATALOG.get(m.driver_node_type)
     drv_cpu_eff = _cpu_effective_pct(d.drv_cpu_p50, d.drv_cpu_p95)
     if not driver_spec or drv_cpu_eff is None:
@@ -678,7 +742,10 @@ def _keep_photon_world(m: DagMetrics, photon_off: bool | None) -> bool:
 
 def _p50_busy_cores(m: DagMetrics, *, photon_off: bool | None = None) -> float:
     """Aggregate p50-busy vCPUs of the observed shape (driver + workers)."""
-    d = effective_demand(m, photon_off=photon_off)
+    duty = _task_duty_cycle(m.dag_id, m)
+    if duty is not None:
+        return duty * observed_total_cores(m)
+    d = _sizing_demand(m, photon_off=photon_off)
     busy = _vcpus(m.driver_node_type) * (d.drv_cpu_p50 or 0.0) / 100.0
     if m.topology == "multi" and m.worker_count:
         busy += (
@@ -891,7 +958,7 @@ def _multi_preset_for_worker(worker_node_type: str | None) -> str | None:
 def _driver_minimize_node(
     m: DagMetrics, *, photon_off: bool | None = None
 ) -> str | None:
-    d = effective_demand(m, photon_off=photon_off)
+    d = _sizing_demand(m, photon_off=photon_off)
     if d.drv_mem_p95 is None:
         return None
     current_spec = INSTANCE_CATALOG.get(m.driver_node_type)
@@ -918,7 +985,7 @@ def _driver_minimize_node(
 def _worker_resize(
     m: DagMetrics, *, photon_off: bool | None = None
 ) -> WorkerResize | None:
-    d = effective_demand(m, photon_off=photon_off)
+    d = _sizing_demand(m, photon_off=photon_off)
     if (
         m.topology != "multi"
         or not m.worker_count
@@ -962,7 +1029,14 @@ def _worker_resize(
     rec_count = m.worker_count
     count_blocked_sla = False
     if min_count < m.worker_count and m.worker_count > 2:
-        candidate_count = max(min_count, m.worker_count - 2, 2)
+        candidate_count = max(
+            min_count,
+            _min_worker_count_for_cores_floor(
+                m, candidate_spec.vcpus, photon_off=photon_off
+            ),
+            2,
+        )
+        candidate_count = min(candidate_count, m.worker_count)
         candidate_cores = (
             _vcpus(m.driver_node_type) + candidate_spec.vcpus * candidate_count
         )
@@ -1088,7 +1162,7 @@ def _spill_pressure(m: DagMetrics) -> bool:
 def _projected_driver_mem_after_collapse(
     m: DagMetrics, rec_driver: str | None, *, photon_off: bool | None = None
 ) -> float | None:
-    d = effective_demand(m, photon_off=photon_off)
+    d = _sizing_demand(m, photon_off=photon_off)
     if (
         rec_driver is None
         or d.drv_mem_p95 is None
@@ -1435,6 +1509,27 @@ _DRIVER_BOUND_WAIT_P95_MAX = 10.0
 _DRIVER_BOUND_CPU_P50_MAX = 5.0
 
 
+def _review_flags_from_tasks(tasks: list[TaskMetrics]) -> list[str]:
+    io_candidates: list[tuple[float, str]] = []
+    driver_candidates: list[tuple[float, str]] = []
+    for task in tasks:
+        wait = task.wrk_cpu_wait_p95
+        cpu_p50 = task.wrk_cpu_p50
+        if wait is None or cpu_p50 is None:
+            continue
+        if wait > _IO_SCAN_WAIT_P95_MIN and cpu_p50 < _IO_SCAN_CPU_P50_MAX:
+            io_candidates.append((wait, task.airflow_task_id))
+        elif wait < _DRIVER_BOUND_WAIT_P95_MAX and cpu_p50 < _DRIVER_BOUND_CPU_P50_MAX:
+            driver_candidates.append((cpu_p50, task.airflow_task_id))
+    if io_candidates:
+        task_id = max(io_candidates, key=lambda item: item[0])[1]
+        return [f"io_scan_review:task={task_id}"]
+    if driver_candidates:
+        task_id = min(driver_candidates, key=lambda item: item[0])[1]
+        return [f"driver_bound_review:task={task_id}"]
+    return []
+
+
 def review_flags(m: DagMetrics) -> list[str]:
     """Spark-job review markers for pathological worker-utilization shapes.
 
@@ -1445,6 +1540,9 @@ def review_flags(m: DagMetrics) -> list[str]:
       driver is doing the work (API pagination, collect-heavy logic). The
       cluster shape is wrong in kind, not in size.
     """
+    tasks = _TASK_METRICS.get(m.dag_id)
+    if tasks:
+        return _review_flags_from_tasks(tasks)
     if m.topology != "multi":
         return []
     wait = m.wrk_wait_p95
@@ -2414,6 +2512,86 @@ ORDER BY arm_total_cost_usd DESC
 """
 
 
+_MEMORY_HISTORY_SQL_TEMPLATE = """\
+-- Per-DAG long-window memory footprint (ARM + AMD) for right-sizing insurance.
+-- Grouped by node config: a mem%% percentile is only meaningful against the
+-- node it was measured on, so GB conversion happens per config in Python and
+-- the per-DAG max across configs wins.
+-- Generated by recommend_cluster_specs.py; do not hand-edit.
+SELECT
+    airflow_dag_id                                              AS dag_id,
+    driver_node_type,
+    worker_node_type,
+    COUNT(*)                                                    AS n_runs,
+    APPROX_PERCENTILE(weighted_avg_p95_driver_mem_used_percent, 0.99)
+                                                                AS driver_mem_p99,
+    APPROX_PERCENTILE(weighted_avg_p95_worker_mem_used_percent, 0.99)
+                                                                AS worker_mem_p99
+FROM dw_databricks_health.fact_databricks_dag_run
+WHERE dt_dag_run_started >= CURRENT_DATE - INTERVAL '{days}' DAY
+  AND airflow_dag_id LIKE 'bietlejuice.%'
+  AND airflow_dag_id IS NOT NULL
+  AND NOT REGEXP_LIKE(airflow_dag_id, '__validation$')
+  AND is_job_on_interactive = FALSE
+  AND is_any_task_failed = FALSE
+  AND is_any_databricks_run_failed = FALSE
+  AND COALESCE(total_cost_usd, 0) > 0
+GROUP BY airflow_dag_id, driver_node_type, worker_node_type
+ORDER BY airflow_dag_id
+"""
+
+_TASK_SQL_TEMPLATE = """\
+-- Per-task health metrics for critical-task sizing and review flags.
+-- Generated by recommend_cluster_specs.py; do not hand-edit.
+SELECT
+    airflow_dag_id                                              AS dag_id,
+    airflow_task_id,
+    COUNT(*)                                                    AS task_runs,
+    APPROX_PERCENTILE(CAST(execution_duration_seconds AS DOUBLE) / 60.0, 0.5)
+                                                                AS wall_p50_min,
+    APPROX_PERCENTILE(CAST(execution_duration_seconds AS DOUBLE) / 60.0, 0.95)
+                                                                AS wall_p95_min,
+    APPROX_PERCENTILE(p50_driver_cpu_busy_percent, 0.5)         AS drv_cpu_p50,
+    APPROX_PERCENTILE(p95_driver_cpu_busy_percent, 0.95)        AS drv_cpu_p95,
+    APPROX_PERCENTILE(p50_driver_cpu_wait_percent, 0.5)         AS drv_cpu_wait_p50,
+    APPROX_PERCENTILE(p95_driver_cpu_wait_percent, 0.95)        AS drv_cpu_wait_p95,
+    APPROX_PERCENTILE(p50_driver_mem_used_percent, 0.5)         AS drv_mem_p50,
+    APPROX_PERCENTILE(p95_driver_mem_used_percent, 0.95)        AS drv_mem_p95,
+    APPROX_PERCENTILE(p50_worker_cpu_busy_percent, 0.5)         AS wrk_cpu_p50,
+    APPROX_PERCENTILE(p95_worker_cpu_busy_percent, 0.95)        AS wrk_cpu_p95,
+    APPROX_PERCENTILE(p50_worker_cpu_wait_percent, 0.5)         AS wrk_cpu_wait_p50,
+    APPROX_PERCENTILE(p95_worker_cpu_wait_percent, 0.95)        AS wrk_cpu_wait_p95,
+    APPROX_PERCENTILE(p50_worker_mem_used_percent, 0.5)         AS wrk_mem_p50,
+    APPROX_PERCENTILE(p95_worker_mem_used_percent, 0.95)        AS wrk_mem_p95,
+    MAX(peak_concurrent_workers)                                AS peak_concurrent_workers
+FROM dw_databricks_health.fact_databricks_task_run
+WHERE dt_task_started >= CURRENT_DATE - INTERVAL '{days}' DAY
+  AND airflow_dag_id LIKE 'bietlejuice.%'
+  AND airflow_dag_id IS NOT NULL
+  AND NOT REGEXP_LIKE(airflow_dag_id, '__validation$')
+  AND NOT is_job_on_interactive
+  AND task_result_state = 'SUCCEEDED'
+  AND p50_driver_cpu_busy_percent IS NOT NULL
+  AND p95_driver_cpu_busy_percent IS NOT NULL
+  AND p50_worker_cpu_busy_percent IS NOT NULL
+  AND p95_worker_cpu_busy_percent IS NOT NULL
+  AND p50_driver_mem_used_percent IS NOT NULL
+  AND p95_driver_mem_used_percent IS NOT NULL
+  AND p50_worker_mem_used_percent IS NOT NULL
+  AND p95_worker_mem_used_percent IS NOT NULL
+GROUP BY airflow_dag_id, airflow_task_id
+ORDER BY airflow_dag_id, airflow_task_id
+"""
+
+
+def build_memory_history_sql(days: int = 90) -> str:
+    return _MEMORY_HISTORY_SQL_TEMPLATE.format(days=days)
+
+
+def build_task_sql(days: int) -> str:
+    return _TASK_SQL_TEMPLATE.format(days=days)
+
+
 def build_sql(days: int, min_days: int, min_runs: int) -> str:
     return _TRINO_SQL_TEMPLATE.format(days=days, min_days=min_days, min_runs=min_runs)
 
@@ -3025,6 +3203,180 @@ def _i_row(v: Any, default: int = 0) -> int:
     if s in ("", "None", "nan", "NaN"):
         return default
     return int(float(s))
+
+
+def _memory_gb_from_pct(node_type: str | None, mem_pct: float | None) -> float | None:
+    if not node_type or mem_pct is None:
+        return None
+    spec = INSTANCE_CATALOG.get(node_type)
+    if not spec:
+        return None
+    return spec.memory_gb * mem_pct / 100.0
+
+
+def _memory_history_gb_from_row(
+    row: dict[str, Any],
+) -> tuple[float | None, float | None]:
+    driver_type = str(row.get("driver_node_type") or "").strip() or None
+    worker_type = str(row.get("worker_node_type") or "").strip() or driver_type
+    driver_gb = _memory_gb_from_pct(driver_type, _f_row(row.get("driver_mem_p99")))
+    worker_gb = _memory_gb_from_pct(worker_type, _f_row(row.get("worker_mem_p99")))
+    return driver_gb, worker_gb
+
+
+def _task_metrics_from_row(row: dict[str, Any]) -> TaskMetrics:
+    peak = _i_row(row.get("peak_concurrent_workers"), default=0)
+    return TaskMetrics(
+        dag_id=str(row["dag_id"]).strip(),
+        airflow_task_id=str(row["airflow_task_id"]).strip(),
+        task_runs=_i_row(row.get("task_runs"), default=0),
+        wall_p50_min=_f_row(row.get("wall_p50_min")),
+        wall_p95_min=_f_row(row.get("wall_p95_min")),
+        drv_cpu_p50=_f_row(row.get("drv_cpu_p50")),
+        drv_cpu_p95=_f_row(row.get("drv_cpu_p95")),
+        drv_cpu_wait_p50=_f_row(row.get("drv_cpu_wait_p50")),
+        drv_cpu_wait_p95=_f_row(row.get("drv_cpu_wait_p95")),
+        drv_mem_p50=_f_row(row.get("drv_mem_p50")),
+        drv_mem_p95=_f_row(row.get("drv_mem_p95")),
+        wrk_cpu_p50=_f_row(row.get("wrk_cpu_p50")),
+        wrk_cpu_p95=_f_row(row.get("wrk_cpu_p95")),
+        wrk_cpu_wait_p50=_f_row(row.get("wrk_cpu_wait_p50")),
+        wrk_cpu_wait_p95=_f_row(row.get("wrk_cpu_wait_p95")),
+        wrk_mem_p50=_f_row(row.get("wrk_mem_p50")),
+        wrk_mem_p95=_f_row(row.get("wrk_mem_p95")),
+        peak_concurrent_workers=peak if peak > 0 else None,
+    )
+
+
+def _best_cpu_eff_task(tasks: list[TaskMetrics], *, side: str) -> TaskMetrics | None:
+    best: TaskMetrics | None = None
+    best_eff = -1.0
+    for task in tasks:
+        if side == "driver":
+            eff = _cpu_effective_pct(task.drv_cpu_p50, task.drv_cpu_p95)
+        else:
+            eff = _cpu_effective_pct(task.wrk_cpu_p50, task.wrk_cpu_p95)
+        if eff is not None and eff > best_eff:
+            best_eff = eff
+            best = task
+    return best
+
+
+def _apply_task_demand_overrides(dag_id: str, tasks: list[TaskMetrics]) -> None:
+    if not tasks:
+        return
+    drv_mem_p95 = max(
+        (t.drv_mem_p95 for t in tasks if t.drv_mem_p95 is not None), default=None
+    )
+    wrk_mem_p95 = max(
+        (t.wrk_mem_p95 for t in tasks if t.wrk_mem_p95 is not None), default=None
+    )
+    drv_task = _best_cpu_eff_task(tasks, side="driver")
+    wrk_task = _best_cpu_eff_task(tasks, side="worker")
+    _DEMAND_OVERRIDE[dag_id] = EffectiveDemand(
+        drv_cpu_p50=drv_task.drv_cpu_p50 if drv_task else None,
+        drv_cpu_p95=drv_task.drv_cpu_p95 if drv_task else None,
+        drv_mem_p50=None,
+        drv_mem_p95=drv_mem_p95,
+        wrk_cpu_p50=wrk_task.wrk_cpu_p50 if wrk_task else None,
+        wrk_cpu_p95=wrk_task.wrk_cpu_p95 if wrk_task else None,
+        wrk_mem_p50=None,
+        wrk_mem_p95=wrk_mem_p95,
+    )
+
+
+def load_memory_history_csv(path: str | Path) -> None:
+    """Load 90d memory history into ``_MEMORY_HISTORY``.
+
+    Rows arrive per (dag, driver/worker node config); each config's mem%% is
+    converted to GB against its own node and the per-DAG max across configs
+    wins — a percentile measured on one node type is never applied to another.
+    """
+    _MEMORY_HISTORY.clear()
+    for_row: dict[str, tuple[float | None, float | None]] = _MEMORY_HISTORY
+    with open(path, newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            dag_id = str(row.get("dag_id") or row.get("airflow_dag_id") or "").strip()
+            if not dag_id or _is_validation_dag(dag_id):
+                continue
+            driver_gb, worker_gb = _memory_history_gb_from_row(row)
+            prev = for_row.get(dag_id)
+            if prev is not None:
+                driver_gb = max(
+                    (v for v in (driver_gb, prev[0]) if v is not None), default=None
+                )
+                worker_gb = max(
+                    (v for v in (worker_gb, prev[1]) if v is not None), default=None
+                )
+            for_row[dag_id] = (driver_gb, worker_gb)
+
+
+def load_task_metrics_csv(path: str | Path) -> None:
+    """Load per-task metrics and precompute per-DAG demand overrides."""
+    _TASK_METRICS.clear()
+    _DEMAND_OVERRIDE.clear()
+    with open(path, newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            try:
+                task = _task_metrics_from_row(row)
+            except (KeyError, ValueError) as exc:
+                print(
+                    f"WARNING: skipping malformed task row {row}: {exc}",
+                    file=sys.stderr,
+                )
+                continue
+            if _is_validation_dag(task.dag_id):
+                continue
+            _TASK_METRICS.setdefault(task.dag_id, []).append(task)
+    for dag_id, tasks in _TASK_METRICS.items():
+        _apply_task_demand_overrides(dag_id, tasks)
+
+
+def _task_duty_cycle(dag_id: str, m: DagMetrics) -> float | None:
+    """Duration-weighted per-task p50-busy duty cycle with peak-worker correction."""
+    tasks = _TASK_METRICS.get(dag_id)
+    if not tasks:
+        return None
+    old_cores = observed_total_cores(m)
+    if old_cores <= 0:
+        return None
+    worker_vcpus = _vcpus(_worker_node_type(m))
+    driver_vcpus = _vcpus(m.driver_node_type)
+    busy_sum = 0.0
+    weight_sum = 0.0
+    for task in tasks:
+        weight = task.wall_p50_min or 0.0
+        if weight <= 0:
+            continue
+        peak_workers = task.peak_concurrent_workers or m.worker_count or 1
+        task_busy = driver_vcpus * (task.drv_cpu_p50 or 0.0) / 100.0
+        if m.topology == "multi" and worker_vcpus > 0:
+            task_busy += (
+                worker_vcpus * (task.wrk_cpu_p50 or 0.0) / 100.0 * max(peak_workers, 1)
+            )
+        busy_sum += weight * task_busy
+        weight_sum += weight
+    if weight_sum <= 0:
+        return None
+    return busy_sum / weight_sum / old_cores
+
+
+def _min_worker_count_for_cores_floor(
+    m: DagMetrics,
+    worker_vcpus: int,
+    *,
+    photon_off: bool | None = None,
+) -> int:
+    """Minimum workers so total cores stay at or above measured demand + headroom."""
+    if worker_vcpus <= 0:
+        return 2
+    cores_floor = math.ceil(
+        _p50_busy_cores(m, photon_off=photon_off) / _SINGLE_NODE_CPU_TARGET
+    )
+    driver_cores = _vcpus(m.driver_node_type)
+    if cores_floor <= driver_cores:
+        return 2
+    return max(2, math.ceil((cores_floor - driver_cores) / worker_vcpus))
 
 
 _VALIDATION_OUTCOME_FIELDS = [
@@ -3642,6 +3994,16 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Minimum AMD run count for AMD correction pool (default 10)",
     )
     parser.add_argument(
+        "--memory-history-csv",
+        metavar="PATH",
+        help="Load 90d ARM+AMD memory history CSV for long-window memory sizing",
+    )
+    parser.add_argument(
+        "--task-metrics-csv",
+        metavar="PATH",
+        help="Load per-task metrics CSV for critical-task sizing and review flags",
+    )
+    parser.add_argument(
         "--validation-outcomes",
         metavar="PATH",
         help="Write validation_outcomes.csv comparing recommendations vs __validation runs",
@@ -3696,6 +4058,21 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     print(f"Loaded {len(metrics)} DAG rows.", file=sys.stderr)
+
+    if args.memory_history_csv:
+        load_memory_history_csv(args.memory_history_csv)
+        print(
+            f"Loaded {len(_MEMORY_HISTORY)} DAG memory-history rows.",
+            file=sys.stderr,
+        )
+
+    if args.task_metrics_csv:
+        load_task_metrics_csv(args.task_metrics_csv)
+        print(
+            f"Loaded {sum(len(v) for v in _TASK_METRICS.values())} task rows "
+            f"across {len(_TASK_METRICS)} DAGs.",
+            file=sys.stderr,
+        )
 
     # Populate fleet DBU rate map for cost-truthful repricing (Trino runs only).
     if args.trino:

@@ -44,6 +44,8 @@ Useful flags:
 | `--dominant-config-share-min` | `0.50` | Min dominant-config run **and** cost share to pass `mixed_config_review` |
 | `--trino-host` | prod Trino hostname | Trino endpoint; overridden by `TRINO_HOST` env var when set |
 | `--use-amd-history` | off | Optional AMD (x86) fallback for DAGs below ARM eligibility; same cohort/preset logic as ARM |
+| `--memory-history-csv` | off | 90d ARM+AMD per-config memory history (`build_memory_history_sql`); floors memory demand at the long-window absolute-GB max |
+| `--task-metrics-csv` | off | Per-task health percentiles (`build_task_sql`, `fact_databricks_task_run`); enables critical-task sizing, task duty-cycle wall model, and task-named review flags |
 | `--amd-min-runs` | `10` | Minimum total x86 run count for AMD history pool |
 | `--validation-outcomes` | off | Write `validation_outcomes.csv` comparing recommendations vs existing `__validation` runs (requires `--trino`) |
 | `--validation-min-runs` | `1` | Minimum validation runs per DAG for outcome comparison |
@@ -191,6 +193,29 @@ Review carefully:
 - `medium-x86`: recommendation derived from AMD (x86) history via `--use-amd-history`. Same cohorts as ARM (`collapse_to_single`, `right_size_multi`, `keep_multi_*`, etc.); lower confidence because telemetry is pre-Graviton. Wall times in the report are observed (uncorrected); SLA/collapse math applies a 26.5% ARM speedup factor (`AMD_WALL_CORRECTION = 0.735`) before sizing.
 
 Do not promote directly from the report. Every change needs a validation DAG run.
+
+## Feedback loop (outcomes → promotion → watch)
+
+See `docs/platform/cluster_rightsizing_feedback_loop_plan.md` for the design.
+
+- **Outcomes table**: the daily platform DAG `rightsizing_outcomes`
+  (`dags/platform/rightsizing_outcomes/`) writes
+  `enrich_rightsizing_outcomes` — one row per (prod dag, day) comparing prod
+  vs `__validation` twins, with `is_promote_eligible`, `outcome`, and
+  `promotion_action` precomputed. Promotion bar: ≥1 clean validation run,
+  cost below prod, wall ≤ 1.5× prod p50 (or the cadence limit for ≤2h
+  schedules); `mem_p95 > 82` holds for one more run.
+- **Promotion gate**: export the outcomes table to CSV (Trino), then
+  `uv run --python 3.12 python scripts/promote_rightsizing_validations.py
+  --outcomes-csv <csv> --report-out <md>` — promotes eligible specs into the
+  prod `cluster:` block, removes rejected validation sections, snapshots the
+  pre-change baseline into `scripts/rightsizing_promotion_ledger.json`, and
+  emits the promoted/rejected/extended report. Review the resulting diff as
+  one PR.
+- **Post-promotion watch**: `… --watch --outcomes-csv <fresh csv>` compares
+  each promotion (<7 days old) against its ledger baseline and prints alert
+  lines (cost > baseline +15%, failures, cadence-SLA breach) including the
+  exact previous spec for revert.
 
 ---
 
