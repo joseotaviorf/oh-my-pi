@@ -48,6 +48,13 @@ workflow:
       extra_spark_job_arguments:
         - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
         - "column_mapping_delta_test_pin"
+    # Use context: Exports active employees (without salary band) from DW 2.0 to PIN. "Public Pin"
+    # Migrated from: /Workspace/People/People_Analytics/Daily_Pipeline/external_reports (cell base_public_no_banda)
+    # Governance: docs/people_public_gsheet_exports.md
+    public_information:
+      extra_spark_job_arguments:
+        - "1lf1CIn8GRvHOnNm0imZ8z01w_NXtjv16zbPqD5GP8-k"
+        - "base - PIN"
     # Use context: Used as the basis for the load that updates Codex data in PIN.
     # Business Owner: jessica.mlara@quintoandar.com.br
     # Data Owner: gabriel.berger@quintoandar.com.br
