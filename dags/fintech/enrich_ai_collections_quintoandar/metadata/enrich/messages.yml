@@ -1,13 +1,20 @@
 database_name: enrich_ai_collections_quintoandar
 table_name: messages
-description: Agglutinated chatbot conversation per id_sauron_session, with all messages concatenated into a single ordered string for downstream LLM analysis of Matthew (collections AI agent) interactions.
+description: Agglutinated chatbot conversation per unified session key (id_session_key), with all messages concatenated into a single ordered string for downstream LLM analysis of Matthew (collections AI agent) interactions.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_sauron_session:
     lineage:
       - datalake_chatbot.messages.id_sauron_session
-    description: "Sauron session identifier, joining back to enrich_ai_collections_quintoandar.sessions.id_sauron_session."
+    description: "Numeric Sauron session identifier from the source message. NULL when the session is tracked only by a hash id (see id_session_key)."
+  id_session_key:
+    lineage:
+      - datalake_chatbot.messages.id_sauron_session
+      - datalake_chatbot.messages.id_sss_session
+      - datalake_ai_collections_quintoandar.sessions.id_sauron_session
+      - datalake_ai_collections_quintoandar.sessions.id_sss_session
+    description: "Unified session identity used to join messages to Matthew sessions: COALESCE(id_sauron_session, id_sss_session) from chatbot messages, aligned with enrich_ai_collections_quintoandar.sessions."
   id_external:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.id_external
