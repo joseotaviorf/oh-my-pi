@@ -41,6 +41,7 @@ arriving logs from clusters that finish around midnight UTC.
 """
 
 import argparse
+from typing import Optional
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
@@ -54,6 +55,11 @@ from pyspark.sql.types import (
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import spark
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 # Java regex for ``regexp_extract`` (capture group 1 = Spark application / attempt id).
@@ -167,6 +173,8 @@ def main() -> None:
         datalake_bucket=args.bucket,
         schema=args.database_base_name,
         table_name=args.table_name,
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
     )
     logger.info(f"m=main,msg='finished {JOB_NAME}'")
 
@@ -193,6 +201,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "databricks_bucket", type=str, help="bucket where event logs are written"
     )
+    add_validation_target_args(parser)
     return parser.parse_args()
 
 
@@ -397,17 +406,29 @@ def load_table(
     datalake_bucket: str,
     schema: str,
     table_name: str,
+    target_database: Optional[str] = None,
+    target_table: Optional[str] = None,
 ) -> None:
     logger.info(f"m=load_table,msg='loading table {schema}.{table_name}'")
 
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database,
+            target_table=target_table,
+        )
+    )
 
     loader = DeltaLoader(spark)
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}/{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location.rstrip('/')}/{write_table_name}",
         source_df=dataframe,
         partition_by=["dt_stage_completed"],
     )

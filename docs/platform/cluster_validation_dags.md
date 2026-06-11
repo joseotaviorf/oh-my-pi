@@ -185,7 +185,33 @@ Before each new trigger, the script **unpauses** the validation DAG if it is pau
 
 While PRs land incrementally, keep `--skip-missing` enabled so only deployed validation DAGs are triggered. Failed runs print Airflow task logs to stderr immediately when they finish.
 
-**`--from-prod-run` load window:** For each validation DAG, the script reads the matching prod DAG (`bietlejuice.{name}`, without `__validation`). Among successful prod runs in the last `--prod-run-lookback-days` (default 14) with wall-clock duration of at least **8 minutes**, it picks the run with the shortest duration (ties: most recent `start_date`). Very short prod runs are ignored because they are usually no-op or erroneous executions and make a poor validation baseline. Load dates come from that run's `conf` when present, otherwise from `data_interval_start` and `data_interval_end` (end date uses the exclusive-interval rule: calendar day before `data_interval_end`). DAGs whose prod DAG has not had a qualifying success in the last `--prod-run-recency-days` (default 7) are skipped unless `--no-prod-run-recency-filter` is set.
+**`--from-prod-run` load window:** For each validation DAG, the script reads the matching prod DAG (`bietlejuice.{name}`, without `__validation`). Among successful prod runs in the last `--prod-run-lookback-days` (default 14) with wall-clock duration of at least **8 minutes**, it picks the run with the shortest duration (ties: most recent `start_date`). Very short prod runs are ignored because they are usually no-op or erroneous executions and make a poor validation baseline. Load dates come from that run's `conf` when present, otherwise from `data_interval_start` and `data_interval_end` (end date uses the exclusive-interval rule: calendar day before `data_interval_end`). When the resolved window has `load_start_date >= load_end_date`, the script bumps `load_end_date` by one day (API-ingestion DAGs need `end > start`). Prefer explicit `--load-start-date` / `--load-end-date` for API DAGs instead of relying on `--from-prod-run` alone. DAGs whose prod DAG has not had a qualifying success in the last `--prod-run-recency-days` (default 7) are skipped unless `--no-prod-run-recency-filter` is set.
+
+### Stale validation tables
+
+If a validation run fails with a Delta **schema mismatch** or **location already exists** error, the leftover `cluster_validation` table from a prior run may block the next attempt. **`DROP TABLE` only removes the UC metastore entry** — delete the underlying S3 prefix as well, then re-trigger.
+
+1. Drop the UC table (from the failing task log: `cluster_validation.datalake_<schema>___<table>`):
+
+```sql
+DROP TABLE IF EXISTS cluster_validation.datalake_amplitude_page_viewed_events___schedule_search_listing_events;
+DROP TABLE IF EXISTS cluster_validation.datalake_hub_services___business_unit;
+```
+
+2. Remove the table data prefix on S3. Validation writes under:
+
+`s3://{datalake_bucket}/validation/cluster_validation/{prod_database}/{validation_table_name}/`
+
+where `{prod_database}` is the prod UC database (segment before `___` in the validation table name) and `{validation_table_name}` is the full validation table name.
+
+For prod (`datalake_bucket` = `5a-datalake-prod`):
+
+```bash
+aws s3 rm s3://5a-datalake-prod/validation/cluster_validation/datalake_amplitude_page_viewed_events/datalake_amplitude_page_viewed_events___schedule_search_listing_events/ --recursive
+aws s3 rm s3://5a-datalake-prod/validation/cluster_validation/datalake_hub_services/datalake_hub_services___business_unit/ --recursive
+```
+
+For forno, use bucket `5a-datalake-forno` and the same path suffixes. Confirm the location in Databricks with `DESCRIBE TABLE EXTENDED cluster_validation.<table>` if unsure.
 
 **Re-run / resume:** Before each validation DAG, the script queries recent Airflow runs (`--dag-runs-lookback`, default 25): it **resumes** monitoring any active run (`queued` / `running` / `deferred`), **skips** when the most recent terminal run finished within `--validation-cooldown-hours` (default 2h, success or failure), **skips** when the most recent terminal run is `success` (cluster validation is a smoke test; one success is enough signal), and **triggers** when the last run failed or there is no prior success. Use `--force-retrigger` to run again after an older success; cooldown still applies. `--from-prod-run` only chooses the load window sent on **trigger**; it does not affect skip. Dry-run `SKIP` lines include the last successful run id (e.g. `already validated (last run success: manual__...)`). Transient API errors during polling are retried with backoff until the run finishes or `--timeout` is reached.
 

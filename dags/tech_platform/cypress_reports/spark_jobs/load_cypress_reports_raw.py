@@ -10,6 +10,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -38,7 +42,8 @@ def _generate_date_range(load_start_date, load_end_date):
 
 logger = QuintoAndarLogger(JOB_NAME)
 
-if __name__ == "__main__":
+
+def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("env")
@@ -46,8 +51,13 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
+    add_validation_target_args(parser)
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
 
     env = args.env
     datalake_bucket = args.datalake_bucket
@@ -78,6 +88,16 @@ if __name__ == "__main__":
     db_info = datalake_metastore_mapper.get_all_datalake_info()
     database_name = db_info["db_raw_name"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=source,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
 
     base_dbutils = BaseDBUtils()
 
@@ -91,7 +111,7 @@ if __name__ == "__main__":
 
     gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
 
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     logger.info(
         f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Getting data from bucket..."""
@@ -126,27 +146,27 @@ if __name__ == "__main__":
                 s3_loader.load_df(
                     df=df,
                     format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                    s3_path=f"{database_location}{source}",
+                    s3_path=f"{write_location.rstrip('/')}/{write_table_name}",
                     partitions=raw_partition_cols,
                     compression="gzip",
                 )
 
                 logger.info(
-                    f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={source}, msg=Update metastore..."""
+                    f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={write_table_name}, msg=Update metastore..."""
                 )
                 spark_metastore_loader.update_metastore(
                     df=df,
-                    database_name=database_name,
-                    table_name=source,
+                    database_name=write_database_name,
+                    table_name=write_table_name,
                     format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                    database_location=database_location,
+                    database_location=write_location,
                     partitions=raw_partition_cols,
                 )
 
                 spark_metastore_service.create_new_partitions_from_df(
                     df=df,
-                    database_name=database_name,
-                    table_name=source,
+                    database_name=write_database_name,
+                    table_name=write_table_name,
                     partition_cols=raw_partition_cols,
                 )
 

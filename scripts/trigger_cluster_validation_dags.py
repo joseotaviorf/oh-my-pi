@@ -450,6 +450,24 @@ def _dag_run_duration_seconds(run: dict[str, Any]) -> float | None:
     return max(0.0, (end - start).total_seconds())
 
 
+def _ensure_exclusive_load_end(conf: dict[str, str]) -> dict[str, str]:
+    start = conf.get("load_start_date")
+    end = conf.get("load_end_date")
+    if not (_is_valid_date_param(start) and _is_valid_date_param(end)):
+        return conf
+    if start >= end:
+        bumped_end = (
+            datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)
+        ).strftime("%Y-%m-%d")
+        print(
+            "WARNING: load_end_date must be after load_start_date; "
+            f"bumping load_end_date from {end} to {bumped_end}",
+            file=sys.stderr,
+        )
+        return {**conf, "load_end_date": bumped_end}
+    return conf
+
+
 def _load_window_from_prod_dag_run(
     run: dict[str, Any],
 ) -> tuple[dict[str, str], LoadWindowSource] | None:
@@ -459,11 +477,13 @@ def _load_window_from_prod_dag_run(
         end = run_conf.get("load_end_date")
         if _is_valid_date_param(start) and _is_valid_date_param(end):
             return (
-                {
-                    "run_type": "test_run",
-                    "load_start_date": str(start),
-                    "load_end_date": str(end),
-                },
+                _ensure_exclusive_load_end(
+                    {
+                        "run_type": "test_run",
+                        "load_start_date": str(start),
+                        "load_end_date": str(end),
+                    }
+                ),
                 "conf",
             )
 
@@ -474,11 +494,13 @@ def _load_window_from_prod_dag_run(
 
     load_end_dt = interval_end - timedelta(days=1)
     return (
-        {
-            "run_type": "test_run",
-            "load_start_date": _to_utc_date_str(interval_start),
-            "load_end_date": _to_utc_date_str(load_end_dt),
-        },
+        _ensure_exclusive_load_end(
+            {
+                "run_type": "test_run",
+                "load_start_date": _to_utc_date_str(interval_start),
+                "load_end_date": _to_utc_date_str(load_end_dt),
+            }
+        ),
         "data_interval",
     )
 

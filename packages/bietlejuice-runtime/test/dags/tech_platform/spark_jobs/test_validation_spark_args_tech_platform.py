@@ -34,8 +34,14 @@ _SPARK_STUBS = [
 for _mod in _SPARK_STUBS:
     sys.modules.setdefault(_mod, MagicMock())
 
+from dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load import (  # noqa: E402
+    parse_arguments as parse_application_audit_logs_args,
+)
 from dags.tech_platform.crowdstrike.spark_jobs.load_crowdstrike_raw import (  # noqa: E402
     CrowdStrikeJobArgumentParser,
+)
+from dags.tech_platform.cypress_reports.spark_jobs.load_cypress_reports_raw import (  # noqa: E402
+    parse_arguments as parse_cypress_reports_args,
 )
 from dags.tech_platform.idn.spark_jobs.load_idn_raw import (  # noqa: E402
     IdnJobArgumentParser,
@@ -144,6 +150,29 @@ _OPA_POSITIONAL = [
     "2024-01-01T00:00:00+00:00",
     "opa",
     '["year", "month", "day", "hour"]',
+]
+
+_APPLICATION_AUDIT_LOGS_POSITIONAL = [
+    "application_audit_logs",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "application_audit_logs",
+    "2024-01-01T00:00:00+00:00",
+    "logs",
+    '["year", "month", "day", "hour"]',
+]
+
+_CYPRESS_REPORTS_POSITIONAL = [
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "cypress_reports",
+    "2024-01-01",
+    "2024-01-02",
+]
+
+_TECH_PLATFORM_JOB_PATHS = [
+    "dags/tech_platform/application_audit_logs/spark_jobs/application_audit_logs_load.py",
+    "dags/tech_platform/cypress_reports/spark_jobs/load_cypress_reports_raw.py",
 ]
 
 _ZSCALER_POSITIONAL = [
@@ -272,6 +301,16 @@ class TestTechPlatformSparkJobValidationArgs:
                 _OPA_POSITIONAL,
                 "datalake_access_logs_clean___opa",
             ),
+            (
+                parse_application_audit_logs_args,
+                _APPLICATION_AUDIT_LOGS_POSITIONAL,
+                "datalake_application_audit_logs_clean___logs",
+            ),
+            (
+                parse_cypress_reports_args,
+                _CYPRESS_REPORTS_POSITIONAL,
+                "datalake_cypress_reports_raw___cypress_reports",
+            ),
         ],
     )
     def test_log_jobs_accept_validation_flags(
@@ -301,6 +340,12 @@ class TestTechPlatformSparkJobValidationArgs:
                 return_value=MagicMock(get_config=MagicMock(return_value="path"))
             ),
         )
+        monkeypatch.setattr(
+            "dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(get_config=MagicMock(return_value="path"))
+            ),
+        )
         args = parse_fn()
 
         assert args.target_database_name == _VALIDATION_DB
@@ -311,6 +356,11 @@ class TestTechPlatformSparkJobValidationArgs:
         [
             (parse_istio_args, _ISTIO_POSITIONAL),
             (parse_opa_args, _OPA_POSITIONAL),
+            (
+                parse_application_audit_logs_args,
+                _APPLICATION_AUDIT_LOGS_POSITIONAL,
+            ),
+            (parse_cypress_reports_args, _CYPRESS_REPORTS_POSITIONAL),
         ],
     )
     def test_log_jobs_default_without_validation_flags(
@@ -329,10 +379,23 @@ class TestTechPlatformSparkJobValidationArgs:
                 return_value=MagicMock(get_config=MagicMock(return_value="path"))
             ),
         )
+        monkeypatch.setattr(
+            "dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(get_config=MagicMock(return_value="path"))
+            ),
+        )
         args = parse_fn()
 
         assert args.target_database_name is None
         assert args.target_table_name is None
+
+
+@pytest.mark.parametrize("job_path", _TECH_PLATFORM_JOB_PATHS)
+def test_tech_platform_jobs_register_validation_helpers(job_path: str):
+    text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
+    assert "add_validation_target_args" in text
+    assert "resolve_datalake_write_target(" in text
 
 
 @pytest.mark.parametrize("job_path", _CLOUDZERO_JOB_PATHS)

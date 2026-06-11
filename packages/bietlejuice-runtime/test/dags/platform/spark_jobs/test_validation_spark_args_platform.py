@@ -10,6 +10,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _PLATFORM_JOB_PATHS = [
     "dags/platform/databricks_usage/spark_jobs/load_databricks_usage_raw.py",
+    "dags/platform/enrich_spark_event_logs/spark_jobs/load_spark_stage_metrics.py",
 ]
 
 _SPARK_STUBS = [
@@ -43,6 +44,9 @@ from dags.platform.enrich_databricks.spark_jobs.load_daily_users import (  # noq
 from dags.platform.enrich_databricks.spark_jobs.load_instance_pools import (  # noqa: E402
     parse_args as parse_instance_pools,
 )
+from dags.platform.enrich_spark_event_logs.spark_jobs.load_spark_stage_metrics import (  # noqa: E402
+    parse_args as parse_spark_stage_metrics,
+)
 
 _DAILY_USERS_POSITIONAL = [
     "prod",
@@ -61,11 +65,29 @@ _INSTANCE_POOLS_POSITIONAL = [
     "instance_pools",
 ]
 
+_SPARK_STAGE_METRICS_POSITIONAL = [
+    "prod",
+    "5a-datalake-prod",
+    "enrich_spark_event_logs",
+    "databricks_health",
+    "spark_stage_metrics",
+    "2024-01-01",
+    "2024-01-02",
+    "5a-databricks-prod",
+]
+
 _VALIDATION_FLAGS = [
     "--target-database-name",
     "cluster_validation",
     "--target-table-name",
     "datalake_databricks___daily_users",
+]
+
+_SPARK_STAGE_METRICS_VALIDATION_FLAGS = [
+    "--target-database-name",
+    "cluster_validation",
+    "--target-table-name",
+    "datalake_databricks_health___spark_stage_metrics",
 ]
 
 
@@ -101,6 +123,28 @@ class TestPlatformSparkJobValidationArgs:
     def test_defaults_without_validation_flags(self, parse_fn, positional, monkeypatch):
         monkeypatch.setattr(sys, "argv", ["job"] + positional)
         args = parse_fn()
+
+        assert args.target_database_name is None
+        assert args.target_table_name is None
+
+    def test_spark_stage_metrics_accepts_validation_flags(self, monkeypatch):
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            ["job"]
+            + _SPARK_STAGE_METRICS_POSITIONAL
+            + _SPARK_STAGE_METRICS_VALIDATION_FLAGS,
+        )
+        args = parse_spark_stage_metrics()
+
+        assert args.target_database_name == "cluster_validation"
+        assert (
+            args.target_table_name == "datalake_databricks_health___spark_stage_metrics"
+        )
+
+    def test_spark_stage_metrics_defaults_without_validation_flags(self, monkeypatch):
+        monkeypatch.setattr(sys, "argv", ["job"] + _SPARK_STAGE_METRICS_POSITIONAL)
+        args = parse_spark_stage_metrics()
 
         assert args.target_database_name is None
         assert args.target_table_name is None

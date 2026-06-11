@@ -912,6 +912,20 @@ class TestProdRunResolution:
         assert conf["load_end_date"] == "2026-05-26"
         assert source == "data_interval"
 
+    def test_bumps_load_end_when_equal_to_start(self) -> None:
+        run = {
+            "conf": {
+                "load_start_date": "2026-06-01",
+                "load_end_date": "2026-06-01",
+            },
+        }
+        result = trigger_script._load_window_from_prod_dag_run(run)
+        assert result is not None
+        conf, source = result
+        assert conf["load_start_date"] == "2026-06-01"
+        assert conf["load_end_date"] == "2026-06-02"
+        assert source == "conf"
+
     def test_selects_fastest_run_in_lookback(self) -> None:
         now = datetime(2026, 6, 2, tzinfo=timezone.utc)
         runs = [

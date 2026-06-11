@@ -55,6 +55,8 @@ if __name__ == "__main__":
     dim_house_listing_amenities = spark_client.conn.sql(amenities_query)
     dim_house_listing_amenities.createOrReplaceTempView("dim_house_listing_amenities")
 
+    import lightgbm  # noqa: F401 — must load before joblib.load on Graviton (libgomp TLS)
+
     model = joblib.load(lost_listings_model_path)
 
     lost_listings_df_pd = spark_client.conn.sql(
