@@ -91,7 +91,7 @@ columns:
     lineage:
       - datalake_customer_support.calls.origin
       - datalake_customer_support.chats.origin
-    description: Origin of the contact.
+    description: Communication origin channel of the contact, indicating whether it came through the in-app chat interface ('in_app') or WhatsApp ('whatsapp').
   direction:
     lineage:
       - datalake_customer_support.calls.direction
@@ -115,13 +115,13 @@ columns:
     lineage:
       - datalake_customer_support.calls.worker_email
       - datalake_customer_support.chats.worker_email
-    description: Email of the analyst
+    description: Email address of the QuintoAndar analyst who handled the contact interaction in Twilio Flex.
   quinto_andar_phone_number:
     lineage:
       - datalake_customer_support.calls.to_phone_number
       - datalake_customer_support.calls.from_phone_number
       - datalake_customer_support.chats.twilio_phone_number
-    description: Phone number from 5A
+    description: QuintoAndar's phone number used in the contact, representing the company-side number in call or WhatsApp interactions managed via Twilio.
   completion_reason:
     lineage:
       - datalake_customer_support.chats.task_completion_reason

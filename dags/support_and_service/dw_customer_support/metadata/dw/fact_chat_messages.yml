@@ -30,7 +30,7 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.id
       - datalake_internal_chat_clean.internal_chat_messages.id_message
       - datalake_chatbot.messages.id_message
-    description: Message identifier.
+    description: Unique surrogate key identifying each individual chat message across all channels (Twilio, internal chat, and chatbot).
   sk_user_sender:
     lineage:
       - datalake_ebdb_user.user.id
@@ -52,7 +52,7 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.message_body
       - datalake_internal_chat_clean.internal_chat_messages.message
       - datalake_chatbot.messages.message
-    description: Content of the message.
+    description: Text body of the message exchanged in the chat, as sent by the user, analyst, or bot during the interaction.
   message_index:
     lineage: 
       - datalake_quinto_messenger_clean.chat.id_session
@@ -61,7 +61,7 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.ts_created
       - datalake_internal_chat_clean.internal_chat_messages.ts_created
       - datalake_chatbot.messages.ts_created
-    description: Message index.
+    description: Sequential position of the message within its chat session, computed by ordering messages by creation timestamp within each session (Sauron or SSS).
   reply_time:
     lineage:
     - datalake_chatbot.messages.reply_time
