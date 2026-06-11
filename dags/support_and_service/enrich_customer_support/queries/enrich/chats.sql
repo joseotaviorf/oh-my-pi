@@ -45,15 +45,15 @@ inapp_sessions AS (
   SELECT DISTINCT
     c.id_chat,
     c.id_session, -- sessões do sauron OU sessões do SSS
-    COALESCE(s.id_session, ss.id_session) AS id_sauron_session,
-    COALESCE(ss.id_sss_session, s.id_sss_session) AS id_sss_session,
+    COALESCE(s.id_session, ss.id_session, s_hash.id_session) AS id_sauron_session,
+    COALESCE(ss.id_sss_session, s.id_sss_session, s_hash.id_sss_session) AS id_sss_session,
     get_json_object(c.attributes, '$.channel_type') AS channel_type,
-    COALESCE(ss.id_user, s.id_user) AS id_user,
-    COALESCE(ss.user_phone, s.user_phone) AS user_phone,
-    COALESCE(ss.user_email, s.user_email) AS user_email,
+    COALESCE(ss.id_user, s.id_user, s_hash.id_user) AS id_user,
+    COALESCE(ss.user_phone, s.user_phone, s_hash.user_phone) AS user_phone,
+    COALESCE(ss.user_email, s.user_email, s_hash.user_email) AS user_email,
     COALESCE(ss.created_by, s.created_by) AS created_by,
-    COALESCE(ss.source, s.source) AS source,
-    COALESCE(ss.source_environment, s.source_environment) AS source_environment
+    COALESCE(ss.source, s.source, s_hash.source) AS source,
+    COALESCE(ss.source_environment, s.source_environment, s_hash.source_environment) AS source_environment
   FROM
     datalake_quinto_messenger_clean.chat AS c
   LEFT JOIN
@@ -62,8 +62,12 @@ inapp_sessions AS (
       AND c.source = 'support_session'
   LEFT JOIN
     sauron_session_data AS s
-      ON s.id_session = c.id_session
+      ON s.id_session = TRY_CAST(c.id_session AS BIGINT)
       AND c.source = 'sauron'
+  LEFT JOIN 
+    sauron_session_data AS s_hash
+    ON s_hash.id_sss_session = c.id_session
+    AND c.source = 'sauron'
   WHERE
     MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
 ),

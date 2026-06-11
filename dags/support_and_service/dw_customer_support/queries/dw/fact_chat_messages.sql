@@ -279,7 +279,7 @@ QUALIFY
 ),
 ai_without_spoc AS (
   SELECT DISTINCT
-  COALESCE(c_cast.id_channel, c_hash.id_channel, c_sss.id_channel),
+  COALESCE(c_cast.id_channel, c_hash.id_channel, c_sss.id_channel) AS id_channel,
   m.id_message,
   m.id_sauron_session AS id_session,
   m.id_sss_session,
@@ -317,7 +317,7 @@ QUALIFY
 ),
 human_without_spoc AS (
   SELECT
-  COALESCE(c_cast.id_channel, c_hash.id_channel, c_sss.id_channel),
+  COALESCE(c_cast.id_channel, c_hash.id_channel, c_sss.id_channel) AS id_channel,
   m.id_message,
   m.id_sauron_session AS id_session,
   m.id_sss_session,
@@ -398,7 +398,7 @@ all_messages_with_tasks AS (
     id_message,
     id_session,
     id_sss_session,
-    id_user,
+    CAST(COALESCE(id_user, -1) AS BIGINT) AS id_user,
     origin,
     message,
     user_type,
@@ -431,7 +431,7 @@ SELECT
   id_task AS sk_task,
   id_session AS sk_session,
   id_sss_session AS sk_support_session,
-  COALESCE(id_user, -1) AS sk_user_sender,
+  id_user AS sk_user_sender,
   origin,
   user_type,
   message,
