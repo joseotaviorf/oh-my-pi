@@ -35,6 +35,7 @@ base as (
     ruuc.id_recommendation is not null
     AND ruc.id_listing is not null
     AND ruuc.use_case in ('FEED_CONCIERGE', 'FEED_MULTI_ORIGIN_PERSONALIZED_TRANSACTIONAL', 'FEED_MULTI_ORIGIN_PERSONALIZED_CLASSIFIED', 'FEED_MULTI_ORIGIN_SIMILAR_TRANSACTIONAL', 'FEED_MULTI_ORIGIN_SIMILAR_CLASSIFIED')
+    AND upper(COALESCE(ruuc.origin, 'JULIA')) = upper('JULIA')
     AND CAST(ruuc.ts_created AS DATE) = DATE_SUB('{load_start_date}', 4)
   GROUP by all -- this is needed because we sometimes have duplicates on our tracking and not having this was leading to
                -- having an ndcg and recall bigger than 1
