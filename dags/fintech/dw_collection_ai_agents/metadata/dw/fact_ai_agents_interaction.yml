@@ -1,6 +1,6 @@
 database_name: dw_collection_ai_agents
 table_name: fact_ai_agents_interaction
-description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags (V1, V1.5, V2, V3), trace context, observation aggregates (including escalation attempts), user wallet snapshot and 2-day post-session payment / overdue-recovery for the user, plus the agglutinated conversation string.
+description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags (V1, V1.5, V2, V3), trace context, business signals unified across the V2 (observation) and V3 (matthew_mcp_observations) sources, user wallet snapshot and 2-day post-session payment / overdue-recovery for the user, plus the agglutinated conversation string.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -111,7 +111,7 @@ columns:
   n_contracts:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.n_contracts
-    description: "Total number of contracts associated with the user at the session date."
+    description: "Total number of contracts associated with the user at the session date (wallet snapshot). For the count of contracts the V3 agent saw during the conversation, use n_contracts_mcp."
   active_contracts:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.active_contracts
@@ -132,106 +132,110 @@ columns:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.array_open_invoices
     description: "Flattened array of all open invoices across the user's contracts at the session date."
-  flag_ask_user_preferences:
+  array_negotiated_invoices:
     lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_ask_user_preferences
-    description: "1 if the agent asked the user for preferences during the session, else 0 (absent or no observations recorded for the session)."
+      - dw_collection_ai_agents.fact_user_wallet_timeline.array_negotiated_invoices
+    description: "Flattened array of all negotiated invoices across the user's contracts at the session date."
+  array_paid_invoices:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.array_paid_invoices
+    description: "Flattened array of all paid invoices across the user's contracts at the session date."
   send_proposal_count:
     lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.send_proposal_count
       - datalake_ai_collections_quintoandar.observation.send_proposal_count
-    description: "Number of times the agent sent a negotiation proposal during the session (0 when no observations recorded)."
+    description: "Number of negotiation proposals presented to the user during the session, unified across versions. V3: distinct Langfuse traces with a successful simulate_negotiation_v1 (matthew_mcp_observations); V2: count of send_proposal observations. 0 when neither source has activity."
   flag_handle_segments_without_proposals:
     lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts_negotiation_options_not_found
       - datalake_ai_collections_quintoandar.observation.flag_handle_segments_without_proposals
-    description: "1 if the agent reached the handle_segments_without_proposals state at least once, else 0 (absent or no observations recorded)."
+    description: "1 when the agent had a customer segment but no negotiation options to offer, unified across versions. V3: matthew_mcp_observations.n_contracts_negotiation_options_not_found > 0; V2: the handle_segments_without_proposals observation. 0 otherwise."
   handle_negotiation_cancelled_count:
     lineage:
+      - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count_v3
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_create_negotiation
       - datalake_ai_collections_quintoandar.observation.handle_negotiation_cancelled_count
-    description: "Number of times the agent reached the handle_negotiation_cancelled state (0 when no observations recorded)."
+    description: "Whether a negotiation was confirmed by the user but ultimately not created (cancelled), unified across versions. V3: 1 when the user confirmed (confirm_negotiation_count_v3 > 0) but no negotiation was created (flag_create_negotiation = 0); V2: count of handle_negotiation_cancelled observations. 0 otherwise."
   confirm_negotiation_count:
     lineage:
+      - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count_v3
       - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count
-    description: "Number of times the agent emitted a confirm_negotiation observation (0 when no observations recorded)."
+    description: "Number of user-confirmed negotiation offers, unified across versions. V3: confirm_negotiation_count_v3 (count of create_negotiation_v1 TOOL observations with null output, each a confirmation prompt); V2: count of confirm_negotiation observations. 0 when no observations recorded."
   flag_create_negotiation:
     lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_create_negotiation
       - datalake_ai_collections_quintoandar.observation.flag_create_negotiation
-    description: "1 if the agent emitted a create_negotiation observation at least once, else 0 (absent or no observations recorded)."
-  flag_collectionsinput_agent:
+    description: "1 when a debt negotiation was successfully created in the session (the main success outcome), unified across versions. V3: matthew_mcp_observations.flag_create_negotiation (a create_negotiation_v1 call succeeded); V2: the create_negotiation observation. 0 otherwise."
+  flag_fetch_financial_data:
     lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
-    description: "1 if the session contains the CollectionsInput observation (canonical Matthew V2 entrypoint), else 0 (absent or no observations recorded)."
-  flag_collectionsinputv3_agent:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_financial_context_calls
+      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
+      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
+      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
+      - datalake_ai_collections_quintoandar.observation.flag_has_fetch_collections_data
+    description: "1 when the agent fetched the user's financial/collections context in the session, unified across versions. V3: matthew_mcp_observations.n_financial_context_calls > 0 (get_financial_context_v1, the single MCP tool that replaced the V2 fetch/debt tools); V2: OR of flag_debt_retriever_tool, flag_debt_finder_tool, flag_user_debt_classifier_tool, flag_has_fetch_collections_data. 0 otherwise. For the granular per-tool V2 flags / V3 call counts, query observation / matthew_mcp_observations directly."
+  flag_fetch_financial_data_error:
     lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
-    description: "1 if the session contains the canonical Matthew V3 entrypoint observation, else 0 (absent or no observations recorded). Sourced from observation names in ('collectionsagentv1input', 'collectionsagentv3input') because, during the V3 rollout, the backend still emits the legacy 'collectionsagentv1input' name for V3 sessions; both are matched until the upstream rename PR ships."
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_fetch_financial_data_error
+      - datalake_ai_collections_quintoandar.observation.flag_has_collections_data_error
+      - datalake_ai_collections_quintoandar.observation.flag_has_finance_fetch_error
+    description: "1 when fetching the user's financial/collections context failed in the session, unified across versions. V3: matthew_mcp_observations.flag_fetch_financial_data_error (any get_financial_context_v1 downstream call failed, excluding HTTP 404); V2: OR of flag_has_collections_data_error and flag_has_finance_fetch_error. 0 otherwise."
+  flag_has_fetch_contracts:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_financial_context_calls
+      - datalake_ai_collections_quintoandar.observation.flag_has_fetch_contracts
+    description: "1 when the agent attempted to fetch the user's contracts, unified across versions. V3: matthew_mcp_observations.n_financial_context_calls > 0 (contracts are fetched inside get_financial_context_v1); V2: the fetch_contracts observation. 0 otherwise."
+  flag_handle_no_contracts:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts
+      - datalake_ai_collections_quintoandar.observation.flag_handle_no_contracts
+    description: "1 when the user had no contracts available to the agent, unified across versions. V3: matthew_mcp_observations.n_contracts = 0 (GetContracts returned an empty array; NULL n_contracts, i.e. no successful call, yields 0); V2: the handle_no_contracts observation. 0 otherwise."
+  flag_get_yearly_paid_invoices_report_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_annual_tax_report_calls
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_paid_invoices_report_calls
+      - datalake_ai_collections_quintoandar.observation.flag_get_yearly_paid_invoices_report_tool
+    description: "1 when the yearly paid-invoices (IR / Imposto de Renda) report tool was invoked, unified across versions. V3: n_annual_tax_report_calls > 0 OR n_paid_invoices_report_calls > 0 (get_annual_tax_report_v1 was renamed from get_paid_invoices_annual_report_v1 — same tool, OR both); V2: the get_yearly_paid_invoices_report_tool observation. 0 otherwise. Keeps the V2 node name because it already existed in this table."
+  flag_negotiation_proposer_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_simulate_negotiation_calls
+      - datalake_ai_collections_quintoandar.observation.flag_negotiation_proposer_tool
+    description: "1 when the agent ran the negotiation proposer / simulation, unified across versions. V3: matthew_mcp_observations.n_simulate_negotiation_calls > 0 (simulate_negotiation_v1); V2: the NegotiationProposerTool observation. 0 otherwise."
+  flag_ongoing_deal_renegotiation_request_helper:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_ongoing_negotiation_calls
+      - datalake_ai_collections_quintoandar.observation.flag_ongoing_deal_renegotiation_request_helper
+    description: "1 when the user requested to renegotiate an ongoing deal, unified across versions. V3: matthew_mcp_observations.n_ongoing_negotiation_calls > 0 (get_ongoing_negotiation_information_v1); V2: the ongoing_deal_renegotiation_request_helper observation. 0 otherwise."
+  flag_handle_non_tenant:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.is_owner_only
+      - datalake_ai_collections_quintoandar.observation.flag_handle_non_tenant
+    description: "1 when the user is not a tenant, unified across versions. V3: sessions.is_owner_only = 1 (the tenant gate moved to the host, so the collections agent is not called for non-tenants); V2: the handle_non_tenant observation. 0 otherwise."
+  flag_empty_invoices_mismatch:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_all_empty_invoices
+      - dw_collection_ai_agents.fact_user_wallet_timeline.array_open_invoices
+      - dw_collection_ai_agents.fact_user_wallet_timeline.array_paid_invoices
+      - dw_collection_ai_agents.fact_user_wallet_timeline.array_negotiated_invoices
+    description: "Data-quality cross-check (V3). 1 when the MCP agent saw only empty invoices (flag_all_empty_invoices_mcp = 1) yet the user wallet snapshot at the session date does have invoices (any of array_open_invoices / array_paid_invoices / array_negotiated_invoices is non-empty); else 0. Flags sessions where the agent's financial context disagreed with the wallet timeline."
+  flag_no_contracts_mismatch:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_handle_no_contracts
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts
+      - dw_collection_ai_agents.fact_user_wallet_timeline.n_contracts
+    description: "Data-quality cross-check. 1 when the agent concluded the user had no contracts (V2 flag_handle_no_contracts = 1 or V3 n_contracts_mcp = 0) yet the user wallet snapshot shows contracts (fact_user_wallet_timeline.n_contracts > 0); else 0."
+  flag_has_prorated_rent:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.has_prorated_rent_error
+    description: "1 when an annual-tax / paid-invoices report tool output in the session mentioned prorated-rent adjustments that prevent a clean invoice summary; else 0. Sourced from the observation table (Langfuse TOOL output), available for V2 and V3 sessions."
   is_notification_reply:
     lineage:
       - datalake_ai_collections_quintoandar.observation.is_notification_reply
-    description: "1 if the session contains the outbound_payload_from_dto observation, else 0 (absent or no observations recorded)."
-  flag_has_collections_data_error:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_has_collections_data_error
-    description: "1 if the session contains a handle_collections_data_error observation, else 0 (absent or no observations recorded)."
-  flag_has_finance_fetch_error:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_has_finance_fetch_error
-    description: "1 if the session contains a handle_finance_fetch_error observation, signalling a failure when fetching finance data for the user; else 0 (absent or no observations recorded)."
-  flag_has_fetch_collections_data:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_has_fetch_collections_data
-    description: "1 if the session contains a fetch_collections_data observation, else 0 (absent or no observations recorded)."
-  flag_handle_no_contracts:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_handle_no_contracts
-    description: "1 if the session contains a handle_no_contracts observation, else 0 (absent or no observations recorded)."
-  flag_has_fetch_contracts:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_has_fetch_contracts
-    description: "1 if the session contains a fetch_contracts observation, else 0 (absent or no observations recorded)."
-  flag_payment_allegation_tool:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_payment_allegation_tool
-    description: "1 if the session invoked the PaymentAllegationTool tool at least once, else 0 (absent or no observations recorded)."
-  flag_debt_retriever_tool:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
-    description: "1 if the session invoked the DebtRetrieverTool tool at least once, else 0 (absent or no observations recorded)."
-  flag_user_debt_classifier_tool:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
-    description: "1 if the session invoked the UserDebtClassifierTool tool at least once, else 0 (absent or no observations recorded)."
-  flag_debt_finder_tool:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
-    description: "1 if the session invoked the DebtFinderTool tool at least once, else 0 (absent or no observations recorded)."
-  flag_get_yearly_paid_invoices_report_tool:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_get_yearly_paid_invoices_report_tool
-    description: "1 if the session invoked the get_yearly_paid_invoices_report_tool tool at least once, else 0 (absent or no observations recorded)."
-  flag_negotiation_proposer_tool:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_negotiation_proposer_tool
-    description: "1 if the session invoked the NegotiationProposerTool tool at least once, else 0 (absent or no observations recorded)."
-  flag_debt_summary_display_helper:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_debt_summary_display_helper
-    description: "1 if the session reached the debt_summary_display_helper helper at least once, else 0 (absent or no observations recorded)."
-  flag_original_invoice_values_disagreement_helper:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_original_invoice_values_disagreement_helper
-    description: "1 if the session reached the original_invoice_values_disagreement_helper helper, signalling that the user disagreed with the original invoice values; else 0 (absent or no observations recorded)."
-  flag_ongoing_deal_renegotiation_request_helper:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_ongoing_deal_renegotiation_request_helper
-    description: "1 if the session reached the ongoing_deal_renegotiation_request_helper helper, signalling that the user requested to renegotiate an ongoing deal; else 0 (absent or no observations recorded)."
-  flag_handle_non_tenant:
-    lineage:
-      - datalake_ai_collections_quintoandar.observation.flag_handle_non_tenant
-    description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant; else 0 (absent or no observations recorded)."
+    description: "1 if the session contains the outbound_payload_from_dto observation (reply to a Matthew-driven reminder), else 0 (absent or no observations recorded)."
   flag_escalation_attempted:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_escalation_attempted
-    description: "1 if the session contains an escalation tool observation (escalate_to_human_for_collections or escalate_tool), signalling that Matthew attempted to hand the conversation off to a human agent; else 0 (absent or no observations recorded). Existence-only flag — independent from whether the escalation reason JSON could be parsed (see matthew_declared_escalation_reason). Used in the V2-vs-V3 experiment to compare hand-off rates."
+    description: "1 if the session contains an escalation tool observation (escalate_to_human_for_collections or escalate_tool), signalling that Matthew attempted to hand the conversation off to a human agent; else 0 (absent or no observations recorded). Existence-only flag — independent from whether the escalation reason JSON could be parsed (see matthew_declared_escalation_reason)."
   matthew_declared_escalation_reason:
     lineage:
       - datalake_ai_collections_quintoandar.observation.matthew_declared_escalation_reason
@@ -244,6 +248,42 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.observation.ts_last_observation
     description: "Timestamp of the last Langfuse observation recorded for the session."
+  n_contracts_mcp:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts
+    description: "V3 only. Number of rental contracts the agent saw for the user during the conversation (GetContracts response length inside get_financial_context_v1). NULL for V2 sessions or when no successful GetContracts call exists; 0 means no contracts. For the wallet-snapshot contract count use n_contracts."
+  flag_all_empty_invoices_mcp:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_all_empty_invoices
+    description: "V3 only. 1 when every GetInvoicesForContract / GetDetailedBills downstream call returned empty (nothing to collect), 0 when at least one returned a non-empty response, NULL when neither call type appears in the session or for V2 sessions."
+  user_segment:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.user_segment
+    description: "V3 only. ChargeHub customer segment guiding how the agent should approach the debt (e.g. EVICTIONS). NULL for V2 sessions or when no GetCustomerSegment call exists."
+  negotiation_options_list:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.negotiation_options_list
+    description: "V3 only. JSON array text of available negotiation option keys offered to the customer (e.g. [\"pixleto-1x-lpf\",\"cc-lpf\"]) from the first successful non-empty GetNegotiationOptions call. NULL for V2 sessions or when no eligible options were returned."
+  created_negotiation_option_key:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.created_negotiation_option_key
+    description: "V3 only. Negotiation option key the customer chose when a deal was closed. NULL for V2 sessions or when no successful create_negotiation_v1 call occurred."
+  created_negotiation_payment_method:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.created_negotiation_payment_method
+    description: "V3 only. Payment method used when a deal was closed (BOLETO, PIX or CREDIT_CARD). NULL for V2 sessions or when no successful create_negotiation_v1 call occurred."
+  flag_negotiation_created_missing_payment_info:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_negotiation_created_missing_payment_info
+    description: "V3 only. 1 when a deal was created but the final payment instructions were likely never shown to the customer (no successful GetOngoingNegotiation without an empty response was recorded after creation); else 0. NULL for V2 sessions."
+  ts_first_mcp_call:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.ts_first_mcp_call
+    description: "V3 only. Timestamp of the earliest MCP tool request in the session. NULL for V2 sessions."
+  ts_last_mcp_call:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_mcp_observations.ts_last_mcp_call
+    description: "V3 only. Timestamp of the latest MCP tool request in the session. NULL for V2 sessions."
   full_conversation:
     lineage:
       - datalake_ai_collections_quintoandar.messages.full_conversation

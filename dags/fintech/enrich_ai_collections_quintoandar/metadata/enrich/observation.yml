@@ -132,9 +132,12 @@ columns:
       - datalake_langfuse_clean.observations.type
     description: "1 if any Langfuse TOOL observation output in the session contains the
       prorated rent error text (pattern: '%prorated rent%' or '%adjustments to the rent
-      value%'). This error is raised by the annual tax report service when a contract has
-      rent value adjustments that prevent a clean invoice summary. Sourced from a sibling
-      CTE scoped to TOOL observations only; 0 when no matching output is found."
+      value%'). This error is raised by the annual-tax / paid-invoices report tools when a
+      contract has rent value adjustments that prevent a clean invoice summary. Matches both
+      the V2 graph-node tool (get_yearly_paid_invoices_report_tool) and the V3 MCP tools
+      (get_annual_tax_report_v1, get_paid_invoices_annual_report_v1), so it is populated for
+      V2 and V3 sessions. Sourced from a sibling CTE scoped to TOOL observations only; 0 when
+      no matching output is found."
   ts_first_observation:
     lineage:
       - datalake_langfuse_clean.observations.ts_started

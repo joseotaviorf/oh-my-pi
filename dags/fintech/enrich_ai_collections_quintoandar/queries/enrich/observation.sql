@@ -47,12 +47,10 @@ SELECT
             ELSE NULL
         END
     ) AS matthew_declared_escalation_reason,
-    -- Prorated-rent error: output of get_annual_tax_report_v1 / get_paid_invoices_annual_report_v1
-    -- mentions prorated rent when the agent cannot compute exact values.
     MAX(
         CASE
             WHEN UPPER(obs.type) = 'TOOL'
-                AND LOWER(obs.name) IN ('get_annual_tax_report_v1', 'get_paid_invoices_annual_report_v1')
+                AND LOWER(obs.name) IN ('get_annual_tax_report_v1', 'get_paid_invoices_annual_report_v1', 'get_yearly_paid_invoices_report_tool')
                 AND (
                     LOWER(obs.output) LIKE '%prorated rent%'
                     OR LOWER(obs.output) LIKE '%adjustments to the rent value%'
