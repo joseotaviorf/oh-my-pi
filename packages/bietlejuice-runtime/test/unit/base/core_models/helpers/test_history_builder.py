@@ -848,3 +848,108 @@ class TestHistoryBuilderJsonDerivedField:
             if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
         ]
         assert len(update_rows) == 0
+
+
+class TestHistoryBuilderSnapshotRead:
+    """Tests for CDC snapshot/read rows (op_cdc='r')."""
+
+    SNAPSHOT_TS = datetime(2025, 5, 12, 0, 0, 0)
+
+    def _build(self, spark_session, data):
+        df = spark_session.createDataFrame(data, TRANSACTIONAL_SCHEMA)
+        return HistoryBuilder.build_history_for_columns(
+            df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=EVENT_CONFIGS,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+        )
+
+    def test_snapshot_read_baseline_emits_events(self, spark_session):
+        # arrange -- first snapshot row for entity (prev is NULL)
+        data = [("700", "Ativo", 2500.0, "r", self.SNAPSHOT_TS)]
+        result = self._build(spark_session, data)
+        rows = result.collect()
+
+        # assert
+        assert len(rows) == 2
+        assert {r["event_name"] for r in rows} == {"ev_STATUS", "ev_RENT_VALUE"}
+
+    def test_repeated_identical_snapshot_read_emits_no_extra_events(
+        self, spark_session
+    ):
+        # arrange -- two identical r rows (re-snapshot with unchanged value)
+        data = [
+            ("701", "Ativo", 2500.0, "r", self.SNAPSHOT_TS),
+            ("701", "Ativo", 2500.0, "r", datetime(2025, 6, 2, 0, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        rows = result.collect()
+
+        # assert -- only baseline from first r; second r suppressed
+        assert len(rows) == 2
+        assert all(r["ts_transaction"] == self.SNAPSHOT_TS for r in rows)
+
+    def test_snapshot_read_with_changed_value_emits_event(self, spark_session):
+        # arrange -- re-snapshot reflects a value change vs prior r
+        data = [
+            ("702", "Ativo", 2500.0, "r", self.SNAPSHOT_TS),
+            ("702", "Finalizado", 2500.0, "r", datetime(2025, 6, 2, 0, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        status_rows = [
+            r
+            for r in result.collect()
+            if r["event_name"] == "ev_STATUS"
+            and r["ts_transaction"] == datetime(2025, 6, 2, 0, 0, 0)
+        ]
+
+        # assert
+        assert len(status_rows) == 1
+        assert status_rows[0]["value"] == "Finalizado"
+
+    def test_snapshot_read_only_entity_surfaces_in_history(self, spark_session):
+        # arrange -- entity exists only via snapshot, never c/u/d
+        data = [("703", "Ativo", 1800.0, "r", self.SNAPSHOT_TS)]
+        result = self._build(spark_session, data)
+        rows = result.collect()
+
+        # assert
+        assert len(rows) == 2
+        assert all(r["id_contract"] == "703" for r in rows)
+
+    def test_snapshot_read_followed_by_update_same_value_emits_no_extra_event(
+        self, spark_session
+    ):
+        # arrange -- r baseline then u with identical values
+        data = [
+            ("704", "Ativo", 2500.0, "r", self.SNAPSHOT_TS),
+            ("704", "Ativo", 2500.0, "u", datetime(2025, 6, 3, 10, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2025, 6, 3, 10, 0, 0)
+        ]
+
+        # assert -- u with no value change suppressed
+        assert len(update_rows) == 0
+        assert len(result.collect()) == 2
+
+    def test_two_snapshot_reads_at_same_timestamp_share_id_event(self, spark_session):
+        # arrange -- two r rows at same ts with different status (both emit)
+        same_ts = datetime(2025, 10, 9, 10, 31, 31)
+        data = [
+            ("705", "Ativo", 2500.0, "r", same_ts),
+            ("705", "Finalizado", 2500.0, "r", same_ts),
+        ]
+        result = self._build(spark_session, data)
+        status_rows = [r for r in result.collect() if r["event_name"] == "ev_STATUS"]
+
+        # assert -- both rows emit (value changed) but merge dedupes via id_event
+        assert len(status_rows) == 2
+        assert status_rows[0]["id_event"] == status_rows[1]["id_event"]

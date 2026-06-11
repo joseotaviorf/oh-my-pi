@@ -17,6 +17,11 @@ class HistoryBuilder:
     Each tracked column change becomes its own row in the historical table,
     enabling field-level change tracking across any Core Model entity.
     The output schema is identical regardless of the entity being tracked.
+
+    CDC operations ``c`` (create), ``d`` (delete), ``u`` (update), and ``r``
+    (snapshot/read) are supported. Snapshot reads use the same LAG-based
+    change detection as updates; ``ts_transaction`` on ``r`` rows reflects
+    the snapshot instant, not the original business event time.
     """
 
     # Each entry needs tracked_col plus either event_name or target_col (see resolve_event_name).
@@ -226,7 +231,13 @@ class HistoryBuilder:
         event_type: str,
         event_origin: str,
     ) -> List[DataFrame]:
-        """Build one event DataFrame per tracked column, filtered to changed rows."""
+        """Build one event DataFrame per tracked column, filtered to changed rows.
+
+        Inserts (``c``) and deletes (``d``) always emit. Updates (``u``) and
+        snapshot reads (``r``) emit only when the tracked value changed vs the
+        prior row (null-safe). For ``r``, ``ts_transaction`` is the snapshot
+        instant, not the original event time.
+        """
         event_dfs = []
 
         for ec in event_configs:
@@ -244,6 +255,7 @@ class HistoryBuilder:
                 (F.col(op_col) == F.lit("c"))
                 | (F.col(op_col) == F.lit("d"))
                 | ((F.col(op_col) == F.lit("u")) & values_differ)
+                | ((F.col(op_col) == F.lit("r")) & values_differ)
             )
 
             event_df = df_with_prev.filter(changed_expr).select(
