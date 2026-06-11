@@ -1,5 +1,5 @@
 -- Sonia Closing audience view: one row per contract signatory from per-person contract-sent events.
--- Source: rent_flow_[tenant|owner]_contract_sent CDP events from 2026-05-01.
+-- Source: rent_flow_[tenant|owner]_contract_sent CDP events from 2026-04-24.
 -- is_participant encodes three independently-expandable gates (all use the same binning_value):
 --   Gate 0: number_of_signatories = 2,                                        threshold 0-100 (100 = fully open)
 --   Gate 1: all contract signatories registered (every uuid_person NOT NULL),  threshold 0-100 (100 = fully open)
@@ -23,7 +23,7 @@ raw_sent_events AS (
     datalake_cdp_clean.transactional
   WHERE
     event_name IN ('rent_flow_tenant_contract_sent', 'rent_flow_owner_contract_sent')
-    AND ts_event >= TIMESTAMP '2026-05-01 00:00:00'
+    AND ts_event >= TIMESTAMP '2026-04-24 00:00:00'
 ),
 contract_person_sent_events AS (
   SELECT
@@ -69,7 +69,7 @@ contract_canceled_events AS (
     datalake_cdp_clean.transactional
   WHERE
     event_name = 'rent_flow_contract_canceled'
-    AND ts_event >= TIMESTAMP '2026-05-01 00:00:00'
+    AND ts_event >= TIMESTAMP '2026-04-24 00:00:00'
   GROUP BY
     CAST(event_properties:id_rent_flow AS STRING)
 ),
@@ -82,7 +82,7 @@ contract_signed_events AS (
     datalake_cdp_clean.transactional
   WHERE
     event_name IN ('rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed')
-    AND ts_event >= TIMESTAMP '2026-05-01 00:00:00'
+    AND ts_event >= TIMESTAMP '2026-04-24 00:00:00'
   GROUP BY
     CAST(event_properties:id_rent_flow AS STRING),
     TRY_CAST(event_properties:id_contract_person AS INT)
@@ -102,8 +102,14 @@ SELECT
   canceled.id_rent_flow IS NOT NULL AS is_canceled,
   signed.id_contract_person IS NOT NULL AS is_signed,
   (
-    -- Gate 0: exactly 2 signatories (main tenant and main owner)
-    (sig.number_of_signatories = 2 AND sent.binning_value < 50)
+    -- Gate 0: exactly 2 signatories (main tenant and main owner), graduated rollout by first-sent date
+    (sig.number_of_signatories = 2 AND (
+      (sent.binning_value < 1  AND sent.ts_first_sent >= TIMESTAMP '2026-04-27 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-04-28 00:00:00')
+      OR (sent.binning_value < 3  AND sent.ts_first_sent >= TIMESTAMP '2026-04-28 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-07 00:00:00')
+      OR (sent.binning_value < 30 AND sent.ts_first_sent >= TIMESTAMP '2026-05-07 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-09 00:00:00')
+      OR (sent.binning_value < 50 AND sent.ts_first_sent >= TIMESTAMP '2026-05-09 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-06-02 00:00:00')
+      OR (sent.binning_value < 10 AND sent.ts_first_sent >= TIMESTAMP '2026-06-02 00:00:00')
+    ))
     -- Gate 1: all signatories in this contract are registered
     OR (crs.all_signatories_registered AND sent.binning_value < 0)
     -- Gate 2: this contract has at least one unregistered signatory

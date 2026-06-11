@@ -3,7 +3,7 @@ table_name: closing_audience_view
 description: |
   Enrich view for Sonia closing journey. One row per contract signatory
   from rent_flow_tenant_contract_sent and rent_flow_owner_contract_sent CDP events
-  (from 2026-05-01 onward). Joins later "signed" and "canceled" related events,
+  (from 2026-04-24 onward). Joins later "signed" and "canceled" related events,
   together with contact information of `closing_contract_person_view`, besides EBDB
   house address. Covers all signatories regardless of eligibility; the is_participant
   flag marks those meeting Sonia entry criteria. Feeds SFMC for follow-up closing communications.
