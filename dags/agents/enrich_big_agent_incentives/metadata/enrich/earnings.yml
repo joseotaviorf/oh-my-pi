@@ -31,10 +31,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.id_author
     description: Author identifier from the earning author payload when the role is not SYSTEM.
-  id_cart:
+  uuid_cart:
     lineage:
-      - datalake_cart_system_clean.cart.id
-    description: Cart identifier linked via the earning source external cart UUID, when present.
+      - datalake_big_agent_clean.earning_sources.uuid_external_cart
+    description: External cart UUID linked via the earning source, when present.
   uuid_company:
     lineage:
       - datalake_big_agent_clean.new_earnings.id_external_receiver

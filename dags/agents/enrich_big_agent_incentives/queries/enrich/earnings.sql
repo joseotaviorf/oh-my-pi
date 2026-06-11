@@ -28,7 +28,7 @@ SELECT
     IF(es.external_domain_type = 'RENT_CONTRACT', es.id_external_domain, NULL) AS id_contract,
     IF(es.external_domain_type = 'SALES_FLOW', es.id_external_domain, NULL) AS id_sales_flow,
     IF(ne.author_role <> "SYSTEM", ne.id_author, NULL) AS id_author,
-    c.id AS id_cart,
+    es.uuid_external_cart AS uuid_cart,
     IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
     IF(ne.external_receiver_type = "AGENT", ne.id_external_receiver, NULL) AS uuid_person,
     CASE
@@ -59,6 +59,3 @@ FROM
 JOIN 
     datalake_big_agent_clean.earning_sources AS es 
         ON es.id = ne.id_earning_source
-LEFT JOIN
-    datalake_cart_system_clean.cart AS c
-        ON c.uuid_cart = es.uuid_external_cart
