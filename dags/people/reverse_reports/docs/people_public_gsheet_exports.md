@@ -67,8 +67,6 @@ People lake → Google Sheets exports that provide the active-employee base for 
 | idade_empresa | Employee tenure in the company in full months. | `dw_employee_details.fact_assignment_snapshots.months_tenure_in_company` |
 | fl_lider | 1 if the employee is a manager; 0 otherwise. | `dw_employee_details.fact_assignment_snapshots.is_manager` |
 | dt_inicio | Date when the current work relationship started. | `dw_employee_details.fact_assignment_snapshots.dt_hired` |
-| dt_desligamento | Termination date; NULL for active employees or when termination is scheduled in the future. | `dw_employee_details.fact_assignment_snapshots.dt_terminated` (CASE: NULL when >= CURRENT_DATE) |
-| dt_nascimento | Employee date of birth. | `dw_employee_details.dim_employee.dt_birth` |
 | dt_last_update | Date when the snapshot was last loaded, in Brazil/São Paulo timezone. | `dw_employee_details.fact_assignment_snapshots.ts_load` |
 | dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_hired` (MIN per person_number) |
 | year | Partition year (from `{load_start_date}`). Not exported to the sheet. | — |

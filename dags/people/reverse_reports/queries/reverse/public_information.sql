@@ -91,11 +91,6 @@ SELECT
         ELSE 0
     END AS fl_lider,
     f.dt_hired AS dt_inicio,
-    CASE
-        WHEN f.dt_terminated >= CURRENT_DATE() THEN NULL
-        ELSE f.dt_terminated
-    END AS dt_desligamento,
-    e.dt_birth AS dt_nascimento,
     CAST(FROM_UTC_TIMESTAMP(f.ts_load, 'America/Sao_Paulo') AS DATE) AS dt_last_update,
     dip.dt_inicio_person AS dt_inicio_person,
     YEAR(DATE('{load_start_date}')) AS year,
