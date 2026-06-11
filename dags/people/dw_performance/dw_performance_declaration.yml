@@ -54,6 +54,9 @@ workflow:
     fact_continuous_management:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    fact_peer_evaluations:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     fact_talent_reviews:
       vacuum_retention_hours: 168
       vacuum_lite: true

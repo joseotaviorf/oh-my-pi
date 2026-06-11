@@ -2,7 +2,7 @@
 
 **Metastore schema:** `dw_performance`
 
-> Performance and talent cycle data for QuintoAndar employees — Performa scores, calibration outcomes, talent review assessments, goal achievements, and continuous management practices (Mid-Year Checkpoint, PDI, and One-on-One) — enabling HR teams and business leaders to understand how employees are evaluated, developed, and recognized across every review period.
+> Performance and talent cycle data for QuintoAndar employees — Performa scores, calibration outcomes, talent review assessments, goal achievements, continuous management practices (Mid-Year Checkpoint, PDI, and One-on-One), and peer feedback — enabling HR teams and business leaders to understand how employees are evaluated, developed, and recognized across every review period.
 
 ## People Data Catalog
 
@@ -17,6 +17,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * [Core Features and Business Logic](#core-features-and-business-logic)
 * [Attention and Limitations](#attention-and-limitations)
 * [How to Use](#how-to-use)
+  * [Where to Find Evaluation Text](#where-to-find-evaluation-text)
+  * [Self and Manager Evaluations](#self-and-manager-evaluations)
+  * [Peer Evaluations](#peer-evaluations)
+  * [Unified View — All Evaluation Types (UNION)](#unified-view--all-evaluation-types-union)
 * [Glossary](#glossary)
 * [See Also](#see-also)
 
@@ -33,6 +37,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 **✅ Goals (Impact Alignment)** : Individual goal records, achievement percentages, and overall weighted goal result for each employee across every review period and goal plan.
 
 **✅ Data quality flags** : Five smoke-detector signals that surface rating inconsistencies between goal results, self and manager evaluations, and prior-cycle calibration outcomes.
+
+**✅ Peer feedback** : Peer evaluations submitted during Performa cycles, including section ratings and open-text comments. Each row links the evaluated employee to the peer who provided feedback, supporting both received and given feedback analysis.
 
 **✅ Continuous management (Check-in)** : Mid-Year Checkpoint, Individual Development Plan (PDI), and One-on-One sessions registered in PIN, including questionnaire responses and manager feedback linked to each check-in meeting.
 
@@ -57,7 +63,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 *Note: Detailed definitions for every column, metric, and flag are maintained in DataHub. Do not create a column-level data dictionary section or list individual columns in this markdown document.*
 
-* **Temporal coverage:** Mixed. Evaluation and calibration dimensions carry full history as Validity Windows (SCD Type 2). Variation and rating dimensions are Current State lookup tables. Fact tables store one canonical row per grain event (evaluation, calibration, talent review, goal, check-in meeting, or cycle) rather than historical snapshots.
+* **Temporal coverage:** Mixed. Evaluation and calibration dimensions carry full history as Validity Windows (SCD Type 2). Variation and rating dimensions are Current State lookup tables. Fact tables store one canonical row per grain event (evaluation, calibration, talent review, goal, or cycle) rather than historical snapshots.
 * **Airflow DAG:** `bietlejuice.dw_performance`
 * **SLA:** D-1 available by 08:00 BRT
 
@@ -74,16 +80,19 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 | `fact_talent_reviews` | One record per assignment per committee meeting | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_talent_reviews,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_talent_reviews.sql) |
 | `fact_goal_achievements` | One record per goal (person × review period × goal plan × goal name) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_goal_achievements,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_goal_achievements.sql) |
 | `fact_smoke_detectors` | One record per assignment per performance cycle — five data quality flags | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_smoke_detectors,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_smoke_detectors.sql) |
+| `fact_peer_evaluations` | One record per peer feedback submission (evaluated employee × peer × Performa cycle) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_peer_evaluations,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_peer_evaluations.sql) |
 | `fact_continuous_management` | One record per check-in meeting (Mid-Year Checkpoint, PDI, or One-on-One) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_continuous_management,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_continuous_management.sql) |
 
 > **Note:** VPN connection is required to access DataHub.
 
 **Main join identifiers:**
 
-* `person_number` (Business key — present in calibration, goal, smoke-detector, and continuous-management facts; use to join to `dw_people.dim_employee`)
+* `person_number` (Business key — present in calibration, goal, smoke-detector, continuous-management, and peer-evaluation facts; use to join to `dw_people.dim_employee`)
 * `manager_person_number` (Manager business key — present in continuous-management facts; use to join manager attributes via `dw_people.dim_employee`)
+* `peer_person_number` (Peer evaluator business key — present in peer-evaluation facts; filter on this column to list feedback a person gave to others)
 * `review_period_name` (Review cycle label — present in continuous-management facts; e.g. Performa 2025)
-* `assignment_number` (Assignment-level grain key — present in evaluation, talent review, and smoke-detector facts)
+* `cycle_name` (Review cycle label — present in peer-evaluation facts; e.g. Performa 2025)
+* `assignment_number` (Assignment-level grain key — present in evaluation, talent review, smoke-detector, and peer-evaluation facts)
 
 ## Core Features and Business Logic
 
@@ -103,6 +112,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **Smoke detectors** : Five boolean flags (SD1–SD5) surface data quality inconsistencies: goal score misaligned with manager impact band (SD1); self-vs-manager gap of two or more steps on Impact (SD2) or Behavior (SD3); and drift of two or more steps between the resolved manager rating and the prior-cycle calibrated rating on Impact (SD4) or Behavior (SD5). These flags do not block data from other facts — they are additional quality signals.
 
+* **Peer feedback** : Each Performa cycle may include peer nominations where colleagues provide Impact, Behavior, and (when applicable) Leadership ratings plus open-text comments. `fact_peer_evaluations` stores one row per peer submission. Filter on `person_number` to list feedback received; filter on `peer_person_number` to list feedback given. Peer ratings do not feed into Performa Score or IPA — they are analytical inputs only.
+
+* **Where evaluation text lives (SELF vs MANAGER vs PEER)** : Self and manager questionnaires are modeled as **SCD Type 2 dimensions** (`dim_performance_evaluation`) because each Performa document has exactly one self-assessment and one manager assessment per cycle, and those records can be versioned over time. Peer feedback is modeled as a **fact table** (`fact_peer_evaluations`) because each employee may receive **multiple** peer submissions per cycle (0–N peers). This split is intentional, but it means open-text feedback is not in a single table — use the [unified UNION pattern](#unified-view--all-evaluation-types-union) below when the analysis needs every evaluation type together.
+
 * **Continuous management document types** : Each check-in meeting is classified as `mid_year_checkpoint`, `pdi`, `one_on_one`, or `unknown` based on the Oracle check-in template. Mid-Year Checkpoint and PDI are tied to the Performa review period; One-on-One sessions are recurring manager–worker conversations that may include agenda topics and linked notes.
 
 * **Questionnaire vs. discussion content** : Free-text responses from worker and manager questionnaires (career goals, self-awareness, action plans, leader comments) are consolidated in `worker_questionnaire_text` and `manager_questionnaire_text`. For Mid-Year Checkpoint, the manager's evaluation of the employee typically appears in `manager_questionnaire_text` even though the PIN form is labeled under the manager's name. Additional notes attached to One-on-One discussion topics are stored separately in `manager_feedback_text`.
@@ -119,7 +132,13 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **One canonical calibration row per person per year** : `fact_performance_calibrations` stores a single row per person per meeting year, even when a person appeared in multiple committee meetings. The row selected is the one with the most complete calibrated ratings; ties are broken by the most recent meeting timestamp and then by meeting ID. Queries counting calibration records will therefore produce one row per person per year, never one row per meeting attended.
 
-* **Aggregated questionnaire text** : `worker_questionnaire_text` and `manager_questionnaire_text` concatenate all answers for a meeting into a single string (answers separated by ` | `). Question-level detail is not available in this fact; use clean-layer `pin_questionnaires` tables for per-question analysis.
+* **Incomplete peer participations are included** : Rows with `participation_status` other than `COMP` may have NULL section ratings and empty `open_evaluation`. This is expected for in-progress or pending requests.
+
+* **Aggregated open-text feedback** : `open_evaluation` concatenates all questionnaire free-text answers for a peer submission (answers separated by ` | `). Question-level detail is not available in this fact; use clean-layer `pin_questionnaires` for per-question analysis.
+
+* **Self and manager text is in the dimension, peer text is in the fact** : There is no single DW table with all open-text feedback. `dim_performance_evaluation.open_evaluation` holds self and manager questionnaires; `fact_peer_evaluations.open_evaluation` holds peer questionnaires. Section ratings (`description_*`, `numeric_*`) follow the same split. When in doubt, start from the [evaluation text guide](#where-to-find-evaluation-text) in How to Use.
+
+* **Aggregated questionnaire text (check-in)** : `worker_questionnaire_text` and `manager_questionnaire_text` concatenate all answers for a meeting into a single string (answers separated by ` | `). Question-level detail is not available in this fact; use clean-layer `pin_questionnaires` tables for per-question analysis.
 
 * **Coverage varies by document type** : PDI and most Mid-Year Checkpoint meetings do not create discussion topics in Oracle; One-on-One sessions are more likely to have agenda topics and linked notes. Absence of discussion topics does not necessarily mean the session was not held in PIN.
 
@@ -131,7 +150,8 @@ When joining performance data with other DW domains:
 
 1. Join on `person_number` to reach `dw_people.dim_employee` for employee attributes.
 2. Join on `assignment_number` when linking evaluations or talent reviews to assignment-level dimensions.
-3. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
+3. Filter peer-evaluation facts on `cycle_name` and `participation_status = 'COMP'` when analyzing completed peer feedback only.
+4. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
 
 ### Continuous Management (Exploratory Query)
 
@@ -150,6 +170,355 @@ GROUP BY
     fact.checkpoint_status
 ORDER BY
     headcount DESC
+LIMIT 100
+```
+
+### Where to Find Evaluation Text
+
+Performa collects four distinct questionnaire perspectives in PIN. In the warehouse they map to **two objects**:
+
+| PIN label (UI) | `evaluation_type` | DW object | Grain | Open-text column |
+| :--- | :--- | :--- | :--- | :--- |
+| **Meu Questionário** (autoavaliação) | `SELF` | `dim_performance_evaluation` | 1 self-assessment per assignment × cycle (versioned) | `open_evaluation` |
+| **Questionário do Gerente** | `MANAGER` | `dim_performance_evaluation` | 1 manager assessment per assignment × cycle (versioned) | `open_evaluation` |
+| **Participante — Pares/Stakeholders** | `PEER` | `fact_peer_evaluations` | 1 row per peer submission | `open_evaluation` |
+| Self + manager side by side (ratings only) | — | `fact_performance_evaluations` | 1 row per assignment × cycle | *(no open text — use the dimension)* |
+
+**Quick rules:**
+
+* Need **self or manager** text or section ratings → `dim_performance_evaluation` with `is_current = TRUE`.
+* Need **peer** text or section ratings → `fact_peer_evaluations`.
+* Need **all types in one result set** → UNION pattern below; resolve `person_number` via `datalake_people.identifier_mapping` for self/manager rows.
+* Peer feedback **does not** affect Performa Score, IPA, or calibration — it is complementary input for people analytics.
+
+### Self and Manager Evaluations
+
+**Question:** What did employee `120469` write in their self-assessment for Performa 2025?
+
+```sql
+SELECT
+    im.person_number,
+    dpe.cycle_name,
+    dpe.evaluation_type,
+    dpe.open_evaluation,
+    dpe.description_impact,
+    dpe.description_behavior,
+    dpe.description_leadership,
+    dpe.numeric_impact,
+    dpe.numeric_behavior,
+    dpe.numeric_leadership,
+    dpe.dt_valid_from,
+    dpe.is_current
+FROM
+    dw_performance.dim_performance_evaluation AS dpe
+INNER JOIN
+    datalake_people.identifier_mapping AS im
+        ON im.assignment_number = dpe.assignment_number
+        AND im.is_person_latest_assignment = TRUE
+WHERE
+    im.person_number = '120469'
+    AND dpe.cycle_name = 'Performa 2025'
+    AND dpe.evaluation_type = 'SELF'
+    AND dpe.is_current = TRUE
+LIMIT 100
+```
+
+**Question:** What did the manager write about the same employee in the same cycle?
+
+```sql
+SELECT
+    im.person_number AS person_number,
+    im_mgr.person_number AS manager_person_number,
+    dpe.cycle_name,
+    dpe.evaluation_type,
+    dpe.open_evaluation,
+    dpe.description_impact,
+    dpe.description_behavior,
+    dpe.description_leadership
+FROM
+    dw_performance.dim_performance_evaluation AS dpe
+INNER JOIN
+    datalake_people.identifier_mapping AS im
+        ON im.assignment_number = dpe.assignment_number
+        AND im.is_person_latest_assignment = TRUE
+LEFT JOIN
+    datalake_people.identifier_mapping AS im_mgr
+        ON im_mgr.assignment_number = dpe.manager_assignment_number
+        AND im_mgr.is_person_latest_assignment = TRUE
+WHERE
+    im.person_number = '120469'
+    AND dpe.cycle_name = 'Performa 2025'
+    AND dpe.evaluation_type = 'MANAGER'
+    AND dpe.is_current = TRUE
+LIMIT 100
+```
+
+**Question:** Compare self vs manager Impact and Behavior bands without open text (wide layout).
+
+```sql
+SELECT
+    im.person_number,
+    fpe.cycle_name,
+    fpe.impact_self,
+    fpe.impact_manager,
+    fpe.behavior_self,
+    fpe.behavior_manager,
+    fpe.leadership_self,
+    fpe.leadership_manager,
+    fpe.numeric_impact_self,
+    fpe.numeric_impact_manager
+FROM
+    dw_performance.fact_performance_evaluations AS fpe
+INNER JOIN
+    datalake_people.identifier_mapping AS im
+        ON im.assignment_number = fpe.assignment_number
+        AND im.is_person_latest_assignment = TRUE
+WHERE
+    im.person_number = '120469'
+    AND fpe.cycle_name = 'Performa 2025'
+LIMIT 100
+```
+
+> **Note:** `fact_performance_evaluations` pivots self and manager **section ratings** side by side. For questionnaire free text, always use `dim_performance_evaluation`.
+
+### Peer Evaluations
+
+**Question:** Which peers completed feedback **about** employee `120469` in Performa 2025?
+
+```sql
+SELECT
+    fact.person_number,
+    fact.peer_person_number,
+    evaluator.name AS peer_name,
+    fact.cycle_name,
+    fact.participation_status,
+    fact.description_impact,
+    fact.description_behavior,
+    fact.description_leadership,
+    LENGTH(fact.open_evaluation) AS open_text_length,
+    fact.ts_feedback_completed
+FROM
+    dw_performance.fact_peer_evaluations AS fact
+LEFT JOIN
+    dw_people.dim_employee AS evaluator
+        ON evaluator.person_number = fact.peer_person_number
+WHERE
+    fact.person_number = '120469'
+    AND fact.cycle_name = 'Performa 2025'
+    AND fact.participation_status = 'COMP'
+ORDER BY
+    fact.ts_feedback_completed
+LIMIT 100
+```
+
+**Question:** Which colleagues did employee `120469` evaluate as a peer (feedback **given**)?
+
+```sql
+SELECT
+    fact.peer_person_number AS evaluator_person_number,
+    fact.person_number AS evaluated_person_number,
+    evaluated.name AS evaluated_name,
+    fact.cycle_name,
+    fact.participation_status,
+    LENGTH(fact.open_evaluation) AS open_text_length,
+    fact.ts_feedback_completed
+FROM
+    dw_performance.fact_peer_evaluations AS fact
+LEFT JOIN
+    dw_people.dim_employee AS evaluated
+        ON evaluated.person_number = fact.person_number
+WHERE
+    fact.peer_person_number = '120469'
+    AND fact.cycle_name = 'Performa 2025'
+    AND fact.participation_status = 'COMP'
+ORDER BY
+    fact.ts_feedback_completed
+LIMIT 100
+```
+
+### Unified View — All Evaluation Types (UNION)
+
+**Question:** List every evaluation submission (self, manager, and all peers) for employee `120469` in Performa 2025 in a single result set.
+
+The CTEs below normalize each source to the same column layout. `evaluator_person_number` identifies **who wrote** the feedback; `person_number` is always the **employee being evaluated**.
+
+```sql
+WITH self_and_manager AS (
+    SELECT
+        im.person_number,
+        CASE
+            WHEN dpe.evaluation_type = 'SELF' THEN im.person_number
+            WHEN dpe.evaluation_type = 'MANAGER' THEN im_mgr.person_number
+        END AS evaluator_person_number,
+        dpe.evaluation_type,
+        dpe.cycle_name,
+        dpe.assignment_number,
+        dpe.open_evaluation,
+        dpe.description_impact,
+        dpe.description_behavior,
+        dpe.description_leadership,
+        dpe.numeric_impact,
+        dpe.numeric_behavior,
+        dpe.numeric_leadership,
+        CAST(NULL AS STRING) AS participation_status,
+        CAST(dpe.dt_valid_from AS TIMESTAMP) AS ts_feedback_completed,
+        'dim_performance_evaluation' AS source_table
+    FROM
+        dw_performance.dim_performance_evaluation AS dpe
+    INNER JOIN
+        datalake_people.identifier_mapping AS im
+            ON im.assignment_number = dpe.assignment_number
+            AND im.is_person_latest_assignment = TRUE
+    LEFT JOIN
+        datalake_people.identifier_mapping AS im_mgr
+            ON im_mgr.assignment_number = dpe.manager_assignment_number
+            AND im_mgr.is_person_latest_assignment = TRUE
+    WHERE
+        dpe.is_current = TRUE
+        AND dpe.evaluation_type IN ('SELF', 'MANAGER')
+),
+peer_feedback AS (
+    SELECT
+        fact.person_number,
+        fact.peer_person_number AS evaluator_person_number,
+        'PEER' AS evaluation_type,
+        fact.cycle_name,
+        fact.assignment_number,
+        fact.open_evaluation,
+        fact.description_impact,
+        fact.description_behavior,
+        fact.description_leadership,
+        fact.numeric_impact,
+        fact.numeric_behavior,
+        fact.numeric_leadership,
+        fact.participation_status,
+        fact.ts_feedback_completed,
+        'fact_peer_evaluations' AS source_table
+    FROM
+        dw_performance.fact_peer_evaluations AS fact
+    WHERE
+        fact.participation_status = 'COMP'
+),
+all_evaluations AS (
+    SELECT * FROM self_and_manager
+    UNION ALL
+    SELECT * FROM peer_feedback
+)
+SELECT
+    ev.person_number,
+    emp.name AS person_name,
+    ev.evaluator_person_number,
+    evaluator.name AS evaluator_name,
+    ev.evaluation_type,
+    ev.cycle_name,
+    ev.assignment_number,
+    ev.participation_status,
+    ev.description_impact,
+    ev.description_behavior,
+    ev.description_leadership,
+    ev.numeric_impact,
+    ev.numeric_behavior,
+    ev.numeric_leadership,
+    LENGTH(ev.open_evaluation) AS open_text_length,
+    ev.open_evaluation,
+    ev.ts_feedback_completed,
+    ev.source_table
+FROM
+    all_evaluations AS ev
+LEFT JOIN
+    dw_people.dim_employee AS emp
+        ON emp.person_number = ev.person_number
+LEFT JOIN
+    dw_people.dim_employee AS evaluator
+        ON evaluator.person_number = ev.evaluator_person_number
+WHERE
+    ev.person_number = '120469'
+    AND ev.cycle_name = 'Performa 2025'
+ORDER BY
+    CASE ev.evaluation_type
+        WHEN 'SELF' THEN 1
+        WHEN 'MANAGER' THEN 2
+        WHEN 'PEER' THEN 3
+    END,
+    ev.ts_feedback_completed
+LIMIT 100
+```
+
+**Expected row shape for a fully completed Performa cycle:**
+
+| `evaluation_type` | Typical row count | `evaluator_person_number` |
+| :--- | :--- | :--- |
+| `SELF` | 1 | Same as `person_number` (the employee) |
+| `MANAGER` | 1 | Manager's `person_number` |
+| `PEER` | 0–N | Each peer's `person_number` |
+
+**Question:** Count how many evaluation submissions of each type exist per employee in Performa 2025.
+
+```sql
+WITH self_and_manager AS (
+    SELECT
+        im.person_number,
+        dpe.evaluation_type,
+        dpe.cycle_name
+    FROM
+        dw_performance.dim_performance_evaluation AS dpe
+    INNER JOIN
+        datalake_people.identifier_mapping AS im
+            ON im.assignment_number = dpe.assignment_number
+            AND im.is_person_latest_assignment = TRUE
+    WHERE
+        dpe.is_current = TRUE
+        AND dpe.evaluation_type IN ('SELF', 'MANAGER')
+        AND dpe.cycle_name = 'Performa 2025'
+),
+peer_feedback AS (
+    SELECT
+        fact.person_number,
+        'PEER' AS evaluation_type,
+        fact.cycle_name
+    FROM
+        dw_performance.fact_peer_evaluations AS fact
+    WHERE
+        fact.participation_status = 'COMP'
+        AND fact.cycle_name = 'Performa 2025'
+),
+all_evaluations AS (
+    SELECT * FROM self_and_manager
+    UNION ALL
+    SELECT * FROM peer_feedback
+)
+SELECT
+    person_number,
+    evaluation_type,
+    COUNT(*) AS submission_count
+FROM
+    all_evaluations
+GROUP BY
+    person_number,
+    evaluation_type
+ORDER BY
+    person_number,
+    evaluation_type
+LIMIT 100
+```
+
+### Peer Feedback Volume (Exploratory Query)
+
+**Question:** How many completed peer evaluations did each employee receive in the latest Performa cycle?
+
+```sql
+SELECT
+    fact.person_number,
+    COUNT(*) AS peer_feedback_received
+FROM
+    dw_performance.fact_peer_evaluations AS fact
+WHERE
+    fact.cycle_name = 'Performa 2025'
+    AND fact.participation_status = 'COMP'
+GROUP BY
+    fact.person_number
+ORDER BY
+    peer_feedback_received DESC
 LIMIT 100
 ```
 
@@ -207,6 +576,8 @@ LIMIT 100
 * **Performa** : QuintoAndar's annual performance review process, comprising self-assessment, manager evaluation, and committee calibration phases.
 * **IPA (Individual Performance Assessment)** : The numeric multiplier derived from the Performa Score, used in the annual PLR bonus calculation.
 * **Calibration** : The committee review phase where initial manager ratings are reviewed and, when needed, adjusted to ensure consistency across the organization.
+* **Peer feedback** : Colleague evaluations collected during Performa cycles. Peers rate the evaluated employee on Impact, Behavior, and Leadership (when applicable) and may provide open-text comments. Distinct from self and manager evaluations modeled in `dim_performance_evaluation`. Stored in `fact_peer_evaluations` because multiple peers can evaluate the same employee in one cycle.
+* **Evaluation type** : Perspective of a questionnaire submission — `SELF` (employee self-assessment), `MANAGER` (manager assessment), or `PEER` (colleague feedback). Self and manager live in `dim_performance_evaluation`; peers live in `fact_peer_evaluations`.
 * **Continuous management** : Ongoing manager–worker practices in PIN outside the formal Performa evaluation form, including Mid-Year Checkpoint, PDI, and One-on-One sessions.
 * **Mid-Year Checkpoint** : Mid-cycle performance conversation between manager and employee, usually including the manager's written assessment of first-semester delivery and second-semester direction.
 * **PDI (Individual Development Plan)** : Career development document where the employee records goals, strengths, development areas, and action plans for the review period.

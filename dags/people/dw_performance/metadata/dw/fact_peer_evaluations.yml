@@ -1,0 +1,72 @@
+---
+database_name: dw_performance
+table_name: fact_peer_evaluations
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Fact table with one row per peer feedback submission in a Performa evaluation cycle. Each row links the evaluated employee (person_number) to the peer who provided feedback (peer_person_number), including section ratings, open-text responses, and participation status. Sources: HRA_EVAL_PARTICIPANTS and HRA_EVAL_RATINGS (pin_performance) with role_type PARTICIPANT, HRQ questionnaire responses (pin_questionnaires), and review period translation (pin_talent). Both directions of analysis are supported: feedback received (filter on person_number) and feedback given (filter on peer_person_number).
+columns:
+  sk_peer_evaluation:
+    description: MD5 surrogate key derived from the Oracle HCM evaluation participant identifier. Uniquely identifies each peer feedback submission in this fact table.
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.id_eval_participant
+  person_number:
+    description: Oracle HCM person number of the employee being evaluated (subject of the Performa document). Resolved by joining evaluation.id_person with datalake_pin_core_clean.all_people.
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  peer_person_number:
+    description: Oracle HCM person number of the peer who provided feedback. Resolved by joining evaluation_participant.id_person with datalake_pin_core_clean.all_people for participants with role_type_code PARTICIPANT.
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  assignment_number:
+    description: Business identifier for the evaluated employee's assignment during the Performa cycle. Resolved via datalake_people.identifier_mapping on evaluation.id_assignment.
+    lineage:
+      - datalake_people.identifier_mapping.assignment_number
+  cycle_name:
+    description: Display name of the review period for this evaluation, for example Performa 2025. Resolved via datalake_pin_talent_clean.review_period_translation filtered to language US.
+    lineage:
+      - datalake_pin_talent_clean.review_period_translation.review_period_name
+  participation_status:
+    description: Current status of the peer's participation in the feedback process, sourced from evaluation_participant.participation_status_code.
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.participation_status_code
+    categories:
+      COMP: Peer has completed the feedback submission.
+      INPROG: Peer has started but not yet completed feedback.
+      AWAITING_REPLY: Feedback request sent; peer has not yet responded.
+      REQUEST_NOT_SENT: Peer was nominated but the feedback request was not yet sent.
+  description_impact:
+    description: Descriptive Impact rating provided by the peer, resolved from evaluation_rating joined to rating_level_translation. NULL when the peer did not rate Impact or feedback is incomplete.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  description_behavior:
+    description: Descriptive Behavior rating provided by the peer, resolved from evaluation_rating joined to rating_level_translation. NULL when the peer did not rate Behavior or feedback is incomplete.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  description_leadership:
+    description: Descriptive Leadership rating provided by the peer. Only applicable when the evaluated employee's Performa template includes a Leadership section. NULL for non-managerial templates or when the peer did not rate Leadership.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  open_evaluation:
+    description: Consolidated free-text answers from the peer questionnaire linked to this evaluation participant. Aggregated from pin_questionnaires question_response via questionnaire_participant where id_subject matches the evaluation and id_participant matches id_eval_participant. Multiple answers are joined with ' | ' separator. Empty string when no open-text responses exist.
+    lineage:
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer_unlimited
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer
+  numeric_impact:
+    description: Numeric Impact rating on the Performa scale provided by the peer. NULL when not rated.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  numeric_behavior:
+    description: Numeric Behavior rating on the Performa scale provided by the peer. NULL when not rated.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  numeric_leadership:
+    description: Numeric Leadership rating on the Performa scale provided by the peer. NULL when the template has no Leadership section or the peer did not rate it.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  ts_feedback_completed:
+    description: Timestamp when the peer finished providing feedback, sourced from evaluation_participant.ts_feedback_completed.
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.ts_feedback_completed
+  ts_load:
+    description: Timestamp of when this record was loaded into the fact table by the Spark job.

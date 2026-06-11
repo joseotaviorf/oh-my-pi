@@ -1,0 +1,41 @@
+---
+table_name: dw_performance.fact_peer_evaluations
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_peer_evaluation:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error
+  peer_person_number:
+    is_complete:
+      severity_level: Error
+  assignment_number:
+    is_complete:
+      severity_level: Error
+  cycle_name:
+    is_complete:
+      severity_level: Error
+  participation_status:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ['COMP', 'INPROG', 'AWAITING_REPLY', 'REQUEST_NOT_SENT']
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning
