@@ -1,0 +1,110 @@
+---
+database_name: datalake_privacy_hub_clean
+table_name: cookie_definition
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Clean layer for cookie definition templates managed by QuintoAndar's Privacy Hub service
+  (PostgreSQL source: privacy_hub.public.cookie_definition). One row per catalogued cookie template,
+  identified by a name pattern and domain, describing the cookie's expected lifespan, party type,
+  retention, and default classification before site-specific overrides. Acts as the parent template
+  referenced by the cookie table via id_cookie_definition. Used by Growth and governance for cookie
+  consent banner compliance (LGPD/ePrivacy) and cookie inventory management. Part of the privacy_hub
+  DAG (daily CDC).
+columns:
+  id:
+    description: |
+      Primary key of the cookie definition template in Privacy Hub. Uniquely identifies a cookie
+      template and is referenced as id_cookie_definition by catalogued cookie records.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.id
+  name_pattern:
+    description: |
+      Cookie name or name pattern that this definition matches. When is_regex is true, this value is
+      a regular expression used to match cookie names; otherwise it is matched literally. Unique
+      together with domain in the source.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.name_pattern
+  friendly_name:
+    description: |
+      Human-readable display name for the cookie definition, shown in Privacy Hub UI and consent
+      documentation in place of the raw name pattern.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.friendly_name
+  domain:
+    description: |
+      Website domain the cookie definition applies to. Unique together with name_pattern in the
+      source and used to scope the template to a specific QuintoAndar domain.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.domain
+  description:
+    description: |
+      Free-text explanation of the cookie's purpose and behaviour, used in consent banner copy and
+      privacy documentation. May be null when no description was provided.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.description
+  lifespan_type:
+    description: |
+      Cookie lifespan classification indicating whether the cookie persists across browser sessions
+      or is cleared when the session ends.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.lifespan_type
+    categories:
+      PERSISTENT: Cookie persists on the device until its retention period expires or it is deleted.
+      SESSION: Cookie is temporary and cleared when the browser session ends.
+  party_type:
+    description: |
+      Cookie party classification indicating whether the cookie is set by QuintoAndar's own domain or
+      by an external third-party vendor.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.party_type
+    categories:
+      FIRST_PARTY: Cookie set directly by the QuintoAndar domain the user is visiting.
+      THIRD_PARTY: Cookie set by an external domain or vendor embedded in the page.
+  retention:
+    description: |
+      Retention period of the cookie as declared in Privacy Hub (free-text, e.g. duration the cookie
+      is stored on the device). Replaced the legacy numeric ttl column. May be null.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.retention
+  version:
+    description: |
+      Version number of the cookie definition record in Privacy Hub. Increments when the template
+      metadata or classification is updated.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.version
+  is_regex:
+    description: |
+      Flag indicating whether name_pattern should be interpreted as a regular expression (true) or
+      matched as a literal cookie name (false).
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.is_regex
+  ts_created_at:
+    description: |
+      Timestamp when the cookie definition was first created in Privacy Hub (created_at in source).
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.created_at
+  ts_updated_at:
+    description: |
+      Timestamp when the cookie definition record was last updated in Privacy Hub. Used as the basis
+      for incremental CDC loads and partition derivation.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.updated_at
+  year:
+    description: |
+      Table partition column (year). Derived from ts_updated_at at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.updated_at
+  month:
+    description: |
+      Table partition column (month, 1–12). Derived from ts_updated_at. Must be filtered together with
+      year and day in every query to enable partition pruning.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.updated_at
+  day:
+    description: |
+      Table partition column (day, 1–31). Derived from ts_updated_at. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
+    lineage:
+      - datalake_privacy_hub_raw.cookie_definition.updated_at

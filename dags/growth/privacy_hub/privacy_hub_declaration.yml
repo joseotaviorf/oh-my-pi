@@ -27,6 +27,10 @@ workflow:
       clean_table_name: cookie
       raw_primary_keys: [id]
       clean_primary_keys: [id]
+    cookie_definition:
+      clean_table_name: cookie_definition
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     intercepted_cookie:
       clean_table_name: intercepted_cookie
       raw_primary_keys: [id]
