@@ -2,7 +2,7 @@
 
 **Metastore schema:** `dw_performance`
 
-> Performance and talent cycle data for QuintoAndar employees — Performa scores, calibration outcomes, talent review assessments, and goal achievements — enabling HR teams and business leaders to understand how employees are evaluated, developed, and recognized across every review period.
+> Performance and talent cycle data for QuintoAndar employees — Performa scores, calibration outcomes, talent review assessments, goal achievements, and continuous management practices (Mid-Year Checkpoint, PDI, and One-on-One) — enabling HR teams and business leaders to understand how employees are evaluated, developed, and recognized across every review period.
 
 ## People Data Catalog
 
@@ -34,6 +34,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **✅ Data quality flags** : Five smoke-detector signals that surface rating inconsistencies between goal results, self and manager evaluations, and prior-cycle calibration outcomes.
 
+**✅ Continuous management (Check-in)** : Mid-Year Checkpoint, Individual Development Plan (PDI), and One-on-One sessions registered in PIN, including questionnaire responses and manager feedback linked to each check-in meeting.
+
 ### Out of Scope
 
 **❌ Employee identity, contact, and org chain** : Preferred name, work email, documents, and reporting hierarchy are in `dw_employee_details` and `dw_people`.
@@ -42,20 +44,20 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 ### Who is included
 
-* **Target Population:** All active employees with an assignment recorded in PIN who have participated in at least one Performa evaluation cycle, Talent Review committee, or goal-setting period. Both self and manager evaluation records are included for each completed cycle.
+* **Target Population:** All active employees with an assignment recorded in PIN who have participated in at least one Performa evaluation cycle, Talent Review committee, goal-setting period, or continuous management check-in (Mid-Year Checkpoint, PDI, or One-on-One). Both self and manager evaluation records are included for each completed cycle.
 * **Exclusions:** Employees who have not yet been included in any Performa cycle (e.g. new hires admitted after the cycle close date), test and non-production accounts, and pending hires not yet active in PIN.
 
 ## Data Model and Tables
 
 ### Data Sources and System Context
 
-* **Oracle HCM Cloud (PIN)** : QuintoAndar's HR system of record, integrated via SFTP through Oracle Integration Cloud (OIC). All performance evaluation templates, rating scales, calibration meeting records, talent review assessments, and goal plans originate from Oracle HCM Cloud and flow into the warehouse through this integration.
+* **Oracle HCM Cloud (PIN)** : QuintoAndar's HR system of record, integrated via SFTP through Oracle Integration Cloud (OIC). All performance evaluation templates, rating scales, calibration meeting records, talent review assessments, goal plans, check-in meetings, discussion topics, and questionnaire responses originate from Oracle HCM Cloud and flow into the warehouse through this integration.
 
 ### About the data
 
 *Note: Detailed definitions for every column, metric, and flag are maintained in DataHub. Do not create a column-level data dictionary section or list individual columns in this markdown document.*
 
-* **Temporal coverage:** Mixed. Evaluation and calibration dimensions carry full history as Validity Windows (SCD Type 2). Variation and rating dimensions are Current State lookup tables. Fact tables store one canonical row per grain event (evaluation, calibration, talent review, goal, or cycle) rather than historical snapshots.
+* **Temporal coverage:** Mixed. Evaluation and calibration dimensions carry full history as Validity Windows (SCD Type 2). Variation and rating dimensions are Current State lookup tables. Fact tables store one canonical row per grain event (evaluation, calibration, talent review, goal, check-in meeting, or cycle) rather than historical snapshots.
 * **Airflow DAG:** `bietlejuice.dw_performance`
 * **SLA:** D-1 available by 08:00 BRT
 
@@ -72,12 +74,15 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 | `fact_talent_reviews` | One record per assignment per committee meeting | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_talent_reviews,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_talent_reviews.sql) |
 | `fact_goal_achievements` | One record per goal (person × review period × goal plan × goal name) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_goal_achievements,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_goal_achievements.sql) |
 | `fact_smoke_detectors` | One record per assignment per performance cycle — five data quality flags | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_smoke_detectors,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_smoke_detectors.sql) |
+| `fact_continuous_management` | One record per check-in meeting (Mid-Year Checkpoint, PDI, or One-on-One) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.fact_continuous_management,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/fact_continuous_management.sql) |
 
 > **Note:** VPN connection is required to access DataHub.
 
 **Main join identifiers:**
 
-* `person_number` (Business key — present in all calibration, goal, and smoke-detector facts; use to join to `dw_people.dim_employee`)
+* `person_number` (Business key — present in calibration, goal, smoke-detector, and continuous-management facts; use to join to `dw_people.dim_employee`)
+* `manager_person_number` (Manager business key — present in continuous-management facts; use to join manager attributes via `dw_people.dim_employee`)
+* `review_period_name` (Review cycle label — present in continuous-management facts; e.g. Performa 2025)
 * `assignment_number` (Assignment-level grain key — present in evaluation, talent review, and smoke-detector facts)
 
 ## Core Features and Business Logic
@@ -98,6 +103,12 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **Smoke detectors** : Five boolean flags (SD1–SD5) surface data quality inconsistencies: goal score misaligned with manager impact band (SD1); self-vs-manager gap of two or more steps on Impact (SD2) or Behavior (SD3); and drift of two or more steps between the resolved manager rating and the prior-cycle calibrated rating on Impact (SD4) or Behavior (SD5). These flags do not block data from other facts — they are additional quality signals.
 
+* **Continuous management document types** : Each check-in meeting is classified as `mid_year_checkpoint`, `pdi`, `one_on_one`, or `unknown` based on the Oracle check-in template. Mid-Year Checkpoint and PDI are tied to the Performa review period; One-on-One sessions are recurring manager–worker conversations that may include agenda topics and linked notes.
+
+* **Questionnaire vs. discussion content** : Free-text responses from worker and manager questionnaires (career goals, self-awareness, action plans, leader comments) are consolidated in `worker_questionnaire_text` and `manager_questionnaire_text`. For Mid-Year Checkpoint, the manager's evaluation of the employee typically appears in `manager_questionnaire_text` even though the PIN form is labeled under the manager's name. Additional notes attached to One-on-One discussion topics are stored separately in `manager_feedback_text`.
+
+* **Checkpoint completion status** : `checkpoint_status` (`filled`, `in_progress`, `not_started`) is derived from questionnaire answers, discussion topics, and linked notes in the lake. It may differ from the PIN list view label "Discutido com [manager]" when Oracle flags (`is_worker_questionnaire_discussed`, `is_manager_questionnaire_discussed`) remain unset.
+
 ### Business Assumptions
 
 * **Calibration meetings lag one calendar year behind the review cycle** : Performa committee meetings for a given review cycle (e.g. cycle year 2024) typically take place in the following calendar year (meeting year 2025). When joining calibration results back to evaluation or goal data by cycle year, account for this offset (meeting_year = cycle_year + 1).
@@ -108,6 +119,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **One canonical calibration row per person per year** : `fact_performance_calibrations` stores a single row per person per meeting year, even when a person appeared in multiple committee meetings. The row selected is the one with the most complete calibrated ratings; ties are broken by the most recent meeting timestamp and then by meeting ID. Queries counting calibration records will therefore produce one row per person per year, never one row per meeting attended.
 
+* **Aggregated questionnaire text** : `worker_questionnaire_text` and `manager_questionnaire_text` concatenate all answers for a meeting into a single string (answers separated by ` | `). Question-level detail is not available in this fact; use clean-layer `pin_questionnaires` tables for per-question analysis.
+
+* **Coverage varies by document type** : PDI and most Mid-Year Checkpoint meetings do not create discussion topics in Oracle; One-on-One sessions are more likely to have agenda topics and linked notes. Absence of discussion topics does not necessarily mean the session was not held in PIN.
+
 ## How to Use
 
 ### Standard Join Pattern
@@ -116,6 +131,27 @@ When joining performance data with other DW domains:
 
 1. Join on `person_number` to reach `dw_people.dim_employee` for employee attributes.
 2. Join on `assignment_number` when linking evaluations or talent reviews to assignment-level dimensions.
+3. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
+
+### Continuous Management (Exploratory Query)
+
+**Question:** What share of Mid-Year Checkpoint meetings are marked as filled in a given Performa cycle?
+
+```sql
+SELECT
+    fact.checkpoint_status,
+    COUNT(DISTINCT fact.person_number) AS headcount
+FROM
+    dw_performance.fact_continuous_management AS fact
+WHERE
+    fact.document_type = 'mid_year_checkpoint'
+    AND fact.review_period_name = 'Performa 2025'
+GROUP BY
+    fact.checkpoint_status
+ORDER BY
+    headcount DESC
+LIMIT 100
+```
 
 ### Wide Join (Exploratory Query)
 
@@ -171,6 +207,10 @@ LIMIT 100
 * **Performa** : QuintoAndar's annual performance review process, comprising self-assessment, manager evaluation, and committee calibration phases.
 * **IPA (Individual Performance Assessment)** : The numeric multiplier derived from the Performa Score, used in the annual PLR bonus calculation.
 * **Calibration** : The committee review phase where initial manager ratings are reviewed and, when needed, adjusted to ensure consistency across the organization.
+* **Continuous management** : Ongoing manager–worker practices in PIN outside the formal Performa evaluation form, including Mid-Year Checkpoint, PDI, and One-on-One sessions.
+* **Mid-Year Checkpoint** : Mid-cycle performance conversation between manager and employee, usually including the manager's written assessment of first-semester delivery and second-semester direction.
+* **PDI (Individual Development Plan)** : Career development document where the employee records goals, strengths, development areas, and action plans for the review period.
+* **One-on-One** : Recurring manager–worker check-in that may include agenda topics and discussion notes.
 
 ## See Also
 

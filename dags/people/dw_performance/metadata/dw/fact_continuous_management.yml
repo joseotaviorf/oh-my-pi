@@ -1,0 +1,77 @@
+---
+database_name: dw_performance
+table_name: fact_continuous_management
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Fact table with one row per check-in meeting, consolidating continuous management practices including Mid Year Checkpoint, PDI, and One-on-One sessions from Oracle HCM. Sources: HRA_CHECK_IN_MEETINGS and HRA_DISCUSSION_TOPICS (pin_performance), HRQ questionnaire responses (pin_questionnaires), and HRT_NOTES (pin_talent). Questionnaire answers link to check-in meetings via questionnaire_participant.id_subject = check_in_meeting.id_check_in_meeting. The document_type is derived from id_check_in_template: 300000008306046 and 300000116219293 = mid_year_checkpoint, 300000087654297 = pdi, 300000008306049 = one_on_one.
+columns:
+  sk_continuous_management:
+    description: MD5 surrogate key derived from the Oracle HCM check-in meeting identifier. Uniquely identifies each check-in meeting row in this fact table.
+    lineage:
+      - datalake_pin_performance_clean.check_in_meeting.id_check_in_meeting
+  sk_check_in_date:
+    description: Surrogate key for the date dimension formatted as YYYYMMDD (e.g. 20250615). Derived from dt_check_in by removing hyphens. Join with the date dimension table using this key.
+    lineage:
+      - datalake_pin_performance_clean.check_in_meeting.dt_check_in
+  person_number:
+    description: Oracle HCM person number of the worker (employee) who participated in the check-in meeting. Resolved by joining check_in_meeting.id_worker_person with datalake_pin_core_clean.all_people.
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  manager_person_number:
+    description: Oracle HCM person number of the manager who conducted the check-in meeting. Resolved by joining check_in_meeting.id_manager_person with datalake_pin_core_clean.all_people.
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  review_period_name:
+    description: Display name of the review period this check-in belongs to, for example 'Performa 2025'. Resolved via datalake_pin_talent_clean.review_period_translation filtered to language PTB.
+    lineage:
+      - datalake_pin_talent_clean.review_period_translation.review_period_name
+  document_type:
+    description: Business classification of the check-in document derived from the check-in template ID. Values are mid_year_checkpoint (templates 300000008306046 and 300000116219293), pdi (300000087654297), one_on_one (300000008306049), or unknown.
+    lineage:
+      - datalake_pin_performance_clean.check_in_meeting.id_check_in_template
+    categories:
+      mid_year_checkpoint: Mid-Year Checkpoint document where manager and worker discuss performance progress at the midpoint of the review period.
+      pdi: Individual Development Plan (PDI) document focused on the worker's career development goals and actions.
+      one_on_one: Regular one-on-one meeting between manager and worker for ongoing check-ins outside of formal review cycles.
+      unknown: Template ID not mapped to a known document type.
+  checkpoint_status:
+    description: Completion status of the check-in meeting derived from questionnaire answers, discussion topics, and linked manager notes. filled when worker or manager questionnaire answers exist, manager notes exist on linked discussion topics, or either questionnaire was marked discussed; in_progress when discussion topics exist but completion criteria are not met; not_started when none of the above apply.
+    categories:
+      filled: Meeting has questionnaire answers, manager notes on linked discussion topics, or at least one questionnaire marked as discussed.
+      in_progress: Meeting has discussion topics but no questionnaire answers, manager notes, or discussed flags.
+      not_started: Meeting has no questionnaire answers, discussion topics, or discussed flags.
+  worker_questionnaire_text:
+    description: Consolidated free-text answers from the worker questionnaire linked to this check-in meeting (career objective, self-awareness, action plans, etc.). Aggregated from pin_questionnaires question_response via questionnaire_participant where id_participant matches the worker and id_subject matches the check-in meeting. Multiple answers are joined with ' | ' separator. HTML tags are stripped in the clean layer.
+    lineage:
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer_unlimited
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer
+  manager_questionnaire_text:
+    description: Consolidated free-text answers from the manager questionnaire linked to this check-in meeting (leader comments, manager sections). Aggregated from pin_questionnaires question_response via questionnaire_participant where id_participant matches the manager and id_subject matches the check-in meeting. Multiple answers are joined with ' | ' separator.
+    lineage:
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer_unlimited
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer
+  manager_feedback_text:
+    description: Consolidated feedback text from HRT_NOTES linked to discussion topics via context_type ORA_DISCUSSION_TOPIC and id_context. Distinct from manager_questionnaire_text, which comes from the manager questionnaire form. Multiple notes are joined with ' | ' separator. Empty string when no linked notes exist.
+    lineage:
+      - datalake_pin_talent_clean.note.note_text
+  is_worker_questionnaire_discussed:
+    description: True when the worker's questionnaire was discussed during the meeting, sourced directly from check_in_meeting.is_worker_questionnaire_discussed.
+    lineage:
+      - datalake_pin_performance_clean.check_in_meeting.is_worker_questionnaire_discussed
+    categories:
+      'true': Worker questionnaire was discussed during the check-in meeting.
+      'false': Worker questionnaire was not discussed during the check-in meeting.
+  is_manager_questionnaire_discussed:
+    description: True when the manager's questionnaire was discussed during the meeting, sourced directly from check_in_meeting.is_manager_questionnaire_discussed.
+    lineage:
+      - datalake_pin_performance_clean.check_in_meeting.is_manager_questionnaire_discussed
+    categories:
+      'true': Manager questionnaire was discussed during the check-in meeting.
+      'false': Manager questionnaire was not discussed during the check-in meeting.
+  dt_check_in:
+    description: Date on which the check-in meeting took place, sourced from CHECK_IN_DATE in Oracle HCM HRA_CHECK_IN_MEETINGS.
+    lineage:
+      - datalake_pin_performance_clean.check_in_meeting.dt_check_in
+  ts_load:
+    description: Timestamp of when this record was loaded into the fact table by the Spark job.

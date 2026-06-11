@@ -42,6 +42,13 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_performance
           date_column_to_partition: last_update_date
+    hra_discussion_topics:
+      clean_table_name: discussion_topic
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
     hra_eval_items:
       clean_table_name: evaluation_item
       vacuum_retention_hours: 168
