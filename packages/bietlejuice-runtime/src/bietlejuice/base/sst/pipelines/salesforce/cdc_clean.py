@@ -124,7 +124,6 @@ def salesforce_clean_pipeline(cfg):
             "source_file",
             "ts_load",
             "ChangeEventHeader",
-            "changed_field",
             "partition_date",
             "partition_hour",
         ]
