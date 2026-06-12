@@ -32,10 +32,12 @@ recommend → validate → auto-compare → promote gate → post-promotion watc
 ### D1. Outcomes table + monitoring DAG
 
 New platform DAG (e.g. `dags/platform/rightsizing_outcomes/`, daily) writing
-`enrich_rightsizing_outcomes` (one row per DAG per day per side):
+`enrich_rightsizing_outcomes` (one row per validation Airflow run):
 
-- Join `fact_databricks_dag_run` prod vs `…__validation` twins (same join keys
-  as the recalibration runbook SQL).
+- Pair each validation run from `datalake_astro_clean.dag_run` with the
+  reference prod run (14d lookback, fastest successful run ≥8m wall) and join
+  `fact_databricks_dag_run` for prod/val metrics on those specific logical runs.
+- `reference_match_source` records how each validation was paired (conf_run_id / conf_window / heuristic); promotion derives latest-per-DAG from `val_ts_started`.
 - Columns: run counts, avg cost, wall p50/p95, worker/driver cpu p50/p95,
   mem p95, failure counts, plus the *spec under test* (node types, count,
   engine) and the recommender metadata (cohort, predicted cost delta,

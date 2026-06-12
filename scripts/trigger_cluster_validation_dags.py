@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import os
 import random
-import re
 import sys
 import time
 from collections.abc import Callable
@@ -33,6 +33,21 @@ from scripts.cluster_validation_dag_discovery import (  # noqa: E402
     filter_validation_dags,
     group_by_line,
 )
+from scripts.cluster_validation_reference import (  # noqa: E402
+    MIN_PROD_RUN_DURATION_SECONDS,
+    LoadWindowSource,
+    dag_run_duration_seconds,
+    dag_run_id_from_payload,
+    has_prod_success_within_days,
+    load_window_from_prod_dag_run,
+    parse_airflow_timestamp,
+    select_reference_prod_run,
+    validation_conf_with_reference,
+)
+
+DEFAULT_TRIGGER_LEDGER_PATH = (
+    REPO_ROOT / "scripts" / "rightsizing_validation_trigger_ledger.jsonl"
+)
 
 TERMINAL_STATES = frozenset({"success", "failed", "upstream_failed"})
 FAILURE_STATES = frozenset({"failed", "upstream_failed"})
@@ -45,13 +60,15 @@ DATABRICKS_RUN_ID_SUFFIX_RESERVE = 43
 DATABRICKS_MAX_VALIDATION_DAG_ID_LENGTH = (
     DATABRICKS_MAX_CLUSTER_NAME_LENGTH - 1 - DATABRICKS_RUN_ID_SUFFIX_RESERVE
 )
-# Ignore prod runs shorter than this when picking a reference window (--from-prod-run).
-MIN_PROD_RUN_DURATION_SECONDS = 8 * 60
 DEFAULT_VALIDATION_COOLDOWN_HOURS = 2.0
 VALIDATION_TIMEOUT_PROD_WALL_FACTOR = 2.0
 TRANSIENT_HTTP_STATUS_CODES = frozenset({408, 429, 502, 503, 504})
-DATE_PARAM_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-LoadWindowSource = Literal["conf", "data_interval"]
+# Backward-compatible aliases for unit tests and dry-run helpers.
+_dag_run_id_from_payload = dag_run_id_from_payload
+_dag_run_duration_seconds = dag_run_duration_seconds
+_load_window_from_prod_dag_run = load_window_from_prod_dag_run
+_select_reference_prod_run = select_reference_prod_run
+_has_prod_success_within_days = has_prod_success_within_days
 
 
 @dataclass
@@ -432,144 +449,28 @@ def _compute_poll_delay(
     return delay
 
 
-def _dag_run_id_from_payload(run: dict[str, Any]) -> str | None:
-    run_id = run.get("dag_run_id") or run.get("run_id")
-    return str(run_id) if run_id else None
-
-
-def _is_valid_date_param(value: Any) -> bool:
-    return isinstance(value, str) and bool(DATE_PARAM_PATTERN.match(value))
-
-
-def _parse_airflow_timestamp(value: Any) -> datetime | None:
-    if not value or not isinstance(value, str):
-        return None
-    normalized = value.replace("Z", "+00:00")
-    try:
-        parsed = datetime.fromisoformat(normalized)
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
-
-
-def _to_utc_date_str(value: datetime) -> str:
-    return value.astimezone(timezone.utc).strftime("%Y-%m-%d")
-
-
-def _dag_run_duration_seconds(run: dict[str, Any]) -> float | None:
-    start = _parse_airflow_timestamp(run.get("start_date"))
-    end = _parse_airflow_timestamp(run.get("end_date"))
-    if start is None or end is None:
-        return None
-    return max(0.0, (end - start).total_seconds())
-
-
-def _ensure_exclusive_load_end(conf: dict[str, str]) -> dict[str, str]:
-    start = conf.get("load_start_date")
-    end = conf.get("load_end_date")
-    if not (_is_valid_date_param(start) and _is_valid_date_param(end)):
-        return conf
-    if start >= end:
-        bumped_end = (
-            datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)
-        ).strftime("%Y-%m-%d")
-        print(
-            "WARNING: load_end_date must be after load_start_date; "
-            f"bumping load_end_date from {end} to {bumped_end}",
-            file=sys.stderr,
-        )
-        return {**conf, "load_end_date": bumped_end}
-    return conf
-
-
-def _load_window_from_prod_dag_run(
-    run: dict[str, Any],
-) -> tuple[dict[str, str], LoadWindowSource] | None:
-    run_conf = run.get("conf")
-    if isinstance(run_conf, dict):
-        start = run_conf.get("load_start_date")
-        end = run_conf.get("load_end_date")
-        if _is_valid_date_param(start) and _is_valid_date_param(end):
-            return (
-                _ensure_exclusive_load_end(
-                    {
-                        "run_type": "test_run",
-                        "load_start_date": str(start),
-                        "load_end_date": str(end),
-                    }
-                ),
-                "conf",
-            )
-
-    interval_start = _parse_airflow_timestamp(run.get("data_interval_start"))
-    interval_end = _parse_airflow_timestamp(run.get("data_interval_end"))
-    if interval_start is None or interval_end is None:
-        return None
-
-    load_end_dt = interval_end - timedelta(days=1)
-    return (
-        _ensure_exclusive_load_end(
-            {
-                "run_type": "test_run",
-                "load_start_date": _to_utc_date_str(interval_start),
-                "load_end_date": _to_utc_date_str(load_end_dt),
-            }
-        ),
-        "data_interval",
-    )
-
-
-def _has_prod_success_within_days(
-    runs: list[dict[str, Any]],
+def _append_trigger_ledger(
     *,
-    recency_days: int,
-    now: datetime,
-    min_duration_seconds: float = MIN_PROD_RUN_DURATION_SECONDS,
-) -> bool:
-    cutoff = now - timedelta(days=recency_days)
-    for run in runs:
-        end = _parse_airflow_timestamp(run.get("end_date"))
-        if end is None or end < cutoff:
-            continue
-        duration = _dag_run_duration_seconds(run)
-        if duration is None or duration < min_duration_seconds:
-            continue
-        return True
-    return False
-
-
-def _select_reference_prod_run(
-    runs: list[dict[str, Any]],
-    *,
-    lookback_days: int,
-    now: datetime,
-    min_duration_seconds: float = MIN_PROD_RUN_DURATION_SECONDS,
-) -> dict[str, Any] | None:
-    cutoff = now - timedelta(days=lookback_days)
-    candidates: list[tuple[float, datetime, dict[str, Any]]] = []
-
-    for run in runs:
-        end = _parse_airflow_timestamp(run.get("end_date"))
-        start = _parse_airflow_timestamp(run.get("start_date"))
-        reference = end or start
-        if reference is None or reference < cutoff:
-            continue
-        duration = _dag_run_duration_seconds(run)
-        if duration is None or duration < min_duration_seconds:
-            continue
-        tie_break = start or end or reference
-        candidates.append((duration, tie_break, run))
-
-    if not candidates:
-        return None
-
-    _duration, _tie_break, selected = min(
-        candidates,
-        key=lambda item: (item[0], -item[1].timestamp()),
-    )
-    return selected
+    validation_dag_id: str,
+    validation_dag_run_id: str,
+    reference_prod_dag_id: str,
+    reference_prod_dag_run_id: str | None,
+    load_start_date: str,
+    load_end_date: str,
+    ledger_path: Path = DEFAULT_TRIGGER_LEDGER_PATH,
+) -> None:
+    record = {
+        "validation_dag_id": validation_dag_id,
+        "validation_dag_run_id": validation_dag_run_id,
+        "reference_prod_dag_id": reference_prod_dag_id,
+        "reference_prod_dag_run_id": reference_prod_dag_run_id,
+        "load_start_date": load_start_date,
+        "load_end_date": load_end_date,
+        "triggered_at": datetime.now(timezone.utc).isoformat(),
+    }
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    with ledger_path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True) + "\n")
 
 
 def _resolve_prod_run_plan(
@@ -634,11 +535,19 @@ def _resolve_prod_run_plan(
         )
 
     conf, source = window
+    prod_dag_run_id = _dag_run_id_from_payload(reference_run)
+    prod_duration_seconds = _dag_run_duration_seconds(reference_run)
+    enriched_conf = validation_conf_with_reference(
+        conf,
+        reference_prod_dag_run_id=prod_dag_run_id,
+        reference_prod_duration_seconds=prod_duration_seconds,
+        window_source=source,
+    )
     return DagExecutionPlan(
         dag=dag,
-        conf=conf,
-        prod_dag_run_id=_dag_run_id_from_payload(reference_run),
-        prod_duration_seconds=_dag_run_duration_seconds(reference_run),
+        conf=enriched_conf,
+        prod_dag_run_id=prod_dag_run_id,
+        prod_duration_seconds=prod_duration_seconds,
         window_source=source,
     )
 
@@ -797,8 +706,8 @@ def _run_finished_within_hours(
 ) -> bool:
     if hours <= 0:
         return False
-    end = _parse_airflow_timestamp(run.get("end_date"))
-    start = _parse_airflow_timestamp(run.get("start_date"))
+    end = parse_airflow_timestamp(run.get("end_date"))
+    start = parse_airflow_timestamp(run.get("start_date"))
     reference = end or start
     if reference is None:
         return False
@@ -1391,6 +1300,18 @@ async def trigger_and_monitor(
                         client.trigger_dag_run, dag.dag_id, plan.conf
                     )
                     dag_run_id = payload["dag_run_id"]
+                    if plan.conf is not None:
+                        await asyncio.to_thread(
+                            _append_trigger_ledger,
+                            validation_dag_id=dag.dag_id,
+                            validation_dag_run_id=dag_run_id,
+                            reference_prod_dag_id=dag.original_dag_id,
+                            reference_prod_dag_run_id=plan.prod_dag_run_id,
+                            load_start_date=str(
+                                plan.conf.get("load_start_date", "")
+                            ),
+                            load_end_date=str(plan.conf.get("load_end_date", "")),
+                        )
                 except (AirflowApiError, KeyError, requests.RequestException) as exc:
                     await progress.mark_outcome(
                         "trigger_failed", release_active_slot=False

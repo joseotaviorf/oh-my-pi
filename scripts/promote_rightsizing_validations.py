@@ -23,7 +23,7 @@ import csv
 import json
 import sys
 from dataclasses import asdict, dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -104,6 +104,39 @@ def _parse_date(value: Any) -> date | None:
     if not text:
         return None
     return date.fromisoformat(text[:10])
+
+
+def _row_date(row: dict[str, Any]) -> date | None:
+    return _parse_date(row.get("val_dt")) or _parse_date(row.get("dt"))
+
+
+def _parse_ts(value: Any) -> datetime | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    normalized = text.replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _row_sort_key(row: dict[str, Any]) -> tuple[date, datetime, str]:
+    """Order validation runs: calendar day, then execution time, then run id."""
+    row_day = _row_date(row) or date.min
+    ts = _parse_ts(row.get("val_ts_started"))
+    ts_key = ts if ts is not None else datetime.min.replace(tzinfo=timezone.utc)
+    run_id = str(row.get("validation_airflow_run_id") or "")
+    return row_day, ts_key, run_id
+
+
+def _has_validation_run_grain(rows: list[dict[str, Any]]) -> bool:
+    return any(str(row.get("validation_airflow_run_id") or "").strip() for row in rows)
 
 
 def _mem_p95_max(row: dict[str, Any], prefix: str = "val") -> float | None:
@@ -208,13 +241,13 @@ def decide_promotion_action(
 
 
 def _rows_for_dag(rows: list[dict[str, Any]], dag_id: str) -> list[dict[str, Any]]:
-    dated = [
-        (_parse_date(row.get("dt")), row)
+    matched = [
+        row
         for row in rows
         if str(row.get("prod_airflow_dag_id") or row.get("dag_id") or "").strip()
         == dag_id
     ]
-    return [row for dt, row in sorted(dated, key=lambda item: item[0] or date.min)]
+    return sorted(matched, key=_row_sort_key)
 
 
 def decide_promotion_for_dag(
@@ -223,20 +256,21 @@ def decide_promotion_for_dag(
     *,
     validation_age_days: int | None = None,
 ) -> tuple[PromotionDecision, dict[str, Any] | None]:
-    """Aggregate per-day rows into one decision; returns (decision, deciding row).
+    """Return one promotion decision for a DAG; returns (decision, deciding row).
 
-    The outcomes table is per (dag, day), so the newest day alone is not the
-    evidence — a day without a validation run would hide an earlier clean,
-    cheaper run and park the DAG on `extend` forever. Policy:
-
-    - among days with validation activity, the **newest decisive signal wins**:
-      a pass promotes, a failure/cost/wall miss rejects, and a mem>82 warn
-      holds (the OOM guard is never bypassed by an older pass);
-    - non-decisive days (activity but still awaiting the first clean run) are
-      skipped so a quiet day cannot hide earlier evidence;
-    - with no decisive day at all: extend / age-out.
+    Validation-run grain: the deciding row is the latest validation run by
+    ``val_ts_started`` (the table has no precomputed latest flag; latest is derived here). Legacy daily grain: newest
+    decisive signal among days with validation activity wins.
     """
     ordered = _rows_for_dag(rows, dag_id)
+    if _has_validation_run_grain(ordered) and ordered:
+        latest_row = ordered[-1]
+        return (
+            decide_promotion_action(
+                latest_row, validation_age_days=validation_age_days
+            ),
+            latest_row,
+        )
     per_day = [
         (row, decide_promotion_action(row, validation_age_days=validation_age_days))
         for row in ordered
@@ -281,22 +315,15 @@ def latest_row_per_dag(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         dag_id = str(row.get("prod_airflow_dag_id") or row.get("dag_id") or "").strip()
         if not dag_id:
             continue
-        row_date = _parse_date(row.get("dt"))
         existing = latest.get(dag_id)
-        if existing is None:
-            latest[dag_id] = row
-            continue
-        existing_date = _parse_date(existing.get("dt"))
-        if existing_date is None or (
-            row_date is not None and row_date >= existing_date
-        ):
+        if existing is None or _row_sort_key(row) >= _row_sort_key(existing):
             latest[dag_id] = row
     return latest
 
 
 def validation_age_days(rows: list[dict[str, Any]], dag_id: str) -> int | None:
     dated_rows = [
-        (_parse_date(row.get("dt")), row)
+        (_row_date(row), row)
         for row in rows
         if str(row.get("prod_airflow_dag_id") or row.get("dag_id") or "").strip()
         == dag_id
@@ -306,7 +333,7 @@ def validation_age_days(rows: list[dict[str, Any]], dag_id: str) -> int | None:
         return None
 
     first_val_activity: date | None = None
-    for dt, row in sorted(dated_rows):
+    for dt, row in sorted(dated_rows, key=lambda item: item[0]):
         if _i(row.get("val_run_count")) > 0 or _i(row.get("val_clean_run_count")) > 0:
             first_val_activity = dt
             break
@@ -327,7 +354,7 @@ def prod_baseline_snapshot(
     dated_rows = [
         (dt, row)
         for dt, row in (
-            (_parse_date(row.get("dt")), row)
+            (_row_date(row), row)
             for row in rows
             if str(row.get("prod_airflow_dag_id") or row.get("dag_id") or "").strip()
             == dag_id
@@ -363,6 +390,20 @@ def prod_baseline_snapshot(
         "failure_count": sum(failures),
         "lookback_days": lookback_days,
         "snapshot_through": as_of.isoformat() if as_of else None,
+    }
+
+
+def baseline_from_deciding_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Snapshot reference-prod metrics from a validation-run outcomes row."""
+    row_day = _row_date(row)
+    return {
+        "avg_cost_usd": _f(row.get("prod_avg_cost_usd")),
+        "wall_p50_min": _f(row.get("prod_wall_p50_min")),
+        "wall_p95_min": _f(row.get("prod_wall_p95_min")),
+        "mem_p95_max": _mem_p95_max(row, prefix="prod"),
+        "schedule_interval_minutes": _f(row.get("schedule_interval_minutes")),
+        "failure_count": _i(row.get("prod_failure_count")),
+        "snapshot_through": row_day.isoformat() if row_day else None,
     }
 
 
@@ -499,13 +540,17 @@ def apply_promotions(
                 )
                 decisions[-1] = decision
                 continue
-            as_of = _parse_date(row.get("dt")) or date.today()  # deciding row's day
+            as_of = _row_date(row) or date.today()
+            if _has_validation_run_grain([row]):
+                baseline = baseline_from_deciding_row(row)
+            else:
+                baseline = prod_baseline_snapshot(rows, dag_id, as_of=as_of)
             ledger.append(
                 PromotionLedgerEntry(
                     dag_id=dag_id,
                     promoted_at=as_of.isoformat(),
                     previous_cluster_spec=previous_cluster,
-                    baseline=prod_baseline_snapshot(rows, dag_id, as_of=as_of),
+                    baseline=baseline,
                 )
             )
         elif decision.action == "reject":

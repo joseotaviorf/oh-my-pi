@@ -267,3 +267,73 @@ class TestDecidePromotionForDagWindow:
         ]
         decision, _ = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
         assert decision.action == "extend"
+
+
+class TestValidationRunGrain:
+    def test_uses_latest_validation_run_row(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__2026-06-08",
+                val_dt="2026-06-08",
+            ),
+            _row(
+                validation_airflow_run_id="manual__2026-06-10",
+                val_dt="2026-06-10",
+            ),
+        ]
+        decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert decision.action == "promote"
+        assert row["validation_airflow_run_id"] == "manual__2026-06-10"
+
+    def test_same_day_picks_latest_val_ts_started(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__2026-06-11T10:00:00",
+                val_dt="2026-06-11",
+                val_ts_started="2026-06-11 10:00:00",
+            ),
+            _row(
+                validation_airflow_run_id="manual__2026-06-11T20:00:00",
+                val_dt="2026-06-11",
+                val_ts_started="2026-06-11 20:00:00",
+            ),
+        ]
+        _, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert row["validation_airflow_run_id"] == "manual__2026-06-11T20:00:00"
+
+    def test_duplicate_is_latest_flag_uses_val_ts_started(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__older",
+                val_dt="2026-06-11",
+                val_ts_started="2026-06-11 10:00:00",
+            ),
+            _row(
+                validation_airflow_run_id="manual__newer",
+                val_dt="2026-06-20",
+                val_ts_started="2026-06-20 15:00:00",
+            ),
+        ]
+        _, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert row["validation_airflow_run_id"] == "manual__newer"
+
+    def test_latest_row_per_dag_uses_val_ts_started(self):
+        rows = [
+            _row(
+                prod_airflow_dag_id="bietlejuice.test_dag",
+                validation_airflow_run_id="manual__older",
+                val_dt="2026-06-11",
+                val_ts_started="2026-06-11 10:00:00",
+            ),
+            _row(
+                prod_airflow_dag_id="bietlejuice.test_dag",
+                validation_airflow_run_id="manual__newer",
+                val_dt="2026-06-11",
+                val_ts_started="2026-06-11 22:00:00",
+            ),
+        ]
+        latest = prv.latest_row_per_dag(rows)
+        assert (
+            latest["bietlejuice.test_dag"]["validation_airflow_run_id"]
+            == "manual__newer"
+        )

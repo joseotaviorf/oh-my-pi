@@ -4,11 +4,11 @@ dag:
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
-      Daily prod vs `__validation` twin comparison for cluster right-sizing feedback
-      (Track D1). One row per (prod airflow_dag_id, dt) joining
-      dw_databricks_health.fact_databricks_dag_run production runs with their
-      shadow validation DAGs. Feeds the promotion gate
-      (scripts/promote_rightsizing_validations.py) and post-promotion watch.
+      Prod vs `__validation` twin comparison for cluster right-sizing feedback
+      (Track D1). One row per validation Airflow run, paired with the reference
+      prod run selected by trigger_cluster_validation_dags.py (--from-prod-run).
+      Feeds the promotion gate (scripts/promote_rightsizing_validations.py) and
+      post-promotion watch. Pairing ladder: conf-persisted reference run id, exact load-window match, fastest-run heuristic.
 
       Uses per-task-health percentiles (p50/p95 CPU busy/wait, memory), wall
       durations, peak_concurrent_workers, and result-state flags only — stage-
@@ -21,7 +21,7 @@ workflow:
   has_hive_sync: true
   tables_customization:
     enrich_rightsizing_outcomes:
-      partitions: [dt]
+      partitions: [val_dt]
       table_privileges:
         data-platform-engineers:
           - ALL PRIVILEGES

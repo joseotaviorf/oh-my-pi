@@ -1,26 +1,224 @@
 -- ============================================================================
 -- enrich_rightsizing_outcomes.sql
 --
--- Daily prod vs __validation twin comparison for cluster right-sizing feedback.
--- Grain: one row per (prod_airflow_dag_id, dt).
+-- Prod vs __validation twin comparison for cluster right-sizing feedback.
+-- Grain: one row per validation Airflow dag run (validation_airflow_run_id).
 --
--- Join keys mirror the recalibration runbook / recommend_cluster_specs validation
--- SQL: REGEXP_REPLACE(airflow_dag_id, '__validation$', '') for validation twins.
---
--- Telemetry: per-task health percentiles rolled up to dag_run (p50/p95 CPU busy/
--- wait, memory), wall durations, peak_concurrent_workers, and failure flags.
--- Stage-derived task_run columns are intentionally excluded (~0% populated).
+-- Reference prod pairing ladder: (1) reference_prod_dag_run_id persisted in the
+-- validation run's conf by trigger_cluster_validation_dags.py, (2) candidate
+-- whose derived load window equals the validation's own conf window, (3)
+-- fastest successful prod run in 14d with wall >= 480s. Conf is a pickled dict
+-- stored as bytea-hex text; fields are extracted via unhex+regexp.
 -- ============================================================================
-WITH scoped_runs AS (
+WITH validation_runs_raw AS (
     SELECT
+        id_dag                                                                       AS validation_airflow_dag_id,
+        id_run                                                                       AS validation_airflow_run_id,
+        REGEXP_REPLACE(id_dag, '__validation$', '')                                  AS prod_airflow_dag_id,
+        ts_started                                                                   AS val_ts_started,
+        ts_ended                                                                     AS val_ts_ended,
+        DATE(ts_started)                                                             AS val_dt,
+        state                                                                        AS val_state,
         CASE
-            WHEN REGEXP_LIKE(airflow_dag_id, '__validation$')
-                THEN REGEXP_REPLACE(airflow_dag_id, '__validation$', '')
-            ELSE airflow_dag_id
-        END                                                                          AS prod_airflow_dag_id,
+            WHEN configuration IS NOT NULL AND SUBSTRING(configuration, 1, 2) = '\\x'
+                THEN DECODE(UNHEX(SUBSTRING(configuration, 3)), 'ISO-8859-1')
+        END                                                                          AS conf_text,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_dag, id_run
+            ORDER BY ts_updated DESC
+        )                                                                            AS dedup_rn
+    FROM datalake_astro_clean.dag_run
+    WHERE MAKE_DATE(year, month, day) >= DATE('{load_start_date}')
+      AND ts_started >= TO_TIMESTAMP('{load_start_date}')
+      AND ts_started < TO_TIMESTAMP('{load_end_date}') + INTERVAL 1 DAY
+      AND id_dag LIKE 'bietlejuice.%'
+      AND REGEXP_LIKE(id_dag, '__validation$')
+      AND state IN ('success', 'failed')
+      AND run_type = 'manual'
+),
+validation_runs AS (
+    SELECT
+        validation_airflow_dag_id,
+        validation_airflow_run_id,
+        prod_airflow_dag_id,
+        val_ts_started,
+        val_ts_ended,
+        val_dt,
+        val_state,
+        TO_DATE(NULLIF(
+            regexp_extract(conf_text, 'load_start_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+        ))                                                                           AS val_conf_load_start_date,
+        TO_DATE(NULLIF(
+            regexp_extract(conf_text, 'load_end_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+        ))                                                                           AS val_conf_load_end_date,
+        NULLIF(
+            regexp_extract(
+                conf_text,
+                'reference_prod_dag_run_id.{1,5}?((?:manual|scheduled|dataset_triggered|backfill)__[0-9T:.+-]+)',
+                1
+            ), ''
+        )                                                                            AS conf_reference_prod_run_id
+    FROM validation_runs_raw
+    WHERE dedup_rn = 1
+),
+prod_astro AS (
+    SELECT
+        prod_airflow_dag_id,
+        prod_airflow_run_id,
+        ts_started,
+        ts_ended,
+        ts_data_interval_started,
+        ts_data_interval_ended,
+        TO_DATE(NULLIF(
+            regexp_extract(conf_text, 'load_start_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+        ))                                                                           AS prod_conf_load_start_date,
+        TO_DATE(NULLIF(
+            regexp_extract(conf_text, 'load_end_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+        ))                                                                           AS prod_conf_load_end_date
+    FROM (
+        SELECT
+            id_dag                                                                   AS prod_airflow_dag_id,
+            id_run                                                                   AS prod_airflow_run_id,
+            ts_started,
+            ts_ended,
+            ts_data_interval_started,
+            ts_data_interval_ended,
+            CASE
+                WHEN configuration IS NOT NULL AND SUBSTRING(configuration, 1, 2) = '\\x'
+                    THEN DECODE(UNHEX(SUBSTRING(configuration, 3)), 'ISO-8859-1')
+            END                                                                      AS conf_text,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_dag, id_run
+                ORDER BY ts_updated DESC
+            )                                                                        AS dedup_rn
+        FROM datalake_astro_clean.dag_run
+        WHERE MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 16)
+          AND id_dag LIKE 'bietlejuice.%'
+          AND NOT REGEXP_LIKE(id_dag, '__validation$')
+          AND state = 'success'
+          AND ts_ended IS NOT NULL
+          AND ts_started IS NOT NULL
+    )
+    WHERE dedup_rn = 1
+),
+reference_prod_candidates AS (
+    SELECT
+        v.validation_airflow_dag_id,
+        v.validation_airflow_run_id,
+        v.prod_airflow_dag_id,
+        v.val_ts_started,
+        v.val_ts_ended,
+        v.val_dt,
+        v.val_state,
+        v.val_conf_load_start_date,
+        v.val_conf_load_end_date,
+        v.conf_reference_prod_run_id,
+        p.prod_airflow_run_id                                                        AS reference_prod_airflow_run_id,
+        p.ts_started                                                                 AS ref_ts_started,
+        p.ts_ended                                                                   AS ref_ts_ended,
+        COALESCE(p.prod_airflow_run_id = v.conf_reference_prod_run_id, FALSE)        AS is_conf_run_id_match,
+        (p.prod_conf_load_start_date IS NOT NULL
+         AND p.prod_conf_load_end_date IS NOT NULL)                                  AS is_ref_window_from_conf,
+        COALESCE(p.prod_conf_load_start_date, DATE(p.ts_data_interval_started))      AS ref_derived_start,
+        COALESCE(
+            p.prod_conf_load_end_date,
+            DATE_SUB(DATE(p.ts_data_interval_ended), 1)
+        )                                                                            AS ref_derived_end_raw,
+        UNIX_TIMESTAMP(p.ts_ended) - UNIX_TIMESTAMP(p.ts_started)                    AS ref_duration_seconds
+    FROM validation_runs AS v
+    LEFT JOIN prod_astro AS p
+        ON v.prod_airflow_dag_id = p.prod_airflow_dag_id
+       AND (
+            p.prod_airflow_run_id = v.conf_reference_prod_run_id
+            OR (
+                p.ts_ended <= v.val_ts_started
+                AND p.ts_ended >= v.val_ts_started - INTERVAL 14 DAYS
+                AND UNIX_TIMESTAMP(p.ts_ended) - UNIX_TIMESTAMP(p.ts_started) >= 480
+            )
+       )
+),
+reference_prod_ranked AS (
+    SELECT
+        c.*,
+        CASE
+            WHEN c.ref_derived_start IS NOT NULL
+             AND c.ref_derived_end_raw IS NOT NULL
+             AND c.ref_derived_start >= c.ref_derived_end_raw
+                THEN DATE_ADD(c.ref_derived_end_raw, 1)
+            ELSE c.ref_derived_end_raw
+        END                                                                          AS ref_derived_end_final,
+        COALESCE(
+            c.val_conf_load_start_date IS NOT NULL
+            AND c.val_conf_load_end_date IS NOT NULL
+            AND c.val_conf_load_start_date = c.ref_derived_start
+            AND c.val_conf_load_end_date IN (
+                c.ref_derived_end_raw,
+                CASE
+                    WHEN c.ref_derived_start >= c.ref_derived_end_raw
+                        THEN DATE_ADD(c.ref_derived_end_raw, 1)
+                    ELSE c.ref_derived_end_raw
+                END
+            ),
+            FALSE
+        )                                                                            AS is_window_match,
+        ROW_NUMBER() OVER (
+            PARTITION BY c.validation_airflow_run_id
+            ORDER BY
+                CASE WHEN c.is_conf_run_id_match THEN 0 ELSE 1 END,
+                CASE
+                    WHEN c.val_conf_load_start_date IS NOT NULL
+                     AND c.val_conf_load_start_date = c.ref_derived_start
+                     AND c.val_conf_load_end_date IN (
+                         c.ref_derived_end_raw,
+                         CASE
+                             WHEN c.ref_derived_start >= c.ref_derived_end_raw
+                                 THEN DATE_ADD(c.ref_derived_end_raw, 1)
+                             ELSE c.ref_derived_end_raw
+                         END
+                     )
+                        THEN 0
+                    ELSE 1
+                END,
+                c.ref_duration_seconds ASC,
+                c.ref_ts_started DESC
+        )                                                                            AS ref_rank
+    FROM reference_prod_candidates AS c
+),
+validation_with_reference AS (
+    SELECT
+        r.validation_airflow_dag_id,
+        r.validation_airflow_run_id,
+        r.prod_airflow_dag_id,
+        r.val_ts_started,
+        r.val_ts_ended,
+        r.val_dt,
+        r.val_state,
+        r.val_conf_load_start_date,
+        r.val_conf_load_end_date,
+        r.reference_prod_airflow_run_id,
+        r.ref_ts_started,
+        r.ref_ts_ended,
+        r.ref_derived_start                                                          AS reference_load_start_date,
+        r.ref_derived_end_final                                                      AS reference_load_end_date,
+        CASE
+            WHEN r.reference_prod_airflow_run_id IS NULL THEN NULL
+            WHEN r.is_ref_window_from_conf THEN 'conf'
+            ELSE 'data_interval'
+        END                                                                          AS window_source,
+        CASE
+            WHEN r.reference_prod_airflow_run_id IS NULL THEN NULL
+            WHEN r.is_conf_run_id_match THEN 'conf_run_id'
+            WHEN r.is_window_match THEN 'conf_window'
+            ELSE 'heuristic'
+        END                                                                          AS reference_match_source
+    FROM reference_prod_ranked AS r
+    WHERE r.ref_rank = 1
+),
+fd_runs AS (
+    SELECT
         airflow_dag_id,
-        REGEXP_LIKE(airflow_dag_id, '__validation$')                                 AS is_validation_side,
-        dt_dag_run_started                                                             AS dt,
+        dt_dag_run_started,
+        ts_logical_run_started,
         total_cost_usd,
         total_wall_clock_seconds,
         weighted_avg_p50_driver_cpu_busy_percent                                     AS drv_cpu_p50,
@@ -37,103 +235,178 @@ WITH scoped_runs AS (
         worker_count,
         primary_dbr_version
     FROM dw_databricks_health.fact_databricks_dag_run
-    WHERE dt_dag_run_started >= DATE('{load_start_date}')
+    WHERE dt_dag_run_started >= DATE_SUB(DATE('{load_start_date}'), 16)
       AND dt_dag_run_started <= DATE('{load_end_date}')
       AND airflow_dag_id LIKE 'bietlejuice.%'
       AND is_job_on_interactive = FALSE
       AND COALESCE(total_cost_usd, 0) > 0
 ),
+val_fd_ranked AS (
+    SELECT
+        v.validation_airflow_run_id,
+        fd.total_cost_usd,
+        fd.total_wall_clock_seconds,
+        fd.drv_cpu_p50,
+        fd.drv_cpu_p95,
+        fd.drv_mem_p95,
+        fd.wrk_cpu_p50,
+        fd.wrk_cpu_p95,
+        fd.wrk_mem_p95,
+        fd.peak_concurrent_workers,
+        fd.is_any_task_failed,
+        fd.is_any_databricks_run_failed,
+        fd.driver_node_type,
+        fd.worker_node_type,
+        fd.worker_count,
+        fd.primary_dbr_version,
+        ROW_NUMBER() OVER (
+            PARTITION BY v.validation_airflow_run_id
+            ORDER BY
+                ABS(
+                    UNIX_TIMESTAMP(fd.ts_logical_run_started)
+                    - UNIX_TIMESTAMP(v.val_ts_started)
+                ),
+                fd.total_cost_usd DESC
+        )                                                                            AS fd_rank
+    FROM validation_with_reference AS v
+    LEFT JOIN fd_runs AS fd
+        ON fd.airflow_dag_id = v.validation_airflow_dag_id
+       AND fd.ts_logical_run_started >= v.val_ts_started - INTERVAL 5 MINUTES
+       AND fd.ts_logical_run_started <= COALESCE(v.val_ts_ended, v.val_ts_started)
+            + INTERVAL 30 MINUTES
+),
+val_fd AS (
+    SELECT *
+    FROM val_fd_ranked
+    WHERE fd_rank = 1
+),
+ref_fd_ranked AS (
+    SELECT
+        v.validation_airflow_run_id,
+        fd.total_cost_usd,
+        fd.total_wall_clock_seconds,
+        fd.drv_cpu_p50,
+        fd.drv_cpu_p95,
+        fd.drv_mem_p95,
+        fd.wrk_cpu_p50,
+        fd.wrk_cpu_p95,
+        fd.wrk_mem_p95,
+        fd.peak_concurrent_workers,
+        fd.is_any_task_failed,
+        fd.is_any_databricks_run_failed,
+        fd.driver_node_type,
+        fd.worker_node_type,
+        fd.worker_count,
+        fd.primary_dbr_version,
+        ROW_NUMBER() OVER (
+            PARTITION BY v.validation_airflow_run_id
+            ORDER BY
+                ABS(
+                    UNIX_TIMESTAMP(fd.ts_logical_run_started)
+                    - UNIX_TIMESTAMP(v.ref_ts_started)
+                ),
+                fd.total_cost_usd DESC
+        )                                                                            AS fd_rank
+    FROM validation_with_reference AS v
+    INNER JOIN fd_runs AS fd
+        ON v.reference_prod_airflow_run_id IS NOT NULL
+       AND fd.airflow_dag_id = v.prod_airflow_dag_id
+       AND fd.ts_logical_run_started >= v.ref_ts_started - INTERVAL 5 MINUTES
+       AND fd.ts_logical_run_started <= COALESCE(v.ref_ts_ended, v.ref_ts_started)
+            + INTERVAL 5 MINUTES
+       AND fd.total_wall_clock_seconds >= 300
+),
+ref_fd AS (
+    SELECT *
+    FROM ref_fd_ranked
+    WHERE fd_rank = 1
+),
 dag_cadence AS (
     SELECT
-        prod_airflow_dag_id,
-        COUNT(DISTINCT dt)                                                           AS cadence_days,
-        COUNT(*)                                                                     AS prod_runs_in_window,
-        ROUND(1440.0 * COUNT(DISTINCT dt) / NULLIF(COUNT(*), 0), 1)                 AS schedule_interval_minutes
-    FROM scoped_runs
-    WHERE NOT is_validation_side
+        CASE
+            WHEN REGEXP_LIKE(airflow_dag_id, '__validation$')
+                THEN REGEXP_REPLACE(airflow_dag_id, '__validation$', '')
+            ELSE airflow_dag_id
+        END                                                                          AS prod_airflow_dag_id,
+        ROUND(1440.0 * COUNT(DISTINCT dt_dag_run_started) / NULLIF(COUNT(*), 0), 1) AS schedule_interval_minutes
+    FROM fd_runs
+    WHERE NOT REGEXP_LIKE(airflow_dag_id, '__validation$')
       AND is_any_task_failed = FALSE
       AND is_any_databricks_run_failed = FALSE
-    GROUP BY prod_airflow_dag_id
-),
-daily_side AS (
-    SELECT
-        prod_airflow_dag_id,
-        dt,
-        is_validation_side,
-        COUNT(*)                                                                     AS run_count,
-        SUM(
-            CASE
-                WHEN is_any_task_failed OR is_any_databricks_run_failed THEN 1
-                ELSE 0
-            END
-        )                                                                            AS failure_count,
-        SUM(
-            CASE
-                WHEN NOT is_any_task_failed
-                 AND NOT is_any_databricks_run_failed THEN 1
-                ELSE 0
-            END
-        )                                                                            AS clean_run_count,
-        ROUND(AVG(total_cost_usd), 6)                                                AS avg_cost_usd,
-        ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.5) / 60.0, 1)           AS wall_p50_min,
-        ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.95) / 60.0, 1)          AS wall_p95_min,
-        ROUND(APPROX_PERCENTILE(drv_cpu_p50, 0.5), 1)                               AS drv_cpu_p50,
-        ROUND(APPROX_PERCENTILE(drv_cpu_p95, 0.95), 1)                              AS drv_cpu_p95,
-        ROUND(APPROX_PERCENTILE(drv_mem_p95, 0.95), 1)                              AS drv_mem_p95,
-        ROUND(APPROX_PERCENTILE(wrk_cpu_p50, 0.5), 1)                               AS wrk_cpu_p50,
-        ROUND(APPROX_PERCENTILE(wrk_cpu_p95, 0.95), 1)                              AS wrk_cpu_p95,
-        ROUND(APPROX_PERCENTILE(wrk_mem_p95, 0.95), 1)                              AS wrk_mem_p95,
-        MAX(peak_concurrent_workers)                                                   AS peak_concurrent_workers,
-        any_value(driver_node_type IGNORE NULLS)                                       AS driver_node_type,
-        any_value(worker_node_type IGNORE NULLS)                                       AS worker_node_type,
-        any_value(worker_count IGNORE NULLS)                                           AS worker_count,
-        any_value(primary_dbr_version IGNORE NULLS)                                    AS dbr_version
-    FROM scoped_runs
-    GROUP BY prod_airflow_dag_id, dt, is_validation_side
+    GROUP BY 1
 ),
 paired AS (
     SELECT
-        prod.prod_airflow_dag_id,
-        prod.dt,
-        prod.run_count                                                               AS prod_run_count,
-        COALESCE(val.run_count, 0)                                                     AS val_run_count,
-        prod.failure_count                                                             AS prod_failure_count,
-        COALESCE(val.failure_count, 0)                                                 AS val_failure_count,
-        COALESCE(val.clean_run_count, 0)                                             AS val_clean_run_count,
-        prod.avg_cost_usd                                                              AS prod_avg_cost_usd,
-        val.avg_cost_usd                                                               AS val_avg_cost_usd,
-        prod.wall_p50_min                                                            AS prod_wall_p50_min,
-        prod.wall_p95_min                                                            AS prod_wall_p95_min,
-        val.wall_p50_min                                                             AS val_wall_p50_min,
-        val.wall_p95_min                                                             AS val_wall_p95_min,
-        prod.drv_cpu_p50                                                             AS prod_drv_cpu_p50,
-        prod.drv_cpu_p95                                                             AS prod_drv_cpu_p95,
-        prod.drv_mem_p95                                                             AS prod_drv_mem_p95,
-        prod.wrk_cpu_p50                                                             AS prod_wrk_cpu_p50,
-        prod.wrk_cpu_p95                                                             AS prod_wrk_cpu_p95,
-        prod.wrk_mem_p95                                                             AS prod_wrk_mem_p95,
-        val.drv_cpu_p50                                                              AS val_drv_cpu_p50,
-        val.drv_cpu_p95                                                              AS val_drv_cpu_p95,
-        val.drv_mem_p95                                                              AS val_drv_mem_p95,
-        val.wrk_cpu_p50                                                              AS val_wrk_cpu_p50,
-        val.wrk_cpu_p95                                                              AS val_wrk_cpu_p95,
-        val.wrk_mem_p95                                                              AS val_wrk_mem_p95,
-        prod.peak_concurrent_workers                                                 AS prod_peak_concurrent_workers,
-        val.peak_concurrent_workers                                                  AS val_peak_concurrent_workers,
-        prod.driver_node_type                                                        AS prod_driver_node_type,
-        prod.worker_node_type                                                        AS prod_worker_node_type,
-        prod.worker_count                                                            AS prod_worker_count,
-        prod.dbr_version                                                             AS prod_dbr_version,
-        val.driver_node_type                                                         AS val_driver_node_type,
-        val.worker_node_type                                                         AS val_worker_node_type,
-        val.worker_count                                                             AS val_worker_count,
-        val.dbr_version                                                              AS val_dbr_version
-    FROM daily_side AS prod
-    LEFT JOIN daily_side AS val
-        ON prod.prod_airflow_dag_id = val.prod_airflow_dag_id
-       AND prod.dt = val.dt
-       AND val.is_validation_side = TRUE
-    WHERE prod.is_validation_side = FALSE
+        v.validation_airflow_run_id,
+        v.validation_airflow_dag_id,
+        v.prod_airflow_dag_id,
+        v.val_ts_started,
+        v.val_ts_ended,
+        v.val_dt,
+        v.val_conf_load_start_date,
+        v.val_conf_load_end_date,
+        v.reference_prod_airflow_run_id,
+        v.ref_ts_started,
+        v.ref_ts_ended,
+        v.reference_load_start_date,
+        v.reference_load_end_date,
+        v.window_source,
+        v.reference_match_source,
+        CASE WHEN v.reference_prod_airflow_run_id IS NOT NULL THEN 1 ELSE 0 END      AS prod_run_count,
+        1                                                                            AS val_run_count,
+        CASE
+            WHEN ref_fd.is_any_task_failed OR ref_fd.is_any_databricks_run_failed
+                THEN 1
+            ELSE 0
+        END                                                                          AS prod_failure_count,
+        CASE
+            WHEN val_fd.is_any_task_failed
+              OR val_fd.is_any_databricks_run_failed
+              OR v.val_state = 'failed'
+                THEN 1
+            ELSE 0
+        END                                                                          AS val_failure_count,
+        CASE
+            WHEN val_fd.validation_airflow_run_id IS NOT NULL
+             AND COALESCE(val_fd.is_any_task_failed, FALSE) = FALSE
+             AND COALESCE(val_fd.is_any_databricks_run_failed, FALSE) = FALSE
+             AND v.val_state = 'success'
+                THEN 1
+            ELSE 0
+        END                                                                          AS val_clean_run_count,
+        ROUND(ref_fd.total_cost_usd, 6)                                              AS prod_avg_cost_usd,
+        ROUND(val_fd.total_cost_usd, 6)                                              AS val_avg_cost_usd,
+        ROUND(ref_fd.total_wall_clock_seconds / 60.0, 1)                             AS prod_wall_p50_min,
+        ROUND(ref_fd.total_wall_clock_seconds / 60.0, 1)                             AS prod_wall_p95_min,
+        ROUND(val_fd.total_wall_clock_seconds / 60.0, 1)                             AS val_wall_p50_min,
+        ROUND(val_fd.total_wall_clock_seconds / 60.0, 1)                             AS val_wall_p95_min,
+        ROUND(ref_fd.drv_cpu_p50, 1)                                                 AS prod_drv_cpu_p50,
+        ROUND(ref_fd.drv_cpu_p95, 1)                                                 AS prod_drv_cpu_p95,
+        ROUND(ref_fd.drv_mem_p95, 1)                                                 AS prod_drv_mem_p95,
+        ROUND(ref_fd.wrk_cpu_p50, 1)                                                 AS prod_wrk_cpu_p50,
+        ROUND(ref_fd.wrk_cpu_p95, 1)                                                 AS prod_wrk_cpu_p95,
+        ROUND(ref_fd.wrk_mem_p95, 1)                                                 AS prod_wrk_mem_p95,
+        ROUND(val_fd.drv_cpu_p50, 1)                                                 AS val_drv_cpu_p50,
+        ROUND(val_fd.drv_cpu_p95, 1)                                                 AS val_drv_cpu_p95,
+        ROUND(val_fd.drv_mem_p95, 1)                                                 AS val_drv_mem_p95,
+        ROUND(val_fd.wrk_cpu_p50, 1)                                                 AS val_wrk_cpu_p50,
+        ROUND(val_fd.wrk_cpu_p95, 1)                                                 AS val_wrk_cpu_p95,
+        ROUND(val_fd.wrk_mem_p95, 1)                                                 AS val_wrk_mem_p95,
+        ref_fd.peak_concurrent_workers                                               AS prod_peak_concurrent_workers,
+        val_fd.peak_concurrent_workers                                               AS val_peak_concurrent_workers,
+        ref_fd.driver_node_type                                                      AS prod_driver_node_type,
+        ref_fd.worker_node_type                                                      AS prod_worker_node_type,
+        ref_fd.worker_count                                                          AS prod_worker_count,
+        ref_fd.primary_dbr_version                                                   AS prod_dbr_version,
+        val_fd.driver_node_type                                                      AS val_driver_node_type,
+        val_fd.worker_node_type                                                      AS val_worker_node_type,
+        val_fd.worker_count                                                          AS val_worker_count,
+        val_fd.primary_dbr_version                                                   AS val_dbr_version
+    FROM validation_with_reference AS v
+    LEFT JOIN val_fd
+        ON v.validation_airflow_run_id = val_fd.validation_airflow_run_id
+    LEFT JOIN ref_fd
+        ON v.validation_airflow_run_id = ref_fd.validation_airflow_run_id
 ),
 scored AS (
     SELECT
@@ -279,7 +552,20 @@ scored AS (
 )
 SELECT
     prod_airflow_dag_id,
-    dt,
+    validation_airflow_run_id,
+    validation_airflow_dag_id,
+    val_ts_started,
+    val_ts_ended,
+    val_dt,
+    reference_prod_airflow_run_id,
+    ref_ts_started,
+    ref_ts_ended,
+    reference_load_start_date,
+    reference_load_end_date,
+    window_source,
+    reference_match_source,
+    val_conf_load_start_date,
+    val_conf_load_end_date,
     schedule_interval_minutes,
     prod_run_count,
     val_run_count,

@@ -1055,7 +1055,11 @@ class TestProdRunResolution:
             ["--from-prod-run", "--no-prod-run-recency-filter"]
         )
         plan = trigger_script._resolve_prod_run_plan(client, _sample_dag(), args)
-        assert plan.conf == EXPECTED_CONF
+        assert plan.conf is not None
+        assert plan.conf["load_start_date"] == EXPECTED_CONF["load_start_date"]
+        assert plan.conf["load_end_date"] == EXPECTED_CONF["load_end_date"]
+        assert plan.conf["reference_prod_dag_run_id"] == "old"
+        assert plan.conf["window_source"] == "conf"
 
 
 class TestDryRunTable:
@@ -1131,9 +1135,12 @@ class TestTriggerAndMonitorFailureHandling:
                     log_tail_lines=20,
                 )
             )
-            for _ in range(50):
+            for _ in range(200):
                 await asyncio.sleep(0.01)
-                if log_fetch_started.is_set():
+                if (
+                    log_fetch_started.is_set()
+                    and client.trigger_dag_run.call_count >= 3
+                ):
                     break
             assert log_fetch_started.is_set()
             assert client.trigger_dag_run.call_count == 3

@@ -200,11 +200,15 @@ See `docs/platform/cluster_rightsizing_feedback_loop_plan.md` for the design.
 
 - **Outcomes table**: the daily platform DAG `rightsizing_outcomes`
   (`dags/platform/rightsizing_outcomes/`) writes
-  `enrich_rightsizing_outcomes` — one row per (prod dag, day) comparing prod
-  vs `__validation` twins, with `is_promote_eligible`, `outcome`, and
+  `enrich_rightsizing_outcomes` — one row per validation Airflow run, paired
+  with the reference prod run selected by `trigger_cluster_validation_dags.py`
+  (`--from-prod-run`). `scripts/promote_rightsizing_validations.py` picks the
+  latest row per DAG by `val_ts_started` (the table has no latest flag; `reference_match_source` records how each run was paired: `conf_run_id`, `conf_window`, or `heuristic`). Columns include
+  `is_promote_eligible`, `outcome`, and
   `promotion_action` precomputed. Promotion bar: ≥1 clean validation run,
   cost below prod, wall ≤ 1.5× prod p50 (or the cadence limit for ≤2h
   schedules); `mem_p95 > 82` holds for one more run.
+  Deploy note: this PR changes the table grain and partition scheme (dt → val_dt); the existing datalake_rightsizing_outcomes.enrich_rightsizing_outcomes table must be dropped/recreated before the first post-merge run (coordinate with the Data Life Cycle owner — exact DDL depends on the managed-vs-external table setup; unverified — confirm first).
 - **Promotion gate**: export the outcomes table to CSV (Trino), then
   `uv run --python 3.12 python scripts/promote_rightsizing_validations.py
   --outcomes-csv <csv> --report-out <md>` — promotes eligible specs into the

@@ -78,3 +78,6 @@ tars_track_record.jsonl
 # Legacy contracts directory
 /contracts/
 .tars/
+
+# Rightsizing validation trigger runtime ledger (appended per trigger; never committed)
+scripts/rightsizing_validation_trigger_ledger.jsonl
