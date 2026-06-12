@@ -84,10 +84,10 @@ daily_side AS (
         ROUND(APPROX_PERCENTILE(wrk_cpu_p95, 0.95), 1)                              AS wrk_cpu_p95,
         ROUND(APPROX_PERCENTILE(wrk_mem_p95, 0.95), 1)                              AS wrk_mem_p95,
         MAX(peak_concurrent_workers)                                                   AS peak_concurrent_workers,
-        ARBITRARY(driver_node_type)                                                    AS driver_node_type,
-        ARBITRARY(worker_node_type)                                                    AS worker_node_type,
-        ARBITRARY(worker_count)                                                        AS worker_count,
-        ARBITRARY(primary_dbr_version)                                                 AS dbr_version
+        any_value(driver_node_type IGNORE NULLS)                                       AS driver_node_type,
+        any_value(worker_node_type IGNORE NULLS)                                       AS worker_node_type,
+        any_value(worker_count IGNORE NULLS)                                           AS worker_count,
+        any_value(primary_dbr_version IGNORE NULLS)                                    AS dbr_version
     FROM scoped_runs
     GROUP BY prod_airflow_dag_id, dt, is_validation_side
 ),
