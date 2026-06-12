@@ -14,13 +14,21 @@ Execution model after the multi-package restructure:
   but `bietlejuice.base.core_models` lives under `packages/bietlejuice-runtime/`, which is
   NOT a dependency of `bietlejuice-compiler`. Running pytest with `sys.executable` would
   therefore fail to import the source under coverage.
-- Solution: spawn pytest via `uv run --project packages/bietlejuice-runtime` so the
-  runtime venv (which does have `bietlejuice.base.core_models`, `pyspark`, `delta-spark`,
-  and `pytest-cov`) drives the test run. We deliberately do NOT pass `--no-sync` because
-  CI runs from a bare `python:3.12-bookworm` image with no pre-existing runtime venv;
-  uv must materialize one on first invocation. We keep `cwd=REPO_ROOT` so `dags/core/`
-  and the runtime test paths resolve from the repo root, matching how
-  `_find_project_root()` in the test files walks up to put the repo root on `sys.path`.
+- Solution: spawn pytest via `uv run --project packages/bietlejuice-runtime/envs/dbr-16-4`
+  so the runtime DBR env (which has `bietlejuice.base.core_models`, `pyspark`,
+  `delta-spark`, and the dev-group `pytest-cov`) drives the test run. We keep
+  `cwd=REPO_ROOT` so `dags/core/` and the runtime test paths resolve from the repo root,
+  matching how `_find_project_root()` in the test files walks up to put the repo root on
+  `sys.path`.
+- Env targeting: the CI image sets a global `UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/
+  venvs/workspace` (see `.container/Dockerfile`). That value takes precedence over the
+  `--project` default, so a plain `uv run` here would run pytest in the workspace venv —
+  whose dev group is only ruff/ty/sqlfluff (no `pytest-cov`), since `pytest-cov` lives in
+  the runtime DBR env that is NOT a workspace member. The result is the misleading
+  "pytest-cov plugin is not available" error. We therefore override `UV_PROJECT_ENVIRONMENT`
+  to the baked DBR 16.4 venv when it exists, mirroring the Makefile's `DBR_UV_ENV` (the
+  same override every other pytest target uses). Locally the baked path is absent and uv
+  falls back to `envs/dbr-16-4/.venv`.
 """
 
 import argparse
@@ -34,6 +42,12 @@ from typing import List, Tuple
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
 RUNTIME_PROJECT = REPO_ROOT / "packages" / "bietlejuice-runtime" / "envs" / "dbr-16-4"
+
+# CI/devcontainer images bake the DBR 16.4 venv here and export a global
+# UV_PROJECT_ENVIRONMENT pointing at the workspace venv. We override that env for
+# the spawned pytest so it runs in the DBR 16.4 venv (which carries the dev-group
+# pytest-cov) instead of the workspace venv. Mirrors the Makefile's DBR_UV_ENV.
+BAKED_DBR_VENV = Path("/opt/bietlejuice/venvs/dbr-16-4")
 
 
 # Core model source paths to measure coverage for (directory paths relative to
@@ -58,14 +72,7 @@ DEFAULT_THRESHOLD = 80.0
 
 
 def _runtime_pytest_cmd(extra_args: List[str]) -> List[str]:
-    """Build a `uv run` command that drives pytest from the runtime project venv.
-
-    Note: `--no-sync` is intentionally NOT passed. CI runs this from a bare
-    `python:3.12-bookworm` image with no pre-existing runtime venv, so uv must
-    materialize one (installing pyspark, delta-spark, etc.) before pytest can
-    collect tests. Subsequent invocations within the same process are no-ops
-    once the venv is hydrated.
-    """
+    """Build a `uv run` command that drives pytest from the runtime DBR env."""
     return [
         "uv",
         "run",
@@ -76,6 +83,22 @@ def _runtime_pytest_cmd(extra_args: List[str]) -> List[str]:
         "pytest",
         *extra_args,
     ]
+
+
+def _runtime_pytest_env() -> dict:
+    """Build the environment for the spawned pytest subprocess.
+
+    Mirrors the Makefile's ``DBR_UV_ENV``: when the baked DBR 16.4 venv exists
+    (CI / devcontainer images), set ``UV_PROJECT_ENVIRONMENT`` to it so ``uv run``
+    targets that fully-synced env (which carries the dev-group ``pytest-cov``)
+    instead of the inherited workspace venv from the image's global
+    ``UV_PROJECT_ENVIRONMENT``. Locally the baked path is absent and uv falls
+    back to ``envs/dbr-16-4/.venv``.
+    """
+    env = os.environ.copy()
+    if (BAKED_DBR_VENV / "bin" / "python3").exists():
+        env["UV_PROJECT_ENVIRONMENT"] = str(BAKED_DBR_VENV)
+    return env
 
 
 def parse_args():
@@ -125,6 +148,7 @@ def check_pytest_cov_available() -> bool:
             text=True,
             timeout=30,
             cwd=REPO_ROOT,
+            env=_runtime_pytest_env(),
         )
         return "--cov" in result.stdout
     except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError):
@@ -190,6 +214,7 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
             capture_output=True,
             text=True,
             cwd=REPO_ROOT,
+            env=_runtime_pytest_env(),
         )
         output = result.stdout + result.stderr
 
