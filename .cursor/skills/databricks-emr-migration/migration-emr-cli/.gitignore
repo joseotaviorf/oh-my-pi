@@ -1,0 +1,8 @@
+dist/
+.pex-root/
+venv
+.venv
+.env
+*.csv
+*.pkl
+.DS_Store

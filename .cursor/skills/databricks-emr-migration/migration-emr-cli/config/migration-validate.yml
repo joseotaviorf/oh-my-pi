@@ -1,0 +1,79 @@
+# EMR settings for DAG migration validation (persistent cluster + submit-step).
+# Use: EMR_SETTINGS_FILE=.cursor/skills/databricks-emr-migration/migration-emr-cli/config/migration-validate.yml
+
+region: us-east-1
+release_label: emr-7.12.0
+subnet_id: subnet-05cb5b20def7300c3
+job_flow_role: emr-prod
+service_role: arn:aws:iam::206390561754:role/EMR_DefaultRole_V2
+poll_sec: 15.0
+action_on_failure: CONTINUE
+deploy_mode: client
+dump_logs_base_uri: s3://artifacts.s3.data.quintoandar.com.br/emr/logs/
+log_uri: s3://artifacts.s3.data.quintoandar.com.br/emr/logs/cli/
+staging_uri: s3://artifacts.s3.data.quintoandar.com.br/emr/staging/cli/
+visible_to_all_users: true
+idle_timeout_sec: 7200
+
+applications:
+  - Hadoop
+  - Hive
+  - Spark
+
+configurations:
+  - Classification: iceberg-defaults
+    Properties:
+      iceberg.enabled: "true"
+  - Classification: delta-defaults
+    Properties:
+      delta.enabled: "true"
+  - Classification: hive-site
+    Properties:
+      hive.metastore.client.factory.class: com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory
+  - Classification: spark-hive-site
+    Properties:
+      hive.metastore.client.factory.class: com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory
+  - Classification: yarn-site
+    Properties:
+      yarn.resourcemanager.scheduler.enable-preemption: "true"
+      yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
+      yarn.scheduler.capacity.resource-calculator: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
+      yarn.nodemanager.vmem-check-enabled: "false"
+      yarn.nodemanager.pmem-check-enabled: "false"
+  - Classification: capacity-scheduler
+    Properties:
+      yarn.scheduler.capacity.root.queues: "default"
+      yarn.scheduler.capacity.root.default.capacity: "100"
+      yarn.scheduler.capacity.root.default.maximum-capacity: "100"
+      yarn.scheduler.capacity.root.default.ordering-policy: fair
+      yarn.scheduler.capacity.root.default.maximum-am-resource-percent: "0.2"
+      yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
+      yarn.scheduler.capacity.maximum-applications: "2000"
+      yarn.scheduler.capacity.minimum-user-limit-percent: "10"
+  - Classification: spark-defaults
+    Properties:
+      spark.sql.catalogImplementation: hive
+      spark.dynamicAllocation.enabled: "true"
+      spark.shuffle.service.enabled: "true"
+      spark.dynamicAllocation.minExecutors: "1"
+      spark.dynamicAllocation.maxExecutors: "12"
+      spark.executor.memory: 8g
+      spark.executor.cores: "2"
+      spark.executor.memoryOverhead: 2048m
+      spark.driver.memory: 6g
+      spark.driver.memoryOverhead: 2048m
+      spark.yarn.am.memory: 6g
+      spark.yarn.am.cores: "2"
+
+# Validation cluster sizing — see deploy_mode: client above.
+# EMR step + client mode (AWS Release Guide): driver on the primary (master) node where
+# command-runner runs spark-submit; YARN Application Master runs on a core node, not primary.
+# Production DAG submits (packages/emr-cli/config/prod.yml) use deploy_mode: cluster — driver
+# then runs inside the AM on a core/task node; sizing master there matters less.
+# - 3 ON_DEMAND cores ≈ enrich DAG num_workers: 3; executors + cluster-mode driver land here.
+# - Primary m7g.2xlarge sized for client-mode driver memory on DESCRIBE+COUNT validation steps.
+# Existing clusters keep old instance types until terminated; pass --new-emr-session to apply.
+master_instance_type: m7g.2xlarge
+core_instance_type: m7g.2xlarge
+core_instance_count: 3
+use_spot: false

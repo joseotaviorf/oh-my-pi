@@ -1,0 +1,11 @@
+{
+  "resultType": "table",
+  "schema": [
+    {"name": "sk_offer", "type": "\"bigint\""},
+    {"name": "sk_client", "type": "\"bigint\""}
+  ],
+  "data": [
+    ["101", "202"],
+    ["103", "204"]
+  ]
+}

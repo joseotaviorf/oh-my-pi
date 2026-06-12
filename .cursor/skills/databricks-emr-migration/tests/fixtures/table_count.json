@@ -1,0 +1,9 @@
+{
+  "resultType": "table",
+  "schema": [
+    {"name": "cnt", "type": "\"bigint\""}
+  ],
+  "data": [
+    ["1204431"]
+  ]
+}

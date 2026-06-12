@@ -1,0 +1,13 @@
+baseline/**
+reports/**
+watchers/**
+*.log
+_*.py
+_*.sh
+validation_results.json
+.session.yml
+migration-emr-cli/dist/
+migration-emr-cli/.venv/
+migration-emr-cli/.pex-root/
+migration-emr-cli/.pytest_cache/
+migration-emr-cli/.ruff_cache/

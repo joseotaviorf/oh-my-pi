@@ -1,0 +1,4 @@
+{
+  "resultType": "text",
+  "data": "col_name\tdata_type\tcomment\nsk_offer\tbigint\tnull\nsk_client\tbigint\tnull"
+}
