@@ -8,3 +8,10 @@ cluster:
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_m_general_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      data_security_mode: USER_ISOLATION
+      driver_node_type_id: r6g.2xlarge

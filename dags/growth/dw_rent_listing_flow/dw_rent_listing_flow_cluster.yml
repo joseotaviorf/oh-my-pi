@@ -12,3 +12,15 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      num_workers: 3
+      driver_node_type_id: r6g.large
