@@ -988,6 +988,25 @@ validate-source-layer-policy-all-core:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a --core-only
 
+.PHONY: validate-databricks-sql-constructs
+## Fail if new/changed SQL files introduce Databricks-only constructs incompatible with EMR Spark 3.5
+validate-databricks-sql-constructs:
+	@echo ""
+	@echo "Validating SQL for Databricks-specific constructs (EMR compatibility)"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_databricks_sql_constructs.py -b "$(CI_COMMIT_BRANCH)"
+
+.PHONY: validate-databricks-sql-constructs-all
+## Scan all .sql files under dags/ for Databricks-only constructs (local audit)
+validate-databricks-sql-constructs-all:
+	@echo ""
+	@echo "Scanning all SQL files for Databricks-specific constructs"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_databricks_sql_constructs.py -a
+
 MAKE_TARGET ?=
 MAKE_EXTRA_ARGS ?=
 .PHONY: run-domain-validation
