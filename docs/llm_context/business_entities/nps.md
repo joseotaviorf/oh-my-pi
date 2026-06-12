@@ -16,6 +16,10 @@ NPS campaigns target specific customer segments at specific moments in the custo
 
 Each NPS answer may include a **justification** — free-text feedback explaining the score.
 
+## Related Metric Entities
+
+- NPS FR
+
 ## Synonyms
 
 - **NPS**, **Net Promoter Score**, **nota NPS** → `nps`
@@ -218,3 +222,7 @@ LEFT JOIN dw_customer_satisfaction.dim_nps_campaign AS dnc
 WHERE dna.score_category = 'detractor'
     AND dna.ts_answered >= DATE '2025-01-01'
 ```
+
+## Superset Golden Assets
+
+- **NPS For Rent Post Contract [Perf.] [Support and Services]** — reference dataset to use as the base for NPS data manipulation in Superset.

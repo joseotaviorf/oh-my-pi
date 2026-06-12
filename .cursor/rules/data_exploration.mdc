@@ -71,21 +71,15 @@ Always prefer the highest available layer:
 | 1st | **DW (Data Warehouse)** | `dw_*` | **Default choice.** Curated, aggregated, ready for analysis. Always start here. |
 | 2nd | **Enrich** | `datalake_*` (no `_clean` suffix) | When DW doesn't have the column or granularity you need. |
 | 3rd | **Clean** | `datalake_*_clean` | Last resort. Cleaned source data, very granular, no business logic. |
-| 4th | **Metric** | `metric_*` | Pre-aggregated KPIs. Use only if specifically needed — may contain opinionated logic. |
+| 4th | **Metric schema** (`metric_*`) | `metric_*` | Pre-aggregated KPIs. Use only if specifically needed — may contain opinionated logic. |
 | Never | **Raw + Core** | `*_raw`, `core_*` | Never suggest these to users. |
+
+> **Do not confuse the `metric_*` DW schema with metric entities.** The `metric_*` row above is a **data layer** (a schema prefix). **Metric entities** (`docs/llm_context/metric_entities/*.md`) are a **documentation/context layer** that defines official metrics; they typically read from DW/Enrich tables and GSheets (`*_gsheets_clean`), not from the `metric_*` schema. See `docs/llm_context/intro.md` for how to find and choose entity context.
 
 **Decision tree:**
 1. Does the entity file list a DW table that answers the question? → Use it.
 2. Need deeper granularity or a column not in DW? → Check Enrich tables in the entity file.
 3. Still not found? → Proceed with best judgment based on available schema and context.
-
----
-
-## Column Verification
-
-Entity docs point you to the right tables, but they do not list every column. When you need more detail about a table recommended by an entity doc — available columns, types, or descriptions — **search the repository for the SQL and metadata files that define it**.
-
-Every table in this repo has a `.sql` file under `dags/**/queries/` and a matching `.yml` under `dags/**/metadata/`. Search for the table name (e.g., `Grep` for the table name in `dags/`), then `Read` the SQL to see available columns and the metadata YAML for column descriptions. This takes seconds and should be your default reflex before writing complex JOINs or guessing column names.
 
 ---
 
@@ -118,11 +112,15 @@ When a foreign key is VARCHAR in one table and numeric in another, always use `C
 
 ---
 
-## Entity File Routing
+## Finding Context
 
-The `docs/llm_context/business_entities/` folder contains one markdown file per business entity with detailed domain context (tables, metrics, JOINs, dos/don'ts, golden queries).
+The rules for **how to find data context are owned by `docs/llm_context/intro.md`** — this rule does **not** redefine them. When a question may relate to known data, **read `docs/llm_context/intro.md` first**: it defines the context-search order (DataHub first, then `business_entities/` and `metric_entities/` files as needed) and the difference between the two entity layers, and it holds the full entity index. Follow that guidance to decide what to load.
 
-**Always check entity files** when the user's question may relate to a known entity. Read `docs/llm_context/intro.md` for the full entity index and file structure. When in doubt, check — it is better to load an entity file than to miss relevant context.
+### Fallback — verify columns directly in the repo
+
+When that route isn't enough — there is **no entity file** for the question, or an entity doc points you to a table but doesn't list the specific columns, types, or descriptions you need — fall back to **searching the repository for the SQL and metadata files that define the table**.
+
+Every table in this repo has a `.sql` file under `dags/**/queries/` and a matching `.yml` under `dags/**/metadata/`. Search for the table name (e.g., `Grep` for the table name in `dags/`), then `Read` the SQL to see available columns and the metadata YAML for column descriptions. This takes seconds and should be your default reflex before writing complex JOINs or guessing column names.
 
 ---
 
@@ -130,7 +128,7 @@ The `docs/llm_context/business_entities/` folder contains one markdown file per 
 
 When answering user questions about data:
 
-1. **Identify the entity** — map the user's terms to the correct entity using the Synonyms section in entity files
+1. **Find context** — follow `docs/llm_context/intro.md` (DataHub first, then business/metric entity files as needed) to identify the relevant entity and map the user's terms via its Synonyms.
 2. **Review entity rules** — check Dos and Don'ts for mandatory patterns before producing any SQL
 3. **Pick the right table** — follow the layer priority above and the entity's Tables section
 4. **Write Trino SQL** — all queries must use Trino syntax; convert Databricks constructs automatically

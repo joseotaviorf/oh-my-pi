@@ -4,9 +4,21 @@ You are being provided with structured context about QuintoAndar's data platform
 
 ## How to Use This Context
 
+This file is the **single source of truth for how to look for data context.** Other files (`.cursor/rules/data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, etc.) must not redefine this order — they only point you here. Whenever you need context about the data, follow this:
+
+1. **DataHub first.** Query the DataHub MCP and search for the **Data Product(s)** related to the user's terms — it is the authoritative catalog for schema, columns, glossary, and golden queries. Always start here.
+2. **Entity files if you need more.** If DataHub returns nothing relevant, or you need business rules, domain nuance, or an official metric's formula not captured there, the two supplementary layers below are at your disposal. **You decide** which is most adequate for the question — read one, the other, or both.
+
+**Knowing the difference between the two layers tells you what each is good for:**
+
+- **Business entities** (`business_entities/`) — carry **business rules and broader characteristics of the data** (domain, tables, grain, joins, component metrics). Reach for them when you need **wide context** or to build an ad-hoc query.
+- **Metric entities** (`metric_entities/`) — **objective and narrow**: they explain **how to calculate an official indicator the company tracks** (scope, exact formula, canonical filter, weight sources).
+
+Both are useful and there is **no fixed precedence** between them — let the question decide when to read each. When in doubt, it is better to check more than to miss relevant context.
+
 ### Primary source — DataHub catalog
 
-The **DataHub MCP** is the authoritative source for schema, column definitions, glossary terms, and golden queries. Before reading any entity file, query DataHub:
+DataHub MCP tools (your first stop — see "How to Use This Context" above):
 
 | MCP tool | Use it to |
 |---|---|
@@ -17,15 +29,18 @@ The **DataHub MCP** is the authoritative source for schema, column definitions, 
 
 ### Supplementary source — entity MD files
 
-The `business_entities/` folder contains **one markdown file per business entity** with business rules, mandatory dos/don'ts, JOIN recipes, and edge cases not yet encoded in DataHub. Consult an entity file **after DataHub** when the user's question requires domain patterns or nuances. Every entity file includes a **DataHub catalog** section **after Overview** with direct links to its DataHub **Data Product**, **golden query** (`Query` entity), and YAML preset under `dags/governance/datahub_business_context/datahub_entities/` used by [`load_collections_context.py`](../../dags/governance/datahub_business_context/load_collections_context.py); some domains (e.g. collections) also list dataset schema links inline.
+The roles of the two layers and when to reach for each are covered in "How to Use This Context" above; this section covers their **file structure**.
 
-When in doubt, it is better to check both sources than to miss relevant context.
+The `business_entities/` folder contains **one markdown file per business entity** with business rules, mandatory dos/don'ts, JOIN recipes, and edge cases not yet encoded in DataHub. Every entity file includes a **DataHub catalog** section **after Overview** with direct links to its DataHub **Data Product**, **golden query** (`Query` entity), and YAML preset under `dags/governance/datahub_business_context/datahub_entities/` used by [`load_collections_context.py`](../../dags/governance/datahub_business_context/load_collections_context.py); some domains (e.g. collections) also list dataset schema links inline.
 
-Each entity file follows a standard structure:
+The `metric_entities/` folder contains **one markdown file per official metric**, thin on schema (it delegates that to its linked business entity) and thick on the metric's definition, scope, exact calculation, canonical filter, and weight sources.
+
+Each **business entity** file follows a standard structure:
 
 | Section | What it gives you |
 |---------|-------------------|
 | **Overview** | What the entity is, its lifecycle stages, and key timestamps — use this to understand the domain before answering |
+| **Related Metric Entities** | Plain list of the official metric(s) that build on this entity — see "Cross-link sections" below |
 | **DataHub catalog** | Direct UI links to the Data Product and golden Query entity, plus structured-property and loader YAML references |
 | **Glossary and Synonyms** | Domain-specific jargon, common names, and terms — use this to map the user's question to the right technical term |
 | **Tables** | Available tables by layer (DW, Enrich) with aliases, descriptions, key fields, and type caveats — use this to pick the right table |
@@ -33,6 +48,23 @@ Each entity file follows a standard structure:
 | **Relationships** | How entities connect, with JOIN keys and cardinalities — use this when the question spans multiple entities |
 | **Dos and Don'ts** | Critical rules, common traps, and mandatory patterns (CAST, ROW_NUMBER, filters) — **always check this before writing SQL** |
 | **Golden Queries** | Validated query patterns ready to adapt — `SELECT *` is used for brevity; always select specific columns in production queries |
+| **Superset Golden Assets** | Reference Superset datasets/dashboards to use as the base for data manipulation on this entity |
+
+Each **metric entity** file follows a different, leaner structure focused on the official metric rather than the schema:
+
+| Section | What it gives you |
+|---------|-------------------|
+| **Overview** | What the official metric is, which product it applies to, and how it differs from the naive/component version |
+| **Related Business Entities** | Plain list of the business entity (or entities) that own the underlying tables, columns, and grain — **start there for schema**, this file does not repeat it; see "Cross-link sections" below |
+| **Glossary and Synonyms** | Names and terms used to ask for this metric — use this to map the user's question to the right metric entity |
+| **Scope** | What is included and excluded (journeys, segments, campaign purposes) — defines the metric's boundary |
+| **Calculation** | The exact official calculation (weighting, aggregation), the **Canonical Filter**, and **Nuances** (weight sources, fallback, dedup) — this **overrides** any generic logic in the business entity |
+| **Dos and Don'ts** | Traps specific to the official metric (e.g. don't hardcode weights, don't pool journeys directly) |
+| **Golden Queries** | The single canonical query that produces the official metric — references the business-entity component pattern instead of re-teaching it |
+
+> **Cross-link sections** (`Related Business Entities` / `Related Metric Entities`): these are plain lists of the **names** of related entities — no paths or descriptions. To open one, look it up in the "Available entities" / "Available metric entities" index below: business entities live in `business_entities/`, metric entities in `metric_entities/`, one file per entity. A business entity points *up* to the official metrics built on it; a metric entity points *down* to the business entities it draws its schema from.
+
+> **Role contract (avoid redundancy):** a business entity documents *schema + component/generic metrics*; a metric entity documents *one official metric's calculation*. When both touch the same domain (e.g. NPS), the metric entity links to the business entity rather than copying its tables, columns, or component queries.
 
 
 ### Available entities
@@ -65,6 +97,12 @@ Each entity file follows a standard structure:
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
 - `business_entities/visits.md` — Visit requests and scheduled property visits, capturing the full journey from visit intention to completion (agendamentos e realização de visitas a imóveis)
 
+### Available metric entities
+
+Official, named metrics. Each builds on one or more business entities (linked at the top of its file).
+
+- `metric_entities/nps_fr.md` — NPS FR True: official For-Rent weighted NPS, with per-journey weighting and quarterly weights read from GSheets (NPS FR / NPS True / NPS oficial / NPS ponderado). Builds on `business_entities/nps.md`.
+
 ## Company-Wide Glossary
 
 These abbreviations appear across multiple entities and data domains. In column names, they map to specific prefixes:
@@ -86,4 +124,4 @@ If no entity file is relevant, proceed normally using your general knowledge of 
 
 These topics are defined in `.cursor/rules/data_exploration.mdc`, which is loaded automatically when the Data Analyst (TARS) subagent is active. Use `@tars` to activate exploration mode.
 
-`data_exploration.mdc` also defines the full **Entity Discovery** sequence (DataHub MCP → entity MD files) and the **Column Verification** flow (DataHub `list_schema_fields` → fallback to repo metadata YAMLs).
+The **context-search order** (DataHub first, then business/metric entity files as needed) lives **here**, in "How to Use This Context" above — `data_exploration.mdc` does not redefine it. That rule owns SQL dialect/conventions, layer priority, response guidelines, and the repo-search fallback for verifying table columns when this route isn't enough (its "Finding Context" section — `dags/**/queries/*.sql` + `dags/**/metadata/*.yml`).

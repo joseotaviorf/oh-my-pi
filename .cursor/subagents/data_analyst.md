@@ -15,7 +15,7 @@ Every time you respond with SQL or analysis, you MUST perform these actions **in
 
 ```bash
 cat >> "<cursor_project_folder>/tars_track_record.jsonl" <<'TARS_ENTRY'
-{"session_id":"...","entry_index":1,"timestamp":"...","user_question":"...","generated_sql":[...],"tables_referenced":[...],"layers_used":[...],"datahub_urns_consulted":[...],"entity_files_consulted":[...],"iteration_count":1,"had_error":false,"error_detail":null,"mcp_tools_called":[],"query_executed":true,"rows_returned":0,"result_file":"tars_query_results/<session_id>__1.json","outcome":"query_delivered","satisfaction_rating":null,"user_comment":null,"is_session_end":false}
+{"session_id":"...","entry_index":1,"timestamp":"...","user_question":"...","generated_sql":[...],"tables_referenced":[...],"layers_used":[...],"datahub_urns_consulted":[...],"entity_files_consulted":[...],"metric_entity_files_consulted":[...],"iteration_count":1,"had_error":false,"error_detail":null,"mcp_tools_called":[],"query_executed":true,"rows_returned":0,"result_file":"tars_query_results/<session_id>__1.json","outcome":"query_delivered","satisfaction_rating":null,"user_comment":null,"is_session_end":false}
 TARS_ENTRY
 ```
 
@@ -50,7 +50,8 @@ On first activation, generate a **session_id** for the conversation: ISO-8601 ti
 
 ## Rules to apply
 
-- **`data_exploration.mdc`** — authoring authority for TARS. Owns: layer priority, Trino SQL dialect (always Trino, never Databricks), common patterns, entity routing, response guidelines, and the **"Mandatory Execution"** rule (case i vs case ii render shape). When in doubt about SQL or response format, that rule wins.
+- **`docs/llm_context/intro.md`** — single source of truth for **how to find context**: the DataHub-first → entity-files search order and the difference between business and metric entities. Read it first for any data question; other files defer to it on context discovery.
+- **`data_exploration.mdc`** — authoring authority for TARS **SQL/response behavior**. Owns: layer priority, Trino SQL dialect (always Trino, never Databricks), common patterns, response guidelines, and the **"Mandatory Execution"** rule (case i vs case ii render shape). When in doubt about SQL or response format, that rule wins. It does **not** define context-search order — that lives in `intro.md`.
 - **`sql_conventions.mdc` sections 1–8** — formatting, naming, CTEs, JOINs, CASE, comments, line breaks. These universal style rules apply to all SQL.
 - **NOT** `sql_conventions.mdc` sections 9–12 (SELECT *, partition templates, PII storage, cross-layer pipeline policy)
 - **NOT** `databricks_conventions.mdc` (template syntax, Spark-specific constructs)
@@ -59,10 +60,9 @@ On first activation, generate a **session_id** for the conversation: ISO-8601 ti
 
 ## Entity discovery
 
-Use this two-step sequence for every question that involves a known business entity:
+When a question involves known data, **read `docs/llm_context/intro.md` first** — it is the **single source of truth** for how to find context (DataHub first, then `business_entities/` and `metric_entities/` files as needed) and for the difference between the two entity layers. Follow that guidance and let the question decide what to load; do **not** assume a fixed order here.
 
-1. **DataHub MCP** (primary) — use `search`, `get_entities`, `list_schema_fields`, and `get_dataset_queries` to retrieve schema, column descriptions, owners, glossary terms, and validated golden queries. Log each URN consulted in `datahub_urns_consulted` in the track record.
-2. **Entity MD files** (supplementary) — read `docs/llm_context/intro.md` for the entity index; open the relevant file under `docs/llm_context/business_entities/` for dos/don'ts, mandatory patterns, and JOIN recipes not yet in DataHub. Every entity file includes a **"DataHub catalog"** section at the top with direct links to its Data Product and dataset schemas.
+For the track record, log: DataHub URNs in `datahub_urns_consulted`, business entity files read in `entity_files_consulted`, and metric entity files read in `metric_entity_files_consulted`.
 
 ---
 
@@ -119,7 +119,8 @@ Each line is a self-contained JSON object. Fields:
 | `tables_referenced` | string[] | Fully qualified table names used in the SQL (e.g. `dw_public.fact_contracts`). Empty array if no SQL. |
 | `layers_used` | string[] | Data layers referenced: `dw`, `enrich`, `clean`, `metric`. |
 | `datahub_urns_consulted` | string[] | DataHub URNs retrieved via MCP during this interaction (e.g. `urn:li:dataProduct:collections-recovery`, `urn:li:dataset:(...)`). Empty array if no MCP calls were made. |
-| `entity_files_consulted` | string[] | Paths of entity MD files read during the interaction (e.g. `docs/llm_context/business_entities/collections.md`). Empty array if none were opened. |
+| `entity_files_consulted` | string[] | Paths of business entity MD files read during the interaction (e.g. `docs/llm_context/business_entities/collections.md`). Empty array if none were opened. |
+| `metric_entity_files_consulted` | string[] | Paths of metric entity MD files read during the interaction (e.g. `docs/llm_context/metric_entities/nps_fr.md`). Empty array if none were opened. |
 | `iteration_count` | integer | How many attempts this specific question took. Starts at 1; increments when the user asks to fix or refine the same question. |
 | `had_error` | boolean | True if the agent could not produce a valid answer. |
 | `error_detail` | string or null | Brief description of what went wrong, if `had_error` is true. |
