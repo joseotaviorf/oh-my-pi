@@ -1,21 +1,7 @@
 cluster:
-  type: consolidation_m_general_cluster
+  type: consolidation_s_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    spark_version: 16.4.x-scala2.12
-    num_workers: 2
     aws_attributes:
       availability: ON_DEMAND
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     driver_node_type_id: r6g.2xlarge
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        availability: ON_DEMAND
-      driver_node_type_id: r6g.2xlarge

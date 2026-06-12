@@ -2,24 +2,8 @@ cluster:
   type: consolidation_m_general_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    driver_node_type_id: r6gd.xlarge
-    node_type_id: m6gd.2xlarge
-    num_workers: 2
-    runtime_engine: PHOTON
     aws_attributes:
       availability: ON_DEMAND
-    spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: USER_ISOLATION
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_m_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        availability: ON_DEMAND
-      data_security_mode: USER_ISOLATION
-      runtime_engine: PHOTON
-      driver_node_type_id: r6g.xlarge
+    runtime_engine: PHOTON
+    driver_node_type_id: r6g.xlarge

@@ -1,30 +1,9 @@
 cluster:
-  type: consolidation_s_memory_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    autotermination_minutes: 20
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
     aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
-      availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    driver_node_type_id: m6g.2xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
-      num_workers: 3
-      driver_node_type_id: r6g.xlarge
-  allow_custom_spark_job: true
+    num_workers: 3
+    driver_node_type_id: r6g.xlarge

@@ -1,27 +1,10 @@
 cluster:
-  type: consolidation_s_memory_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    node_type_id: r6gd.xlarge
-    driver_node_type_id: r6gd.large
-    runtime_engine: PHOTON
     aws_attributes:
       ebs_volume_size: 200
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      runtime_engine: PHOTON
+    runtime_engine: PHOTON

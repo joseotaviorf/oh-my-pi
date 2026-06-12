@@ -835,6 +835,40 @@ class TestNormalizeDatabricksClusterTopology:
         assert custom["driver_node_type_id"] == "r6g.4xlarge"
         assert custom["node_type_id"] == "r6g.4xlarge"
 
+    def test_photon_does_not_upgrade_explicit_graviton_to_nvme(self):
+        cluster_args = {
+            "type": "consolidation_m_memory_cluster",
+            "custom_configurations": {
+                "runtime_engine": "PHOTON",
+                "driver_node_type_id": "r6g.xlarge",
+                "node_type_id": "r6g.xlarge",
+                "num_workers": 3,
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "r6g.xlarge"
+        assert custom["node_type_id"] == "r6g.xlarge"
+        assert custom["runtime_engine"] == "PHOTON"
+
+    def test_photon_legacy_d_type_still_maps_to_nvme_graviton(self):
+        cluster_args = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {
+                "runtime_engine": "PHOTON",
+                "driver_node_type_id": "m5d.xlarge",
+                "node_type_id": "m5d.xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m6gd.xlarge"
+        assert custom["node_type_id"] == "m6gd.xlarge"
+
 
 class TestBuildRightsizingValidationClusterSpec:
     def test_general_to_memory_single_node_omits_preset_defaults(self):

@@ -1,29 +1,12 @@
 cluster:
-  type: consolidation_s_general_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   custom_libraries:
   - pypi:
       package: google-api-python-client
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
     spark_version: 13.3.x-scala2.12
     num_workers: 3
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - pypi:
-        package: google-api-python-client
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_version: 13.3.x-scala2.12
-      num_workers: 3
-      driver_node_type_id: m6g.xlarge
-  allow_custom_spark_job: true
+    driver_node_type_id: m6g.xlarge

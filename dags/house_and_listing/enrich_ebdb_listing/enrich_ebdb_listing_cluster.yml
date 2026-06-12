@@ -1,33 +1,12 @@
 cluster:
-  type: consolidation_l_memory_cluster
+  type: consolidation_l_general_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    autotermination_minutes: 20
-    driver_node_type_id: m6g.2xlarge
-    num_workers: 3
-    spark_conf:
-      spark.sql.broadcastTimeout: 1200
-      spark.sql.sources.partitionOverwriteMode: static
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
       ebs_volume_size: 200
-      availability: SPOT_WITH_FALLBACK
-    spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
+      spark.sql.broadcastTimeout: 1200
     data_security_mode: USER_ISOLATION
-validation:
-  cluster:
-    type: consolidation_l_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.sql.sources.partitionOverwriteMode: static
-        spark.sql.broadcastTimeout: 1200
-      data_security_mode: USER_ISOLATION
-      num_workers: 3
-      driver_node_type_id: r6g.xlarge
+    num_workers: 3
+    driver_node_type_id: r6g.xlarge

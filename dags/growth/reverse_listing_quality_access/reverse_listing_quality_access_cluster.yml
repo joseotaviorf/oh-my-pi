@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_s_general_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
   - group_name: software-engineers
@@ -7,32 +7,7 @@ cluster:
   - group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_configurations:
-    driver_node_type_id: r6g.2xlarge
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
     aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
-      availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-    - group_name: software-engineers
-      permission_level: CAN_MANAGE
-    - group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
-      driver_node_type_id: r6g.xlarge
-  allow_custom_spark_job: true
+    driver_node_type_id: r6g.xlarge

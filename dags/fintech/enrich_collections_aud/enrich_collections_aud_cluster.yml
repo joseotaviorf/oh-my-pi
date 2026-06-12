@@ -1,10 +1,3 @@
 cluster:
-  type: consolidation_xl_memory_single_node_cluster
+  type: consolidation_l_memory_single_node_cluster
   databricks_conn_id: databricks_new_env
-  custom_configurations:
-    num_workers: 4
-    spark_version: 16.4.x-scala2.12
-validation:
-  cluster:
-    type: consolidation_l_memory_single_node_cluster
-    databricks_conn_id: databricks_new_env

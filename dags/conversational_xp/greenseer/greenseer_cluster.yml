@@ -1,21 +1,9 @@
 cluster:
-  type: consolidation_s_general_cluster
+  type: consolidation_xs_memory_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
     aws_attributes:
       availability: ON_DEMAND
     spark_conf:
       spark.driver.maxResultSize: '0'
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      aws_attributes:
-        availability: ON_DEMAND
-      spark_conf:
-        spark.driver.maxResultSize: '0'
-      driver_node_type_id: m6g.xlarge
+    driver_node_type_id: m6g.xlarge

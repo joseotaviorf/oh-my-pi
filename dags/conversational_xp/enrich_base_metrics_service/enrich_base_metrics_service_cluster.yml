@@ -5,30 +5,9 @@ cluster:
     group_name: data-products
     permission_level: CAN_MANAGE
   custom_configurations:
-    autotermination_minutes: 20
-    driver_node_type_id: r6gd.2xlarge
-    node_type_id: m6gd.8xlarge
-    runtime_engine: PHOTON
-    spark_version: 16.4.x-scala2.12
-    num_workers: 3
-    spark_conf:
-      spark.metrics.namespace: data_products.enrich_base_metrics_service
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-validation:
-  cluster:
-    type: consolidation_xl_general_cluster
-    databricks_conn_id: databricks_new_env
-    access_control_list:
-      group_name: data-products
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.metrics.namespace: data_products.enrich_base_metrics_service
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
+    spark_conf:
+      spark.metrics.namespace: data_products.enrich_base_metrics_service
+    num_workers: 3
+    driver_node_type_id: r6g.2xlarge

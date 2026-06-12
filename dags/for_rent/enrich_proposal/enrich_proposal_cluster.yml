@@ -1,20 +1,7 @@
 cluster:
-  type: consolidation_l_general_cluster
+  type: consolidation_m_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    driver_node_type_id: m6g.2xlarge
-    num_workers: 2
-    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark_conf:
-        spark.sql.sources.partitionOverwriteMode: static
-      driver_node_type_id: r6g.xlarge
+    driver_node_type_id: r6g.xlarge

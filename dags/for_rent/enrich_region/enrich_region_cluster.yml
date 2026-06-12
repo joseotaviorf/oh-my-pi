@@ -1,27 +1,11 @@
 cluster:
-  type: consolidation_s_general_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    spark_conf:
-      spark.sql.sources.partitionOverwriteMode: static
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    num_workers: 3
-    node_type_id: m6gd.xlarge
-    driver_node_type_id: m6gd.xlarge
-    runtime_engine: PHOTON
     aws_attributes:
       ebs_volume_size: 200
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.sql.sources.partitionOverwriteMode: static
-      num_workers: 3
-      runtime_engine: PHOTON
-      driver_node_type_id: m6g.xlarge
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
+    num_workers: 3
+    runtime_engine: PHOTON
+    driver_node_type_id: m6g.xlarge

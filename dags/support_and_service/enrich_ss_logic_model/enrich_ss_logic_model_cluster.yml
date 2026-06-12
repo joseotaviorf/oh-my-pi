@@ -1,29 +1,8 @@
 cluster:
-  type: consolidation_l_general_cluster
+  type: consolidation_m_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    autotermination_minutes: 20
-    driver_node_type_id: m6gd.4xlarge
-    node_type_id: m6gd.4xlarge
-    runtime_engine: PHOTON
-    spark_version: 16.4.x-scala2.12
-    num_workers: 5
     aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
-      availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 3
-      runtime_engine: PHOTON
+    num_workers: 3
+    runtime_engine: PHOTON

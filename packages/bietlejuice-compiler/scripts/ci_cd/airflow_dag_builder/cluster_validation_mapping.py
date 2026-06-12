@@ -254,10 +254,22 @@ def _is_graviton_nvme_instance_type(instance_type: str) -> bool:
     return generation == 6 and variant == "gd"
 
 
+def _is_graviton_non_nvme_instance_type(instance_type: str) -> bool:
+    """True when instance type is Graviton gen-6 without local NVMe (m6g/r6g/c6g)."""
+    match = _INSTANCE_TYPE_RE.match(str(instance_type).strip().lower())
+    if not match:
+        return False
+    generation = int(match.group(2))
+    variant = match.group(3)
+    return generation == 6 and variant == "g"
+
+
 def _use_nvme_for_topology_value(instance_type: str, *, photon_enabled: bool) -> bool:
     """NVMe Graviton mapping when explicit *gd or when Photon drives legacy *d → *gd."""
     if _is_graviton_nvme_instance_type(instance_type):
         return True
+    if _is_graviton_non_nvme_instance_type(instance_type):
+        return False
     return photon_enabled
 
 

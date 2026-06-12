@@ -2,21 +2,6 @@ cluster:
   type: consolidation_s_general_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
     runtime_engine: PHOTON
-    num_workers: 3
-    node_type_id: m6gd.xlarge
-    driver_node_type_id: m6gd.xlarge
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      runtime_engine: PHOTON
