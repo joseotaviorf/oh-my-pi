@@ -3,6 +3,39 @@
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
+from pyspark.sql import functions as F
+
+TIMESTAMP_FORMATS = [
+    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",  # 2025-03-25T22:41:13.000+0000
+    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",  # 2026-06-12T18:29:31.618+00:00
+    "yyyy-MM-dd'T'HH:mm:ssXXX",  # 2025-03-25T22:41:13Z
+    "yyyy-MM-dd HH:mm:ss.SSS",  # 2025-03-25 22:41:13.000
+    "yyyy-MM-dd HH:mm:ss",  # 2025-03-25 22:41:13
+]
+
+
+def standardize_timestamps(df, cols):
+    for col_name in cols:
+        value = F.trim(F.col(col_name).cast("string"))
+
+        parsed_timestamp = F.coalesce(
+            *[
+                F.try_to_timestamp(value, F.lit(timestamp_format))
+                for timestamp_format in TIMESTAMP_FORMATS
+            ]
+        )
+
+        df = df.withColumn(
+            col_name,
+            F.date_format(parsed_timestamp, "yyyy-MM-dd HH:mm:ss"),
+        )
+
+    return df
+
+
+def standard_now():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
 # Default to 0:00 UTC
 def date_str_to_utc_iso(date: Union[str, datetime], hour: int = 0) -> str:

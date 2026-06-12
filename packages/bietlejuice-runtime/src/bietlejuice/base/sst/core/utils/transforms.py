@@ -9,6 +9,7 @@ from bietlejuice.base.sst.core.utils.common import (
     compare_schema_types,
     conforming_schema,
 )
+from bietlejuice.base.sst.core.utils.time import standard_now
 from bietlejuice.base.sst.domains.salesforce.api.transform import (
     cast_string_to_boolean,
     parse_struct_column,
@@ -115,7 +116,6 @@ def get_versioning_df(
     )
     next_effective_ts = F.lead(F.col(event_ts_col_name)).over(window_effective_ts)
 
-    now = F.current_timestamp()
     window_pipeline_cols = Window.partitionBy(context_col_name).orderBy(
         event_ts_col_name
     )
@@ -128,7 +128,7 @@ def get_versioning_df(
             "_created_at",
             F.first("_created_at", ignorenulls=True).over(window_pipeline_cols),
         )
-        .withColumn("_last_updated_at", now)
+        .withColumn("_last_updated_at", F.lit(standard_now()))
     )
 
 
