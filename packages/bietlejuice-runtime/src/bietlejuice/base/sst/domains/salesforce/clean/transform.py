@@ -73,7 +73,14 @@ def in_memory_cdc_udpate(df):
     cols = [
         col
         for col in df.columns
-        if col not in ["id_record", "commit_number", "commit_ts", "sequence_number"]
+        if col
+        not in [
+            "id_record",
+            "commit_number",
+            "commit_ts",
+            "sequence_number",
+            "changed_field",
+        ]
     ]
     updated_cdc = df.select(
         "id_record",
