@@ -58,7 +58,7 @@ columns:
   correction_description:
     description: Description of the correction sent for the monthly closing case.
     lineage:
-      - datalake_gsheets_raw.quality_closing_ongoing.descricao1
+      - datalake_gsheets_raw.quality_closing_ongoing.descricao_correcao
   notes:
     description: Additional observations recorded for the monthly closing quality case.
     lineage:

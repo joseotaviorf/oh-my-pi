@@ -11,7 +11,7 @@ SELECT
     NULLIF(TRIM(correcao), '') AS correction,
     NULLIF(TRIM(ofensor_causa_raiz), '') AS root_cause_offender,
     NULLIF(TRIM(envio_correcao), '') AS correction_sent,
-    NULLIF(TRIM(descricao1), '') AS correction_description,
+    NULLIF(TRIM(descricao_correcao), '') AS correction_description,
     NULLIF(TRIM(obs), '') AS notes,
     NULLIF(TRIM(time), '') AS team,
     NOW() AS ts_load
