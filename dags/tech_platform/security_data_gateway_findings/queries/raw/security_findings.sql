@@ -1,0 +1,21 @@
+SELECT
+    source,
+    event_type,
+    resource_id,
+    resource_type,
+    resource_name,
+    location,
+    actor_email,
+    risk_level,
+    pii_types_detected,
+    source_metadata,
+    source_raw_payload,
+    classified_at,
+    year,
+    month,
+    day,
+    ts_load
+FROM
+    datalake_security_data_gateway_raw.security_findings
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

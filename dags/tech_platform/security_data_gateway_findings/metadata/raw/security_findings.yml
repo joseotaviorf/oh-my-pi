@@ -1,0 +1,62 @@
+---
+database_name: datalake_security_data_gateway_raw
+table_name: security_findings
+domain: Tech Platform
+owner: evandro.souza@quintoandar.com.br
+description: |
+  Raw landing table for all PII findings produced by the Security Data Gateway pipeline.
+  One row per classified Google Drive file (files with zero PII detections are excluded at
+  source). Keyed on (source, resource_id) with idempotent MERGE semantics — re-classification
+  events update the row only when the incoming classified_at is newer than the stored value.
+  Partitioned by year/month/day derived from classified_at; Z-ORDERed by resource_id.
+
+  source_raw_payload is the verbatim upstream ClassificationResultEvent.
+
+columns:
+  source:
+    description: "Identifier for the upstream ingestion source (e.g. 'drive_historical_backfill'). Part of the merge key (source, resource_id)."
+
+  event_type:
+    description: "Type of finding event."
+
+  resource_id:
+    description: "Unique identifier of the classified resource (Google Drive file ID). Part of the merge key (source, resource_id)."
+
+  resource_type:
+    description: "Type of the classified resource."
+
+  resource_name:
+    description: "Human-readable name of the resource (file name). Nullable — omitted when absent."
+
+  location:
+    description: "Path/location of the resource within the source system (e.g. 'My Drive/Legal'). Nullable."
+
+  actor_email:
+    description: "Email of the actor associated with the classified resource (typically the owner). Nullable — absent when owner email is null."
+
+  risk_level:
+    description: "Overall risk classification for the finding. Enum: LOW, MEDIUM, HIGH, CRITICAL."
+
+  pii_types_detected:
+    description: "Array of PII type detections. Each element has pii_type (e.g. CPF, RG, full_name) and confidence_score (0.0–1.0). Deduped by type upstream (highest confidence)."
+
+  source_metadata:
+    description: "JSON string carrying source-specific context: mime_type, sharing_state, ou_path, lane (MY_DRIVE|SHARED_DRIVES), batch_id, and optional parent_drive_id. Query via get_json_object or Databricks colon syntax (source_metadata:mime_type)."
+
+  source_raw_payload:
+    description: "Verbatim copy of the upstream ClassificationResultEvent JSON."
+
+  classified_at:
+    description: "UTC timestamp when the Security Data Gateway classified the resource. Drives partitioning and the MERGE update guard (newer classified_at wins)."
+
+  year:
+    description: "Year partition column derived from classified_at."
+
+  month:
+    description: "Month partition column derived from classified_at."
+
+  day:
+    description: "Day partition column derived from classified_at."
+
+  ts_load:
+    description: "Timestamp when this row was last written by the ingestion job (current_timestamp at batch time)."

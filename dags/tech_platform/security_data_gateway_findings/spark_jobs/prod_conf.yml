@@ -1,0 +1,10 @@
+---
+kafka_brokers: lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092
+kafka_topic: prod_security-data-gateway.findings
+kafka_consumer_group: bi_etl_security_data_gateway_findings
+kafka_api_key_secret: SECURITY_DATA_GATEWAY_KAFKA_API_KEY
+kafka_api_secret_secret: SECURITY_DATA_GATEWAY_KAFKA_API_SECRET
+path_prefix: s3://
+checkpoints_path_suffix: /raw/security_findings/checkpoints
+load_path_suffix: /raw/security_findings/security_findings
+data_security_uc_group: prod-data-security

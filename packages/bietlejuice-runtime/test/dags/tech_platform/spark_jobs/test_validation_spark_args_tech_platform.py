@@ -13,6 +13,7 @@ _SPARK_STUBS = [
     "pyspark.sql.types",
     "pyspark.sql.dataframe",
     "pyspark.sql.utils",
+    "pyspark.sql.window",
     "databricks",
     "databricks.sdk",
     "requests",
@@ -37,6 +38,38 @@ for _mod in _SPARK_STUBS:
 from dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load import (  # noqa: E402
     parse_arguments as parse_application_audit_logs_args,
 )
+
+
+# LoadSecurityDataGatewayFindingsRawJob subclasses BaseCoreModelSparkJob — need a
+# real (non-mock) base class so Python's class machinery can build the subclass.
+class _FakeBaseCoreModelSparkJob:
+    def __init__(self, job_name: str):
+        self.job_name = job_name
+        self.logger = MagicMock()
+        self.config_service = None
+
+    def initialize_configuration(self, source: str) -> None:
+        self.config_service = MagicMock()
+
+    def initialize_spark_session(self):
+        return MagicMock()
+
+    def parse_args(self):
+        pass
+
+    def create_core_model(self, spark, args):
+        pass
+
+    def run_pipeline(self, df, args, spark) -> None:
+        pass
+
+
+_fake_base_module = MagicMock()
+_fake_base_module.BaseCoreModelSparkJob = _FakeBaseCoreModelSparkJob
+sys.modules.setdefault(
+    "bietlejuice.base.spark.base_core_model_spark_job", _fake_base_module
+)
+
 from dags.tech_platform.crowdstrike.spark_jobs.load_crowdstrike_raw import (  # noqa: E402
     CrowdStrikeJobArgumentParser,
 )
@@ -60,6 +93,9 @@ from dags.tech_platform.opa.spark_jobs.opa_logs_load import (  # noqa: E402
 )
 from dags.tech_platform.release_validations_tests.spark_jobs.load_release_validations_tests_raw import (  # noqa: E402
     parse_args as parse_release_validations_tests_args,
+)
+from dags.tech_platform.security_data_gateway_findings.spark_jobs.load_security_data_gateway_findings_raw import (  # noqa: E402
+    LoadSecurityDataGatewayFindingsRawJob,
 )
 from dags.tech_platform.zscaler.spark_jobs.load_zscaler_raw import (  # noqa: E402
     ZscalerJobArgumentParser,
@@ -189,6 +225,14 @@ _ZSCALER_POSITIONAL = [
     "{}",
 ]
 
+_SECURITY_FINDINGS_POSITIONAL = [
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "datalake_security_data_gateway_raw",
+    '["year", "month", "day"]',
+    "2026-06-01",
+]
+
 _CLOUDZERO_JOB_PATHS = [
     "dags/tech_platform/reverse_integration_cloudzero/spark_jobs/load_contracts_to_cloudzero.py",
     "dags/tech_platform/reverse_integration_cloudzero/spark_jobs/load_api_requests_to_cloudzero.py",
@@ -235,6 +279,11 @@ class TestTechPlatformSparkJobValidationArgs:
                 _ZSCALER_POSITIONAL,
                 "datalake_zscaler_raw___managed_devices",
             ),
+            (
+                LoadSecurityDataGatewayFindingsRawJob().parse_args,
+                _SECURITY_FINDINGS_POSITIONAL,
+                "datalake_security_data_gateway_raw___security_findings",
+            ),
         ],
     )
     def test_dict_jobs_accept_validation_flags(
@@ -273,6 +322,10 @@ class TestTechPlatformSparkJobValidationArgs:
                 _RELEASE_VALIDATIONS_TESTS_POSITIONAL,
             ),
             (ZscalerJobArgumentParser.parse_args, _ZSCALER_POSITIONAL),
+            (
+                LoadSecurityDataGatewayFindingsRawJob().parse_args,
+                _SECURITY_FINDINGS_POSITIONAL,
+            ),
         ],
     )
     def test_dict_jobs_default_without_validation_flags(

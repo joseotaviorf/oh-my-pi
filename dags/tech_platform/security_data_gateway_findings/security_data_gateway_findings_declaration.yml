@@ -1,0 +1,41 @@
+dag:
+  name: security_data_gateway_findings
+  schedule_start_date: 2026, 6, 1
+  schedule_interval: 0 12 * * *
+  owner: Tech Platform Cyber Security
+  documentation:
+    dag_purpose: |
+      Consumes the ${profile}_security-data-gateway.findings Kafka topic and lands every
+      classified Drive file finding (>=1 PII detection) into the Delta table
+      datalake_security_data_gateway_raw.security_findings via idempotent MERGE keyed
+      on (source, resource_id). This is the terminal sink of the Security Data Gateway pipeline.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_security_data_gateway_findings_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{partitions}"
+    - "{{ data_interval_start | ds }}"
+  execution_timeout_hours: 5
+  default_extraction_type: incremental
+  tables_customization:
+    security_findings:
+      partitions:
+        - year
+        - month
+        - day
+      z_order_by:
+        - resource_id
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
