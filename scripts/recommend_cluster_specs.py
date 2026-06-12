@@ -188,6 +188,7 @@ _KEEP_MULTI_COHORTS = {
     "keep_multi_compute",
     "keep_multi_balanced",
     "keep_multi_cost",
+    "keep_multi_io_bound",
 }
 
 # ---------------------------------------------------------------------------
@@ -256,9 +257,9 @@ def _strip_nvme(node_type: str | None) -> str | None:
     """Map a local-NVMe instance to its non-NVMe equivalent (``*gd`` → ``*g``).
 
     e.g. ``m6gd.2xlarge`` → ``m6g.2xlarge``, ``r6gd.xlarge`` → ``r6g.xlarge``.
-    Non-NVMe types (and ``None``) pass through unchanged. Recommendations never
-    keep NVMe instances: the cost engine assumes the ~20% NVMe EC2 premium is
-    removed, so the emitted node type must match.
+    Non-NVMe types (and ``None``) pass through unchanged. NVMe is stripped only
+    when ``_io_shrink_guard`` is false; I/O-bound DAGs keep ``*gd`` via
+    ``_with_nvme``.
     """
     if not node_type or "." not in node_type:
         return node_type
@@ -266,6 +267,26 @@ def _strip_nvme(node_type: str | None) -> str | None:
     if prefix.endswith("gd"):
         prefix = prefix[:-1]  # drop the trailing 'd' (m6gd → m6g)
     return f"{prefix}.{size}"
+
+
+def _is_nvme(node_type: str | None) -> bool:
+    return bool(node_type) and _strip_nvme(node_type) != node_type
+
+
+def _with_nvme(node_type: str | None) -> str | None:
+    """Inverse of _strip_nvme: m6g.4xlarge → m6gd.4xlarge when the variant is in INSTANCE_CATALOG; otherwise unchanged."""
+    if not node_type or "." not in node_type:
+        return node_type
+    prefix, _, size = node_type.partition(".")
+    if prefix.endswith("g"):
+        candidate = f"{prefix}d.{size}"
+        if candidate in INSTANCE_CATALOG:
+            return candidate
+    return node_type
+
+
+def _node_disk_bw(node_type: str | None) -> float:
+    return _NVME_DISK_BW_FACTOR if _is_nvme(node_type) else 1.0
 
 
 def _node_tier(node_type: str) -> str | None:
@@ -514,6 +535,12 @@ _DOWNSIZE_WORKER_CPU_P95_MAX = 55.0
 _DOWNSIZE_WORKER_MEM_P95_MAX = 45.0
 _SPILL_PRESSURE_BYTES = 0.0
 _COLLAPSE_DRIVER_MEM_PROJECTED_MAX = 125.0
+_IO_BOUND_WAIT_P95_MIN = 30.0  # worker (driver for single-node) iowait p95 ≥ this → I/O-bound
+_DISK_PRESSURE_LOCAL_DISK_P95_MIN = (
+    25.0  # /local_disk0 utilization p95 ≥ this → local disk is load-bearing
+)
+_NVME_DISK_BW_FACTOR = 8.0  # relative per-node scratch bandwidth: *gd NVMe vs single gp2 EBS volume
+_DISK_SPACE_PROJECTED_MAX = 85.0  # max projected /local_disk0 occupancy p95 after a count shrink
 
 
 def _is_validation_dag(dag_id: str) -> bool:
@@ -757,24 +784,82 @@ def _p50_busy_cores(m: DagMetrics, *, photon_off: bool | None = None) -> float:
     return busy
 
 
-def _wall_inflation(
-    m: DagMetrics, rec_total_cores: int | None, *, photon_off: bool | None = None
-) -> float:
-    """Calibrated work-conserving wall stretch for a core reduction.
+def _io_wait_pct(m: DagMetrics) -> float:
+    wait = m.wrk_wait_p95 if m.topology == "multi" else m.drv_wait_p95
+    return wait or 0.0
 
-    ``wall_ratio = 1 + f * (old_cores / new_cores - 1)`` where ``f`` is the
-    aggregate p50-busy fraction of the observed cluster: only the CPU-busy
-    share of the wall stretches when cores shrink; idle (I/O, API, scheduler)
-    time does not. Growth or equal capacity never deflates (ratio floors at 1).
+
+def _io_bound(m: DagMetrics) -> bool:
+    return _io_wait_pct(m) >= _IO_BOUND_WAIT_P95_MIN
+
+
+def _disk_pressure(m: DagMetrics) -> bool:
+    return (m.local_disk_p95 or 0.0) >= _DISK_PRESSURE_LOCAL_DISK_P95_MIN
+
+
+def _io_shrink_guard(m: DagMetrics) -> bool:
+    """True when shrinking RAM, disk bandwidth, or disk class is unsafe for this DAG."""
+    return _io_bound(m) or _disk_pressure(m)
+
+
+def _observed_disk_bw(m: DagMetrics) -> float:
+    if m.topology == "multi" and m.worker_count:
+        return _node_disk_bw(_worker_node_type(m)) * m.worker_count
+    return _node_disk_bw(m.driver_node_type)
+
+
+def _candidate_disk_bw(driver: str | None, worker: str | None, worker_count: int) -> float:
+    if worker_count > 0 and worker:
+        return _node_disk_bw(worker) * worker_count
+    return _node_disk_bw(driver)
+
+
+def _min_worker_count_for_disk_space(m: DagMetrics) -> int:
+    """Minimum workers so scratch on /local_disk0 still fits after a count shrink.
+
+    Scratch (shuffle/spill) is data-proportional: it redistributes over the
+    remaining nodes at roughly ``observed_count / new_count``. Occupancy is a
+    feasibility limit the iowait-based wall model cannot see — a low-iowait DAG
+    at 75% disk loses nothing in projected wall yet runs out of disk when a
+    node is removed. Approximation: assumes the candidate keeps the observed
+    per-node disk size (true under ``_io_shrink_guard``; unguarded DAGs sit
+    below the pressure threshold where the floor rarely binds).
+    """
+    if not m.local_disk_p95 or not m.worker_count:
+        return 0
+    return math.ceil(m.worker_count * m.local_disk_p95 / _DISK_SPACE_PROJECTED_MAX)
+
+
+def _wall_inflation(
+    m: DagMetrics,
+    rec_total_cores: int | None,
+    *,
+    photon_off: bool | None = None,
+    rec_disk_bw: float | None = None,
+) -> float:
+    """Calibrated work-conserving wall stretch for a core or disk-bandwidth reduction.
+
+    CPU term: ``1 + f * (old_cores / new_cores - 1)`` where ``f`` is the
+    aggregate p50-busy fraction. I/O term: only the iowait-share of the wall
+    stretches with bandwidth loss; ``rec_disk_bw=None`` skips the term. No cap on
+    the I/O term — an 8× bandwidth cut on a 60%-iowait job is supposed to look
+    catastrophic. Growth or equal core capacity never deflates the CPU term.
     """
     old_cores = observed_total_cores(m)
-    if not old_cores or not rec_total_cores or rec_total_cores >= old_cores:
-        return 1.0
-    f = min(
-        max(_p50_busy_cores(m, photon_off=photon_off) / old_cores, 0.0),
-        _WALL_CPU_BOUND_FRACTION_CAP,
-    )
-    return 1.0 + f * (old_cores / rec_total_cores - 1.0)
+    cpu_term = 0.0
+    if old_cores and rec_total_cores and rec_total_cores < old_cores:
+        f = min(
+            max(_p50_busy_cores(m, photon_off=photon_off) / old_cores, 0.0),
+            _WALL_CPU_BOUND_FRACTION_CAP,
+        )
+        cpu_term = f * (old_cores / rec_total_cores - 1.0)
+    io_term = 0.0
+    if rec_disk_bw is not None and rec_disk_bw > 0:
+        observed_bw = _observed_disk_bw(m)
+        if rec_disk_bw < observed_bw:
+            f_io = min(_io_wait_pct(m) / 100.0, 1.0)
+            io_term = f_io * (observed_bw / rec_disk_bw - 1.0)
+    return 1.0 + cpu_term + io_term
 
 
 def _current_cost_basis(m: DagMetrics) -> float:
@@ -796,6 +881,7 @@ def _shape_wall_minutes(
     *,
     keep_photon: bool = False,
     rec_total_cores: int | None = None,
+    rec_disk_bw: float | None = None,
 ) -> float | None:
     """Observed wall with topology-shape inflation only (no Photon term).
 
@@ -816,7 +902,9 @@ def _shape_wall_minutes(
         rec_total_cores = (
             _vcpus(m.driver_node_type) + _vcpus(_worker_node_type(m)) * rec_workers
         )
-    return base * _wall_inflation(m, rec_total_cores, photon_off=photon_off)
+    return base * _wall_inflation(
+        m, rec_total_cores, photon_off=photon_off, rec_disk_bw=rec_disk_bw
+    )
 
 
 def _legacy_dbu_projection(
@@ -893,6 +981,7 @@ def estimate_projected_total_cost(
         rec_workers,
         keep_photon=keep_photon,
         rec_total_cores=sum(_vcpus(node) for node in nodes),
+        rec_disk_bw=_candidate_disk_bw(rec_driver, rec_worker_type, rec_workers),
     )
     if base_wall is None:
         return None
@@ -1004,15 +1093,18 @@ def _worker_resize(
     per_node_mem_gb = current_spec.memory_gb * d.wrk_mem_p95 / 100.0
     per_node_cores = current_spec.vcpus * wrk_cpu_eff / 100.0
     exclude_compute = _keep_photon_world(m, photon_off)
-    candidate_worker = (
-        _node_for_demand(
-            per_node_mem_gb, per_node_cores, exclude_compute=exclude_compute
-        )
-        or current_worker
-    )
-    candidate_price = _instance_price(candidate_worker)
-    if candidate_price is None or candidate_price >= current_price:
+    if _io_shrink_guard(m):
         candidate_worker = current_worker
+    else:
+        candidate_worker = (
+            _node_for_demand(
+                per_node_mem_gb, per_node_cores, exclude_compute=exclude_compute
+            )
+            or current_worker
+        )
+        candidate_price = _instance_price(candidate_worker)
+        if candidate_price is None or candidate_price >= current_price:
+            candidate_worker = current_worker
 
     candidate_spec = INSTANCE_CATALOG[candidate_worker]
     aggregate_mem_gb = per_node_mem_gb * m.worker_count
@@ -1034,14 +1126,22 @@ def _worker_resize(
             _min_worker_count_for_cores_floor(
                 m, candidate_spec.vcpus, photon_off=photon_off
             ),
+            _min_worker_count_for_disk_space(m),
             2,
         )
         candidate_count = min(candidate_count, m.worker_count)
+        if _io_shrink_guard(m):
+            candidate_count = max(candidate_count, m.worker_count - 1)
         candidate_cores = (
             _vcpus(m.driver_node_type) + candidate_spec.vcpus * candidate_count
         )
         projected_wall = _projected_wall_for_sla(
-            m, candidate_count, rec_total_cores=candidate_cores
+            m,
+            candidate_count,
+            rec_total_cores=candidate_cores,
+            rec_disk_bw=_candidate_disk_bw(
+                m.driver_node_type, candidate_worker, candidate_count
+            ),
         )
         if projected_wall is None or projected_wall > _sla_limit_minutes(m):
             count_blocked_sla = True
@@ -1106,7 +1206,10 @@ def build_current_refined_candidate(
     worker_resize = _worker_resize(m, photon_off=photon_off)
     if worker_resize is None or worker_resize.worker_count < 2:
         return None
-    driver = _driver_minimize_node(m, photon_off=photon_off) or m.driver_node_type
+    if _io_shrink_guard(m):
+        driver = m.driver_node_type
+    else:
+        driver = _driver_minimize_node(m, photon_off=photon_off) or m.driver_node_type
     return ShapeCandidate(
         driver,
         worker_resize.node_type,
@@ -1214,6 +1317,8 @@ def _single_node_downsize_node(
     it (projected memory must stay under the single-node memory target). Returns
     None when no safe downsize exists.
     """
+    if _io_shrink_guard(m):
+        return None
     d = effective_demand(m, photon_off=photon_off)
     drv_cpu_eff = _cpu_effective_pct(d.drv_cpu_p50, d.drv_cpu_p95)
     if drv_cpu_eff is None or d.drv_mem_p95 is None:
@@ -1248,6 +1353,7 @@ def _projected_wall_for_sla(
     *,
     keep_photon: bool = False,
     rec_total_cores: int | None = None,
+    rec_disk_bw: float | None = None,
 ) -> float | None:
     """Projected p95 wall used for the SLA guard.
 
@@ -1265,7 +1371,12 @@ def _projected_wall_for_sla(
         rec_total_cores = (
             _vcpus(m.driver_node_type) + _vcpus(_worker_node_type(m)) * rec_workers
         )
-    wall = base * _wall_inflation(m, rec_total_cores, photon_off=not keep_photon)
+    wall = base * _wall_inflation(
+        m,
+        rec_total_cores,
+        photon_off=not keep_photon,
+        rec_disk_bw=rec_disk_bw,
+    )
     if photon_off:
         wall *= _PHOTON_OFF_WALL_INFLATION
     return wall
@@ -1311,6 +1422,8 @@ def _candidate_is_reduction(m: DagMetrics, candidate: ShapeCandidate) -> bool:
 
 def _keep_multi_reason(m: DagMetrics, sizing: SingleNodeSizing) -> str:
     """Most informative reason a multi-node DAG is kept as-is."""
+    if _io_shrink_guard(m):
+        return "keep_multi_io_bound"
     if sizing.blocked_reason in {
         "keep_multi_memory",
         "keep_multi_compute",
@@ -1325,7 +1438,12 @@ def _keep_multi_reason(m: DagMetrics, sizing: SingleNodeSizing) -> str:
     ):
         return "keep_multi_balanced"
     wall = _projected_wall_for_sla(
-        m, 0, rec_total_cores=_vcpus(sizing.node_type) if sizing.node_type else None
+        m,
+        0,
+        rec_total_cores=_vcpus(sizing.node_type) if sizing.node_type else None,
+        rec_disk_bw=_candidate_disk_bw(sizing.node_type, None, 0)
+        if sizing.node_type
+        else None,
     )
     if wall is None or wall > _sla_limit_minutes(m):
         return "keep_multi_sla"
@@ -1361,17 +1479,20 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
 
         best_single = build_best_single_candidate(m, photon_off=photon_off)
         if (
-            best_single is not None
+            not _io_shrink_guard(m)
+            and best_single is not None
             and candidate_total_cores(best_single) <= observed_cores
             and _collapse_memory_feasible(
                 m, best_single.driver_node_type, photon_off=photon_off
             )
+            and _min_worker_count_for_disk_space(m) <= 1
         ):
             wall = _projected_wall_for_sla(
                 m,
                 0,
                 keep_photon=keep_photon,
                 rec_total_cores=candidate_total_cores(best_single),
+                rec_disk_bw=_candidate_disk_bw(best_single.driver_node_type, None, 0),
             )
             cost = estimate_projected_total_cost(
                 m, best_single.driver_node_type, 0, keep_photon=keep_photon
@@ -1390,6 +1511,11 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
                 refined.worker_count,
                 keep_photon=keep_photon,
                 rec_total_cores=candidate_total_cores(refined),
+                rec_disk_bw=_candidate_disk_bw(
+                    refined.driver_node_type,
+                    refined.worker_node_type,
+                    refined.worker_count,
+                ),
             )
             cost = estimate_projected_total_cost(
                 m,
@@ -1404,11 +1530,17 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     # Q4: drop Photon at the observed shape (NVMe stripped) — the "remove the
     # accelerators only" candidate. Competes in the same pool, so dropping
     # Photon wins only when it genuinely beats keeping it at every shape.
-    if m.is_any_photon:
+    # Skipped for I/O-bound DAGs: Photon drop is not a safe normalization there.
+    if m.is_any_photon and not _io_shrink_guard(m):
         same_driver = _strip_nvme(m.driver_node_type)
         same_worker = _strip_nvme(_worker_node_type(m))
         same_count = m.worker_count or 0
-        wall = _projected_wall_for_sla(m, same_count, keep_photon=False)
+        wall = _projected_wall_for_sla(
+            m,
+            same_count,
+            keep_photon=False,
+            rec_disk_bw=_candidate_disk_bw(same_driver, same_worker, same_count),
+        )
         cost = estimate_projected_total_cost(
             m, same_driver, same_count, rec_worker=same_worker, keep_photon=False
         )
@@ -1658,6 +1790,7 @@ def recommend_preset(
         "keep_multi_compute",
         "keep_multi_balanced",
         "keep_multi_cost",
+        "keep_multi_io_bound",
         "right_size_multi",
     }
     if not tier and cohort not in {"collapse_to_single", *keep_multi_cohorts}:
@@ -1779,6 +1912,7 @@ class Recommendation:
     wrk_cpu_p95: float | None
     wrk_mem_p95: float | None
     wrk_wait_p95: float | None
+    local_disk_p95: float | None = None
     runs_per_day: float | None = None
     schedule_interval_minutes: float | None = None
     arm_total_ec2_cost_usd: float | None = None
@@ -1993,16 +2127,22 @@ def build_recommendation(
             rec_runtime_engine = "STANDARD"
             actions.append("disable_photon")
         if m.is_any_local_nvme and rec_driver is not None:
-            rec_driver = _strip_nvme(rec_driver)
-            rec_worker = _strip_nvme(rec_worker)
-            actions.append("drop_nvme")
+            if _io_shrink_guard(m):
+                rec_driver = _with_nvme(rec_driver)
+                rec_worker = _with_nvme(rec_worker)
+                actions.append("keep_nvme")
+            else:
+                rec_driver = _strip_nvme(rec_driver)
+                rec_worker = _strip_nvme(rec_worker)
+                actions.append("drop_nvme")
 
         # A same-shape fill that ended up keeping everything is a true no-change.
-        if not actions:
+        if not actions or actions == ["keep_nvme"]:
             rec_preset_name = None
             rec_driver = None
             rec_worker = None
             rec_workers = None
+            actions = []
 
     if rec_spec and rec_driver and rec_driver != rec_spec.driver_node_type:
         driver_override_node_type_id = rec_driver
@@ -2261,6 +2401,7 @@ def build_recommendation(
         wrk_cpu_p95=m.wrk_cpu_p95,
         wrk_mem_p95=m.wrk_mem_p95,
         wrk_wait_p95=m.wrk_wait_p95,
+        local_disk_p95=m.local_disk_p95,
         dominant_config_run_share=m.dominant_config_run_share,
         dominant_config_cost_share=m.dominant_config_cost_share,
         config_changed_in_window=m.config_changed_in_window,
@@ -3702,6 +3843,7 @@ _CSV_FIELDS = [
     "wrk_mem_p50",
     "wrk_mem_p95",
     "wrk_wait_p95",
+    "local_disk_p95",
     "total_memory_bytes_spilled",
     "total_disk_bytes_spilled",
     # Recommended spec

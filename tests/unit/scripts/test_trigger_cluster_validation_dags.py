@@ -1354,3 +1354,29 @@ class TestCliList:
 
         assert code == 0
         assert "bietlejuice.dw_agent__validation" in stdout.getvalue()
+
+class TestEffectiveRunTimeout:
+    def test_prod_duration_none_uses_base(self):
+        plan = trigger_script.DagExecutionPlan(
+            dag=_sample_dag(),
+            conf=None,
+            prod_duration_seconds=None,
+        )
+        assert trigger_script._effective_run_timeout(plan, 7200) == 7200
+
+    def test_prod_duration_below_base_uses_base(self):
+        plan = trigger_script.DagExecutionPlan(
+            dag=_sample_dag(),
+            conf=None,
+            prod_duration_seconds=1000.0,
+        )
+        assert trigger_script._effective_run_timeout(plan, 7200) == 7200
+
+    def test_prod_duration_above_base_scales(self):
+        plan = trigger_script.DagExecutionPlan(
+            dag=_sample_dag(),
+            conf=None,
+            prod_duration_seconds=6000.0,
+        )
+        assert trigger_script._effective_run_timeout(plan, 7200) == 12000
+

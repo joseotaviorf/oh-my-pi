@@ -37,6 +37,7 @@ _ACTIONABLE_COHORTS = frozenset(
         "keep_multi_compute",
         "keep_multi_balanced",
         "keep_multi_cost",
+        "keep_multi_io_bound",
         "healthy_single",
     }
 )
@@ -50,6 +51,7 @@ _KEEP_MULTI_COHORTS = frozenset(
         "keep_multi_compute",
         "keep_multi_balanced",
         "keep_multi_cost",
+        "keep_multi_io_bound",
     }
 )
 
@@ -194,7 +196,13 @@ def generate_validation_config(
         getattr(rec, "rec_runtime_engine", None)
         or _NORMALIZATION_ACTIONS.intersection(rec.actions.split("|"))
     )
-    if prod_type and rec.recommended_preset == prod_type and not has_normalization:
+    has_worker_count_override = getattr(rec, "num_workers_override", None) is not None
+    if (
+        prod_type
+        and rec.recommended_preset == prod_type
+        and not has_normalization
+        and not has_worker_count_override
+    ):
         return None
 
     prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)

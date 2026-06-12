@@ -1044,10 +1044,25 @@ class TestCostProjection:
             rcs._projected_wall_for_sla(m, 0, keep_photon=True, rec_total_cores=4)
         )
 
-        # The priced keep-Photon collapse tracks the raw-demand wall end to end.
-        expected_ec2 = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.xlarge"] * (keep_wall / 60.0)
+        # The priced keep-Photon collapse tracks the raw-demand wall end to end,
+        # including the disk-bandwidth term threaded through ``estimate_projected_total_cost``.
+        rec_disk_bw = rcs._candidate_disk_bw("m6g.xlarge", None, 0)
+        expected_wall = 30.0 * rcs._wall_inflation(
+            m, 4, photon_off=False, rec_disk_bw=rec_disk_bw
+        )
+        priced_wall = rcs._shape_wall_minutes(
+            m,
+            0,
+            keep_photon=True,
+            rec_total_cores=4,
+            rec_disk_bw=rec_disk_bw,
+        )
+        assert priced_wall == pytest.approx(expected_wall)
+        expected_ec2 = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.xlarge"] * (
+            expected_wall / 60.0
+        )
         expected_dbu = rcs._legacy_dbu_projection(
-            m, ["m6g.xlarge"], keep_wall, photon_off=False
+            m, ["m6g.xlarge"], expected_wall, photon_off=False
         )
         keep_cost = estimate_projected_total_cost(m, "m6g.xlarge", 0, keep_photon=True)
         assert keep_cost == pytest.approx(round(expected_ec2 + expected_dbu, 6))
@@ -2018,6 +2033,225 @@ class TestFleetDbuRate:
 _ACCEPTANCE_FIXTURES_PATH = (
     REPO_ROOT / "tests" / "fixtures" / "recommend_cluster_specs_acceptance.json"
 )
+
+
+
+class TestIoBoundGuards:
+    def test_nvme_kept_under_disk_pressure(self):
+        m = _m(
+            driver_node_type="m6gd.xlarge",
+            worker_node_type="m6gd.4xlarge",
+            worker_count=4,
+            is_any_local_nvme=True,
+            is_any_photon=True,
+            local_disk_p95=62.0,
+            wrk_wait_p95=66.0,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=25.0,
+        )
+        rec = build_recommendation(m)
+        assert "drop_nvme" not in rec.actions.split("|")
+        if rec.rec_worker_node_type is not None:
+            assert rcs._is_nvme(rec.rec_worker_node_type)
+
+    def test_nvme_still_stripped_when_disk_idle(self):
+        m = _m(
+            driver_node_type="m6gd.xlarge",
+            worker_node_type="m6gd.4xlarge",
+            worker_count=4,
+            is_any_local_nvme=True,
+            is_any_photon=True,
+            local_disk_p95=5.0,
+            wrk_wait_p95=2.0,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=25.0,
+        )
+        rec = build_recommendation(m)
+        assert "drop_nvme" in rec.actions.split("|")
+        if rec.rec_driver_node_type is not None:
+            assert not rcs._is_nvme(rec.rec_driver_node_type)
+        if rec.rec_worker_node_type is not None:
+            assert not rcs._is_nvme(rec.rec_worker_node_type)
+
+    def test_worker_type_pinned_under_guard(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.8xlarge",
+            worker_count=8,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=25.0,
+            wrk_wait_p95=50.0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            schedule_interval_minutes=240.0,
+            arm_avg_total_cost_estimate_usd=40.0,
+            arm_avg_ec2_cost_usd=15.0,
+            arm_avg_dbu_cost_usd=25.0,
+        )
+        assert rcs._worker_resize(m).node_type == m.worker_node_type
+
+    def test_count_shrink_capped_at_minus_one(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.4xlarge",
+            worker_count=6,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wrk_wait_p95=50.0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            schedule_interval_minutes=1440.0,
+            arm_avg_total_cost_estimate_usd=40.0,
+            arm_avg_ec2_cost_usd=15.0,
+            arm_avg_dbu_cost_usd=25.0,
+        )
+        assert rcs._worker_resize(m).worker_count == 5
+
+    def test_collapse_suppressed_under_io_guard(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type="m6g.2xlarge",
+            worker_count=2,
+            drv_cpu_p95=75.0,
+            drv_mem_p95=70.0,
+            wrk_cpu_p50=55.0,
+            wrk_cpu_p95=70.0,
+            wrk_mem_p95=65.0,
+            wrk_wait_p95=50.0,
+            arm_avg_total_cost_estimate_usd=100.0,
+            arm_avg_ec2_cost_usd=40.0,
+            arm_avg_dbu_cost_usd=60.0,
+        )
+        assert classify(m) != "collapse_to_single"
+        assert classify(m) == "keep_multi_io_bound"
+
+    def test_single_node_downsize_suppressed(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            drv_cpu_p95=10.0,
+            drv_mem_p95=40.0,
+            drv_wait_p95=50.0,
+            is_any_photon=False,
+        )
+        assert classify(m) == "healthy_single"
+
+    def test_wall_io_term(self):
+        m = _m(wrk_wait_p95=66.1, worker_count=4, worker_node_type="m6gd.4xlarge")
+        old_cores = rcs.observed_total_cores(m)
+        same = rcs._wall_inflation(m, old_cores, rec_disk_bw=8 * 4)
+        assert same == pytest.approx(1.0)
+        shrunk = rcs._wall_inflation(m, old_cores, rec_disk_bw=1 * 4)
+        assert shrunk == pytest.approx(1.0 + 0.661 * 7, rel=1e-3)
+        cpu_only = rcs._wall_inflation(m, old_cores, rec_disk_bw=None)
+        assert cpu_only == pytest.approx(1.0)
+
+    def test_chatbot_end_to_end_regression(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        dag_dir = tmp_path / "dags" / "conversational_xp" / "enrich_chatbot"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "enrich_chatbot_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_l_memory_cluster\n"
+            "  databricks_conn_id: databricks_new\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "enrich_chatbot_declaration.yml").write_text(
+            "dag:\n  name: enrich_chatbot\n"
+            "workflow:\n  type: query_delta\n  layer: enrich\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(rcs, "DAGS_ROOT", tmp_path / "dags")
+
+        m = _m(
+            dag_id="bietlejuice.enrich_chatbot",
+            driver_node_type="r6g.2xlarge",
+            worker_node_type="r6g.4xlarge",
+            worker_count=6,
+            wrk_wait_p95=45.0,
+            wrk_mem_p95=33.0,
+            wrk_cpu_p50=10.0,
+            wrk_cpu_p95=50.0,
+            schedule_interval_minutes=1440.0,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            arm_avg_total_cost_estimate_usd=40.0,
+            arm_avg_ec2_cost_usd=15.0,
+            arm_avg_dbu_cost_usd=25.0,
+        )
+        rec = build_recommendation(m)
+        assert rec.cohort == "right_size_multi"
+        assert rec.rec_worker_node_type == "r6g.4xlarge"
+        assert rec.rec_worker_count == 5
+        assert rec.recommended_preset == "consolidation_l_memory_cluster"
+        assert rec.num_workers_override == 5
+
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
+        assert cfg is not None
+        assert cfg["validation"]["cluster"]["custom_configurations"]["num_workers"] == 5
+
+    def test_min_worker_count_for_disk_space(self):
+        # ceil(observed_count * occupancy / 85): scratch redistributes over survivors.
+        assert rcs._min_worker_count_for_disk_space(_m(worker_count=8, local_disk_p95=24.0)) == 3
+        assert rcs._min_worker_count_for_disk_space(_m(worker_count=6, local_disk_p95=75.0)) == 6
+        assert rcs._min_worker_count_for_disk_space(_m(worker_count=4)) == 0  # no telemetry
+
+    def test_disk_space_floor_blocks_count_shrink(self):
+        # Disk-pressure-only (iowait below the I/O-bound threshold): the -1 count
+        # cap alone would allow 6 -> 5, but ceil(6 * 75 / 85) = 6 keeps the count.
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.4xlarge",
+            worker_count=6,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wrk_wait_p95=10.0,
+            local_disk_p95=75.0,
+            wall_p50_min=30.0,
+            wall_p95_min=30.0,
+            schedule_interval_minutes=1440.0,
+            arm_avg_total_cost_estimate_usd=40.0,
+            arm_avg_ec2_cost_usd=15.0,
+            arm_avg_dbu_cost_usd=25.0,
+        )
+        resize = rcs._worker_resize(m)
+        assert resize.node_type == "r6g.4xlarge"
+        assert resize.worker_count == 6
+
+    def test_collapse_blocked_by_disk_space(self):
+        # Hot-at-p95 / moderate-at-p50 shape that collapses when worker disks are
+        # empty, but 4 workers at 24% occupancy (below the guard threshold)
+        # cannot fit on a single node's disk -> collapse is suppressed.
+        kwargs = dict(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type="m6g.2xlarge",
+            worker_count=4,
+            drv_cpu_p95=75.0,
+            drv_mem_p95=70.0,
+            wrk_cpu_p50=55.0,
+            wrk_cpu_p95=70.0,
+            wrk_mem_p95=65.0,
+            arm_avg_total_cost_estimate_usd=100.0,
+            arm_avg_ec2_cost_usd=40.0,
+            arm_avg_dbu_cost_usd=60.0,
+        )
+        assert classify(_m(**kwargs)) == "collapse_to_single"
+        assert classify(_m(**kwargs, local_disk_p95=24.0)) != "collapse_to_single"
 
 
 class TestRealDagAcceptance:

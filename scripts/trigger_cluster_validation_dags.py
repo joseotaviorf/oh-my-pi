@@ -48,6 +48,7 @@ DATABRICKS_MAX_VALIDATION_DAG_ID_LENGTH = (
 # Ignore prod runs shorter than this when picking a reference window (--from-prod-run).
 MIN_PROD_RUN_DURATION_SECONDS = 8 * 60
 DEFAULT_VALIDATION_COOLDOWN_HOURS = 2.0
+VALIDATION_TIMEOUT_PROD_WALL_FACTOR = 2.0
 TRANSIENT_HTTP_STATUS_CODES = frozenset({408, 429, 502, 503, 504})
 DATE_PARAM_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LoadWindowSource = Literal["conf", "data_interval"]
@@ -222,7 +223,15 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=25,
         help="Recent dag runs to inspect per DAG for resume/skip (default 25)",
     )
-    parser.add_argument("--timeout", type=int, default=7200)
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=7200,
+        help=(
+            "Floor monitor timeout in seconds (default 7200); raised per-DAG to "
+            "2× the reference prod run duration when known"
+        ),
+    )
     parser.add_argument("--log-tail-lines", type=int, default=80)
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument(
@@ -392,6 +401,13 @@ def _format_duration(seconds: float | None) -> str:
     if minutes:
         return f"{minutes}m{secs}s"
     return f"{secs}s"
+
+
+def _effective_run_timeout(plan: DagExecutionPlan, base_timeout: int) -> int:
+    """Per-DAG monitor timeout: a verdict needs room for ≥2x the reference prod wall."""
+    if plan.prod_duration_seconds is None:
+        return base_timeout
+    return max(base_timeout, int(plan.prod_duration_seconds * VALIDATION_TIMEOUT_PROD_WALL_FACTOR))
 
 
 def _tail_lines(text: str, max_lines: int) -> str:
@@ -1237,7 +1253,7 @@ async def trigger_and_monitor(
     printer = EventPrinter()
     progress = ProgressTracker(total=len(plans))
 
-    async def _monitor(dag: ValidationDag, dag_run_id: str) -> RunOutcome:
+    async def _monitor(dag: ValidationDag, dag_run_id: str, run_timeout: int) -> RunOutcome:
         try:
             return await monitor_run(
                 client,
@@ -1249,7 +1265,7 @@ async def trigger_and_monitor(
                 poll_interval=poll_interval,
                 poll_max_interval=poll_max_interval,
                 poll_jitter=poll_jitter,
-                timeout=timeout,
+                timeout=run_timeout,
                 verbose=verbose,
                 log_tail_lines=log_tail_lines,
                 fetch_failure_logs=False,
@@ -1313,6 +1329,7 @@ async def trigger_and_monitor(
             )
 
         outcome: RunOutcome
+        run_timeout = _effective_run_timeout(plan, timeout)
         async with run_slots:
             action = plan.validation_action
             if action is None:
@@ -1357,7 +1374,7 @@ async def trigger_and_monitor(
                     f"run={action.dag_run_id}  {action.reason}",
                     progress=progress,
                 )
-                outcome = await _monitor(dag, action.dag_run_id)
+                outcome = await _monitor(dag, action.dag_run_id, run_timeout)
             else:
                 try:
                     unpaused = await asyncio.to_thread(
@@ -1399,7 +1416,7 @@ async def trigger_and_monitor(
                     f"run={dag_run_id}",
                     progress=progress,
                 )
-                outcome = await _monitor(dag, dag_run_id)
+                outcome = await _monitor(dag, dag_run_id, run_timeout)
 
         await _publish_outcome_failure_logs(outcome)
         return outcome
