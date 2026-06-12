@@ -1,0 +1,21 @@
+database_name: datalake_sonia_journeys
+table_name: closing_contract_participant_view
+description: |
+  Enrich view holding the Sonia Closing participation flag at contract grain.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Contract identifier parsed from the id_contract field of the contract-sent event payload.
+  is_participant:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      True when the contract meets is participant of the sonia A/B test.
+  ts_created:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: Timestamp of the earliest contract-sent event observed for the contract.

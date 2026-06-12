@@ -17,3 +17,6 @@ workflow:
     ds2ca_reject_view:
       sync: [trino]
       sql_dialect: trino
+    closing_contract_participant_view:
+      sync: [trino]
+      sql_dialect: trino
