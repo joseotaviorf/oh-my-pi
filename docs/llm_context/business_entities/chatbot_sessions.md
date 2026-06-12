@@ -73,6 +73,7 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 
 - `sessions.id_langfuse_session = evals.id_langfuse_session`
 - Only available for non-legacy sessions (where `id_langfuse_session IS NOT NULL`)
+- For LLM-as-a-judge eval semantics, evaluator names, numeric vs categorical scores, and golden queries, see `business_entities/evals.md`
 
 ### Bypass (1:N — one session may have multiple bypasses)
 
