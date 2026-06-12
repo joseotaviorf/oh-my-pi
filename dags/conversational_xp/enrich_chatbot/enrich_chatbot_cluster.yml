@@ -5,7 +5,7 @@ cluster:
     num_workers: 6
     driver_node_type_id: r6g.2xlarge
     spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
@@ -18,4 +18,5 @@ validation:
       spark_conf:
         spark.sql.mapKeyDedupPolicy: LAST_WIN
       num_workers: 5
-      driver_node_type_id: r6g.2xlarge
+      driver_node_type_id: m6g.xlarge
+      worker_node_type_id: m6gd.4xlarge
