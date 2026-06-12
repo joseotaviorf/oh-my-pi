@@ -80,6 +80,7 @@ def in_memory_cdc_udpate(df):
         "commit_number",
         "commit_ts",
         "sequence_number",
+        "changed_field",
         *[F.last(F.col(col), ignorenulls=True).over(w).alias(col) for col in cols],
     )
 
