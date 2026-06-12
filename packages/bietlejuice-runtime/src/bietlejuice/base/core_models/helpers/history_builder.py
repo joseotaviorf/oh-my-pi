@@ -10,6 +10,25 @@ from bietlejuice.base.core_models.helpers.event_config_resolution import (
 )
 from bietlejuice.base.core_models.helpers.surrogate_keys import SurrogateKeysHelper
 
+# Ordered tie-breaker chain used to canonicalize multiple CDC rows that share the
+# same ``(entity_id, ts_database_transaction)``. The first column resolves ties
+# first, then the second, and so on. Only columns actually present in the input
+# DataFrame are used (see ``_resolve_tie_breaker_columns``), so the same default
+# self-adapts across sources with different schemas:
+#   - ``version`` / ``updated_at`` (source recency): pick the newest TRUE revision
+#     when a source replays multiple historical states at one transaction instant.
+#   - ``ts_cdc_transaction`` / ``cdc_binlog_position`` / ``cdc_transaction_id``
+#     (ingest recency): universal CDC metadata, present on every transactional
+#     table, used as the fallback when source-recency columns are absent.
+# No value normalization is applied: different stored values stay different.
+DEFAULT_CANONICALIZE_TIE_BREAKERS = [
+    "version",
+    "updated_at",
+    "ts_cdc_transaction",
+    "cdc_binlog_position",
+    "cdc_transaction_id",
+]
+
 
 class HistoryBuilder:
     """Converts transactional CDC rows into narrow, fixed-schema event rows.
@@ -37,12 +56,21 @@ class HistoryBuilder:
         event_configs: List[Dict[str, str]],
         event_type: str = "cdc",
         event_origin: str = "",
+        canonicalize_tie_breaker_columns: Optional[List[str]] = None,
     ) -> DataFrame:
         """Convert a transactional DataFrame into narrow event rows.
 
         For CDC sources, uses LAG-based change detection and sets
         ``payload`` to NULL.  For outbox sources (future), maps directly
         from the source event and preserves the payload content.
+
+        Transactional CDC can emit many rows per
+        ``(entity_id, ts_database_transaction)`` (notably on Debezium snapshot
+        batches), all of which would collide on the same ``id_event``
+        (hashed from id, event_name and ts only). To enforce the documented
+        history grain of one event per ``(entity_id, event_name, ts)``, the
+        input is canonicalized to a single row per
+        ``(entity_id, ts_database_transaction)`` before change detection.
 
         Args:
             df: Pre-loaded transactional DataFrame with CDC columns.
@@ -57,6 +85,17 @@ class HistoryBuilder:
             event_type: ``"cdc"`` or ``"outbox_pattern"``.
             event_origin: Fully qualified source table name
                 (e.g. ``"datalake_ebdb_transactional.contrato"``).
+            canonicalize_tie_breaker_columns: Ordered tie-breaker chain used to
+                pick the surviving row when several rows share the same
+                ``(entity_id, ts_database_transaction)``. The first column wins
+                ties first, then the second, etc. (all applied ``DESC`` with
+                nulls last). Only columns present in ``df`` are used. Defaults to
+                ``DEFAULT_CANONICALIZE_TIE_BREAKERS`` (source-recency columns
+                first, universal CDC metadata as fallback). Override per-source
+                only when a table both lacks ``version``/``updated_at`` and
+                replays distinct payloads at one transaction instant that only a
+                source-recency column orders correctly. No value normalization is
+                applied.
 
         Returns:
             DataFrame with the fixed historical schema:
@@ -79,8 +118,20 @@ class HistoryBuilder:
         source_cols = [source_col for source_col, _ in json_derived_columns.values()]
         id_entity_col = f"id_{entity_name}"
 
+        tie_breaker_columns = HistoryBuilder._resolve_tie_breaker_columns(
+            df, canonicalize_tie_breaker_columns
+        )
+        # ``version`` / ``updated_at`` participate in the exact-dedupe key (when
+        # present) even if a custom tie-breaker override omits them, so distinct
+        # source revisions are never collapsed before canonicalization.
+        recency_cols = [c for c in ("version", "updated_at") if c in df.columns]
+
         cols_to_select = list(
-            {id_col, ts_col, op_col} | set(raw_tracked_cols) | set(source_cols)
+            {id_col, ts_col, op_col}
+            | set(raw_tracked_cols)
+            | set(source_cols)
+            | set(tie_breaker_columns)
+            | set(recency_cols)
         )
         df_source = df.select(*[F.col(c) for c in cols_to_select])
         df_source = HistoryBuilder._materialize_json_derived_columns(
@@ -99,10 +150,29 @@ class HistoryBuilder:
         # only the ~32 relevant columns are materialised into executor memory.
         df_source.cache()
         try:
-            df_with_prev = HistoryBuilder._apply_lag_windows(
-                df_source, id_col, ts_col, tracked_cols, default_values
+            # Step 1: drop byte-identical business rows (e.g. partition-artifact
+            # pairs that differ only in year/month/day/hour or CDC metadata).
+            df_canonical = HistoryBuilder._dedupe_identical_rows(
+                df_source, id_col, ts_col, op_col, tracked_cols
+            )
+            # Step 2: collapse to one row per (entity_id, ts_database_transaction)
+            # using the resolved tie-breaker chain.
+            df_canonical = HistoryBuilder._canonicalize_to_one_row_per_timestamp(
+                df_canonical, id_col, ts_col, tie_breaker_columns
             )
 
+            # Step 3: LAG with the same tie-breaker ordering so the "previous row"
+            # aligns with the surviving canonical row.
+            df_with_prev = HistoryBuilder._apply_lag_windows(
+                df_canonical,
+                id_col,
+                ts_col,
+                tracked_cols,
+                default_values,
+                tie_breaker_columns,
+            )
+
+            # Step 4: change detection (c / d / u / r) -- unchanged.
             event_dfs = HistoryBuilder._detect_and_pivot(
                 df_with_prev,
                 event_configs,
@@ -119,6 +189,10 @@ class HistoryBuilder:
             result_df = HistoryBuilder._generate_keys(
                 result_df, entity_name, id_entity_col
             )
+
+            # Step 5: safety net -- guarantee a unique id_event per batch even if
+            # a future source quirk slips through the canonicalization above.
+            result_df = result_df.dropDuplicates(["id_event"])
 
             result_df = HistoryBuilder._add_metadata_columns(result_df)
 
@@ -190,12 +264,78 @@ class HistoryBuilder:
         }
 
     @staticmethod
+    def _resolve_tie_breaker_columns(
+        df: DataFrame, requested: Optional[List[str]]
+    ) -> List[str]:
+        """Filter the requested (or default) tie-breaker list to present columns.
+
+        Preserves the requested order and keeps only columns that actually exist
+        in ``df`` (case-sensitive match against the source column names), so the
+        same default chain self-adapts across sources with different schemas.
+        """
+        columns = (
+            requested if requested is not None else DEFAULT_CANONICALIZE_TIE_BREAKERS
+        )
+        return [col_name for col_name in columns if col_name in df.columns]
+
+    @staticmethod
+    def _dedupe_identical_rows(
+        df: DataFrame,
+        id_col: str,
+        ts_col: str,
+        op_col: str,
+        tracked_cols: List[str],
+    ) -> DataFrame:
+        """Drop byte-identical business rows (Step 1 of canonicalization).
+
+        Collapses rows that share the same identity, transaction instant,
+        operation, tracked values and source-recency columns
+        (``version`` / ``updated_at`` when present). CDC metadata and partition
+        columns are intentionally excluded from the key so partition-artifact
+        pairs (same payload, different ``year`` / ``month`` / ``day`` / ``hour``
+        or binlog position) collapse to one row.
+        """
+        recency_cols = [c for c in ("version", "updated_at") if c in df.columns]
+        dedupe_key = list(
+            dict.fromkeys([id_col, ts_col, op_col, *tracked_cols, *recency_cols])
+        )
+        return df.dropDuplicates(dedupe_key)
+
+    @staticmethod
+    def _canonicalize_to_one_row_per_timestamp(
+        df: DataFrame,
+        id_col: str,
+        ts_col: str,
+        tie_breaker_columns: List[str],
+    ) -> DataFrame:
+        """Keep one row per ``(entity_id, ts_database_transaction)`` (Step 2).
+
+        Ranks rows within each ``(id_col, ts_col)`` group by the resolved
+        tie-breaker chain (``DESC``, nulls last) and keeps the top row. When no
+        tie-breaker columns are present the surviving row is non-deterministic,
+        but the grain (one row per id+ts) is still enforced.
+        """
+        if tie_breaker_columns:
+            order_by = [
+                F.col(col_name).desc_nulls_last() for col_name in tie_breaker_columns
+            ]
+        else:
+            order_by = [F.col(ts_col)]
+        w = Window.partitionBy(id_col, ts_col).orderBy(*order_by)
+        return (
+            df.withColumn("_rn", F.row_number().over(w))
+            .filter(F.col("_rn") == 1)
+            .drop("_rn")
+        )
+
+    @staticmethod
     def _apply_lag_windows(
         df: DataFrame,
         id_col: str,
         ts_col: str,
         tracked_cols: List[str],
         default_values: Optional[Dict[str, Tuple[str, str]]] = None,
+        tie_breaker_columns: Optional[List[str]] = None,
     ) -> DataFrame:
         """Apply coalesce defaults then compute LAG windows for change detection.
 
@@ -205,9 +345,15 @@ class HistoryBuilder:
         - Transitions like ``null → false`` (same effective value) are correctly
           suppressed rather than emitting a spurious event.
         - The stored ``value`` in the output row already reflects the default.
+
+        The LAG window orders by ``ts_col`` then the same tie-breaker columns used
+        for canonicalization, so the "previous row" is deterministic and aligns
+        with the surviving canonical row at each timestamp.
         """
         if default_values is None:
             default_values = {}
+        if tie_breaker_columns is None:
+            tie_breaker_columns = []
 
         for col_name, (default_val, col_type) in default_values.items():
             df = df.withColumn(
@@ -215,7 +361,10 @@ class HistoryBuilder:
                 F.coalesce(F.col(col_name), F.lit(default_val).cast(col_type)),
             )
 
-        w = Window.partitionBy(id_col).orderBy(ts_col)
+        order_by = [F.col(ts_col)] + [
+            F.col(col_name).desc_nulls_last() for col_name in tie_breaker_columns
+        ]
+        w = Window.partitionBy(id_col).orderBy(*order_by)
         for col_name in tracked_cols:
             df = df.withColumn(f"_prev_{col_name}", F.lag(F.col(col_name)).over(w))
         return df

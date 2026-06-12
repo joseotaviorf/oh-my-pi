@@ -7,6 +7,7 @@ from pyspark.sql.types import (
     BooleanType,
     DoubleType,
     IntegerType,
+    LongType,
     StringType,
     StructField,
     StructType,
@@ -940,8 +941,10 @@ class TestHistoryBuilderSnapshotRead:
         assert len(update_rows) == 0
         assert len(result.collect()) == 2
 
-    def test_two_snapshot_reads_at_same_timestamp_share_id_event(self, spark_session):
-        # arrange -- two r rows at same ts with different status (both emit)
+    def test_two_snapshot_reads_at_same_timestamp_collapse_to_one_event(
+        self, spark_session
+    ):
+        # arrange -- two r rows at same ts with different status
         same_ts = datetime(2025, 10, 9, 10, 31, 31)
         data = [
             ("705", "Ativo", 2500.0, "r", same_ts),
@@ -950,6 +953,301 @@ class TestHistoryBuilderSnapshotRead:
         result = self._build(spark_session, data)
         status_rows = [r for r in result.collect() if r["event_name"] == "ev_STATUS"]
 
-        # assert -- both rows emit (value changed) but merge dedupes via id_event
-        assert len(status_rows) == 2
-        assert status_rows[0]["id_event"] == status_rows[1]["id_event"]
+        # assert -- canonicalization keeps one row per (id, ts), so a single
+        # status event is emitted upstream of the merge (no duplicate id_event).
+        # The schema carries no tie-breaker columns, so the surviving value is
+        # non-deterministic; only the grain is guaranteed.
+        assert len(status_rows) == 1
+        assert status_rows[0]["value"] in {"Ativo", "Finalizado"}
+
+
+# ---------------------------------------------------------------------------
+# Canonicalization: collapse many CDC rows per (entity_id, ts) to one
+# ---------------------------------------------------------------------------
+
+# Region-like profile: source-recency columns (version / updated_at) plus the
+# universal CDC metadata and partition columns.
+CANON_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("status", StringType(), True),
+        StructField("rent", DoubleType(), True),
+        StructField("op_cdc", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+        StructField("version", IntegerType(), True),
+        StructField("updated_at", TimestampType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("cdc_binlog_position", LongType(), True),
+        StructField("cdc_transaction_id", StringType(), True),
+        StructField("year", IntegerType(), True),
+        StructField("month", IntegerType(), True),
+        StructField("day", IntegerType(), True),
+    ]
+)
+
+# House (imovel) profile: NO version / updated_at -- only CDC metadata.
+IMOVEL_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("status", StringType(), True),
+        StructField("rent", DoubleType(), True),
+        StructField("op_cdc", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("cdc_binlog_position", LongType(), True),
+        StructField("cdc_transaction_id", StringType(), True),
+    ]
+)
+
+
+class TestHistoryBuilderCanonicalization:
+    """Tests for the canonicalization pipeline (Steps 1, 2, 5)."""
+
+    SNAPSHOT_TS = datetime(2025, 5, 12, 0, 0, 0)
+
+    def _build(self, df, tie_breakers=None):
+        return HistoryBuilder.build_history_for_columns(
+            df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=EVENT_CONFIGS,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+            canonicalize_tie_breaker_columns=tie_breakers,
+        )
+
+    def test_exact_dedupe_drops_partition_artifact_pairs(self, spark_session):
+        # arrange -- identical business payload, differing only in partition
+        # columns and binlog position (a partition-artifact pair).
+        upd = datetime(2025, 5, 12, 0, 0, 0)
+        cdc = datetime(2025, 5, 12, 1, 0, 0)
+        data = [
+            (
+                "800",
+                "Ativo",
+                2500.0,
+                "r",
+                self.SNAPSHOT_TS,
+                7,
+                upd,
+                cdc,
+                10,
+                "tx",
+                None,
+                None,
+                None,
+            ),
+            (
+                "800",
+                "Ativo",
+                2500.0,
+                "r",
+                self.SNAPSHOT_TS,
+                7,
+                upd,
+                cdc,
+                20,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+        ]
+        df = spark_session.createDataFrame(data, CANON_SCHEMA)
+        result = self._build(df)
+        rows = result.collect()
+
+        # assert -- one event per tracked column, no duplicate id_event
+        assert len(rows) == 2
+        assert {r["event_name"] for r in rows} == {"ev_STATUS", "ev_RENT_VALUE"}
+        assert len({r["id_event"] for r in rows}) == 2
+
+    def test_canonicalize_picks_max_version_at_same_ts(self, spark_session):
+        # arrange -- replay of 3 revisions at one snapshot instant, versions 5/6/7
+        upd = datetime(2025, 5, 12, 0, 0, 0)
+        cdc = datetime(2025, 5, 12, 1, 0, 0)
+        data = [
+            (
+                "801",
+                "V5",
+                100.0,
+                "r",
+                self.SNAPSHOT_TS,
+                5,
+                upd,
+                cdc,
+                1,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+            (
+                "801",
+                "V7",
+                300.0,
+                "r",
+                self.SNAPSHOT_TS,
+                7,
+                upd,
+                cdc,
+                1,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+            (
+                "801",
+                "V6",
+                200.0,
+                "r",
+                self.SNAPSHOT_TS,
+                6,
+                upd,
+                cdc,
+                1,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+        ]
+        df = spark_session.createDataFrame(data, CANON_SCHEMA)
+        result = self._build(df)
+        rows = result.collect()
+
+        # assert -- only the highest-version revision survives
+        status_rows = [r for r in rows if r["event_name"] == "ev_STATUS"]
+        rent_rows = [r for r in rows if r["event_name"] == "ev_RENT_VALUE"]
+        assert len(status_rows) == 1
+        assert status_rows[0]["value"] == "V7"
+        assert len(rent_rows) == 1
+        assert rent_rows[0]["value"] == "300.0"
+
+    def test_same_ts_different_values_collapse_to_one_event(self, spark_session):
+        # arrange -- two rows at same ts, different value, version decides
+        upd = datetime(2025, 5, 12, 0, 0, 0)
+        cdc = datetime(2025, 5, 12, 1, 0, 0)
+        data = [
+            (
+                "802",
+                "Ativo",
+                2500.0,
+                "r",
+                self.SNAPSHOT_TS,
+                1,
+                upd,
+                cdc,
+                1,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+            (
+                "802",
+                "Finalizado",
+                2500.0,
+                "r",
+                self.SNAPSHOT_TS,
+                2,
+                upd,
+                cdc,
+                1,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+        ]
+        df = spark_session.createDataFrame(data, CANON_SCHEMA)
+        result = self._build(df)
+        status_rows = [r for r in result.collect() if r["event_name"] == "ev_STATUS"]
+
+        # assert -- exactly one status event (version 2 wins), unique id_event
+        assert len(status_rows) == 1
+        assert status_rows[0]["value"] == "Finalizado"
+
+    def test_output_id_event_is_unique(self, spark_session):
+        # arrange -- multi-entity snapshot replay with several rows per (id, ts)
+        upd = datetime(2025, 5, 12, 0, 0, 0)
+        cdc = datetime(2025, 5, 12, 1, 0, 0)
+        data = [
+            ("900", "A", 10.0, "r", self.SNAPSHOT_TS, v, upd, cdc, 1, "tx", 2025, 5, 12)
+            for v in range(5)
+        ] + [
+            ("901", "B", 20.0, "r", self.SNAPSHOT_TS, v, upd, cdc, 1, "tx", 2025, 5, 12)
+            for v in range(8)
+        ]
+        df = spark_session.createDataFrame(data, CANON_SCHEMA)
+        result = self._build(df)
+        rows = result.collect()
+
+        # assert -- id_event is unique across the whole output
+        id_events = [r["id_event"] for r in rows]
+        assert len(id_events) == len(set(id_events))
+
+    def test_custom_tie_breaker_columns(self, spark_session):
+        # arrange -- two rows tied on version/updated_at; only binlog differs
+        upd = datetime(2025, 5, 12, 0, 0, 0)
+        cdc = datetime(2025, 5, 12, 1, 0, 0)
+        data = [
+            (
+                "803",
+                "low",
+                1.0,
+                "r",
+                self.SNAPSHOT_TS,
+                1,
+                upd,
+                cdc,
+                100,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+            (
+                "803",
+                "high",
+                2.0,
+                "r",
+                self.SNAPSHOT_TS,
+                1,
+                upd,
+                cdc,
+                200,
+                "tx",
+                2025,
+                5,
+                12,
+            ),
+        ]
+        df = spark_session.createDataFrame(data, CANON_SCHEMA)
+        # override: rank by binlog position only -> highest (200) wins
+        result = self._build(df, tie_breakers=["cdc_binlog_position"])
+        status_rows = [r for r in result.collect() if r["event_name"] == "ev_STATUS"]
+
+        # assert
+        assert len(status_rows) == 1
+        assert status_rows[0]["value"] == "high"
+
+    def test_missing_version_falls_back_to_cdc_columns(self, spark_session):
+        # arrange -- imovel profile (no version/updated_at); ts_cdc_transaction
+        # is the leading present tie-breaker.
+        early_cdc = datetime(2025, 5, 12, 1, 0, 0)
+        late_cdc = datetime(2025, 5, 12, 2, 0, 0)
+        data = [
+            ("804", "old", 1.0, "r", self.SNAPSHOT_TS, early_cdc, 1, "tx"),
+            ("804", "new", 2.0, "r", self.SNAPSHOT_TS, late_cdc, 2, "tx"),
+        ]
+        df = spark_session.createDataFrame(data, IMOVEL_SCHEMA)
+        result = self._build(df)
+        status_rows = [r for r in result.collect() if r["event_name"] == "ev_STATUS"]
+
+        # assert -- latest ts_cdc_transaction wins; one row per (id, ts)
+        assert len(status_rows) == 1
+        assert status_rows[0]["value"] == "new"
