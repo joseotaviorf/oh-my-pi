@@ -677,7 +677,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--outcomes-csv",
         type=Path,
         required=True,
-        help="Trino export of datalake_rightsizing_outcomes.enrich_rightsizing_outcomes",
+        help="Trino export of datalake_databricks_health.enrich_rightsizing_outcomes",
     )
     parser.add_argument(
         "--dags-root",

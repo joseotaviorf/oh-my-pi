@@ -208,7 +208,10 @@ See `docs/platform/cluster_rightsizing_feedback_loop_plan.md` for the design.
   `promotion_action` precomputed. Promotion bar: ≥1 clean validation run,
   cost below prod, wall ≤ 1.5× prod p50 (or the cadence limit for ≤2h
   schedules); `mem_p95 > 82` holds for one more run.
-  Deploy note: this PR changes the table grain and partition scheme (dt → val_dt); the existing datalake_rightsizing_outcomes.enrich_rightsizing_outcomes table must be dropped/recreated before the first post-merge run (coordinate with the Data Life Cycle owner — exact DDL depends on the managed-vs-external table setup; unverified — confirm first).
+  Deploy note: table lives in `datalake_databricks_health.enrich_rightsizing_outcomes`
+  (same UC schema as query_history / daily_cluster_health). The orphaned
+  `datalake_rightsizing_outcomes.enrich_rightsizing_outcomes` entry from the v1
+  schema can be dropped later; it does not block the new location.
 - **Promotion gate**: export the outcomes table to CSV (Trino), then
   `uv run --python 3.12 python scripts/promote_rightsizing_validations.py
   --outcomes-csv <csv> --report-out <md>` — promotes eligible specs into the

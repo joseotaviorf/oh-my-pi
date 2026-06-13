@@ -17,6 +17,7 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  custom_schema: databricks_health
   default_extraction_type: incremental
   has_hive_sync: true
   tables_customization:

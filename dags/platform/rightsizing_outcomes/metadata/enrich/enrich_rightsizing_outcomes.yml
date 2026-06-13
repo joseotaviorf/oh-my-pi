@@ -1,5 +1,5 @@
 ---
-database_name: datalake_rightsizing_outcomes
+database_name: datalake_databricks_health
 table_name: enrich_rightsizing_outcomes
 description: |
   Prod vs `__validation` twin comparison for cluster right-sizing feedback
