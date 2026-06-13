@@ -10,4 +10,6 @@ cluster:
     spark_conf:
       spark.metrics.namespace: data_products.enrich_base_metrics_service
     num_workers: 3
-    driver_node_type_id: r6g.2xlarge
+    driver_node_type_id: r6gd.2xlarge
+    node_type_id: m6gd.8xlarge
+    runtime_engine: PHOTON
