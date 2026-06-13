@@ -1,4 +1,4 @@
-WITH time_metrics AS (
+WITH time_metrics_raw AS (
   SELECT DISTINCT
     id_segment AS id_task,
     id_reservation,
@@ -6,34 +6,63 @@ WITH time_metrics AS (
     total_talk_time,
     total_wrap_up_time,
     total_handling_time,
-    total_waiting_time
+    total_waiting_time,
+    ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) AS rn
   FROM
     datalake_twilio_flex_insights_clean.conversation_time_metrics
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) = 1
 ),
-chat_reservation_timestamp AS (
+time_metrics AS (
   SELECT
     id_task,
-    ts_created - INTERVAL 3 HOUR AS ts_reservation_created
+    id_reservation,
+    total_queue_time,
+    total_talk_time,
+    total_wrap_up_time,
+    total_handling_time,
+    total_waiting_time
+  FROM
+    time_metrics_raw
+  WHERE
+    rn = 1
+),
+chat_reservation_timestamp_raw AS (
+  SELECT
+    id_task,
+    ts_created - INTERVAL 3 HOUR AS ts_reservation_created,
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created) AS rn
   FROM
     datalake_quinto_messenger_clean.task_event
   WHERE
     event_type = 'reservation.accepted'
     AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 3 YEAR
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created) = 1
 ),
-customer_email AS (
+chat_reservation_timestamp AS (
+  SELECT
+    id_task,
+    ts_reservation_created
+  FROM
+    chat_reservation_timestamp_raw
+  WHERE
+    rn = 1
+),
+customer_email_raw AS (
   SELECT DISTINCT
     customer_contact AS email,
-    id_user
+    id_user,
+    ROW_NUMBER() OVER (PARTITION BY customer_contact ORDER BY id_user DESC) AS rn
   FROM
     datalake_ebdb_customer_contact_identification.customer_contact_identification
   WHERE
-      channel = 'email'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY email ORDER BY id_user DESC) = 1
+    channel = 'email'
+),
+customer_email AS (
+  SELECT
+    email,
+    id_user
+  FROM
+    customer_email_raw
+  WHERE
+    rn = 1
 ),
 twilio_demand AS (
   SELECT DISTINCT
@@ -68,7 +97,7 @@ twilio_demand AS (
     NULL AS customer_email,
     waiting_time_sec,
     NULL AS seconds_to_first_response,
-    NULL AS total_inactivity_time, 
+    NULL AS total_inactivity_time,
     NULL AS last_inactivity_time,
     NULL AS is_per_team_task,
     is_call_answered AS is_contact_answered,
@@ -112,7 +141,7 @@ twilio_demand AS (
     customer_email,
     NULL AS waiting_time_sec,
     seconds_to_first_response,
-    CAST(total_inactivity_time AS DOUBLE) / 1000 AS total_inactivity_time, 
+    CAST(total_inactivity_time AS DOUBLE) / 1000 AS total_inactivity_time,
     CAST(last_inactivity_time AS DOUBLE) / 1000 AS last_inactivity_time,
     is_per_team_task,
     TRUE AS is_contact_answered,
@@ -339,8 +368,58 @@ front_contacts AS (
     MAKE_DATE(t.year, t.month, t.day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_end_date}')
     AND t.channel = 'email'
     AND front_or_back = 'front'
+),
+front_contacts_ranked AS (
+  SELECT DISTINCT
+    sk_contact,
+    sk_interaction,
+    sk_session,
+    sk_support_session,
+    sk_task,
+    sk_call,
+    sk_reservation,
+    COALESCE(sk_ticket, -1) AS sk_ticket,
+    COALESCE(sk_user, -1) AS sk_user,
+    LAG(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_prev_department,
+    sk_department,
+    sk_analyst,
+    LEAD(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_next_department,
+    FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_first_department,
+    FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created DESC) AS sk_last_department,
+    direction,
+    channel,
+    origin,
+    status,
+    worker_email,
+    completion_reason,
+    quinto_andar_phone_number,
+    REPLACE(REPLACE(customer_phone_number, "+", ""), "whatsapp:", "") AS customer_phone_number,
+    customer_email,
+    total_talk_time,
+    total_queue_time,
+    total_wrap_up_time,
+    total_waiting_time,
+    first_reply_time,
+    total_handling_time,
+    total_inactivity_time,
+    last_inactivity_time,
+    is_first_interaction,
+    is_last_interaction,
+    is_first_department_interaction,
+    is_per_team_task,
+    is_contact_answered,
+    is_interaction_answered,
+    is_spoc_task,
+    is_isaias_session,
+    ts_task_created,
+    ts_reservation_created,
+    ts_reservation_ended,
+    NOW() AS ts_load,
+    ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_interaction, sk_user, sk_department ORDER BY ts_task_created DESC) AS rn
+  FROM
+    front_contacts
 )
-SELECT DISTINCT
+SELECT
   sk_contact,
   sk_interaction,
   sk_session,
@@ -348,14 +427,14 @@ SELECT DISTINCT
   sk_task,
   sk_call,
   sk_reservation,
-  COALESCE(sk_ticket, -1) AS sk_ticket,
-  COALESCE(sk_user, -1) AS sk_user,
-  LAG(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_prev_department,
+  sk_ticket,
+  sk_user,
+  sk_prev_department,
   sk_department,
   sk_analyst,
-  LEAD(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_next_department,
-  FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_first_department,
-  FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created DESC) AS sk_last_department,
+  sk_next_department,
+  sk_first_department,
+  sk_last_department,
   direction,
   channel,
   origin,
@@ -363,7 +442,7 @@ SELECT DISTINCT
   worker_email,
   completion_reason,
   quinto_andar_phone_number,
-  REPLACE(REPLACE(customer_phone_number, "+", ""), "whatsapp:", "") AS customer_phone_number,
+  customer_phone_number,
   customer_email,
   total_talk_time,
   total_queue_time,
@@ -384,8 +463,8 @@ SELECT DISTINCT
   ts_task_created,
   ts_reservation_created,
   ts_reservation_ended,
-  NOW() AS ts_load
+  ts_load
 FROM
-  front_contacts
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_interaction, sk_user, sk_department ORDER BY ts_task_created DESC) = 1
+  front_contacts_ranked
+WHERE
+  rn = 1
