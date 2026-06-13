@@ -17,6 +17,8 @@ validation:
       group_name: analytics-engineers
       permission_level: CAN_MANAGE
     custom_configurations:
+      single_user_name: "{{ var.value.databricks_single_user_name }}"
+      data_security_mode: SINGLE_USER
       aws_attributes:
         ebs_volume_size: 200
   allow_custom_spark_job: true
