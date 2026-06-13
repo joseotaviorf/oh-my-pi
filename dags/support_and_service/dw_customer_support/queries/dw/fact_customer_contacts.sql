@@ -138,7 +138,7 @@ twilio_contacts AS (
   SELECT DISTINCT
     CASE
       WHEN d.channel = 'call' THEN MD5(CONCAT(COALESCE(d.id_call, d.id_task), 'call'))
-      WHEN d.channel = 'chat' THEN MD5(CONCAT(d.id_session, 'chat'))
+      WHEN d.channel = 'chat' THEN MD5(CONCAT(COALESCE(d.id_session, d.id_sss_session, d.id_task), 'chat'))
     END AS sk_contact,
     CASE
       WHEN d.channel = 'call' THEN MD5(COALESCE(d.id_reservation, CONCAT(COALESCE(d.id_call, d.id_task), 'n/a')))
