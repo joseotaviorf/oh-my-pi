@@ -241,6 +241,28 @@ Phase 2 (excluded / future work): `wonka`, `query_view` — see [Exclusions](#ex
 
 `query_view` creates Trino/Spark views only; it does not materialise any table. There are no write-target rows to redirect, and no `cluster_validation` tables are emitted. View creation on a validation cluster is harmless but does not test compute behaviour, so `query_view` is **excluded** from Phase 2 write-target wiring (future work if view DDL compatibility testing is needed).
 
+### access / reverse export DAGs
+
+Custom Spark jobs that **export** data to external systems (SQS, SNS, S3, Birdie API, etc.) must **not** redirect reads to `cluster_validation` shadow tables. Validation runs inject `--target-database-name` / `--target-table-name` for consistency with other custom jobs, but the job should:
+
+1. Call `is_validation_run(target_database_name, target_table_name)` and **return early** (skip the export).
+2. Keep reading from **prod** sources (`reverse_birdie.{table}`, etc.) when not in validation mode.
+
+See `load_into_sqs.py` and `load_into_birdie_api.py` for the pattern. Misusing `resolve_datalake_write_target` on the read path causes `TABLE_OR_VIEW_NOT_FOUND` on non-existent shadow tables.
+
+### Validation conf exceptions
+
+Some prod DAGs do not use the generic `load_start_date` / `load_end_date` window that `trigger_cluster_validation_dags.py --from-prod-run` derives from `data_interval_end - 1 day`. Register them in [`scripts/cluster_validation_conf_exceptions.py`](../../scripts/cluster_validation_conf_exceptions.py):
+
+| Prod DAG | Resolver | Why |
+| -------- | -------- | --- |
+| `bietlejuice.text2filter_evals` | `exception:text2filter_single_day` | Single S3 partition per run (`data_interval_start`), not a multi-day window |
+| `bietlejuice.cyber_legal` | `exception:cyber_legal_3day_window` | Declaration uses `load_end = load_start + 2 days`, not `interval_end - 1` |
+
+Dry-run output shows the resolver in the **SRC** column (`conf`, `data_interval`, or `exception:*`). DAGs that consume non-standard conf keys may also need declaration `get_date_param` wiring (see `text2filter_evals` `load_start_date`).
+
+To add a new exception: implement a resolver, register it in `VALIDATION_CONF_EXCEPTIONS`, extend `LoadWindowSource` in `cluster_validation_reference.py`, and add unit tests in `tests/unit/scripts/test_cluster_validation_conf_exceptions.py`.
+
 ## UC grants
 
 Job clusters need write access to schema `cluster_validation` in `quintoandar_prod` (one-time platform grant).

@@ -21,7 +21,12 @@ MIN_PROD_DATABRICKS_WALL_SECONDS = 5 * 60
 
 DEFAULT_PROD_RUN_LOOKBACK_DAYS = 14
 
-LoadWindowSource = Literal["conf", "data_interval"]
+LoadWindowSource = Literal[
+    "conf",
+    "data_interval",
+    "exception:text2filter_single_day",
+    "exception:cyber_legal_3day_window",
+]
 
 
 def is_valid_date_param(value: Any) -> bool:

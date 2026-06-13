@@ -3,7 +3,7 @@ import logging
 import time
 from argparse import ArgumentParser
 from datetime import datetime
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import requests
@@ -14,7 +14,7 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
-    resolve_datalake_write_target,
+    is_validation_run,
 )
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -111,10 +111,12 @@ def create_feedbacks_results_payload(df, table_name):
     return feedbacks_results_list
 
 
-def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str, str]:
+def parse_arguments() -> Tuple[
+    str, str, str, datetime, str, str, str, Optional[str], Optional[str]
+]:
     """
     Parse the arguments passed to the job.
-    Returns a tuple with the DAG name, database name, table name, event type, and execution date.
+    Returns a tuple with the DAG name, database name, table name, and execution date.
     """
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -135,28 +137,16 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str, str]:
     add_validation_target_args(parser)
     args = parser.parse_args()
 
-    dag_name = args.dag_name
-    execution_date = datetime.fromisoformat(args.execution_date)
-    feedbacks_endpoint = args.feedbacks_endpoint
-    accounts_endpoint = args.accounts_endpoint
-    api_url = args.api_url
-    database_name, table_name, _ = resolve_datalake_write_target(
-        prod_database=args.database_name,
-        prod_table=args.table_name,
-        prod_location="",
-        bucket="",
-        target_database=args.target_database_name,
-        target_table=args.target_table_name,
-    )
-
     return (
-        dag_name,
-        database_name,
-        table_name,
-        execution_date,
-        feedbacks_endpoint,
-        accounts_endpoint,
-        api_url,
+        args.dag_name,
+        args.database_name,
+        args.table_name,
+        datetime.fromisoformat(args.execution_date),
+        args.feedbacks_endpoint,
+        args.accounts_endpoint,
+        args.api_url,
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -307,7 +297,15 @@ def main():
         feedbacks_endpoint,
         accounts_endpoint,
         api_url,
+        target_database_name,
+        target_table_name,
     ) = parse_arguments()
+
+    if is_validation_run(target_database_name, target_table_name):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping Birdie API export in cluster validation mode"
+        )
+        return
 
     base_dbutils = BaseDBUtils()
     global dbutils

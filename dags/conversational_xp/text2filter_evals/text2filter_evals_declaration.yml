@@ -8,13 +8,15 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_text2filter_evals_into_datalake
   default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
 
   spark_job_arguments:
   - "{environment}"
   - "{bucket}"
   - "{dag_name}"
   - s3://data-science.s3.data.quintoandar.com.br/text2filter-evals/text2filter_evals
-  - "{{ data_interval_start | ds }}"
+  - "{load_start_date}"
   - "{table_name}"
   - "{partitions}"
   - parquet
@@ -27,4 +29,3 @@ workflow:
       - year
       - month
       - day
-

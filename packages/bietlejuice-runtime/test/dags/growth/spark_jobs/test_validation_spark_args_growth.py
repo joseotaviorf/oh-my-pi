@@ -29,7 +29,7 @@ _JOB_PATHS = [
     "dags/growth/hubspot/spark_jobs/load_hubspot_raw.py",
     "dags/growth/hmb_ada/spark_jobs/load_hmb_ada_raw.py",
     "dags/growth/lifull_campaigns/spark_jobs/load_lifull_campaigns_raw.py",
-    "dags/growth/olos_dialer_test/spark_jobs/load_olos_dialer_raw.py",
+    "dags/growth/olos_dialer/spark_jobs/load_olos_dialer_raw.py",
     "dags/growth/profound/spark_jobs/load_profound_raw.py",
     "dags/growth/quires/spark_jobs/load_quires_raw.py",
     "dags/growth/reverse_atlas_pricing_report_access/spark_jobs/load_into_sns.py",

@@ -28,6 +28,9 @@ from scripts.airflow_rest_client import (  # noqa: E402
     AirflowAuth,
     AirflowRestClient,
 )
+from scripts.cluster_validation_conf_exceptions import (  # noqa: E402
+    resolve_validation_conf_for_dag,
+)
 from scripts.cluster_validation_dag_discovery import (  # noqa: E402
     ValidationDag,
     discover_validation_dags,
@@ -530,7 +533,7 @@ def _resolve_prod_run_plan(
             ),
         )
 
-    window = _load_window_from_prod_dag_run(reference_run)
+    window = resolve_validation_conf_for_dag(dag.original_dag_id, reference_run)
     if window is None:
         return DagExecutionPlan(
             dag=dag,
@@ -661,7 +664,7 @@ def _print_dry_run_table(plans: list[DagExecutionPlan]) -> None:
         "SRC",
         "ACTION",
     )
-    widths = (12, 44, 36, 8, 12, 12, 10, 32)
+    widths = (12, 44, 36, 8, 12, 12, 34, 32)
     header_line = "  ".join(
         header.ljust(width) for header, width in zip(headers, widths, strict=True)
     )
