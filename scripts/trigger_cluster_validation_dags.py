@@ -8,6 +8,7 @@ import asyncio
 import json
 import os
 import random
+import secrets
 import sys
 import time
 from collections.abc import Callable
@@ -55,10 +56,13 @@ ACTIVE_DAG_RUN_STATES = frozenset({"queued", "running", "deferred"})
 CONF_MATCH_KEYS = ("run_type", "load_start_date", "load_end_date")
 DATABRICKS_MAX_CLUSTER_NAME_LENGTH = 100
 # prod_conf cluster_name: "{{ dag.dag_id }}_{{ run_id }}" (also used as Databricks job_cluster_key).
-# Worst common run_id: scheduled__ + ISO-8601 with microseconds + timezone (43 chars).
-DATABRICKS_RUN_ID_SUFFIX_RESERVE = 43
+VALIDATION_RUN_ID_PREFIX = "val__"
+VALIDATION_RUN_ID_SUFFIX_LEN = 4
+VALIDATION_RUN_ID_MAX_LEN = (
+    len(VALIDATION_RUN_ID_PREFIX) + 14 + 1 + VALIDATION_RUN_ID_SUFFIX_LEN
+)
 DATABRICKS_MAX_VALIDATION_DAG_ID_LENGTH = (
-    DATABRICKS_MAX_CLUSTER_NAME_LENGTH - 1 - DATABRICKS_RUN_ID_SUFFIX_RESERVE
+    DATABRICKS_MAX_CLUSTER_NAME_LENGTH - 1 - VALIDATION_RUN_ID_MAX_LEN
 )
 DEFAULT_VALIDATION_COOLDOWN_HOURS = 2.0
 VALIDATION_TIMEOUT_PROD_WALL_FACTOR = 2.0
@@ -569,9 +573,20 @@ def _attach_validation_action(
     return plan
 
 
+def _build_validation_dag_run_id(
+    *, now: datetime | None = None
+) -> tuple[str, str]:
+    """Return a short Airflow dag_run_id and matching logical_date for validation triggers."""
+    reference = now or datetime.now(timezone.utc)
+    timestamp = reference.strftime("%Y%m%d%H%M%S")
+    suffix = secrets.token_hex(2)
+    dag_run_id = f"{VALIDATION_RUN_ID_PREFIX}{timestamp}_{suffix}"
+    return dag_run_id, reference.isoformat()
+
+
 def _dag_id_exceeds_databricks_limit(dag_id: str) -> bool:
     return (
-        len(dag_id) + 1 + DATABRICKS_RUN_ID_SUFFIX_RESERVE
+        len(dag_id) + 1 + VALIDATION_RUN_ID_MAX_LEN
         > DATABRICKS_MAX_CLUSTER_NAME_LENGTH
     )
 
@@ -1296,8 +1311,13 @@ async def trigger_and_monitor(
                             "was paused",
                             progress=progress,
                         )
+                    custom_run_id, logical_date = _build_validation_dag_run_id()
                     payload = await asyncio.to_thread(
-                        client.trigger_dag_run, dag.dag_id, plan.conf
+                        client.trigger_dag_run,
+                        dag.dag_id,
+                        plan.conf,
+                        dag_run_id=custom_run_id,
+                        logical_date=logical_date,
                     )
                     dag_run_id = payload["dag_run_id"]
                     if plan.conf is not None:

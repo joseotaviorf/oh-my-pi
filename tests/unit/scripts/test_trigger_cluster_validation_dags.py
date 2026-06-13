@@ -5,7 +5,7 @@ import threading
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
 import requests
@@ -579,29 +579,35 @@ def _dag_id_with_length(total_length: int) -> str:
 
 
 class TestDatabricksDagIdLength:
-    def test_braze_length_dag_id_exceeds_limit(self) -> None:
+    def test_braze_length_dag_id_within_limit(self) -> None:
         dag_id = "bietlejuice.enrich_braze_events_user_centric_periodicity__validation"
         assert len(dag_id) == 68
-        assert trigger_script._dag_id_exceeds_databricks_limit(dag_id)
+        assert not trigger_script._dag_id_exceeds_databricks_limit(dag_id)
 
-    def test_braze_length_skipped_in_build_plans(self) -> None:
+    def test_braze_length_allowed_in_build_plans(self) -> None:
         dag_id = "bietlejuice.enrich_braze_events_user_centric_periodicity__validation"
         client = MagicMock()
-        args = trigger_script._parse_args(["--from-prod-run"])
+        client.list_dag_runs.return_value = []
+        args = trigger_script._parse_args(
+            [
+                "--load-start-date",
+                "2024-01-01",
+                "--load-end-date",
+                "2024-01-07",
+            ]
+        )
         plans = trigger_script._build_execution_plans(
             client,
             [_validation_dag_with_id(dag_id)],
             args,
         )
         assert len(plans) == 1
-        assert plans[0].conf is None
-        assert "too long for Databricks" in (plans[0].skip_reason or "")
-        client.list_dag_runs.assert_not_called()
+        assert plans[0].skip_reason is None
+        assert plans[0].conf is not None
 
     def test_force_retrigger_still_skips_too_long_dag_id(self) -> None:
-        dag_id = (
-            "bietlejuice.arquivo_confidencial_integration_report__validation"
-        )
+        dag_id = _dag_id_with_length(76)
+        assert len(dag_id) == 76
         client = MagicMock()
         action = trigger_script._resolve_run_action(
             client,
@@ -614,9 +620,7 @@ class TestDatabricksDagIdLength:
         client.list_dag_runs.assert_not_called()
 
     def test_force_retrigger_does_not_trigger_too_long_dag(self) -> None:
-        dag_id = (
-            "bietlejuice.arquivo_confidencial_integration_report__validation"
-        )
+        dag_id = _dag_id_with_length(76)
         client = MagicMock()
         plan = trigger_script.DagExecutionPlan(
             dag=_validation_dag_with_id(dag_id),
@@ -647,27 +651,34 @@ class TestDatabricksDagIdLength:
         assert "too long for Databricks" in (outcomes[0].error_message or "")
         client.trigger_dag_run.assert_not_called()
 
-    def test_arquivo_confidencial_length_skipped(self) -> None:
+    def test_arquivo_confidencial_length_allowed(self) -> None:
         dag_id = (
             "bietlejuice.arquivo_confidencial_integration_report__validation"
         )
         assert len(dag_id) == 63
-        assert trigger_script._dag_id_exceeds_databricks_limit(dag_id)
+        assert not trigger_script._dag_id_exceeds_databricks_limit(dag_id)
 
         client = MagicMock()
-        args = trigger_script._parse_args(["--from-prod-run"])
+        client.list_dag_runs.return_value = []
+        args = trigger_script._parse_args(
+            [
+                "--load-start-date",
+                "2024-01-01",
+                "--load-end-date",
+                "2024-01-07",
+            ]
+        )
         plans = trigger_script._build_execution_plans(
             client,
             [_validation_dag_with_id(dag_id)],
             args,
         )
-        assert plans[0].conf is None
-        assert "too long for Databricks" in (plans[0].skip_reason or "")
-        client.list_dag_runs.assert_not_called()
+        assert plans[0].skip_reason is None
+        assert plans[0].conf is not None
 
     def test_dag_id_at_limit_allowed(self) -> None:
-        dag_id = _dag_id_with_length(56)
-        assert len(dag_id) == 56
+        dag_id = _dag_id_with_length(75)
+        assert len(dag_id) == 75
         assert not trigger_script._dag_id_exceeds_databricks_limit(dag_id)
 
         client = MagicMock()
@@ -688,8 +699,8 @@ class TestDatabricksDagIdLength:
         assert plans[0].skip_reason is None
 
     def test_dag_id_one_over_limit_skipped(self) -> None:
-        dag_id = _dag_id_with_length(57)
-        assert len(dag_id) == 57
+        dag_id = _dag_id_with_length(76)
+        assert len(dag_id) == 76
         assert trigger_script._dag_id_exceeds_databricks_limit(dag_id)
 
         client = MagicMock()
@@ -700,7 +711,37 @@ class TestDatabricksDagIdLength:
             args,
         )
         assert plans[0].conf is None
-        assert "limit 56" in (plans[0].skip_reason or "")
+        assert "limit 75" in (plans[0].skip_reason or "")
+
+    def test_cluster_name_fits_for_long_validation_dags(self) -> None:
+        for dag_id in (
+            "bietlejuice.enrich_braze_events_user_centric_periodicity__validation",
+            "bietlejuice.arquivo_confidencial_integration_report__validation",
+        ):
+            run_id, _ = trigger_script._build_validation_dag_run_id(
+                now=datetime(2026, 6, 13, 14, 30, 22, tzinfo=timezone.utc)
+            )
+            assert len(run_id) == trigger_script.VALIDATION_RUN_ID_MAX_LEN
+            assert len(f"{dag_id}_{run_id}") <= trigger_script.DATABRICKS_MAX_CLUSTER_NAME_LENGTH
+
+
+class TestBuildValidationDagRunId:
+    def test_fixed_length_and_prefix(self) -> None:
+        reference = datetime(2026, 6, 13, 14, 30, 22, tzinfo=timezone.utc)
+        run_id, logical_date = trigger_script._build_validation_dag_run_id(now=reference)
+
+        assert run_id.startswith("val__")
+        assert len(run_id) == trigger_script.VALIDATION_RUN_ID_MAX_LEN
+        assert run_id.startswith("val__20260613143022_")
+        assert logical_date == reference.isoformat()
+
+    def test_unique_suffix_across_calls(self) -> None:
+        reference = datetime(2026, 6, 13, 14, 30, 22, tzinfo=timezone.utc)
+        run_ids = {
+            trigger_script._build_validation_dag_run_id(now=reference)[0]
+            for _ in range(20)
+        }
+        assert len(run_ids) > 1
 
 
 class TestTransientApiError:
@@ -1104,7 +1145,9 @@ class TestTriggerAndMonitorFailureHandling:
         client.list_dag_runs.return_value = []
         client.ensure_dag_unpaused.return_value = False
         client.trigger_dag_run.side_effect = (
-            lambda dag_id, conf: {"dag_run_id": f"run__{dag_id}"}
+            lambda dag_id, conf, **kwargs: {
+                "dag_run_id": kwargs.get("dag_run_id", f"run__{dag_id}")
+            }
         )
         client.get_dag_run.side_effect = get_dag_run
         client.list_task_instances.side_effect = list_task_instances
@@ -1228,13 +1271,15 @@ class TestMaxParallel:
         peak_in_flight = 0
         lock = threading.Lock()
 
-        def trigger_dag_run(dag_id: str, conf: dict) -> dict:
+        def trigger_dag_run(dag_id: str, conf: dict, **kwargs: object) -> dict:
             nonlocal peak_in_flight
             with lock:
                 active_runs.add(dag_id)
                 peak_in_flight = max(peak_in_flight, len(active_runs))
             time.sleep(0.05)
-            return {"dag_run_id": f"run__{dag_id}"}
+            return {
+                "dag_run_id": kwargs.get("dag_run_id", f"run__{dag_id}"),
+            }
 
         poll_counts: dict[str, int] = {}
 
@@ -1329,8 +1374,51 @@ class TestUnpauseBeforeTrigger:
         assert client.method_calls.index(
             call.set_dag_paused(_sample_dag().dag_id, is_paused=False)
         ) < client.method_calls.index(
-            call.trigger_dag_run(_sample_dag().dag_id, EXPECTED_CONF)
+            call.trigger_dag_run(
+                _sample_dag().dag_id,
+                EXPECTED_CONF,
+                dag_run_id=ANY,
+                logical_date=ANY,
+            )
         )
+
+    def test_trigger_passes_short_dag_run_id(self) -> None:
+        client = MagicMock()
+        client.list_dag_runs.return_value = []
+        client.ensure_dag_unpaused.return_value = False
+        client.get_dag_run.return_value = {"state": "success"}
+        client.list_task_instances.return_value = []
+
+        captured: dict[str, str] = {}
+
+        def capture_trigger(
+            dag_id: str, conf: dict, *, dag_run_id: str, logical_date: str
+        ) -> dict:
+            captured["dag_run_id"] = dag_run_id
+            captured["logical_date"] = logical_date
+            return {"dag_run_id": dag_run_id}
+
+        client.trigger_dag_run.side_effect = capture_trigger
+
+        outcomes = asyncio.run(
+            trigger_script.trigger_and_monitor(
+                client,
+                [_plan_with_conf()],
+                max_parallel=1,
+                max_runs=1,
+                force_retrigger=False,
+                dag_runs_lookback=25,
+                poll_interval=0,
+                timeout=30,
+                verbose=False,
+                log_tail_lines=20,
+            )
+        )
+
+        assert outcomes[0].final_state == "success"
+        assert captured["dag_run_id"].startswith("val__")
+        assert len(captured["dag_run_id"]) == trigger_script.VALIDATION_RUN_ID_MAX_LEN
+        assert captured["logical_date"]
 
     def test_skips_unpause_when_already_active(self) -> None:
         client = MagicMock()

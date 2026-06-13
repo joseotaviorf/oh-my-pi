@@ -113,11 +113,23 @@ class AirflowRestClient:
         self.set_dag_paused(dag_id, is_paused=False)
         return True
 
-    def trigger_dag_run(self, dag_id: str, conf: dict[str, Any]) -> dict[str, Any]:
+    def trigger_dag_run(
+        self,
+        dag_id: str,
+        conf: dict[str, Any],
+        *,
+        dag_run_id: str | None = None,
+        logical_date: str | None = None,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"conf": conf}
+        if dag_run_id is not None:
+            body["dag_run_id"] = dag_run_id
+        if logical_date is not None:
+            body["logical_date"] = logical_date
         return self._request(
             "POST",
             f"dags/{dag_id}/dagRuns",
-            json={"conf": conf},
+            json=body,
         )
 
     def get_dag_run(self, dag_id: str, dag_run_id: str) -> dict[str, Any]:
