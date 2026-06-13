@@ -37,7 +37,7 @@ dependencies:
       - load-clean-session
   bietlejuice.support_session_service:
     is_daily: true
-    execution_hour: 3
+    execution_hour: 6
     tasks:
       - load-clean-support-session
 

@@ -48,6 +48,13 @@ def cfg(table_spec):
 def pipeline_with_spec(cfg, table_spec):
     pipeline = cases_module.SupportJourneyCoreModelPipeline(cfg)
     pipeline.table_spec = table_spec_from_cfg(cfg)
+    # Mirror run_config(): populate tracked_cols from the source specs so
+    # create_core_model() can read self.tracked_cols["case"] directly.
+    pipeline.tracked_cols = {
+        table: source["tracked_cols"]
+        for table, source in pipeline.table_spec["sources"].items()
+        if source.get("tracked_cols")
+    }
     return pipeline
 
 
@@ -102,15 +109,19 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         )
         spark.table.assert_not_called()
 
+    @mock.patch.object(cases_module, "filter_relevant_cdc_events")
     @mock.patch.object(cases_module, "partition_has_data")
-    def test_returns_when_source_case_partition_is_empty(
-        self, mock_partition_has_data, cfg, pipeline_with_spec
+    def test_returns_when_filtered_case_partition_is_empty(
+        self, mock_partition_has_data, mock_filter, cfg, pipeline_with_spec
     ):
         # arrange
         spark = mock.MagicMock()
-        empty_df = mock.MagicMock()
-        empty_df.isEmpty.return_value = True
-        spark.table.return_value.where.return_value = empty_df
+        source_df = mock.MagicMock()
+        spark.table.return_value.where.return_value = source_df
+
+        filtered_df = mock.MagicMock()
+        filtered_df.isEmpty.return_value = True
+        mock_filter.return_value.dropDuplicates.return_value = filtered_df
         mock_partition_has_data.return_value = False
         pipeline = pipeline_with_spec
 
@@ -121,8 +132,10 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         spark.table.assert_called_once_with(
             pipeline.table_spec["sources"]["case"]["table_name"]
         )
-        empty_df.isEmpty.assert_called_once()
+        mock_filter.assert_called_once_with(source_df, pipeline.tracked_cols["case"])
+        filtered_df.isEmpty.assert_called_once()
 
+    @mock.patch.object(cases_module, "filter_relevant_cdc_events")
     @mock.patch.object(cases_module, "DataFrameDeltaTableLoaderPipeline")
     @mock.patch.object(cases_module, "SchemaValidator")
     @mock.patch.object(cases_module, "get_versioning_df")
@@ -139,6 +152,7 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         mock_get_versioning_df,
         mock_schema_validator_cls,
         mock_pipeline_cls,
+        mock_filter,
         cfg,
         pipeline_with_spec,
     ):
@@ -153,6 +167,7 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         source_df.alias.return_value = source_df
         source_df.join.return_value = source_df
         source_df.select.return_value = source_df
+        mock_filter.return_value.dropDuplicates.return_value = source_df
 
         spark = mock.MagicMock()
         spark.table.return_value.where.return_value = source_df
@@ -172,9 +187,11 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         pipeline.create_core_model(spark)
 
         # assert
+        mock_filter.assert_called_once_with(source_df, pipeline.tracked_cols["case"])
         mock_pipeline_cls.assert_called_once()
         mock_pipeline.run.assert_called_once()
 
+    @mock.patch.object(cases_module, "filter_relevant_cdc_events")
     @mock.patch.object(cases_module, "SchemaValidator")
     @mock.patch.object(cases_module, "get_versioning_df")
     @mock.patch.object(cases_module, "_complete_dataframe_schema")
@@ -189,6 +206,7 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         mock_complete_schema,
         mock_get_versioning_df,
         mock_schema_validator_cls,
+        mock_filter,
         cfg,
         pipeline_with_spec,
     ):
@@ -203,6 +221,7 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         source_df.alias.return_value = source_df
         source_df.join.return_value = source_df
         source_df.select.return_value = source_df
+        mock_filter.return_value.dropDuplicates.return_value = source_df
 
         spark = mock.MagicMock()
         spark.table.return_value.where.return_value = source_df
@@ -256,3 +275,42 @@ class TestSupportJourneyCoreModelPipelineRun:
         mock_table_spec_from_cfg.assert_called_once_with(cfg)
         mock_initialize_spark_session.assert_called_once()
         mock_create_core_model.assert_called_once_with(spark)
+        # run_config() should load tracked_cols for sources that declare them
+        assert (
+            pipeline.tracked_cols["case"]
+            == table_spec["sources"]["case"]["tracked_cols"]
+        )
+
+    @mock.patch.object(
+        cases_module.SupportJourneyCoreModelPipeline, "initialize_spark_session"
+    )
+    @mock.patch.object(
+        cases_module.SupportJourneyCoreModelPipeline, "initialize_configuration"
+    )
+    @mock.patch.object(cases_module, "table_spec_from_cfg")
+    def test_run_config_only_tracks_sources_that_declare_tracked_cols(
+        self,
+        mock_table_spec_from_cfg,
+        mock_initialize_configuration,
+        mock_initialize_spark_session,
+        cfg,
+        table_spec,
+    ):
+        # arrange
+        mock_table_spec_from_cfg.return_value = table_spec
+        pipeline = cases_module.SupportJourneyCoreModelPipeline(cfg)
+
+        # act
+        pipeline.run_config()
+
+        # assert
+        sources = table_spec["sources"]
+        expected = {
+            table: source["tracked_cols"]
+            for table, source in sources.items()
+            if source.get("tracked_cols")
+        }
+        assert pipeline.tracked_cols == expected
+        # sources without tracked_cols must not leak into the dict
+        assert "record_types" not in pipeline.tracked_cols
+        assert "case_milestones" not in pipeline.tracked_cols

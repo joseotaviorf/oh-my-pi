@@ -34,6 +34,22 @@ sources:
         "partition_hour",
         "ts_load",
       ]
+    tracked_cols: [
+        "AccountId",
+        "OwnerId",
+        "CreatedById",
+        "CaseNumber",
+        "Type",
+        "Status",
+        "Reason",
+        "Origin",
+        "Subject",
+        "Priority",
+        "Description",
+        "IsClosed",
+        "CreatedDate",
+        "ClosedDate",
+    ]
   record_types:
     table_name: "datalake_salesforce_clean.record_types"
     key_cols: ["id_record_type"]
@@ -71,7 +87,7 @@ schema:
     id_event:
       type: string
       required: true
-    bk_case_event:
+    id_event_type:
       type: string
       required: true
     id_account:
@@ -90,7 +106,7 @@ schema:
       type: bigint
       required: true
     case_number:
-      type: int
+      type: string
       required: true
     event_type:
       type: string
@@ -123,16 +139,16 @@ schema:
       type: boolean
       required: true
     created_date:
-      type: timestamp
+      type: string
       required: true
     last_modified_date:
-      type: timestamp
+      type: string
       required: true
     closed_date:
-      type: timestamp
+      type: string
       required: true
     committed_at:
-      type: timestamp
+      type: string
       required: true
     record_type_name:
       type: string
@@ -180,37 +196,37 @@ schema:
       type: int
       required: true
     dt_start:
-      type: timestamp
+      type: date
       required: true
     dt_target:
-      type: timestamp
+      type: date
       required: true
     dt_completion:
-      type: timestamp
+      type: date
       required: true
     partition_date:
       type: string
       required: true
     partition_hour:
-      type: int
+      type: string
       required: true
     _created_at:
-      type: timestamp
+      type: string
       required: true
     _updated_at:
-      type: timestamp
+      type: string
       required: true
     _effective_timestamp:
-      type: timestamp
+      type: string
       required: true
     _expired_timestamp:
-      type: timestamp
+      type: string
       required: true
     _is_current:
       type: boolean
       required: true
     _ts_load:
-      type: timestamp
+      type: string
       required: true
 min_columns: 49
 max_columns: 49

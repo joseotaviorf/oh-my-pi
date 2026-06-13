@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 from pyspark.sql import SparkSession
@@ -15,11 +16,16 @@ from bietlejuice.base.sst.core.utils.common import (
     _table_exists,
     default_args,
     get_latest_version_from_df,
+    normalize_column_name,
     safe_union_with_target_schema,
 )
+from bietlejuice.base.sst.core.utils.time import standardize_timestamps
 from bietlejuice.base.sst.core.utils.transforms import (
     get_rows_to_update,
     get_versioning_df,
+)
+from bietlejuice.base.sst.domains.salesforce.common.transforms import (
+    filter_relevant_cdc_events,
 )
 from bietlejuice.base.sst.domains.salesforce.core_models.config_loader import (
     table_spec_from_cfg,
@@ -78,10 +84,27 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
     partition_*, target_*, job_name, table_config_relative_path).
     """
 
+    def run_config(self):
+        self.initialize_configuration(self.cfg.dag_name)
+        self.table_spec = table_spec_from_cfg(self.cfg)
+        self.spark = self.initialize_spark_session()
+
+        sources = self.table_spec["sources"]
+        for table, value in sources.items():
+            tracked_cols = value.get("tracked_cols", None)
+            if tracked_cols:
+                self.logger.info(
+                    f"m=create_core_model, msg=Adding tracked cols for {table=}"
+                )
+                self.tracked_cols[table] = tracked_cols
+
     def __init__(self, cfg: Any) -> None:
         super().__init__(cfg.job_name)
         self.cfg = cfg
         self.table_spec: Optional[Dict[str, Any]] = None
+        # tracked_cols: updated columns in CDC events, keyed by source table.
+        # changed_field is non-normalized, so values are original Salesforce names.
+        self.tracked_cols: Dict[str, Any] = {}
 
     def create_core_model(self, spark: SparkSession) -> None:
         """
@@ -116,8 +139,14 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
             & (F.col("partition_hour") == self.cfg.partition_hour)
         )
 
+        tracked_cols = self.tracked_cols["case"]
+        normalized_tracked = [normalize_column_name(col) for col in tracked_cols]
+        filtered_case_df = filter_relevant_cdc_events(
+            source_case_df, tracked_cols
+        ).dropDuplicates(normalized_tracked)
+
         # Checking if the source table is empty - if it is, we raise an error
-        if source_case_df.isEmpty():
+        if filtered_case_df.isEmpty():
             self.logger.warning(
                 f"No case rows found in {case_src['table_name']} for partition "
                 f"(partition_date={self.cfg.partition_date}, partition_hour={self.cfg.partition_hour})"
@@ -125,8 +154,9 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
             return
 
         # Creating the case dataframe with the necessary columns
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         source_case_mandatory_columns_df = (
-            source_case_df.withColumn("id_case", F.col("id_record"))
+            filtered_case_df.withColumn("id_case", F.col("id_record"))
             .withColumn(
                 "id_event",
                 F.sha2(
@@ -140,7 +170,7 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
                 ),
             )
             .withColumn(
-                "bk_case_event",
+                "id_event_type",
                 F.concat_ws(
                     "_",
                     F.lit("id_record"),
@@ -154,9 +184,9 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
                     F.lit(False)
                 ),
             )
-            .withColumn("_created_at", F.now())
-            .withColumn("_updated_at", F.now())
-            .withColumn("_ts_load", F.now())
+            .withColumn("_created_at", F.lit(now))
+            .withColumn("_updated_at", F.lit(now))
+            .withColumn("_ts_load", F.lit(now))
         )
 
         # Reading and handling the secondary source tables
@@ -256,6 +286,11 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
         self.logger.info(
             "m=create_core_model, msg=Creating pipeline to load the dataframe into the target table"
         )
+
+        versioned_df = standardize_timestamps(
+            versioned_df, ["created_date", "last_modified_date", "closed_date"]
+        )
+
         pipeline = DataFrameDeltaTableLoaderPipeline(
             database_name=self.table_spec["target_schema"],
             table_name=self.table_spec["target_table"],
@@ -284,9 +319,7 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
     def run(self) -> None:
         self.logger.info(f"m=run, msg=Starting {self.job_name} processing")
         self.logger.info(f"m=run, msg=Config: {self.cfg=}")
-        self.initialize_configuration(self.cfg.dag_name)
-        self.table_spec = table_spec_from_cfg(self.cfg)
-        self.spark = self.initialize_spark_session()
+        self.run_config()
         self.create_core_model(self.spark)
         self.logger.info(
             f"m=run, msg={self.job_name} processing completed successfully"
