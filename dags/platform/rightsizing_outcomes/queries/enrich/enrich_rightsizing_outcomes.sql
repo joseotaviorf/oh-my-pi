@@ -46,15 +46,15 @@ validation_runs AS (
         val_dt,
         val_state,
         TO_DATE(NULLIF(
-            regexp_extract(conf_text, 'load_start_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+            regexp_extract(conf_text, 'load_start_date.{{1,5}}?(\\d{{4}}-\\d{{2}}-\\d{{2}})', 1), ''
         ))                                                                           AS val_conf_load_start_date,
         TO_DATE(NULLIF(
-            regexp_extract(conf_text, 'load_end_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+            regexp_extract(conf_text, 'load_end_date.{{1,5}}?(\\d{{4}}-\\d{{2}}-\\d{{2}})', 1), ''
         ))                                                                           AS val_conf_load_end_date,
         NULLIF(
             regexp_extract(
                 conf_text,
-                'reference_prod_dag_run_id.{1,5}?((?:manual|scheduled|dataset_triggered|backfill)__[0-9T:.+-]+)',
+                'reference_prod_dag_run_id.{{1,5}}?((?:manual|scheduled|dataset_triggered|backfill)__[0-9T:.+-]+)',
                 1
             ), ''
         )                                                                            AS conf_reference_prod_run_id
@@ -70,10 +70,10 @@ prod_astro AS (
         ts_data_interval_started,
         ts_data_interval_ended,
         TO_DATE(NULLIF(
-            regexp_extract(conf_text, 'load_start_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+            regexp_extract(conf_text, 'load_start_date.{{1,5}}?(\\d{{4}}-\\d{{2}}-\\d{{2}})', 1), ''
         ))                                                                           AS prod_conf_load_start_date,
         TO_DATE(NULLIF(
-            regexp_extract(conf_text, 'load_end_date.{1,5}?(\\d{4}-\\d{2}-\\d{2})', 1), ''
+            regexp_extract(conf_text, 'load_end_date.{{1,5}}?(\\d{{4}}-\\d{{2}}-\\d{{2}})', 1), ''
         ))                                                                           AS prod_conf_load_end_date
     FROM (
         SELECT
