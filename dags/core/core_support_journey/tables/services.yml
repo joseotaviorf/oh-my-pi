@@ -1,0 +1,196 @@
+target_schema: core_support_journey
+target_table: services
+partition_cols: ["partition_date", "partition_hour"]
+merge_on: ["id_event"]
+when_matched_update_condition: "source.partition_date = target.partition_date AND source.partition_hour = target.partition_hour"
+
+sources:
+  support_session:
+    table_name: "datalake_support_session_service_clean.support_session"
+  sauron_session:
+    table_name: "datalake_sauron_clean.session"
+  bigfone_event:
+    table_name: "datalake_bigfone_clean.event"
+  qm_channel:
+    table_name: "datalake_quinto_messenger_clean.channel"
+  qm_chat:
+    table_name: "datalake_quinto_messenger_clean.chat"
+  qm_task:
+    table_name: "datalake_quinto_messenger_clean.task"
+
+schema:
+  columns:
+    id_event:
+      type: string
+      required: true
+    id_event_type:
+      type: string
+      required: true
+    id_session:
+      type: string
+      required: true
+    id_support_session:
+      type: string
+      required: true
+    id_sauron_session:
+      type: string
+      required: true
+    id_session_event:
+      type: string
+      required: true
+    id_task:
+      type: string
+      required: true
+    id_task_event:
+      type: string
+      required: true
+    id_channel:
+      type: string
+      required: true
+    id_reservation:
+      type: string
+      required: true
+    id_call:
+      type: string
+      required: true
+    id_user:
+      type: string
+      required: true
+    id_worker:
+      type: string
+      required: true
+    id_source_ctwa:
+      type: string
+      required: true
+    database_source:
+      type: string
+      required: true
+    service_type:
+      type: string
+      required: true
+    direction:
+      type: string
+      required: true
+    channel_type:
+      type: string
+      required: true
+    origin:
+      type: string
+      required: true
+    bpo_name:
+      type: string
+      required: true
+    bpo_selection_reason:
+      type: string
+      required: true
+    queue_name:
+      type: string
+      required: true
+    worker_email:
+      type: string
+      required: true
+    customer_email:
+      type: string
+      required: true
+    customer_phone_number:
+      type: string
+      required: true
+    twilio_phone_number:
+      type: string
+      required: true
+    from_phone_number:
+      type: string
+      required: true
+    to_phone_number:
+      type: string
+      required: true
+    task_cancelation_reason:
+      type: string
+      required: true
+    task_status:
+      type: string
+      required: true
+    task_outcome:
+      type: string
+      required: true
+    task_completion_reason:
+      type: string
+      required: true
+    url_source_ctwa:
+      type: string
+      required: true
+    type_source_ctwa:
+      type: string
+      required: true
+    task_attributes:
+      type: string
+      required: true
+    waiting_time_sec:
+      type: int
+      required: true
+    seconds_to_first_response:
+      type: int
+      required: true
+    total_inactivity_time:
+      type: bigint
+      required: true
+    last_inactivity_time:
+      type: bigint
+      required: true
+    is_forwarded:
+      type: boolean
+      required: true
+    is_per_team_task:
+      type: boolean
+      required: true
+    is_spoc_task:
+      type: boolean
+      required: true
+    is_isaias_session:
+      type: boolean
+      required: true
+    ts_task_created:
+      type: timestamp
+      required: true
+    ts_task_updated:
+      type: timestamp
+      required: true
+    ts_session_event_created:
+      type: timestamp
+      required: true
+    ts_session_event_updated:
+      type: timestamp
+      required: true
+    ts_session_created:
+      type: timestamp
+      required: true
+    ts_session_updated:
+      type: timestamp
+      required: true
+    partition_date:
+      type: string
+      required: true
+    partition_hour:
+      type: int
+      required: true
+    _created_at:
+      type: timestamp
+      required: true
+    _ts_load:
+      type: timestamp
+      required: true
+    _effective_timestamp:
+      type: timestamp
+      required: true
+    _expired_timestamp:
+      type: timestamp
+      required: true
+    _is_current:
+      type: boolean
+      required: true
+    _last_updated_at:
+      type: timestamp
+      required: true
+min_columns: 57
+max_columns: 57
+strict: true

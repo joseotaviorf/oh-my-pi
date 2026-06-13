@@ -62,8 +62,7 @@ def nullify_fields_on_delete(
 
 def get_versioning_df(
     input_df: DataFrame,
-    context_col_name: str,
-    event_col_name: str,
+    context_col_name: Union[str, List[str]],
     event_ts_col_name: str,
     commit_number_col_name: str = None,
 ) -> DataFrame:
@@ -87,8 +86,6 @@ def get_versioning_df(
     context_col_name : str
         Column that identifies the entity or grain for which versions are computed
         (window partition key).
-    event_col_name : str
-        Name of the event column (logged for observability; not used in the transform).
     event_ts_col_name : str
         Column with the event effective time used to order versions and compute
         ``effective_timestamp`` / ``expired_timestamp``.
@@ -103,20 +100,23 @@ def get_versioning_df(
         ``is_current``, ``_created_at`` (filled from partition), and ``_last_updated_at``.
     """
 
+    if isinstance(context_col_name, str):
+        context_col_name = [context_col_name]
+
     high_date = F.to_timestamp(F.lit("9999-12-31 23:59:59"))
 
     window_effective_ts = (
-        Window.partitionBy(context_col_name).orderBy(
+        Window.partitionBy(*context_col_name).orderBy(
             F.col(event_ts_col_name).asc(), F.col(commit_number_col_name).desc()
         )
         if commit_number_col_name
-        else Window.partitionBy(context_col_name).orderBy(
+        else Window.partitionBy(*context_col_name).orderBy(
             F.col(event_ts_col_name).asc()
         )
     )
     next_effective_ts = F.lead(F.col(event_ts_col_name)).over(window_effective_ts)
 
-    window_pipeline_cols = Window.partitionBy(context_col_name).orderBy(
+    window_pipeline_cols = Window.partitionBy(*context_col_name).orderBy(
         event_ts_col_name
     )
 
@@ -133,7 +133,10 @@ def get_versioning_df(
 
 
 def get_rows_to_update(
-    spark: SparkSession, table_name: str, update_df: DataFrame, context_col_name: str
+    spark: SparkSession,
+    table_name: str,
+    update_df: DataFrame,
+    context_col_name: Union[str, List[str]],
 ) -> DataFrame:
     """
     Select current target rows that must participate in an SCD Type 2 refresh.
@@ -155,7 +158,7 @@ def get_rows_to_update(
         columns, including ``_is_current``.
     update_df : DataFrame
         Incoming batch for the current load; must contain ``context_col_name``.
-    context_col_name : str
+    context_col_name : str | list
         Business key or grain column shared by target and update (e.g.
         ``id_case``); join key for matching rows to refresh.
 
@@ -166,8 +169,11 @@ def get_rows_to_update(
         distinct ``context_col_name`` value in ``update_df``. Schema matches the
         target table projection used in the join (all target columns).
     """
+    if isinstance(context_col_name, str):
+        context_col_name = [context_col_name]
+
     target_historical_df = spark.table(table_name).where(F.col("_is_current"))
-    unique_rows = update_df.select(context_col_name).distinct()
+    unique_rows = update_df.select(*context_col_name).distinct()
     return target_historical_df.join(unique_rows, on=context_col_name, how="inner")
 
 

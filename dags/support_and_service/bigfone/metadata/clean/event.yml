@@ -1,105 +1,172 @@
 database_name: datalake_bigfone_clean
 table_name: event
+description: Clean version of the Bigfone telephony events ingested from Twilio
+  TaskRouter, with one row per event in the lifecycle of a call-handling task.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
+    description: Unique identifier of the Bigfone event row, inherited from the
+      Twilio TaskRouter event ingested in the raw layer.
     lineage:
       - datalake_bigfone_raw.event.id
   id_task:
+    description: Twilio TaskRouter task identifier (TaskSid) tying together all
+      events of the same call-handling task.
     lineage:
       - datalake_bigfone_raw.event.metadata
   id_call:
+    description: Twilio call identifier (call_sid) of the underlying phone call
+      associated with the task.
     lineage:
       - datalake_bigfone_raw.event.metadata
   id_reservation:
+    description: Twilio TaskRouter reservation identifier (ReservationSid)
+      representing the offer of the task to an agent.
     lineage:
       - datalake_bigfone_raw.event.metadata
   id_event:
+    description: Twilio event identifier (Sid) of the TaskRouter event emitted for
+      this record.
     lineage:
       - datalake_bigfone_raw.event.metadata
   id_queue:
+    description: Twilio TaskRouter queue identifier (TaskQueueSid) of the queue the
+      task was routed through.
     lineage:
       - datalake_bigfone_raw.event.metadata
   id_worker:
+    description: Twilio TaskRouter worker identifier (WorkerSid) of the agent
+      handling the task at the event time.
     lineage:
       - datalake_bigfone_raw.event.metadata
   twilio_sid:
+    description: Twilio resource SID (call_id) of the call linked to the event.
     lineage:
       - datalake_bigfone_raw.event.call_id
   event_type:
+    description: Lifecycle type of the TaskRouter event (e.g. task created,
+      reservation accepted, task completed).
     lineage:
       - datalake_bigfone_raw.event.type
   workflow_name:
+    description: Name of the Twilio TaskRouter workflow that routed the task.
     lineage:
       - datalake_bigfone_raw.event.metadata
   from_phone_number:
+    description: Originating (caller) phone number of the call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   to_phone_number:
+    description: Destination phone number that received the call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   outbound_to_phone_number:
+    description: Phone number dialed on outbound, agent-initiated calls.
     lineage:
       - datalake_bigfone_raw.event.metadata
   direction:
+    description: Direction of the call (inbound or outbound) as set in the task
+      attributes.
     lineage:
       - datalake_bigfone_raw.event.metadata
   channel_type:
+    description: Communication channel of the task (e.g. voice) as classified by
+      Twilio.
     lineage:
       - datalake_bigfone_raw.event.metadata
   bpo_name:
+    description: Name of the BPO (outsourced operation) responsible for handling
+      the call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   queue_name:
+    description: Human-readable name of the TaskRouter queue the task was routed to.
     lineage:
       - datalake_bigfone_raw.event.metadata
   worker_email:
+    description: Corporate email of the agent (worker) assigned to handle the task.
     lineage:
       - datalake_bigfone_raw.event.metadata
   task_cancelation_reason:
+    description: Reason the task was canceled, when applicable (e.g. caller hung up
+      before answer).
     lineage:
       - datalake_bigfone_raw.event.metadata
   ivr_steps:
+    description: Sequence of IVR menu steps the caller navigated before the task was
+      created.
     lineage:
       - datalake_bigfone_raw.event.metadata
   csat_1:
+    description: First customer satisfaction (CSAT) survey score collected for the
+      call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   csat_2:
+    description: Second customer satisfaction (CSAT) survey score collected for the
+      call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   csat_3:
+    description: Third customer satisfaction (CSAT) survey score collected for the
+      call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   waiting_time_sec:
+    description: Time in seconds the caller waited in queue before the task was
+      handled.
     lineage:
       - datalake_bigfone_raw.event.metadata
   is_scheduled:
+    description: Flag indicating whether the call was a scheduled callback rather
+      than a real-time call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   has_wrapup:
+    description: Flag indicating whether the agent performed post-call wrap-up work
+      for the task.
     lineage:
       - datalake_bigfone_raw.event.metadata
   has_csat:
+    description: Flag indicating whether a CSAT satisfaction survey was collected
+      for the call.
     lineage:
       - datalake_bigfone_raw.event.metadata
   metadata:
+    description: Raw JSON payload of the Twilio TaskRouter event, retained for
+      fields not yet flattened into dedicated columns.
     lineage:
       - datalake_bigfone_raw.event.metadata
   provider:
+    description: Telephony provider that originated the event (source system).
     lineage:
       - datalake_bigfone_raw.event.provider
   ts_created:
+    description: Timestamp when the event occurred in the telephony provider
+      (event_timestamp).
     lineage:
       - datalake_bigfone_raw.event.event_timestamp
   ts_received:
+    description: Timestamp when the event was received and ingested into the data
+      lake.
     lineage:
       - datalake_bigfone_raw.event.received_timestamp
+  ts_cdc_transaction:
+    lineage:
+      - datalake_bigfone_raw.event.ts_cdc_transaction
+    description: |
+      Timestamp when the CDC pipeline captured this event row, used for hourly
+      incremental loads in downstream core models.
   year:
+    description: Year component of the event date, used as a partition column.
     lineage:
       - datalake_bigfone_raw.event.year
   month:
+    description: Month component of the event date, used as a partition column.
     lineage:
       - datalake_bigfone_raw.event.month
   day:
+    description: Day component of the event date, used as a partition column.
     lineage:
       - datalake_bigfone_raw.event.day

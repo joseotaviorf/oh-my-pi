@@ -201,7 +201,6 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
         )
 
         context_col = "id_case"
-        event_col = "event_type"
         event_ts_col = "committed_at"
         commit_col = "commit_number"
 
@@ -231,7 +230,6 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
         self.logger.info(
             f"m=get_versioning_df, msg=Getting versioning dataframe for {context_col}"
         )
-        self.logger.info(f"m=get_versioning_df, msg=Event column name: {event_col}")
         self.logger.info(
             f"m=get_versioning_df, msg=Event timestamp column name: {event_ts_col}"
         )
@@ -240,7 +238,7 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
         )
 
         versioned_df = get_versioning_df(
-            unioned_target_df, context_col, event_col, event_ts_col, commit_col
+            unioned_target_df, context_col, event_ts_col, commit_col
         ).select(*schema_column_names)
 
         # Validating the schema of the dataframe

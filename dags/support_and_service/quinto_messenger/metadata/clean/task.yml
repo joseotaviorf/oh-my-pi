@@ -17,7 +17,8 @@ columns:
     lineage:
       - datalake_quinto_messenger_raw.task.channel_id
   id_chat:
-    description: Identifier of the chat.
+    description: Identifier of the chat (conversation) the task belongs to; groups all
+      messages of the same customer-service conversation.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   id_worker:
@@ -29,11 +30,13 @@ columns:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   task_status:
-    description: Status of the task.
+    description: Current status of the Twilio task (e.g. pending, assigned, wrapping,
+      completed, canceled) reflecting its position in the service lifecycle.
     lineage:
       - datalake_quinto_messenger_raw.task.task_status
   task_outcome:
-    description: Outcome of the task.
+    description: Business outcome of the conversation once finished (e.g. resolved,
+      transferred, abandoned), parsed from the conversation attributes.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_metadata:
@@ -45,11 +48,13 @@ columns:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_phone_number:
-    description: Customer phone number.
+    description: Phone number of the customer who started the conversation (original
+      WhatsApp/voice number).
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_email:
-    description: Customer email.
+    description: Email address of the customer associated with the conversation, when
+      provided.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   twilio_phone_number:
@@ -69,7 +74,8 @@ columns:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   channel_status:
-    description: Status of the channel.
+    description: Status of the Twilio channel backing the conversation (e.g. active,
+      inactive, closed).
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   department:
@@ -112,11 +118,13 @@ columns:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   task_attributes:
-    description: Attributes of the task.
+    description: Raw JSON payload with all Twilio task attributes, kept as the source
+      for fields not yet flattened into dedicated columns.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   task_resource:
-    description: Resources of the task.
+    description: Raw JSON payload describing the task resource/completion details (e.g.
+      completion reason) returned by Twilio.
     lineage:
       - datalake_quinto_messenger_raw.task.task_resource
   assigned_to:
@@ -147,6 +155,12 @@ columns:
     description: timestamp indicating when the chat was last updated.
     lineage:
       - datalake_quinto_messenger_raw.task.updated_at
+  ts_cdc_transaction:
+    description: |
+      Timestamp when the CDC pipeline captured this task row, used for hourly
+      incremental loads in downstream core models.
+    lineage:
+      - datalake_quinto_messenger_raw.task.ts_cdc_transaction
   year:
     description: Year component of the task creation date.
     lineage:
