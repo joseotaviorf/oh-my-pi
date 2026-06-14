@@ -55,6 +55,11 @@ Usage
 
 Docs: docs/platform/cluster_spec_recommender_runbook.md
       docs/platform/cluster_spec_recommender_algorithm.md
+
+``worker_count == 1`` on multi-node: always collapse to single-node when
+feasibility gates pass (memory on max(driver, worker) node, SLA, I/O, disk);
+cost comparison skipped. Single-node size is **max(driver, worker)** — never
+additive upsize.
 """
 
 from __future__ import annotations
@@ -296,6 +301,29 @@ def _node_tier(node_type: str) -> str | None:
         return _SIZE_TO_TIER.get(size)
     except (IndexError, AttributeError):
         return None
+
+
+def _node_capacity_rank(node_type: str | None) -> tuple[int, int]:
+    """Lexicographic (vcpus, memory_gb) for comparing instance sizes."""
+    if not node_type:
+        return (0, 0)
+    spec = INSTANCE_CATALOG.get(node_type)
+    if spec:
+        return (spec.vcpus, spec.memory_gb)
+    # Fallback for types outside catalog (e.g. r7a.xlarge): tier index only.
+    size = node_type.split(".")[-1] if "." in node_type else ""
+    tier = _SIZE_TO_TIER.get(size)
+    tier_idx = _TIER_ORDER.index(tier) if tier in _TIER_ORDER else -1
+    return (tier_idx, 0)
+
+
+def _larger_node_type(a: str | None, b: str | None) -> str | None:
+    """Return the larger of two node types; ties prefer ``a`` (driver)."""
+    if not a:
+        return b
+    if not b:
+        return a
+    return a if _node_capacity_rank(a) >= _node_capacity_rank(b) else b
 
 
 def infer_current_preset(
@@ -748,6 +776,38 @@ def size_single_node(
     )
 
 
+def size_single_node_at(
+    m: DagMetrics,
+    node_type: str,
+    *,
+    photon_off: bool | None = None,
+) -> SingleNodeSizing:
+    """Project additive demand onto a fixed node type (no upsize search)."""
+    required_mem_gb = _additive_memory_gb(m, photon_off=photon_off)
+    required_cores = _additive_cores(m, photon_off=photon_off)
+    if required_mem_gb is None or required_cores is None:
+        return SingleNodeSizing(
+            None, required_mem_gb, required_cores, None, None, "needs_more_telemetry"
+        )
+    spec = INSTANCE_CATALOG.get(node_type)
+    if not spec:
+        return SingleNodeSizing(
+            node_type,
+            required_mem_gb,
+            required_cores,
+            None,
+            None,
+            None,
+        )
+    return SingleNodeSizing(
+        node_type=node_type,
+        required_mem_gb=required_mem_gb,
+        required_cores=required_cores,
+        projected_mem_pct=round(required_mem_gb / spec.memory_gb * 100.0, 1),
+        projected_cpu_pct=round(required_cores / spec.vcpus * 100.0, 1),
+    )
+
+
 def _schedule_interval_minutes(m: DagMetrics) -> float:
     if m.schedule_interval_minutes and m.schedule_interval_minutes > 0:
         if m.runs_per_day and m.runs_per_day >= 18.0:
@@ -1191,6 +1251,36 @@ def build_best_single_candidate(
     )
 
 
+def _one_worker_collapse_node_type(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> str | None:
+    """Single-node target for driver+1-worker: max(driver, worker), no upsize."""
+    if (m.worker_count or 0) != 1:
+        return None
+    node = _larger_node_type(m.driver_node_type, _worker_node_type(m))
+    if not node:
+        return None
+    if not _io_shrink_guard(m):
+        node = _strip_nvme(node) or node
+    return node
+
+
+def build_one_worker_collapse_candidate(
+    m: DagMetrics, *, photon_off: bool | None = None
+) -> ShapeCandidate | None:
+    """Collapse candidate for worker_count==1 using max(driver, worker) sizing."""
+    node = _one_worker_collapse_node_type(m, photon_off=photon_off)
+    if not node:
+        return None
+    return ShapeCandidate(
+        node,
+        None,
+        0,
+        "one_worker_collapse",
+        keep_photon=photon_off is False,
+    )
+
+
 def build_current_refined_candidate(
     m: DagMetrics, *, photon_off: bool | None = None
 ) -> ShapeCandidate | None:
@@ -1450,34 +1540,22 @@ def _keep_multi_reason(m: DagMetrics, sizing: SingleNodeSizing) -> str:
     return "keep_multi_cost"
 
 
-def _decide_multi(m: DagMetrics) -> MultiDecision:
-    """Bidirectional multi-node decision: cost-truthful pick among candidates.
-
-    Generates the feasible candidates (collapse to a single node; refine the
-    multi-node shape when it genuinely shrinks), filters by core-cap / SLA /
-    memory headroom, and keeps the cheapest that beats the observed cost. The
-    cohort *is* the reason; when nothing wins, the DAG is kept with the most
-    informative keep-multi reason.
-    """
-    sizing = size_single_node(m)
-    if sizing.blocked_reason == "needs_more_telemetry":
-        return MultiDecision("needs_more_telemetry", None)
-
+def _feasible_collapse_options(
+    m: DagMetrics,
+) -> list[tuple[float, ShapeCandidate]]:
+    """Feasible collapse candidates with projected cost; no baseline filter."""
     observed_cores = observed_total_cores(m)
     sla_limit = _sla_limit_minutes(m)
-    baseline = _current_cost_basis(m)
-
-    options: list[tuple[float, str, ShapeCandidate]] = []
-
-    # Enumerate shape candidates across both Photon worlds. A non-Photon DAG has
-    # only the drop-Photon world (keep_photon is a no-op there); a Photon DAG
-    # also gets keep-Photon candidates, sized on raw (un-inflated) demand so an
-    # oversized-but-fast box can shrink while staying on Photon.
+    options: list[tuple[float, ShapeCandidate]] = []
     photon_worlds = [False, True] if m.is_any_photon else [False]
+    collapse_builder = (
+        build_one_worker_collapse_candidate
+        if (m.worker_count or 0) == 1
+        else build_best_single_candidate
+    )
     for keep_photon in photon_worlds:
         photon_off = not keep_photon
-
-        best_single = build_best_single_candidate(m, photon_off=photon_off)
+        best_single = collapse_builder(m, photon_off=photon_off)
         if (
             not _io_shrink_guard(m)
             and best_single is not None
@@ -1498,7 +1576,45 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
                 m, best_single.driver_node_type, 0, keep_photon=keep_photon
             )
             if wall is not None and wall <= sla_limit and cost is not None:
-                options.append((cost, "collapse_to_single", best_single))
+                options.append((cost, best_single))
+    return options
+
+
+def _decide_multi(m: DagMetrics) -> MultiDecision:
+    """Bidirectional multi-node decision: cost-truthful pick among candidates.
+
+    Generates the feasible candidates (collapse to a single node; refine the
+    multi-node shape when it genuinely shrinks), filters by core-cap / SLA /
+    memory headroom, and keeps the cheapest that beats the observed cost. The
+    cohort *is* the reason; when nothing wins, the DAG is kept with the most
+    informative keep-multi reason.
+    """
+    sizing = size_single_node(m)
+    if sizing.blocked_reason == "needs_more_telemetry":
+        return MultiDecision("needs_more_telemetry", None)
+
+    if (m.worker_count or 0) == 1:
+        collapse_options = _feasible_collapse_options(m)
+        if collapse_options:
+            _cost, candidate = min(collapse_options, key=lambda option: option[0])
+            return MultiDecision("collapse_to_single", candidate)
+
+    observed_cores = observed_total_cores(m)
+    sla_limit = _sla_limit_minutes(m)
+    baseline = _current_cost_basis(m)
+
+    options: list[tuple[float, str, ShapeCandidate]] = []
+
+    for cost, candidate in _feasible_collapse_options(m):
+        options.append((cost, "collapse_to_single", candidate))
+
+    # Enumerate shape candidates across both Photon worlds. A non-Photon DAG has
+    # only the drop-Photon world (keep_photon is a no-op there); a Photon DAG
+    # also gets keep-Photon candidates, sized on raw (un-inflated) demand so an
+    # oversized-but-fast box can shrink while staying on Photon.
+    photon_worlds = [False, True] if m.is_any_photon else [False]
+    for keep_photon in photon_worlds:
+        photon_off = not keep_photon
 
         refined = build_current_refined_candidate(m, photon_off=photon_off)
         if (
@@ -1550,7 +1666,13 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
             )
             options.append((cost, "right_size_multi", q4))
 
-    viable = [option for option in options if baseline <= 0 or option[0] < baseline]
+    viable = [
+        option
+        for option in options
+        if option[1] == "collapse_to_single" and (m.worker_count or 0) == 1
+        or baseline <= 0
+        or option[0] < baseline
+    ]
     if viable:
         cost, cohort, candidate = min(viable, key=lambda option: option[0])
         return MultiDecision(cohort, candidate)
@@ -1797,7 +1919,11 @@ def recommend_preset(
         return None, None
 
     if cohort == "collapse_to_single":
-        name, _node_type = _single_node_preset_for_node(size_single_node(m).node_type)
+        if (m.worker_count or 0) == 1:
+            node = _one_worker_collapse_node_type(m)
+        else:
+            node = size_single_node(m).node_type
+        name, _node_type = _single_node_preset_for_node(node)
         return (name, None) if name else (None, None)
 
     if cohort in keep_multi_cohorts:
@@ -1972,6 +2098,13 @@ def build_recommendation(
         recent_era_min_days,
         recent_era_min_runs,
     )
+    decision = _decide_multi(m) if m.topology == "multi" else None
+    candidate = decision.candidate if decision else None
+    multi_winner = (
+        cohort in ("collapse_to_single", "right_size_multi") and candidate is not None
+    )
+    winner_keep_photon = True
+
     current_preset = infer_current_preset(
         m.driver_node_type, m.worker_node_type, m.worker_count
     )
@@ -1989,22 +2122,24 @@ def build_recommendation(
     actions: list[str] = []
     blocked_cost_per_run: float | None = None
     driver_override_node_type_id = None
-    sizing = size_single_node(m) if cohort == "collapse_to_single" else None
-
-    decision = _decide_multi(m) if m.topology == "multi" else None
-    candidate = decision.candidate if decision else None
+    sizing = None
+    if cohort == "collapse_to_single":
+        if candidate is not None and candidate.driver_node_type:
+            sizing = size_single_node_at(
+                m,
+                candidate.driver_node_type,
+                photon_off=not candidate.keep_photon,
+            )
+        elif (m.worker_count or 0) == 1:
+            node = _one_worker_collapse_node_type(m)
+            sizing = size_single_node_at(m, node) if node else None
+        else:
+            sizing = size_single_node(m)
 
     cost_basis = (
         m.arm_avg_total_cost_estimate_usd
         if m.arm_avg_total_cost_estimate_usd is not None
         else m.arm_avg_cost_per_run_usd
-    )
-
-    # Whether the recommended plan keeps Photon on. Defaults to keeping it;
-    # flipped to drop only when dropping Photon is the cost-justified winner.
-    winner_keep_photon = True
-    multi_winner = (
-        cohort in ("collapse_to_single", "right_size_multi") and candidate is not None
     )
 
     if cohort == "collapse_to_single" and candidate is not None:

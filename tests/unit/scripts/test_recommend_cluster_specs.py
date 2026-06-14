@@ -651,6 +651,125 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert rec.projected.blocked_cost_delta_pct > 0.0
         assert rcs._format_delta(rec).startswith("  est 0% (")
 
+
+
+class TestOneWorkerMultiHygiene:
+    def test_one_worker_collapses_despite_higher_projected_cost(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.4xlarge",
+            worker_count=1,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p50_min=18.0,
+            wall_p95_min=18.0,
+            schedule_interval_minutes=600.0,
+            arm_avg_total_cost_estimate_usd=0.01,
+            arm_avg_ec2_cost_usd=0.005,
+            arm_avg_dbu_cost_usd=0.005,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "collapse_to_single"
+        assert rec.rec_worker_count == 0
+        assert rec.recommended_preset.endswith("_single_node_cluster")
+        assert generate_validation_config(rec) is not None
+
+    def test_two_worker_still_blocked_by_cost_guard(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.4xlarge",
+            worker_count=2,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p50_min=18.0,
+            wall_p95_min=18.0,
+            schedule_interval_minutes=600.0,
+            arm_avg_total_cost_estimate_usd=0.01,
+            arm_avg_ec2_cost_usd=0.005,
+            arm_avg_dbu_cost_usd=0.005,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "keep_multi_cost"
+        assert generate_validation_config(rec) is None
+
+    def test_one_worker_io_bound_still_keeps_multi(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type="m6g.2xlarge",
+            worker_count=1,
+            drv_cpu_p95=75.0,
+            drv_mem_p95=70.0,
+            wrk_cpu_p50=55.0,
+            wrk_cpu_p95=70.0,
+            wrk_mem_p95=65.0,
+            wrk_wait_p95=50.0,
+            arm_avg_total_cost_estimate_usd=100.0,
+            arm_avg_ec2_cost_usd=40.0,
+            arm_avg_dbu_cost_usd=60.0,
+        )
+
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "keep_multi_io_bound"
+        assert generate_validation_config(rec) is None
+
+    def test_one_worker_uses_max_driver_worker_not_additive_upsize(self):
+        m = _m(
+            driver_node_type="m6g.large",
+            worker_node_type="r6g.4xlarge",
+            worker_count=1,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=20.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p50_min=18.0,
+            wall_p95_min=18.0,
+            schedule_interval_minutes=600.0,
+            arm_avg_total_cost_estimate_usd=0.01,
+        )
+        rec = build_recommendation(m)
+
+        assert rec.cohort == "collapse_to_single"
+        assert rec.rec_driver_node_type == "r6g.4xlarge"
+        assert rec.rec_driver_node_type != "r6g.12xlarge"
+        assert rec.recommended_preset == "consolidation_l_memory_single_node_cluster"
+
+    def test_one_worker_asymmetric_picks_larger_driver(self):
+        m = _m(
+            driver_node_type="r6g.2xlarge",
+            worker_node_type="r6g.large",
+            worker_count=1,
+            drv_cpu_p95=15.0,
+            drv_mem_p95=15.0,
+            wrk_cpu_p50=3.0,
+            wrk_cpu_p95=5.0,
+            wrk_mem_p95=5.0,
+            wall_p50_min=20.0,
+            wall_p95_min=20.0,
+            schedule_interval_minutes=600.0,
+            arm_avg_total_cost_estimate_usd=0.05,
+        )
+        rec = build_recommendation(m)
+
+        assert rec.rec_driver_node_type == "r6g.2xlarge"
+        assert rec.recommended_preset == "consolidation_m_memory_single_node_cluster"
+
+    def test_larger_node_type_helper(self):
+        assert rcs._larger_node_type("m6g.large", "r6g.4xlarge") == "r6g.4xlarge"
+        assert rcs._larger_node_type("r6g.2xlarge", "r6g.large") == "r6g.2xlarge"
+
     def test_opa_like_spiky_hourly_shape_stays_multi_for_sla_before_cost(self):
         m = _m(
             dag_id="bietlejuice.opa",
