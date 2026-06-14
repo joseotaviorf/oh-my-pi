@@ -107,7 +107,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             F.date_format(F.to_date(F.col(ts_cdc_col)), "yyyy-MM-dd").alias(
                 "partition_date"
             ),
-            F.hour(F.col(ts_cdc_col)).cast("int").alias("partition_hour"),
+            F.hour(F.col(ts_cdc_col)).cast("string").alias("partition_hour"),
         ]
 
     def _build_call_events_df(

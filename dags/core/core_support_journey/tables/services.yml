@@ -171,7 +171,7 @@ schema:
       type: string
       required: true
     partition_hour:
-      type: int
+      type: string
       required: true
     _created_at:
       type: timestamp
