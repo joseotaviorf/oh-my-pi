@@ -6,11 +6,12 @@ from typing import Union
 from pyspark.sql import functions as F
 
 TIMESTAMP_FORMATS = [
-    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",  # 2025-03-25T22:41:13.000+0000
-    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",  # 2026-06-12T18:29:31.618+00:00
-    "yyyy-MM-dd'T'HH:mm:ssXXX",  # 2025-03-25T22:41:13Z
-    "yyyy-MM-dd HH:mm:ss.SSS",  # 2025-03-25 22:41:13.000
-    "yyyy-MM-dd HH:mm:ss",  # 2025-03-25 22:41:13
+    "yyyy-MM-dd HH:mm:ss.SSSSSS",
+    "yyyy-MM-dd HH:mm:ss.SSS",
+    "yyyy-MM-dd HH:mm:ss",
+    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+    "yyyy-MM-dd'T'HH:mm:ssXXX",
 ]
 
 

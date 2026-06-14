@@ -79,8 +79,6 @@ _TIMESTAMP_COLS = [
     "ts_session_event_updated",
     "ts_session_created",
     "ts_session_updated",
-    "_effective_timestamp",
-    "_expired_timestamp",
 ]
 
 
