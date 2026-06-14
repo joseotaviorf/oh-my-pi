@@ -10,7 +10,7 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.driver.maxResultSize: "0"
     driver_node_type_id: r6g.2xlarge
-    node_type_id: r6gd.4xlarge
+    node_type_id: r6g.4xlarge
     num_workers: 5
 validation:
   cluster:
@@ -23,4 +23,5 @@ validation:
         spark.driver.maxResultSize: '0'
       num_workers: 5
       driver_node_type_id: r6g.xlarge
+      node_type_id: r6g.4xlarge
   allow_custom_spark_job: true

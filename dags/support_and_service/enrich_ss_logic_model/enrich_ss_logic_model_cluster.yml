@@ -1,18 +1,9 @@
 cluster:
-  type: consolidation_m_memory_cluster
+  type: consolidation_l_general_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    num_workers: 3
+    num_workers: 4
     runtime_engine: PHOTON
-validation:
-  cluster:
-    type: consolidation_l_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 4
-      runtime_engine: PHOTON
-      driver_node_type_id: m6gd.4xlarge
+    driver_node_type_id: m6gd.4xlarge

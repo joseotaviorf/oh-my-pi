@@ -1,21 +1,8 @@
 cluster:
-  type: consolidation_m_general_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      spark_conf:
-        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-      num_workers: 3
-      driver_node_type_id: r6g.xlarge
-  allow_custom_spark_job: true
+    num_workers: 3
+    driver_node_type_id: r6g.xlarge

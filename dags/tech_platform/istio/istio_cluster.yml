@@ -1,38 +1,16 @@
 cluster:
-  type: consolidation_s_general_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: auditlogs
     permission_level: CAN_MANAGE
   custom_configurations:
-    driver_node_type_id: m6g.large
-    num_workers: 5
-    spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.hadoop.fs.s3a.threads.max: '64'
       spark.hadoop.fs.s3a.connection.maximum: '200'
       spark.sql.sources.parallelPartitionDiscovery.parallelism: '400'
       spark.sql.files.maxPartitionBytes: '67108864'
       spark.sql.files.openCostInBytes: '1048576'
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: auditlogs
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      spark_conf:
-        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-        spark.hadoop.fs.s3a.threads.max: '64'
-        spark.hadoop.fs.s3a.connection.maximum: '200'
-        spark.sql.sources.parallelPartitionDiscovery.parallelism: '400'
-        spark.sql.files.maxPartitionBytes: '67108864'
-        spark.sql.files.openCostInBytes: '1048576'
-      num_workers: 5
-      driver_node_type_id: m6g.large
-  allow_custom_spark_job: true
+    num_workers: 5
+    driver_node_type_id: m6g.large

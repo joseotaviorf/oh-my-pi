@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_s_memory_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: people-analytics
@@ -8,26 +8,7 @@ cluster:
   - pypi:
       package: paramiko==4.0.0
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
     num_workers: 3
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: people-analytics
-      permission_level: CAN_MANAGE
-    custom_libraries:
-    - pypi:
-        package: paramiko==4.0.0
-    custom_configurations:
-      aws_attributes:
-        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
-      num_workers: 3
-      driver_node_type_id: r6g.xlarge
-  allow_custom_spark_job: true
+    driver_node_type_id: r6g.xlarge
