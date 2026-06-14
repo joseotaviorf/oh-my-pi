@@ -18,6 +18,7 @@ from bietlejuice.base.sst.core.utils.common import (
 )
 from bietlejuice.base.sst.core.utils.time import standard_now, standardize_timestamps
 from bietlejuice.base.sst.core.utils.transforms import (
+    get_latest_version_from_df,
     get_rows_to_update,
     get_versioning_df,
 )
@@ -168,7 +169,13 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
 
         cross_call_df = calls_sauron_df.union(calls_sss_df)
 
-        call_events_source_df = self._event_partition_filter(spark.table(bigfone_table))
+        call_events_source_df = self._event_partition_filter(
+            spark.table(bigfone_table)
+        ).withColumn("_dedup_sort_ts", F.col("ts_cdc_transaction"))
+        call_cols = call_events_source_df.columns
+        call_events_source_df = get_latest_version_from_df(
+            call_events_source_df, ["id"], call_cols, ["_dedup_sort_ts"]
+        )
 
         return (
             call_events_source_df.join(
@@ -360,60 +367,64 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             )
         )
 
-        tasks_source_df = (
-            self._event_partition_filter(spark.table(qm_task_table))
-            .select(
-                F.col("id").alias("id_task_event"),
-                "id_channel",
-                "id_chat",
-                "id_task",
-                "id_worker",
-                "worker_email",
-                F.when(
-                    F.col("channel_type") == "whatsapp",
-                    F.coalesce(
-                        F.col("customer_phone_number"),
-                        F.regexp_replace(
-                            F.col("customer_contact_info"), "whatsapp:\\+", ""
-                        ),
-                    ),
-                )
-                .otherwise(F.lit(None))
-                .alias("from_phone_number"),
-                F.regexp_replace(
-                    F.col("twilio_phone_number"), "whatsapp:\\+", ""
-                ).alias("twilio_phone_number"),
-                "customer_email",
-                "channel_type",
-                "task_status",
-                "task_outcome",
-                F.col("completion_reason").alias("task_completion_reason"),
-                "channel_status",
-                "bpo_name",
-                "bpo_selection_reason",
-                "assigned_to",
-                "seconds_to_first_response",
-                "is_forwarded",
-                "is_per_team_task",
-                "is_spoc_task",
-                "ts_created",
-                "ts_updated",
-                "ts_cdc_transaction",
-                "task_attributes",
-                "id_source_ctwa",
-                "url_source_ctwa",
-                "type_source_ctwa",
-                "total_inactivity_time",
-                "last_inactivity_time",
-            )
-            .alias("t")
+        tasks_source_df = self._event_partition_filter(
+            spark.table(qm_task_table)
+        ).withColumn("_dedup_sort_ts", F.col("ts_cdc_transaction"))
+        task_cols = tasks_source_df.columns
+        tasks_source_df = get_latest_version_from_df(
+            tasks_source_df, ["id"], task_cols, ["_dedup_sort_ts"]
         )
+
+        task_events_df = tasks_source_df.select(
+            F.col("id").alias("id_task_event"),
+            "id_channel",
+            "id_chat",
+            "id_task",
+            "id_worker",
+            "worker_email",
+            F.when(
+                F.col("channel_type") == "whatsapp",
+                F.coalesce(
+                    F.col("customer_phone_number"),
+                    F.regexp_replace(
+                        F.col("customer_contact_info"), "whatsapp:\\+", ""
+                    ),
+                ),
+            )
+            .otherwise(F.lit(None))
+            .alias("from_phone_number"),
+            F.regexp_replace(F.col("twilio_phone_number"), "whatsapp:\\+", "").alias(
+                "twilio_phone_number"
+            ),
+            "customer_email",
+            "channel_type",
+            "task_status",
+            "task_outcome",
+            F.col("completion_reason").alias("task_completion_reason"),
+            "channel_status",
+            "bpo_name",
+            "bpo_selection_reason",
+            "assigned_to",
+            "seconds_to_first_response",
+            "is_forwarded",
+            "is_per_team_task",
+            "is_spoc_task",
+            "ts_created",
+            "ts_updated",
+            "ts_cdc_transaction",
+            "task_attributes",
+            "id_source_ctwa",
+            "url_source_ctwa",
+            "type_source_ctwa",
+            "total_inactivity_time",
+            "last_inactivity_time",
+        ).alias("t")
 
         ias = inapp_sessions.alias("ias")
         ws = whatsapp_chats_df.alias("ws")
 
         return (
-            tasks_source_df.join(
+            task_events_df.join(
                 ias, on=F.col("ias.id_chat") == F.col("t.id_chat"), how="left"
             )
             .join(ws, on=F.col("ws.id_channel") == F.col("t.id_channel"), how="left")
