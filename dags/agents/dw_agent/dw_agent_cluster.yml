@@ -1,21 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_s_general_cluster
+  type: consolidation_s_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    # Cost-saving spot/OD mix: 1 CORE on-demand + 2 TASK spot (~67% spot).
-    # Master stays ON_DEMAND (m7g.xlarge) per emr_consolidation_base anchor.
-    core_nodes:
-        instance_count: 1
-    task_nodes:
-        instance_count: 2
-    spark_conf:
-      # Master / YARN RM (m7g.xlarge — 4 vCPU / 16 GB)
-      spark.driver.memory: 8g
-      spark.driver.cores: "4"
-      # Workers are m7g.2xlarge (8 vCPU / 32 GB each); 3 workers (1 CORE + 2 TASK).
-      # 2 execs/worker × 4 cores = 8 cores fully utilized.
-      # 2 × 11g (10g heap + 1g overhead) = 22 GB used / 32 GB per worker (10 GB OS headroom).
-      spark.executor.memory: 10g
-      spark.executor.cores: "4"
-      # 3 workers × 2 execs/worker = 6 execs max.
-      spark.dynamicAllocation.minExecutors: "2"
-      spark.dynamicAllocation.maxExecutors: "6"
+    num_workers: 3
