@@ -14,11 +14,11 @@ from bietlejuice.base.sst.core.utils.common import (
     _complete_dataframe_schema,
     _table_exists,
     default_args,
+    get_latest_version_from_df,
     safe_union_with_target_schema,
 )
 from bietlejuice.base.sst.core.utils.time import standard_now, standardize_timestamps
 from bietlejuice.base.sst.core.utils.transforms import (
-    get_latest_version_from_df,
     get_rows_to_update,
     get_versioning_df,
 )
