@@ -1,0 +1,24 @@
+dag:
+  name: dw_support_journey
+  schedule_start_date: 2026, 6, 14
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      DW layer for the Support Journey domain, modeling human customer service on
+      Salesforce Service Cloud. Part of the Single Station consolidation that
+      deprecates Zendesk and reframes the legacy "Ticket" concept into Salesforce
+      Cases and Tasks (the successor analytical model to dw_customer_support).
+      Builds fact_requests from the core_support_journey.cases core model, one row
+      per support case event version, preserving SCD history via the
+      ts_effective / ts_expired validity window (is_current flags the active version).
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: support_journey
+  default_extraction_type: incremental
+  default_partitions: []
+  tables_customization:
+    fact_requests:
+      z_order_by: [id_case, case_number]
+      merge_on: [sk_event]

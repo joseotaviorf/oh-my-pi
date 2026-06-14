@@ -1,0 +1,139 @@
+---
+database_name: dw_support_journey
+table_name: fact_requests
+description: Fact table with the support request (Salesforce case) events of the support journey, one row per case event version sourced from the core support journey model.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_event:
+    description: Surrogate key uniquely identifying a case event version (grain of the table). System-generated upstream as a hash of id_record, transaction_key and commit_number, so it is unique per event.
+    lineage:
+      - core_support_journey.cases.id_event
+  id_case:
+    description: Unique identifier of the support Case in Salesforce, sourced from id_record in the upstream Salesforce tables. A Case spans multiple rows in this table as it changes over time (SCD history), so only one version is current (is_current = true) at any given moment, bounded by the ts_effective / ts_expired validity window.
+    lineage:
+      - core_support_journey.cases.id_case
+  id_event_type:
+    description: Identifier of the event type associated with the case event.
+    lineage:
+      - core_support_journey.cases.id_event_type
+  id_account:
+    description: Identifier of the account related to the case.
+    lineage:
+      - core_support_journey.cases.id_account
+  id_owner:
+    description: Identifier of the user that currently owns the case.
+    lineage:
+      - core_support_journey.cases.id_owner
+  id_created_by:
+    description: Identifier of the user that created the case.
+    lineage:
+      - core_support_journey.cases.id_created_by
+  id_case_milestone:
+    description: Identifier of the case milestone tracking the SLA for the case.
+    lineage:
+      - core_support_journey.cases.id_case_milestone
+  id_last_modified_by:
+    description: Identifier of the user that last modified the case.
+    lineage:
+      - core_support_journey.cases.id_last_modified_by
+  case_number:
+    description: Human-readable case number displayed in Salesforce Page.
+    lineage:
+      - core_support_journey.cases.case_number
+  record_type_name:
+    description: Name of the Salesforce record type that classifies the case.
+    lineage:
+      - core_support_journey.cases.record_type_name
+  type:
+    description: Type classification of the support case.
+    lineage:
+      - core_support_journey.cases.type
+  status:
+    description: Current workflow status of the support case.
+    lineage:
+      - core_support_journey.cases.status
+  reason:
+    description: Reason that motivated the opening of the case.
+    lineage:
+      - core_support_journey.cases.reason
+  origin:
+    description: Channel through which the case was originated.
+    lineage:
+      - core_support_journey.cases.origin
+  subject:
+    description: Free-text subject describing the case.
+    lineage:
+      - core_support_journey.cases.subject
+  priority:
+    description: Priority level assigned to the case.
+    lineage:
+      - core_support_journey.cases.priority
+  description:
+    description: Free-text description detailing the case request.
+    lineage:
+      - core_support_journey.cases.description
+  developer_name:
+    description: API developer name of the Salesforce record type of the case.
+    lineage:
+      - core_support_journey.cases.developer_name
+  target_response_time_minutes:
+    description: SLA target response time for the case milestone, in minutes.
+    lineage:
+      - core_support_journey.cases.target_response_in_mins
+  time_remaining_minutes:
+    description: Time remaining until the case milestone SLA target is breached, in minutes.
+    lineage:
+      - core_support_journey.cases.time_remaining_in_mins
+  elapsed_time_minutes:
+    description: Time elapsed since the case milestone started, in minutes.
+    lineage:
+      - core_support_journey.cases.elapsed_time_in_mins
+  time_since_target_minutes:
+    description: Time elapsed since the case milestone SLA target was reached, in minutes.
+    lineage:
+      - core_support_journey.cases.time_since_target_in_mins
+  is_closed:
+    description: Flag indicating whether the case is currently closed.
+    lineage:
+      - core_support_journey.cases.is_closed
+  is_deleted:
+    description: Flag indicating whether the case has been deleted in the source system. A case can be undeleted
+    lineage:
+      - core_support_journey.cases.is_deleted
+  is_current:
+    description: Flag indicating whether this is the most recent version of the case event (SCD current record). Use this for fast filtering on the current version of the case/table
+    lineage:
+      - core_support_journey.cases._is_current
+  dt_start:
+    description: Date when the case milestone started.
+    lineage:
+      - core_support_journey.cases.dt_start
+  dt_target:
+    description: Date when the case milestone SLA target is due.
+    lineage:
+      - core_support_journey.cases.dt_target
+  dt_completion:
+    description: Date when the case milestone was completed.
+    lineage:
+      - core_support_journey.cases.dt_completion
+  ts_created:
+    description: Timestamp when the case was created in the source system.
+    lineage:
+      - core_support_journey.cases.created_date
+  ts_last_modified:
+    description: Timestamp when the case was last modified in the source system.
+    lineage:
+      - core_support_journey.cases.last_modified_date
+  ts_closed:
+    description: Timestamp when the case was closed in the source system.
+    lineage:
+      - core_support_journey.cases.closed_date
+  ts_effective:
+    description: SCD valid-from timestamp - the moment this case version became the active record. To reconstruct the state of a case at a given instant T, filter ts_effective <= T AND ts_expired > T; for the latest state use is_current = true.
+    lineage:
+      - core_support_journey.cases._effective_timestamp
+  ts_expired:
+    description: SCD valid-to timestamp - the moment this case version was superseded by a newer one; the current version carries a 9999 sentinel (year 9999) instead of a real date, so it is never expired. Each [ts_effective, ts_expired) window is half-open and non-overlapping per id_case, so point-in-time queries use ts_effective <= T AND ts_expired > T.
+    lineage:
+      - core_support_journey.cases._expired_timestamp

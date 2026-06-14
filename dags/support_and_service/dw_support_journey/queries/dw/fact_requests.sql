@@ -1,0 +1,39 @@
+SELECT
+    id_event AS sk_event,
+    id_case,
+    id_event_type,
+    id_account,
+    id_owner,
+    id_created_by,
+    id_case_milestone,
+    id_last_modified_by,
+    case_number,
+    record_type_name,
+    type,
+    status,
+    reason,
+    origin,
+    subject,
+    priority,
+    description,
+    developer_name,
+    target_response_in_mins AS target_response_time_minutes,
+    time_remaining_in_mins AS time_remaining_minutes,
+    elapsed_time_in_mins AS elapsed_time_minutes,
+    time_since_target_in_mins AS time_since_target_minutes,
+    is_closed,
+    is_deleted,
+    dt_start,
+    dt_target,
+    dt_completion,
+    created_date AS ts_created,
+    last_modified_date AS ts_last_modified,
+    closed_date AS ts_closed,
+    _is_current AS is_current,
+    _effective_timestamp AS ts_effective,
+    _expired_timestamp AS ts_expired
+FROM
+    core_support_journey.cases
+WHERE
+    _last_updated_at >= '{load_start_date}'
+    AND _last_updated_at < '{load_end_date}'
