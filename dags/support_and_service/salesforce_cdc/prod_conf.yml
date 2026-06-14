@@ -32,6 +32,7 @@ events_config:
   case_repair_analysis:
     event_path: "raw/salesforce/CaseRepairAnalysisEvent"
     api_entity: "CaseRepairAnalysis__c"
+    threshold_partition_hours: 48
   case_repair_budget:
     event_path: "raw/salesforce/CaseRepairBudgetEvent"
     api_entity: "CaseRepairBudget__c"
