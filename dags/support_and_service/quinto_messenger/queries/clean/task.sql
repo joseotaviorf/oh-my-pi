@@ -34,7 +34,6 @@ SELECT
     COALESCE(CAST(GET_JSON_OBJECT(task_attributes,'$.is_spoc') AS BOOLEAN), FALSE) AS is_spoc_task,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    ts_cdc_transaction,
     year_month,
     year,
     month,

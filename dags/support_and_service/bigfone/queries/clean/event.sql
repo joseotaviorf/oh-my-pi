@@ -33,7 +33,6 @@ SELECT
     provider,
     event_timestamp AS ts_created,
     received_timestamp AS ts_received,
-    ts_cdc_transaction,
     year,
     month,
     day
