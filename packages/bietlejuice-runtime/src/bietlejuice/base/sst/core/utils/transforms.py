@@ -128,7 +128,7 @@ def get_versioning_df(
             "_created_at",
             F.first("_created_at", ignorenulls=True).over(window_pipeline_cols),
         )
-        .withColumn("_last_updated_at", F.lit(standard_now()))
+        .withColumn("_last_updated_at", standard_now(is_col=True))
     )
 
 

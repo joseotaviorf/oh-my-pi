@@ -33,8 +33,12 @@ def standardize_timestamps(df, cols):
     return df
 
 
-def standard_now():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def standard_now(is_col: bool = False):
+    return (
+        F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        if is_col
+        else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
 
 
 # Default to 0:00 UTC

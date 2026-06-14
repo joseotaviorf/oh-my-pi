@@ -16,6 +16,7 @@ from bietlejuice.base.sst.core.utils.common import (
     default_args,
     safe_union_with_target_schema,
 )
+from bietlejuice.base.sst.core.utils.time import standard_now, standardize_timestamps
 from bietlejuice.base.sst.core.utils.transforms import (
     get_rows_to_update,
     get_versioning_df,
@@ -70,6 +71,16 @@ _DEFAULT_CLI_OPTIONAL_ARGS = [
 
 _VERSIONING_CONTEXT_COLS = ["id_session", "id_task"]
 _VERSIONING_EVENT_TS_COL = "ts_task_updated"
+_TIMESTAMP_COLS = [
+    "ts_task_created",
+    "ts_task_updated",
+    "ts_session_event_created",
+    "ts_session_event_updated",
+    "ts_session_created",
+    "ts_session_updated",
+    "_effective_timestamp",
+    "_expired_timestamp",
+]
 
 
 class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
@@ -568,8 +579,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                     F.lit("id_task_event"),
                 ),
             )
-            .withColumn("_created_at", F.current_timestamp())
-            .withColumn("_ts_load", F.now())
+            .withColumn("_created_at", standard_now(is_col=True))
+            .withColumn("_ts_load", standard_now(is_col=True))
         )
 
     def create_core_model(self, spark: SparkSession) -> None:
@@ -658,6 +669,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             _VERSIONING_CONTEXT_COLS,
             _VERSIONING_EVENT_TS_COL,
         ).select(*schema_column_names)
+
+        versioned_df = standardize_timestamps(versioned_df, _TIMESTAMP_COLS)
 
         self.logger.info("m=create_core_model, msg=Validating schema of the dataframe")
         validator = SchemaValidator()
