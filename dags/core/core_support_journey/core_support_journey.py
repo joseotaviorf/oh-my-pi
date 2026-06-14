@@ -165,7 +165,7 @@ with DAG(
     default_args=_DEFAULT_ARGS,
     schedule_interval="0 * * * *",
     start_date=datetime(2026, 5, 1),
-    catchup=False,
+    catchup=True,
     tags=["core_model", "support_journey", "SST", "Salesforce", "SF"],
     max_active_runs=1,
     on_failure_callback=gchat_callback.dag_failure_alert,
