@@ -702,7 +702,11 @@ def _family_order_for_demand(
 
 
 def _node_for_demand(
-    required_mem_gb: float, required_cores: float, *, exclude_compute: bool = False
+    required_mem_gb: float,
+    required_cores: float,
+    *,
+    exclude_compute: bool = False,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> str | None:
     """Pick the cheapest ARM node that fits demand at target utilization."""
     for family in _family_order_for_demand(
@@ -712,7 +716,7 @@ def _node_for_demand(
             (node_type, spec, price)
             for node_type, spec, price in _single_node_candidates()
             if spec.family == family
-            and required_mem_gb / spec.memory_gb <= _SINGLE_NODE_MEM_TARGET
+            and required_mem_gb / spec.memory_gb <= mem_target
             and required_cores / spec.vcpus <= _SINGLE_NODE_CPU_TARGET
         ]
         if family_candidates:
@@ -724,7 +728,10 @@ def _node_for_demand(
 
 
 def size_single_node(
-    m: DagMetrics, *, photon_off: bool | None = None
+    m: DagMetrics,
+    *,
+    photon_off: bool | None = None,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> SingleNodeSizing:
     required_mem_gb = _additive_memory_gb(m, photon_off=photon_off)
     required_cores = _additive_cores(m, photon_off=photon_off)
@@ -743,7 +750,7 @@ def size_single_node(
             (node_type, spec, price)
             for node_type, spec, price in _single_node_candidates()
             if spec.family == family
-            and required_mem_gb / spec.memory_gb <= _SINGLE_NODE_MEM_TARGET
+            and required_mem_gb / spec.memory_gb <= mem_target
             and required_cores / spec.vcpus <= _SINGLE_NODE_CPU_TARGET
         ]
         if family_candidates:
@@ -755,7 +762,7 @@ def size_single_node(
         largest_vcpus = max(spec.vcpus for _, spec, _ in _single_node_candidates())
         blocked_reason = (
             "keep_multi_memory"
-            if required_mem_gb / largest_mem > _SINGLE_NODE_MEM_TARGET
+            if required_mem_gb / largest_mem > mem_target
             else "keep_multi_compute"
             if required_cores / largest_vcpus > _SINGLE_NODE_CPU_TARGET
             else "keep_multi_balanced"
@@ -1132,7 +1139,10 @@ def _driver_minimize_node(
 
 
 def _worker_resize(
-    m: DagMetrics, *, photon_off: bool | None = None
+    m: DagMetrics,
+    *,
+    photon_off: bool | None = None,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> WorkerResize | None:
     d = _sizing_demand(m, photon_off=photon_off)
     if (
@@ -1158,7 +1168,7 @@ def _worker_resize(
     else:
         candidate_worker = (
             _node_for_demand(
-                per_node_mem_gb, per_node_cores, exclude_compute=exclude_compute
+                per_node_mem_gb, per_node_cores, exclude_compute=exclude_compute, mem_target=mem_target
             )
             or current_worker
         )
@@ -1173,7 +1183,7 @@ def _worker_resize(
         2,
         math.ceil(
             max(
-                aggregate_mem_gb / (candidate_spec.memory_gb * _SINGLE_NODE_MEM_TARGET),
+                aggregate_mem_gb / (candidate_spec.memory_gb * mem_target),
                 aggregate_cores / (candidate_spec.vcpus * _SINGLE_NODE_CPU_TARGET),
             )
         ),
@@ -1240,10 +1250,13 @@ def candidate_total_cores(candidate: ShapeCandidate) -> int:
 
 
 def build_best_single_candidate(
-    m: DagMetrics, *, photon_off: bool | None = None
+    m: DagMetrics,
+    *,
+    photon_off: bool | None = None,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> ShapeCandidate | None:
     """Smallest single on-demand node that holds the additive demand."""
-    sizing = size_single_node(m, photon_off=photon_off)
+    sizing = size_single_node(m, photon_off=photon_off, mem_target=mem_target)
     if not sizing.node_type:
         return None
     return ShapeCandidate(
@@ -1282,7 +1295,10 @@ def build_one_worker_collapse_candidate(
 
 
 def build_current_refined_candidate(
-    m: DagMetrics, *, photon_off: bool | None = None
+    m: DagMetrics,
+    *,
+    photon_off: bool | None = None,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> ShapeCandidate | None:
     """Refined multi-node: demand-sized OD driver + >=2 right-sized spot workers.
 
@@ -1293,7 +1309,7 @@ def build_current_refined_candidate(
     """
     if m.topology != "multi":
         return None
-    worker_resize = _worker_resize(m, photon_off=photon_off)
+    worker_resize = _worker_resize(m, photon_off=photon_off, mem_target=mem_target)
     if worker_resize is None or worker_resize.worker_count < 2:
         return None
     if _io_shrink_guard(m):
@@ -1399,7 +1415,10 @@ _RELAXED_DOWNSIZE_MEM_P95_MAX = 70.0
 
 
 def _single_node_downsize_node(
-    m: DagMetrics, *, photon_off: bool | None = None
+    m: DagMetrics,
+    *,
+    photon_off: bool | None = None,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> str | None:
     """Relaxed single-node downsize candidate.
 
@@ -1430,7 +1449,7 @@ def _single_node_downsize_node(
     used_cores = current_spec.vcpus * drv_cpu_eff / 100.0
     projected_cpu_pct = used_cores / downsize_spec.vcpus if downsize_spec.vcpus else 1.0
     if (
-        projected_mem_pct > _SINGLE_NODE_MEM_TARGET
+        projected_mem_pct > mem_target
         or projected_cpu_pct > _SINGLE_NODE_CPU_TARGET
     ):
         return None
@@ -1542,6 +1561,8 @@ def _keep_multi_reason(m: DagMetrics, sizing: SingleNodeSizing) -> str:
 
 def _feasible_collapse_options(
     m: DagMetrics,
+    *,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> list[tuple[float, ShapeCandidate]]:
     """Feasible collapse candidates with projected cost; no baseline filter."""
     observed_cores = observed_total_cores(m)
@@ -1555,7 +1576,11 @@ def _feasible_collapse_options(
     )
     for keep_photon in photon_worlds:
         photon_off = not keep_photon
-        best_single = collapse_builder(m, photon_off=photon_off)
+        # one_worker_collapse doesn't use mem_target (uses max node type)
+        if (m.worker_count or 0) == 1:
+            best_single = collapse_builder(m, photon_off=photon_off)
+        else:
+            best_single = collapse_builder(m, photon_off=photon_off, mem_target=mem_target)
         if (
             not _io_shrink_guard(m)
             and best_single is not None
@@ -1580,7 +1605,11 @@ def _feasible_collapse_options(
     return options
 
 
-def _decide_multi(m: DagMetrics) -> MultiDecision:
+def _decide_multi(
+    m: DagMetrics,
+    *,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
+) -> MultiDecision:
     """Bidirectional multi-node decision: cost-truthful pick among candidates.
 
     Generates the feasible candidates (collapse to a single node; refine the
@@ -1589,23 +1618,27 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     cohort *is* the reason; when nothing wins, the DAG is kept with the most
     informative keep-multi reason.
     """
-    sizing = size_single_node(m)
+    sizing = size_single_node(m, mem_target=mem_target)
     if sizing.blocked_reason == "needs_more_telemetry":
         return MultiDecision("needs_more_telemetry", None)
 
     if (m.worker_count or 0) == 1:
-        collapse_options = _feasible_collapse_options(m)
+        collapse_options = _feasible_collapse_options(m, mem_target=mem_target)
+        baseline = _current_cost_basis(m)
         if collapse_options:
-            _cost, candidate = min(collapse_options, key=lambda option: option[0])
-            return MultiDecision("collapse_to_single", candidate)
+            cost, candidate = min(collapse_options, key=lambda option: option[0])
+            if baseline <= 0 or cost < baseline:
+                return MultiDecision("collapse_to_single", candidate)
+        # Fall through to unified candidate pool (may still collapse via that path)
 
     observed_cores = observed_total_cores(m)
     sla_limit = _sla_limit_minutes(m)
-    baseline = _current_cost_basis(m)
+    if (m.worker_count or 0) != 1:
+        baseline = _current_cost_basis(m)
 
     options: list[tuple[float, str, ShapeCandidate]] = []
 
-    for cost, candidate in _feasible_collapse_options(m):
+    for cost, candidate in _feasible_collapse_options(m, mem_target=mem_target):
         options.append((cost, "collapse_to_single", candidate))
 
     # Enumerate shape candidates across both Photon worlds. A non-Photon DAG has
@@ -1616,7 +1649,7 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     for keep_photon in photon_worlds:
         photon_off = not keep_photon
 
-        refined = build_current_refined_candidate(m, photon_off=photon_off)
+        refined = build_current_refined_candidate(m, photon_off=photon_off, mem_target=mem_target)
         if (
             refined is not None
             and candidate_total_cores(refined) <= observed_cores
@@ -1669,9 +1702,7 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     viable = [
         option
         for option in options
-        if option[1] == "collapse_to_single" and (m.worker_count or 0) == 1
-        or baseline <= 0
-        or option[0] < baseline
+        if baseline <= 0 or option[0] < baseline
     ]
     if viable:
         cost, cohort, candidate = min(viable, key=lambda option: option[0])
@@ -1681,6 +1712,160 @@ def _decide_multi(m: DagMetrics) -> MultiDecision:
     # in the pool), and surface the cheapest feasible alternative as blocked.
     blocked_cost = min((option[0] for option in options), default=None)
     return MultiDecision(_keep_multi_reason(m, sizing), None, blocked_cost=blocked_cost)
+
+
+
+
+def _build_expansion_candidate(
+    m: DagMetrics,
+    *,
+    photon_off: bool | None = None,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
+) -> ShapeCandidate | None:
+    """Build small-driver + spot-worker candidate for single-node expansion."""
+    if m.topology != "single":
+        return None
+
+    # Get additive demand
+    required_mem_gb = _additive_memory_gb(m, photon_off=photon_off)
+    required_cores = _additive_cores(m, photon_off=photon_off)
+    if required_mem_gb is None or required_cores is None:
+        return None
+
+    # Get driver demand
+    d = _sizing_demand(m, photon_off=photon_off)
+    driver_spec = INSTANCE_CATALOG.get(m.driver_node_type)
+    if not driver_spec:
+        return None
+
+    drv_cpu_eff = _cpu_effective_pct(d.drv_cpu_p50, d.drv_cpu_p95) or 0.0
+    driver_mem_gb = driver_spec.memory_gb * (d.drv_mem_p95 or 0) / 100.0
+    driver_cores = driver_spec.vcpus * drv_cpu_eff / 100.0
+
+    # Find minimum viable driver
+    driver_family = _node_family(m.driver_node_type)
+    min_driver = None
+    for tier in _TIER_ORDER:
+        candidate_driver = _node_for_family_tier(driver_family, tier)
+        if not candidate_driver:
+            continue
+        spec = INSTANCE_CATALOG.get(candidate_driver)
+        if not spec:
+            continue
+        if (spec.memory_gb * mem_target >= driver_mem_gb and
+            spec.vcpus * _SINGLE_NODE_CPU_TARGET >= driver_cores):
+            min_driver = candidate_driver
+            break
+
+    if not min_driver:
+        return None
+
+    min_driver_spec = INSTANCE_CATALOG.get(min_driver)
+    if not min_driver_spec:
+        return None
+
+    # Worker gets the overflow: total demand minus driver capacity
+    worker_mem_gb = max(0, required_mem_gb - min_driver_spec.memory_gb * mem_target)
+    worker_cores = max(0, required_cores - min_driver_spec.vcpus * _SINGLE_NODE_CPU_TARGET)
+
+    if worker_mem_gb <= 0 and worker_cores <= 0:
+        # No overflow — single node is fine
+        return None
+
+    # Find worker node
+    worker_node = _node_for_demand(worker_mem_gb, worker_cores, mem_target=mem_target)
+    if not worker_node:
+        return None
+
+    worker_spec = INSTANCE_CATALOG.get(worker_node)
+    if not worker_spec:
+        return None
+
+    # Worker count: ceil of demand / capacity
+    worker_count = max(1, math.ceil(max(
+        worker_mem_gb / (worker_spec.memory_gb * mem_target) if worker_spec.memory_gb > 0 else 0,
+        worker_cores / (worker_spec.vcpus * _SINGLE_NODE_CPU_TARGET) if worker_spec.vcpus > 0 else 0,
+    )))
+
+    return ShapeCandidate(
+        min_driver,
+        worker_node,
+        worker_count,
+        "expand_to_multi",
+    )
+
+
+def _decide_single(
+    m: DagMetrics,
+    *,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
+) -> tuple[str, ShapeCandidate | None]:
+    """Single-node expansion decision: compare current single vs small-driver + spot workers.
+
+    Returns (cohort, candidate) where cohort is one of:
+    - "expand_to_multi" with a ShapeCandidate when multi-node is cheaper
+    - "healthy_single" with None when current single is optimal
+    - "driver_downsize" with None (delegate to existing logic)
+    """
+    if m.topology != "single":
+        return ("healthy_single", None)
+
+    # Require minimum telemetry to avoid thrashing
+    if m.arm_runs < 5:
+        return ("healthy_single", None)
+
+    # Only expand when the single-node is in memory or general family at tier l or xl
+    # (expensive enough to justify multi overhead)
+    driver_family = _node_family(m.driver_node_type)
+    driver_tier = _node_tier(m.driver_node_type)
+    if driver_family == "compute":
+        return ("healthy_single", None)
+    if driver_tier not in ("l", "xl"):
+        return ("healthy_single", None)
+
+    # Get current single-node cost baseline
+    baseline = _current_cost_basis(m)
+    if baseline <= 0:
+        return ("healthy_single", None)
+
+    # Build a multi-node candidate
+    candidate = _build_expansion_candidate(m, mem_target=mem_target)
+    if candidate is None:
+        return ("healthy_single", None)
+
+    # Check SLA wall constraint before costing
+    sla_limit = _sla_limit_minutes(m)
+    wall = _projected_wall_for_sla(
+        m,
+        candidate.worker_count,
+        keep_photon=False,
+        rec_total_cores=candidate_total_cores(candidate),
+        rec_disk_bw=_candidate_disk_bw(
+            candidate.driver_node_type,
+            candidate.worker_node_type,
+            candidate.worker_count,
+        ),
+    )
+    if wall is None or wall > sla_limit:
+        return ("healthy_single", None)
+
+    # Price the multi candidate using spot workers
+    multi_cost = estimate_projected_total_cost(
+        m,
+        candidate.driver_node_type,
+        candidate.worker_count,
+        rec_worker=candidate.worker_node_type,
+        keep_photon=False,
+    )
+
+    if multi_cost is None:
+        return ("healthy_single", None)
+
+    # Only expand if multi cost is cheaper than baseline
+    if multi_cost < baseline:
+        return ("expand_to_multi", candidate)
+
+    return ("healthy_single", None)
 
 
 def _recent_era_established(
@@ -1709,6 +1894,7 @@ def classify(
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
     recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
     recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> str:
     # arm_runs/arm_days are era-scoped (latest config only). Wait until the new era
     # meets --recent-era-min-*; then size on those runs. Window min_days/min_runs
@@ -1736,12 +1922,18 @@ def classify(
     if m.ec2_pricing_missing or m.dbu_negotiated_price_missing:
         return "cost_confidence_review"
 
-    # Single-node branch: only refine downward (single -> multi is parked).
+    # Single-node branch: check expansion, then refine downward.
     if topo == "single":
         d = effective_demand(m)
         if (d.drv_mem_p95 or 0.0) >= _DRIVER_OOM_P95:
             return "protect_oom_risk"
-        if _single_node_downsize_node(m):
+
+        # Check if small-driver + spot-worker is cheaper than current large single
+        expansion = _decide_single(m, mem_target=mem_target)
+        if expansion[0] == "expand_to_multi":
+            return "expand_to_multi"
+
+        if _single_node_downsize_node(m, mem_target=mem_target):
             return "driver_downsize"
         return "healthy_single"
 
@@ -1749,7 +1941,7 @@ def classify(
     # A 1-worker cluster is strictly dominated by single-node, so it folds into
     # the single-node candidate comparison (build_current_refined returns None).
     if topo == "multi":
-        return _decide_multi(m).cohort
+        return _decide_multi(m, mem_target=mem_target).cohort
 
     return "autoscale_review"
 
@@ -2089,6 +2281,7 @@ def build_recommendation(
     dominant_config_share_min: float = _DEFAULT_DOMINANT_CONFIG_SHARE_MIN,
     recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
     recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
+    mem_target: float = _SINGLE_NODE_MEM_TARGET,
 ) -> Recommendation:
     cohort = classify(
         m,
@@ -2097,8 +2290,9 @@ def build_recommendation(
         dominant_config_share_min,
         recent_era_min_days,
         recent_era_min_runs,
+        mem_target,
     )
-    decision = _decide_multi(m) if m.topology == "multi" else None
+    decision = _decide_multi(m, mem_target=mem_target) if m.topology == "multi" else None
     candidate = decision.candidate if decision else None
     multi_winner = (
         cohort in ("collapse_to_single", "right_size_multi") and candidate is not None
@@ -2183,6 +2377,20 @@ def build_recommendation(
             num_workers_override = rec_workers
         else:
             num_workers_override = None
+    elif cohort == "expand_to_multi":
+        expansion = _decide_single(m, mem_target=mem_target)
+        expand_candidate = expansion[1]
+        if expand_candidate:
+            rec_preset_name = _multi_preset_for_worker(expand_candidate.worker_node_type)
+            rec_driver = expand_candidate.driver_node_type
+            rec_worker = expand_candidate.worker_node_type
+            rec_workers = expand_candidate.worker_count
+            actions = ["expand_to_multi"]
+            rec_spec = PRESET_CATALOG.get(rec_preset_name) if rec_preset_name else None
+            if rec_spec and rec_workers is not None and rec_workers != rec_spec.num_workers:
+                num_workers_override = rec_workers
+            else:
+                num_workers_override = None
     elif cohort in _KEEP_MULTI_COHORTS:
         # Nothing — including dropping Photon, which competed in the candidate
         # pool — beat the observed cost: keep the observed shape exactly as-is
@@ -2206,7 +2414,7 @@ def build_recommendation(
                 )
     if cohort == "driver_downsize" and rec_preset_name:
         actions = ["reduce_driver"]
-        rec_driver = _single_node_downsize_node(m) or _driver_downsize_node(m)
+        rec_driver = _single_node_downsize_node(m, mem_target=mem_target) or _driver_downsize_node(m)
     elif cohort == "protect_oom_risk" and rec_preset_name:
         # Safety upsize to a higher-memory family/tier; the explicit action keeps
         # the report honest (the shape does change even though cost may rise).
@@ -4259,7 +4467,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help=(
             "Also query AMD (x86) history for DAGs below the ARM threshold. "
             "Uses the same cohort/preset logic as ARM with a "
-            f"{AMD_WALL_CORRECTION:.0%} wall-clock correction for SLA sizing. "
+            f"{AMD_WALL_CORRECTION*100:.0f}%% wall-clock correction for SLA sizing. "
             "Recommendations are labelled confidence=medium-x86."
         ),
     )
@@ -4291,6 +4499,16 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=1,
         metavar="N",
         help="Minimum validation runs per DAG for outcome comparison (default 1)",
+    )
+    parser.add_argument(
+        "--mem-target",
+        type=float,
+        default=_SINGLE_NODE_MEM_TARGET,
+        metavar="FRACTION",
+        help=(
+            "Target memory utilization for single-node sizing (default 0.82). "
+            "Higher values (e.g. 0.93) yield smaller nodes but less headroom."
+        ),
     )
     return parser.parse_args(argv)
 
@@ -4378,6 +4596,7 @@ def main(argv: list[str] | None = None) -> int:
             args.dominant_config_share_min,
             args.recent_era_min_days,
             args.recent_era_min_runs,
+            args.mem_target,
         )
         for m in metrics
     ]

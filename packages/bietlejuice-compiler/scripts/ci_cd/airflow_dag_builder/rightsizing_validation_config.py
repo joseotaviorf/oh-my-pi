@@ -39,6 +39,7 @@ _ACTIONABLE_COHORTS = frozenset(
         "keep_multi_cost",
         "keep_multi_io_bound",
         "healthy_single",
+        "expand_to_multi",
     }
 )
 
