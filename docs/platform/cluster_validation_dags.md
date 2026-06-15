@@ -229,13 +229,23 @@ Phase 1: `query_delta`, `query`, `dw_query`, `metric_query` without unsupported 
 
 Phase 2 (implemented, PR2–PR5): `cdc`, `dms_cdc`, `gsheets`, `database_pull`, `api_ingestion`, `reverse`, `core_model`, `qube_dimension`, `qube_measure`, `qube_metric`.
 
-Phase 2 (excluded / future work): `wonka`, `query_view` — see [Exclusions](#exclusions) below.
+Phase 2 (pilot): `wonka` — shadow `__validation` DAGs with write redirect to `cluster_validation.wonka___*` (see [Wonka pilot](#wonka-pilot) below).
+
+Phase 2 (excluded / future work): `query_view` — see [Exclusions](#exclusions) below.
+
+## Wonka pilot
+
+Wonka feature sets (QuintoML `jobs/wonka/*/configs/prod.yml`) can opt in to cluster validation by adding a top-level `validation.cluster` block. The validation DAG:
+
+- Uses a `consolidation_*` cluster preset (Graviton) while `WonkaWorkflow` still merges the `wonka_cluster` runtime overlay (PEX init, Vault, env vars).
+- Skips `optimize_delta_tables` and `load_cdf_to_datazord` (no prod Kafka CDF traffic).
+- Redirects pipeline output via `load_wonka.py` env injection and `WonkaRunner` writer remapping to `cluster_validation.wonka___<feature_set>` (and `__latest` tables).
+
+Pilot DAGs: `quintoml.wonka.user_visits__validation`, `quintoml.wonka.house_main__validation`.
+
+Fleet auto-generation for Wonka DAGs remains deferred (see Phase 6 in the wiring plan).
 
 ## Exclusions
-
-### wonka
-
-`load_wonka` is a pipeline runner that dispatches to other jobs at runtime. It cannot redirect table output without changes to the Wonka runner itself. `cluster_validation` DAGs for `wonka` workflow types are currently **not supported** — the validator will raise if `validation:` is set on a wonka DAG.
 
 ### query_view
 

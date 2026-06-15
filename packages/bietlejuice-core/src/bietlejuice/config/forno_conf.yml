@@ -315,8 +315,7 @@ custom_cluster_with_sedona:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
               region: ""
 
-wonka_cluster:
-    <<: *cluster_anchor
+wonka_runtime: &wonka_runtime
     access_control_list:
         group_name: mlops
         permission_level: CAN_MANAGE
@@ -376,6 +375,10 @@ wonka_cluster:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
               region: ""
+
+wonka_cluster:
+    <<: *cluster_anchor
+    <<: *wonka_runtime
 
 databricks_10_4_min_general_cluster:
     <<: *cluster_anchor
@@ -2445,6 +2448,22 @@ consolidation_xl_memory_cluster:
     node_type_id: r6g.8xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
+
+wonka_consolidation_xs_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.large
+    node_type_id: r6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    <<: *wonka_runtime
+
+wonka_consolidation_xl_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.4xlarge
+    node_type_id: r6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    <<: *wonka_runtime
 
 ##### Consolidation Single-Node Presets #####
 # Naming: consolidation_{size}_{family}_single_node_cluster

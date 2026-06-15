@@ -220,47 +220,51 @@ class WonkaWorkflow(BaseWorkflow):
         )
         created_tasks_ids.append(load_wonka_task.task_id)
 
-        tables_to_optimize = [wonka_table_attributes]
-
         datazord_config = self.workflow_args.get("datazord_config")
-        if datazord_config:
-            wonka_latest_table_attributes = TableAttributes(
-                self.dag_args,
-                self.workflow_args,
-                LayerEnum.WONKA,
-                datazord_config["table"],
-            )
 
-            tables_to_optimize.append(wonka_latest_table_attributes)
-
-            load_cdf_to_datazord_task = (
-                self.load_cdf_to_datazord_task_creator.create_task(
-                    wonka_latest_table_attributes,
-                    key_columns=(
-                        datazord_config["key_columns"]
-                        if "key_columns" in datazord_config
-                        else []
-                    ),
-                )
-            )
-            created_tasks_ids.append(load_cdf_to_datazord_task.task_id)
-
-        # We keep only a single "optimize table" task that will be used to optimize all the tables
-        optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
-            tables_to_optimize
-        )
-        created_tasks_ids.append(optimize_delta_tables_task.task_id)
-
-        execute_job_cluster_task >> load_wonka_task >> optimize_delta_tables_task
-
-        if datazord_config:
-            (
-                optimize_delta_tables_task
-                >> load_cdf_to_datazord_task
-                >> cluster_completion_sink
-            )
+        if self.is_validation:
+            execute_job_cluster_task >> load_wonka_task >> cluster_completion_sink
         else:
-            optimize_delta_tables_task >> cluster_completion_sink
+            tables_to_optimize = [wonka_table_attributes]
+            load_cdf_to_datazord_task = None
+
+            if datazord_config:
+                wonka_latest_table_attributes = TableAttributes(
+                    self.dag_args,
+                    self.workflow_args,
+                    LayerEnum.WONKA,
+                    datazord_config["table"],
+                )
+
+                tables_to_optimize.append(wonka_latest_table_attributes)
+
+                load_cdf_to_datazord_task = (
+                    self.load_cdf_to_datazord_task_creator.create_task(
+                        wonka_latest_table_attributes,
+                        key_columns=(
+                            datazord_config["key_columns"]
+                            if "key_columns" in datazord_config
+                            else []
+                        ),
+                    )
+                )
+                created_tasks_ids.append(load_cdf_to_datazord_task.task_id)
+
+            optimize_delta_tables_task = (
+                self.optimize_delta_table_task_creator.create_task(tables_to_optimize)
+            )
+            created_tasks_ids.append(optimize_delta_tables_task.task_id)
+
+            execute_job_cluster_task >> load_wonka_task >> optimize_delta_tables_task
+
+            if datazord_config:
+                (
+                    optimize_delta_tables_task
+                    >> load_cdf_to_datazord_task
+                    >> cluster_completion_sink
+                )
+            else:
+                optimize_delta_tables_task >> cluster_completion_sink
 
         attach_emr_job_cluster_finished_work_prerequisites(
             self.dag_execution_context,
