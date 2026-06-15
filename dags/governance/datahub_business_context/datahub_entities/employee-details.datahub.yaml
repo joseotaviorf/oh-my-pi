@@ -1,0 +1,132 @@
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "Employee Details"
+product_description: |
+  Employee Details is the People Data Warehouse schema for workforce identity, contact and
+  legal documentation, emergency contacts, management hierarchy, and daily assignment snapshots.
+  It is the primary internal source for headcount, tenure, admissions, exits, and org-structure
+  analysis within the People domain.
+
+  The central fact table (fact_assignment_snapshots) stores one row per assignment per calendar
+  day. Dimension tables use mixed temporal models: dim_employee is current state only; contact,
+  documentation, emergency contact, and hierarchy dimensions are SCD Type 2 validity windows.
+
+  Sensitive personal data (CPF, address, legal name, marital status) lives here under restricted
+  access. Prefer dim_employee.name (preferred name) for display; use dim_documentation only for
+  compliance contexts.
+
+  Population: all current and former employees with a valid HR assignment (contractors and FTE);
+  test users excluded. Source: PIN (Oracle HCM). SLA: D-1 by 08:00 BRT.
+
+  Temporal model: dim_employee is current state; contact, documentation, emergency contact, and
+  hierarchy are SCD Type 2 validity windows; fact_assignment_snapshots is one row per assignment
+  per calendar day.
+
+  Critical rules:
+  - Always filter fact_assignment_snapshots by is_current = TRUE or an explicit dt_reference;
+    unscoped queries multiply rows across every historical day.
+  - sk_*_version columns on the fact are point-in-time join keys, not permanent identifiers.
+  - Use is_primary_assignment_for_snapshot = TRUE when an employee has multiple assignments.
+  - dim_employee is always current state — combine with a scoped fact for point-in-time analysis.
+  - dim_management_hierarchy exposes L0–L9 (L0 = CEO); everyone in the same area shares the same L1.
+  - Work email history per assignment is not available — only the most recent assignment email is exposed.
+  - Use dt_original_hire for tenure crediting prior employment; dt_hired for current contract seniority.
+  - Out of scope: compensation (dw_compensation), org definitions (dw_organization), DE&I (dw_demographics).
+
+  Key metrics: active headcount, tenure (days_tenure_in_company, days_tenure_in_assignment),
+  span of control (count_direct_report, count_indirect_report), voluntary terminations via
+  dim_event_definition.
+
+  Further detail and table routing: docs/llm_context/business_entities/employee_details.md
+
+data_product_id: employee-details
+domain_urn: urn:li:domain:people
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.employee-details.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.employee-details.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:088366b1-fdbf-43e3-9a02-63395721661f
+  name: "Query 1 — Active headcount (current state)"
+  description: >-
+    Returns the count of active employees as of the latest snapshot using
+    fact_assignment_snapshots with is_current, is_active, and is_primary_assignment_for_snapshot.
+    Source: docs/llm_context/business_entities/employee_details.md
+  subjects:
+    - schema: dw_employee_details
+      table: fact_assignment_snapshots
+  sql: |
+    SELECT
+        COUNT(DISTINCT fact.person_number) AS active_headcount
+    FROM dw_employee_details.fact_assignment_snapshots AS fact
+    WHERE fact.is_current = TRUE
+      AND fact.is_active = TRUE
+      AND fact.is_primary_assignment_for_snapshot = TRUE
+
+datasets:
+  - schema: dw_employee_details
+    table: dim_employee
+  - schema: dw_employee_details
+    table: dim_contact
+  - schema: dw_employee_details
+    table: dim_documentation
+  - schema: dw_employee_details
+    table: dim_emergency_contact
+  - schema: dw_employee_details
+    table: dim_event_definition
+  - schema: dw_employee_details
+    table: dim_management_hierarchy
+  - schema: dw_employee_details
+    table: fact_assignment_snapshots
+  - schema: metric_people
+    table: employee_snapshots
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:people
+  terms:
+    - id: employee_details_entity
+      name: "Employee Details (Colaborador / Funcionário)"
+      description: >-
+        People DW schema for workforce identity, contacts, hierarchy, and daily assignment
+        snapshots. Primary internal source for headcount and tenure. Schema: dw_employee_details.
+    - id: employee_headcount
+      name: "Headcount / Quadro"
+      description: >-
+        Active employee count from fact_assignment_snapshots where is_active = TRUE and
+        is_current = TRUE. Use is_primary_assignment_for_snapshot = TRUE to avoid duplicate
+        assignments after internal transfers.
+      related_terms:
+        - urn: urn:li:glossaryTerm:employee_details_entity
+          relationship: hasA
+    - id: employee_snapshot_current
+      name: "Base completa / Current state (is_current)"
+      description: >-
+        Filter is_current = TRUE on fact_assignment_snapshots for the latest available daily
+        snapshot per assignment. Replaces the legacy base completa pattern.
+      related_terms:
+        - urn: urn:li:glossaryTerm:employee_details_entity
+          relationship: hasA
+    - id: employee_preferred_name
+      name: "Nome social / Preferred name"
+      description: >-
+        Use dim_employee.name for display and communications. Legal name is in dim_documentation
+        and should be used only for compliance contexts.
+      related_terms:
+        - urn: urn:li:glossaryTerm:employee_details_entity
+          relationship: hasA
+    - id: employee_hierarchy
+      name: "Management hierarchy (Hierarquia)"
+      description: >-
+        Reporting chain from CEO (L0) to employee in dim_management_hierarchy. Join via
+        sk_hierarchy_version on the fact. Columns name_l0 through name_l9.
+      related_terms:
+        - urn: urn:li:glossaryTerm:employee_details_entity
+          relationship: hasA
+
+documentation_link:
+  label: "Business entity documentation (employee_details.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/employee_details.md

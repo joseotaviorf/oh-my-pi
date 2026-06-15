@@ -12,8 +12,7 @@ workflow:
   layer: dw
   bucket_config_name: people_bucket
   custom_schema: organization
-  has_hive_sync: false  # Private to People; Trino has no s3:ListBucket on people bucket.
-  # When made public, configure a bucket with public access before re-enabling hive_sync.
+  has_hive_sync: true
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
