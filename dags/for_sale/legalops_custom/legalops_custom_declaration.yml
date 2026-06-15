@@ -1,0 +1,17 @@
+dag:
+  name: legalops_custom
+  schedule_start_date: 2026, 6, 15
+  schedule_interval: 0 23 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      "This DAG creates a custom CLEAN table from datalake_legalops_raw.contract_analysis_request in order to unpack a custom json from the source table"
+workflow:
+  type: query_delta
+  layer: clean
+  custom_schema: legalops
+  default_extraction_type: full
+  tables_customization:
+    lego_analysis_results:
+      run_optimize: false
+      run_vacuum: true

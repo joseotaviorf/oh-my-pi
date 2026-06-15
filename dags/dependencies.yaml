@@ -2970,8 +2970,6 @@ bietlejuice.enrich_learning:
   - bietlejuice.degreed:load-clean-skill-plan-details:first-run-of-day
   - bietlejuice.degreed:load-clean-users:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
-bietlejuice.enrich_legalops:
-  - bietlejuice.legalops:load-clean-contract-analysis-request:first-run-of-day
 bietlejuice.enrich_legaut:
   - bietlejuice.legaut:load-clean-crawlers-crawler:first-run-of-day
   - bietlejuice.legaut:load-clean-crawlers-crawlergroup:first-run-of-day
