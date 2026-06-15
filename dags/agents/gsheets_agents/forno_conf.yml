@@ -1,10 +1,4 @@
 sheets_info:
-  account_managers_info:
-    sheet_id: 1u-blwq-Ct5cRMIuyJFaSdnbCfMf9hXNaSwpznyi2ycc
-    sheet_name: analistas
-    clean_table_name: account_managers_info
-    sheet_context: agents
-  
   agents_historical_quartile:
     sheet_id: 172reBsDjSEJp-DnlMXDv-s8tY0W5jr3iutulVcvgfJU
     sheet_name: dados_quartil_historico
@@ -15,30 +9,6 @@ sheets_info:
     sheet_id: 1NGVOSgoNKG_cTlocCe2zun30tYihRXtHZh2f6tSlQjw
     sheet_name: dados_targets_input_metrics
     clean_table_name: agents_targets_tracking
-    sheet_context: agents
-  
-  asp_rent_fl_and_ciq_opportunity_distribution:
-    sheet_id: 1r9jdNq5ux4D60smnonIH6S4_7DDgjWF9D_bQtJNPyWc
-    sheet_name: export_dados
-    clean_table_name: asp_rent_fl_and_ciq_opportunity_distribution
-    sheet_context: agents
-  
-  asp_rent_relisting_opportunity_distribution:
-    sheet_id: 18UZUKEF9ByN1xJcs_o2WF8zM45LgeAMG2fBVELTGzBg
-    sheet_name: export_dados
-    clean_table_name: asp_rent_relisting_opportunity_distribution
-    sheet_context: agents
-
-  broker_score_by_quartiles:
-    sheet_id: 16GyMIRBWwvhkcbTAPatLEWLHkdIibybmiot3vXlTzmY
-    sheet_name: Resumo Quartis
-    clean_table_name: broker_score_by_quartiles
-    sheet_context: agents
-
-  brokerage_fee_tiers:
-    sheet_id: 1TF99ftLp13tFxtoNZAv4ieb9400G30RiOihv5iYRY3k
-    sheet_name: Tiers
-    clean_table_name: brokerage_fee_tiers
     sheet_context: agents
 
   ciq_portfolio:
@@ -72,38 +42,14 @@ sheets_info:
     clean_table_name: sale_listings_date
     sheet_context: agents
 
-  sale_listings_2025:
-    sheet_id: 1ntFRbqs8dSyoWIHHqsaSMZUkj7Q3Mpl17YiXzgoSdKU
-    sheet_name: listings_date
-    clean_table_name: sale_listings_2025
-    sheet_context: agents
-
   sale_ongoing_listings_date:
     sheet_id: 1p-LDBU61HTO6qEjW2lujKHfyVIIxlpnZVwyupCJcbN8
     sheet_name: listings_date_ol
     clean_table_name: sale_ongoing_listings_date
     sheet_context: agents
 
-  secretariat_sale_portfolio:
-    sheet_id: 1OIxF-7w_1n3BB77aiJRkbnA9nHrMqTSrQ-piU5WSFOw
-    sheet_name: sv_portfolio_history
-    clean_table_name: secretariat_sale_portfolio
-    sheet_context: agents
-
-  secretariat_sale_portfolio_details:
-    sheet_id: 1OIxF-7w_1n3BB77aiJRkbnA9nHrMqTSrQ-piU5WSFOw
-    sheet_name: sv_portfolio_details_history
-    clean_table_name: secretariat_sale_portfolio_details
-    sheet_context: agents
-
   subhub_regions:
     sheet_id: 1-9okIQsfHo1kcc51msMYEa7Xw35wYWXDKcrWdCmdW8k
     sheet_name: Detalhamento de SubHubs
     clean_table_name: subhub_regions
-    sheet_context: agents
-
-  tqc_pro_pilot_program_cognito_form:
-    sheet_id: 1SjZ0bCKopwhhEv2RLrLEHNHsT_vrP0Kn_9g3hY2qe2U
-    sheet_name: Programa Piloto Traz Quem Compra Pro
-    clean_table_name: tqc_pro_pilot_program_cognito_form
     sheet_context: agents
