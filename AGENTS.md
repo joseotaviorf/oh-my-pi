@@ -49,6 +49,9 @@ Exception: a skill that *intentionally* isolates a CLI tool may do so — but pr
   config/validation/utils), `bietlejuice-airflow` (DAG builder, Airflow integration),
   `bietlejuice-runtime` (Spark/Qube/UDFs, Databricks-side; standalone uv project with
   per-DBR venvs), `bietlejuice-compiler` (`create-dag-files`, validation scripts, SQL tooling).
+- **`governance/`** — normative **policy-as-data** (CI-enforced): `pii_catalog/` (PII type catalog)
+  and `pii_anonymization_controls/` (RAE registry). Owned by `@quintoandar/data-ops-governance`.
+  Distinct from `dags/governance/` (pipelines) and `packages/*/src/bietlejuice/governance/` (Python code).
 - **`Makefile`** — all dev/CI targets (`install`, `create-dag-files`, `run-local-environment`,
   `check-style`, `tests`, the `validate-*` governance checks, …).
 

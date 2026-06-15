@@ -145,7 +145,7 @@ git checkout master && git pull && git checkout -b feat/add-my-table
 ```
 
 **Step 2 — Build files**  
-In the existing DAG folder, add `queries/<layer>/<new_table>.sql` and `metadata/<layer>/<new_table>.yml` with the **same base name**. Copy a sibling as a template. Set **`owner`**, descriptions, and **`lineage`** where required (do **not** add `personal_data_classification` — CI does not accept it yet); include **`retention_policy`** and **`cost_center`** when the schema requires those keys (§5.4 — **no fill guidance here**). If the declaration must list tables, edit **only** `*_declaration.yml`.
+In the existing DAG folder, add `queries/<layer>/<new_table>.sql` and `metadata/<layer>/<new_table>.yml` with the **same base name**. Copy a sibling as a template. Set **`owner`**, descriptions, and **`lineage`** where required; include **`retention_policy`** and **`cost_center`** when the schema requires those keys (§5.4 — **no fill guidance here**). Do **not** add `personal_data_classification` (CI rejects it) or `privacy` on normal feature PRs — PII metadata classification rolls out in dedicated governance PRs later. If the declaration must list tables, edit **only** `*_declaration.yml`.
 
 **Step 3 — Generate Python** ⚠️ *Skip if no local `make`; contact a code owner ([§5.7](#a7-who-reviews-your-pr-codeowners)).*  
 
@@ -303,7 +303,7 @@ This section collects **merge and governance rules** in one place (allowed folde
 | Default **new tables** to **enrich** or **`dw`** per [§1](#1-introduction--concepts) | **Create** new **clean** or **raw** **outputs** as self-service business-path tables unless a **code owner** explicitly directs otherwise |
 | Use **CTEs (`WITH`)** for readability where it helps | Rely on **deep nested subqueries** when a CTE is clearer |
 | Avoid **`SELECT *`** | Ship **`SELECT *`** in production SQL |
-| Restrict access to PII-bearing tables via **`table_privileges`** | Add a **`personal_data_classification`** key or any PII-tier text (classification isn't part of metadata yet — CI rejects the key) |
+| Restrict access to PII-bearing tables via **`table_privileges`** in the declaration | Add **`personal_data_classification`** or **`privacy`** on normal feature PRs (classification rollout is separate); PII-tier text in `description` |
 | Keep **`.sql` and `.yml` paired** (same base name) | Hand-edit **`*_dag.py`** |
 | Get **green Woodpecker / GitHub Checks** before merge | Commit **passwords, tokens, API keys** |
 
@@ -327,7 +327,7 @@ Full detail: **[`sql_conventions.mdc`](../.cursor/rules/sql_conventions.mdc)**.
 
 ### 5.4 Metadata & governance
 
-**Standard fields (CI):** valid YAML, `description`, `domain`, columns, **`lineage`** where values come from other tables — see **[`governance_metadata.mdc`](../.cursor/rules/governance_metadata.mdc)**. PII classification is **not** part of metadata authoring yet (no `personal_data_classification` key, no PII-tier text in `description`). LGPD controls such as `table_privileges` are set in the **declaration**, inferred from column semantics or domain rules — see "Personal Data Handling" in that rule.
+**Standard fields (CI):** valid YAML, `description`, `domain`, columns, **`lineage`** where values come from other tables — see **[`governance_metadata.mdc`](../.cursor/rules/governance_metadata.mdc)**. **Phase 1:** metadata PII classification (`privacy` section) is **not** required on normal PRs — infra exists but rollout is via dedicated governance PRs. Never use `personal_data_classification` (CI rejects it). LGPD controls such as `table_privileges` are set in the **declaration**; infer sensitivity from column semantics or domain rules when `privacy` is absent — see "Personal Data Handling" in that rule.
 
 **Business-path table fields** (tables under the two allowed roots):
 
@@ -500,7 +500,7 @@ make create-dag-files
 |----------|----|--------|
 | **Declaration** | Match layer naming (`dw_`, `enrich_`, `metric_*__*`, etc.); use correct `databricks_conn_id` for the layer | Use `.yaml` extension; skip `make create-dag-files` after YAML edits |
 | **SQL** | Match project SQL style; filter partitions; avoid `SELECT *` | Reference tables from a **higher** layer than your own (cross-layer rule) |
-| **Metadata** | One YAML per SQL file; satisfy CI (descriptions, lineage / dimension-metric blocks) | Ship PII without classification and required controls |
+| **Metadata** | One YAML per SQL file; satisfy CI (descriptions, lineage / dimension-metric blocks) | Ship raw PII in enrich/DW without Person model; add `personal_data_classification` or proactive `privacy` on normal PRs |
 | **Python (`bietlejuice/`)** | Follow Python conventions; add tests for new logic modules | Hardcode `prod` / `forno` or secrets — use `ConfigurationService` |
 
 **Canonical references:** [`sql_conventions.mdc`](../.cursor/rules/sql_conventions.mdc) · [`governance_metadata.mdc`](../.cursor/rules/governance_metadata.mdc) · [`create-metadata-files` skill](../.cursor/skills/create-metadata-files/SKILL.md) · [`naming_conventions.mdc`](../.cursor/rules/naming_conventions.mdc)

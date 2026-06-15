@@ -123,7 +123,7 @@ Subagents are domain-specialist roles the AI adopts for specific types of judgme
 
 Six rules activate automatically when you open or edit a matching file type:
 
-- **`governance_metadata.mdc`** activates for any `metadata/**/*.yml` file — it knows PII classification is **not** authored in metadata yet (no `personal_data_classification` key). LGPD controls (`table_privileges`, `k_anonymity`) are enforced via declaration/SQL; sensitivity is inferred from domain rules and column semantics until formal classification ships.
+- **`governance_metadata.mdc`** activates for any `metadata/**/*.yml` file — **Phase 1:** PII catalog + `validate-pii-privacy` CI exist as infra; **do not** add or suggest `privacy` on routine PRs. Rejects `personal_data_classification`. LGPD controls (`table_privileges`, `k_anonymity`) stay in declaration/SQL/review as today.
 - **`sql_conventions.mdc`** activates for any `.sql` file — it blocks `SELECT *`, enforces partition filters, and applies Person Data Model rules.
 - **`testing_conventions.mdc`** activates for any file under `packages/*/test/` — it enforces the TDD Red → Green → Refactor workflow and selects the correct test pattern (Pattern A vs Pattern B).
 - **`python_conventions.mdc`** activates for any `.py` file — it enforces Ruff style, `QuintoAndarLogger`, and Pydantic v2 APIs.
@@ -354,7 +354,7 @@ CHANGE PLAN:
 | Declaration validation | Invalid workflow type, missing required fields, wrong cluster conn_id |
 | Metadata pairs | `.sql` without matching `.yml`, description < 10 chars, missing lineage |
 | Python conventions | `logging.getLogger` instead of `QuintoAndarLogger`, relative imports, bare `NotImplementedError` |
-| LGPD controls | Raw PII stored in enrich/DW, special-category/financially-sensitive data without `table_privileges`, or a `personal_data_classification` key present (not accepted by CI yet — remove it) |
+| LGPD controls | Raw PII stored in enrich/DW, special-category/financially-sensitive data without `table_privileges`, or a `personal_data_classification` key in metadata (CI rejects — remove it) |
 | Test coverage | Missing test files for changed modules, coverage below 80% threshold |
 | Lint | Additional lint checks beyond style (`make check-style`) |
 
@@ -517,7 +517,7 @@ Subagents are domain-expert roles the AI adopts automatically when a task clearl
 |---|---|---|---|
 | Data Engineer Architect | `data_engineer_architect.md` | Pipeline design across all layers: raw, clean, enrich, dw, metric, qube, and core | Creating or reviewing a DAG on any layer, workflow type selection, cross-layer join rules, CDC prerequisites |
 | Reliability Engineer | `reliability_engineer.md` | Cluster sizing, Delta optimizations, backfills | Performance questions, cluster config, large backfills |
-| Governance Officer | `governance_officer.md` | SQL conventions, metadata, LGPD/PII, Kimball modeling | Metadata review, privacy classification, SQL naming |
+| Governance Officer | `governance_officer.md` | SQL conventions, metadata, LGPD (Person model, table_privileges), Kimball modeling | Metadata review, SQL naming — **does not** suggest metadata PII classification in Phase 1 |
 
 ### Data Engineer Architect
 
@@ -587,7 +587,7 @@ The Reliability Engineer will:
 
 ### Governance Officer
 
-Owns data quality, LGPD compliance, and SQL correctness. It reviews any new table for privacy violations and blocks PRs that expose raw PII in upper layers.
+Owns data quality, LGPD compliance, and SQL correctness. It blocks raw PII in upper layers and declaration gaps — **not** missing `privacy` in metadata during Phase 1 rollout.
 
 **Example trigger**:
 ```
@@ -601,7 +601,7 @@ The Governance Officer checks:
 - No raw PII stored in enrich/DW columns (join `dim_person` instead)
 - enrich/dw tables with `sensitive` or `highly_personal` data have `table_privileges` in the declaration (infer tier from column semantics or domain rules — not from a metadata field)
 - metric/qube outputs derived from `sensitive` data require `k_anonymity >= 5`
-- No `personal_data_classification` key in metadata — CI rejects it; remove if present
+- No `personal_data_classification` key in metadata — CI rejects it; remove if present. **Do not** suggest adding `privacy` on routine PRs.
 
 **Person Data Model enforcement** — the Governance Officer blocks any SQL that stores raw PII (name, CPF, email, address) in enrich or DW tables. The correct pattern is:
 
@@ -639,7 +639,7 @@ sequenceDiagram
     AI->>SK: invoke create-dag skill
     SK-->>AI: creates declaration + SQL skeletons + metadata YAMLs
     AI->>GO: fraud_alerts has column cpf — how to handle?
-    GO-->>AI: set table_privileges; do NOT classify PII in metadata (no personal_data_classification, no PII-tier text)
+    GO-->>AI: set table_privileges if needed; do NOT add privacy metadata in Phase 1
     AI->>RE: which cluster for join-heavy fraud SQL?
     RE-->>AI: upgrade to med_memory_cluster
     AI->>V: run make validate-* checks
@@ -675,7 +675,7 @@ dags/fintech/dw_fraud_metrics/
 
 **Step 3 — Governance Officer flags a PII column**
 
-The skill reads `fraud_alerts.sql` and notices a `cpf` column. It documents the column functionally — PII classification is **not** part of metadata authoring yet, so it adds **no** `personal_data_classification` key and **no** PII-tier text in the description:
+The skill reads `fraud_alerts.sql` and notices a `cpf` column. In **Phase 1** it documents the column functionally and sets **`table_privileges`** in the declaration if required — it does **not** add `privacy` to metadata or suggest classification:
 
 ```yaml
 # In metadata/dw/fraud_alerts.yml

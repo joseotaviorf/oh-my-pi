@@ -1,0 +1,10 @@
+# Yamale type for the columns.*.privacy section (YAML key remains `privacy:`).
+privacy_schema:
+  piiType: str(min=1, max=64, required=False)
+  dataSubjectType: list(str(min=1, max=64), min=1, required=False)
+  jsonPaths: list(include("privacy_json_path"), required=False)
+---
+privacy_json_path:
+  path: str(min=1, max=512)
+  piiType: str(min=1, max=64)
+  dataSubjectType: list(str(min=1, max=64), min=1)

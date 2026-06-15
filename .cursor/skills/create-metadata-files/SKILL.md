@@ -12,7 +12,7 @@ description: Author and fix metadata YAML files for bi-etl-ejuice. Follows .curs
 - Column schema (`description`, `lineage`, categories, metric blocks)
 - FAIR F2-01 / F2-02 and common mistakes and validation commands
 
-**Do not** add `personal_data_classification` to metadata YAML — the field is not supported by repo validation/CI yet.
+**Phase 1 rollout:** Do **not** add `columns.*.privacy` when creating or fixing metadata on normal feature PRs. PII catalog + CI exist as infra only; classification rolls out in dedicated governance PRs later. If you see `personal_data_classification`, remove it (CI rejects it) — do not replace with `privacy` unless the user explicitly asked for classification.
 
 ## When to use
 
@@ -321,11 +321,41 @@ Examples:
 - metric block fields:
   - `name`, `description`, `acronym`, `is_additive`, `business_stage`, `hierarchy`, `approved_by`, optional `link_to_metric`.
 
-## Step 4 - Governance details when needed
+## Step 4 — PII privacy (deferred — not for normal authoring)
 
-PII classification is **not** part of metadata authoring yet. Do **not** add a `personal_data_classification` key (CI/lint fails) and do **not** record a PII tier in `description`. Describe PII columns functionally — see [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) → "Personal Data Handling".
+**Skip this step** on routine metadata creation unless the user or ticket explicitly requests PII classification (dedicated governance PR).
 
-LGPD controls (`table_privileges`, `k_anonymity`) live in the **declaration** or qube spec, not in metadata. Infer whether they apply from domain rules and column semantics (see governance rule) — do not invent metadata classification.
+When classification **is** explicitly requested, add a `privacy` section (never `personal_data_classification`):
+
+```yaml
+columns:
+  cpf:
+    description: "Brazilian CPF."
+    lineage:
+      - datalake_example_clean.person.cpf
+    privacy:
+      piiType: cpf  # slug in pii_catalog.yml
+      dataSubjectType: [customer]      # customer | employee | partner
+```
+
+- **`customer`** → must be masked in authX after merge to `master` (unless RAE in `governance/pii_anonymization_controls/`).
+- **`employee`** / **`partner` only** → classify PII, no Trino mask.
+- Omit `privacy` entirely for non-PII columns.
+
+### Defaults by domain (`dataSubjectType`)
+
+Pick the slug from [`governance/pii_catalog/pii_catalog.yml`](../../governance/pii_catalog/pii_catalog.yml). Use these defaults when titular is obvious; otherwise ask the data owner.
+
+| Context | Default `dataSubjectType` |
+|---------|---------------------------|
+| `People` domain, HR/employee tables, `dags/people/reverse_reports/` | `[employee]` |
+| Agent / partner / 3P tables (`*_agent*`, broker, partner) | `[partner]` or `[partner, customer]` if end-customer data |
+| Rent, sale, fintech, growth customer data | `[customer]` |
+| RAE exception (mask waived) | `[customer]` + row in `governance/pii_anonymization_controls/rae.yml` |
+
+**People pitfall:** do not use `[customer]` for employee CPF/email in HR exports — that triggers customer masking in authX.
+
+LGPD controls (`table_privileges`, `k_anonymity`) live in the **declaration** or qube spec, not in metadata. When `privacy.piiType` is declared, use the catalog-derived tier; otherwise infer from domain rules and column semantics — see [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) → "Personal Data Handling".
 
 ## Step 5 - Use these templates
 
@@ -386,6 +416,8 @@ Run validation and iterate until green:
 make validate-metadata-files-content
 ```
 
+Run `make validate-pii-privacy` only when the diff already includes `privacy` blocks or `governance/pii_*` changes.
+
 If validation fails:
 1. read the exact field/type error and file path;
 2. fix YAML keys, value formats, or metric/dimension structure;
@@ -406,4 +438,5 @@ make validate-lineage-consistency
 - metric column missing `dimension` or `metric`: add exactly one.
 - **missing `lineage` on enrich/dw column**: CI fails; add `lineage: [database.table.column]` for every column.
 - enrich/dw lineage inconsistency: align `lineage` entries with SQL selected columns.
-- unexpected `personal_data_classification` key on a column: remove it — not supported by CI yet.
+- unexpected `personal_data_classification` key: **remove it** (CI rejects it). Do not add `privacy` unless the user requested classification.
+- invalid `privacy` in diff: fix only when `privacy` is already present — see Step 4.

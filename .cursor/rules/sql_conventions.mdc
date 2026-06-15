@@ -493,6 +493,10 @@ WHERE
 
 ## 11. Person Data Model — PII Centralisation
 
+### Phase 1 rollout gate (metadata classification)
+
+> **Same policy as [`governance_metadata.mdc`](governance_metadata.mdc):** SQL review and authoring must **not** add or suggest `columns.*.privacy` in metadata YAML on routine PRs. The PII catalog and `validate-pii-privacy` CI are **infra only** until dedicated governance PRs roll out classification. Fintech and other exceptions below still require **`table_privileges`** in the declaration and Person-model SQL rules — that is separate from metadata `privacy`. Remove `personal_data_classification` if present (CI rejects it); do **not** suggest `privacy` as a replacement unless classification is explicitly in scope.
+
 ### Rule
 
 The [RFC "Person as PII Data Model at 5A" (Closed Apr 2025)](docs/pii_audit.md) is the authoritative policy for personal data in the analytical environment. Two tables are live in production and must be used as the single source of truth for person identity:
@@ -519,7 +523,7 @@ The following columns must never appear as stored columns in new enrich or DW SQ
 **Exceptions (documented legal basis required):**
 
 - Clean tables — mirror the source database for fidelity; PII is allowed but must not be propagated to enrich/DW.
-- Fintech schemas (`cyber*`, `sorting_hat`, `recupera`) — CPF, RG, and mother/father names are required for credit analysis and debt collection under LGPD art. 7 §V. Each table must set `table_privileges` in the DAG declaration. Do **not** classify the PII in metadata — neither a `personal_data_classification` key (rejected by the validator) nor PII-tier text in `description`; that process isn't implemented yet (see `governance_metadata.mdc` → "Personal Data Handling").
+- Fintech schemas (`cyber*`, `sorting_hat`, `recupera`) — CPF, RG, and mother/father names are required for credit analysis and debt collection under LGPD art. 7 §V. Each table must set `table_privileges` in the DAG declaration. Metadata PII classification (`privacy` section) is **not** required on normal PRs in Phase 1 — see rollout gate above and `governance_metadata.mdc`. Never use the deprecated `personal_data_classification` key (rejected by the validator) nor PII-tier text in `description`.
 - Reverse DAGs — contact PII is required for external API transmission by design; must be sourced from `dim_person` (not `dim_user` or raw clean tables) and subject to the `has_right_to_be_forgotten` guard below.
 
 ### `has_right_to_be_forgotten` — Mandatory Guard for Reverse DAGs

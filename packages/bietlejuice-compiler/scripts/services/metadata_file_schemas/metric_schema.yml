@@ -11,12 +11,14 @@ column_with_dimension:
   lineage: list(str(min=1, max=280), required=False)
   categories: map(str(), key=str(), required=False)
   dimension: bool()
+  privacy: include("privacy_schema", required=False)
 ---
 column_with_metric:
   description: str()
   lineage: list(str(min=1, max=280), required=False)
   categories: map(str(), key=str(), required=False)
   metric: include("metric")
+  privacy: include("privacy_schema", required=False)
 ---
 metric:
   name: str(min=1, max=280)

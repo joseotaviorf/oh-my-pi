@@ -50,14 +50,22 @@ class MetadataFileService:
         r"(?:.*/)?dags/(?P<domain>\w+)/(?P<dag>\w+)/metadata/(?P<layer>\w+)(?:/\w+)?/(?P<table_name>\w+)\.(?:yml|yaml)"
     )
 
+    @staticmethod
+    def _make_layer_yamale_schema(layer_schema_path: str, privacy_schema_path: str):
+        """Merge layer + privacy Yamale docs (make_schema accepts one path or content=)."""
+        layer_content = Path(layer_schema_path).read_text(encoding="utf-8")
+        privacy_content = Path(privacy_schema_path).read_text(encoding="utf-8")
+        merged = layer_content.rstrip() + "\n---\n" + privacy_content.lstrip()
+        return yamale.make_schema(content=merged)
+
     def __init__(self):
-        base_path = f"{Path(__file__).parent}/metadata_file_schemas"
+        base_path = Path(__file__).parent / "metadata_file_schemas"
+        privacy_schema_path = str(base_path / "privacy_schema.yml")
         self.schemas = {
-            "raw": yamale.make_schema(f"{base_path}/raw_schema.yml"),
-            "clean": yamale.make_schema(f"{base_path}/clean_schema.yml"),
-            "core": yamale.make_schema(f"{base_path}/core_schema.yml"),
-            "enrich_dw": yamale.make_schema(f"{base_path}/enrich_dw_schema.yml"),
-            "metric": yamale.make_schema(f"{base_path}/metric_schema.yml"),
+            layer: self._make_layer_yamale_schema(
+                str(base_path / f"{layer}_schema.yml"), privacy_schema_path
+            )
+            for layer in ("raw", "clean", "core", "enrich_dw", "metric")
         }
 
     @staticmethod

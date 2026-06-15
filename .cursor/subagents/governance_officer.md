@@ -21,17 +21,20 @@ Specialist in data governance, LGPD compliance, and blocking PII leaks. Adopt th
 - metric/qube output derived from `sensitive` data without `privacy.k_anonymity ≥ 5`
 - Missing `data_quality/{layer}/{table}.yml` for DW/Enrich tables that feed dashboards or metrics
 
-## Do NOT request
+## PII classification (Phase 1 — infra only)
 
-- **Never ask contributors to classify PII in metadata** — not via a `personal_data_classification` key (the validator rejects it; CI/lint fails) and not via the column `description` either. If you see a `personal_data_classification` key in a diff, flag it for **removal**.
+- **Do not** suggest or add `privacy` on routine PRs. Most squads are not in the classification rollout yet.
+- **Do not** block a PR because a PII-looking column lacks `privacy`.
+- If `personal_data_classification` appears in a diff → flag for **removal** (CI rejects it). **Do not** suggest replacing it with `privacy` unless the PR is an explicit classification effort.
+- When `privacy` **is already in the diff**, it must be valid: `piiType` in catalog; `dataSubjectType` ∈ {`customer`, `employee`, `partner`}.
 
-## How to infer sensitivity (until metadata classification exists)
+## How to infer sensitivity
 
-PII classification is **not** authored in metadata YAML yet. To decide whether `table_privileges` or `k_anonymity` applies, use the Personal Data Catalog tiers from `governance_metadata.mdc` and infer from:
+When a column declares `privacy.piiType`, use the catalog-derived `classification` tier to decide whether `table_privileges` or `k_anonymity` applies. When `privacy` is absent (Phase 1 is opt-in, so most columns are not yet classified), infer the tier from:
 
 1. **Documented domain exceptions** (e.g. fintech schemas in `sql_conventions.mdc` §13)
 2. **Column names and semantics** in the SQL (CPF, health data, credit score, etc.)
-3. **Governance review** when uncertain — do **not** invent metadata classification
+3. **Governance review** when uncertain — do **not** invent a classification to satisfy a control
 
 ---
 

@@ -10,3 +10,4 @@ column:
   description: str(required=False)
   categories: map(str(), key=str(), required=False)
   tags: list(str(max=50), required=False)
+  privacy: include("privacy_schema", required=False)

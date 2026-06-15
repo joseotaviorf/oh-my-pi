@@ -1,0 +1,698 @@
+version: '1.2'
+source: QuintoAndar Personal Data Catalog
+types:
+  bank_account:
+    display_name: Bank Account
+    description: Bank code, branch, and account number used to route deposits, withdrawals, and payment settlements to an individual.
+    category: banking_data
+    classification: personal
+  corporate_card:
+    display_name: Corporate Debit or Credit Card Number
+    description: Payment card number issued by or through an employer for business expenses, distinct from personal cards.
+    category: banking_data
+    classification: highly_personal
+  personal_card:
+    display_name: Personal Debit or Credit Card Number
+    description: Debit or credit card number used for personal purposes.
+    category: banking_data
+    classification: personal
+  pix_key:
+    display_name: Pix Key
+    description: Identifier (CPF, email, phone, or random key) used to receive or send instant payments through Brazil's Pix system.
+    category: banking_data
+    classification: personal
+  facial_recognition:
+    display_name: Facial Recognition
+    description: Image in photo or video used in modern systems capable of comparing an image with databases for authentication.
+    category: biometric_data
+    classification: sensitive
+  fingerprints:
+    display_name: Fingerprints
+    description: Unique ridge patterns on a person's fingers collected or stored for biometric identification, access control, or forensic matching.
+    category: biometric_data
+    classification: sensitive
+  voice_recognition:
+    display_name: Voice Recognition
+    description: Analysis of a person's vocal pattern, including tone, rhythm, and intonation, for authentication.
+    category: biometric_data
+    classification: sensitive
+  cookies:
+    display_name: Cookies
+    description: Small text files sent and stored on the user's device that contain information about their interactions with websites.
+    category: browsing_information
+    classification: personal
+  ip_address:
+    display_name: IP Address
+    description: It is the number assigned to a device connected to the internet, which can be used to identify the approximate geographic location of the user.
+    category: browsing_information
+    classification: personal
+  browsing_history:
+    display_name: Browsing History
+    description: Pages visited by the user in a given period, including the URL, date and time of access, and the sequence of pages visited.
+    category: browsing_information
+    classification: personal
+  neighborhood:
+    display_name: Neighborhood
+    description: District or bairro within a city, refining a street address for delivery, risk assessment, or geographic profiling.
+    category: contact_information
+    classification: personal
+  city:
+    display_name: City
+    description: Municipality associated with a person's home, work, or registration, used to locate services, correspondence, or regional analysis.
+    category: contact_information
+    classification: personal
+  emergency_contact:
+    display_name: Emergency Contact Information
+    description: Name, phone, and relationship of a person to be reached when the data subject is unavailable due to accident or health event.
+    category: contact_information
+    classification: personal
+  state:
+    display_name: State
+    description: Federative unit (Brazilian state) linked to an address, workplace, or official record, often combined with city for location.
+    category: contact_information
+    classification: personal
+  residential_address:
+    display_name: Residential Address
+    description: Street, number, complement, and postal code where a person lives, used for delivery, verification, and geospatial risk.
+    category: contact_information
+    classification: personal
+  personal_email:
+    display_name: Personal Email
+    description: Email address used for personal (non-employer) communication, account recovery, or marketing to the individual.
+    category: contact_information
+    classification: personal
+  personal_phone:
+    display_name: Personal Phone Number
+    description: Telephone number used for personal contact, distinct from a corporate line provided by an employer.
+    category: contact_information
+    classification: personal
+  academic_background:
+    display_name: Academic Background
+    description: Set of studies and qualifications acquired throughout a person's educational life.
+    category: educational_information
+    classification: personal
+  academic_certificates:
+    display_name: Academic Certificates
+    description: Official documents issued by educational institutions certifying the completion of a course or educational stage.
+    category: educational_information
+    classification: personal
+  languages:
+    display_name: Languages
+    description: Languages a person speaks, reads, or writes, recorded for hiring, customer support routing, or service personalization.
+    category: educational_information
+    classification: personal
+  education_level:
+    display_name: Education Level
+    description: Educational stage a person has completed in their learning journey, indicating the level of education achieved up to a certain point.
+    category: educational_information
+    classification: personal
+  licenses_certifications:
+    display_name: Licenses and Certifications
+    description: Official documents or formal recognitions issued by an authority, institution, or organization certifying that a person possesses the necessary competencies, skills, or knowledge in a specific area.
+    category: educational_information
+    classification: personal
+  publications:
+    display_name: Publications
+    description: Content published in formal or informal media with the aim of sharing information, knowledge, or news with a specific or general audience.
+    category: educational_information
+    classification: personal
+  admission_date:
+    display_name: Admission Date
+    description: Date employment or engagement with the organization began.
+    category: employment_information
+    classification: personal
+  annual_leave:
+    display_name: Annual Leave Record
+    description: Documentation and control of the employee's right to take vacations during the year.
+    category: employment_information
+    classification: personal
+  area_line:
+    display_name: Area / Line
+    description: Business unit, department, or product line the employee belongs to.
+    category: employment_information
+    classification: personal
+  benefits_rights:
+    display_name: Benefits and Rights
+    description: Information related to the social benefits and labor rights that a worker has or is entitled to.
+    category: employment_information
+    classification: personal
+  companyentity:
+    display_name: Company/Entity
+    description: Legal employer or contracting entity (company name, CNPJ, or internal code) tied to a person's employment relationship.
+    category: employment_information
+    classification: personal
+  contract_type:
+    display_name: Type of Contract
+    description: Employment modality (CLT, PJ, internship, etc.) governing rights and obligations.
+    category: employment_information
+    classification: personal
+  corporate_address:
+    display_name: Corporate Address
+    description: Location of a workplace, branch, or employer premises associated with the person's job.
+    category: employment_information
+    classification: personal
+  corporate_email:
+    display_name: Corporate Email
+    description: Email address issued by an employer or contracting organization for work-related communication.
+    category: employment_information
+    classification: personal
+  corporate_phone:
+    display_name: Corporate Phone Number
+    description: Telephone number assigned for professional contact, including corporate mobile lines.
+    category: employment_information
+    classification: personal
+  disciplinary_actions:
+    display_name: Sanctions and Disciplinary Actions
+    description: Measures adopted by an organization or entity to correct inappropriate behaviors, violations, or non-compliance with established rules.
+    category: employment_information
+    classification: personal
+  termination_date:
+    display_name: Termination Date
+    description: Date the employment or engagement ended.
+    category: employment_information
+    classification: personal
+  operation_state:
+    display_name: State of Operation
+    description: Brazilian state where the person performs work under their current contract.
+    category: employment_information
+    classification: personal
+  selection_history:
+    display_name: Selection Process History
+    description: Documentation accompanying the entire cycle of a recruitment process for a job opening.
+    category: employment_information
+    classification: personal
+  complaints_history:
+    display_name: History of Complaints, Claims, or Grievances
+    description: Record of incidents involving dissatisfaction, discontent, or inappropriate behavior by a person.
+    category: employment_information
+    classification: personal
+  harassment_records:
+    display_name: Information on Intimidation and Harassment
+    description: Information on abusive practices that can cause serious emotional, psychological, and even physical harm to victims.
+    category: employment_information
+    classification: personal
+  roleposition:
+    display_name: Role/Position
+    description: Job title, function, or organizational role held by an employee or contractor, describing what they do rather than who employs them.
+    category: employment_information
+    classification: personal
+  org_chart_manager:
+    display_name: Organizational Chart / Manager
+    description: Identity and hierarchy position of the employee's direct manager in the organizational structure.
+    category: employment_information
+    classification: personal
+  performance_records:
+    display_name: Performance and Achievement
+    description: Information about an individual's potential or ability to achieve goals or objectives.
+    category: employment_information
+    classification: personal
+  timekeeping:
+    display_name: Timekeeping (Controle de ponto)
+    description: Document for recording and monitoring hours worked by employees.
+    category: employment_information
+    classification: personal
+  employee_id:
+    display_name: Employee Registration Number (ID)
+    description: Employer-assigned enrollment or personnel number used in payroll, access systems, and HR records.
+    category: employment_information
+    classification: personal
+  salary_expectation:
+    display_name: Salary Expectation
+    description: Compensation range the candidate states during recruitment, before an offer is made.
+    category: employment_information
+    classification: personal
+  termination_reason:
+    display_name: Reason for Termination
+    description: Documented cause or category for ending employment (resignation, dismissal, mutual agreement, etc.).
+    category: employment_information
+    classification: personal
+  corporate_travel:
+    display_name: Corporate Travel History
+    description: Record of trips made by employees in connection with their professional activities, containing detailed information about the trips, such as dates, destinations, purpose of the trip, associated costs, accommodations, transportation used, and other important details.
+    category: employment_information
+    classification: personal
+  beneficiaries_and_dependents:
+    display_name: Beneficiaries and Dependents Information
+    description: Information related to people who have the right to receive benefits due to an action, contract, or specific right.
+    category: employment_information
+    classification: personal
+  children_registration:
+    display_name: Registration Data of Children
+    description: Names, birth dates, and civil data of a person's dependent children declared for benefits or family policies.
+    category: family_information
+    classification: personal
+  degree_of_kinship:
+    display_name: Degree of Kinship
+    description: Legal or declared family relationship (spouse, child, parent, etc.) between the data subject and another person.
+    category: family_information
+    classification: personal
+  parents_registration:
+    display_name: Registration Data of Parents
+    description: Identifying and civil data of a person's parents, collected for benefits, genealogy, or legal declarations.
+    category: family_information
+    classification: personal
+  property_regime:
+    display_name: Property Regime
+    description: Set of rules that determine the administration, use, possession, and division of a couple's assets during marriage and in the case of separation, divorce, or the death of one of the spouses.
+    category: family_information
+    classification: personal
+  bank_statement:
+    display_name: Bank Statement
+    description: Periodic record of credits, debits, and balances in a person's bank account, revealing income, spending, and financial behavior.
+    category: financial_information
+    classification: highly_personal
+  credit_history:
+    display_name: Credit History
+    description: Timeline of loans, defaults, and repayments reported to credit bureaus about the person.
+    category: financial_information
+    classification: highly_personal
+  inss_benefit_statement:
+    display_name: Social Security Benefit Statement (INSS)
+    description: Official document detailing the values and information related to the social security benefits received by the INSS insured.
+    category: financial_information
+    classification: highly_personal
+  irpf:
+    display_name: Income Tax Declaration (IRPF)
+    description: Formal document where the taxpayer reports to the Federal Revenue their income, expenses, deductions, and amounts paid during the year, used for income verification and tax compliance.
+    category: financial_information
+    classification: highly_personal
+  property_records:
+    display_name: Personal Property Records
+    description: Deeds, registrations, or liens showing assets owned or encumbered by the person.
+    category: financial_information
+    classification: personal
+  salary:
+    display_name: Salary / Compensation
+    description: Monetary compensation paid to an employee for work, including base pay and recurring fixed amounts before variable bonuses.
+    category: financial_information
+    classification: personal
+  residence_type:
+    display_name: Type of Residence
+    description: Whether housing is owned, rented, financed, or otherwise occupied, used in credit, rental, and risk models.
+    category: financial_information
+    classification: personal
+  credit_score:
+    display_name: Credit Score
+    description: Numerical score used to evaluate the likelihood of an individual paying their debts on time.
+    category: financial_information
+    classification: highly_personal
+  body_temperature:
+    display_name: Body Temperature
+    description: Clinical measurement of body heat, often collected in health screenings, occupational safety, or pandemic protocols.
+    category: health_information
+    classification: sensitive
+  health_reports:
+    display_name: Health Reports
+    description: Medical evaluations, lab results, or clinical notes describing a person's health status.
+    category: health_information
+    classification: sensitive
+  height:
+    display_name: Height
+    description: Measurement of a person's stature, typically in centimeters, used in health, insurance, identity, or occupational contexts.
+    category: health_information
+    classification: sensitive
+  icd:
+    display_name: International Classification of Diseases (ICD)
+    description: World Health Organization (WHO) system used to classify and code diseases, health conditions, and other health-related issues.
+    category: health_information
+    classification: sensitive
+  neurodiversity:
+    display_name: Neurodiversity
+    description: Information that a person has cognitive variations such as autism, ADHD, or dyslexia, often for inclusion or accommodation.
+    category: health_information
+    classification: sensitive
+  health_declaration_dps:
+    display_name: Personal Health Declaration (DPS)
+    description: Information provided by an individual about their health status, especially in job admission processes.
+    category: health_information
+    classification: sensitive
+  disability:
+    display_name: Physical, Visual, Auditory, Mental/Intellectual Disability
+    description: Information about physical, sensory, intellectual, or mental impairments that may require workplace accommodation or benefits.
+    category: health_information
+    classification: sensitive
+  pre_existing_health_conditions:
+    display_name: Pre-existing health conditions
+    description: Diagnoses or chronic conditions present before a new insurance or employment health assessment begins.
+    category: health_information
+    classification: sensitive
+  prescriptions:
+    display_name: Prescription (Licenses and Medications)
+    description: Formal indications and authorizations made by healthcare professionals for a patient to receive medical treatment or to have the right to health-related leave.
+    category: health_information
+    classification: sensitive
+  toxicological_exam:
+    display_name: Toxicological Exam
+    description: Result of tests conducted to detect the presence of chemicals or drugs in the body.
+    category: health_information
+    classification: sensitive
+  weight:
+    display_name: Weight
+    description: Measurement of a person's body mass, used in health assessments, insurance underwriting, or wellness programs.
+    category: health_information
+    classification: sensitive
+  photo_or_video:
+    display_name: Image in Photo or Video
+    description: Image captured for various purposes, such as photography or visual media, without focusing on security or biometric analysis.
+    category: image_or_sound_information
+    classification: personal
+  voice_recording:
+    display_name: Voice Recording
+    description: Verbal communication used in daily life to interact with others. There is no analysis or verification of biometric characteristics of the voice.
+    category: image_or_sound_information
+    classification: personal
+  death_certificate:
+    display_name: Death Certificate
+    description: Official civil record certifying a person's death, including date, place, and registry identifiers for legal and insurance processes.
+    category: insurance_information
+    classification: personal
+  insurance_policy:
+    display_name: Insurance Policy Number
+    description: Unique identifier of an insurance contract covering life, health, property, or liability risks.
+    category: insurance_information
+    classification: personal
+  appeals_disputes_record:
+    display_name: Record of Appeals, Disputes, and Requests
+    description: Documentation or formal process used to record and track requests for review or contestation of decisions made by the insurer.
+    category: insurance_information
+    classification: personal
+  policyholder_id:
+    display_name: Policyholder Identification Number
+    description: Number used to identify the person or entity that signed the insurance contract.
+    category: insurance_information
+    classification: personal
+  civil_lawsuits:
+    display_name: Civil Lawsuits
+    description: Legal or administrative actions involving conflicts of rights and obligations of a civil nature.
+    category: procedural_information
+    classification: personal
+  criminal_background:
+    display_name: Criminal Background
+    description: Records of criminal convictions, charges, or investigations involving the person across jurisdictions.
+    category: procedural_information
+    classification: highly_personal
+  labor_lawsuits:
+    display_name: Labor Lawsuits
+    description: Actions involving conflicts between employees and employers related to labor issues, such as labor rights, obligations, and responsibilities of both parties.
+    category: procedural_information
+    classification: personal
+  tax_lawsuits:
+    display_name: Tax Lawsuits
+    description: Refers to legal disputes or litigations related to tax and fiscal issues, usually involving the government (tax administration agencies) and taxpayers.
+    category: procedural_information
+    classification: personal
+  workers_compensation:
+    display_name: Workers' Compensation Claims
+    description: Records of workplace injury claims, benefits, and medical leave tied to labor accidents or occupational diseases.
+    category: procedural_information
+    classification: personal
+  resume_attachment:
+    display_name: Resume (Attachment)
+    description: Document used to present and summarize a person's professional and academic background.
+    category: professional_information
+    classification: personal
+  professional_experience:
+    display_name: Professional Experience
+    description: Structured history of roles, employers, and tenure in a person's career, often parsed from a résumé.
+    category: professional_information
+    classification: personal
+  professional_association_membership:
+    display_name: Membership in Professional Associations
+    description: Act of an individual becoming a member of an organization or entity that represents the interests of a specific category or profession.
+    category: professional_information
+    classification: personal
+  union_membership:
+    display_name: Union Membership
+    description: Act of a worker joining a union, an organization that represents and defends the interests of a professional category or workers in a specific sector or economic activity.
+    category: professional_information
+    classification: sensitive
+  quintoandar_username:
+    display_name: QuintoAndar Username/Login
+    description: Unique identification used by a person to access a system, platform, or online service.
+    category: quintoandar_group_account_information
+    classification: personal
+  contract_number:
+    display_name: Contract Number
+    description: Unique code assigned to a rental, sale, or service contract in QuintoAndar systems for tracking and support.
+    category: quintoandar_group_account_information
+    classification: personal
+  geolocation:
+    display_name: Geolocation
+    description: Process of identifying the physical location of an object, person, or device on Earth using geographic coordinates.
+    category: quintoandar_group_account_information
+    classification: personal
+  id:
+    display_name: ID
+    description: Internal or external identifier for a client, partner, or provider account in QuintoAndar systems, distinct from government IDs.
+    category: quintoandar_group_account_information
+    classification: personal
+  contract_info:
+    display_name: Contract Information
+    description: Detailed and specific data that is part of a contract, a legal document formalizing an agreement between two or more parties.
+    category: quintoandar_group_account_information
+    classification: personal
+  quintoandar_account:
+    display_name: QuintoAndar Account Information
+    description: General information about the user's account on the QuintoAndar platforms, such as account age, access logs, etc.
+    category: quintoandar_group_account_information
+    classification: personal
+  device_id:
+    display_name: Device ID
+    description: Unique identifier assigned to a digital device, allowing it to be recognized and tracked within a network.
+    category: quintoandar_group_account_information
+    classification: personal
+  age:
+    display_name: Age
+    description: Elapsed time in years since birth, or an age band derived from it, used for eligibility, pricing, compliance, or analytics.
+    category: registration_information
+    classification: personal
+  prenuptial_agreement:
+    display_name: Prenuptial Agreement
+    description: Contract made between two people before marriage, aimed at defining rules regarding the property regime to be adopted during the union.
+    category: registration_information
+    classification: personal
+  cpf:
+    display_name: National Register of Individuals (CPF - Cadastro Nacional de Pessoas Físicas)
+    description: Brazilian individual taxpayer registry number (CPF), used as a national person identifier for tax, banking, and civil records.
+    category: registration_information
+    classification: personal
+  citizenship:
+    display_name: Citizenship
+    description: Country whose nationality laws recognize the person as a citizen, with associated rights and duties.
+    category: registration_information
+    classification: personal
+  cnh:
+    display_name: Driver's License Number (CNH)
+    description: Number of a Brazilian National Driver's License (CNH), authorizing the holder to operate specified vehicle categories.
+    category: registration_information
+    classification: personal
+  creci:
+    display_name: CRECI Number (Real Estate Professional Registry)
+    description: Professional identification code assigned to real estate brokers registered with the Regional Council of Real Estate Brokers (CRECI).
+    category: registration_information
+    classification: personal
+  ctps:
+    display_name: Work Permit Number (CTPS - Carteira de Trabalho e Previdência Social)
+    description: Number of the Brazilian Work and Social Security Card (CTPS), linking a worker to employment history and labor rights.
+    category: registration_information
+    classification: personal
+  date_of_birth:
+    display_name: Date of Birth
+    description: Calendar date on which a person was born, used for age calculation, identity verification, and eligibility checks.
+    category: registration_information
+    classification: personal
+  other_professional_registration:
+    display_name: Registration Number in Other Professional Entities
+    description: Identification number in any other professional body or institution not covered by the other options.
+    category: registration_information
+    classification: personal
+  civil_inability:
+    display_name: Civil Inability
+    description: Limitation of a person's ability to perform civil acts, i.e., enter into contracts and perform other legal acts.
+    category: registration_information
+    classification: personal
+  first_name:
+    display_name: First Name
+    description: Given name by which a person is primarily known in daily or formal interaction, excluding surnames and patronymics.
+    category: registration_information
+    classification: personal
+  persons_photo:
+    display_name: Person’s Photo
+    description: Portrait or likeness of an individual stored as an image file, distinct from biometric templates used solely for authentication.
+    category: registration_information
+    classification: personal
+  full_name:
+    display_name: Full Name
+    description: Complete legal or commonly used name of a natural person, combining given and family names as recorded in official or business systems.
+    category: registration_information
+    classification: personal
+  gender:
+    display_name: Gender
+    description: Sex or gender marker recorded on civil documents or HR systems; may differ from gender identity where both are collected.
+    category: registration_information
+    classification: personal
+  gender_identity:
+    display_name: Gender Identity
+    description: Gender with which a person identifies internally, regardless of their biological characteristics or sexual orientation.
+    category: registration_information
+    classification: sensitive
+  last_name:
+    display_name: Last Name
+    description: Family name or surname used to identify a person within a household or lineage, as recorded in civil or employment records.
+    category: registration_information
+    classification: personal
+  marital_status:
+    display_name: Marital Status
+    description: Civil status regarding marriage or partnership (single, married, divorced, widowed, etc.) used in benefits, contracts, and KYC.
+    category: registration_information
+    classification: personal
+  military_or_veteran_status:
+    display_name: Military or Veteran Status
+    description: Whether a person served in the armed forces or holds veteran benefits status, used in hiring compliance or affirmative programs.
+    category: registration_information
+    classification: personal
+  rg:
+    display_name: ID Number (RG - Registro Geral)
+    description: General Registration - number of the official identification document issued by the Identification Institutes of the Brazilian states.
+    category: registration_information
+    classification: personal
+  rne:
+    display_name: Foreigner Identity Number (RNE - Registro Nacional de Estrangeiros)
+    description: National Foreigner Registration - number of the official document issued to foreigners residing in Brazil temporarily or permanently.
+    category: registration_information
+    classification: personal
+  nationality:
+    display_name: Nationality
+    description: Country or countries with which a person is legally affiliated by birth, naturalization, or parentage.
+    category: registration_information
+    classification: personal
+  social_name:
+    display_name: Social Name
+    description: Name a person, typically a transgender or non-binary person, chooses to be called in social situations and daily life, instead of the birth name.
+    category: registration_information
+    classification: personal
+  oab:
+    display_name: OAB Number (Lawyer Registration)
+    description: Identification number assigned to lawyers registered with the Brazilian Bar Association (OAB).
+    category: registration_information
+    classification: personal
+  peripheral_origin:
+    display_name: Peripheral Origin
+    description: Information about the location of a residence being in a peripheral or marginal area.
+    category: registration_information
+    classification: personal
+  passport_number:
+    display_name: Passport Number
+    description: Unique identifier printed on a government-issued passport used for international travel and cross-border identity checks.
+    category: registration_information
+    classification: personal
+  pis_pasep:
+    display_name: PIS/PASEP Number
+    description: Number of the Social Integration Program (PIS) and the Public Server Heritage Formation Program (PASEP).
+    category: registration_information
+    classification: personal
+  place_of_birth:
+    display_name: Place of Birth
+    description: City, state, or country where a person was born, as stated on civil records or identity documents.
+    category: registration_information
+    classification: personal
+  status_in_the_country:
+    display_name: Status in the Country
+    description: Immigration or residency status (citizen, permanent resident, temporary visa holder, etc.) within Brazil.
+    category: registration_information
+    classification: personal
+  voter_id:
+    display_name: Voter ID Number
+    description: Identification code assigned by the Electoral Justice to each Brazilian citizen who registers to vote.
+    category: registration_information
+    classification: personal
+  document_photo:
+    display_name: Document Photo
+    description: Photographic image of an identity or supporting document (not only the holder's face), used for verification or archival.
+    category: security_information
+    classification: personal
+  image_recorded_by_cctv:
+    display_name: Image Recorded by CCTV
+    description: Camera surveillance system used for monitoring and securing environments, where the images captured by the cameras are transmitted to a closed set of monitors.
+    category: security_information
+    classification: personal
+  photo_with_id_document:
+    display_name: Photo of Person with ID Document
+    description: Image showing the person holding or next to an official ID, used in remote identity-proofing and fraud prevention.
+    category: security_information
+    classification: highly_personal
+  references:
+    display_name: Personal and Professional References
+    description: Information to confirm data provided by a person about their professional experience, education, and other relevant aspects.
+    category: security_information
+    classification: personal
+  signature:
+    display_name: Signature
+    description: Handwritten, digital, or electronic mark used to authenticate documents, contracts, or consent.
+    category: security_information
+    classification: personal
+  service_audio_recording:
+    display_name: Audio Recording of Services
+    description: Audio capture of a service interaction (call center or visit) stored for quality, dispute resolution, or regulatory retention.
+    category: service_information
+    classification: personal
+  service_transcript:
+    display_name: Transcript of services (including email and chat)
+    description: Written log of customer interactions (chat, email, or tickets) retaining message content and metadata for support or audit.
+    category: service_information
+    classification: personal
+  service_history:
+    display_name: Service History
+    description: Detailed record of all interactions between a client or user and a customer service.
+    category: service_information
+    classification: personal
+  social_media_username:
+    display_name: Social Media Username/Login
+    description: Unique identification used by a person to access a system, platform, or online service.
+    category: social_media_information
+    classification: personal
+  social_media_posts:
+    display_name: Social Media Posts
+    description: Content published by a person on social networks, including text, media, timestamps, and engagement metadata.
+    category: social_media_information
+    classification: personal
+  age_range:
+    display_name: Age Range
+    description: Bracket of ages (e.g., 25–34) used when exact age is not stored but cohort analysis or targeting is required.
+    category: statistical_and_research_information
+    classification: personal
+  buying_trends:
+    display_name: Buying Trends
+    description: Behavior or pattern observed in consumers regarding how, when, and what they buy over time.
+    category: statistical_and_research_information
+    classification: personal
+  religious_political_membership:
+    display_name: Membership in a Religious, Philosophical, or Political Organization
+    description: Formal association or identification of a person with a specific organization or movement that has a religious, philosophical, or political orientation.
+    category: strictly_personal_information
+    classification: sensitive
+  political_opinion:
+    display_name: Political Opinion
+    description: A person's views, beliefs, or position on political, social, economic, and governmental issues.
+    category: strictly_personal_information
+    classification: sensitive
+  racial_or_ethnic_origin:
+    display_name: Racial or Ethnic Origin
+    description: A person's identity in relation to the racial or ethnic group they belong to, based on shared physical, cultural, historical, and geographical characteristics.
+    category: strictly_personal_information
+    classification: sensitive
+  religion_religious_beliefs:
+    display_name: Religion / Religious Beliefs
+    description: Set of beliefs, practices, rituals, traditions, and values followed by an individual or group based on belief in a higher power or entity.
+    category: strictly_personal_information
+    classification: sensitive
+  dietary_restrictions:
+    display_name: Dietary Restrictions
+    description: Foods or ingredients a person must avoid for health, religious, or ethical reasons.
+    category: strictly_personal_information
+    classification: personal
+  sexual_orientation:
+    display_name: Sexual Orientation
+    description: Refers to the emotional, romantic, sexual, or affectionate attraction a person feels for another based on gender or sex.
+    category: strictly_personal_information
+    classification: sensitive

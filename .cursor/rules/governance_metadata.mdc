@@ -20,10 +20,15 @@ owner: str                  # email: user@quintoandar.com.br
 columns:
   column_name:
     description: str        # min 10 characters
+    privacy:                # optional; required only when the column is PII
+      piiType: str          # slug from governance/pii_catalog/pii_catalog.yml
+      dataSubjectType:      # who the data is about (drives masking)
+        - customer          # → must be masked in authX unless RAE in controls
+        - employee          # classify PII, no Trino mask
+        - partner           # classify PII, no Trino mask
 ```
 
-> PII classification is **not** part of metadata authoring yet — see
-> [Personal Data Handling](#personal-data-handling) below.
+> Optional `privacy` section — see [PII privacy section](#pii-privacy-section-preferred) below.
 
 **Valid domains:** must **full-match** one value below (same list as F2-01 / CI Yamale — canonical source: [`fairness_metadata.mdc`](fairness_metadata.mdc) and `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `fairness_assessment/constants.py`):
 
@@ -31,29 +36,68 @@ columns:
 
 **Deprecated labels (do not use in new metadata):** `Governance` → `Data Ops & Governance`; `Platform` → `Data Platform` or `Tech Platform`; `Data Science` → `DS Pricing` or `MLOps`; `Support and Service` → `Support and Services`.
 
+## PII privacy section (Phase 1 — infra only, do not suggest in normal PRs)
+
+> **Rollout gate (Phase 1):** The catalog, Yamale schema, and `validate-pii-privacy` CI exist as **foundation**. **Metadata PII classification is not part of normal table authoring or PR review yet** — most contributors should not know or act on this. Do **not** add or suggest a `privacy` section on routine PRs (create-metadata, review-pr, Kody, Governance Officer). Only add `privacy` when the user or ticket **explicitly** requests PII classification (dedicated governance PR). CI validates `privacy` **only when it is already in the diff** (positive validation).
+
+When classification **is** explicitly in scope, columns use `columns.<name>.privacy` (not `personal_data_classification` on the column).
+
+- **No `privacy` section** → expected on routine PRs; CI passes (positive validation).
+- **`piiType`** — must exist in [`governance/pii_catalog/pii_catalog.yml`](../../governance/pii_catalog/pii_catalog.yml).
+- **`dataSubjectType`** — non-empty list: `customer`, `employee`, `partner`.
+- **Do not** duplicate `category`, `dataClassification`, or `containsPII` in metadata — CI derives tier from the catalog.
+- **RAE** (customer PII without mask) — register only in [`governance/pii_anonymization_controls/`](../../governance/pii_anonymization_controls/), not in column metadata.
+
+```yaml
+columns:
+  cpf:
+    description: "Brazilian individual taxpayer identification number (CPF)."
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_person.cpf
+    privacy:
+      piiType: cpf  # slug from pii_catalog.yml
+      dataSubjectType: [customer]
+```
+
+Production masking is configured in **authX** (`commons/data/trino/prod.yaml`) after metadata merges to `master`. See [`governance/pii/README.md`](../../governance/pii/README.md).
+
+### JSON columns (`jsonPaths`)
+
+Use when the lake still stores a **JSON blob** and PII lives at specific paths. If SQL already explodes fields into scalar columns, use normal `privacy` on each column instead.
+
+```yaml
+columns:
+  person_payload:
+    description: "JSON document from the source API."
+    lineage:
+      - datalake_example_clean.person.person_payload
+    privacy:
+      jsonPaths:
+        - path: $.holder.cpf
+          piiType: cpf
+          dataSubjectType: [customer]
+        - path: $.holder.email
+          piiType: personal_email
+          dataSubjectType: [customer]
+```
+
+`id_entity` for a path: `datalake_db.table.column#$.holder.cpf`.
+
 ## Personal Data Handling
 
-### PII classification in metadata — not available yet
+Do **not** add a `personal_data_classification` key to columns — the metadata validator rejects it and CI/lint fails. Do **not** encode a column's PII tier in its `description`. When a dedicated classification PR adds `privacy`, use `privacy.piiType`; CI derives LGPD tier from the catalog. **Do not** proactively add `privacy` on normal feature PRs.
 
-Do **not** add a `personal_data_classification` key to columns — the metadata validator rejects it and CI/lint fails. Do **not** encode a column's PII tier in its `description` either. Document columns functionally, like any other column.
+### Personal Data Catalog (reference)
 
-A formal PII-classification field in bietlejuice metadata is planned but not implemented yet.
-
-### Personal Data Catalog (reference only)
-
-These tiers come from the QuintoAndar Personal Data Catalog. They are **not** written into metadata YAML today — they inform which LGPD controls apply (below) and will become metadata fields in a future rollout.
+These tiers come from the QuintoAndar Personal Data Catalog ([`governance/pii_catalog/pii_catalog.yml`](../../governance/pii_catalog/pii_catalog.yml)). Each `piiType` slug maps to `classification`:
 
 - **`sensitive`** — special-category data under LGPD Art. 11: racial/ethnic origin, political opinion, religion, gender identity, sexual orientation, union membership, health information, biometric data. Must never appear in metric/qube outputs or publicly-accessible schemas without documented LGPD approval.
 - **`highly_personal`** — financially or legally sensitive data: bank statement, credit history, credit score, IRPF, INSS statement, criminal background, card numbers, photo of person with ID document. Prefer hashing or masking before promoting to enrich/dw.
 - **`personal`** — standard personal data under LGPD Art. 5: name, CPF, date of birth, email, phone, address, RG, passport, geolocation, salary, device ID, IP, cookies, etc.
 
+When `privacy` is not declared yet, infer sensitivity from column semantics, domain rules, or governance review — do **not** invent metadata classification to satisfy a control.
+
 ### LGPD controls — enforced today
-
-These controls apply **independently of metadata classification**. Until `personal_data_classification` exists, determine sensitivity from:
-
-1. **Documented domain exceptions** (e.g. fintech schemas in `sql_conventions.mdc` §13)
-2. **Column semantics** in the SQL (CPF, health data, credit score, etc.)
-3. **Governance review** when uncertain — do **not** invent metadata classification to satisfy a control
 
 | Control | When it applies | Where it lives |
 |---|---|---|
@@ -62,17 +106,9 @@ These controls apply **independently of metadata classification**. Until `person
 | `privacy.k_anonymity ≥ 5` | Metric/qube output derived from `sensitive` data | Qube/metric declaration |
 | `has_right_to_be_forgotten` guard | Reverse DAG exporting contact PII | SQL (`sql_conventions.mdc` §13) |
 
+When a column has `privacy.piiType`, use the catalog-derived `classification` for `table_privileges` and `k_anonymity` decisions. The same logical column should use the same `piiType` and `dataSubjectType` across layers (raw → clean → enrich → dw).
+
 ### Examples
-
-**Metadata** — describe PII columns functionally; no classification field or PII-tier text:
-
-```yaml
-columns:
-  cpf:
-    lineage:
-      - ebdb_public.person.cpf
-    description: "Brazilian individual taxpayer identification number (CPF)."
-```
 
 **Declaration** — `table_privileges` lives in the declaration, not in metadata:
 
@@ -154,6 +190,9 @@ make validate-metadata-files-exist
 # Check that metadata content is valid against schema
 make validate-metadata-files-content
 
+# Check PII privacy sections (piiType, dataSubjectType, RAE controls)
+make validate-pii-privacy
+
 # Check SQL lineage consistency with metadata
 make validate-lineage-consistency
 ```
@@ -166,7 +205,10 @@ make validate-lineage-consistency
 - Adding `lineage` to a hardcoded literal column (e.g. `'RENT' AS business_context`) → incorrect; remove it.
 - Metric column without `dimension: true` or `metric:` block → CI fails.
 - Metric SQL referencing raw/clean tables directly → lineage validation fails.
-- Adding a `personal_data_classification` key to any column → **CI/lint fails**; the validator does not accept it yet. Remove it. (Don't move the classification into `description` either — PII classification isn't part of metadata authoring yet.)
+- Column containing personal data with no `privacy` section → **expected in Phase 1**; not a CI failure; **do not** suggest adding `privacy` in review or authoring.
+- `personal_data_classification` on a column → remove (CI rejects the key). **Do not** suggest replacing it with `privacy` unless the PR is an explicit classification effort.
+- When `privacy` **is** in the diff: `privacy.piiType` must be in `governance/pii_catalog/pii_catalog.yml` → else CI fails.
+- `customer` in `dataSubjectType` without RAE → expect authX masking PR after merge to `master` (not in this repo).
 - Storing raw PII (name, CPF, email, address, etc.) as a column in a new enrich/dw table instead of joining `dim_person` → governance review will block it.
-- `sensitive` or `highly_personal` data in enrich/dw without `table_privileges` in the declaration → LGPD violation risk (infer tier from column semantics or domain rules — not from a metadata field).
+- `sensitive` or `highly_personal` data in enrich/dw without `table_privileges` in the declaration → LGPD violation risk (use catalog-derived tier when `privacy` is declared, else infer from column semantics or domain rules).
 - `sensitive` data exposed in a metric/qube output without `k_anonymity ≥ 5` → LGPD violation risk.
