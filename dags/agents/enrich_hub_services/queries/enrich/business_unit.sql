@@ -1,14 +1,21 @@
-WITH updated_business_unit_region AS (
-    SELECT DISTINCT 
+WITH updated_business_unit AS (
+    SELECT 
         id_business_unit
     FROM 
         datalake_hub_services_clean.business_unit_region_aud
     WHERE 
         DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    UNION
+    SELECT 
+        id AS id_business_unit
+    FROM 
+        datalake_hub_services_clean.business_unit
+    WHERE 
+        DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
-    aud.id AS id_business_unit_region,
     bu.id AS id_business_unit,
+    aud.id AS id_business_unit_region,
     aud.id_region,
     bu.hub_name,
     r.region_code,
@@ -30,13 +37,14 @@ SELECT
     bu.month,
     bu.day
 FROM
-    datalake_hub_services_clean.business_unit_region_aud AS aud
-JOIN
-    updated_business_unit_region AS updated
-        ON updated.id_business_unit = aud.id_business_unit
-JOIN
     datalake_hub_services_clean.business_unit AS bu
-        ON bu.id = aud.id_business_unit
+JOIN
+    updated_business_unit AS updated
+        ON updated.id_business_unit = bu.id
+LEFT JOIN
+    datalake_hub_services_clean.business_unit_region_aud AS aud
+        ON updated.id_business_unit = aud.id_business_unit
+        AND aud.rev_type <> 2
 LEFT JOIN
     datalake_hub_services_clean.business_unit_region_aud AS aud_end
         ON aud_end.rev = aud.rev_end
@@ -44,5 +52,3 @@ LEFT JOIN
 LEFT JOIN 
     datalake_region.region AS r
         ON aud.id_region = CAST(r.id AS INT)
-WHERE
-    aud.rev_type <> 2
