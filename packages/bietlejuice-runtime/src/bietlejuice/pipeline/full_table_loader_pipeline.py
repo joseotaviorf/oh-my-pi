@@ -52,6 +52,16 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
                 partitions=self.partitions,
             )
 
+        self._ensure_secondary_catalog_table(df, format_options)
+
+        self._register_partitions_from_df(
+            spark_metastore_service,
+            df,
+            self.target_database_name,
+            self.table_name,
+            format_options,
+        )
+
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
         )

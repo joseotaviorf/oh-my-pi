@@ -87,6 +87,63 @@ class TableLoaderPipeline(AbstractPipeline):
     def load_and_register(self, df, format_options, **load_options):
         raise NotImplementedError()
 
+    def _ensure_secondary_catalog_table(self, df, format_options):
+        """Ensure the parquet/json table exists in the secondary catalog.
+
+        On Databricks + Unity Catalog the table is saved via ``saveAsTable`` and
+        ``SparkMetastoreLoader.update_metastore`` is skipped, so the external table
+        is never created in Glue and partition registration silently no-ops. Mirror
+        ``DeltaTableLoaderPipeline`` by syncing the table to the secondary catalog
+        (Glue on Databricks, UC REST on EMR) before registering partitions. The sync
+        is idempotent and runtime-aware; Delta is excluded by the format guard.
+        """
+        if not self._uses_glue_hive_partitions(format_options):
+            return
+
+        from bietlejuice.base.spark.catalog_strategy_resolver import (
+            CatalogStrategyResolver,
+        )
+        from bietlejuice.services.schema_service import SchemaService
+
+        table_schema = SchemaService.get_schema_from_dataframe(df)
+        CatalogStrategyResolver.sync_to_secondary_catalog(
+            database_name=self.target_database_name,
+            table_name=self.table_name,
+            table_location=self.target_database_location + self.table_name,
+            table_schema=table_schema,
+            partitions=self.partitions,
+            format_str=format_options,
+        )
+
+    def _register_partitions_from_df(
+        self,
+        metastore_service,
+        df,
+        database_name,
+        table_name,
+        format_options,
+    ):
+        """Register hive-style partitions in Glue for parquet/json tables only."""
+        if not self.partitions:
+            return
+        if not self._uses_glue_hive_partitions(format_options):
+            return
+        metastore_service.create_new_partitions_from_df(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            partition_cols=self.partitions,
+        )
+
+    @staticmethod
+    def _uses_glue_hive_partitions(format_options) -> bool:
+        if not isinstance(format_options, str):
+            return False
+        return format_options.upper() in (
+            SparkTableStorageFormat.PARQUET,
+            SparkTableStorageFormat.JSON,
+        )
+
     def register_udf(self, spark_client, udf_identifier):
         """
         Registers a function as a UDF into Spark session, setting the `udf_indentifier`

@@ -12,6 +12,12 @@ from typing import Dict, List
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.services.metastore_services.glue_partition_utils import (
+    build_partition_input,
+    discover_hive_partitions_from_s3,
+    is_delta_glue_table,
+    partition_tuples_to_dicts,
+)
 from bietlejuice.services.metastore_services.glue_storage_formats import (
     get_glue_format_config,
 )
@@ -102,17 +108,160 @@ class GlueMetastoreService(MetastoreService):
         return self._client.get_table_names(database_name)
 
     def repair_table_partitions(self, database_name: str, table_name: str) -> None:
+        """Register S3 hive-style partitions missing from the Glue catalog."""
+        table = self._client.get_table(database_name, table_name)
+        if not table:
+            logger.warning(
+                f"m=repair_table_partitions, table={database_name}.{table_name}, "
+                "msg=table not found in Glue, skipping"
+            )
+            return
+
+        if is_delta_glue_table(table):
+            logger.info(
+                f"m=repair_table_partitions, table={database_name}.{table_name}, "
+                "msg=Delta table, Glue partition repair not required, skipping"
+            )
+            return
+
+        partition_key_names = [
+            pk["Name"] for pk in table.get("PartitionKeys", []) if pk.get("Name")
+        ]
+        if not partition_key_names:
+            logger.info(
+                f"m=repair_table_partitions, table={database_name}.{table_name}, "
+                "msg=table is not partitioned, skipping"
+            )
+            return
+
+        table_sd = table.get("StorageDescriptor")
+        if not table_sd or not table_sd.get("Location"):
+            logger.info(
+                f"m=repair_table_partitions, table={database_name}.{table_name}, "
+                "msg=table lacks StorageDescriptor or Location (e.g. a view), skipping"
+            )
+            return
+
+        table_location = table_sd["Location"]
+        discovered = discover_hive_partitions_from_s3(
+            table_location, partition_key_names, s3_client=self._client.s3_client
+        )
+        if not discovered:
+            logger.info(
+                f"m=repair_table_partitions, table={database_name}.{table_name}, "
+                "msg=no hive-style partitions discovered on S3, skipping"
+            )
+            return
+
+        existing = self._client.get_partition_value_tuples(database_name, table_name)
+        missing_tuples = [values for values in discovered if values not in existing]
+        if not missing_tuples:
+            logger.info(
+                f"m=repair_table_partitions, table={database_name}.{table_name}, "
+                "msg=all discovered partitions already registered in Glue"
+            )
+            return
+
+        partition_dicts = partition_tuples_to_dicts(partition_key_names, missing_tuples)
         logger.info(
             f"m=repair_table_partitions, table={database_name}.{table_name}, "
-            "msg=Glue does not support MSCK REPAIR; partitions are managed "
-            "via batch_create_partition instead. Skipping."
+            f"partition_count={len(partition_dicts)}, "
+            "msg=registering missing partitions in Glue"
         )
+        self.add_partitions(database_name, table_name, partition_dicts)
+
+    def create_new_partitions_from_df(
+        self, database_name, table_name, df, partition_cols, parallelism=1
+    ):
+        """Register every distinct partition found in ``df`` in a single batch.
+
+        Overrides the base implementation, which calls ``add_partitions`` once per
+        distinct partition (one ``get_table`` boto3 call each). Collecting all
+        partition dicts up front means a single ``get_table`` plus the batched
+        ``batch_create_partition``, which avoids hammering Glue (and getting
+        throttled — secondary-catalog failures are swallowed by the composite, so a
+        throttled partition would be silently dropped).
+        """
+        distinct_rows = df.select(partition_cols).distinct().rdd.map(tuple).collect()
+        partition_dicts = [dict(zip(partition_cols, row)) for row in distinct_rows]
+        self.add_partitions(database_name, table_name, partition_dicts)
 
     def add_partitions(self, database_name, table_name, partitions):
+        """Register hive-style partitions in Glue via ``batch_create_partition``."""
+        if not partitions:
+            return
+
+        table = self._client.get_table(database_name, table_name)
+        if not table:
+            logger.warning(
+                f"m=add_partitions, table={database_name}.{table_name}, "
+                "msg=table not found in Glue, skipping partition registration"
+            )
+            return
+
+        if is_delta_glue_table(table):
+            logger.info(
+                f"m=add_partitions, table={database_name}.{table_name}, "
+                "msg=Delta table, skipping Glue partition registration"
+            )
+            return
+
+        partition_key_names = [
+            pk["Name"] for pk in table.get("PartitionKeys", []) if pk.get("Name")
+        ]
+        if not partition_key_names:
+            logger.warning(
+                f"m=add_partitions, table={database_name}.{table_name}, "
+                "msg=table has no partition keys in Glue, skipping"
+            )
+            return
+
+        table_sd = table.get("StorageDescriptor")
+        if not table_sd or not table_sd.get("Location"):
+            logger.info(
+                f"m=add_partitions, table={database_name}.{table_name}, "
+                "msg=table lacks StorageDescriptor or Location (e.g. a view), skipping"
+            )
+            return
+
+        table_location = table_sd["Location"]
+
+        # No existence pre-check: do NOT scan the table's partition list
+        # (``get_partition_value_tuples``) nor point-look-up each partition
+        # (``get_partition``). ``batch_create_partition`` is idempotent, so we just
+        # submit the supplied partitions. Hot-path cost stays O(N) in the partitions
+        # of this write, never O(total partitions in the table).
+        partition_inputs: List[Dict] = []
+        for partition in partitions:
+            missing_keys = [key for key in partition_key_names if key not in partition]
+            if missing_keys:
+                logger.warning(
+                    f"m=add_partitions, table={database_name}.{table_name}, "
+                    f"missing_keys={missing_keys}, msg=partition dict incomplete, skipping"
+                )
+                continue
+
+            partition_inputs.append(
+                build_partition_input(
+                    table_sd, partition_key_names, partition, table_location
+                )
+            )
+
+        if not partition_inputs:
+            logger.info(
+                f"m=add_partitions, table={database_name}.{table_name}, "
+                "msg=no new partitions to register in Glue"
+            )
+            return
+
+        created_count = self._client.batch_create_partition(
+            database_name, table_name, partition_inputs
+        )
         logger.info(
             f"m=add_partitions, table={database_name}.{table_name}, "
-            "msg=Glue partition management handled via batch_create_partition. "
-            "Skipping legacy ADD PARTITION call."
+            f"partition_count={len(partition_inputs)}, "
+            f"created_count={created_count}, "
+            "msg=partitions registered in Glue"
         )
 
     # -- Internal helpers ----------------------------------------------------

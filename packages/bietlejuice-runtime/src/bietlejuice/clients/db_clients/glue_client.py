@@ -8,7 +8,7 @@ cross-account access.  Adapted from the UC-Glue sync script.
 from __future__ import annotations
 
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 import boto3
 from quintoandar_logger import QuintoAndarLogger
@@ -36,6 +36,8 @@ class GlueClient(DBClient):
         self._role_arn = role_arn or os.environ.get("GLUE_ASSUME_ROLE_ARN")
         self._region = region
         self._glue = None
+        self._s3 = None
+        self._assumed_creds = None
 
     @property
     def conn(self):
@@ -44,14 +46,31 @@ class GlueClient(DBClient):
             self._glue = self._build_glue_client()
         return self._glue
 
-    def _build_glue_client(self):
+    @property
+    def s3_client(self):
+        """Return a ``boto3`` S3 client using the same credentials as Glue."""
+        if self._s3 is None:
+            self._s3 = self._build_s3_client()
+        return self._s3
+
+    def _get_assumed_credentials(self) -> Optional[Dict]:
+        """Return assumed-role credentials, caching across Glue/S3 clients."""
+        if self._assumed_creds is not None:
+            return self._assumed_creds
         if self._role_arn:
-            logger.info(f"m=_build_glue_client, msg=Assuming role {self._role_arn}")
+            logger.info(
+                f"m=_get_assumed_credentials, msg=Assuming role {self._role_arn}"
+            )
             sts = boto3.client("sts", region_name=self._region)
-            creds = sts.assume_role(
+            self._assumed_creds = sts.assume_role(
                 RoleArn=self._role_arn,
                 RoleSessionName="bietlejuice-glue-sync",
             )["Credentials"]
+        return self._assumed_creds
+
+    def _build_glue_client(self):
+        creds = self._get_assumed_credentials()
+        if creds:
             return boto3.client(
                 "glue",
                 region_name=self._region,
@@ -60,6 +79,18 @@ class GlueClient(DBClient):
                 aws_session_token=creds["SessionToken"],
             )
         return boto3.client("glue", region_name=self._region)
+
+    def _build_s3_client(self):
+        creds = self._get_assumed_credentials()
+        if creds:
+            return boto3.client(
+                "s3",
+                region_name=self._region,
+                aws_access_key_id=creds["AccessKeyId"],
+                aws_secret_access_key=creds["SecretAccessKey"],
+                aws_session_token=creds["SessionToken"],
+            )
+        return boto3.client("s3", region_name=self._region)
 
     # -- DBClient interface --------------------------------------------------
 
@@ -136,18 +167,125 @@ class GlueClient(DBClient):
                 names.append(table["Name"])
         return names
 
+    def get_partition(
+        self, database_name: str, table_name: str, values: List[str]
+    ) -> Optional[Dict]:
+        """Return a Glue partition if it exists, else ``None``."""
+        try:
+            resp = self.conn.get_partition(
+                DatabaseName=database_name,
+                TableName=table_name,
+                PartitionValues=values,
+            )
+            return resp.get("Partition")
+        except self.conn.exceptions.EntityNotFoundException:
+            return None
+
+    def get_partition_value_tuples(
+        self, database_name: str, table_name: str
+    ) -> Set[tuple]:
+        """Return existing Glue partition values as hashable tuples."""
+        values: Set[tuple] = set()
+        paginator = self.conn.get_paginator("get_partitions")
+        for page in paginator.paginate(
+            DatabaseName=database_name, TableName=table_name
+        ):
+            for partition in page.get("Partitions", []):
+                values.add(tuple(partition.get("Values", [])))
+        return values
+
+    def create_partition(
+        self,
+        database_name: str,
+        table_name: str,
+        partition_input: Dict,
+    ) -> None:
+        """Create a single Glue partition, skipping if it already exists."""
+        try:
+            self.conn.create_partition(
+                DatabaseName=database_name,
+                TableName=table_name,
+                PartitionInput=partition_input,
+            )
+        except self.conn.exceptions.AlreadyExistsException:
+            logger.info(
+                f"m=create_partition, table={database_name}.{table_name}, "
+                f"values={partition_input.get('Values')}, "
+                "msg=partition already exists in Glue, skipping"
+            )
+
     def batch_create_partition(
         self,
         database_name: str,
         table_name: str,
         partition_input_list: List[Dict],
-    ) -> None:
-        """Add partitions to a Glue table in batches of 100."""
+    ) -> int:
+        """Add partitions to a Glue table in batches of 100 (idempotent).
+
+        Returns the number of partitions successfully created.
+        """
+        if not partition_input_list:
+            return 0
+
         batch_size = 100
+        created_count = 0
         for i in range(0, len(partition_input_list), batch_size):
             batch = partition_input_list[i : i + batch_size]
-            self.conn.batch_create_partition(
-                DatabaseName=database_name,
-                TableName=table_name,
-                PartitionInputList=batch,
-            )
+            try:
+                response = self.conn.batch_create_partition(
+                    DatabaseName=database_name,
+                    TableName=table_name,
+                    PartitionInputList=batch,
+                )
+                errors = response.get("Errors", [])
+                if errors:
+                    already_exists_count = 0
+                    other_errors: List[Dict] = []
+                    for err in errors:
+                        error_detail = err.get("ErrorDetail", {})
+                        if error_detail.get("ErrorCode") == "AlreadyExistsException":
+                            already_exists_count += 1
+                        else:
+                            other_errors.append(err)
+
+                    if already_exists_count > 0:
+                        logger.info(
+                            f"m=batch_create_partition, "
+                            f"table={database_name}.{table_name}, "
+                            f"already_exists_count={already_exists_count}, "
+                            "msg=some partitions already existed in Glue"
+                        )
+
+                    if other_errors:
+                        for err in other_errors:
+                            partition_values = err.get("PartitionValues", [])
+                            error_detail = err.get("ErrorDetail", {})
+                            logger.error(
+                                f"m=batch_create_partition, "
+                                f"table={database_name}.{table_name}, "
+                                f"partition_values={partition_values}, "
+                                f"error_code={error_detail.get('ErrorCode')}, "
+                                f"error_message={error_detail.get('ErrorMessage')}, "
+                                "msg=partition creation failed in Glue"
+                            )
+                        raise RuntimeError(
+                            f"Glue batch_create_partition failed for "
+                            f"{len(other_errors)} partition(s) in "
+                            f"{database_name}.{table_name}: "
+                            f"{[e.get('ErrorDetail', {}).get('ErrorCode') for e in other_errors]}"
+                        )
+
+                    created_count += len(batch) - len(errors)
+                else:
+                    created_count += len(batch)
+
+            except self.conn.exceptions.AlreadyExistsException:
+                logger.info(
+                    f"m=batch_create_partition, table={database_name}.{table_name}, "
+                    "msg=batch contained existing partitions, falling back to singles"
+                )
+                for partition_input in batch:
+                    self.create_partition(database_name, table_name, partition_input)
+                    created_count += 1
+
+        return created_count
