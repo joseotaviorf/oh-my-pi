@@ -8,3 +8,13 @@ cluster:
       ebs_volume_size: 200
     num_workers: 3
     driver_node_type_id: m6g.xlarge
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - whl: '{artifacts_bucket}/survicate-api-client-python/quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl'
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+  allow_custom_spark_job: true

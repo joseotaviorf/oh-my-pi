@@ -6,3 +6,12 @@ cluster:
     permission_level: CAN_MANAGE
   custom_configurations:
     driver_node_type_id: r6g.2xlarge
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      driver_node_type_id: r6g.2xlarge

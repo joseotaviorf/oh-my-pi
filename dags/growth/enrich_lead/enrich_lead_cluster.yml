@@ -5,3 +5,12 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     runtime_engine: PHOTON
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      runtime_engine: PHOTON
+      driver_node_type_id: r6g.large

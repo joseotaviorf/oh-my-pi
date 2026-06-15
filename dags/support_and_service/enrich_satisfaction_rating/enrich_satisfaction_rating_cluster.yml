@@ -5,3 +5,11 @@ cluster:
     aws_attributes:
       availability: ON_DEMAND
     driver_node_type_id: r6g.2xlarge
+validation:
+  cluster:
+    type: consolidation_l_memory_single_node_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        availability: ON_DEMAND
+      driver_node_type_id: r6g.2xlarge
