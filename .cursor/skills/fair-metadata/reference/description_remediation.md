@@ -1,4 +1,4 @@
-# Description remediation (F2-02 / table `description`) — Gate B
+# Description remediation (F2-01 table + F2-02 columns) — Gate B
 
 **Purpose:** Descriptions explain **business meaning**. Passing F2 heuristics is a side effect — not the goal.
 
@@ -19,7 +19,7 @@ Gate B evaluates **every clean / core / enrich / dw / metric file in the closed 
 ```bash
 # Domain-wide PLAN / post-EXECUTE audit
 make audit-fair-metadata-scope domain=governance
-# Gate B section: F2-02 failures per file in that folder
+# Gate B section: F2-01/F2-02 failures per file in that folder
 
 # Single table — all layers present in repo, not the whole domain
 make audit-fair-metadata-scope fqn=datalake_metabase_clean.metabase_table
@@ -36,16 +36,16 @@ Re-run after EXECUTE on the **same user scope** (same flags / FQN / owner filter
 - Bulk `sed` / scripts that only lengthen text
 - Column name as the whole description (`Dashboard title`, `Status column`)
 
-If the only way to pass F2-02 is filler → **stop**, research, or **ask the user**.
+If the only way to pass F2-01/F2-02 is filler → **stop**, research, or **ask the user**.
 
 ## F2 heuristics (TDQ — same as production)
 
 | Rule | Threshold |
 |------|-----------|
 | Min length | 24 characters (after normalization) |
-| Substantive words | ≥ 2 words not in column/table name vocabulary |
+| Substantive words | ≥ 2 words not in table/column/database name vocabulary |
 | Name echo | Avoid descriptions that only repeat identifier tokens |
-| Partitions | `year`, `month`, `day` excluded from F2-02 |
+| Partitions | `year`, `month`, `day` excluded from F2-02 column checks |
 
 ## Research before writing (in order)
 
@@ -68,8 +68,8 @@ For **Data Ops & Governance** (Superset, Jira, Metabase, …): SQL + product sem
 
 ## Workflow per table (max ~10 tables per PR in EXECUTE)
 
-1. Scope audit lists failing columns with `reason_code`.
-2. Draft from research — one column at a time.
+1. Scope audit lists failing table (`F2-01`) and column (`F2-02`) entries with `reason_code`.
+2. Draft from research — table description first, then one column at a time.
 3. Re-run scope audit Gate B on user scope.
 4. CI: `make validate-fair-metadata` on branch (PR diff).
 

@@ -15,7 +15,7 @@ Hard stop for **`fair-metadata`**. If you have not completed the checklist below
 
 1. [ ] **Scope resolved** — inventory matches user request (repo folder / YAML `domain:` / owner / table / DAG) per [`scoping.md`](scoping.md) and [`domain_disambiguation.md`](domain_disambiguation.md); count published (`N files`); plan states **scope type**, repo folder (if any), and YAML allowlist value when fixing `domain:`
 2. [ ] **Gate A** — every distinct `owner:` in inventory verified ACTIVE via `@tars` or **AskQuestion** completed for replacements; **none skipped** (offline audit lists UNVERIFIED until Trino)
-3. [ ] **Gate B** — `make audit-fair-metadata-scope …` shows 0 F2-02 failures on clean / core / enrich / dw / metric in scope
+3. [ ] **Gate B** — `make audit-fair-metadata-scope …` shows 0 F2-01/F2-02 description failures on clean / core / enrich / dw / metric in scope
 4. [ ] **Gate C** — physical layout assessed; failures listed in plan gate summary (see [`SKILL.md`](../SKILL.md) Gate C)
 5. [ ] Posted plan with heading `## FAIR metadata remediation plan` ([`remediation_plan.md`](remediation_plan.md) Phase D)
 6. [ ] Ended PLAN message with **“Waiting for your approval before editing any metadata files.”**

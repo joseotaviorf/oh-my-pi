@@ -32,6 +32,11 @@ from bietlejuice.governance.fairness_assessment.datahub_graphql.client import (
     entity_json_has_data_contract_resource,
 )
 
+_SUBSTANTIVE_FACT_CONTRACT_DESC = (
+    "One row per signed rental contract with property linkage and revenue dates; "
+    "consumed by Rent analytics dashboards."
+)
+
 
 class TestTierAchievedToClassification(unittest.TestCase):
     def test_map_0_to_4(self):
@@ -417,7 +422,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": True,
@@ -472,7 +477,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": False,
@@ -491,7 +496,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": False,
@@ -511,7 +516,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": True,
@@ -529,7 +534,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "f4_01_pass": True,
@@ -547,7 +552,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": None,
@@ -566,7 +571,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": True,
@@ -591,7 +596,7 @@ class TestMvpChecks(unittest.TestCase):
             "table_name": "fact_contract",
             "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
-            "table_description": "Contracts fact",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": True,

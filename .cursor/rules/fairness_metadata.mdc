@@ -11,7 +11,7 @@ Governance YAML under `dags/**/metadata/` feeds **fairness assessment** and down
 
 | Lifecycle stage | What to validate | Tool |
 |-----------------|------------------|------|
-| **PR / authoring** (table may not exist yet) | Substantive **column** descriptions (F2-02) on clean+ | `make validate-fair-metadata` — **only on clean+ metadata changed vs `origin/master`** |
+| **PR / authoring** (table may not exist yet) | Substantive **table** (F2-01) + **column** (F2-02) descriptions on clean+ | `make validate-fair-metadata` — **only on clean+ metadata changed vs `origin/master`** |
 | **PR / authoring** (table may not exist yet) | Owner, domain, table/column min length, YAML shape | `make validate-metadata-files-content` (Yamale) |
 | **Scope audit** (repo folder / owner / table) | Gates A/B/C (agent scope audit) | `make audit-fair-metadata-scope` — see `fair-metadata/SKILL.md`; **`--domain` = repo folder basename** (not YAML `domain:` allowlist) — see `fair-metadata/reference/domain_disambiguation.md` |
 | **PR / authoring** | Metadata `columns` ↔ paired SQL output (sqlglot) | `make validate-lineage-consistency` (Woodpecker: `validate-lineage-consistency`) |
@@ -21,13 +21,13 @@ For schema keys shared with CI Yamale (`database_name`, `lineage`, metric blocks
 
 ## F2-01 — Basic rich metadata (production + lake tiering)
 
-F2-01 (owner, domain, table description) is enforced in **production** via `enrich_fairness_assessment` and offline in **scope audit Gate A** for owners. **Woodpecker does not re-run F2-01** — Yamale (`validate-metadata-files-content`) already validates `owner` email, `domain` allowlist, and min description length where the layer schema requires them.
+F2-01 (owner, domain, substantive table description via `assess_table_description_quality`) is enforced in **production** via `enrich_fairness_assessment` and in **PR/skill scope audit** via `validate-fair-metadata`. Yamale (`validate-metadata-files-content`) validates `owner` email, `domain` allowlist, and min description length where the layer schema requires them. Owner ACTIVE is production-only (not re-run in Woodpecker).
 
 ### Owner activity (`owner_not_active_employee`)
 
 | Context | Behavior |
 |---------|----------|
-| **Woodpecker / `make validate-fair-metadata`** | **F2-02** on clean+ in PR diff. Owner/domain/min length: Yamale. **Owner ACTIVE: online only.** |
+| **Woodpecker / `make validate-fair-metadata`** | **F2-01** table + **F2-02** column substantive descriptions on clean+ in PR diff. Owner/domain/min length: Yamale. **Owner ACTIVE: online only.** |
 | **Production** | `enrich_fairness_assessment` joins `datalake_people_public.org_chart` (`assignment_status_type = 'ACTIVE'`) — authoritative for tiering. |
 | **Agent (`fair-metadata`)** | `@tars` + `check_owner_active.sql`; **AskQuestion** for replacements — see `fair-metadata/reference/owner_remediation.md`. |
 
@@ -39,9 +39,17 @@ Owner ACTIVE is **not** validated offline (no snapshot file). Use Trino via `@ta
 
 Synced with `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `packages/bietlejuice-runtime/src/bietlejuice/governance/fairness_assessment/constants.py` and compiler `*_schema.yml`.
 
+### Table description substance (F2-01 — blocking in `validate-fair-metadata`)
+
+Woodpecker **`validate-fair-metadata`** and scope audit **Gate B** run **`assess_table_description_quality`** on clean+ files (same TDQ heuristics as F2-02 columns).
+
+**Typical failure:** `F2-01 table_description_not_substantive: {reason_code}` (`empty`, `too_short`, `boilerplate_or_name_echo`).
+
+**Authoring intent:** Table `description` must explain grain, source system, and main consumers — not echo the table name or generic “information about …” filler. See `fair-metadata/reference/description_remediation.md`.
+
 ## F2-02 — Substantive column descriptions (blocking in `validate-fair-metadata`)
 
-Woodpecker **`validate-fair-metadata`** runs **F2-02 only** on **clean / core / enrich / dw / metric** files in the PR diff. **Raw is skipped.**
+Woodpecker **`validate-fair-metadata`** runs **F2-02** on **clean / core / enrich / dw / metric** files in the PR diff. **Raw is skipped.**
 
 **Typical failure:** `column_description_not_substantive` with per-column `reason_code` from `assess_column_description_quality`.
 
@@ -73,10 +81,6 @@ For enrich/dw, lineage keys must also match real sources (same script).
 
 - New tables: pass F2-01/F2-02 + lineage-consistency in the PR; confirm I1-01 after deploy and the next fairness assessment run (~1 day after `documentation_metrics`).
 - Failure reasons: `undocumented_columns`, `documented_not_in_physical`, `spark_schema_not_in_columns_metastore_snapshot`, `i1_01_not_assessed`.
-
-## Table description quality (advisory)
-
-F2-01 requires a **non-empty** table `description`. **Substantive** table description quality is **advisory** in the CLI (TDQ) — only **column** descriptions block F2-02. Production F2-02 is column-only as well.
 
 ## Commands (typical PR)
 

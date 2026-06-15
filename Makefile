@@ -878,7 +878,7 @@ validate-metadata-files-exist:
 .PHONY: validate-fair-metadata
 validate-fair-metadata:
 	@echo ""
-	@echo "Validating FAIR metadata (F2-02 substantive column descriptions) on changed clean+ YAML"
+	@echo "Validating FAIR metadata (F2-01 table + F2-02 column substantive descriptions) on changed clean+ YAML"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master

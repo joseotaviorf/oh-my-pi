@@ -48,6 +48,7 @@ Often domain + platform together:
 | `domain_missing` | Data domain not set |
 | `domain_not_in_allowlist` | Domain value not in approved list |
 | `table_description_missing` | Table description empty |
+| `table_description_not_substantive` | Table description too short or generic (echoes name/boilerplate) |
 
 ### F2-02 / I1-01 failure codes (common)
 

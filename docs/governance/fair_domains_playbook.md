@@ -25,14 +25,14 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
 ```
 
 - **Yamale** (`validate-metadata-files-content`) — schema: required fields, min length per layer.
-- **FAIR CLI** (`validate-fair-metadata`) — F2-02 substantive column descriptions on clean+.
+- **FAIR CLI** (`validate-fair-metadata`) — F2-01 substantive table + F2-02 substantive column descriptions on clean+.
 - **Lineage** — metadata `columns` ↔ paired SQL (sqlglot).
 
 ## PR bar vs lake tier
 
 | When | What it checks |
 |------|----------------|
-| **Woodpecker on PR** | F2-02 on clean+ metadata in the diff |
+| **Woodpecker on PR** | F2-01 table + F2-02 column substantive descriptions on clean+ metadata in the diff |
 | **Lake** (`fairness_assessment`) | Full tier + Platform checks; query via `@tars` |
 
 Perfect metadata in a PR can still show tier &lt; 2 in the lake if Platform-owned checks fail — not a metadata-PR action.

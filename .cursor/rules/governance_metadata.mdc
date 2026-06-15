@@ -4,7 +4,7 @@ globs: "**/metadata/**/*.yml"
 ---
 # Governance Metadata Conventions
 
-> **FAIR:** [`fairness_metadata.mdc`](fairness_metadata.mdc) — F2-02 via `make validate-fair-metadata`; schema via `make validate-metadata-files-content`; metadata ↔ SQL via `make validate-lineage-consistency`; lake I1-01 after deploy.
+> **FAIR:** [`fairness_metadata.mdc`](fairness_metadata.mdc) — F2-01/F2-02 via `make validate-fair-metadata`; schema via `make validate-metadata-files-content`; metadata ↔ SQL via `make validate-lineage-consistency`; lake I1-01 after deploy.
 
 ## The Golden Rule
 Every `.sql` file in `queries/{layer}/` **must** have a matching `.yml` in `metadata/{layer}/` with the same base name. CI fails without it.
@@ -171,14 +171,14 @@ ongoing_contracts:
 
 | | **raw** (`raw_schema.yml`) | **clean+** (`clean_schema.yml`, core, enrich, dw, metric) |
 |--|---------------------------|------------------------------------------------------|
-| Table `description` | Optional (Yamale) | Required, min 10 chars (Yamale). **FAIR F2-01:** non-empty; write substantive business context (entity/process, grain, main consumers) — table TDQ is advisory at PR time |
+| Table `description` | Optional (Yamale) | Required, min 10 chars (Yamale). **FAIR F2-01:** substantive business context (entity/process, grain, main consumers) — same TDQ gate as columns at PR time |
 | `owner` | Optional | Optional in schema; required for FAIR F2-01 when file is in PR diff |
 | `columns` | Optional | Required |
 | Column `description` | Optional (Yamale) | Required, min 10 chars (Yamale). **FAIR F2-02 (blocking on clean+):** substantive — business meaning, units/format, derivation logic; not name echo, status-only labels, or platform filler |
 | `lineage` | Not in schema | Required on enrich/dw for derived columns |
 | `tags` on columns | Allowed (e.g. Confidential) | — |
 
-**Description quality (all layers where you document):** Yamale enforces **presence and min length** on clean+; FAIR enforces **substance**. Table and column text should explain *what* the data represents in business terms, *how* it is produced or derived, and *who* uses it — aligned to [`fairness_metadata.mdc`](fairness_metadata.mdc) and [`fair_requirement_glossary.md`](../../docs/governance/fair_requirement_glossary.md) (F2-01 / F2-02). Min 10 characters alone is not enough for clean+ columns in PR CI.
+**Description quality (all layers where you document):** Yamale enforces **presence and min length** on clean+; FAIR enforces **substance** on table (F2-01) and columns (F2-02). Table and column text should explain *what* the data represents in business terms, *how* it is produced or derived, and *who* uses it — aligned to [`fairness_metadata.mdc`](fairness_metadata.mdc) and [`fair_requirement_glossary.md`](../../docs/governance/fair_requirement_glossary.md). Min 10 characters alone is not enough for clean+ in PR CI.
 
 Many **raw** tables are ingested via **Spark jobs** without `queries/raw/*.sql` — lineage-consistency does not apply there. Prefer rich documentation on **clean / enrich / dw**; touch **raw** only when that YAML is in the PR diff or CI failed on it. See `fair-metadata/reference/woodpecker_layer_gates.md` and `fairness_metadata.mdc`.
 

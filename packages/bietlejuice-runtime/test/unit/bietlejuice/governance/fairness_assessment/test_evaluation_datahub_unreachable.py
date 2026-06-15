@@ -21,7 +21,10 @@ def _row(**overrides):
         "is_active_employee": True,
         "fqn_occurrence_count": 1,
         "domain": "Data Ops & Governance",
-        "table_description": "Some long enough description for the table.",
+        "table_description": (
+            "Dimension of contestation records with status and resolution timestamps; "
+            "used by Support and Services reporting."
+        ),
         "spark_table_exists": True,
         "spark_catalog_probe_status": "OK",
         "f4_01_pass": False,

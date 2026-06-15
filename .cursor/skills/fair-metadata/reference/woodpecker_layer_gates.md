@@ -18,7 +18,7 @@ Schema definitions: `packages/bietlejuice-compiler/scripts/services/metadata_fil
 | **`validate-metadata-files-exist`** | `dags/**/*.sql` changed | SQL must have matching metadata YAML |
 | **`validate-metadata-files-content`** | `dags/**/*.yml` changed | Yamale: owner email, domain allowlist, min description length, `columns` map shape, metric blocks, etc. |
 | **`validate-lineage-consistency`** | metadata or SQL in diff | SQL ↔ YAML column names when both exist |
-| **`validate-fair-metadata`** | metadata changed vs `origin/master` | **F2-02 only** — substantive column descriptions on **clean / core / enrich / dw / metric** (skips raw) |
+| **`validate-fair-metadata`** | metadata changed vs `origin/master` | **F2-01** substantive table + **F2-02** substantive column descriptions on **clean / core / enrich / dw / metric** (skips raw) |
 
 **No overlap:** do not re-check in `validate-fair-metadata` what Yamale already enforces (`owner`, `domain`, table/column min length, YAML shape).
 
@@ -43,7 +43,7 @@ Many raw tables use **Spark jobs** with no `queries/raw/*.sql` → **lineage-con
 
 | Field | CI (Yamale) | FAIR (`validate-fair-metadata`) |
 |-------|-------------|----------------------------------|
-| `description` (table) | Required min 10 chars (clean+) | — (TDQ advisory in scope audit only) |
+| `description` (table) | Required min 10 chars (clean+) | **F2-01 substantive** (same TDQ heuristics as columns) |
 | `columns` | Required map (clean+) | — |
 | Each column `description` | Required min 10 chars | **F2-02 substantive** (semantic quality) |
 | `lineage` | Required on derived columns (enrich/dw) | — |
@@ -57,7 +57,7 @@ Many raw tables use **Spark jobs** with no `queries/raw/*.sql` → **lineage-con
 ### PLAN — full user scope
 
 1. Resolve inventory ([`scoping.md`](scoping.md)).
-2. `make audit-fair-metadata-scope …` — Gate A (owners), Gate B (F2-02 clean+).
+2. `make audit-fair-metadata-scope …` — Gate A (owners), Gate B (F2-01 table + F2-02 columns on clean+).
 3. Post plan; wait for approval.
 
 ### EXECUTE — PR-sized batches

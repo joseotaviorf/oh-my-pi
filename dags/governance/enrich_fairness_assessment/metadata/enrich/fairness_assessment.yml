@@ -76,8 +76,9 @@ columns:
   table_description_is_substantive:
     description: |
       True when ``assess_table_description_quality`` finds enough non-boilerplate vocabulary beyond
-      schema/table name tokens. False for empty, short, or generic PT/EN echo text. Heuristic only; does
-      not replace F2-01. No separate TDQ JSON column is stored on this table.
+      database/table name tokens (same TDQ heuristics as F2-02 column descriptions). False for empty,
+      short, or generic PT/EN echo text. Mirrors F2-01 ``table_description_not_substantive`` — when F2-01
+      fails only for owner/domain, this column still reflects table-description quality alone.
   columns_description_is_substantive:
     description: |
       True if and only if the column-documentation snapshot (latest ``doc_dt`` join for this FQN) has at

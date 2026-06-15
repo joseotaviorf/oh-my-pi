@@ -131,6 +131,7 @@ steps:
     depends_on: [setup]
 
 
+  # F2-01 table + F2-02 column substantive descriptions (validate_metadata_cli on clean+ diff)
   validate-fair-metadata:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true

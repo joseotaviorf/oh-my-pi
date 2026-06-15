@@ -32,7 +32,7 @@ Resolve scope first → publish **closed inventory** (`N files`) → run **Gates
 
 | Task | `@tars` required? |
 |------|------------------|
-| Scope inventory, Gate B (F2-02 descriptions), Gate C (physical layout) | No — local CLI + read declarations |
+| Scope inventory, Gate B (substantive descriptions) | No — local CLI + read declarations |
 | Gate A owner ACTIVE via `org_chart` / lake | Yes — Trino [`sql/check_owner_active.sql`](sql/check_owner_active.sql) |
 | Business semantics from lake samples / `llm_context` | Yes |
 
@@ -49,7 +49,7 @@ Run on **every file in the closed scope inventory** before the PLAN deliverable 
 | Gate | What | Tool |
 |------|------|------|
 | **A — Owners** | Every distinct `owner:` present; ACTIVE verified **online** before EXECUTE | `@tars` + `check_owner_active.sql` (Gate A offline lists MISSING / UNVERIFIED only) |
-| **B — F2-02** | Substantive column descriptions on **clean / core / enrich / dw / metric** | `make audit-fair-metadata-scope domain=…` or `--audit --domain …` |
+| **B — Descriptions** | Substantive **table** (F2-01) + **column** (F2-02) descriptions on **clean / core / enrich / dw / metric** | `make audit-fair-metadata-scope domain=…` or `--audit --domain …` |
 | **C — Physical Layout** | Partition/z-order from declaration reflected in metadata descriptions (**all layers**) | Read `*_declaration.yml` + metadata — see **Gate C** below |
 | **Raw (optional)** | Column docs on raw encouraged, **not required** | Scope audit prints a raw summary only — never blocks |
 
@@ -90,7 +90,7 @@ uv run --project packages/bietlejuice-runtime python \
 make audit-fair-metadata-scope fqn=datalake_metabase_clean.metabase_table
 ```
 
-**Done criteria:** Gate A — no MISSING owners without user decision; ACTIVE verified via `@tars` before EXECUTE; Gate B — 0 F2-02 failures in clean+; Gate C — 0 tables with declaration layout config missing partition/z-order docs in metadata.
+**Done criteria:** Gate A — no MISSING owners without user decision; ACTIVE verified via `@tars` before EXECUTE; Gate B — 0 F2-01/F2-02 description failures in clean+; Gate C — 0 tables with declaration layout config missing partition/z-order docs in metadata.
 
 ---
 

@@ -85,7 +85,7 @@ Return: exit code, full output. Note: this check only runs when the branch touch
 ```bash
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
 ```
-Return: exit code, FAIL lines with F2-01/F2-02 messages. Classify as **blocking** for F2-01 and F2-02 failures; **non-blocking but should fix** for table TDQ advisories only.
+Return: exit code, FAIL lines with F2-01/F2-02 messages. Classify as **blocking** for F2-01 and F2-02 failures.
 
 ## Step 2b — PR scope check (manual, no subagent)
 
@@ -110,7 +110,7 @@ Classify scope issues as **non-blocking but should fix** — PRs with unrelated 
 Group all issues by severity:
 
 **Blocking (will fail CI):**
-- FAIR metadata validation failures (`validate-fair-metadata`: F2-02 substantive column descriptions on clean+)
+- FAIR metadata validation failures (`validate-fair-metadata`: F2-01 substantive table + F2-02 substantive column descriptions on clean+)
 - `validate-lineage-consistency` failures (metadata columns vs SQL — Woodpecker step when SQL/metadata in diff)
 - Style errors (black/flake8)
 - Lint errors (`make lint`)
@@ -121,7 +121,6 @@ Group all issues by severity:
 - RAE control without matching `privacy` + `customer` on the same `id_entity` (when RAE file is in the diff)
 
 **Non-blocking but should fix:**
-- Table TDQ advisories from `validate-fair-metadata` (non-blocking)
 - Python convention violations
 - Incomplete metadata (short descriptions, missing lineage)
 - New `bietlejuice/` module with no matching unit test file (config/constants modules exempt)

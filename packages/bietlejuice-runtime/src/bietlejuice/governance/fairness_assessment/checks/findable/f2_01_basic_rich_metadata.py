@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from bietlejuice.governance.fairness_assessment.checks.patterns import EMAIL_RE
 from bietlejuice.governance.fairness_assessment.constants import (
     METADATA_DOMAIN_CI_ALLOWLIST_RE,
+)
+from bietlejuice.governance.fairness_assessment.description_quality import (
+    assess_table_description_quality,
 )
 from bietlejuice.governance.fairness_assessment.models import RequirementResult
 
@@ -29,8 +32,12 @@ def check_f2_01_basic_rich_metadata(
     is_active_employee: bool,
     domain: Optional[str],
     table_description: Optional[str],
+    *,
+    database_name: Optional[str] = None,
+    table_name: Optional[str] = None,
 ) -> RequirementResult:
     failure_codes: list[str] = []
+    detail: dict[str, Any] = {}
     own = _ownership_failure_code(owner_email_normalized, is_active_employee)
     if own is not None:
         failure_codes.append(own)
@@ -44,6 +51,15 @@ def check_f2_01_basic_rich_metadata(
     desc = str(table_description).strip() if table_description is not None else ""
     if not desc:
         failure_codes.append("table_description_missing")
+    else:
+        tdq = assess_table_description_quality(
+            database_name, table_name, table_description
+        )
+        if not tdq.is_substantive:
+            failure_codes.append("table_description_not_substantive")
+            detail["table_description_reason_code"] = (
+                tdq.reason_code or "not_substantive"
+            )
 
     if not failure_codes:
         return RequirementResult(
@@ -52,10 +68,11 @@ def check_f2_01_basic_rich_metadata(
             reason=None,
             detail=None,
         )
+    detail["failure_codes"] = list(failure_codes)
     joined = ",".join(failure_codes)
     return RequirementResult(
         requirement_id="F2-01",
         passed=False,
         reason=joined,
-        detail={"failure_codes": list(failure_codes)},
+        detail=detail,
     )

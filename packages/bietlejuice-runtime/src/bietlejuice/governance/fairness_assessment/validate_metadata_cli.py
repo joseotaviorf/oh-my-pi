@@ -1,8 +1,9 @@
 """Offline FAIR metadata checks on governance YAML files.
 
-Woodpecker ``validate-fair-metadata`` runs **F2-02 only** (substantive column
-descriptions on clean+ layers). Schema checks (owner, domain, min description
-length, YAML shape) belong to ``validate-metadata-files-content`` (Yamale).
+Woodpecker ``validate-fair-metadata`` runs substantive description checks on
+clean+ layers: **F2-01** (table ``description``) and **F2-02** (column
+``description``). Schema checks (owner, domain, min description length, YAML
+shape) belong to ``validate-metadata-files-content`` (Yamale).
 **Does not** honor ``skip_list.yml`` ``metadata_files_out_of_pattern`` — FAIR
 applies to every changed clean+ metadata file in the PR diff.
 
@@ -250,47 +251,44 @@ def collect_distinct_owners(
     return rows, yaml_load_errors
 
 
-def validate_metadata_file(
-    path: Path,
-    *,
-    include_table_tdq_advisory: bool = True,
-) -> Tuple[bool, List[str], List[str]]:
-    """Return (passed, blocking_issues, advisories).
+def validate_metadata_file(path: Path) -> Tuple[bool, List[str]]:
+    """Return (passed, blocking_issues).
 
-    CI and scope audit use this for **F2-02 only** on clean+ layers. Yamale
-    (``validate-metadata-files-content``) already validates owner, domain,
-    table/column description length, and ``columns`` map shape.
+    CI and scope audit use this for **F2-01 table + F2-02 column** substantive
+    descriptions on clean+ layers. Yamale (``validate-metadata-files-content``)
+    already validates owner, domain, table/column description length, and
+    ``columns`` map shape.
     """
     blocking: List[str] = []
-    advisories: List[str] = []
     data, load_err = _try_load_metadata(path)
     if load_err or data is None:
         blocking.append(load_err or f"{path}: failed to load metadata YAML")
-        return (False, blocking, advisories)
+        return (False, blocking)
 
     database_name = data.get("database_name")
     table_name = data.get("table_name")
     description = data.get("description")
     columns = data.get("columns") or {}
 
-    if include_table_tdq_advisory:
+    if _is_raw_metadata(path) or not _is_clean_plus_metadata(path):
+        return (True, blocking)
+
+    desc = str(description).strip() if description is not None else ""
+    if not desc:
+        blocking.append("F2-01 table_description_missing")
+    else:
         table_tdq = assess_table_description_quality(
             database_name, table_name, description
         )
-        if not table_tdq.is_substantive and description:
-            advisories.append(
-                f"Table description advisory (TDQ): {table_tdq.reason_code}"
-                " (not an MVP gate; improves catalog quality)"
-            )
-
-    if _is_raw_metadata(path) or not _is_clean_plus_metadata(path):
-        return (True, blocking, advisories)
+        if not table_tdq.is_substantive:
+            reason = table_tdq.reason_code or "not_substantive"
+            blocking.append(f"F2-01 table_description_not_substantive: {reason}")
 
     if not isinstance(columns, dict):
         blocking.append(
             f"{path}: columns must be a mapping (dict); invalid YAML shape for metadata columns"
         )
-        return (False, blocking, advisories)
+        return (False, blocking)
 
     insufficient: List[str] = []
     for col_name, col_meta in columns.items():
@@ -314,7 +312,7 @@ def validate_metadata_file(
             + suffix
         )
 
-    return (len(blocking) == 0, blocking, advisories)
+    return (len(blocking) == 0, blocking)
 
 
 @dataclass
@@ -323,7 +321,6 @@ class ScopeAuditResult:
     missing_paths: List[Path] = field(default_factory=list)
     owner_rows: List[Tuple[str, int, str]] = field(default_factory=list)
     f2_failures: List[Tuple[Path, List[str]]] = field(default_factory=list)
-    table_tdq_advisories: List[Tuple[Path, List[str]]] = field(default_factory=list)
     raw_file_count: int = 0
     raw_with_columns_count: int = 0
     yaml_load_errors: List[str] = field(default_factory=list)
@@ -367,11 +364,9 @@ def audit_scope_paths(paths: Sequence[Path]) -> ScopeAuditResult:
             continue
         if not _is_clean_plus_metadata(path):
             continue
-        ok, blocking, advisories = validate_metadata_file(path)
+        ok, blocking = validate_metadata_file(path)
         if not ok and blocking:
             result.f2_failures.append((path, blocking))
-        if advisories:
-            result.table_tdq_advisories.append((path, advisories))
 
     return result
 
@@ -404,27 +399,21 @@ def print_scope_audit_report(
         print(f"\n  FAIL: {len(missing)} owner(s) missing: {', '.join(missing)}")
 
     print(
-        "\n=== Gate B — F2-02 substantive column descriptions (clean / core / enrich / dw / metric) ==="
+        "\n=== Gate B — substantive descriptions: table F2-01 + columns F2-02 "
+        "(clean / core / enrich / dw / metric) ==="
     )
     print(
         "  NOTE: owner, domain, and min description length are validated by "
         "validate-metadata-files-content (Yamale)."
     )
     if not result.f2_failures:
-        print("  PASS: no F2-02 blocking issues in clean+ layers")
+        print("  PASS: no F2-01/F2-02 blocking issues in clean+ layers")
     else:
         print(f"  FAIL: {len(result.f2_failures)} file(s)")
         for path, issues in result.f2_failures:
             print(f"  - {path}")
             for issue in issues:
                 print(f"      {issue}")
-
-    if result.table_tdq_advisories:
-        print("\n  Table description advisories (improve when possible):")
-        for path, advisories in result.table_tdq_advisories[:15]:
-            print(f"  - {path}: {advisories[0]}")
-        if len(result.table_tdq_advisories) > 15:
-            print(f"  ... and {len(result.table_tdq_advisories) - 15} more")
 
     if result.missing_paths:
         print(f"\n  FAIL: {len(result.missing_paths)} inventory path(s) not on disk:")
@@ -439,7 +428,7 @@ def print_scope_audit_report(
         )
         print(
             "  Raw column documentation is encouraged but not required; "
-            "F2-02 applies on clean+ only."
+            "F2-01/F2-02 apply on clean+ only."
         )
 
     if result.yaml_load_errors:
@@ -524,8 +513,8 @@ def _branch_ignored_with_scope_flags(args: argparse.Namespace) -> bool:
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Validate metadata YAML for FAIR F2-02 (substantive column descriptions). "
-            "Schema checks (owner, domain, min length) run in "
+            "Validate metadata YAML for FAIR F2-01 (table description) and F2-02 "
+            "(column descriptions). Schema checks (owner, domain, min length) run in "
             "validate-metadata-files-content. Owner ACTIVE is online-only. "
             "Use scope flags + --audit for Gate A/B scope inventory; "
             "use -b for PR diff (Woodpecker). "
@@ -654,8 +643,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     print(
-        "F2-02 on clean+ — owner/domain/min length: validate-metadata-files-content "
-        "(Yamale). Owner ACTIVE: online only (@tars / org_chart)."
+        "F2-01 table + F2-02 column descriptions on clean+ — owner/domain/min length: "
+        "validate-metadata-files-content (Yamale). Owner ACTIVE: online only "
+        "(@tars / org_chart)."
     )
 
     failed = 0
@@ -672,15 +662,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"SKIP (not clean+): {path}")
             continue
         validated += 1
-        ok, blocking, advisories = validate_metadata_file(path)
+        ok, blocking = validate_metadata_file(path)
         if ok:
             print(f"PASS: {path}")
-            for issue in advisories:
-                print(f"  - advisory: {issue}")
         else:
             failed += 1
             print(f"FAIL: {path}")
-            for issue in blocking + advisories:
+            for issue in blocking:
                 print(f"  - {issue}")
 
     if validated == 0 and paths:

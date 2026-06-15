@@ -24,7 +24,7 @@ make audit-fair-metadata-scope domain=<scope>
 # or: --owner … --fqn … --dag …
 ```
 
-Report Gate A (owners), Gate B (F2-02 on clean+), Gate C (physical layout on all layers), and raw-layer summary (optional column docs — not blocking).
+Report Gate A (owners), Gate B (F2-01 table + F2-02 columns on clean+), Gate C (physical layout on all layers), and raw-layer summary (optional column docs — not blocking).
 
 ### A2. Lake (`@tars`, supplementary)
 
@@ -56,7 +56,7 @@ If any owner is missing, invalid, or not ACTIVE → **AskQuestion** before EXECU
 | Gate | Status | Notes |
 |------|--------|-------|
 | A Owners | PASS / FAIL | distinct owners: … |
-| B F2 descriptions | PASS / FAIL | N file(s) failing |
+| B Substantive descriptions | PASS / FAIL | N file(s) failing (F2-01 table + F2-02 columns) |
 | C Physical layout | PASS / FAIL | N table(s) missing partition/z-order docs |
 | Raw (optional) | PASS / FAIL | N raw file(s) with columns: |
 

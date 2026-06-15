@@ -184,10 +184,12 @@ make {failing_make_target}
 
 ### FAIR metadata failures (`validate-fair-metadata`)
 
-Woodpecker runs **F2-02 only** on clean+ files. Owner/domain/min length errors come from **`validate-metadata-files-content`** (Yamale), not this step.
+Woodpecker runs **F2-01 table + F2-02 column** substantive description checks on clean+ files. Owner/domain/min length errors come from **`validate-metadata-files-content`** (Yamale), not this step.
 
 | Error message pattern | Root cause | Fix |
 |----------------------|-----------|-----|
+| `F2-01 table_description_missing` | Table `description` is empty, null, or whitespace-only | Add a substantive table description (min 10 chars for Yamale; must pass TDQ heuristics). See `fair-metadata/reference/description_remediation.md`. |
+| `F2-01 table_description_not_substantive` | Table `description` passes Yamale min length but fails TDQ heuristics | Rewrite table description: grain, source system, consumers — not table/database name echo or generic “information about …” filler. See `fair-metadata/reference/description_remediation.md`. |
 | `F2-02 column_description_not_substantive` | Column `description` passes Yamale min length but fails TDQ heuristics | Rewrite using **SQL + declaration only** (no `@tars` required). State business meaning, grain, units — not column name echo or governance-lake filler. For entity context or bulk remediation use **`fair-metadata`** with `@tars`. |
 | `invalid domain` / Yamale domain regex | `domain` not in allowlist | Use exact value from `fairness_metadata.mdc` — fix via metadata content validation |
 | `column in SQL not found in metadata` / `Columns in SQL query but missing in metadata` | Metadata ↔ SQL mismatch | Run `make validate-lineage-consistency`; align `columns:` with SQL (sqlglot) — see `LINEAGE_CONSISTENCY_VALIDATION.md` |

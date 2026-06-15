@@ -81,6 +81,8 @@ def evaluate_mvp_checks_from_row(
         is_active,
         row.get("domain"),
         row.get("table_description"),
+        database_name=db,
+        table_name=tbl,
     )
     f4_ok = bool(row.get("f4_01_pass"))
     f4_reason = row.get("f4_01_failure_reason")

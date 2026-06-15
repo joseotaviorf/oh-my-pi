@@ -67,7 +67,7 @@ def good_metadata(tmp_path: Path) -> Path:
 # validate_metadata_file
 # --------------------------------------------------------------------------- #
 def test_validate_metadata_file_passes(good_metadata: Path) -> None:
-    ok, blocking, _advisories = validate_metadata_file(good_metadata)
+    ok, blocking = validate_metadata_file(good_metadata)
     assert ok, blocking
     assert not blocking
 
@@ -101,7 +101,7 @@ def test_validate_metadata_file_blocking_shapes(
     mutate(data)
     good_metadata.write_text(yaml.dump(data), encoding="utf-8")
     # Act
-    ok, blocking, _advisories = validate_metadata_file(good_metadata)
+    ok, blocking = validate_metadata_file(good_metadata)
     # Assert
     assert not ok
     assert any(expected_substr in issue for issue in blocking)
@@ -114,7 +114,7 @@ def test_validate_metadata_file_skips_f2_02_on_raw(tmp_path: Path) -> None:
         columns={"id": {"description": "id"}},
     )
     # Act — raw columns allowed; F2-02 not applied
-    ok, blocking, _advisories = validate_metadata_file(raw)
+    ok, blocking = validate_metadata_file(raw)
     # Assert
     assert ok
     assert not blocking
@@ -128,7 +128,7 @@ def test_validate_metadata_file_skips_partition_columns_case_insensitive(
     data["columns"]["MONTH"] = {"description": "Month"}
     good_metadata.write_text(yaml.dump(data), encoding="utf-8")
     # Act — partition cols excluded like production assessment
-    ok, blocking, _advisories = validate_metadata_file(good_metadata)
+    ok, blocking = validate_metadata_file(good_metadata)
     # Assert
     assert ok, blocking
 
@@ -138,21 +138,40 @@ def test_validate_metadata_file_fails_on_unreadable_yaml(tmp_path: Path) -> None
     bad.parent.mkdir(parents=True)
     bad.write_text("columns: [\n", encoding="utf-8")
     # Act
-    ok, blocking, _advisories = validate_metadata_file(bad)
+    ok, blocking = validate_metadata_file(bad)
     # Assert
     assert not ok
     assert blocking
 
 
-def test_table_tdq_advisory_does_not_fail(good_metadata: Path) -> None:
+def test_table_tdq_blocks_non_substantive_description(good_metadata: Path) -> None:
     data = yaml.safe_load(good_metadata.read_text(encoding="utf-8"))
     data["description"] = "Orders table in datalake_test_clean."
     good_metadata.write_text(yaml.dump(data), encoding="utf-8")
-    # Act
-    ok, blocking, advisories = validate_metadata_file(good_metadata)
-    # Assert
-    assert ok, blocking
-    assert any("TDQ" in issue for issue in advisories)
+    ok, blocking = validate_metadata_file(good_metadata)
+    assert not ok
+    assert any("F2-01 table_description_not_substantive" in issue for issue in blocking)
+
+
+@pytest.mark.parametrize(
+    "description",
+    [
+        pytest.param("", id="empty_string"),
+        pytest.param("   ", id="whitespace_only"),
+        pytest.param(None, id="null"),
+    ],
+)
+def test_empty_table_description_uses_missing_code(
+    good_metadata: Path,
+    description: str | None,
+) -> None:
+    data = yaml.safe_load(good_metadata.read_text(encoding="utf-8"))
+    data["description"] = description
+    good_metadata.write_text(yaml.dump(data), encoding="utf-8")
+    ok, blocking = validate_metadata_file(good_metadata)
+    assert not ok
+    assert any("F2-01 table_description_missing" in issue for issue in blocking)
+    assert not any("table_description_not_substantive" in issue for issue in blocking)
 
 
 # --------------------------------------------------------------------------- #
@@ -318,7 +337,7 @@ def test_audit_scope_paths_raw_columns_optional_not_blocking(tmp_path: Path) -> 
     paths = resolve_scope_paths(tmp_path, domain="g")
     # Act
     audit = audit_scope_paths(paths)
-    # Assert — raw columns optional; clean fails F2-02 only
+    # Assert — raw columns optional; clean fails F2-01/F2-02 when descriptions weak
     assert not audit.gate_b_passed
     assert audit.gate_a_passed
     assert audit.raw_file_count == 1
