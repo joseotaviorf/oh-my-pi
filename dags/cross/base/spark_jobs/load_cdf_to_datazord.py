@@ -7,10 +7,14 @@ the changes to a Kafka topic. It's designed to run as a triggered job when
 the Delta table is updated.
 """
 
+from __future__ import annotations
+
 import argparse
+import json
 import logging
 import os
 
+import boto3
 from pyspark.sql import SparkSession
 
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
@@ -62,6 +66,24 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def _get_kafka_credentials() -> tuple[str, str]:
+    if RuntimeDetector.is_emr():
+        secret_id = (
+            "WONKA_CONFLUENT_KAFKA_API_KEY_FORNO"
+            if os.getenv("ENVIRONMENT") == "forno"
+            else "WONKA_CONFLUENT_KAFKA_API_KEY_PROD"
+        )
+
+        client = boto3.client("secretsmanager", "us-east-1")
+
+        secret_string = client.get_secret_value(SecretId=secret_id)["SecretString"]
+        api_key_content = json.loads(secret_string)
+
+        return api_key_content["key"], api_key_content["secret"]
+
+    return os.getenv("KAFKA_API_KEY"), os.getenv("KAFKA_API_SECRET")
+
+
 def main():
     """Main entry point."""
     args = parse_arguments()
@@ -75,8 +97,7 @@ def main():
     else:
         spark = SparkSession.builder.getOrCreate()
 
-    kafka_api_key = os.getenv("KAFKA_API_KEY")
-    kafka_api_secret = os.getenv("KAFKA_API_SECRET")
+    kafka_api_key, kafka_api_secret = _get_kafka_credentials()
 
     service = DeltaCDFToKafkaService(
         spark=spark,

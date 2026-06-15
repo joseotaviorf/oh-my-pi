@@ -2624,11 +2624,6 @@ wonka_cluster_emr:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
           args: []
-        - s3:
-              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
-          args:
-              - "{{ var.value.environment }}"
-              - "" # Empty for now, as it isn't used. In the future, something like "{{ var.value.wonka_vault_approle_secret_id }}"
     spark_conf:
         <<: *emr_cluster_spark_conf_anchor
         spark.pyspark.driver.python: /home/hadoop/venv/bin/python

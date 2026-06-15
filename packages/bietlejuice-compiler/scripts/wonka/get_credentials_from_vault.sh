@@ -8,19 +8,18 @@ set -euo pipefail
 # Configuration
 # =============================================================================
 
-# Databricks: ENVIRONMENT and VAULT_SECRET via spark_env_vars.
-# EMR bootstrap: $1 = environment ("forno" or "prod"), $2 = Vault AppRole secret ID.
+# Environment variables required:
+# - ENVIRONMENT: "forno" or "prod"
+# - VAULT_SECRET: Secret ID for AppRole authentication
 
-ENVIRONMENT="${1:-${ENVIRONMENT:-}}"
-VAULT_SECRET="${2:-${VAULT_SECRET:-}}"
-
-if [[ -z "${ENVIRONMENT}" ]]; then
-    echo "ERROR: ENVIRONMENT is required (env var or bootstrap \$1)" >&2
+# Check required environment variables
+if [[ -z "${ENVIRONMENT:-}" ]]; then
+    echo "ERROR: ENVIRONMENT variable is required"
     exit 1
 fi
 
 if [[ -z "${VAULT_SECRET:-}" ]]; then
-    echo "ERROR: VAULT_SECRET variable is required (env var or bootstrap \$2)" >&2
+    echo "ERROR: VAULT_SECRET variable is required"
     exit 1
 fi
 
