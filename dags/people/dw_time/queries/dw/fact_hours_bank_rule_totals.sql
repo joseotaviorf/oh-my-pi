@@ -159,6 +159,7 @@ hours_bank_lines_with_hourly_rate_ranked AS (
         hours_bank_rule.is_closed,
         hours_bank_rule.hours_bank_rule_key,
         hours_bank_rule.minutes_balance_rule_raw,
+        hours_bank_rule_dim.segment_label,
         cost_window.sk_employee_cost_window,
         cost_window.hourly_rate_amount AS hourly_rate_applied,
         cost_window.dt_hourly_cost_segment_started AS dt_hourly_rate_segment_started,
@@ -170,7 +171,7 @@ hours_bank_lines_with_hourly_rate_ranked AS (
                 ELSE (CAST(hours_bank_rule.minutes_balance_rule_raw AS BIGINT) / 60.0)
                     * cost_window.hourly_rate_amount
             END AS DECIMAL(18, 4)
-        ) AS estimated_balance_cost_amount,
+        ) AS amount_balance_base,
         ROW_NUMBER() OVER (
             PARTITION BY
                 hours_bank_rule.sk_employee,
@@ -183,6 +184,13 @@ hours_bank_lines_with_hourly_rate_ranked AS (
     FROM
         hours_bank_rule_lines AS hours_bank_rule
     LEFT JOIN
+        dw_time.dim_hours_bank_rule AS hours_bank_rule_dim
+            ON TRANSLATE(
+                REGEXP_REPLACE(hours_bank_rule.hours_bank_rule_key, '^_+', ''),
+                '_',
+                '-'
+            ) = hours_bank_rule_dim.hours_bank_rule_key
+    LEFT JOIN
         dw_time.fact_employee_hourly_cost_windows AS cost_window
             ON hours_bank_rule.sk_employee = cost_window.sk_employee
             AND UPPER(cost_window.cost_segment_status) = 'ACTIVE'
@@ -194,21 +202,167 @@ hours_bank_lines_with_hourly_rate_ranked AS (
 ),
 hours_bank_lines_with_hourly_rate AS (
     SELECT
-        sk_employee,
-        person_number,
-        dt_hours_bank_balanced,
-        is_closed,
-        hours_bank_rule_key,
-        minutes_balance_rule_raw,
-        sk_employee_cost_window,
-        hourly_rate_applied,
-        dt_hourly_rate_segment_started,
-        dt_hourly_rate_segment_ended,
-        estimated_balance_cost_amount
+        hourly_rate_ranked.sk_employee,
+        hourly_rate_ranked.person_number,
+        hourly_rate_ranked.dt_hours_bank_balanced,
+        CAST(
+            DATE_TRUNC('month', hourly_rate_ranked.dt_hours_bank_balanced) AS DATE
+        ) AS dt_reference_month,
+        hourly_rate_ranked.is_closed,
+        hourly_rate_ranked.hours_bank_rule_key,
+        hourly_rate_ranked.minutes_balance_rule_raw,
+        hourly_rate_ranked.segment_label,
+        TRY_CAST(
+            TRIM(CAST(hourly_rate_ranked.segment_label AS STRING)) AS INT
+        ) AS segment_label_numeric,
+        hourly_rate_ranked.sk_employee_cost_window,
+        hourly_rate_ranked.hourly_rate_applied,
+        hourly_rate_ranked.dt_hourly_rate_segment_started,
+        hourly_rate_ranked.dt_hourly_rate_segment_ended,
+        hourly_rate_ranked.amount_balance_base
     FROM
-        hours_bank_lines_with_hourly_rate_ranked
+        hours_bank_lines_with_hourly_rate_ranked AS hourly_rate_ranked
     WHERE
-        row_number_latest = 1
+        hourly_rate_ranked.row_number_latest = 1
+),
+month_payment_calendar AS (
+    SELECT
+        CAST(DATE_TRUNC('month', calendar_date.date) AS DATE) AS dt_payment_month,
+        CAST(SUM(
+            CASE
+                WHEN calendar_date.week_day = 0
+                    THEN 1
+                ELSE 0
+            END
+        ) AS INT) AS sundays_in_month,
+        CAST(SUM(
+            CASE
+                WHEN calendar_date.is_brz_holiday = 'Holiday'
+                    AND calendar_date.week_day BETWEEN 1 AND 5
+                    AND LOWER(COALESCE(calendar_date.br_holiday_name, '')) NOT LIKE '%carnival%'
+                    THEN 1
+                ELSE 0
+            END
+        ) AS INT) AS weekday_holidays_excl_carnival,
+        CAST(SUM(
+            CASE
+                WHEN calendar_date.week_day BETWEEN 1 AND 6
+                    AND calendar_date.is_brz_holiday <> 'Holiday'
+                    THEN 1
+                ELSE 0
+            END
+        ) AS INT) AS mon_sat_workdays
+    FROM
+        dw_public.dim_date AS calendar_date
+    GROUP BY
+        CAST(DATE_TRUNC('month', calendar_date.date) AS DATE)
+),
+hours_bank_lines_with_realized_cost AS (
+    SELECT
+        hourly_rate_lines.sk_employee,
+        hourly_rate_lines.person_number,
+        hourly_rate_lines.dt_hours_bank_balanced,
+        hourly_rate_lines.dt_reference_month,
+        hourly_rate_lines.is_closed,
+        hourly_rate_lines.hours_bank_rule_key,
+        hourly_rate_lines.minutes_balance_rule_raw,
+        hourly_rate_lines.segment_label,
+        hourly_rate_lines.sk_employee_cost_window,
+        hourly_rate_lines.hourly_rate_applied,
+        hourly_rate_lines.dt_hourly_rate_segment_started,
+        hourly_rate_lines.dt_hourly_rate_segment_ended,
+        hourly_rate_lines.amount_balance_base,
+        CAST(
+            CASE
+                WHEN hourly_rate_lines.segment_label_numeric IN (50, 60)
+                    THEN hourly_rate_lines.segment_label_numeric
+                ELSE NULL
+            END AS DECIMAL(5, 2)
+        ) AS premium_pct,
+        CASE
+            WHEN hourly_rate_lines.is_closed
+                AND hourly_rate_lines.segment_label_numeric IN (50, 60)
+                THEN TRUE
+            ELSE FALSE
+        END AS is_in_overtime_realized,
+        CAST(
+            CASE
+                WHEN hourly_rate_lines.amount_balance_base IS NULL
+                    THEN NULL
+                WHEN hourly_rate_lines.is_closed
+                    AND hourly_rate_lines.segment_label_numeric IN (50, 60)
+                    THEN hourly_rate_lines.amount_balance_base
+                        * (
+                            1.0 + (
+                                CAST(hourly_rate_lines.segment_label_numeric AS DOUBLE) / 100.0
+                            )
+                        )
+                ELSE hourly_rate_lines.amount_balance_base
+            END AS DECIMAL(18, 4)
+        ) AS estimated_balance_cost_amount,
+        CAST(
+            CASE
+                WHEN hourly_rate_lines.amount_balance_base IS NULL
+                    OR NOT hourly_rate_lines.is_closed
+                    OR hourly_rate_lines.segment_label_numeric NOT IN (50, 60)
+                    OR payment_calendar.mon_sat_workdays IS NULL
+                    OR payment_calendar.mon_sat_workdays = 0
+                    THEN NULL
+                ELSE (
+                    hourly_rate_lines.amount_balance_base
+                    * (
+                        1.0 + (
+                            CAST(hourly_rate_lines.segment_label_numeric AS DOUBLE) / 100.0
+                        )
+                    )
+                    * (
+                        CAST(
+                            payment_calendar.sundays_in_month
+                            + payment_calendar.weekday_holidays_excl_carnival
+                        AS DOUBLE)
+                        / CAST(payment_calendar.mon_sat_workdays AS DOUBLE)
+                    )
+                )
+            END AS DECIMAL(18, 4)
+        ) AS amount_dsr_on_overtime,
+        CAST(
+            CASE
+                WHEN hourly_rate_lines.amount_balance_base IS NULL
+                    THEN NULL
+                WHEN hourly_rate_lines.is_closed
+                    AND hourly_rate_lines.segment_label_numeric IN (50, 60)
+                    AND payment_calendar.mon_sat_workdays IS NOT NULL
+                    AND payment_calendar.mon_sat_workdays <> 0
+                    THEN (
+                        hourly_rate_lines.amount_balance_base
+                        * (
+                            1.0 + (
+                                CAST(hourly_rate_lines.segment_label_numeric AS DOUBLE) / 100.0
+                            )
+                        )
+                    )
+                    * (
+                        1.0 + (
+                            CAST(
+                                payment_calendar.sundays_in_month
+                                + payment_calendar.weekday_holidays_excl_carnival
+                            AS DOUBLE)
+                            / CAST(payment_calendar.mon_sat_workdays AS DOUBLE)
+                        )
+                    )
+                WHEN hourly_rate_lines.is_closed
+                    AND hourly_rate_lines.segment_label_numeric IN (50, 60)
+                    THEN NULL
+                ELSE hourly_rate_lines.amount_balance_base
+            END AS DECIMAL(18, 4)
+        ) AS amount_overtime_realized_total
+    FROM
+        hours_bank_lines_with_hourly_rate AS hourly_rate_lines
+    LEFT JOIN
+        month_payment_calendar AS payment_calendar
+            ON payment_calendar.dt_payment_month = CAST(
+                ADD_MONTHS(hourly_rate_lines.dt_reference_month, 1) AS DATE
+            )
 )
 SELECT
     MD5(CONCAT_WS(
@@ -227,14 +381,20 @@ SELECT
     hours_bank_cost.person_number,
     CAST(hours_bank_cost.minutes_balance_rule_raw AS BIGINT) AS minutes_balance_rule,
     hours_bank_cost.hourly_rate_applied,
+    hours_bank_cost.premium_pct,
+    hours_bank_cost.amount_balance_base,
     hours_bank_cost.estimated_balance_cost_amount,
+    hours_bank_cost.amount_dsr_on_overtime,
+    hours_bank_cost.amount_overtime_realized_total,
+    hours_bank_cost.is_in_overtime_realized,
     hours_bank_cost.is_closed,
+    hours_bank_cost.dt_reference_month,
     hours_bank_cost.dt_hours_bank_balanced,
     hours_bank_cost.dt_hourly_rate_segment_started,
     hours_bank_cost.dt_hourly_rate_segment_ended,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
-    hours_bank_lines_with_hourly_rate AS hours_bank_cost
+    hours_bank_lines_with_realized_cost AS hours_bank_cost
 INNER JOIN
     dw_public.dim_date AS balance_date
         ON balance_date.date = hours_bank_cost.dt_hours_bank_balanced

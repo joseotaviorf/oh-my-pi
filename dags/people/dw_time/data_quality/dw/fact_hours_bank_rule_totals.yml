@@ -51,3 +51,25 @@ column_level_validations:
   minutes_balance_rule:
     is_complete:
       severity_level: Error
+  dt_reference_month:
+    is_complete:
+      severity_level: Error
+  is_in_overtime_realized:
+    is_complete:
+      severity_level: Error
+  overtime_realized_total_matches_premium_plus_dsr:
+    custom:
+      # Closed overtime rows: amount_overtime_realized_total must equal premium plus proportional DSR.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_time.fact_hours_bank_rule_totals
+         WHERE is_in_overtime_realized = TRUE
+           AND amount_overtime_realized_total IS NOT NULL
+           AND estimated_balance_cost_amount IS NOT NULL
+           AND amount_dsr_on_overtime IS NOT NULL
+           AND ABS(
+             amount_overtime_realized_total
+             - (estimated_balance_cost_amount + amount_dsr_on_overtime)
+           ) > 0.01
+        ) = 0
+      severity_level: Error

@@ -99,6 +99,22 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 
 * **Balance cost overlay** : Indicative cost multiplies bank minutes by the hourly rate whose window covers the balance date.
 
+* **Estimated realized overtime cost (DBP-1515)** : For closed monthly balances on 50% or 60% overtime segments, `fact_hours_bank_rule_totals` exposes premium, DSR reflection, and total realized cost. Amounts are **estimates for analytics**, not payroll-paid values. Attribute them to **`dt_reference_month`** (calendar month of the balance date — the work month), not to the payroll payment month.
+
+  **Premium** (`estimated_balance_cost_amount` on overtime rows): `(minutes / 60) × hourly_rate_applied × (1 + premium_pct/100)`, where `hourly_rate_applied` comes from Oitchau `employee_costs` via `fact_employee_hourly_cost_windows`.
+
+  **DSR on overtime** (`amount_dsr_on_overtime`): proportional reflection on the premium, using the **payment month** calendar (`ADD_MONTHS(dt_reference_month, 1)`) from `dw_public.dim_date`:
+
+  ```
+  DSR = premium × (sundays + weekday_holidays_excl_carnival) / mon_sat_workdays
+  ```
+
+  - **Sundays** in the payment month (`week_day = 0`).
+  - **Weekday holidays** (`week_day` 1–5, `is_brz_holiday = 'Holiday'`), **excluding Carnival** (`br_holiday_name` containing `carnival`) because facultative carnival days are often treated differently in payroll.
+  - **Mon–Sat workdays** (`week_day` 1–6, not a national holiday) as the denominator — a Mon–Sat schedule proxy; per-employee weekly schedule (Mon–Fri vs Mon–Sat) is not yet applied row by row.
+
+  **Total** (`amount_overtime_realized_total`): `premium + amount_dsr_on_overtime`.
+
 * **Absence catalog line** : Each row is one absence category with descriptive label, ceiling on duration, paid-leave treatment, and performance-protection tagging for qualifying leave types under company policies.
 
 * **Absence submission line** : Each row reflects one PIN absence submission with flags for approval, withdrawal, validity, and “in effect today” planning use.
@@ -111,7 +127,14 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 
 ## Attention and limitations
 
-* **Product vs payroll** : Costs and rates shown here are estimates for analysis only, payroll and finance systems decide actual pay.
+* **Product vs payroll (folha)** : Costs and rates in `dw_time` are **estimates for analysis only**. **Oracle HCM (PIN)** is the HR system of record (person, assignment, compensation context). **Payroll processing (folha de pagamento)** is a **separate system** that calculates and pays earnings (verbas such as overtime premium and DSR). Only folha exports and bank payments are authoritative; lake columns must not be used as payroll truth.
+
+* **Realized overtime estimate — known gaps** :
+  * **Hourly rate** comes from Oitchau, not from folha; it may lag collective agreements (dissídio) or differ from the rate folha uses in the payment month.
+  * **DSR** uses a calendar-based Mon–Sat proxy, not the employee’s actual weekly schedule from Oitchau/PIN nor folha’s internal “Referência” factor (verba 322).
+  * **Carnival** facultative holidays are excluded from the DSR numerator; folha may still apply simplified rules in some months (e.g. premium ÷ 6).
+  * **Payment timing** : reconcile money by `dt_reference_month` (work month); folha spreadsheets often label rows by **payment month** (typically work month + 1).
+  * A **folha integration** (paid amounts per verba and period) is required for exact reconciliation; until then, treat `amount_overtime_realized_total` as directional.
 
 * **Hourly-bank rule labels** : Bucket keys occasionally fail to resolve to the rule catalog when formatting diverges; the fact still exposes the bucket key for investigation while the rule key may appear empty.
 
@@ -155,15 +178,18 @@ LIMIT 100
 
 ### Analytical Snapshot (Fact + All Related Dims)
 
-**Question:** For last month's balance dates, how do minutes and indicative cost break down by rule segment labels?
+**Question:** For last month's closed balances, what is **estimated** realized overtime cost by work month and segment? (See [Estimated realized overtime cost](#core-features-and-business-logic) and [limitations](#attention-and-limitations).)
 
 ```sql
 SELECT
     bal.person_number,
-    bal.dt_hours_bank_balanced,
+    bal.dt_reference_month,
     bal.minutes_balance_rule,
     bal.hourly_rate_applied,
-    bal.estimated_balance_cost_amount,
+    bal.premium_pct,
+    bal.estimated_balance_cost_amount AS amount_overtime_premium,
+    bal.amount_dsr_on_overtime,
+    bal.amount_overtime_realized_total,
     rules.segment_label,
     rules.group_name
 FROM
@@ -173,8 +199,8 @@ LEFT JOIN
         ON bal.sk_hours_bank_rule = rules.sk_hours_bank_rule
 WHERE
     bal.is_closed = TRUE
-    AND bal.dt_hours_bank_balanced BETWEEN ADD_MONTHS(CURRENT_DATE(), -1)
-        AND DATE_SUB(CURRENT_DATE(), 1)
+    AND bal.is_in_overtime_realized = TRUE
+    AND bal.dt_reference_month = DATE_TRUNC('month', ADD_MONTHS(CURRENT_DATE(), -1))
 LIMIT 100
 ```
 

@@ -9,7 +9,8 @@ dag:
       (hours-bank balances, operational request lines, hourly cost windows) and Oracle HCM PIN absence models
       (dim_absence_type, fact_absence_requests, fact_vacation_balances). Dimensions include hours-bank rule slices,
       request subtypes, and absence type reference; facts expose open and closed balances, approval workflows,
-      vacation balances, and optional estimated cost on fact_hours_bank_rule_totals.
+      vacation balances, and estimated realized overtime cost on fact_hours_bank_rule_totals (dt_reference_month,
+      proportional DSR from dim_date; folha-paid amounts require a separate payroll integration).
 
 workflow:
   type: query_delta

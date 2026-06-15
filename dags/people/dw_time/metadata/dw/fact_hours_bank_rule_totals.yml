@@ -3,7 +3,20 @@ database_name: dw_time
 table_name: fact_hours_bank_rule_totals
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Hours-bank balances from the workforce time integration and the monthly close snapshot, split by rule or bucket that holds minutes for each employee on a calendar day. Grain: one row per employee (PIN person number) × balance date × rule key. Summing minutes_balance_rule for the same person and date gives total minutes across buckets shown in that balance snapshot; slice by rule for workforce or payroll support analytics. Population: employees who exist in the time product whose Oitchau externalId (id_external in clean) matches an Oracle HCM person_number in dw_people.dim_employee. People without a match do not appear. Reporting: filter is_closed = true for official monthly close balances and is_closed = false for current period daily balances that can still change after future adjustments. Closed history comes from the monthly close clean table; open balances come from the daily clean table only after the latest closed balance date per employee. Join dw_people.dim_employee on sk_employee or person_number for profile and hierarchy; join sk_balance_date or dt_hours_bank_balanced to dw_public.dim_date for calendars. Join sk_hours_bank_rule to dw_time.dim_hours_bank_rule for readable rule labels (null sk when the fact key has no dimension row, for example legacy or literal keys). Hourly rate and estimated cost are denormalized from dw_time.fact_employee_hourly_cost_windows when the balance date falls inside the rate window (open-ended windows use a null end date). Cost segments are loaded from datalake_oitchau_clean.employee_costs via the oitchau_api ingestion path."
+description: |
+  Hours-bank balances from the workforce time integration and the monthly close snapshot, split by rule or bucket that
+  holds minutes for each employee on a calendar day. Grain: one row per employee (PIN person number) × balance date ×
+  rule key. Summing minutes_balance_rule for the same person and date gives total minutes across buckets shown in that
+  balance snapshot; slice by rule for workforce or payroll support analytics.
+
+  Overtime realized cost (DBP-1515): for closed rows on segments 50% or 60%, amount_overtime_realized_total is an
+  **estimate** of premium plus DSR reflection for analytics. Attribute to dt_reference_month (work month). Oracle HCM
+  (PIN) is the HR source; **payroll (folha)** is a separate system and is authoritative for paid amounts — lake values
+  are not payroll truth until a folha integration exists.
+
+  Population: employees who exist in the time product whose Oitchau externalId (id_external in clean) matches an Oracle
+  HCM person_number in dw_people.dim_employee. Reporting: filter is_closed = true for official monthly close balances.
+  Join dw_people.dim_employee and dim_hours_bank_rule for labels and segment mapping.
 columns:
   sk_hours_bank_rule_total:
     description: "Surrogate key for one grain row (employee, balance date, rule key). Computed as MD5 of the concatenated natural key components. Used for deduplication and fact table joins within this mart."
@@ -54,10 +67,45 @@ columns:
     lineage:
       - datalake_oitchau_clean.employee_costs.hourly_rate_amount
       - dw_time.fact_employee_hourly_cost_windows.hourly_rate_amount
+  premium_pct:
+    description: |
+      Overtime premium percentage from dim_hours_bank_rule.segment_label when the segment is 50 or 60 (for example 50
+      for H EXTRAS 50%). Null for non-overtime buckets.
+    lineage:
+      - dw_time.dim_hours_bank_rule.segment_label
+  amount_balance_base:
+    description: |
+      Base labor value before overtime premium: (minutes_balance_rule / 60) × hourly_rate_applied. Null when
+      hourly_rate_applied is null.
   estimated_balance_cost_amount:
-    description: "Approximate monetary value of minutes_balance_rule at hourly_rate_applied (minutes divided by 60 times rate). Null when hourly_rate_applied is null. For management estimates only; official payroll remains downstream systems."
+    description: |
+      Indicative monetary value of the balance row. For closed overtime segments (50% or 60%), equals the estimated
+      premium (base × (1 + premium_pct/100)) using Oitchau hourly rate — analogous to folha verbas 11D or 13C but not
+      sourced from payroll. For other segments, equals amount_balance_base. Null when hourly_rate_applied is null. For
+      premium plus DSR estimate, use amount_overtime_realized_total.
+  amount_dsr_on_overtime:
+    description: |
+      Estimated DSR reflection on overtime premium for closed rows on segments 50 or 60. Computed as premium ×
+      (sundays + weekday_holidays_excl_carnival) / mon_sat_workdays on the payment month calendar (ADD_MONTHS of
+      dt_reference_month) from dw_public.dim_date. Carnival facultative holidays are excluded from the numerator. Null
+      for open balances and non-overtime segments. Folha verba 322 is the authoritative paid DSR; this column is an
+      analytics proxy only.
+  amount_overtime_realized_total:
+    description: |
+      Estimated total realized overtime for closed rows on segments 50 or 60: premium plus amount_dsr_on_overtime.
+      Directional substitute for folha totals (e.g. verbas 11D + 322) when grouped by person_number and
+      dt_reference_month; exact reconciliation requires payroll system integration. For other rows, equals
+      amount_balance_base.
+  is_in_overtime_realized:
+    description: |
+      TRUE when the row is from a monthly close snapshot (is_closed) on a 50% or 60% overtime segment. Use with
+      dt_reference_month for dashboard realized overtime filters.
   is_closed:
     description: "True when the row comes from the official monthly close snapshot (validated balance); false when the row comes from the daily balance table and can still change after future adjustments."
+  dt_reference_month:
+    description: |
+      First calendar day of the work month for the balance snapshot (month of dt_hours_bank_balanced). Use this column
+      — not the folha payment month — when grouping estimated realized overtime for analytics.
   dt_hours_bank_balanced:
     description: "Calendar date of the hours-bank snapshot (source column dt_balanced)."
     lineage:
