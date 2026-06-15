@@ -6,7 +6,7 @@ Schema definitions: `packages/bietlejuice-compiler/scripts/services/metadata_fil
 
 | Scope | Used for | Command |
 |-------|----------|---------|
-| **User scope** | PLAN audit — Gates A/B on full domain / owner / table | `make audit-fair-metadata-scope domain=…` |
+| **User scope** | PLAN audit — Gates A/B/C per [`SKILL.md`](../SKILL.md) | `make audit-fair-metadata-scope domain=…` |
 | **PR diff** | Woodpecker CI on changed files only | `make validate-fair-metadata` |
 
 ---

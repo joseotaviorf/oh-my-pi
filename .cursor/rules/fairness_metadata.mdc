@@ -13,7 +13,7 @@ Governance YAML under `dags/**/metadata/` feeds **fairness assessment** and down
 |-----------------|------------------|------|
 | **PR / authoring** (table may not exist yet) | Substantive **column** descriptions (F2-02) on clean+ | `make validate-fair-metadata` — **only on clean+ metadata changed vs `origin/master`** |
 | **PR / authoring** (table may not exist yet) | Owner, domain, table/column min length, YAML shape | `make validate-metadata-files-content` (Yamale) |
-| **Scope audit** (repo folder / owner / table) | Gate A owners + Gate B F2-02 on **full user-requested inventory** | `make audit-fair-metadata-scope` — see `fair-metadata/SKILL.md`; **`--domain` = repo folder basename** (not YAML `domain:` allowlist) — see `fair-metadata/reference/domain_disambiguation.md` |
+| **Scope audit** (repo folder / owner / table) | Gates A/B/C (agent scope audit) | `make audit-fair-metadata-scope` — see `fair-metadata/SKILL.md`; **`--domain` = repo folder basename** (not YAML `domain:` allowlist) — see `fair-metadata/reference/domain_disambiguation.md` |
 | **PR / authoring** | Metadata `columns` ↔ paired SQL output (sqlglot) | `make validate-lineage-consistency` (Woodpecker: `validate-lineage-consistency`) |
 | **After first deploy** | Documented columns ↔ **physical** schema | Production **I1-01** in `enrich_fairness_assessment` (`columns_metastore` snapshot) |
 

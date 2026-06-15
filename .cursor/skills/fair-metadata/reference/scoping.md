@@ -1,6 +1,6 @@
 # Scoping FAIR audits and remediation
 
-**Scope = exactly what the user asked for.** Build a **closed inventory** of metadata YAML paths, then run Gates A and B on **every file in that inventory**.
+**Scope = exactly what the user asked for.** Build a **closed inventory** of metadata YAML paths, then run Gates A/B/C per [`SKILL.md`](../SKILL.md) on **every file in that inventory**.
 
 Do **not** substitute PR diff, CI-changed files, or BugBot comment paths for scope.
 
@@ -108,7 +108,7 @@ CLI: `--dag ${DOMAIN}/${DAG}`
 
 | Concept | Meaning |
 |---------|---------|
-| **User scope** | Full inventory for Gates A/B — repo folder, YAML `domain:`, owner, table, or DAG |
+| **User scope** | Full inventory for Gates A/B/C — repo folder, YAML `domain:`, owner, table, or DAG |
 | **PR diff** | Files changed vs `origin/master` — Woodpecker `validate-fair-metadata` only |
 | **EXECUTE batch** | Max ~10 tables per PR — slice from scope inventory |
 
