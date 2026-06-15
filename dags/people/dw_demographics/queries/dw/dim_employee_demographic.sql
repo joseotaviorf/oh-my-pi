@@ -10,23 +10,49 @@ WITH person_keys AS (
       AND im.assignment_type IN ('E', 'C')
       AND NOT im.is_user_test
 ),
-ethnicity_primary AS (
+ethnicity_primary_ranked AS (
     SELECT
       id_person,
       legislation_code,
-      ethnicity_code
-    FROM
-      datalake_pin_core_clean.ethnicity
-    WHERE
-      is_primary
-    QUALIFY
+      ethnicity_code,
       ROW_NUMBER() OVER (
         PARTITION BY
           id_person,
           legislation_code
         ORDER BY
           ts_updated DESC
-      ) = 1
+      ) AS rn
+    FROM
+      datalake_pin_core_clean.ethnicity
+    WHERE
+      is_primary
+),
+ethnicity_primary AS (
+    SELECT
+      id_person,
+      legislation_code,
+      ethnicity_code
+    FROM
+      ethnicity_primary_ranked
+    WHERE
+      rn = 1
+),
+religion_primary_ranked AS (
+    SELECT
+      id_person,
+      legislation_code,
+      religion_code,
+      ROW_NUMBER() OVER (
+        PARTITION BY
+          id_person,
+          legislation_code
+        ORDER BY
+          ts_updated DESC
+      ) AS rn
+    FROM
+      datalake_pin_core_clean.religion
+    WHERE
+      is_primary
 ),
 religion_primary AS (
     SELECT
@@ -34,23 +60,22 @@ religion_primary AS (
       legislation_code,
       religion_code
     FROM
-      datalake_pin_core_clean.religion
+      religion_primary_ranked
     WHERE
-      is_primary
-    QUALIFY
-      ROW_NUMBER() OVER (
-        PARTITION BY
-          id_person,
-          legislation_code
-        ORDER BY
-          ts_updated DESC
-      ) = 1
+      rn = 1
 ),
-lookup_fnd AS (
+lookup_fnd_ranked AS (
     SELECT
       lookup_code,
       meaning,
-      lookup_type
+      lookup_type,
+      ROW_NUMBER() OVER (
+        PARTITION BY
+          lookup_type,
+          lookup_code
+        ORDER BY
+          ts_updated DESC
+      ) AS rn
     FROM
       datalake_pin_core_clean.foundation_lookup_value
     WHERE
@@ -68,14 +93,16 @@ lookup_fnd AS (
           AND is_enabled = TRUE
         )
       )
-    QUALIFY
-      ROW_NUMBER() OVER (
-        PARTITION BY
-          lookup_type,
-          lookup_code
-        ORDER BY
-          ts_updated DESC
-      ) = 1
+),
+lookup_fnd AS (
+    SELECT
+      lookup_code,
+      meaning,
+      lookup_type
+    FROM
+      lookup_fnd_ranked
+    WHERE
+      rn = 1
 ),
 pl_periods AS (
     SELECT
@@ -100,6 +127,7 @@ pl_periods AS (
     INNER JOIN
       person_keys AS pk
         ON pk.id_person = pl.id_person
+        AND pk.legislation_code = pl.legislation_code
     LEFT JOIN
       ethnicity_primary AS eth
         ON eth.id_person = pl.id_person
@@ -134,6 +162,7 @@ missing_people_legislative AS (
           datalake_pin_core_clean.people_legislative AS pl
         WHERE
           pl.id_person = pk.id_person
+          AND pl.legislation_code = pk.legislation_code
       )
 ),
 pl_periods_all AS (

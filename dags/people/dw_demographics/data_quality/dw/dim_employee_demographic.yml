@@ -16,6 +16,19 @@ column_level_validations:
   sk_employee:
     is_complete:
       severity_level: Error
+  single_current_record_per_employee:
+    custom:
+      # Exactly one current demographic record per employee: legislation pinning must
+      # prevent SCD2 fan-out across multiple legislation_code values for the same person.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT sk_employee
+          FROM dw_demographics.dim_employee_demographic
+          WHERE is_current = TRUE
+          GROUP BY sk_employee
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
   person_number:
     has_null_count:
       less_than_or_equal_to: 1

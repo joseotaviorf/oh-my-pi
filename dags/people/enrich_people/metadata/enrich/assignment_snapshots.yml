@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.id_business_unit
   id_job:
-    description: Job identifier.
+    description: Oracle HCM job position identifier for the assignment on dt_reference. Use to join job_with_salary_table or dw_compensation.dim_job for role title, band, and compensation context effective on the snapshot date.
     lineage:
       - datalake_pin_core_clean.all_assignments.id_job
   sk_job_version:
@@ -179,7 +179,7 @@ columns:
     lineage:
       - datalake_gsheets_people_clean.layoffs.is_layoff
   is_monthly_snapshot:
-    description: True when dt_reference is the last day of the month, the most recent day (current date), or the assignment's termination date. The termination-date row guarantees a monthly snapshot exists for the month an employee left, even when they were terminated mid-month.
+    description: True when dt_reference is the last calendar day of the month (month-end closing) or the current date (the in-progress month's partial snapshot, matching the legacy base_fotografias behavior). Each closed month therefore has exactly one monthly snapshot per assignment, and the current month is represented by the current-date snapshot. Employees terminated mid-month still appear on their termination month-end (or the current-date snapshot if terminated in the in-progress month) because the reference-date series extends to the last day of the termination month, capped at the current date.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
