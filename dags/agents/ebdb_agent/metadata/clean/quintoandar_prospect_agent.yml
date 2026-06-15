@@ -3,7 +3,9 @@ database_name: datalake_ebdb_clean
 table_name: quintoandar_prospect_agent
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
-description: Prospect details for QuintoAndar agents, including licensing, interests, availability, experience, referral data, and operating regions.
+description: |
+  Prospect details for QuintoAndar agents, including licensing, CRECI validation reference,
+  interests, availability, experience, referral data, and operating regions.
 columns:
   id_prospect_agent:
     lineage:
@@ -12,11 +14,15 @@ columns:
   id_primary_operating_region:
     lineage:
       - datalake_ebdb_raw.QuintoAndarProspectAgent.primary_operating_region_id
-    description: Identifier of the prospect agent primary operating region.
+    description: EBDB region id where the prospect declared they primarily operate.
   id_parent_operating_region:
     lineage:
       - datalake_ebdb_raw.QuintoAndarProspectAgent.parent_operating_region_id
     description: Identifier of the parent operating region for the primary region.
+  uuid_creci_validation:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.creci_validation_uuid
+    description: UUID linking the prospect to a CRECI validation record in creci_validation.
   primary_operating_region_type:
     lineage:
       - datalake_ebdb_raw.QuintoAndarProspectAgent.primary_operating_region_type

@@ -2,6 +2,7 @@ SELECT
     prospect_agent_id AS id_prospect_agent,
     primary_operating_region_id AS id_primary_operating_region,
     parent_operating_region_id AS id_parent_operating_region,
+    creci_validation_uuid AS uuid_creci_validation,
     primary_operating_region_type,
     parent_operating_region_type,
     IF(TRIM(referral_code) = '', NULL, referral_code) AS referral_code,
