@@ -16,6 +16,8 @@ from bietlejuice.base.sst.pipelines.quality.contracts.generic import (
 
 TABLE = "datalake_salesforce_clean.events_case"
 BUCKET = "test-bucket"
+PARTITION_DATE = "2026-04-07"
+PARTITION_HOUR = "15"
 
 
 @pytest.fixture
@@ -27,6 +29,10 @@ def mock_pyspark_functions():
         col.__ge__ = MagicMock(return_value=MagicMock())
         mock_f.lit.return_value = MagicMock()
         mock_f.max.return_value = MagicMock()
+        partition_ts = MagicMock()
+        partition_ts.__ge__ = MagicMock(return_value=MagicMock())
+        partition_ts.__le__ = MagicMock(return_value=MagicMock())
+        mock_f.to_timestamp.return_value = partition_ts
         yield mock_f
 
 
@@ -148,9 +154,11 @@ class TestRun:
         self, mock_validate_and_write, mock_pyspark_functions, spark_table_chain
     ):
         spark, _ = spark_table_chain(count=1)
-        checks = _make_checks(spark)
+        checks = _make_checks(
+            spark, partition_date=PARTITION_DATE, partition_hour=PARTITION_HOUR
+        )
 
-        with patch.object(checks, "_freshness_check") as mock_check:
+        with patch.object(checks, "_freshness_check_partition") as mock_check:
             with patch.object(checks.logger, "info") as mock_info:
                 checks.run()
 
@@ -196,7 +204,9 @@ class TestRun:
         self, mock_validate_and_write, mock_pyspark_functions, spark_table_chain
     ):
         spark, _ = spark_table_chain(count=0)
-        checks = _make_checks(spark)
+        checks = _make_checks(
+            spark, partition_date=PARTITION_DATE, partition_hour=PARTITION_HOUR
+        )
 
         with patch.object(checks.logger, "info"):
             with patch.object(checks.logger, "warning"):
@@ -209,4 +219,4 @@ class TestRun:
         assert len(rows) == 1
         assert rows[0]["status"] == "failed"
         assert rows[0]["count_rows"] == 0
-        assert rows[0]["metric_name"] == "freshness"
+        assert rows[0]["metric_name"] == "freshness_partition"

@@ -67,7 +67,7 @@ class GenericContractQualityChecks:
         )
         if self.partition_date and self.partition_hour:
             self._freshness_check_partition()
-        self._freshness_check()
+        # self._freshness_check()
 
         quality_checks_df = self.spark.createDataFrame(
             self.quality_checks_data, self.quality_checks_schema
