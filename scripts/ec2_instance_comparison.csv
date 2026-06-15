@@ -1,0 +1,989 @@
+Name,API Name,CoreMark Score,Compute Family,FFmpeg FPS,Instance Memory,Memory Speed,vCPUs,Clock Speed(GHz),Instance Storage,Network Performance,On Demand,Linux Reserved cost,Linux Spot Average cost,EMR cost
+C6GD Medium,c6gd.medium,"19,098.549",Compute optimized,,2 GiB,,1 vCPUs,2.5 GHz,59 GB NVMe SSD,Up to 10 Gigabit,$0.0384 hourly,$0.0242 hourly,$0.0105 hourly,
+C6GN Medium,c6gn.medium,"19,136.314",Compute optimized,,2 GiB,,1 vCPUs,2.5 GHz,EBS only,Up to 16 Gigabit,$0.0432 hourly,$0.0273 hourly,$0.0119 hourly,
+M6G Medium,m6g.medium,"19,256.692",General purpose,,4 GiB,,1 vCPUs,,EBS only,Up to 10 Gigabit,$0.0385 hourly,$0.0241 hourly,$0.0144 hourly,
+C6G Medium,c6g.medium,"19,743.337",Compute optimized,,2 GiB,,1 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.034 hourly,$0.0214 hourly,$0.0089 hourly,
+R6GD Medium,r6gd.medium,"19,801.98",Memory optimized,6.8 fps,8 GiB,,1 vCPUs,2.5 GHz,59 GB NVMe SSD,Up to 10 Gigabit,$0.0576 hourly,$0.0363 hourly,$0.0177 hourly,
+M6GD Medium,m6gd.medium,"19,811.134",General purpose,,4 GiB,,1 vCPUs,2.5 GHz,59 GB NVMe SSD,Up to 10 Gigabit,$0.0452 hourly,$0.0285 hourly,$0.0149 hourly,
+R6G Medium,r6g.medium,"19,841.27",Memory optimized,7.0 fps,8 GiB,,1 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.0504 hourly,$0.0318 hourly,$0.014 hourly,
+M7GD Medium,m7gd.medium,"24,319.066",General purpose,,4 GiB,,1 vCPUs,2.5 GHz,59 GB NVMe SSD,Up to 12.5 Gigabit,$0.0534 hourly,$0.0336 hourly,$0.0175 hourly,
+C7G Medium,c7g.medium,"24,828.271",Compute optimized,,2 GiB,,1 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0363 hourly,$0.0239 hourly,$0.0129 hourly,
+C7GD Medium,c7gd.medium,"24,917.461",Compute optimized,,2 GiB,,1 vCPUs,2.5 GHz,59 GB NVMe SSD,Up to 12.5 Gigabit,$0.0454 hourly,$0.0286 hourly,$0.0153 hourly,
+M7G Medium,m7g.medium,"25,521.055",General purpose,,4 GiB,,1 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0408 hourly,$0.027 hourly,$0.0177 hourly,
+R7GD Medium,r7gd.medium,"25,953.802",Memory optimized,10.0 fps,8 GiB,,1 vCPUs,2.5 GHz,59 GB NVMe SSD,Up to 12.5 Gigabit,$0.068 hourly,$0.0428 hourly,$0.0186 hourly,
+M5AD Large,m5ad.large,"25,994.281",General purpose,9.7 fps,8 GiB,2667 MT/s,2 vCPUs,2.5 GHz,75 GB NVMe SSD,Up to 10 Gigabit,$0.103 hourly,$0.065 hourly,$0.0455 hourly,
+R5A Large,r5a.large,"26,305.406",Memory optimized,9.6 fps,16 GiB,3200 MT/s,2 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.113 hourly,$0.071 hourly,$0.0482 hourly,
+R7G Medium,r7g.medium,"26,471.367",Memory optimized,10.0 fps,8 GiB,,1 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0536 hourly,$0.0354 hourly,$0.0164 hourly,
+M5A Large,m5a.large,"26,516.407",General purpose,9.6 fps,8 GiB,3200 MT/s,2 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.086 hourly,$0.054 hourly,$0.0385 hourly,
+R5AD Large,r5ad.large,"26,638.253",Memory optimized,9.6 fps,16 GiB,3200 MT/s,2 vCPUs,2.5 GHz,75 GB NVMe SSD,Up to 10 Gigabit,$0.131 hourly,$0.083 hourly,$0.0521 hourly,
+R5D Large,r5d.large,"28,203.441",Memory optimized,11.0 fps,16 GiB,3200 MT/s,2 vCPUs,3.1 GHz,75 GB NVMe SSD,Up to 10 Gigabit,$0.144 hourly,$0.091 hourly,$0.0781 hourly,
+M5 General Purpose Large,m5.large,"28,469.751",General purpose,12.0 fps,8 GiB,3200 MT/s,2 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.096 hourly,$0.06 hourly,$0.0405 hourly,
+M5 General Purpose Large,m5d.large,"28,933.79",General purpose,10.0 fps,8 GiB,2666 MT/s,2 vCPUs,3.1 GHz,75 GB NVMe SSD,Up to 10 Gigabit,$0.113 hourly,$0.071 hourly,$0.0706 hourly,
+R5 Large,r5.large,"29,155.936",Memory optimized,11.0 fps,16 GiB,2666 MT/s,2 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.126 hourly,$0.079 hourly,$0.0414 hourly,
+C8GN Medium,c8gn.medium,"29,202.765",Compute optimized,,2 GiB,,1 vCPUs,2.8 GHz,EBS only,Up to 25 Gigabit,$0.0593 hourly,,$0.023 hourly,
+M8G Medium,m8g.medium,"29,431.241",General purpose,,4 GiB,,1 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0449 hourly,$0.0297 hourly,$0.0141 hourly,
+C8GB Medium,c8gb.medium,"29,620.853",Compute optimized,,2 GiB,,1 vCPUs,2.8 GHz,EBS only,Up to 16.66 Gigabit,$0.0593 hourly,,$0.0164 hourly,
+C8G Medium,c8g.medium,"30,161.363",Compute optimized,,2 GiB,,1 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0399 hourly,$0.0263 hourly,$0.0131 hourly,
+R5N Large,r5n.large,"30,237.363",Memory optimized,12.0 fps,16 GiB,3200 MT/s,2 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$0.149 hourly,$0.094 hourly,$0.0482 hourly,
+M8GB Medium,m8gb.medium,"30,250.321",General purpose,,4 GiB,,1 vCPUs,2.8 GHz,EBS only,Up to 16.66 Gigabit,$0.0728 hourly,,$0.0201 hourly,
+M8GN Medium,m8gn.medium,"30,369.752",General purpose,,4 GiB,,1 vCPUs,2.8 GHz,EBS only,Up to 25 Gigabit,$0.0728 hourly,,$0.0193 hourly,
+R8G Medium,r8g.medium,"30,926.241",Memory optimized,12.0 fps,8 GiB,,1 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0589 hourly,$0.039 hourly,$0.0124 hourly,
+C5N Large,c5n.large,"31,365.989",Compute optimized,12.0 fps,5.25 GiB,2666 MT/s,2 vCPUs,3 GHz,EBS only,Up to 25 Gigabit,$0.108 hourly,$0.068 hourly,$0.0387 hourly,
+M6IN Large,m6in.large,"32,420.165",General purpose,14.0 fps,8 GiB,3200 MT/s,2 vCPUs,3.5 GHz,EBS only,Up to 25 Gigabit,$0.1392 hourly,$0.0877 hourly,$0.0481 hourly,
+M7A Medium,m7a.medium,"32,470.168",General purpose,,4 GiB,5600 MT/s,1 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.058 hourly,$0.0383 hourly,$0.0212 hourly,
+C7A Medium,c7a.medium,"32,965.222",Compute optimized,,2 GiB,4800 MT/s,1 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0513 hourly,$0.034 hourly,$0.0094 hourly,
+C5 High-CPU Large,c5.large,"33,103.448",Compute optimized,,4 GiB,3200 MT/s,2 vCPUs,3.4 GHz,EBS only,Up to 10 Gigabit,$0.085 hourly,$0.054 hourly,$0.0315 hourly,
+M6IDN Large,m6idn.large,"33,200.531",General purpose,14.0 fps,8 GiB,3200 MT/s,2 vCPUs,3.5 GHz,118 GB NVMe SSD,Up to 25 Gigabit,$0.1591 hourly,$0.1003 hourly,$0.052 hourly,
+C5 High-CPU Large,c5d.large,"33,285.255",Compute optimized,,4 GiB,2933 MT/s,2 vCPUs,3.4 GHz,50 GB NVMe SSD,Up to 10 Gigabit,$0.096 hourly,$0.06 hourly,$0.0379 hourly,
+C6IN Large,c6in.large,"33,765.247",Compute optimized,,4 GiB,3200 MT/s,2 vCPUs,3.5 GHz,EBS only,Up to 25 Gigabit,$0.1134 hourly,$0.0714 hourly,$0.0362 hourly,
+M6ID Large,m6id.large,"35,040.077",General purpose,14.0 fps,8 GiB,3200 MT/s,2 vCPUs,3.5 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1187 hourly,$0.0748 hourly,$0.0435 hourly,
+M6I Large,m6i.large,"35,055.431",General purpose,14.0 fps,8 GiB,3200 MT/s,2 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.096 hourly,$0.0635 hourly,$0.0399 hourly,
+C6I Large,c6i.large,"35,321.128",Compute optimized,,4 GiB,3200 MT/s,2 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.085 hourly,$0.0562 hourly,$0.0362 hourly,
+R7A Medium,r7a.medium,"35,377.358",Memory optimized,15.0 fps,8 GiB,4800 MT/s,1 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0761 hourly,$0.0503 hourly,$0.0218 hourly,
+R6I Large,r6i.large,"36,253.776",Memory optimized,11.0 fps,16 GiB,3200 MT/s,2 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.126 hourly,$0.0834 hourly,$0.0534 hourly,
+C5A Large,c5a.large,"37,030.18",Compute optimized,,4 GiB,2933 MT/s,2 vCPUs,3.3 GHz,EBS only,Up to 10 Gigabit,$0.077 hourly,$0.049 hourly,$0.032 hourly,
+M6G Large,m6g.large,"37,343.624",General purpose,13.0 fps,8 GiB,,2 vCPUs,,EBS only,Up to 10 Gigabit,$0.077 hourly,$0.0483 hourly,$0.0456 hourly,
+M5ZN Large,m5zn.large,"39,037.72",General purpose,14.0 fps,8 GiB,2933 MT/s,2 vCPUs,4.5 GHz,EBS only,Up to 25 Gigabit,$0.1652 hourly,$0.1041 hourly,$0.0439 hourly,
+R6GD Large,r6gd.large,"39,110.879",Memory optimized,13.0 fps,16 GiB,,2 vCPUs,2.5 GHz,118 GB NVMe SSD,Up to 10 Gigabit,$0.1152 hourly,$0.0726 hourly,$0.0487 hourly,
+R6G Large,r6g.large,"39,267.016",Memory optimized,13.0 fps,16 GiB,,2 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.1008 hourly,$0.0635 hourly,$0.0431 hourly,
+C7I Large,c7i.large,"39,481.477",Compute optimized,,4 GiB,4800 MT/s,2 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.0893 hourly,$0.059 hourly,$0.0319 hourly,
+C6GD Large,c6gd.large,"39,968.026",Compute optimized,,4 GiB,,2 vCPUs,2.5 GHz,118 GB NVMe SSD,Up to 10 Gigabit,$0.0768 hourly,$0.0484 hourly,$0.0316 hourly,
+C6GN Large,c6gn.large,"40,238.75",Compute optimized,,4 GiB,,2 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$0.0864 hourly,$0.0545 hourly,$0.0399 hourly,
+M6GD Large,m6gd.large,"40,249.547",General purpose,13.0 fps,8 GiB,,2 vCPUs,2.5 GHz,118 GB NVMe SSD,Up to 10 Gigabit,$0.0904 hourly,$0.057 hourly,$0.0487 hourly,
+C6G Large,c6g.large,"40,300.913",Compute optimized,,4 GiB,,2 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.068 hourly,$0.0428 hourly,$0.0289 hourly,
+C7I-FLEX Large,c7i-flex.large,"40,363.269",Compute optimized,,4 GiB,4800 MT/s,2 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.0848 hourly,$0.0561 hourly,$0.0339 hourly,
+M6A Large,m6a.large,"40,862.192",General purpose,17.0 fps,8 GiB,3200 MT/s,2 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.0864 hourly,$0.0572 hourly,$0.0397 hourly,
+M8A Medium,m8a.medium,"41,172.03",General purpose,,4 GiB,6400 MT/s,1 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0609 hourly,,$0.0216 hourly,
+C8A Medium,c8a.medium,"42,137.791",Compute optimized,,2 GiB,6400 MT/s,1 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0539 hourly,,$0.0127 hourly,
+R6A Large,r6a.large,"42,316.847",Memory optimized,17.0 fps,16 GiB,3200 MT/s,2 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.1134 hourly,$0.075 hourly,$0.047 hourly,
+M8IDN Large,m8idn.large,"42,614.393",General purpose,20.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 25 Gigabit,$0.1909 hourly,,$0.0759 hourly,
+C8I Large,c8i.large,"42,900.043",Compute optimized,,4 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.0937 hourly,,$0.048 hourly,
+C6A Large,c6a.large,"43,208.987",Compute optimized,,4 GiB,2933 MT/s,2 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.0765 hourly,$0.0506 hourly,$0.0296 hourly,
+M7I-FLEX Large,m7i-flex.large,"43,763.676",General purpose,16.0 fps,8 GiB,4800 MT/s,2 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0958 hourly,$0.0633 hourly,$0.0451 hourly,
+M8I Large,m8i.large,"44,021.35",General purpose,20.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.1058 hourly,,$0.0432 hourly,
+R8I Large,r8i.large,"44,023.773",Memory optimized,20.0 fps,16 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.1389 hourly,,$0.0452 hourly,
+M8I-FLEX Large,m8i-flex.large,"44,411.547",General purpose,19.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.1006 hourly,,$0.0415 hourly,
+R8A Medium,r8a.medium,"44,859.813",Memory optimized,20.0 fps,8 GiB,6400 MT/s,1 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0799 hourly,,$0.0236 hourly,
+R8IDB Large,r8idb.large,"45,325.779",Memory optimized,20.0 fps,16 GiB,7200 MT/s,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 16.66 Gigabit,$0.2345 hourly,,$0.064 hourly,
+M8IDB Large,m8idb.large,"45,736.936",General purpose,20.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 16.66 Gigabit,$0.1909 hourly,,$0.0689 hourly,
+M8IB Large,m8ib.large,"45,879.452",General purpose,20.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 16.66 Gigabit,$0.1671 hourly,,$0.0527 hourly,
+R8I-FLEX Large,r8i-flex.large,"46,481.001",Memory optimized,20.0 fps,16 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.132 hourly,,$0.0488 hourly,
+R8IDN Large,r8idn.large,"46,542.295",Memory optimized,20.0 fps,16 GiB,7200 MT/s,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 25 Gigabit,$0.2345 hourly,,$0.068 hourly,
+M7I Large,m7i.large,"46,780.89",General purpose,17.0 fps,8 GiB,5600 MT/s,2 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.1008 hourly,$0.0667 hourly,$0.0388 hourly,
+R8IN Large,r8in.large,"46,818.306",Memory optimized,20.0 fps,16 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 25 Gigabit,$0.2092 hourly,,$0.0548 hourly,
+M8INE Large,m8ine.large,"47,221.785",General purpose,21.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,3.125 Gigabit,$0.2089 hourly,,,
+M8IN Large,m8in.large,"47,225.502",General purpose,20.0 fps,8 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 25 Gigabit,$0.1671 hourly,,$0.0518 hourly,
+R8IB Large,r8ib.large,"47,553.002",Memory optimized,20.0 fps,16 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 16.66 Gigabit,$0.2092 hourly,,$0.0594 hourly,
+C8INE Large,c8ine.large,"47,630.388",Compute optimized,,4 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,3.125 Gigabit,$0.1701 hourly,,,
+R7I Large,r7i.large,"48,385.146",Memory optimized,17.0 fps,16 GiB,4800 MT/s,2 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.1323 hourly,$0.0875 hourly,$0.0515 hourly,
+C8I-FLEX Large,c8i-flex.large,"48,504.446",Compute optimized,,4 GiB,7200 MT/s,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.089 hourly,,$0.0355 hourly,
+R7G Large,r7g.large,"49,239.86",Memory optimized,19.0 fps,16 GiB,,2 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.1071 hourly,$0.0708 hourly,$0.0513 hourly,
+M7GD Large,m7gd.large,"49,443.758",General purpose,18.0 fps,8 GiB,,2 vCPUs,2.5 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1068 hourly,$0.0673 hourly,$0.0534 hourly,
+C7GD Large,c7gd.large,"50,706.725",Compute optimized,,4 GiB,,2 vCPUs,2.5 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.0907 hourly,$0.0572 hourly,$0.0438 hourly,
+M7G Large,m7g.large,"51,659.563",General purpose,19.0 fps,8 GiB,,2 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0816 hourly,$0.054 hourly,$0.0491 hourly,
+R5AD Extra Large,r5ad.xlarge,"51,880.674",Memory optimized,19.0 fps,32 GiB,2667 MT/s,4 vCPUs,2.5 GHz,150 GB NVMe SSD,Up to 10 Gigabit,$0.262 hourly,$0.165 hourly,$0.1412 hourly,$0.066 hourly
+C7G Large,c7g.large,"51,890.77",Compute optimized,,4 GiB,,2 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.0725 hourly,$0.0478 hourly,$0.0371 hourly,
+R7GD Large,r7gd.large,"52,160.306",Memory optimized,19.0 fps,16 GiB,,2 vCPUs,2.5 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1361 hourly,$0.0855 hourly,$0.0638 hourly,
+M5AD Extra Large,m5ad.xlarge,"52,335.47",General purpose,19.0 fps,16 GiB,2667 MT/s,4 vCPUs,2.5 GHz,150 GB NVMe SSD,Up to 10 Gigabit,$0.206 hourly,$0.13 hourly,$0.1042 hourly,$0.052 hourly
+M5A Extra Large,m5a.xlarge,"52,823.876",General purpose,19.0 fps,16 GiB,3200 MT/s,4 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.172 hourly,$0.108 hourly,$0.0863 hourly,$0.043 hourly
+R5A Extra Large,r5a.xlarge,"53,565.45",Memory optimized,19.0 fps,32 GiB,2667 MT/s,4 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.226 hourly,$0.142 hourly,$0.0924 hourly,$0.057 hourly
+C8G Large,c8g.large,"58,152.213",Compute optimized,,4 GiB,,2 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0798 hourly,$0.0526 hourly,$0.0354 hourly,
+R5 Extra Large,r5.xlarge,"58,306.205",Memory optimized,20.0 fps,32 GiB,2666 MT/s,4 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.252 hourly,$0.159 hourly,$0.0706 hourly,$0.063 hourly
+R5D Extra Large,r5d.xlarge,"58,662.495",Memory optimized,20.0 fps,32 GiB,2666 MT/s,4 vCPUs,3.1 GHz,150 GB NVMe SSD,Up to 10 Gigabit,$0.288 hourly,$0.181 hourly,$0.1674 hourly,$0.072 hourly
+M5 General Purpose Extra Large,m5d.xlarge,"59,020.264",General purpose,20.0 fps,16 GiB,3200 MT/s,4 vCPUs,3.1 GHz,150 GB NVMe SSD,Up to 10 Gigabit,$0.226 hourly,$0.142 hourly,$0.1353 hourly,$0.057 hourly
+M5 General Purpose Extra Large,m5.xlarge,"59,119.125",General purpose,20.0 fps,16 GiB,2666 MT/s,4 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.192 hourly,$0.121 hourly,$0.0646 hourly,$0.048 hourly
+M8GN Large,m8gn.large,"59,435.364",General purpose,22.0 fps,8 GiB,,2 vCPUs,2.8 GHz,EBS only,Up to 30 Gigabit,$0.1455 hourly,,$0.0638 hourly,
+R5N Extra Large,r5n.xlarge,"59,946.049",Memory optimized,20.0 fps,32 GiB,3200 MT/s,4 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$0.298 hourly,$0.188 hourly,$0.1535 hourly,$0.0745 hourly
+C8GB Large,c8gb.large,"60,163.947",Compute optimized,,4 GiB,,2 vCPUs,2.8 GHz,EBS only,Up to 20 Gigabit,$0.1185 hourly,,$0.056 hourly,
+C8GN Large,c8gn.large,"60,656.608",Compute optimized,,4 GiB,,2 vCPUs,2.8 GHz,EBS only,Up to 30 Gigabit,$0.1185 hourly,,$0.0487 hourly,
+M8GB Large,m8gb.large,"62,348.999",General purpose,22.0 fps,8 GiB,,2 vCPUs,2.8 GHz,EBS only,Up to 20 Gigabit,$0.1455 hourly,,$0.0696 hourly,
+M8G Large,m8g.large,"62,514.652",General purpose,22.0 fps,8 GiB,,2 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.0898 hourly,$0.0594 hourly,$0.0519 hourly,
+R8G Large,r8g.large,"63,582.896",Memory optimized,22.0 fps,16 GiB,,2 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.1178 hourly,$0.0779 hourly,$0.0433 hourly,
+C5 High-CPU Extra Large,c5d.xlarge,"63,798.397",Compute optimized,26.0 fps,8 GiB,2933 MT/s,4 vCPUs,3.4 GHz,100 GB NVMe SSD,Up to 10 Gigabit,$0.192 hourly,$0.121 hourly,$0.0755 hourly,$0.048 hourly
+R7A Large,r7a.large,"65,782.261",Memory optimized,27.0 fps,16 GiB,4800 MT/s,2 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.1522 hourly,$0.1007 hourly,$0.0545 hourly,
+M6ID Extra Large,m6id.xlarge,"65,797.59",General purpose,28.0 fps,16 GiB,3200 MT/s,4 vCPUs,3.5 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2373 hourly,$0.1495 hourly,$0.0956 hourly,$0.0593 hourly
+C5N Extra Large,c5n.xlarge,"65,832.785",Compute optimized,24.0 fps,10.5 GiB,2666 MT/s,4 vCPUs,3 GHz,EBS only,Up to 25 Gigabit,$0.216 hourly,$0.136 hourly,$0.0924 hourly,$0.054 hourly
+R6I Extra Large,r6i.xlarge,"66,126.633",Memory optimized,28.0 fps,32 GiB,3200 MT/s,4 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.252 hourly,$0.1667 hourly,$0.0986 hourly,$0.063 hourly
+M6I Extra Large,m6i.xlarge,"66,741.751",General purpose,27.0 fps,16 GiB,3200 MT/s,4 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.192 hourly,$0.127 hourly,$0.0916 hourly,$0.048 hourly
+C7A Large,c7a.large,"67,336.289",Compute optimized,,4 GiB,4800 MT/s,2 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.1026 hourly,$0.0679 hourly,$0.0316 hourly,
+M7A Large,m7a.large,"67,950.17",General purpose,27.0 fps,8 GiB,4800 MT/s,2 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.1159 hourly,$0.0767 hourly,$0.041 hourly,
+C5A Extra Large,c5a.xlarge,"68,555.759",Compute optimized,28.0 fps,8 GiB,2933 MT/s,4 vCPUs,3.3 GHz,EBS only,Up to 10 Gigabit,$0.154 hourly,$0.097 hourly,$0.0693 hourly,$0.0385 hourly
+C6IN Extra Large,c6in.xlarge,"68,678.371",Compute optimized,28.0 fps,8 GiB,3200 MT/s,4 vCPUs,3.5 GHz,EBS only,Up to 30 Gigabit,$0.2268 hourly,$0.1429 hourly,$0.0914 hourly,$0.0567 hourly
+M6IDN Extra Large,m6idn.xlarge,"68,693.114",General purpose,28.0 fps,16 GiB,3200 MT/s,4 vCPUs,3.5 GHz,237 GB NVMe SSD,Up to 30 Gigabit,$0.3182 hourly,$0.2005 hourly,$0.1641 hourly,$0.0796 hourly
+M6IN Extra Large,m6in.xlarge,"68,769.879",General purpose,28.0 fps,16 GiB,3200 MT/s,4 vCPUs,3.5 GHz,EBS only,Up to 30 Gigabit,$0.2785 hourly,$0.1754 hourly,$0.1181 hourly,$0.0696 hourly
+C6I Extra Large,c6i.xlarge,"70,311.127",Compute optimized,27.0 fps,8 GiB,3200 MT/s,4 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.17 hourly,$0.1125 hourly,$0.0693 hourly,$0.0425 hourly
+C5 High-CPU Extra Large,c5.xlarge,"72,684.323",Compute optimized,27.0 fps,8 GiB,2933 MT/s,4 vCPUs,3.4 GHz,EBS only,Up to 10 Gigabit,$0.17 hourly,$0.107 hourly,$0.077 hourly,$0.043 hourly
+M6GD Extra Large,m6gd.xlarge,"76,098.675",General purpose,26.0 fps,16 GiB,,4 vCPUs,2.5 GHz,237 GB NVMe SSD,Up to 10 Gigabit,$0.1808 hourly,$0.1139 hourly,$0.1292 hourly,$0.0452 hourly
+M6G Extra Large,m6g.xlarge,"77,002.053",General purpose,26.0 fps,16 GiB,,4 vCPUs,,EBS only,Up to 10 Gigabit,$0.154 hourly,$0.0966 hourly,$0.0683 hourly,$0.039 hourly
+C6GD Extra Large,c6gd.xlarge,"78,426.247",Compute optimized,26.0 fps,8 GiB,,4 vCPUs,2.5 GHz,237 GB NVMe SSD,Up to 10 Gigabit,$0.1536 hourly,$0.0968 hourly,$0.0675 hourly,$0.0384 hourly
+M7I-FLEX Extra Large,m7i-flex.xlarge,"78,697.555",General purpose,31.0 fps,16 GiB,4800 MT/s,4 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.1915 hourly,$0.1267 hourly,$0.0986 hourly,$0.0479 hourly
+C6GN Extra Large,c6gn.xlarge,"79,166.117",Compute optimized,26.0 fps,8 GiB,,4 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$0.1728 hourly,$0.1091 hourly,$0.0866 hourly,$0.0432 hourly
+R6A Extra Large,r6a.xlarge,"79,168.728",Memory optimized,34.0 fps,32 GiB,3200 MT/s,4 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.2268 hourly,$0.15 hourly,$0.0807 hourly,$0.0567 hourly
+R6G Extra Large,r6g.xlarge,"79,507.056",Memory optimized,26.0 fps,32 GiB,,4 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.2016 hourly,$0.127 hourly,$0.0988 hourly,$0.0504 hourly
+C6G Extra Large,c6g.xlarge,"79,512.324",Compute optimized,26.0 fps,8 GiB,,4 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.136 hourly,$0.0857 hourly,$0.0712 hourly,$0.034 hourly
+R6GD Extra Large,r6gd.xlarge,"80,488.296",Memory optimized,25.0 fps,32 GiB,,4 vCPUs,2.5 GHz,237 GB NVMe SSD,Up to 10 Gigabit,$0.2304 hourly,$0.1452 hourly,$0.147 hourly,$0.0576 hourly
+M6A Extra Large,m6a.xlarge,"80,527.455",General purpose,34.0 fps,16 GiB,3200 MT/s,4 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.1728 hourly,$0.1143 hourly,$0.0805 hourly,$0.0432 hourly
+C7I-FLEX Extra Large,c7i-flex.xlarge,"81,045.487",Compute optimized,32.0 fps,8 GiB,5600 MT/s,4 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.1696 hourly,$0.1122 hourly,$0.068 hourly,
+M5ZN Extra Large,m5zn.xlarge,"82,402.019",General purpose,28.0 fps,16 GiB,2933 MT/s,4 vCPUs,4.5 GHz,EBS only,Up to 25 Gigabit,$0.3303 hourly,$0.2081 hourly,$0.1469 hourly,$0.0826 hourly
+C6A Extra Large,c6a.xlarge,"86,157.381",Compute optimized,34.0 fps,8 GiB,2933 MT/s,4 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.153 hourly,$0.1012 hourly,$0.0665 hourly,$0.0383 hourly
+M8I Extra Large,m8i.xlarge,"88,967.972",General purpose,40.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.2117 hourly,,$0.0994 hourly,
+M7I Extra Large,m7i.xlarge,"89,171.265",General purpose,32.0 fps,16 GiB,4800 MT/s,4 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.2016 hourly,$0.1334 hourly,$0.0814 hourly,$0.0504 hourly
+R8A Large,r8a.large,"90,096.854",Memory optimized,35.0 fps,16 GiB,6400 MT/s,2 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.1598 hourly,,$0.0445 hourly,
+R8IDB Extra Large,r8idb.xlarge,"90,764.693",Memory optimized,40.0 fps,32 GiB,7200 MT/s,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 20 Gigabit,$0.4689 hourly,,$0.1716 hourly,
+M8IDN Extra Large,m8idn.xlarge,"92,219.02",General purpose,40.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 30 Gigabit,$0.3819 hourly,,$0.1614 hourly,
+C8INE Extra Large,c8ine.xlarge,"92,823.577",Compute optimized,40.0 fps,8 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,6.25 Gigabit,$0.3402 hourly,,,
+R8IDN Extra Large,r8idn.xlarge,"93,321.668",Memory optimized,40.0 fps,32 GiB,7200 MT/s,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 30 Gigabit,$0.4689 hourly,,$0.1822 hourly,
+M8IB Extra Large,m8ib.xlarge,"93,611.046",General purpose,40.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 20 Gigabit,$0.3342 hourly,,$0.1733 hourly,
+C8A Large,c8a.large,"94,265.515",Compute optimized,,4 GiB,6400 MT/s,2 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.1078 hourly,,$0.0401 hourly,
+C8I Extra Large,c8i.xlarge,"94,311.818",Compute optimized,40.0 fps,8 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.1874 hourly,,$0.1012 hourly,
+M8A Large,m8a.large,"94,347.714",General purpose,35.0 fps,8 GiB,6400 MT/s,2 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.1217 hourly,,$0.0425 hourly,
+C8I-FLEX Extra Large,c8i-flex.xlarge,"95,085.28",Compute optimized,39.0 fps,8 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.178 hourly,,$0.0746 hourly,
+R7I Extra Large,r7i.xlarge,"95,166.343",Memory optimized,35.0 fps,32 GiB,5600 MT/s,4 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.2646 hourly,$0.175 hourly,$0.0969 hourly,$0.0662 hourly
+R7GD Extra Large,r7gd.xlarge,"96,354.585",Memory optimized,38.0 fps,32 GiB,,4 vCPUs,2.5 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2722 hourly,$0.171 hourly,$0.1539 hourly,$0.0681 hourly
+R8IB Extra Large,r8ib.xlarge,"97,032.425",Memory optimized,39.0 fps,32 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 20 Gigabit,$0.4184 hourly,,$0.1715 hourly,
+M8IN Extra Large,m8in.xlarge,"97,205.346",General purpose,39.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 30 Gigabit,$0.3342 hourly,,$0.1523 hourly,
+R8IN Extra Large,r8in.xlarge,"97,292.038",Memory optimized,39.0 fps,32 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 30 Gigabit,$0.4184 hourly,,$0.1805 hourly,
+M8INE Extra Large,m8ine.xlarge,"97,331.495",General purpose,39.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,6.25 Gigabit,$0.4177 hourly,,,
+C7I Extra Large,c7i.xlarge,"97,652.277",Compute optimized,33.0 fps,8 GiB,4800 MT/s,4 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.1785 hourly,$0.1181 hourly,$0.0713 hourly,$0.0446 hourly
+M8IDB Extra Large,m8idb.xlarge,"97,719.87",General purpose,40.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 20 Gigabit,$0.3819 hourly,,$0.1545 hourly,
+R8I Extra Large,r8i.xlarge,"98,540.371",Memory optimized,39.0 fps,32 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.2778 hourly,,$0.1253 hourly,
+R8I-FLEX Extra Large,r8i-flex.xlarge,"98,871.22",Memory optimized,39.0 fps,32 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.2639 hourly,,$0.126 hourly,
+M8I-FLEX Extra Large,m8i-flex.xlarge,"99,345.972",General purpose,40.0 fps,16 GiB,7200 MT/s,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.2011 hourly,,$0.1033 hourly,
+C7G Extra Large,c7g.xlarge,"99,781.727",Compute optimized,38.0 fps,8 GiB,,4 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.145 hourly,$0.0955 hourly,$0.0662 hourly,$0.0363 hourly
+C7GD Extra Large,c7gd.xlarge,"100,483.577",Compute optimized,36.0 fps,8 GiB,,4 vCPUs,2.5 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.1814 hourly,$0.1143 hourly,$0.0933 hourly,$0.0454 hourly
+M5A Double Extra Large,m5a.2xlarge,"101,265.823",General purpose,37.0 fps,32 GiB,3200 MT/s,8 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.344 hourly,$0.217 hourly,$0.1631 hourly,$0.086 hourly
+R5AD Double Extra Large,r5ad.2xlarge,"102,362.876",Memory optimized,37.0 fps,64 GiB,2667 MT/s,8 vCPUs,2.5 GHz,300 GB NVMe SSD,Up to 10 Gigabit,$0.524 hourly,$0.33 hourly,$0.3055 hourly,$0.131 hourly
+R7G Extra Large,r7g.xlarge,"102,570.678",Memory optimized,38.0 fps,32 GiB,,4 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.2142 hourly,$0.1417 hourly,$0.0782 hourly,$0.0536 hourly
+M7GD Extra Large,m7gd.xlarge,"102,860.816",General purpose,38.0 fps,16 GiB,,4 vCPUs,2.5 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2136 hourly,$0.1345 hourly,$0.1259 hourly,$0.0534 hourly
+M7G Extra Large,m7g.xlarge,"103,066.22",General purpose,38.0 fps,16 GiB,,4 vCPUs,2.5 GHz,EBS only,Up to 12.5 Gigabit,$0.1632 hourly,$0.108 hourly,$0.0913 hourly,$0.0408 hourly
+M5AD Double Extra Large,m5ad.2xlarge,"104,302.477",General purpose,37.0 fps,32 GiB,2667 MT/s,8 vCPUs,2.5 GHz,300 GB NVMe SSD,Up to 10 Gigabit,$0.412 hourly,$0.26 hourly,$0.2944 hourly,$0.103 hourly
+R5A Double Extra Large,r5a.2xlarge,"104,404.568",Memory optimized,37.0 fps,64 GiB,3200 MT/s,8 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.452 hourly,$0.285 hourly,$0.2059 hourly,$0.113 hourly
+R5 Double Extra Large,r5.2xlarge,"109,920.308",Memory optimized,39.0 fps,64 GiB,2933 MT/s,8 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.504 hourly,$0.318 hourly,$0.1559 hourly,$0.126 hourly
+M5 General Purpose Double Extra Large,m5d.2xlarge,"112,813.763",General purpose,40.0 fps,32 GiB,2666 MT/s,8 vCPUs,3.1 GHz,300 GB NVMe SSD,Up to 10 Gigabit,$0.452 hourly,$0.285 hourly,$0.3032 hourly,$0.113 hourly
+M5 General Purpose Double Extra Large,m5.2xlarge,"115,790.997",General purpose,40.0 fps,32 GiB,2666 MT/s,8 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.384 hourly,$0.242 hourly,$0.1533 hourly,$0.096 hourly
+R5D Double Extra Large,r5d.2xlarge,"116,138.398",Memory optimized,39.0 fps,64 GiB,2933 MT/s,8 vCPUs,3.1 GHz,300 GB NVMe SSD,Up to 10 Gigabit,$0.576 hourly,$0.363 hourly,$0.3315 hourly,$0.144 hourly
+C8GB Extra Large,c8gb.xlarge,"120,681.852",Compute optimized,46.0 fps,8 GiB,,4 vCPUs,2.8 GHz,EBS only,Up to 26.66 Gigabit,$0.237 hourly,,$0.111 hourly,
+M8GB Extra Large,m8gb.xlarge,"121,479.007",General purpose,45.0 fps,16 GiB,,4 vCPUs,2.8 GHz,EBS only,Up to 26.66 Gigabit,$0.291 hourly,,$0.1531 hourly,
+R8G Extra Large,r8g.xlarge,"122,100.122",Memory optimized,46.0 fps,32 GiB,,4 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.2356 hourly,$0.1559 hourly,$0.073 hourly,$0.0589 hourly
+C8GN Extra Large,c8gn.xlarge,"122,165.381",Compute optimized,46.0 fps,8 GiB,,4 vCPUs,2.8 GHz,EBS only,Up to 40 Gigabit,$0.237 hourly,,$0.0994 hourly,
+C5N Double Extra Large,c5n.2xlarge,"122,680.57",Compute optimized,47.0 fps,21 GiB,2666 MT/s,8 vCPUs,3 GHz,EBS only,Up to 25 Gigabit,$0.432 hourly,$0.272 hourly,$0.2053 hourly,$0.108 hourly
+R5N Double Extra Large,r5n.2xlarge,"122,906.745",Memory optimized,47.0 fps,64 GiB,3200 MT/s,8 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$0.596 hourly,$0.375 hourly,$0.3336 hourly,$0.149 hourly
+M8G Extra Large,m8g.xlarge,"124,678.563",General purpose,45.0 fps,16 GiB,,4 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.1795 hourly,$0.1188 hourly,$0.0878 hourly,
+C8G Extra Large,c8g.xlarge,"125,039.075",Compute optimized,44.0 fps,8 GiB,,4 vCPUs,2.7 GHz,EBS only,Up to 12.5 Gigabit,$0.1595 hourly,$0.1051 hourly,$0.0842 hourly,
+M8GN Extra Large,m8gn.xlarge,"125,657.74",General purpose,45.0 fps,16 GiB,,4 vCPUs,2.8 GHz,EBS only,Up to 40 Gigabit,$0.291 hourly,,$0.1452 hourly,
+M7A Extra Large,m7a.xlarge,"131,219.245",General purpose,55.0 fps,16 GiB,5600 MT/s,4 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.2318 hourly,$0.1534 hourly,$0.0906 hourly,$0.058 hourly
+C5 High-CPU Double Extra Large,c5.2xlarge,"132,664.483",Compute optimized,45.0 fps,16 GiB,2933 MT/s,8 vCPUs,3.4 GHz,EBS only,Up to 10 Gigabit,$0.34 hourly,$0.214 hourly,$0.1464 hourly,$0.085 hourly
+C7A Extra Large,c7a.xlarge,"133,081.956",Compute optimized,55.0 fps,8 GiB,5600 MT/s,4 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.2053 hourly,$0.1358 hourly,$0.0753 hourly,$0.0513 hourly
+M6IDN Double Extra Large,m6idn.2xlarge,"133,701.011",General purpose,54.0 fps,32 GiB,3200 MT/s,8 vCPUs,3.5 GHz,474 GB NVMe SSD,Up to 40 Gigabit,$0.6365 hourly,$0.401 hourly,$0.4105 hourly,$0.1591 hourly
+M6ID Double Extra Large,m6id.2xlarge,"133,952.865",General purpose,56.0 fps,32 GiB,3200 MT/s,8 vCPUs,3.5 GHz,474 GB NVMe SSD,Up to 12.5 Gigabit,$0.4746 hourly,$0.299 hourly,$0.2063 hourly,$0.1187 hourly
+C5 High-CPU Double Extra Large,c5d.2xlarge,"134,986.923",Compute optimized,45.0 fps,16 GiB,2933 MT/s,8 vCPUs,3.4 GHz,200 GB NVMe SSD,Up to 10 Gigabit,$0.384 hourly,$0.242 hourly,$0.1735 hourly,$0.096 hourly
+C6IN Double Extra Large,c6in.2xlarge,"136,025.505",Compute optimized,56.0 fps,16 GiB,3200 MT/s,8 vCPUs,3.5 GHz,EBS only,Up to 40 Gigabit,$0.4536 hourly,$0.2858 hourly,$0.1653 hourly,$0.1134 hourly
+M6IN Double Extra Large,m6in.2xlarge,"136,518.771",General purpose,56.0 fps,32 GiB,3200 MT/s,8 vCPUs,3.5 GHz,EBS only,Up to 40 Gigabit,$0.5569 hourly,$0.3509 hourly,$0.2265 hourly,$0.1392 hourly
+R6I Double Extra Large,r6i.2xlarge,"136,693.721",Memory optimized,55.0 fps,64 GiB,3200 MT/s,8 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.504 hourly,$0.3334 hourly,$0.2021 hourly,$0.126 hourly
+C6I Double Extra Large,c6i.2xlarge,"136,839.855",Compute optimized,54.0 fps,16 GiB,3200 MT/s,8 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.34 hourly,$0.2249 hourly,$0.174 hourly,$0.085 hourly
+R7A Extra Large,r7a.xlarge,"136,892.539",Memory optimized,55.0 fps,32 GiB,4800 MT/s,4 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.3043 hourly,$0.2013 hourly,$0.1105 hourly,$0.0761 hourly
+M6I Double Extra Large,m6i.2xlarge,"138,822.611",General purpose,55.0 fps,32 GiB,3200 MT/s,8 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.384 hourly,$0.254 hourly,$0.1745 hourly,$0.096 hourly
+C5A Double Extra Large,c5a.2xlarge,"145,348.837",Compute optimized,54.0 fps,16 GiB,2933 MT/s,8 vCPUs,3.3 GHz,EBS only,Up to 10 Gigabit,$0.308 hourly,$0.194 hourly,$0.1628 hourly,$0.077 hourly
+R6GD Double Extra Large,r6gd.2xlarge,"151,343.171",Memory optimized,42.0 fps,64 GiB,,8 vCPUs,2.5 GHz,474 GB NVMe SSD,Up to 10 Gigabit,$0.4608 hourly,$0.2903 hourly,$0.2197 hourly,$0.1152 hourly
+M6GD Double Extra Large,m6gd.2xlarge,"151,966.061",General purpose,50.0 fps,32 GiB,,8 vCPUs,2.5 GHz,474 GB NVMe SSD,Up to 10 Gigabit,$0.3616 hourly,$0.2278 hourly,$0.198 hourly,$0.0904 hourly
+R6G Double Extra Large,r6g.2xlarge,"152,400.305",Memory optimized,50.0 fps,64 GiB,,8 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.4032 hourly,$0.254 hourly,$0.1532 hourly,$0.1008 hourly
+C6G Double Extra Large,c6g.2xlarge,"152,497.141",Compute optimized,50.0 fps,16 GiB,,8 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.272 hourly,$0.1714 hourly,$0.1348 hourly,$0.068 hourly
+M6G Double Extra Large,m6g.2xlarge,"154,689.011",General purpose,50.0 fps,32 GiB,,8 vCPUs,,EBS only,Up to 10 Gigabit,$0.308 hourly,$0.1932 hourly,$0.1479 hourly,$0.077 hourly
+M7I-FLEX Double Extra Large,m7i-flex.2xlarge,"157,720.933",General purpose,57.0 fps,32 GiB,5600 MT/s,8 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.383 hourly,$0.2534 hourly,$0.2004 hourly,$0.0958 hourly
+C6GD Double Extra Large,c6gd.2xlarge,"158,029.894",Compute optimized,50.0 fps,16 GiB,,8 vCPUs,2.5 GHz,474 GB NVMe SSD,Up to 10 Gigabit,$0.3072 hourly,$0.1935 hourly,$0.0744 hourly,$0.0768 hourly
+C7I Double Extra Large,c7i.2xlarge,"159,211.901",Compute optimized,58.0 fps,16 GiB,4800 MT/s,8 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.357 hourly,$0.2362 hourly,$0.1667 hourly,$0.0893 hourly
+C6GN Double Extra Large,c6gn.2xlarge,"160,192.231",Compute optimized,50.0 fps,16 GiB,,8 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$0.3456 hourly,$0.2181 hourly,$0.1613 hourly,$0.0864 hourly
+R6A Double Extra Large,r6a.2xlarge,"161,567.202",Memory optimized,65.0 fps,64 GiB,3200 MT/s,8 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.4536 hourly,$0.3001 hourly,$0.1913 hourly,$0.1134 hourly
+M7I Double Extra Large,m7i.2xlarge,"163,373.666",General purpose,59.0 fps,32 GiB,4800 MT/s,8 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.4032 hourly,$0.2667 hourly,$0.1694 hourly,$0.1008 hourly
+M5ZN Double Extra Large,m5zn.2xlarge,"163,926.028",General purpose,53.0 fps,32 GiB,2933 MT/s,8 vCPUs,4.5 GHz,EBS only,Up to 25 Gigabit,$0.6607 hourly,$0.4162 hourly,$0.2833 hourly,$0.1652 hourly
+M6A Double Extra Large,m6a.2xlarge,"169,106.378",General purpose,66.0 fps,32 GiB,3200 MT/s,8 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.3456 hourly,$0.2286 hourly,$0.1637 hourly,$0.0864 hourly
+M8A Extra Large,m8a.xlarge,"174,418.605",General purpose,71.0 fps,16 GiB,6400 MT/s,4 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.2434 hourly,,$0.073 hourly,
+C7I-FLEX Double Extra Large,c7i-flex.2xlarge,"181,289.421",Compute optimized,73.0 fps,16 GiB,5600 MT/s,8 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.3392 hourly,$0.2244 hourly,$0.1615 hourly,
+C6A Double Extra Large,c6a.2xlarge,"181,776.869",Compute optimized,66.0 fps,16 GiB,2933 MT/s,8 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.306 hourly,$0.2024 hourly,$0.1476 hourly,$0.0765 hourly
+R8IN Double Extra Large,r8in.2xlarge,"185,722.577",Memory optimized,74.0 fps,64 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 40 Gigabit,$0.8368 hourly,,$0.3842 hourly,
+R8IDB Double Extra Large,r8idb.2xlarge,"185,945.611",Memory optimized,77.0 fps,64 GiB,7200 MT/s,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 26.66 Gigabit,$0.9379 hourly,,$0.4145 hourly,
+M8IDB Double Extra Large,m8idb.2xlarge,"186,763.161",General purpose,78.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 26.66 Gigabit,$0.7638 hourly,,$0.3709 hourly,
+R7I Double Extra Large,r7i.2xlarge,"187,214.79",Memory optimized,65.0 fps,64 GiB,4800 MT/s,8 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.5292 hourly,$0.3501 hourly,$0.194 hourly,$0.1323 hourly
+C8I-FLEX Double Extra Large,c8i-flex.2xlarge,"188,065.666",Compute optimized,76.0 fps,16 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.3561 hourly,,$0.1684 hourly,
+C8A Extra Large,c8a.xlarge,"188,146.754",Compute optimized,68.0 fps,8 GiB,6400 MT/s,4 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.2155 hourly,,$0.079 hourly,
+R8I Double Extra Large,r8i.2xlarge,"189,080.596",Memory optimized,77.0 fps,64 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.5557 hourly,,$0.2511 hourly,
+M8IDN Double Extra Large,m8idn.2xlarge,"189,506.1",General purpose,78.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 40 Gigabit,$0.7638 hourly,,$0.3653 hourly,
+R8I-FLEX Double Extra Large,r8i-flex.2xlarge,"189,536.032",Memory optimized,73.0 fps,64 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.5279 hourly,,$0.2426 hourly,
+C8I Double Extra Large,c8i.2xlarge,"189,588.435",Compute optimized,75.0 fps,16 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.3748 hourly,,$0.2239 hourly,
+R8IDN Double Extra Large,r8idn.2xlarge,"190,642.625",Memory optimized,77.0 fps,64 GiB,7200 MT/s,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 40 Gigabit,$0.9379 hourly,,$0.4594 hourly,
+R8A Extra Large,r8a.xlarge,"190,682.557",Memory optimized,72.0 fps,32 GiB,6400 MT/s,4 vCPUs,Up to 4.5 GHz,EBS only,Up to 12.5 Gigabit,$0.3195 hourly,,$0.138 hourly,
+M8I-FLEX Double Extra Large,m8i-flex.2xlarge,"191,563.236",General purpose,75.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.4022 hourly,,$0.1943 hourly,
+M8IB Double Extra Large,m8ib.2xlarge,"192,407.905",General purpose,77.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 26.66 Gigabit,$0.6683 hourly,,$0.3385 hourly,
+M8INE Double Extra Large,m8ine.2xlarge,"193,038.547",General purpose,76.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,12.5 Gigabit,$0.8354 hourly,,,
+R8IB Double Extra Large,r8ib.2xlarge,"195,854.415",Memory optimized,77.0 fps,64 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 26.66 Gigabit,$0.8368 hourly,,$0.4046 hourly,
+M8I Double Extra Large,m8i.2xlarge,"196,858.467",General purpose,76.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.4234 hourly,,$0.2177 hourly,
+R7G Double Extra Large,r7g.2xlarge,"196,963.48",Memory optimized,72.0 fps,64 GiB,,8 vCPUs,2.5 GHz,EBS only,Up to 15 Gigabit,$0.4284 hourly,$0.2834 hourly,$0.16 hourly,$0.1071 hourly
+M8IN Double Extra Large,m8in.2xlarge,"198,060.656",General purpose,78.0 fps,32 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,Up to 40 Gigabit,$0.6683 hourly,,$0.3635 hourly,
+C8INE Double Extra Large,c8ine.2xlarge,"198,626.169",Compute optimized,74.0 fps,16 GiB,7200 MT/s,8 vCPUs,3.9 GHz,EBS only,12.5 Gigabit,$0.6804 hourly,,,
+C7G Double Extra Large,c7g.2xlarge,"199,104.032",Compute optimized,72.0 fps,16 GiB,,8 vCPUs,2.5 GHz,EBS only,Up to 15 Gigabit,$0.29 hourly,$0.1911 hourly,$0.139 hourly,$0.0725 hourly
+M7G Double Extra Large,m7g.2xlarge,"199,153.597",General purpose,73.0 fps,32 GiB,,8 vCPUs,2.5 GHz,EBS only,Up to 15 Gigabit,$0.3264 hourly,$0.2159 hourly,$0.1443 hourly,$0.0816 hourly
+M5AD Quadruple Extra Large,m5ad.4xlarge,"202,429.15",General purpose,67.0 fps,64 GiB,2667 MT/s,16 vCPUs,2.5 GHz,600 GB (2×300 GB NVMe SSD),Up to 10 Gigabit,$0.824 hourly,$0.519 hourly,$0.4775 hourly,$0.206 hourly
+M7GD Double Extra Large,m7gd.2xlarge,"202,698.423",General purpose,72.0 fps,32 GiB,,8 vCPUs,2.5 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.4271 hourly,$0.2691 hourly,$0.1208 hourly,$0.1068 hourly
+R7GD Double Extra Large,r7gd.2xlarge,"203,977.562",Memory optimized,73.0 fps,64 GiB,,8 vCPUs,2.5 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.5443 hourly,$0.3421 hourly,$0.2692 hourly,$0.1361 hourly
+C7GD Double Extra Large,c7gd.2xlarge,"206,718.346",Compute optimized,72.0 fps,16 GiB,,8 vCPUs,2.5 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.3629 hourly,$0.2287 hourly,$0.0893 hourly,$0.0907 hourly
+M5A Quadruple Extra Large,m5a.4xlarge,"206,825.233",General purpose,68.0 fps,64 GiB,2667 MT/s,16 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.688 hourly,$0.433 hourly,$0.3145 hourly,$0.172 hourly
+R5AD Quadruple Extra Large,r5ad.4xlarge,"209,218.699",Memory optimized,68.0 fps,128 GiB,2667 MT/s,16 vCPUs,2.5 GHz,600 GB (2×300 GB NVMe SSD),Up to 10 Gigabit,$1.048 hourly,$0.66 hourly,$0.6093 hourly,$0.262 hourly
+R5A Quadruple Extra Large,r5a.4xlarge,"209,918.657",Memory optimized,67.0 fps,128 GiB,2667 MT/s,16 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.904 hourly,$0.57 hourly,$0.3721 hourly,$0.226 hourly
+M5 General Purpose Quadruple Extra Large,m5d.4xlarge,"216,645.604",General purpose,77.0 fps,64 GiB,2666 MT/s,16 vCPUs,3.1 GHz,600 GB (2×300 GB NVMe SSD),Up to 10 Gigabit,$0.904 hourly,$0.57 hourly,$0.5094 hourly,$0.226 hourly
+R5N Quadruple Extra Large,r5n.4xlarge,"223,630.265",Memory optimized,77.0 fps,128 GiB,2666 MT/s,16 vCPUs,2.5 GHz,EBS only,Up to 25 Gigabit,$1.192 hourly,$0.751 hourly,$0.6078 hourly,$0.27 hourly
+R5 Quadruple Extra Large,r5.4xlarge,"225,035.162",Memory optimized,77.0 fps,128 GiB,3200 MT/s,16 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$1.008 hourly,$0.635 hourly,$0.3284 hourly,$0.252 hourly
+R5D Quadruple Extra Large,r5d.4xlarge,"232,862.757",Memory optimized,77.0 fps,128 GiB,2666 MT/s,16 vCPUs,3.1 GHz,600 GB (2×300 GB NVMe SSD),Up to 10 Gigabit,$1.152 hourly,$0.726 hourly,$0.6578 hourly,$0.27 hourly
+M5 General Purpose Quadruple Extra Large,m5.4xlarge,"235,271.052",General purpose,78.0 fps,64 GiB,2666 MT/s,16 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.768 hourly,$0.484 hourly,$0.278 hourly,$0.192 hourly
+C8GN Double Extra Large,c8gn.2xlarge,"236,756.437",Compute optimized,88.0 fps,16 GiB,,8 vCPUs,2.8 GHz,EBS only,Up to 50 Gigabit,$0.474 hourly,,$0.186 hourly,
+C8G Double Extra Large,c8g.2xlarge,"236,896.654",Compute optimized,88.0 fps,16 GiB,,8 vCPUs,2.7 GHz,EBS only,Up to 15 Gigabit,$0.319 hourly,$0.2102 hourly,$0.1367 hourly,
+M8G Double Extra Large,m8g.2xlarge,"240,493.011",General purpose,86.0 fps,32 GiB,,8 vCPUs,2.7 GHz,EBS only,Up to 15 Gigabit,$0.359 hourly,$0.2375 hourly,$0.1271 hourly,
+R8G Double Extra Large,r8g.2xlarge,"240,583.415",Memory optimized,88.0 fps,64 GiB,,8 vCPUs,2.7 GHz,EBS only,Up to 15 Gigabit,$0.4713 hourly,$0.3118 hourly,$0.1469 hourly,$0.1178 hourly
+M8GN Double Extra Large,m8gn.2xlarge,"243,494.141",General purpose,88.0 fps,32 GiB,,8 vCPUs,2.8 GHz,EBS only,Up to 50 Gigabit,$0.582 hourly,,$0.2706 hourly,
+M8GB Double Extra Large,m8gb.2xlarge,"246,153.846",General purpose,82.0 fps,32 GiB,,8 vCPUs,2.8 GHz,EBS only,Up to 33.33 Gigabit,$0.582 hourly,,$0.3042 hourly,
+C5 High-CPU Quadruple Extra Large,c5d.4xlarge,"250,459.829",Compute optimized,88.0 fps,32 GiB,2666 MT/s,16 vCPUs,3.4 GHz,400 GB NVMe SSD,Up to 10 Gigabit,$0.768 hourly,$0.484 hourly,$0.3606 hourly,$0.192 hourly
+M5ZN 3xlarge,m5zn.3xlarge,"252,711.383",General purpose,78.0 fps,48 GiB,2933 MT/s,12 vCPUs,4.5 GHz,EBS only,Up to 25 Gigabit,$0.991 hourly,$0.6243 hourly,$0.4353 hourly,$0.2478 hourly
+C5N Quadruple Extra Large,c5n.4xlarge,"253,425.2",Compute optimized,92.0 fps,42 GiB,3200 MT/s,16 vCPUs,3 GHz,EBS only,Up to 25 Gigabit,$0.864 hourly,$0.544 hourly,$0.4726 hourly,$0.216 hourly
+C8GB Double Extra Large,c8gb.2xlarge,"255,244.476",Compute optimized,88.0 fps,16 GiB,,8 vCPUs,2.8 GHz,EBS only,Up to 33.33 Gigabit,$0.474 hourly,,$0.2222 hourly,
+R7A Double Extra Large,r7a.2xlarge,"255,699.979",Memory optimized,104.0 fps,64 GiB,4800 MT/s,8 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.6086 hourly,$0.4026 hourly,$0.2119 hourly,$0.1522 hourly
+C7A Double Extra Large,c7a.2xlarge,"257,510.73",Compute optimized,105.0 fps,16 GiB,4800 MT/s,8 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.4106 hourly,$0.2716 hourly,$0.1583 hourly,$0.1026 hourly
+C5 High-CPU Quadruple Extra Large,c5.4xlarge,"262,069.53",Compute optimized,87.0 fps,32 GiB,2933 MT/s,16 vCPUs,3.4 GHz,EBS only,Up to 10 Gigabit,$0.68 hourly,$0.428 hourly,$0.2465 hourly,$0.17 hourly
+M7A Double Extra Large,m7a.2xlarge,"262,826.48",General purpose,104.0 fps,32 GiB,4800 MT/s,8 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.4637 hourly,$0.3067 hourly,$0.2067 hourly,$0.1159 hourly
+M6I Quadruple Extra Large,m6i.4xlarge,"266,023.776",General purpose,108.0 fps,64 GiB,3200 MT/s,16 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.768 hourly,$0.508 hourly,$0.2954 hourly,$0.192 hourly
+M6IN Quadruple Extra Large,m6in.4xlarge,"266,866.817",General purpose,107.0 fps,64 GiB,3200 MT/s,16 vCPUs,3.5 GHz,EBS only,Up to 50 Gigabit,$1.1138 hourly,$0.7017 hourly,$0.6942 hourly,$0.2785 hourly
+R6I Quadruple Extra Large,r6i.4xlarge,"267,524.976",Memory optimized,107.0 fps,128 GiB,3200 MT/s,16 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$1.008 hourly,$0.6668 hourly,$0.3892 hourly,$0.252 hourly
+M6ID Quadruple Extra Large,m6id.4xlarge,"268,118.978",General purpose,107.0 fps,64 GiB,3200 MT/s,16 vCPUs,3.5 GHz,950 GB NVMe SSD,Up to 12.5 Gigabit,$0.9492 hourly,$0.598 hourly,$0.3987 hourly,$0.2373 hourly
+C6IN Quadruple Extra Large,c6in.4xlarge,"269,837.254",Compute optimized,107.0 fps,32 GiB,3200 MT/s,16 vCPUs,3.5 GHz,EBS only,Up to 50 Gigabit,$0.9072 hourly,$0.5715 hourly,$0.3052 hourly,$0.2268 hourly
+C6I Quadruple Extra Large,c6i.4xlarge,"276,864.509",Compute optimized,101.0 fps,32 GiB,3200 MT/s,16 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.68 hourly,$0.4498 hourly,$0.3195 hourly,$0.17 hourly
+M6IDN Quadruple Extra Large,m6idn.4xlarge,"278,842.802",General purpose,106.0 fps,64 GiB,3200 MT/s,16 vCPUs,3.5 GHz,950 GB NVMe SSD,Up to 50 Gigabit,$1.273 hourly,$0.802 hourly,$0.6379 hourly,$0.3182 hourly
+C5A Quadruple Extra Large,c5a.4xlarge,"290,552.504",Compute optimized,101.0 fps,32 GiB,2933 MT/s,16 vCPUs,3.3 GHz,EBS only,Up to 10 Gigabit,$0.616 hourly,$0.388 hourly,$0.316 hourly,$0.154 hourly
+C6GN Quadruple Extra Large,c6gn.4xlarge,"306,435.138",Compute optimized,93.0 fps,32 GiB,,16 vCPUs,2.5 GHz,EBS only,25 Gigabit,$0.6912 hourly,$0.4363 hourly,$0.2855 hourly,$0.1728 hourly
+M6G Quadruple Extra Large,m6g.4xlarge,"309,817.337",General purpose,93.0 fps,64 GiB,,16 vCPUs,,EBS only,Up to 10 Gigabit,$0.616 hourly,$0.3864 hourly,$0.3068 hourly,$0.154 hourly
+R6GD Quadruple Extra Large,r6gd.4xlarge,"309,937.367",Memory optimized,94.0 fps,128 GiB,,16 vCPUs,2.5 GHz,950 GB NVMe SSD,Up to 10 Gigabit,$0.9216 hourly,$0.5806 hourly,$0.4659 hourly,$0.2304 hourly
+C6GD Quadruple Extra Large,c6gd.4xlarge,"311,425.42",Compute optimized,94.0 fps,32 GiB,,16 vCPUs,2.5 GHz,950 GB NVMe SSD,Up to 10 Gigabit,$0.6144 hourly,$0.3871 hourly,$0.2205 hourly,$0.1536 hourly
+R6G Quadruple Extra Large,r6g.4xlarge,"312,134.218",Memory optimized,92.0 fps,128 GiB,,16 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.8064 hourly,$0.508 hourly,$0.3165 hourly,$0.2016 hourly
+C6G Quadruple Extra Large,c6g.4xlarge,"321,737.382",Compute optimized,92.0 fps,32 GiB,,16 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$0.544 hourly,$0.3427 hourly,$0.1891 hourly,$0.136 hourly
+M6GD Quadruple Extra Large,m6gd.4xlarge,"323,777.403",General purpose,94.0 fps,64 GiB,,16 vCPUs,2.5 GHz,950 GB NVMe SSD,Up to 10 Gigabit,$0.7232 hourly,$0.4556 hourly,$0.3698 hourly,$0.1808 hourly
+Gr6 Graphics and Machine Learning GPU High RAM ratio Quadruple Extra Large,gr6.4xlarge,"326,914.236",GPU instance,127.0 fps,128 GiB,3200 MT/s,16 vCPUs,2.6 GHz,600 GB NVMe SSD,Up to 25 Gigabit,$1.5392 hourly,$1.002 hourly,$0.6133 hourly,$0.3848 hourly
+GR6F Quadruple Extra Large,gr6f.4xlarge,"331,434.49",GPU instance,118.0 fps,128 GiB,3200 MT/s,16 vCPUs,2.6 GHz,450 GB NVMe SSD,Up to 25 Gigabit,$1.066 hourly,,$0.4196 hourly,
+C6A Quadruple Extra Large,c6a.4xlarge,"332,450.262",Compute optimized,120.0 fps,32 GiB,2933 MT/s,16 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.612 hourly,$0.4048 hourly,$0.3061 hourly,$0.153 hourly
+M6A Quadruple Extra Large,m6a.4xlarge,"333,385.425",General purpose,121.0 fps,64 GiB,3200 MT/s,16 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.6912 hourly,$0.4572 hourly,$0.3681 hourly,$0.1728 hourly
+M7I-FLEX Quadruple Extra Large,m7i-flex.4xlarge,"341,042.311",General purpose,137.0 fps,64 GiB,4800 MT/s,16 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$0.7661 hourly,$0.5067 hourly,$0.3572 hourly,$0.1915 hourly
+R6A Quadruple Extra Large,r6a.4xlarge,"348,337.234",Memory optimized,122.0 fps,128 GiB,3200 MT/s,16 vCPUs,3.6 GHz,EBS only,Up to 12.5 Gigabit,$0.9072 hourly,$0.6001 hourly,$0.4406 hourly,$0.2268 hourly
+C8A Double Extra Large,c8a.2xlarge,"354,872.098",Compute optimized,133.0 fps,16 GiB,6400 MT/s,8 vCPUs,Up to 4.5 GHz,EBS only,Up to 15 Gigabit,$0.4311 hourly,,$0.2105 hourly,
+C8I-FLEX Quadruple Extra Large,c8i-flex.4xlarge,"366,244.468",Compute optimized,141.0 fps,32 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.7122 hourly,,$0.3368 hourly,
+M8A Double Extra Large,m8a.2xlarge,"367,787.909",General purpose,130.0 fps,32 GiB,6400 MT/s,8 vCPUs,Up to 4.5 GHz,EBS only,Up to 15 Gigabit,$0.4869 hourly,,$0.1688 hourly,
+M8I-FLEX Quadruple Extra Large,m8i-flex.4xlarge,"367,830.185",General purpose,144.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.8044 hourly,,$0.3376 hourly,
+M8IN Quadruple Extra Large,m8in.4xlarge,"371,632.084",General purpose,146.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 50 Gigabit,$1.3366 hourly,,$0.8063 hourly,
+M7I Quadruple Extra Large,m7i.4xlarge,"372,381.691",General purpose,126.0 fps,64 GiB,5600 MT/s,16 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.8064 hourly,$0.5334 hourly,$0.3846 hourly,$0.2016 hourly
+M8IB Quadruple Extra Large,m8ib.4xlarge,"372,656.341",General purpose,146.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 33.33 Gigabit,$1.3366 hourly,,$0.765 hourly,
+R7I Quadruple Extra Large,r7i.4xlarge,"374,035.689",Memory optimized,129.0 fps,128 GiB,4800 MT/s,16 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$1.0584 hourly,$0.7001 hourly,$0.4043 hourly,$0.2646 hourly
+R8I-FLEX Quadruple Extra Large,r8i-flex.4xlarge,"374,035.689",Memory optimized,144.0 fps,128 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$1.0558 hourly,,$0.5859 hourly,
+C7I-FLEX Quadruple Extra Large,c7i-flex.4xlarge,"374,590.292",Compute optimized,140.0 fps,32 GiB,5600 MT/s,16 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.6783 hourly,$0.4487 hourly,$0.3147 hourly,
+R8IN Quadruple Extra Large,r8in.4xlarge,"376,455.825",Memory optimized,139.0 fps,128 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 50 Gigabit,$1.6736 hourly,,$0.8437 hourly,
+M8IDB Quadruple Extra Large,m8idb.4xlarge,"377,774.28",General purpose,147.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 33.33 Gigabit,$1.5275 hourly,,$0.8565 hourly,
+M8IDN Quadruple Extra Large,m8idn.4xlarge,"378,012.285",General purpose,145.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 50 Gigabit,$1.5275 hourly,,$0.9162 hourly,
+R8I Quadruple Extra Large,r8i.4xlarge,"378,638.479",Memory optimized,142.0 fps,128 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$1.1114 hourly,,$0.5801 hourly,
+C7I Quadruple Extra Large,c7i.4xlarge,"382,775.12",Compute optimized,131.0 fps,32 GiB,4800 MT/s,16 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$0.714 hourly,$0.4723 hourly,$0.3473 hourly,$0.1785 hourly
+M8INE Quadruple Extra Large,m8ine.4xlarge,"385,472.505",General purpose,113.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,25 Gigabit,$1.6708 hourly,,,
+R8IB Quadruple Extra Large,r8ib.4xlarge,"386,520.111",Memory optimized,140.0 fps,128 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 33.33 Gigabit,$1.6736 hourly,,$0.8162 hourly,
+M5AD Eight Extra Large,m5ad.8xlarge,"386,551.238",General purpose,101.0 fps,128 GiB,3200 MT/s,32 vCPUs,2.5 GHz,1200 GB (2×600 GB NVMe SSD),Up to 10 Gigabit,$1.648 hourly,$1.038 hourly,$0.7459 hourly,$0.27 hourly
+C8I Quadruple Extra Large,c8i.4xlarge,"386,706.949",Compute optimized,143.0 fps,32 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.7497 hourly,,$0.3306 hourly,
+R8A Double Extra Large,r8a.2xlarge,"390,019.058",Memory optimized,136.0 fps,64 GiB,6400 MT/s,8 vCPUs,Up to 4.5 GHz,EBS only,Up to 15 Gigabit,$0.639 hourly,,$0.3007 hourly,
+R8IDB Quadruple Extra Large,r8idb.4xlarge,"391,309.665",Memory optimized,145.0 fps,128 GiB,7200 MT/s,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 33.33 Gigabit,$1.8758 hourly,,$0.953 hourly,
+C8INE Quadruple Extra Large,c8ine.4xlarge,"391,453.27",Compute optimized,134.0 fps,32 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,25 Gigabit,$1.3608 hourly,,,
+M8I Quadruple Extra Large,m8i.4xlarge,"393,587.799",General purpose,141.0 fps,64 GiB,7200 MT/s,16 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$0.8467 hourly,,$0.4075 hourly,
+R5AD Eight Extra Large,r5ad.8xlarge,"399,052.251",Memory optimized,100.0 fps,256 GiB,2667 MT/s,32 vCPUs,2.5 GHz,1200 GB (2×600 GB NVMe SSD),Up to 10 Gigabit,$2.096 hourly,$1.32 hourly,$0.9741 hourly,$0.27 hourly
+R8IDN Quadruple Extra Large,r8idn.4xlarge,"400,367.003",Memory optimized,143.0 fps,128 GiB,7200 MT/s,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 50 Gigabit,$1.8758 hourly,,$0.9159 hourly,
+R7GD Quadruple Extra Large,r7gd.4xlarge,"401,782.912",Memory optimized,133.0 fps,128 GiB,,16 vCPUs,2.5 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$1.0886 hourly,$0.6842 hourly,$0.5649 hourly,$0.2722 hourly
+C7GD Quadruple Extra Large,c7gd.4xlarge,"402,161.619",Compute optimized,133.0 fps,32 GiB,,16 vCPUs,2.5 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$0.7258 hourly,$0.4574 hourly,$0.2474 hourly,$0.1815 hourly
+M7GD Quadruple Extra Large,m7gd.4xlarge,"405,165.865",General purpose,133.0 fps,64 GiB,,16 vCPUs,2.5 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$0.8543 hourly,$0.5382 hourly,$0.4054 hourly,$0.2136 hourly
+HPC7G Quadruple Extra Large,hpc7g.4xlarge,"405,911.08",Compute optimized,134.0 fps,128 GiB,,16 vCPUs,2.6 GHz,EBS only,200 Gigabit,$1.6832 hourly,$1.3255 hourly,,
+R5A Eight Extra Large,r5a.8xlarge,"407,695.248",Memory optimized,99.0 fps,256 GiB,2667 MT/s,32 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$1.808 hourly,$1.139 hourly,$0.7128 hourly,$0.27 hourly
+R7G Quadruple Extra Large,r7g.4xlarge,"411,073.287",Memory optimized,132.0 fps,128 GiB,,16 vCPUs,2.5 GHz,EBS only,Up to 15 Gigabit,$0.8568 hourly,$0.5668 hourly,$0.321 hourly,$0.2142 hourly
+M7G Quadruple Extra Large,m7g.4xlarge,"411,602.032",General purpose,134.0 fps,64 GiB,,16 vCPUs,2.5 GHz,EBS only,Up to 15 Gigabit,$0.6528 hourly,$0.4318 hourly,$0.2873 hourly,$0.1632 hourly
+C7G Quadruple Extra Large,c7g.4xlarge,"413,329.889",Compute optimized,133.0 fps,32 GiB,,16 vCPUs,2.5 GHz,EBS only,Up to 15 Gigabit,$0.58 hourly,$0.3822 hourly,$0.231 hourly,$0.145 hourly
+M5A Eight Extra Large,m5a.8xlarge,"419,369.635",General purpose,99.0 fps,128 GiB,2667 MT/s,32 vCPUs,2.5 GHz,EBS only,Up to 10 Gigabit,$1.376 hourly,$0.867 hourly,$0.664 hourly,$0.27 hourly
+M5 General Purpose Eight Extra Large,m5.8xlarge,"442,865.71",General purpose,134.0 fps,128 GiB,2666 MT/s,32 vCPUs,3.1 GHz,EBS only,10 Gigabit,$1.536 hourly,$0.968 hourly,$0.5422 hourly,$0.27 hourly
+R5N Eight Extra Large,r5n.8xlarge,"448,514.296",Memory optimized,135.0 fps,256 GiB,3200 MT/s,32 vCPUs,2.5 GHz,EBS only,25 Gigabit,$2.384 hourly,$1.502 hourly,$0.9952 hourly,$0.27 hourly
+R5 Eight Extra Large,r5.8xlarge,"449,290.963",Memory optimized,134.0 fps,256 GiB,3200 MT/s,32 vCPUs,3.1 GHz,EBS only,10 Gigabit,$2.016 hourly,$1.27 hourly,$0.5968 hourly,$0.27 hourly
+M5 General Purpose Eight Extra Large,m5d.8xlarge,"462,940.638",General purpose,146.0 fps,128 GiB,2666 MT/s,32 vCPUs,3.1 GHz,1200 GB (2×600 GB NVMe SSD),10 Gigabit,$1.808 hourly,$1.139 hourly,$0.8845 hourly,$0.27 hourly
+R5D Eight Extra Large,r5d.8xlarge,"467,085.097",Memory optimized,133.0 fps,256 GiB,2666 MT/s,32 vCPUs,3.1 GHz,1200 GB (2×600 GB NVMe SSD),10 Gigabit,$2.304 hourly,$1.452 hourly,$1.163 hourly,$0.27 hourly
+C8GN Quadruple Extra Large,c8gn.4xlarge,"470,726.684",Compute optimized,157.0 fps,32 GiB,,16 vCPUs,2.8 GHz,EBS only,50 Gigabit,$0.948 hourly,,$0.2697 hourly,
+R8G Quadruple Extra Large,r8g.4xlarge,"476,013.388",Memory optimized,157.0 fps,128 GiB,,16 vCPUs,2.7 GHz,EBS only,Up to 15 Gigabit,$0.9426 hourly,$0.6235 hourly,$0.2735 hourly,$0.2356 hourly
+C8GB Quadruple Extra Large,c8gb.4xlarge,"477,255.779",Compute optimized,159.0 fps,32 GiB,,16 vCPUs,2.8 GHz,EBS only,33.33 Gigabit,$0.948 hourly,,$0.3039 hourly,
+M8GN Quadruple Extra Large,m8gn.4xlarge,"478,111.46",General purpose,161.0 fps,64 GiB,,16 vCPUs,2.8 GHz,EBS only,50 Gigabit,$1.164 hourly,,$0.4551 hourly,
+M8GB Quadruple Extra Large,m8gb.4xlarge,"486,285.237",General purpose,160.0 fps,64 GiB,,16 vCPUs,2.8 GHz,EBS only,33.33 Gigabit,$1.164 hourly,,$0.4794 hourly,
+C8G Quadruple Extra Large,c8g.4xlarge,"486,803.073",Compute optimized,159.0 fps,32 GiB,,16 vCPUs,2.7 GHz,EBS only,Up to 15 Gigabit,$0.6381 hourly,$0.4205 hourly,$0.2545 hourly,
+M5ZN 6xlarge,m5zn.6xlarge,"500,913.123",General purpose,145.0 fps,96 GiB,2933 MT/s,24 vCPUs,4.5 GHz,EBS only,50 Gigabit,$1.982 hourly,$1.2487 hourly,$0.8701 hourly,$0.27 hourly
+M8G Quadruple Extra Large,m8g.4xlarge,"511,100.463",General purpose,158.0 fps,64 GiB,,16 vCPUs,2.7 GHz,EBS only,Up to 15 Gigabit,$0.7181 hourly,$0.475 hourly,$0.3216 hourly,
+M7A Quadruple Extra Large,m7a.4xlarge,"511,617.992",General purpose,189.0 fps,64 GiB,4800 MT/s,16 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.9274 hourly,$0.6135 hourly,$0.4135 hourly,$0.2318 hourly
+R7A Quadruple Extra Large,r7a.4xlarge,"513,506.285",Memory optimized,178.0 fps,128 GiB,5600 MT/s,16 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$1.2172 hourly,$0.8052 hourly,$0.4776 hourly,$0.3043 hourly
+C7A Quadruple Extra Large,c7a.4xlarge,"514,497.026",Compute optimized,189.0 fps,32 GiB,5600 MT/s,16 vCPUs,Up to 3.7 GHz,EBS only,Up to 12.5 Gigabit,$0.8211 hourly,$0.5432 hourly,$0.3258 hourly,$0.2053 hourly
+C6I Eight Extra Large,c6i.8xlarge,"540,723.217",Compute optimized,185.0 fps,64 GiB,3200 MT/s,32 vCPUs,3.5 GHz,EBS only,12.5 Gigabit,$1.36 hourly,$0.8996 hourly,$0.6103 hourly,$0.34 hourly
+C6IN Eight Extra Large,c6in.8xlarge,"544,588.155",Compute optimized,186.0 fps,64 GiB,3200 MT/s,32 vCPUs,3.5 GHz,EBS only,50 Gigabit,$1.8144 hourly,$1.1431 hourly,$0.7738 hourly,$0.4536 hourly
+R6I Eight Extra Large,r6i.8xlarge,"547,219.016",Memory optimized,184.0 fps,256 GiB,3200 MT/s,32 vCPUs,3.5 GHz,EBS only,12.5 Gigabit,$2.016 hourly,$1.3336 hourly,$0.7509 hourly,$0.504 hourly
+M6I Eight Extra Large,m6i.8xlarge,"550,371.931",General purpose,181.0 fps,128 GiB,3200 MT/s,32 vCPUs,3.5 GHz,EBS only,12.5 Gigabit,$1.536 hourly,$1.0161 hourly,$0.5881 hourly,$0.384 hourly
+C5 High-CPU 9xlarge,c5d.9xlarge,"554,464.595",Compute optimized,167.0 fps,72 GiB,2666 MT/s,36 vCPUs,3.4 GHz,900 GB NVMe SSD,12 Gigabit,$1.728 hourly,$1.089 hourly,$0.6942 hourly,$0.27 hourly
+M6ID Eight Extra Large,m6id.8xlarge,"559,171.727",General purpose,188.0 fps,128 GiB,3200 MT/s,32 vCPUs,3.5 GHz,1900 GB NVMe SSD,12.5 Gigabit,$1.8984 hourly,$1.196 hourly,$0.6633 hourly,$0.4746 hourly
+M6IDN Eight Extra Large,m6idn.8xlarge,"560,199.571",General purpose,148.0 fps,128 GiB,3200 MT/s,32 vCPUs,3.5 GHz,1900 GB NVMe SSD,50 Gigabit,$2.5459 hourly,$1.6039 hourly,$1.2658 hourly,$0.6365 hourly
+M6IN Eight Extra Large,m6in.8xlarge,"568,282.721",General purpose,178.0 fps,128 GiB,3200 MT/s,32 vCPUs,3.5 GHz,EBS only,50 Gigabit,$2.2277 hourly,$1.4034 hourly,$1.1517 hourly,$0.5569 hourly
+C5 High-CPU 9xlarge,c5.9xlarge,"572,906.306",Compute optimized,165.0 fps,72 GiB,2666 MT/s,36 vCPUs,3.4 GHz,EBS only,12 Gigabit,$1.53 hourly,$0.964 hourly,$0.6392 hourly,$0.27 hourly
+C5A Eight Extra Large,c5a.8xlarge,"587,155.963",Compute optimized,161.0 fps,64 GiB,2933 MT/s,32 vCPUs,3.3 GHz,EBS only,10 Gigabit,$1.232 hourly,$0.776 hourly,$0.5676 hourly,$0.27 hourly
+C5N 9xlarge,c5n.9xlarge,"587,395.472",Compute optimized,166.0 fps,96 GiB,2666 MT/s,36 vCPUs,3 GHz,EBS only,50 Gigabit,$1.944 hourly,$1.225 hourly,$0.8748 hourly,$0.27 hourly
+M6GD Eight Extra Large,m6gd.8xlarge,"608,789.397",General purpose,150.0 fps,128 GiB,,32 vCPUs,2.5 GHz,1900 GB NVMe SSD,12 Gigabit,$1.4464 hourly,$0.9112 hourly,$0.5168 hourly,$0.3616 hourly
+R5AD 12xlarge Extra Large,r5ad.12xlarge,"617,178.124",Memory optimized,111.0 fps,384 GiB,2667 MT/s,48 vCPUs,2.5 GHz,1800 GB (2×900 GB NVMe SSD),10 Gigabit,$3.144 hourly,$1.981 hourly,$1.5073 hourly,$0.27 hourly
+C6GN Eight Extra Large,c6gn.8xlarge,"619,874.734",Compute optimized,151.0 fps,64 GiB,,32 vCPUs,2.5 GHz,EBS only,50 Gigabit,$1.3824 hourly,$0.8725 hourly,$0.6145 hourly,$0.3456 hourly
+M5AD 12xlarge Extra Large,m5ad.12xlarge,"620,101.628",General purpose,113.0 fps,192 GiB,2667 MT/s,48 vCPUs,2.5 GHz,1800 GB (2×900 GB NVMe SSD),10 Gigabit,$2.472 hourly,$1.557 hourly,$1.0578 hourly,$0.27 hourly
+C6A Eight Extra Large,c6a.8xlarge,"624,969.484",Compute optimized,178.0 fps,64 GiB,2933 MT/s,32 vCPUs,3.6 GHz,EBS only,12.5 Gigabit,$1.224 hourly,$0.8097 hourly,$0.6128 hourly,$0.306 hourly
+C6GD Eight Extra Large,c6gd.8xlarge,"625,814.863",Compute optimized,152.0 fps,64 GiB,,32 vCPUs,2.5 GHz,1900 GB NVMe SSD,12 Gigabit,$1.2288 hourly,$0.7741 hourly,$0.3756 hourly,$0.3072 hourly
+M6G Eight Extra Large,m6g.8xlarge,"627,861.347",General purpose,149.0 fps,128 GiB,,32 vCPUs,,EBS only,12 Gigabit,$1.232 hourly,$0.7728 hourly,$0.5063 hourly,$0.308 hourly
+R6GD Eight Extra Large,r6gd.8xlarge,"630,376.256",Memory optimized,151.0 fps,256 GiB,,32 vCPUs,2.5 GHz,1900 GB NVMe SSD,12 Gigabit,$1.8432 hourly,$1.1612 hourly,$0.7103 hourly,$0.4608 hourly
+M5A 12xlarge Extra Large,m5a.12xlarge,"630,749.014",General purpose,117.0 fps,192 GiB,2933 MT/s,48 vCPUs,2.5 GHz,EBS only,10 Gigabit,$2.064 hourly,$1.30 hourly,$0.8692 hourly,$0.27 hourly
+R5A 12xlarge Extra Large,r5a.12xlarge,"635,004.63",Memory optimized,107.0 fps,384 GiB,2667 MT/s,48 vCPUs,2.5 GHz,EBS only,10 Gigabit,$2.712 hourly,$1.709 hourly,$1.0903 hourly,$0.27 hourly
+R6G Eight Extra Large,r6g.8xlarge,"642,054.575",Memory optimized,151.0 fps,256 GiB,,32 vCPUs,2.5 GHz,EBS only,12 Gigabit,$1.6128 hourly,$1.0161 hourly,$0.5187 hourly,$0.4032 hourly
+Gr6 Graphics and Machine Learning GPU High RAM ratio Eight Extra Large,gr6.8xlarge,"644,316.923",GPU instance,134.0 fps,256 GiB,3200 MT/s,32 vCPUs,2.6 GHz,900 GB (2×450 GB NVMe SSD),25 Gigabit,$2.4464 hourly,$1.5926 hourly,$1.1305 hourly,$0.6116 hourly
+C6G Eight Extra Large,c6g.8xlarge,"647,161.925",Compute optimized,151.0 fps,64 GiB,,32 vCPUs,2.5 GHz,EBS only,12 Gigabit,$1.088 hourly,$0.6854 hourly,$0.4032 hourly,$0.272 hourly
+R6A Eight Extra Large,r6a.8xlarge,"648,068.452",Memory optimized,195.0 fps,256 GiB,3200 MT/s,32 vCPUs,3.6 GHz,EBS only,12.5 Gigabit,$1.8144 hourly,$1.2002 hourly,$0.7695 hourly,$0.4536 hourly
+M6A Eight Extra Large,m6a.8xlarge,"648,725.356",General purpose,195.0 fps,128 GiB,3200 MT/s,32 vCPUs,3.6 GHz,EBS only,12.5 Gigabit,$1.3824 hourly,$0.9145 hourly,$0.6437 hourly,$0.3456 hourly
+M5 General Purpose 12xlarge Extra Large,m5.12xlarge,"680,239.974",General purpose,157.0 fps,192 GiB,3200 MT/s,48 vCPUs,3.1 GHz,EBS only,12 Gigabit,$2.304 hourly,$1.452 hourly,$0.7005 hourly,$0.27 hourly
+R5D 12xlarge Extra Large,r5d.12xlarge,"685,714.286",Memory optimized,159.0 fps,384 GiB,2666 MT/s,48 vCPUs,3.1 GHz,1800 GB (2×900 GB NVMe SSD),12 Gigabit,$3.456 hourly,$2.177 hourly,$1.3319 hourly,$0.27 hourly
+M5 General Purpose 12xlarge Extra Large,m5d.12xlarge,"686,237.133",General purpose,157.0 fps,192 GiB,2666 MT/s,48 vCPUs,3.1 GHz,1800 GB (2×900 GB NVMe SSD),12 Gigabit,$2.712 hourly,$1.709 hourly,$1.0401 hourly,$0.27 hourly
+C7I-FLEX Eight Extra Large,c7i-flex.8xlarge,"686,965.544",Compute optimized,210.0 fps,64 GiB,4800 MT/s,32 vCPUs,3.2 GHz,EBS only,Up to 12.5 Gigabit,$1.3566 hourly,$0.8974 hourly,$0.6285 hourly,
+M7I Eight Extra Large,m7i.8xlarge,"699,530.003",General purpose,200.0 fps,128 GiB,4800 MT/s,32 vCPUs,3.2 GHz,EBS only,12.5 Gigabit,$1.6128 hourly,$1.0669 hourly,$0.8348 hourly,$0.4032 hourly
+R5 12xlarge Extra Large,r5.12xlarge,"703,743.525",Memory optimized,158.0 fps,384 GiB,3200 MT/s,48 vCPUs,3.1 GHz,EBS only,12 Gigabit,$3.024 hourly,$1.905 hourly,$1.0557 hourly,$0.27 hourly
+R5N 12xlarge Extra Large,r5n.12xlarge,"719,172.951",Memory optimized,158.0 fps,384 GiB,2933 MT/s,48 vCPUs,2.5 GHz,EBS only,50 Gigabit,$3.576 hourly,$2.253 hourly,$1.422 hourly,$0.27 hourly
+C8A Quadruple Extra Large,c8a.4xlarge,"731,565.384",Compute optimized,237.0 fps,32 GiB,6400 MT/s,16 vCPUs,Up to 4.5 GHz,EBS only,Up to 15 Gigabit,$0.8622 hourly,,$0.4037 hourly,
+R8A Quadruple Extra Large,r8a.4xlarge,"732,992.288",Memory optimized,227.0 fps,128 GiB,6400 MT/s,16 vCPUs,Up to 4.5 GHz,EBS only,Up to 15 Gigabit,$1.2781 hourly,,$0.5705 hourly,
+R8IB Eight Extra Large,r8ib.8xlarge,"734,675.136",Memory optimized,194.0 fps,256 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,33.33 Gigabit,$3.3472 hourly,,$1.731 hourly,
+M7I-FLEX Eight Extra Large,m7i-flex.8xlarge,"735,378.605",General purpose,214.0 fps,128 GiB,5600 MT/s,32 vCPUs,3.5 GHz,EBS only,Up to 12.5 Gigabit,$1.5322 hourly,$1.0135 hourly,$0.696 hourly,$0.383 hourly
+M8IN Eight Extra Large,m8in.8xlarge,"742,660.426",General purpose,249.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,50 Gigabit,$2.6733 hourly,,$1.3566 hourly,
+R8I-FLEX Eight Extra Large,r8i-flex.8xlarge,"745,573.159",Memory optimized,232.0 fps,256 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$2.1115 hourly,,$0.8238 hourly,
+M8I-FLEX Eight Extra Large,m8i-flex.8xlarge,"752,085.863",General purpose,229.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$1.6088 hourly,,$0.6367 hourly,
+R8I Eight Extra Large,r8i.8xlarge,"759,073.298",Memory optimized,243.0 fps,256 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,15 Gigabit,$2.2227 hourly,,$0.9482 hourly,
+C8I Eight Extra Large,c8i.8xlarge,"761,814.07",Compute optimized,242.0 fps,64 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,15 Gigabit,$1.4994 hourly,,$0.636 hourly,
+R7I Eight Extra Large,r7i.8xlarge,"763,358.779",Memory optimized,218.0 fps,256 GiB,4800 MT/s,32 vCPUs,3.2 GHz,EBS only,12.5 Gigabit,$2.1168 hourly,$1.4003 hourly,$0.6392 hourly,$0.5292 hourly
+R8IDB Eight Extra Large,r8idb.8xlarge,"764,605.153",Memory optimized,204.0 fps,256 GiB,7200 MT/s,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,33.33 Gigabit,$3.7515 hourly,,$2.1278 hourly,
+M8I Eight Extra Large,m8i.8xlarge,"765,153.629",General purpose,239.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,15 Gigabit,$1.6934 hourly,,$0.7659 hourly,
+C7I Eight Extra Large,c7i.8xlarge,"766,834.412",Compute optimized,223.0 fps,64 GiB,5600 MT/s,32 vCPUs,3.2 GHz,EBS only,12.5 Gigabit,$1.428 hourly,$0.9446 hourly,$0.7022 hourly,$0.357 hourly
+M8IDN Eight Extra Large,m8idn.8xlarge,"767,294.089",General purpose,247.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,50 Gigabit,$3.055 hourly,,$1.5514 hourly,
+R8IDN Eight Extra Large,r8idn.8xlarge,"768,922.707",Memory optimized,237.0 fps,256 GiB,7200 MT/s,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,50 Gigabit,$3.7515 hourly,,$2.1062 hourly,
+M8A Quadruple Extra Large,m8a.4xlarge,"771,022.408",General purpose,236.0 fps,64 GiB,6400 MT/s,16 vCPUs,Up to 4.5 GHz,EBS only,Up to 15 Gigabit,$0.9738 hourly,,$0.3491 hourly,
+C8I-FLEX Eight Extra Large,c8i-flex.8xlarge,"771,921.361",Compute optimized,232.0 fps,64 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,Up to 15 Gigabit,$1.4243 hourly,,$0.7902 hourly,
+HPC7A 12xlarge Extra Large,hpc7a.12xlarge,"777,957.861",Compute optimized,180.0 fps,768 GiB,4800 MT/s,24 vCPUs,3.7 GHz,EBS only,300 Gigabit,,,,
+M8IB Eight Extra Large,m8ib.8xlarge,"778,967.868",General purpose,233.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,33.33 Gigabit,$2.6733 hourly,,$1.4631 hourly,
+M8IDB Eight Extra Large,m8idb.8xlarge,"779,505.501",General purpose,224.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,33.33 Gigabit,$3.055 hourly,,$1.4576 hourly,
+C5 High-CPU 12xlarge Extra Large,c5d.12xlarge,"786,691.797",Compute optimized,178.0 fps,96 GiB,2933 MT/s,48 vCPUs,3.4 GHz,1800 GB (2×900 GB NVMe SSD),12 Gigabit,$2.304 hourly,$1.452 hourly,$0.6909 hourly,$0.27 hourly
+C5 High-CPU 12xlarge Extra Large,c5.12xlarge,"789,311.408",Compute optimized,178.0 fps,96 GiB,2933 MT/s,48 vCPUs,3.4 GHz,EBS only,12 Gigabit,$2.04 hourly,$1.285 hourly,$0.9004 hourly,$0.27 hourly
+C6IN 12xlarge Extra Large,c6in.12xlarge,"795,228.628",Compute optimized,215.0 fps,96 GiB,3200 MT/s,48 vCPUs,3.5 GHz,EBS only,75 Gigabit,$2.7216 hourly,$1.7146 hourly,$0.9592 hourly,$0.6804 hourly
+R8IN Eight Extra Large,r8in.8xlarge,"795,722.989",Memory optimized,230.0 fps,256 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,50 Gigabit,$3.3472 hourly,,$1.8018 hourly,
+C8INE Eight Extra Large,c8ine.8xlarge,"796,812.749",Compute optimized,231.0 fps,64 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,50 Gigabit,$2.7216 hourly,,,
+M8INE Eight Extra Large,m8ine.8xlarge,"798,801.797",General purpose,119.0 fps,128 GiB,7200 MT/s,32 vCPUs,3.9 GHz,EBS only,50 Gigabit,$3.3416 hourly,,,
+C7G Eight Extra Large,c7g.8xlarge,"807,876.799",Compute optimized,212.0 fps,64 GiB,,32 vCPUs,2.5 GHz,EBS only,15 Gigabit,$1.16 hourly,$0.7644 hourly,$0.3646 hourly,$0.29 hourly
+M6I 12xlarge Extra Large,m6i.12xlarge,"808,352.981",General purpose,215.0 fps,192 GiB,3200 MT/s,48 vCPUs,3.5 GHz,EBS only,18.75 Gigabit,$2.304 hourly,$1.5241 hourly,$0.8568 hourly,$0.576 hourly
+M5A 16xlarge Extra Large,m5a.16xlarge,"810,673.873",General purpose,110.0 fps,256 GiB,2667 MT/s,64 vCPUs,2.5 GHz,EBS only,12 Gigabit,$2.752 hourly,$1.734 hourly,$0.9878 hourly,$0.27 hourly
+M7G Eight Extra Large,m7g.8xlarge,"815,390.496",General purpose,213.0 fps,128 GiB,,32 vCPUs,2.5 GHz,EBS only,15 Gigabit,$1.3056 hourly,$0.8637 hourly,$0.5796 hourly,$0.3264 hourly
+M7GD Eight Extra Large,m7gd.8xlarge,"817,160.368",General purpose,212.0 fps,128 GiB,,32 vCPUs,2.5 GHz,1900 GB NVMe SSD,15 Gigabit,$1.7086 hourly,$1.0764 hourly,$0.6476 hourly,$0.4272 hourly
+R7GD Eight Extra Large,r7gd.8xlarge,"817,891.374",Memory optimized,208.0 fps,256 GiB,,32 vCPUs,2.5 GHz,1900 GB NVMe SSD,15 Gigabit,$2.1773 hourly,$1.3684 hourly,$1.3043 hourly,$0.5443 hourly
+M5AD 16xlarge Extra Large,m5ad.16xlarge,"818,518.992",General purpose,113.0 fps,256 GiB,2667 MT/s,64 vCPUs,2.5 GHz,2400 GB (4×600 GB NVMe SSD),12 Gigabit,$3.296 hourly,$2.076 hourly,$1.4768 hourly,$0.27 hourly
+M6IN 12xlarge Extra Large,m6in.12xlarge,"818,658.594",General purpose,219.0 fps,192 GiB,3200 MT/s,48 vCPUs,3.5 GHz,EBS only,75 Gigabit,$3.3415 hourly,$2.1052 hourly,$1.578 hourly,$0.8354 hourly
+HPC7G Eight Extra Large,hpc7g.8xlarge,"819,304.871",Compute optimized,214.0 fps,128 GiB,,32 vCPUs,2.6 GHz,EBS only,200 Gigabit,$1.6832 hourly,$1.3255 hourly,,
+M6IDN 12xlarge Extra Large,m6idn.12xlarge,"819,812.126",General purpose,216.0 fps,192 GiB,3200 MT/s,48 vCPUs,3.5 GHz,2850 GB (2×1425 GB NVMe SSD),75 Gigabit,$3.8189 hourly,$2.4059 hourly,$1.3499 hourly,$0.9547 hourly
+C7GD Eight Extra Large,c7gd.8xlarge,"819,882.142",Compute optimized,212.0 fps,64 GiB,,32 vCPUs,2.5 GHz,1900 GB NVMe SSD,15 Gigabit,$1.4515 hourly,$0.9148 hourly,$0.4441 hourly,$0.3629 hourly
+M6ID 12xlarge Extra Large,m6id.12xlarge,"820,442.697",General purpose,219.0 fps,192 GiB,3200 MT/s,48 vCPUs,3.5 GHz,2850 GB (2×1425 GB NVMe SSD),18.75 Gigabit,$2.8476 hourly,$1.794 hourly,$0.8824 hourly,$0.7119 hourly
+R5AD 16xlarge Extra Large,r5ad.16xlarge,"824,529.76",Memory optimized,117.0 fps,512 GiB,2667 MT/s,64 vCPUs,2.5 GHz,2400 GB (4×600 GB NVMe SSD),12 Gigabit,$4.192 hourly,$2.641 hourly,$1.4343 hourly,$0.27 hourly
+R5A 16xlarge Extra Large,r5a.16xlarge,"825,593.395",Memory optimized,107.0 fps,512 GiB,3200 MT/s,64 vCPUs,2.5 GHz,EBS only,12 Gigabit,$3.616 hourly,$2.278 hourly,$0.9307 hourly,$0.27 hourly
+R7G Eight Extra Large,r7g.8xlarge,"833,767.587",Memory optimized,206.0 fps,256 GiB,,32 vCPUs,2.5 GHz,EBS only,15 Gigabit,$1.7136 hourly,$1.1335 hourly,$0.5076 hourly,$0.4284 hourly
+R6I 12xlarge Extra Large,r6i.12xlarge,"845,256.438",Memory optimized,218.0 fps,384 GiB,3200 MT/s,48 vCPUs,3.5 GHz,EBS only,18.75 Gigabit,$3.024 hourly,$2.0004 hourly,$1.1039 hourly,$0.756 hourly
+C6I 12xlarge Extra Large,c6i.12xlarge,"847,121.112",Compute optimized,218.0 fps,96 GiB,3200 MT/s,48 vCPUs,3.5 GHz,EBS only,18.75 Gigabit,$2.04 hourly,$1.3495 hourly,$0.7251 hourly,$0.51 hourly
+C5A 12xlarge Extra Large,c5a.12xlarge,"891,199.406",Compute optimized,176.0 fps,96 GiB,2933 MT/s,48 vCPUs,3.3 GHz,EBS only,12 Gigabit,$1.848 hourly,$1.164 hourly,$0.7956 hourly,$0.27 hourly
+R5N 16xlarge Extra Large,r5n.16xlarge,"911,940.724",Memory optimized,160.0 fps,512 GiB,3200 MT/s,64 vCPUs,2.5 GHz,EBS only,75 Gigabit,$4.768 hourly,$3.004 hourly,$1.4712 hourly,$0.27 hourly
+M5 General Purpose 16xlarge Extra Large,m5d.16xlarge,"915,070.06",General purpose,162.0 fps,256 GiB,2933 MT/s,64 vCPUs,3.1 GHz,2400 GB (4×600 GB NVMe SSD),20 Gigabit,$3.616 hourly,$2.278 hourly,$1.4949 hourly,$0.27 hourly
+R5D 16xlarge Extra Large,r5d.16xlarge,"919,188.051",Memory optimized,164.0 fps,512 GiB,2933 MT/s,64 vCPUs,3.1 GHz,2400 GB (4×600 GB NVMe SSD),20 Gigabit,$4.608 hourly,$2.903 hourly,$1.5505 hourly,$0.27 hourly
+C6G 12xlarge Extra Large,c6g.12xlarge,"920,774.986",Compute optimized,170.0 fps,96 GiB,,48 vCPUs,2.5 GHz,EBS only,20 Gigabit,$1.632 hourly,$1.0282 hourly,$0.5082 hourly,$0.408 hourly
+R6G 12xlarge Extra Large,r6g.12xlarge,"926,402.47",Memory optimized,173.0 fps,384 GiB,,48 vCPUs,2.5 GHz,EBS only,20 Gigabit,$2.4192 hourly,$1.5241 hourly,$0.6858 hourly,$0.6048 hourly
+C6GD 12xlarge Extra Large,c6gd.12xlarge,"928,373.412",Compute optimized,172.0 fps,96 GiB,,48 vCPUs,2.5 GHz,2850 GB (2×1425 GB NVMe SSD),20 Gigabit,$1.8432 hourly,$1.1612 hourly,$0.5434 hourly,$0.4608 hourly
+R5 16xlarge Extra Large,r5.16xlarge,"928,657.799",Memory optimized,163.0 fps,512 GiB,3200 MT/s,64 vCPUs,3.1 GHz,EBS only,20 Gigabit,$4.032 hourly,$2.54 hourly,$0.9085 hourly,$0.27 hourly
+M8G Eight Extra Large,m8g.8xlarge,"928,815.035",General purpose,255.0 fps,128 GiB,,32 vCPUs,2.7 GHz,EBS only,15 Gigabit,$1.4362 hourly,$0.95 hourly,$0.568 hourly,
+R6GD 12xlarge Extra Large,r6gd.12xlarge,"931,556.476",Memory optimized,172.0 fps,384 GiB,,48 vCPUs,2.5 GHz,2850 GB (2×1425 GB NVMe SSD),20 Gigabit,$2.7648 hourly,$1.7418 hourly,$0.7715 hourly,$0.6912 hourly
+M6G 12xlarge Extra Large,m6g.12xlarge,"932,038.835",General purpose,172.0 fps,192 GiB,,48 vCPUs,,EBS only,20 Gigabit,$1.848 hourly,$1.1592 hourly,$0.6556 hourly,$0.462 hourly
+M5ZN 12xlarge Extra Large,m5zn.12xlarge,"932,355.655",General purpose,200.0 fps,192 GiB,2933 MT/s,48 vCPUs,4.5 GHz,EBS only,100 Gigabit,$3.9641 hourly,$2.4974 hourly,$1.5419 hourly,$0.27 hourly
+C6GN 12xlarge Extra Large,c6gn.12xlarge,"932,823.735",Compute optimized,172.0 fps,96 GiB,,48 vCPUs,2.5 GHz,EBS only,75 Gigabit,$2.0736 hourly,$1.3088 hourly,$0.7877 hourly,$0.5184 hourly
+M6GD 12xlarge Extra Large,m6gd.12xlarge,"933,005.054",General purpose,173.0 fps,192 GiB,,48 vCPUs,2.5 GHz,2850 GB (2×1425 GB NVMe SSD),20 Gigabit,$2.1696 hourly,$1.3668 hourly,$0.7011 hourly,$0.5424 hourly
+M5 General Purpose 16xlarge Extra Large,m5.16xlarge,"936,265.665",General purpose,161.0 fps,256 GiB,2666 MT/s,64 vCPUs,3.1 GHz,EBS only,20 Gigabit,$3.072 hourly,$1.935 hourly,$1.032 hourly,$0.27 hourly
+R8G Eight Extra Large,r8g.8xlarge,"961,033.111",Memory optimized,248.0 fps,256 GiB,,32 vCPUs,2.7 GHz,EBS only,15 Gigabit,$1.8851 hourly,$1.247 hourly,$0.5765 hourly,$0.4713 hourly
+M7I-FLEX 12xlarge Extra Large,m7i-flex.12xlarge,"968,620.724",General purpose,227.0 fps,192 GiB,4800 MT/s,48 vCPUs,3.5 GHz,EBS only,Up to 18.75 Gigabit,$2.2982 hourly,$1.5202 hourly,$0.8261 hourly,
+C8GN Eight Extra Large,c8gn.8xlarge,"975,386.726",Compute optimized,252.0 fps,64 GiB,,32 vCPUs,2.8 GHz,EBS only,100 Gigabit,$1.896 hourly,,$0.5666 hourly,
+C8GB Eight Extra Large,c8gb.8xlarge,"983,858.57",Compute optimized,257.0 fps,64 GiB,,32 vCPUs,2.8 GHz,EBS only,66.66 Gigabit,$1.896 hourly,,$0.7905 hourly,
+M8GN Eight Extra Large,m8gn.8xlarge,"998,050.682",General purpose,186.0 fps,128 GiB,,32 vCPUs,2.8 GHz,EBS only,100 Gigabit,$2.328 hourly,,$0.8293 hourly,
+M6A 12xlarge Extra Large,m6a.12xlarge,"1,009,410.651",General purpose,211.0 fps,192 GiB,3200 MT/s,48 vCPUs,3.6 GHz,EBS only,18.75 Gigabit,$2.0736 hourly,$1.3717 hourly,$0.9335 hourly,$0.5184 hourly
+C6A 12xlarge Extra Large,c6a.12xlarge,"1,014,155.926",Compute optimized,218.0 fps,96 GiB,2933 MT/s,48 vCPUs,3.6 GHz,EBS only,18.75 Gigabit,$1.836 hourly,$1.2145 hourly,$0.7659 hourly,$0.459 hourly
+M5ZN Metal,m5zn.metal,"1,015,228.426",General purpose,132.0 fps,192 GiB,2933 MT/s,48 vCPUs,4.5 GHz,EBS only,100 Gigabit,$3.9641 hourly,$2.4974 hourly,$1.1146 hourly,
+M8GB Eight Extra Large,m8gb.8xlarge,"1,015,873.016",General purpose,218.0 fps,128 GiB,,32 vCPUs,2.8 GHz,EBS only,66.66 Gigabit,$2.328 hourly,,$0.8276 hourly,
+C8G Eight Extra Large,c8g.8xlarge,"1,024,081.927",Compute optimized,254.0 fps,64 GiB,,32 vCPUs,2.7 GHz,EBS only,15 Gigabit,$1.2762 hourly,$0.841 hourly,$0.4157 hourly,
+R7I 12xlarge Extra Large,r7i.12xlarge,"1,058,395.502",Memory optimized,232.0 fps,384 GiB,4800 MT/s,48 vCPUs,3.2 GHz,EBS only,18.75 Gigabit,$3.1752 hourly,$2.1004 hourly,$0.9318 hourly,$0.7938 hourly
+C7A Eight Extra Large,c7a.8xlarge,"1,061,007.958",Compute optimized,285.0 fps,64 GiB,5600 MT/s,32 vCPUs,Up to 3.7 GHz,EBS only,12.5 Gigabit,$1.6422 hourly,$1.0863 hourly,$0.6518 hourly,$0.4106 hourly
+C6IN 16xlarge Extra Large,c6in.16xlarge,"1,061,183.883",Compute optimized,187.0 fps,128 GiB,3200 MT/s,64 vCPUs,3.5 GHz,EBS only,100 Gigabit,$3.6288 hourly,$2.2861 hourly,$1.0736 hourly,$0.9072 hourly
+R6A 12xlarge Extra Large,r6a.12xlarge,"1,064,183.572",Memory optimized,217.0 fps,384 GiB,3200 MT/s,48 vCPUs,3.6 GHz,EBS only,18.75 Gigabit,$2.7216 hourly,$1.8003 hourly,$0.9843 hourly,$0.6804 hourly
+M7I 12xlarge Extra Large,m7i.12xlarge,"1,068,011.57",General purpose,235.0 fps,192 GiB,4800 MT/s,48 vCPUs,3.2 GHz,EBS only,18.75 Gigabit,$2.4192 hourly,$1.6003 hourly,$0.7583 hourly,$0.6048 hourly
+M6I 16xlarge Extra Large,m6i.16xlarge,"1,069,742.175",General purpose,184.0 fps,256 GiB,3200 MT/s,64 vCPUs,3.5 GHz,EBS only,25 Gigabit,$3.072 hourly,$2.0321 hourly,$1.3495 hourly,$0.768 hourly
+C6I 16xlarge Extra Large,c6i.16xlarge,"1,074,862.493",Compute optimized,185.0 fps,128 GiB,3200 MT/s,64 vCPUs,3.5 GHz,EBS only,25 Gigabit,$2.72 hourly,$1.7993 hourly,$0.8362 hourly,$0.68 hourly
+R7A Eight Extra Large,r7a.8xlarge,"1,076,112.543",Memory optimized,284.0 fps,256 GiB,5600 MT/s,32 vCPUs,Up to 3.7 GHz,EBS only,12.5 Gigabit,$2.4344 hourly,$1.6104 hourly,$0.6352 hourly,$0.6086 hourly
+R6I 16xlarge Extra Large,r6i.16xlarge,"1,080,077.631",Memory optimized,187.0 fps,512 GiB,3200 MT/s,64 vCPUs,3.5 GHz,EBS only,25 Gigabit,$4.032 hourly,$2.6672 hourly,$1.178 hourly,$1.008 hourly
+M7A Eight Extra Large,m7a.8xlarge,"1,087,079.606",General purpose,281.0 fps,128 GiB,5600 MT/s,32 vCPUs,Up to 3.7 GHz,EBS only,12.5 Gigabit,$1.8547 hourly,$1.2269 hourly,$0.9641 hourly,$0.4637 hourly
+M6IN 16xlarge Extra Large,m6in.16xlarge,"1,090,336.045",General purpose,187.0 fps,256 GiB,3200 MT/s,64 vCPUs,3.5 GHz,EBS only,100 Gigabit,$4.4554 hourly,$2.8069 hourly,$1.9949 hourly,$1.1138 hourly
+M6ID 16xlarge Extra Large,m6id.16xlarge,"1,098,570.999",General purpose,184.0 fps,256 GiB,3200 MT/s,64 vCPUs,3.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$3.7968 hourly,$2.392 hourly,$1.1158 hourly,$0.9492 hourly
+M6IDN 16xlarge Extra Large,m6idn.16xlarge,"1,101,738.681",General purpose,186.0 fps,256 GiB,3200 MT/s,64 vCPUs,3.5 GHz,3800 GB (2×1900 GB NVMe SSD),100 Gigabit,$5.0918 hourly,$3.2079 hourly,$2.008 hourly,$1.273 hourly
+C7I-FLEX 12xlarge Extra Large,c7i-flex.12xlarge,"1,109,399.076",Compute optimized,245.0 fps,96 GiB,5600 MT/s,48 vCPUs,3.2 GHz,EBS only,Up to 18.75 Gigabit,$2.0349 hourly,$1.3461 hourly,$0.7995 hourly,
+M8I 12xlarge Extra Large,m8i.12xlarge,"1,109,527.295",General purpose,281.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,22.5 Gigabit,$2.5402 hourly,,$1.1061 hourly,
+M8I-FLEX 12xlarge Extra Large,m8i-flex.12xlarge,"1,114,464.825",General purpose,262.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,Up to 22.5 Gigabit,$2.4132 hourly,,$0.7742 hourly,
+C7I 12xlarge Extra Large,c7i.12xlarge,"1,114,637.356",Compute optimized,245.0 fps,96 GiB,4800 MT/s,48 vCPUs,3.2 GHz,EBS only,18.75 Gigabit,$2.142 hourly,$1.4169 hourly,$1.0917 hourly,$0.5355 hourly
+R8IDB 12xlarge Extra Large,r8idb.12xlarge,"1,120,012.445",Memory optimized,276.0 fps,384 GiB,7200 MT/s,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,50 Gigabit,$5.6273 hourly,,$2.7642 hourly,
+M8INE 12xlarge Extra Large,m8ine.12xlarge,"1,130,742.049",General purpose,108.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,75 Gigabit,$5.0124 hourly,,,
+C8I 12xlarge Extra Large,c8i.12xlarge,"1,138,114.997",Compute optimized,282.0 fps,96 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,22.5 Gigabit,$2.249 hourly,,$1.0229 hourly,
+C5 High-CPU 18xlarge,c5.18xlarge,"1,142,358.494",Compute optimized,183.0 fps,144 GiB,2933 MT/s,72 vCPUs,3.4 GHz,EBS only,25 Gigabit,$3.06 hourly,$1.928 hourly,$1.0282 hourly,$0.27 hourly
+R8IB 12xlarge Extra Large,r8ib.12xlarge,"1,145,767.027",Memory optimized,143.0 fps,384 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,50 Gigabit,$5.0208 hourly,,$2.5442 hourly,
+R8IDN 12xlarge Extra Large,r8idn.12xlarge,"1,148,691.768",Memory optimized,242.0 fps,384 GiB,7200 MT/s,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,75 Gigabit,$5.6273 hourly,,$3.0053 hourly,
+M8IDB 12xlarge Extra Large,m8idb.12xlarge,"1,153,938.617",General purpose,284.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,50 Gigabit,$4.5826 hourly,,$2.1522 hourly,
+M8IDN 12xlarge Extra Large,m8idn.12xlarge,"1,156,487.17",General purpose,235.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,75 Gigabit,$4.5826 hourly,,$1.8777 hourly,
+M8IB 12xlarge Extra Large,m8ib.12xlarge,"1,159,607.022",General purpose,270.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,50 Gigabit,$4.0099 hourly,,$1.7878 hourly,
+C5N 18xlarge,c5n.18xlarge,"1,160,775.462",Compute optimized,187.0 fps,192 GiB,2666 MT/s,72 vCPUs,3 GHz,EBS only,100 Gigabit,$3.888 hourly,$2.449 hourly,$1.4231 hourly,$0.27 hourly
+C5 High-CPU 18xlarge,c5d.18xlarge,"1,164,577.436",Compute optimized,188.0 fps,144 GiB,2666 MT/s,72 vCPUs,3.4 GHz,1800 GB (2×900 GB NVMe SSD),25 Gigabit,$3.456 hourly,$2.177 hourly,$0.9604 hourly,$0.27 hourly
+R8I 12xlarge Extra Large,r8i.12xlarge,"1,169,590.643",Memory optimized,279.0 fps,384 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,22.5 Gigabit,$3.3341 hourly,,$1.1992 hourly,
+M8IN 12xlarge Extra Large,m8in.12xlarge,"1,169,828.181",General purpose,269.0 fps,192 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,75 Gigabit,$4.0099 hourly,,$1.7015 hourly,
+C8I-FLEX 12xlarge Extra Large,c8i-flex.12xlarge,"1,172,686.184",Compute optimized,266.0 fps,96 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,Up to 22.5 Gigabit,$2.1365 hourly,,$0.7252 hourly,
+R5A 24xlarge,r5a.24xlarge,"1,175,174.44",Memory optimized,115.0 fps,768 GiB,2667 MT/s,96 vCPUs,2.5 GHz,EBS only,20 Gigabit,$5.424 hourly,$3.417 hourly,$1.8963 hourly,$0.27 hourly
+C8INE 12xlarge Extra Large,c8ine.12xlarge,"1,178,203.24",Compute optimized,109.0 fps,96 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,75 Gigabit,$4.0824 hourly,,,
+R7G 12xlarge Extra Large,r7g.12xlarge,"1,184,600.197",Memory optimized,239.0 fps,384 GiB,,48 vCPUs,2.5 GHz,EBS only,22.5 Gigabit,$2.5704 hourly,$1.7003 hourly,$0.6726 hourly,$0.6426 hourly
+R8I-FLEX 12xlarge Extra Large,r8i-flex.12xlarge,"1,195,169.523",Memory optimized,266.0 fps,384 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,Up to 22.5 Gigabit,$3.1673 hourly,,$1.2114 hourly,
+C5A 16xlarge Extra Large,c5a.16xlarge,"1,197,828.935",Compute optimized,184.0 fps,128 GiB,2933 MT/s,64 vCPUs,3.3 GHz,EBS only,20 Gigabit,$2.464 hourly,$1.552 hourly,$1.0808 hourly,$0.27 hourly
+C5N Metal,c5n.metal,"1,201,201.201",Compute optimized,184.0 fps,192 GiB,2666 MT/s,72 vCPUs,3 GHz,EBS only,100 Gigabit,$3.888 hourly,$2.449 hourly,$1.1395 hourly,
+R8IN 12xlarge Extra Large,r8in.12xlarge,"1,205,525.324",Memory optimized,205.0 fps,384 GiB,7200 MT/s,48 vCPUs,3.9 GHz,EBS only,75 Gigabit,$5.0208 hourly,,$2.3256 hourly,
+M5A 24xlarge,m5a.24xlarge,"1,205,575.788",General purpose,114.0 fps,384 GiB,2667 MT/s,96 vCPUs,2.5 GHz,EBS only,20 Gigabit,$4.128 hourly,$2.601 hourly,$1.5452 hourly,$0.27 hourly
+C7GD 12xlarge Extra Large,c7gd.12xlarge,"1,211,280.045",Compute optimized,238.0 fps,96 GiB,,48 vCPUs,2.5 GHz,2850 GB (2×1425 GB NVMe SSD),22.5 Gigabit,$2.1773 hourly,$1.3721 hourly,$0.6228 hourly,$0.5443 hourly
+R6G Metal,r6g.metal,"1,222,229.295",Memory optimized,178.0 fps,512 GiB,,64 vCPUs,2.5 GHz,EBS only,25 Gigabit,$3.2256 hourly,$2.0321 hourly,$0.9096 hourly,
+R7GD 12xlarge Extra Large,r7gd.12xlarge,"1,239,589.386",Memory optimized,239.0 fps,384 GiB,,48 vCPUs,2.5 GHz,2850 GB (2×1425 GB NVMe SSD),22.5 Gigabit,$3.2659 hourly,$2.0525 hourly,$0.9382 hourly,$0.8165 hourly
+C6GD 16xlarge Extra Large,c6gd.16xlarge,"1,243,764.98",Compute optimized,176.0 fps,128 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$2.4576 hourly,$1.5483 hourly,$0.6762 hourly,$0.6144 hourly
+M7G 12xlarge Extra Large,m7g.12xlarge,"1,244,732.577",General purpose,239.0 fps,192 GiB,,48 vCPUs,2.5 GHz,EBS only,22.5 Gigabit,$1.9584 hourly,$1.2955 hourly,$0.6518 hourly,$0.4896 hourly
+R6GD 16xlarge Extra Large,r6gd.16xlarge,"1,245,620.864",Memory optimized,175.0 fps,512 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$3.6864 hourly,$2.3224 hourly,$1.4196 hourly,$0.9216 hourly
+M7GD 12xlarge Extra Large,m7gd.12xlarge,"1,247,077.163",General purpose,239.0 fps,192 GiB,,48 vCPUs,2.5 GHz,2850 GB (2×1425 GB NVMe SSD),22.5 Gigabit,$2.5628 hourly,$1.6146 hourly,$0.6883 hourly,$0.6407 hourly
+C6GD Metal,c6gd.metal,"1,247,239.184",Compute optimized,178.0 fps,128 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$2.4576 hourly,$1.5483 hourly,$0.6529 hourly,
+M5AD 24xlarge,m5ad.24xlarge,"1,248,699.272",General purpose,97.0 fps,384 GiB,2667 MT/s,96 vCPUs,2.5 GHz,3600 GB (4×900 GB NVMe SSD),20 Gigabit,$4.944 hourly,$3.115 hourly,$2.2294 hourly,$0.27 hourly
+C7G 12xlarge Extra Large,c7g.12xlarge,"1,252,037.822",Compute optimized,240.0 fps,96 GiB,,48 vCPUs,2.5 GHz,EBS only,22.5 Gigabit,$1.74 hourly,$1.1466 hourly,$0.5364 hourly,$0.435 hourly
+R5AD 24xlarge,r5ad.24xlarge,"1,255,066.022",Memory optimized,112.0 fps,768 GiB,2667 MT/s,96 vCPUs,2.5 GHz,3600 GB (4×900 GB NVMe SSD),20 Gigabit,$6.288 hourly,$3.961 hourly,$2.1472 hourly,$0.27 hourly
+C6G Metal,c6g.metal,"1,258,768.767",Compute optimized,177.0 fps,128 GiB,,64 vCPUs,2.5 GHz,EBS only,25 Gigabit,$2.176 hourly,$1.3709 hourly,$0.6611 hourly,
+C6G 16xlarge Extra Large,c6g.16xlarge,"1,271,018.138",Compute optimized,175.0 fps,128 GiB,,64 vCPUs,2.5 GHz,EBS only,25 Gigabit,$2.176 hourly,$1.3709 hourly,$0.5401 hourly,$0.544 hourly
+C6GN 16xlarge Extra Large,c6gn.16xlarge,"1,273,125.124",Compute optimized,175.0 fps,128 GiB,,64 vCPUs,2.5 GHz,EBS only,100 Gigabit,$2.7648 hourly,$1.745 hourly,$0.7903 hourly,$0.6912 hourly
+R6G 16xlarge Extra Large,r6g.16xlarge,"1,273,547.36",Memory optimized,176.0 fps,512 GiB,,64 vCPUs,2.5 GHz,EBS only,25 Gigabit,$3.2256 hourly,$2.0321 hourly,$0.9614 hourly,$0.8064 hourly
+M6G 16xlarge Extra Large,m6g.16xlarge,"1,277,445.11",General purpose,176.0 fps,256 GiB,,64 vCPUs,,EBS only,25 Gigabit,$2.464 hourly,$1.5456 hourly,$0.7783 hourly,$0.616 hourly
+M6GD Metal,m6gd.metal,"1,278,891.627",General purpose,178.0 fps,256 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$2.8928 hourly,$1.8225 hourly,$0.6987 hourly,
+M6G Metal,m6g.metal,"1,280,256.051",General purpose,178.0 fps,256 GiB,,64 vCPUs,,EBS only,25 Gigabit,$2.464 hourly,$1.5456 hourly,$0.627 hourly,
+M6GD 16xlarge Extra Large,m6gd.16xlarge,"1,289,109.709",General purpose,175.0 fps,256 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$2.8928 hourly,$1.8225 hourly,$0.9853 hourly,$0.7232 hourly
+C7I-FLEX 16xlarge Extra Large,c7i-flex.16xlarge,"1,296,684.001",Compute optimized,228.0 fps,128 GiB,5600 MT/s,64 vCPUs,3.2 GHz,EBS only,Up to 25 Gigabit,$2.7132 hourly,$1.7948 hourly,$0.9185 hourly,
+C8A Eight Extra Large,c8a.8xlarge,"1,300,372.503",Compute optimized,349.0 fps,64 GiB,6400 MT/s,32 vCPUs,Up to 4.5 GHz,EBS only,15 Gigabit,$1.7243 hourly,,$0.8289 hourly,
+R6GD Metal,r6gd.metal,"1,302,489.655",Memory optimized,178.0 fps,512 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$3.6864 hourly,$2.3224 hourly,$1.1811 hourly,
+R5D Metal,r5d.metal,"1,303,816.379",Memory optimized,170.0 fps,768 GiB,2933 MT/s,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),25 Gigabit,$6.912 hourly,$4.355 hourly,$1.806 hourly,
+R5 Metal,r5.metal,"1,310,893.387",Memory optimized,176.0 fps,768 GiB,2933 MT/s,96 vCPUs,3.1 GHz,EBS only,25 Gigabit,$6.048 hourly,$3.81 hourly,$1.6161 hourly,
+M5 General Purpose Metal,m5.metal,"1,318,409.668",General purpose,180.0 fps,384 GiB,2666 MT/s,96 vCPUs,3.1 GHz,EBS only,25 Gigabit,$4.608 hourly,$2.903 hourly,$1.0918 hourly,
+R5N Metal,r5n.metal,"1,321,767.865",Memory optimized,176.0 fps,768 GiB,2666 MT/s,96 vCPUs,2.5 GHz,EBS only,100 Gigabit,$7.152 hourly,$4.506 hourly,$2.6903 hourly,
+M7I-FLEX 16xlarge Extra Large,m7i-flex.16xlarge,"1,328,489.881",General purpose,210.0 fps,256 GiB,4800 MT/s,64 vCPUs,3.5 GHz,EBS only,Up to 25 Gigabit,$3.0643 hourly,$2.0269 hourly,$1.0116 hourly,
+C6A 16xlarge Extra Large,c6a.16xlarge,"1,332,500.521",Compute optimized,226.0 fps,128 GiB,2933 MT/s,64 vCPUs,3.6 GHz,EBS only,25 Gigabit,$2.448 hourly,$1.6194 hourly,$0.9515 hourly,$0.612 hourly
+M7I 16xlarge Extra Large,m7i.16xlarge,"1,339,566.036",General purpose,231.0 fps,256 GiB,5600 MT/s,64 vCPUs,3.2 GHz,EBS only,25 Gigabit,$3.2256 hourly,$2.1337 hourly,$1.1111 hourly,$0.8064 hourly
+R5D 24xlarge,r5d.24xlarge,"1,345,951.63",Memory optimized,173.0 fps,768 GiB,2933 MT/s,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),25 Gigabit,$6.912 hourly,$4.355 hourly,$2.838 hourly,$0.27 hourly
+R5 24xlarge,r5.24xlarge,"1,351,398.909",Memory optimized,177.0 fps,768 GiB,2933 MT/s,96 vCPUs,3.1 GHz,EBS only,25 Gigabit,$6.048 hourly,$3.81 hourly,$1.8718 hourly,$0.27 hourly
+R5N 24xlarge,r5n.24xlarge,"1,355,214.399",Memory optimized,176.0 fps,768 GiB,2933 MT/s,96 vCPUs,2.5 GHz,EBS only,100 Gigabit,$7.152 hourly,$4.506 hourly,$2.5903 hourly,$0.27 hourly
+M5 General Purpose Metal,m5d.metal,"1,359,869.679",General purpose,173.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),25 Gigabit,$5.424 hourly,$3.417 hourly,$1.1998 hourly,
+C8G 12xlarge Extra Large,c8g.12xlarge,"1,371,722.512",Compute optimized,293.0 fps,96 GiB,,48 vCPUs,2.7 GHz,EBS only,22.5 Gigabit,$1.9142 hourly,$1.2614 hourly,$0.6264 hourly,
+M5 General Purpose 24xlarge,m5.24xlarge,"1,374,718.075",General purpose,172.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.1 GHz,EBS only,25 Gigabit,$4.608 hourly,$2.903 hourly,$1.2833 hourly,$0.27 hourly
+M8GN 12xlarge Extra Large,m8gn.12xlarge,"1,375,161.152",General purpose,289.0 fps,192 GiB,,48 vCPUs,2.8 GHz,EBS only,150 Gigabit,$3.492 hourly,,$1.0652 hourly,
+R6A 16xlarge Extra Large,r6a.16xlarge,"1,375,456.695",Memory optimized,225.0 fps,512 GiB,3200 MT/s,64 vCPUs,3.6 GHz,EBS only,25 Gigabit,$3.6288 hourly,$2.4005 hourly,$1.0272 hourly,$0.9072 hourly
+M5 General Purpose 24xlarge,m5d.24xlarge,"1,386,431.744",General purpose,173.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),25 Gigabit,$5.424 hourly,$3.417 hourly,$2.1112 hourly,$0.27 hourly
+M8A Eight Extra Large,m8a.8xlarge,"1,391,102.739",General purpose,329.0 fps,128 GiB,6400 MT/s,32 vCPUs,Up to 4.5 GHz,EBS only,15 Gigabit,$1.9475 hourly,,$0.6332 hourly,
+C8GN 12xlarge Extra Large,c8gn.12xlarge,"1,393,020.387",Compute optimized,290.0 fps,96 GiB,,48 vCPUs,2.8 GHz,EBS only,150 Gigabit,$2.844 hourly,,$0.9239 hourly,
+M8GB 12xlarge Extra Large,m8gb.12xlarge,"1,395,856.052",General purpose,293.0 fps,192 GiB,,48 vCPUs,2.8 GHz,EBS only,100 Gigabit,$3.492 hourly,,$1.0773 hourly,
+C7A 12xlarge Extra Large,c7a.12xlarge,"1,416,207.71",Compute optimized,298.0 fps,96 GiB,4800 MT/s,48 vCPUs,Up to 3.7 GHz,EBS only,18.75 Gigabit,$2.4634 hourly,$1.6295 hourly,$0.8947 hourly,$0.6158 hourly
+M6A 16xlarge Extra Large,m6a.16xlarge,"1,416,948.027",General purpose,227.0 fps,256 GiB,3200 MT/s,64 vCPUs,3.6 GHz,EBS only,25 Gigabit,$2.7648 hourly,$1.8289 hourly,$1.1856 hourly,$0.6912 hourly
+R8G 12xlarge Extra Large,r8g.12xlarge,"1,430,913.698",Memory optimized,291.0 fps,384 GiB,,48 vCPUs,2.7 GHz,EBS only,22.5 Gigabit,$2.8277 hourly,$1.8705 hourly,$0.7941 hourly,$0.7069 hourly
+R7I 16xlarge Extra Large,r7i.16xlarge,"1,431,874.114",Memory optimized,235.0 fps,512 GiB,4800 MT/s,64 vCPUs,3.2 GHz,EBS only,25 Gigabit,$4.2336 hourly,$2.8005 hourly,$1.246 hourly,$1.0584 hourly
+M8G 12xlarge Extra Large,m8g.12xlarge,"1,434,548.715",General purpose,293.0 fps,192 GiB,,48 vCPUs,2.7 GHz,EBS only,22.5 Gigabit,$2.1542 hourly,$1.425 hourly,$0.698 hourly,
+C8GB 12xlarge Extra Large,c8gb.12xlarge,"1,444,151.937",Compute optimized,291.0 fps,96 GiB,,48 vCPUs,2.8 GHz,EBS only,100 Gigabit,$2.844 hourly,,$1.0489 hourly,
+C7I 16xlarge Extra Large,c7i.16xlarge,"1,461,076.022",Compute optimized,240.0 fps,128 GiB,4800 MT/s,64 vCPUs,3.2 GHz,EBS only,25 Gigabit,$2.856 hourly,$1.8892 hourly,$0.9677 hourly,$0.714 hourly
+M8I-FLEX 16xlarge Extra Large,m8i-flex.16xlarge,"1,480,967.257",General purpose,263.0 fps,256 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,Up to 30 Gigabit,$3.2176 hourly,,$1.0671 hourly,
+M8IDN 16xlarge Extra Large,m8idn.16xlarge,"1,497,251.14",General purpose,246.0 fps,256 GiB,7200 MT/s,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,100 Gigabit,$6.1101 hourly,,$2.8971 hourly,
+M8IN 16xlarge Extra Large,m8in.16xlarge,"1,499,238.668",General purpose,235.0 fps,256 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,100 Gigabit,$5.3466 hourly,,$2.2255 hourly,
+R8IDB 16xlarge Extra Large,r8idb.16xlarge,"1,518,206.618",Memory optimized,285.0 fps,512 GiB,7200 MT/s,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,66.66 Gigabit,$7.503 hourly,,$3.4828 hourly,
+M7GD Metal,m7gd.metal,"1,523,537.464",General purpose,245.0 fps,256 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$3.4171 hourly,$2.1528 hourly,$0.7279 hourly,
+R8I-FLEX 16xlarge Extra Large,r8i-flex.16xlarge,"1,527,021.116",Memory optimized,274.0 fps,512 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,Up to 30 Gigabit,$4.223 hourly,,$1.181 hourly,
+R8A Eight Extra Large,r8a.8xlarge,"1,530,501.326",Memory optimized,369.0 fps,256 GiB,6400 MT/s,32 vCPUs,Up to 4.5 GHz,EBS only,15 Gigabit,$2.5562 hourly,,$0.9133 hourly,
+R7G Metal,r7g.metal,"1,531,008.911",Memory optimized,245.0 fps,512 GiB,,64 vCPUs,2.5 GHz,EBS only,30 Gigabit,$3.4272 hourly,$2.2671 hourly,$0.9613 hourly,
+M8IDB 16xlarge Extra Large,m8idb.16xlarge,"1,531,405.783",General purpose,278.0 fps,256 GiB,7200 MT/s,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,66.66 Gigabit,$6.1101 hourly,,$2.3483 hourly,
+C7G Metal,c7g.metal,"1,533,852.606",Compute optimized,245.0 fps,128 GiB,,64 vCPUs,2.5 GHz,EBS only,30 Gigabit,$2.32 hourly,$1.5288 hourly,$0.7771 hourly,
+M7A 12xlarge Extra Large,m7a.12xlarge,"1,543,408.36",General purpose,308.0 fps,192 GiB,5600 MT/s,48 vCPUs,Up to 3.7 GHz,EBS only,18.75 Gigabit,$2.7821 hourly,$1.8404 hourly,$1.0049 hourly,$0.6955 hourly
+R8IB 16xlarge Extra Large,r8ib.16xlarge,"1,544,960.772",Memory optimized,277.0 fps,512 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,66.66 Gigabit,$6.6944 hourly,,$3.1911 hourly,
+R8IDN 16xlarge Extra Large,r8idn.16xlarge,"1,545,085.1",Memory optimized,274.0 fps,512 GiB,7200 MT/s,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,100 Gigabit,$7.503 hourly,,$3.9592 hourly,
+C5 High-CPU 24xlarge,c5d.24xlarge,"1,546,080.444",Compute optimized,196.0 fps,192 GiB,2933 MT/s,96 vCPUs,3.4 GHz,3600 GB (4×900 GB NVMe SSD),25 Gigabit,$4.608 hourly,$2.903 hourly,$1.2915 hourly,$0.27 hourly
+M6IN 24xlarge,m6in.24xlarge,"1,559,327.54",General purpose,237.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.5 GHz,EBS only,150 Gigabit,$6.683 hourly,$4.2103 hourly,$2.6468 hourly,$1.6708 hourly
+C8I-FLEX 16xlarge Extra Large,c8i-flex.16xlarge,"1,565,493.905",Compute optimized,274.0 fps,128 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,Up to 30 Gigabit,$2.8486 hourly,,$1.3389 hourly,
+M8IB 16xlarge Extra Large,m8ib.16xlarge,"1,576,095.879",General purpose,204.0 fps,256 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,66.66 Gigabit,$5.3466 hourly,,$2.2275 hourly,
+HPC7G 16xlarge Extra Large,hpc7g.16xlarge,"1,576,743.04",Compute optimized,242.0 fps,128 GiB,,64 vCPUs,2.6 GHz,EBS only,200 Gigabit,$1.6832 hourly,$1.3255 hourly,,
+C7GD 16xlarge Extra Large,c7gd.16xlarge,"1,579,466.93",Compute optimized,242.0 fps,128 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$2.903 hourly,$1.8295 hourly,$0.7257 hourly,$0.7258 hourly
+M7G 16xlarge Extra Large,m7g.16xlarge,"1,580,051.845",General purpose,242.0 fps,256 GiB,,64 vCPUs,2.5 GHz,EBS only,30 Gigabit,$2.6112 hourly,$1.7273 hourly,$0.9811 hourly,$0.6528 hourly
+C8I 16xlarge Extra Large,c8i.16xlarge,"1,583,570.457",Compute optimized,251.0 fps,128 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,30 Gigabit,$2.9987 hourly,,$1.4274 hourly,
+R8IN 16xlarge Extra Large,r8in.16xlarge,"1,583,766.394",Memory optimized,226.0 fps,512 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,100 Gigabit,$6.6944 hourly,,$3.7257 hourly,
+R7GD 16xlarge Extra Large,r7gd.16xlarge,"1,587,695.361",Memory optimized,242.0 fps,512 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$4.3546 hourly,$2.7367 hourly,$2.1179 hourly,$1.0887 hourly
+M6I 24xlarge,m6i.24xlarge,"1,587,761.009",General purpose,235.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.5 GHz,EBS only,37.5 Gigabit,$4.608 hourly,$3.0482 hourly,$1.4151 hourly,$1.152 hourly
+C5 High-CPU Metal,c5.metal,"1,609,657.948",Compute optimized,192.0 fps,192 GiB,3200 MT/s,96 vCPUs,3.4 GHz,EBS only,25 Gigabit,$4.08 hourly,$2.57 hourly,$1.1343 hourly,
+C7G 16xlarge Extra Large,c7g.16xlarge,"1,611,786.186",Compute optimized,242.0 fps,128 GiB,,64 vCPUs,2.5 GHz,EBS only,30 Gigabit,$2.32 hourly,$1.5288 hourly,$0.6709 hourly,$0.58 hourly
+M8I 16xlarge Extra Large,m8i.16xlarge,"1,612,496.851",General purpose,284.0 fps,256 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,30 Gigabit,$3.3869 hourly,,$1.0929 hourly,
+R8I 16xlarge Extra Large,r8i.16xlarge,"1,615,753.598",Memory optimized,283.0 fps,512 GiB,7200 MT/s,64 vCPUs,3.9 GHz,EBS only,30 Gigabit,$4.4454 hourly,,$1.0534 hourly,
+C6I 24xlarge,c6i.24xlarge,"1,618,545.838",Compute optimized,237.0 fps,192 GiB,3200 MT/s,96 vCPUs,3.5 GHz,EBS only,37.5 Gigabit,$4.08 hourly,$2.6989 hourly,$1.3548 hourly,$1.02 hourly
+C5 High-CPU 24xlarge,c5.24xlarge,"1,626,773.989",Compute optimized,192.0 fps,192 GiB,2933 MT/s,96 vCPUs,3.4 GHz,EBS only,25 Gigabit,$4.08 hourly,$2.57 hourly,$1.2273 hourly,$0.27 hourly
+R7A 12xlarge Extra Large,r7a.12xlarge,"1,627,394.474",Memory optimized,315.0 fps,384 GiB,4800 MT/s,48 vCPUs,Up to 3.7 GHz,EBS only,18.75 Gigabit,$3.6516 hourly,$2.4155 hourly,$1.2281 hourly,$0.9129 hourly
+C7GD Metal,c7gd.metal,"1,630,157.922",Compute optimized,245.0 fps,128 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$2.903 hourly,$1.8295 hourly,$0.6437 hourly,
+C6IN 24xlarge,c6in.24xlarge,"1,632,306.057",Compute optimized,238.0 fps,192 GiB,3200 MT/s,96 vCPUs,3.5 GHz,EBS only,150 Gigabit,$5.4432 hourly,$3.4292 hourly,$1.3594 hourly,$1.3608 hourly
+HPC6ID 32xlarge,hpc6id.32xlarge,"1,644,610.048",Compute optimized,216.0 fps,1024 GiB,3200 MT/s,64 vCPUs,3.5 GHz,15200 GB (4×3800 GB NVMe SSD),200 Gigabit,,,,
+M6IDN 24xlarge,m6idn.24xlarge,"1,646,655.232",General purpose,233.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.5 GHz,5700 GB (4×1425 GB NVMe SSD),150 Gigabit,$7.6378 hourly,$4.8118 hourly,$2.3168 hourly,$1.9094 hourly
+R7GD Metal,r7gd.metal,"1,648,316.271",Memory optimized,245.0 fps,512 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$4.3546 hourly,$2.7367 hourly,$1.159 hourly,
+R7G 16xlarge Extra Large,r7g.16xlarge,"1,652,572.461",Memory optimized,223.0 fps,512 GiB,,64 vCPUs,2.5 GHz,EBS only,30 Gigabit,$3.4272 hourly,$2.2671 hourly,$0.8966 hourly,$0.8568 hourly
+HPC7A 24xlarge,hpc7a.24xlarge,"1,661,187.057",Compute optimized,272.0 fps,768 GiB,5600 MT/s,48 vCPUs,3.7 GHz,EBS only,300 Gigabit,,,,
+M7GD 16xlarge Extra Large,m7gd.16xlarge,"1,664,499.35",General purpose,242.0 fps,256 GiB,,64 vCPUs,2.5 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$3.4171 hourly,$2.1528 hourly,$1.1101 hourly,$0.8543 hourly
+M6ID 24xlarge,m6id.24xlarge,"1,695,439.092",General purpose,240.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.5 GHz,5700 GB (4×1425 GB NVMe SSD),37.5 Gigabit,$5.6952 hourly,$3.588 hourly,$1.6878 hourly,$1.4238 hourly
+R6I 24xlarge,r6i.24xlarge,"1,705,908.485",Memory optimized,239.0 fps,768 GiB,3200 MT/s,96 vCPUs,3.5 GHz,EBS only,37.5 Gigabit,$6.048 hourly,$4.0008 hourly,$1.969 hourly,$1.512 hourly
+M7G Metal,m7g.metal,"1,729,262.362",General purpose,245.0 fps,256 GiB,,64 vCPUs,2.5 GHz,EBS only,30 Gigabit,$2.6112 hourly,$1.7273 hourly,$0.6718 hourly,
+C5 High-CPU Metal,c5d.metal,"1,749,430.524",Compute optimized,198.0 fps,192 GiB,2933 MT/s,96 vCPUs,3.4 GHz,3600 GB (4×900 GB NVMe SSD),25 Gigabit,$4.608 hourly,$2.903 hourly,$1.1708 hourly,
+C5A 24xlarge,c5a.24xlarge,"1,782,067.941",Compute optimized,209.0 fps,192 GiB,2933 MT/s,96 vCPUs,3.3 GHz,EBS only,20 Gigabit,$3.696 hourly,$2.328 hourly,$1.3237 hourly,$0.27 hourly
+M6A 24xlarge,m6a.24xlarge,"1,807,143.866",General purpose,240.0 fps,384 GiB,3200 MT/s,96 vCPUs,3.6 GHz,EBS only,37.5 Gigabit,$4.1472 hourly,$2.7434 hourly,$1.4876 hourly,$1.0368 hourly
+R6A 24xlarge,r6a.24xlarge,"1,818,526.236",Memory optimized,239.0 fps,768 GiB,3200 MT/s,96 vCPUs,3.6 GHz,EBS only,37.5 Gigabit,$5.4432 hourly,$3.6007 hourly,$1.4955 hourly,$1.3608 hourly
+C8GN 16xlarge Extra Large,c8gn.16xlarge,"1,838,816.262",Compute optimized,297.0 fps,128 GiB,,64 vCPUs,2.8 GHz,EBS only,200 Gigabit,$3.792 hourly,,$0.9722 hourly,
+C6A 24xlarge,c6a.24xlarge,"1,843,494.959",Compute optimized,263.0 fps,192 GiB,2933 MT/s,96 vCPUs,3.6 GHz,EBS only,37.5 Gigabit,$3.672 hourly,$2.429 hourly,$1.1949 hourly,$0.918 hourly
+M8GB 16xlarge Extra Large,m8gb.16xlarge,"1,863,580.112",General purpose,296.0 fps,256 GiB,,64 vCPUs,2.8 GHz,EBS only,133.33 Gigabit,$4.656 hourly,,$1.7524 hourly,
+C8GB 16xlarge Extra Large,c8gb.16xlarge,"1,872,713.972",Compute optimized,297.0 fps,128 GiB,,64 vCPUs,2.8 GHz,EBS only,133.33 Gigabit,$3.792 hourly,,$1.1767 hourly,
+M8GN 16xlarge Extra Large,m8gn.16xlarge,"1,925,825.623",General purpose,295.0 fps,256 GiB,,64 vCPUs,2.8 GHz,EBS only,200 Gigabit,$4.656 hourly,,$1.7533 hourly,
+M7A 16xlarge Extra Large,m7a.16xlarge,"1,932,756.191",General purpose,302.0 fps,256 GiB,5600 MT/s,64 vCPUs,Up to 3.7 GHz,EBS only,25 Gigabit,$3.7094 hourly,$2.4538 hourly,$1.5072 hourly,$0.9274 hourly
+M8G 16xlarge Extra Large,m8g.16xlarge,"1,941,747.573",General purpose,297.0 fps,256 GiB,,64 vCPUs,2.7 GHz,EBS only,30 Gigabit,$2.8723 hourly,$1.90 hourly,$0.9572 hourly,
+R7I 24xlarge,r7i.24xlarge,"1,947,327.496",Memory optimized,258.0 fps,768 GiB,5600 MT/s,96 vCPUs,3.2 GHz,EBS only,37.5 Gigabit,$6.3504 hourly,$4.2008 hourly,$2.1162 hourly,$1.5876 hourly
+C7I 24xlarge,c7i.24xlarge,"1,984,974.843",Compute optimized,251.0 fps,192 GiB,4800 MT/s,96 vCPUs,3.2 GHz,EBS only,37.5 Gigabit,$4.284 hourly,$2.8339 hourly,$1.8666 hourly,$1.071 hourly
+R7A 16xlarge Extra Large,r7a.16xlarge,"1,992,631.415",Memory optimized,309.0 fps,512 GiB,4800 MT/s,64 vCPUs,Up to 3.7 GHz,EBS only,25 Gigabit,$4.8688 hourly,$3.2207 hourly,$1.2411 hourly,$1.2172 hourly
+C8G 16xlarge Extra Large,c8g.16xlarge,"1,995,323.461",Compute optimized,296.0 fps,128 GiB,,64 vCPUs,2.7 GHz,EBS only,30 Gigabit,$2.5523 hourly,$1.6819 hourly,$0.7412 hourly,
+C7I Metal-24xl,c7i.metal-24xl,"2,007,248.397",Compute optimized,278.0 fps,192 GiB,4800 MT/s,96 vCPUs,3.2 GHz,EBS only,37.5 Gigabit,$4.284 hourly,$2.8339 hourly,$1.1858 hourly,
+C7A 16xlarge Extra Large,c7a.16xlarge,"2,015,219.103",Compute optimized,322.0 fps,128 GiB,4800 MT/s,64 vCPUs,Up to 3.7 GHz,EBS only,25 Gigabit,$3.2845 hourly,$2.1727 hourly,$1.204 hourly,$0.8211 hourly
+M7I 24xlarge,m7i.24xlarge,"2,034,760.492",General purpose,257.0 fps,384 GiB,5600 MT/s,96 vCPUs,3.2 GHz,EBS only,37.5 Gigabit,$4.8384 hourly,$3.2006 hourly,$1.4353 hourly,$1.2096 hourly
+R8G 16xlarge Extra Large,r8g.16xlarge,"2,040,490.993",Memory optimized,297.0 fps,512 GiB,,64 vCPUs,2.7 GHz,EBS only,30 Gigabit,$3.7702 hourly,$2.494 hourly,$1.0161 hourly,$0.9426 hourly
+C8A 12xlarge Extra Large,c8a.12xlarge,"2,043,132.804",Compute optimized,388.0 fps,96 GiB,6400 MT/s,48 vCPUs,Up to 4.5 GHz,EBS only,22.5 Gigabit,$2.5865 hourly,,$1.0875 hourly,
+M7I Metal-24xl,m7i.metal-24xl,"2,055,234.425",General purpose,279.0 fps,384 GiB,5600 MT/s,96 vCPUs,3.2 GHz,EBS only,37.5 Gigabit,$4.8384 hourly,$3.2006 hourly,$1.2592 hourly,
+R7I Metal-24xl,r7i.metal-24xl,"2,100,043.751",Memory optimized,270.0 fps,768 GiB,4800 MT/s,96 vCPUs,3.2 GHz,EBS only,37.5 Gigabit,$6.3504 hourly,$4.2008 hourly,$1.9198 hourly,
+M6IDN 32xlarge,m6idn.32xlarge,"2,140,826.225",General purpose,215.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),200 Gigabit,$10.1837 hourly,$6.4157 hourly,$3.7571 hourly,$2.5459 hourly
+C6IN 32xlarge,c6in.32xlarge,"2,142,887.038",Compute optimized,212.0 fps,256 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,200 Gigabit,$7.2576 hourly,$4.5723 hourly,$1.7725 hourly,$1.8144 hourly
+M8I 24xlarge,m8i.24xlarge,"2,193,157.805",General purpose,303.0 fps,384 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,40 Gigabit,$5.0803 hourly,,$1.9358 hourly,
+R8IDN 24xlarge,r8idn.24xlarge,"2,194,034.967",Memory optimized,278.0 fps,768 GiB,7200 MT/s,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),150 Gigabit,$11.2546 hourly,,$4.4721 hourly,
+R8IN 24xlarge,r8in.24xlarge,"2,200,320.88",Memory optimized,296.0 fps,768 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,150 Gigabit,$10.0416 hourly,,$2.9539 hourly,
+M6ID 32xlarge,m6id.32xlarge,"2,204,900.736",General purpose,213.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),50 Gigabit,$7.5936 hourly,$4.784 hourly,$2.4747 hourly,$1.8984 hourly
+M6IN 32xlarge,m6in.32xlarge,"2,206,611.214",General purpose,220.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,200 Gigabit,$8.9107 hourly,$5.6138 hourly,$2.7767 hourly,$2.2277 hourly
+M8IDB 24xlarge,m8idb.24xlarge,"2,234,636.872",General purpose,227.0 fps,384 GiB,7200 MT/s,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),100 Gigabit,$9.1651 hourly,,$3.5058 hourly,
+R8A 12xlarge Extra Large,r8a.12xlarge,"2,242,323.863",Memory optimized,402.0 fps,384 GiB,6400 MT/s,48 vCPUs,Up to 4.5 GHz,EBS only,22.5 Gigabit,$3.8342 hourly,,$1.4835 hourly,
+R8I 24xlarge,r8i.24xlarge,"2,246,270.839",Memory optimized,292.0 fps,768 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,40 Gigabit,$6.6682 hourly,,$2.4267 hourly,
+M8A 12xlarge Extra Large,m8a.12xlarge,"2,249,392.92",General purpose,417.0 fps,192 GiB,6400 MT/s,48 vCPUs,Up to 4.5 GHz,EBS only,22.5 Gigabit,$2.9213 hourly,,$0.8683 hourly,
+M8IN 24xlarge,m8in.24xlarge,"2,253,653.383",General purpose,282.0 fps,384 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,150 Gigabit,$8.0198 hourly,,$2.0398 hourly,
+C6I 32xlarge,c6i.32xlarge,"2,262,083.591",Compute optimized,219.0 fps,256 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,50 Gigabit,$5.44 hourly,$3.5986 hourly,$1.8034 hourly,$1.36 hourly
+C8I 24xlarge,c8i.24xlarge,"2,265,486.726",Compute optimized,309.0 fps,192 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,40 Gigabit,$4.4981 hourly,,$2.0878 hourly,
+R6I Metal,r6i.metal,"2,266,389.27",Memory optimized,145.0 fps,1024 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,50 Gigabit,$8.064 hourly,$5.3343 hourly,$2.3775 hourly,
+C6I Metal,c6i.metal,"2,266,589.933",Compute optimized,255.0 fps,256 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,50 Gigabit,$5.44 hourly,$3.5986 hourly,$1.6093 hourly,
+R8IB 24xlarge,r8ib.24xlarge,"2,268,967.147",Memory optimized,267.0 fps,768 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,100 Gigabit,$10.0416 hourly,,$3.1854 hourly,
+M6I 32xlarge,m6i.32xlarge,"2,269,000.665",General purpose,215.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,50 Gigabit,$6.144 hourly,$4.0643 hourly,$2.2499 hourly,$1.536 hourly
+R6I 32xlarge,r6i.32xlarge,"2,279,100.824",Memory optimized,222.0 fps,1024 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,50 Gigabit,$8.064 hourly,$5.3343 hourly,$2.3037 hourly,$2.016 hourly
+M8IB 24xlarge,m8ib.24xlarge,"2,293,084.916",General purpose,251.0 fps,384 GiB,7200 MT/s,96 vCPUs,3.9 GHz,EBS only,100 Gigabit,$8.0198 hourly,,$1.9838 hourly,
+C6IN Metal,c6in.metal,"2,300,606.605",Compute optimized,258.0 fps,256 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,200 Gigabit,$7.2576 hourly,$4.5723 hourly,$1.5781 hourly,
+R6A 32xlarge,r6a.32xlarge,"2,310,469.314",Memory optimized,236.0 fps,1024 GiB,3200 MT/s,128 vCPUs,3.6 GHz,EBS only,50 Gigabit,$7.2576 hourly,$4.8009 hourly,$2.1477 hourly,$1.8144 hourly
+M8IDN 24xlarge,m8idn.24xlarge,"2,315,066.016",General purpose,278.0 fps,384 GiB,7200 MT/s,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),150 Gigabit,$9.1651 hourly,,$2.7293 hourly,
+M6I Metal,m6i.metal,"2,345,073.971",General purpose,259.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,50 Gigabit,$6.144 hourly,$4.0643 hourly,$1.8042 hourly,
+R8IDB 24xlarge,r8idb.24xlarge,"2,345,849.963",Memory optimized,141.0 fps,768 GiB,7200 MT/s,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),100 Gigabit,$11.2546 hourly,,$4.2887 hourly,
+M6ID Metal,m6id.metal,"2,367,739.549",General purpose,274.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),50 Gigabit,$7.5936 hourly,$4.784 hourly,$2.0843 hourly,
+M6IDN Metal,m6idn.metal,"2,398,575.846",General purpose,189.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),200 Gigabit,$10.1837 hourly,$6.4157 hourly,$2.7537 hourly,
+M6IN Metal,m6in.metal,"2,559,744.026",General purpose,256.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.5 GHz,EBS only,200 Gigabit,$8.9107 hourly,$5.6138 hourly,$1.9533 hourly,
+C8A 16xlarge Extra Large,c8a.16xlarge,"2,600,921.16",Compute optimized,400.0 fps,128 GiB,6400 MT/s,64 vCPUs,Up to 4.5 GHz,EBS only,30 Gigabit,$3.4486 hourly,,$1.0677 hourly,
+M6A 32xlarge,m6a.32xlarge,"2,624,429.75",General purpose,228.0 fps,512 GiB,3200 MT/s,128 vCPUs,3.6 GHz,EBS only,50 Gigabit,$5.5296 hourly,$3.6578 hourly,$2.1744 hourly,$1.3824 hourly
+HPC6A 48xlarge,hpc6a.48xlarge,"2,704,225.352",Compute optimized,235.0 fps,384 GiB,2933 MT/s,96 vCPUs,2.95 GHz,EBS only,100 Gigabit,,,,
+M7A 24xlarge,m7a.24xlarge,"2,714,420.358",General purpose,311.0 fps,384 GiB,5600 MT/s,96 vCPUs,Up to 3.7 GHz,EBS only,37.5 Gigabit,$5.5642 hourly,$3.6807 hourly,$1.6422 hourly,$1.391 hourly
+C6A 32xlarge,c6a.32xlarge,"2,731,929.425",Compute optimized,229.0 fps,256 GiB,2933 MT/s,128 vCPUs,3.6 GHz,EBS only,50 Gigabit,$4.896 hourly,$3.2387 hourly,$1.8319 hourly,$1.224 hourly
+C8GB 24xlarge,c8gb.24xlarge,"2,751,701.899",Compute optimized,297.0 fps,192 GiB,,96 vCPUs,2.8 GHz,EBS only,200 Gigabit,$5.688 hourly,,$1.5913 hourly,
+R7A 24xlarge,r7a.24xlarge,"2,791,373.879",Memory optimized,308.0 fps,768 GiB,4800 MT/s,96 vCPUs,Up to 3.7 GHz,EBS only,37.5 Gigabit,$7.3032 hourly,$4.8311 hourly,$1.6689 hourly,$1.8258 hourly
+M8A 16xlarge Extra Large,m8a.16xlarge,"2,819,496.175",General purpose,416.0 fps,256 GiB,6400 MT/s,64 vCPUs,Up to 4.5 GHz,EBS only,30 Gigabit,$3.895 hourly,,$1.0542 hourly,
+R8A 16xlarge Extra Large,r8a.16xlarge,"2,858,767.157",Memory optimized,422.0 fps,512 GiB,6400 MT/s,64 vCPUs,Up to 4.5 GHz,EBS only,30 Gigabit,$5.1123 hourly,,$1.7167 hourly,
+C8GB Metal-24xl,c8gb.metal-24xl,"2,861,827.396",Compute optimized,301.0 fps,192 GiB,,96 vCPUs,2.8 GHz,EBS only,200 Gigabit,$5.688 hourly,,$1.20 hourly,
+C7A 24xlarge,c7a.24xlarge,"2,865,386.529",Compute optimized,315.0 fps,192 GiB,5600 MT/s,96 vCPUs,Up to 3.7 GHz,EBS only,37.5 Gigabit,$4.9267 hourly,$3.259 hourly,$1.6613 hourly,$1.2317 hourly
+M8GB 24xlarge,m8gb.24xlarge,"2,891,348.543",General purpose,296.0 fps,384 GiB,,96 vCPUs,2.8 GHz,EBS only,200 Gigabit,$6.984 hourly,,$2.2696 hourly,
+C8GN 24xlarge,c8gn.24xlarge,"2,892,219.628",Compute optimized,297.0 fps,192 GiB,,96 vCPUs,2.8 GHz,EBS only,300 Gigabit,$5.688 hourly,,$1.791 hourly,
+M8G Metal-24xl,m8g.metal-24xl,"2,892,873.286",General purpose,299.0 fps,384 GiB,,96 vCPUs,2.7 GHz,EBS only,40 Gigabit,$4.3085 hourly,$2.8501 hourly,$1.1567 hourly,
+R8G 24xlarge,r8g.24xlarge,"2,903,811.252",Memory optimized,297.0 fps,768 GiB,,96 vCPUs,2.7 GHz,EBS only,40 Gigabit,$5.6554 hourly,$3.741 hourly,$1.5889 hourly,$1.4138 hourly
+C8G 24xlarge,c8g.24xlarge,"2,925,714.286",Compute optimized,298.0 fps,192 GiB,,96 vCPUs,2.7 GHz,EBS only,40 Gigabit,$3.8285 hourly,$2.5228 hourly,$1.1644 hourly,
+M8GN 24xlarge,m8gn.24xlarge,"2,929,285.224",General purpose,297.0 fps,384 GiB,,96 vCPUs,2.8 GHz,EBS only,300 Gigabit,$6.984 hourly,,$2.2063 hourly,
+M8IB 32xlarge,m8ib.32xlarge,"2,967,599.838",General purpose,291.0 fps,512 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,133.33 Gigabit,$10.6931 hourly,,$3.5498 hourly,
+R8G Metal-24xl,r8g.metal-24xl,"2,969,837.587",Memory optimized,299.0 fps,768 GiB,,96 vCPUs,2.7 GHz,EBS only,40 Gigabit,$5.6554 hourly,$3.741 hourly,$1.6504 hourly,
+M8G 24xlarge,m8g.24xlarge,"2,983,682.984",General purpose,297.0 fps,384 GiB,,96 vCPUs,2.7 GHz,EBS only,40 Gigabit,$4.3085 hourly,$2.8501 hourly,$1.4623 hourly,
+M8I 32xlarge,m8i.32xlarge,"2,992,751.929",General purpose,314.0 fps,512 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,50 Gigabit,$6.7738 hourly,,$2.5055 hourly,
+C8I 32xlarge,c8i.32xlarge,"3,001,876.173",Compute optimized,335.0 fps,256 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,50 Gigabit,$5.9974 hourly,,$2.9787 hourly,
+C8G Metal-24xl,c8g.metal-24xl,"3,003,284.843",Compute optimized,300.0 fps,192 GiB,,96 vCPUs,2.7 GHz,EBS only,40 Gigabit,$3.8285 hourly,$2.5228 hourly,$1.2833 hourly,
+R8I 32xlarge,r8i.32xlarge,"3,004,342.213",Memory optimized,308.0 fps,1024 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,50 Gigabit,$8.8909 hourly,,$3.0184 hourly,
+R8IDB 32xlarge,r8idb.32xlarge,"3,010,171.086",Memory optimized,304.0 fps,1024 GiB,7200 MT/s,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),133.33 Gigabit,$15.0061 hourly,,$7.1045 hourly,
+R8IB 32xlarge,r8ib.32xlarge,"3,093,094.907",Memory optimized,120.0 fps,1024 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,133.33 Gigabit,$13.3888 hourly,,$4.1077 hourly,
+M8IDN 32xlarge,m8idn.32xlarge,"3,097,773.475",General purpose,294.0 fps,512 GiB,7200 MT/s,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),200 Gigabit,$12.2202 hourly,,$2.9973 hourly,
+R8IDN 32xlarge,r8idn.32xlarge,"3,144,963.145",Memory optimized,207.0 fps,1024 GiB,7200 MT/s,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),200 Gigabit,$15.0061 hourly,,$6.8831 hourly,
+R8IN 32xlarge,r8in.32xlarge,"3,151,415.675",Memory optimized,237.0 fps,1024 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,200 Gigabit,$13.3888 hourly,,$3.8051 hourly,
+M8IDB 32xlarge,m8idb.32xlarge,"3,157,894.737",General purpose,227.0 fps,512 GiB,7200 MT/s,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),133.33 Gigabit,$12.2202 hourly,,$5.2989 hourly,
+M8IN 32xlarge,m8in.32xlarge,"3,165,704.864",General purpose,303.0 fps,512 GiB,7200 MT/s,128 vCPUs,3.9 GHz,EBS only,200 Gigabit,$10.6931 hourly,,$3.3592 hourly,
+HPC7A 48xlarge,hpc7a.48xlarge,"3,240,324.032",Compute optimized,305.0 fps,768 GiB,4800 MT/s,96 vCPUs,3.7 GHz,EBS only,300 Gigabit,,,,
+C6A Metal,c6a.metal,"3,398,330.334",Compute optimized,257.0 fps,384 GiB,2933 MT/s,192 vCPUs,3.6 GHz,EBS only,50 Gigabit,$7.344 hourly,$4.8581 hourly,$1.8698 hourly,
+M7I Metal-48xl,m7i.metal-48xl,"3,469,461.511",General purpose,303.0 fps,768 GiB,4800 MT/s,192 vCPUs,3.2 GHz,EBS only,50 Gigabit,$9.6768 hourly,$6.4012 hourly,$2.4617 hourly,
+C6A 48xlarge,c6a.48xlarge,"3,584,764.75",Compute optimized,220.0 fps,384 GiB,2933 MT/s,192 vCPUs,3.6 GHz,EBS only,50 Gigabit,$7.344 hourly,$4.8581 hourly,$2.1335 hourly,$1.836 hourly
+M6A 48xlarge,m6a.48xlarge,"3,589,455.973",General purpose,248.0 fps,768 GiB,3200 MT/s,192 vCPUs,3.6 GHz,EBS only,50 Gigabit,$8.2944 hourly,$5.4868 hourly,$3.4649 hourly,$2.0736 hourly
+C8GB Metal-48xl,c8gb.metal-48xl,"3,725,261.932",Compute optimized,254.0 fps,384 GiB,,192 vCPUs,2.8 GHz,EBS only,400 Gigabit,$11.376 hourly,,$2.1822 hourly,
+R6A 48xlarge,r6a.48xlarge,"3,727,431.567",Memory optimized,248.0 fps,1536 GiB,3200 MT/s,192 vCPUs,3.6 GHz,EBS only,50 Gigabit,$10.8864 hourly,$7.2014 hourly,$3.2698 hourly,$2.7216 hourly
+R6A Metal,r6a.metal,"3,807,509.254",Memory optimized,250.0 fps,1536 GiB,3200 MT/s,192 vCPUs,3.6 GHz,EBS only,50 Gigabit,$10.8864 hourly,$7.2014 hourly,$2.5144 hourly,
+M7I 48xlarge,m7i.48xlarge,"3,809,523.81",General purpose,268.0 fps,768 GiB,5600 MT/s,192 vCPUs,3.2 GHz,EBS only,50 Gigabit,$9.6768 hourly,$6.4012 hourly,$3.7454 hourly,$2.4192 hourly
+M6A Metal,m6a.metal,"3,831,060.858",General purpose,253.0 fps,768 GiB,3200 MT/s,192 vCPUs,3.6 GHz,EBS only,50 Gigabit,$8.2944 hourly,$5.4868 hourly,$2.0622 hourly,
+R8A 24xlarge,r8a.24xlarge,"3,843,494.086",Memory optimized,417.0 fps,768 GiB,6400 MT/s,96 vCPUs,Up to 4.5 GHz,EBS only,40 Gigabit,$7.6685 hourly,,$2.3176 hourly,
+R7I 48xlarge,r7i.48xlarge,"3,921,435.136",Memory optimized,269.0 fps,1536 GiB,5600 MT/s,192 vCPUs,3.2 GHz,EBS only,50 Gigabit,$12.7008 hourly,$8.4016 hourly,$4.3407 hourly,$3.1752 hourly
+C7I 48xlarge,c7i.48xlarge,"3,925,310.072",Compute optimized,268.0 fps,384 GiB,4800 MT/s,192 vCPUs,3.2 GHz,EBS only,50 Gigabit,$8.568 hourly,$5.6677 hourly,$2.9738 hourly,$2.142 hourly
+C8A Metal-24xl,c8a.metal-24xl,"3,948,696.855",Compute optimized,438.0 fps,192 GiB,6400 MT/s,96 vCPUs,Up to 4.5 GHz,EBS only,40 Gigabit,$5.173 hourly,,$1.4877 hourly,
+M8A 24xlarge,m8a.24xlarge,"3,988,819.219",General purpose,416.0 fps,384 GiB,6400 MT/s,96 vCPUs,Up to 4.5 GHz,EBS only,40 Gigabit,$5.8426 hourly,,$1.9579 hourly,
+C8A 24xlarge,c8a.24xlarge,"3,994,099.626",Compute optimized,414.0 fps,192 GiB,6400 MT/s,96 vCPUs,Up to 4.5 GHz,EBS only,40 Gigabit,$5.173 hourly,,$1.8813 hourly,
+R7I Metal-48xl,r7i.metal-48xl,"3,999,722.242",Memory optimized,311.0 fps,1536 GiB,5600 MT/s,192 vCPUs,3.2 GHz,EBS only,50 Gigabit,$12.7008 hourly,$8.4016 hourly,$2.7493 hourly,
+M8A Metal-24xl,m8a.metal-24xl,"4,001,667.361",General purpose,443.0 fps,384 GiB,6400 MT/s,96 vCPUs,Up to 4.5 GHz,EBS only,40 Gigabit,$5.8426 hourly,,$1.411 hourly,
+R8G Metal-48xl,r8g.metal-48xl,"4,025,157.233",Memory optimized,281.0 fps,1536 GiB,,192 vCPUs,2.7 GHz,EBS only,50 Gigabit,$11.3107 hourly,$7.482 hourly,$2.7403 hourly,
+R8A Metal-24xl,r8a.metal-24xl,"4,039,940.319",Memory optimized,434.0 fps,768 GiB,6400 MT/s,96 vCPUs,Up to 4.5 GHz,EBS only,40 Gigabit,$7.6685 hourly,,$1.7339 hourly,
+C7A 32xlarge,c7a.32xlarge,"4,052,342.761",Compute optimized,294.0 fps,256 GiB,4800 MT/s,128 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$6.569 hourly,$4.3454 hourly,$2.3226 hourly,$1.6422 hourly
+M7A 32xlarge,m7a.32xlarge,"4,116,638.079",General purpose,296.0 fps,512 GiB,5600 MT/s,128 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$7.4189 hourly,$4.9076 hourly,$2.4171 hourly,$1.8547 hourly
+R8I 48xlarge,r8i.48xlarge,"4,143,735.837",Memory optimized,333.0 fps,1536 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,75 Gigabit,$13.3363 hourly,,$4.0445 hourly,
+C7I Metal-48xl,c7i.metal-48xl,"4,179,667.658",Compute optimized,283.0 fps,384 GiB,4800 MT/s,192 vCPUs,3.2 GHz,EBS only,50 Gigabit,$8.568 hourly,$5.6677 hourly,$2.3392 hourly,
+R7A 32xlarge,r7a.32xlarge,"4,237,708.989",Memory optimized,310.0 fps,1024 GiB,5600 MT/s,128 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$9.7376 hourly,$6.4414 hourly,$2.38 hourly,$2.4344 hourly
+R8IN 48xlarge,r8in.48xlarge,"4,257,914.287",Memory optimized,321.0 fps,1536 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,300 Gigabit,$20.0832 hourly,,$6.3381 hourly,
+M8IDN 48xlarge,m8idn.48xlarge,"4,311,942.058",General purpose,288.0 fps,768 GiB,7200 MT/s,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),300 Gigabit,$18.3302 hourly,,$4.6633 hourly,
+R8IDN 48xlarge,r8idn.48xlarge,"4,316,789.388",Memory optimized,277.0 fps,1536 GiB,7200 MT/s,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),300 Gigabit,$22.5091 hourly,,$7.0038 hourly,
+M8I 48xlarge,m8i.48xlarge,"4,350,042.481",General purpose,309.0 fps,768 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,75 Gigabit,$10.1606 hourly,,$3.2751 hourly,
+M8IN 48xlarge,m8in.48xlarge,"4,406,449.022",General purpose,301.0 fps,768 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,300 Gigabit,$16.0397 hourly,,$4.3364 hourly,
+C8I 48xlarge,c8i.48xlarge,"4,448,821.178",Compute optimized,311.0 fps,384 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,75 Gigabit,$8.9962 hourly,,$3.8515 hourly,
+M8G Metal-48xl,m8g.metal-48xl,"4,450,625.869",General purpose,283.0 fps,768 GiB,,192 vCPUs,2.7 GHz,EBS only,50 Gigabit,$8.617 hourly,$5.7001 hourly,$2.27 hourly,
+R8IB 48xlarge,r8ib.48xlarge,"4,478,395.242",Memory optimized,187.0 fps,1536 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,200 Gigabit,$20.0832 hourly,,$4.8234 hourly,
+R8IDB 48xlarge,r8idb.48xlarge,"4,517,381.331",Memory optimized,314.0 fps,1536 GiB,7200 MT/s,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),200 Gigabit,$22.5091 hourly,,$6.2302 hourly,
+C8I Metal-48xl,c8i.metal-48xl,"4,532,845.423",Compute optimized,292.0 fps,384 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,75 Gigabit,$8.9962 hourly,,$3.5001 hourly,
+M8IDB 48xlarge,m8idb.48xlarge,"4,544,916.558",General purpose,299.0 fps,768 GiB,7200 MT/s,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),200 Gigabit,$18.3302 hourly,,$4.6514 hourly,
+R8I Metal-48xl,r8i.metal-48xl,"4,551,650.566",Memory optimized,301.0 fps,1536 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,75 Gigabit,$13.3363 hourly,,$3.0622 hourly,
+M8IB 48xlarge,m8ib.48xlarge,"4,633,204.633",General purpose,284.0 fps,768 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,200 Gigabit,$16.0397 hourly,,$4.1307 hourly,
+M8I Metal-48xl,m8i.metal-48xl,"4,685,212.299",General purpose,298.0 fps,768 GiB,7200 MT/s,192 vCPUs,3.9 GHz,EBS only,75 Gigabit,$10.1606 hourly,,$2.7356 hourly,
+R8GB Metal-48xl,r8gb.metal-48xl,"4,734,311.429",Memory optimized,117.0 fps,1536 GiB,,192 vCPUs,2.8 GHz,EBS only,400 Gigabit,$17.4893 hourly,,$2.6211 hourly,
+R8GB 48xlarge,r8gb.48xlarge,"5,215,619.694",Memory optimized,117.0 fps,1536 GiB,,192 vCPUs,2.8 GHz,EBS only,400 Gigabit,$17.4893 hourly,,$5.386 hourly,
+C8GN 48xlarge,c8gn.48xlarge,"5,220,228.385",Compute optimized,274.0 fps,384 GiB,,192 vCPUs,2.8 GHz,EBS only,600 Gigabit,$11.376 hourly,,$3.9093 hourly,
+M8GB 48xlarge,m8gb.48xlarge,"5,283,070.785",General purpose,117.0 fps,768 GiB,,192 vCPUs,2.8 GHz,EBS only,400 Gigabit,$13.968 hourly,,$5.3638 hourly,
+C8G 48xlarge,c8g.48xlarge,"5,350,424.969",Compute optimized,278.0 fps,384 GiB,,192 vCPUs,2.7 GHz,EBS only,50 Gigabit,$7.657 hourly,$5.0457 hourly,$2.6933 hourly,
+M8GN 48xlarge,m8gn.48xlarge,"5,357,516.568",General purpose,117.0 fps,768 GiB,,192 vCPUs,2.8 GHz,EBS only,600 Gigabit,$13.968 hourly,,$5.597 hourly,
+R8G 48xlarge,r8g.48xlarge,"5,455,707.892",Memory optimized,277.0 fps,1536 GiB,,192 vCPUs,2.7 GHz,EBS only,50 Gigabit,$11.3107 hourly,$7.482 hourly,$4.2692 hourly,$2.8277 hourly
+R7A 48xlarge,r7a.48xlarge,"5,477,107.403",Memory optimized,305.0 fps,1536 GiB,4800 MT/s,192 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$14.6064 hourly,$9.6621 hourly,$3.8807 hourly,$3.6516 hourly
+C8G Metal-48xl,c8g.metal-48xl,"5,484,930.724",Compute optimized,283.0 fps,384 GiB,,192 vCPUs,2.7 GHz,EBS only,50 Gigabit,$7.657 hourly,$5.0457 hourly,$2.0273 hourly,
+M8G 48xlarge,m8g.48xlarge,"5,500,250.662",General purpose,277.0 fps,768 GiB,,192 vCPUs,2.7 GHz,EBS only,50 Gigabit,$8.617 hourly,$5.7001 hourly,$4.0759 hourly,
+C8GB 48xlarge,c8gb.48xlarge,"5,503,403.798",Compute optimized,117.0 fps,384 GiB,,192 vCPUs,2.8 GHz,EBS only,400 Gigabit,$11.376 hourly,,$3.7483 hourly,
+C7A 48xlarge,c7a.48xlarge,"5,863,490.609",Compute optimized,311.0 fps,384 GiB,5600 MT/s,192 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$9.8534 hourly,$6.5181 hourly,$2.8929 hourly,$2.4634 hourly
+M7A 48xlarge,m7a.48xlarge,"5,871,260.384",General purpose,300.0 fps,768 GiB,5600 MT/s,192 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$11.1283 hourly,$7.3614 hourly,$3.658 hourly,$2.7821 hourly
+C7A Metal-48xl,c7a.metal-48xl,"6,115,948.184",Compute optimized,329.0 fps,384 GiB,5600 MT/s,192 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$9.8534 hourly,$6.5181 hourly,$2.5637 hourly,
+R7A Metal-48xl,r7a.metal-48xl,"6,200,215.285",Memory optimized,293.0 fps,1536 GiB,4800 MT/s,192 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$14.6064 hourly,$9.6621 hourly,$3.2176 hourly,
+M7A Metal-48xl,m7a.metal-48xl,"6,428,571.429",General purpose,320.0 fps,768 GiB,4800 MT/s,192 vCPUs,Up to 3.7 GHz,EBS only,50 Gigabit,$11.1283 hourly,$7.3614 hourly,$2.6732 hourly,
+HPC7A 96xlarge,hpc7a.96xlarge,"6,797,663.303",Compute optimized,326.0 fps,768 GiB,4800 MT/s,192 vCPUs,3.7 GHz,EBS only,300 Gigabit,,,,
+R8A Metal-48xl,r8a.metal-48xl,"6,825,673.841",Memory optimized,425.0 fps,1536 GiB,6400 MT/s,192 vCPUs,Up to 4.5 GHz,EBS only,75 Gigabit,$15.337 hourly,,$3.4568 hourly,
+C8A 48xlarge,c8a.48xlarge,"6,834,509.093",Compute optimized,410.0 fps,384 GiB,6400 MT/s,192 vCPUs,Up to 4.5 GHz,EBS only,75 Gigabit,$10.3459 hourly,,$3.5347 hourly,
+M8A 48xlarge,m8a.48xlarge,"6,962,254.821",General purpose,406.0 fps,768 GiB,6400 MT/s,192 vCPUs,Up to 4.5 GHz,EBS only,75 Gigabit,$11.6851 hourly,,$2.8105 hourly,
+R8A 48xlarge,r8a.48xlarge,"7,250,506.368",Memory optimized,415.0 fps,1536 GiB,6400 MT/s,192 vCPUs,Up to 4.5 GHz,EBS only,75 Gigabit,$15.337 hourly,,$4.6594 hourly,
+M8A Metal-48xl,m8a.metal-48xl,"7,478,488.722",General purpose,426.0 fps,768 GiB,6400 MT/s,192 vCPUs,Up to 4.5 GHz,EBS only,75 Gigabit,$11.6851 hourly,,$2.4181 hourly,
+C8A Metal-48xl,c8a.metal-48xl,"7,931,202.824",Compute optimized,412.0 fps,384 GiB,6400 MT/s,192 vCPUs,Up to 4.5 GHz,EBS only,75 Gigabit,$10.3459 hourly,,$2.3926 hourly,
+M8IDB 96xlarge,m8idb.96xlarge,"8,017,119.891",General purpose,188.0 fps,1536 GiB,7200 MT/s,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),400 Gigabit,$36.6605 hourly,,$10.9886 hourly,
+R8IDN 96xlarge,r8idn.96xlarge,"8,432,610.486",Memory optimized,283.0 fps,3072 GiB,7200 MT/s,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),600 Gigabit,$45.0182 hourly,,$16.4368 hourly,
+M8IN 96xlarge,m8in.96xlarge,"8,686,308.884",General purpose,303.0 fps,1536 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,600 Gigabit,$32.0794 hourly,,$10.4834 hourly,
+M8I 96xlarge,m8i.96xlarge,"8,717,366.629",General purpose,309.0 fps,1536 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,100 Gigabit,$20.3213 hourly,,$6.4372 hourly,
+C8I 96xlarge,c8i.96xlarge,"8,808,854.734",Compute optimized,312.0 fps,768 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,100 Gigabit,$17.9923 hourly,,$7.8145 hourly,
+R8IB 96xlarge,r8ib.96xlarge,"8,830,631.252",Memory optimized,178.0 fps,3072 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,400 Gigabit,$40.1664 hourly,,$14.1475 hourly,
+M8IB 96xlarge,m8ib.96xlarge,"8,852,515.705",General purpose,260.0 fps,1536 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,400 Gigabit,$32.0794 hourly,,$10.5491 hourly,
+R8IN 96xlarge,r8in.96xlarge,"8,889,574.813",Memory optimized,317.0 fps,3072 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,600 Gigabit,$40.1664 hourly,,$13.7985 hourly,
+M8IDN 96xlarge,m8idn.96xlarge,"8,919,860.627",General purpose,254.0 fps,1536 GiB,7200 MT/s,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),600 Gigabit,$36.6605 hourly,,$7.5076 hourly,
+R8I 96xlarge,r8i.96xlarge,"8,925,043.579",Memory optimized,303.0 fps,3072 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,100 Gigabit,$26.6726 hourly,,$5.8429 hourly,
+R8IDB 96xlarge,r8idb.96xlarge,"9,041,676.478",Memory optimized,230.0 fps,3072 GiB,7200 MT/s,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),400 Gigabit,$45.0182 hourly,,$16.7527 hourly,
+C8I Metal-96xl,c8i.metal-96xl,"9,151,572.927",Compute optimized,277.0 fps,768 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,100 Gigabit,$17.9923 hourly,,$6.6956 hourly,
+M8I Metal-96xl,m8i.metal-96xl,"9,221,902.017",General purpose,253.0 fps,1536 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,100 Gigabit,$20.3213 hourly,,$5.3187 hourly,
+R8I Metal-96xl,r8i.metal-96xl,"9,497,310.332",Memory optimized,172.0 fps,3072 GiB,7200 MT/s,384 vCPUs,3.9 GHz,EBS only,100 Gigabit,$26.6726 hourly,,$5.7434 hourly,
+C5AD 12xlarge Extra Large,c5ad.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,3.3 GHz,1800 GB (2×900 GB NVMe SSD),12 Gigabit,$2.064 hourly,$1.30 hourly,$0.9331 hourly,$0.27 hourly
+C5AD 16xlarge Extra Large,c5ad.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,3.3 GHz,2400 GB (2×1200 GB NVMe SSD),20 Gigabit,$2.752 hourly,$1.734 hourly,$1.0779 hourly,$0.27 hourly
+C5AD 24xlarge,c5ad.24xlarge,,Compute optimized,,192 GiB,,96 vCPUs,3.3 GHz,3800 GB (2×1900 GB NVMe SSD),20 Gigabit,$4.128 hourly,$2.601 hourly,$1.5621 hourly,$0.27 hourly
+C5AD Double Extra Large,c5ad.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,3.3 GHz,300 GB NVMe SSD,Up to 10 Gigabit,$0.344 hourly,$0.217 hourly,$0.1975 hourly,$0.086 hourly
+C5AD Quadruple Extra Large,c5ad.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,3.3 GHz,600 GB (2×300 GB NVMe SSD),Up to 10 Gigabit,$0.688 hourly,$0.433 hourly,$0.3176 hourly,$0.172 hourly
+C5AD Eight Extra Large,c5ad.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,3.3 GHz,1200 GB (2×600 GB NVMe SSD),10 Gigabit,$1.376 hourly,$0.867 hourly,$0.6876 hourly,$0.27 hourly
+C5AD Large,c5ad.large,,Compute optimized,,4 GiB,,2 vCPUs,3.3 GHz,75 GB NVMe SSD,Up to 10 Gigabit,$0.086 hourly,$0.054 hourly,$0.0363 hourly,
+C5AD Extra Large,c5ad.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,3.3 GHz,150 GB NVMe SSD,Up to 10 Gigabit,$0.172 hourly,$0.108 hourly,$0.0751 hourly,$0.043 hourly
+C6GN Metal,c6gn.metal,,Compute optimized,,128 GiB,,64 vCPUs,2.5 GHz,EBS only,100 Gigabit,,,,
+C6ID 12xlarge Extra Large,c6id.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,3.5 GHz,2850 GB (2×1425 GB NVMe SSD),18.75 Gigabit,$2.4192 hourly,$1.5246 hourly,$0.7069 hourly,$0.6048 hourly
+C6ID 16xlarge Extra Large,c6id.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,3.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$3.2256 hourly,$2.0328 hourly,$0.9988 hourly,$0.8064 hourly
+C6ID 24xlarge,c6id.24xlarge,,Compute optimized,,192 GiB,,96 vCPUs,3.5 GHz,5700 GB (4×1425 GB NVMe SSD),37.5 Gigabit,$4.8384 hourly,$3.0492 hourly,$1.4653 hourly,$1.2096 hourly
+C6ID Double Extra Large,c6id.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,3.5 GHz,474 GB NVMe SSD,Up to 12.5 Gigabit,$0.4032 hourly,$0.2541 hourly,$0.1822 hourly,$0.1008 hourly
+C6ID 32xlarge,c6id.32xlarge,,Compute optimized,,256 GiB,,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),50 Gigabit,$6.4512 hourly,$4.0656 hourly,$1.8379 hourly,$1.6128 hourly
+C6ID Quadruple Extra Large,c6id.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,3.5 GHz,950 GB NVMe SSD,Up to 12.5 Gigabit,$0.8064 hourly,$0.5082 hourly,$0.4303 hourly,$0.2016 hourly
+C6ID Eight Extra Large,c6id.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,3.5 GHz,1900 GB NVMe SSD,12.5 Gigabit,$1.6128 hourly,$1.0164 hourly,$0.8612 hourly,$0.4032 hourly
+C6ID Large,c6id.large,,Compute optimized,,4 GiB,,2 vCPUs,3.5 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1008 hourly,$0.0635 hourly,$0.0373 hourly,
+C6ID Metal,c6id.metal,,Compute optimized,,256 GiB,,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),50 Gigabit,$6.4512 hourly,$4.0656 hourly,$1.9455 hourly,
+C6ID Extra Large,c6id.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,3.5 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2016 hourly,$0.1271 hourly,$0.0788 hourly,$0.0504 hourly
+C7GN 12xlarge Extra Large,c7gn.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,2.6 GHz,EBS only,150 Gigabit,$2.9952 hourly,$1.887 hourly,$0.9373 hourly,$0.7488 hourly
+C7GN 16xlarge Extra Large,c7gn.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,2.6 GHz,EBS only,200 Gigabit,$3.9936 hourly,$2.516 hourly,$1.0983 hourly,$0.9984 hourly
+C7GN Double Extra Large,c7gn.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,2.6 GHz,EBS only,Up to 50 Gigabit,$0.4992 hourly,$0.3145 hourly,$0.1978 hourly,$0.1248 hourly
+C7GN Quadruple Extra Large,c7gn.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,2.6 GHz,EBS only,50 Gigabit,$0.9984 hourly,$0.629 hourly,$0.2957 hourly,$0.2496 hourly
+C7GN Eight Extra Large,c7gn.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,2.6 GHz,EBS only,100 Gigabit,$1.9968 hourly,$1.258 hourly,$0.6073 hourly,$0.4992 hourly
+C7GN Large,c7gn.large,,Compute optimized,,4 GiB,,2 vCPUs,2.6 GHz,EBS only,Up to 30 Gigabit,$0.1248 hourly,$0.0786 hourly,$0.0441 hourly,
+C7GN Medium,c7gn.medium,,Compute optimized,,2 GiB,,1 vCPUs,2.6 GHz,EBS only,Up to 25 Gigabit,$0.0624 hourly,$0.0393 hourly,$0.0264 hourly,
+C7GN Metal,c7gn.metal,,Compute optimized,,128 GiB,,64 vCPUs,2.6 GHz,EBS only,200 Gigabit,$3.9936 hourly,$2.516 hourly,$1.3301 hourly,
+C7GN Extra Large,c7gn.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,2.6 GHz,EBS only,Up to 40 Gigabit,$0.2496 hourly,$0.1572 hourly,$0.0919 hourly,$0.0624 hourly
+C8GD 12xlarge Extra Large,c8gd.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,2.7 GHz,2850 GB (3×950 GB NVMe SSD),22.5 Gigabit,$2.3515 hourly,,$0.6743 hourly,
+C8GD 16xlarge Extra Large,c8gd.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,2.7 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$3.1354 hourly,,$0.8482 hourly,
+C8GD 24xlarge,c8gd.24xlarge,,Compute optimized,,192 GiB,,96 vCPUs,2.7 GHz,5700 GB (3×1900 GB NVMe SSD),40 Gigabit,$4.703 hourly,,$1.3238 hourly,
+C8GD Double Extra Large,c8gd.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,2.7 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.3919 hourly,,$0.1614 hourly,
+C8GD 48xlarge,c8gd.48xlarge,,Compute optimized,,384 GiB,,192 vCPUs,2.7 GHz,11400 GB (6×1900 GB NVMe SSD),50 Gigabit,$9.4061 hourly,,$3.4234 hourly,
+C8GD Quadruple Extra Large,c8gd.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,2.7 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$0.7838 hourly,,$0.3014 hourly,
+C8GD Eight Extra Large,c8gd.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,2.7 GHz,1900 GB NVMe SSD,15 Gigabit,$1.5677 hourly,,$0.6213 hourly,
+C8GD Large,c8gd.large,,Compute optimized,,4 GiB,,2 vCPUs,2.7 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.098 hourly,,$0.0432 hourly,
+C8GD Medium,c8gd.medium,,Compute optimized,,2 GiB,,1 vCPUs,2.7 GHz,59 GB NVMe SSD,Up to 12.5 Gigabit,$0.049 hourly,,$0.0167 hourly,
+C8GD Metal-24xl,c8gd.metal-24xl,,Compute optimized,,192 GiB,,96 vCPUs,2.7 GHz,5700 GB (3×1900 GB NVMe SSD),40 Gigabit,$4.703 hourly,,$1.1354 hourly,
+C8GD Metal-48xl,c8gd.metal-48xl,,Compute optimized,,384 GiB,,192 vCPUs,2.7 GHz,11400 GB (6×1900 GB NVMe SSD),50 Gigabit,$9.4061 hourly,,$2.1989 hourly,
+C8GD Extra Large,c8gd.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,2.7 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.196 hourly,,$0.0978 hourly,
+C8GN Metal-24xl,c8gn.metal-24xl,,Compute optimized,,192 GiB,,96 vCPUs,2.8 GHz,EBS only,300 Gigabit,$5.688 hourly,,$1.2833 hourly,
+C8GN Metal-48xl,c8gn.metal-48xl,,Compute optimized,,384 GiB,,192 vCPUs,2.8 GHz,EBS only,600 Gigabit,$11.376 hourly,,$2.4693 hourly,
+C8IB 12xlarge Extra Large,c8ib.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,3.9 GHz,EBS only,50 Gigabit,$3.2659 hourly,,$1.4552 hourly,
+C8IB 16xlarge Extra Large,c8ib.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,3.9 GHz,EBS only,66.66 Gigabit,$4.3546 hourly,,$1.98 hourly,
+C8IB 24xlarge,c8ib.24xlarge,,Compute optimized,,192 GiB,,96 vCPUs,3.9 GHz,EBS only,100 Gigabit,$6.5318 hourly,,$2.3703 hourly,
+C8IB Double Extra Large,c8ib.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,3.9 GHz,EBS only,Up to 26.66 Gigabit,$0.5443 hourly,,$0.3139 hourly,
+C8IB 32xlarge,c8ib.32xlarge,,Compute optimized,,256 GiB,,128 vCPUs,3.9 GHz,EBS only,133.33 Gigabit,$8.7091 hourly,,$3.3496 hourly,
+C8IB 48xlarge,c8ib.48xlarge,,Compute optimized,,384 GiB,,192 vCPUs,3.9 GHz,EBS only,200 Gigabit,$13.0637 hourly,,$3.6077 hourly,
+C8IB Quadruple Extra Large,c8ib.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,3.9 GHz,EBS only,Up to 33.33 Gigabit,$1.0886 hourly,,$0.6555 hourly,
+C8IB Eight Extra Large,c8ib.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,3.9 GHz,EBS only,33.33 Gigabit,$2.1773 hourly,,$1.246 hourly,
+C8IB 96xlarge,c8ib.96xlarge,,Compute optimized,,768 GiB,,384 vCPUs,3.9 GHz,EBS only,400 Gigabit,$26.1274 hourly,,$9.6143 hourly,
+C8IB Large,c8ib.large,,Compute optimized,,4 GiB,,2 vCPUs,3.9 GHz,EBS only,Up to 16.66 Gigabit,$0.1361 hourly,,$0.0496 hourly,
+C8IB Metal-48xl,c8ib.metal-48xl,,Compute optimized,,384 GiB,,192 vCPUs,3.9 GHz,EBS only,200 Gigabit,$13.0637 hourly,,$2.6668 hourly,
+C8IB Metal-96xl,c8ib.metal-96xl,,Compute optimized,,768 GiB,,384 vCPUs,3.9 GHz,EBS only,400 Gigabit,$26.1274 hourly,,$4.9573 hourly,
+C8IB Extra Large,c8ib.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,3.9 GHz,EBS only,Up to 20 Gigabit,$0.2722 hourly,,$0.0815 hourly,
+C8ID 12xlarge Extra Large,c8id.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,22.5 Gigabit,$2.6611 hourly,,$0.7858 hourly,
+C8ID 16xlarge Extra Large,c8id.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,30 Gigabit,$3.5482 hourly,,$1.5593 hourly,
+C8ID 24xlarge,c8id.24xlarge,,Compute optimized,,192 GiB,,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),40 Gigabit,$5.3222 hourly,,$1.8263 hourly,
+C8ID Double Extra Large,c8id.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.4435 hourly,,$0.1656 hourly,
+C8ID 32xlarge,c8id.32xlarge,,Compute optimized,,256 GiB,,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),50 Gigabit,$7.0963 hourly,,$3.2155 hourly,
+C8ID 48xlarge,c8id.48xlarge,,Compute optimized,,384 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),75 Gigabit,$10.6445 hourly,,$2.273 hourly,
+C8ID Quadruple Extra Large,c8id.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$0.887 hourly,,$0.292 hourly,
+C8ID Eight Extra Large,c8id.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,15 Gigabit,$1.7741 hourly,,$0.5766 hourly,
+C8ID 96xlarge,c8id.96xlarge,,Compute optimized,,768 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),100 Gigabit,$21.289 hourly,,$5.1754 hourly,
+C8ID Large,c8id.large,,Compute optimized,,4 GiB,,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1109 hourly,,$0.0446 hourly,
+C8ID Metal-48xl,c8id.metal-48xl,,Compute optimized,,384 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),75 Gigabit,$10.6445 hourly,,$3.179 hourly,
+C8ID Metal-96xl,c8id.metal-96xl,,Compute optimized,,768 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),100 Gigabit,$21.289 hourly,,$3.8149 hourly,
+C8ID Extra Large,c8id.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2218 hourly,,$0.0704 hourly,
+C8IN 12xlarge Extra Large,c8in.12xlarge,,Compute optimized,,96 GiB,,48 vCPUs,3.9 GHz,EBS only,75 Gigabit,$3.2659 hourly,,$1.3171 hourly,
+C8IN 16xlarge Extra Large,c8in.16xlarge,,Compute optimized,,128 GiB,,64 vCPUs,3.9 GHz,EBS only,100 Gigabit,$4.3546 hourly,,$1.7656 hourly,
+C8IN 24xlarge,c8in.24xlarge,,Compute optimized,,192 GiB,,96 vCPUs,3.9 GHz,EBS only,150 Gigabit,$6.5318 hourly,,$1.6095 hourly,
+C8IN Double Extra Large,c8in.2xlarge,,Compute optimized,,16 GiB,,8 vCPUs,3.9 GHz,EBS only,Up to 40 Gigabit,$0.5443 hourly,,$0.2434 hourly,
+C8IN 32xlarge,c8in.32xlarge,,Compute optimized,,256 GiB,,128 vCPUs,3.9 GHz,EBS only,200 Gigabit,$8.7091 hourly,,$2.7545 hourly,
+C8IN 48xlarge,c8in.48xlarge,,Compute optimized,,384 GiB,,192 vCPUs,3.9 GHz,EBS only,300 Gigabit,$13.0637 hourly,,$3.8467 hourly,
+C8IN Quadruple Extra Large,c8in.4xlarge,,Compute optimized,,32 GiB,,16 vCPUs,3.9 GHz,EBS only,Up to 50 Gigabit,$1.0886 hourly,,$0.4841 hourly,
+C8IN Eight Extra Large,c8in.8xlarge,,Compute optimized,,64 GiB,,32 vCPUs,3.9 GHz,EBS only,50 Gigabit,$2.1773 hourly,,$0.9361 hourly,
+C8IN 96xlarge,c8in.96xlarge,,Compute optimized,,768 GiB,,384 vCPUs,3.9 GHz,EBS only,600 Gigabit,$26.1274 hourly,,$9.0492 hourly,
+C8IN Large,c8in.large,,Compute optimized,,4 GiB,,2 vCPUs,3.9 GHz,EBS only,Up to 25 Gigabit,$0.1361 hourly,,$0.0456 hourly,
+C8IN Metal-48xl,c8in.metal-48xl,,Compute optimized,,384 GiB,,192 vCPUs,3.9 GHz,EBS only,300 Gigabit,$13.0637 hourly,,$2.7107 hourly,
+C8IN Metal-96xl,c8in.metal-96xl,,Compute optimized,,768 GiB,,384 vCPUs,3.9 GHz,EBS only,600 Gigabit,$26.1274 hourly,,$4.9878 hourly,
+C8IN Extra Large,c8in.xlarge,,Compute optimized,,8 GiB,,4 vCPUs,3.9 GHz,EBS only,Up to 30 Gigabit,$0.2722 hourly,,$0.08 hourly,
+HPC8A 96xlarge,hpc8a.96xlarge,,General purpose,,768 GiB,,192 vCPUs,4.5 GHz,EBS only,300 Gigabit,,,,
+M5DN 12xlarge Extra Large,m5dn.12xlarge,,General purpose,,192 GiB,,48 vCPUs,3.1 GHz,1800 GB (2×900 GB NVMe SSD),50 Gigabit,$3.264 hourly,$2.056 hourly,$1.4311 hourly,$0.27 hourly
+M5DN 16xlarge Extra Large,m5dn.16xlarge,,General purpose,,256 GiB,,64 vCPUs,3.1 GHz,2400 GB (4×600 GB NVMe SSD),75 Gigabit,$4.352 hourly,$2.742 hourly,$2.2804 hourly,$0.27 hourly
+M5DN 24xlarge,m5dn.24xlarge,,General purpose,,384 GiB,,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),100 Gigabit,$6.528 hourly,$4.113 hourly,$2.8906 hourly,$0.27 hourly
+M5DN Double Extra Large,m5dn.2xlarge,,General purpose,,32 GiB,,8 vCPUs,3.1 GHz,300 GB NVMe SSD,Up to 25 Gigabit,$0.544 hourly,$0.343 hourly,$0.3641 hourly,$0.136 hourly
+M5DN Quadruple Extra Large,m5dn.4xlarge,,General purpose,,64 GiB,,16 vCPUs,3.1 GHz,600 GB (2×300 GB NVMe SSD),Up to 25 Gigabit,$1.088 hourly,$0.685 hourly,$0.5926 hourly,$0.27 hourly
+M5DN Eight Extra Large,m5dn.8xlarge,,General purpose,,128 GiB,,32 vCPUs,3.1 GHz,1200 GB (2×600 GB NVMe SSD),25 Gigabit,$2.176 hourly,$1.371 hourly,$1.2484 hourly,$0.27 hourly
+M5DN Large,m5dn.large,,General purpose,,8 GiB,,2 vCPUs,3.1 GHz,75 GB NVMe SSD,Up to 25 Gigabit,$0.136 hourly,$0.086 hourly,$0.0494 hourly,
+M5DN Metal,m5dn.metal,,General purpose,,384 GiB,,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),100 Gigabit,$6.528 hourly,$4.113 hourly,$2.0195 hourly,
+M5DN Extra Large,m5dn.xlarge,,General purpose,,16 GiB,,4 vCPUs,3.1 GHz,150 GB NVMe SSD,Up to 25 Gigabit,$0.272 hourly,$0.171 hourly,$0.1387 hourly,$0.068 hourly
+M5N 12xlarge Extra Large,m5n.12xlarge,,General purpose,,192 GiB,,48 vCPUs,3.1 GHz,EBS only,50 Gigabit,$2.856 hourly,$1.799 hourly,$1.1791 hourly,$0.27 hourly
+M5N 16xlarge Extra Large,m5n.16xlarge,,General purpose,,256 GiB,,64 vCPUs,3.1 GHz,EBS only,75 Gigabit,$3.808 hourly,$2.399 hourly,$1.7295 hourly,$0.27 hourly
+M5N 24xlarge,m5n.24xlarge,,General purpose,,384 GiB,,96 vCPUs,3.1 GHz,EBS only,100 Gigabit,$5.712 hourly,$3.599 hourly,$2.1434 hourly,$0.27 hourly
+M5N Double Extra Large,m5n.2xlarge,,General purpose,,32 GiB,,8 vCPUs,3.1 GHz,EBS only,Up to 25 Gigabit,$0.476 hourly,$0.30 hourly,$0.2215 hourly,$0.119 hourly
+M5N Quadruple Extra Large,m5n.4xlarge,,General purpose,,64 GiB,,16 vCPUs,3.1 GHz,EBS only,Up to 25 Gigabit,$0.952 hourly,$0.60 hourly,$0.3506 hourly,$0.238 hourly
+M5N Eight Extra Large,m5n.8xlarge,,General purpose,,128 GiB,,32 vCPUs,3.1 GHz,EBS only,25 Gigabit,$1.904 hourly,$1.20 hourly,$1.0457 hourly,$0.27 hourly
+M5N Large,m5n.large,,General purpose,,8 GiB,,2 vCPUs,3.1 GHz,EBS only,Up to 25 Gigabit,$0.119 hourly,$0.075 hourly,$0.0461 hourly,
+M5N Metal,m5n.metal,,General purpose,,384 GiB,,96 vCPUs,3.1 GHz,EBS only,100 Gigabit,$5.712 hourly,$3.599 hourly,$1.488 hourly,
+M5N Extra Large,m5n.xlarge,,General purpose,,16 GiB,,4 vCPUs,3.1 GHz,EBS only,Up to 25 Gigabit,$0.238 hourly,$0.15 hourly,$0.1061 hourly,$0.0595 hourly
+M8AZN 12xlarge Extra Large,m8azn.12xlarge,,General purpose,,192 GiB,,48 vCPUs,Up to 5 GHz,EBS only,100 Gigabit,$4.955 hourly,,$1.7302 hourly,
+M8AZN 24xlarge,m8azn.24xlarge,,General purpose,,384 GiB,,96 vCPUs,Up to 5 GHz,EBS only,200 Gigabit,$9.9101 hourly,,$2.3564 hourly,
+M8AZN 3xlarge,m8azn.3xlarge,,General purpose,,48 GiB,,12 vCPUs,Up to 5 GHz,EBS only,Up to 50 Gigabit,$1.2388 hourly,,$0.5377 hourly,
+M8AZN 6xlarge,m8azn.6xlarge,,General purpose,,96 GiB,,24 vCPUs,Up to 5 GHz,EBS only,50 Gigabit,$2.4775 hourly,,$0.9228 hourly,
+M8AZN Large,m8azn.large,,General purpose,,8 GiB,,2 vCPUs,Up to 5 GHz,EBS only,Up to 30 Gigabit,$0.2065 hourly,,$0.0531 hourly,
+M8AZN Medium,m8azn.medium,,General purpose,,4 GiB,,1 vCPUs,Up to 5 GHz,EBS only,Up to 25 Gigabit,$0.1032 hourly,,$0.0314 hourly,
+M8AZN Metal-12xl,m8azn.metal-12xl,,General purpose,,192 GiB,,48 vCPUs,Up to 5 GHz,EBS only,100 Gigabit,$4.955 hourly,,$1.364 hourly,
+M8AZN Metal-24xl,m8azn.metal-24xl,,General purpose,,384 GiB,,96 vCPUs,Up to 5 GHz,EBS only,200 Gigabit,$9.9101 hourly,,$1.8593 hourly,
+M8AZN Extra Large,m8azn.xlarge,,General purpose,,16 GiB,,4 vCPUs,Up to 5 GHz,EBS only,Up to 40 Gigabit,$0.4129 hourly,,$0.1403 hourly,
+M8GB Metal-24xl,m8gb.metal-24xl,,General purpose,,384 GiB,,96 vCPUs,2.8 GHz,EBS only,200 Gigabit,$13.968 hourly,,$2.1799 hourly,
+M8GB Metal-48xl,m8gb.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,2.8 GHz,EBS only,400 Gigabit,$13.968 hourly,,$3.0529 hourly,
+M8GD 12xlarge Extra Large,m8gd.12xlarge,,General purpose,,192 GiB,,48 vCPUs,2.7 GHz,2850 GB (3×950 GB NVMe SSD),22.5 Gigabit,$2.7677 hourly,,$0.8828 hourly,
+M8GD 16xlarge Extra Large,m8gd.16xlarge,,General purpose,,256 GiB,,64 vCPUs,2.7 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$3.6902 hourly,,$1.0834 hourly,
+M8GD 24xlarge,m8gd.24xlarge,,General purpose,,384 GiB,,96 vCPUs,2.7 GHz,5700 GB (3×1900 GB NVMe SSD),40 Gigabit,$5.5354 hourly,,$1.6359 hourly,
+M8GD Double Extra Large,m8gd.2xlarge,,General purpose,,32 GiB,,8 vCPUs,2.7 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.4613 hourly,,$0.1693 hourly,
+M8GD 48xlarge,m8gd.48xlarge,,General purpose,,768 GiB,,192 vCPUs,2.7 GHz,11400 GB (6×1900 GB NVMe SSD),50 Gigabit,$11.0707 hourly,,$4.3761 hourly,
+M8GD Quadruple Extra Large,m8gd.4xlarge,,General purpose,,64 GiB,,16 vCPUs,2.7 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$0.9226 hourly,,$0.3456 hourly,
+M8GD Eight Extra Large,m8gd.8xlarge,,General purpose,,128 GiB,,32 vCPUs,2.7 GHz,1900 GB NVMe SSD,15 Gigabit,$1.8451 hourly,,$0.6378 hourly,
+M8GD Large,m8gd.large,,General purpose,,8 GiB,,2 vCPUs,2.7 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1153 hourly,,$0.0477 hourly,
+M8GD Medium,m8gd.medium,,General purpose,,4 GiB,,1 vCPUs,2.7 GHz,59 GB NVMe SSD,Up to 12.5 Gigabit,$0.0577 hourly,,$0.0143 hourly,
+M8GD Metal-24xl,m8gd.metal-24xl,,General purpose,,384 GiB,,96 vCPUs,2.7 GHz,5700 GB (3×1900 GB NVMe SSD),40 Gigabit,$5.5354 hourly,,$1.6179 hourly,
+M8GD Metal-48xl,m8gd.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,2.7 GHz,11400 GB (6×1900 GB NVMe SSD),50 Gigabit,$11.0707 hourly,,$2.8474 hourly,
+M8GD Extra Large,m8gd.xlarge,,General purpose,,16 GiB,,4 vCPUs,2.7 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2306 hourly,,$0.0908 hourly,
+M8GN Metal-24xl,m8gn.metal-24xl,,General purpose,,384 GiB,,96 vCPUs,2.8 GHz,EBS only,300 Gigabit,$6.984 hourly,,$1.5215 hourly,
+M8GN Metal-48xl,m8gn.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,2.8 GHz,EBS only,600 Gigabit,$13.968 hourly,,$2.7964 hourly,
+M8IB Metal-48xl,m8ib.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.9 GHz,EBS only,200 Gigabit,$16.0397 hourly,,$7.0478 hourly,
+M8IB Metal-96xl,m8ib.metal-96xl,,General purpose,,1536 GiB,,384 vCPUs,3.9 GHz,EBS only,400 Gigabit,$32.0794 hourly,,$10.9314 hourly,
+M8ID 12xlarge Extra Large,m8id.12xlarge,,General purpose,,192 GiB,,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,22.5 Gigabit,$3.1325 hourly,,$1.0589 hourly,
+M8ID 16xlarge Extra Large,m8id.16xlarge,,General purpose,,256 GiB,,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,30 Gigabit,$4.1766 hourly,,$1.5651 hourly,
+M8ID 24xlarge,m8id.24xlarge,,General purpose,,384 GiB,,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),40 Gigabit,$6.265 hourly,,$1.7899 hourly,
+M8ID Double Extra Large,m8id.2xlarge,,General purpose,,32 GiB,,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.5221 hourly,,$0.2718 hourly,
+M8ID 32xlarge,m8id.32xlarge,,General purpose,,512 GiB,,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),50 Gigabit,$8.3533 hourly,,$2.0785 hourly,
+M8ID 48xlarge,m8id.48xlarge,,General purpose,,768 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),75 Gigabit,$12.5299 hourly,,$2.4027 hourly,
+M8ID Quadruple Extra Large,m8id.4xlarge,,General purpose,,64 GiB,,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$1.0442 hourly,,$0.478 hourly,
+M8ID Eight Extra Large,m8id.8xlarge,,General purpose,,128 GiB,,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,15 Gigabit,$2.0883 hourly,,$0.8107 hourly,
+M8ID 96xlarge,m8id.96xlarge,,General purpose,,1536 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),100 Gigabit,$25.0598 hourly,,$4.7173 hourly,
+M8ID Large,m8id.large,,General purpose,,8 GiB,,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1305 hourly,,$0.0497 hourly,
+M8ID Metal-48xl,m8id.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),75 Gigabit,$12.5299 hourly,,$4.2065 hourly,
+M8ID Metal-96xl,m8id.metal-96xl,,General purpose,,1536 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),100 Gigabit,$25.0598 hourly,,$4.1618 hourly,
+M8ID Extra Large,m8id.xlarge,,General purpose,,16 GiB,,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.261 hourly,,$0.1591 hourly,
+M8IDB Metal-48xl,m8idb.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),200 Gigabit,$18.3302 hourly,,$8.0647 hourly,
+M8IDB Metal-96xl,m8idb.metal-96xl,,General purpose,,1536 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),400 Gigabit,$36.6605 hourly,,$15.8723 hourly,
+M8IDN Metal-48xl,m8idn.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),300 Gigabit,$18.3302 hourly,,$8.4921 hourly,
+M8IDN Metal-96xl,m8idn.metal-96xl,,General purpose,,1536 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),600 Gigabit,$36.6605 hourly,,$14.724 hourly,
+M8IN Metal-48xl,m8in.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.9 GHz,EBS only,300 Gigabit,$16.0397 hourly,,$7.5489 hourly,
+M8IN Metal-96xl,m8in.metal-96xl,,General purpose,,1536 GiB,,384 vCPUs,3.9 GHz,EBS only,600 Gigabit,$32.0794 hourly,,$11.6217 hourly,
+M9G 12xlarge Extra Large,m9g.12xlarge,,General purpose,,192 GiB,,48 vCPUs,3.3 GHz,EBS only,25 Gigabit,$2.3482 hourly,,$0.9299 hourly,
+M9G 16xlarge Extra Large,m9g.16xlarge,,General purpose,,256 GiB,,64 vCPUs,3.3 GHz,EBS only,34 Gigabit,$3.1309 hourly,,$1.1644 hourly,
+M9G 24xlarge,m9g.24xlarge,,General purpose,,384 GiB,,96 vCPUs,3.3 GHz,EBS only,50 Gigabit,$4.6963 hourly,,$1.8776 hourly,
+M9G Double Extra Large,m9g.2xlarge,,General purpose,,32 GiB,,8 vCPUs,3.3 GHz,EBS only,Up to 17 Gigabit,$0.3914 hourly,,$0.1701 hourly,
+M9G 48xlarge,m9g.48xlarge,,General purpose,,768 GiB,,192 vCPUs,3.3 GHz,EBS only,100 Gigabit,$9.3926 hourly,,$3.8986 hourly,
+M9G Quadruple Extra Large,m9g.4xlarge,,General purpose,,64 GiB,,16 vCPUs,3.3 GHz,EBS only,Up to 17 Gigabit,$0.7827 hourly,,$0.3395 hourly,
+M9G Eight Extra Large,m9g.8xlarge,,General purpose,,128 GiB,,32 vCPUs,3.3 GHz,EBS only,17 Gigabit,$1.5654 hourly,,$0.6509 hourly,
+M9G Large,m9g.large,,General purpose,,8 GiB,,2 vCPUs,3.3 GHz,EBS only,Up to 15 Gigabit,$0.0978 hourly,,$0.0437 hourly,
+M9G Medium,m9g.medium,,General purpose,,4 GiB,,1 vCPUs,3.3 GHz,EBS only,Up to 15 Gigabit,$0.0489 hourly,,$0.0194 hourly,
+M9G Metal-48xl,m9g.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.3 GHz,EBS only,100 Gigabit,$9.3926 hourly,,$2.9422 hourly,
+M9G Extra Large,m9g.xlarge,,General purpose,,16 GiB,,4 vCPUs,3.3 GHz,EBS only,Up to 15 Gigabit,$0.1957 hourly,,$0.0865 hourly,
+M9GD 12xlarge Extra Large,m9gd.12xlarge,,General purpose,,192 GiB,,48 vCPUs,3.3 GHz,2850 GB (3×950 GB NVMe SSD),25 Gigabit,$3.0168 hourly,,$1.0431 hourly,
+M9GD 16xlarge Extra Large,m9gd.16xlarge,,General purpose,,256 GiB,,64 vCPUs,3.3 GHz,3800 GB NVMe SSD,34 Gigabit,$4.0224 hourly,,$1.3753 hourly,
+M9GD 24xlarge,m9gd.24xlarge,,General purpose,,384 GiB,,96 vCPUs,3.3 GHz,5700 GB (3×1900 GB NVMe SSD),50 Gigabit,$6.0336 hourly,,$1.9653 hourly,
+M9GD Double Extra Large,m9gd.2xlarge,,General purpose,,32 GiB,,8 vCPUs,3.3 GHz,474 GB NVMe SSD,Up to 17 Gigabit,$0.5028 hourly,,$0.207 hourly,
+M9GD 48xlarge,m9gd.48xlarge,,General purpose,,768 GiB,,192 vCPUs,3.3 GHz,11400 GB (3×3800 GB NVMe SSD),100 Gigabit,$12.0672 hourly,,$4.5265 hourly,
+M9GD Quadruple Extra Large,m9gd.4xlarge,,General purpose,,64 GiB,,16 vCPUs,3.3 GHz,950 GB NVMe SSD,Up to 17 Gigabit,$1.0056 hourly,,$0.4231 hourly,
+M9GD Eight Extra Large,m9gd.8xlarge,,General purpose,,128 GiB,,32 vCPUs,3.3 GHz,1900 GB NVMe SSD,17 Gigabit,$2.0112 hourly,,$0.8421 hourly,
+M9GD Large,m9gd.large,,General purpose,,8 GiB,,2 vCPUs,3.3 GHz,118 GB NVMe SSD,Up to 15 Gigabit,$0.1257 hourly,,$0.0523 hourly,
+M9GD Medium,m9gd.medium,,General purpose,,4 GiB,,1 vCPUs,3.3 GHz,59 GB NVMe SSD,Up to 15 Gigabit,$0.0629 hourly,,$0.0193 hourly,
+M9GD Metal-48xl,m9gd.metal-48xl,,General purpose,,768 GiB,,192 vCPUs,3.3 GHz,11400 GB (3×3800 GB NVMe SSD),100 Gigabit,$12.0672 hourly,,$3.7071 hourly,
+M9GD Extra Large,m9gd.xlarge,,General purpose,,16 GiB,,4 vCPUs,3.3 GHz,237 GB NVMe SSD,Up to 15 Gigabit,$0.2514 hourly,,$0.1081 hourly,
+R5B 12xlarge Extra Large,r5b.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.1 GHz,EBS only,12 Gigabit,$3.576 hourly,$2.2529 hourly,$1.9135 hourly,$0.27 hourly
+R5B 16xlarge Extra Large,r5b.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.1 GHz,EBS only,20 Gigabit,$4.768 hourly,$3.0038 hourly,$2.3936 hourly,$0.27 hourly
+R5B 24xlarge,r5b.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,3.1 GHz,EBS only,25 Gigabit,$7.152 hourly,$4.5058 hourly,$4.2532 hourly,$0.27 hourly
+R5B Double Extra Large,r5b.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.596 hourly,$0.3755 hourly,$0.3737 hourly,$0.149 hourly
+R5B Quadruple Extra Large,r5b.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$1.192 hourly,$0.751 hourly,$0.7338 hourly,$0.27 hourly
+R5B Eight Extra Large,r5b.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.1 GHz,EBS only,10 Gigabit,$2.384 hourly,$1.5019 hourly,$1.3193 hourly,$0.27 hourly
+R5B Large,r5b.large,,Memory optimized,,16 GiB,,2 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.149 hourly,$0.0939 hourly,$0.052 hourly,
+R5B Metal,r5b.metal,,Memory optimized,,768 GiB,,96 vCPUs,3.1 GHz,EBS only,25 Gigabit,$7.152 hourly,$4.5058 hourly,$2.2899 hourly,
+R5B Extra Large,r5b.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.1 GHz,EBS only,Up to 10 Gigabit,$0.298 hourly,$0.1877 hourly,$0.1498 hourly,$0.0745 hourly
+R5DN 12xlarge Extra Large,r5dn.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.1 GHz,1800 GB (2×900 GB NVMe SSD),50 Gigabit,$4.008 hourly,$2.525 hourly,$1.498 hourly,$0.27 hourly
+R5DN 16xlarge Extra Large,r5dn.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.1 GHz,2400 GB (4×600 GB NVMe SSD),75 Gigabit,$5.344 hourly,$3.367 hourly,$1.8157 hourly,$0.27 hourly
+R5DN 24xlarge,r5dn.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),100 Gigabit,$8.016 hourly,$5.05 hourly,$3.0648 hourly,$0.27 hourly
+R5DN Double Extra Large,r5dn.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.1 GHz,300 GB NVMe SSD,Up to 25 Gigabit,$0.668 hourly,$0.421 hourly,$0.3334 hourly,$0.167 hourly
+R5DN Quadruple Extra Large,r5dn.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.1 GHz,600 GB (2×300 GB NVMe SSD),Up to 25 Gigabit,$1.336 hourly,$0.842 hourly,$0.6512 hourly,$0.27 hourly
+R5DN Eight Extra Large,r5dn.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.1 GHz,1200 GB (2×600 GB NVMe SSD),25 Gigabit,$2.672 hourly,$1.683 hourly,$1.4198 hourly,$0.27 hourly
+R5DN Large,r5dn.large,,Memory optimized,,16 GiB,,2 vCPUs,3.1 GHz,75 GB NVMe SSD,Up to 25 Gigabit,$0.167 hourly,$0.105 hourly,$0.0477 hourly,
+R5DN Metal,r5dn.metal,,Memory optimized,,768 GiB,,96 vCPUs,3.1 GHz,3600 GB (4×900 GB NVMe SSD),100 Gigabit,$8.016 hourly,$5.05 hourly,$2.425 hourly,
+R5DN Extra Large,r5dn.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.1 GHz,150 GB NVMe SSD,Up to 25 Gigabit,$0.334 hourly,$0.21 hourly,$0.165 hourly,$0.084 hourly
+R6ID 12xlarge Extra Large,r6id.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.5 GHz,2850 GB (2×1425 GB NVMe SSD),18.75 Gigabit,$3.6288 hourly,$2.2806 hourly,$1.7831 hourly,$0.9072 hourly
+R6ID 16xlarge Extra Large,r6id.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.5 GHz,3800 GB (2×1900 GB NVMe SSD),25 Gigabit,$4.8384 hourly,$3.0408 hourly,$2.0483 hourly,$1.2096 hourly
+R6ID 24xlarge,r6id.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,3.5 GHz,5700 GB (4×1425 GB NVMe SSD),37.5 Gigabit,$7.2576 hourly,$4.5612 hourly,$3.7992 hourly,$1.8144 hourly
+R6ID Double Extra Large,r6id.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.5 GHz,474 GB NVMe SSD,Up to 12.5 Gigabit,$0.6048 hourly,$0.3801 hourly,$0.2384 hourly,$0.1512 hourly
+R6ID 32xlarge,r6id.32xlarge,,Memory optimized,,1024 GiB,,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),50 Gigabit,$9.6768 hourly,$6.0816 hourly,$3.1737 hourly,$2.4192 hourly
+R6ID Quadruple Extra Large,r6id.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.5 GHz,950 GB NVMe SSD,Up to 12.5 Gigabit,$1.2096 hourly,$0.7602 hourly,$0.5428 hourly,$0.3024 hourly
+R6ID Eight Extra Large,r6id.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.5 GHz,1900 GB NVMe SSD,12.5 Gigabit,$2.4192 hourly,$1.5204 hourly,$1.5491 hourly,$0.6048 hourly
+R6ID Large,r6id.large,,Memory optimized,,16 GiB,,2 vCPUs,3.5 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1512 hourly,$0.095 hourly,$0.0499 hourly,
+R6ID Metal,r6id.metal,,Memory optimized,,1024 GiB,,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),50 Gigabit,$9.6768 hourly,$6.0816 hourly,$2.7027 hourly,
+R6ID Extra Large,r6id.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.5 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.3024 hourly,$0.1901 hourly,$0.1456 hourly,$0.0756 hourly
+R6IDN 12xlarge Extra Large,r6idn.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.5 GHz,2850 GB (2×1425 GB NVMe SSD),75 Gigabit,$4.6894 hourly,$2.9543 hourly,$1.6275 hourly,$1.1723 hourly
+R6IDN 16xlarge Extra Large,r6idn.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.5 GHz,3800 GB (2×1900 GB NVMe SSD),100 Gigabit,$6.2525 hourly,$3.9391 hourly,$1.9248 hourly,$1.5631 hourly
+R6IDN 24xlarge,r6idn.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,3.5 GHz,5700 GB (4×1425 GB NVMe SSD),150 Gigabit,$9.3787 hourly,$5.9086 hourly,$3.8162 hourly,$2.3447 hourly
+R6IDN Double Extra Large,r6idn.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.5 GHz,474 GB NVMe SSD,Up to 40 Gigabit,$0.7816 hourly,$0.4924 hourly,$0.4172 hourly,$0.1954 hourly
+R6IDN 32xlarge,r6idn.32xlarge,,Memory optimized,,1024 GiB,,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),200 Gigabit,$12.505 hourly,$7.8781 hourly,$4.3018 hourly,$3.1262 hourly
+R6IDN Quadruple Extra Large,r6idn.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.5 GHz,950 GB NVMe SSD,Up to 50 Gigabit,$1.5631 hourly,$0.9848 hourly,$0.8781 hourly,$0.3908 hourly
+R6IDN Eight Extra Large,r6idn.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.5 GHz,1900 GB NVMe SSD,50 Gigabit,$3.1262 hourly,$1.9695 hourly,$1.3464 hourly,$0.7816 hourly
+R6IDN Large,r6idn.large,,Memory optimized,,16 GiB,,2 vCPUs,3.5 GHz,118 GB NVMe SSD,Up to 25 Gigabit,$0.1954 hourly,$0.1231 hourly,$0.0574 hourly,
+R6IDN Metal,r6idn.metal,,Memory optimized,,1024 GiB,,128 vCPUs,3.5 GHz,7600 GB (4×1900 GB NVMe SSD),200 Gigabit,$12.505 hourly,$7.8781 hourly,$3.5428 hourly,
+R6IDN Extra Large,r6idn.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.5 GHz,237 GB NVMe SSD,Up to 30 Gigabit,$0.3908 hourly,$0.2462 hourly,$0.2033 hourly,$0.0977 hourly
+R6IN 12xlarge Extra Large,r6in.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.5 GHz,EBS only,75 Gigabit,$4.1839 hourly,$2.6359 hourly,$1.8318 hourly,$1.046 hourly
+R6IN 16xlarge Extra Large,r6in.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.5 GHz,EBS only,100 Gigabit,$5.5786 hourly,$3.5145 hourly,$1.5712 hourly,$1.3946 hourly
+R6IN 24xlarge,r6in.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,3.5 GHz,EBS only,150 Gigabit,$8.3678 hourly,$5.2717 hourly,$3.004 hourly,$2.092 hourly
+R6IN Double Extra Large,r6in.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.5 GHz,EBS only,Up to 40 Gigabit,$0.6973 hourly,$0.4393 hourly,$0.3335 hourly,$0.1743 hourly
+R6IN 32xlarge,r6in.32xlarge,,Memory optimized,,1024 GiB,,128 vCPUs,3.5 GHz,EBS only,200 Gigabit,$11.1571 hourly,$7.029 hourly,$3.3477 hourly,$2.7893 hourly
+R6IN Quadruple Extra Large,r6in.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.5 GHz,EBS only,Up to 50 Gigabit,$1.3946 hourly,$0.8786 hourly,$0.6906 hourly,$0.3487 hourly
+R6IN Eight Extra Large,r6in.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.5 GHz,EBS only,50 Gigabit,$2.7893 hourly,$1.7573 hourly,$1.2697 hourly,$0.6973 hourly
+R6IN Large,r6in.large,,Memory optimized,,16 GiB,,2 vCPUs,3.5 GHz,EBS only,Up to 25 Gigabit,$0.1743 hourly,$0.1098 hourly,$0.0387 hourly,
+R6IN Metal,r6in.metal,,Memory optimized,,1024 GiB,,128 vCPUs,3.5 GHz,EBS only,200 Gigabit,$11.1571 hourly,$7.029 hourly,$2.6236 hourly,
+R6IN Extra Large,r6in.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.5 GHz,EBS only,Up to 30 Gigabit,$0.3487 hourly,$0.2197 hourly,$0.1664 hourly,$0.0872 hourly
+R7IZ 12xlarge Extra Large,r7iz.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.9 GHz,EBS only,25 Gigabit,$4.464 hourly,$2.8123 hourly,$1.7942 hourly,$1.116 hourly
+R7IZ 16xlarge Extra Large,r7iz.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.9 GHz,EBS only,25 Gigabit,$5.952 hourly,$3.7498 hourly,$2.0087 hourly,$1.488 hourly
+R7IZ Double Extra Large,r7iz.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.744 hourly,$0.4687 hourly,$0.3425 hourly,$0.186 hourly
+R7IZ 32xlarge,r7iz.32xlarge,,Memory optimized,,1024 GiB,,128 vCPUs,3.9 GHz,EBS only,50 Gigabit,$11.904 hourly,$7.4995 hourly,$4.9837 hourly,$2.976 hourly
+R7IZ Quadruple Extra Large,r7iz.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$1.488 hourly,$0.9374 hourly,$0.6385 hourly,$0.372 hourly
+R7IZ Eight Extra Large,r7iz.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.9 GHz,EBS only,12.5 Gigabit,$2.976 hourly,$1.8749 hourly,$1.3743 hourly,$0.744 hourly
+R7IZ Large,r7iz.large,,Memory optimized,,16 GiB,,2 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.186 hourly,$0.1172 hourly,$0.0532 hourly,
+R7IZ Metal-16xl,r7iz.metal-16xl,,Memory optimized,,512 GiB,,64 vCPUs,3.9 GHz,EBS only,25 Gigabit,$5.952 hourly,$3.7498 hourly,$1.8145 hourly,
+R7IZ Metal-32xl,r7iz.metal-32xl,,Memory optimized,,1024 GiB,,128 vCPUs,3.9 GHz,EBS only,50 Gigabit,$11.904 hourly,$7.4995 hourly,$3.056 hourly,
+R7IZ Extra Large,r7iz.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.9 GHz,EBS only,Up to 12.5 Gigabit,$0.372 hourly,$0.2344 hourly,$0.1547 hourly,$0.093 hourly
+R8GB 12xlarge Extra Large,r8gb.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,2.8 GHz,EBS only,100 Gigabit,$4.3723 hourly,,$1.5902 hourly,
+R8GB 16xlarge Extra Large,r8gb.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,2.8 GHz,EBS only,133.33 Gigabit,$5.8298 hourly,,$1.5964 hourly,
+R8GB 24xlarge,r8gb.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,2.8 GHz,EBS only,200 Gigabit,$8.7446 hourly,,$2.3728 hourly,
+R8GB Double Extra Large,r8gb.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,2.8 GHz,EBS only,Up to 33.33 Gigabit,$0.7287 hourly,,$0.3356 hourly,
+R8GB Quadruple Extra Large,r8gb.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,2.8 GHz,EBS only,33.33 Gigabit,$1.4574 hourly,,$0.7154 hourly,
+R8GB Eight Extra Large,r8gb.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,2.8 GHz,EBS only,66.66 Gigabit,$2.9149 hourly,,$1.144 hourly,
+R8GB Large,r8gb.large,,Memory optimized,,16 GiB,,2 vCPUs,2.8 GHz,EBS only,Up to 20 Gigabit,$0.1822 hourly,,$0.0832 hourly,
+R8GB Medium,r8gb.medium,,Memory optimized,,8 GiB,,1 vCPUs,2.8 GHz,EBS only,Up to 16.66 Gigabit,$0.0911 hourly,,$0.0238 hourly,
+R8GB Metal-24xl,r8gb.metal-24xl,,Memory optimized,,768 GiB,,96 vCPUs,2.8 GHz,EBS only,200 Gigabit,$17.4893 hourly,,$7.9915 hourly,
+R8GB Extra Large,r8gb.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,2.8 GHz,EBS only,Up to 26.66 Gigabit,$0.3644 hourly,,$0.1975 hourly,
+R8GD 12xlarge Extra Large,r8gd.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,2.7 GHz,2850 GB (3×950 GB NVMe SSD),22.5 Gigabit,$3.527 hourly,,$1.1643 hourly,
+R8GD 16xlarge Extra Large,r8gd.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,2.7 GHz,3800 GB (2×1900 GB NVMe SSD),30 Gigabit,$4.7027 hourly,,$1.38 hourly,
+R8GD 24xlarge,r8gd.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,2.7 GHz,5700 GB (3×1900 GB NVMe SSD),40 Gigabit,$7.0541 hourly,,$1.9706 hourly,
+R8GD Double Extra Large,r8gd.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,2.7 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.5878 hourly,,$0.2126 hourly,
+R8GD 48xlarge,r8gd.48xlarge,,Memory optimized,,1536 GiB,,192 vCPUs,2.7 GHz,11400 GB (6×1900 GB NVMe SSD),50 Gigabit,$14.1082 hourly,,$5.26 hourly,
+R8GD Quadruple Extra Large,r8gd.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,2.7 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$1.1757 hourly,,$0.5796 hourly,
+R8GD Eight Extra Large,r8gd.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,2.7 GHz,1900 GB NVMe SSD,15 Gigabit,$2.3514 hourly,,$1.0745 hourly,
+R8GD Large,r8gd.large,,Memory optimized,,16 GiB,,2 vCPUs,2.7 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.147 hourly,,$0.0535 hourly,
+R8GD Medium,r8gd.medium,,Memory optimized,,8 GiB,,1 vCPUs,2.7 GHz,59 GB NVMe SSD,Up to 12.5 Gigabit,$0.0735 hourly,,$0.0189 hourly,
+R8GD Metal-24xl,r8gd.metal-24xl,,Memory optimized,,768 GiB,,96 vCPUs,2.7 GHz,5700 GB (3×1900 GB NVMe SSD),40 Gigabit,$7.0541 hourly,,$1.7714 hourly,
+R8GD Metal-48xl,r8gd.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,2.7 GHz,11400 GB (6×1900 GB NVMe SSD),50 Gigabit,$14.1082 hourly,,$3.8725 hourly,
+R8GD Extra Large,r8gd.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,2.7 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.2939 hourly,,$0.1083 hourly,
+R8GN 12xlarge Extra Large,r8gn.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,2.8 GHz,EBS only,150 Gigabit,$4.3723 hourly,,$1.1113 hourly,
+R8GN 16xlarge Extra Large,r8gn.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,2.8 GHz,EBS only,200 Gigabit,$5.8298 hourly,,$1.6874 hourly,
+R8GN 24xlarge,r8gn.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,2.8 GHz,EBS only,300 Gigabit,$8.7446 hourly,,$2.3457 hourly,
+R8GN Double Extra Large,r8gn.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,2.8 GHz,EBS only,Up to 50 Gigabit,$0.7287 hourly,,$0.36 hourly,
+R8GN 48xlarge,r8gn.48xlarge,,Memory optimized,,1536 GiB,,192 vCPUs,2.8 GHz,EBS only,600 Gigabit,$17.4893 hourly,,$4.51 hourly,
+R8GN Quadruple Extra Large,r8gn.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,2.8 GHz,EBS only,50 Gigabit,$1.4574 hourly,,$0.6547 hourly,
+R8GN Eight Extra Large,r8gn.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,2.8 GHz,EBS only,100 Gigabit,$2.9149 hourly,,$1.0787 hourly,
+R8GN Large,r8gn.large,,Memory optimized,,16 GiB,,2 vCPUs,2.8 GHz,EBS only,Up to 30 Gigabit,$0.1822 hourly,,$0.0818 hourly,
+R8GN Medium,r8gn.medium,,Memory optimized,,8 GiB,,1 vCPUs,2.8 GHz,EBS only,Up to 25 Gigabit,$0.0911 hourly,,$0.0225 hourly,
+R8GN Metal-24xl,r8gn.metal-24xl,,Memory optimized,,768 GiB,,96 vCPUs,2.8 GHz,EBS only,300 Gigabit,$8.7446 hourly,,$4.0698 hourly,
+R8GN Metal-48xl,r8gn.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,2.8 GHz,EBS only,600 Gigabit,$17.4893 hourly,,$2.371 hourly,
+R8GN Extra Large,r8gn.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,2.8 GHz,EBS only,Up to 40 Gigabit,$0.3644 hourly,,$0.1808 hourly,
+R8IB Metal-48xl,r8ib.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,3.9 GHz,EBS only,200 Gigabit,$20.0832 hourly,,$7.1905 hourly,
+R8IB Metal-96xl,r8ib.metal-96xl,,Memory optimized,,3072 GiB,,384 vCPUs,3.9 GHz,EBS only,400 Gigabit,$40.1664 hourly,,$12.6654 hourly,
+R8ID 12xlarge Extra Large,r8id.12xlarge,,Memory optimized,,384 GiB,,48 vCPUs,3.9 GHz,2850 GB NVMe SSD,22.5 Gigabit,$3.9917 hourly,,$1.7166 hourly,
+R8ID 16xlarge Extra Large,r8id.16xlarge,,Memory optimized,,512 GiB,,64 vCPUs,3.9 GHz,3800 GB NVMe SSD,30 Gigabit,$5.3222 hourly,,$2.0912 hourly,
+R8ID 24xlarge,r8id.24xlarge,,Memory optimized,,768 GiB,,96 vCPUs,3.9 GHz,5700 GB (2×2850 GB NVMe SSD),40 Gigabit,$7.9834 hourly,,$2.8514 hourly,
+R8ID Double Extra Large,r8id.2xlarge,,Memory optimized,,64 GiB,,8 vCPUs,3.9 GHz,474 GB NVMe SSD,Up to 15 Gigabit,$0.6653 hourly,,$0.3523 hourly,
+R8ID 32xlarge,r8id.32xlarge,,Memory optimized,,1024 GiB,,128 vCPUs,3.9 GHz,7600 GB (2×3800 GB NVMe SSD),50 Gigabit,$10.6445 hourly,,$4.3938 hourly,
+R8ID 48xlarge,r8id.48xlarge,,Memory optimized,,1536 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),75 Gigabit,$15.9667 hourly,,$4.2734 hourly,
+R8ID Quadruple Extra Large,r8id.4xlarge,,Memory optimized,,128 GiB,,16 vCPUs,3.9 GHz,950 GB NVMe SSD,Up to 15 Gigabit,$1.3306 hourly,,$0.7514 hourly,
+R8ID Eight Extra Large,r8id.8xlarge,,Memory optimized,,256 GiB,,32 vCPUs,3.9 GHz,1900 GB NVMe SSD,15 Gigabit,$2.6611 hourly,,$1.0092 hourly,
+R8ID 96xlarge,r8id.96xlarge,,Memory optimized,,3072 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),100 Gigabit,$31.9334 hourly,,$15.8453 hourly,
+R8ID Large,r8id.large,,Memory optimized,,16 GiB,,2 vCPUs,3.9 GHz,118 GB NVMe SSD,Up to 12.5 Gigabit,$0.1663 hourly,,$0.0956 hourly,
+R8ID Metal-48xl,r8id.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),75 Gigabit,$15.9667 hourly,,$3.239 hourly,
+R8ID Metal-96xl,r8id.metal-96xl,,Memory optimized,,3072 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),100 Gigabit,$31.9334 hourly,,$9.7319 hourly,
+R8ID Extra Large,r8id.xlarge,,Memory optimized,,32 GiB,,4 vCPUs,3.9 GHz,237 GB NVMe SSD,Up to 12.5 Gigabit,$0.3326 hourly,,$0.2324 hourly,
+R8IDB Metal-48xl,r8idb.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),200 Gigabit,$22.5091 hourly,,$9.6998 hourly,
+R8IDB Metal-96xl,r8idb.metal-96xl,,Memory optimized,,3072 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),400 Gigabit,$45.0182 hourly,,$16.0392 hourly,
+R8IDN Metal-48xl,r8idn.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,3.9 GHz,11400 GB (3×3800 GB NVMe SSD),300 Gigabit,$22.5091 hourly,,$8.866 hourly,
+R8IDN Metal-96xl,r8idn.metal-96xl,,Memory optimized,,3072 GiB,,384 vCPUs,3.9 GHz,22800 GB (6×3800 GB NVMe SSD),600 Gigabit,$45.0182 hourly,,$14.4295 hourly,
+R8IN Metal-48xl,r8in.metal-48xl,,Memory optimized,,1536 GiB,,192 vCPUs,3.9 GHz,EBS only,300 Gigabit,$20.0832 hourly,,$8.3761 hourly,
+R8IN Metal-96xl,r8in.metal-96xl,,Memory optimized,,3072 GiB,,384 vCPUs,3.9 GHz,EBS only,600 Gigabit,$40.1664 hourly,,$13.5973 hourly,
