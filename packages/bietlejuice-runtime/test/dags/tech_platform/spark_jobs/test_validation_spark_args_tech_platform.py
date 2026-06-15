@@ -1,5 +1,6 @@
 """Argparse validation-flag smoke tests for tech_platform custom Spark jobs."""
 
+import re
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -37,6 +38,12 @@ for _mod in _SPARK_STUBS:
 
 from dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load import (  # noqa: E402
     parse_arguments as parse_application_audit_logs_args,
+)
+from dags.tech_platform.identitynow.spark_jobs.events_load import (  # noqa: E402
+    parse_arguments as parse_identitynow_events_args,
+)
+from dags.tech_platform.vault.spark_jobs.events_load import (  # noqa: E402
+    parse_arguments as parse_vault_events_args,
 )
 
 
@@ -198,6 +205,26 @@ _APPLICATION_AUDIT_LOGS_POSITIONAL = [
     '["year", "month", "day", "hour"]',
 ]
 
+_VAULT_EVENTS_POSITIONAL = [
+    "vault",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "vault_audit_logs",
+    "2024-01-01T00:00:00+00:00",
+    "events",
+    '["year", "month", "day"]',
+]
+
+_IDENTITYNOW_EVENTS_POSITIONAL = [
+    "identitynow",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "identitynow_audit_logs",
+    "2024-01-01T00:00:00+00:00",
+    "events",
+    '["year", "month", "day"]',
+]
+
 _CYPRESS_REPORTS_POSITIONAL = [
     _TEST_ENV,
     _TEST_BUCKET,
@@ -209,6 +236,13 @@ _CYPRESS_REPORTS_POSITIONAL = [
 _TECH_PLATFORM_JOB_PATHS = [
     "dags/tech_platform/application_audit_logs/spark_jobs/application_audit_logs_load.py",
     "dags/tech_platform/cypress_reports/spark_jobs/load_cypress_reports_raw.py",
+    "dags/tech_platform/vault/spark_jobs/events_load.py",
+    "dags/tech_platform/identitynow/spark_jobs/events_load.py",
+]
+
+_EVENTS_LOAD_JOB_PATHS = [
+    "dags/tech_platform/vault/spark_jobs/events_load.py",
+    "dags/tech_platform/identitynow/spark_jobs/events_load.py",
 ]
 
 _ZSCALER_POSITIONAL = [
@@ -364,6 +398,16 @@ class TestTechPlatformSparkJobValidationArgs:
                 _CYPRESS_REPORTS_POSITIONAL,
                 "datalake_cypress_reports_raw___cypress_reports",
             ),
+            (
+                parse_vault_events_args,
+                _VAULT_EVENTS_POSITIONAL,
+                "datalake_vault_audit_logs_clean___events",
+            ),
+            (
+                parse_identitynow_events_args,
+                _IDENTITYNOW_EVENTS_POSITIONAL,
+                "datalake_identitynow_audit_logs_clean___events",
+            ),
         ],
     )
     def test_log_jobs_accept_validation_flags(
@@ -399,6 +443,32 @@ class TestTechPlatformSparkJobValidationArgs:
                 return_value=MagicMock(get_config=MagicMock(return_value="path"))
             ),
         )
+        monkeypatch.setattr(
+            "dags.tech_platform.vault.spark_jobs.events_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(
+                        side_effect=lambda key: {
+                            "input_path": "s3://input",
+                            "output_path": "s3://output",
+                        }[key]
+                    )
+                )
+            ),
+        )
+        monkeypatch.setattr(
+            "dags.tech_platform.identitynow.spark_jobs.events_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(
+                        side_effect=lambda key: {
+                            "input_path": "s3://input",
+                            "output_path": "s3://output",
+                        }[key]
+                    )
+                )
+            ),
+        )
         args = parse_fn()
 
         assert args.target_database_name == _VALIDATION_DB
@@ -414,6 +484,8 @@ class TestTechPlatformSparkJobValidationArgs:
                 _APPLICATION_AUDIT_LOGS_POSITIONAL,
             ),
             (parse_cypress_reports_args, _CYPRESS_REPORTS_POSITIONAL),
+            (parse_vault_events_args, _VAULT_EVENTS_POSITIONAL),
+            (parse_identitynow_events_args, _IDENTITYNOW_EVENTS_POSITIONAL),
         ],
     )
     def test_log_jobs_default_without_validation_flags(
@@ -438,6 +510,32 @@ class TestTechPlatformSparkJobValidationArgs:
                 return_value=MagicMock(get_config=MagicMock(return_value="path"))
             ),
         )
+        monkeypatch.setattr(
+            "dags.tech_platform.vault.spark_jobs.events_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(
+                        side_effect=lambda key: {
+                            "input_path": "s3://input",
+                            "output_path": "s3://output",
+                        }[key]
+                    )
+                )
+            ),
+        )
+        monkeypatch.setattr(
+            "dags.tech_platform.identitynow.spark_jobs.events_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(
+                        side_effect=lambda key: {
+                            "input_path": "s3://input",
+                            "output_path": "s3://output",
+                        }[key]
+                    )
+                )
+            ),
+        )
         args = parse_fn()
 
         assert args.target_database_name is None
@@ -449,6 +547,28 @@ def test_tech_platform_jobs_register_validation_helpers(job_path: str):
     text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
     assert "add_validation_target_args" in text
     assert "resolve_datalake_write_target(" in text
+
+
+@pytest.mark.parametrize("job_path", _EVENTS_LOAD_JOB_PATHS)
+def test_events_load_jobs_resolve_uses_validation_target_args(job_path: str):
+    text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
+    for block in re.findall(
+        r"resolve_datalake_write_target\((.*?)\)", text, flags=re.DOTALL
+    ):
+        assert "target_database=args.target_database_name" in block
+        assert "target_table=args.target_table_name" in block
+
+
+@pytest.mark.parametrize("job_path", _EVENTS_LOAD_JOB_PATHS)
+def test_events_load_jobs_use_resolved_write_targets(job_path: str):
+    text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
+    assert "write_database_name" in text
+    assert "write_table_name" in text
+    assert "write_path" in text
+    assert "managed_table_fqn(" in text
+    assert 'table_name=f"{write_database_name}.{write_table_name}"' in text
+    assert "path=write_path" in text
+    assert 'f"datalake_{args.schema}_clean.{args.table_name}"' not in text
 
 
 @pytest.mark.parametrize("job_path", _CLOUDZERO_JOB_PATHS)
