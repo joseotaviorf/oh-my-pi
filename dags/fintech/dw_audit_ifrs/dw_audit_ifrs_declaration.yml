@@ -15,3 +15,10 @@ workflow:
   has_load_to_redshift_task: false
   short_circuit_customization:
     function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
+  inner_dependencies:
+    fact_closing:
+      - dim_bill_item_hierarchy
+      - fact_delay_rule
+      - fact_early_bird_full
+    fact_ever_portfolio:
+      - fact_closing

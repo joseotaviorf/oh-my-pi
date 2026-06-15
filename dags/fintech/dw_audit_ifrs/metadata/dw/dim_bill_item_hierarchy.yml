@@ -1,0 +1,15 @@
+---
+database_name: dw_audit_ifrs
+table_name: dim_bill_item_hierarchy
+description: Classifies invoices as repair_invoice or guarantee_invoice based on the presence of repair-related bill items. Used by db_fact_closing to segregate repair amounts from guarantee amounts in the IFRS provisioning calculation.
+owner: marcos.mota@quintoandar.com.br
+domain: Fintech
+columns:
+  sk_invoice:
+    lineage:
+      - dw_losses.dim_bill_items.sk_invoice
+    description: Surrogate key that uniquely identifies the invoice within the payment system. Joins to fact_closing and fact_provision.
+  invoice_hierarchy:
+    lineage:
+      - dw_losses.dim_bill_items.bill_item_name
+    description: Invoice classification based on bill item composition. repair_invoice when the invoice contains repair offboarding or residential protection 5A items; guarantee_invoice otherwise.

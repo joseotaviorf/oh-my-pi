@@ -1,0 +1,57 @@
+---
+database_name: dw_audit_ifrs
+table_name: fact_delay_rule
+description: Applies Rule E for delay contamination in the IFRS provisioning calculation. In case of a broken deal, all delayed debt is further contaminated by the anchor delay accumulated at the deal's creation date.
+owner: marcos.mota@quintoandar.com.br
+domain: Fintech
+columns:
+  id_invoice:
+    lineage:
+      - datalake_losses.delay.id_invoice
+    description: External identifier of the invoice from the payment snapshot system. Used to join with db_fact_closing on the provisioning calculation.
+  id_contract:
+    lineage:
+      - datalake_losses.delay.id_contract
+    description: External identifier of the rental contract. Used to look up deal history and anchor delay when applying Rule E contamination.
+  dt_closing:
+    lineage:
+      - datalake_losses.delay.dt_closing
+    description: Last day of the reference month.
+  deal_delay_rule_e:
+    lineage:
+      - datalake_losses.delay.deal_delay_rule_e
+    description: Raw Rule E delay value from the source delay table, before recalculation.
+  bigger_anchor_deal_at_contract:
+    lineage:
+      - datalake_losses.delay.bigger_anchor_deal_at_contract
+    description: Highest anchor delay across all active deals for the contract at the time of deal creation.
+  delta_days:
+    lineage:
+      - datalake_losses.delay.delta_days
+    description: Natural delay of the invoice in days (days overdue relative to the closing date).
+  is_contract_with_deal:
+    lineage:
+      - datalake_losses.delay.is_contract_with_deal
+    description: Flag indicating whether the contract has an active negotiation deal.
+  delay_at_deal_creation:
+    lineage:
+      - datalake_losses.delay.delay_at_deal_creation
+    description: Delay in days registered at the moment the deal was created.
+  deal_status:
+    lineage:
+      - datalake_losses.delay.deal_status
+    description: Current status of the deal. Possible values are DEAL IN DELAY, DEAL ON TIME. DELAY AT ANCHOR, and NOT-DEAL.
+  delay_contaminated_range_rule_e:
+    lineage:
+      - datalake_losses.delay.delay_contaminated_range_rule_e
+    description: Delay range bucket after applying Rule E contamination (e.g. a. Current, b. 1-30, c. 31-60).
+  delay_contamined_range:
+    lineage:
+      - datalake_losses.delay.delay_contamined_range
+    description: Natural delay range bucket of the invoice without deal contamination.
+  deal_delay_rule_e_calc:
+    lineage:
+      - datalake_losses.delay.delta_days
+      - datalake_losses.delay.bigger_anchor_deal_at_contract
+      - datalake_losses.delay.delay_at_deal_creation
+    description: Recalculated Rule E delay in days. For broken deals, adds the invoice delta_days to the anchor delay. For deals on time with anchor delay, uses delay_at_deal_creation. For non-deal contracts, uses delta_days directly.

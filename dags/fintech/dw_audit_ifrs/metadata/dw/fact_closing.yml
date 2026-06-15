@@ -1,0 +1,133 @@
+---
+database_name: dw_audit_ifrs
+table_name: fact_closing
+description: Main closing fact for the IFRS provisioning calculation. Combines early bird contracts (active at closing month) with the historical closing fact from dw_losses, enriched with provision balance, delay contamination (Rule E), and bill item hierarchy classification. Filters exclude canceled, written-down in dead time, international, before-started, and already written-off invoices.
+owner: marcos.mota@quintoandar.com.br
+domain: Fintech
+columns:
+  dt_closing:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.dt_closing
+      - dw_losses.fact_closing.dt_closing
+    description: Last day of the reference month.
+  sk_contract:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.id_contract
+      - dw_losses.fact_closing.sk_contract
+    description: Surrogate key that uniquely identifies the rental contract. Used to group invoices by contract for portfolio-level provisioning.
+  sk_invoice:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.id_invoice
+      - dw_losses.fact_closing.sk_invoice
+    description: Surrogate key that uniquely identifies the invoice within the payment system. Primary join key to fact_provision, fact_delay, and delay_rule.
+  invoice_type:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.invoice_type
+      - dw_losses.fact_closing.invoice_type
+    description: Type of the invoice (Mensal, Onboarding, Extra, Rescisão, Pos_rental).
+  invoice_status:
+    lineage:
+      - dw_losses.fact_provision.invoice_status
+    description: Provision status of the invoice (e.g. Baixado).
+  payment_status:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.payment_status
+      - dw_losses.fact_closing.payment_status
+    description: Payment status of the invoice (paid, open, written down, canceled).
+  invoice_account_type:
+    lineage:
+      - dw_losses.fact_delay.user
+    description: Account type associated with the invoice (tenant, landlord).
+  dt_due:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.dt_due
+      - dw_losses.fact_closing.dt_due
+    description: Original due date of the invoice.
+  dt_paid:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.dt_paid
+      - dw_losses.fact_closing.dt_paid
+    description: Date the invoice was paid.
+  is_writtendown_in_dead_time:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.is_writtendown_in_dead_time
+      - dw_losses.fact_closing.is_writtendown_in_dead_time
+    description: Flag indicating whether the invoice was written down between the closing date and the snapshot date.
+  provisional_group:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.is_guarantee_paid
+      - dw_losses.fact_closing.is_guarantee_paid
+    description: Provisioning group based on guarantee type. b. Paid for contracts with a paid guarantee; a. Free otherwise.
+  is_international:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.is_international
+      - dw_losses.fact_closing.is_international
+    description: Flag indicating whether the contract is from outside Brazil.
+  is_before_started:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.is_before_started
+      - dw_losses.fact_closing.is_before_started
+    description: Flag indicating whether the contract was annulled before it started.
+  has_repair_offboarding_bill_item:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.has_repair_offboarding_bill_item
+      - dw_losses.fact_closing.has_repair_offboarding_bill_item
+    description: Flag indicating whether the invoice contains a repair offboarding bill item.
+  invoice_hierarchy:
+    lineage:
+      - dw_audit_ifrs.dim_bill_item_hierarchy.invoice_hierarchy
+    description: Invoice classification based on bill item composition (repair_invoice or guarantee_invoice).
+  is_early_bird:
+    description: Flag indicating whether the invoice is an early bird (paid in the same month it was created).
+  is_write_off:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.is_write_off
+      - dw_losses.fact_closing.is_write_off
+    description: Flag indicating whether the invoice was written off.
+  dt_write_off:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.dt_write_off
+      - dw_losses.fact_closing.dt_write_off
+    description: Date the invoice was written off.
+  closing_month_status:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.closing_month_status
+      - dw_losses.fact_closing.closing_month_status
+    description: Status of the contract at the closing month (Ativo or Finalizado).
+  bigger_anchor_deal_at_contract:
+    lineage:
+      - dw_audit_ifrs.fact_delay_rule.bigger_anchor_deal_at_contract
+    description: Highest anchor delay across all active deals for the contract at the time of deal creation.
+  delta_days:
+    lineage:
+      - dw_audit_ifrs.fact_delay_rule.delta_days
+    description: Natural delay of the invoice in days relative to the closing date.
+  is_contract_with_deal:
+    lineage:
+      - dw_audit_ifrs.fact_delay_rule.is_contract_with_deal
+    description: Flag indicating whether the contract has an active negotiation deal.
+  delay_at_deal_creation:
+    lineage:
+      - dw_audit_ifrs.fact_delay_rule.delay_at_deal_creation
+    description: Delay in days registered at the moment the deal was created.
+  deal_status:
+    lineage:
+      - dw_audit_ifrs.fact_delay_rule.deal_status
+    description: Current status of the deal (DEAL IN DELAY, DEAL ON TIME. DELAY AT ANCHOR, or NOT-DEAL).
+  delay_contamined_range:
+    lineage:
+      - dw_losses.fact_delay.delay_contamined_range
+    description: Natural delay range bucket of the invoice without deal contamination.
+  delay_contaminated_range_rule_e:
+    lineage:
+      - dw_losses.fact_delay.delay_contaminated_range_rule_e
+    description: Delay range bucket after applying Rule E contamination.
+  due_amount:
+    lineage:
+      - dw_audit_ifrs.fact_early_bird_full.due_amount
+      - dw_losses.fact_closing.due_amount
+    description: Total value of the invoice, sign-inverted to positive (original values are negative for receivables).
+  provision_balance:
+    lineage:
+      - dw_losses.fact_provision.provision_balance
+    description: Expected credit loss provision balance for the invoice, sign-inverted to positive.

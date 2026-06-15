@@ -126,13 +126,19 @@ bietlejuice.dw_atta:
   - bietlejuice.sales_flow:load-clean-negotiation:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.dw_audit_ifrs:
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot:first-run-of-day
   - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot:first-run-of-day
+  - bietlejuice.dw_losses:load-dw-losses-dim-bill-items:first-run-of-day
   - bietlejuice.dw_losses:load-dw-losses-fact-closing:first-run-of-day
   - bietlejuice.dw_losses:load-dw-losses-fact-delay:first-run-of-day
   - bietlejuice.dw_losses:load-dw-losses-fact-losses:first-run-of-day
   - bietlejuice.dw_losses:load-dw-losses-fact-provision:first-run-of-day
+  - bietlejuice.enrich_losses:load-enrich-bill-items:first-run-of-day
+  - bietlejuice.enrich_losses:load-enrich-delay:first-run-of-day
+  - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-ead-lgd-asset:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-ead-lgd-liability:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.dw_banking_file_payments:
   - bietlejuice.vans:load-clean-bank-boleto:first-run-of-day
   - bietlejuice.vans:load-clean-bank-payment:first-run-of-day

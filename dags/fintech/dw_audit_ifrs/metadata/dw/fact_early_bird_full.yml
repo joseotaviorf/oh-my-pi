@@ -1,0 +1,165 @@
+---
+database_name: dw_audit_ifrs
+table_name: fact_early_bird_full
+description: Full early bird fact table combining historical rebuild (pre-Aug/2022, reconstructed from the Oct/2022 snapshot) and ongoing snapshot data (Aug/2022 onwards). An early bird invoice is one paid in the same month it was created, for tenant accounts with monthly or onboarding frequency. Used as input to db_fact_closing to include early bird contracts in the IFRS provisioning portfolio.
+owner: marcos.mota@quintoandar.com.br
+domain: Fintech
+columns:
+  dt_closing:
+    lineage:
+      - dw_losses.fact_closing.dt_closing
+      - dw_public.dim_date.month_end
+    description: Last day of the reference month. For the historical rebuild (pre-Aug/2022), derived from dw_losses.fact_closing closing dates between Sep/2018 and Jun/2022; for the snapshot, derived from the dim_date month_end of the snapshot.
+  id_invoice:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.sk_invoice
+    description: External identifier of the invoice from the payment snapshot system. Joins to dim_invoice_snapshot and downstream provisioning tables.
+  id_contract:
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+    description: External identifier of the rental contract, resolved via the retsuko invoice relationship. Used to group early bird invoices by contract.
+  accrual_year_month:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.accrual_year_month
+    description: String with Year number and Month number 'yyyymm' related to the sent date.
+  closing_month_status:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+    description: Status of the contract at the closing month. Ativo when the contract was active; Finalizado when annulled before or on the closing date.
+  due_amount:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.due_amount
+    description: Total value of the invoice (negative for receivables).
+  frequency:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.frequency
+    description: Frequency of the invoice. Always monthly or onboarding for early bird records.
+  invoice_type:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.frequency
+    description: Translated invoice type in Portuguese (Mensal, Onboarding, Extra, Rescisão, Pos_rental).
+  city:
+    lineage:
+      - datalake_retsuko_clean.contract.city
+    description: City of the rental property.
+  contract_guarantee:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.guarantee
+    description: Guarantee modality of the contract (Fairfax, Pro_Guarantor, Rental_Guarantee, Rental_Deposit, Standalone, Third_Party_3D, Outros).
+  is_guarantee_paid:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.guarantee
+    description: Flag indicating whether the contract has a paid guarantee modality (Rental Deposit, Rental Guarantee, Deposito, Pro Guarantor, Third Party Guarantee, or Standalone).
+  is_before_started:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+      - dw_public_snapshot.dim_contract_snapshot.dt_start
+    description: Flag indicating whether the contract was annulled before it started (coalesced with backup snapshot).
+  is_before_started_raw:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+      - dw_public_snapshot.dim_contract_snapshot.dt_start
+    description: Raw flag indicating whether the contract was annulled before it started, without coalesce fallback.
+  is_canceled_in_dead_time:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_canceled
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
+    description: Flag indicating whether the invoice was canceled between the closing date and the snapshot date (dead time).
+  is_international:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.country_code
+    description: Flag indicating whether the contract is from outside Brazil.
+  is_paid_in_closing_day:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+    description: Flag indicating whether the invoice was paid exactly on the closing day.
+  is_writtendown_in_dead_time:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
+    description: Flag indicating whether the invoice was written down between the closing date and the snapshot date (dead time).
+  is_write_off:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.is_write_off
+      - dw_payment_snapshot.dim_invoice_snapshot.reason
+    description: Flag indicating whether the invoice was written off, including write-off-negotiation-cyber and write-off-negotiation-5a reasons.
+  is_contract_write_off:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.is_write_off
+      - dw_payment_snapshot.dim_invoice_snapshot.reason
+    description: Flag indicating whether any invoice in the contract has a write-off status.
+  has_repair_offboarding_bill_item:
+    lineage:
+      - datalake_losses.bill_items.bill_item_name
+    description: Flag indicating whether the invoice contains a repair offboarding bill item.
+  paid_amount:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.paid_amount
+    description: Total paid amount of the invoice.
+  payment_status:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.payment_status
+    description: Raw payment status of the invoice (paid, open, canceled, written down, not payable).
+  payment_status_timeline:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.payment_status
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_canceled
+    description: Payment status adjusted to the closing date timeline. For the historical rebuild, recalculates status as of dt_closing; for the snapshot, equals payment_status directly.
+  user:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.user
+    description: Account type associated with the invoice. Always tenant for early bird records.
+  origin_factor:
+    description: Source of the record. HISTORICAL REBUILD for pre-Aug/2022 data reconstructed from the Oct/2022 snapshot; SNAPSHOT for Aug/2022 onwards.
+  dt_created:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_created
+    description: Date the invoice was created.
+  dt_canceled:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_canceled
+    description: Date the invoice was canceled, if applicable.
+  dt_closing_source_photo:
+    lineage:
+      - dw_public.dim_date.month_end
+    description: Last day of the month from the source snapshot used to build this closing record.
+  dt_contract_signature:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.ts_signature
+      - dw_public_snapshot.dim_contract_snapshot.dt_start
+    description: Date the contract was signed (falls back to dt_start when ts_signature is null).
+  dt_annulment:
+    lineage:
+      - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+    description: Contract annulment date, if applicable.
+  dt_due:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_due
+    description: Original due date of the invoice.
+  dt_due_adjusted_retsuko:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_due_adjusted
+      - dw_public.dim_date.next_brz_fintech_business_day
+    description: Due date adjusted to the next Brazilian fintech business day when the original due date falls on a non-business day.
+  dt_paid:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+    description: Date the invoice was paid.
+  dt_paid_timeline:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+    description: Payment date adjusted to the closing date timeline. Null when the invoice was paid after the closing date (historical rebuild only); equals dt_paid otherwise.
+  dt_sent:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_sent
+    description: Date the invoice was sent to the tenant.
+  dt_write_off:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.dt_write_off
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_created
+    description: Date the invoice was written off. For write-off-negotiation reasons without a dt_write_off, falls back to the invoice creation date.
+  dt_snapshot:
+    lineage:
+      - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
+    description: Date of the snapshot used as data source.
