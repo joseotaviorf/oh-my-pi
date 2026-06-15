@@ -99,6 +99,22 @@ AMD_WALL_CORRECTION = (
 
 ARM_REGEX = re.compile(r"^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)\.", re.IGNORECASE)
 
+
+def _generation_of(node_type: str) -> int | None:
+    """ARM Graviton generation digit, or None for non-ARM / unparseable."""
+    m = re.match(r"^[cmr]([0-9]+)g", node_type)
+    return int(m.group(1)) if m else None
+
+
+# Real-Spark per-generation throughput (newer/older runtime ratio), triangulated.
+# Sources: AWS TPC-DS Data-on-EKS R-series (r6g->r7g 1.14x, r7g->r8g 1.085x);
+# AWS EMR Spark C7g +13-19%; SPECint2017 per-core ~+12%/gen; Graviton3 DDR5 +50% BW.
+_GEN_THROUGHPUT: dict[str, dict[int, float]] = {
+    "compute": {6: 1.00, 7: 1.15, 8: 1.24},
+    "general": {6: 1.00, 7: 1.15, 8: 1.24},
+    "memory": {6: 1.00, 7: 1.15, 8: 1.24},
+}
+
 # ---------------------------------------------------------------------------
 # Instance catalog  (ARM Graviton + x86 AMD fallback for reverse-mapping)
 #
@@ -134,6 +150,15 @@ INSTANCE_CATALOG: dict[str, InstanceSpec] = {
     )
     for name, spec in INSTANCE_SPECS_RAW.items()
 }
+
+
+def _node_throughput(node_type: str) -> float:
+    spec = INSTANCE_CATALOG.get(node_type)
+    gen = _generation_of(node_type)
+    if spec is None or gen is None:
+        return 1.0
+    return _GEN_THROUGHPUT.get(spec.family, {}).get(gen, 1.0)
+
 
 _SPOT_TO_ON_DEMAND_RATIO = 0.37
 _SINGLE_NODE_MEM_TARGET = 0.82
@@ -179,6 +204,18 @@ _PHOTON_DBU_PREMIUM = 3.0
 # Populated once at runtime (main); empty in offline/unit contexts, where the
 # cost engine degrades to a vCPU-scaled observed-DBU proxy.
 _FLEET_DBU_RATE: dict[str, float] = {}
+# Opt-in generation retarget: family -> target ARM generation; empty = disabled.
+_TARGET_GENERATION: dict[str, int] = {}
+_RETARGET_SCOPE: str = "bounded"  # "bounded" | "fleet"
+
+
+def _set_target_generations(per_family: dict[str, int], scope: str) -> None:
+    _TARGET_GENERATION.clear()
+    _TARGET_GENERATION.update(per_family)
+    global _RETARGET_SCOPE
+    _RETARGET_SCOPE = scope
+
+
 # Long-window (90d ARM+AMD) per-DAG absolute memory demand in GiB.
 _MEMORY_HISTORY: dict[str, tuple[float | None, float | None]] = {}
 # Per-DAG task telemetry loaded from --task-metrics-csv.
@@ -563,12 +600,18 @@ _DOWNSIZE_WORKER_CPU_P95_MAX = 55.0
 _DOWNSIZE_WORKER_MEM_P95_MAX = 45.0
 _SPILL_PRESSURE_BYTES = 0.0
 _COLLAPSE_DRIVER_MEM_PROJECTED_MAX = 125.0
-_IO_BOUND_WAIT_P95_MIN = 30.0  # worker (driver for single-node) iowait p95 ≥ this → I/O-bound
+_IO_BOUND_WAIT_P95_MIN = (
+    30.0  # worker (driver for single-node) iowait p95 ≥ this → I/O-bound
+)
 _DISK_PRESSURE_LOCAL_DISK_P95_MIN = (
     25.0  # /local_disk0 utilization p95 ≥ this → local disk is load-bearing
 )
-_NVME_DISK_BW_FACTOR = 8.0  # relative per-node scratch bandwidth: *gd NVMe vs single gp2 EBS volume
-_DISK_SPACE_PROJECTED_MAX = 85.0  # max projected /local_disk0 occupancy p95 after a count shrink
+_NVME_DISK_BW_FACTOR = (
+    8.0  # relative per-node scratch bandwidth: *gd NVMe vs single gp2 EBS volume
+)
+_DISK_SPACE_PROJECTED_MAX = (
+    85.0  # max projected /local_disk0 occupancy p95 after a count shrink
+)
 
 
 def _is_validation_dag(dag_id: str) -> bool:
@@ -626,6 +669,16 @@ def _instance_price(node_type: str | None, *, spot: bool = False) -> float | Non
     if od_price is None:
         return None
     return round(od_price * _SPOT_TO_ON_DEMAND_RATIO, 6) if spot else od_price
+
+
+def _to_generation(node_type: str, generation: int) -> str | None:
+    """Same family/size/suffix node on a different ARM generation, or None when
+    that node has no seed price (uncataloged -> caller keeps the original)."""
+    m = re.match(r"^([cmr])([0-9]+)(g[dnb]?)\.(.+)$", node_type)
+    if not m:
+        return None
+    candidate = f"{m.group(1)}{generation}{m.group(3)}.{m.group(4)}"
+    return candidate if _instance_price(candidate) is not None else None
 
 
 def _single_node_candidates() -> list[tuple[str, InstanceSpec, float]]:
@@ -875,7 +928,9 @@ def _observed_disk_bw(m: DagMetrics) -> float:
     return _node_disk_bw(m.driver_node_type)
 
 
-def _candidate_disk_bw(driver: str | None, worker: str | None, worker_count: int) -> float:
+def _candidate_disk_bw(
+    driver: str | None, worker: str | None, worker_count: int
+) -> float:
     if worker_count > 0 and worker:
         return _node_disk_bw(worker) * worker_count
     return _node_disk_bw(driver)
@@ -1054,7 +1109,15 @@ def estimate_projected_total_cost(
         return None
 
     photon_off = bool(m.is_any_photon) and not keep_photon
-    wall_minutes = base_wall * (_PHOTON_OFF_WALL_INFLATION if photon_off else 1.0)
+    obs_node = _worker_node_type(m)
+    rec_node = rec_worker_type or rec_driver
+    obs_tp = _node_throughput(obs_node) or 1.0
+    speedup = _node_throughput(rec_node) / obs_tp
+    if speedup <= 0:
+        speedup = 1.0
+    wall_minutes = (
+        base_wall * (_PHOTON_OFF_WALL_INFLATION if photon_off else 1.0) / speedup
+    )
     wall_h = wall_minutes / 60.0
 
     driver_price = _instance_price(rec_driver, spot=False)
@@ -1168,7 +1231,10 @@ def _worker_resize(
     else:
         candidate_worker = (
             _node_for_demand(
-                per_node_mem_gb, per_node_cores, exclude_compute=exclude_compute, mem_target=mem_target
+                per_node_mem_gb,
+                per_node_cores,
+                exclude_compute=exclude_compute,
+                mem_target=mem_target,
             )
             or current_worker
         )
@@ -1448,10 +1514,7 @@ def _single_node_downsize_node(
     projected_mem_pct = used_mem_gb / downsize_spec.memory_gb
     used_cores = current_spec.vcpus * drv_cpu_eff / 100.0
     projected_cpu_pct = used_cores / downsize_spec.vcpus if downsize_spec.vcpus else 1.0
-    if (
-        projected_mem_pct > mem_target
-        or projected_cpu_pct > _SINGLE_NODE_CPU_TARGET
-    ):
+    if projected_mem_pct > mem_target or projected_cpu_pct > _SINGLE_NODE_CPU_TARGET:
         return None
     return downsize
 
@@ -1580,7 +1643,9 @@ def _feasible_collapse_options(
         if (m.worker_count or 0) == 1:
             best_single = collapse_builder(m, photon_off=photon_off)
         else:
-            best_single = collapse_builder(m, photon_off=photon_off, mem_target=mem_target)
+            best_single = collapse_builder(
+                m, photon_off=photon_off, mem_target=mem_target
+            )
         if (
             not _io_shrink_guard(m)
             and best_single is not None
@@ -1649,7 +1714,9 @@ def _decide_multi(
     for keep_photon in photon_worlds:
         photon_off = not keep_photon
 
-        refined = build_current_refined_candidate(m, photon_off=photon_off, mem_target=mem_target)
+        refined = build_current_refined_candidate(
+            m, photon_off=photon_off, mem_target=mem_target
+        )
         if (
             refined is not None
             and candidate_total_cores(refined) <= observed_cores
@@ -1699,11 +1766,7 @@ def _decide_multi(
             )
             options.append((cost, "right_size_multi", q4))
 
-    viable = [
-        option
-        for option in options
-        if baseline <= 0 or option[0] < baseline
-    ]
+    viable = [option for option in options if baseline <= 0 or option[0] < baseline]
     if viable:
         cost, cohort, candidate = min(viable, key=lambda option: option[0])
         return MultiDecision(cohort, candidate)
@@ -1712,8 +1775,6 @@ def _decide_multi(
     # in the pool), and surface the cheapest feasible alternative as blocked.
     blocked_cost = min((option[0] for option in options), default=None)
     return MultiDecision(_keep_multi_reason(m, sizing), None, blocked_cost=blocked_cost)
-
-
 
 
 def _build_expansion_candidate(
@@ -1752,8 +1813,10 @@ def _build_expansion_candidate(
         spec = INSTANCE_CATALOG.get(candidate_driver)
         if not spec:
             continue
-        if (spec.memory_gb * mem_target >= driver_mem_gb and
-            spec.vcpus * _SINGLE_NODE_CPU_TARGET >= driver_cores):
+        if (
+            spec.memory_gb * mem_target >= driver_mem_gb
+            and spec.vcpus * _SINGLE_NODE_CPU_TARGET >= driver_cores
+        ):
             min_driver = candidate_driver
             break
 
@@ -1766,7 +1829,9 @@ def _build_expansion_candidate(
 
     # Worker gets the overflow: total demand minus driver capacity
     worker_mem_gb = max(0, required_mem_gb - min_driver_spec.memory_gb * mem_target)
-    worker_cores = max(0, required_cores - min_driver_spec.vcpus * _SINGLE_NODE_CPU_TARGET)
+    worker_cores = max(
+        0, required_cores - min_driver_spec.vcpus * _SINGLE_NODE_CPU_TARGET
+    )
 
     if worker_mem_gb <= 0 and worker_cores <= 0:
         # No overflow — single node is fine
@@ -1782,10 +1847,19 @@ def _build_expansion_candidate(
         return None
 
     # Worker count: ceil of demand / capacity
-    worker_count = max(1, math.ceil(max(
-        worker_mem_gb / (worker_spec.memory_gb * mem_target) if worker_spec.memory_gb > 0 else 0,
-        worker_cores / (worker_spec.vcpus * _SINGLE_NODE_CPU_TARGET) if worker_spec.vcpus > 0 else 0,
-    )))
+    worker_count = max(
+        1,
+        math.ceil(
+            max(
+                worker_mem_gb / (worker_spec.memory_gb * mem_target)
+                if worker_spec.memory_gb > 0
+                else 0,
+                worker_cores / (worker_spec.vcpus * _SINGLE_NODE_CPU_TARGET)
+                if worker_spec.vcpus > 0
+                else 0,
+            )
+        ),
+    )
 
     return ShapeCandidate(
         min_driver,
@@ -2292,7 +2366,9 @@ def build_recommendation(
         recent_era_min_runs,
         mem_target,
     )
-    decision = _decide_multi(m, mem_target=mem_target) if m.topology == "multi" else None
+    decision = (
+        _decide_multi(m, mem_target=mem_target) if m.topology == "multi" else None
+    )
     candidate = decision.candidate if decision else None
     multi_winner = (
         cohort in ("collapse_to_single", "right_size_multi") and candidate is not None
@@ -2381,13 +2457,19 @@ def build_recommendation(
         expansion = _decide_single(m, mem_target=mem_target)
         expand_candidate = expansion[1]
         if expand_candidate:
-            rec_preset_name = _multi_preset_for_worker(expand_candidate.worker_node_type)
+            rec_preset_name = _multi_preset_for_worker(
+                expand_candidate.worker_node_type
+            )
             rec_driver = expand_candidate.driver_node_type
             rec_worker = expand_candidate.worker_node_type
             rec_workers = expand_candidate.worker_count
             actions = ["expand_to_multi"]
             rec_spec = PRESET_CATALOG.get(rec_preset_name) if rec_preset_name else None
-            if rec_spec and rec_workers is not None and rec_workers != rec_spec.num_workers:
+            if (
+                rec_spec
+                and rec_workers is not None
+                and rec_workers != rec_spec.num_workers
+            ):
                 num_workers_override = rec_workers
             else:
                 num_workers_override = None
@@ -2414,7 +2496,9 @@ def build_recommendation(
                 )
     if cohort == "driver_downsize" and rec_preset_name:
         actions = ["reduce_driver"]
-        rec_driver = _single_node_downsize_node(m, mem_target=mem_target) or _driver_downsize_node(m)
+        rec_driver = _single_node_downsize_node(
+            m, mem_target=mem_target
+        ) or _driver_downsize_node(m)
     elif cohort == "protect_oom_risk" and rec_preset_name:
         # Safety upsize to a higher-memory family/tier; the explicit action keeps
         # the report honest (the shape does change even though cost may rise).
@@ -2486,6 +2570,54 @@ def build_recommendation(
             rec_worker = None
             rec_workers = None
             actions = []
+
+    if _TARGET_GENERATION:
+        fleet_synth = False
+        if rec_preset_name is None:
+            if _RETARGET_SCOPE == "fleet" and current_preset is not None:
+                fleet_synth = True
+                rec_preset_name = current_preset
+                rec_spec = PRESET_CATALOG.get(rec_preset_name)
+                rec_driver = m.driver_node_type
+                rec_worker = _worker_node_type(m) if m.topology == "multi" else None
+                rec_workers = m.worker_count if m.topology == "multi" else 0
+
+        if rec_preset_name is not None:
+            remapped = False
+
+            def _retarget_family(node: str) -> int | None:
+                return _TARGET_GENERATION.get(_node_family(node))
+
+            if rec_driver:
+                gen = _retarget_family(rec_driver)
+                if gen and gen != _generation_of(rec_driver):
+                    new = _to_generation(rec_driver, gen)
+                    if new:
+                        rec_driver = new
+                        remapped = True
+            if rec_worker:
+                gen = _retarget_family(rec_worker)
+                if gen and gen != _generation_of(rec_worker):
+                    new = _to_generation(rec_worker, gen)
+                    if new:
+                        rec_worker = new
+                        remapped = True
+            if remapped:
+                actions.append("retarget_generation")
+            elif fleet_synth:
+                rec_preset_name = None
+                rec_spec = None
+                rec_driver = None
+                rec_worker = None
+                rec_workers = None
+
+            if winner_keep_photon and m.is_any_photon:
+                rec_nodes = [n for n in (rec_driver, rec_worker) if n]
+                if any(_node_family(n) == "compute" for n in rec_nodes):
+                    winner_keep_photon = False
+                    rec_runtime_engine = "STANDARD"
+                    if "disable_photon" not in actions:
+                        actions.append("disable_photon")
 
     if rec_spec and rec_driver and rec_driver != rec_spec.driver_node_type:
         driver_override_node_type_id = rec_driver
@@ -4199,6 +4331,7 @@ _CSV_FIELDS = [
     "rec_worker_count",
     "num_workers_override",
     "driver_override_node_type_id",
+    "target_generation",
     # Projected metrics
     "est_drv_cpu_p50",
     "est_drv_cpu_p95",
@@ -4220,6 +4353,10 @@ def _rec_to_row(r: Recommendation) -> dict[str, Any]:
     # Flatten projected
     p = row.pop("projected")
     row.update(p)
+    node = r.rec_worker_node_type or r.rec_driver_node_type or ""
+    fam = _node_family(node) if node else ""
+    target_gen = _TARGET_GENERATION.get(fam)
+    row["target_generation"] = target_gen if target_gen is not None else ""
     return row
 
 
@@ -4467,7 +4604,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help=(
             "Also query AMD (x86) history for DAGs below the ARM threshold. "
             "Uses the same cohort/preset logic as ARM with a "
-            f"{AMD_WALL_CORRECTION*100:.0f}%% wall-clock correction for SLA sizing. "
+            f"{AMD_WALL_CORRECTION * 100:.0f}%% wall-clock correction for SLA sizing. "
             "Recommendations are labelled confidence=medium-x86."
         ),
     )
@@ -4510,11 +4647,85 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "Higher values (e.g. 0.93) yield smaller nodes but less headroom."
         ),
     )
+    parser.add_argument(
+        "--target-generation",
+        type=int,
+        choices=[6, 7, 8],
+        default=None,
+        help=(
+            "Retarget emitted driver+worker node types to this ARM generation "
+            "(opt-in; default keeps the observed generation)."
+        ),
+    )
+    parser.add_argument(
+        "--target-generation-compute",
+        type=int,
+        choices=[6, 7, 8],
+        default=None,
+        help="Per-family override for compute nodes (defaults to --target-generation).",
+    )
+    parser.add_argument(
+        "--target-generation-general",
+        type=int,
+        choices=[6, 7, 8],
+        default=None,
+        help="Per-family override for general nodes (defaults to --target-generation).",
+    )
+    parser.add_argument(
+        "--target-generation-memory",
+        type=int,
+        choices=[6, 7, 8],
+        default=None,
+        help="Per-family override for memory nodes (defaults to --target-generation).",
+    )
+    parser.add_argument(
+        "--retarget-scope",
+        choices=["bounded", "fleet"],
+        default="bounded",
+        help=(
+            "bounded: retarget only DAGs already getting a rightsizing change; "
+            "fleet: retarget every DAG on an older generation."
+        ),
+    )
     return parser.parse_args(argv)
+
+
+def _configure_target_generations(args: argparse.Namespace) -> None:
+    base_gen = args.target_generation
+    per_family: dict[str, int] = {}
+    for fam, override in (
+        ("compute", args.target_generation_compute),
+        ("general", args.target_generation_general),
+        ("memory", args.target_generation_memory),
+    ):
+        g = override if override is not None else base_gen
+        if g is not None:
+            per_family[fam] = g
+    if not per_family:
+        return
+    prefix_by_family = {"compute": "c", "general": "m", "memory": "r"}
+    for fam, g in per_family.items():
+        probe = _node_for_family_tier(fam, "m")
+        if (
+            _to_generation(probe, g) is None
+            and _instance_price(f"{prefix_by_family[fam]}{g}g.2xlarge") is None
+        ):
+            print(
+                f"target generation {g} for {fam} has no seed price; seed "
+                "dim_ec2_price.sql + instance_specs.yml per the migration plan (D4).",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    _set_target_generations(per_family, args.retarget_scope)
 
 
 def _print_cohort_summary(recs: list[Recommendation]) -> None:
     from collections import Counter
+
+    if _TARGET_GENERATION:
+        print(
+            f"Target generation: {dict(_TARGET_GENERATION)} (scope={_RETARGET_SCOPE})"
+        )
 
     counts: Counter[str] = Counter(r.cohort for r in recs)
     costs: dict[str, float] = {}
@@ -4534,6 +4745,7 @@ def _print_cohort_summary(recs: list[Recommendation]) -> None:
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
     args = _parse_args(argv)
+    _configure_target_generations(args)
     trino_host = resolve_trino_host(args.trino_host)
 
     if not args.trino and not args.metrics_csv:

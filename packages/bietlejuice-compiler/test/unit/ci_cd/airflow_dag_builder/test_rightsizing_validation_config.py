@@ -299,6 +299,43 @@ class TestGenerateValidationConfig:
         assert cfg["validation"]["allow_custom_spark_job"] is True
         assert "custom_libraries" not in cfg["validation"]["cluster"]
 
+    def test_retarget_generation_emits_gen7_overrides(self, tmp_path):
+        dag_dir = tmp_path / "dags" / "platform" / "gen_dag"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "gen_dag_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_m_general_cluster\n"
+            "  databricks_conn_id: databricks_new\n"
+            "  custom_configurations:\n"
+            "    driver_node_type_id: m6g.2xlarge\n"
+            "    node_type_id: m6g.2xlarge\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "gen_dag_declaration.yml").write_text(
+            "dag:\n  name: gen_dag\nworkflow:\n  type: query_delta\n  layer: enrich\n",
+            encoding="utf-8",
+        )
+
+        rec = _Rec(
+            dag_id="bietlejuice.gen_dag",
+            cohort="keep_multi_cost",
+            confidence="high",
+            actions="retarget_generation",
+            current_preset="consolidation_m_general_cluster",
+            recommended_preset="consolidation_m_general_cluster",
+            rec_driver_node_type="m7g.xlarge",
+            rec_worker_node_type="m7g.2xlarge",
+            rec_worker_count=2,
+            driver_override_node_type_id="m7g.xlarge",
+        )
+
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
+
+        assert cfg is not None
+        custom = cfg["validation"]["cluster"]["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m7g.xlarge"
+        assert custom["node_type_id"] == "m7g.2xlarge"
+
 
 class TestWriteValidationClusterFile:
     def test_remove_validation_section(self, tmp_path):

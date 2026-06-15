@@ -281,6 +281,7 @@ Key rules:
 - **Photon-off wall** multiplies the projected wall by `_PHOTON_OFF_WALL_INFLATION = 2.0` **only for drop-Photon candidates**. Keep-Photon candidates run at the observed wall.
 - **Photon demand adjustment** (`effective_demand(photon_off=...)`, gated on `is_any_photon`): drop-Photon sizing uses inflated CPU/memory telemetry — `_PHOTON_OFF_CPU_INFLATION = 1.20` on p50/p95 CPU, `_PHOTON_OFF_MEM_INFLATION = 1.30` on p50/p95 memory — so collapse/downsize/OOM/multi levers assume STANDARD-runtime headroom; keep-Photon sizing uses raw observed demand. Non-Photon DAGs never inflate. CSV observed columns stay raw; only decision logic uses effective demand.
 - **NVMe normalized off** is implicit on every actionable recommendation: recommended node types are the non-`gd` equivalents, so the ~20% NVMe EC2 premium is gone.
+- **Generation throughput credit (opt-in):** when `--target-generation` is set and the recommended nodes differ in ARM generation from the observed cluster, the projected wall is divided by a per-family throughput ratio (`_GEN_THROUGHPUT`: Gen6=1.0, Gen7≈1.15, Gen8≈1.24). Same-generation candidates keep `speedup = 1.0`, so default runs are byte-identical. DBU is generation-neutral at matched vCPU/RAM — only the shorter wall is credited.
 
 The break-even intuition is unchanged — because spot is only 37% of on-demand, a small OD driver plus spot workers can beat a large OD single node:
 
@@ -309,6 +310,25 @@ spec failed to launch). The recommender enforces this in two places:
   for the single-node sizer, the refined driver, and the refined worker type.
 - Final guard: if a winning plan would keep Photon on a compute-family node
   (e.g. via a preset fallback), Photon is force-dropped (`disable_photon`).
+
+---
+
+## Generation retarget (opt-in)
+
+Sizing builders (`_node_for_family_tier`, `_build_preset_catalog`) stay on Gen 6.
+When `--target-generation` is set, `build_recommendation` remaps the winning
+driver and worker to the target generation **after** sizing and SLA gates:
+
+- **`--retarget-scope bounded` (default):** only DAGs that already receive a
+  rightsizing recommendation are remapped.
+- **`--retarget-scope fleet`:** every Gen-6 DAG is retargeted; healthy DAGs
+  synthesize `recommended_preset = current_preset` and emit
+  `retarget_generation` so validation configs carry Gen-7
+  `driver_node_type_id` / `node_type_id` overrides against the Gen-6 preset.
+
+Per-family overrides (`--target-generation-compute|general|memory`) default to
+the global `--target-generation`. With no flags, recommendations are identical
+to today (CSV gains a blank `target_generation` column only).
 
 ---
 

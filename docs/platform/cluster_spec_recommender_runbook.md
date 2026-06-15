@@ -51,6 +51,11 @@ Useful flags:
 | `--amd-min-runs` | `10` | Minimum total x86 run count for AMD history pool |
 | `--validation-outcomes` | off | Write `validation_outcomes.csv` comparing recommendations vs existing `__validation` runs (requires `--trino`) |
 | `--validation-min-runs` | `1` | Minimum validation runs per DAG for outcome comparison |
+| `--target-generation` | off | Retarget emitted driver+worker node types to this ARM generation (6/7/8); opt-in |
+| `--target-generation-compute` | off | Per-family override for compute nodes (defaults to `--target-generation`) |
+| `--target-generation-general` | off | Per-family override for general nodes (defaults to `--target-generation`) |
+| `--target-generation-memory` | off | Per-family override for memory nodes (defaults to `--target-generation`) |
+| `--retarget-scope` | `bounded` | `bounded`: retarget only DAGs with an actionable change; `fleet`: retarget all Gen-6 DAGs |
 
 Set `TRINO_HOST` to point at a non-prod Trino endpoint without changing the command line:
 

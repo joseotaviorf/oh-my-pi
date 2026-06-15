@@ -190,6 +190,7 @@ def generate_validation_config(
             "reduce_driver",
             "reduce_worker_type",
             "reduce_worker_count",
+            "retarget_generation",
         }
         if not accepted_actions.intersection(rec.actions.split("|")):
             return None

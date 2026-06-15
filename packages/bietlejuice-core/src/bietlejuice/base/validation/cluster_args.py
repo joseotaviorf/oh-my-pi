@@ -97,6 +97,13 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
     prod_custom = _strip_prod_topology_for_consolidation_validation(
         prod_custom, validation_cluster_type, prod_cluster_type
     )
+    # Empty validation custom means "preset defaults only". Do not inherit prod's
+    # explicit PHOTON engine — consolidation presets default to STANDARD unless
+    # validation.cluster re-states runtime_engine (see rightsizing disable_photon).
+    if validation_cluster_type.startswith("consolidation_") and not validation_custom:
+        prod_custom = {
+            key: value for key, value in prod_custom.items() if key != "runtime_engine"
+        }
     if prod_custom or validation_custom:
         merged["custom_configurations"] = {**prod_custom, **validation_custom}
     return merged

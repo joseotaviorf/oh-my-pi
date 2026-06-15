@@ -281,6 +281,34 @@ class TestMergeValidationClusterArgs:
         merged = merge_validation_cluster_args(prod, validation)
         assert "num_workers" not in merged.get("custom_configurations", {})
 
+    def test_strips_prod_photon_when_validation_custom_empty(self):
+        prod = {
+            "type": "consolidation_m_general_single_node_cluster",
+            "custom_configurations": {"runtime_engine": "PHOTON"},
+        }
+        validation = {
+            "type": "consolidation_m_general_single_node_cluster",
+            "custom_configurations": {},
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert "runtime_engine" not in merged.get("custom_configurations", {})
+
+    def test_keeps_prod_photon_when_validation_has_other_overrides(self):
+        prod = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {
+                "num_workers": 2,
+                "runtime_engine": "PHOTON",
+            },
+        }
+        validation = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {"num_workers": 3},
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"]["runtime_engine"] == "PHOTON"
+        assert merged["custom_configurations"]["num_workers"] == 3
+
     def test_strips_master_node_type_id_for_consolidation_validation(self):
         prod = {
             "type": "custom_cluster",

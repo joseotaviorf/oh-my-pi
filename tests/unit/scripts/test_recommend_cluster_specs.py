@@ -652,7 +652,6 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert rcs._format_delta(rec).startswith("  est 0% (")
 
 
-
 class TestOneWorkerMultiHygiene:
     def test_one_worker_keeps_multi_when_spot_cheaper(self, monkeypatch):
         """1-worker with large spot worker is kept when cheaper than collapse."""
@@ -683,7 +682,11 @@ class TestOneWorkerMultiHygiene:
         rec = build_recommendation(m)
 
         # High utilization + low spot baseline => collapse costs more => keep multi
-        assert rec.cohort in ("keep_multi_cost", "keep_multi_memory", "keep_multi_balanced")
+        assert rec.cohort in (
+            "keep_multi_cost",
+            "keep_multi_memory",
+            "keep_multi_balanced",
+        )
 
     def test_one_worker_collapses_when_sizes_similar(self, monkeypatch):
         """1-worker with similar driver/worker sizes collapses (spot discount doesn't overcome overhead)."""
@@ -1386,7 +1389,7 @@ class TestPresetAndValidation:
             is_any_photon=True,
         )
         rec = build_recommendation(m)
-        cfg = generate_validation_config(rec)
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
 
         assert rec.cohort == "healthy_single"
         assert cfg is not None
@@ -1424,7 +1427,7 @@ class TestPresetAndValidation:
             is_any_local_nvme=True,
         )
         rec = build_recommendation(m)
-        cfg = generate_validation_config(rec)
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
 
         assert rec.cohort == "healthy_single"
         assert "drop_nvme" in rec.actions.split("|")
@@ -2195,7 +2198,6 @@ _ACCEPTANCE_FIXTURES_PATH = (
 )
 
 
-
 class TestIoBoundGuards:
     def test_nvme_kept_under_disk_pressure(self):
         m = _m(
@@ -2364,9 +2366,21 @@ class TestIoBoundGuards:
 
     def test_min_worker_count_for_disk_space(self):
         # ceil(observed_count * occupancy / 85): scratch redistributes over survivors.
-        assert rcs._min_worker_count_for_disk_space(_m(worker_count=8, local_disk_p95=24.0)) == 3
-        assert rcs._min_worker_count_for_disk_space(_m(worker_count=6, local_disk_p95=75.0)) == 6
-        assert rcs._min_worker_count_for_disk_space(_m(worker_count=4)) == 0  # no telemetry
+        assert (
+            rcs._min_worker_count_for_disk_space(
+                _m(worker_count=8, local_disk_p95=24.0)
+            )
+            == 3
+        )
+        assert (
+            rcs._min_worker_count_for_disk_space(
+                _m(worker_count=6, local_disk_p95=75.0)
+            )
+            == 6
+        )
+        assert (
+            rcs._min_worker_count_for_disk_space(_m(worker_count=4)) == 0
+        )  # no telemetry
 
     def test_disk_space_floor_blocks_count_shrink(self):
         # Disk-pressure-only (iowait below the I/O-bound threshold): the -1 count
@@ -2917,8 +2931,14 @@ class TestMemTargetParameter:
         sizing_93 = rcs.size_single_node(m, mem_target=0.93)
 
         # Both should succeed (sizing is about projected utilization)
-        assert sizing_82.blocked_reason is None or sizing_82.blocked_reason != "needs_more_telemetry"
-        assert sizing_93.blocked_reason is None or sizing_93.blocked_reason != "needs_more_telemetry"
+        assert (
+            sizing_82.blocked_reason is None
+            or sizing_82.blocked_reason != "needs_more_telemetry"
+        )
+        assert (
+            sizing_93.blocked_reason is None
+            or sizing_93.blocked_reason != "needs_more_telemetry"
+        )
 
     def test_node_for_demand_respects_mem_target(self):
         """_node_for_demand should use mem_target in filtering."""
@@ -2950,3 +2970,158 @@ class TestMemTargetParameter:
         rec = rcs.build_recommendation(m, mem_target=0.93)
 
         assert rec.cohort is not None
+
+
+class TestGenerationRetarget:
+    @pytest.fixture(autouse=True)
+    def _reset_generation_state(self):
+        rcs._TARGET_GENERATION.clear()
+        rcs._RETARGET_SCOPE = "bounded"
+        yield
+        rcs._TARGET_GENERATION.clear()
+        rcs._RETARGET_SCOPE = "bounded"
+
+    def test_generation_of(self):
+        assert rcs._generation_of("m6g.2xlarge") == 6
+        assert rcs._generation_of("r7gd.4xlarge") == 7
+        assert rcs._generation_of("c8g.xlarge") == 8
+        assert rcs._generation_of("m5a.large") is None
+
+    def test_to_generation(self):
+        assert rcs._to_generation("m6g.2xlarge", 7) == "m7g.2xlarge"
+        assert rcs._to_generation("m6gd.4xlarge", 7) == "m7gd.4xlarge"
+        assert rcs._to_generation("c6g.large", 7) is None
+
+    def test_cost_model_credits_gen7(self):
+        m = _m(
+            driver_node_type="m6g.2xlarge",
+            worker_node_type="m6g.2xlarge",
+            worker_count=2,
+            wall_p50_min=30.0,
+            wall_p95_min=45.0,
+        )
+        gen6 = estimate_projected_total_cost(
+            m, "m6g.2xlarge", 2, rec_worker="m6g.2xlarge"
+        )
+        gen7 = estimate_projected_total_cost(
+            m, "m7g.2xlarge", 2, rec_worker="m7g.2xlarge"
+        )
+        assert gen6 is not None and gen7 is not None
+        assert gen7 < gen6
+        p, s = 1.06, 1.15
+        for e in (0.0, 0.5, 1.0):
+            ratio = (e * p + (1.0 - e)) / s
+            assert 0.86 <= ratio <= 0.93
+
+    def test_bounded_vs_fleet_healthy_single(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            driver_node_type="m6g.xlarge",
+            drv_cpu_p95=90.0,
+            drv_mem_p95=50.0,
+        )
+        assert classify(m) == "healthy_single"
+
+        rcs._set_target_generations(
+            {"general": 7, "compute": 7, "memory": 7}, "bounded"
+        )
+        bounded = build_recommendation(m)
+        assert bounded.recommended_preset is None
+
+        rcs._set_target_generations({"general": 7, "compute": 7, "memory": 7}, "fleet")
+        fleet = build_recommendation(m)
+        assert fleet.recommended_preset == fleet.current_preset
+        assert fleet.rec_driver_node_type == "m7g.xlarge"
+        assert "retarget_generation" in fleet.actions.split("|")
+
+    def test_fleet_skips_when_already_on_target_generation(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            driver_node_type="m7g.xlarge",
+            drv_cpu_p95=90.0,
+            drv_mem_p95=50.0,
+        )
+        rcs._set_target_generations({"general": 7, "compute": 7, "memory": 7}, "fleet")
+        rec = build_recommendation(m)
+        assert rec.recommended_preset is None
+        assert "retarget_generation" not in rec.actions.split("|")
+
+    def test_fleet_skips_non_arm_nodes(self):
+        m = _m(
+            worker_count=0,
+            worker_node_type=None,
+            driver_node_type="m5a.xlarge",
+            drv_cpu_p95=90.0,
+            drv_mem_p95=50.0,
+        )
+        rcs._set_target_generations({"general": 7, "compute": 7, "memory": 7}, "fleet")
+        rec = build_recommendation(m)
+        assert rec.recommended_preset is None
+        assert "retarget_generation" not in rec.actions.split("|")
+
+    def test_default_generation_state_is_unchanged(self):
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_cpu_p50=55.0,
+            drv_cpu_p95=82.0,
+            drv_mem_p95=35.0,
+            wrk_cpu_p50=5.0,
+            wrk_cpu_p95=10.0,
+            wrk_mem_p95=10.0,
+            wall_p95_min=12.0,
+        )
+        baseline = build_recommendation(m)
+        assert not rcs._TARGET_GENERATION
+        repeat = build_recommendation(m)
+        assert repeat.recommended_preset == baseline.recommended_preset
+        assert repeat.rec_driver_node_type == baseline.rec_driver_node_type
+        assert repeat.rec_worker_node_type == baseline.rec_worker_node_type
+        assert (
+            repeat.projected.est_cost_per_run_usd
+            == baseline.projected.est_cost_per_run_usd
+        )
+
+    def test_fleet_retarget_driver_tracks_worker_generation(self):
+        m = _m(
+            driver_node_type="m6g.xlarge",
+            worker_node_type="m6g.xlarge",
+            worker_count=2,
+            drv_cpu_p50=40.0,
+            drv_cpu_p95=45.0,
+            drv_mem_p95=30.0,
+            wrk_cpu_p50=40.0,
+            wrk_cpu_p95=45.0,
+            wrk_mem_p95=30.0,
+            wall_p95_min=20.0,
+        )
+        rcs._set_target_generations({"general": 7}, "fleet")
+        rec = build_recommendation(m)
+        assert rec.rec_driver_node_type is not None
+        assert rec.rec_worker_node_type is not None
+        assert rcs._generation_of(rec.rec_driver_node_type) == 7
+        assert rcs._generation_of(rec.rec_worker_node_type) == 7
+
+    def test_bounded_retarget_compute_still_drops_photon(self):
+        m = _m(
+            driver_node_type="c6g.2xlarge",
+            worker_node_type=None,
+            worker_count=0,
+            drv_cpu_p50=70.0,
+            drv_cpu_p95=85.0,
+            drv_mem_p95=45.0,
+            arm_avg_total_cost_estimate_usd=2.5,
+            arm_avg_ec2_cost_usd=0.25,
+            arm_avg_dbu_cost_usd=2.25,
+            is_any_photon=True,
+        )
+        rcs._set_target_generations(
+            {"compute": 7, "general": 7, "memory": 7}, "bounded"
+        )
+        rec = build_recommendation(m)
+        assert rec.rec_driver_node_type == "c7g.2xlarge"
+        assert "disable_photon" in rec.actions.split("|")
+        assert rec.rec_runtime_engine == "STANDARD"
