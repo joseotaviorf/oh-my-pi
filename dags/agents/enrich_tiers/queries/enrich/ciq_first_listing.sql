@@ -264,8 +264,7 @@ SELECT
         ),
         FILTER(
             ARRAY(
-                ufl.reason_invalidation_duplicated_previous_house,
-                ufl.reason_invalidation_duplicated_first_house,
+                COALESCE(ufl.reason_invalidation_duplicated_previous_house, ufl.reason_invalidation_duplicated_first_house),
                 ufl.reason_invalidation_hybrid,
                 ufl.reason_invalidation_indica_ai,
                 ufl.reason_invalidation_general_rule
@@ -296,6 +295,7 @@ SELECT
     ufl.dt_min_published_accumulated_days,
     ufl.ts_first_contract_signed,
     ufl.ts_original_first_listing,
+    FROM_UTC_TIMESTAMP(ufl.ts_original_first_listing, 'America/Sao_Paulo') AS ts_original_first_listing_local_tz,
     ufl.ts_final_first_listing,
     ufl.ts_last_depublication
 FROM

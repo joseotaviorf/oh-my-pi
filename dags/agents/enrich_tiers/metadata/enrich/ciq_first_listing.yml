@@ -121,7 +121,14 @@ columns:
     lineage:
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_sale
-    description: Original first listing timestamp for the given business context.
+    description: Original first listing timestamp (UTC) for the given business context.
+  ts_original_first_listing_local_tz:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_sale
+    description: >
+      Original first listing timestamp converted to America/Sao_Paulo. Used by FL_FS and FL_FR
+      metric_events to attribute first listings to calendar-month periods in local time.
   ts_final_first_listing:
     lineage:
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent

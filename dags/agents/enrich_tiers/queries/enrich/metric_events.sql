@@ -4,6 +4,8 @@ WITH metric_period_process AS (
         mp.metric,
         mp.dt_init,
         mp.dt_end,
+        mp. ts_interval_started,
+        mp. ts_interval_ended,
         -- keeping partitions immutable for the merge on function
         YEAR(mp.dt_init) AS year,
         MONTH(mp.dt_init) AS month,
@@ -455,8 +457,7 @@ sale_first_listing_simple_metrics AS (
         datalake_tiers.ciq_first_listing AS cfl
     JOIN
         metric_period_process AS mp
-            ON DATE(cfl.ts_original_first_listing) BETWEEN mp.dt_init AND mp.dt_end
-            AND DATE(cfl.dt_compliance_general_rule) BETWEEN mp.dt_init AND mp.dt_end
+            ON cfl.dt_compliance_general_rule BETWEEN DATE(mp.ts_interval_started) AND DATE(mp.ts_interval_ended)
             AND mp.metric IN ("FL_FS")
     WHERE
         cfl.business_context = "SALE"
@@ -492,8 +493,7 @@ rent_first_listing_simple_metrics AS (
         datalake_tiers.ciq_first_listing AS cfl
     JOIN
         metric_period_process AS mp
-            ON DATE(cfl.ts_original_first_listing) BETWEEN mp.dt_init AND mp.dt_end
-            AND DATE(cfl.dt_compliance_general_rule) BETWEEN mp.dt_init AND mp.dt_end + INTERVAL 15 DAY
+            ON cfl.dt_compliance_general_rule BETWEEN DATE(mp.ts_interval_started) AND DATE(mp.ts_interval_ended + INTERVAL 2 DAY)
             AND mp.metric IN ("FL_FR")
     WHERE
         cfl.business_context = "RENT"
@@ -524,47 +524,75 @@ union_metrics AS (
     SELECT * FROM sale_first_listing_simple_metrics
     UNION ALL
     SELECT * FROM rent_first_listing_simple_metrics
-)
-SELECT
-    XXHASH64(
-        um.id_user,
-        um.id_external_domain,
-        um.id_metric_period,
-        um.agent_profile,
-        COALESCE(um.partial_metric, '-1')
-    ) AS id_metric_event,
-    um.id_user,
-    um.id_agent,
-    um.uuid_person,
-    um.id_external_domain,
-    um.id_metric_period,
-    um.external_domain,
-    um.agent_profile,
-    um.partial_metric,
-    um.final_metric,
-    um.reason,
-    um.cumulative_value_type,
-    um.cumulative_value,
-    um.is_valid,
-    um.is_compound_metric_part,
-    um.is_cumulative_metric,
-    um.dt_become_valid,
-    um.ts_invalidation,
-    um.ts_updated,
-    um.year,
-    um.month,
-    um.day
-FROM
-    union_metrics AS um
-QUALIFY
-    1 = ROW_NUMBER() OVER (
-        PARTITION BY 
+),
+metric_events AS (
+    SELECT
+        XXHASH64(
             um.id_user,
             um.id_external_domain,
             um.id_metric_period,
             um.agent_profile,
-            COALESCE(um.partial_metric, '-1') 
-        ORDER BY 
-            um.ts_updated DESC, 
-            um.dt_become_valid DESC
-    )
+            COALESCE(um.partial_metric, '-1')
+        ) AS id_metric_event,
+        um.id_user,
+        um.id_agent,
+        um.uuid_person,
+        um.id_external_domain,
+        um.id_metric_period,
+        um.external_domain,
+        um.agent_profile,
+        um.partial_metric,
+        um.final_metric,
+        um.reason,
+        um.cumulative_value_type,
+        um.cumulative_value,
+        um.is_valid,
+        um.is_compound_metric_part,
+        um.is_cumulative_metric,
+        ROW_NUMBER() OVER (
+            PARTITION BY 
+                um.id_user,
+                um.id_external_domain,
+                um.id_metric_period,
+                um.agent_profile,
+                COALESCE(um.partial_metric, '-1') 
+            ORDER BY 
+                um.ts_updated DESC, 
+                um.dt_become_valid DESC
+        ) = 1 AS is_latest_event,
+        um.dt_become_valid,
+        um.ts_invalidation,
+        um.ts_updated,
+        um.year,
+        um.month,
+        um.day
+    FROM
+        union_metrics AS um
+)
+SELECT
+    me.id_metric_event,
+    me.id_user,
+    me.id_agent,
+    me.uuid_person,
+    me.id_external_domain,
+    me.id_metric_period,
+    me.external_domain,
+    me.agent_profile,
+    me.partial_metric,
+    me.final_metric,
+    me.reason,
+    me.cumulative_value_type,
+    me.cumulative_value,
+    me.is_valid,
+    me.is_compound_metric_part,
+    me.is_cumulative_metric,
+    me.dt_become_valid,
+    me.ts_invalidation,
+    me.ts_updated,
+    me.year,
+    me.month,
+    me.day
+FROM
+    metric_events AS me
+WHERE
+    me.is_latest_event IS TRUE

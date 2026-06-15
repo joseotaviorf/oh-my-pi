@@ -4,10 +4,11 @@ table_name: listing_deduplication
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 description: |
-  This table contains deduplication analysis of house listings based on normalized address parsing.
-  It processes house data from EBDB, normalizes address complements using complex regex rules,
-  and identifies duplicate listings by comparing parsed addresses. The table includes information
-  about listing registration, contracts, supply sources, and duplicate relationships.
+  Enriched deduplication analysis of house listings based on normalized address parsing.
+  Reads the full EBDB house universe (including excluido status and international cities such
+  as Mexico metro areas), normalizes address complements with regex rules, and identifies duplicate
+  listings by comparing parsed short addresses. Includes listing registration, contract timestamps,
+  supply sources, and duplicate-group relationships used downstream by First Listing (FL) metrics.
 columns:
   id_address_parsed_short:
     description: MD5 hash of the parsed short address used for efficient address-based grouping and indexing.
@@ -49,7 +50,8 @@ columns:
   address_parsed_short:
     description: |
       Short deduplication key: street, digit-normalized number, and parsed complement (normalized text
-      and regex-derived parts). Excludes neighborhood, city, and zipcode.
+      and regex-derived parts). Excludes neighborhood, city, and zipcode. Built for every EBDB house
+      row that flows through house_parsed, without filtering by status or city.
     lineage:
       - datalake_ebdb_clean.house.address
       - datalake_ebdb_clean.house.number
@@ -78,7 +80,9 @@ columns:
       - datalake_ebdb_clean.house.address
       - datalake_ebdb_clean.house.number
       - datalake_ebdb_clean.house.complement
-    description: Boolean flag indicating whether this house has duplicate listings based on parsed address matching.
+    description: |
+      Boolean flag indicating whether this house shares a parsed short address with at least one
+      other house in the full EBDB universe (status and city are not excluded upstream).
   is_first_listing_in_duplicates:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing

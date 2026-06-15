@@ -101,7 +101,7 @@ columns:
   has_similiar_house_by_address_parsed:
     description: True when listing deduplication flags the house as duplicated on parsed address.
     lineage:
-      - datalake_listing_deduplication.listing_deduplication.is_duplicated
+      - datalake_listing_deduplication.listing_deduplication.has_duplicates
   has_similiar_house_by_atlas:
     description: True when an Atlas house deduplication row exists for this house.
     lineage:

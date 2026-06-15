@@ -22,6 +22,19 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.month_end
     description: End date of the monthly validity window for the metric.
+  ts_interval_started:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: >
+      UTC-aligned start timestamp of the metric window (month start plus 3 hours).
+      Persisted for period reference; FL metric attribution in metric_events uses
+      ts_original_first_listing_local_tz with dt_init/dt_end instead.
+  ts_interval_ended:
+    lineage:
+      - datalake_quintoandar.aux_date.month_end
+    description: >
+      UTC-aligned end timestamp of the metric window (month end at 23:59:59 plus 3 hours).
+      Persisted for period reference; non-FL metrics in metric_events use dt_init/dt_end.
   ts_created:
     lineage:
       - datalake_quintoandar.aux_date.month_start

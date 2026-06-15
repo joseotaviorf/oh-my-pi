@@ -83,7 +83,7 @@ SELECT
             TIMESTAMPDIFF(DAY, c.ts_listing_version_start, COALESCE(c.ts_listing_version_end, DATE(NOW()))), 
             0
     ) AS total_days_since_house_inactived,
-    ld.is_duplicated AS has_similiar_house_by_address_parsed,
+    ld.has_duplicates AS has_similiar_house_by_address_parsed,
     ahd.id_duplicity IS NOT NULL AS has_similiar_house_by_atlas,
     c.is_house_inactive,
     c.ts_contract_signed IS NOT NULL AS is_eligible,

@@ -220,9 +220,6 @@ house_parsed as (
     END AS address_parsed_short  
   FROM 
     house h
-  WHERE
-    h.status_origin != 'excluido'
-    AND h.city NOT IN ('Ciudad del México', 'Tlalnepantla', 'Ciudad López Mateos', 'Naucalpan de Juárez', 'Tlalnepantla de Baz')
 ),
 listing_info AS (
   SELECT
@@ -241,26 +238,24 @@ listing_info AS (
 rent_contract AS (
   SELECT
     id_house,
-    COALESCE(ts_signed, ts_created) AS ts_signed,
-    "RENT" AS business_context
+    ts_signed,
+    "RENT" AS business_context,
+    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_signed ASC) = 1 AS is_first_contract
   FROM
     datalake_ebdb_contract.contract
   WHERE
     status IN ('Ativo', 'Finalizado')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_signed ASC) = 1
 ),
 sale_contract AS (
   SELECT
     id_house,
     ts_sale_agreement_signed AS ts_signed,
-    "SALE" AS business_context
+    "SALE" AS business_context,
+    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_sale_agreement_signed ASC) = 1 AS is_first_contract
   FROM
     datalake_sale_offer.sale_offer
   WHERE
     ts_sale_agreement_signed IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_sale_agreement_signed ASC) = 1
 ),
 supply_source_info_by_context AS (
   SELECT
@@ -274,21 +269,20 @@ supply_source_info_by_context AS (
 supply_source_info AS (
   SELECT
     cl.id_house,
-    cl.supply_source
-  FROM
-    datalake_supply_flows.conversion_lookup AS cl
-  LEFT JOIN
-    listing_info AS li
-      ON cl.id_house = li.id_house
-      AND li.ts_first_listing IS NOT NULL
-  QUALIFY
+    cl.supply_source,
     ROW_NUMBER() OVER (
       PARTITION BY cl.id_house 
       ORDER BY
         LEAST(li.ts_first_listing_rent, li.ts_first_listing_sale),
         IF(cl.supply_source = 'CIQ', 1, 2),
         cl.supply_source
-    ) = 1
+    ) = 1 AS is_first_supply_source
+  FROM
+    datalake_supply_flows.conversion_lookup AS cl
+  LEFT JOIN
+    listing_info AS li
+      ON cl.id_house = li.id_house
+      AND li.ts_first_listing IS NOT NULL
 ),
 listings_full_info AS (
   SELECT
@@ -300,7 +294,7 @@ listings_full_info AS (
     CASE 
         WHEN COUNT(*) OVER(PARTITION BY h.address_parsed_short) > 1 THEN TRUE 
         ELSE FALSE 
-    END AS is_duplicated,
+    END AS has_duplicates,
     ssi.supply_source,
     ssibc.supply_source_rent,
     ssibc.supply_source_sale,
@@ -308,7 +302,6 @@ listings_full_info AS (
     li.ts_first_listing_rent,
     li.ts_first_listing,
     ROW_NUMBER() OVER (PARTITION BY h.address_parsed_short ORDER BY li.ts_first_listing) AS first_listing_order,
-    first_listing_order = 1 AND is_duplicated AS is_first_listing_in_duplicates,
     rc.ts_signed AS ts_contract_signed_rent,
     sc.ts_signed AS ts_contract_signed_sale
   FROM 
@@ -320,15 +313,18 @@ listings_full_info AS (
   LEFT JOIN
     rent_contract AS rc
       ON h.id_house = rc.id_house
+      AND rc.is_first_contract IS TRUE
   LEFT JOIN
     sale_contract AS sc
       ON h.id_house = sc.id_house
+      AND sc.is_first_contract IS TRUE
   LEFT JOIN
     supply_source_info_by_context AS ssibc
       ON h.id_house = ssibc.id_house
   LEFT JOIN
     supply_source_info AS ssi
       ON h.id_house = ssi.id_house
+      AND ssi.is_first_supply_source IS TRUE
   WHERE
     h.address_parsed_short IS NOT NULL
 )
@@ -345,8 +341,9 @@ SELECT
   lfi.supply_source_rent,
   lfi.supply_source_sale,
   lfi.first_listing_order,
-  lfi.is_duplicated,
-  lfi.is_first_listing_in_duplicates,
+  lfi.has_duplicates,
+  lfi.first_listing_order > 1 AS is_duplicate_listing,
+  lfi.has_duplicates AND lfi.first_listing_order = 1 AS is_original_listing,
   lfi.ts_first_listing_sale,
   lfi.ts_first_listing_rent,
   lfi.ts_first_listing,
