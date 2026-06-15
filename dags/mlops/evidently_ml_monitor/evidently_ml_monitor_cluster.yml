@@ -16,4 +16,6 @@ validation:
     access_control_list:
       group_name: mlops
       permission_level: CAN_MANAGE
+    custom_configurations:
+      driver_node_type_id: r7g.2xlarge
   allow_custom_spark_job: true

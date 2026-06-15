@@ -1090,8 +1090,20 @@ def build_rightsizing_validation_cluster_spec(
     custom_configurations = merge_declaration_validation_custom_configurations(
         declaration, custom_configurations
     )
+    # Collapse the redundant worker node_type_id only for single-node clusters,
+    # where driver and worker are the same single node. For multi-node clusters the
+    # worker node_type_id is a real override (e.g. a generation retarget where driver
+    # and worker map to the same newer-gen node); dropping it would silently revert
+    # the worker to the preset default.
+    single_node = (
+        recommended_preset.endswith("_single_node_cluster") or num_workers == 0
+    )
     driver_override = custom_configurations.get("driver_node_type_id")
-    if driver_override and custom_configurations.get("node_type_id") == driver_override:
+    if (
+        single_node
+        and driver_override
+        and custom_configurations.get("node_type_id") == driver_override
+    ):
         custom_configurations.pop("node_type_id", None)
 
     if validation_resolves_to_prod_spec(

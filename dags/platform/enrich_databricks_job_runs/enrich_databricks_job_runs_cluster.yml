@@ -12,4 +12,6 @@ validation:
     type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
-      num_workers: 3
+      num_workers: 4
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

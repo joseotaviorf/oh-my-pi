@@ -22,4 +22,5 @@ validation:
     custom_configurations:
       aws_attributes:
         availability: ON_DEMAND
+      driver_node_type_id: r7g.2xlarge
   allow_custom_spark_job: true

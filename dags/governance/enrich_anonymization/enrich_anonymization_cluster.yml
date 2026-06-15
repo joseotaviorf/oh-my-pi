@@ -14,3 +14,22 @@ cluster:
     spark_version: 14.3.x-scala2.12
     num_workers: 3
     driver_node_type_id: r6g.xlarge
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_libraries:
+    - pypi:
+        package: presidio_analyzer==2.2.357
+    - pypi:
+        package: numpy==1.26.4
+    - whl: '{artifacts_bucket}/spacy-models/en_core_web_lg-3.7.1-py3-none-any.whl'
+    custom_configurations:
+      spark_conf:
+        spark.sql.execution.arrow.pyspark.enabled: true
+        spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
+      spark_version: 14.3.x-scala2.12
+      num_workers: 3
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.xlarge
+  allow_custom_spark_job: true

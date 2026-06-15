@@ -16,3 +16,4 @@ validation:
     custom_configurations:
       spark_conf:
         spark.driver.maxResultSize: '0'
+      driver_node_type_id: r7g.xlarge

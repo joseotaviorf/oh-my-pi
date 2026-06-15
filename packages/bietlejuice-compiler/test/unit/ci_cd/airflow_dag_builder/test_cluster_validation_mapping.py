@@ -981,6 +981,36 @@ class TestBuildRightsizingValidationClusterSpec:
         assert spec.custom_configurations.get("num_workers") == 3
         assert "node_type_id" not in spec.custom_configurations
 
+    def test_keep_multi_same_node_retarget_preserves_worker_override(self):
+        """Multi-node retarget where driver and worker map to the same newer-gen
+        node must keep the worker node_type_id. Dropping it (the single-node pop)
+        would silently revert the worker to the Gen-6 preset default."""
+        declaration = {
+            "dag": {"name": "meetcall"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+        }
+        prod_cluster_args = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        spec = build_rightsizing_validation_cluster_spec(
+            prod_cluster_args=prod_cluster_args,
+            declaration=declaration,
+            recommended_preset="consolidation_xs_memory_cluster",
+            recommended_num_workers=3,
+            recommended_driver_node_type="r7g.large",
+            recommended_worker_node_type="r7g.large",
+        )
+
+        assert spec is not None
+        assert spec.custom_configurations["driver_node_type_id"] == "r7g.large"
+        assert spec.custom_configurations["node_type_id"] == "r7g.large"
+        assert spec.custom_configurations["num_workers"] == 3
+
     def test_returns_none_for_emr_prod_cluster(self):
         prod_cluster_args = {
             "type": "emr_7_12_consolidation_m_memory_cluster",

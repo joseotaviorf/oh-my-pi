@@ -19,4 +19,5 @@ validation:
       spark_conf:
         spark.driver.maxResultSize: '0'
       spark_version: 13.3.x-scala2.12
+      driver_node_type_id: r7g.xlarge
   allow_custom_spark_job: true

@@ -15,3 +15,4 @@ validation:
       permission_level: CAN_MANAGE
     custom_configurations:
       runtime_engine: PHOTON
+      driver_node_type_id: r7g.xlarge

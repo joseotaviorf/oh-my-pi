@@ -7,3 +7,14 @@ cluster:
     num_workers: 3
     runtime_engine: PHOTON
     driver_node_type_id: r6g.large
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      num_workers: 3
+      runtime_engine: PHOTON
+      node_type_id: m7g.xlarge
+      driver_node_type_id: r7g.large

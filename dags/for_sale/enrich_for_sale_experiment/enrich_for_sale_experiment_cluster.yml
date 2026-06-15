@@ -18,4 +18,5 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
       num_workers: 3
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.2xlarge

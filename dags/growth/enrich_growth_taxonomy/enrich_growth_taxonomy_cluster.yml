@@ -13,4 +13,5 @@ validation:
     type: consolidation_s_general_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
-      driver_node_type_id: r6g.large
+      node_type_id: m7g.xlarge
+      driver_node_type_id: r7g.large

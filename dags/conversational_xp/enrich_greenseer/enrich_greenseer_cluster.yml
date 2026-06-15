@@ -16,4 +16,5 @@ validation:
     custom_configurations:
       spark_version: 13.3.x-scala2.12
       num_workers: 3
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.4xlarge
+      driver_node_type_id: r7g.2xlarge

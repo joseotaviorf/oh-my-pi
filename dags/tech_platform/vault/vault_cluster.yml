@@ -12,7 +12,7 @@ cluster:
   databricks_conn_id: databricks_new
 validation:
   cluster:
-    type: consolidation_xs_memory_cluster
+    type: consolidation_s_general_cluster
     databricks_conn_id: databricks_new
     access_control_list:
       group_name: auditlogs
@@ -20,5 +20,6 @@ validation:
     custom_configurations:
       spark_conf:
         spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-      driver_node_type_id: m6g.xlarge
+      node_type_id: m7g.xlarge
+      driver_node_type_id: m7g.xlarge
   allow_custom_spark_job: true

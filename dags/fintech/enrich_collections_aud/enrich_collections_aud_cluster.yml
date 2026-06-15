@@ -5,3 +5,5 @@ validation:
   cluster:
     type: consolidation_m_memory_single_node_cluster
     databricks_conn_id: databricks_new_env
+    custom_configurations:
+      driver_node_type_id: r7g.2xlarge

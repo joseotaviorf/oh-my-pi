@@ -14,4 +14,5 @@ validation:
       group_name: analytics-engineers
       permission_level: CAN_MANAGE
     custom_configurations:
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.2xlarge

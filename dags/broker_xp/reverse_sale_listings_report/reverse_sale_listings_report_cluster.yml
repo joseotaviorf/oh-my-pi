@@ -7,3 +7,15 @@ cluster:
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
     num_workers: 3
     driver_node_type_id: r6g.xlarge
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
+      num_workers: 3
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.xlarge
+  allow_custom_spark_job: true

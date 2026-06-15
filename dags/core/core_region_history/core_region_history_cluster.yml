@@ -11,3 +11,20 @@ cluster:
       spark.sql.adaptive.skewJoin.enabled: 'true'
     aws_attributes:
       ebs_volume_size: 200
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.sql.shuffle.partitions: '8'
+        spark.databricks.delta.merge.enableLowShuffle: 'true'
+        spark.databricks.adaptive.autoOptimizeShuffle.enabled: 'true'
+        spark.memory.fraction: '0.8'
+        spark.memory.storageFraction: '0.3'
+        spark.sql.adaptive.skewJoin.enabled: 'true'
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large
+  allow_custom_spark_job: true

@@ -11,11 +11,12 @@ cluster:
     data_security_mode: USER_ISOLATION
 validation:
   cluster:
-    type: consolidation_m_general_cluster
+    type: consolidation_m_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
       spark_conf:
         spark.sql.broadcastTimeout: '600'
       data_security_mode: USER_ISOLATION
       num_workers: 4
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.2xlarge
+      driver_node_type_id: r7g.2xlarge

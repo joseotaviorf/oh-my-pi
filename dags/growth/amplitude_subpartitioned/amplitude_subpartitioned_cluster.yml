@@ -15,7 +15,7 @@ cluster:
       ebs_volume_size: 500
 validation:
   cluster:
-    type: consolidation_l_compute_cluster
+    type: consolidation_l_general_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
       aws_attributes:
@@ -25,3 +25,5 @@ validation:
         spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
         spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
       num_workers: 3
+      node_type_id: m7g.4xlarge
+      driver_node_type_id: c7g.4xlarge

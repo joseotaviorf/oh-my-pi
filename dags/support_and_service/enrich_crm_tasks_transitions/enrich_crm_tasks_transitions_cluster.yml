@@ -3,3 +3,10 @@ cluster:
   databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: r6g.xlarge
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.xlarge

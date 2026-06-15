@@ -14,3 +14,5 @@ validation:
       spark_conf:
         spark.sql.sources.partitionOverwriteMode: static
       runtime_engine: PHOTON
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.xlarge

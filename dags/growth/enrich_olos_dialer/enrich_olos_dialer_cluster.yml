@@ -14,3 +14,5 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
       runtime_engine: PHOTON
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

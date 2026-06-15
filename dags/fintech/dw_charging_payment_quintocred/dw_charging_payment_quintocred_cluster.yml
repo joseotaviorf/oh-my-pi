@@ -13,4 +13,5 @@ validation:
       spark_conf:
         spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
       spark_version: 13.3.x-scala2.12
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.2xlarge

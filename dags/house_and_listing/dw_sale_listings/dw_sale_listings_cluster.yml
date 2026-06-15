@@ -18,3 +18,5 @@ validation:
     custom_configurations:
       data_security_mode: USER_ISOLATION
       num_workers: 3
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

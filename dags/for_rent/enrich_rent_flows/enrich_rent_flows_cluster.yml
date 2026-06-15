@@ -21,4 +21,5 @@ validation:
       data_security_mode: USER_ISOLATION
       num_workers: 3
       runtime_engine: PHOTON
-      driver_node_type_id: r6g.xlarge
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.xlarge

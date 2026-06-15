@@ -12,3 +12,5 @@ validation:
     custom_configurations:
       spark_conf:
         spark.sql.sources.partitionOverwriteMode: static
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.xlarge

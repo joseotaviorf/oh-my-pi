@@ -37,4 +37,6 @@ validation:
     custom_configurations:
       spark_conf:
         spark.scheduler.taskSetBlacklistTimeout: 1200000
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.xlarge
   allow_custom_spark_job: true

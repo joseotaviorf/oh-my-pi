@@ -16,3 +16,5 @@ validation:
         ebs_volume_size: 200
       data_security_mode: USER_ISOLATION
       runtime_engine: PHOTON
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.xlarge

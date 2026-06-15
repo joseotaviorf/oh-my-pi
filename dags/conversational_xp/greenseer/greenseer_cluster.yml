@@ -16,3 +16,5 @@ validation:
         availability: ON_DEMAND
       spark_conf:
         spark.driver.maxResultSize: '0'
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

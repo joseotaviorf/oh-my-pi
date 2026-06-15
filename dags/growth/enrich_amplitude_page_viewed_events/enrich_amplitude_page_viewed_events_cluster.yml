@@ -9,11 +9,8 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 validation:
   cluster:
-    type: consolidation_xl_memory_cluster
+    type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
-      num_workers: 4
-      autoscale:
-        min_workers: 2
-        max_workers: 4
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

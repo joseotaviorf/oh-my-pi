@@ -15,4 +15,5 @@ validation:
     databricks_conn_id: databricks_new
     custom_configurations:
       spark_version: 13.3.x-scala2.12
-      driver_node_type_id: r6g.xlarge
+      node_type_id: m7g.xlarge
+      driver_node_type_id: r7g.xlarge

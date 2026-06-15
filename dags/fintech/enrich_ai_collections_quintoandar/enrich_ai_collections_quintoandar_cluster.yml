@@ -17,4 +17,4 @@ validation:
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
-      driver_node_type_id: r6g.4xlarge
+      driver_node_type_id: r7g.8xlarge

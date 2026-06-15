@@ -12,11 +12,11 @@ cluster:
       spark.sql.mapKeyDedupPolicy: LAST_WIN
 validation:
   cluster:
-    type: consolidation_l_general_cluster
+    type: consolidation_l_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
       spark_conf:
         spark.sql.mapKeyDedupPolicy: LAST_WIN
-      num_workers: 5
-      driver_node_type_id: m6g.xlarge
-      worker_node_type_id: m6gd.4xlarge
+      num_workers: 6
+      node_type_id: r7g.4xlarge
+      driver_node_type_id: r7g.2xlarge

@@ -10,3 +10,5 @@ validation:
     databricks_conn_id: databricks_new_env
     custom_configurations:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

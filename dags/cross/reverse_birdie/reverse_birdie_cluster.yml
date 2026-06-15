@@ -11,3 +11,15 @@ cluster:
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_m_memory_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      data_security_mode: USER_ISOLATION
+      num_workers: 3
+      node_type_id: r7g.2xlarge
+      driver_node_type_id: r7g.2xlarge

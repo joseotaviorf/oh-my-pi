@@ -10,3 +10,13 @@ cluster:
     autotermination_minutes: 20
     num_workers: 3
     spark_version: 16.4.x-scala2.12
+validation:
+  cluster:
+    type: consolidation_m_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      spark_conf:
+        spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
+      num_workers: 3
+      node_type_id: r7g.2xlarge
+      driver_node_type_id: r7g.2xlarge

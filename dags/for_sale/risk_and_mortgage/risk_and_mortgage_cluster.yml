@@ -25,3 +25,5 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
       spark_version: 13.3.x-scala2.12
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large

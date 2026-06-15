@@ -15,4 +15,6 @@ validation:
     databricks_conn_id: databricks_new
     custom_configurations:
       spark_version: 13.3.x-scala2.12
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large
   allow_custom_spark_job: true

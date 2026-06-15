@@ -25,3 +25,4 @@ validation:
         spark.metrics.appStatusSource.enabled: 'true'
       spark_env_vars:
         GLUE_ASSUME_ROLE_ARN: '{{ var.value.get(''glue_assume_role_arn'', '''') }}'
+      driver_node_type_id: r7g.large

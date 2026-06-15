@@ -4,3 +4,11 @@ cluster:
   custom_configurations:
     data_security_mode: USER_ISOLATION
     driver_node_type_id: r6g.2xlarge
+validation:
+  cluster:
+    type: consolidation_l_memory_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      data_security_mode: USER_ISOLATION
+      node_type_id: r7g.4xlarge
+      driver_node_type_id: r7g.2xlarge

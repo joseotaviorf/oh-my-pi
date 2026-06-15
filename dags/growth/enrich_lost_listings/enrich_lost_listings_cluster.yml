@@ -29,4 +29,6 @@ validation:
       spark_version: 12.2.x-scala2.12
       num_workers: 3
       runtime_engine: PHOTON
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.large
   allow_custom_spark_job: true

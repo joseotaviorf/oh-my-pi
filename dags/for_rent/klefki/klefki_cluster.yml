@@ -12,9 +12,11 @@ cluster:
       ebs_volume_size: 200
 validation:
   cluster:
-    type: consolidation_l_memory_single_node_cluster
+    type: consolidation_xs_memory_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
-      driver_node_type_id: r6g.2xlarge
+      num_workers: 3
+      node_type_id: r7g.large
+      driver_node_type_id: r7g.2xlarge

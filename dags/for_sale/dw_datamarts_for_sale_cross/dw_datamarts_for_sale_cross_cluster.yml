@@ -15,4 +15,5 @@ validation:
         spark.sql.shuffle.partitions: 200
       data_security_mode: USER_ISOLATION
       num_workers: 3
-      driver_node_type_id: r6g.2xlarge
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.2xlarge

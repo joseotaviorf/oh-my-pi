@@ -1,3 +1,10 @@
 cluster:
   type: consolidation_s_memory_cluster
   databricks_conn_id: databricks_new
+validation:
+  cluster:
+    type: consolidation_s_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      node_type_id: r7g.xlarge
+      driver_node_type_id: r7g.xlarge

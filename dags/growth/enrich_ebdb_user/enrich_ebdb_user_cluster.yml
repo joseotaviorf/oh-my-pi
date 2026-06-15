@@ -11,3 +11,19 @@ cluster:
       spark.sql.sources.partitionOverwriteMode: static
     num_workers: 3
     driver_node_type_id: r6g.large
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - maven:
+        coordinates: graphframes:graphframes:0.8.1-spark3.0-s_2.12
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.sql.sources.partitionOverwriteMode: static
+      num_workers: 3
+      node_type_id: m7g.xlarge
+      driver_node_type_id: r7g.large
+  allow_custom_spark_job: true
