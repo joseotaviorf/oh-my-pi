@@ -13,6 +13,11 @@ from typing import Any, Protocol
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.airflow.cluster_config_resolver import (
+    validation_resolves_to_prod_spec,
+)
+from bietlejuice.services.configuration_service import ConfigurationService
+
 from .cluster_validation_mapping import (
     ValidationClusterSpec,
     build_rightsizing_validation_cluster_spec,
@@ -42,8 +47,6 @@ _ACTIONABLE_COHORTS = frozenset(
         "expand_to_multi",
     }
 )
-
-_NORMALIZATION_ACTIONS = frozenset({"disable_photon", "drop_nvme"})
 
 _KEEP_MULTI_COHORTS = frozenset(
     {
@@ -193,18 +196,6 @@ def generate_validation_config(
 
     dag_name = rec.dag_id.removeprefix("bietlejuice.")
     prod_type = get_current_cluster_type(dag_name, dags_root) or rec.current_preset
-    has_normalization = bool(
-        getattr(rec, "rec_runtime_engine", None)
-        or _NORMALIZATION_ACTIONS.intersection(rec.actions.split("|"))
-    )
-    has_worker_count_override = getattr(rec, "num_workers_override", None) is not None
-    if (
-        prod_type
-        and rec.recommended_preset == prod_type
-        and not has_normalization
-        and not has_worker_count_override
-    ):
-        return None
 
     prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)
     if not prod_cluster_args:
@@ -310,6 +301,34 @@ def remove_validation_from_cluster_file(cluster_path: Path) -> bool:
     return True
 
 
+def _cluster_file_validation_is_noop(cluster_path: Path) -> bool:
+    """True when the cluster file's existing validation resolves to prod's spec.
+
+    Used to prune only *stale* validation blocks (e.g. left over after a
+    promotion makes prod equal to the validation spec), never blocks for DAGs
+    that are merely non-actionable on this recommender run.
+    """
+    try:
+        document = yaml.safe_load(cluster_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return False
+    if not isinstance(document, dict):
+        return False
+    prod_cluster = document.get("cluster")
+    validation = document.get("validation")
+    validation_cluster = (
+        validation.get("cluster") if isinstance(validation, dict) else None
+    )
+    if not isinstance(prod_cluster, dict) or not isinstance(validation_cluster, dict):
+        return False
+    try:
+        return validation_resolves_to_prod_spec(
+            prod_cluster, validation_cluster, ConfigurationService()
+        )
+    except (ValueError, IndexError):
+        return False
+
+
 def write_validation_cluster_file(
     cluster_path: Path,
     val_config: dict,
@@ -391,6 +410,18 @@ def write_validation_configs(
 
         cfg = generate_validation_config(rec, databricks_conn_id, dags_root=dags_root)
         if not cfg:
+            if write_cluster_files:
+                cluster_path = find_dag_cluster_path(dag_name, dags_root)
+                if cluster_path is None:
+                    folder = find_dag_folder(dag_name, dags_root)
+                    if folder:
+                        cluster_path = folder / f"{dag_name}_cluster.yml"
+                if (
+                    cluster_path is not None
+                    and cluster_path.exists()
+                    and _cluster_file_validation_is_noop(cluster_path)
+                ):
+                    remove_validation_from_cluster_file(cluster_path)
             continue
         entries.append(cfg)
 

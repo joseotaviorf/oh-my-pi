@@ -3,7 +3,10 @@ from unittest import mock
 
 import pytest
 
-from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
+from bietlejuice.base.airflow.cluster_config_resolver import (
+    merge_cluster_configuration,
+    validation_resolves_to_prod_spec,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
     DAGDeclarationValidator,
 )
@@ -52,15 +55,19 @@ class TestClusterValidationConfig:
         with pytest.raises(AssertionError, match="distinguishing overrides"):
             validator.validate(declaration)
 
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
     def test_allows_same_cluster_as_prod_with_overrides(self, validator):
+        ConfigurationService._instance_cache.clear()
         declaration = _base_declaration(type="consolidation_s_general_cluster")
         declaration["cluster"]["type"] = "consolidation_s_general_cluster"
         declaration["cluster"]["custom_configurations"] = {
             "num_workers": 2,
             "runtime_engine": "PHOTON",
         }
+        # A genuine resolved difference (num_workers 2 -> 3) keeps this a real
+        # validation; the same-preset + distinguishing-override path stays allowed.
         declaration["validation"]["cluster"]["custom_configurations"] = {
-            "runtime_engine": "PHOTON",
+            "num_workers": 3,
         }
         validator.validate(declaration)
 
@@ -75,6 +82,90 @@ class TestClusterValidationConfig:
         declaration["workflow"]["load_spark_job"] = "custom_job"
         declaration["validation"]["allow_custom_spark_job"] = True
         validator.validate(declaration)
+
+
+class TestClusterValidationResolvedEquality:
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_rejects_validation_resolving_to_prod_spec(self, validator):
+        ConfigurationService._instance_cache.clear()
+        declaration = _base_declaration(type="consolidation_s_general_cluster")
+        declaration["cluster"]["type"] = "consolidation_s_general_cluster"
+        declaration["cluster"]["custom_configurations"] = {
+            "num_workers": 2,
+            "runtime_engine": "PHOTON",
+        }
+        # validation.cluster only re-states an override prod already has -> resolves
+        # to prod's effective spec, so it would validate nothing.
+        declaration["validation"]["cluster"]["custom_configurations"] = {
+            "runtime_engine": "PHOTON",
+        }
+        with pytest.raises(
+            AssertionError, match="resolves to the same effective cluster"
+        ):
+            validator.validate(declaration)
+
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_allows_validation_with_real_resolved_diff(self, validator):
+        ConfigurationService._instance_cache.clear()
+        declaration = _base_declaration(type="consolidation_s_general_cluster")
+        declaration["cluster"]["type"] = "consolidation_s_general_cluster"
+        declaration["cluster"]["custom_configurations"] = {
+            "num_workers": 2,
+            "runtime_engine": "PHOTON",
+        }
+        declaration["validation"]["cluster"]["custom_configurations"] = {
+            "num_workers": 3,
+        }
+        validator.validate(declaration)
+
+
+class TestValidationResolvesToProdSpec:
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_true_when_validation_restates_prod(self):
+        ConfigurationService._instance_cache.clear()
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "r6g.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "r6g.xlarge",
+            },
+        }
+        assert validation_resolves_to_prod_spec(
+            prod, validation, ConfigurationService()
+        )
+
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_false_for_driver_only_downsize(self):
+        ConfigurationService._instance_cache.clear()
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "aws_attributes": {"ebs_volume_size": 200},
+                "data_security_mode": "USER_ISOLATION",
+                "num_workers": 3,
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        # validation drops the prod driver override, so it resolves to the preset
+        # default driver -- a real downsize, not a no-op.
+        validation = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "aws_attributes": {"ebs_volume_size": 200},
+                "data_security_mode": "USER_ISOLATION",
+                "num_workers": 3,
+            },
+        }
+        assert not validation_resolves_to_prod_spec(
+            prod, validation, ConfigurationService()
+        )
 
 
 class TestMergeValidationClusterArgs:

@@ -8,6 +8,7 @@ from scripts.ci_cd.airflow_dag_builder.rightsizing_validation_config import (
     generate_validation_config,
     remove_validation_from_cluster_file,
     write_validation_cluster_file,
+    write_validation_configs,
 )
 
 pytest_plugins = ["test.unit.ci_cd.airflow_dag_builder.cluster_validation_prod_env"]
@@ -42,18 +43,40 @@ class _Rec:
 
 
 class TestGenerateValidationConfig:
-    def test_skips_when_recommended_preset_matches_prod_type(self):
+    def test_skips_when_recommendation_resolves_to_prod_spec(self):
+        # Same preset, no overrides: rec collapses to prod's exact effective spec.
         rec = _Rec(
             dag_id="bietlejuice.test_dag",
             cohort="collapse_to_single",
             confidence="high",
             actions="collapse_to_single",
-            current_preset="consolidation_m_memory_cluster",
-            recommended_preset="consolidation_m_memory_cluster",
-            driver_override_node_type_id="r6g.xlarge",
+            current_preset="consolidation_m_memory_single_node_cluster",
+            recommended_preset="consolidation_m_memory_single_node_cluster",
+            rec_worker_count=0,
         )
 
         assert generate_validation_config(rec) is None
+
+    def test_keeps_same_preset_driver_only_downsize(self):
+        # Same preset but a driver override resolves to a smaller driver than the
+        # preset default (r6g.2xlarge -> r6g.xlarge): a real validation, not a no-op.
+        rec = _Rec(
+            dag_id="bietlejuice.test_dag",
+            cohort="driver_downsize",
+            confidence="high",
+            actions="reduce_driver",
+            current_preset="consolidation_m_memory_cluster",
+            recommended_preset="consolidation_m_memory_cluster",
+            driver_override_node_type_id="r6g.xlarge",
+            rec_driver_node_type="r6g.xlarge",
+        )
+
+        cfg = generate_validation_config(rec)
+        assert cfg is not None
+        assert (
+            cfg["validation"]["cluster"]["custom_configurations"]["driver_node_type_id"]
+            == "r6g.xlarge"
+        )
 
     def test_single_node_omits_preset_default_topology(self, tmp_path, monkeypatch):
         dag_dir = tmp_path / "dags" / "growth" / "enrich_semrush_classified"
@@ -313,3 +336,62 @@ class TestWriteValidationClusterFile:
         assert "databricks_conn_id: databricks_new_env" in text
         assert "validation:" in text
         assert "consolidation_xs_memory_single_node_cluster" in text
+
+
+NOOP_CLUSTER_BODY = "cluster:\n  type: consolidation_xs_memory_cluster\n  custom_configurations:\n    num_workers: 3\n    driver_node_type_id: r6g.xlarge\nvalidation:\n  cluster:\n    type: consolidation_xs_memory_cluster\n    custom_configurations:\n      num_workers: 3\n      driver_node_type_id: r6g.xlarge\n"
+REAL_CLUSTER_BODY = "cluster:\n  type: consolidation_xs_memory_cluster\n  custom_configurations:\n    num_workers: 3\n    driver_node_type_id: m6g.xlarge\nvalidation:\n  cluster:\n    type: consolidation_xs_memory_cluster\n    custom_configurations:\n      num_workers: 3\n"
+
+
+class TestWriteValidationConfigsPrune:
+    """--write-cluster-files prunes only stale (resolves-to-prod) validation blocks."""
+
+    @staticmethod
+    def _write_cluster(dags_root, dag_name, body):
+        dag_dir = dags_root / "growth" / dag_name
+        dag_dir.mkdir(parents=True)
+        cluster_path = dag_dir / f"{dag_name}_cluster.yml"
+        cluster_path.write_text(body, encoding="utf-8")
+        return cluster_path
+
+    def test_prunes_stale_noop_validation_block(self, tmp_path):
+        dags_root = tmp_path / "dags"
+        cluster_path = self._write_cluster(dags_root, "noop_dag", NOOP_CLUSTER_BODY)
+        # Non-actionable cohort -> generate_validation_config returns None, but the
+        # existing block resolves to prod (stale, e.g. post-promotion) so it is pruned.
+        rec = _Rec(
+            dag_id="bietlejuice.noop_dag",
+            cohort="no_change",
+            confidence="high",
+            actions="no_change",
+            current_preset="consolidation_xs_memory_cluster",
+        )
+        write_validation_configs(
+            [rec],
+            tmp_path / "out.yml",
+            dags_root=dags_root,
+            write_cluster_files=True,
+        )
+        text = cluster_path.read_text(encoding="utf-8")
+        assert "validation:" not in text
+        assert "cluster:" in text
+
+    def test_keeps_real_validation_block_for_non_actionable_dag(self, tmp_path):
+        dags_root = tmp_path / "dags"
+        cluster_path = self._write_cluster(dags_root, "active_dag", REAL_CLUSTER_BODY)
+        # Non-actionable this run, but the in-progress validation does NOT resolve to
+        # prod (driver downsize), so the block must be preserved.
+        rec = _Rec(
+            dag_id="bietlejuice.active_dag",
+            cohort="no_change",
+            confidence="high",
+            actions="no_change",
+            current_preset="consolidation_xs_memory_cluster",
+        )
+        write_validation_configs(
+            [rec],
+            tmp_path / "out.yml",
+            dags_root=dags_root,
+            write_cluster_files=True,
+        )
+        text = cluster_path.read_text(encoding="utf-8")
+        assert "validation:" in text

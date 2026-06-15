@@ -181,6 +181,24 @@ class TestExtractClusterValidationFiles:
         assert "driver_node_type_id: m6g.xlarge" in content
         assert "node_type_id: m6g.large" in content
         assert "m5a." not in content
+        # Once prod is normalized to graviton it already matches its consolidation
+        # equivalent, so the validation would validate nothing and is skipped.
+        assert "validation:" not in content
+
+    def test_build_cluster_file_emits_validation_when_consolidation_differs(self):
+        # databricks_16_4_med_general_cluster resolves differently from its
+        # consolidation_s_general equivalent (aws_attributes/num_workers), so a
+        # real validation is still emitted.
+        declaration = {
+            "dag": {"name": "fleet_dag"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {"type": "databricks_16_4_med_general_cluster"},
+        }
+        content = build_cluster_file_content(
+            cluster_text="cluster:\n  type: databricks_16_4_med_general_cluster\n",
+            declaration=declaration,
+            cluster_args=declaration["cluster"],
+        )
         assert "validation:" in content
         document = yaml.safe_load(content)
         validation_custom = (

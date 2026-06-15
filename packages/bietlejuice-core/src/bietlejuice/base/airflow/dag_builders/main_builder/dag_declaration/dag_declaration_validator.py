@@ -2,6 +2,9 @@ import json
 
 from cerberus import Validator
 
+from bietlejuice.base.airflow.cluster_config_resolver import (
+    validation_resolves_to_prod_spec,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
     AuthenticationStrategyEnum,
     PaginationStrategyEnum,
@@ -28,6 +31,7 @@ from bietlejuice.base.udfs.udf_enum import UDFEnum
 from bietlejuice.base.validation.cluster_args import (
     validation_cluster_has_distinguishing_overrides,
 )
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 class DAGDeclarationValidator(Validator):
@@ -639,6 +643,21 @@ class DAGDeclarationValidator(Validator):
                 "m=_check_cluster_validation_config, "
                 "msg='validation.cluster.type' must differ from prod 'cluster.type' "
                 "or 'validation.cluster' must specify distinguishing overrides"
+            )
+
+        try:
+            is_noop = validation_resolves_to_prod_spec(
+                prod_cluster, validation.get("cluster", {}), ConfigurationService()
+            )
+        except (ValueError, IndexError):
+            # ENVIRONMENT unset or unresolved preset type: other validators/build
+            # steps surface those; don't turn this backstop into a new crash.
+            is_noop = False
+        if is_noop:
+            raise AssertionError(
+                "m=validate_cluster_validation_cluster_diff, "
+                "msg='validation.cluster' resolves to the same effective cluster "
+                "spec as prod 'cluster'; it would not validate any change"
             )
 
     @staticmethod

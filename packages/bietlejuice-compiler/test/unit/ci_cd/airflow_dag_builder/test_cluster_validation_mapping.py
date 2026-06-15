@@ -483,6 +483,29 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is None
 
+    def test_custom_cluster_resolving_to_prod_omits_validation(self):
+        # hightouch_logs shape: prod custom_cluster maps to a consolidation preset
+        # whose resolved spec equals prod, so the validation would validate nothing.
+        declaration = {
+            "dag": {"name": "hightouch_logs"},
+            "workflow": {"type": "query_delta", "layer": "growth"},
+            "cluster": {
+                "type": "custom_cluster",
+                "databricks_conn_id": "databricks_new",
+                "custom_configurations": {
+                    "driver_node_type_id": "r6g.2xlarge",
+                    "node_type_id": "c6g.2xlarge",
+                    "num_workers": 4,
+                    "spark_version": "16.4.x-scala2.12",
+                },
+            },
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is None
+
     def test_excluded_dag_omits_validation(self):
         declaration = {
             "dag": {"name": "reverse_kyc"},
@@ -591,6 +614,9 @@ class TestBuildValidationClusterSpec:
         assert spec.custom_configurations["num_workers"] == 3
 
     def test_explicit_nvme_without_photon_validation_overrides(self):
+        # A legacy worker (r5) migrates to graviton while an explicit NVMe driver
+        # (r6gd) is preserved without a Photon upgrade -- a real validation, not a
+        # no-op, because prod and the mapped validation resolve differently.
         declaration = {
             "dag": {"name": "enrich_nvme_only"},
             "workflow": {"type": "query_delta", "layer": "enrich"},
@@ -599,7 +625,7 @@ class TestBuildValidationClusterSpec:
                 "databricks_conn_id": "databricks_new_env",
                 "custom_configurations": {
                     "driver_node_type_id": "r6gd.4xlarge",
-                    "node_type_id": "r6gd.4xlarge",
+                    "node_type_id": "r5.4xlarge",
                     "num_workers": 5,
                 },
             },
@@ -610,8 +636,8 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is not None
         assert spec.cluster_type == "consolidation_l_memory_cluster"
-        assert spec.custom_configurations["node_type_id"] == "r6gd.4xlarge"
         assert spec.custom_configurations["driver_node_type_id"] == "r6gd.4xlarge"
+        assert "node_type_id" not in spec.custom_configurations
         assert "runtime_engine" not in spec.custom_configurations
         assert spec.custom_configurations["num_workers"] == 5
 
@@ -672,8 +698,10 @@ class TestBuildValidationClusterSpec:
             "cluster": {
                 "type": "custom_cluster_with_sedona",
                 "custom_configurations": {
-                    "driver_node_type_id": "m6g.xlarge",
-                    "node_type_id": "m6g.xlarge",
+                    # Legacy m5 types so the consolidation mapping is a real
+                    # migration (not a no-op) while sedona init scripts persist.
+                    "driver_node_type_id": "m5.xlarge",
+                    "node_type_id": "m5.xlarge",
                     "num_workers": 3,
                     "spark_version": "16.4.x-scala2.12",
                     "spark_conf": {

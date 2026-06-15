@@ -433,6 +433,8 @@ The old `driver_cpu_bound_keep`, `driver_memory_pressure`, `io_bound_keep`, `mem
 
 Actionable recommendations emit `validation.cluster`, never prod `cluster`.
 
+A recommendation is skipped (no `validation.cluster` emitted) when its fully-resolved spec equals prod's effective spec — i.e. the validation would validate nothing. This is the only no-op rule: same-preset driver-only or worker downsizes that still resolve differently from prod are real validations and are emitted.
+
 For exact presets:
 
 ```yaml

@@ -11,6 +11,8 @@ The recommender is report-only. It writes validation configs only; it does not m
 
 Validation blocks are minimal: only `custom_configurations` that differ from the recommended preset defaults. `databricks_conn_id` is copied from prod `*_cluster.yml`; `--databricks-conn-id` is a fallback when prod omits it.
 
+Validations that resolve to prod's effective spec are not written, and `--write-cluster-files` strips any stale `validation:` block whose spec now matches prod (e.g. after a promotion).
+
 DAGs whose prod `cluster.type` starts with `emr_` (or resolve to an EMR `spark_version`) are excluded: no `validation:` block is emitted, and `--write-cluster-files` removes any stale validation section.
 
 ---

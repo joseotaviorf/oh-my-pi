@@ -13,7 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
+from bietlejuice.base.airflow.cluster_config_resolver import (
+    merge_cluster_configuration,
+    validation_resolves_to_prod_spec,
+)
 from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -1021,6 +1024,13 @@ def build_validation_cluster_spec(
     allow_custom_spark_job = _has_load_spark_job(declaration)
     validation_cluster = _validation_cluster_override(declaration)
 
+    if validation_resolves_to_prod_spec(
+        cluster_args,
+        {"type": matched.name, "custom_configurations": custom_configurations},
+        service,
+    ):
+        return None
+
     return ValidationClusterSpec(
         cluster_type=matched.name,
         custom_configurations=custom_configurations,
@@ -1083,6 +1093,13 @@ def build_rightsizing_validation_cluster_spec(
     driver_override = custom_configurations.get("driver_node_type_id")
     if driver_override and custom_configurations.get("node_type_id") == driver_override:
         custom_configurations.pop("node_type_id", None)
+
+    if validation_resolves_to_prod_spec(
+        prod_cluster_args,
+        {"type": recommended_preset, "custom_configurations": custom_configurations},
+        service,
+    ):
+        return None
 
     return ValidationClusterSpec(
         cluster_type=recommended_preset,
