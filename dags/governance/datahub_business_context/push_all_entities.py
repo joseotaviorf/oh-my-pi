@@ -1,27 +1,14 @@
 #!/usr/bin/env python3
-"""Push all datahub_entities/*.datahub.yaml entity configs to DataHub in sequence.
+"""Deprecated wrapper — use generate_and_push_datahub_entities.py instead.
 
-Prerequisites:
-    export DATAHUB_GRAPHQL_URL=https://<datahub-host>/api/graphql
-    export DATAHUB_TOKEN=<personal-access-token-with-editor-role>
-
-Optional — override the DataHub UI origin used when removing stale discovery links:
-    export DATAHUB_UI_ORIGIN=https://datahub.apps.data-prd.habitat.zone
+Markdown is the versioned source of truth. This script forwards to the CI
+generator with ``--all`` for backward compatibility.
 
 Usage:
-    # Push all entities (skip _TEMPLATE and any _*.yaml):
     python dags/governance/datahub_business_context/push_all_entities.py
+    python dags/governance/datahub_business_context/push_all_entities.py accounting-funnel
 
-    # Push a single entity (same as calling the loader directly):
-    python dags/governance/datahub_business_context/push_all_entities.py chatbot-sessions
-
-Exit codes:
-    0 — all entities pushed successfully
-    1 — one or more entities failed or invalid invocation
-
-Notes:
-    - The loader is idempotent: re-running is safe and will upsert existing entities.
-    - Entities are pushed sequentially (not in parallel) to avoid rate-limit issues.
+Requires OPENAI_API_KEY, DATAHUB_GRAPHQL_URL, and DATAHUB_TOKEN.
 """
 
 from __future__ import annotations
@@ -32,101 +19,46 @@ import sys
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
-_ENTITY_CONFIG_DIR = _SCRIPT_DIR / "datahub_entities"
-_LOADER = _SCRIPT_DIR / "load_collections_context.py"
+_REPO_ROOT = _SCRIPT_DIR.parents[2]
+_GENERATE_SCRIPT = (
+    _REPO_ROOT
+    / "packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py"
+)
+_MD_DIR = _REPO_ROOT / "docs/llm_context/business_entities"
 
 
-def _resolve_target_configs(entity_arg: str | None) -> list[Path]:
-    if entity_arg:
-        slug = entity_arg.removesuffix(".datahub.yaml")
-        path = _ENTITY_CONFIG_DIR / f"{slug}.datahub.yaml"
-        if not path.is_file():
-            print(f"ERROR: config not found: {path}", file=sys.stderr)
-            sys.exit(1)
-        return [path]
-
-    configs = sorted(
-        p
-        for p in _ENTITY_CONFIG_DIR.glob("*.datahub.yaml")
-        if not p.name.startswith("_")
-    )
-    if not configs:
-        print(
-            f"No *.datahub.yaml files found in {_ENTITY_CONFIG_DIR}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    return configs
+def _md_for_slug(slug: str) -> Path:
+    stem = slug.replace("-", "_")
+    return _MD_DIR / f"{stem}.md"
 
 
 def main() -> int:
-    graphql_url = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
-    if not graphql_url:
-        print("ERROR: DATAHUB_GRAPHQL_URL is not set.", file=sys.stderr)
+    print(
+        "NOTE: push_all_entities.py is deprecated. "
+        "Forwarding to generate_and_push_datahub_entities.py",
+        file=sys.stderr,
+    )
+
+    if not os.environ.get("OPENAI_API_KEY", "").strip():
         print(
-            "  export DATAHUB_GRAPHQL_URL=https://<datahub-host>/api/graphql",
+            "ERROR: OPENAI_API_KEY is required for MD → YAML generation.",
             file=sys.stderr,
         )
         return 1
 
-    token_set = bool(os.environ.get("DATAHUB_TOKEN", "").strip())
-    if not token_set:
-        print(
-            "WARNING: DATAHUB_TOKEN is not set — mutations may fail.",
-            file=sys.stderr,
-        )
+    cmd = [sys.executable, str(_GENERATE_SCRIPT)]
+    if len(sys.argv) > 1:
+        slug = sys.argv[1].removesuffix(".datahub.yaml")
+        md_path = _md_for_slug(slug)
+        if not md_path.is_file():
+            print(f"ERROR: no MD found for slug {slug!r}: {md_path}", file=sys.stderr)
+            return 1
+        cmd.append(str(md_path))
+    else:
+        cmd.append("--all")
 
-    entity_arg = sys.argv[1] if len(sys.argv) > 1 else None
-    target_files = _resolve_target_configs(entity_arg)
-    total = len(target_files)
-
-    print(f"DataHub target  : {graphql_url}")
-    print(f"Auth token      : {'set' if token_set else 'NOT SET'}")
-    print(f"Entities to push: {total}")
-    print("────────────────────────────────────────────────────────────")
-
-    passed: list[str] = []
-    failed: list[tuple[str, int]] = []
-
-    for config_path in target_files:
-        entity_name = config_path.name.removesuffix(".datahub.yaml")
-        print("")
-        print(f"▶  {entity_name}  ({config_path})")
-        print("────────────────────────────────────────────────────────────")
-
-        proc = subprocess.run(
-            [sys.executable, str(_LOADER), "--config", str(config_path)],
-            check=False,
-        )
-        if proc.returncode == 0:
-            passed.append(entity_name)
-        else:
-            failed.append((entity_name, proc.returncode))
-            print(
-                f"  ✗ {entity_name} FAILED (exit {proc.returncode})",
-                file=sys.stderr,
-            )
-
-    print("")
-    print("════════════════════════════════════════════════════════════")
-    print(f"Results: {len(passed)} passed / {len(failed)} failed / {total} total")
-
-    if passed:
-        print("")
-        print("Passed:")
-        for name in passed:
-            print(f"  ✓ {name}")
-
-    if failed:
-        print("")
-        print("Failed:")
-        for name, code in failed:
-            print(f"  ✗ {name} (exit {code})")
-        return 1
-
-    print("")
-    print(f"All {total} entities pushed successfully.")
-    return 0
+    proc = subprocess.run(cmd, cwd=_REPO_ROOT, check=False)
+    return proc.returncode
 
 
 if __name__ == "__main__":

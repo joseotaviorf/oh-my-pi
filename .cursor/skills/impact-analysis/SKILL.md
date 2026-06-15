@@ -1,6 +1,6 @@
 ---
 name: impact-analysis
-description: Trace the full downstream impact of renaming, removing, or changing a table or column across ~772 DAGs. Launches parallel explore subagents to find all SQL consumers, metadata lineage entries, and declaration dependencies. Use when the user asks about impact of a change, wants to rename a table or column, or needs to understand what would break.
+description: Trace the full downstream impact of renaming, removing, or changing a table or column across 871 DAG folders (834 DAG Builder + 37 legacy Python). Launches parallel explore subagents to find all SQL consumers, metadata lineage entries, and declaration dependencies. Use when the user asks about impact of a change, wants to rename a table or column, or needs to understand what would break.
 ---
 
 # Change Impact Analysis
@@ -74,6 +74,6 @@ If the user is performing a rename, generate the concrete steps:
 
 ## Notes
 
-- The repo has ~772 DAGs across 21 domain folders. Always use parallel subagents — sequential search takes too long.
+- The repo has 871 Airflow DAGs (834 DAG Builder + 37 legacy Python) across 25 domain folders. Always use parallel subagents — sequential search takes too long.
 - `dags/dependencies.yaml` (auto-generated) is the canonical dependency graph; cross-reference it for DAG-level dependencies.
 - Column renames in clean/enrich tables cascade to all downstream dw/metric SQL and metadata.

@@ -3,7 +3,7 @@ alwaysApply: true
 ---
 # bi-etl-ejuice — Core (always-applied)
 
-**bi-etl-ejuice** is QuintoAndar's central data engineering monorepo (~771 Airflow DAGs, package `bietlejuice`). For full DAG Builder reference (workflow types, declaration anatomy, custom_schema, databricks_conn_id, folder structure, governance/CI), see `core.mdc` — auto-loads on `dags/**` and `bietlejuice/**` files. For naming, see `naming_cheatsheet.mdc` (always-on quick ref) and `naming_conventions.mdc` (full reference, auto-loaded on data files).
+**bi-etl-ejuice** is QuintoAndar's central data engineering monorepo (834 DAG Builder DAGs, 871 Airflow DAGs total including 37 legacy Python, package `bietlejuice`). For full DAG Builder reference (workflow types, declaration anatomy, custom_schema, databricks_conn_id, folder structure, governance/CI), see `core.mdc` — auto-loads on `dags/**` and `bietlejuice/**` files. For naming, see `naming_cheatsheet.mdc` (always-on quick ref) and `naming_conventions.mdc` (full reference, auto-loaded on data files).
 
 ## Five-layer architecture (cross-layer join rule)
 

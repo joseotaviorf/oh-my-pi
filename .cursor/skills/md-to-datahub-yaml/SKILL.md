@@ -2,7 +2,7 @@
 name: md-to-datahub-yaml
 description: >
   Convert an existing business entity Markdown file (docs/llm_context/business_entities/*.md)
-  into a companion DataHub YAML (dags/governance/datahub_business_context/datahub_entities/*.datahub.yaml).
+  into ephemeral DataHub YAML (CI generates and pushes; not committed to git).
   Use when retrofitting older Markdown files that predate automated YAML generation, or when
   generating the YAML for a single entity without creating the Markdown from scratch.
 ---
@@ -24,14 +24,11 @@ This skill reads a business entity Markdown file and produces a correctly-struct
 
 ## Prerequisites — collect before running
 
-Ask the user (or inherit from `create-entity-doc` Step 1) for any items not present in the Markdown:
-
 | Item | Source | Notes |
 |------|--------|-------|
 | **MD file path** | User or filename | `docs/llm_context/business_entities/{entity}.md` |
-| **domain_urn** | User | e.g. `urn:li:domain:growth`. Common: `fintech`, `growth`, `people`, `supply`, `rent`, `sale` |
-
-The `domain_urn` is never present in the Markdown — always ask explicitly.
+| **domain_urn** | Live catalog (CI) or user | **CI flow:** CI fetches all domains from DataHub via GraphQL and injects the catalog into the prompt; the LLM infers the best match from that list. **Interactive flow:** ask the user for the URN from the DataHub UI — do not guess. |
+| **stable_urn** | Prompt (CI) or generated | If the caller supplies a `stable_urn` value in the prompt (CI flow), use it verbatim. Otherwise generate once with `python -c "import uuid; print(uuid.uuid4())"` and never change it after first push. |
 
 ---
 
@@ -48,7 +45,7 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 | `domain_urn` | Collected from user | Direct use, e.g. `urn:li:domain:growth` |
 | `structured_property.qualified_name` | `data_product_id` | `br.com.quintoandar.datahub.{data_product_id}.golden_query` |
 | `structured_property.legacy_qualified_names_to_drop` | `data_product_id` | `[br.com.quintoandar.datahub.{data_product_id}.golden_query_url]` |
-| `golden_query.stable_urn` | Generated | `python -c "import uuid; print(uuid.uuid4())"` — generate once per new entity, never reuse |
+| `golden_query.stable_urn` | Prompt (CI) or generated | Use value supplied by caller if present. Otherwise: `python -c "import uuid; print(uuid.uuid4())"` — generate once per new entity, never change after first push. |
 | `golden_query.name` | `## Golden Queries` H3 title | First H3 under Golden Queries, e.g. `"Query 1 — Contracts signed in a period"` |
 | `golden_query.description` | First sentence below the H3 | One sentence + ` Source: docs/llm_context/business_entities/{entity}.md` |
 | `golden_query.subjects` | SQL `FROM` / `JOIN` clauses in first golden query | Extract `schema.table` pairs; map to `- schema: ...\n  table: ...` |
@@ -122,6 +119,7 @@ All forms are valid input — extract term name, aliases, and mapping text for t
 Scan the `## Tables` section for every `` `schema.table` `` backtick pair (also written as `` `schema.table` `` inside table rows or critical rules).
 
 - Keep only `schema.table` pairs where the schema looks like a real Databricks schema (e.g., `dw_rent`, `datalake_checkout_clean`, `enrich_visits`).
+- **Never emit wildcards or patterns in `datasets`.** DataHub links concrete dataset URNs only. Skip (do not copy to YAML) any reference containing `*`, `…`, or placeholder suffixes like `statement_*`, `reverse_accounts_*`, or `schema.*`. If the Markdown uses a pattern for narrative routing, expand to the real table names listed elsewhere in the same doc, or omit from `datasets` entirely.
 - Deduplicate.
 - Output as:
 
@@ -144,27 +142,20 @@ Use the **first** Golden Query from `## Golden Queries`:
 3. **`sql`**: verbatim SQL from the first code block. Preserve indentation. Must use Trino SQL dialect (no `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-arg `DATEDIFF`).
 4. **`subjects`**: parse `FROM` and `JOIN` clauses in the SQL to extract `schema.table` pairs.
 
-**`stable_urn` — UUID generation:**
-
-```bash
-python -c "import uuid; print(uuid.uuid4())"
-```
-
-Generate this once. The resulting UUID becomes `urn:li:query:{uuid}`. **Never change it after the first successful push.**
-
-If a companion YAML already exists (update scenario): preserve the existing `stable_urn`. Only generate a new UUID if creating the YAML from scratch.
+**`stable_urn`:** use the `stable_urn` value injected in the prompt verbatim (CI assigns
+deterministic `uuid5(entity_slug)`). Do NOT invent a new UUID.
 
 ---
 
-## Step 6 — Write the YAML file
+## Step 6 — Output the YAML
 
-Write to `dags/governance/datahub_business_context/datahub_entities/{entity_slug}.datahub.yaml`.
+Output valid YAML only (CI writes it to a temp file — do not reference a repo path).
 
-**Filename rule:** `{entity_slug}` = filename stem of the MD, with underscores converted to hyphens: `broker_xp` → `broker-xp`.
+**Filename rule:** `data_product_id` = MD filename stem with underscores → hyphens: `broker_xp` → `broker-xp`.
 
 Use `kind: data_product_curated_entity` for all new entities.
 
-Follow the exact structure of `dags/governance/datahub_business_context/datahub_entities/_TEMPLATE.datahub.yaml`. Do not add extra YAML keys not present in the template.
+Follow the exact structure of `dags/governance/datahub_business_context/reference/_TEMPLATE.datahub.yaml`.
 
 **Minimum required fields (all must be present):**
 
@@ -213,32 +204,35 @@ documentation_link:
 Before presenting the YAML to the user:
 
 - [ ] `data_product_id` is kebab-case and matches filename stem
+- [ ] `datasets` lists only concrete `schema.table` pairs — no `*`, no `schema.*`, no ellipsis placeholders
 - [ ] `domain_urn` matches what the user provided (not inferred)
-- [ ] `stable_urn` is a freshly generated UUID4 (not a placeholder `00000000-…`)
+- [ ] `stable_urn` matches the value provided in the prompt (do not rotate)
 - [ ] `product_description` ends with `Further detail and table routing: docs/…`
 - [ ] All `schema.table` pairs in `datasets` appear in the Markdown's Tables section
 - [ ] `golden_query.sql` is valid Trino SQL (no Spark-only constructs)
 - [ ] `golden_query.subjects` match the tables in the SQL
 - [ ] Each glossary term has `id` (snake_case), `name`, and `description` populated
+- [ ] Glossary `id` matches the slug already in DataHub when the term exists (loader resolves by `name` as fallback, but `related_terms` URNs must use real ids)
 - [ ] No YAML keys present that are not in the template
 
 ---
 
 ## Reference examples
 
-- **Gold standard descriptions:** `dags/governance/datahub_business_context/datahub_entities/payments.datahub.yaml`
-- **Gold standard glossary with `related_terms`:** `dags/governance/datahub_business_context/datahub_entities/visits.datahub.yaml`
-- **Template:** `dags/governance/datahub_business_context/datahub_entities/_TEMPLATE.datahub.yaml`
+- **Gold standard descriptions:** `dags/governance/datahub_business_context/reference/payments.datahub.yaml`
+- **Gold standard glossary with `related_terms`:** `dags/governance/datahub_business_context/reference/visits.datahub.yaml`
+- **Template:** `dags/governance/datahub_business_context/reference/_TEMPLATE.datahub.yaml`
 
 ---
 
 ## After the YAML is written
 
-Inform the user that the YAML is ready. Offer to push it to DataHub:
+Inform the user that CI will publish on merge. To push locally:
 
 ```bash
-# Requires DATAHUB_GRAPHQL_URL and DATAHUB_TOKEN to be set
-python dags/governance/datahub_business_context/push_all_entities.py {entity_slug}
+export OPENAI_API_KEY=... DATAHUB_GRAPHQL_URL=... DATAHUB_TOKEN=...
+uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py \\
+  docs/llm_context/business_entities/{entity}.md
 ```
 
 Verify with:
@@ -252,5 +246,5 @@ If the MD file's `## DataHub catalog` section is still a placeholder, offer to b
 ## DataHub catalog
 
 - **Data Product:** [urn:li:dataProduct:{entity_slug}](https://datahub.apps.data-prd.habitat.zone/dataProducts/urn%3Ali%3AdataProduct%3A{entity_slug})
-- **Datasets:** listed in `dags/governance/datahub_business_context/datahub_entities/{entity_slug}.datahub.yaml`
+- **Datasets:** listed in the generated YAML (CI) from the Markdown `## Tables` section
 ```

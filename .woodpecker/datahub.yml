@@ -4,22 +4,30 @@
 # Workflow triggers on pull_request or push to master / hotfix/* only.
 #
 # Triggers on changes to:
-#   • docs/llm_context/business_entities/**  (Markdown entity docs)
-#   • dags/governance/datahub_business_context/datahub_entities/**  (YAML entity configs)
+#   • docs/llm_context/business_entities/**  (Markdown entity docs — versioned source)
 #   • dags/governance/datahub_business_context/load_collections_context.py  (loader logic)
-#   • dags/governance/datahub_business_context/push_all_entities.py  (push runner)
+#   • dags/governance/datahub_business_context/datahub_domain_catalog.py  (domain catalog)
+#   • dags/governance/datahub_business_context/push_all_entities.py  (deprecated push wrapper)
 #   • dags/governance/datahub_business_context/smoke_test_datahub.py  (smoke test)
+#   • dags/governance/datahub_business_context/reference/**  (LLM reference YAMLs)
+#   • packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
+#   • .woodpecker/datahub.yml
 #
 # Steps:
-#   validate-datahub-entities — runs smoke_test_datahub.py on pull_request and on push
-#                                to master / hotfix/* to confirm every *.datahub.yaml entity
-#                                is reachable in DataHub.
-#   push-datahub-business-context — runs push_all_entities.py on push to master / hotfix/*
-#                                    to publish all entity configs to production DataHub.
+#   get-credentials-prod — Vault OPENAI_API_KEY for LiteLLM (push only)
+#   push-datahub-business-context — LLM → ephemeral YAML → DataHub via
+#                                   generate_and_push_datahub_entities.py (push only)
+#   validate-datahub-entities — smoke full catalog on pull_request (no push-only deps)
+#   validate-datahub-entities-post-push — smoke --changed-only after publish (push only;
+#       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
+#       depends_on push-datahub-business-context fails on pull_request)
 #
 # Secrets required (configure in Woodpecker repo settings):
-#   datahub_graphql_url — full URL to the DataHub GraphQL endpoint
-#   datahub_token       — DataHub personal access token with editor role
+#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push step)
+#   datahub_api_key_prod     — prod DataHub PAT with editor role (push step)
+#   datahub_graphql_url      — DataHub GraphQL endpoint (validate step)
+#   datahub_token            — DataHub PAT (validate step)
+#   Vault (prod)             — OPENAI_API_KEY for LiteLLM (push step only)
 #
 # This pipeline does NOT depend on lint / tests / validations so it can run
 # independently on documentation-only changes.
@@ -29,7 +37,53 @@ when:
   - event: push
     branch: [master, hotfix/*]
 
+clone:
+  - name: clone
+    image: woodpeckerci/plugin-git
+    settings:
+      partial: false
+
 steps:
+  get-credentials-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
+    pull: true
+    settings:
+      vault_secrets:
+        - OPENAI_API_KEY=kv:/apps/shared/litellm/zordon-tars-llm#key
+      output_file: ./my-secrets
+      vault_env: prod
+    when:
+      - event: push
+        branch: [master, hotfix/*]
+        path: &datahub_path
+          include:
+            - "docs/llm_context/business_entities/**"
+            - "dags/governance/datahub_business_context/load_collections_context.py"
+            - "dags/governance/datahub_business_context/datahub_domain_catalog.py"
+            - "dags/governance/datahub_business_context/push_all_entities.py"
+            - "dags/governance/datahub_business_context/smoke_test_datahub.py"
+            - "dags/governance/datahub_business_context/reference/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py"
+            - ".woodpecker/datahub.yml"
+          on_empty: false
+
+  push-datahub-business-context:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url_prod
+      DATAHUB_TOKEN:
+        from_secret: datahub_api_key_prod
+    commands:
+      - eval $(cat ./my-secrets)
+      - uv run python packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py --resync-if-loader-changed
+    when:
+      - event: push
+        branch: [master, hotfix/*]
+        path: *datahub_path
+    depends_on: [get-credentials-prod]
+
   validate-datahub-entities:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
@@ -42,19 +96,9 @@ steps:
       - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
     when:
       - event: pull_request
-        path: &datahub_path
-          include:
-            - "docs/llm_context/business_entities/**"
-            - "dags/governance/datahub_business_context/datahub_entities/**"
-            - "dags/governance/datahub_business_context/load_collections_context.py"
-            - "dags/governance/datahub_business_context/push_all_entities.py"
-            - "dags/governance/datahub_business_context/smoke_test_datahub.py"
-          on_empty: false
-      - event: push
-        branch: [master, hotfix/*]
         path: *datahub_path
 
-  push-datahub-business-context:
+  validate-datahub-entities-post-push:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     environment:
@@ -68,4 +112,4 @@ steps:
       - event: push
         branch: [master, hotfix/*]
         path: *datahub_path
-    depends_on: [validate-datahub-entities]
+    depends_on: [push-datahub-business-context]

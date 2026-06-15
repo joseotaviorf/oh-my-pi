@@ -8,8 +8,8 @@ Goal: give TARS enough routing context to pick the right table and write correct
       for any reasonable question about this business entity.
 
 Rules:
-  • Plain language. No DataHub URNs, no catalog links — those are auto-generated
-    from the companion `datahub_entities/{entity}.datahub.yaml` by the governance loader.
+  • Plain language. No DataHub URNs in prose — catalog links live in `## DataHub catalog`.
+  • CI publishes to DataHub from this MD via `generate_and_push_datahub_entities.py`.
   • Every table section must state grain, key dedup flags, and common join keys.
   • Every synonym that has a Portuguese name should be listed in the Synonyms table.
   • Golden query: the single most important / most-asked metric for this entity.

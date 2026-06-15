@@ -1,0 +1,59 @@
+# ==============================================================================
+# DataHub YAML schema reference — spec_version: 1
+# ==============================================================================
+#
+# Entity configs are NOT committed per entity. CI generates ephemeral YAML from
+# docs/llm_context/business_entities/{entity}.md via:
+#   packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
+#
+# Authoring flow:
+#   1. Write / update docs/llm_context/business_entities/{entity}.md
+#   2. Push to master (or run the generate script locally) — CI publishes to DataHub
+#   3. Verify: python dags/governance/datahub_business_context/smoke_test_datahub.py
+#
+# golden_query.stable_urn is assigned deterministically (uuid5 from entity slug) by CI.
+#
+# ==============================================================================
+
+spec_version: 1
+kind: data_product_curated_entity
+
+product_display_name: "{Human-readable name}"
+product_description: |
+  ...
+
+data_product_id: {entity_slug_kebab}
+domain_urn: urn:li:domain:{domain}
+
+structured_property:
+  qualified_name: br.com.quintoandar.datahub.{entity_slug_kebab}.golden_query
+  legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.{entity_slug_kebab}.golden_query_url
+
+golden_query:
+  stable_urn: urn:li:query:{uuid}
+  name: "Query 1 — ..."
+  description: >-
+    ...
+  subjects:
+    - schema: ...
+      table: ...
+  sql: |
+    ...
+
+datasets:
+  - schema: ...
+    table: ...
+
+glossary_terms:
+  parent_node_urn: urn:li:glossaryNode:{domain}
+  terms:
+    - id: {term_slug}
+      name: "..."
+      description: >-
+        ...
+
+documentation_link:
+  label: "Business entity documentation ({entity}.md)"
+  url: >-
+    https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/{entity}.md

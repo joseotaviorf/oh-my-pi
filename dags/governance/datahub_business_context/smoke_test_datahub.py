@@ -1,9 +1,8 @@
-"""Smoke-test: verify every *.datahub.yaml entity is reachable in DataHub.
+"""Smoke-test: verify entity Markdown files have a live Data Product in DataHub.
 
-For each non-template YAML in ``datahub_entities/`` the script:
-  1. Derives the expected Data Product URN from data_product_id.
-  2. Calls the DataHub GraphQL API and checks the entity exists with a name.
-  3. Reports pass / fail per entity and exits non-zero if any entity is missing.
+For each non-template ``docs/llm_context/business_entities/*.md`` the script:
+  1. Derives ``data_product_id`` from the filename (``accounting_funnel`` → ``accounting-funnel``).
+  2. Calls the DataHub GraphQL API and checks the Data Product exists with a name.
 
 Prerequisites:
     export DATAHUB_GRAPHQL_URL=https://<datahub-host>/api/graphql
@@ -15,11 +14,14 @@ Usage:
     # Verbose — show full GraphQL response per entity:
     python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
 
+    # Only MD files changed in this commit (CI push after generate-and-push):
+    python dags/governance/datahub_business_context/smoke_test_datahub.py --changed-only
+
 Exit codes:
-    0 — all entities verified
+    0 — all targeted entities verified
     1 — one or more entities missing or unreachable
 
-CI: invoked by ``.woodpecker/datahub.yml`` step ``validate-datahub-entities`` (secrets: graphql URL + token).
+CI: ``validate-datahub-entities-push`` runs after ``generate-and-push-datahub`` on push.
 """
 
 from __future__ import annotations
@@ -27,13 +29,32 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any, Optional
 
-import yaml
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = _SCRIPT_DIR.parents[2]
+_MD_DIR = _REPO_ROOT / "docs" / "llm_context" / "business_entities"
+_MD_PREFIX = "docs/llm_context/business_entities/"
+
+GRAPHQL_URL: str = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
+TOKEN: Optional[str] = os.environ.get("DATAHUB_TOKEN", "").strip() or None
+
+_GET_DATA_PRODUCT = """
+query SmokeTestDataProduct($urn: String!) {
+  dataProduct(urn: $urn) {
+    urn
+    properties {
+      name
+      description
+    }
+  }
+}
+"""
 
 
 def _datahub_graphql_post(
@@ -43,7 +64,6 @@ def _datahub_graphql_post(
     variables: dict[str, Any],
     timeout_sec: float = 60.0,
 ) -> tuple[Optional[dict[str, Any]], str]:
-    """POST GraphQL; stdlib-only so Woodpecker CI needs no bietlejuice deps."""
     payload = json.dumps({"query": query, "variables": variables}).encode("utf-8")
     req = urllib.request.Request(
         graphql_url,
@@ -68,83 +88,73 @@ def _datahub_graphql_post(
         return None, "fetch_error"
 
 
-# ---------------------------------------------------------------------------
-# Config
-# ---------------------------------------------------------------------------
+def md_path_to_data_product_id(md_path: Path) -> str:
+    return md_path.stem.replace("_", "-")
 
-GRAPHQL_URL: str = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
-TOKEN: Optional[str] = os.environ.get("DATAHUB_TOKEN", "").strip() or None
 
-_SCRIPT_DIR = Path(__file__).resolve().parent
-_ENTITY_CONFIG_DIR = _SCRIPT_DIR / "datahub_entities"
+def _git_changed_files() -> list[str]:
+    prev_sha = os.environ.get("CI_PREV_COMMIT_SHA", "").strip()
+    curr_sha = os.environ.get("CI_COMMIT_SHA", "HEAD").strip() or "HEAD"
+    if prev_sha:
+        cmd = ["git", "diff", "--name-only", prev_sha, curr_sha]
+    else:
+        cmd = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
+    try:
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, check=True, cwd=_REPO_ROOT
+        )
+    except subprocess.CalledProcessError:
+        result = subprocess.run(
+            ["git", "show", "--name-only", "--format=", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=_REPO_ROOT,
+        )
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
-_GET_DATA_PRODUCT = """
-query SmokeTestDataProduct($urn: String!) {
-  dataProduct(urn: $urn) {
-    urn
-    properties {
-      name
-      description
-    }
-  }
-}
-"""
+
+def _load_entity_mds(*, changed_only: bool) -> list[tuple[str, Path, str]]:
+    """Return [(entity_name, md_path, data_product_id)] for smoke targets."""
+    changed = set(_git_changed_files()) if changed_only else None
+    results: list[tuple[str, Path, str]] = []
+    for path in sorted(_MD_DIR.glob("*.md")):
+        if path.name.startswith("_"):
+            continue
+        rel = f"{_MD_PREFIX}{path.name}"
+        if changed is not None and rel not in changed:
+            continue
+        pid = md_path_to_data_product_id(path)
+        results.append((path.stem, path, pid))
+    return results
 
 
 def _fetch_data_product(urn: str) -> Optional[dict[str, Any]]:
     root, _diag = _datahub_graphql_post(
         GRAPHQL_URL, TOKEN, _GET_DATA_PRODUCT, {"urn": urn}
     )
-    if root is None:
+    if root is None or root.get("errors"):
         return None
-    if root.get("errors"):
-        return None
-    data = root.get("data") or {}
-    dp = data.get("dataProduct")
-    # DataHub returns a non-null shell for unknown URNs; only real entities have properties.
+    dp = (root.get("data") or {}).get("dataProduct")
     if dp and (dp.get("properties") is not None):
         return dp
     return None
 
 
-def _load_all_configs() -> list[tuple[str, dict[str, Any]]]:
-    """Return [(entity_name, spec_dict)] for all non-template YAML files."""
-    results = []
-    for path in sorted(_ENTITY_CONFIG_DIR.glob("*.datahub.yaml")):
-        if path.name.startswith("_"):
-            continue
-        with path.open(encoding="utf8") as fh:
-            spec = yaml.safe_load(fh)
-        if not isinstance(spec, dict):
-            continue
-        entity_name = path.stem.removesuffix(".datahub")
-        results.append((entity_name, spec))
-    return results
-
-
-def _data_product_id_from_spec(spec: dict[str, Any]) -> Optional[str]:
-    """Extract data_product_id: present in data_product_curated_entity; derived from
-    bundle_id for full_curated_datahub_bundle."""
-    pid = spec.get("data_product_id")
-    if pid:
-        return str(pid).strip()
-    # full_curated_datahub_bundle: data_product_id lives inside the bundle module;
-    # fall back to bundle_id slug used as the product identifier.
-    bid = spec.get("bundle_id")
-    if bid:
-        return str(bid).replace("_", "-").strip()
-    return None
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Smoke-test: verify all DataHub Data Products are live.",
+        description="Smoke-test: verify entity MDs have live Data Products in DataHub.",
     )
     parser.add_argument(
         "--verbose",
         "-v",
         action="store_true",
         help="Show full DataHub response per entity.",
+    )
+    parser.add_argument(
+        "--changed-only",
+        action="store_true",
+        help="Validate only entity MD files changed in this commit.",
     )
     ns = parser.parse_args()
 
@@ -156,31 +166,23 @@ def main() -> None:
         )
         sys.exit(1)
 
-    configs = _load_all_configs()
-    if not configs:
-        print(
-            f"No *.datahub.yaml files found in {_ENTITY_CONFIG_DIR}.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    entities = _load_entity_mds(changed_only=ns.changed_only)
+    if not entities:
+        mode = "changed MDs" if ns.changed_only else "entity MDs"
+        print(f"No {mode} to validate — exiting successfully.")
+        sys.exit(0)
 
     print(f"DataHub target  : {GRAPHQL_URL}")
     print(f"Auth token      : {'set' if TOKEN else 'NOT SET'}")
-    print(f"Entities to test: {len(configs)}")
+    if ns.changed_only:
+        print("Scope           : changed MD files in this commit only")
+    print(f"Entities to test: {len(entities)}")
     print("─" * 60)
 
     passed: list[str] = []
     failed: list[tuple[str, str]] = []
 
-    for entity_name, spec in configs:
-        pid = _data_product_id_from_spec(spec)
-        if not pid:
-            failed.append(
-                (entity_name, "could not determine data_product_id from YAML")
-            )
-            print(f"  ✗ {entity_name}: no data_product_id in YAML")
-            continue
-
+    for entity_name, md_path, pid in entities:
         urn = f"urn:li:dataProduct:{pid}"
         dp = _fetch_data_product(urn)
 
@@ -191,13 +193,14 @@ def main() -> None:
             name = (dp.get("properties") or {}).get("name") or "—"
             print(f"  ✓ {entity_name}  |  name={name!r}  |  urn={urn}")
             if ns.verbose:
+                print(f"      md={md_path.name}")
                 print(f"      {json.dumps(dp, indent=4, default=str)}")
             passed.append(entity_name)
 
     print()
     print("═" * 60)
     print(
-        f"Results: {len(passed)} passed / {len(failed)} failed / {len(configs)} total"
+        f"Results: {len(passed)} passed / {len(failed)} failed / {len(entities)} total"
     )
 
     if failed:

@@ -60,6 +60,7 @@ dags_not_using_builder:
   - platform/notify_airbyte_key_rotation/notify_airbyte_key_rotation.py
   - governance/notify_dag_rotation/notify_dag_rotation.py
   - governance/datahub_business_context/datahub_curated_urns.py
+  - governance/datahub_business_context/datahub_domain_catalog.py
   - governance/datahub_business_context/load_collections_context.py
   - governance/datahub_business_context/push_all_entities.py
   - governance/datahub_business_context/smoke_test_datahub.py

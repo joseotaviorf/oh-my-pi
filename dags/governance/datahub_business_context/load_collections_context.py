@@ -1,19 +1,26 @@
 """Push curated business context into DataHub via GraphQL mutations.
 
-**Configuration is YAML-first** (``spec_version: 1``, ``kind: data_product_curated_entity``).
-Use ``--config`` to choose a preset file:
+Orchestration only — table registries, copy, glossary, and Golden SQL payload live in sibling
+bundle modules selected by YAML ``bundle_id`` (when using ``kind: full_curated_datahub_bundle``).
 
+**Configuration is YAML-first** (`spec_version: 1`). Use ``--config`` to choose a preset file:
+
+    # Heavyweight bundle example (datasets + glossary + Golden query + sidebar SP)
     python .../load_collections_context.py \\
-      --config .../datahub_entities/collections-recovery.datahub.yaml
+      --config /path/to/ephemeral-or-reference.yaml
 
+    # Lightweight curated product (datasets + links + YAML-driven golden query)
     python .../load_collections_context.py \\
-      --config .../datahub_entities/customer-support-contacts.datahub.yaml
+      --config /path/to/ephemeral-or-reference.yaml
 
-Each YAML preset declares: ``product_display_name``, ``product_description``,
-``data_product_id``, ``domain_urn``, ``structured_property``, ``golden_query``
-(with ``stable_urn``, ``name``, ``description``, ``subjects``, ``sql``),
-``datasets`` (each entry may carry ``description`` and ``fields`` for per-dataset/field
-descriptions), ``glossary_terms``, and ``documentation_link``.
+``full_curated_datahub_bundle``: seven-step pipeline (editable dataset docs, schema field docs if
+provided by the bundle, glossary terms from the bundle, Data Product lifecycle, glossary attach +
+documentation link from the bundle, Golden ``createQuery``, merge-preserving sidebar structured
+property + legacy ``removeLink`` cleanup). Payload and default URNs are supplied by Python modules
+such as ``collections_recovery_bundle.py`` — not by this orchestrator.
+
+``data_product_curated_entity``: declarative YAML only (datasets, documentation link,
+``createQuery``, structured property sidebar) — no Python bundle module.
 
 Usage:
     export DATAHUB_GRAPHQL_URL=https://<your-datahub-host>/api/graphql
@@ -33,7 +40,12 @@ import argparse
 import json
 import os
 import sys
+import time
+import urllib.error
+import urllib.request
+from dataclasses import dataclass
 from pathlib import Path
+from types import ModuleType
 from typing import Any, Optional
 
 import yaml
@@ -54,6 +66,8 @@ from datahub_curated_urns import (  # noqa: E402
     STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT,
     STRUCTURED_PROPERTY_ENTITY_TYPE_QUERY,
     STRUCTURED_PROPERTY_VALUE_TYPE_URN_POINTER,
+    DataHubCuratedUrns,
+    load_curated_urns_from_spec,
     structured_property_urn,
 )
 
@@ -66,20 +80,66 @@ from bietlejuice.governance.fairness_assessment.datahub_graphql.client import ( 
 # ---------------------------------------------------------------------------
 
 SPEC_VERSION_EXPECTED = 1
+KIND_FULL_CURATED_DATAHUB_BUNDLE = "full_curated_datahub_bundle"
 KIND_DATA_PRODUCT_CURATED_ENTITY = "data_product_curated_entity"
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
-_DATAHUB_ENTITY_CONFIG_DIR = _SCRIPT_DIR / "datahub_entities"
-DEFAULT_CONFIG_PATH = _DATAHUB_ENTITY_CONFIG_DIR / "collections-recovery.datahub.yaml"
+_REFERENCE_DIR = _SCRIPT_DIR / "reference"
+DEFAULT_CONFIG_PATH = _REFERENCE_DIR / "payments.datahub.yaml"
 
 GRAPHQL_URL = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
 TOKEN: Optional[str] = os.environ.get("DATAHUB_TOKEN", "").strip() or None
 
 PLATFORM = "databricks"
 
+FULL_CURATED_BUNDLE_IDS_SUPPORTED: tuple[str, ...] = ("collections_recovery",)
+
 # Fallback anchors when YAML omits domain/glossary (presets normally set explicitly).
 _FALLBACK_DOMAIN_URN = "urn:li:domain:fintech"
 _FALLBACK_GLOSSARY_PARENT_NODE_URN = "urn:li:glossaryNode:fintech"
+
+BUNDLE_YAML_RUNTIME: dict[str, str] = {}
+
+
+@dataclass(frozen=True)
+class ActiveFullCuratedBundle:
+    bundle_module: ModuleType
+    urns: DataHubCuratedUrns
+
+
+_ACTIVE_FULL_CURATED_BUNDLE: ActiveFullCuratedBundle | None = None
+
+
+def resolve_full_bundle_module(bundle_id: str) -> ModuleType:
+    if bundle_id == "collections_recovery":
+        import collections_recovery_bundle as m
+
+        return m
+    raise SystemExit(
+        f"Unknown bundle_id {bundle_id!r}; "
+        f"supported: {FULL_CURATED_BUNDLE_IDS_SUPPORTED}"
+    )
+
+
+def active_full_curated_bundle() -> ActiveFullCuratedBundle:
+    if _ACTIVE_FULL_CURATED_BUNDLE is None:
+        raise RuntimeError("Internal error: no active full curated bundle session.")
+    return _ACTIVE_FULL_CURATED_BUNDLE
+
+
+def curated_bundle_urns() -> DataHubCuratedUrns:
+    return active_full_curated_bundle().urns
+
+
+def _effective_bundle_domain_urn() -> str:
+    return BUNDLE_YAML_RUNTIME.get("domain_urn", _FALLBACK_DOMAIN_URN)
+
+
+def _effective_bundle_glossary_parent_node_urn() -> str:
+    return BUNDLE_YAML_RUNTIME.get(
+        "glossary_parent_node_urn",
+        _FALLBACK_GLOSSARY_PARENT_NODE_URN,
+    )
 
 
 DATAHUB_UI_ORIGIN = os.environ.get(
@@ -112,13 +172,88 @@ def _urn(schema: str, table: str) -> str:
 
 _errors: list[str] = []
 
+_GRAPHQL_MAX_ATTEMPTS = 3
+_GRAPHQL_RETRYABLE_ERROR_SUBSTRINGS = (
+    "timeout",
+    "time out",
+    "connection lease",
+    "temporarily unavailable",
+    "429",
+    "502",
+    "503",
+    "504",
+    "elasticsearch",
+    "circuit breaker",
+    "rate limit",
+    "connection reset",
+    "broken pipe",
+)
+
+
+def _graphql_errors_retryable(errors: list) -> bool:
+    for err in errors or []:
+        msg = (err.get("message") or "").lower()
+        if any(sub in msg for sub in _GRAPHQL_RETRYABLE_ERROR_SUBSTRINGS):
+            return True
+    return False
+
+
+def _graphql_call_with_retry(
+    query: str,
+    variables: dict[str, Any],
+    *,
+    timeout_sec: float = 60.0,
+) -> tuple[Optional[dict[str, Any]], str]:
+    """POST GraphQL with retries on transient HTTP or GraphQL failures."""
+    last_root: Optional[dict[str, Any]] = None
+    last_diag = ""
+
+    for attempt in range(1, _GRAPHQL_MAX_ATTEMPTS + 1):
+        root, diag = datahub_graphql_post(
+            GRAPHQL_URL,
+            TOKEN,
+            query,
+            variables,
+            timeout_sec=timeout_sec,
+        )
+        last_root, last_diag = root, diag
+
+        if root is None:
+            if attempt < _GRAPHQL_MAX_ATTEMPTS:
+                delay_s = 2**attempt
+                print(
+                    f"    WARN: DataHub HTTP failure ({diag}) — "
+                    f"retry {attempt}/{_GRAPHQL_MAX_ATTEMPTS - 1} in {delay_s}s",
+                    file=sys.stderr,
+                )
+                time.sleep(delay_s)
+                continue
+            return None, diag
+
+        gql_errors = root.get("errors")
+        if gql_errors and _graphql_errors_retryable(gql_errors):
+            if attempt < _GRAPHQL_MAX_ATTEMPTS:
+                delay_s = 2**attempt
+                print(
+                    f"    WARN: DataHub transient GraphQL error — "
+                    f"retry {attempt}/{_GRAPHQL_MAX_ATTEMPTS - 1} in {delay_s}s: "
+                    f"{json.dumps(gql_errors)}",
+                    file=sys.stderr,
+                )
+                time.sleep(delay_s)
+                continue
+
+        return root, diag
+
+    return last_root, last_diag
+
 
 def _post(query: str, variables: dict[str, Any]) -> Optional[dict[str, Any]]:
     if not GRAPHQL_URL:
         raise RuntimeError(
             "DATAHUB_GRAPHQL_URL is not set. Export it before running this script."
         )
-    root, diag = datahub_graphql_post(GRAPHQL_URL, TOKEN, query, variables)
+    root, diag = _graphql_call_with_retry(query, variables)
     if root is None:
         print(f"    [DEBUG] HTTP-level failure, diag={diag}", file=sys.stderr)
         return None
@@ -141,7 +276,7 @@ def _fail(label: str, detail: str) -> None:
 
 def _graphql_root(query: str, variables: dict[str, Any]) -> Optional[dict]:
     """Returns the full GraphQL JSON body (possibly with ``errors``) or None on HTTP failure."""
-    root, diag = datahub_graphql_post(GRAPHQL_URL, TOKEN, query, variables)
+    root, diag = _graphql_call_with_retry(query, variables)
     if root is None:
         print(f"    [DEBUG] HTTP-level failure, diag={diag}", file=sys.stderr)
     return root
@@ -150,9 +285,313 @@ def _graphql_root(query: str, variables: dict[str, Any]) -> Optional[dict]:
 def _errors_indicate_already_exists(errors: list) -> bool:
     for err in errors or []:
         lower = (err.get("message") or "").lower()
-        if "already exists" in lower or "duplicate" in lower or "duplicatekey" in lower:
+        if "already exist" in lower or "duplicate" in lower or "duplicatekey" in lower:
             return True
     return False
+
+
+def _graphql_field(data: Optional[dict[str, Any]], field: str) -> dict[str, Any]:
+    """Return a GraphQL object field; JSON ``null`` is treated as missing."""
+    if not isinstance(data, dict):
+        return {}
+    block = data.get(field)
+    return block if isinstance(block, dict) else {}
+
+
+def _data_product_exists(dp_urn: str) -> bool:
+    data = _post(_CHECK_DATA_PRODUCT, {"urn": dp_urn})
+    return bool(_graphql_field(data, "dataProduct").get("urn"))
+
+
+_ENTITY_EXISTS = """
+query EntityExists($urn: String!) {
+  entityExists(urn: $urn)
+}
+"""
+
+
+def _entity_exists(urn: str) -> bool:
+    data = _post(_ENTITY_EXISTS, {"urn": urn})
+    return bool(data and data.get("entityExists"))
+
+
+def _gms_base_url_from_graphql(graphql_url: str) -> str:
+    url = graphql_url.rstrip("/")
+    marker = "/api/graphql"
+    if url.endswith(marker):
+        return url[: -len(marker)]
+    return url
+
+
+def _glossary_term_id_from_urn(urn: str) -> str:
+    prefix = "urn:li:glossaryTerm:"
+    urn = str(urn or "").strip()
+    if urn.startswith(prefix):
+        return urn[len(prefix) :]
+    return ""
+
+
+def _glossary_term_urn_exists(urn: str) -> bool:
+    return _fetch_glossary_term(urn) is not None
+
+
+_SEARCH_GLOSSARY_TERMS_BY_NAME = """
+query SearchGlossaryTermsByName($input: SearchInput!) {
+  search(input: $input) {
+    searchResults {
+      entity {
+        urn
+        ... on GlossaryTerm {
+          properties {
+            name
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+
+def _fetch_glossary_term(urn: str) -> dict[str, Any] | None:
+    """Return glossary term payload when ``urn`` is a real catalog entity (not a shell)."""
+    urn = str(urn or "").strip()
+    if not urn.startswith("urn:li:glossaryTerm:"):
+        return None
+    query = """
+    query FetchGlossaryTerm($urn: String!) {
+      glossaryTerm(urn: $urn) {
+        urn
+        properties {
+          name
+        }
+      }
+    }
+    """
+    root = _graphql_root(query, {"urn": urn})
+    if not root or root.get("errors"):
+        return None
+    term = (root.get("data") or {}).get("glossaryTerm")
+    if not isinstance(term, dict):
+        return None
+    props = term.get("properties")
+    if not isinstance(props, dict):
+        return None
+    if not str(props.get("name") or "").strip():
+        return None
+    resolved = str(term.get("urn") or "").strip()
+    if resolved != urn:
+        return None
+    return term
+
+
+def _lookup_glossary_term_urn_by_name(label: str, term_id: str = "") -> str | None:
+    """Resolve an existing glossary term URN by display name or slug similarity."""
+    name = str(label or "").strip()
+    term_id = str(term_id or "").strip()
+    if not name and not term_id:
+        return None
+    search_queries: list[str] = []
+    if name:
+        search_queries.append(name)
+        if " / " in name:
+            search_queries.append(name.split(" / ", 1)[0].strip())
+    if term_id:
+        search_queries.append(term_id.replace("_", " "))
+    seen_queries: set[str] = set()
+    slug_candidates: list[str] = []
+    for query_text in search_queries:
+        if not query_text or query_text in seen_queries:
+            continue
+        seen_queries.add(query_text)
+        root = _graphql_root(
+            _SEARCH_GLOSSARY_TERMS_BY_NAME,
+            {
+                "input": {
+                    "query": query_text,
+                    "type": "GLOSSARY_TERM",
+                    "start": 0,
+                    "count": 25,
+                }
+            },
+        )
+        if not root or root.get("errors"):
+            continue
+        rows = (
+            ((root.get("data") or {}).get("search") or {}).get("searchResults")
+        ) or []
+        exact: str | None = None
+        casefold: str | None = None
+        name_key = name.casefold() if name else ""
+        for row in rows:
+            entity = row.get("entity") if isinstance(row, dict) else None
+            if not isinstance(entity, dict):
+                continue
+            props = (
+                entity.get("properties")
+                if isinstance(entity.get("properties"), dict)
+                else {}
+            )
+            candidate_name = str(props.get("name") or "").strip()
+            candidate_urn = str(entity.get("urn") or "").strip()
+            if not candidate_urn.startswith("urn:li:glossaryTerm:"):
+                continue
+            slug_candidates.append(candidate_urn)
+            if name and candidate_name == name:
+                exact = candidate_urn
+                break
+            if name and candidate_name.casefold() == name_key and casefold is None:
+                casefold = candidate_urn
+        if exact:
+            return exact
+        if casefold:
+            return casefold
+    if term_id:
+        for candidate_urn in dict.fromkeys(slug_candidates):
+            candidate_id = _glossary_term_id_from_urn(candidate_urn)
+            if candidate_id == term_id:
+                return candidate_urn
+            if term_id in candidate_id or candidate_id in term_id:
+                return candidate_urn
+    return None
+
+
+def _resolve_glossary_term_urn(term_id: str, label: str) -> str | None:
+    """Return a catalog-backed glossary term URN for YAML ``id`` / display name."""
+    by_id_urn = _glossary_term_urn(term_id)
+    if _fetch_glossary_term(by_id_urn) is not None:
+        return by_id_urn
+    by_name = _lookup_glossary_term_urn_by_name(label, term_id=term_id)
+    if by_name:
+        print(
+            f"  -> resolved {label!r} by name to {by_name} "
+            f"(yaml id {term_id!r} not in catalog)"
+        )
+        return by_name
+    return None
+
+
+def _filter_existing_glossary_term_urns(urns: list[str]) -> list[str]:
+    kept: list[str] = []
+    for urn in urns:
+        if _fetch_glossary_term(urn) is not None:
+            kept.append(urn)
+        else:
+            print(
+                f"  ! skipping attach for missing glossary term URN: {urn}",
+                file=sys.stderr,
+            )
+    return kept
+
+
+_CHECK_QUERY_EXISTS = """
+query CheckQueryExists($urn: String!) {
+  query(urn: $urn) {
+    urn
+    properties {
+      name
+    }
+  }
+}
+"""
+
+
+def _query_exists(urn: str) -> bool:
+    urn = str(urn or "").strip()
+    if not urn.startswith("urn:li:query:"):
+        return False
+    root = _graphql_root(_CHECK_QUERY_EXISTS, {"urn": urn})
+    if not root or root.get("errors"):
+        return False
+    node = (root.get("data") or {}).get("query")
+    if not isinstance(node, dict):
+        return False
+    props = node.get("properties")
+    if not isinstance(props, dict):
+        return False
+    if not str(props.get("name") or "").strip():
+        return False
+    resolved = str(node.get("urn") or "").strip()
+    return resolved == urn
+
+
+def _gms_ingest_proposal(proposal: dict[str, Any]) -> tuple[bool, str]:
+    """POST a MetadataChangeProposal wrapper to GMS REST ingest."""
+    base = _gms_base_url_from_graphql(GRAPHQL_URL)
+    url = f"{base.rstrip('/')}/aspects?action=ingestProposal"
+    payload = json.dumps(proposal).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        method="POST",
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+    )
+    if TOKEN:
+        req.add_header("Authorization", f"Bearer {TOKEN}")
+    try:
+        with urllib.request.urlopen(req, timeout=60.0) as resp:
+            status = int(getattr(resp, "status", None) or resp.getcode())
+            if 200 <= status < 300:
+                return True, "ok"
+            body = resp.read().decode("utf-8", errors="replace")[:500]
+            return False, f"HTTP {status}: {body}"
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")[:500]
+        return False, f"HTTP {exc.code}: {body}"
+    except Exception as exc:  # pragma: no cover - network guard
+        return False, str(exc)
+
+
+def _ingest_query_at_urn(
+    query_urn: str,
+    name: str,
+    description: str,
+    sql_text: str,
+    subject_dataset_urns: list[str],
+) -> bool:
+    """Upsert a Query entity at a stable URN via GMS REST (GraphQL createQuery cannot)."""
+    now_ms = int(time.time() * 1000)
+    actor = "urn:li:corpuser:datahub"
+    audit = {"time": now_ms, "actor": actor}
+    properties_aspect = {
+        "customProperties": {},
+        "name": name,
+        "description": description or name,
+        "statement": {"value": sql_text, "language": "SQL"},
+        "source": "MANUAL",
+        "created": audit,
+        "lastModified": audit,
+    }
+    subjects_aspect = {
+        "subjects": [{"entity": urn} for urn in sorted(set(subject_dataset_urns))]
+    }
+    for aspect_name, aspect_body in (
+        ("queryProperties", properties_aspect),
+        ("querySubjects", subjects_aspect),
+    ):
+        proposal = {
+            "proposal": {
+                "entityType": "query",
+                "entityUrn": query_urn,
+                "changeType": "UPSERT",
+                "aspectName": aspect_name,
+                "aspect": {
+                    "contentType": "application/json",
+                    "value": json.dumps(aspect_body),
+                },
+            }
+        }
+        ok, detail = _gms_ingest_proposal(proposal)
+        if not ok:
+            print(
+                f"    [DEBUG] ingestProposal {aspect_name} failed: {detail}",
+                file=sys.stderr,
+            )
+            return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -168,6 +607,22 @@ mutation UpdateDatasetDescription($urn: String!, $description: String!) {
   }
 }
 """
+
+
+def push_dataset_descriptions() -> None:
+    print("\n[1/7] Pushing dataset descriptions...")
+    bm = active_full_curated_bundle().bundle_module
+    editable = bm.merged_editable_dataset_urn_rows()
+    for key, urn in editable.items():
+        desc = bm.DATASET_DESCRIPTIONS.get(key)
+        if not desc:
+            _fail(key, "no description defined — skipping")
+            continue
+        data = _post(_UPDATE_DATASET_DESCRIPTION, {"urn": urn, "description": desc})
+        if data and data.get("updateDataset"):
+            _ok(key)
+        else:
+            _fail(key, f"mutation returned unexpected response: {data}")
 
 
 # ---------------------------------------------------------------------------
@@ -188,6 +643,32 @@ mutation UpdateFieldDescription(
   })
 }
 """
+
+
+def push_schema_field_descriptions() -> None:
+    print("\n[2/7] Pushing schemaField descriptions...")
+    bm = active_full_curated_bundle().bundle_module
+    for table_key, fields in bm.SCHEMA_FIELD_DESCRIPTIONS.items():
+        urn = bm.DATASET_URNS.get(table_key)
+        if not urn:
+            _fail(
+                table_key, "URN not found in bundle dataset registry — skipping table"
+            )
+            continue
+        for field_path, description in fields.items():
+            label = f"{table_key}.{field_path}"
+            data = _post(
+                _UPDATE_FIELD_DESCRIPTION,
+                {
+                    "description": description,
+                    "resourceUrn": urn,
+                    "fieldPath": field_path,
+                },
+            )
+            if data is not None and data.get("updateDescription") is not False:
+                _ok(label)
+            else:
+                _fail(label, f"unexpected response: {data}")
 
 
 # ---------------------------------------------------------------------------
@@ -215,26 +696,43 @@ def _glossary_term_urn(term_id: str) -> str:
 
 
 def _term_exists(term_id: str) -> bool:
-    """Check whether a glossary term already exists by querying its URN directly.
+    """Return True when ``urn:li:glossaryTerm:{term_id}`` resolves in DataHub."""
+    return _fetch_glossary_term(_glossary_term_urn(term_id)) is not None
 
-    Previous approach used text-search with count=5, which fails for short or
-    common IDs (e.g. 'csat') that don't surface in the top search results.
-    Direct lookup is reliable: DataHub returns a non-null shell for any URN, but
-    only real terms have a non-null `properties` block.
-    """
-    query = """
-    query CheckGlossaryTermExists($urn: String!) {
-      glossaryTerm(urn: $urn) {
-        properties { name }
-      }
-    }
-    """
-    urn = _glossary_term_urn(term_id)
-    data = _post(query, {"urn": urn})
-    if not data:
-        return False
-    term = data.get("glossaryTerm") or {}
-    return bool(term.get("properties"))
+
+def push_glossary_terms() -> None:
+    print("\n[3/7] Pushing glossary terms...")
+    bm = active_full_curated_bundle().bundle_module
+    for term in bm.GLOSSARY_TERMS:
+        label = term["name"]
+        term_id = term["id"]
+
+        if _term_exists(term_id):
+            print(f"  \u2192 {label}: already exists — skipping create")
+        else:
+            payload: dict[str, Any] = {
+                "id": term_id,
+                "name": term["name"],
+                "description": term["description"],
+            }
+            glossary_parent = _effective_bundle_glossary_parent_node_urn()
+            if glossary_parent:
+                payload["parentNode"] = glossary_parent
+
+            root = _graphql_root(_CREATE_GLOSSARY_TERM, {"input": payload})
+            errs = (root or {}).get("errors") or []
+            data = (root or {}).get("data") if not errs else {}
+            if data.get("createGlossaryTerm"):
+                _ok(f"{label} ({data['createGlossaryTerm']})")
+            elif errs and _errors_indicate_already_exists(errs):
+                print(f"  \u2192 {label}: already exists — skipping create")
+            else:
+                _fail(label, f"unexpected response: {data}")
+                continue
+
+        rt = term.get("related_terms") or []
+        if rt:
+            _push_term_related_terms(_glossary_term_urn(term_id), rt)
 
 
 def _push_term_related_terms(
@@ -260,6 +758,15 @@ def _push_term_related_terms(
             )
             continue
 
+        other_id = _glossary_term_id_from_urn(other_urn)
+        if not _glossary_term_urn_exists(other_urn):
+            resolved_other = _resolve_glossary_term_urn(
+                other_id,
+                str(entry.get("name") or other_id.replace("_", " ")),
+            )
+            if resolved_other:
+                other_urn = resolved_other
+
         gql_type = _RELATIONSHIP_TYPE_MAP.get(rel_key)
         if gql_type is None:
             _fail(
@@ -273,6 +780,31 @@ def _push_term_related_terms(
             mutation_source, mutation_targets = other_urn, [source_urn]
         else:
             mutation_source, mutation_targets = source_urn, [other_urn]
+
+        if not _glossary_term_urn_exists(mutation_source):
+            print(
+                f"  ! skipping related term (missing source): {source_urn}",
+                file=sys.stderr,
+            )
+            continue
+        missing_targets = [
+            u for u in mutation_targets if not _glossary_term_urn_exists(u)
+        ]
+        if missing_targets:
+            print(
+                f"  ! skipping related term (missing target): "
+                f"{source_urn} --[{rel_key}]--> {other_urn}",
+                file=sys.stderr,
+            )
+            continue
+
+        if mutation_source in mutation_targets:
+            print(
+                f"  ! skipping self-referential related term: "
+                f"{mutation_source} --[{rel_key}]--> {other_urn}",
+                file=sys.stderr,
+            )
+            continue
 
         label = f"{source_urn} --[{rel_key}]--> {other_urn}"
         data = _post(
@@ -320,6 +852,58 @@ def _data_product_urn(product_id: str) -> str:
     return f"urn:li:dataProduct:{product_id}"
 
 
+def push_data_product() -> None:
+    print("\n[4/7] Pushing DataProduct...")
+    bm = active_full_curated_bundle().bundle_module
+    cx = curated_bundle_urns()
+    dp_urn = cx.data_product_urn
+
+    # Always attempt creation; DataHub returns a GraphQL error if it already exists.
+    # In that case the urn field is absent from the response, so we fall through to
+    # asset linking (the product exists from a prior run).
+    create_data = _post(
+        _CREATE_DATA_PRODUCT,
+        {
+            "input": {
+                "id": cx.data_product_id,
+                "properties": {
+                    "name": bm.DATA_PRODUCT_NAME,
+                    "description": bm.DATA_PRODUCT_DESCRIPTION,
+                },
+                "domainUrn": _effective_bundle_domain_urn(),
+            }
+        },
+    )
+    if create_data and _graphql_field(create_data, "createDataProduct").get("urn"):
+        _ok(f"Created {bm.DATA_PRODUCT_NAME} ({dp_urn})")
+    else:
+        # Could be an "already exists" error from a prior run — that is fine.
+        print(
+            f"  \u2192 {bm.DATA_PRODUCT_NAME}: creation returned no URN "
+            "(may already exist) — proceeding to asset linking"
+        )
+
+    # Link assets
+    asset_data = _post(
+        _SET_DATA_PRODUCT_ASSETS,
+        {
+            "input": {
+                "dataProductUrn": dp_urn,
+                "resourceUrns": cx.dataset_resource_urns,
+            }
+        },
+    )
+    if asset_data is not None:
+        _ok(
+            f"Linked {len(cx.dataset_resource_urns)} datasets to {bm.DATA_PRODUCT_NAME}"
+        )
+    else:
+        _fail(
+            f"asset linking for {bm.DATA_PRODUCT_NAME}",
+            f"unexpected response: {asset_data}",
+        )
+
+
 # ---------------------------------------------------------------------------
 # Mutation 4b — DataProduct enrichments (glossary terms + GitHub resource)
 # ---------------------------------------------------------------------------
@@ -357,6 +941,55 @@ _RELATIONSHIP_TYPE_MAP: dict[str, str] = {
 _REVERSE_RELATIONSHIP_KEYS = frozenset({"inherited_by", "contained_by"})
 
 
+def push_data_product_enrichments() -> None:
+    """Attach glossary terms and GitHub documentation link to the DataProduct."""
+    print("\n[5/7] Enriching DataProduct (terms + GitHub resource)...")
+    bm = active_full_curated_bundle().bundle_module
+    cx = curated_bundle_urns()
+    dp_urn = cx.data_product_urn
+
+    # --- GitHub documentation link ---
+    root_gh = _graphql_root(
+        _ADD_LINK,
+        {
+            "input": {
+                "linkUrl": cx.documentation_github_url,
+                "label": bm.DOCUMENTATION_LINK_LABEL,
+                "resourceUrn": dp_urn,
+            }
+        },
+    )
+    errs_gh = (root_gh or {}).get("errors") or []
+    data_gh = (root_gh or {}).get("data") if not errs_gh else {}
+    if data_gh and data_gh.get("addLink") is not None:
+        _ok("Linked GitHub documentation to DataProduct")
+    elif errs_gh and _errors_indicate_already_exists(errs_gh):
+        _ok("GitHub documentation link (already on DataProduct)")
+    elif errs_gh:
+        print(f"    [DEBUG] GraphQL errors: {json.dumps(errs_gh)}", file=sys.stderr)
+        _fail("addLink", "GitHub resource link failed")
+    else:
+        _fail("addLink", "GitHub resource link failed (empty response)")
+
+    # --- Glossary terms ---
+    terms_data = _post(
+        _BATCH_ADD_TERMS,
+        {
+            "input": {
+                "termUrns": cx.data_product_attached_glossary_term_urns,
+                "resources": [{"resourceUrn": dp_urn}],
+            }
+        },
+    )
+    if terms_data and terms_data.get("batchAddTerms"):
+        _ok(
+            f"Attached {len(cx.data_product_attached_glossary_term_urns)} "
+            "glossary terms to DataProduct",
+        )
+    else:
+        _fail("batchAddTerms", f"unexpected response: {terms_data}")
+
+
 # ---------------------------------------------------------------------------
 # Mutation 6 — Golden query
 # ---------------------------------------------------------------------------
@@ -385,11 +1018,80 @@ query DhSearchQueries($frag: String!) {
 """
 
 
+def push_golden_query() -> None:
+    print("\n[6/7] Pushing golden Query entity (no Summary resource link)...")
+    bm = active_full_curated_bundle().bundle_module
+    cx = curated_bundle_urns()
+    # Note: `source` is not available in this DataHub version's CreateQueryInput.
+    data = _post(
+        _CREATE_QUERY,
+        {
+            "input": {
+                "properties": {
+                    "name": bm.GOLDEN_QUERY_NAME,
+                    "description": bm.GOLDEN_QUERY_ENTITY_DESCRIPTION,
+                    "statement": {
+                        "value": bm.AR_RECOVERY_RATE_SQL,
+                        "language": "SQL",
+                    },
+                },
+                "subjects": [
+                    {"datasetUrn": urn} for urn in cx.golden_query_subject_urns
+                ],
+            }
+        },
+    )
+    if data and _graphql_field(data, "createQuery").get("urn"):
+        _ok(f"Created query: {bm.GOLDEN_QUERY_NAME}")
+    else:
+        _fail(bm.GOLDEN_QUERY_NAME, f"unexpected response: {data}")
+
+
 _REMOVE_LINK = """
 mutation RemoveGoldenQueryLink($input: RemoveLinkInput!) {
   removeLink(input: $input)
 }
 """
+
+
+def _maybe_remove_golden_query_discovery_link() -> None:
+    """Drop legacy golden-query URL from the Data Product Summary (Resources)."""
+
+    cx = curated_bundle_urns()
+    dp_urn = cx.data_product_urn
+    root = _graphql_root(
+        _REMOVE_LINK,
+        {
+            "input": {
+                "linkUrl": cx.golden_query_ui_summary_url(DATAHUB_UI_ORIGIN),
+                "label": cx.golden_query_discovery_link_removal_label,
+                "resourceUrn": dp_urn,
+            }
+        },
+    )
+    if root is None:
+        return
+    errs = root.get("errors") or []
+    data = root.get("data") if not errs else {}
+    if errs:
+        for err in errs:
+            msg = (err.get("message") or "").lower()
+            if "not found" in msg or "does not exist" in msg or "unknown" in msg:
+                _ok("Golden-query discovery link (already absent)")
+                return
+        print(
+            f"    [DEBUG] removeLink response: {json.dumps(root)}",
+            file=sys.stderr,
+        )
+        _fail(
+            "removeLink (golden query)",
+            "could not remove stale discovery link (see stderr)",
+        )
+        return
+
+    rl = data.get("removeLink")
+    if rl is True or rl is False or rl is None:
+        _ok("Golden-query discovery link cleanup finished")
 
 
 # ---------------------------------------------------------------------------
@@ -552,6 +1254,11 @@ def ensure_dp_golden_struct_property(qualified_name: str) -> None:
         )
 
 
+def ensure_golden_query_structured_property_definition() -> None:
+    nm = curated_bundle_urns().golden_query_structured_property_qualified_name
+    ensure_dp_golden_struct_property(nm)
+
+
 def _merged_dp_structured_props(
     dp_urn: str,
     *,
@@ -623,6 +1330,54 @@ def _merged_dp_structured_props(
     return merged
 
 
+def _merged_structured_property_input_params(
+    dp_urn: str,
+) -> Optional[list[dict[str, Any]]]:
+    cx = curated_bundle_urns()
+
+    return _merged_dp_structured_props(
+        dp_urn,
+        golden_sp_qname=cx.golden_query_structured_property_qualified_name,
+        golden_query_urn_val=cx.golden_query_urn,
+        legacy_skip_urns=cx.legacy_structured_property_urns_to_drop,
+    )
+
+
+def push_golden_query_structured_property() -> None:
+    """Set golden query as a URN structured property → Query entity link in sidebar (showInAssetSummary)."""
+
+    print("\n[7/7] Golden query structured property (Data Product sidebar)...")
+    _maybe_remove_golden_query_discovery_link()
+    ensure_golden_query_structured_property_definition()
+    dp_urn = curated_bundle_urns().data_product_urn
+
+    merged = _merged_structured_property_input_params(dp_urn)
+    if merged is None:
+        _fail(
+            "upsertStructuredProperties (golden query)",
+            "skipped: merge preflight failed (see stderr); no destructive upsert applied",
+        )
+        return
+
+    data = _post(
+        _UPSERT_STRUCTURED_PROPERTIES,
+        {
+            "input": {
+                "assetUrn": dp_urn,
+                "structuredPropertyInputParams": merged,
+            },
+        },
+    )
+    up_resp = (data or {}).get("upsertStructuredProperties")
+    if data is not None and up_resp is not None:
+        _ok(f"Upserted structured properties on Data Product ({len(merged)} key(s))")
+    else:
+        _fail(
+            "upsertStructuredProperties (golden query)",
+            f"unexpected response: {data}",
+        )
+
+
 # ---------------------------------------------------------------------------
 # Curated Entity preset (YAML kind: data_product_curated_entity)
 # ---------------------------------------------------------------------------
@@ -656,6 +1411,23 @@ def _curated_data_product_asset_urns(cfg: dict[str, Any]) -> list[str]:
     return sorted(set(out))
 
 
+def _filter_registered_dataset_urns(urns: list[str]) -> list[str]:
+    """Keep only dataset URNs that exist in DataHub (batchSet fails on unknown URNs)."""
+    registered: list[str] = []
+    for urn in urns:
+        if _entity_exists(urn):
+            registered.append(urn)
+        else:
+            print(f"  ! skipping dataset not in DataHub: {urn}")
+    omitted = len(urns) - len(registered)
+    if omitted:
+        print(
+            f"  -> using {len(registered)}/{len(urns)} datasets "
+            f"({omitted} omitted — not registered in DataHub)"
+        )
+    return registered
+
+
 def curated_push_assets(cfg: dict[str, Any]) -> None:
     print("\n[1/7] DataProduct assets (datasets only)...")
     pid = str(cfg["data_product_id"])
@@ -665,10 +1437,16 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     if not isinstance(pdesc_raw, str) or not pdesc_raw.strip():
         raise SystemExit("product_description (non-empty string) is required")
 
-    urns = _curated_data_product_asset_urns(cfg)
+    urns = _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg))
+    if not urns:
+        _fail(
+            "curated.batchSetDataProduct",
+            "no datasets from YAML are registered in DataHub",
+        )
+        return
     dp_u = _data_product_urn(pid)
 
-    cre = _post(
+    create_root = _graphql_root(
         _CREATE_DATA_PRODUCT,
         {
             "input": {
@@ -681,10 +1459,26 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
             },
         },
     )
-    if cre and cre.get("createDataProduct", {}).get("urn"):
+    if create_root is None:
+        _fail("curated.createDataProduct", "HTTP failure")
+        return
+
+    create_errors = create_root.get("errors") or []
+    create_data = create_root.get("data") or {}
+    create_dp = _graphql_field(
+        create_data if isinstance(create_data, dict) else None,
+        "createDataProduct",
+    )
+    if create_dp.get("urn"):
         _ok(f"Created DataProduct ({dp_u})")
+    elif _errors_indicate_already_exists(create_errors) or _data_product_exists(dp_u):
+        print("  -> DataProduct already exists — proceeding to asset linking")
     else:
-        print("  -> DataProduct create returned empty (probably already exists)")
+        _fail(
+            "curated.createDataProduct",
+            json.dumps(create_errors or create_root, default=str),
+        )
+        return
 
     ln = _post(
         _SET_DATA_PRODUCT_ASSETS,
@@ -730,8 +1524,7 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
     """Create glossary terms declared in the YAML and wire any related-term relationships.
 
     Skips the step gracefully when the YAML has no ``glossary_terms`` block so that
-    existing configs (e.g. datahub_entities/customer-support-contacts.datahub.yaml) keep working
-    without any changes.
+    existing configs keep working without any changes.
 
     After terms are created / verified the function attaches them to the Data Product
     via ``batchAddTerms``.
@@ -759,10 +1552,9 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
             _fail("curated.glossaryTerm", f"term entry missing 'id': {term}")
             continue
 
-        term_urn = _glossary_term_urn(term_id)
-
-        if _term_exists(term_id):
-            print(f"  \u2192 {label}: already exists — skipping create")
+        resolved_urn = _resolve_glossary_term_urn(term_id, label)
+        if resolved_urn:
+            print(f"  \u2192 {label}: already in catalog ({resolved_urn})")
         else:
             payload: dict[str, Any] = {
                 "id": term_id,
@@ -772,36 +1564,62 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
             if parent_node:
                 payload["parentNode"] = parent_node
 
-            data = _post(_CREATE_GLOSSARY_TERM, {"input": payload})
-            if data and data.get("createGlossaryTerm"):
+            root = _graphql_root(_CREATE_GLOSSARY_TERM, {"input": payload})
+            errs = (root or {}).get("errors") or []
+            data = (root or {}).get("data") if not errs else {}
+            if data.get("createGlossaryTerm"):
                 _ok(f"{label} ({data['createGlossaryTerm']})")
+            elif errs and _errors_indicate_already_exists(errs):
+                print(
+                    f"  \u2192 {label}: create reported duplicate — resolving catalog URN"
+                )
             else:
                 _fail(label, f"unexpected response: {data}")
                 continue
 
+            resolved_urn = _resolve_glossary_term_urn(term_id, label)
+
+        if not resolved_urn:
+            _fail(
+                label,
+                f"glossary term id {term_id!r} not found in catalog "
+                f"and name {label!r} could not be resolved",
+            )
+            continue
+
         rt = term.get("related_terms") or []
         if rt:
-            _push_term_related_terms(term_urn, rt)
+            _push_term_related_terms(resolved_urn, rt)
 
-        created_urns.append(term_urn)
+        created_urns.append(resolved_urn)
 
-    if not created_urns:
+    attach_urns = _filter_existing_glossary_term_urns(created_urns)
+    if not attach_urns:
+        if created_urns:
+            _fail(
+                "curated.batchAddTerms",
+                "no resolvable glossary term URNs to attach",
+            )
         return
 
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
-    terms_data = _post(
+    root = _graphql_root(
         _BATCH_ADD_TERMS,
         {
             "input": {
-                "termUrns": created_urns,
+                "termUrns": attach_urns,
                 "resources": [{"resourceUrn": dp_u}],
             }
         },
     )
-    if terms_data and terms_data.get("batchAddTerms"):
-        _ok(f"Attached {len(created_urns)} glossary term(s) to DataProduct")
+    errs = (root or {}).get("errors") or []
+    data = (root or {}).get("data") if not errs else {}
+    if data and data.get("batchAddTerms"):
+        _ok(f"Attached {len(attach_urns)} glossary term(s) to DataProduct")
+    elif errs and _errors_indicate_already_exists(errs):
+        _ok("Glossary terms on DataProduct (already attached)")
     else:
-        _fail("curated.batchAddTerms", f"unexpected response: {terms_data}")
+        _fail("curated.batchAddTerms", json.dumps(root, default=str))
 
 
 def _curated_extra_query_discovery_urls(cfg: dict[str, Any]) -> list[str]:
@@ -862,7 +1680,17 @@ def curated_push_create_query(cfg: dict[str, Any]) -> None:
     name = str(gq["name"])
     desc_text = str(gq.get("description") or name).strip()
     sql_txt = str(gq.get("sql") or "").strip()
+    stable_urn = str(gq.get("stable_urn") or "").strip()
     subj = _curated_dataset_subject_urns(cfg)
+
+    if stable_urn and _query_exists(stable_urn):
+        _ok(f"Query already exists at {stable_urn}")
+        return
+
+    if stable_urn and _ingest_query_at_urn(stable_urn, name, desc_text, sql_txt, subj):
+        _ok(f"Upserted Query at {stable_urn}")
+        return
+
     root = _graphql_root(
         _CREATE_QUERY,
         {
@@ -882,6 +1710,12 @@ def curated_push_create_query(cfg: dict[str, Any]) -> None:
         cq_blob = data_n.get("createQuery") or {}
         urn_c = cq_blob.get("urn") if isinstance(cq_blob, dict) else None
         if urn_c:
+            if stable_urn and urn_c != stable_urn:
+                print(
+                    f"  ! createQuery returned {urn_c} but YAML stable_urn is "
+                    f"{stable_urn}; sidebar will keep YAML URN (REST ingest failed)",
+                    file=sys.stderr,
+                )
             _ok(f"Created Query {urn_c}")
             return
     if errs and _errors_indicate_already_exists(errs):
@@ -940,7 +1774,13 @@ def curated_push_sidebar_struct_props(cfg: dict[str, Any]) -> None:
 
 def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
     print("\n[7/7] Re-affirm dataset-only memberships...")
-    urns_r = _curated_data_product_asset_urns(cfg)
+    urns_r = _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg))
+    if not urns_r:
+        _fail(
+            "curated.datasets.refresh",
+            "no datasets from YAML are registered in DataHub",
+        )
+        return
     ref = _post(
         _SET_DATA_PRODUCT_ASSETS,
         {
@@ -956,69 +1796,46 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
     _ok(f"Pinned {len(urns_r)} datasets")
 
 
-def curated_push_dataset_descriptions(cfg: dict[str, Any]) -> None:
-    """Push per-dataset descriptions declared inline in the YAML ``datasets`` list."""
-    rows = [
-        r
-        for r in (cfg.get("datasets") or [])
-        if isinstance(r, dict) and r.get("description")
-    ]
-    if not rows:
-        return
-    print("\n[1b] Dataset descriptions...")
-    for row in rows:
-        schema = str(row.get("schema") or "")
-        table = str(row.get("table") or "")
-        desc = str(row["description"]).strip()
-        urn = _urn(schema, table)
-        label = f"{schema}.{table}"
-        data = _post(_UPDATE_DATASET_DESCRIPTION, {"urn": urn, "description": desc})
-        if data and data.get("updateDataset"):
-            _ok(label)
-        else:
-            _fail(label, f"mutation returned unexpected response: {data}")
-
-
-def curated_push_field_descriptions(cfg: dict[str, Any]) -> None:
-    """Push per-field descriptions declared inline in the YAML ``datasets`` list."""
-    rows = [
-        r
-        for r in (cfg.get("datasets") or [])
-        if isinstance(r, dict) and isinstance(r.get("fields"), dict)
-    ]
-    if not rows:
-        return
-    print("\n[1c] Schema field descriptions...")
-    for row in rows:
-        schema = str(row.get("schema") or "")
-        table = str(row.get("table") or "")
-        urn = _urn(schema, table)
-        for field_path, description in row["fields"].items():
-            label = f"{schema}.{table}.{field_path}"
-            data = _post(
-                _UPDATE_FIELD_DESCRIPTION,
-                {
-                    "description": str(description),
-                    "resourceUrn": urn,
-                    "fieldPath": str(field_path),
-                },
-            )
-            if data is not None and data.get("updateDescription") is not False:
-                _ok(label)
-            else:
-                _fail(label, f"unexpected response: {data}")
-
-
 def run_data_product_curated_entity(spec: dict[str, Any]) -> None:
-    curated_push_assets(spec)
-    curated_push_dataset_descriptions(spec)
-    curated_push_field_descriptions(spec)
-    curated_push_documentation_link(spec)
-    curated_push_glossary_terms(spec)
-    curated_purge_discovery_links(spec)
-    curated_push_create_query(spec)
-    curated_push_sidebar_struct_props(spec)
-    curated_refresh_dataset_assets(spec)
+    curated_push_assets(spec)  # [1/7]
+    curated_push_documentation_link(spec)  # [2/7]
+    curated_push_glossary_terms(spec)  # [3/7]
+    curated_purge_discovery_links(spec)  # [4/7]
+    curated_push_create_query(spec)  # [5/7]
+    curated_push_sidebar_struct_props(spec)  # [6/7]
+    curated_refresh_dataset_assets(spec)  # [7/7]
+
+
+def run_full_curated_datahub_bundle(spec: dict[str, Any]) -> None:
+    global _ACTIVE_FULL_CURATED_BUNDLE
+
+    bundle_id = str(spec.get("bundle_id") or "").strip()
+    if not bundle_id:
+        raise SystemExit(
+            "full_curated_datahub_bundle presets require bundle_id "
+            f"(supported: {FULL_CURATED_BUNDLE_IDS_SUPPORTED})"
+        )
+    bundle_mod = resolve_full_bundle_module(bundle_id)
+
+    urns = load_curated_urns_from_spec(spec, bundle_mod.curated_urn_baseline_kwargs())
+    _ACTIVE_FULL_CURATED_BUNDLE = ActiveFullCuratedBundle(
+        bundle_module=bundle_mod,
+        urns=urns,
+    )
+    BUNDLE_YAML_RUNTIME.clear()
+    BUNDLE_YAML_RUNTIME["domain_urn"] = urns.domain_urn
+    BUNDLE_YAML_RUNTIME["glossary_parent_node_urn"] = urns.glossary_parent_node_urn
+    try:
+        push_dataset_descriptions()
+        push_schema_field_descriptions()
+        push_glossary_terms()
+        push_data_product()
+        push_data_product_enrichments()
+        push_golden_query()
+        push_golden_query_structured_property()
+    finally:
+        BUNDLE_YAML_RUNTIME.clear()
+        _ACTIVE_FULL_CURATED_BUNDLE = None
 
 
 def _pipeline_reset_errors() -> None:
@@ -1050,7 +1867,7 @@ def main() -> None:
         default=DEFAULT_CONFIG_PATH,
         help=(
             "Path to *.datahub.yaml "
-            "(default: datahub_entities/collections-recovery.datahub.yaml beside this script)"
+            "(default: reference/payments.datahub.yaml beside this script)"
         ),
     )
     ns = parser.parse_args()
@@ -1073,12 +1890,15 @@ def main() -> None:
     _pipeline_reset_errors()
 
     try:
-        if kind_sel == KIND_DATA_PRODUCT_CURATED_ENTITY:
+        if kind_sel == KIND_FULL_CURATED_DATAHUB_BUNDLE:
+            run_full_curated_datahub_bundle(bundle)
+        elif kind_sel == KIND_DATA_PRODUCT_CURATED_ENTITY:
             run_data_product_curated_entity(bundle)
         else:
             raise SystemExit(
                 f"{path}: unsupported kind {kind_sel!r} "
-                f"(expected '{KIND_DATA_PRODUCT_CURATED_ENTITY}')"
+                f"(need '{KIND_FULL_CURATED_DATAHUB_BUNDLE}' or "
+                f"'{KIND_DATA_PRODUCT_CURATED_ENTITY}')"
             )
 
         print("\n" + "=" * 60)

@@ -7,7 +7,7 @@ alwaysApply: false
 
 ## What this repository is
 
-**bi-etl-ejuice** is QuintoAndar's central data engineering monorepo. It consolidates all batch data pipeline logic for the company — intraday and D-1 cadence — across ~771 Airflow DAGs. The primary Python package is `bietlejuice`.
+**bi-etl-ejuice** is QuintoAndar's central data engineering monorepo. It consolidates all batch data pipeline logic for the company — intraday and D-1 cadence — across 834 DAG Builder DAGs (871 Airflow DAGs total, including 37 legacy Python). The primary Python package is `bietlejuice`.
 
 All pipeline logic lives here: raw ingestion from source databases and APIs, data lake transformations, Data Warehouse models, pre-aggregated metrics, and a semantic query layer called Qube. New pipelines are created by adding files to this repository — not by running ad-hoc scripts or configuring external tools directly.
 

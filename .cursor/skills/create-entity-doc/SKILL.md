@@ -73,6 +73,7 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 
 **Critical rules:**
 - {Mandatory filters, type caveats, dedup requirements — only include if they exist}
+- **DataHub CI:** list concrete `schema.table` names only — never wildcards (`statement_*`, `schema.*`, `table_*`) in the Tables section; DataHub cannot link pattern URNs.
 
 ## Key Metrics
 
@@ -180,6 +181,7 @@ Before presenting to the user, verify:
 - [ ] No column descriptions duplicated from metadata YAML
 - [ ] Glossary only contains domain-specific terms (no IQ/PP)
 - [ ] Every table in the Tables section has a clear "You need..." trigger
+- [ ] Tables section uses concrete `schema.table` names only (no `*` wildcards or `schema.*` globs)
 - [ ] Every relationship has an exact JOIN pattern with real column names
 - [ ] Every Do/Don't references a specific table, column, or filter
 - [ ] Golden Queries are syntactically valid and cover common needs
@@ -191,51 +193,25 @@ Before presenting to the user, verify:
 
 ---
 
-## Step 6 — Generate the companion DataHub YAML
+## Step 6 — DataHub publication (automatic)
 
-After the Markdown is written and self-reviewed, generate the companion YAML at:
-`dags/governance/datahub_business_context/datahub_entities/{entity_slug}.datahub.yaml`
+CI generates ephemeral YAML from this Markdown and pushes to DataHub on merge
+(`.woodpecker/datahub.yml` → `generate-and-push-datahub`). No companion YAML is committed.
 
-Use the skill at `.cursor/skills/md-to-datahub-yaml/SKILL.md` — load and follow it now. You already have all the required inputs from Steps 1–5:
-- The entity Markdown you just wrote
-- The `domain_urn` collected in Step 1
-- The Golden Queries from the Markdown (adapt the first one as the DataHub `golden_query`)
-
-Key rules when generating the YAML:
-- `data_product_id`: kebab-case slug derived from the filename (e.g., `broker-xp` from `broker_xp.md`)
-- `golden_query.stable_urn`: generate a new UUID4 — `python -c "import uuid; print(uuid.uuid4())"`. **Never reuse** an existing URN from another entity.
-- `product_description`: condense the `## Overview` section into 3–5 focused paragraphs covering scope, grain, critical rules, and key metrics. End with `Further detail and table routing: docs/llm_context/business_entities/{entity}.md`.
-- `glossary_terms`: expand the `## Glossary and Synonyms` bullet list into full DataHub term entries with `id` (snake_case slug), `name`, and `description` (plain-language definition referencing the column/table where the concept lives). Add `related_terms` where applicable.
-- `datasets`: extract all `schema.table` pairs from the `## Tables` section.
+The `md-to-datahub-yaml` skill defines the generated schema. Key mappings:
+- `data_product_id`: kebab-case from filename (`broker_xp.md` → `broker-xp`)
+- `golden_query.stable_urn`: deterministic `uuid5(entity_slug)` assigned by CI
+- `product_description`, `glossary_terms`, `datasets`: derived from Overview, Glossary, and Tables sections
 
 ---
 
-## Step 7 — Offer to push to DataHub and back-fill the MD
+## Step 7 — Manual push (optional, local testing)
 
-After generating the YAML, offer the user two follow-up actions:
-
-### 7a — Push to DataHub (optional)
-
-If the user says yes, run:
+Prerequisites: `OPENAI_API_KEY`, `DATAHUB_GRAPHQL_URL`, `DATAHUB_TOKEN`.
 
 ```bash
-python dags/governance/datahub_business_context/push_all_entities.py {entity_slug}
-```
+uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py \\
+  docs/llm_context/business_entities/{entity_slug}.md
 
-Prerequisites: `DATAHUB_GRAPHQL_URL` and `DATAHUB_TOKEN` must be set in the shell. If they are not set, tell the user to export them and retry.
-
-Verify the push with:
-```bash
-python dags/governance/datahub_business_context/smoke_test_datahub.py
-```
-
-### 7b — Back-fill the DataHub catalog section in the MD (after successful push)
-
-Once the push succeeds, replace the `## DataHub catalog` placeholder in the Markdown with:
-
-```markdown
-## DataHub catalog
-
-- **Data Product:** [urn:li:dataProduct:{entity_slug}](https://datahub.apps.data-prd.habitat.zone/dataProducts/urn%3Ali%3AdataProduct%3A{entity_slug})
-- **Datasets:** listed in `dags/governance/datahub_business_context/datahub_entities/{entity_slug}.datahub.yaml`
+python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
 ```
