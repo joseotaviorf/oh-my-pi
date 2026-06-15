@@ -222,7 +222,3 @@ LEFT JOIN dw_customer_satisfaction.dim_nps_campaign AS dnc
 WHERE dna.score_category = 'detractor'
     AND dna.ts_answered >= DATE '2025-01-01'
 ```
-
-## Superset Golden Assets
-
-- **NPS For Rent Post Contract [Perf.] [Support and Services]** — reference dataset to use as the base for NPS data manipulation in Superset.

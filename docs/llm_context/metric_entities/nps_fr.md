@@ -174,3 +174,7 @@ LEFT JOIN latest_weights AS lw ON d.journey = lw.journey
 GROUP BY d.month
 ORDER BY d.month
 ```
+
+## Superset Golden Assets
+
+- **NPS For Rent Post Contract [Perf.] [Support and Services]** — reference dataset to use as the canonical base for NPS FR data manipulation in Superset.

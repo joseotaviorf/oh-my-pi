@@ -137,3 +137,13 @@ FROM component
 GROUP BY 1
 ORDER BY 1
 ```
+
+## Superset Golden Assets
+
+<!--
+Optional. List Superset datasets or dashboards that serve as the canonical starting point for
+data manipulation on this metric in Superset. Include the asset name and a short note on its
+role. Omit this section if no golden Superset asset exists for this metric.
+-->
+
+- **{Asset Name}** — {one-sentence description of what this asset is and when to use it as a base.}
