@@ -1438,3 +1438,7 @@ bietlejuice.enrich_fairness_assessment:
 bietlejuice.dw_brokers:
   remove:
     - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates:first-run-of-day
+bietlejuice.dw_support_journey:
+  add:
+    - bietlejuice.core_support_journey:load_core_support_journey_cases
+    - bietlejuice.core_support_journey:load_core_support_journey_services

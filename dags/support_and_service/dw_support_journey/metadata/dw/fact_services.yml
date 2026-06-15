@@ -1,0 +1,225 @@
+---
+database_name: dw_support_journey
+table_name: fact_services
+description: Fact table with human customer service events (chat and call) of the support journey, one row per service event sourced from the core support journey services model. Each event represents an interaction handled in a session, carrying outcome, timing and routing attributes used for service-level and productivity analysis.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_service:
+    description: Surrogate key uniquely identifying a service event (grain of the table). Built directly from id_event of the core services model, so it is unique per event.
+    lineage:
+      - core_support_journey.services.id_event
+  id_event:
+    description: Unique identifier of the service event in the source system.
+    lineage:
+      - core_support_journey.services.id_event
+  id_event_type:
+    description: Identifier of the event type associated with the service event.
+    lineage:
+      - core_support_journey.services.id_event_type
+  id_session:
+    description: Identifier of the service session the event belongs to.
+    lineage:
+      - core_support_journey.services.id_session
+  id_support_session:
+    description: Identifier of the support session (Support Session Service source) related to the event.
+    lineage:
+      - core_support_journey.services.id_support_session
+  id_sauron_session:
+    description: Identifier of the Sauron session related to the event.
+    lineage:
+      - core_support_journey.services.id_sauron_session
+  id_session_event:
+    description: Identifier of the session event linking the service event to its session.
+    lineage:
+      - core_support_journey.services.id_session_event
+  id_task:
+    description: Identifier of the task associated with the service event.
+    lineage:
+      - core_support_journey.services.id_task
+  id_task_event:
+    description: Identifier of the task event associated with the service event.
+    lineage:
+      - core_support_journey.services.id_task_event
+  id_channel:
+    description: Identifier of the messaging channel associated with the service event.
+    lineage:
+      - core_support_journey.services.id_channel
+  id_reservation:
+    description: Identifier of the reservation related to the service event.
+    lineage:
+      - core_support_journey.services.id_reservation
+  id_call:
+    description: Identifier of the call related to the service event.
+    lineage:
+      - core_support_journey.services.id_call
+  id_user:
+    description: Identifier of the user (customer) related to the service event. Built by casting id_user to BIGINT and defaulting to -1 when the user is unknown.
+    lineage:
+      - core_support_journey.services.id_user
+  id_worker:
+    description: Identifier of the worker (service agent) handling the event. Built as the MD5 hash of worker_email, defaulting to the hash of 'NULL' when the email is missing.
+    lineage:
+      - core_support_journey.services.worker_email
+  id_queue:
+    description: Identifier of the routing queue the event was assigned to. Built as the MD5 hash of queue_name, defaulting to the hash of 'NULL' when the queue is missing.
+    lineage:
+      - core_support_journey.services.queue_name
+  id_source_ctwa:
+    description: Identifier of the Click-To-WhatsApp (CTWA) ad source that originated the service event.
+    lineage:
+      - core_support_journey.services.id_source_ctwa
+  worker_email:
+    description: Email of the worker (service agent) that handled the service event.
+    lineage:
+      - core_support_journey.services.worker_email
+  database_source:
+    description: Source database/system from which the service event was ingested.
+    lineage:
+      - core_support_journey.services.database_source
+  service_type:
+    description: Type of service interaction, distinguishing chat from call events.
+    lineage:
+      - core_support_journey.services.service_type
+  direction:
+    description: Direction of the service event, indicating whether it is inbound or outbound.
+    lineage:
+      - core_support_journey.services.direction
+  channel_type:
+    description: Type of the channel through which the service event occurred.
+    lineage:
+      - core_support_journey.services.channel_type
+  origin:
+    description: Origin that triggered the service event.
+    lineage:
+      - core_support_journey.services.origin
+  bpo_name:
+    description: Name of the BPO (outsourced operation) responsible for handling the service event.
+    lineage:
+      - core_support_journey.services.bpo_name
+  bpo_selection_reason:
+    description: Reason why the BPO was selected to handle the service event.
+    lineage:
+      - core_support_journey.services.bpo_selection_reason
+  queue_name:
+    description: Name of the routing queue the service event was assigned to.
+    lineage:
+      - core_support_journey.services.queue_name
+  status:
+    description: Final status bucket of the service event (idled, expired, completed, transferred or abandoned). Built per service_type by mapping task_completion_reason / task_outcome for chat events and task_cancelation_reason for call events, defaulting to transferred otherwise.
+    lineage:
+      - core_support_journey.services.service_type
+      - core_support_journey.services.task_completion_reason
+      - core_support_journey.services.task_outcome
+      - core_support_journey.services.task_cancelation_reason
+  task_cancelation_reason:
+    description: Reason why the task associated with the service event was cancelled, when applicable.
+    lineage:
+      - core_support_journey.services.task_cancelation_reason
+  url_source_ctwa:
+    description: URL of the Click-To-WhatsApp (CTWA) ad source that originated the service event.
+    lineage:
+      - core_support_journey.services.url_source_ctwa
+  type_source_ctwa:
+    description: Type of the Click-To-WhatsApp (CTWA) ad source that originated the service event.
+    lineage:
+      - core_support_journey.services.type_source_ctwa
+  waiting_time_sec:
+    description: Time the customer waited before being served, in seconds.
+    lineage:
+      - core_support_journey.services.waiting_time_sec
+  seconds_to_first_response:
+    description: Time elapsed until the first response was given to the customer, in seconds.
+    lineage:
+      - core_support_journey.services.seconds_to_first_response
+  first_response_time_sec:
+    description: First response time of the service event, in seconds. Built by selecting waiting_time_sec for call events and seconds_to_first_response for chat events.
+    lineage:
+      - core_support_journey.services.service_type
+      - core_support_journey.services.waiting_time_sec
+      - core_support_journey.services.seconds_to_first_response
+  total_inactivity_time:
+    description: Total inactivity time accumulated during the service event, in seconds.
+    lineage:
+      - core_support_journey.services.total_inactivity_time
+  last_inactivity_time:
+    description: Duration of the last inactivity period during the service event, in seconds.
+    lineage:
+      - core_support_journey.services.last_inactivity_time
+  is_answered:
+    description: Flag indicating whether the service event was effectively answered. Built per service_type from task_status, task_completion_reason, task_outcome (chat) and task_cancelation_reason (call).
+    lineage:
+      - core_support_journey.services.service_type
+      - core_support_journey.services.task_status
+      - core_support_journey.services.task_completion_reason
+      - core_support_journey.services.task_outcome
+      - core_support_journey.services.task_cancelation_reason
+  is_abandoned:
+    description: Flag indicating whether a call service event was abandoned. True for call events that have a task cancelation reason, false otherwise.
+    lineage:
+      - core_support_journey.services.service_type
+      - core_support_journey.services.task_cancelation_reason
+  is_forwarded:
+    description: Flag indicating whether the service event was forwarded to another worker or queue.
+    lineage:
+      - core_support_journey.services.is_forwarded
+  is_per_team_task:
+    description: Flag indicating whether the task was routed on a per-team basis.
+    lineage:
+      - core_support_journey.services.is_per_team_task
+  is_spoc_task:
+    description: Flag indicating whether the task is a SPOC (Single Point of Contact) task.
+    lineage:
+      - core_support_journey.services.is_spoc_task
+  is_isaias_session:
+    description: Flag indicating whether the session was handled by the Isaias automated assistant.
+    lineage:
+      - core_support_journey.services.is_isaias_session
+  is_inbound:
+    description: Flag indicating whether the service event is inbound. Built by checking whether direction equals 'inbound'.
+    lineage:
+      - core_support_journey.services.direction
+  dt_task_created:
+    description: Date when the task associated with the service event was created. Built by truncating ts_task_created to date.
+    lineage:
+      - core_support_journey.services.ts_task_created
+  ts_task_created:
+    description: Timestamp when the task associated with the service event was created.
+    lineage:
+      - core_support_journey.services.ts_task_created
+  ts_task_updated:
+    description: Timestamp when the task associated with the service event was last updated.
+    lineage:
+      - core_support_journey.services.ts_task_updated
+  ts_session_event_created:
+    description: Timestamp when the session event was created.
+    lineage:
+      - core_support_journey.services.ts_session_event_created
+  ts_session_event_updated:
+    description: Timestamp when the session event was last updated.
+    lineage:
+      - core_support_journey.services.ts_session_event_updated
+  ts_session_created:
+    description: Timestamp when the service session was created.
+    lineage:
+      - core_support_journey.services.ts_session_created
+  ts_session_updated:
+    description: Timestamp when the service session was last updated.
+    lineage:
+      - core_support_journey.services.ts_session_updated
+  _ts_load:
+    description: Timestamp when the record was loaded into the lake by the ingestion pipeline.
+    lineage:
+      - core_support_journey.services._ts_load
+  _effective_timestamp:
+    description: SCD valid-from timestamp - the moment this event version became the active record.
+    lineage:
+      - core_support_journey.services._effective_timestamp
+  _expired_timestamp:
+    description: SCD valid-to timestamp - the moment this event version was superseded by a newer one; the current version carries a far-future sentinel so it is never expired.
+    lineage:
+      - core_support_journey.services._expired_timestamp
+  _is_current:
+    description: Flag indicating whether this is the most recent version of the service event (SCD current record). Use it to filter the active version of each event.
+    lineage:
+      - core_support_journey.services._is_current

@@ -4,6 +4,12 @@
 # DAGOwner.equals must document every DAGOwner listed in jiraops_mute_list.yml.
 
 DAG:
+  equals:
+    bietlejuice.core_support_journey:
+      reason: "Fluxo de salesforce fora da padrão adotado pelo dag builder, com utilização de external sensor."
+      deadline: 2026-06-30
+      created_by: gabriel.firmino@quintoandar.com.br
+      approved_by: lucas.bguerra@quintoandar.com.br
   contains:
     bietlejuice.gsheets_:
       reason: "GSheets are used to store the manual operations data for the datalake, so they are not Data Engineering on call responsibility."
