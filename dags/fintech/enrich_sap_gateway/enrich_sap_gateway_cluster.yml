@@ -9,3 +9,10 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_xl_compute_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      num_workers: 3
+      driver_node_type_id: r6g.2xlarge

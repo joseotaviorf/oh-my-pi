@@ -6,3 +6,12 @@ cluster:
     permission_level: CAN_MANAGE
   custom_configurations:
     runtime_engine: PHOTON
+validation:
+  cluster:
+    type: consolidation_s_memory_single_node_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: auditlogs
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      runtime_engine: PHOTON

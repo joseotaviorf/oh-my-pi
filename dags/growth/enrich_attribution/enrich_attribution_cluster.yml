@@ -6,3 +6,12 @@ cluster:
       ebs_volume_size: 200
     runtime_engine: PHOTON
     driver_node_type_id: m6gd.xlarge
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      num_workers: 3
+      runtime_engine: PHOTON
