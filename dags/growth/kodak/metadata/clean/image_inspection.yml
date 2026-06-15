@@ -163,6 +163,10 @@ columns:
     lineage:
       - datalake_kodak_raw.image_inspection.bonus_sharpness
     description: 'Quality bonus: True if image sharpness exceeds high-quality thresholds. Indicates exceptional photo quality that enhances listing appeal.'
+  is_iqa_refined:
+    lineage:
+      - datalake_kodak_raw.image_inspection.iqa_refined
+    description: 'Boolean flag indicating whether the image was reprocessed through the Image Quality Analyzer (IQA) refine workflow. True when the Refine - Photo Lever pipeline applied quality refinement to the image.'
   ts_created:
     lineage:
       - datalake_kodak_raw.image_inspection.created_at

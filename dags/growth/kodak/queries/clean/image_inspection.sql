@@ -32,6 +32,7 @@ SELECT
   fault_sharpness AS has_fault_sharpness,
   fault_aspect_ratio AS has_fault_aspect_ratio,
   bonus_sharpness AS has_bonus_sharpness,
+  iqa_refined AS is_iqa_refined,
   created_at AS ts_created,
   updated_at AS ts_updated,
   year,

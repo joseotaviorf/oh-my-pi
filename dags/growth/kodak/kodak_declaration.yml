@@ -32,6 +32,7 @@ dag:
       - **image_inspection_group_result**: Business context-specific group analysis results
       - **watermark_removal**: Watermark detection and removal processing results
       - **photo_invalid_source**: Tracking of failed photo processing attempts
+      - **image_inspection_refine_history**: Audit log of Refine - Photo Lever runs, capturing image quality attributes and URLs before and after the refine workflow
       - **Audit tables**: Complete change history via Hibernate Envers for compliance
       
       **Business Impact:**
@@ -48,6 +49,7 @@ workflow:
     image_analysis: {}
     image_inspection_group: {}
     image_inspection_group_result: {}
+    image_inspection_refine_history: {}
     group_analysis: {}
     photo: {}
     photo_invalid_source: {}
