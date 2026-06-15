@@ -12,8 +12,10 @@ workflow:
   database_type: postgres
   source_schema: public
   tables_customization:
-    message: {}
-    session: {}
+    message:
+      clean_z_order_by: [ts_created, id_session]
+    session:
+      clean_z_order_by: [ts_created]
     state: {}
     message_flow: {}
     voice_call_attempt: {}
