@@ -124,6 +124,18 @@ COPY packages/bietlejuice-core/pyproject.toml /tmp/workspace/packages/bietlejuic
 RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
   ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4 uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4 --python 3.12 --no-editable; rm -rf /root/.cache/uv; find /opt/bietlejuice/venvs -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true; find /opt/bietlejuice/venvs -name '*.pyc' -delete 2>/dev/null || true; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
 
+# Warm Ivy cache for Delta Lake JARs used by unit-tests-dags Spark+Delta integration
+# tests (delta-spark==3.3.1 / DBR 16.4). Build agents reach Maven; Woodpecker test
+# agents do not — Spark resolves from /root/.ivy2 offline at runtime.
+RUN JAVA_HOME=/usr/lib/jvm/ci-openjdk-17 \
+  /opt/bietlejuice/venvs/dbr-16-4/bin/python -c "\
+from pyspark.sql import SparkSession; \
+from delta import configure_spark_with_delta_pip; \
+spark = configure_spark_with_delta_pip( \
+  SparkSession.builder.master('local[1]').appName('prefetch-delta-jars') \
+).getOrCreate(); \
+spark.stop()"
+
 ###############################################################################
 # Target: devcontainer — ci-jdk + dev tooling
 ###############################################################################

@@ -1,7 +1,10 @@
 """Stubs for heavy dependencies that must be applied before the test module is imported."""
 
+import os
 import sys
 from unittest.mock import MagicMock
+
+os.environ.setdefault("PYSPARK_PYTHON", sys.executable)
 
 _STUB_MODULES = [
     "quintoandar_logger",
