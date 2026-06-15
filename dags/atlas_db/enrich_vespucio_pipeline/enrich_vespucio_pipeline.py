@@ -335,6 +335,7 @@ extract_step_task = create_task(
         "--overwrite_schema",
         f"--output_extracted_condos={Tables.extract_step_condos}",
         f"--output_extracted_houses={Tables.extract_step_houses}",
+        f"--output_extracted_houses_images={Tables.extract_step_houses_images}",
     ],
 )
 
@@ -453,7 +454,7 @@ images_tasks = [
         entry_point="core_images_step",
         parameters=[
             f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--input_extracted_houses={Tables.extract_step_houses}",
+            f"--input_extracted_houses_images={Tables.extract_step_houses_images}",
             f"--input_kodak_photo={Tables.kodak_photo}",
             "--overwrite_schema",
             f"--output_images_houses={Tables.images_step_houses}",
@@ -465,7 +466,7 @@ images_tasks = [
         parameters=[
             f"--input_kodak_photo={Tables.kodak_photo}",
             f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--input_extracted_houses={Tables.extract_step_houses}",
+            f"--input_extracted_houses_images={Tables.extract_step_houses_images}",
             f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
@@ -477,7 +478,7 @@ images_tasks = [
         parameters=[
             f"--input_kodak_photo={Tables.kodak_photo}",
             f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--input_extracted_houses={Tables.extract_step_houses}",
+            f"--input_extracted_houses_images={Tables.extract_step_houses_images}",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
             "--kodak_photo_sns_region=us-east-1",

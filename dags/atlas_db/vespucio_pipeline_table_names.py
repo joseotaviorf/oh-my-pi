@@ -37,6 +37,7 @@ class Tables:
     source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
     extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
     extract_step_houses = "vespucio_pipeline_delta.extract_step_houses"
+    extract_step_houses_images = "vespucio_pipeline_delta.extract_step_houses_images"
     prioritize_step_condos = "vespucio_pipeline_delta.prioritize_step_condos"
     prioritize_step_houses = "vespucio_pipeline_delta.prioritize_step_houses"
     geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
