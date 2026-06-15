@@ -64,6 +64,25 @@ class TestGlueClient:
                 assert glue_calls[0][1]["aws_session_token"] == "token-env"
                 assert glue_calls[0][1]["region_name"] == "us-east-1"
 
+    def test_update_table_passes_skip_archive_by_default(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("GLUE_ASSUME_ROLE_ARN", None)
+            with patch(
+                "bietlejuice.clients.db_clients.glue_client.boto3.client"
+            ) as mock_boto_client:
+                mock_glue = MagicMock()
+                mock_boto_client.return_value = mock_glue
+
+                client = GlueClient(role_arn=None)
+                table_input = {"Name": "example_table"}
+                client.update_table("datalake_example", table_input)
+
+                mock_glue.update_table.assert_called_once_with(
+                    DatabaseName="datalake_example",
+                    TableInput=table_input,
+                    SkipArchive=True,
+                )
+
     def test_conn_with_explicit_role_arn_assumes_role(self):
         role_arn = "arn:aws:iam::222222222222:role/explicit"
         with patch.dict(os.environ, {}, clear=False):

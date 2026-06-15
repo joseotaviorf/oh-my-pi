@@ -133,9 +133,23 @@ class GlueClient(DBClient):
         """Create a table in the Glue Data Catalog."""
         self.conn.create_table(DatabaseName=database_name, TableInput=table_input)
 
-    def update_table(self, database_name: str, table_input: Dict) -> None:
-        """Update an existing table in the Glue Data Catalog."""
-        self.conn.update_table(DatabaseName=database_name, TableInput=table_input)
+    def update_table(
+        self,
+        database_name: str,
+        table_input: Dict,
+        *,
+        skip_archive: bool = True,
+    ) -> None:
+        """Update an existing table in the Glue Data Catalog.
+
+        By default ``SkipArchive=True`` so Glue does not create a new
+        TABLE_VERSION on every metadata update (see AWS Glue quotas).
+        """
+        self.conn.update_table(
+            DatabaseName=database_name,
+            TableInput=table_input,
+            SkipArchive=skip_archive,
+        )
 
     def delete_table(self, database_name: str, table_name: str) -> None:
         """Delete a table from the Glue Data Catalog."""

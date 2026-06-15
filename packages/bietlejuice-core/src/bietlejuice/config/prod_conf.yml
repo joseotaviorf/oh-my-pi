@@ -1665,6 +1665,7 @@ emr_cluster_base: &emr_cluster_anchor
         - Classification: spark-hive-site
           Properties:
               hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+              hive.metastore.glue.skip-archive: "true"
         - Classification: yarn-site
           Properties:
               yarn.resourcemanager.scheduler.enable-preemption: "true"
