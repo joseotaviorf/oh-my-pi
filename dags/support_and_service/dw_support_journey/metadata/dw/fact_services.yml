@@ -25,14 +25,6 @@ columns:
     description: Identifier of the support session (Support Session Service source) related to the event.
     lineage:
       - core_support_journey.services.id_support_session
-  id_sauron_session:
-    description: Identifier of the Sauron session related to the event.
-    lineage:
-      - core_support_journey.services.id_sauron_session
-  id_session_event:
-    description: Identifier of the session event linking the service event to its session.
-    lineage:
-      - core_support_journey.services.id_session_event
   id_task:
     description: Identifier of the task associated with the service event.
     lineage:
@@ -191,22 +183,6 @@ columns:
     description: Timestamp when the task associated with the service event was last updated.
     lineage:
       - core_support_journey.services.ts_task_updated
-  ts_session_event_created:
-    description: Timestamp when the session event was created.
-    lineage:
-      - core_support_journey.services.ts_session_event_created
-  ts_session_event_updated:
-    description: Timestamp when the session event was last updated.
-    lineage:
-      - core_support_journey.services.ts_session_event_updated
-  ts_session_created:
-    description: Timestamp when the service session was created.
-    lineage:
-      - core_support_journey.services.ts_session_created
-  ts_session_updated:
-    description: Timestamp when the service session was last updated.
-    lineage:
-      - core_support_journey.services.ts_session_updated
   _ts_load:
     description: Timestamp when the record was loaded into the lake by the ingestion pipeline.
     lineage:

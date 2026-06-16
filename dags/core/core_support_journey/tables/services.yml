@@ -20,22 +20,18 @@ sources:
 
 schema:
   columns:
+    # Event identity (added in _build_target_df)
     id_event:
       type: string
       required: true
     id_event_type:
       type: string
       required: true
+    # Session / task ids
     id_session:
       type: string
       required: true
     id_support_session:
-      type: string
-      required: true
-    id_sauron_session:
-      type: string
-      required: true
-    id_session_event:
       type: string
       required: true
     id_task:
@@ -62,6 +58,7 @@ schema:
     id_source_ctwa:
       type: string
       required: true
+    # Descriptive attributes
     database_source:
       type: string
       required: true
@@ -125,6 +122,7 @@ schema:
     task_attributes:
       type: string
       required: true
+    # Metrics
     waiting_time_sec:
       type: int
       required: true
@@ -137,6 +135,7 @@ schema:
     last_inactivity_time:
       type: bigint
       required: true
+    # Booleans
     is_forwarded:
       type: boolean
       required: true
@@ -149,48 +148,40 @@ schema:
     is_isaias_session:
       type: boolean
       required: true
+    # Event timestamps
     ts_task_created:
-      type: timestamp
+      type: string
       required: true
     ts_task_updated:
-      type: timestamp
+      type: string
       required: true
-    ts_session_event_created:
-      type: timestamp
-      required: true
-    ts_session_event_updated:
-      type: timestamp
-      required: true
-    ts_session_created:
-      type: timestamp
-      required: true
-    ts_session_updated:
-      type: timestamp
-      required: true
+    # Partitions
     partition_date:
       type: string
       required: true
     partition_hour:
       type: string
       required: true
+    # Pipeline metadata
     _created_at:
-      type: timestamp
+      type: string
       required: true
     _ts_load:
-      type: timestamp
+      type: string
       required: true
+    # SCD Type 2 versioning (added by get_versioning_df)
     _effective_timestamp:
-      type: timestamp
+      type: string
       required: true
     _expired_timestamp:
-      type: timestamp
+      type: string
       required: true
     _is_current:
       type: boolean
       required: true
     _last_updated_at:
-      type: timestamp
+      type: string
       required: true
-min_columns: 57
-max_columns: 57
+min_columns: 51
+max_columns: 51
 strict: true

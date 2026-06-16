@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
-from pyspark.sql import DataFrame, SparkSession, Window
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
 from bietlejuice.base.core_models.helpers.schema_validator import (
@@ -70,15 +71,12 @@ _DEFAULT_CLI_OPTIONAL_ARGS = [
     ),
 ]
 
+
 _VERSIONING_CONTEXT_COLS = ["id_session", "id_task"]
 _VERSIONING_EVENT_TS_COL = "ts_task_updated"
 _TIMESTAMP_COLS = [
     "ts_task_created",
     "ts_task_updated",
-    "ts_session_event_created",
-    "ts_session_event_updated",
-    "ts_session_created",
-    "ts_session_updated",
 ]
 
 
@@ -94,112 +92,82 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         self.cfg = cfg
         self.table_spec: Optional[Dict[str, Any]] = None
 
-    def _event_partition_filter(self, df: DataFrame) -> DataFrame:
-        """Filter CDC event sources by transaction date (daily upstream DAGs)."""
-        return df.where(
-            F.to_date(F.col("ts_cdc_transaction")) == F.lit(self.cfg.partition_date)
-        )
-
     def _partition_cols_from_cdc(self, ts_cdc_col: str) -> List:
         return [
-            F.date_format(F.to_date(F.col(ts_cdc_col)), "yyyy-MM-dd").alias(
-                "partition_date"
-            ),
-            F.hour(F.col(ts_cdc_col)).cast("string").alias("partition_hour"),
+            F.date_format(F.col(ts_cdc_col), "yyyy-MM-dd").alias("partition_date"),
+            F.date_format(F.col(ts_cdc_col), "HH").alias("partition_hour"),
         ]
+
+    def build_ts_filter(
+        self,
+        partition_date: str,
+        delta_hours: int = -80,
+        col: Optional[str] = None,
+    ):
+        """
+        Build a timestamp range covering the full partition_date calendar day,
+        extended by signed delta_hours.
+
+        The window always spans the whole partition day
+        [partition_date 00:00, partition_date + 1 day 00:00) so that events
+        occurring during the partition day are never dropped. ``delta_hours``
+        extends the window backward (negative) or forward (positive).
+
+        The upper bound is exclusive (``col < max_ts``) to avoid overlapping
+        the next partition's first instant.
+
+        Examples
+        --------
+        delta_hours = 80:
+            min_ts = partition_date
+            max_ts = partition_date + 1 day + 80h
+
+        delta_hours = -80:
+            min_ts = partition_date - 80h
+            max_ts = partition_date + 1 day
+        """
+        partition_start = datetime.strptime(partition_date, "%Y-%m-%d").replace(
+            tzinfo=timezone.utc
+        )
+        partition_end = partition_start + timedelta(days=1)
+
+        if delta_hours >= 0:
+            min_dt = partition_start
+            max_dt = partition_end + timedelta(hours=delta_hours)
+        else:
+            min_dt = partition_start + timedelta(hours=delta_hours)
+            max_dt = partition_end
+
+        min_ts = min_dt.isoformat(timespec="milliseconds")
+        max_ts = max_dt.isoformat(timespec="milliseconds")
+
+        if col:
+            return (F.col(col) >= F.lit(min_ts)) & (F.col(col) < F.lit(max_ts))
+
+        return min_ts, max_ts
 
     def _build_call_events_df(
         self,
         spark: SparkSession,
-        sss_source_df: DataFrame,
-        sauron_source_df: DataFrame,
+        session_df: DataFrame,
         bigfone_table: str,
     ) -> DataFrame:
-        calls_sauron_df = (
-            sauron_source_df.where(F.col("source").isin("call_in_app", "call"))
-            .withColumn("id_sauron_session", F.col("id"))
-            .withColumn("id_session_event", F.lit(None))
-            .withColumn("id_user", F.json_tuple(F.col("user_data"), "user_id"))
-            .withColumn("id_support_session", F.col("public_id"))
-            .withColumn("database_source", F.lit("sauron"))
-            .select(
-                "id_sauron_session",
-                "id_session_event",
-                "id_user",
-                "id_support_session",
-                "source_identity",
-                "database_source",
-                F.col("ts_created").alias("ts_session_event_created"),
-                F.col("ts_updated").alias("ts_session_event_updated"),
-                F.min("ts_created")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_created"),
-                F.max("ts_updated")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_updated"),
-            )
-        )
 
-        calls_sss_df = (
-            sss_source_df.where(F.col("source").isin("call_in_app", "call"))
-            .withColumn("id_sauron_session", F.lit(None))
-            .withColumn("id_session_event", F.col("id"))
-            .withColumn("id_user", F.json_tuple(F.col("user_data"), "user_id"))
-            .withColumn("id_support_session", F.col("public_id"))
-            .withColumn("database_source", F.lit("support_session_service"))
-            .select(
-                "id_sauron_session",
-                "id_session_event",
-                "id_user",
-                "id_support_session",
-                "source_identity",
-                "database_source",
-                F.col("ts_created").alias("ts_session_event_created"),
-                F.col("ts_updated").alias("ts_session_event_updated"),
-                F.min("ts_created")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_created"),
-                F.max("ts_updated")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_updated"),
-            )
-        )
-
-        cross_call_df = calls_sauron_df.union(calls_sss_df)
-
-        call_events_source_df = self._event_partition_filter(
+        call_event_df = (
             spark.table(bigfone_table)
-        ).withColumn("_dedup_sort_ts", F.col("ts_cdc_transaction"))
-        call_cols = call_events_source_df.columns
-        call_events_source_df = get_latest_version_from_df(
-            call_events_source_df, ["id"], call_cols, ["_dedup_sort_ts"]
-        )
-
-        return (
-            call_events_source_df.join(
-                cross_call_df,
-                on=(F.col("source_identity") == F.col("id_call"))
-                | (F.col("source_identity") == F.col("id_task")),
-                how="left",
+            .where(
+                self.build_ts_filter(
+                    self.cfg.partition_date, delta_hours=-24, col="ts_cdc_transaction"
+                )
             )
-            .withColumn("id_task_event", F.col("id"))
-            .withColumn(
-                "id_session",
-                F.coalesce(F.col("id_sauron_session"), F.col("id_session_event")),
-            )
+            .where(F.col("id_call").isNotNull() | F.col("id_task").isNotNull())
             .select(
-                "id_support_session",
-                "id_sauron_session",
-                "id_session",
-                "id_user",
-                "database_source",
-                "id_session_event",
+                F.col("id").alias("id_task_event"),
+                F.coalesce(F.col("id_task"), F.col("id_call")).alias("id_task_call"),
                 "id_task",
-                "id_reservation",
                 "id_call",
-                "id_task_event",
+                "id_reservation",
                 "id_worker",
-                F.lit("call").alias("service_type"),
                 "direction",
                 "channel_type",
                 "bpo_name",
@@ -209,171 +177,117 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 "task_cancelation_reason",
                 "to_phone_number",
                 "waiting_time_sec",
-                F.col("ts_created").alias("ts_task_created"),
-                F.col("ts_received").alias("ts_task_updated"),
-                "ts_session_event_created",
-                "ts_session_event_updated",
-                "ts_session_created",
-                "ts_session_updated",
-                *self._partition_cols_from_cdc("ts_cdc_transaction"),
+                "ts_created",
+                "ts_received",
+                F.col("ts_cdc_transaction").alias("ts_updated"),
             )
-            .filter(F.col("id_session").isNotNull())
+        )
+
+        return call_event_df.join(
+            session_df, F.col("id_task_call") == F.col("source_identity"), how="inner"
+        ).select(
+            "id_session",
+            "id_support_session",
+            "id_user",
+            "database_source",
+            "id_task",
+            "id_reservation",
+            "id_call",
+            "id_worker",
+            F.col("source").alias("service_type"),
+            "direction",
+            "channel_type",
+            "bpo_name",
+            "queue_name",
+            "worker_email",
+            "from_phone_number",
+            "task_cancelation_reason",
+            "to_phone_number",
+            "waiting_time_sec",
+            F.col("ts_created").alias("ts_task_created"),
+            F.col("ts_updated").alias("ts_task_updated"),
         )
 
     def _build_chats_results_df(
         self,
         spark: SparkSession,
-        sss_source_df: DataFrame,
-        sauron_source_df: DataFrame,
+        session_df: DataFrame,
         qm_channel_table: str,
         qm_chat_table: str,
         qm_task_table: str,
     ) -> DataFrame:
-        sss_chats_df = (
-            sss_source_df.where(F.col("source").isin(["internal_chat"]))
-            .withColumn("database_source", F.lit("support_session"))
-            .select(
-                F.col("id").alias("id_session_event"),
-                F.lit(None).alias("id_sauron_session"),
-                F.col("public_id").alias("id_support_session"),
-                F.json_tuple(F.col("user_data"), "user_id").alias("id_user"),
-                F.json_tuple(F.col("user_data"), "user_phone").alias("user_phone"),
-                F.json_tuple(F.col("user_data"), "user_email").alias("user_email"),
-                "created_by",
-                "source",
-                F.col("source_env").alias("source_environment"),
-                "database_source",
-                F.col("ts_created").alias("ts_session_event_created"),
-                F.col("ts_updated").alias("ts_session_event_updated"),
-                F.min("ts_created")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_created"),
-                F.max("ts_updated")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_updated"),
-            )
+
+        chat_filter = self.build_ts_filter(
+            self.cfg.partition_date, delta_hours=-72, col="ts_updated"
         )
 
-        sauron_chats_df = (
-            sauron_source_df.where(F.col("source").isin(["internal_chat", "whatsapp"]))
-            .withColumn("database_source", F.lit("sauron"))
-            .withColumn(
-                "id_session_event",
-                F.sha2(
-                    F.concat_ws("_", F.col("id"), F.col("ts_updated")),
-                    256,
-                ),
-            )
-            .select(
-                "id_session_event",
-                F.col("id").alias("id_sauron_session"),
-                F.col("public_id").alias("id_support_session"),
-                F.json_tuple(F.col("user_data"), "user_id").alias("id_user"),
-                F.json_tuple(F.col("user_data"), "user_phone").alias("user_phone"),
-                F.json_tuple(F.col("user_data"), "user_email").alias("user_email"),
-                "created_by",
-                "source",
-                "source_environment",
-                "database_source",
-                F.col("ts_created").alias("ts_session_event_created"),
-                F.col("ts_updated").alias("ts_session_event_updated"),
-                F.min("ts_created")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_created"),
-                F.max("ts_updated")
-                .over(Window.partitionBy("id"))
-                .alias("ts_session_updated"),
-            )
+        channel = spark.table(qm_channel_table).where(chat_filter)
+        chat_session = session_df.where(F.col("source") == F.lit("chat")).withColumn(
+            "join_key",
+            F.when(
+                F.col("database_source") == "sauron",
+                F.coalesce(F.col("id_session"), F.col("id_support_session")),
+            ).otherwise(F.col("id_support_session")),
         )
 
-        channel = spark.table(qm_channel_table).alias("c")
-        whatsapp_chats_df = channel.join(
-            sauron_chats_df.alias("s"),
-            on=F.col("s.id_sauron_session") == F.col("c.id_session"),
-            how="left",
-        ).select(
-            F.col("c.id_channel"),
-            F.col("c.id_session"),
-            F.col("s.id_sauron_session"),
-            F.col("s.id_support_session"),
-            F.col("s.id_user"),
-            F.col("s.user_phone"),
-            F.col("s.user_email"),
-            F.col("s.created_by"),
-            F.col("s.source"),
-            F.col("s.source_environment"),
-            F.col("s.database_source"),
-            F.col("s.ts_session_created"),
-            F.col("s.ts_session_updated"),
-            F.col("ts_session_event_created"),
-            F.col("ts_session_event_updated"),
-        )
-
-        chat = spark.table(qm_chat_table).alias("c")
-        inapp_sessions = (
-            chat.join(
-                sss_chats_df.alias("sss"),
-                on=(F.col("sss.id_support_session") == F.col("c.id_session"))
-                & (F.col("c.source").isin("support_session")),
-                how="left",
-            )
+        whatsapp_chats_df = (
+            channel.alias("c")
             .join(
-                sauron_chats_df.alias("s"),
-                on=(F.col("s.id_sauron_session") == F.col("c.id_session"))
-                & (F.col("c.source").isin("sauron")),
+                chat_session.alias("s"),
+                on=["id_session"],
                 how="left",
             )
             .select(
-                F.col("c.id_chat"),
+                F.lit(None).alias("id_chat"),
+                F.col("c.id_channel"),
                 F.col("c.id_session"),
-                F.col("s.id_sauron_session"),
-                F.col("sss.id_support_session"),
-                F.json_tuple(F.col("c.attributes"), "channel_type").alias(
-                    "channel_type"
-                ),
-                F.coalesce(F.col("sss.id_user"), F.col("s.id_user")).alias("id_user"),
-                F.coalesce(F.col("sss.user_phone"), F.col("s.user_phone")).alias(
-                    "user_phone"
-                ),
-                F.coalesce(F.col("sss.user_email"), F.col("s.user_email")).alias(
-                    "user_email"
-                ),
-                F.coalesce(F.col("sss.created_by"), F.col("s.created_by")).alias(
-                    "created_by"
-                ),
-                F.coalesce(F.col("sss.source"), F.col("s.source")).alias("source"),
-                F.coalesce(
-                    F.col("sss.source_environment"), F.col("s.source_environment")
-                ).alias("source_environment"),
-                F.coalesce(
-                    F.col("sss.database_source"), F.col("s.database_source")
-                ).alias("database_source"),
-                F.coalesce(
-                    F.col("sss.ts_session_created"), F.col("s.ts_session_created")
-                ).alias("ts_session_created"),
-                F.coalesce(
-                    F.col("sss.ts_session_updated"), F.col("s.ts_session_updated")
-                ).alias("ts_session_updated"),
-                F.coalesce(
-                    F.col("sss.ts_session_event_created"),
-                    F.col("s.ts_session_event_created"),
-                ).alias("ts_session_event_created"),
-                F.coalesce(
-                    F.col("sss.ts_session_event_updated"),
-                    F.col("s.ts_session_event_updated"),
-                ).alias("ts_session_event_updated"),
+                F.col("s.id_support_session"),
+                F.lit(None).alias("channel_type"),
+                F.col("s.id_user"),
+                F.col("s.user_phone"),
+                F.col("s.user_email"),
+                F.col("s.created_by"),
+                F.col("s.source"),
+                F.col("s.source_environment"),
+                F.col("s.database_source"),
             )
         )
 
-        tasks_source_df = self._event_partition_filter(
-            spark.table(qm_task_table)
-        ).withColumn("_dedup_sort_ts", F.col("ts_cdc_transaction"))
-        task_cols = tasks_source_df.columns
-        tasks_source_df = get_latest_version_from_df(
-            tasks_source_df, ["id"], task_cols, ["_dedup_sort_ts"]
+        chat = spark.table(qm_chat_table).where(chat_filter).alias("c")
+
+        inapp_sessions = chat.join(
+            chat_session.alias("session"),
+            on=F.col("session.join_key") == F.col("c.id_session"),
+            how="inner",
+        ).select(
+            F.col("c.id_chat"),
+            F.lit(None).alias("id_channel"),
+            F.col("c.id_session"),
+            F.col("session.id_support_session"),
+            F.json_tuple(F.col("c.attributes"), "channel_type").alias("channel_type"),
+            F.col("session.id_user").alias("id_user"),
+            F.col("session.user_phone").alias("user_phone"),
+            F.col("session.user_email").alias("user_email"),
+            F.col("session.created_by").alias("created_by"),
+            F.col("session.source").alias("source"),
+            F.col("session.source_environment").alias("source_environment"),
+            F.col("session.database_source").alias("database_source"),
         )
 
-        task_events_df = tasks_source_df.select(
+        task_df = (
+            spark.table(qm_task_table)
+            .where(
+                self.build_ts_filter(
+                    self.cfg.partition_date, delta_hours=-24, col="ts_updated"
+                )
+            )
+            .withColumn("dedup_ts", F.col("ts_updated"))
+            .alias("c")
+        )
+        task_cols = task_df.columns
+        task_df = get_latest_version_from_df(task_df, ["id"], task_cols, ["dedup_ts"])
+
+        task_events_df = task_df.select(
             F.col("id").alias("id_task_event"),
             "id_channel",
             "id_chat",
@@ -407,8 +321,6 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             "is_forwarded",
             "is_per_team_task",
             "is_spoc_task",
-            "ts_created",
-            "ts_updated",
             "ts_cdc_transaction",
             "task_attributes",
             "id_source_ctwa",
@@ -416,80 +328,55 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             "type_source_ctwa",
             "total_inactivity_time",
             "last_inactivity_time",
+            "ts_created",
+            "ts_updated",
         ).alias("t")
 
         ias = inapp_sessions.alias("ias")
         ws = whatsapp_chats_df.alias("ws")
 
+        union_ias_ws = ias.unionByName(ws, allowMissingColumns=True)
+
         return (
-            task_events_df.join(
-                ias, on=F.col("ias.id_chat") == F.col("t.id_chat"), how="left"
+            task_events_df.alias("t")
+            .join(
+                union_ias_ws.alias("u"),
+                on=(
+                    (F.col("u.id_chat") == F.col("t.id_chat"))
+                    | (F.col("u.id_channel") == F.col("t.id_channel"))
+                ),
+                how="inner",
             )
-            .join(ws, on=F.col("ws.id_channel") == F.col("t.id_channel"), how="left")
-            .where(
-                (
-                    F.coalesce(
-                        F.col("ias.id_session"), F.col("ws.id_session")
-                    ).isNotNull()
-                )
-                & (
-                    F.coalesce(
-                        F.col("ias.ts_session_created"), F.col("ws.ts_session_created")
-                    ).isNotNull()
-                )
-            )
+            .where(F.col("u.id_session").isNotNull())
             .select(
                 F.col("t.id_task_event"),
                 F.col("t.id_channel"),
                 F.col("t.id_task"),
-                F.coalesce(F.col("ias.id_session"), F.col("ws.id_session"))
-                .cast("string")
-                .alias("id_session"),
-                F.coalesce(
-                    F.col("ias.id_support_session"), F.col("ws.id_support_session")
-                ).alias("id_support_session"),
-                F.coalesce(
-                    F.col("ias.id_sauron_session"), F.col("ws.id_sauron_session")
-                ).alias("id_sauron_session"),
-                F.coalesce(F.col("ias.id_user"), F.col("ws.id_user")).alias("id_user"),
+                F.col("u.id_session").cast("string").alias("id_session"),
+                F.col("u.id_support_session").alias("id_support_session"),
+                F.col("u.id_user").alias("id_user"),
                 F.col("t.id_worker"),
                 F.col("t.id_source_ctwa"),
-                F.coalesce(
-                    F.col("ias.database_source"), F.col("ws.database_source")
-                ).alias("database_source"),
+                F.col("u.database_source").alias("database_source"),
                 F.lit("chat").alias("service_type"),
-                F.coalesce(
-                    F.col("ias.user_email"),
-                    F.col("ws.user_email"),
-                    F.col("t.customer_email"),
-                ).alias("customer_email"),
-                F.coalesce(
-                    F.col("ias.user_phone"),
-                    F.col("ws.user_phone"),
-                    F.col("t.from_phone_number"),
-                ).alias("customer_phone_number"),
+                F.coalesce(F.col("u.user_email"), F.col("t.customer_email")).alias(
+                    "customer_email"
+                ),
+                F.coalesce(F.col("u.user_phone"), F.col("t.from_phone_number")).alias(
+                    "customer_phone_number"
+                ),
                 F.col("t.twilio_phone_number"),
-                F.when(
-                    F.coalesce(F.col("ias.source"), F.col("ws.source"))
-                    == "internal_chat",
-                    F.lit("in app"),
-                )
-                .otherwise(F.coalesce(F.col("ias.source"), F.col("ws.source")))
+                F.when(F.col("u.source") == "internal_chat", F.lit("in app"))
+                .otherwise(F.col("u.source"))
                 .alias("origin"),
                 F.when(
                     F.col("t.is_spoc_task")
-                    & (
-                        F.coalesce(F.col("ias.created_by"), F.col("ws.created_by"))
-                        == "human_support"
-                    ),
+                    & (F.coalesce(F.col("u.created_by")) == "human_support"),
                     F.lit("inbound"),
                 )
                 .when(
                     F.col("t.is_spoc_task")
-                    & (
-                        F.coalesce(F.col("ias.created_by"), F.col("ws.created_by"))
-                        == "user"
-                    ),
+                    & (F.coalesce(F.col("u.created_by")) == "user"),
                     F.lit("outbound"),
                 )
                 .otherwise(F.lit("inbound"))
@@ -506,9 +393,9 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 F.col("t.is_per_team_task"),
                 F.col("t.is_spoc_task"),
                 F.when(
-                    F.coalesce(
-                        F.col("ias.source_environment"), F.col("ws.source_environment")
-                    ).isin("isaias_inbound", "isaias_inbound_main"),
+                    F.col("u.source_environment").isin(
+                        "isaias_inbound", "isaias_inbound_main"
+                    ),
                     F.lit(True),
                 )
                 .otherwise(F.lit(False))
@@ -520,21 +407,6 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 F.col("t.ts_created").alias("ts_task_created"),
                 F.col("t.ts_updated").alias("ts_task_updated"),
                 F.col("t.task_attributes"),
-                F.coalesce(
-                    F.col("ias.ts_session_created"), F.col("ws.ts_session_created")
-                ).alias("ts_session_created"),
-                F.coalesce(
-                    F.col("ias.ts_session_updated"), F.col("ws.ts_session_updated")
-                ).alias("ts_session_updated"),
-                F.coalesce(
-                    F.col("ias.ts_session_event_created"),
-                    F.col("ws.ts_session_event_created"),
-                ).alias("ts_session_event_created"),
-                F.coalesce(
-                    F.col("ias.ts_session_event_updated"),
-                    F.col("ws.ts_session_event_updated"),
-                ).alias("ts_session_event_updated"),
-                *self._partition_cols_from_cdc("t.ts_cdc_transaction"),
             )
         )
 
@@ -543,26 +415,82 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         spark: SparkSession,
         sources: Dict[str, Any],
     ) -> DataFrame:
+
+        CALL_SOURCES = ["call_in_app", "call"]
+        CHAT_SOURCES = ["internal_chat", "whatsapp"]
+        source_cond = (
+            F.when(F.col("source").isin(CALL_SOURCES), F.lit("call"))
+            .when(F.col("source").isin(CHAT_SOURCES), F.lit("chat"))
+            .otherwise(F.lit(None))
+        )
+        ts_filter = self.build_ts_filter(
+            self.cfg.partition_date, delta_hours=-72, col="ts_updated"
+        )
+
         sss_source_df = spark.table(sources["support_session"]["table_name"]).where(
             F.col("ts_created").isNotNull()
         )
+
+        sss_base_df = (
+            sss_source_df.where(F.col("ts_created").isNotNull())
+            .where(ts_filter)
+            .select(
+                F.col("id").cast("string").alias("id_session"),
+                F.col("public_id").alias("id_support_session"),
+                source_cond.alias("source"),
+                F.json_tuple(F.col("user_data"), "user_id").alias("id_user"),
+                F.json_tuple(F.col("user_data"), "user_phone").alias("user_phone"),
+                F.json_tuple(F.col("user_data"), "user_email").alias("user_email"),
+                F.col("created_by"),
+                F.col("source_env").alias("source_environment"),
+                F.col("source_identity"),
+                F.lit("support_session_service").alias("database_source"),
+            )
+        )
+
         sauron_source_df = spark.table(sources["sauron_session"]["table_name"])
+        sauron_base_df = (
+            sauron_source_df.where(ts_filter)
+            .select(
+                F.col("id").cast("string").alias("id_session"),
+                F.col("public_id").alias("id_support_session"),
+                source_cond.alias("source"),
+                F.json_tuple(F.col("user_data"), "user_id").alias("id_user"),
+                F.json_tuple(F.col("user_data"), "user_phone").alias("user_phone"),
+                F.json_tuple(F.col("user_data"), "user_email").alias("user_email"),
+                F.col("created_by"),
+                F.col("source_environment"),
+                F.col("source_identity"),
+                F.lit("sauron").alias("database_source"),
+                F.col("ts_created"),
+            )
+            .where(
+                (
+                    (F.col("source") == "call")
+                    & (F.col("ts_created") < F.lit("2025-11-10 00:00:00"))
+                )
+                | (F.col("source") == "chat")
+            )
+            .drop("ts_created")
+        )
+
+        session_df = (sauron_base_df.union(sss_base_df)).persist()
 
         call_events_df = self._build_call_events_df(
             spark,
-            sss_source_df,
-            sauron_source_df,
+            session_df,
             sources["bigfone_event"]["table_name"],
         )
         chats_results_df = self._build_chats_results_df(
             spark,
-            sss_source_df,
-            sauron_source_df,
+            session_df,
             sources["qm_channel"]["table_name"],
             sources["qm_chat"]["table_name"],
             sources["qm_task"]["table_name"],
         )
-
+        partition_date, partition_hour = self._partition_cols_from_cdc(
+            "ts_task_updated"
+        )
         return (
             call_events_df.unionByName(chats_results_df, allowMissingColumns=True)
             .withColumn(
@@ -571,7 +499,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                     F.concat_ws(
                         "_",
                         F.col("id_session"),
-                        F.col("id_session_event"),
+                        F.col("id_support_session"),
                         F.col("id_task"),
                         F.col("id_task_event"),
                     ),
@@ -583,11 +511,13 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 F.concat_ws(
                     "_",
                     F.lit("id_session"),
-                    F.lit("id_session_event"),
+                    F.lit("id_support_session"),
                     F.lit("id_task"),
                     F.lit("id_task_event"),
                 ),
             )
+            .withColumn("partition_date", partition_date)
+            .withColumn("partition_hour", partition_hour)
             .withColumn("_created_at", standard_now(is_col=True))
             .withColumn("_ts_load", standard_now(is_col=True))
         )
@@ -618,24 +548,28 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             )
             return
 
-        bigfone_events_df = self._event_partition_filter(
-            spark.table(sources["bigfone_event"]["table_name"])
+        bigfone_events_df = spark.table(sources["bigfone_event"]["table_name"]).where(
+            self.build_ts_filter(
+                self.cfg.partition_date,
+                delta_hours=-24,
+                col="ts_cdc_transaction",
+            )
         )
-        qm_tasks_df = self._event_partition_filter(
-            spark.table(sources["qm_task"]["table_name"])
+        qm_tasks_df = spark.table(sources["qm_task"]["table_name"]).where(
+            self.build_ts_filter(
+                self.cfg.partition_date, delta_hours=-24, col="ts_updated"
+            )
         )
 
         if bigfone_events_df.isEmpty() and qm_tasks_df.isEmpty():
-            self.logger.warning(
+            raise ValueError(
                 "No service event rows found in "
                 f"{sources['bigfone_event']['table_name']} or "
                 f"{sources['qm_task']['table_name']} for partition "
-                f"partition_date={self.cfg.partition_date})"
+                f"partition_date={self.cfg.partition_date}"
             )
-            return
 
         target_df = self._build_target_df(spark, sources)
-
         if _table_exists(spark, target_full_table_name):
             self.logger.info(
                 "m=get_rows_to_update, "
@@ -672,7 +606,6 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             "m=get_versioning_df, "
             f"msg=Event timestamp column name: {_VERSIONING_EVENT_TS_COL}"
         )
-
         versioned_df = get_versioning_df(
             unioned_target_df,
             _VERSIONING_CONTEXT_COLS,

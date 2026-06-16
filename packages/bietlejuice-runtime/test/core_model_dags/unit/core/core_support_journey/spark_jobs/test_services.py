@@ -87,6 +87,58 @@ class TestSupportJourneyServicesCoreModelPipelineInit:
         )
 
 
+class TestSupportJourneyServicesBuildTsFilter:
+    @pytest.mark.parametrize(
+        "partition_date, delta_hours, expected_min, expected_max",
+        [
+            # Regression: negative delta_hours must keep the upper bound at the
+            # END of the partition day (next-day midnight), otherwise every
+            # event happening during partition_date itself is dropped.
+            (
+                "2026-05-27",
+                -24,
+                "2026-05-26T00:00:00.000+00:00",
+                "2026-05-28T00:00:00.000+00:00",
+            ),
+            (
+                "2026-05-27",
+                -72,
+                "2026-05-24T00:00:00.000+00:00",
+                "2026-05-28T00:00:00.000+00:00",
+            ),
+            (
+                "2026-05-27",
+                80,
+                "2026-05-27T00:00:00.000+00:00",
+                "2026-05-31T08:00:00.000+00:00",
+            ),
+        ],
+    )
+    def test_window_covers_full_partition_day(
+        self,
+        pipeline_with_spec,
+        partition_date,
+        delta_hours,
+        expected_min,
+        expected_max,
+    ):
+        # act
+        min_ts, max_ts = pipeline_with_spec.build_ts_filter(
+            partition_date, delta_hours=delta_hours
+        )
+
+        # assert
+        assert min_ts == expected_min
+        assert max_ts == expected_max
+
+    def test_negative_delta_does_not_end_at_partition_start(self, pipeline_with_spec):
+        # act
+        _, max_ts = pipeline_with_spec.build_ts_filter("2026-05-27", delta_hours=-24)
+
+        # assert: the buggy behaviour ended the window at partition-day midnight
+        assert max_ts != "2026-05-27T00:00:00.000+00:00"
+
+
 class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
     @mock.patch.object(services_module, "partition_has_data")
     def test_skips_when_partition_already_exists(
@@ -110,7 +162,7 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         spark.table.assert_not_called()
 
     @mock.patch.object(services_module, "partition_has_data")
-    def test_returns_when_event_sources_are_empty(
+    def test_raises_when_event_sources_are_empty(
         self, mock_partition_has_data, cfg, pipeline_with_spec
     ):
         # arrange
@@ -123,10 +175,10 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         mock_partition_has_data.return_value = False
         pipeline = pipeline_with_spec
 
-        # act
-        pipeline.create_core_model(spark)
+        # act / assert
+        with pytest.raises(ValueError, match="No service event rows found"):
+            pipeline.create_core_model(spark)
 
-        # assert
         assert spark.table.call_count == 2
         empty_df.isEmpty.assert_called()
 
