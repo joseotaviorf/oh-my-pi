@@ -5,7 +5,7 @@ description: Fact table with human customer service events (chat and call) of th
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
-  sk_service:
+  sk_event:
     description: Surrogate key uniquely identifying a service event (grain of the table). Built directly from id_event of the core services model, so it is unique per event.
     lineage:
       - core_support_journey.services.id_event
@@ -183,19 +183,17 @@ columns:
     description: Timestamp when the task associated with the service event was last updated.
     lineage:
       - core_support_journey.services.ts_task_updated
-  _ts_load:
-    description: Timestamp when the record was loaded into the lake by the ingestion pipeline.
-    lineage:
-      - core_support_journey.services._ts_load
-  _effective_timestamp:
-    description: SCD valid-from timestamp - the moment this event version became the active record.
-    lineage:
-      - core_support_journey.services._effective_timestamp
-  _expired_timestamp:
-    description: SCD valid-to timestamp - the moment this event version was superseded by a newer one; the current version carries a far-future sentinel so it is never expired.
-    lineage:
-      - core_support_journey.services._expired_timestamp
-  _is_current:
-    description: Flag indicating whether this is the most recent version of the service event (SCD current record). Use it to filter the active version of each event.
+  is_current:
+    description: Flag indicating whether this is the most recent version of the service event (SCD current record). Use this for fast filtering on the current version of the event.
     lineage:
       - core_support_journey.services._is_current
+  ts_effective:
+    description: SCD valid-from timestamp - the moment this event version became the active record. To reconstruct the state of an event at a given instant T, filter ts_effective <= T AND ts_expired > T; for the latest state use is_current = true.
+    lineage:
+      - core_support_journey.services._effective_timestamp
+  ts_expired:
+    description: SCD valid-to timestamp - the moment this event version was superseded by a newer one; the current version carries a far-future sentinel (year 9999) so it is never expired. Each [ts_effective, ts_expired) window is half-open and non-overlapping per event.
+    lineage:
+      - core_support_journey.services._expired_timestamp
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse table by the ingestion pipeline. Built from NOW() at load time.

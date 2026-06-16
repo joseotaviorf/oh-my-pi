@@ -20,5 +20,8 @@ workflow:
   default_partitions: []
   tables_customization:
     fact_requests:
-      z_order_by: [id_case, case_number]
+      z_order_by: [id_case, case_number, is_current]
+      merge_on: [sk_event]
+    fact_services:
+      z_order_by: [id_session, id_task, is_current]
       merge_on: [sk_event]

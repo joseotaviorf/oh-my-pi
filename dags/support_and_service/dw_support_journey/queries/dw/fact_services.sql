@@ -1,5 +1,5 @@
 SELECT
-    se.id_event AS sk_service,
+    se.id_event AS sk_event,
     se.id_event,
     se.id_event_type,
     se.id_session,
@@ -74,12 +74,12 @@ SELECT
     DATE(se.ts_task_created) AS dt_task_created,
     se.ts_task_created,
     se.ts_task_updated,
-    se._ts_load,
-    se._effective_timestamp,
-    se._expired_timestamp,
-    se._is_current
+    se._is_current AS is_current,
+    se._effective_timestamp AS ts_effective,
+    se._expired_timestamp AS ts_expired,
+    NOW() AS ts_load
 FROM
     core_support_journey.services AS se
 WHERE
-    _last_updated_at >= '{load_start_date}'
-    AND _last_updated_at < '{load_end_date}'
+    se._last_updated_at >= '{load_start_date}'
+    AND se._last_updated_at < '{load_end_date}'
