@@ -674,10 +674,14 @@ class DAGDeclarationValidator(Validator):
             )
 
         validation_cluster_type = cluster["type"]
-        if not validation_cluster_type.startswith("consolidation_"):
+        if not (
+            validation_cluster_type.startswith("consolidation_")
+            or validation_cluster_type.startswith("emr_7_12_")
+        ):
             raise AssertionError(
                 "m=_check_cluster_validation_config, "
-                "msg='validation.cluster.type' must start with 'consolidation_'"
+                "msg='validation.cluster.type' must start with 'consolidation_' "
+                "or 'emr_7_12_'"
             )
 
         workflow = dag_declaration.get("workflow", {})

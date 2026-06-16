@@ -3,3 +3,20 @@ cluster:
   databricks_conn_id: databricks_new
   custom_configurations:
     num_workers: 3
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xl_memory_single_node_cluster
+    custom_configurations:
+      core_nodes:
+        node_type_id: r7g.8xlarge
+        instance_count: 1
+      task_nodes:
+        node_type_id: r7g.8xlarge
+        instance_count: 2
+      spark_conf:
+        spark.driver.memory: 8g
+        spark.driver.cores: "4"
+        spark.executor.memory: 24g
+        spark.executor.cores: "4"
+        spark.dynamicAllocation.minExecutors: "2"
+        spark.dynamicAllocation.maxExecutors: "24"

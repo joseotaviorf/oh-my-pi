@@ -22,6 +22,19 @@ _EMR_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
         "task_nodes",
     }
 )
+_DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
+    {
+        "node_type_id",
+        "driver_node_type_id",
+        "master_node_type_id",
+        "task_node_type_id",
+        "num_workers",
+        "runtime_engine",
+        "instance_pool_id",
+        "driver_instance_pool_id",
+        "autoscale",
+    }
+)
 
 
 def _strip_emr_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[str, Any]:
@@ -48,6 +61,22 @@ def _is_emr_to_databricks_validation(
     return prod_cluster_type.startswith("emr_") and validation_cluster_type.startswith(
         "consolidation_"
     )
+
+
+def _is_databricks_to_emr_validation(
+    prod_cluster_type: str, validation_cluster_type: str
+) -> bool:
+    return not str(prod_cluster_type).startswith("emr_") and str(
+        validation_cluster_type
+    ).startswith("emr_")
+
+
+def _strip_databricks_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        key: value
+        for key, value in custom.items()
+        if key not in _DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS
+    }
 
 
 def _strip_prod_topology_for_consolidation_validation(
@@ -94,9 +123,13 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
     validation_custom = validation_cluster.get("custom_configurations") or {}
     prod_cluster_type = prod_cluster.get("type", "")
     validation_cluster_type = validation_cluster.get("type", "")
-    prod_custom = _strip_prod_topology_for_consolidation_validation(
-        prod_custom, validation_cluster_type, prod_cluster_type
-    )
+    if _is_databricks_to_emr_validation(prod_cluster_type, validation_cluster_type):
+        merged.pop("databricks_conn_id", None)
+        prod_custom = _strip_databricks_only_custom_config_keys(prod_custom)
+    else:
+        prod_custom = _strip_prod_topology_for_consolidation_validation(
+            prod_custom, validation_cluster_type, prod_cluster_type
+        )
     # Empty validation custom means "preset defaults only". Do not inherit prod's
     # explicit PHOTON engine — consolidation presets default to STANDARD unless
     # validation.cluster re-states runtime_engine (see rightsizing disable_photon).

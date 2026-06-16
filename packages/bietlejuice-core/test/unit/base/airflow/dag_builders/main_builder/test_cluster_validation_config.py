@@ -43,6 +43,17 @@ class TestClusterValidationConfig:
         declaration = _base_declaration(type="consolidation_s_general_cluster")
         validator.validate(declaration)
 
+    def test_valid_emr_validation_cluster_when_prod_is_databricks(self, validator):
+        declaration = _base_declaration(type="emr_7_12_consolidation_xl_memory_cluster")
+        declaration["cluster"]["type"] = "consolidation_xl_memory_cluster"
+        declaration["cluster"]["databricks_conn_id"] = "databricks_new"
+        declaration["cluster"]["custom_configurations"] = {"num_workers": 3}
+        declaration["validation"]["cluster"]["custom_configurations"] = {
+            "core_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 1},
+            "task_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 2},
+        }
+        validator.validate(declaration)
+
     def test_rejects_non_consolidation_validation_cluster(self, validator):
         declaration = _base_declaration(type="databricks_16_4_med_general_fleet")
         with pytest.raises(AssertionError, match="consolidation_"):
@@ -263,6 +274,33 @@ class TestMergeValidationClusterArgs:
             "task_nodes": {"instance_count": 2},
             "spark_conf": {"spark.driver.memory": "8g"},
             "num_workers": 2,
+        }
+
+    def test_strips_databricks_keys_for_databricks_to_emr_validation(self):
+        prod = {
+            "type": "consolidation_xl_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "r6g.2xlarge",
+                "node_type_id": "r6g.2xlarge",
+                "runtime_engine": "PHOTON",
+                "spark_conf": {"spark.sql.shuffle.partitions": "200"},
+            },
+        }
+        validation = {
+            "type": "emr_7_12_consolidation_xl_memory_cluster",
+            "custom_configurations": {
+                "core_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 1},
+                "task_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 2},
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert "databricks_conn_id" not in merged
+        assert merged["custom_configurations"] == {
+            "spark_conf": {"spark.sql.shuffle.partitions": "200"},
+            "core_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 1},
+            "task_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 2},
         }
 
     def test_strips_prod_num_workers_for_single_node_validation(self):
