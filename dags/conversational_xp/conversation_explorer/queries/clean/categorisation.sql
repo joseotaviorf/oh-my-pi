@@ -3,7 +3,7 @@ SELECT
     session_date,
     channel,
     is_escalated,
-    first_queue,
+    CAST(first_queue AS STRING) AS first_queue,
     CAST(last_queue AS STRING) AS last_queue,
     category,
     subcategory,
