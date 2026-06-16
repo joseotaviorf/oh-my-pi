@@ -38,5 +38,5 @@ workflow:
       partitions: [year, month, day]
     agent_daily:
       extraction_type: incremental
-      merge_on: [id_agent_daily]
+      merge_on: [sk_agent_daily]
       partitions: [year, month, day]

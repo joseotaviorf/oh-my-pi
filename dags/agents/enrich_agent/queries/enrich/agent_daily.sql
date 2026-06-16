@@ -1,5 +1,6 @@
 SELECT
     MD5(CONCAT(id_agent, CURRENT_DATE)) AS id_agent_daily,
+    id_agent_daily AS sk_agent_daily,
     id_agent,
     id_agent_data,
     id_partner,
