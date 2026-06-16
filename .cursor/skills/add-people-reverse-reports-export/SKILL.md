@@ -1,0 +1,294 @@
+---
+name: add-people-reverse-reports-export
+description: >-
+  People domain (`dags/people/` only). Add, migrate, or edit a Google Sheets export under
+  `dags/people/reverse_reports/`. Interactive one-question-at-a-time flow in PT-BR
+  (notebook migration, net-new tab, edit existing, validation/Forno/PR/cutover). DBP Jira
+  kickoff on People Data (DBP). First turn: AskQuestion flow selection (like
+  provision-data-contract). Source priority DW (`dw_*`) then
+  metric-layer; avoid enrich/clean unless documented exception.
+---
+
+# Add People `reverse_reports` export
+
+End-to-end flow to **add, migrate, edit, validate, and cut over** a People Google Sheets export via `dags/people/reverse_reports/` (lake table → `load_to_gsheet`).
+
+Technical rules live in [reference.md](reference.md). Apply them when generating artifacts — **after** the user confirms the summary.
+
+## Interaction (mandatory)
+
+- Ask **one question at a time**. Wait for the user's answer before the next step.
+- **User-facing questions and option labels → PT-BR.** Jira **summary**, **description**, and **comments** → **English** ([`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md)).
+- **DBP** = Jira project/board do squad **People Data**. Nos prompts PT-BR: **"board do Jira de People Data (DBP)"**. Não expandir o nome legado do board (*Data Bedrock and People*) — time Bedrock não existe mais; só a sigla/nome no Jira permaneceu.
+- **First turn:** call the **AskQuestion** tool with [Flow selection](#flow-selection) — **mandatory** when the user invokes the skill without a clear flow already chosen. One short ack line is OK; **do not** substitute a prose-only menu or open with [Intake inicial](#shared--intake-inicial). **Do not** explore the repo before that AskQuestion (except reading this skill + `reference.md`).
+- **AskQuestion is required** whenever options are known — listing bullets in chat **does not** count. Same pattern as [`provision-data-contract`](https://github.com/quintoandar/data-contracts/tree/main/.cursor/skills/provision-data-contract).
+- **Do not** dump a multi-field intake table on the first turn.
+- **Do not** edit repo files until the user confirms the **summary** (Flow 1 step 13 / Flow 2 step 9 / Flow 3 step 7).
+- **Do not** open a PR until validation and local Forno run are proved — unless the user explicitly waives in writing (document in PR body).
+- Reuse answers already in the thread; skip questions that are already answered.
+- **Never invent** governance consumers, owners, or integration patterns — ask.
+- **Validation:** Tier 1–3 diffs run on **Databricks** only — People data is not complete in Trino; do not use `@tars` / skill **`trino`** here.
+
+**Shortcuts:** If the first message already picks a flow **and** includes material (DBP key, SQL/notebook, sheet URL, business description), acknowledge both, skip Flow selection and duplicate intake AskQuestions, and jump to the next missing step.
+
+---
+
+## Flow selection
+
+**Always first** — unless the shortcut above applies.
+
+Call **AskQuestion** (tool) with prompt **"O que você quer fazer?"** and these options:
+
+| id | label |
+| --- | --- |
+| `migrate` | Migrar export de notebook Databricks |
+| `new` | Adicionar nova exportação (sem notebook) |
+| `edit` | Editar export existente |
+| `continue` | Continuar trabalho em andamento (validação, Forno, PR ou cutover) |
+
+Then enter the matching flow:
+
+- `migrate` → [Flow 1](#flow-1--migrate-notebook-export)
+- `new` → [Flow 2](#flow-2--new-export-no-notebook)
+- `edit` → [Flow 3](#flow-3--edit-existing-export)
+- `continue` → [Flow 4](#flow-4--continue-in-flight)
+
+---
+
+## Shared — Intake inicial
+
+**After Flow 1 or Flow 2 is selected** — unless the thread already has enough context (card, query/notebook, and/or what to export).
+
+### Step A — What do you have?
+
+Call **AskQuestion** with prompt **"O que você já tem em mãos?"**:
+
+| id | label |
+| --- | --- |
+| `dbp_key` | Tenho chave DBP (ex.: DBP-1422) |
+| `query_notebook` | Tenho query, notebook ou `.ipynb` |
+| `description` | Tenho só a descrição do que exportar |
+| `other` | Outro — vou explicar na próxima mensagem |
+
+### Step B — Collect (one turn each)
+
+| User chose | Next ask |
+| --- | --- |
+| `dbp_key` | **"Qual a chave do issue? (ex.: DBP-1422)"** → store `{KEY}`; optionally `getJiraIssue` |
+| `query_notebook` | **"Cole a query, URL do notebook ou anexe o `.ipynb`."** → parse tabs/SQL; infer grain, columns, sources |
+| `description` | **"Descreva o que precisa exportar — processo, aba, colunas principais."** |
+| `other` | Free text — acknowledge; ask only what is still missing |
+
+| Also in thread | Agent does |
+| --- | --- |
+| **Mix** (shortcut) | Acknowledge all; skip Step A/B items already answered |
+
+Do **not** ask which `dw_*` or metric tables to read — infer sources from the query/notebook and [reference.md](reference.md); confirm in the **remap plan**.
+
+## Flow 1 — Migrate notebook export
+
+Follow steps in order. Skip any step whose answer is already in the thread or in [Intake inicial](#shared--intake-inicial).
+
+### 1. Intake inicial
+
+Follow [Shared — Intake inicial](#shared--intake-inicial).
+
+### 2. Notebook
+
+If intake did not include a notebook URL, path, or `.ipynb`, ask: **"Qual notebook Databricks devemos migrar? Cole a URL do workspace, o caminho ou o `.ipynb` exportado."**
+
+### 3. Jira (DBP)
+
+If `{KEY}` is missing, follow [Shared — Jira (DBP kickoff)](#shared--jira-dbp-kickoff). Continue at step 4 when `{KEY}` is set (or **local-only** is explicitly waived).
+
+### 4. Scope — tabs
+
+Inspect the notebook and list tabs (cell titles, `table_to_gsheets` / `send_data_to_sheet`).
+
+Ask: **"Este notebook grava na(s) aba(s): {list}. Migrar todas agora ou só algumas?"**
+
+### 5–9. Per tab
+
+Repeat for each tab before the shared remap step:
+
+- **5.** **"Qual a URL da planilha de produção (ou `sheet_id`) e o nome exato da aba `{tab}`?"** (+ Editor for `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`)
+- **6.** Business purpose — skip if intake already described it; otherwise **"Qual processo de negócio a aba `{tab}` sustenta? Quem usa e com que frequência?"**
+- **7.** **"Por que isso ainda é uma aba no Google Sheets em vez de Databricks / Superset / integração direta?"**
+- **8.** Call **AskQuestion**: **"Os cabeçalhos exportados precisam ser idênticos ao notebook/planilha legado (Looker, PIN, scripts)?"** — Sim / Não / Não tenho certeza (default Sim)
+- **9.** Legacy SQL — skip if intake already included SQL/notebook; otherwise **"Cole o SQL da aba `{tab}`, ou anexe o notebook exportado / `@file`."**
+
+### 10. `table_name`
+
+Propose `snake_case` name. Ask: **"Usamos `{table_name}` como nome da tabela no lake, ou prefere outro?"**
+
+### 11. Governance
+
+One at a time: business owner, technical owner, operational consumer; upstream owner only if not DW-only.
+
+### 12. Remap plan
+
+Present remap table + grain, headers, risks, cutover scope. Ask: **"Esse plano de remap está correto?"**
+
+### 13. Summary
+
+Present resumo in PT-BR. Ask: **"Está tudo certo? Posso implementar no repositório?"**
+
+→ [Shared — Implement](#shared--implement-in-repo)
+
+---
+
+## Flow 2 — New export (no notebook)
+
+1. [Shared — Intake inicial](#shared--intake-inicial)
+2. [Shared — Jira (DBP kickoff)](#shared--jira-dbp-kickoff) — only if `{KEY}` still missing
+3. **"Por que Google Sheets para esse processo?"** — skip business purpose if intake already covered it
+4. **"URL da planilha de produção (ou `sheet_id`) e nome da aba?"**
+5. **"O que cada linha da planilha representa?"** — skip if inferrable from intake SQL/description; optional examples: colaborador, cargo, tabela + banda
+6. AskQuestion: cabeçalhos — naming_conventions vs nomes fixos legados
+7. Governance (Flow 1 step 11)
+8. Remap plan (sources inferred from intake — confirm with **"Esse plano de remap está correto?"**)
+9. Resumo → **"Está tudo certo? Posso implementar no repositório?"**
+
+---
+
+## Flow 3 — Edit existing export
+
+1. Read `reverse_reports_declaration.yml`. Call **AskQuestion** with export options (or **"Qual export você quer editar?"** if too many for a list).
+2. [Shared — Jira (DBP kickoff)](#shared--jira-dbp-kickoff)
+3. Summarize SQL, docs, declaration. Ask: **"É esse export que você quer alterar?"**
+4. Call **AskQuestion**: o que mudar — SQL / colunas / planilha / governance / declaration / outro
+5. Detalhes — uma pergunta por turno (see [reference.md](reference.md))
+6. **"Tem mais alguma alteração nesse export antes de eu aplicar?"**
+7. Resumo → **"Posso aplicar essas alterações no repositório?"** → then validation/Forno/PR as needed
+
+---
+
+## Flow 4 — Continue in-flight
+
+Call **AskQuestion** with prompt **"Em que ponto você parou?"**:
+
+| id | label |
+| --- | --- |
+| `validation` | Validação SQL (Tier 1–3) |
+| `validation_ok` | Validação OK — falta Forno |
+| `forno_ok` | Forno OK — falta PR / merge |
+| `prod_ok` | Merge + prod OK — falta cutover |
+
+If `{KEY}` unknown: **"Qual issue DBP cobre esse trabalho?"**
+
+---
+
+## Shared — Jira (DBP kickoff)
+
+Use on **Flows 1–3** before repo edits. **One question per turn.**
+
+Read [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) before Atlassian MCP calls.
+
+**Shortcut:** thread contains `DBP-<number>` → **"Confirmo: o card é `{KEY}`?"**
+
+### Step 1 — Card on the board?
+
+Ask with **AskQuestion** (tool):
+
+**"Já existe um card no board do Jira de People Data (DBP) para esse trabalho?"**
+
+- **Sim — tenho a chave** → [Step 2a](#step-2a--issue-key)
+- **Sim — mas não lembro a chave** → [Step 2b](#step-2b--find-existing-issue)
+- **Não / não sei** → [Step 3](#step-3--create-a-card)
+
+### Step 2a — Issue key
+
+Ask: **"Qual a chave do issue? (ex.: DBP-1422)"**
+
+Optionally `getJiraIssue` to confirm summary. Store `{KEY}`.
+
+### Step 2b — Find existing issue
+
+Ask: **"Descreva o card — notebook, export/`table_name`, aba ou palavras do summary — para eu buscar no DBP."**
+
+`searchJiraIssuesUsingJql` → present matches. Ask: **"Qual issue é?"**
+
+No match → Step 3.
+
+### Step 3 — Create a card?
+
+Ask: **"Quer que eu crie um card no board do Jira de People Data (DBP) para esse trabalho?"**
+
+- **Não** → **"Continuar como local-only (sem Jira) ou parar até você ter um card?"**
+- **Sim** → [Shared — Create DBP issue](#shared--create-dbp-issue)
+
+### Step 4 — Git branch (optional)
+
+Ask: **"Quer que eu configure a branch Git agora?"** → skill **`people-jira-branch-setup`** if yes.
+
+---
+
+## Shared — Create DBP issue
+
+One question per turn. Jira body in **English**.
+
+- **C1** AskQuestion: Story ou Sub-task (`Sub-task` API name)
+- **C2** (Sub-task) **"Qual a chave do issue pai (Story ou Epic)?"**
+- **C3** AskQuestion: planejado na sprint ou buffer (`[buffer]` prefix if buffer)
+- **C4** Propose English summary → **"Uso este summary no Jira: `{proposal}`?"**
+- **C5** Show English description draft → **"Quer acrescentar ou mudar algo antes de criar o issue?"**
+- **C6** **"Posso criar o issue no DBP?"** → `createJiraIssue`, share `{KEY}` + URL
+
+---
+
+## Shared — Implement in repo
+
+After summary confirmation — [reference.md — Implementation checklist](reference.md#implementation-checklist).
+
+Run skill **`databricks-emr-sql-lint`** after `.sql` edits.
+
+Ask: **"Implementação concluída. Gerar SQL de validação ou ir direto para o Airflow local (Forno)?"**
+
+---
+
+## Shared — Validation
+
+**Runtime:** People DW / reverse tables are **not fully available in Trino**. Run all Tier 1–3 validation SQL on **Databricks** (SQL editor, notebook, or MCP `execute_sql`). **Do not** use Trino or the `@tars` / `trino` skill for these diffs.
+
+**"Qual `load_start_date` / data de referência usar nas queries de diff?"**
+
+Save under `.cursor/temp/{JIRA_KEY}/{branch-slug}/validation/`. See [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) when present.
+
+**"Rode as queries no Databricks e cole os resultados Tier 1–3, depois responda validation OK."**
+
+---
+
+## Shared — Local Airflow (Forno)
+
+[`run-dag-locally`](../run-dag-locally/SKILL.md). Env check → trigger `bietlejuice.reverse_reports`.
+
+**"O run no Forno deu certo para `{table_name}`? Responda local run OK ou envie os logs."**
+
+---
+
+## Shared — Open PR
+
+[`review-pr`](../review-pr/SKILL.md) → [`create-or-update-pr`](../create-or-update-pr/SKILL.md) (`DBP-xxxx | …`).
+
+**"Quando merge + prod estiverem OK, responda PR merged, prod OK para o checklist de cutover."**
+
+---
+
+## Shared — Post-merge cutover
+
+Comment notebook write cells; remove Daily Pipeline task if full migration. [`exodus_migration_guide.md`](../../../dags/people/reverse_reports/docs/exodus_migration_guide.md).
+
+**"Responda cutover done quando terminar a limpeza no notebook/job."**
+
+---
+
+## References
+
+- [reference.md](reference.md)
+- [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) — project **DBP**, squad **People Data**
+- [`people-jira-branch-setup`](../people/jira-branch-setup/SKILL.md)
+- [DBP-1310](https://quintoandar.atlassian.net/browse/DBP-1310)
+
+## Out of scope
+
+Other domains, BI-only without reverse lake table, human sheet ACLs outside service account.

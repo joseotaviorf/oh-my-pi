@@ -1,6 +1,6 @@
 # DBP Jira — reference cache (Data People)
 
-**Purpose:** Stable, reusable facts about Jira for the Data People squad (project **DBP**): IDs, URLs, API quirks, kickoff policies, branch/slug/Jira summary norms, and workflow — usually learned once via Jira/API or squad norms. **Read this file before** opening a Jira/MCP call for the same fact. After you discover something durable (field name, issue type string, cloud id), **add it here** in the same delivery so the next run skips the lookup. If Atlassian configuration changes, update this file when you adjust the process.
+**Purpose:** Stable, reusable facts about Jira for the **People Data** squad (project key **DBP**): IDs, URLs, API quirks, kickoff policies, branch/slug/Jira summary norms, and workflow — usually learned once via Jira/API or squad norms. **Read this file before** opening a Jira/MCP call for the same fact. After you discover something durable (field name, issue type string, cloud id), **add it here** in the same delivery so the next run skips the lookup. If Atlassian configuration changes, update this file when you adjust the process.
 
 **Location:** `.cursor/rules/people/dbp-jira-reference.md` — People rules companion; **delivery procedures** live under **`.cursor/skills/people/*/`** (see **Related delivery skills** below).
 
@@ -11,6 +11,8 @@
 | Item | Value |
 |------|--------|
 | **Project key** | `DBP` |
+| **Squad (today)** | **People Data** — use this in prompts and docs |
+| **Jira display name (legacy)** | *Data Bedrock and People* — former squad name; board/project title unchanged in Jira. **Do not** repeat this full string in agent or user prompts; say **People Data (DBP)** or **DBP** |
 | **Issue key pattern** | `DBP-<number>` (e.g. `DBP-1234`) |
 | **Site** | https://quintoandar.atlassian.net/ |
 | **Cloud ID** (REST / MCP `cloudId`) | `8a4667b7-87a1-4c6c-805c-fc0d6e60a7a0` |
