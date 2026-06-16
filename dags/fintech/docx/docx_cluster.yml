@@ -1,5 +1,17 @@
 cluster:
-  type: consolidation_m_general_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_m_general_cluster
   custom_configurations:
-    num_workers: 5
+    master_node_type_id: m7g.xlarge
+    core_nodes:
+        instance_count: 2
+    task_nodes:
+        instance_count: 3
+    node_type_id: m7g.2xlarge
+    task_node_type_id: m7g.2xlarge
+    spark_conf:
+      spark.executor.memory: 8g
+      spark.executor.memoryOverhead: 3g
+      spark.driver.memory: 8g
+      spark.driver.memoryOverhead: 2g
+      spark.dynamicAllocation.maxExecutors: "4"
+      spark.sql.shuffle.partitions: "256"

@@ -1,6 +1,7 @@
 cluster:
-  type: consolidation_m_general_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_med_general_photon_cluster
   custom_configurations:
-    num_workers: 4
-    runtime_engine: PHOTON
+    master_node_type_id: m7a.xlarge
+    node_type_id: m7a.2xlarge
+    task_nodes:
+      instance_count: 1
