@@ -28,6 +28,7 @@ LoadWindowSource = Literal[
     "exception:cyber_legal_3day_window",
     "exception:greenhouse_v3_single_day",
     "exception:maestro_next_day_ingest",
+    "exception:conversation_explorer_pinned_day",
 ]
 
 

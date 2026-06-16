@@ -271,8 +271,9 @@ Some prod DAGs do not use the generic `load_start_date` / `load_end_date` window
 | `bietlejuice.greenhouse_v3` | `exception:greenhouse_v3_single_day` | Single-day `updated_at` API window; pairs with validation-mode date scoping in `load_greenhouse_v3_raw.py` |
 | `bietlejuice.demand_balancer_service` | `exception:maestro_next_day_ingest` | S3 partition is `data_interval_start + 1 day`; pairs with `get_date_param` on `load_start_date` in the spark job |
 | `bietlejuice.search_metrics_service` | `exception:maestro_next_day_ingest` | Same next-day S3 partition as demand_balancer (`search_monitoring/data`) |
+| `bietlejuice.conversation_explorer` | `exception:conversation_explorer_pinned_day` | Pins raw `date` and clean window to a known-good ingest day (`2026-05-15`) while prod raw has intermittent `first_queue` schema drift on recent partitions |
 
-Dry-run output shows the resolver in the **SRC** column (`conf`, `data_interval`, or `exception:*`). DAGs that consume non-standard conf keys may also need declaration `get_date_param` wiring (see `text2filter_evals` `load_start_date`).
+Dry-run output shows the resolver in the **SRC** column (`conf`, `data_interval`, or `exception:*`). DAGs that consume non-standard conf keys may also need declaration `get_date_param` wiring (see `text2filter_evals` `load_start_date`, `conversation_explorer` raw `date` spark arg).
 
 To add a new exception: implement a resolver, register it in `VALIDATION_CONF_EXCEPTIONS`, extend `LoadWindowSource` in `cluster_validation_reference.py`, and add unit tests in `tests/unit/scripts/test_cluster_validation_conf_exceptions.py`.
 

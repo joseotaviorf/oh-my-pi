@@ -30,7 +30,7 @@ workflow:
     - "{schema}"
     - "{table_name}"
     - "{partitions}"
-    - "{{ dag_run.conf.get('date', '') }}"
+    - "{{ dag_run.conf.get('date') or get_date_param(dag_run, '', 'load_start_date') }}"
 
   raw_inner_dependencies:
     annotations:

@@ -27,12 +27,20 @@ TEXT2FILTER_SINGLE_DAY: LoadWindowSource = "exception:text2filter_single_day"
 CYBER_LEGAL_3DAY_WINDOW: LoadWindowSource = "exception:cyber_legal_3day_window"
 GREENHOUSE_V3_SINGLE_DAY: LoadWindowSource = "exception:greenhouse_v3_single_day"
 MAESTRO_NEXT_DAY_INGEST: LoadWindowSource = "exception:maestro_next_day_ingest"
+CONVERSATION_EXPLORER_PINNED_DAY: LoadWindowSource = (
+    "exception:conversation_explorer_pinned_day"
+)
+
+# Prod raw has intermittent schema drift on recent partitions (first_queue INT vs STRING).
+# Validation smoke tests pin to an early ingest day with stable prod raw data.
+CONVERSATION_EXPLORER_VALIDATION_INGEST_DAY = "2026-05-15"
 
 DAG_TEXT2FILTER_EVALS = "bietlejuice.text2filter_evals"
 DAG_CYBER_LEGAL = "bietlejuice.cyber_legal"
 DAG_GREENHOUSE_V3 = "bietlejuice.greenhouse_v3"
 DAG_DEMAND_BALANCER_SERVICE = "bietlejuice.demand_balancer_service"
 DAG_SEARCH_METRICS_SERVICE = "bietlejuice.search_metrics_service"
+DAG_CONVERSATION_EXPLORER = "bietlejuice.conversation_explorer"
 
 
 def _conf_load_start_from_run(run: dict[str, Any]) -> str | None:
@@ -141,12 +149,26 @@ def resolve_maestro_next_day_ingest_conf(
     return _test_run_conf(ingest_day, exclusive_end), MAESTRO_NEXT_DAY_INGEST
 
 
+def resolve_conversation_explorer_conf(
+    run: dict[str, Any],
+) -> tuple[dict[str, str], LoadWindowSource] | None:
+    """Pin validation to a known-good ingest day; raw uses conf ``date``."""
+    ingest_day = CONVERSATION_EXPLORER_VALIDATION_INGEST_DAY
+    exclusive_end = (
+        datetime.strptime(ingest_day, "%Y-%m-%d") + timedelta(days=1)
+    ).strftime("%Y-%m-%d")
+    conf = _test_run_conf(ingest_day, exclusive_end)
+    conf["date"] = ingest_day
+    return conf, CONVERSATION_EXPLORER_PINNED_DAY
+
+
 VALIDATION_CONF_EXCEPTIONS: dict[str, ValidationConfResolver] = {
     DAG_TEXT2FILTER_EVALS: resolve_text2filter_evals_conf,
     DAG_CYBER_LEGAL: resolve_cyber_legal_conf,
     DAG_GREENHOUSE_V3: resolve_greenhouse_v3_conf,
     DAG_DEMAND_BALANCER_SERVICE: resolve_maestro_next_day_ingest_conf,
     DAG_SEARCH_METRICS_SERVICE: resolve_maestro_next_day_ingest_conf,
+    DAG_CONVERSATION_EXPLORER: resolve_conversation_explorer_conf,
 }
 
 

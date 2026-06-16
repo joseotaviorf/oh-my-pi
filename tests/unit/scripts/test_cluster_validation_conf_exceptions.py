@@ -119,6 +119,21 @@ class TestMaestroNextDayIngestConfException:
         assert source == "exception:maestro_next_day_ingest"
 
 
+class TestConversationExplorerConfException:
+    def test_pins_known_good_ingest_day(self) -> None:
+        run = {
+            "data_interval_start": "2026-06-16T07:00:00+00:00",
+            "data_interval_end": "2026-06-17T07:00:00+00:00",
+        }
+        result = exc.resolve_conversation_explorer_conf(run)
+        assert result is not None
+        conf, source = result
+        assert conf["load_start_date"] == "2026-05-15"
+        assert conf["load_end_date"] == "2026-05-16"
+        assert conf["date"] == "2026-05-15"
+        assert source == "exception:conversation_explorer_pinned_day"
+
+
 class TestResolveValidationConfForDag:
     def test_unregistered_dag_uses_generic_resolver(self) -> None:
         run = {
@@ -177,3 +192,16 @@ class TestResolveValidationConfForDag:
         assert result is not None
         _, source = result
         assert source == "exception:maestro_next_day_ingest"
+
+    def test_conversation_explorer_registered(self) -> None:
+        run = {
+            "data_interval_start": "2026-06-16T07:00:00+00:00",
+            "data_interval_end": "2026-06-17T07:00:00+00:00",
+        }
+        result = exc.resolve_validation_conf_for_dag(
+            exc.DAG_CONVERSATION_EXPLORER, run
+        )
+        assert result is not None
+        conf, source = result
+        assert conf["date"] == "2026-05-15"
+        assert source == "exception:conversation_explorer_pinned_day"
