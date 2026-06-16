@@ -851,7 +851,249 @@ Usar para validar outputs de queries e identificar anomalias.
 
 ---
 
-## 10. Pitfalls — Nunca Cometa Esses Erros
+## 10. Salesforce CDC — Eventos EoF (`datalake_salesforce_clean`)
+
+Quatro tabelas de Change Data Capture (CDC) da Salesforce alimentam o contexto operacional do EoF. Cada linha representa **um evento de mudança** em um registro Salesforce — não o estado atual do registro.
+
+### ⚠️ Comportamento CDC — Leia Antes de Consultar
+
+**Comportamento padrão (Sparse CDC):** Nos eventos UPDATE, apenas os campos que mudaram são populados — todos os demais ficam NULL. Em eventos CREATE, todos os campos são populados. Para reconstruir o estado atual de um registro, é necessário agregar todos os eventos por `id_record` ordenados por `id_replay`.
+
+**Exceção:** `events_incident` envia estado completo em cada evento (não é sparse).
+
+**`commit_ts`** é sempre timestamp em **milissegundos** de epoch (ex.: `1781127243000`). Usar `TIMESTAMP_MILLIS(commit_ts)` ou dividir por 1000 para converter. `committed_at` já é derivado e formatado como `YYYY-MM-DD HH:MM:SS` UTC.
+
+**`id_replay`** é o cursor monotônico de ordenação dos eventos CDC. Usar `ORDER BY id_replay` para sequenciar eventos de um mesmo registro.
+
+---
+
+### 10.1 `events_pendency` — Solicitações (Pendency__c)
+
+**Grain:** 1 linha por evento CDC de um registro Pendency__c.
+
+**O que é:** Comunicação entre ENs (Especialistas de Negócio) e parceiros CRN durante a jornada de compra e venda. Criadas manualmente pelo EN ou automaticamente pelo sistema.
+
+| Coluna | Tipo / Valores | Observação |
+|--------|----------------|------------|
+| `id_record` | string (`a0G...`) | ID do registro Pendency__c |
+| `id_replay` | bigint | Cursor CDC — usar para ordenar eventos |
+| `event_type` | string | `CREATE` (todos os campos populados, `status__c='Nova'`); `UPDATE` (sparse, só campos alterados) |
+| `commit_ts` | bigint | Milissegundos epoch |
+| `committed_at` | string | `YYYY-MM-DD HH:MM:SS` UTC |
+| `status__c` | string | `Nova` (estado inicial no CREATE) → `Concluída` (resolvida). NULL se não mudou. |
+| `open_source__c` | string | `Manual` (criada pelo EN); `Automation` (automação Salesforce). NULL se não mudou. |
+| `pendency_type__c` | string | Ex.: `Solicitação de contato (Parceiro ao cliente)`. NULL se não mudou ou não definido. |
+| `comments__c` | string | Texto HTML da solicitação (escrito pelo EN). NULL se não mudou. |
+| `comment_response__c` | string | Texto HTML da resposta (escrita pelo CRN). NULL se não mudou. |
+| `solicitacao_data_de_conclusao__c` | string | Data de conclusão — NULL no CREATE; populado no UPDATE quando `status__c='Concluída'`. |
+| `caso__c` | string (`500b...`) | FK → `events_case` |
+| `purchase_sale_contract__c` | string (`a0H...`) | FK → `purchase_sale_contract` |
+| `offer_id__c` | string | `sk_offer` equivalente em `dw_sale.dim_sale_agreement` |
+| `id_created_by` / `id_last_modified_by` | string (`005b...`) | FK → `users` |
+
+**Reconstrução de estado atual:**
+```sql
+-- Estado atual de cada pendência (último valor de cada campo por id_record)
+WITH ranked AS (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY id_record, 'status__c'
+               ORDER BY id_replay DESC
+           ) AS rn
+    FROM datalake_salesforce_clean.events_pendency
+    WHERE status__c IS NOT NULL
+)
+SELECT id_record, status__c, committed_at
+FROM ranked WHERE rn = 1
+```
+
+**Contagem de pendências por status em um caso:**
+```sql
+SELECT
+    caso__c,
+    status__c,
+    COUNT(DISTINCT id_record) AS total_pendencias
+FROM (
+    SELECT id_record, caso__c, status__c,
+           ROW_NUMBER() OVER (PARTITION BY id_record ORDER BY id_replay DESC) AS rn
+    FROM datalake_salesforce_clean.events_pendency
+    WHERE status__c IS NOT NULL
+      AND caso__c IS NOT NULL
+) t
+WHERE rn = 1
+GROUP BY 1, 2
+```
+
+---
+
+### 10.2 `events_received_document` — Solicitação de Documentos (ReceivedDocument__c)
+
+**Grain:** 1 linha por evento CDC de um registro ReceivedDocument__c.
+
+**O que é:** Requisição de documentos adicionais para compradores ou vendedores durante o processo de compra e venda. Status lifecycle: `Solicitado` → `Enviado` → `Aprovado`.
+
+| Coluna | Tipo / Valores | Observação |
+|--------|----------------|------------|
+| `id_record` | string (`a0q...`) | ID do registro ReceivedDocument__c |
+| `id_replay` | bigint | Cursor CDC |
+| `event_type` | string | `CREATE` (todos os campos populados, `status__c='Solicitado'`); `UPDATE` (sparse, tipicamente só `status__c` muda) |
+| `commit_ts` | bigint | Milissegundos epoch |
+| `committed_at` | string | `YYYY-MM-DD HH:MM:SS` UTC |
+| `status__c` | string | `Solicitado` → `Enviado` → `Aprovado`. NULL se não mudou. |
+| `requested_document_for__c` | string | `Comprador` ou `Vendedor` |
+| `received_document__c` | string | Ex.: `Matrícula completa do imóvel`, `Extrato do FGTS`, `Outros` |
+| `fs_request_justification__c` | string | Texto plano (não HTML). Justificativa da solicitação. |
+| `opportunity__c` | string (`006b...`) | FK → `opportunity`. Usado no estágio **pré-contrato** (ex.: análise de FGTS/financiamento). **Mutuamente exclusivo com `purchase_sale_contract__c`**. |
+| `purchase_sale_contract__c` | string (`a0H...`) | FK → `purchase_sale_contract`. Usado no estágio **pós-contrato**. **Mutuamente exclusivo com `opportunity__c`**. |
+| `caso__c` | string (`500b...`) | FK → `events_case` |
+| `id_owner` / `id_created_by` | string (`005b...`) | FK → `users` |
+
+---
+
+### 10.3 `events_incident` — Incidentes (Incident)
+
+**Grain:** 1 linha por evento CDC de um registro Incident.
+
+**O que é:** Agrupa múltiplas notas de pendências para um caso Legal Ops. Cada incidente reúne pendências de diferentes partes (comprador, vendedor, imóvel, negociação) em um único registro.
+
+> ⚠️ **Diferença crítica:** `events_incident` **não é sparse**. Ambos CREATE e UPDATE enviam **estado completo** em cada evento — todos os campos são populados.
+
+| Coluna | Tipo / Valores | Observação |
+|--------|----------------|------------|
+| `id_record` | string (`0ny...`) | ID do registro Incident |
+| `id_replay` | bigint | Cursor CDC |
+| `event_type` | string | `CREATE` (`status='ACTIVE'`); `UPDATE` (estado completo — não sparse) |
+| `commit_ts` | bigint | Milissegundos epoch |
+| `committed_at` | string | `YYYY-MM-DD HH:MM:SS` UTC |
+| `status` | string | `ACTIVE` (aberto) → `Resolved` (resolvido) |
+| `subject` | string | Sempre `Pendência` |
+| `impact` / `priority` / `urgency` | string | Observados como `High` / `Critical` / `High` |
+| `is_closed` | boolean | Sempre `false` nos dados observados |
+| `resolution_date_time` | string | NULL quando `status='ACTIVE'`; populado quando `status='Resolved'` |
+| `pendency_notes__c` | string | Texto plano concatenado. Cada nota é prefixada com role (`HOUSE`, `SELLER`, `BUYER`, `NEGOTIATION`, `NOTE`) seguido de `:`. Múltiplas notas separadas por ` \|\| `. |
+| `incident_number` | string | Ex.: `INC-000003779` |
+| `case_legal_ops__c` | string (`a14...`) | FK → `events_case_legal_ops` |
+| `case__c` | string (`500b...`) | FK → `events_case` |
+| `id_owner` / `id_created_by` / `id_last_modified_by` | string (`005b...`) | FK → `users` |
+
+**Notas pendentes por categoria (parsing do prefixo):**
+```sql
+SELECT
+    id_record,
+    status,
+    committed_at,
+    -- Extrai prefixo de role: HOUSE, SELLER, BUYER, etc.
+    REGEXP_EXTRACT(note_part, '^([A-Z]+):', 1) AS role,
+    TRIM(REGEXP_REPLACE(note_part, '^[A-Z]+:\s*', ''))   AS note_text
+FROM datalake_salesforce_clean.events_incident
+CROSS JOIN UNNEST(SPLIT(pendency_notes__c, ' || ')) AS t(note_part)
+WHERE event_type = 'UPDATE'
+  AND status = 'ACTIVE'
+```
+
+---
+
+### 10.4 `events_case_legal_ops` — Casos Legal Ops (CaseLegalOps__c)
+
+**Grain:** 1 linha por evento CDC de um registro CaseLegalOps__c.
+
+**O que é:** Caso de Legal Ops criado quando um EN envia a oferta a um Analista Jurídico para análise contratual e de due diligence. Cada caso é criado com `status__c='Aberto'` e vai avançando conforme a análise progride.
+
+| Coluna | Tipo / Valores | Observação |
+|--------|----------------|------------|
+| `id_record` | string (`a14...`) | ID do CaseLegalOps__c |
+| `id_replay` | bigint | Cursor CDC |
+| `event_type` | string | `CREATE` (maioria dos campos populados, `status__c='Aberto'`); `UPDATE` (sparse) |
+| `commit_ts` | bigint | Milissegundos epoch |
+| `committed_at` | string | `YYYY-MM-DD HH:MM:SS` UTC |
+| `status__c` | string | `Aberto` (estado inicial), `Oferta Cancelada`. NULL se não mudou. |
+| `queue__c` | string | `Front`, `Back`, `Confecção`, `Docs`. Definido no CREATE. NULL se não mudou. |
+| `risk_classification__c` | string | `Sem apontamentos`, `Baixo`. NULL se não mudou. |
+| `dilligence_sent_date__c` | string | Data de envio da due diligence (`YYYY-MM-DD`). NULL se não mudou. |
+| `delay_reason__c` | string | Ex.: `Não Aplicável (dentro do SLA)`. NULL se não mudou. |
+| `front_complexity_level__c` | string | Ex.: `Não vai para Front`. NULL se não mudou. |
+| `dilligence_scope__c` | string | Ex.: `New DD`. NULL se não mudou. |
+| `inscription_link__c` | string | `Sim` quando link da matrícula disponível (texto, não URL). NULL se não mudou. |
+| `error_type__c` | string | Ex.: `Inclusão de partes`. NULL se não mudou. |
+| `reasons_changes__c` | string | Lista de razões de mudança separadas por `;`. Ex.: `Qualificação: Dados Incorretos;Preços e Condições`. NULL se não mudou. |
+| `number_change__c` | double | Contador de mudanças no caso. |
+| `reopen_date__c` | string | Data de reabertura do caso. NULL se não mudou. |
+| `contract__c` | string (`800b...`) | FK → `contract` |
+| `id_owner` / `id_created_by` | string (`005b...`) | FK → `users` |
+| `deadline_extension__c` | string | Extensão de prazo concedida. NULL se não mudou. |
+| `ccv_sent_date2nd__c` | string | Data de envio do CCV pela segunda vez. |
+| `had_ccv__c` | boolean | Flag se o caso teve CCV. |
+
+**Casos abertos por queue e risk_classification (estado atual):**
+```sql
+WITH latest_status AS (
+    SELECT id_record,
+           FIRST_VALUE(status__c) IGNORE NULLS OVER (
+               PARTITION BY id_record ORDER BY id_replay DESC
+               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ) AS current_status,
+           FIRST_VALUE(queue__c) IGNORE NULLS OVER (
+               PARTITION BY id_record ORDER BY id_replay ASC
+               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ) AS initial_queue,
+           FIRST_VALUE(risk_classification__c) IGNORE NULLS OVER (
+               PARTITION BY id_record ORDER BY id_replay DESC
+               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ) AS latest_risk,
+           ROW_NUMBER() OVER (PARTITION BY id_record ORDER BY id_replay DESC) AS rn
+    FROM datalake_salesforce_clean.events_case_legal_ops
+)
+SELECT
+    initial_queue,
+    latest_risk,
+    COUNT(*) AS total_casos
+FROM latest_status
+WHERE rn = 1
+  AND current_status = 'Aberto'
+GROUP BY 1, 2 ORDER BY 3 DESC
+```
+
+---
+
+### 10.5 Relacionamentos entre tabelas CDC
+
+```
+events_case_legal_ops ──── (case_legal_ops__c) ──── events_incident
+                   │                                       │
+                   └──── (contract__c) ─── contract        └──── (case__c) ─── events_case
+                                                                        │
+events_pendency ──── (caso__c) ─── events_case              └──── (id_*) ─── users
+      │
+      └──── (purchase_sale_contract__c) ──── purchase_sale_contract
+      └──── (offer_id__c) ──────────────── dw_sale.dim_sale_agreement.sk_offer
+
+events_received_document ──── (caso__c) ─── events_case
+      │
+      ├──── (opportunity__c) [pré-contrato] ──── opportunity
+      └──── (purchase_sale_contract__c) [pós-contrato] ──── purchase_sale_contract
+```
+
+---
+
+### 10.6 Dos and Don'ts — Tabelas CDC Salesforce
+
+**Do:**
+- Usar `id_replay` para ordenar eventos de um mesmo `id_record` — é o cursor monotônico correto para CDC.
+- Para reconstruir estado atual: aplicar `LAST_VALUE(...) IGNORE NULLS OVER (PARTITION BY id_record ORDER BY id_replay)` ou `ROW_NUMBER()` + filtrar `rn=1` por campo.
+- Usar `TIMESTAMP_MILLIS(commit_ts)` para converter para timestamp.
+- Para `events_incident`, usar diretamente o registro mais recente (`MAX(id_replay)`) — não é sparse, todos os campos são sempre populados.
+- Lembrar que `opportunity__c` e `purchase_sale_contract__c` em `events_received_document` são **mutuamente exclusivos** por estágio do negócio.
+
+**Don't:**
+- Não tratar NULL em colunas de negócio como "dado ausente" — em CDC sparse NULL = campo não mudou naquele evento.
+- Não usar `commit_ts` como segundos — é **milissegundos**. Dividir por 1000 ou usar `TIMESTAMP_MILLIS()`.
+- Não assumir que `events_incident` é sparse — ao contrário das outras 3 tabelas, envia estado completo em cada evento.
+- Não fazer JOIN direto entre `events_case_legal_ops` e `dw_sale.fact_offers` pelo `contract__c` — o campo é um ID Salesforce (`800b...`), não `sk_offer`. Usar `purchase_sale_contract__c` em `events_pendency`/`events_received_document` como ponte via `purchase_sale_contract` clean.
+- Não usar `created_date` do registro CDC para análises temporais de volume — usar `committed_at` ou `TIMESTAMP_MILLIS(commit_ts)` para datar o evento.
+
+---
+
+## 11. Pitfalls — Nunca Cometa Esses Erros
 
 | ❌ Erro | ✅ Abordagem correta |
 |---------|-------------------|

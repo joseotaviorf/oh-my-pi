@@ -92,7 +92,7 @@ def create_sst_task(
                 "parameters": base_parameters,
             }
         },
-        execution_timeout=timedelta(hours=1),
+        execution_timeout=timedelta(minutes=30),
     )
 
 
@@ -120,7 +120,7 @@ gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
 default_args = {
     "owner": CONFIG_SERVICE.get_config("owner"),
     "email_on_retry": False,
-    "retries": 3,
+    "retries": 1,
     "depends_on_past": True,
     "on_failure_callback": gchat_callback.task_failure_alert,
     # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
@@ -131,6 +131,7 @@ with DAG(
     default_args=default_args,
     schedule_interval="0 * * * *",
     start_date=datetime(2026, 6, 8),
+    dagrun_timeout=timedelta(hours=3),
     catchup=True,
     tags=["ForSale", "SF", "salesforce"],
     on_failure_callback=gchat_callback.dag_failure_alert,

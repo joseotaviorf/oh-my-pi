@@ -1,0 +1,238 @@
+---
+database_name: datalake_salesforce_clean
+table_name: events_case_legal_ops
+description: >
+  Table with salesforce cases related to Legal Ops tasks like contract analysis and due diligence.
+  Every time an EN sends the offer to a Legal Analyst a CaseLegalOps ticket is created (status='Aberto').
+  Because this is CDC, only the fields that changed in an UPDATE event are populated — all other columns will be NULL.
+  On CREATE events most business fields are populated. To reconstruct the full current state, aggregate
+  events by id_record ordered by id_replay.
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com
+columns:
+  id_record:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.id_record
+    description: Primary Salesforce 18-digit identifier for the CaseLegalOps custom object; use with id_replay to reconstruct state from CDC events.
+  commit_number:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.commit_number
+    description: Commit number associated with the CDC event.
+  commit_ts:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.commit_ts
+    description: Commit timestamp of the CDC event in milliseconds epoch (e.g. 1781188554000). Divide by 1000 to get seconds.
+  sequence_number:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.sequence_number
+    description: Sequence number of the CDC event within the transaction.
+  entity_name:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.entity_name
+    description: Salesforce entity name that originated the event (CaseLegalOps__c).
+  event_type:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.event_type
+    description: Type of CDC event. Observed values are CREATE (most fields populated, status='Aberto') and UPDATE (sparse, only changed fields populated).
+  transaction_key:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.transaction_key
+    description: Unique key identifying the transaction that generated the event.
+  commit_user:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.commit_user
+    description: Salesforce user ID who committed the change.
+  available_for_chargeback__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.AvailableForChargeback__c
+    description: Flag indicating if the case is available for chargeback.
+  buyer_accept_date__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.BuyerAcceptDate__c
+    description: Date when the buyer accepted the due diligence.
+  buyer_decision__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.BuyerDecision__c
+    description: Buyer's decision on the due diligence.
+  ccv_sent_date2nd__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.CCVSentDate2nd__c
+    description: Date when the CCV was sent for the second time.
+  commercial_agreement__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.CommercialAgreement__c
+    description: Flag indicating if there is a commercial agreement.
+  complexity_level__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ComplexityLevel__c
+    description: Qualitative complexity rating assigned to the Legal Ops case by the analyst team; influences queue routing.
+  contract__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.Contract__c
+    description: Reference to the contract associated with the Legal Ops case. Joinable with datalake_salesforce_clean.contract
+  crawler_failure__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.CrawlerFailure__c
+    description: Flag indicating if there was a crawler failure during due diligence.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.CreatedById
+    description: Salesforce user ID who created the record (Criado pelo ID).
+  created_date:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.CreatedDate
+    description: Date when the record was created in Salesforce (Data de criação).
+  dd_add__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DDAdd__c
+    description: Due diligence additional information field.
+  date_last_checklist_sent__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DateLastChecklistSent__c
+    description: Calendar date when the most recent due diligence checklist was emailed to the buyer or seller.
+  delay_reason__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DelayReason__c
+    description: Reason for delay in the Legal Ops case. Known values include "Não Aplicável (dentro do SLA)". NULL when not changed.
+  dilligence_sent_date__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DilligenceSentDate__c
+    description: Date when the due diligence was sent.
+  dilligence_scope__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.Dilligence_Scope__c
+    description: Scope defined for the due diligence analysis. Known values include "New DD".
+  early_dd__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.EarlyDD__c
+    description: Flag indicating if the due diligence was performed early.
+  error_type__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ErrorType__c
+    description: Type of error encountered in the Legal Ops case. Known values include "Inclusão de partes". NULL when not changed.
+  front_complexity_level__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.FrontComplexityLevel__c
+    description: Frontend-facing complexity level of the Legal Ops case. Known values include "Não vai para Front". NULL when not changed.
+  had_ccv__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.HadCCV__c
+    description: Flag indicating if a CCV (purchase and sale agreement) existed.
+  has_pendency__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.HasPendency__c
+    description: Numeric indicator of whether the case has pendencies.
+  inscription_link__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.InscriptionLink__c
+    description: Indicates whether the property registration (matrícula) link is available. Observed as text "Sim" (not a URL). NULL when not changed.
+  internal_error__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.InternalError__c
+    description: Flag indicating if there was an internal error in the case.
+  is_landlord_same_as_registry__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.IsLandlordSameAsRegistry__c
+    description: Flag indicating if the landlord matches the property registry owner.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.LastModifiedById
+    description: Salesforce user ID who last modified the record (Última modificação pelo ID).
+  last_modified_date:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.LastModifiedDate
+    description: Date when the record was last modified in Salesforce (Data da última modificação).
+  legaut_card_creation__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.LegautCardCreation__c
+    description: Reference timestamp or flag from the Legaut integration indicating when the diligence card was created in the external system.
+  name:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.Name
+    description: Human-readable ticket title auto-generated by Salesforce for the CaseLegalOps record; usually includes the offer or property reference.
+  number_change__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.NumberChange__c
+    description: Number of changes made in the Legal Ops case.
+  out_of_scope_points__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.OutOfScopePoints__c
+    description: Points identified as out of scope in the due diligence.
+  id_owner:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.OwnerId
+    description: Salesforce owner user ID of the record (ID do proprietário). Joinable with datalake_salesforce_clean.users
+  payment_delayed__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.PaymentDelayed__c
+    description: Flag indicating if payment has been delayed.
+  queue__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.Queue__c
+    description: 'Queue assigned to the Legal Ops case. Known values: "Front", "Back", "Confecção", "Docs". Set on CREATE.'
+  quinto_andar_network__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.QuintoAndarNetwork__c
+    description: Flag indicating if the case is within the QuintoAndar network.
+  reasons_changes__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ReasonsChanges__c
+    description: 'Semicolon-separated list of reasons for changes in the Legal Ops case. Example: "Qualificação: Dados Incorretos;Preços e Condições;Valores/corretagem". NULL when not changed.'
+  id_record_type:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.RecordTypeId
+    description: Salesforce record type ID for the Legal Ops case (ID do tipo de registro).
+  reopen_date__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ReopenDate__c
+    description: Date when the Legal Ops case was reopened.
+  id_replay:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ReplayId
+    description: Replay ID used for CDC event replay from Salesforce.
+  risk_classification__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.RiskClassification__c
+    description: Risk classification assigned to the Legal Ops case. Known values include "Sem apontamentos", "Baixo". NULL when not changed.
+  status__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.Status__c
+    description: Current status of the Legal Ops case (Status). Known values include "Aberto" (initial state on CREATE), "Oferta Cancelada". NULL when not changed.
+  committed_at:
+    description: Timestamp of when the CDC event was committed, derived from commit_ts (format YYYY-MM-DD HH:MM:SS, UTC). Equivalent to TIMESTAMP_MILLIS(commit_ts).
+  ts_load:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ts_load
+    description: Timestamp of when the record was loaded into the raw table.
+  partition_date:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.partition_date
+    description: Partition date used for table partitioning (YYYY-MM-DD).
+  partition_hour:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.partition_hour
+    description: Partition hour used for table partitioning (HH).
+  dd_sent_buyer_date__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DDSentBuyerDate__c
+    description: Date when the due diligence was sent to the buyer.
+  dd_sent_seller_date__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DDSentSellerDate__c
+    description: Date when the due diligence was sent to the seller.
+  return_to_docs_detail__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ReturnToDocs_Detail__c
+    description: Detail description for returning the case to documentation.
+  return_reason__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ReturnReason__c
+    description: Reason for returning the Legal Ops case.
+  return_to_docs_action__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.ReturnToDocs_Action__c
+    description: Action taken when returning the case to documentation.
+  deadline_extension__c:
+    lineage:
+      - datalake_salesforce_raw.events_case_legal_ops.DeadlineExtension__c
+    description: Deadline extension granted for the Legal Ops case. NULL when not changed.
