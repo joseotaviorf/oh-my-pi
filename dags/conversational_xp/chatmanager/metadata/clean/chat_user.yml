@@ -5,7 +5,7 @@ domain: Conversational XP
 description: "Chat users from chat-manager service"
 columns:
   id:
-    description: "Chat user identifier"
+    description: "Internal primary key for the chat user record."
     lineage:
       - datalake_chatmanager_raw.chatuser.id
   uuid:
@@ -13,23 +13,23 @@ columns:
     lineage:
       - datalake_chatmanager_raw.chatuser.uuid
   id_participant:
-    description: "Participant identifier"
+    description: "External participant identifier from the originating system."
     lineage:
       - datalake_chatmanager_raw.chatuser.participant_id
   id_origin:
-    description: "Origin identifier"
+    description: "Identifier of the entity that registered this chat user."
     lineage:
       - datalake_chatmanager_raw.chatuser.origin_id
   origin_type:
-    description: "Origin type"
+    description: "Type of the originating system."
     lineage:
       - datalake_chatmanager_raw.chatuser.origin_type
   attributes:
-    description: "Chat user attributes"
+    description: "Arbitrary key-value metadata attached to this chat user by the service."
     lineage:
       - datalake_chatmanager_raw.chatuser.attributes
   version:
-    description: "Chat user version"
+    description: "Record version number for optimistic concurrency control."
     lineage:
       - datalake_chatmanager_raw.chatuser.version
   ts_created:

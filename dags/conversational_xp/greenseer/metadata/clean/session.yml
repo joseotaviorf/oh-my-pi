@@ -1,36 +1,50 @@
 database_name: datalake_greenseer_clean
 table_name: session
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "[LEGACY — actively being deprecated] Greenseer chatbot sessions ingested from the Greenseer PostgreSQL database. Greenseer was the first-generation WhatsApp chatbot that routed inbound contacts to human agents; it is being replaced by the Copilot service. Each row represents a single interaction session. Prefer copilot_service tables for new analyses."
 columns:
   id_session:
+    description: "Unique identifier for the Greenseer chatbot session."
     lineage:
       - datalake_greenseer_raw.session.session_id
   id_pipeline:
+    description: "Identifier of the dialogue pipeline that managed this session."
     lineage:
       - datalake_greenseer_raw.session.pipeline_id
   language_code:
+    description: "IETF language code for the session, used to serve responses in the user's language."
     lineage:
       - datalake_greenseer_raw.session.language_code
   memory:
+    description: "JSON-serialized context stored by the chatbot across turns within this session."
     lineage:
       - datalake_greenseer_raw.session.memory
   current_state:
+    description: "Name of the current state in the dialogue state machine for this session."
     lineage:
       - datalake_greenseer_raw.session.current_state
   ts_started:
+    description: "Timestamp when the chatbot session was initiated by the user."
     lineage:
       - datalake_greenseer_raw.session.beginning_timestamp
   ts_ended:
+    description: "Timestamp when the chatbot session concluded; null if still active."
     lineage:
       - datalake_greenseer_raw.session.end_timestamp
   ts_updated:
+    description: "Timestamp of the most recent update to this session record."
     lineage:
       - datalake_greenseer_raw.session.update_timestamp
   year:
+    description: year partition
     lineage:
       - datalake_greenseer_raw.session.year
   month:
+    description: month partition
     lineage:
       - datalake_greenseer_raw.session.month
   day:
+    description: day partition
     lineage:
       - datalake_greenseer_raw.session.day

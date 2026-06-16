@@ -6,19 +6,19 @@ domain: Conversational XP
 description: "This table stores chat states in the Copilot service"
 columns:
   id:
-    description: "The state identifier"
+    description: "Internal primary key for the chat state snapshot record."
     lineage:
     - datalake_copilot_service_raw.state.id
   id_session:
-    description: "The session identifier"
+    description: "FK to the Copilot session this state snapshot belongs to."
     lineage:
     - datalake_copilot_service_raw.state.external_id
   id_message:
-    description: "The message identifier"
+    description: "FK to the message that triggered this state transition."
     lineage:
     - datalake_copilot_service_raw.state.message_id
   state_version:
-    description: "The state version"
+    description: "Version number of the state schema used to serialize this snapshot."
     lineage:
     - datalake_copilot_service_raw.state.state_version
   flow:
@@ -26,7 +26,7 @@ columns:
     lineage:
     - datalake_copilot_service_raw.state.flow
   state:
-    description: "The state content"
+    description: "Serialized snapshot of the conversation state at this point in time."
     lineage:
     - datalake_copilot_service_raw.state.state
   ts_created:

@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_copilot_service_raw.voice_session.id
   id_user:
-    description: "The user identifier"
+    description: "FK to the QuintoAndar user who initiated or received this voice session."
     lineage:
       - datalake_copilot_service_raw.voice_session.user_id
   id_idempotency:
@@ -18,31 +18,31 @@ columns:
     lineage:
       - datalake_copilot_service_raw.voice_session.idempotency_id
   user_phone:
-    description: "The user phone number"
+    description: "Phone number dialed or called for this voice session."
     lineage:
       - datalake_copilot_service_raw.voice_session.user_phone
   user_name:
-    description: "The user name"
+    description: "Name of the user as provided to the telephony channel for this session."
     lineage:
       - datalake_copilot_service_raw.voice_session.user_name
   user_document_number:
-    description: "The user document number"
+    description: "National identification number of the user associated with this voice session."
     lineage:
       - datalake_copilot_service_raw.voice_session.user_document_number
   channel:
-    description: "The channel"
+    description: "Communication channel used for this session."
     lineage:
       - datalake_copilot_service_raw.voice_session.channel
   call_context:
-    description: "The call context"
+    description: "Business context describing the purpose of this voice contact."
     lineage:
       - datalake_copilot_service_raw.voice_session.call_context
   state:
-    description: "The voice session state"
+    description: "Current lifecycle state of the voice session."
     lineage:
       - datalake_copilot_service_raw.voice_session.state
   completion_state:
-    description: "The completion state"
+    description: "Final outcome after the voice session ended."
     lineage:
       - datalake_copilot_service_raw.voice_session.completion_state
   min_interval_between_calls:

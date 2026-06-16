@@ -5,7 +5,7 @@ domain: Conversational XP
 description: "Chat groups from chat-manager service"
 columns:
   id:
-    description: "Chat group identifier"
+    description: "Internal primary key for the chat group record."
     lineage:
       - datalake_chatmanager_raw.chatgroup.id
   id_last_chat_vendor:
@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_chat_vendor_id
   id_chat_subtype:
-    description: "Chat subtype identifier"
+    description: "FK to the chat subtype that categorizes this conversation thread."
     lineage:
       - datalake_chatmanager_raw.chatgroup.chat_subtype_id
   uuid:
@@ -21,19 +21,19 @@ columns:
     lineage:
       - datalake_chatmanager_raw.chatgroup.uuid
   version:
-    description: "Chat group version"
+    description: "Record version number for optimistic concurrency control."
     lineage:
       - datalake_chatmanager_raw.chatgroup.version
   type:
-    description: "Chat group type"
+    description: "Conversation type classification."
     lineage:
       - datalake_chatmanager_raw.chatgroup.type
   chat_group:
-    description: "Chat group name"
+    description: "Friendly name or identifier assigned to this conversation group."
     lineage:
       - datalake_chatmanager_raw.chatgroup.chat_group
   state:
-    description: "Chat group state"
+    description: "Current state of the chat group."
     lineage:
       - datalake_chatmanager_raw.chatgroup.state
   last_message_sent_by:
@@ -41,35 +41,35 @@ columns:
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_message_sent_by
   last_message_type:
-    description: "Last message type"
+    description: "Message type of the most recently sent message."
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_message_type
   last_message_body:
-    description: "Last message body"
+    description: "Text content of the most recently sent message in this group."
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_message_body
   last_message_index:
-    description: "Last message index"
+    description: "Sequential index of the most recent message in the conversation."
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_message_index
   last_message_data:
-    description: "Last message data"
+    description: "Structured data payload associated with the most recent message."
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_message_data
   attributes:
-    description: "Chat group attributes"
+    description: "Arbitrary key-value metadata attached to this chat group by the service."
     lineage:
       - datalake_chatmanager_raw.chatgroup.attributes
   last_message_media_content_type:
-    description: "Last message media content type"
+    description: "MIME type of the media file attached to the most recent message."
     lineage:
       - datalake_chatmanager_raw.chatgroup.customer_name
   last_chat_vendor_name:
-    description: "Last chat vendor name"
+    description: "Name of the messaging provider used for the most recent message."
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_chat_vendor_name
   chat_subtype:
-    description: "Chat subtype"
+    description: "Subtype label describing the nature of the conversation."
     lineage:
       - datalake_chatmanager_raw.chatgroup.chat_subtype
   ts_created:
@@ -77,7 +77,7 @@ columns:
     lineage:
       - datalake_chatmanager_raw.chatgroup.created_at
   ts_last_message_sent:
-    description: "Last message sent date"
+    description: "Timestamp of the most recently sent message in this conversation."
     lineage:
       - datalake_chatmanager_raw.chatgroup.last_message_sent_at
   ts_updated:

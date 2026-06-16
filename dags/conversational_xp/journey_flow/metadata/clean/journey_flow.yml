@@ -1,70 +1,95 @@
 ---
 database_name: datalake_journey_flow_clean
 table_name: journey_flow
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Journey Flow chatbot session records ingested from the Journey Flow PostgreSQL database. Each row represents a complete chatbot journey instance triggered by a user, capturing the taxonomy routing, execution status, and user role within the QuintoAndar platform."
 columns:
   id:
+    description: "Internal primary key for the journey flow record."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.id
   id_correlation:
+    description: "Correlation identifier that groups related events across the same user session."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.correlation_id
   id_user:
+    description: "Identifier of the QuintoAndar user who triggered this journey."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.user_id
   id_content:
+    description: "FK to the knowledge-base content item that initiated this journey."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.content_id
   taxonomy:
+    description: "Top-level routing taxonomy for this chatbot flow."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.taxonomy
   taxonomy_submenu:
+    description: "Sub-category within the top-level taxonomy for more specific intent routing."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.taxonomy_submenu
   journey_name:
+    description: "Name of the journey definition that was executed for this instance."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.journey_name
   journey_version:
+    description: "Version of the journey definition active when this instance was created."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.journey_version
   journey_state:
+    description: "Lifecycle state of the journey instance."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.journey_state
   status:
+    description: "Final execution status of the journey."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.status
   status_error_message:
+    description: "Error message captured when the journey ended with a non-success status."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.status_error_message
   origin:
+    description: "Entry channel that triggered this journey."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.origin
   rule_description:
+    description: "Description of the routing rule that matched to trigger this journey."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.rule_description
   submenu_content:
+    description: "Content or options displayed to the user during the submenu navigation step."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.submenu_content
   user_role:
+    description: "Business role of the user in this interaction."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.user_role
   fired_response:
+    description: "Final response message sent back to the user at the end of this journey."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.fired_response
   ts_shared_var_expiration:
+    description: "Timestamp after which shared session variables for this journey become invalid."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.shared_var_expiration
   ts_created:
+    description: "Timestamp when this journey flow instance was created."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.created_at
   ts_updated:
+    description: "Timestamp of the most recent update to this journey flow record."
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.updated_at
   year:
+    description: year partition
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.updated_at
   month:
+    description: month partition
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.updated_at
   day:
+    description: day partition
     lineage:
       - datalake_journey_flow_raw.t_journey_flow.updated_at

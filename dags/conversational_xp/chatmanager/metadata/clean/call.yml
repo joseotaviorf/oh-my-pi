@@ -5,7 +5,7 @@ domain: Conversational XP
 description: "Call records from chat-manager service"
 columns:
   id:
-    description: "Call identifier"
+    description: "Internal primary key for the call record in chat-manager."
     lineage:
       - datalake_chatmanager_raw.call.id
   uuid:
@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_chatmanager_raw.call.uuid
   id_chat_group:
-    description: "Chat group identifier"
+    description: "FK to the chat group conversation this call belongs to."
     lineage:
       - datalake_chatmanager_raw.call.chat_group_id
   id_from_chat_user:
@@ -21,55 +21,55 @@ columns:
     lineage:
       - datalake_chatmanager_raw.call.from_chat_user_id
   id_to_chat_user:
-    description: "To chat user identifier"
+    description: "Recipient chat user targeted in this voice call."
     lineage:
       - datalake_chatmanager_raw.call.to_chat_user_id
   id_vendor:
-    description: "Vendor identifier"
+    description: "FK to the telephony vendor that handled this call."
     lineage:
       - datalake_chatmanager_raw.call.vendor_id
   version:
-    description: "Call version"
+    description: "Record version number for optimistic concurrency control."
     lineage:
       - datalake_chatmanager_raw.call.version
   state:
-    description: "Call state"
+    description: "Current lifecycle state of the call."
     lineage:
       - datalake_chatmanager_raw.call.state
   result:
-    description: "Call result"
+    description: "Final outcome of the call attempt."
     lineage:
       - datalake_chatmanager_raw.call.result
   from_leg_type:
-    description: "From leg type"
+    description: "Telephony leg type for the caller side."
     lineage:
       - datalake_chatmanager_raw.call.from_leg_type
   from_leg_state:
-    description: "From leg state"
+    description: "Lifecycle state of the caller leg during the call."
     lineage:
       - datalake_chatmanager_raw.call.from_leg_state
   from_leg_result:
-    description: "From leg result"
+    description: "Outcome of the caller-side leg."
     lineage:
       - datalake_chatmanager_raw.call.from_leg_result
   from_leg_duration:
-    description: "From leg duration"
+    description: "Duration in seconds for the caller-side leg of the call."
     lineage:
       - datalake_chatmanager_raw.call.from_leg_duration
   to_leg_type:
-    description: "To leg type"
+    description: "Telephony leg type for the callee side."
     lineage:
       - datalake_chatmanager_raw.call.to_leg_type
   to_leg_state:
-    description: "To leg state"
+    description: "Lifecycle state of the callee leg during the call."
     lineage:
       - datalake_chatmanager_raw.call.to_leg_state
   to_leg_result:
-    description: "To leg result"
+    description: "Outcome of the callee-side leg."
     lineage:
       - datalake_chatmanager_raw.call.to_leg_result
   to_leg_duration:
-    description: "To leg duration"
+    description: "Duration in seconds for the callee-side leg of the call."
     lineage:
       - datalake_chatmanager_raw.call.to_leg_duration
   to_voip_rang:
@@ -77,7 +77,7 @@ columns:
     lineage:
       - datalake_chatmanager_raw.call.to_voip_rang
   vendor_name:
-    description: "Vendor name"
+    description: "Display name of the telephony vendor that handled this call."
     lineage:
       - datalake_chatmanager_raw.call.vendor_name
   is_from_answered_by_machine:

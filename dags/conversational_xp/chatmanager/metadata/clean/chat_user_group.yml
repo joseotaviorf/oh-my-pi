@@ -5,15 +5,15 @@ domain: Conversational XP
 description: "Chat user group associations"
 columns:
   id_chat_group:
-    description: "Chat group identifier"
+    description: "FK to the chat group this membership record belongs to."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.chat_group_id
   id_chat_user:
-    description: "Chat user identifier"
+    description: "FK to the chat user who is a member of this group."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.chat_user_id
   state:
-    description: "Chat user group state"
+    description: "Membership state for this user in the group."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.state
   visible:
@@ -21,19 +21,19 @@ columns:
     lineage:
       - datalake_chatmanager_raw.chatusergroup.visible
   profile:
-    description: "User profile"
+    description: "Role or profile of this user within the conversation."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.profile
   last_read_index:
-    description: "Last read message index"
+    description: "Sequential index of the last message read by this user in the group."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.last_read_index
   attributes:
-    description: "Chat user group attributes"
+    description: "Arbitrary key-value metadata for this user's participation in the group."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.attributes
   ts_last_read:
-    description: "Last read date"
+    description: "Timestamp when this user last read a message in the group."
     lineage:
       - datalake_chatmanager_raw.chatusergroup.last_read_at
   ts_created:

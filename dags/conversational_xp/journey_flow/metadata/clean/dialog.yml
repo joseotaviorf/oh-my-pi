@@ -1,61 +1,83 @@
 ---
 database_name: datalake_journey_flow_clean
 table_name: dialog
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Individual dialogue steps from the Journey Flow chatbot service. Each row represents a single message exchange within a chatbot journey, capturing the content, sender/recipient roles, and execution result of that step."
 columns:
   id:
+    description: "Internal primary key for the dialog record."
     lineage:
       - datalake_journey_flow_raw.t_dialog.id
   id_journey:
+    description: "FK to the journey flow instance this dialog step belongs to."
     lineage:
       - datalake_journey_flow_raw.t_dialog.journey_id
   id_correlation:
+    description: "Correlation identifier that groups related events within the same user session."
     lineage:
       - datalake_journey_flow_raw.t_dialog.correlation_id
   id_user:
+    description: "Identifier of the QuintoAndar user participating in this dialog."
     lineage:
       - datalake_journey_flow_raw.t_dialog.user_id
   id_content:
+    description: "FK to the knowledge-base content item triggered at this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.content_id
   message_from:
+    description: "Sender role or identifier for this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.message_from
   message_to:
+    description: "Recipient role or identifier for this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.message_to
   message_content:
+    description: "Text or structured body of the message exchanged at this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.message_content
   step_status:
+    description: "Execution status of this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.step_status
   step_message:
+    description: "Human-readable result description or error detail for this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.step_message
   journey_name:
+    description: "Name of the journey definition this dialog step belongs to."
     lineage:
       - datalake_journey_flow_raw.t_dialog.journey_name
   journey_version:
+    description: "Version of the journey definition active when this step was executed."
     lineage:
       - datalake_journey_flow_raw.t_dialog.journey_version
   journey_step_name:
+    description: "Name of the specific step within the journey definition that was executed."
     lineage:
       - datalake_journey_flow_raw.t_dialog.journey_step_name
   journey_step_type:
+    description: "Type of journey step executed."
     lineage:
       - datalake_journey_flow_raw.t_dialog.journey_step_type
   elapsed_time:
+    description: "Time in milliseconds taken to complete this dialog step."
     lineage:
       - datalake_journey_flow_raw.t_dialog.elapsed_time
   ts_created:
+    description: "Timestamp when this dialog step record was created."
     lineage:
       - datalake_journey_flow_raw.t_dialog.creation
   year:
+    description: year partition
     lineage:
       - datalake_journey_flow_raw.t_dialog.creation
   month:
+    description: month partition
     lineage:
       - datalake_journey_flow_raw.t_dialog.creation
   day:
+    description: day partition
     lineage:
       - datalake_journey_flow_raw.t_dialog.creation

@@ -6,7 +6,7 @@ domain: Conversational XP
 description: "This table stores information about messages sent/received by the Copilot service"
 columns:
   id:
-    description: "The message identifier"
+    description: "Internal primary key for the Copilot service message record."
     lineage:
     - datalake_copilot_service_raw.message.id
   id_external:
@@ -14,7 +14,7 @@ columns:
     lineage:
     - datalake_copilot_service_raw.message.external_id
   id_session:
-    description: "The session identifier"
+    description: "FK to the Copilot session this message belongs to."
     lineage:
     - datalake_copilot_service_raw.message.session_id
   id_user:
@@ -22,7 +22,7 @@ columns:
     lineage:
     - datalake_copilot_service_raw.message.user_id
   message_index:
-    description: "The message index"
+    description: "Sequential position of this message within the session conversation."
     lineage:
     - datalake_copilot_service_raw.message.message_index
   role:
@@ -34,11 +34,11 @@ columns:
     lineage:
     - datalake_copilot_service_raw.message.channel
   input_type:
-    description: "The message input type"
+    description: "How the message was submitted."
     lineage:
     - datalake_copilot_service_raw.message.input_type
   content:
-    description: "The message content"
+    description: "Text or structured body of the message sent or received by the user."
     lineage:
     - datalake_copilot_service_raw.message.content
   extra:
@@ -46,7 +46,7 @@ columns:
     lineage:
     - datalake_copilot_service_raw.message.extra
   processing_status:
-    description: "Processing status of the message"
+    description: "Current processing lifecycle status of the message."
     lineage:
     - datalake_copilot_service_raw.message.processing_status
   media_url:
