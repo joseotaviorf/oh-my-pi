@@ -1,3 +1,7 @@
 cluster:
-  type: consolidation_m_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_min_general_2_workers_cluster
+  custom_configurations:
+    master_node_type_id: m7a.xlarge
+    core_nodes:
+      node_type_id: m7a.2xlarge
+      instance_count: 2

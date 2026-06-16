@@ -1,22 +1,24 @@
 cluster:
-  type: consolidation_xl_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_xl_memory_single_node_cluster
   custom_configurations:
-    num_workers: 3
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xl_memory_single_node_cluster
-    custom_configurations:
-      core_nodes:
+    # Cost-saving spot/OD mix: 1 CORE on-demand + 2 TASK spot (~67% spot).
+    # num_workers is the TOTAL (CORE + TASK), so 3 = 1 CORE + 2 TASK.
+    # Grows from 1-worker single_node to 3 workers; 2 of them are SPOT.
+    # Master ON_DEMAND (r7g.8xlarge — preset tier); 1 CORE + 2 TASK spot (~67% spot).
+    core_nodes:
         node_type_id: r7g.8xlarge
         instance_count: 1
-      task_nodes:
+    task_nodes:
         node_type_id: r7g.8xlarge
         instance_count: 2
-      spark_conf:
-        spark.driver.memory: 8g
-        spark.driver.cores: "4"
-        spark.executor.memory: 24g
-        spark.executor.cores: "4"
-        spark.dynamicAllocation.minExecutors: "2"
-        spark.dynamicAllocation.maxExecutors: "24"
+    spark_conf:
+      # Master / YARN RM (r7g.8xlarge — 32 vCPU / 256 GB)
+      spark.driver.memory: 8g
+      spark.driver.cores: "4"
+      # Workers are r7g.8xlarge (32 vCPU / 256 GB); 3 workers (1 CORE + 2 TASK).
+      # 8 execs/worker × 4 cores = 32 cores; 8 × 28g (24g heap + 4g overhead) = 224 GB / 256 GB per worker.
+      spark.executor.memory: 24g
+      spark.executor.cores: "4"
+      # 3 workers × 8 execs/worker = 24 executors max.
+      spark.dynamicAllocation.minExecutors: "2"
+      spark.dynamicAllocation.maxExecutors: "24"
