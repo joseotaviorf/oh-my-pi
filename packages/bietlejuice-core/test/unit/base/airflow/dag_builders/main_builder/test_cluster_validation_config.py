@@ -392,5 +392,5 @@ class TestMergeValidationClusterArgs:
         }
         merged = merge_validation_cluster_args(prod, validation)
         resolved = merge_cluster_configuration(merged, ConfigurationService())
-        assert resolved["node_type_id"].startswith("m6g.")
-        assert resolved["driver_node_type_id"].startswith("m6g.")
+        assert resolved["node_type_id"].startswith("m7g.")
+        assert resolved["driver_node_type_id"] == "m6g.xlarge"

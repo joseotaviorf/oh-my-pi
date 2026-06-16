@@ -6,14 +6,3 @@ cluster:
       ebs_volume_size: 200
     data_security_mode: USER_ISOLATION
     num_workers: 3
-    driver_node_type_id: m6g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      data_security_mode: USER_ISOLATION
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.large

@@ -7,17 +7,4 @@ cluster:
   custom_configurations:
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-    driver_node_type_id: r6g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: auditlogs
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      spark_conf:
-        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.xlarge
-  allow_custom_spark_job: true
+    driver_node_type_id: r7g.xlarge

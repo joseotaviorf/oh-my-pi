@@ -13,17 +13,3 @@ cluster:
       ebs_volume_size: 200
     spark_version: 13.3.x-scala2.12
     num_workers: 3
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_version: 13.3.x-scala2.12
-      num_workers: 3
-      node_type_id: r7g.xlarge
-      driver_node_type_id: r7g.xlarge

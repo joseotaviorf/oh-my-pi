@@ -2184,132 +2184,132 @@ emr_7_12_consolidation_xl_memory_single_node_cluster:
 ##### Consolidation Cluster Presets #####
 # Naming: consolidation_{size}_{family}_cluster
 # Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32
-# Families: compute=c6g (1:2)  general=m6g (1:4)  memory=r6g (1:8)  — AWS Graviton (gen 6).
+# Families: compute=c7g (1:2)  general=m7g (1:4)  memory=r7g (1:8)  — AWS Graviton (gen 7).
 # Special IAM: declare aws_attributes.instance_profile_arn in the DAG's custom_configurations.
 
-##### Compute Optimized (c6g — 1 vCPU : 2 GiB RAM) #####
+##### Compute Optimized (c7g — 1 vCPU : 2 GiB RAM) #####
 
 consolidation_xs_compute_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: c6g.large
-    node_type_id: c6g.large
+    driver_node_type_id: c7g.large
+    node_type_id: c7g.large
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_s_compute_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: c6g.xlarge
-    node_type_id: c6g.xlarge
+    driver_node_type_id: c7g.xlarge
+    node_type_id: c7g.xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_m_compute_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: c6g.2xlarge
-    node_type_id: c6g.2xlarge
+    driver_node_type_id: c7g.2xlarge
+    node_type_id: c7g.2xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_l_compute_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: c6g.4xlarge
-    node_type_id: c6g.4xlarge
+    driver_node_type_id: c7g.4xlarge
+    node_type_id: c7g.4xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_xl_compute_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: c6g.8xlarge
-    node_type_id: c6g.8xlarge
+    driver_node_type_id: c7g.8xlarge
+    node_type_id: c7g.8xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
-##### General Purpose (m6g — 1 vCPU : 4 GiB RAM) #####
+##### General Purpose (m7g — 1 vCPU : 4 GiB RAM) #####
 
 consolidation_xs_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.large
-    node_type_id: m6g.large
+    driver_node_type_id: m7g.large
+    node_type_id: m7g.large
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_s_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.xlarge
-    node_type_id: m6g.xlarge
+    driver_node_type_id: m7g.xlarge
+    node_type_id: m7g.xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_m_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.2xlarge
-    node_type_id: m6g.2xlarge
+    driver_node_type_id: m7g.2xlarge
+    node_type_id: m7g.2xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_l_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.4xlarge
-    node_type_id: m6g.4xlarge
+    driver_node_type_id: m7g.4xlarge
+    node_type_id: m7g.4xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_xl_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.8xlarge
-    node_type_id: m6g.8xlarge
+    driver_node_type_id: m7g.8xlarge
+    node_type_id: m7g.8xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
-##### Memory Optimized (r6g — 1 vCPU : 8 GiB RAM) #####
+##### Memory Optimized (r7g — 1 vCPU : 8 GiB RAM) #####
 
 consolidation_xs_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.large
-    node_type_id: r6g.large
+    driver_node_type_id: r7g.large
+    node_type_id: r7g.large
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_s_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.xlarge
-    node_type_id: r6g.xlarge
+    driver_node_type_id: r7g.xlarge
+    node_type_id: r7g.xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_m_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.2xlarge
-    node_type_id: r6g.2xlarge
+    driver_node_type_id: r7g.2xlarge
+    node_type_id: r7g.2xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_l_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.4xlarge
-    node_type_id: r6g.4xlarge
+    driver_node_type_id: r7g.4xlarge
+    node_type_id: r7g.4xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 consolidation_xl_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.8xlarge
-    node_type_id: r6g.8xlarge
+    driver_node_type_id: r7g.8xlarge
+    node_type_id: r7g.8xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
 
 wonka_consolidation_xs_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.large
-    node_type_id: r6g.large
+    driver_node_type_id: r7g.large
+    node_type_id: r7g.large
     num_workers: 2
     spark_version: 16.4.x-scala2.12
     <<: *wonka_runtime
 
 wonka_consolidation_xl_memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.4xlarge
-    node_type_id: r6g.8xlarge
+    driver_node_type_id: r7g.4xlarge
+    node_type_id: r7g.8xlarge
     num_workers: 2
     spark_version: 16.4.x-scala2.12
     <<: *wonka_runtime
@@ -2317,17 +2317,17 @@ wonka_consolidation_xl_memory_cluster:
 ##### Consolidation Single-Node Presets #####
 # Naming: consolidation_{size}_{family}_single_node_cluster
 # Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32
-# Families: general=m6g (Graviton ARM, 1:4)  memory=r6g (Graviton ARM, 1:8)
+# Families: general=m7g (Graviton ARM, 1:4)  memory=r7g (Graviton ARM, 1:8)
 # compute family omitted — no dedicated single-node compute t-shirt in this set.
 # All specs: num_workers=0, singleNode spark conf, ResourceClass=SingleNode tag.
 # Default runtime: 16.4.x-scala2.12  (override per-DAG via custom_configurations.spark_version)
 
-##### General Purpose Single-Node (m6g — 1 vCPU : 4 GiB RAM) #####
+##### General Purpose Single-Node (m7g — 1 vCPU : 4 GiB RAM) #####
 
 consolidation_xs_general_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.large
-    node_type_id: m6g.large
+    driver_node_type_id: m7g.large
+    node_type_id: m7g.large
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2340,8 +2340,8 @@ consolidation_xs_general_single_node_cluster:
 
 consolidation_s_general_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.xlarge
-    node_type_id: m6g.xlarge
+    driver_node_type_id: m7g.xlarge
+    node_type_id: m7g.xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2354,8 +2354,8 @@ consolidation_s_general_single_node_cluster:
 
 consolidation_m_general_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.2xlarge
-    node_type_id: m6g.2xlarge
+    driver_node_type_id: m7g.2xlarge
+    node_type_id: m7g.2xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2368,8 +2368,8 @@ consolidation_m_general_single_node_cluster:
 
 consolidation_l_general_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.4xlarge
-    node_type_id: m6g.4xlarge
+    driver_node_type_id: m7g.4xlarge
+    node_type_id: m7g.4xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2382,8 +2382,8 @@ consolidation_l_general_single_node_cluster:
 
 consolidation_xl_general_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m6g.8xlarge
-    node_type_id: m6g.8xlarge
+    driver_node_type_id: m7g.8xlarge
+    node_type_id: m7g.8xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2394,12 +2394,12 @@ consolidation_xl_general_single_node_cluster:
         <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
 
-##### Memory Optimized Single-Node (r6g — 1 vCPU : 8 GiB RAM) #####
+##### Memory Optimized Single-Node (r7g — 1 vCPU : 8 GiB RAM) #####
 
 consolidation_xs_memory_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.large
-    node_type_id: r6g.large
+    driver_node_type_id: r7g.large
+    node_type_id: r7g.large
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2412,8 +2412,8 @@ consolidation_xs_memory_single_node_cluster:
 
 consolidation_s_memory_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.xlarge
-    node_type_id: r6g.xlarge
+    driver_node_type_id: r7g.xlarge
+    node_type_id: r7g.xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2426,8 +2426,8 @@ consolidation_s_memory_single_node_cluster:
 
 consolidation_m_memory_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.2xlarge
-    node_type_id: r6g.2xlarge
+    driver_node_type_id: r7g.2xlarge
+    node_type_id: r7g.2xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2440,8 +2440,8 @@ consolidation_m_memory_single_node_cluster:
 
 consolidation_l_memory_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.4xlarge
-    node_type_id: r6g.4xlarge
+    driver_node_type_id: r7g.4xlarge
+    node_type_id: r7g.4xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -2454,8 +2454,8 @@ consolidation_l_memory_single_node_cluster:
 
 consolidation_xl_memory_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r6g.8xlarge
-    node_type_id: r6g.8xlarge
+    driver_node_type_id: r7g.8xlarge
+    node_type_id: r7g.8xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:

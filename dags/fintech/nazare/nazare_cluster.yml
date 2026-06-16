@@ -4,4 +4,4 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    driver_node_type_id: m6g.2xlarge
+    driver_node_type_id: m7g.2xlarge

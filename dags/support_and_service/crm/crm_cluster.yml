@@ -2,4 +2,4 @@ cluster:
   type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    driver_node_type_id: r6g.xlarge
+    driver_node_type_id: r7g.xlarge

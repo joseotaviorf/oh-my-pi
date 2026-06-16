@@ -3,4 +3,4 @@ cluster:
   databricks_conn_id: databricks_new
   custom_configurations:
     num_workers: 4
-    driver_node_type_id: r6g.4xlarge
+    driver_node_type_id: r7g.4xlarge

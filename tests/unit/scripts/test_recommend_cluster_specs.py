@@ -230,7 +230,7 @@ class TestSingleNodeBranch:
 
         assert rec.cohort == "protect_oom_risk"
         assert rec.recommended_preset == "consolidation_s_memory_single_node_cluster"
-        assert rec.rec_driver_node_type == "r6g.xlarge"
+        assert rec.rec_driver_node_type == "r7g.xlarge"
         assert rec.projected.est_drv_mem_p95 == "projected 45.0%"
 
     def test_single_node_oom_risk_promotes_compute_to_general_family(self):
@@ -245,7 +245,7 @@ class TestSingleNodeBranch:
 
         assert rec.cohort == "protect_oom_risk"
         assert rec.recommended_preset == "consolidation_s_general_single_node_cluster"
-        assert rec.rec_driver_node_type == "m6g.xlarge"
+        assert rec.rec_driver_node_type == "m7g.xlarge"
 
     def test_single_node_oom_risk_on_memory_family_steps_up_size_tier(self):
         m = _m(
@@ -259,7 +259,7 @@ class TestSingleNodeBranch:
 
         assert rec.cohort == "protect_oom_risk"
         assert rec.recommended_preset == "consolidation_m_memory_single_node_cluster"
-        assert rec.rec_driver_node_type == "r6g.2xlarge"
+        assert rec.rec_driver_node_type == "r7g.2xlarge"
         assert rec.projected.est_drv_mem_p95 == "projected 45.0%"
 
     def test_single_node_oom_risk_on_memory_xl_cannot_upsize(self):
@@ -287,7 +287,7 @@ class TestSingleNodeBranch:
         rec = build_recommendation(m)
 
         assert rec.cohort == "driver_downsize"
-        assert rec.rec_driver_node_type == "m6g.large"
+        assert rec.rec_driver_node_type == "m7g.large"
 
     def test_single_node_hot_cpu_is_healthy_not_auto_keep(self):
         m = _m(
@@ -563,7 +563,7 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert cfg is not None
         custom = cfg["validation"]["cluster"]["custom_configurations"]
         assert custom["driver_node_type_id"] == "m6g.large"
-        assert "node_type_id" not in custom
+        assert custom["node_type_id"] == "r6g.large"
 
     def test_keep_multi_conservatively_reduces_worker_count_when_sla_allows(self):
         m = _m(
@@ -1443,6 +1443,9 @@ class TestPresetAndValidation:
             PRESET_CATALOG["consolidation_m_general_single_node_cluster"].num_workers
             == 0
         )
+        assert PRESET_CATALOG["consolidation_m_general_cluster"].worker_node_type.startswith(
+            "m7g."
+        )
 
 
 class TestSqlAndRowMapping:
@@ -1762,7 +1765,7 @@ class TestGenerateValidationConfigContract:
             wrk_mem_p95=30.0,
             wrk_wait_p95=1.0,
             recommended_preset="consolidation_xs_memory_single_node_cluster",
-            rec_driver_node_type="r6g.large",
+            rec_driver_node_type="r7g.large",
             rec_worker_count=0,
             projected=rcs.ProjectedMetrics(est_cost_delta_pct=-20.0),
         )

@@ -1,28 +1,14 @@
 cluster:
-  type: consolidation_xs_general_single_node_cluster
+  type: consolidation_xs_memory_single_node_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_env_vars:
-      GLUE_ASSUME_ROLE_ARN: "{{ var.value.get('glue_assume_role_arn', '') }}"
+      GLUE_ASSUME_ROLE_ARN: '{{ var.value.get(''glue_assume_role_arn'', '''') }}'
     spark_conf:
-      spark.driver.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
-      spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
-      spark.executor.heartbeatInterval: "100s"
-      spark.network.timeout: "600s"
-      spark.metrics.appStatusSource.enabled: "true"
-validation:
-  cluster:
-    type: consolidation_xs_memory_single_node_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      spark_conf:
-        spark.driver.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
-        spark.executor.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
-        spark.executor.heartbeatInterval: 100s
-        spark.network.timeout: 600s
-        spark.metrics.appStatusSource.enabled: 'true'
-      spark_env_vars:
-        GLUE_ASSUME_ROLE_ARN: '{{ var.value.get(''glue_assume_role_arn'', '''') }}'
-      driver_node_type_id: r7g.large
+      spark.driver.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
+      spark.executor.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
+      spark.executor.heartbeatInterval: 100s
+      spark.network.timeout: 600s
+      spark.metrics.appStatusSource.enabled: 'true'

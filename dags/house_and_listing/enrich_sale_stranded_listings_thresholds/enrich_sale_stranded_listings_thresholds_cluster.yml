@@ -8,4 +8,4 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     num_workers: 3
-    driver_node_type_id: m6g.2xlarge
+    driver_node_type_id: m7g.2xlarge

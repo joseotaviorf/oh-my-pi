@@ -12,4 +12,4 @@ cluster:
       ebs_volume_size: 200
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
     num_workers: 3
-    driver_node_type_id: r6g.2xlarge
+    driver_node_type_id: r7g.2xlarge

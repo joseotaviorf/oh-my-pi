@@ -2,8 +2,10 @@
 """
 Audit *_cluster.yml topology overrides against preset defaults and consolidation families.
 
-Fails when custom_configurations change instance generation/variant (e.g. m7a preset + m7g
-override) or instance category (general/memory/compute) on worker topology keys.
+Fails when:
+- custom_configurations restate preset-default topology (redundant echoes)
+- *_single_node_cluster presets set num_workers > 0
+- overrides change instance generation/variant or instance category vs presets
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_confi
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _instance_family,
+    find_redundant_preset_default_overrides,
     is_emr_effective_config,
 )
 
@@ -48,7 +51,7 @@ EMR_CONSOLIDATION_PREFIX = "emr_7_12_consolidation_"
 EMR_LEGACY_MIN_PREFIX = "emr_7_12_min_"
 
 EXPECTED_GENERATION = {
-    "databricks_consolidation": 6,
+    "databricks_consolidation": 7,
     "emr_consolidation": 7,
     "emr_legacy_min": 7,
 }
@@ -80,10 +83,12 @@ def _parse_instance_type(instance_type: str) -> Tuple[str, int, str, str]:
 
 
 def generation_variant_key(instance_type: str) -> str:
-    """Normalized generation+variant for preset/override comparison (6gd == 6g)."""
+    """Normalized generation+variant for preset/override comparison (6gd == 6g, 7gd == 7g)."""
     _class, generation, variant, _size = _parse_instance_type(instance_type)
     if generation == 6 and variant in ("gd", "g"):
         return "6g"
+    if generation == 7 and variant in ("gd", "g"):
+        return "7g"
     return f"{generation}{variant}"
 
 
@@ -91,6 +96,11 @@ def is_graviton_6g_family(instance_type: str) -> bool:
     _class, generation, variant, _size = _parse_instance_type(instance_type)
     # Require explicit g/gd variant; bare m6.* is Intel/AMD gen-6, not Graviton m6g.
     return generation == 6 and variant in ("g", "gd")
+
+
+def is_graviton_7g_family(instance_type: str) -> bool:
+    _class, generation, variant, _size = _parse_instance_type(instance_type)
+    return generation == 7 and variant in ("g", "gd")
 
 
 def is_emr_7g_family(instance_type: str) -> bool:
@@ -157,8 +167,8 @@ def _check_consolidation_family(
     if policy == "databricks_consolidation":
         if topology_label.startswith("master:"):
             return None
-        if not is_graviton_6g_family(instance_type):
-            return "databricks_consolidation_requires_6g_family"
+        if not is_graviton_7g_family(instance_type):
+            return "databricks_consolidation_requires_7g_family"
     if policy == "emr_consolidation":
         if topology_label.startswith("master:"):
             return None
@@ -176,7 +186,7 @@ def _emr_legacy_min_allows_explicit_override(cluster_type: str) -> bool:
     return cluster_type.startswith(EMR_LEGACY_MIN_PREFIX)
 
 
-def _databricks_override_requires_6g(
+def _databricks_override_requires_graviton_g(
     cluster_type: str, effective_preset: dict, topology_label: str
 ) -> bool:
     if _preset_policy(cluster_type) == "databricks_consolidation":
@@ -246,57 +256,92 @@ def _compare_override_to_preset(
     ):
         return "worker_instance_category_mismatch"
 
-    if _databricks_override_requires_6g(
+    if _databricks_override_requires_graviton_g(
         cluster_type, effective_preset, topology_label
     ) and not topology_label.startswith("master:"):
-        if not is_graviton_6g_family(override_value):
+        if _preset_policy(cluster_type) == "databricks_consolidation":
+            if not is_graviton_7g_family(override_value):
+                return "databricks_requires_7g_family"
+        elif not is_graviton_6g_family(override_value):
             return "databricks_requires_6g_family"
 
     return _check_consolidation_family(cluster_type, override_value, topology_label)
 
 
-def _cluster_path_label(cluster_path: Path) -> str:
-    try:
-        return cluster_path.relative_to(REPO_ROOT).as_posix()
-    except ValueError:
-        return cluster_path.as_posix()
+def _format_topology_value(value: Any) -> str:
+    return str(value)
 
 
-def audit_cluster_file(
-    cluster_path: Path,
+def _audit_cluster_block(
+    cluster: dict,
+    *,
+    path_label: str,
+    dag_name: str,
     config_service: ConfigurationService,
 ) -> List[Violation]:
-    document = yaml.safe_load(cluster_path.read_text(encoding="utf-8")) or {}
-    cluster = document.get("cluster") or {}
     cluster_type = cluster.get("type")
     if not cluster_type:
         return []
 
     custom = cluster.get("custom_configurations") or {}
     preset_merged = merge_cluster_configuration({"type": cluster_type}, config_service)
-    dag_name = cluster_path.parent.name
-    path_label = _cluster_path_label(cluster_path)
-
     violations: List[Violation] = []
+
+    if str(cluster_type).endswith("_single_node_cluster"):
+        num_workers = custom.get("num_workers")
+        if num_workers is not None and int(num_workers) > 0:
+            violations.append(
+                Violation(
+                    dag=dag_name,
+                    cluster_path=path_label,
+                    preset_type=str(cluster_type),
+                    topology_key="num_workers",
+                    preset_default="0",
+                    override_value=str(num_workers),
+                    reason="single_node_cluster_with_workers",
+                )
+            )
+
+    redundant_items = find_redundant_preset_default_overrides(cluster, config_service)
+    for item in redundant_items:
+        violations.append(
+            Violation(
+                dag=dag_name,
+                cluster_path=path_label,
+                preset_type=str(cluster_type),
+                topology_key=".".join(item.path),
+                preset_default=_format_topology_value(item.preset_default),
+                override_value=_format_topology_value(item.override_value),
+                reason="redundant_preset_default_override",
+            )
+        )
+
+    redundant_paths = {item.path for item in redundant_items}
+
     for topology_label, path, override_value in _iter_topology_overrides(custom):
+        if path in redundant_paths:
+            continue
+
         preset_default = _preset_default_for_path(preset_merged, path)
         if preset_default is None or not isinstance(preset_default, str):
             reason = _check_consolidation_family(
                 cluster_type, override_value, topology_label
             )
-            if not reason and _databricks_override_requires_6g(
+            if not reason and _databricks_override_requires_graviton_g(
                 cluster_type, preset_merged, topology_label
             ):
-                if not topology_label.startswith(
-                    "master:"
-                ) and not is_graviton_6g_family(override_value):
-                    reason = "databricks_requires_6g_family"
+                if not topology_label.startswith("master:"):
+                    if _preset_policy(cluster_type) == "databricks_consolidation":
+                        if not is_graviton_7g_family(override_value):
+                            reason = "databricks_requires_7g_family"
+                    elif not is_graviton_6g_family(override_value):
+                        reason = "databricks_requires_6g_family"
             if reason:
                 violations.append(
                     Violation(
                         dag=dag_name,
                         cluster_path=path_label,
-                        preset_type=cluster_type,
+                        preset_type=str(cluster_type),
                         topology_key=".".join(path),
                         preset_default="(preset unset)",
                         override_value=override_value,
@@ -320,13 +365,55 @@ def audit_cluster_file(
                 Violation(
                     dag=dag_name,
                     cluster_path=path_label,
-                    preset_type=cluster_type,
+                    preset_type=str(cluster_type),
                     topology_key=".".join(path),
                     preset_default=preset_default,
                     override_value=override_value,
                     reason=reason,
                 )
             )
+    return violations
+
+
+def _cluster_path_label(cluster_path: Path) -> str:
+    try:
+        return cluster_path.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return cluster_path.as_posix()
+
+
+def audit_cluster_file(
+    cluster_path: Path,
+    config_service: ConfigurationService,
+) -> List[Violation]:
+    document = yaml.safe_load(cluster_path.read_text(encoding="utf-8")) or {}
+    dag_name = cluster_path.parent.name
+    path_label = _cluster_path_label(cluster_path)
+
+    violations: List[Violation] = []
+    cluster = document.get("cluster") or {}
+    if cluster.get("type"):
+        violations.extend(
+            _audit_cluster_block(
+                cluster,
+                path_label=path_label,
+                dag_name=dag_name,
+                config_service=config_service,
+            )
+        )
+
+    validation = document.get("validation") or {}
+    validation_cluster = validation.get("cluster") or {}
+    if validation_cluster.get("type"):
+        violations.extend(
+            _audit_cluster_block(
+                validation_cluster,
+                path_label=f"{path_label}#validation",
+                dag_name=dag_name,
+                config_service=config_service,
+            )
+        )
+
     return violations
 
 
@@ -360,10 +447,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     violations = audit_tree(scan_root, config_service)
 
     if not violations:
-        print("No cluster instance-family violations found.")
+        print("No cluster topology audit violations found.")
         return 0
 
-    print(f"Found {len(violations)} cluster instance-family violation(s):\n")
+    print(f"Found {len(violations)} cluster topology audit violation(s):\n")
     for violation in violations:
         print(violation.format_line())
 

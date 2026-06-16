@@ -13,5 +13,5 @@ cluster:
       ebs_volume_size: 200
     runtime_engine: PHOTON
     num_workers: 3
-    node_type_id: r6gd.4xlarge
-    driver_node_type_id: r6gd.2xlarge
+    node_type_id: r7gd.4xlarge
+    driver_node_type_id: r7g.2xlarge

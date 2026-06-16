@@ -17,6 +17,7 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     merge_declaration_validation_custom_configurations,
     normalize_databricks_cluster_topology,
     size_tier_from_instance_type,
+    strip_redundant_preset_default_overrides,
 )
 
 pytest_plugins = ["test.unit.ci_cd.airflow_dag_builder.cluster_validation_prod_env"]
@@ -26,7 +27,7 @@ class TestMapInstanceTypeToGraviton:
     def test_general_m5a_to_m6g(self):
         # Arrange
         instance_type = "m5a.xlarge"
-        expected = "m6g.xlarge"
+        expected = "m7g.xlarge"
         # Act
         result = map_instance_type_to_graviton(instance_type)
         # Assert
@@ -35,7 +36,7 @@ class TestMapInstanceTypeToGraviton:
     def test_memory_r5a_to_r6g(self):
         # Arrange
         instance_type = "r5a.2xlarge"
-        expected = "r6g.2xlarge"
+        expected = "r7g.2xlarge"
         # Act
         result = map_instance_type_to_graviton(instance_type)
         # Assert
@@ -44,7 +45,7 @@ class TestMapInstanceTypeToGraviton:
     def test_fleet_to_m6g(self):
         # Arrange
         instance_type = "m-fleet.xlarge"
-        expected = "m6g.xlarge"
+        expected = "m7g.xlarge"
         # Act
         result = map_instance_type_to_graviton(instance_type)
         # Assert
@@ -52,7 +53,7 @@ class TestMapInstanceTypeToGraviton:
 
     def test_size_tier_from_xlarge(self):
         # Arrange
-        instance_type = "m6g.xlarge"
+        instance_type = "m7g.xlarge"
         expected = "s"
         # Act
         result = size_tier_from_instance_type(instance_type)
@@ -64,46 +65,46 @@ class TestMapInstanceTypeToGraviton:
         assert size_tier_from_instance_type("m5a.12xlarge") == "xl"
 
     def test_aberrant_sizes_map_to_valid_graviton_sizes(self):
-        assert map_instance_type_to_graviton("c5d.9xlarge") == "c6g.8xlarge"
-        assert map_instance_type_to_graviton("c5.12xlarge") == "c6g.12xlarge"
-        assert map_instance_type_to_graviton("m5a.12xlarge") == "m6g.12xlarge"
-        assert map_instance_type_to_graviton("r5.12xlarge") == "r6g.12xlarge"
-        assert map_instance_type_to_graviton("m5a.8xlarge") == "m6g.8xlarge"
+        assert map_instance_type_to_graviton("c5d.9xlarge") == "c7g.8xlarge"
+        assert map_instance_type_to_graviton("c5.12xlarge") == "c7g.12xlarge"
+        assert map_instance_type_to_graviton("m5a.12xlarge") == "m7g.12xlarge"
+        assert map_instance_type_to_graviton("r5.12xlarge") == "r7g.12xlarge"
+        assert map_instance_type_to_graviton("m5a.8xlarge") == "m7g.8xlarge"
 
     def test_memory_fleet_passes_through_to_r6g(self):
-        assert map_instance_type_to_graviton("r-fleet.4xlarge") == "r6g.4xlarge"
+        assert map_instance_type_to_graviton("r-fleet.4xlarge") == "r7g.4xlarge"
 
     def test_compute_fleet_passes_through_to_c6g(self):
-        assert map_instance_type_to_graviton("c-fleet.2xlarge") == "c6g.2xlarge"
+        assert map_instance_type_to_graviton("c-fleet.2xlarge") == "c7g.2xlarge"
 
     def test_valid_graviton_sizes_pass_through_unchanged(self):
-        assert map_instance_type_to_graviton("m5.16xlarge") == "m6g.16xlarge"
-        assert map_instance_type_to_graviton("r5a.metal") == "r6g.metal"
-        assert map_instance_type_to_graviton("m5a.medium") == "m6g.medium"
-        assert size_tier_from_instance_type("m6g.16xlarge") == "xl"
+        assert map_instance_type_to_graviton("m5.16xlarge") == "m7g.16xlarge"
+        assert map_instance_type_to_graviton("r5a.metal") == "r7g.metal"
+        assert map_instance_type_to_graviton("m5a.medium") == "m7g.medium"
+        assert size_tier_from_instance_type("m7g.16xlarge") == "xl"
 
     def test_photon_maps_to_nvme_graviton_family(self):
         assert (
-            map_instance_type_to_graviton("m5d.xlarge", use_nvme=True) == "m6gd.xlarge"
+            map_instance_type_to_graviton("m5d.xlarge", use_nvme=True) == "m7gd.xlarge"
         )
         assert (
             map_instance_type_to_graviton("r5d.2xlarge", use_nvme=True)
-            == "r6gd.2xlarge"
+            == "r7gd.2xlarge"
         )
         assert (
             map_instance_type_to_graviton("c5a.2xlarge", use_nvme=True)
-            == "c6gd.2xlarge"
+            == "c7gd.2xlarge"
         )
         assert (
-            map_instance_type_to_graviton("m5d.xlarge", use_nvme=False) == "m6g.xlarge"
+            map_instance_type_to_graviton("m5d.xlarge", use_nvme=False) == "m7g.xlarge"
         )
         assert (
             map_instance_type_to_graviton("r5d.2xlarge", use_nvme=False)
-            == "r6g.2xlarge"
+            == "r7g.2xlarge"
         )
         assert (
             map_instance_type_to_graviton("c5a.2xlarge", use_nvme=False)
-            == "c6g.2xlarge"
+            == "c7g.2xlarge"
         )
 
 
@@ -122,7 +123,7 @@ class TestMatchConsolidationPreset:
         )
         assert matched is not None
         assert matched.name == "consolidation_s_general_cluster"
-        assert matched.node_type_id == "m6g.xlarge"
+        assert matched.node_type_id == "m7g.xlarge"
 
     def test_custom_cluster_single_worker(self, catalog):
         effective = {
@@ -149,7 +150,7 @@ class TestMatchConsolidationPreset:
         )
         assert matched is not None
         assert matched.name == "consolidation_s_memory_cluster"
-        assert matched.node_type_id == "r6g.xlarge"
+        assert matched.node_type_id == "r7g.xlarge"
 
     def test_prod_consolidation_m_memory_skips_when_only_match(self, catalog):
         service = ConfigurationService()
@@ -182,16 +183,16 @@ class TestComputeValidationOverrides:
     def test_skips_fields_equal_to_preset_defaults(self):
         overrides = compute_validation_overrides(
             effective_prod={
-                "node_type_id": "m6g.xlarge",
-                "driver_node_type_id": "m6g.xlarge",
+                "node_type_id": "m7g.xlarge",
+                "driver_node_type_id": "m7g.xlarge",
                 "num_workers": 2,
                 "spark_version": "16.4.x-scala2.12",
             },
-            mapped_worker="m6g.xlarge",
-            mapped_driver="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
+            mapped_driver="m7g.xlarge",
             validation_resolved={
-                "node_type_id": "m6g.xlarge",
-                "driver_node_type_id": "m6g.xlarge",
+                "node_type_id": "m7g.xlarge",
+                "driver_node_type_id": "m7g.xlarge",
                 "num_workers": 2,
                 "spark_version": "16.4.x-scala2.12",
             },
@@ -201,23 +202,23 @@ class TestComputeValidationOverrides:
     def test_coerces_numeric_types(self):
         overrides = compute_validation_overrides(
             effective_prod={"num_workers": "3"},
-            mapped_worker="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
             mapped_driver=None,
-            validation_resolved={"num_workers": 3, "node_type_id": "m6g.xlarge"},
+            validation_resolved={"num_workers": 3, "node_type_id": "m7g.xlarge"},
         )
         assert "num_workers" not in overrides
 
     def test_emits_uncapped_oversized_driver(self):
         overrides = compute_validation_overrides(
             effective_prod={},
-            mapped_worker="r6g.2xlarge",
-            mapped_driver="r6g.4xlarge",
+            mapped_worker="r7g.2xlarge",
+            mapped_driver="r7g.4xlarge",
             validation_resolved={
-                "node_type_id": "r6g.2xlarge",
-                "driver_node_type_id": "r6g.2xlarge",
+                "node_type_id": "r7g.2xlarge",
+                "driver_node_type_id": "r7g.2xlarge",
             },
         )
-        assert overrides["driver_node_type_id"] == "r6g.4xlarge"
+        assert overrides["driver_node_type_id"] == "r7g.4xlarge"
 
     def test_emits_people_instance_profile_arn_override(self):
         overrides = compute_validation_overrides(
@@ -228,10 +229,10 @@ class TestComputeValidationOverrides:
                     ),
                 },
             },
-            mapped_worker="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
             mapped_driver=None,
             validation_resolved={
-                "node_type_id": "m6g.xlarge",
+                "node_type_id": "m7g.xlarge",
                 "aws_attributes": {
                     "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
                 },
@@ -249,10 +250,10 @@ class TestComputeValidationOverrides:
                     "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
                 },
             },
-            mapped_worker="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
             mapped_driver=None,
             validation_resolved={
-                "node_type_id": "m6g.xlarge",
+                "node_type_id": "m7g.xlarge",
                 "aws_attributes": {
                     "ebs_volume_size": 100,
                     "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
@@ -264,18 +265,18 @@ class TestComputeValidationOverrides:
     def test_photon_prod_emits_photon_without_normalization(self):
         overrides = compute_validation_overrides(
             effective_prod={"runtime_engine": "PHOTON"},
-            mapped_worker="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
             mapped_driver=None,
-            validation_resolved={"node_type_id": "m6g.xlarge"},
+            validation_resolved={"node_type_id": "m7g.xlarge"},
         )
         assert overrides.get("runtime_engine") == "PHOTON"
 
     def test_disable_photon_drops_runtime_engine_from_validation(self):
         overrides = compute_validation_overrides(
             effective_prod={"runtime_engine": "PHOTON"},
-            mapped_worker="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
             mapped_driver=None,
-            validation_resolved={"node_type_id": "m6g.xlarge"},
+            validation_resolved={"node_type_id": "m7g.xlarge"},
             recommended_runtime_engine="STANDARD",
         )
         # Normalizing Photon off must not carry PHOTON into the validation run;
@@ -290,10 +291,10 @@ class TestComputeValidationOverrides:
                     "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
                 },
             },
-            mapped_worker="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
             mapped_driver=None,
             validation_resolved={
-                "node_type_id": "m6g.xlarge",
+                "node_type_id": "m7g.xlarge",
                 "aws_attributes": {
                     "ebs_volume_size": 100,
                     "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
@@ -334,11 +335,11 @@ class TestComputeValidationOverrides:
                     },
                 ],
             },
-            mapped_worker="m6g.xlarge",
-            mapped_driver="m6g.xlarge",
+            mapped_worker="m7g.xlarge",
+            mapped_driver="m7g.xlarge",
             validation_resolved={
-                "node_type_id": "m6g.xlarge",
-                "driver_node_type_id": "m6g.xlarge",
+                "node_type_id": "m7g.xlarge",
+                "driver_node_type_id": "m7g.xlarge",
                 "spark_conf": {"spark.scheduler.mode": "FAIR"},
                 "spark_env_vars": {"SPARK_RUNTIME": "databricks"},
                 "init_scripts": [
@@ -371,8 +372,8 @@ class TestComputeValidationOverrides:
         mapped_worker, mapped_driver = _mapped_worker_and_driver(
             effective_prod, "emr_7_12_consolidation_s_memory_cluster"
         )
-        assert mapped_worker == "m6g.2xlarge"
-        assert mapped_driver == "m6g.xlarge"
+        assert mapped_worker == "m7g.2xlarge"
+        assert mapped_driver == "m7g.xlarge"
 
     def test_mapped_worker_and_driver_keeps_large_driver_uncapped(self):
         effective_prod = {
@@ -384,8 +385,8 @@ class TestComputeValidationOverrides:
         mapped_worker, mapped_driver = _mapped_worker_and_driver(
             effective_prod, "custom_cluster"
         )
-        assert mapped_worker == "r6g.xlarge"
-        assert mapped_driver == "r6g.8xlarge"
+        assert mapped_worker == "r7g.xlarge"
+        assert mapped_driver == "r7g.8xlarge"
 
     def test_mapped_worker_rfleet_pool_resolves_to_memory(self):
         service = ConfigurationService()
@@ -393,8 +394,8 @@ class TestComputeValidationOverrides:
         mapped_worker, mapped_driver = _mapped_worker_and_driver(
             effective, "databricks_16_4_rfleet_instance_cluster"
         )
-        assert mapped_worker == "r6g.xlarge"
-        assert mapped_driver == "r6g.xlarge"
+        assert mapped_worker == "r7g.xlarge"
+        assert mapped_driver == "r7g.xlarge"
 
     def test_emr_preset_uses_master_node_type_id(self):
         resolved = ConfigurationService().get_config(
@@ -450,7 +451,7 @@ class TestBuildValidationClusterSpec:
         assert spec.allow_custom_spark_job is True
         assert spec.custom_configurations["spark_version"] == "13.3.x-scala2.12"
         assert spec.custom_configurations["num_workers"] == 1
-        assert spec.custom_configurations["driver_node_type_id"] == "m6g.xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "m7g.xlarge"
         assert "node_type_id" not in spec.custom_configurations
 
     def test_prod_consolidation_m_memory_omits_validation(self):
@@ -493,8 +494,8 @@ class TestBuildValidationClusterSpec:
                 "type": "custom_cluster",
                 "databricks_conn_id": "databricks_new",
                 "custom_configurations": {
-                    "driver_node_type_id": "r6g.2xlarge",
-                    "node_type_id": "c6g.2xlarge",
+                    "driver_node_type_id": "r7g.2xlarge",
+                    "node_type_id": "c7g.2xlarge",
                     "num_workers": 4,
                     "spark_version": "16.4.x-scala2.12",
                 },
@@ -608,8 +609,8 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is not None
         assert spec.cluster_type == "consolidation_s_general_cluster"
-        assert spec.custom_configurations["node_type_id"] == "m6gd.xlarge"
-        assert spec.custom_configurations["driver_node_type_id"] == "m6gd.xlarge"
+        assert spec.custom_configurations["node_type_id"] == "m7gd.xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "m7gd.xlarge"
         assert spec.custom_configurations["runtime_engine"] == "PHOTON"
         assert spec.custom_configurations["num_workers"] == 3
 
@@ -624,7 +625,7 @@ class TestBuildValidationClusterSpec:
                 "type": "custom_cluster",
                 "databricks_conn_id": "databricks_new_env",
                 "custom_configurations": {
-                    "driver_node_type_id": "r6gd.4xlarge",
+                    "driver_node_type_id": "r7gd.4xlarge",
                     "node_type_id": "r5.4xlarge",
                     "num_workers": 5,
                 },
@@ -636,7 +637,7 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is not None
         assert spec.cluster_type == "consolidation_l_memory_cluster"
-        assert spec.custom_configurations["driver_node_type_id"] == "r6gd.4xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "r7gd.4xlarge"
         assert "node_type_id" not in spec.custom_configurations
         assert "runtime_engine" not in spec.custom_configurations
         assert spec.custom_configurations["num_workers"] == 5
@@ -663,7 +664,7 @@ class TestBuildValidationClusterSpec:
         assert spec is not None
         assert spec.cluster_type == "consolidation_xl_compute_cluster"
         assert "node_type_id" not in spec.custom_configurations
-        assert spec.custom_configurations["driver_node_type_id"] == "m6g.2xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "m7g.2xlarge"
         assert spec.custom_configurations.get("num_workers", 2) == 2
 
     def test_enrich_visit_aberrant_compute_worker(self):
@@ -687,8 +688,8 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is not None
         assert spec.cluster_type == "consolidation_xl_compute_cluster"
-        assert spec.custom_configurations["node_type_id"] == "c6g.12xlarge"
-        assert spec.custom_configurations["driver_node_type_id"] == "r6g.2xlarge"
+        assert spec.custom_configurations["node_type_id"] == "c7g.12xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "r7g.2xlarge"
         assert spec.custom_configurations["num_workers"] == 8
 
     def test_sedona_preset_emits_preset_only_init_scripts(self):
@@ -738,6 +739,57 @@ class TestBuildValidationClusterSpec:
         assert "init_script.sh" in init_scripts[1]["s3"]["destination"]
 
 
+class TestStripRedundantPresetDefaultOverrides:
+    def test_strip_worker_driver_and_num_workers_echoes(self):
+        cluster_args = {
+            "type": "consolidation_xs_general_cluster",
+            "custom_configurations": {
+                "node_type_id": "m7g.large",
+                "driver_node_type_id": "m7g.xlarge",
+                "num_workers": 2,
+            },
+        }
+        stripped = strip_redundant_preset_default_overrides(
+            cluster_args, ConfigurationService()
+        )
+        custom = stripped["custom_configurations"]
+        assert "node_type_id" not in custom
+        assert "num_workers" not in custom
+        assert custom["driver_node_type_id"] == "m7g.xlarge"
+
+    def test_strip_redundant_driver_when_equal_to_preset(self):
+        cluster_args = {
+            "type": "consolidation_xs_general_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m7g.large",
+                "node_type_id": "m7g.xlarge",
+            },
+        }
+        stripped = strip_redundant_preset_default_overrides(
+            cluster_args, ConfigurationService()
+        )
+        custom = stripped["custom_configurations"]
+        assert "driver_node_type_id" not in custom
+        assert custom["node_type_id"] == "m7g.xlarge"
+
+    def test_normalize_strips_redundant_after_mapping(self):
+        cluster_args = {
+            "type": "consolidation_xs_general_cluster",
+            "custom_configurations": {
+                "node_type_id": "m7g.large",
+                "driver_node_type_id": "m7g.xlarge",
+                "num_workers": 2,
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert "node_type_id" not in custom
+        assert "num_workers" not in custom
+        assert custom["driver_node_type_id"] == "m7g.xlarge"
+
+
 class TestNormalizeDatabricksClusterTopology:
     def test_maps_legacy_custom_cluster_types_to_graviton(self):
         cluster_args = {
@@ -752,22 +804,24 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "m6g.xlarge"
-        assert custom["node_type_id"] == "m6g.large"
+        assert custom["driver_node_type_id"] == "m7g.xlarge"
+        assert custom["node_type_id"] == "m7g.large"
         assert custom["num_workers"] == 1
 
     def test_maps_consolidation_worker_override_to_graviton(self):
         cluster_args = {
             "type": "consolidation_m_general_cluster",
             "custom_configurations": {
-                "driver_node_type_id": "m6g.xlarge",
+                "driver_node_type_id": "m7g.xlarge",
                 "node_type_id": "m5a.2xlarge",
             },
         }
         normalized = normalize_databricks_cluster_topology(
             cluster_args, ConfigurationService()
         )
-        assert normalized["custom_configurations"]["node_type_id"] == "m6g.2xlarge"
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m7g.xlarge"
+        assert "node_type_id" not in custom
 
     def test_no_op_for_emr_cluster(self):
         cluster_args = {
@@ -828,15 +882,15 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "m6g.xlarge"
-        assert custom["node_type_id"] == "r6g.2xlarge"
+        assert custom["driver_node_type_id"] == "m7g.xlarge"
+        assert custom["node_type_id"] == "r7g.2xlarge"
 
     def test_preserves_explicit_nvme_without_photon(self):
         cluster_args = {
             "type": "consolidation_l_memory_cluster",
             "custom_configurations": {
-                "driver_node_type_id": "r6gd.4xlarge",
-                "node_type_id": "r6gd.4xlarge",
+                "driver_node_type_id": "r7gd.4xlarge",
+                "node_type_id": "r7gd.4xlarge",
                 "num_workers": 5,
             },
         }
@@ -844,8 +898,8 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "r6gd.4xlarge"
-        assert custom["node_type_id"] == "r6gd.4xlarge"
+        assert custom["driver_node_type_id"] == "r7gd.4xlarge"
+        assert custom["node_type_id"] == "r7gd.4xlarge"
         assert "runtime_engine" not in custom
 
     def test_legacy_r5d_without_photon_still_maps_to_r6g(self):
@@ -859,17 +913,15 @@ class TestNormalizeDatabricksClusterTopology:
         normalized = normalize_databricks_cluster_topology(
             cluster_args, ConfigurationService()
         )
-        custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "r6g.4xlarge"
-        assert custom["node_type_id"] == "r6g.4xlarge"
+        assert "custom_configurations" not in normalized
 
     def test_photon_does_not_upgrade_explicit_graviton_to_nvme(self):
         cluster_args = {
             "type": "consolidation_m_memory_cluster",
             "custom_configurations": {
                 "runtime_engine": "PHOTON",
-                "driver_node_type_id": "r6g.xlarge",
-                "node_type_id": "r6g.xlarge",
+                "driver_node_type_id": "r7g.xlarge",
+                "node_type_id": "r7g.xlarge",
                 "num_workers": 3,
             },
         }
@@ -877,8 +929,8 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "r6g.xlarge"
-        assert custom["node_type_id"] == "r6g.xlarge"
+        assert custom["driver_node_type_id"] == "r7g.xlarge"
+        assert custom["node_type_id"] == "r7g.xlarge"
         assert custom["runtime_engine"] == "PHOTON"
 
     def test_photon_legacy_d_type_still_maps_to_nvme_graviton(self):
@@ -894,8 +946,8 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "m6gd.xlarge"
-        assert custom["node_type_id"] == "m6gd.xlarge"
+        assert custom["driver_node_type_id"] == "m7gd.xlarge"
+        assert custom["node_type_id"] == "m7gd.xlarge"
 
 
 class TestBuildRightsizingValidationClusterSpec:
@@ -922,7 +974,7 @@ class TestBuildRightsizingValidationClusterSpec:
             declaration=declaration,
             recommended_preset="consolidation_xs_memory_single_node_cluster",
             recommended_num_workers=0,
-            recommended_driver_node_type="r6g.large",
+            recommended_driver_node_type="r7g.large",
         )
 
         assert spec is not None
@@ -947,12 +999,12 @@ class TestBuildRightsizingValidationClusterSpec:
             declaration=declaration,
             recommended_preset="consolidation_m_memory_single_node_cluster",
             recommended_num_workers=0,
-            recommended_driver_node_type="r6g.4xlarge",
+            recommended_driver_node_type="r7g.4xlarge",
         )
 
         assert spec is not None
         assert spec.custom_configurations == {
-            "driver_node_type_id": "r6g.4xlarge",
+            "driver_node_type_id": "r7g.4xlarge",
         }
 
     def test_keep_multi_num_workers_override_only(self):
@@ -965,7 +1017,7 @@ class TestBuildRightsizingValidationClusterSpec:
             "databricks_conn_id": "databricks_new",
             "custom_configurations": {
                 "num_workers": 4,
-                "driver_node_type_id": "r6g.2xlarge",
+                "driver_node_type_id": "r7g.2xlarge",
             },
         }
         spec = build_rightsizing_validation_cluster_spec(
@@ -973,8 +1025,8 @@ class TestBuildRightsizingValidationClusterSpec:
             declaration=declaration,
             recommended_preset="consolidation_xs_memory_cluster",
             recommended_num_workers=3,
-            recommended_driver_node_type="r6g.2xlarge",
-            recommended_worker_node_type="r6g.large",
+            recommended_driver_node_type="r7g.2xlarge",
+            recommended_worker_node_type="r7g.large",
         )
 
         assert spec is not None
@@ -984,7 +1036,7 @@ class TestBuildRightsizingValidationClusterSpec:
     def test_keep_multi_same_node_retarget_preserves_worker_override(self):
         """Multi-node retarget where driver and worker map to the same newer-gen
         node must keep the worker node_type_id. Dropping it (the single-node pop)
-        would silently revert the worker to the Gen-6 preset default."""
+        would silently revert the worker to the preset default."""
         declaration = {
             "dag": {"name": "meetcall"},
             "workflow": {"type": "query_delta", "layer": "enrich"},
@@ -994,7 +1046,7 @@ class TestBuildRightsizingValidationClusterSpec:
             "databricks_conn_id": "databricks_new",
             "custom_configurations": {
                 "num_workers": 3,
-                "driver_node_type_id": "m6g.xlarge",
+                "driver_node_type_id": "m7g.xlarge",
             },
         }
         spec = build_rightsizing_validation_cluster_spec(
@@ -1002,13 +1054,12 @@ class TestBuildRightsizingValidationClusterSpec:
             declaration=declaration,
             recommended_preset="consolidation_xs_memory_cluster",
             recommended_num_workers=3,
-            recommended_driver_node_type="r7g.large",
-            recommended_worker_node_type="r7g.large",
+            recommended_driver_node_type="r7g.xlarge",
+            recommended_worker_node_type="r7g.xlarge",
         )
 
         assert spec is not None
-        assert spec.custom_configurations["driver_node_type_id"] == "r7g.large"
-        assert spec.custom_configurations["node_type_id"] == "r7g.large"
+        assert spec.custom_configurations["node_type_id"] == "r7g.xlarge"
         assert spec.custom_configurations["num_workers"] == 3
 
     def test_returns_none_for_emr_prod_cluster(self):
@@ -1023,8 +1074,8 @@ class TestBuildRightsizingValidationClusterSpec:
             prod_cluster_args=prod_cluster_args,
             declaration={"dag": {"name": "dw_analytical_costs"}},
             recommended_preset="consolidation_s_general_cluster",
-            recommended_driver_node_type="r6g.2xlarge",
-            recommended_worker_node_type="m6g.xlarge",
+            recommended_driver_node_type="r7g.2xlarge",
+            recommended_worker_node_type="m7g.xlarge",
         )
 
         assert spec is None

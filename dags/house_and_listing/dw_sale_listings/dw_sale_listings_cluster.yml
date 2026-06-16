@@ -7,16 +7,3 @@ cluster:
   custom_configurations:
     data_security_mode: USER_ISOLATION
     num_workers: 3
-    driver_node_type_id: m6g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      data_security_mode: USER_ISOLATION
-      num_workers: 3
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.large

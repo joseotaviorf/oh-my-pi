@@ -4,13 +4,4 @@ cluster:
   custom_configurations:
     data_security_mode: USER_ISOLATION
     num_workers: 5
-    driver_node_type_id: r6g.4xlarge
-validation:
-  cluster:
-    type: consolidation_l_general_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      data_security_mode: USER_ISOLATION
-      num_workers: 5
-      node_type_id: m7g.4xlarge
-      driver_node_type_id: r7g.4xlarge
+    driver_node_type_id: r7g.4xlarge

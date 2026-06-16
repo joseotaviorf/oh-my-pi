@@ -143,6 +143,41 @@ class TestMergePromotedCluster:
         assert "node_type_id" not in custom
         assert "driver_node_type_id" not in custom
 
+    def test_single_node_promotion_drops_inherited_prod_num_workers(self):
+        """ebdb_agent pattern: multi-node prod promoted to single-node validation."""
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_m_memory_single_node_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "driver_node_type_id": "r7g.2xlarge",
+            },
+        }
+        merged = merge_promoted_cluster(prod, validation)
+        custom = merged["custom_configurations"]
+        assert merged["type"] == "consolidation_m_memory_single_node_cluster"
+        assert custom["driver_node_type_id"] == "r7g.2xlarge"
+        assert "num_workers" not in custom
+
+    def test_single_node_promotion_keeps_validation_num_workers(self):
+        prod = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {"num_workers": 4},
+        }
+        validation = {
+            "type": "consolidation_m_memory_single_node_cluster",
+            "custom_configurations": {"num_workers": 0},
+        }
+        merged = merge_promoted_cluster(prod, validation)
+        assert merged["custom_configurations"]["num_workers"] == 0
+
     def test_validation_explicit_topology_preserved(self):
         prod = {
             "type": "custom_cluster",

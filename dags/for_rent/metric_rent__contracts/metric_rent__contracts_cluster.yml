@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_s_memory_cluster
+  type: consolidation_l_memory_single_node_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: analytics-engineers
@@ -8,17 +8,3 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     data_security_mode: USER_ISOLATION
-    num_workers: 3
-    driver_node_type_id: m6g.2xlarge
-validation:
-  cluster:
-    type: consolidation_l_memory_single_node_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      data_security_mode: USER_ISOLATION
-      driver_node_type_id: r7g.4xlarge

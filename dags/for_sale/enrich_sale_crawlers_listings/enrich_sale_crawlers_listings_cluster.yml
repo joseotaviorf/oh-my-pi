@@ -9,7 +9,6 @@ cluster:
   - pypi:
       package: apache-sedona==1.2.1
   custom_configurations:
-    num_workers: 3
     spark_version: 12.2.x-scala2.12
     init_scripts:
     - s3:

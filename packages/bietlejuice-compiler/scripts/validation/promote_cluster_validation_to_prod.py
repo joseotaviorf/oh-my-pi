@@ -56,6 +56,13 @@ def merge_promoted_cluster(prod_cluster: dict, validation_cluster: dict) -> dict
     for key in _TOPOLOGY_KEYS:
         if key not in val_custom and key in merged_custom:
             del merged_custom[key]
+    cluster_type = str(merged.get("type", ""))
+    if (
+        cluster_type.endswith("_single_node_cluster")
+        and "num_workers" not in val_custom
+        and "num_workers" in merged_custom
+    ):
+        del merged_custom["num_workers"]
     if merged_custom:
         merged["custom_configurations"] = merged_custom
     elif "custom_configurations" in merged:

@@ -5,4 +5,4 @@ cluster:
     aws_attributes:
       ebs_volume_size: 32
     num_workers: 1
-    driver_node_type_id: r6g.xlarge
+    driver_node_type_id: r7g.xlarge

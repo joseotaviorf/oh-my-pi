@@ -1,16 +1,6 @@
 cluster:
-  type: consolidation_m_memory_cluster
+  type: consolidation_s_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
-    driver_node_type_id: r6g.xlarge
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark_conf:
-        spark.sql.sources.partitionOverwriteMode: static
-      node_type_id: r7g.xlarge
-      driver_node_type_id: r7g.xlarge

@@ -12,19 +12,4 @@ cluster:
       spark.sql.shuffle.partitions: 256
       spark.databricks.delta.targetFileSize: 134217728
     num_workers: 3
-    driver_node_type_id: r6g.2xlarge
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark_conf:
-        spark.sql.adaptive.enabled: true
-        spark.sql.adaptive.coalescePartitions.enabled: true
-        spark.sql.adaptive.coalescePartitions.targetPostShuffleInputSize: 128MB
-        spark.sql.shuffle.partitions: 256
-        spark.databricks.delta.targetFileSize: 134217728
-      num_workers: 3
-      node_type_id: r7g.4xlarge
-      driver_node_type_id: r7g.2xlarge
-  allow_custom_spark_job: true
+    driver_node_type_id: r7g.2xlarge

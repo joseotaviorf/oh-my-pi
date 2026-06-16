@@ -3,11 +3,3 @@ cluster:
   databricks_conn_id: databricks_new_env
   custom_configurations:
     runtime_engine: PHOTON
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      runtime_engine: PHOTON
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.large

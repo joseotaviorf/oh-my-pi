@@ -47,8 +47,7 @@ class TestAuditClusterFile:
                     "cluster": {
                         "type": "consolidation_s_memory_cluster",
                         "custom_configurations": {
-                            "driver_node_type_id": "m6g.xlarge",
-                            "node_type_id": "r6g.xlarge",
+                            "driver_node_type_id": "m7g.xlarge",
                         },
                     }
                 }
@@ -68,7 +67,7 @@ class TestAuditClusterFile:
                     "cluster": {
                         "type": "consolidation_m_general_cluster",
                         "custom_configurations": {
-                            "driver_node_type_id": "m6g.xlarge",
+                            "driver_node_type_id": "m7g.xlarge",
                             "node_type_id": "m5a.2xlarge",
                         },
                     }
@@ -80,7 +79,7 @@ class TestAuditClusterFile:
         assert len(violations) == 1
         assert violations[0].reason in (
             "generation_variant_mismatch",
-            "databricks_consolidation_requires_6g_family",
+            "databricks_consolidation_requires_7g_family",
         )
 
     def test_legacy_databricks_preset_with_graviton_override_is_compliant(
@@ -145,3 +144,118 @@ class TestAuditClusterFile:
         )
         violations = audit_cluster_file(cluster_path, config_service)
         assert violations == []
+
+    def test_redundant_worker_override_is_violation(
+        self, config_service: ConfigurationService, tmp_path: Path
+    ):
+        cluster_path = tmp_path / "airtable_cluster.yml"
+        cluster_path.write_text(
+            yaml.safe_dump(
+                {
+                    "cluster": {
+                        "type": "consolidation_xs_general_cluster",
+                        "custom_configurations": {
+                            "driver_node_type_id": "m7g.xlarge",
+                            "node_type_id": "m7g.large",
+                            "num_workers": 2,
+                        },
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        violations = audit_cluster_file(cluster_path, config_service)
+        reasons = {v.reason for v in violations}
+        assert "redundant_preset_default_override" in reasons
+        keys = {v.topology_key for v in violations}
+        assert "node_type_id" in keys
+        assert "num_workers" in keys
+
+    def test_heterogeneous_driver_only_is_compliant(
+        self, config_service: ConfigurationService, tmp_path: Path
+    ):
+        cluster_path = tmp_path / "airtable_cluster.yml"
+        cluster_path.write_text(
+            yaml.safe_dump(
+                {
+                    "cluster": {
+                        "type": "consolidation_xs_general_cluster",
+                        "custom_configurations": {
+                            "driver_node_type_id": "m7g.xlarge",
+                        },
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        violations = audit_cluster_file(cluster_path, config_service)
+        assert violations == []
+
+    def test_single_node_num_workers_positive_is_violation(
+        self, config_service: ConfigurationService, tmp_path: Path
+    ):
+        cluster_path = tmp_path / "ebdb_agent_cluster.yml"
+        cluster_path.write_text(
+            yaml.safe_dump(
+                {
+                    "cluster": {
+                        "type": "consolidation_m_memory_single_node_cluster",
+                        "custom_configurations": {
+                            "num_workers": 3,
+                            "driver_node_type_id": "r7g.4xlarge",
+                        },
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        violations = audit_cluster_file(cluster_path, config_service)
+        assert len(violations) == 1
+        assert violations[0].reason == "single_node_cluster_with_workers"
+
+    def test_single_node_without_num_workers_is_compliant(
+        self, config_service: ConfigurationService, tmp_path: Path
+    ):
+        cluster_path = tmp_path / "ebdb_agent_cluster.yml"
+        cluster_path.write_text(
+            yaml.safe_dump(
+                {
+                    "cluster": {
+                        "type": "consolidation_m_memory_single_node_cluster",
+                        "custom_configurations": {
+                            "driver_node_type_id": "r7g.4xlarge",
+                        },
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        violations = audit_cluster_file(cluster_path, config_service)
+        assert violations == []
+
+    def test_validation_cluster_also_audited(
+        self, config_service: ConfigurationService, tmp_path: Path
+    ):
+        cluster_path = tmp_path / "foo_cluster.yml"
+        cluster_path.write_text(
+            yaml.safe_dump(
+                {
+                    "cluster": {
+                        "type": "consolidation_s_general_cluster",
+                    },
+                    "validation": {
+                        "cluster": {
+                            "type": "consolidation_s_general_cluster",
+                            "custom_configurations": {
+                                "node_type_id": "m7g.xlarge",
+                            },
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        violations = audit_cluster_file(cluster_path, config_service)
+        assert len(violations) == 1
+        assert violations[0].reason == "redundant_preset_default_override"
+        assert violations[0].cluster_path.endswith("#validation")

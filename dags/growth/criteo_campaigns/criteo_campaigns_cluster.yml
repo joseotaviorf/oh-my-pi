@@ -7,16 +7,3 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     spark_version: 13.3.x-scala2.12
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - whl: '{artifacts_bucket}/criteo-api-client-python/quintoandar_criteo_api_client-0.1.0-py2.py3-none-any.whl'
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_version: 13.3.x-scala2.12
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.large
-  allow_custom_spark_job: true

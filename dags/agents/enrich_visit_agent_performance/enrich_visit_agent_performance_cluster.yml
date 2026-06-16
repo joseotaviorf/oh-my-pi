@@ -2,8 +2,7 @@ cluster:
   type: consolidation_m_general_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    driver_node_type_id: r6g.xlarge
-    num_workers: 2
+    driver_node_type_id: r7g.xlarge
     spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: USER_ISOLATION

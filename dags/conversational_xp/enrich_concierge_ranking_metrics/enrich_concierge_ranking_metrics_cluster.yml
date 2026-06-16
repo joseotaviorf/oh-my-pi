@@ -12,17 +12,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_version: 13.3.x-scala2.12
     num_workers: 3
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new_env
-    access_control_list:
-      group_name: data-products
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      spark_conf:
-        spark.metrics.namespace: data_products.conversational_xp
-      spark_version: 13.3.x-scala2.12
-      num_workers: 3
-      node_type_id: m7g.xlarge
-      driver_node_type_id: m7g.xlarge

@@ -9,6 +9,6 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     num_workers: 3
-    node_type_id: r6gd.4xlarge
-    driver_node_type_id: r6gd.2xlarge
+    node_type_id: r7gd.4xlarge
+    driver_node_type_id: r7g.2xlarge
     runtime_engine: PHOTON

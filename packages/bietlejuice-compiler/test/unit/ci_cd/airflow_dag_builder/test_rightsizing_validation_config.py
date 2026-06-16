@@ -106,7 +106,7 @@ class TestGenerateValidationConfig:
             actions="collapse_to_single",
             current_preset="consolidation_xs_general_single_node_cluster",
             recommended_preset="consolidation_xs_memory_single_node_cluster",
-            rec_driver_node_type="r6g.large",
+            rec_driver_node_type="r7g.large",
             rec_worker_count=0,
         )
 
@@ -334,7 +334,7 @@ class TestGenerateValidationConfig:
         assert cfg is not None
         custom = cfg["validation"]["cluster"]["custom_configurations"]
         assert custom["driver_node_type_id"] == "m7g.xlarge"
-        assert custom["node_type_id"] == "m7g.2xlarge"
+        assert "node_type_id" not in custom
 
 
 class TestWriteValidationClusterFile:

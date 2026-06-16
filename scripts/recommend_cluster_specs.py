@@ -265,9 +265,9 @@ class PresetSpec:
 def _build_preset_catalog() -> dict[str, PresetSpec]:
     catalog: dict[str, PresetSpec] = {}
     families = [
-        ("compute", "c6g"),
-        ("general", "m6g"),
-        ("memory", "r6g"),
+        ("compute", "c7g"),
+        ("general", "m7g"),
+        ("memory", "r7g"),
     ]
     for family, prefix in families:
         for tier, size in _TIER_TO_SIZE.items():
@@ -641,7 +641,7 @@ def _tier_index(tier: str | None) -> int | None:
 
 
 def _node_for_family_tier(family: str, tier: str) -> str:
-    prefix_by_family = {"compute": "c6g", "general": "m6g", "memory": "r6g"}
+    prefix_by_family = {"compute": "c7g", "general": "m7g", "memory": "r7g"}
     return f"{prefix_by_family[family]}.{_TIER_TO_SIZE[tier]}"
 
 

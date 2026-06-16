@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_s_general_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   custom_libraries:
   - pypi:
@@ -12,23 +12,3 @@ cluster:
     spark_version: 12.2.x-scala2.12
     runtime_engine: PHOTON
     num_workers: 3
-    node_type_id: m6gd.xlarge
-    driver_node_type_id: m6gd.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - pypi:
-        package: lightgbm>=3.3.1
-    - pypi:
-        package: scikit-learn>=0.24.0
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_version: 12.2.x-scala2.12
-      num_workers: 3
-      runtime_engine: PHOTON
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.large
-  allow_custom_spark_job: true

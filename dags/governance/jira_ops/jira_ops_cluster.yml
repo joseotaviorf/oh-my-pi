@@ -4,8 +4,7 @@ cluster:
   custom_libraries:
   - whl: '{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.3.2-py2.py3-none-any.whl'
   custom_configurations:
-    driver_node_type_id: r6g.4xlarge
-    node_type_id: r6g.2xlarge
+    driver_node_type_id: r7g.4xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'

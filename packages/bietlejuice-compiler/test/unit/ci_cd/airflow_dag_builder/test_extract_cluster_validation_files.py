@@ -178,8 +178,8 @@ class TestExtractClusterValidationFiles:
             declaration=declaration,
             cluster_args=cluster_args,
         )
-        assert "driver_node_type_id: m6g.xlarge" in content
-        assert "node_type_id: m6g.large" in content
+        assert "driver_node_type_id: m7g.xlarge" in content
+        assert "node_type_id: m7g.large" in content
         assert "m5a." not in content
         # Once prod is normalized to graviton it already matches its consolidation
         # equivalent, so the validation would validate nothing and is skipped.

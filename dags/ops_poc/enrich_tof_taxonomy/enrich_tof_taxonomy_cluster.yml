@@ -2,8 +2,8 @@ cluster:
   type: consolidation_l_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    driver_node_type_id: r6gd.2xlarge
-    node_type_id: r6gd.4xlarge
+    driver_node_type_id: r7g.2xlarge
+    node_type_id: r7gd.4xlarge
     runtime_engine: PHOTON
     num_workers: 5
     spark_version: 16.4.x-scala2.12

@@ -2,14 +2,6 @@ cluster:
   type: consolidation_xl_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    driver_node_type_id: r6g.4xlarge
+    driver_node_type_id: r7g.4xlarge
     spark_version: 16.4.x-scala2.12
     num_workers: 4
-validation:
-  cluster:
-    type: consolidation_xl_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      num_workers: 4
-      node_type_id: r7g.8xlarge
-      driver_node_type_id: r7g.4xlarge

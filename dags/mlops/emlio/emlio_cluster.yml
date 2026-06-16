@@ -1,21 +1,9 @@
 cluster:
-  type: consolidation_l_compute_cluster
+  type: consolidation_m_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: mlops
     permission_level: CAN_MANAGE
   custom_configurations:
     num_workers: 3
-    driver_node_type_id: r6g.large
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: mlops
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      num_workers: 3
-      node_type_id: r7g.2xlarge
-      driver_node_type_id: r7g.large
-  allow_custom_spark_job: true
+    driver_node_type_id: r7g.large

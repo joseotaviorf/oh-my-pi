@@ -16,5 +16,4 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     runtime_engine: PHOTON
-    node_type_id: r6gd.2xlarge
-    driver_node_type_id: r6gd.2xlarge
+    node_type_id: r7gd.2xlarge

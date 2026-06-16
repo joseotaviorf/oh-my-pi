@@ -1,9 +1,3 @@
 cluster:
   type: consolidation_xl_general_single_node_cluster
   databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_xl_general_single_node_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      driver_node_type_id: m7g.8xlarge

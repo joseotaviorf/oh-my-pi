@@ -1,17 +1,8 @@
 cluster:
-  type: consolidation_m_memory_cluster
+  type: consolidation_s_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     spark_conf:
       spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
     spark_version: 13.3.x-scala2.12
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark_conf:
-        spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
-      spark_version: 13.3.x-scala2.12
-      node_type_id: r7g.xlarge
-      driver_node_type_id: r7g.2xlarge
+    driver_node_type_id: r7g.2xlarge

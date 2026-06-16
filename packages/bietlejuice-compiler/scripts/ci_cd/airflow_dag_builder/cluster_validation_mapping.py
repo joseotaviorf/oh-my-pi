@@ -8,6 +8,7 @@ instance types to Graviton equivalents, and selects a consolidation_* preset fro
 from __future__ import annotations
 
 import copy
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -60,7 +61,7 @@ INSTANCE_SUFFIX_TO_TIER = {
     "metal": "xl",
 }
 
-# Valid Graviton2 gen-6 sizes (shared by m6g/r6g/c6g and m6gd/r6gd/c6gd).
+# Valid Graviton ARM sizes (shared by m6g/r6g/c6g, m7g/r7g/c7g and *gd variants).
 GRAVITON_VALID_SUFFIXES = frozenset(
     {
         "medium",
@@ -84,15 +85,15 @@ TIER_TO_CONSOLIDATION_GRAVITON_SUFFIX = {
 }
 
 GRAVITON_FAMILY_PREFIX = {
-    "general": "m6g",
-    "memory": "r6g",
-    "compute": "c6g",
+    "general": "m7g",
+    "memory": "r7g",
+    "compute": "c7g",
 }
 
 GRAVITON_NVME_FAMILY_PREFIX = {
-    "general": "m6gd",
-    "memory": "r6gd",
-    "compute": "c6gd",
+    "general": "m7gd",
+    "memory": "r7gd",
+    "compute": "c7gd",
 }
 
 SIZE_TIER_ORDER = ("xs", "s", "m", "l", "xl")
@@ -119,7 +120,7 @@ MEMORY_PREFIXES = (
     "r7g",
     "r7i",
 )
-COMPUTE_PREFIXES = ("c-fleet", "c5", "c5a", "c5n", "c6g", "c6i", "c7i")
+COMPUTE_PREFIXES = ("c-fleet", "c5", "c5a", "c5n", "c6g", "c6i", "c7g", "c7i")
 
 # Size tokens scanned (longest-first) when a fleet cluster exposes no explicit
 # node_type_id; the fleet pools default to xlarge when no token is present.
@@ -248,23 +249,23 @@ _INSTANCE_TYPE_RE = re.compile(r"^([mrc])(\d+)([a-z]*)\.(.+)$", re.IGNORECASE)
 
 
 def _is_graviton_nvme_instance_type(instance_type: str) -> bool:
-    """True when instance type is Graviton gen-6 with local NVMe (m6gd/r6gd/c6gd)."""
+    """True when instance type is Graviton with local NVMe (m6gd/r6gd/c6gd or m7gd/...)."""
     match = _INSTANCE_TYPE_RE.match(str(instance_type).strip().lower())
     if not match:
         return False
     generation = int(match.group(2))
     variant = match.group(3)
-    return generation == 6 and variant == "gd"
+    return generation in (6, 7) and variant == "gd"
 
 
 def _is_graviton_non_nvme_instance_type(instance_type: str) -> bool:
-    """True when instance type is Graviton gen-6 without local NVMe (m6g/r6g/c6g)."""
+    """True when instance type is Graviton without local NVMe (m6g/r6g/c6g or m7g/...)."""
     match = _INSTANCE_TYPE_RE.match(str(instance_type).strip().lower())
     if not match:
         return False
     generation = int(match.group(2))
     variant = match.group(3)
-    return generation == 6 and variant == "g"
+    return generation in (6, 7) and variant == "g"
 
 
 def _use_nvme_for_topology_value(instance_type: str, *, photon_enabled: bool) -> bool:
@@ -280,6 +281,11 @@ def map_instance_type_to_graviton(instance_type: str, *, use_nvme: bool = False)
     """Map legacy/x86/fleet instance type to Graviton consolidation equivalent."""
     if not instance_type:
         raise ValueError("Empty instance type")
+    normalized = str(instance_type).strip().lower()
+    if _is_graviton_nvme_instance_type(
+        normalized
+    ) or _is_graviton_non_nvme_instance_type(normalized):
+        return normalized
     family = _instance_family(instance_type)
     graviton_suffix = _graviton_suffix_for_instance_type(instance_type)
     prefix_map = GRAVITON_NVME_FAMILY_PREFIX if use_nvme else GRAVITON_FAMILY_PREFIX
@@ -304,6 +310,131 @@ _DATABRICKS_TOPOLOGY_NESTED_KEYS = (
     ("core_nodes", "node_type_id"),
     ("task_nodes", "node_type_id"),
 )
+
+EMR_CONSOLIDATION_PRESET_PREFIX = "emr_7_12_consolidation_"
+
+REDUNDANT_TOPOLOGY_PATHS: Tuple[Tuple[str, ...], ...] = (
+    ("node_type_id",),
+    ("driver_node_type_id",),
+    ("master_node_type_id",),
+    ("task_node_type_id",),
+    ("core_nodes", "node_type_id"),
+    ("task_nodes", "node_type_id"),
+    ("num_workers",),
+)
+
+
+def is_consolidation_preset_for_topology_audit(cluster_type: str | None) -> bool:
+    """True for Databricks consolidation_* and EMR emr_7_12_consolidation_* presets."""
+    if not cluster_type:
+        return False
+    name = str(cluster_type)
+    return is_consolidation_cluster_type(name) or name.startswith(
+        EMR_CONSOLIDATION_PRESET_PREFIX
+    )
+
+
+def _get_nested_value(config: dict, path: Tuple[str, ...]) -> Optional[Any]:
+    current: Any = config
+    for key in path:
+        if not isinstance(current, dict) or key not in current:
+            return None
+        current = current[key]
+    return current
+
+
+def _delete_nested_value(config: dict, path: Tuple[str, ...]) -> None:
+    if not path:
+        return
+    if len(path) == 1:
+        config.pop(path[0], None)
+        return
+    parent = _get_nested_value(config, path[:-1])
+    if isinstance(parent, dict):
+        parent.pop(path[-1], None)
+
+
+def _preset_default_for_topology_path(
+    preset_merged: dict, path: Tuple[str, ...]
+) -> Optional[Any]:
+    value = _get_nested_value(preset_merged, path)
+    if value is not None:
+        return value
+    if path == ("node_type_id",):
+        core = preset_merged.get("core_nodes") or {}
+        if isinstance(core, dict) and core.get("node_type_id") is not None:
+            return core["node_type_id"]
+    return None
+
+
+def _override_matches_preset_default(override: Any, preset_default: Any) -> bool:
+    if isinstance(override, str) and isinstance(preset_default, str):
+        return str(override).lower() == str(preset_default).lower()
+    return _values_equal(override, preset_default)
+
+
+@dataclass(frozen=True)
+class RedundantPresetOverride:
+    path: Tuple[str, ...]
+    override_value: Any
+    preset_default: Any
+
+
+def find_redundant_preset_default_overrides(
+    cluster_args: dict,
+    config_service: Optional[ConfigurationService] = None,
+) -> List[RedundantPresetOverride]:
+    """Return topology keys in custom_configurations that merely echo the preset default."""
+    service = config_service or ConfigurationService()
+    cluster_type = str(cluster_args.get("type", ""))
+    if not is_consolidation_preset_for_topology_audit(cluster_type):
+        return []
+
+    custom = cluster_args.get("custom_configurations")
+    if not isinstance(custom, dict):
+        return []
+
+    preset_merged = merge_cluster_configuration({"type": cluster_type}, service)
+    redundant: List[RedundantPresetOverride] = []
+    for path in REDUNDANT_TOPOLOGY_PATHS:
+        override = _get_nested_value(custom, path)
+        if override is None:
+            continue
+        preset_default = _preset_default_for_topology_path(preset_merged, path)
+        if preset_default is None:
+            continue
+        if _override_matches_preset_default(override, preset_default):
+            redundant.append(
+                RedundantPresetOverride(
+                    path=path,
+                    override_value=override,
+                    preset_default=preset_default,
+                )
+            )
+    return redundant
+
+
+def strip_redundant_preset_default_overrides(
+    cluster_args: dict,
+    config_service: Optional[ConfigurationService] = None,
+) -> dict:
+    """Remove custom_configurations topology keys that match the preset default."""
+    result = copy.deepcopy(cluster_args)
+    custom = result.get("custom_configurations")
+    if not isinstance(custom, dict):
+        return result
+
+    for item in find_redundant_preset_default_overrides(result, config_service):
+        _delete_nested_value(custom, item.path)
+
+    for parent_key in ("core_nodes", "task_nodes"):
+        section = custom.get(parent_key)
+        if isinstance(section, dict) and not section:
+            custom.pop(parent_key, None)
+
+    if not custom:
+        result.pop("custom_configurations", None)
+    return result
 
 
 def _map_topology_value(instance_type: str, *, photon_enabled: bool) -> str:
@@ -347,7 +478,7 @@ def normalize_emr_cluster_topology(cluster_args: dict) -> dict:
         if isinstance(core_nodes, dict) and "instance_count" not in core_nodes:
             core_nodes["instance_count"] = max(core_count, 1)
 
-    return normalized
+    return strip_redundant_preset_default_overrides(normalized)
 
 
 def normalize_databricks_cluster_topology(
@@ -355,7 +486,7 @@ def normalize_databricks_cluster_topology(
     config_service: Optional[ConfigurationService] = None,
 ) -> dict:
     """
-    Rewrite Databricks cluster topology overrides to Graviton gen-6 (m6g/r6g/c6g or *gd).
+    Rewrite Databricks cluster topology overrides to Graviton gen-7 (m7g/r7g/c7g or *gd).
 
     Uses the same mapping as validation preset selection. EMR clusters are returned unchanged.
     """
@@ -383,7 +514,7 @@ def normalize_databricks_cluster_topology(
                 str(section[child_key]), photon_enabled=photon_enabled
             )
 
-    return normalized
+    return strip_redundant_preset_default_overrides(normalized, service)
 
 
 def size_tier_from_instance_type(instance_type: str) -> str:
@@ -1122,3 +1253,94 @@ def build_rightsizing_validation_cluster_spec(
         custom_libraries=prod_cluster_args.get("custom_libraries"),
         allow_custom_spark_job=_has_load_spark_job(declaration),
     )
+
+
+CONSOLIDATION_PRESET_TYPE_PREFIX = "consolidation_"
+
+_GEN6_INSTANCE_RE = re.compile(r"^([cmr])6(gd?)\.(.+)$", re.IGNORECASE)
+
+
+def is_consolidation_cluster_type(cluster_type: str | None) -> bool:
+    return bool(cluster_type) and str(cluster_type).startswith(
+        CONSOLIDATION_PRESET_TYPE_PREFIX
+    )
+
+
+def bump_instance_type_for_role(
+    instance_type: str,
+    *,
+    role: str,
+    single_node: bool,
+) -> str:
+    """Bump Graviton gen-6 instance types to gen-7; strip NVMe on drivers (not single-node)."""
+    if not instance_type:
+        return instance_type
+    match = _GEN6_INSTANCE_RE.match(str(instance_type).strip())
+    if not match:
+        return str(instance_type)
+    family, variant, size = match.group(1), match.group(2), match.group(3)
+    if role == "driver" and not single_node:
+        variant = "g"
+    elif variant == "gd":
+        variant = "gd"
+    elif not variant:
+        variant = "g"
+    return f"{family}7{variant}.{size}"
+
+
+def strip_driver_nvme_override(cluster: dict[str, Any]) -> dict[str, Any]:
+    """Normalize driver_node_type_id from *gd to *g when explicitly set."""
+    updated = copy.deepcopy(cluster)
+    custom = updated.get("custom_configurations")
+    if not isinstance(custom, dict):
+        return updated
+    driver = custom.get("driver_node_type_id")
+    if not driver:
+        return updated
+    match = _INSTANCE_TYPE_RE.match(str(driver).strip().lower())
+    if not match:
+        return updated
+    family, generation, variant, size = (
+        match.group(1),
+        int(match.group(2)),
+        match.group(3),
+        match.group(4),
+    )
+    if variant == "gd":
+        custom["driver_node_type_id"] = f"{family}{generation}g.{size}"
+    return updated
+
+
+def bump_cluster_topology_to_gen7(cluster: dict[str, Any]) -> dict[str, Any]:
+    """Role-aware gen-6 → gen-7 bump on Databricks topology keys in custom_configurations."""
+    updated = copy.deepcopy(cluster)
+    custom = updated.get("custom_configurations")
+    if not isinstance(custom, dict):
+        return updated
+
+    os.environ.setdefault("ENVIRONMENT", "prod")
+    service = ConfigurationService()
+    effective = merge_cluster_configuration(updated, service)
+    single_node = is_single_node_cluster(effective)
+
+    for key in _DATABRICKS_TOPOLOGY_FLAT_KEYS:
+        value = custom.get(key)
+        if not value or not isinstance(value, str):
+            continue
+        role = "driver" if key == "driver_node_type_id" else "worker"
+        custom[key] = bump_instance_type_for_role(
+            value, role=role, single_node=single_node
+        )
+
+    for parent_key, child_key in _DATABRICKS_TOPOLOGY_NESTED_KEYS:
+        section = custom.get(parent_key)
+        if isinstance(section, dict) and section.get(child_key):
+            section[child_key] = bump_instance_type_for_role(
+                str(section[child_key]),
+                role="worker",
+                single_node=single_node,
+            )
+
+    if single_node:
+        return updated
+    return strip_driver_nvme_override(updated)

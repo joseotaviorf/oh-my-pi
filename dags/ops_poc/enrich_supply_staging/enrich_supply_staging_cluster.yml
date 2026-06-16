@@ -6,14 +6,5 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    node_type_id: m6gd.large
-    driver_node_type_id: m6gd.large
+    node_type_id: m7gd.large
     runtime_engine: PHOTON
-validation:
-  cluster:
-    type: consolidation_xs_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      runtime_engine: PHOTON
-      node_type_id: m7gd.large
-      driver_node_type_id: m7gd.large

@@ -5,14 +5,4 @@ cluster:
     spark_conf:
       spark.sql.session.timeZone: America/Sao_Paulo
     num_workers: 3
-    driver_node_type_id: r6g.large
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      spark_conf:
-        spark.sql.session.timeZone: America/Sao_Paulo
-      num_workers: 3
-      node_type_id: m7g.xlarge
-      driver_node_type_id: r7g.large
+    driver_node_type_id: r7g.large

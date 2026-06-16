@@ -17,35 +17,39 @@ validation:
     type: consolidation_s_general_cluster
     custom_configurations:
       num_workers: 3
-      node_type_id: m6g.xlarge
+      node_type_id: m7g.xlarge
 ```
 
 ### How validation presets are chosen
 
 1. Resolve effective prod with `merge_cluster_configuration` (same as runtime `JobClusterEngine`). Runtime config production is not changed by validation generation; the generator uses it as a read-only oracle.
-2. Map worker and driver `node_type_id` to Graviton (`m5`/`m5a`/`m-fleet` → `m6g`, `r*` → `r6g`, `c*` → `c6g`; size suffix preserved).
+2. Map worker and driver `node_type_id` to Graviton Gen7 for production consolidation targets (`m5`/`m5a`/`m-fleet` → `m7g`, `r*` → `r7g`, `c*` → `c7g`; size suffix preserved). Existing explicit `*6g`/`*7g` Graviton overrides are preserved (never downgraded). Forno presets remain Gen6 via `forno_conf.yml`.
 3. **Single-node alignment:** prod single-node → validation `consolidation_*_single_node_*` only; prod multi-node → multi-node consolidation only (never flip modes).
 4. **Worker-first preset match:** pick a consolidation preset whose default `node_type_id` equals the mapped worker type.
 5. **Homogeneous driver/worker** (same instance size): preset must also match `driver_node_type_id`; overrides are only for non-default fields (`spark_version`, `num_workers`, etc.).
 6. **Heterogeneous driver/worker:** match on worker size only; override `driver_node_type_id` when it differs from the preset default (do not copy worker overrides from driver).
-7. **NVMe / Photon alignment:** prod Photon clusters keep `runtime_engine: PHOTON`; legacy instance types (`m5d`, `r5d`, …) map to Graviton `*gd` families when Photon is enabled. Explicit `*gd` overrides (`m6gd`, `r6gd`, `c6gd`) are preserved without Photon — local SSD is driven by the instance type, not `runtime_engine`. Explicit non-NVMe Graviton overrides (`m6g`, `r6g`, `c6g`) are never auto-upgraded to `*gd`, even when Photon is on.
+7. **NVMe / Photon alignment:** prod Photon clusters keep `runtime_engine: PHOTON`; legacy instance types (`m5d`, `r5d`, …) map to Graviton `*gd` families when Photon is enabled. Explicit `*gd` overrides (`m6gd`, `m7gd`, `r6gd`, …) are preserved without Photon — local SSD is driven by the instance type, not `runtime_engine`. Explicit non-NVMe Graviton overrides are never auto-upgraded to `*gd`, even when Photon is on. **Driver vs worker NVMe:** workers keep `*gd` when present; drivers use non-NVMe `*7g` after normalization (single-node clusters preserve NVMe on the sole node).
 8. Emit `validation.cluster.custom_configurations` only when effective prod differs from the validation preset defaults. Dictionary fields are diffed recursively (`spark_conf`, `spark_env_vars`, `aws_attributes`, etc.); list/scalar fields are emitted as full replacement values (`init_scripts`, `custom_tags` when list-shaped, `runtime_engine`, etc.).
 9. **Preset-only fields:** if the prod preset has fields the consolidation preset does not have, emit them explicitly in `validation.cluster.custom_configurations`. Example: `custom_cluster_with_sedona` defines an extra Sedona `init_scripts` entry in `prod_conf.yml`; validation must carry that list explicitly because the consolidation preset only has the default `bi-etl-ejuice/init_script.sh`.
 10. **Top-level cluster args:** declaration-level `custom_libraries`, `access_control_list`, and `databricks_conn_id` stay top-level under `validation.cluster`; they are not written into `custom_configurations`.
 
-**Skip validation** when the fully-resolved validation cluster spec equals prod's effective spec — the validation would validate nothing. This covers prod already being the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r6g.2xlarge` worker and driver) and any re-stated prod spec whose preset plus overlaid `custom_configurations` resolve to prod's running config (e.g. a just-promoted preset re-recommended from lagging history). The generator omits the `validation:` block entirely (`validation_resolves_to_prod_spec`, comparing `merge_cluster_configuration` of prod vs `merge_validation_cluster_args(prod, validation)`).
+**Skip validation** when the fully-resolved validation cluster spec equals prod's effective spec — the validation would validate nothing. This covers prod already being the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r7g.2xlarge` worker and driver) and any re-stated prod spec whose preset plus overlaid `custom_configurations` resolve to prod's running config (e.g. a just-promoted preset re-recommended from lagging history). The generator omits the `validation:` block entirely (`validation_resolves_to_prod_spec`, comparing `merge_cluster_configuration` of prod vs `merge_validation_cluster_args(prod, validation)`).
 
 When validation is emitted, `validation.cluster.type` may match prod `cluster.type` when `validation.cluster` specifies distinguishing overrides (for example `custom_configurations`). It must still differ from prod when no overrides are present (enforced by `DAGDeclarationValidator`). `DAGDeclarationValidator` also rejects any `validation.cluster` whose resolved spec equals prod's effective spec, even when it carries overrides — a re-stated prod spec validates nothing.
 
 Existing validation blocks are also checked against generator output. `validate-cluster-validation-files` fails when a validation-stage `*_cluster.yml` is missing generated effective-prod overrides, so stale blocks should be regenerated instead of relying on runtime fallback behavior.
 
-### Prod topology normalization (Graviton 6g)
+### Prod topology normalization (Graviton Gen7 in production)
 
-When `extract-cluster-validation-files` writes or regenerates `*_cluster.yml`, it **normalizes Databricks prod** `custom_configurations` topology (`node_type_id`, `driver_node_type_id`, nested `core_nodes` / `task_nodes`) using the same `map_instance_type_to_graviton` rules as validation preset selection (`m5a` → `m6g`, `r5d` → `r6g` without Photon; Photon or legacy `*d` types → `*gd`; explicit `*gd` overrides are kept as-is; explicit `m6g`/`r6g`/`c6g` overrides are kept as-is even with Photon). EMR clusters are left unchanged.
+When `extract-cluster-validation-files` writes or regenerates `*_cluster.yml`, it **normalizes Databricks prod** `custom_configurations` topology (`node_type_id`, `driver_node_type_id`, nested `core_nodes` / `task_nodes`) using the same `map_instance_type_to_graviton` rules as validation preset selection for production consolidation (`m5a` → `m7g`, legacy `*d` types → `*7gd` on workers when NVMe applies; explicit `*7gd` worker overrides are kept; driver overrides normalize to non-NVMe `*7g`). EMR clusters are left unchanged.
+
+**Environment split:** `prod_conf.yml` consolidation presets target Gen7 (`c7g`/`m7g`/`r7g`). `forno_conf.yml` consolidation presets stay on Gen6 for cost — preset-only DAGs therefore run Gen7 in prod and Gen6 in forno automatically via `ConfigurationService`. Explicit topology overrides in `*_cluster.yml` apply in both environments.
 
 This keeps prod and `validation.cluster` family-consistent: validation `custom_configurations` should only carry non-topology diffs (`num_workers`, `aws_attributes`, `spark_version`, etc.) unless the matched consolidation preset genuinely differs from normalized prod sizes. Do not hand-edit validation topology keys; re-run the extractor instead.
 
-`promote_cluster_validation_to_prod.py` applies the same normalization after promoting validation to prod.
+`promote_cluster_validation_to_prod.py` and `migrate_consolidation_to_gen7.py` apply the same normalization after promoting validation to prod.
+
+**Prod topology overrides:** `cluster.custom_configurations` must not restate preset-default topology (`node_type_id`, `driver_node_type_id`, `master_node_type_id`, `num_workers`, nested EMR worker keys). Align the preset to the worker size; override only the driver (heterogeneous sizing) or worker NVMe (`*gd`) when needed. `make audit-cluster-instance-families` (part of `validate-cluster-validation-files`) fails CI on redundant echoes and on `*_single_node_cluster` presets with `num_workers > 0`. Use `strip_redundant_cluster_overrides.py` to clean existing files.
 
 ### Generator and CI
 

@@ -4,14 +4,4 @@ cluster:
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
   custom_configurations:
-    driver_node_type_id: r6g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
-    custom_configurations:
-      node_type_id: r7g.large
-      driver_node_type_id: r7g.xlarge
-  allow_custom_spark_job: true
+    driver_node_type_id: r7g.xlarge
