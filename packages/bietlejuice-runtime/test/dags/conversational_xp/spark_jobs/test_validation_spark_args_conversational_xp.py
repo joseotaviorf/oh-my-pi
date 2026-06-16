@@ -8,14 +8,18 @@ _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
     "dags/conversational_xp/conversation_explorer/spark_jobs/load_conversation_explorer.py",
+    "dags/conversational_xp/demand_balancer_service/spark_jobs/load_parquet_batch_inference_into_datalake.py",
     "dags/conversational_xp/langfuse/spark_jobs/fetch_data.py",
     "dags/conversational_xp/reverse_minority_report_ss/spark_jobs/load_reverse_minority_report_ss.py",
+    "dags/conversational_xp/search_metrics_service/spark_jobs/load_parquet_batch_inference_into_datalake.py",
     "dags/conversational_xp/text2filter_evals/spark_jobs/load_text2filter_evals_into_datalake.py",
 ]
 
 _JOBS_WITH_RESOLVE = {
     "dags/conversational_xp/conversation_explorer/spark_jobs/load_conversation_explorer.py",
+    "dags/conversational_xp/demand_balancer_service/spark_jobs/load_parquet_batch_inference_into_datalake.py",
     "dags/conversational_xp/langfuse/spark_jobs/fetch_data.py",
+    "dags/conversational_xp/search_metrics_service/spark_jobs/load_parquet_batch_inference_into_datalake.py",
     "dags/conversational_xp/text2filter_evals/spark_jobs/load_text2filter_evals_into_datalake.py",
 }
 

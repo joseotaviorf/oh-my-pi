@@ -77,6 +77,9 @@ sys.modules.setdefault(
     "bietlejuice.base.spark.base_core_model_spark_job", _fake_base_module
 )
 
+from dags.tech_platform.cloudfront.spark_jobs.cloudfront_logs_load import (  # noqa: E402
+    parse_arguments as parse_cloudfront_args,
+)
 from dags.tech_platform.crowdstrike.spark_jobs.load_crowdstrike_raw import (  # noqa: E402
     CrowdStrikeJobArgumentParser,
 )
@@ -195,6 +198,16 @@ _OPA_POSITIONAL = [
     '["year", "month", "day", "hour"]',
 ]
 
+_CLOUDFRONT_POSITIONAL = [
+    "cloudfront",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "access_logs",
+    "2024-01-01T00:00:00+00:00",
+    "cloudfront",
+    '["year", "month", "day", "hour"]',
+]
+
 _APPLICATION_AUDIT_LOGS_POSITIONAL = [
     "application_audit_logs",
     _TEST_ENV,
@@ -235,6 +248,7 @@ _CYPRESS_REPORTS_POSITIONAL = [
 
 _TECH_PLATFORM_JOB_PATHS = [
     "dags/tech_platform/application_audit_logs/spark_jobs/application_audit_logs_load.py",
+    "dags/tech_platform/cloudfront/spark_jobs/cloudfront_logs_load.py",
     "dags/tech_platform/cypress_reports/spark_jobs/load_cypress_reports_raw.py",
     "dags/tech_platform/vault/spark_jobs/events_load.py",
     "dags/tech_platform/identitynow/spark_jobs/events_load.py",
@@ -389,6 +403,11 @@ class TestTechPlatformSparkJobValidationArgs:
                 "datalake_access_logs_clean___opa",
             ),
             (
+                parse_cloudfront_args,
+                _CLOUDFRONT_POSITIONAL,
+                "datalake_access_logs_clean___cloudfront",
+            ),
+            (
                 parse_application_audit_logs_args,
                 _APPLICATION_AUDIT_LOGS_POSITIONAL,
                 "datalake_application_audit_logs_clean___logs",
@@ -438,6 +457,12 @@ class TestTechPlatformSparkJobValidationArgs:
             ),
         )
         monkeypatch.setattr(
+            "dags.tech_platform.cloudfront.spark_jobs.cloudfront_logs_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(get_config=MagicMock(return_value="path"))
+            ),
+        )
+        monkeypatch.setattr(
             "dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load.ConfigurationService",
             MagicMock(
                 return_value=MagicMock(get_config=MagicMock(return_value="path"))
@@ -479,6 +504,7 @@ class TestTechPlatformSparkJobValidationArgs:
         [
             (parse_istio_args, _ISTIO_POSITIONAL),
             (parse_opa_args, _OPA_POSITIONAL),
+            (parse_cloudfront_args, _CLOUDFRONT_POSITIONAL),
             (
                 parse_application_audit_logs_args,
                 _APPLICATION_AUDIT_LOGS_POSITIONAL,
@@ -500,6 +526,12 @@ class TestTechPlatformSparkJobValidationArgs:
         )
         monkeypatch.setattr(
             "dags.tech_platform.opa.spark_jobs.opa_logs_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(get_config=MagicMock(return_value="path"))
+            ),
+        )
+        monkeypatch.setattr(
+            "dags.tech_platform.cloudfront.spark_jobs.cloudfront_logs_load.ConfigurationService",
             MagicMock(
                 return_value=MagicMock(get_config=MagicMock(return_value="path"))
             ),

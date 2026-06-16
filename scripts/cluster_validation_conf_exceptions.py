@@ -25,9 +25,11 @@ ValidationConfResolver = Callable[
 
 TEXT2FILTER_SINGLE_DAY: LoadWindowSource = "exception:text2filter_single_day"
 CYBER_LEGAL_3DAY_WINDOW: LoadWindowSource = "exception:cyber_legal_3day_window"
+GREENHOUSE_V3_SINGLE_DAY: LoadWindowSource = "exception:greenhouse_v3_single_day"
 
 DAG_TEXT2FILTER_EVALS = "bietlejuice.text2filter_evals"
 DAG_CYBER_LEGAL = "bietlejuice.cyber_legal"
+DAG_GREENHOUSE_V3 = "bietlejuice.greenhouse_v3"
 
 
 def _conf_load_start_from_run(run: dict[str, Any]) -> str | None:
@@ -102,9 +104,27 @@ def resolve_cyber_legal_conf(
     return _test_run_conf(start_str, end_str), CYBER_LEGAL_3DAY_WINDOW
 
 
+def resolve_greenhouse_v3_conf(
+    run: dict[str, Any],
+) -> tuple[dict[str, str], LoadWindowSource] | None:
+    """Single-day API ingest window for Greenhouse v3 validation runs."""
+    ingest_day = _conf_load_start_from_run(run)
+    if ingest_day is None:
+        interval_start = _interval_start(run)
+        if interval_start is None:
+            return None
+        ingest_day = to_utc_date_str(interval_start)
+
+    exclusive_end = (
+        datetime.strptime(ingest_day, "%Y-%m-%d") + timedelta(days=1)
+    ).strftime("%Y-%m-%d")
+    return _test_run_conf(ingest_day, exclusive_end), GREENHOUSE_V3_SINGLE_DAY
+
+
 VALIDATION_CONF_EXCEPTIONS: dict[str, ValidationConfResolver] = {
     DAG_TEXT2FILTER_EVALS: resolve_text2filter_evals_conf,
     DAG_CYBER_LEGAL: resolve_cyber_legal_conf,
+    DAG_GREENHOUSE_V3: resolve_greenhouse_v3_conf,
 }
 
 

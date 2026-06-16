@@ -13,6 +13,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -52,6 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("table_name", help="endpoint to call the API")
     parser.add_argument("execution_date", help="execution date in str format")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -106,20 +111,34 @@ if __name__ == "__main__":
         database_name = db_info["db_raw_databricks"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         database_location = db_info["db_raw_path"]
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=table_name,
+                prod_location=database_location,
+                bucket=bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
 
         logger.info(
             "m=__main__, msg=Creating database in Spark Metastore if not exists..."
         )
-        metastore_service.create_database(database_name)
+        metastore_service.create_database(write_database_name)
 
         s3_loader.load_full_table(
             df=df,
-            database_name=database_name,
-            table_name=table_name,
+            database_name=write_database_name,
+            table_name=write_table_name,
             format_options=format_options,
-            database_location=database_location,
+            database_location=write_location,
         )
 
         spark_metastore_loader.update_metastore(
-            df, database_name, table_name, format_options, database_location
+            df,
+            write_database_name,
+            write_table_name,
+            format_options,
+            write_location,
         )

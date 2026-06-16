@@ -18,6 +18,7 @@ sys.modules["quintoandar_logger"] = MagicMock()
 
 from dags.people.greenhouse_v3.spark_jobs.load_greenhouse_v3_raw import (  # noqa: E402
     GreenhouseAPIV3,
+    apply_validation_api_scope,
 )
 
 BASE_FILTERS_UPDATED_AT = {
@@ -193,6 +194,69 @@ class TestGreenhouseAPIV3ApplyDateFilters(unittest.TestCase):
         self.assertEqual(client.params["per_page"], 500)
         self.assertEqual(client.params["status"], "active")
         self.assertIn("updated_at", client.params)
+
+
+class TestApplyValidationApiScope(unittest.TestCase):
+    def test_validation_run_adds_filters_for_full_scan_table(self):
+        job_args = {
+            "table_name": "applications",
+            "date_column_to_partition": "updated_at",
+            "params": {"per_page": 500},
+            "extraction_type": "full",
+            "load_start_date": datetime(2025, 3, 1),
+            "load_end_date": datetime(2025, 3, 2),
+            "target_database_name": "cluster_validation",
+            "target_table_name": "datalake_greenhouse_v3_raw___applications",
+        }
+
+        apply_validation_api_scope(job_args)
+
+        self.assertEqual(job_args["extraction_type"], "incremental")
+        self.assertEqual(
+            job_args["base_filters"],
+            {
+                "updated_at_gte": "load_start_date",
+                "updated_at_lt": "load_end_date",
+            },
+        )
+
+    def test_validation_run_skips_static_reference_tables(self):
+        job_args = {
+            "table_name": "close_reasons",
+            "params": {"per_page": 500},
+            "extraction_type": "full",
+            "target_database_name": "cluster_validation",
+            "target_table_name": "datalake_greenhouse_v3_raw___close_reasons",
+        }
+
+        apply_validation_api_scope(job_args)
+
+        self.assertEqual(job_args["extraction_type"], "full")
+        self.assertNotIn("base_filters", job_args)
+
+    def test_validation_run_preserves_existing_base_filters(self):
+        job_args = {
+            "table_name": "application_stages",
+            "base_filters": BASE_FILTERS_UPDATED_AT,
+            "extraction_type": "incremental",
+            "target_database_name": "cluster_validation",
+            "target_table_name": "datalake_greenhouse_v3_raw___application_stages",
+        }
+
+        apply_validation_api_scope(job_args)
+
+        self.assertEqual(job_args["base_filters"], BASE_FILTERS_UPDATED_AT)
+
+    def test_non_validation_run_is_noop(self):
+        job_args = {
+            "table_name": "applications",
+            "extraction_type": "full",
+        }
+
+        apply_validation_api_scope(job_args)
+
+        self.assertEqual(job_args["extraction_type"], "full")
+        self.assertNotIn("base_filters", job_args)
 
 
 class TestGreenhouseAPIV3Init(unittest.TestCase):

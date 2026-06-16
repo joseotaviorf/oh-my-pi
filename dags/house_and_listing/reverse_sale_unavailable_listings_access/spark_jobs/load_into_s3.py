@@ -3,11 +3,15 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from http.client import HTTPException
-from typing import Tuple
+from typing import Optional, Tuple
 
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.storage_services import S3Service
 
@@ -26,7 +30,21 @@ buckets = {
 
 
 def main():
-    env, database_name, table_name, execution_date = parse_arguments()
+    (
+        env,
+        database_name,
+        table_name,
+        execution_date,
+        target_database_name,
+        target_table_name,
+    ) = parse_arguments()
+
+    if is_validation_run(target_database_name, target_table_name):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping reverse S3 export in cluster validation mode"
+        )
+        return
+
     bucket = buckets[env]
     logger.info(
         f"""m=__main__, bucket= {bucket}, database_name={database_name}, 
@@ -38,7 +56,7 @@ def main():
     send_to_s3_bucket(result, table_name, destination_path)
 
 
-def parse_arguments() -> Tuple[str, str, str, datetime]:
+def parse_arguments() -> Tuple[str, str, str, datetime, Optional[str], Optional[str]]:
 
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -49,6 +67,7 @@ def parse_arguments() -> Tuple[str, str, str, datetime]:
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     env = args.env
@@ -56,7 +75,14 @@ def parse_arguments() -> Tuple[str, str, str, datetime]:
     table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
 
-    return env, database_name, table_name, execution_date
+    return (
+        env,
+        database_name,
+        table_name,
+        execution_date,
+        args.target_database_name,
+        args.target_table_name,
+    )
 
 
 def prepare_table(database_name: str, table_name: str, execution_date: datetime):

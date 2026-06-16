@@ -19,6 +19,8 @@ _JOB_PATHS = [
     "dags/support_and_service/survicate_survey_attributes/spark_jobs/load_survicate_survey_attributes_raw.py",
     "dags/support_and_service/survicate_surveys/spark_jobs/load_survicate_surveys_raw.py",
     "dags/support_and_service/twilio_flex_insights/spark_jobs/load_twilio_flex_insights_raw.py",
+    "dags/support_and_service/tracksale/spark_jobs/load_full_data_into_datalake_raw.py",
+    "dags/support_and_service/tracksale/spark_jobs/load_incremental_data_into_datalake_raw.py",
     "dags/support_and_service/zendesk/spark_jobs/add_data_from_airbyte_to_raw.py",
     "dags/support_and_service/zendesk/spark_jobs/add_data_from_stitch_to_raw.py",
 ]

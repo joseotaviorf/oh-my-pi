@@ -26,6 +26,7 @@ LoadWindowSource = Literal[
     "data_interval",
     "exception:text2filter_single_day",
     "exception:cyber_legal_3day_window",
+    "exception:greenhouse_v3_single_day",
 ]
 
 
@@ -56,9 +57,7 @@ def dag_run_id_from_payload(run: dict[str, Any]) -> str | None:
 
 
 def dag_run_duration_seconds(run: dict[str, Any]) -> float | None:
-    start = parse_airflow_timestamp(
-        run.get("start_date") or run.get("ts_started")
-    )
+    start = parse_airflow_timestamp(run.get("start_date") or run.get("ts_started"))
     end = parse_airflow_timestamp(run.get("end_date") or run.get("ts_ended"))
     if start is None or end is None:
         return None
@@ -71,9 +70,9 @@ def ensure_exclusive_load_end(conf: dict[str, str]) -> dict[str, str]:
     if not (is_valid_date_param(start) and is_valid_date_param(end)):
         return conf
     if start >= end:
-        bumped_end = (
-            datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)
-        ).strftime("%Y-%m-%d")
+        bumped_end = (datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)).strftime(
+            "%Y-%m-%d"
+        )
         return {**conf, "load_end_date": bumped_end}
     return conf
 

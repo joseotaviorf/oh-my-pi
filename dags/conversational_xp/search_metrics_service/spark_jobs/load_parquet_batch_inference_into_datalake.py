@@ -8,6 +8,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -28,7 +32,14 @@ def get_source_in_forno(environment, source):
 
 
 def load_raw_data(
-    df, environment, source, datalake_bucket, table_name, raw_partition_cols
+    df,
+    environment,
+    source,
+    datalake_bucket,
+    table_name,
+    raw_partition_cols,
+    target_database_name=None,
+    target_table_name=None,
 ):
     spark_client = SparkClient()
     s3_loader = S3Loader()
@@ -36,32 +47,42 @@ def load_raw_data(
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     format_options = SparkTableStorageFormat.PARQUET
 
     spark_metastore_service = SparkMetastoreService(spark_client)
 
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     s3_loader.load_df(
         df=df,
-        s3_path=f"{database_location}{table_name}",
+        s3_path=f"{write_location}{write_table_name}",
         format_options=format_options,
         partitions=raw_partition_cols,
     )
 
     spark_metastore_loader.update_metastore(
         df=df,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=format_options,
-        database_location=database_location,
+        database_location=write_location,
         partitions=raw_partition_cols,
     )
     spark_metastore_service.create_new_partitions_from_df(
         df=df,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         partition_cols=raw_partition_cols,
     )
 
@@ -119,6 +140,7 @@ def main():
     parser.add_argument("raw_partition_cols", help="list with partition cols")
     parser.add_argument("format", help="data format to load from S3. ")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.bucket
@@ -140,7 +162,14 @@ def main():
     df_raw = get_df_raw(table_name, source_root_path, date_to_ingest)
 
     load_raw_data(
-        df_raw, environment, source, datalake_bucket, table_name, raw_partition_cols
+        df_raw,
+        environment,
+        source,
+        datalake_bucket,
+        table_name,
+        raw_partition_cols,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
 
 

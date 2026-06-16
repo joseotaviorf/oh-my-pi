@@ -65,6 +65,33 @@ class TestCyberLegalConfException:
         assert source == "conf"
 
 
+class TestGreenhouseV3ConfException:
+    def test_interval_only_uses_single_ingest_day(self) -> None:
+        run = {
+            "data_interval_start": "2026-06-15T03:00:00+00:00",
+            "data_interval_end": "2026-06-16T03:00:00+00:00",
+        }
+        result = exc.resolve_greenhouse_v3_conf(run)
+        assert result is not None
+        conf, source = result
+        assert conf["load_start_date"] == "2026-06-15"
+        assert conf["load_end_date"] == "2026-06-16"
+        assert source == "exception:greenhouse_v3_single_day"
+
+    def test_conf_load_start_wins(self) -> None:
+        run = {
+            "conf": {"load_start_date": "2026-06-02", "load_end_date": "2026-06-04"},
+            "data_interval_start": "2026-06-15T03:00:00+00:00",
+            "data_interval_end": "2026-06-16T03:00:00+00:00",
+        }
+        result = exc.resolve_greenhouse_v3_conf(run)
+        assert result is not None
+        conf, source = result
+        assert conf["load_start_date"] == "2026-06-02"
+        assert conf["load_end_date"] == "2026-06-03"
+        assert source == "exception:greenhouse_v3_single_day"
+
+
 class TestResolveValidationConfForDag:
     def test_unregistered_dag_uses_generic_resolver(self) -> None:
         run = {
@@ -82,9 +109,19 @@ class TestResolveValidationConfForDag:
             "data_interval_start": "2026-06-05T03:37:00+00:00",
             "data_interval_end": "2026-06-06T03:37:00+00:00",
         }
-        result = exc.resolve_validation_conf_for_dag(
-            exc.DAG_TEXT2FILTER_EVALS, run
-        )
+        result = exc.resolve_validation_conf_for_dag(exc.DAG_TEXT2FILTER_EVALS, run)
         assert result is not None
         _, source = result
         assert source == "exception:text2filter_single_day"
+
+    def test_greenhouse_v3_registered(self) -> None:
+        run = {
+            "data_interval_start": "2026-06-15T03:00:00+00:00",
+            "data_interval_end": "2026-06-16T03:00:00+00:00",
+        }
+        result = exc.resolve_validation_conf_for_dag(exc.DAG_GREENHOUSE_V3, run)
+        assert result is not None
+        conf, source = result
+        assert conf["load_start_date"] == "2026-06-15"
+        assert conf["load_end_date"] == "2026-06-16"
+        assert source == "exception:greenhouse_v3_single_day"

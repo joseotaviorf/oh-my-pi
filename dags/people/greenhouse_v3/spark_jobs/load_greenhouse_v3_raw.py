@@ -9,6 +9,7 @@ from bietlejuice.base.api.auth.oauth2 import BasicAuthOAuth2ClientCredentials
 from bietlejuice.base.api.common.client import BaseAPIClient
 from bietlejuice.base.api.pagination.header_link import HeaderLinkPaginator
 from bietlejuice.base.api.parser.argument_parser import BaseJobArgumentParser
+from bietlejuice.base.validation.spark_args import is_validation_run
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
 from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
@@ -17,6 +18,38 @@ LOGGER = logging.getLogger(__name__)
 
 # Cluster validation: add_validation_target_args / resolve_datalake_write_target
 # (--target-database-name, --target-table-name) via BaseJobArgumentParser + RawLayerLoader.
+
+_VALIDATION_BASE_FILTERS = {
+    "updated_at_gte": "load_start_date",
+    "updated_at_lt": "load_end_date",
+}
+
+
+def apply_validation_api_scope(job_args: Dict[str, Any]) -> None:
+    """Limit full-scan endpoints to the validation load window during cluster validation."""
+    if not is_validation_run(
+        job_args.get("target_database_name"),
+        job_args.get("target_table_name"),
+    ):
+        return
+
+    base_filters = GreenhouseAPIV3._parse_json_field(job_args.get("base_filters", {}))
+    if base_filters:
+        return
+
+    if job_args.get("date_column_to_partition") != "updated_at":
+        LOGGER.info(
+            "Skipping validation API scope for table '%s': no updated_at partition column",
+            job_args.get("table_name"),
+        )
+        return
+
+    job_args["base_filters"] = _VALIDATION_BASE_FILTERS.copy()
+    job_args["extraction_type"] = "incremental"
+    LOGGER.info(
+        "Applied validation API scope for table '%s': incremental updated_at window",
+        job_args.get("table_name"),
+    )
 
 
 class GreenhouseAPIV3(BaseAPIClient):
@@ -140,6 +173,7 @@ def main():
     """
     try:
         job_args = BaseJobArgumentParser.parse_args()
+        apply_validation_api_scope(job_args)
         LOGGER.info(
             f"Running Greenhouse v3 job with the following arguments: {job_args}"
         )
