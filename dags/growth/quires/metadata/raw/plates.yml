@@ -1,0 +1,26 @@
+database_name: datalake_quires_raw
+table_name: plates
+domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Raw plate definitions from the Quires API, representing marketing plates used to group and surface real estate listings. Each plate carries UTM attribution parameters for traffic tracking. One row per plate, partitioned by year/month/day.
+columns:
+  id:
+    description: Unique identifier for the plate record in the Quires source system.
+  reference:
+    description: External or business reference code associated with the plate, used for cross-system identification.
+  label:
+    description: Human-readable display label for the plate as shown on Quires surfaces.
+  utmsource:
+    description: UTM source tag associated with this plate, identifying the originating traffic source for attribution (e.g. google, newsletter).
+  utmmedium:
+    description: UTM medium tag associated with this plate, indicating the marketing channel through which the plate is served (e.g. cpc, email, organic).
+  utmcampaign:
+    description: UTM campaign tag associated with this plate, used to attribute traffic and activations to specific marketing campaigns.
+  createdat:
+    description: Timestamp when the plate record was created in the Quires source system.
+  year:
+    description: Year partition component aligned with the plate creation date for incremental loads.
+  month:
+    description: Month partition component aligned with the plate creation date for incremental loads.
+  day:
+    description: Day partition component aligned with the plate creation date for incremental loads.

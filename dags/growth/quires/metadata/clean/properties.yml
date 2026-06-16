@@ -1,6 +1,6 @@
 database_name: datalake_quires_clean
 table_name: properties
-owner: henrique.pauloa@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table containing properties data from quires
 columns:
@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_quires_raw.properties.geolocation
   property_type:
-    description: Type of property
+    description: Classification of the property type in the Quires platform (e.g. apartment, house, commercial), used to segment listings by real estate category.
     lineage:
       - datalake_quires_raw.properties.propertyType
   status:
@@ -42,6 +42,7 @@ columns:
       - datalake_quires_raw.properties.url
   rent_price:
     description: Rental price of the property
+    lineage:
       - datalake_quires_raw.properties.rentPrice
   sale_price:
     description: Sale price of the property

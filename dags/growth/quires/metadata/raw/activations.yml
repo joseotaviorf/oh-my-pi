@@ -1,5 +1,38 @@
 database_name: datalake_quires_raw
 table_name: activations
-description: Quires - activations
 domain: Growth
-owner: data-growth@quintoandar.com.br / henrique.paulo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
+description: Raw activation events from the Quires API, recording each time a property plate was activated by an installer. Includes UTM attribution parameters and transaction context. One row per activation, partitioned by year/month/day.
+columns:
+  id:
+    description: Unique identifier for the activation event in the Quires source system.
+  plate:
+    description: Plate code identifying the real estate listing associated with this activation.
+  property:
+    description: Property identifier linked to this activation event in the Quires platform.
+  transactiontype:
+    description: Type of real estate transaction for this activation (e.g. rent, sale).
+  url:
+    description: URL of the property listing page associated with this activation.
+  installer:
+    description: Internal code or slug for the installer who triggered this activation.
+  installerid:
+    description: Unique numeric identifier for the installer entity in the Quires source system.
+  installername:
+    description: Human-readable display name of the installer who triggered this activation.
+  installerrc:
+    description: Installer RC (reference code) used internally by Quires to track installer configurations and regional assignments.
+  utmcampaign:
+    description: UTM campaign tag captured at the time of activation, used for marketing attribution across acquisition campaigns.
+  utmmedium:
+    description: UTM medium tag captured at the time of activation, indicating the marketing channel (e.g. cpc, email, organic).
+  utmsource:
+    description: UTM source tag captured at the time of activation, identifying the originating traffic source (e.g. google, newsletter).
+  createdat:
+    description: Timestamp when the activation event was created in the Quires source system.
+  year:
+    description: Year partition component of the activation date, aligned to load_start_date.
+  month:
+    description: Month partition component of the activation date, aligned to load_start_date.
+  day:
+    description: Day partition component of the activation date, aligned to load_start_date.

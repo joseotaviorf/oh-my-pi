@@ -1,5 +1,36 @@
 database_name: datalake_quires_raw
 table_name: properties
-description: Quires - Properties
 domain: Growth
-owner: data-growth@quintoandar.com.br / henrique.paulo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
+description: Raw property listing data from the Quires API, representing the state of each real estate listing at the time of ingestion. Includes pricing, location, and classification attributes. One row per property per load, partitioned by year/month/day.
+columns:
+  id:
+    description: Unique identifier for the property listing in the Quires source system.
+  code:
+    description: Business-facing property code used to identify the listing externally.
+  url:
+    description: URL of the property listing page in the Quires platform.
+  city:
+    description: City where the property is located.
+  citygroup:
+    description: City group or metropolitan area classification used for regional segmentation.
+  geolocation:
+    description: Geographic coordinates (latitude/longitude) of the property location.
+  propertytype:
+    description: Classification of the property type in the Quires platform (e.g. apartment, house, commercial).
+  status:
+    description: Current listing status of the property in the Quires source system (e.g. active, inactive).
+  transactiontype:
+    description: Type of real estate transaction for this property (e.g. rent, sale).
+  rentprice:
+    description: Rental price of the property as reported by the Quires source system at ingestion time.
+  saleprice:
+    description: Sale price of the property as reported by the Quires source system at ingestion time.
+  load_date:
+    description: Date when this property record was loaded from the Quires API.
+  year:
+    description: Year partition component of the load date, aligned to load_start_date.
+  month:
+    description: Month partition component of the load date, aligned to load_start_date.
+  day:
+    description: Day partition component of the load date, aligned to load_start_date.

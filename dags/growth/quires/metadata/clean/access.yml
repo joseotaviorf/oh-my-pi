@@ -1,6 +1,6 @@
 database_name: datalake_quires_clean
 table_name: access
-owner: henrique.pauloa@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table containing access data from quires
 columns:

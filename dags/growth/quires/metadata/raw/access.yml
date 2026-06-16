@@ -1,5 +1,20 @@
 database_name: datalake_quires_raw
 table_name: access
-description: Quires - access
 domain: Growth
-owner: data-growth@quintoandar.com.br / henrique.paulo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
+description: Raw access events from the Quires API, recording each time a real estate plate was accessed by a device. One row per access event, partitioned by year/month/day.
+columns:
+  id:
+    description: Unique identifier for the access event in the Quires source system.
+  plate:
+    description: Plate code identifying the real estate listing that was accessed.
+  deviceid:
+    description: Device identifier of the client that performed the access.
+  createdat:
+    description: Timestamp when the access event was created in the Quires source system.
+  year:
+    description: Year partition component of the access event date, aligned to load_start_date.
+  month:
+    description: Month partition component of the access event date, aligned to load_start_date.
+  day:
+    description: Day partition component of the access event date, aligned to load_start_date.

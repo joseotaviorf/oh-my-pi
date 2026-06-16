@@ -16,21 +16,24 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   spark_job_arguments:
-  - "{environment}" # env
-  - "{bucket}"  # datalake_bucket
-  - "{dag_name}"  # source
-  - "{load_start_date}" # load_start_date
-  - "{load_end_date}" # load_end_date
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
   tables_customization:
     access:
       extra_spark_job_arguments:
-      - access  # table_name
+        - access # table_name
     activations:
       extra_spark_job_arguments:
-      - activations # table_name
+        - activations # table_name
     properties:
       extra_spark_job_arguments:
-      - properties  # table_name
+        - properties # table_name
     urls:
       extra_spark_job_arguments:
-      - urls  # table_name
+        - urls # table_name
+    plates:
+      extra_spark_job_arguments:
+        - plates # table_name

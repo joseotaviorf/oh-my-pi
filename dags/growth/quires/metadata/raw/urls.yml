@@ -1,5 +1,22 @@
 database_name: datalake_quires_raw
 table_name: urls
-description: Quires - Urls
 domain: Growth
-owner: data-growth@quintoandar.com.br / henrique.paulo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
+description: Raw URL records from the Quires API, tracking the lifecycle of property listing URLs including their creation, updates, and current status. One row per URL event, partitioned by year/month/day.
+columns:
+  id:
+    description: Unique identifier for the URL record in the Quires source system.
+  url:
+    description: Full URL of the property listing page tracked by the Quires platform.
+  status:
+    description: Current status of the URL in the Quires source system (e.g. active, inactive, redirected).
+  createdat:
+    description: Timestamp when the URL record was first created in the Quires source system.
+  updatedat:
+    description: Timestamp when the URL record was last updated in the Quires source system.
+  year:
+    description: Year partition component of the URL record date, aligned to load_start_date.
+  month:
+    description: Month partition component of the URL record date, aligned to load_start_date.
+  day:
+    description: Day partition component of the URL record date, aligned to load_start_date.

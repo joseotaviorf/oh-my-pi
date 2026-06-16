@@ -1,0 +1,46 @@
+database_name: datalake_quires_clean
+table_name: plates
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: Table containing marketing plate definitions from Quires
+columns:
+  id:
+    description: Unique identifier for the plate record in the Quires source system.
+    lineage:
+      - datalake_quires_raw.plates.id
+  reference:
+    description: External or business reference code associated with the plate.
+    lineage:
+      - datalake_quires_raw.plates.reference
+  label:
+    description: Human-readable display label for the plate used in Quires surfaces.
+    lineage:
+      - datalake_quires_raw.plates.label
+  utm_source:
+    description: UTM source parameter captured for attribution when the plate is used.
+    lineage:
+      - datalake_quires_raw.plates.utmSource
+  utm_medium:
+    description: UTM medium parameter captured for attribution when the plate is used.
+    lineage:
+      - datalake_quires_raw.plates.utmMedium
+  utm_campaign:
+    description: UTM campaign parameter captured for attribution when the plate is used.
+    lineage:
+      - datalake_quires_raw.plates.utmCampaign
+  ts_created:
+    description: Timestamp when the plate record was created in the source system.
+    lineage:
+      - datalake_quires_raw.plates.createdAt
+  year:
+    description: Year partition component aligned with the plate creation date for incremental loads.
+    lineage:
+      - datalake_quires_raw.plates.year
+  month:
+    description: Month partition component aligned with the plate creation date for incremental loads.
+    lineage:
+      - datalake_quires_raw.plates.month
+  day:
+    description: Day partition component aligned with the plate creation date for incremental loads.
+    lineage:
+      - datalake_quires_raw.plates.day

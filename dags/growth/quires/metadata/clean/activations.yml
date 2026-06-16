@@ -1,6 +1,6 @@
 database_name: datalake_quires_clean
 table_name: activations
-owner: henrique.pauloa@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table containing activations data from quires
 columns:
@@ -9,19 +9,19 @@ columns:
     lineage:
       - datalake_quires_raw.activations.id
   id_installer:
-    description: Installer ID
+    description: Unique numeric identifier for the installer entity that registered the activation in the Quires platform.
     lineage:
       - datalake_quires_raw.activations.installerId
   installer:
-    description: Installer identifier
+    description: Internal code or slug for the installer associated with this activation event, used to link activations to their originating installation source.
     lineage:
       - datalake_quires_raw.activations.installer
   installer_name:
-    description: Name of the installer
+    description: Human-readable display name of the installer who triggered this activation in the Quires platform.
     lineage:
       - datalake_quires_raw.activations.installerName
   installer_rc:
-    description: Installer RC identifier
+    description: Installer RC (reference code) used internally by Quires to track installer configurations and regional assignments.
     lineage:
       - datalake_quires_raw.activations.installerRc
   plate:
@@ -41,15 +41,15 @@ columns:
     lineage:
       - datalake_quires_raw.activations.url
   utm_campaign:
-    description: UTM campaign parameter
+    description: UTM campaign tag captured at the time of activation, used for marketing attribution and traffic source analysis across acquisition channels.
     lineage:
       - datalake_quires_raw.activations.utmCampaign
   utm_medium:
-    description: UTM medium parameter
+    description: UTM medium tag captured at the time of activation, indicating the marketing channel through which the user arrived (e.g. cpc, email, organic).
     lineage:
       - datalake_quires_raw.activations.utmMedium
   utm_source:
-    description: UTM source parameter
+    description: UTM source tag captured at the time of activation, identifying the originating traffic source (e.g. google, newsletter, direct).
     lineage:
       - datalake_quires_raw.activations.utmSource
   ts_created:
