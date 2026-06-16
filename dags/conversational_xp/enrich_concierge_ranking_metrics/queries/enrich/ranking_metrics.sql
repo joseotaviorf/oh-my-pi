@@ -37,8 +37,14 @@ base as (
     AND ruuc.use_case in ('FEED_CONCIERGE', 'FEED_MULTI_ORIGIN_PERSONALIZED_TRANSACTIONAL', 'FEED_MULTI_ORIGIN_PERSONALIZED_CLASSIFIED', 'FEED_MULTI_ORIGIN_SIMILAR_TRANSACTIONAL', 'FEED_MULTI_ORIGIN_SIMILAR_CLASSIFIED')
     AND upper(COALESCE(ruuc.origin, 'JULIA')) = upper('JULIA')
     AND CAST(ruuc.ts_created AS DATE) = DATE_SUB('{load_start_date}', 4)
-  GROUP by all -- this is needed because we sometimes have duplicates on our tracking and not having this was leading to
-               -- having an ndcg and recall bigger than 1
+  GROUP BY
+    ruuc.ts_created,
+    ruuc.id_user,
+    ruuc.id_recommendation,
+    ruc.id_listing,
+    ruc.displayed_order + 1,
+    CASE WHEN cp.house_id IS NOT NULL THEN 1 ELSE 0 END
+    -- deduplication needed: duplicates in tracking were inflating ndcg and recall above 1
 ),
 
 metrics AS (

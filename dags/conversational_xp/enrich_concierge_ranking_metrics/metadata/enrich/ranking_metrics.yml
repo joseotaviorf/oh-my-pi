@@ -9,7 +9,7 @@ columns:
     lineage:
     - datalake_house_listing_search_clean.recommendation_user_use_case.ts_created
   id_user:
-    description: "The user identifier"
+    description: "QuintoAndar internal user identifier for the user who received the recommendation"
     lineage:
     - datalake_house_listing_search_clean.recommendation_user_use_case.id_user
   id_recommendation:
@@ -17,9 +17,15 @@ columns:
     lineage:
     - datalake_house_listing_search_clean.recommendation_user_use_case.id_recommendation
   recall_at_3:
-    description: "The recall at 3"
+    description: "Recall at cutoff 3: fraction of relevant houses that appear in the top-3 recommended positions"
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    - datalake_house_listing_search_clean.recommendation_use_case.displayed_order
   ndcg_at_3:
-    description: "The nDCG at 3"
+    description: "Normalized Discounted Cumulative Gain at cutoff 3, measuring ranking quality of the top-3 recommendations"
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    - datalake_house_listing_search_clean.recommendation_use_case.displayed_order
   year:
     description: "The year of the recommendation creation date"
     lineage:

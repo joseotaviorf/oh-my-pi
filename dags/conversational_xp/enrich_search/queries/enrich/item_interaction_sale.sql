@@ -95,4 +95,18 @@ sale_flow_target AS (
         AND search.ts_event <= sale_flow.ts_first_event 
 )
 
-SELECT * from sale_flow_target
+SELECT
+    id_user,
+    id_item,
+    interaction_type,
+    id_search,
+    search_rendering_type,
+    type_item,
+    ts_interaction,
+    ts_search,
+    dt_interaction,
+    business_context,
+    year,
+    month,
+    day
+FROM sale_flow_target

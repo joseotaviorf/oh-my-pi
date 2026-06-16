@@ -1,13 +1,13 @@
 database_name: datalake_search
 table_name: item_interaction_sale
-owner: alice.ferreira@quintoandar.com.br
+owner: thays.silva@quintoandar.com.br
 domain: Conversational XP
 description: |
   User interaction data. Required for calculating recommendation
   metrics such as precision and recall. Granularity: one user-item pair per row
 columns:
   id_user:
-    description: Identifier of the user
+    description: QuintoAndar internal identifier of the buyer who interacted with the sale listing
     lineage:
       - datalake_sale_flows.id_buyer
   id_item:
@@ -18,6 +18,7 @@ columns:
     description: |
       Type of interaction between user and item. Could be Values:
         - sale_flow
+      Partition key — queries should filter on this column to enable data skipping.
   id_search:
     description:  Identifier of a search related to a specific house and user
     lineage:
@@ -44,8 +45,7 @@ columns:
     lineage:
       - datalake_sale_flows.ts_first_event
   business_context:
-    description: |
-      Business context: sale
+    description: Business context for the interaction; always 'sale' for this table
   year:
     description: Year of the user interaction
     lineage:

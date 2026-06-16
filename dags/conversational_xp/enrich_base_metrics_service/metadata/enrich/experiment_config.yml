@@ -6,6 +6,6 @@ description: |
   This table has the configuration of the experiments.
 columns:
   experiment_name:
-    description: The name of the experiment.
+    description: Human-readable identifier for the experiment, used as the primary lookup key across configuration records.
   config:
     description: The config json of the experiment.

@@ -105,4 +105,18 @@ proper_offer_target AS (
 )
 
 
-SELECT * from proper_offer_target
+SELECT
+    id_user,
+    id_item,
+    interaction_type,
+    id_search,
+    search_rendering_type,
+    type_item,
+    ts_interaction,
+    ts_search,
+    dt_interaction,
+    business_context,
+    year,
+    month,
+    day
+FROM proper_offer_target

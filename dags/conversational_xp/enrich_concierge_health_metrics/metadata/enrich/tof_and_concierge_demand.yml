@@ -16,7 +16,7 @@ columns:
   id_copilot_session:
     lineage:
     - datalake_search.concierge_demand.id_copilot_session
-    description: The id of the copilot session.
+    description: Copilot Service session identifier linking the concierge conversation to its corresponding chatbot session record.
   user_phone:
     lineage:
     - datalake_search.concierge_demand.user_phone

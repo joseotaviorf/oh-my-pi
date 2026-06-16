@@ -26,12 +26,12 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_user
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
   id_device:
-    description: The device id
+    description: Amplitude device identifier assigned to the physical device used during the search session
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
   id_amplitude:
-    description: Amplitude id
+    description: Amplitude user identifier assigned to the user within the search analytics project
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude

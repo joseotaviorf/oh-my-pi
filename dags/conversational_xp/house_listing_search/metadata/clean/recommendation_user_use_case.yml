@@ -38,6 +38,6 @@ columns:
     lineage:
     - datalake_house_listing_search_raw.recommendation_user_use_case.created_at 
   ts_updated:
-    description: "The date when recommendation user use case was updated"
+    description: "Timestamp of the last modification to this recommendation-user-use-case record in the source system"
     lineage:
     - datalake_house_listing_search_raw.recommendation_user_use_case.updated_at 
