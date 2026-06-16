@@ -17,6 +17,10 @@ columns:
       - datalake_klefki_clean.key_delivery_location.id_property
     description: Identifier of the house whose entry configuration history is captured
       in this event.
+  id_actor_user:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.id_actor_user
+    description: Identifier of the actor user who initiated the entry.
   id_occupant:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_occupant
@@ -57,6 +61,10 @@ columns:
       - datalake_klefki_clean.inspection_key_retrieval_confirmation.inspector_key_location_type
       - datalake_klefki_clean.key_delivery_location.location
     description: Location of the houses's key.
+  last_key_location:
+    description: Last key location of the house before the current event of entry model.
+  next_key_location:
+    description: Next key location of the house after the current event of entry model.
   entry_model_type:
     description: Classification of how visitors access the property (assisted or easy
       entrance).
@@ -165,6 +173,8 @@ columns:
   is_first_status:
     description: Flag to indicate if the entry condition status is the first one of
       the house.
+  is_first_event_of_trigger:
+    description: Flag to indicate if the entry condition is the first event of the trigger.
   ts_entrance_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision

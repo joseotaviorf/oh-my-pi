@@ -1,10 +1,13 @@
 SELECT
     id AS sk_house_entrance,
     id_house AS sk_house,
+    id_actor_user AS sk_actor_user,
     occupant_type,
     key_type,
     entry_model_details,
     key_location,
+    last_key_location,
+    next_key_location,
     entry_model_type,
     doorman_type,
     entry_model_channel,
@@ -14,6 +17,9 @@ SELECT
     mod_occupant,
     mod_type,
     is_last_status_of_day,
+    is_last_status,
+    is_first_status,
+    is_first_event_of_trigger,
     ts_entrance_started,
     ts_entrance_ended,
     NOW() AS ts_load

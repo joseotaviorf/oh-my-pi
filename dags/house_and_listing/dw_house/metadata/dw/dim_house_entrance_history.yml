@@ -14,6 +14,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.id_house
     description: ID of house related to the event.
+  sk_actor_user:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.id_actor_user
+    description: ID of actor user who initiated the entry.
   occupant_type:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.occupant_type
@@ -54,6 +58,14 @@ columns:
       OTHER: Access through other.
       OWNER: Access through the owner.
       NONE: Unknown.
+  last_key_location:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.last_key_location
+    description: Last key location of the house before the current event of entry model.
+  next_key_location:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.next_key_location
+    description: Next key location of the house after the current event of entry model.
   entry_model_type:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.entry_model_type
@@ -115,6 +127,18 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.is_last_status_of_day
     description: Boolean indicating whether the current event is the last of the day.
+  is_last_status:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.is_last_status
+    description: Boolean indicating whether the current event is the last of the house.
+  is_first_status:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.is_first_status
+    description: Boolean indicating whether the current event is the first of the house.
+  is_first_event_of_trigger:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.is_first_event_of_trigger
+    description: Boolean indicating whether the current event is the first event of the trigger.
   ts_entrance_started:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.ts_entrance_started

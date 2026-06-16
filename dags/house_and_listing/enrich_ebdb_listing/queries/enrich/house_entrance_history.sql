@@ -1,48 +1,68 @@
 WITH old_entry_model AS (
     WITH access_type AS (
+        WITH access_type_ranked AS (
+            SELECT
+                access.id_house,
+                access.id_occupant,
+                occupant.name AS occupant_type,
+                restriction.name AS restriction_type,
+                key.name AS key_type,
+                access.additional_info AS entry_model_details,
+                CASE
+                    WHEN authorization.name = "LockBox" THEN "LOCK_BOX"
+                    WHEN authorization.name = "FrontDoor" THEN "FRONT_DOOR"
+                    WHEN authorization.name = "KeysLocker" THEN "LOCKER"
+                    WHEN authorization.name = "KeysWithAgent" THEN "AGENT"
+                    WHEN authorization.name = "OwnerPresent" THEN "OWNER"
+                    ELSE UPPER(authorization.name)
+                END AS key_location,
+                authorization.name AS authorization_type,
+                access.has_opted_keys_with_agent,
+                NULL AS entry_model_channel,
+                NULL AS actor_role,
+                NULL AS key_holder_name,
+                NULL AS key_holder_contact,
+                ure.ts_revision AS ts_entrance_started,
+                ROW_NUMBER() OVER(PARTITION BY access.id_house, ure.ts_revision ORDER BY access.rev) AS rn
+            FROM
+                datalake_ebdb_clean.access_type_aud AS access
+            LEFT JOIN
+                datalake_ebdb_clean.access_authorization_type AS authorization
+                    ON access.id_authorization = authorization.id
+            LEFT JOIN
+                datalake_ebdb_clean.occupant_type AS occupant
+                    ON access.id_occupant = occupant.id
+            LEFT JOIN
+                datalake_ebdb_clean.restriction_type AS restriction
+                    ON access.id_restriction = restriction.id
+            LEFT JOIN
+                datalake_ebdb_clean.key_type AS key
+                    ON access.id_type = key.id
+            LEFT JOIN
+                datalake_ebdb_user.user_revision_entity AS ure
+                    ON access.rev = ure.id
+            WHERE
+                access.id_house IS NOT NULL
+        )
         SELECT
-            access.id_house,
-            access.id_occupant,
-            occupant.name AS occupant_type,
-            restriction.name AS restriction_type,
-            key.name AS key_type,
-            access.additional_info AS entry_model_details,
-            CASE
-                WHEN authorization.name = "LockBox" THEN "LOCK_BOX"
-                WHEN authorization.name = "FrontDoor" THEN "FRONT_DOOR"
-                WHEN authorization.name = "KeysLocker" THEN "LOCKER"
-                WHEN authorization.name = "KeysWithAgent" THEN "AGENT"
-                WHEN authorization.name = "OwnerPresent" THEN "OWNER"
-                ELSE UPPER(authorization.name)
-            END AS key_location,
-            authorization.name AS authorization_type,
-            access.has_opted_keys_with_agent,
-            NULL AS entry_model_channel,
-            NULL AS actor_role,
-            NULL AS key_holder_name,
-            NULL AS key_holder_contact,
-            ure.ts_revision AS ts_entrance_started
+            id_house,
+            id_occupant,
+            occupant_type,
+            restriction_type,
+            key_type,
+            entry_model_details,
+            key_location,
+            authorization_type,
+            has_opted_keys_with_agent,
+            entry_model_channel,
+            actor_role,
+            key_holder_name,
+            key_holder_contact,
+            ts_entrance_started
         FROM
-            datalake_ebdb_clean.access_type_aud AS access
-        LEFT JOIN
-            datalake_ebdb_clean.access_authorization_type AS authorization
-                ON access.id_authorization = authorization.id
-        LEFT JOIN
-            datalake_ebdb_clean.occupant_type AS occupant
-                ON access.id_occupant = occupant.id
-        LEFT JOIN
-            datalake_ebdb_clean.restriction_type AS restriction
-                ON access.id_restriction = restriction.id
-        LEFT JOIN
-            datalake_ebdb_clean.key_type AS key
-                ON access.id_type = key.id
-        LEFT JOIN
-            datalake_ebdb_user.user_revision_entity AS ure
-                ON access.rev = ure.id
+            access_type_ranked
         WHERE
-            access.id_house IS NOT NULL
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY access.id_house, ure.ts_revision ORDER BY access.rev) = 1
+            rn = 1
     ),
     inspection AS (
         SELECT
@@ -72,7 +92,7 @@ WITH old_entry_model AS (
             datalake_ebdb_clean.contract AS c
                 ON i.id_contract = c.id
         WHERE
-            i.ts_created::DATE < '2025-03-01'
+            DATE(i.ts_created) < '2025-03-01'
     ),
     tenant AS (
         SELECT
@@ -99,7 +119,7 @@ WITH old_entry_model AS (
         FROM
             datalake_klefki_clean.key_delivery_location
         WHERE
-            ts_created::DATE < '2025-03-01'
+            DATE(ts_created) < '2025-03-01'
     ),
     union_old AS (
         SELECT
@@ -174,12 +194,36 @@ WITH old_entry_model AS (
     FROM union_old
 ),
 new_entry_model AS (
+    WITH new_entry_model_ranked AS (
+        SELECT
+            id_house,
+            id_actor_user,
+            entry_access_details AS entry_model_details,
+            IF(entry_access_type = "KEY_HOLDER", key_holder_role, entry_access_type) AS key_location,
+            IF(key_holder_role = 'AGENT' AND event_type != 'KEY_HOLDER_DEALLOCATED', TRUE, FALSE) AS has_opted_keys_with_agent,
+            channel AS entry_model_channel,
+            actor_role,
+            event_type,
+            entry_access_model,
+            key_holder_type,
+            key_holder_identifier,
+            key_holder_name,
+            key_holder_contact,
+            key_holder_business_context,
+            actor_user_type,
+            "NEW_MODEL" AS entry_model_source,
+            ts_created AS ts_entrance_started,
+            ROW_NUMBER() OVER(PARTITION BY id_house, ts_created ORDER BY id) AS rn
+        FROM
+            datalake_ebdb_clean.entry_access_tracking
+    )
     SELECT
         id_house,
-        entry_access_details AS entry_model_details,
-        IF(entry_access_type = "KEY_HOLDER", key_holder_role, entry_access_type) AS key_location,
-        IF(key_holder_role = 'AGENT' AND event_type != 'KEY_HOLDER_DEALLOCATED', TRUE, FALSE) AS has_opted_keys_with_agent,
-        channel AS entry_model_channel,
+        id_actor_user,
+        entry_model_details,
+        key_location,
+        has_opted_keys_with_agent,
+        entry_model_channel,
         actor_role,
         event_type,
         entry_access_model,
@@ -189,12 +233,12 @@ new_entry_model AS (
         key_holder_contact,
         key_holder_business_context,
         actor_user_type,
-        "NEW_MODEL" AS entry_model_source,
-        ts_created AS ts_entrance_started
+        entry_model_source,
+        ts_entrance_started
     FROM
-        datalake_ebdb_clean.entry_access_tracking
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_house, ts_created ORDER BY id) = 1
+        new_entry_model_ranked
+    WHERE
+        rn = 1
 ),
 request_logs AS (
     SELECT
@@ -204,60 +248,90 @@ request_logs AS (
     FROM
         datalake_request_logging_clean.entryaccess
     WHERE
-        ts_request::DATE >= '2026-05-04'
+        DATE(ts_request) >= '2026-05-04'
         AND status_code = 200
 ),
 new_entry_model_enriched AS ( -- new entry model enriched with old entry model because some fields are not present in the new model
+    WITH new_entry_model_enriched_ranked AS (
+        SELECT
+            new.id_house,
+            new.id_actor_user,
+            old.id_occupant,
+            old.occupant_type,
+            old.restriction_type,
+            old.key_type,
+            new.entry_model_details,
+            new.key_location,
+            old.authorization_type,
+            new.has_opted_keys_with_agent,
+            CASE -- We will hard coded the channels until we have the channel in the request logging since the current data has fixed channels
+                WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
+                WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
+                WHEN rl.host = 'sonia' THEN 'WHATSAPP_SONIA'
+                WHEN rl.host = 'isaias' THEN 'WHATSAPP_ISAIAS'
+                ELSE UPPER(rl.host)
+            END AS host_unified,
+            CASE
+                WHEN new.entry_model_channel IN ('NATIVE_WALLE', 'WHATSAPP_CONCIERGE', 'WHATSAPP_SONIA', 'WHATSAPP_ISAIAS') THEN CONCAT('CONVERSATIONAL - ', new.entry_model_channel) -- Unified the old IA channels with the new unified channels
+                WHEN new.entry_model_channel = 'CONVERSATIONAL' THEN CONCAT_WS(' - ', new.entry_model_channel, host_unified) -- Enrich the channel with the host unified
+                ELSE new.entry_model_channel -- Keep the channel as is for other channels (not conversational)
+            END AS entry_model_channel,
+            new.actor_role,
+            new.event_type,
+            new.entry_access_model,
+            new.key_holder_type,
+            new.key_holder_identifier,
+            new.key_holder_name,
+            new.key_holder_contact,
+            new.key_holder_business_context,
+            new.actor_user_type,
+            new.entry_model_source,
+            new.ts_entrance_started,
+            ROW_NUMBER() OVER(PARTITION BY new.id_house, new.ts_entrance_started ORDER BY old.ts_entrance_started DESC) AS rn
+        FROM
+            new_entry_model AS new
+        LEFT JOIN
+            old_entry_model AS old
+                ON new.id_house = old.id_house
+                AND DATE_ADD(SECOND, 1, new.ts_entrance_started) >= old.ts_entrance_started
+        LEFT JOIN
+            request_logs AS rl
+                ON new.id_house = rl.id_house
+                AND ABS(DATE_DIFF(SECOND, rl.ts_request, new.ts_entrance_started)) < 1
+                AND new.entry_model_channel = 'CONVERSATIONAL'
+    )
     SELECT
-        new.id_house,
-        old.id_occupant,
-        old.occupant_type,
-        old.restriction_type,
-        old.key_type,
-        new.entry_model_details,
-        new.key_location,
-        old.authorization_type,
-        new.has_opted_keys_with_agent,
-        CASE -- We will hard coded the channels until we have the channel in the request logging since the current data has fixed channels
-            WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
-            WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
-            WHEN rl.host = 'sonia' THEN 'WHATSAPP_SONIA'
-            WHEN rl.host = 'isaias' THEN 'WHATSAPP_ISAIAS'
-            ELSE UPPER(rl.host)
-        END AS host_unified,
-        CASE
-            WHEN new.entry_model_channel IN ('NATIVE_WALLE', 'WHATSAPP_CONCIERGE', 'WHATSAPP_SONIA', 'WHATSAPP_ISAIAS') THEN CONCAT('CONVERSATIONAL - ', new.entry_model_channel) -- Unified the old IA channels with the new unified channels
-            WHEN new.entry_model_channel = 'CONVERSATIONAL' THEN CONCAT_WS(' - ', new.entry_model_channel, host_unified) -- Enrich the channel with the host unified
-            ELSE new.entry_model_channel -- Keep the channel as is for other channels (not conversational)
-        END AS entry_model_channel,
-        new.actor_role,
-        new.event_type,
-        new.entry_access_model,
-        new.key_holder_type,
-        new.key_holder_identifier,
-        new.key_holder_name,
-        new.key_holder_contact,
-        new.key_holder_business_context,
-        new.actor_user_type,
-        new.entry_model_source,
-        new.ts_entrance_started
+        id_house,
+        id_actor_user,
+        id_occupant,
+        occupant_type,
+        restriction_type,
+        key_type,
+        entry_model_details,
+        key_location,
+        authorization_type,
+        has_opted_keys_with_agent,
+        entry_model_channel,
+        actor_role,
+        event_type,
+        entry_access_model,
+        key_holder_type,
+        key_holder_identifier,
+        key_holder_name,
+        key_holder_contact,
+        key_holder_business_context,
+        actor_user_type,
+        entry_model_source,
+        ts_entrance_started
     FROM
-        new_entry_model AS new
-    LEFT JOIN
-        old_entry_model AS old
-            ON new.id_house = old.id_house
-            AND DATE_ADD(SECOND, 1, new.ts_entrance_started) >= old.ts_entrance_started
-    LEFT JOIN
-        request_logs AS rl
-            ON new.id_house = rl.id_house
-            AND ABS(DATE_DIFF(SECOND, rl.ts_request, new.ts_entrance_started)) < 1
-            AND new.entry_model_channel = 'CONVERSATIONAL'
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY new.id_house, new.ts_entrance_started ORDER BY old.ts_entrance_started DESC) = 1
+        new_entry_model_enriched_ranked
+    WHERE
+        rn = 1
 ),
 unified_model AS (
     SELECT
         id_house,
+        NULL AS id_actor_user,
         id_occupant,
         occupant_type,
         restriction_type,
@@ -281,10 +355,11 @@ unified_model AS (
     FROM
         old_entry_model
     WHERE
-        ts_entrance_started::DATE < '2025-03-01'
+        DATE(ts_entrance_started) < '2025-03-01'
     UNION ALL
     SELECT
         id_house,
+        id_actor_user,
         id_occupant,
         occupant_type,
         restriction_type,
@@ -308,69 +383,112 @@ unified_model AS (
     FROM
         new_entry_model_enriched
     WHERE
-        ts_entrance_started::DATE >= '2025-03-01'
+        DATE(ts_entrance_started) >= '2025-03-01'
 ),
 doorman_aud AS (
-    SELECT
-        aud.id_house,
-        aud.doorman_type,
-        ure.ts_revision AS ts_created
-    FROM
-        datalake_ebdb_clean.house_aud AS aud
-    JOIN
-        datalake_ebdb_user.user_revision_entity AS ure
-            ON aud.rev= ure.id
-    WHERE
-        aud.id_house IS NOT NULL
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY aud.id_house, ure.ts_revision ORDER BY aud.rev DESC) = 1
-),
-enriched_model AS ( -- the events of entry models are enriched with the last event of house
-    SELECT
-        unified.id_house,
-        unified.id_occupant,
-        unified.occupant_type,
-        unified.restriction_type,
-        unified.key_type,
-        unified.entry_model_details,
-        unified.key_location,
-        unified.authorization_type,
-        unified.has_opted_keys_with_agent,
-        unified.entry_model_channel,
-        unified.actor_role,
-        unified.event_type,
-        unified.entry_access_model,
-        unified.key_holder_type,
-        unified.key_holder_identifier,
-        unified.key_holder_name,
-        unified.key_holder_contact,
-        unified.key_holder_business_context,
-        unified.actor_user_type,
-        unified.entry_model_source,
-        COALESCE(house.country_code, 'Undefined') AS country_code,
-        unified.ts_entrance_started,
-        doorman.doorman_type
-    FROM
-        unified_model AS unified
-    LEFT JOIN
-        datalake_ebdb_country.house AS house
-            ON house.id_house = unified.id_house
-    LEFT JOIN
-        doorman_aud AS doorman
-            ON unified.id_house = doorman.id_house
-            AND unified.ts_entrance_started >= doorman.ts_created
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY unified.id_house, unified.ts_entrance_started ORDER BY doorman.ts_created DESC) = 1
-),
-window_model AS (
+    WITH doorman_aud_ranked AS (
+        SELECT
+            aud.id_house,
+            aud.doorman_type,
+            ure.ts_revision AS ts_created,
+            ROW_NUMBER() OVER(PARTITION BY aud.id_house, ure.ts_revision ORDER BY aud.rev DESC) AS rn
+        FROM
+            datalake_ebdb_clean.house_aud AS aud
+        JOIN
+            datalake_ebdb_user.user_revision_entity AS ure
+                ON aud.rev= ure.id
+        WHERE
+            aud.id_house IS NOT NULL
+    )
     SELECT
         id_house,
+        doorman_type,
+        ts_created
+    FROM
+        doorman_aud_ranked
+    WHERE
+        rn = 1
+),
+enriched_model AS ( -- the events of entry models are enriched with the last event of house
+    WITH enriched_model_ranked AS (
+        SELECT
+            unified.id_house,
+            unified.id_actor_user,
+            unified.id_occupant,
+            unified.occupant_type,
+            unified.restriction_type,
+            unified.key_type,
+            unified.entry_model_details,
+            unified.key_location,
+            unified.authorization_type,
+            unified.has_opted_keys_with_agent,
+            unified.entry_model_channel,
+            unified.actor_role,
+            unified.event_type,
+            unified.entry_access_model,
+            unified.key_holder_type,
+            unified.key_holder_identifier,
+            unified.key_holder_name,
+            unified.key_holder_contact,
+            unified.key_holder_business_context,
+            unified.actor_user_type,
+            unified.entry_model_source,
+            COALESCE(house.country_code, 'Undefined') AS country_code,
+            unified.ts_entrance_started,
+            doorman.doorman_type,
+            ROW_NUMBER() OVER(PARTITION BY unified.id_house, unified.ts_entrance_started ORDER BY doorman.ts_created DESC) AS rn
+        FROM
+            unified_model AS unified
+        LEFT JOIN
+            datalake_ebdb_country.house AS house
+                ON house.id_house = unified.id_house
+        LEFT JOIN
+            doorman_aud AS doorman
+                ON unified.id_house = doorman.id_house
+                AND unified.ts_entrance_started >= doorman.ts_created
+    )
+    SELECT
+        id_house,
+        id_actor_user,
         id_occupant,
         occupant_type,
         restriction_type,
         key_type,
         entry_model_details,
         key_location,
+        authorization_type,
+        has_opted_keys_with_agent,
+        entry_model_channel,
+        actor_role,
+        event_type,
+        entry_access_model,
+        key_holder_type,
+        key_holder_identifier,
+        key_holder_name,
+        key_holder_contact,
+        key_holder_business_context,
+        actor_user_type,
+        entry_model_source,
+        country_code,
+        ts_entrance_started,
+        doorman_type
+    FROM
+        enriched_model_ranked
+    WHERE
+        rn = 1
+),
+window_model AS (
+    SELECT
+        id_house,
+        id_actor_user,
+        id_occupant,
+        occupant_type,
+        restriction_type,
+        key_type,
+        entry_model_details,
+        key_location,
+        LAG(key_location) OVER(PARTITION BY id_house ORDER BY ts_entrance_started) AS last_key_location,
+        LEAD(key_location) OVER(PARTITION BY id_house ORDER BY ts_entrance_started) AS next_key_location,
         authorization_type,
         has_opted_keys_with_agent,
         doorman_type,
@@ -393,25 +511,36 @@ window_model AS (
         LAG(key_location) OVER(PARTITION BY id_house ORDER BY ts_entrance_started) AS lag_key_location,
         COALESCE(key_location, -1) <> COALESCE(lag_key_location, -1) AS mod_authorization,
         LAG(has_opted_keys_with_agent) OVER(PARTITION BY id_house ORDER BY ts_entrance_started) AS lag_has_opted_keys_with_agent,
-        COALESCE(has_opted_keys_with_agent::INTEGER, -1) <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1) AS mod_has_opted_keys_with_agent,
+        COALESCE(CAST(has_opted_keys_with_agent AS INTEGER), -1) <> COALESCE(CAST(lag_has_opted_keys_with_agent AS INTEGER), -1) AS mod_has_opted_keys_with_agent,
         ts_entrance_started,
         LEAD(ts_entrance_started) OVER(PARTITION BY id_house ORDER BY ts_entrance_started) AS ts_entrance_ended,
         IF(ts_entrance_ended IS NULL, TRUE, FALSE) AS is_last_status,
         ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_entrance_started) = 1 AS is_first_status,
+        ROW_NUMBER() OVER(PARTITION BY id_house, DATE_TRUNC('SECOND', ts_entrance_started) ORDER BY ts_entrance_started) = 1 AS is_first_event_of_trigger,
         COALESCE(MAX(ts_entrance_started) OVER(PARTITION BY id_house, DATE(ts_entrance_started)) = ts_entrance_started, FALSE) AS is_last_status_of_day
     FROM
         enriched_model
 ),
 terminations AS (
+    WITH terminations_ranked AS (
+        SELECT
+            id_contract,
+            status,
+            dt_vacancy,
+            IF(status = 'DONE', DATE(ts_updated), NULL) AS dt_termination_finished,
+            ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) AS rn
+        FROM
+            datalake_terminator_clean.termination
+    )
     SELECT
         id_contract,
         status,
         dt_vacancy,
-        IF(status = 'DONE', DATE(ts_updated), NULL) AS dt_termination_finished
+        dt_termination_finished
     FROM
-        datalake_terminator_clean.termination
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
+        terminations_ranked
+    WHERE
+        rn = 1
 ),
 contracts AS (
     SELECT
@@ -425,68 +554,157 @@ contracts AS (
     LEFT JOIN
         terminations AS t
             ON t.id_contract = c.id
+),
+house_entrance_history AS (
+    WITH house_entrance_history_ranked AS (
+        SELECT
+            MD5(wm.id_house || CAST(wm.ts_entrance_started AS STRING)) AS id,
+            wm.id_house,
+            wm.id_actor_user,
+            CASE
+                WHEN wm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND wm.ts_entrance_ended IS NOT NULL THEN 2
+                WHEN wm.occupant_type = 'Empty' AND c.status = 'Ativo' AND wm.ts_entrance_ended IS NULL THEN 2
+                ELSE wm.id_occupant
+            END AS id_occupant,
+            CASE
+                WHEN wm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND wm.ts_entrance_ended IS NOT NULL THEN 'Tenant'
+                WHEN wm.occupant_type = 'Empty' AND c.status = 'Ativo' AND wm.ts_entrance_ended IS NULL THEN 'Tenant'
+                ELSE wm.occupant_type
+            END AS occupant_type,
+            wm.restriction_type,
+            wm.key_type,
+            wm.entry_model_details,
+            wm.key_location,
+            wm.last_key_location,
+            wm.next_key_location,
+            CASE
+                wm.key_location
+                WHEN 'OWNER' THEN 'ASSISTED_ENTRANCE'
+                WHEN 'TENANT' THEN 'ASSISTED_ENTRANCE'
+                WHEN 'INSPECTOR' THEN 'ASSISTED_ENTRANCE'
+                WHEN 'EXTERNAL_RESPONSIBLE' THEN 'ASSISTED_ENTRANCE'
+                WHEN 'EXTERNAL_TENANT' THEN 'ASSISTED_ENTRANCE'
+                WHEN 'FRONT_DOOR' THEN 'EASY_ENTRANCE'
+                WHEN 'AGENT' THEN 'EASY_ENTRANCE'
+                WHEN 'PASSWORD' THEN 'EASY_ENTRANCE'
+                WHEN 'LOCK_BOX' THEN 'EASY_ENTRANCE'
+                WHEN 'LOCKER' THEN 'EASY_ENTRANCE'
+                ELSE 'NOT_CLASSIFIED'
+            END AS entry_model_type,
+            wm.authorization_type,
+            wm.doorman_type,
+            wm.entry_model_channel,
+            wm.actor_role,
+            wm.event_type,
+            wm.entry_access_model,
+            wm.key_holder_type,
+            wm.key_holder_identifier,
+            wm.key_holder_name,
+            wm.key_holder_contact,
+            wm.key_holder_business_context,
+            wm.actor_user_type,
+            wm.entry_model_source,
+            wm.country_code,
+            wm.has_opted_keys_with_agent,
+            wm.mod_authorization,
+            wm.mod_occupant,
+            wm.mod_type,
+            wm.mod_has_opted_keys_with_agent,
+            wm.is_last_status_of_day,
+            wm.is_last_status,
+            wm.is_first_status,
+            wm.is_first_event_of_trigger,
+            wm.ts_entrance_started,
+            wm.ts_entrance_ended,
+            ROW_NUMBER() OVER(PARTITION BY wm.id_house, wm.ts_entrance_started ORDER BY c.ts_created DESC) AS rn
+        FROM
+            window_model AS wm
+        LEFT JOIN
+            contracts AS c
+                ON wm.id_house = c.id_house
+                AND wm.ts_entrance_started >= c.dt_started
+                AND wm.ts_entrance_started < COALESCE(c.dt_termination, NOW())
+    )
+    SELECT
+        id,
+        id_house,
+        id_actor_user,
+        id_occupant,
+        occupant_type,
+        restriction_type,
+        key_type,
+        entry_model_details,
+        key_location,
+        last_key_location,
+        next_key_location,
+        entry_model_type,
+        authorization_type,
+        doorman_type,
+        entry_model_channel,
+        actor_role,
+        event_type,
+        entry_access_model,
+        key_holder_type,
+        key_holder_identifier,
+        key_holder_name,
+        key_holder_contact,
+        key_holder_business_context,
+        actor_user_type,
+        entry_model_source,
+        country_code,
+        has_opted_keys_with_agent,
+        mod_authorization,
+        mod_occupant,
+        mod_type,
+        mod_has_opted_keys_with_agent,
+        is_last_status_of_day,
+        is_last_status,
+        is_first_status,
+        is_first_event_of_trigger,
+        ts_entrance_started,
+        ts_entrance_ended
+    FROM
+        house_entrance_history_ranked
+    WHERE
+        rn = 1
 )
 SELECT
-    MD5(wm.id_house || CAST(wm.ts_entrance_started AS STRING)) AS id,
-    wm.id_house,
-    CASE
-        WHEN wm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND wm.ts_entrance_ended IS NOT NULL THEN 2
-        WHEN wm.occupant_type = 'Empty' AND c.status = 'Ativo' AND wm.ts_entrance_ended IS NULL THEN 2
-        ELSE wm.id_occupant
-    END AS id_occupant,
-    CASE
-        WHEN wm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND wm.ts_entrance_ended IS NOT NULL THEN 'Tenant'
-        WHEN wm.occupant_type = 'Empty' AND c.status = 'Ativo' AND wm.ts_entrance_ended IS NULL THEN 'Tenant'
-        ELSE wm.occupant_type
-    END AS occupant_type,
-    wm.restriction_type,
-    wm.key_type,
-    wm.entry_model_details,
-    wm.key_location,
-    CASE
-        wm.key_location
-        WHEN 'OWNER' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'TENANT' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'INSPECTOR' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'EXTERNAL_RESPONSIBLE' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'EXTERNAL_TENANT' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'FRONT_DOOR' THEN 'EASY_ENTRANCE'
-        WHEN 'AGENT' THEN 'EASY_ENTRANCE'
-        WHEN 'PASSWORD' THEN 'EASY_ENTRANCE'
-        WHEN 'LOCK_BOX' THEN 'EASY_ENTRANCE'
-        WHEN 'LOCKER' THEN 'EASY_ENTRANCE'
-        ELSE 'NOT_CLASSIFIED'
-    END AS entry_model_type,
-    wm.authorization_type,
-    wm.doorman_type,
-    wm.entry_model_channel,
-    wm.actor_role,
-    wm.event_type,
-    wm.entry_access_model,
-    wm.key_holder_type,
-    wm.key_holder_identifier,
-    wm.key_holder_name,
-    wm.key_holder_contact,
-    wm.key_holder_business_context,
-    wm.actor_user_type,
-    wm.entry_model_source,
-    wm.country_code,
-    wm.has_opted_keys_with_agent,
-    wm.mod_authorization,
-    wm.mod_occupant,
-    wm.mod_type,
-    wm.mod_has_opted_keys_with_agent,
-    wm.is_last_status_of_day,
-    wm.is_last_status,
-    wm.is_first_status,
-    wm.ts_entrance_started,
-    wm.ts_entrance_ended
+    id,
+    id_house,
+    id_actor_user,
+    id_occupant,
+    occupant_type,
+    restriction_type,
+    key_type,
+    entry_model_details,
+    key_location,
+    last_key_location,
+    next_key_location,
+    entry_model_type,
+    authorization_type,
+    doorman_type,
+    entry_model_channel,
+    actor_role,
+    event_type,
+    entry_access_model,
+    key_holder_type,
+    key_holder_identifier,
+    key_holder_name,
+    key_holder_contact,
+    key_holder_business_context,
+    actor_user_type,
+    entry_model_source,
+    country_code,
+    has_opted_keys_with_agent,
+    mod_authorization,
+    mod_occupant,
+    mod_type,
+    mod_has_opted_keys_with_agent,
+    is_last_status_of_day,
+    is_last_status,
+    is_first_status,
+    is_first_event_of_trigger,
+    ts_entrance_started,
+    ts_entrance_ended
 FROM
-    window_model AS wm
-LEFT JOIN
-    contracts AS c
-        ON wm.id_house = c.id_house
-        AND wm.ts_entrance_started >= c.dt_started
-        AND wm.ts_entrance_started < COALESCE(c.dt_termination, NOW())
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY wm.id_house, wm.ts_entrance_started ORDER BY c.ts_created DESC) = 1
+    house_entrance_history
