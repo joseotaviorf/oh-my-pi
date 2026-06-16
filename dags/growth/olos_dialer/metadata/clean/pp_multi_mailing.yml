@@ -3,7 +3,11 @@ database_name: datalake_olos_dialer_clean
 table_name: pp_multi_mailing
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about the contacts that will be dialed for PP Multi / IS Expert. This table contains the list of leads and which who will contact them.
+description: |
+  Outbound mailing list for PP Multi / IS Expert landlord campaigns (Olos layout
+  OPS_Mailing_LayoutId_7). Contacts eligible for specialized high-portfolio property owner
+  dialing by the internal or third-party contact teams. Partitioned by `year`, `month`, `day`.
+  This table contains the list of leads and which who will contact them.
 columns:
   id_analyst:
     description: Identifier of the analyst related to the lead. Equivalent to ID_metabase_do_analista.

@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: agent_supervisor
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about agent supervisor in the olos dialer system.
+description: |
+  Mapping between Olos dialer agents and their supervisors in the outbound contact workforce.
+  One row per agent-supervisor relationship per daily load, used for hierarchy reporting and
+  team performance analytics in Growth contact-center operations. Partitioned by `year`, `month`, `day`.
 columns:
   id_agent:
     description: Unique identifier of the agent.

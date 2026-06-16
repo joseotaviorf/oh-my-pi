@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: disposition_detail
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about disposition detail in the olos dialer system.
+description: |
+  Granular disposition detail records extending base Olos disposition outcomes with additional
+  wrap-up context captured by analysts after outbound contact attempts. Partitioned by `year`,
+  `month`, `day`.
 columns:
   id_disposition:
     description: Unique identifier of the disposition.

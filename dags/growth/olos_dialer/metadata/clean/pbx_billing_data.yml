@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: pbx_billing_data
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about pbx billing data in the olos dialer system.
+description: |
+  Telephony billing records from the Olos PBX integration — call duration, routing, and cost
+  details per outbound attempt. Used by Growth for contact-center cost analytics and vendor
+  reconciliation with Olos. Partitioned by `year`, `month`, `day`.
 columns:
   id_pbx_billing_data:
     description: Unique identifier of the pbx billing data.

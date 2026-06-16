@@ -1,9 +1,14 @@
 ---
 database_name: datalake_user
 table_name: broker_user
-description:
-  Ebdb Users daily snapshot classified as active brokers, considering agents that are
-  in the sale or rental context.
+description: |
+  [TO BE DEPRECATED, AVOID USING THIS TABLE] Daily snapshot (D-1) of active QuintoAndar brokers from EBDB. One row per broker user per
+  snapshot date, filtered to agents serving sale or rental business contexts via
+  `datalake_ebdb_clean.agent_data`.
+  Contains PII inherited from `datalake_ebdb_clean.user`.
+  Produced by the `enrich_user` DAG; feeds `datalake_user.persona_type`.
+  Partitioned by `year`, `month`, `day`. Use it in the WHERE clause to enable partition
+  pruning and avoid full table scans.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -16,25 +21,35 @@ columns:
   id_country:
     lineage:
       - datalake_ebdb_clean.user.id_country
-    description: The user country id.
+    description: |
+      Foreign key to the EBDB country dimension (`country_id` on `Usuario`). Identifies the
+      broker's registered country in the main database.
   client_type:
     description: Client type defined as broker.
   country_code:
     lineage:
       - datalake_ebdb_clean.country.country_code
-    description: Country code of the user. Also, a partition of this table.
+    description: |
+      ISO-style country code from `datalake_ebdb_clean.country`, joined via `id_country`.
+      Identifies the broker's operating country for regional Growth analytics.
   main_phone:
     lineage:
       - datalake_ebdb_clean.user.main_phone
-    description: The user main_phone.
+    description: |
+      Primary contact phone number from EBDB `Usuario.main_phone`. Contains PII — restrict
+      access per data policy.
   name:
     lineage:
       - datalake_ebdb_clean.user.name
-    description: The user full_name.
+    description: |
+      Full display name from EBDB `Usuario.name`. Contains PII — used for Growth persona
+      analytics, not for external export.
   email:
     lineage:
       - datalake_ebdb_clean.user.email
-    description: The user email.
+    description: |
+      Primary email address from EBDB `Usuario.email`. Contains PII — join key for
+      marketing and identity resolution.
   cpf:
     lineage:
       - datalake_ebdb_clean.user.cpf
@@ -50,7 +65,9 @@ columns:
   dt_birth:
     lineage:
       - datalake_ebdb_clean.user.dt_birth
-    description: The user birth date.
+    description: |
+      Date of birth from EBDB `Usuario`, cast to DATE. Contains PII under LGPD personal
+      data classification.
   ts_user_created:
     lineage:
       - datalake_ebdb_clean.user.ts_created

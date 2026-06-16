@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: info_reason_type
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info reason type in the olos dialer system.
+description: |
+  Olos lookup dimension mapping reason type IDs to labels for agent wrap-up reason categories
+  during outbound contacts. Joined to `reason` and disposition tables for outcome analysis.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_reason_type:
     description: Unique identifier of the reason type.

@@ -5,7 +5,7 @@ domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id:
-    description: Primary key of the doorman affiliate data record in EBDB.
+    description: The primary key of the doorman affiliate data record in EBDB.
     lineage:
       - datalake_ebdb_clean.doorman_affiliate_data.id
   id_affiliate_data:

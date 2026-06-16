@@ -1,7 +1,12 @@
 ---
 database_name: datalake_user
 table_name: persona_type
-description: QuintoAndar Users daily snapshot unifying all personas types.
+description: |
+  [TO BE DEPRECATED, AVOID USING THIS TABLE] Daily snapshot (D-1) unifying all QuintoAndar personas — landlord, tenant, broker, and
+  photographer — into a single table. One row per user per persona type per snapshot date,
+  built by unioning persona-specific enrich tables in the `enrich_user` DAG.
+  Partitioned by `client_type`, `year`, `month`, `day`. Use it in the WHERE clause to enable partition
+  pruning and avoid full table scans.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -20,7 +25,9 @@ columns:
       - datalake_user.landlord.id_user
     description: The user id in the main.
   id_user_type:
-    description: The id for each user type
+    description: |
+      Numeric persona discriminator assigned at union time: 1=landlord, 2=tenant,
+      3=photographer, 4=broker. Drives `client_type` partitioning on `persona_type`.
     categories:
       "1": For landlord type
       "2": For tenant type
@@ -32,7 +39,9 @@ columns:
       - datalake_user.tenant.id_country
       - datalake_user.photographer_user.id_country
       - datalake_user.landlord.id_country
-    description: The user country id.
+    description: |
+      Foreign key to the EBDB country dimension (`country_id` on `Usuario`). Identifies the
+      user's registered country, propagated from each persona source table.
   client_type:
     lineage:
       - datalake_user.broker_user.client_type
@@ -46,21 +55,27 @@ columns:
       - datalake_user.tenant.main_phone
       - datalake_user.photographer_user.main_phone
       - datalake_user.landlord.main_phone
-    description: The user main_phone.
+    description: |
+      Primary contact phone number from EBDB `Usuario.main_phone`. Contains PII — restrict
+      access per data policy.
   name:
     lineage:
       - datalake_user.broker_user.name
       - datalake_user.tenant.name
       - datalake_user.photographer_user.name
       - datalake_user.landlord.name
-    description: The user full_name.
+    description: |
+      Full display name from EBDB `Usuario.name`. Contains PII — used for Growth persona
+      analytics, not for external export.
   email:
     lineage:
       - datalake_user.broker_user.email
       - datalake_user.tenant.email
       - datalake_user.photographer_user.email
       - datalake_user.landlord.email
-    description: The user email.
+    description: |
+      Primary email address from EBDB `Usuario.email`. Contains PII — join key for
+      marketing and identity resolution.
   cpf:
     lineage:
       - datalake_user.broker_user.cpf
@@ -205,7 +220,9 @@ columns:
       - datalake_user.tenant.dt_birth
       - datalake_user.photographer_user.dt_birth
       - datalake_user.landlord.dt_birth
-    description: The user birth date.
+    description: |
+      Date of birth from EBDB `Usuario`, cast to DATE. Contains PII under LGPD personal
+      data classification.
   ts_user_created:
     lineage:
       - datalake_user.broker_user.ts_user_created

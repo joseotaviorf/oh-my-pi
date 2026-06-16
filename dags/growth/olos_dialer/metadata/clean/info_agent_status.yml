@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: info_agent_status
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info agent status in the olos dialer system.
+description: |
+  Olos lookup dimension mapping agent status IDs to human-readable labels (available, on call,
+  paused, wrap-up, etc.). Joined to agent state and attempt fact tables for workforce status
+  reporting in outbound contact operations. Partitioned by `year`, `month`, `day`.
 columns:
   id_disposition:
     description: Unique identifier of the disposition.

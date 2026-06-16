@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: users
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about users in the olos dialer system.
+description: |
+  Olos dialer user accounts for analysts and supervisors performing outbound supply contacts.
+  One row per dialer system user with role and credential metadata. Used for workforce mapping
+  and agent performance reporting. Partitioned by `year`, `month`, `day`.
 columns:
   id_user:
     description: Unique identifier of the user.

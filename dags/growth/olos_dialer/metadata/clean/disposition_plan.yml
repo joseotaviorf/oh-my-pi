@@ -3,7 +3,9 @@ database_name: datalake_olos_dialer_clean
 table_name: disposition_plan
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about disposition plan in the olos dialer system.
+description: |
+  Disposition plan configuration in Olos defining allowed outcome codes and routing rules for
+  agent wrap-ups in outbound supply campaigns. Partitioned by `year`, `month`, `day`.
 columns:
   id_disposition_plan:
     description: Unique identifier of the disposition plan.

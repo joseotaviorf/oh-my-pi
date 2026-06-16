@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: info_disposition_type
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info disposition type in the olos dialer system.
+description: |
+  Olos lookup dimension mapping disposition type IDs to labels for call outcome categories.
+  Joined to `disposition` and attempt fact tables to classify how outbound contacts ended.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_disposition_type:
     description: Unique identifier of the disposition type.

@@ -3,7 +3,11 @@ database_name: datalake_olos_dialer_clean
 table_name: agent_state_raw_data
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about agent state raw data in the olos dialer system.
+description: |
+  Agent state transition events from the Olos outbound dialer (login, pause, wrap-up, available).
+  One row per state change per agent per daily load, ingested from S3 JSON via the `olos_dialer` DAG.
+  Used by Growth contact-center analytics for analyst productivity and dialer operations monitoring.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_agent:
     description: Unique identifier of the agent.

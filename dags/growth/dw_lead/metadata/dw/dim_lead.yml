@@ -1,7 +1,16 @@
 database_name: dw_public
 table_name: dim_lead
-description: A lead is a potential property owner who might list with QuintoAndar group. A lead can be related to none, one or more properties.
-  Each line is a lead.
+description: |
+  Kimball dimension for property-owner acquisition leads in the QuintoAndar supply funnel.
+  One row per lead (`sk_lead` = EBDB lead id), sourced primarily from `datalake_lead.lead`
+  with enrichments for affiliate attribution, UTM tracking, B2B/Prime classification, and
+  sales-company routing.
+  A lead is a potential landlord who may list zero or more properties; region and property
+  attributes reflect the lead submission, not every linked house.
+  Contains PII data (contact, address, owner details). Produced by the `dw_lead` DAG; consumed
+  by Growth datamarts (`lead_listing_flows`, performance marketing bonus models) and CRM
+  analytics. Full reload, but partitioned by `country_code`. Use it in the WHERE clause to enable
+  partition pruning and avoid full table scans.
 domain: Growth
 owner: gabriel.salla@quintoandar.com
 columns:
@@ -232,7 +241,10 @@ columns:
   origem:
     lineage:
     - datalake_lead.lead.source
-    description: Origin of the lead.
+    description: |
+      Acquisition channel or submission system that created the lead in EBDB (`lead.source`).
+      Distinguishes inbound vs outbound, app, landing page, crawling, affiliate, and
+      reprocessing flows — used for supply funnel attribution and channel performance analysis.
     categories:
       App: Lead came through the App.
       Crawling: Lead came through a crawler.

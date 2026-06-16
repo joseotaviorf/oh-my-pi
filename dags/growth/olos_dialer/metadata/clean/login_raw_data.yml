@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: login_raw_data
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about login raw data in the olos dialer system.
+description: |
+  Agent login and logout session events from the Olos dialer. One row per login activity per
+  analyst, used for schedule adherence, workforce utilization, and shift compliance reporting
+  in Growth contact-center operations. Partitioned by `year`, `month`, `day`.
 columns:
   id_login_raw_data:
     description: Unique identifier of the login raw data.

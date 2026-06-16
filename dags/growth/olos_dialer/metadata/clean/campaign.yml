@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: campaign
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about campaign in the olos dialer system.
+description: |
+  Outbound marketing campaigns configured in the Olos dialer. One row per campaign defining
+  the analyst pool, dialing strategy, and contact initiative for supply acquisition outreach.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_campaign:
     description: Unique identifier of the campaign.

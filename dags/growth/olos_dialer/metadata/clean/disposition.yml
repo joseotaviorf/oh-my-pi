@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: disposition
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about disposition in the olos dialer system.
+description: |
+  Call disposition outcomes from the Olos dialer classifying how each outbound contact attempt
+  ended (answered, no answer, busy, voicemail, etc.). Joined to attempt fact tables for
+  conversion funnel analysis. Partitioned by `year`, `month`, `day`.
 columns:
   id_disposition:
     description: Unique identifier of the disposition.

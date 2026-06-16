@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: customer
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about customer in the olos dialer system.
+description: |
+  Customer and contact master records in the Olos dialer with identifiers and attributes used
+  to route outbound calls to property-owner leads. Synced daily from Olos S3 JSON exports.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_customer:
     description: Unique identifier of the customer.

@@ -1,7 +1,14 @@
 ---
 database_name: datalake_user
 table_name: landlord
-description: Landlord users and their respective journey step. Each row is a daily snapshot of a user
+description: |
+  [TO BE DEPRECATED, AVOID USING THIS TABLE] Daily snapshot (D-1) of landlord (property owner) personas and their rental journey stage.
+  One row per landlord per snapshot date, sourced from `datalake_landlord_journey.landlord_journey_step`.
+  Includes journey flags, house counts, and PP Multi segmentation signals.
+  Produced by the
+  `enrich_user` DAG; feeds `datalake_user.persona_type`.
+  Partitioned by `year`, `month`, `day`. Use it in the WHERE clause to enable partition
+  pruning and avoid full table scans.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -126,7 +133,10 @@ columns:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step
   is_pp_multi_5_more_ongoing_houses:
-    description: If the user is a PP Multi or has 5 or more ongoing houses.
+    description: |
+      TRUE when the landlord is enrolled in the PP Multi program (`is_pp_multi`) or has five
+      or more houses in published, rented, or suspended status on the snapshot date
+      (`ongoing_houses >= 5`). Flags high-portfolio property owners for Growth segmentation.
   year:
     description: Snapshot year, partition column.
   month:

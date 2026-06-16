@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: reason
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about reason in the olos dialer system.
+description: |
+  Call wrap-up reason codes configured in the Olos dialer, used by analysts to document why
+  an outbound contact attempt ended without conversion. Joined to attempt and disposition
+  tables for outcome analysis. Partitioned by `year`, `month`, `day`.
 columns:
   id_reason:
     description: Unique identifier of the reason.

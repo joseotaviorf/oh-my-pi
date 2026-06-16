@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: info_campaign_type
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info campaign type in the olos dialer system.
+description: |
+  Olos lookup dimension mapping campaign type IDs to labels describing outbound campaign
+  categories in the dialer. Joined to `campaign` and attempt tables for campaign segmentation.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_campaign_type:
     description: Unique identifier of the campaign type.

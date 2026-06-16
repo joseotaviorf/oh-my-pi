@@ -1,9 +1,13 @@
 ---
 database_name: datalake_user
 table_name: tenant
-description:
-  Tenant users and their respective journey step. Each row in the table represents a
-  specific customer on a daily snapshot.
+description: |
+  [TO BE DEPRECATED, AVOID USING THIS TABLE] Daily snapshot (D-1) of tenant personas and their rental journey stage. One row per tenant
+  per snapshot date, sourced from `datalake_tenant_journey.tenant_journey_step`. Captures
+  funnel depth from listing/search through contract and offboarding.
+  Produced by the `enrich_user` DAG; feeds `datalake_user.persona_type`.
+  Partitioned by `year`, `month`, `day`, use it in the WHERE clause to enable partition
+  pruning and avoid full table scans.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -15,7 +19,7 @@ columns:
     lineage:
       - datalake_tenant_journey.tenant_journey_step.id_client
     description:
-      The client id, which is the user id that has searched a house in the amplitude
+      The client user's id (EBDB.Usuario.id), which is the user id that has searched a house in the amplitude
       events or the tenant prospect id that has an event in the rent demand funnel
   client_type:
     description: Client type defined as tenant.

@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: reprocessing_mailing
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about the contacts that will be dialed and attempt to convert after drop. This table contains the list of leads and which sales_company will contact them.
+description: |
+  Outbound mailing for lead reprocessing and drop-recovery campaigns (Olos layout
+  OPS_Mailing_LayoutId_4). Re-queues contacts whose previous dial attempts failed to convert,
+  enabling second-chance outbound supply contact. Partitioned by `year`, `month`, `day`.
 columns:
   id_lead:
     description: Identifier of the customer that the dialer will contact. Equivalent to our internal sk_lead.

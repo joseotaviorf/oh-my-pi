@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: config_reasons
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about config reasons in the olos dialer system.
+description: |
+  Configured call outcome reasons in the Olos dialer used to classify agent wrap-up codes
+  during outbound supply contacts. Supports standardized disposition reporting across campaigns.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_campaign:
     description: Unique identifier of the campaign.

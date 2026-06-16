@@ -17,7 +17,7 @@ description: |
 columns:
   id:
     description: |
-      EBDB user identifier (Usuario.id). Primary key of this table.
+      EBDB user identifier (Usuario.id). The primary key of this table.
     lineage:
       - datalake_ebdb_clean.user.id
   id_country:

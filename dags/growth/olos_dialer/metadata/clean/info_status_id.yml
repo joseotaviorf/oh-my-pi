@@ -3,7 +3,10 @@ database_name: datalake_olos_dialer_clean
 table_name: info_status_id
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info status id in the olos dialer system.
+description: |
+  Olos lookup dimension mapping status IDs to labels for contact or attempt lifecycle states
+  in the dialer queue. Used to track lead progression through outbound contact workflows.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_info_status:
     description: Unique identifier of the info status.

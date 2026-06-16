@@ -3,7 +3,11 @@ database_name: datalake_olos_dialer_clean
 table_name: attempts_raw_data
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about attempts raw data in the olos dialer system.
+description: |
+  Outbound dialing attempt records from the Olos dialer — each row captures one contact attempt
+  with timestamps, disposition, campaign, and telephony metadata. Core fact table for Growth
+  contact-center performance and conversion analytics. Ingested daily from S3 via `olos_dialer`.
+  Partitioned by `year`, `month`, `day`.
 columns:
   id_agent:
     description: Unique identifier of the agent.

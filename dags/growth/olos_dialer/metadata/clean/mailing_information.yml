@@ -3,7 +3,9 @@ database_name: datalake_olos_dialer_clean
 table_name: mailing_information
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about mailing information in the olos dialer system.
+description: |
+  Supplemental metadata for Olos mailing batches including layout configuration and batch-level
+  settings for outbound contact lists loaded into the dialer. Partitioned by `year`, `month`, `day`.
 columns:
   id_campaign:
     description: Unique identifier of the campaign.
