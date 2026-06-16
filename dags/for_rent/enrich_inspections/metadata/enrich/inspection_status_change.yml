@@ -52,7 +52,12 @@ columns:
   ts_sent_to_repair_analysis:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
-    description: Timestamp. The inspection was sent to the analysis team to identify the need for repairs to the house
+    description: |
+      Timestamp. The inspection was sent to the analysis team to identify the need for repairs
+      to the house. This marking is only being populated for manual flows, not for the automatic
+      (Kirk) flow, so it must be treated with care: a NULL value does not necessarily mean the
+      inspection skipped repair analysis, it may simply have gone through Kirk's automatic flow,
+      which does not register this timestamp.
   ts_sent_to_owner_review:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
@@ -104,3 +109,5 @@ columns:
       Timestamp.
       In offboarding: Survey sent to the Operations team to validate interventions proposed by owner/tenant
       In onboarding: When the review deadline is reached
+  ts_load:
+    description: Timestamp when the row was loaded into the table (generated at load time via NOW()).

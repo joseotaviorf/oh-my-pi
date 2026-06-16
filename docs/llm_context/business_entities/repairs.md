@@ -112,7 +112,7 @@ Not all repairs follow every step. Offboarding repairs may be exempted early, ag
 - Always identify which repair universe you're querying: offboarding (`dw_inspections`) or ongoing (`dw_repairs`) — they are separate data models
 - Apply the CAST rule when joining `fact_repair_request.sk_inspection` to `fact_inspection.sk_inspection`: `fi.sk_inspection = CAST(rr.sk_inspection AS VARCHAR)`
 - Use `dim_repair_request.cost` for the estimated cost of individual offboarding repairs
-- Use `obt_offboarding.final_tenant_inspection_cost` for the final aggregated cost per termination
+- Use `obt_offboarding.final_tenant_inspection_cost` for the final aggregated cost per termination — but note it is a **gross** value, before any automatic discount applied along the termination flow (if the tenant/IQ gets discounts, this is still the pre-discount repair value) and it may also change after a mediation negotiation
 - Use `datalake_inspection_services_clean.repair_request_history` when you need cost at a specific stage (e.g., AR, review) — it's the only source with temporal per-stage monetary values
 - Use `fact_terminations.total_tentant_repair_ar` / `_review` / `_ac` for pre-aggregated repair counts by stage at termination level
 - Aggregate `fact_repair_request` results when the desired output grain is per inspection or per termination (the JOIN fans out to repair grain)

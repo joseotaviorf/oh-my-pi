@@ -97,6 +97,8 @@ SELECT DISTINCT
     ft.is_exit_inspection_opt_out,
     i.is_automated_ar,
     CASE
+        WHEN i.ts_inspected IS NULL
+            THEN NULL
         WHEN COALESCE(ft.total_tentant_repair_ar, 0) = 0
             THEN TRUE
         WHEN COALESCE(i.is_automated_ar, FALSE)

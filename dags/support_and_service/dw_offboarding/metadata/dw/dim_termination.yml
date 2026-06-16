@@ -46,7 +46,9 @@ columns:
     lineage:
       - datalake_terminator.termination.task_type
   reason:
-    description: Termination's reason.
+    description: |
+      Business reason the tenant gave for ending the rental contract (e.g. moving to own house,
+      problems with the house, owner moving in), as recorded by the terminator system.
     lineage:
       - datalake_terminator.termination.reason
   rescheduling_history:
@@ -58,11 +60,15 @@ columns:
       - datalake_offboarding.mediations.squad
     description: Based on ticket tags indicating agreement or disagreement.
   workflow_current_step:
-    description: Termination workflow step.
+    description: |
+      Current step of the termination in the terminator workflow, indicating where it sits in
+      its lifecycle (e.g. request, inspection, report review, mediation, closure).
     lineage:
       - datalake_terminator.termination.workflow_current_step
   fee_negotiation_status:
-    description: Termination fee negotiation status.
+    description: |
+      Status of the early-termination-fee negotiation with the tenant, indicating whether the
+      fee is still pending, under negotiation, agreed, or waived.
     lineage:
       - datalake_terminator.termination.fee_negotiation_status
   fee_payment_option:
@@ -92,7 +98,13 @@ columns:
   has_mediation_ticket:
     lineage:
       - datalake_offboarding.mediations.has_mediation_ticket
-    description: Flag indicating the presence of a mediation ticket.
+    description: |
+      Flag indicating the presence of a mediation ticket. The flag is only populated for
+      terminations that have already reached the DONE status (the upstream mediations source
+      restricts to finished terminations); it is not marked while the termination is still in
+      progress. Metrics that use this flag must scope the denominator to finished terminations
+      so numerator and denominator stay coherent — e.g. "% of terminations without mediation
+      and with repairs" should consider only terminations that already reached DONE.
   has_ac_repairs:
     lineage:
       - datalake_terminator.termination.total_tentant_repair_ac

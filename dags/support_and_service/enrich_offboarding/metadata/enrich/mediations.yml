@@ -31,7 +31,14 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket
       - datalake_salesforce_clean.cases.case_number
-    description: Flag indicating if a non-eviction mediation ticket or case exists for the termination. Salesforce cases from Squad 7 (evictions) are not counted.
+    description: |
+      Flag indicating if a non-eviction mediation ticket or case exists for the termination.
+      Salesforce cases from Squad 7 (evictions) are not counted. The flag is only populated for
+      terminations that have already reached the DONE status (this query restricts the
+      terminations CTE to status = 'DONE'); it is not marked while the termination is still in
+      progress. Metrics that use this flag must scope the denominator to finished terminations
+      so numerator and denominator stay coherent — e.g. "% of terminations without mediation
+      and with repairs" should consider only terminations that already reached DONE.
   is_ticket_opened_via_terminator:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket

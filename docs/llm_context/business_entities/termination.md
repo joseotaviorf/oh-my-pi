@@ -44,12 +44,12 @@ Not all terminations follow every step. Some are canceled before completion, som
 
 - Termination volume per month (filter by `ts_termination_request` or `ts_termination_finished`)
 - Termination rate by reason (`termination_reason` in `dim_termination`)
-- Mediation rate (`has_mediation_ticket` in `dim_termination`)
+- Mediation rate (`has_mediation_ticket` in `dim_termination`) — **caveat:** this flag is only populated for terminations that already reached `DONE` (the upstream `mediations` source filters `status = 'DONE'`); it is not marked while a termination is still in progress. Any metric using it must scope the denominator to finished terminations so numerator and denominator stay coherent (e.g. "% of terminations without mediation and with repairs" should consider only terminations that already reached `DONE`)
 - Average time from request to vacancy (`leadtime_request_to_vacancy`)
 - Terminations with tenant repairs (`has_repairs`)
 - Relisting rate (`is_relisting`)
 - End-to-end leadtime (`leadtime_total` in `obt_offboarding`)
-- No-human AR rate (`no_human_ar` in `obt_offboarding`) — share of terminations whose repair analysis required no human intervention
+- No-human AR rate (`no_human_ar` in `obt_offboarding`) — share of terminations whose repair analysis required no human intervention. `NULL` when no exit inspection was performed (no repair analysis at all); filter `no_human_ar IS NOT NULL` and never treat NULL as FALSE
 
 ## Relationships with Other Entities
 

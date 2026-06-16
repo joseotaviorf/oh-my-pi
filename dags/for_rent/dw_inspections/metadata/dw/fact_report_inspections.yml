@@ -22,15 +22,21 @@ columns:
   total_cost:
     lineage:
       - datalake_inspection_services_clean.budget.total_cost
-    description: Total cost linked to budget approval.
+    description: |
+      Total cost linked to budget approval (surfaced downstream as
+      obt_offboarding.final_tenant_inspection_cost). It is a gross amount before any automatic
+      discount that may be applied along the termination flow: if the IQ (tenant) receives
+      discounts, this value does not reflect the final amount, only the gross repair value prior
+      to any possible discount. When there is mediation, the value may also change after the
+      negotiation between the parties conducted during mediation.
   owner_amount_payment:
     lineage:
       - datalake_inspection_services_clean.budget.owner_amount_payment
-    description: Owner payment amount.
+    description: Amount (in BRL) the owner is responsible for paying in the budget-approval stage of the inspection report.
   tenant_amount_payment:
     lineage:
       - datalake_inspection_services_clean.budget.tenant_amount_payment
-    description: Tenant payment amount
+    description: Amount (in BRL) the tenant is responsible for paying in the budget-approval stage of the inspection report.
   invoice_discount_value:
     lineage:
       - datalake_inspections.automatic_discounts.invoice_discount_value
@@ -38,19 +44,40 @@ columns:
       The discount value actually applied (invoice generated). Sourced from automatic_discounts.
       Only available for inspections with bandaid (has_applied_discount = TRUE).
   total_tenant_contestation:
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.total_tenant_contestation
     description: Total number of objections made by the tenant.
   total_owner_budget_approval_contestation:
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.total_owner_budget_approval_contestation
     description: Total number of objections made by the tenant at the budget approval stage.
   total_tenant_budget_approval_contestation:
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.total_tenant_budget_approval_contestation
     description: Total number of objections made by the owner at the budget approval stage.
   total_exemptions:
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.is_exempted
     description: Total exemptions in inspection.
   total_exemptions_by_owner:
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.is_exempted_by_owner
     description: Total exemptions made by the owner during the inspection.
   total_exemptions_by_owner_from_budget:
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.is_exempted_by_owner_from_budget
     description: Total exemptions made by the owner at the budget approval stage.
   total_repairs_requested_by_owner:
-    description: Total repairs requested by owner.
+    lineage:
+      - datalake_inspections.repair_request.id_repair_request
+      - datalake_inspections.repair_request.is_requested_by_owner
+    description: Count of repair items the owner requested to add to the inspection report during the owner review stage.
   has_owner_access_review:
     lineage:
       - datalake_amplitude_inspections.inspection_stages_access.has_owner_access_review
@@ -153,7 +180,12 @@ columns:
   ts_sent_to_repair_analysis:
     lineage:
       - datalake_inspections.inspection_status_change.ts_sent_to_repair_analysis
-    description: Date in timestamp format indicating when the report was sent for repair analysis.
+    description: |
+      Date in timestamp format indicating when the report was sent for repair analysis. This
+      marking is only being populated for manual flows, not for the automatic (Kirk) flow, so it
+      must be treated with care: a NULL value does not necessarily mean the inspection skipped
+      repair analysis, it may simply have gone through Kirk's automatic flow, which does not
+      register this timestamp.
   ts_sent_to_owner_review:
     lineage:
       - datalake_inspections.inspection_status_change.ts_sent_to_owner_review
