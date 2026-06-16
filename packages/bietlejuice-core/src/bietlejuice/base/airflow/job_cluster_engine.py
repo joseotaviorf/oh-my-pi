@@ -314,6 +314,9 @@ class EmrJobClusterEngine(JobClusterEngine):
             name=task_id,
             script_uri=spark_job_path,
             args=[str(p) for p in job_parameters],
+            deploy_mode=str(
+                self._merged_cluster_configuration.get("emr_deploy_mode", "client")
+            ),
             extra_spark_args=list(_EMR_EXTRA_SPARK_SUBMIT_ARGS)
             + [
                 "--conf",

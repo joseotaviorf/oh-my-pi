@@ -147,7 +147,7 @@ class DAGClusterValidator(Validator):
         core_nodes = custom.get("core_nodes")
         task_nodes = custom.get("task_nodes")
         if core_nodes is not None or task_nodes is not None:
-            self._validate_emr_node_group(core_nodes, "core_nodes", min_count=1)
+            self._validate_emr_node_group(core_nodes, "core_nodes", min_count=0)
             if task_nodes is not None:
                 self._validate_emr_node_group(task_nodes, "task_nodes", min_count=0)
                 task_count = int((task_nodes or {}).get("instance_count", 0) or 0)

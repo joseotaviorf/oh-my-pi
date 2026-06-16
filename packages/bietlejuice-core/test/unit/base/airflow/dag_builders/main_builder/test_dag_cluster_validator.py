@@ -116,6 +116,19 @@ class TestEmrClusterConfiguration:
         )
         dag_cluster_validator.validate_cluster(dag_declaration=declaration)
 
+    def test_emr_cluster_core_nodes_zero_instance_count_passes(
+        self, dag_cluster_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_consolidation_m_general_single_node_cluster",
+                "custom_configurations": {
+                    "core_nodes": {"instance_count": 0},
+                },
+            }
+        )
+        dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
     def test_emr_cluster_legacy_num_workers_split_still_passes(
         self, dag_cluster_validator
     ):

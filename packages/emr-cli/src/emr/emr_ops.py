@@ -137,23 +137,27 @@ def build_instances_block(
     core_count = int(cfg["core_instance_count"])
     use_spot = bool(cfg.get("use_spot", True))
     core_market = "SPOT" if use_spot else "ON_DEMAND"
-    return {
-        "InstanceGroups": [
-            {
-                "Name": "Master nodes",
-                "Market": "ON_DEMAND",
-                "InstanceRole": "MASTER",
-                "InstanceType": cfg["master_instance_type"],
-                "InstanceCount": 1,
-            },
+    instance_groups: list[dict[str, Any]] = [
+        {
+            "Name": "Master nodes",
+            "Market": "ON_DEMAND",
+            "InstanceRole": "MASTER",
+            "InstanceType": cfg["master_instance_type"],
+            "InstanceCount": 1,
+        },
+    ]
+    if core_count > 0:
+        instance_groups.append(
             {
                 "Name": "Core nodes",
                 "Market": core_market,
                 "InstanceRole": "CORE",
                 "InstanceType": cfg["core_instance_type"],
-                "InstanceCount": max(1, core_count),
-            },
-        ],
+                "InstanceCount": core_count,
+            }
+        )
+    return {
+        "InstanceGroups": instance_groups,
         "Ec2SubnetId": cfg["subnet_id"],
         "KeepJobFlowAliveWhenNoSteps": keep_job_flow_alive_when_no_steps,
     }

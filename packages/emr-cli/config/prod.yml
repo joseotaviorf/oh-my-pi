@@ -7,7 +7,7 @@ job_flow_role: emr-prod
 service_role: arn:aws:iam::206390561754:role/EMR_DefaultRole_V2
 poll_sec: 15.0
 action_on_failure: TERMINATE_CLUSTER
-deploy_mode: cluster
+deploy_mode: client
 dump_logs_base_uri: s3://artifacts.s3.data.quintoandar.com.br/emr/logs/
 log_uri: s3://artifacts.s3.data.quintoandar.com.br/emr/logs/cli/
 staging_uri: s3://artifacts.s3.data.quintoandar.com.br/emr/staging/cli/

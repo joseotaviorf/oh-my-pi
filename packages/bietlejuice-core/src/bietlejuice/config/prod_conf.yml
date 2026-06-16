@@ -1599,6 +1599,7 @@ databricks_16_4_min_2xlarge_memory_cluster_4_workers:
 emr_cluster_base: &emr_cluster_anchor
     cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
     spark_version: emr-7.12.0
+    emr_deploy_mode: client
     master_node_type_id: m7a.xlarge
     core_nodes:
         node_type_id: m7a.xlarge

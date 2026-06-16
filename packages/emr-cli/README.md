@@ -98,7 +98,7 @@ The settings file contains "global" settings that should be fined for most runs.
 | `visible_to_all_users` | bool            | Whether the run is visible to all users.                                                                                                                                                                                                                       |
 | `master_instance_type` | string          | Master **instance type** (overridable with **`--master-instance-type`**).                                                                                                                                                                                      |
 | `core_instance_type`   | string          | Core **instance type** (overridable with **`--core-instance-type`**).                                                                                                                                                                                          |
-| `core_instance_count`  | int (≥ 1)       | Number of core instances (overridable with **`--core-instance-count`**).                                                                                                                                                                                       |
+| `core_instance_count`  | int (≥ 0)       | Number of core instances (`0` = master-only; overridable with **`--core-instance-count`**).                                                                                                                                                                |
 | `idle_timeout_sec`     | int (60–604800) | Idle timeout, for **`create-cluster` only**: terminate the persistent cluster after this many seconds **idle** (no running/pending steps).                                                                                                                     |
 | `use_spot`             | bool            | SPOT vs ON_DEMAND for core nodes (default overridable per run).                                                                                                                                                                                                |
 | `applications`         | list            | EMR **Applications** (e.g. Hadoop, Hive, Livy, Spark) — aligned with **`emr_cluster_base`** / **`emr_applications`** in **[`bietlejuice/forno_conf.yml`](../../../bietlejuice/forno_conf.yml)**.                                                               |
@@ -276,12 +276,12 @@ Those defaults are **not** driven by **`--job-args`**. Extra Spark options such 
 
 ## Equivalent `spark-submit` on the cluster
 
-EMR runs **`command-runner.jar`** with arguments equivalent to the following (binary **`/usr/lib/spark/bin/spark-submit`** — the path EMR documents for interactive submit). **`deploy_mode`** matches **`deploy_mode`** in **`config/*.yml`** (often **`cluster`**). Tokens **after** the **`.py`** URI are **Python `sys.argv`** from **`--job-args`** / **`--job-arg`**, not extra **`--conf`**.
+EMR runs **`command-runner.jar`** with arguments equivalent to the following (binary **`/usr/lib/spark/bin/spark-submit`** — the path EMR documents for interactive submit). **`deploy_mode`** matches **`deploy_mode`** in **`config/*.yml`** (default **`client`**). Tokens **after** the **`.py`** URI are **Python `sys.argv`** from **`--job-args`** / **`--job-arg`**, not extra **`--conf`**.
 
 ```bash
 /usr/lib/spark/bin/spark-submit \
   --master yarn \
-  --deploy-mode cluster \
+  --deploy-mode client \
   --conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension \
   --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog \
   --conf spark.hadoop.fs.s3a.acl.default=BucketOwnerFullControl \
@@ -325,7 +325,7 @@ Node must already have **bi-etl-ejuice** installed (bootstrap). Upload **`sample
 ```bash
 /usr/lib/spark/bin/spark-submit \
   --master yarn \
-  --deploy-mode cluster \
+  --deploy-mode client \
   --conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension \
   --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog \
   --conf spark.hadoop.fs.s3a.acl.default=BucketOwnerFullControl \

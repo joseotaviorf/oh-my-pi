@@ -93,7 +93,12 @@ def main(ctx: click.Context) -> None:
     "--core-instance-count",
     type=int,
     default=None,
-    help="Override number of core instances from settings file (>= 1).",
+    help="Override number of core instances from settings file (>= 0; 0 = master-only).",
+)
+@click.option(
+    "--deploy-mode",
+    default=None,
+    help="Override deploy_mode from settings (e.g. cluster).",
 )
 @click.option(
     "--bootstrap-script-uri",
@@ -154,6 +159,7 @@ def cmd_transient(
     job_args_line: str | None,
     job_script_args: tuple[str, ...],
     use_spot: bool | None,
+    deploy_mode: str | None,
 ) -> None:
     settings_path = str(ctx.obj["settings_path"])
     tags: dict[str, str] | None = _tags_from_kv_pairs(tag_pairs) if tag_pairs else None
@@ -177,6 +183,7 @@ def cmd_transient(
             ),
             job_script_args=job_merged,
             use_spot=use_spot,
+            deploy_mode=deploy_mode,
         )
         resolve_local_uris_in_cfg(cfg)
         validate_transient(cfg)
@@ -222,7 +229,7 @@ def cmd_transient(
     "--core-instance-count",
     type=int,
     default=None,
-    help="Override number of core instances from settings file (>= 1).",
+    help="Override number of core instances from settings file (>= 0; 0 = master-only).",
 )
 @click.option(
     "--bootstrap-script-uri",
@@ -346,6 +353,11 @@ def cmd_terminate(ctx: click.Context, cluster_id: str) -> None:
         "before the script."
     ),
 )
+@click.option(
+    "--deploy-mode",
+    default=None,
+    help="Override deploy_mode from settings (e.g. cluster).",
+)
 def cmd_submit_step(
     ctx: click.Context,
     cluster_id: str,
@@ -355,6 +367,7 @@ def cmd_submit_step(
     follow_logs: bool,
     job_args_line: str | None,
     job_script_args: tuple[str, ...],
+    deploy_mode: str | None,
 ) -> None:
     settings_path = str(ctx.obj["settings_path"])
     try:
@@ -368,6 +381,7 @@ def cmd_submit_step(
             step_name=step_name,
             region=str(load_settings_file(settings_path)["region"]),
             job_script_args=job_merged,
+            deploy_mode=deploy_mode,
         )
         resolve_local_uris_in_cfg(cfg)
         validate_step_submit(cfg)

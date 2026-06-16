@@ -394,6 +394,39 @@ def test_merge_runtime_config_overrides_use_spot(tmp_path: Path) -> None:
     assert off["use_spot"] is False
 
 
+def test_validate_core_instance_count_allows_zero() -> None:
+    from emr.config import _validate_core_instance_count
+
+    assert _validate_core_instance_count(0) == 0
+
+
+def test_merge_runtime_config_overrides_deploy_mode(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_runtime_config
+
+    cfg = merge_runtime_config(
+        config_path=p,
+        s3_uri="s3://b/x.py",
+        step_name="step",
+        name="flow",
+        deploy_mode="cluster",
+    )
+    assert cfg["deploy_mode"] == "cluster"
+
+
+def test_merge_step_submit_config_overrides_deploy_mode(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_step_submit_config
+
+    cfg = merge_step_submit_config(
+        config_path=p,
+        s3_uri="s3://b/x.py",
+        step_name="step",
+        deploy_mode="cluster",
+    )
+    assert cfg["deploy_mode"] == "cluster"
+
+
 def _write_minimal_settings(path: Path) -> Path:
     path.write_text(
         textwrap.dedent(

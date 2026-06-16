@@ -102,3 +102,17 @@ def test_build_instances_block_defaults_core_to_spot_without_key() -> None:
     }
     out = build_instances_block(cfg, keep_job_flow_alive_when_no_steps=False)
     assert out["InstanceGroups"][1]["Market"] == "SPOT"
+
+
+def test_build_instances_block_master_only_when_core_count_zero() -> None:
+    cfg = {
+        "master_instance_type": "m5.xlarge",
+        "core_instance_type": "m5.xlarge",
+        "core_instance_count": 0,
+        "subnet_id": "subnet-abc",
+        "use_spot": True,
+    }
+    out = build_instances_block(cfg, keep_job_flow_alive_when_no_steps=False)
+    groups = out["InstanceGroups"]
+    assert len(groups) == 1
+    assert groups[0]["InstanceRole"] == "MASTER"

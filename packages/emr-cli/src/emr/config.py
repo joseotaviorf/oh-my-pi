@@ -107,8 +107,8 @@ def _validate_instance_type(key: str, value: str) -> str:
 
 
 def _validate_core_instance_count(n: int) -> int:
-    if n < 1:
-        raise ValueError("core_instance_count must be >= 1")
+    if n < 0:
+        raise ValueError("core_instance_count must be >= 0")
     return n
 
 
@@ -359,6 +359,7 @@ def merge_runtime_config(
     bootstrap_script_args: Sequence[str] | None = None,
     job_script_args: Sequence[str] | None = None,
     use_spot: bool | None = None,
+    deploy_mode: str | None = None,
 ) -> dict[str, Any]:
     """Load settings from YAML, then apply per-run CLI fields (do not appear in the YAML file)."""
     cfg = merge_base_config(
@@ -383,6 +384,8 @@ def merge_runtime_config(
         cfg["job_script_args"] = [
             str(a).strip() for a in job_script_args if str(a).strip()
         ]
+    if deploy_mode is not None:
+        cfg["deploy_mode"] = deploy_mode.strip()
     return cfg
 
 
@@ -393,6 +396,7 @@ def merge_step_submit_config(
     step_name: str,
     region: str | None = None,
     job_script_args: Sequence[str] | None = None,
+    deploy_mode: str | None = None,
 ) -> dict[str, Any]:
     """Settings file plus fields needed to add a Spark step to an existing cluster."""
     cfg = load_settings_file(config_path)
@@ -410,6 +414,8 @@ def merge_step_submit_config(
         cfg["job_script_args"] = [
             str(a).strip() for a in job_script_args if str(a).strip()
         ]
+    if deploy_mode is not None:
+        cfg["deploy_mode"] = deploy_mode.strip()
     return cfg
 
 
