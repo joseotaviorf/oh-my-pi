@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 
 from pyspark.sql import functions as F
@@ -189,6 +188,17 @@ def salesforce_clean_pipeline(cfg):
         logger.info(
             f"m=salesforce_clean_pipeline, msg=New columns detected: {new_cols}"
         )
+        logger.info("m=salesforce_clean_pipeline, msg=Saving table_metadata metric")
+        save_table_metadata_metric(
+            spark=spark,
+            table_name=target_table,
+            new_cols=new_cols,
+            env=cfg.env,
+            layer="clean",
+            bucket=cfg.bucket,
+            partition_date=cfg.partition_date,
+            partition_hour=cfg.partition_hour,
+        )
     else:
         logger.info("m=salesforce_clean_pipeline, msg=No new columns detected")
         new_cols = []
@@ -197,7 +207,6 @@ def salesforce_clean_pipeline(cfg):
         "events_volume": ["partition_date", "partition_hour"],
         "events_type_volume": ["partition_date", "partition_hour", "event_type"],
     }
-    sanitized_target_table = re.sub(r"\W", "_", target_table).strip("_").lower()
     for _metric, grain in _metric_grain.items():
         logger.info(f"m=salesforce_clean_pipeline, msg=Saving {_metric} metric")
         save_volume_metric(
@@ -212,21 +221,6 @@ def salesforce_clean_pipeline(cfg):
             table_location=f"s3a://{cfg.bucket}/sst_metrics/{_metric}",
         )
 
-    logger.info("m=salesforce_clean_pipeline, msg=Saving table_metadata metric")
-    save_table_metadata_metric(
-        spark=spark,
-        df=cdc_conformed_df,
-        table_name=target_table,
-        new_cols=new_cols,
-        env=cfg.env,
-        layer="clean",
-        table_location=f"s3a://{cfg.bucket}/sst_metrics/{sanitized_target_table}_metadata",
-        partition_values={
-            "partition_date": cfg.partition_date,
-            "partition_hour": cfg.partition_hour,
-        },
-        partition_cols=["partition_date", "partition_hour"],
-    )
     logger.info("m=salesforce_clean_pipeline, msg=Pipeline completed")
 
 

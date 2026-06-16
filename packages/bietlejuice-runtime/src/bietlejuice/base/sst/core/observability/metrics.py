@@ -1,5 +1,3 @@
-import json
-import re
 from datetime import datetime, timedelta
 
 from pyspark.sql import DataFrame, Window
@@ -12,6 +10,7 @@ from bietlejuice.base.sst.core.observability.common import (
     save_metric_dataframe,
 )
 from bietlejuice.base.sst.core.utils.common import validate_and_write
+from bietlejuice.base.sst.core.utils.time import standard_now
 
 logger = QuintoAndarLogger("sst.core.observability.metrics")
 
@@ -379,68 +378,77 @@ def save_volume_metric(
     )
 
 
-@logger(exclude=["spark", "df"], exclude_return=True)
+@logger(exclude=["spark"], exclude_return=True)
 def save_table_metadata_metric(
     spark,
-    df,
     table_name,
     new_cols,
     env,
     layer,
-    table_location: str,
-    partition_values=None,
-    partition_cols=None,
+    bucket: str,
+    partition_date: str,
+    partition_hour,
 ):
-    write_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    serialized_columns = json.dumps(df.columns)
-    serialized_new_cols = json.dumps(sorted(new_cols or []))
+    """
+    Append one metadata row per source table to the shared
+    ``datalake_sst_metrics.table_metadata`` table.
 
-    _metric = (
-        spark.range(1)
-        .withColumn("metric_category", F.lit("metadata"))
-        .withColumn("metric_name", F.lit("table_metadata"))
-        .withColumn("source_table", F.lit(table_name))
-        .withColumn("columns", F.lit(serialized_columns))
-        .withColumn("new_cols", F.lit(serialized_new_cols))
-        .withColumn("columns_count", F.lit(len(df.columns)))
-        .withColumn("environment", F.lit(env))
-        .withColumn("layer", F.lit(layer))
-        .withColumn("_write_timestamp", F.lit(write_timestamp))
-    )
+    Each row records, for a given ``source_table`` on a given partition, how many
+    new columns showed up (``new_cols_count``) and which columns they are
+    (``new_cols``, an array of column names). The table is partitioned by
+    ``source_table`` + partition
+    keys, so re-running a partition overwrites its own row instead of duplicating
+    it, and a single query returns the new-column count for every table.
+    """
+    new_cols = sorted(new_cols or [])
 
-    partition_values = partition_values or {}
-    partition_cols = partition_cols or []
-    for partition_col, partition_value in partition_values.items():
-        _metric = _metric.withColumn(partition_col, F.lit(partition_value))
+    metric_values = {
+        "metric_category": "metadata",
+        "metric_name": "table_metadata",
+        "source_table": table_name,
+        "new_cols": new_cols,
+        "new_cols_count": len(new_cols),
+        "environment": env,
+        "layer": layer,
+        "partition_date": partition_date,
+        "partition_hour": partition_hour,
+        "write_timestamp": standard_now(),
+    }
 
-    selected_cols = [
+    select_columns = [
         "metric_category",
         "metric_name",
         "source_table",
-        "columns",
         "new_cols",
-        "columns_count",
+        "new_cols_count",
         "environment",
         "layer",
-        *partition_cols,
-        "_write_timestamp",
+        "partition_date",
+        "partition_hour",
+        "write_timestamp",
     ]
 
-    _metric = _metric.select(selected_cols)
-    sanitized_table_name = re.sub(r"\W", "_", table_name).strip("_").lower()
-    metric_table = f"datalake_sst_metrics.{sanitized_table_name}_metadata"
+    results_df = build_metric_dataframe(
+        df=spark.range(1),
+        metric_values=metric_values,
+        select_columns=select_columns,
+    )
 
     logger.info(
-        f"m=save_table_metadata_metric, msg=Writing metadata metric, "
-        f"metric_table={metric_table}, source_table={table_name}, partition_cols={partition_cols}"
+        f"m=save_table_metadata_metric, msg=Writing table_metadata metric, "
+        f"metric_table=datalake_sst_metrics.table_metadata, source_table={table_name}, "
+        f"new_cols_count={len(new_cols)}"
     )
-    validate_and_write(
+
+    save_metric_dataframe(
         spark=spark,
-        df=_metric,
-        target_table=metric_table,
-        table_location=table_location,
-        partition_cols=partition_cols,
-        overwrite_schema=False,
-        append=True,
-        sync_hive=True,
+        df=results_df,
+        bucket=bucket,
+        metric_table="table_metadata",
+        partition_cols=["source_table", "partition_date", "partition_hour"],
+        partition_filter_values={
+            "source_table": table_name,
+            "partition_date": partition_date,
+            "partition_hour": partition_hour,
+        },
     )
