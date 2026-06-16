@@ -58,7 +58,8 @@ recs_house_published AS (
         recs_impressions.recset_id,
         recs_impressions.recset_id_fix,
         MAX(house_publication_dates.ts_house_published) AS ts_house_published,
-        Last(city) AS city
+        LAST(city) AS city,
+        LAST(is_classified) AS is_classified
     FROM datalake_search.recs_impressions
     LEFT JOIN datalake_search.house_publication_dates
         ON house_publication_dates.id_house = recs_impressions.id_house
@@ -96,6 +97,7 @@ SELECT
             'position', recs_impressions.position,
             'showcase', recs_impressions.showcase,
             'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT),
+            'is_classified', recs_house_published.is_classified,
             'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END
         )
     ) AS dimensions,

@@ -26,6 +26,7 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.user_properties
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.user_properties
       - wonka.house_main.city
+      - wonka.house_main.is_classified
       - datalake_search.house_publication_dates.ts_house_published
       - datalake_search.rent_outlier_users_past_30_days.id_user
       - datalake_search.sale_outlier_users_past_30_days.id_user
@@ -76,7 +77,7 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
   date:
-    description: The date of the search.
+    description: Calendar date when the search impression event happened, derived from the search event timestamp.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
@@ -96,7 +97,7 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
   week:
-    description: The week of the search.
+    description: ISO-like week number of the year when the search impression event happened, derived from the search event timestamp.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event

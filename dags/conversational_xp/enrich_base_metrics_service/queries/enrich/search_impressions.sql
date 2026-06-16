@@ -250,7 +250,8 @@ houses_rank AS (
 house_cities AS (
     SELECT
         id AS id_house,
-        Last(city) AS city
+        Last(city) AS city,
+        Last(is_classified) AS is_classified
     FROM
         wonka.house_main
     GROUP BY
@@ -265,6 +266,7 @@ exploded_houses AS (
         houses_rank.id_search,
         houses_rank.id_house,
         house_cities.city,
+        house_cities.is_classified,
         houses_rank.search_rendering_type,
         houses_rank.rank_model,
         houses_rank.absolute_position,
@@ -284,6 +286,7 @@ exploded_houses AS (
         houses_rank.id_search,
         houses_rank.id_house,
         house_cities.city,
+        house_cities.is_classified,
         houses_rank.search_rendering_type,
         houses_rank.rank_model,
         houses_rank.absolute_position,
@@ -322,6 +325,7 @@ SELECT
             'page_number', exploded_houses.page_number,
             'page_position', exploded_houses.page_position,
             'listing_age', exploded_houses.listing_age,
+            'is_classified', exploded_houses.is_classified,
             'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END
         )
     ) AS dimensions,
