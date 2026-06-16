@@ -108,6 +108,10 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/nps_fr.md` — NPS FR True: official For-Rent weighted NPS, with per-journey weighting and quarterly weights read from GSheets (NPS FR / NPS True / NPS oficial / NPS ponderado). Builds on `business_entities/nps.md`.
 
+- `metric_entities/first_listings_1p.md` — FL 1P: official First Listings metric for 1P supply, counting unique properties/listings first published in the selected period for For Rent and For Sale in Brazil, with channel classification separating 1P from 3P/Rede supply. Builds on `business_entities/supply.md`.
+
+- `metric_entities/funnel_conversions_supply.md` — Supply Funnel Conversions: cohort-based conversion rates between all stages of the supply acquisition funnel (L2P, P2Q, Q2O, O2L) plus non-adjacent transitions (P2O, P2L, Lead to Listing). Supports both RENT and SALE verticals with week-0 velocity variants. Builds on `business_entities/supply.md`.
+
 ## Company-Wide Glossary
 
 These abbreviations appear across multiple entities and data domains. In column names, they map to specific prefixes:
