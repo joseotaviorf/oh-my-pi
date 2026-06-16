@@ -27,6 +27,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.demand_visit_management_capability_settings.business_context
     description: Business context from demand visit management capability settings.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_clean.demand_visit_management_capability_settings.is_passive_lead_receiver
+    description: Indicates whether this configuration enables receiving leads passively for demand visit management.
   ts_created:
     lineage:
       - datalake_ebdb_clean.capability.ts_created

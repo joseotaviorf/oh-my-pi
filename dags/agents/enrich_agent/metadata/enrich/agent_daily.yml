@@ -1,0 +1,103 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent_daily
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Daily snapshot of the enrich agent profile with one row per agent per load date.
+  Materializes a point-in-time copy of datalake_agent_accreditation.agent attributes with current behavior.
+columns:
+  id_agent_daily:
+    description: |
+      Primary key of the daily snapshot. Built as MD5 of agent identifier and the
+      processing date (CURRENT_DATE), uniquely identifying each agent-day row.
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+    description: Unique identifier of the agent in EBDB.
+  id_agent_data:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent_data
+    description: Dados Agente identifier resolved from agent external references when type is DADOS_AGENTE_ID.
+  id_partner:
+    lineage:
+      - datalake_agent_accreditation.agent.id_partner
+    description: Partner identifier resolved from agent external references when type is PARTNER_ID.
+  id_user:
+    lineage:
+      - datalake_agent_accreditation.agent.id_user
+    description: Main application user id linked to the agent via person UUID and main credential reference.
+  uuid_company:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_company
+    description: Company UUID when the agent partnership representative type is COMPANY_UUID.
+  uuid_agent:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_agent
+    description: Business UUID of the agent in the source system.
+  uuid_person:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_person
+    description: Person UUID associated with the agent in the person registry.
+  creci:
+    lineage:
+      - datalake_agent_accreditation.agent.creci
+    description: CRECI license number from the last prospect person converted.
+  creci_uf:
+    lineage:
+      - datalake_agent_accreditation.agent.creci_uf
+    description: State (UF) of the CRECI license from the last prospect person converted.
+  affiliation_type:
+    lineage:
+      - datalake_agent_accreditation.agent.affiliation_type
+    description: Agent affiliation model (e.g., autonomous, company-managed) on the snapshot date.
+  company_product_name:
+    lineage:
+      - datalake_agent_accreditation.agent.company_product_name
+    description: Name of the company product tied to the agent via company membership profile (latest by update time).
+  profile:
+    lineage:
+      - datalake_agent_accreditation.agent.profile
+    description: Profile of the agent via company membership profile (latest by update time).
+  is_allow_demand_sale:
+    lineage:
+      - datalake_agent_accreditation.agent.is_allow_demand_sale
+    description: True when the agent is allowed to perform demand sale on the snapshot date.
+  is_allow_demand_rent:
+    lineage:
+      - datalake_agent_accreditation.agent.is_allow_demand_rent
+    description: True when the agent is allowed to perform demand rent on the snapshot date.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_agent_accreditation.agent.is_passive_lead_receiver
+    description: True when the agent is configured to receive passive leads on the snapshot date.
+  is_1p_partnership:
+    lineage:
+      - datalake_agent_accreditation.agent.is_1p_partnership
+    description: True when affiliation type is autonomous (1P-style partnership flag) on the snapshot date.
+  is_3p_partnership:
+    lineage:
+      - datalake_agent_accreditation.agent.is_3p_partnership
+    description: True when affiliation type is company-managed (3P-style partnership flag) on the snapshot date.
+  dt_ref:
+    description: Reference date of the daily snapshot, set to the pipeline processing date (CURRENT_DATE) at load time.
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+  ts_created:
+    lineage:
+      - datalake_agent_accreditation.agent.ts_created
+    description: Timestamp when the agent record was created in EBDB.
+  year:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+    description: Partition year derived from the snapshot reference date at load time.
+  month:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+    description: Partition month derived from the snapshot reference date at load time.
+  day:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+    description: Partition day derived from the snapshot reference date at load time.

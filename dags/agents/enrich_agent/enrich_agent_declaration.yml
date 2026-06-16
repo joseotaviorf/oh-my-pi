@@ -23,6 +23,8 @@ workflow:
       - agent_capability
       - prospect_agent
       - agent_event_log
+    agent_daily:
+      - agent
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -33,4 +35,8 @@ workflow:
     agent_event_log:
       extraction_type: incremental
       merge_on: [id_event_log]
+      partitions: [year, month, day]
+    agent_daily:
+      extraction_type: incremental
+      merge_on: [sk_agent_daily]
       partitions: [year, month, day]

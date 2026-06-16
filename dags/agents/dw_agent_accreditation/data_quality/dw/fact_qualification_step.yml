@@ -1,0 +1,22 @@
+---
+table_name: dw_agent.fact_qualification_step
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_qualification_step_progress:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_qualification:
+    is_complete:
+      severity_level: Error
+  sk_prospect_agent:
+    is_complete:
+      severity_level: Error
+  qualification_state:
+    is_complete:
+      severity_level: Error

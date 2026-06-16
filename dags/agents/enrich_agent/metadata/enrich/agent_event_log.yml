@@ -43,14 +43,27 @@ columns:
     lineage:
       - datalake_ebdb_clean.agent_event_log.on_behalf_of_role
     description: Role on whose behalf the action was performed, when applicable.
+  event_level:
+    description: Level of the event (agent or capability).
+    categories:
+      AGENT: Agent-level event.
+      CAPABILITY: Capability-level event.
+  capability_type:
+    lineage:
+      - datalake_ebdb_clean.agent_capability.type
+    description: Type of capability related to the event.
   event_type:
     lineage:
       - datalake_ebdb_clean.agent_event_log.event_type
     description: Type of event that occurred in the agent or capability lifecycle.
-  ts_created:
+  ts_started:
     lineage:
       - datalake_ebdb_clean.agent_event_log.ts_created
-    description: Timestamp when the event was created.
+    description: Timestamp when the event started.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_updated
+    description: Timestamp when the event ended.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.agent_event_log.ts_updated

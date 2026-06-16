@@ -4,6 +4,7 @@ SELECT
     c.type,
     c.status,
     cs.business_context,
+    cs.is_passive_lead_receiver,
     c.ts_created,
     c.ts_updated
 FROM

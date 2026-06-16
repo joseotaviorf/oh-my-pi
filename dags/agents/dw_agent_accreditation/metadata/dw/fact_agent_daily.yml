@@ -1,0 +1,178 @@
+---
+database_name: dw_agent
+table_name: fact_agent_daily
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Daily snapshot fact table with one row per agent per reference date. Expands each agent
+  from creation through the load window using aux_date, reconstructs activation and capability
+  flags from agent event log history, and enriches profile attributes from agent_daily when
+  available for the same agent-day key.
+columns:
+  sk_agent_daily:
+    description: |
+      Primary key of the table. Built as MD5 of agent identifier and reference date,
+      uniquely identifying each agent-day snapshot row.
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+      - datalake_quintoandar.aux_date.date
+  sk_agent:
+    description: Natural key of the agent in the source transactional system.
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+  sk_agent_data:
+    description: |
+      Dados Agente identifier resolved from agent external references when type is
+      DADOS_AGENTE_ID. Prefers agent_daily snapshot when present, otherwise agent profile.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.id_agent_data
+      - datalake_agent_accreditation.agent.id_agent_data
+  sk_partner:
+    description: |
+      Partner identifier resolved from agent external references when type is PARTNER_ID.
+      Prefers agent_daily snapshot when present, otherwise agent profile.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.id_partner
+      - datalake_agent_accreditation.agent.id_partner
+  sk_user:
+    description: |
+      Main application user id linked to the agent via person UUID and main credential
+      reference. Prefers agent_daily snapshot when present, otherwise agent profile.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.id_user
+      - datalake_agent_accreditation.agent.id_user
+  uuid_company:
+    description: |
+      Company UUID when the agent partnership representative type is COMPANY_UUID on the
+      reference date. Prefers agent_daily snapshot when present.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.uuid_company
+      - datalake_agent_accreditation.agent.uuid_company
+  uuid_agent:
+    description: Business UUID of the agent in the source system on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.uuid_agent
+      - datalake_agent_accreditation.agent.uuid_agent
+  uuid_person:
+    description: Person UUID associated with the agent in the person registry on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.uuid_person
+      - datalake_agent_accreditation.agent.uuid_person
+  creci:
+    description: CRECI license number from the last prospect person converted on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.creci
+      - datalake_agent_accreditation.agent.creci
+  creci_uf:
+    description: State (UF) of the CRECI license from the last prospect person converted.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.creci_uf
+      - datalake_agent_accreditation.agent.creci_uf
+  affiliation_type:
+    description: Agent affiliation model (e.g., autonomous, company-managed) on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.affiliation_type
+      - datalake_agent_accreditation.agent.affiliation_type
+  profile:
+    description: Agent profile from company membership on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.profile
+      - datalake_agent_accreditation.agent.profile
+  days_in_current_status:
+    description: |
+      Number of days the agent has remained in the current activation status as of the
+      reference date. Built as day difference between agent-level event start and dt_ref.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.ts_started
+      - datalake_quintoandar.aux_date.date
+  is_agent_active:
+    description: |
+      True when the agent was active on the reference date. Built from the latest
+      agent-level activation event on that day; null when no activation history exists.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.event_type
+      - datalake_agent_accreditation.agent_event_log.event_level
+  is_allow_supply_acquisition:
+    description: |
+      True when supply acquisition capability was enabled on the reference date. Built
+      from capability events in agent event log; null when no matching capability history exists.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.event_type
+      - datalake_agent_accreditation.agent_event_log.capability_type
+  is_allow_supply_conversion:
+    description: |
+      True when supply conversion consultancy capability was enabled on the reference date.
+      Built from capability events in agent event log; null when no matching capability history exists.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.event_type
+      - datalake_agent_accreditation.agent_event_log.capability_type
+  is_allow_demand_visit:
+    description: |
+      True when demand visit management capability was enabled on the reference date. Built
+      from capability events in agent event log; null when no matching capability history exists.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.event_type
+      - datalake_agent_accreditation.agent_event_log.capability_type
+  is_allow_demand_acquisition:
+    description: |
+      True when demand acquisition capability was enabled on the reference date. Built from
+      capability events in agent event log; null when no matching capability history exists.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.event_type
+      - datalake_agent_accreditation.agent_event_log.capability_type
+  is_allow_negotiation:
+    description: |
+      True when negotiation capability was enabled on the reference date. Built from capability
+      events in agent event log; null when no matching capability history exists.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.event_type
+      - datalake_agent_accreditation.agent_event_log.capability_type
+  is_allow_demand_sale:
+    description: True when the agent is allowed to perform demand sale on the reference date.
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.business_context
+  is_allow_demand_rent:
+    description: True when the agent is allowed to perform demand rent on the reference date.
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.business_context
+  is_passive_lead_receiver:
+    description: True when the agent is configured to receive passive leads on the reference date.
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.passive_lead_receiver
+  is_1p_partnership:
+    description: True when affiliation type is autonomous (1P-style partnership flag) on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.is_1p_partnership
+      - datalake_agent_accreditation.agent.is_1p_partnership
+  is_3p_partnership:
+    description: True when affiliation type is company-managed (3P-style partnership flag) on the reference date.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.is_3p_partnership
+      - datalake_agent_accreditation.agent.is_3p_partnership
+  dt_ref:
+    description: Reference calendar date of the daily snapshot. Joinable with dw_public.dim_date.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  ts_last_status_changed:
+    description: |
+      Timestamp when the current agent activation status started on the reference date,
+      as inferred from the latest agent-level event in agent event log.
+    lineage:
+      - datalake_agent_accreditation.agent_event_log.ts_started
+  ts_created:
+    description: Timestamp when the agent record was created in the source system.
+    lineage:
+      - datalake_agent_accreditation.agent_daily.ts_created
+      - datalake_agent_accreditation.agent.ts_created
+  year:
+    description: Partition year derived from the reference date.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  month:
+    description: Partition month derived from the reference date.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  day:
+    description: Partition day derived from the reference date.
+    lineage:
+      - datalake_quintoandar.aux_date.date

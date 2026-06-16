@@ -1,0 +1,118 @@
+---
+database_name: dw_agent
+table_name: dim_agent
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: Dimension table projecting agent accreditation agent profile from enrich
+  layer.
+columns:
+  sk_agent:
+    description: Unique identifier of the agent in EBDB.
+    lineage:
+    - datalake_agent_accreditation.agent.id_agent
+  sk_agent_data:
+    description: Dados Agente identifier resolved from agent external references when
+      type is DADOS_AGENTE_ID.
+    lineage:
+    - datalake_agent_accreditation.agent.id_agent_data
+  sk_partner:
+    description: Partner identifier resolved from agent external references when type
+      is PARTNER_ID.
+    lineage:
+    - datalake_agent_accreditation.agent.id_partner
+  sk_user:
+    description: Main application user id linked to the agent via person UUID and
+      main credential reference.
+    lineage:
+    - datalake_agent_accreditation.agent.id_user
+  uuid_company:
+    description: Company UUID when the agent partnership representative type is COMPANY_UUID.
+    lineage:
+    - datalake_agent_accreditation.agent.uuid_company
+  uuid_agent:
+    description: Business UUID of the agent in the source system.
+    lineage:
+    - datalake_agent_accreditation.agent.uuid_agent
+  uuid_person:
+    description: Person UUID associated with the agent in the person registry.
+    lineage:
+    - datalake_agent_accreditation.agent.uuid_person
+  creci:
+    description: CRECI license number from the last prospect person converted.
+    lineage:
+    - datalake_agent_accreditation.agent.creci
+  creci_uf:
+    description: State (UF) of the CRECI license from the last prospect person converted.
+    lineage:
+    - datalake_agent_accreditation.agent.creci_uf
+  affiliation_type:
+    description: Agent affiliation model (e.g., autonomous, company-managed).
+    lineage:
+    - datalake_agent_accreditation.agent.affiliation_type
+  status:
+    description: Current lifecycle status of the agent.
+    lineage:
+    - datalake_agent_accreditation.agent.status
+  company_product_name:
+    description: Name of the company product tied to the agent via company membership
+      profile (latest by update time).
+    lineage:
+    - datalake_agent_accreditation.agent.company_product_name
+  profile:
+    description: Profile of the agent via company membership profile (latest by update
+      time).
+    lineage:
+    - datalake_agent_accreditation.agent.profile
+  is_reactivated:
+    description: True when the agent was reactivated.
+    lineage:
+    - datalake_agent_accreditation.agent.is_reactivated
+  is_allow_supply_acquisition:
+    description: True when the agent is allowed to perform supply acquisition.
+    lineage:
+    - datalake_agent_accreditation.agent.is_allow_supply_acquisition
+  is_allow_demand_acquisition:
+    description: True when the agent is allowed to perform demand acquisition.
+    lineage:
+    - datalake_agent_accreditation.agent.is_allow_demand_acquisition
+  is_allow_visit:
+    description: True when the agent is allowed to perform visit.
+    lineage:
+    - datalake_agent_accreditation.agent.is_allow_visit
+  is_allow_demand_sale:
+    description: True when the agent is allowed to perform demand sale.
+    lineage:
+    - datalake_agent_accreditation.agent.is_allow_demand_sale
+  is_allow_demand_rent:
+    description: True when the agent is allowed to perform demand rent.
+    lineage:
+    - datalake_agent_accreditation.agent.is_allow_demand_rent
+  is_passive_lead_receiver:
+    description: True when the agent is configured to receive passive leads.
+    lineage:
+    - datalake_agent_accreditation.agent.is_passive_lead_receiver
+  is_1p_partnership:
+    description: True when affiliation type is autonomous (1P-style partnership flag).
+    lineage:
+    - datalake_agent_accreditation.agent.is_1p_partnership
+  is_3p_partnership:
+    description: True when affiliation type is company-managed (3P-style partnership
+      flag).
+    lineage:
+    - datalake_agent_accreditation.agent.is_3p_partnership
+  days_in_current_status:
+    description: Number of days in the current status.
+    lineage:
+    - datalake_agent_accreditation.agent.days_in_current_status
+  ts_created:
+    description: Timestamp when the agent record was created in EBDB.
+    lineage:
+    - datalake_agent_accreditation.agent.ts_created
+  ts_last_status_changed:
+    description: Timestamp when the last status change was logged for the agent.
+    lineage:
+    - datalake_agent_accreditation.agent.ts_last_status_changed
+  ts_updated:
+    description: Timestamp when the agent record was last updated in EBDB.
+    lineage:
+    - datalake_agent_accreditation.agent.ts_updated

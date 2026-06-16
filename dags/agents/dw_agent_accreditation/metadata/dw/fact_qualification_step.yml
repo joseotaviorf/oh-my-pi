@@ -1,0 +1,102 @@
+---
+database_name: dw_agent
+table_name: fact_qualification_step
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: Fact table projecting qualification step progress events from enrich
+  layer.
+columns:
+  sk_qualification_step_progress:
+    description: Unique identifier of the qualification step progress event (primary
+      key).
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_qualification_step_progress
+  sk_prospect_agent:
+    description: Prospect agent identifier linked to the qualification instance.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_prospect_agent
+  sk_qualification:
+    description: Qualification instance identifier.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_qualification
+  sk_qualification_step:
+    description: Qualification step identifier for the progress row.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_qualification_step
+  sk_contract_process:
+    description: Contract process identifier.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_contract_process
+  sk_signature:
+    description: Identifier of the QuintoAndar partnership contract signature in the
+      Signatures service.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_signature
+  sk_user_step_responsible:
+    description: User identifier responsible for the step when author type is USUARIO;
+      otherwise null.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.id_user_step_responsible
+  qualification_state:
+    description: Current state of the qualification workflow.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.qualification_state
+  qualification_state_reason:
+    description: Reason recorded at qualification level in EBDB.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.qualification_state_reason
+  step_name:
+    description: Name of the qualification step definition.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.step_name
+  step_description:
+    description: Description of the qualification step definition.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.step_description
+  step_status:
+    description: Status of the qualification step after the progress event.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.step_status
+  step_reason:
+    description: Reason or notes for the step progress event.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.step_reason
+  step_author_type:
+    description: Type of author who performed the step progress event.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.step_author_type
+  contract_template_name:
+    description: Display name of the accreditation contract template applied to
+      the prospect's latest partnership agreement during the CONTRACT_SIGNATURE step.
+    lineage:
+    - datalake_agent_accreditation.contract_process.contract_template_name
+  contract_template_description:
+    description: Long-form text from the accreditation contract template describing
+      the partnership terms and obligations associated with the agreement signed in
+      the CONTRACT_SIGNATURE step.
+    lineage:
+    - datalake_agent_accreditation.contract_process.contract_template_description
+  contract_process_status:
+    description: Workflow status of the accreditation contract process in EBDB.
+    lineage:
+    - datalake_agent_accreditation.contract_process.contract_process_status
+  ts_contract_process_signed:
+    description: Timestamp when the contract process was signed.
+    lineage:
+    - datalake_agent_accreditation.contract_process.ts_signed
+  ts_step_changed:
+    description: Timestamp when the step was changed in the source system.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.ts_step_changed
+  ts_step_created:
+    description: Timestamp when the step progress record was created.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.ts_step_created
+  ts_qualification_created:
+    description: Timestamp when the qualification record was created.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.ts_qualification_created
+  ts_qualification_updated:
+    description: Timestamp when the qualification record was last updated.
+    lineage:
+    - datalake_agent_accreditation.qualification_step.ts_qualification_updated

@@ -96,6 +96,11 @@ columns:
       - datalake_agent_accreditation.agent_capability.ts_created
       - datalake_agent_accreditation.agent_capability.type
     description: True when the agent is allowed to perform demand rent.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_agent_accreditation.agent_capability.ts_created
+      - datalake_agent_accreditation.agent_capability.type
+    description: True when the agent is configured to receive passive leads.
   is_1p_partnership:
     lineage:
       - datalake_ebdb_clean.agent.affiliation_type

@@ -1,0 +1,160 @@
+---
+database_name: dw_agent
+table_name: dim_prospect_agent
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: Dimension table projecting prospect agent onboarding profile from enrich
+  layer.
+columns:
+  sk_prospect_agent:
+    description: Unique identifier of the prospect agent record.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.id_prospect_agent
+  sk_agent:
+    description: Agent identifier when the prospect person matches an existing EBDB
+      agent.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.id_agent
+  sk_qualification:
+    description: Qualification identifier when the prospect person matches an existing
+      EBDB qualification.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.id_qualification
+  sk_business_unit:
+    description: Primary operating region id when the region type is HUB; otherwise
+      null.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.id_business_unit
+  sk_region:
+    description: Parent operating region id when the parent region type is REGION;
+      otherwise null.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.id_region
+  uuid_prospect:
+    description: Prospect UUID in the source system.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.uuid_prospect
+  uuid_person:
+    description: Person UUID linked to the prospect.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.uuid_person
+  legal_entity_type:
+    description: Legal entity type of the prospect (e.g., individual or company).
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.legal_entity_type
+  status:
+    description: Current status of the prospect agent onboarding workflow.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.status
+  qualification_state:
+    description: Current status of the qualification workflow.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.qualification_state
+  creci_validation_status:
+    description: Current status of the CRECI validation step.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.creci_validation_status
+  contract_signature_status:
+    description: Current status of the signature contract document.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.contract_signature_status
+  contract_template_name:
+    description: Name of the contract template used for the last contract process.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.contract_template_name
+  business_association:
+    description: Business association category for the prospect agent.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.business_association
+  business_context_applied:
+    description: Business context of interest as captured in the QuintoAndar prospect
+      questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.business_context_applied
+  quintoandar_knowledge:
+    description: Declared knowledge level about QuintoAndar.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.quintoandar_knowledge
+  social:
+    description: Social profile or link information provided by the prospect.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.social
+  creci:
+    description: CRECI license number from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.creci
+  creci_uf:
+    description: State (UF) of the CRECI license.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.creci_uf
+  commuting_method:
+    description: Commuting method from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.commuting_method
+  referral_code:
+    description: Referral code from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.referral_code
+  maximum_acquisition_per_month:
+    description: Maximum acquisition per month from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.maximum_acquisition_per_month
+  minimum_acquisition_per_month:
+    description: Minimum acquisition per month from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.minimum_acquisition_per_month
+  maximum_available_days:
+    description: Maximum available days from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.maximum_available_days
+  minimum_available_days:
+    description: Minimum available days from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.minimum_available_days
+  years_of_experience:
+    description: Maximum years of experience from the QuintoAndar prospect questionnaire.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.years_of_experience
+  is_available_on_weekends:
+    description: Whether the prospect is available on weekends (QuintoAndar prospect
+      questionnaire).
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.is_available_on_weekends
+  is_accepted_alternative_context:
+    description: Whether the prospect accepts alternative business contexts.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.is_accepted_alternative_context
+  is_accepted_alternative_region:
+    description: Whether the prospect accepts alternative operating regions.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.is_accepted_alternative_region
+  is_last_prospect_person_converted:
+    description: When a person has multiple prospect onboarding journeys, TRUE on the
+      converted record with the latest ts_created for that uuid_person; FALSE on non-converted
+      rows and on older converted records for the same person.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.is_last_prospect_person_converted
+  ts_creci_validation_approved:
+    description: Timestamp when the CRECI validation step was approved.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.ts_creci_validation_approved
+  ts_contract_process_initiated:
+    description: Timestamp when the contract process was initiated.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.ts_contract_process_initiated
+  ts_contract_signed:
+    description: Timestamp when the contract was signed.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.ts_contract_signed
+  ts_contract_process_finished:
+    description: Timestamp when the contract process was finished.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.ts_contract_process_finished
+  ts_created:
+    description: Timestamp when the prospect agent record was created.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.ts_created
+  ts_updated:
+    description: Timestamp when the prospect agent record was last updated.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.ts_updated

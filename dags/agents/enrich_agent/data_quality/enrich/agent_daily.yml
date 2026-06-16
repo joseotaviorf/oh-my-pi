@@ -1,15 +1,19 @@
 ---
-table_name: datalake_agent_accreditation.agent_event_log
+table_name: datalake_agent_accreditation.agent_daily
 alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
 column_level_validations:
-  id_event_log:
-    is_complete:
-      severity_level: Error
+  id_agent_daily:
     is_unique:
+      severity_level: Error
+    is_complete:
       severity_level: Error
   id_agent:
     is_complete:
       severity_level: Error
-  ts_started:
+  dt_ref:
     is_complete:
       severity_level: Error
