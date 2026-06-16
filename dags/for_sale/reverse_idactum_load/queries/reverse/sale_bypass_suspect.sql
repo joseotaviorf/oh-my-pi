@@ -1,97 +1,61 @@
-WITH vsl AS (
+WITH bookings AS (
   SELECT
-    visitslog.id_schedule AS sk_booking,
-    COALESCE(UPPER(MIN_BY(visitslog.author_user_role, visitslog.ts_created)), 'NONE') AS requested_by
-  FROM
-    datalake_ebdb_clean.visit_status_log AS visitslog
-  WHERE
-    DATE(visitslog.ts_created) BETWEEN DATE('2021-01-01') AND DATE_SUB(CURRENT_DATE(), 1)
-  GROUP BY
-    visitslog.id_schedule
-),
-bookings AS (
-  SELECT
-    db.sk_booking,
-    db.id_visit AS sk_visit,
-    db.id_visitor AS sk_prospect,
-    db.id_agent AS sk_agent,
-    db.id_property AS sk_house,
+    vs.id_schedule AS sk_booking,
+    vs.id_visit AS sk_visit,
+    vs.id_visitor AS sk_prospect,
+    vs.id_agent AS sk_agent,
+    vs.id_house AS sk_house,
     h.id_user AS sk_owner,
     h.id_region AS sk_region,
     h.is_sale_primary_market,
-    db.dt_created,
-    db.dt_scheduling AS dt_scheduled,
-    db.dt_cancel AS dt_canceled,
-    UPPER(db.status) AS status,
+    vs.ts_schedule_created AS dt_created,
+    vs.ts_schedule_visit AS dt_scheduled,
+    vs.ts_schedule_canceled AS dt_canceled,
     COALESCE(UPPER(h.key_location), 'NONE') AS entrance_method,
-    IF(db.is_3p_supply, '3p', '1p') AS supply,
-    IF(db.is_3p_demand, '3p', '1p') AS demand,
-    IF(
-      UPPER(db.visit_intent) = 'RENT',
-      'RENT',
-      'SALE'
-    ) AS business_context,
+    IF(vs.is_3p_supply, '3p', '1p') AS supply,
+    IF(vs.is_3p_demand, '3p', '1p') AS demand,
+    vs.business_context,
     dr.country_name AS country,
     dr.city_name AS city,
     dr.city_group,
-    vsl.requested_by,
+    vs.user_role_creation AS requested_by,
     CASE
-      WHEN DATE(db.dt_scheduling) > DATE_SUB(CURRENT_DATE(), 1) THEN 0
-      WHEN UPPER(db.status) = 'REALIZADO'
-        AND db.successful_entrance = '1'
-        AND db.is_visit_completed THEN 1
-      WHEN UPPER(db.status) = 'REALIZADO'
-        AND NOT db.is_visit_completed THEN 2
-      WHEN UPPER(db.status) = 'CANCELADO'
-        OR vcu.id_visit IS NOT NULL THEN 3
-      WHEN DATE(db.dt_scheduling) < DATE_SUB(CURRENT_DATE(), 1)
-        AND NOT UPPER(db.status) = 'REALIZADO' THEN 4
+      WHEN DATE(vs.ts_schedule_visit) > DATE_SUB(CURRENT_DATE(), 1) THEN 0
+      WHEN vs.is_completed THEN 1
+      WHEN vs.is_unsuccessful THEN 2
+      WHEN vs.is_canceled THEN 3
+      WHEN DATE(vs.ts_schedule_visit) < DATE_SUB(CURRENT_DATE(), 1)
+        AND vs.is_completed = FALSE
+        AND vs.is_unsuccessful = FALSE THEN 4
       ELSE NULL
     END AS computed_status,
-    COALESCE(
-      UPPER(vcu.on_behalf_of),
-      UPPER(db.responsible)
-    ) AS cancelled_by,
-    COALESCE(
-      TRIM(UPPER(vcu.reason)),
-      UPPER(db.cancellation_reason),
-      TRIM(UPPER(db.reason))
-    ) AS cancellation_reason,
+    v.cancellation_on_behalf_of AS cancelled_by,
+    v.cancellation_reason AS cancellation_reason,
     IF(
-      UPPER(v.type) = 'TENTANT'
-      AND v.has_attended = FALSE,
+      v.has_unsuccessful_demand_attended = FALSE,
       1,
       0
     ) AS visitor_no_show,
     IF(
-      db.dt_scheduling < db.dt_created,
+      v.is_registered,
       1,
       0
     ) AS visit_registered_by_agent,
-    IF(db.is_rescheduled, 1, 0) AS visit_rescheduled
+    IF(vs.id_succeed_schedule is not null, 1, 0) AS visit_rescheduled
   FROM
-    dw_public.dim_booking AS db
+    datalake_visit.visit_schedules AS vs
+  INNER JOIN
+    datalake_visit.visits AS v
+      ON vs.id_visit = v.id_visit
   INNER JOIN
     datalake_ebdb_listing.house AS h
-      ON h.id = db.id_property
+      ON h.id = vs.id_house
   INNER JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = h.id_region
-  LEFT JOIN
-    datalake_visit.visit_cancellation_unified AS vcu
-      ON vcu.id_visit = db.id_visit
-  LEFT JOIN
-    datalake_ebdb_clean.visitor AS v
-      ON v.id_booking = db.sk_booking
-      AND v.id_user = db.id_visitor
-  LEFT JOIN
-    vsl
-      ON vsl.sk_booking = db.sk_booking
   WHERE
-    UPPER(db.type) = 'VISITA'
-    AND UPPER(db.visit_intent) IN ('SALE', 'RENT')
-    AND DATE(db.dt_created) BETWEEN DATE('2021-01-01') AND DATE_SUB(CURRENT_DATE(), 1)
-    AND db.id_property NOT IN (
+    DATE(vs.ts_schedule_created) BETWEEN DATE('2021-01-01') AND DATE_SUB(CURRENT_DATE(), 1)
+    AND vs.id_house NOT IN (
       893768094,
       893073206,
       892819617,
@@ -118,7 +82,6 @@ computed_visits AS (
       COALESCE(b.dt_canceled, b.dt_scheduled),
       NULL
     ) AS cancelled_at,
-    b.status,
     CASE MIN(b.computed_status) OVER (PARTITION BY b.sk_visit)
       WHEN 0 THEN 'SCHEDULED'
       WHEN 1 THEN 'COMPLETED'
