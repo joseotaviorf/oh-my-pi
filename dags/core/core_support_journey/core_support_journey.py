@@ -9,6 +9,7 @@ from airflow import DAG
 from airflow.decorators import task_group
 from airflow.models.baseoperator import BaseOperator
 
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
     attach_job_cluster_engine_to_context,
@@ -180,7 +181,11 @@ with DAG(
 
     load_tasks = []
     for stem, _spec in list_table_specs_from_dir(TABLES_DIR):
-        load_tasks.append(create_load_table_task(dag_execution_context, stem))
+        load_task = create_load_table_task(dag_execution_context, stem)
+        # Emit a per-table dataset event so downstream DAGs (e.g. dw_support_journey)
+        # can trigger on this DAG via dependencies.yaml.
+        DatasetAdder.attach_dataset_to_task(load_task)
+        load_tasks.append(load_task)
 
     cluster_completion_sink = get_job_cluster_completion_sink(
         dag_execution_context, execute_job_cluster, end

@@ -9,6 +9,7 @@ from databricks_plugin import (
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
 
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.base.sst.airflow.common.common import (
@@ -198,6 +199,9 @@ with DAG(
                     "sync_hive": "True",
                 },
             )
+            # Emit a per-table dataset event for the clean layer so downstream
+            # DAGs can trigger on this DAG via dependencies.yaml.
+            DatasetAdder.attach_dataset_to_task(clean_task)
 
             metrics_tasks = build_metrics_tasks(event_table)
             if parameters.get("skip_quality_contracts", False):

@@ -8,6 +8,7 @@ from databricks_plugin import (
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
 
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.base.sst.airflow.common.common import (
     get_cluster_config,
@@ -110,24 +111,25 @@ with DAG(
     )
 
     for table_name, object_config in OBJECTS_CONFIG.items():
-        (
-            execute_job_cluster
-            >> create_task(
-                target_schema=RAW_SCHEMA,
-                target_table=table_name,
-                entry_point="raw",
-                parameters={"external_key": object_config["external_identifier"]},
-            )
-            >> create_task(
-                target_schema=CLEAN_SCHEMA,
-                target_table=table_name,
-                entry_point="clean",
-                parameters={
-                    "source_schema": RAW_SCHEMA,
-                    "sync_hive": "True",
-                },
-            )
-            >> end
+        raw_task = create_task(
+            target_schema=RAW_SCHEMA,
+            target_table=table_name,
+            entry_point="raw",
+            parameters={"external_key": object_config["external_identifier"]},
         )
+        clean_task = create_task(
+            target_schema=CLEAN_SCHEMA,
+            target_table=table_name,
+            entry_point="clean",
+            parameters={
+                "source_schema": RAW_SCHEMA,
+                "sync_hive": "True",
+            },
+        )
+        # Emit a per-table dataset event for the clean layer so downstream
+        # DAGs can trigger on this DAG via dependencies.yaml.
+        DatasetAdder.attach_dataset_to_task(clean_task)
+
+        execute_job_cluster >> raw_task >> clean_task >> end
 
     start >> execute_job_cluster

@@ -109,6 +109,13 @@ def _install_dag_dependency_stubs(
         fake_dec
     )
 
+    # DatasetAdder transitively imports airflow.datasets / extra_link_plugin, which are
+    # not available with the stubbed airflow package. Stub the module directly since the
+    # DAG only calls DatasetAdder.attach_dataset_to_task (a no-op for these helper tests).
+    fake_dataset_adder = MagicMock()
+    fake_dataset_adder.DatasetAdder = MagicMock()
+    sys.modules["bietlejuice.base.airflow.datasets.dataset_adder"] = fake_dataset_adder
+
     common_mod = importlib.import_module("bietlejuice.base.sst.airflow.common.common")
     sys.modules["bietlejuice.base.sst.airflow.common.common"] = common_mod
 
