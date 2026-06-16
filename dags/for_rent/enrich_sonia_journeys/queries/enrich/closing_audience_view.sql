@@ -1,152 +1,100 @@
 -- Sonia Closing audience view: one row per contract signatory from per-person contract-sent events.
--- Source: rent_flow_[tenant|owner]_contract_sent CDP events from 2026-04-24.
+-- Source: rent_flow_[tenant|owner]_contract_sent CDP events from 2026-04.
 -- is_participant encodes three independently-expandable gates (all use the same binning_value):
 --   Gate 0: number_of_signatories = 2,                                        threshold 0-100 (100 = fully open)
 --   Gate 1: all contract signatories registered (every uuid_person NOT NULL),  threshold 0-100 (100 = fully open)
 --   Gate 2: contract has any unregistered signatory (any uuid_person IS NULL), threshold 0-100 (100 = fully open)
 -- PII note: stores contact PII (email, phone, name) as an approved reverse-DAG exception (feeds SFMC).
 WITH
-raw_sent_events AS (
+rent_flow_events AS (
   SELECT
-    CAST(event_properties:id_rent_flow AS STRING) AS id_rent_flow,
-    TRY_CAST(event_properties:id_contract AS INT) AS id_contract,
-    TRY_CAST(event_properties:id_contract_person AS INT) AS id_contract_person,
-    CAST(event_properties:person_uuid AS STRING) AS uuid_person,
-    TRY_CAST(event_properties:id_house AS INT) AS id_house,
-    ABS(CRC32(ENCODE(CONCAT(CAST(TRY_CAST(event_properties:id_house AS INT) AS STRING), '-', CAST(event_properties:id_tenant AS STRING)), 'utf-8'))) % 100 AS binning_value,
-    TRY_CAST(event_properties:id_contract AS INT) % 100 AS binning_value_contract_id,
+    JSON_EXTRACT_SCALAR(event_properties, '$.id_rent_flow')                                AS id_rent_flow,
+    CAST(JSON_EXTRACT_SCALAR(event_properties, '$.id_contract_person') AS INTEGER)         AS id_contract_person,
+    CAST(JSON_EXTRACT_SCALAR(event_properties, '$.id_contract')        AS INTEGER)         AS id_contract,
+    JSON_EXTRACT_SCALAR(event_properties, '$.person_uuid')                                 AS uuid_person,
+    CAST(JSON_EXTRACT_SCALAR(event_properties, '$.id_house') AS INTEGER)                   AS id_house,
+    JSON_EXTRACT_SCALAR(event_properties, '$.id_tenant')                                   AS id_tenant,
+    CASE WHEN event_name = 'rent_flow_tenant_contract_sent' THEN 'tenant' ELSE 'owner' END AS user_role,
     CASE
-      WHEN event_name = 'rent_flow_tenant_contract_sent' THEN 'tenant'
-      ELSE 'owner'
-    END AS user_role,
+      WHEN event_name IN ('rent_flow_tenant_contract_sent',   'rent_flow_owner_contract_sent')   THEN 'sent'
+      WHEN event_name IN ('rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed') THEN 'signed'
+      ELSE 'canceled'
+    END AS kind,
     ts_event
-  FROM
-    datalake_cdp_clean.transactional
-  WHERE
-    event_name IN ('rent_flow_tenant_contract_sent', 'rent_flow_owner_contract_sent')
-    AND ts_event >= TIMESTAMP '2026-04-24 00:00:00'
+  FROM datalake_cdp_clean.transactional
+  WHERE event_name IN (
+        'rent_flow_tenant_contract_sent',   'rent_flow_owner_contract_sent',
+        'rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed',
+        'rent_flow_contract_canceled')
+    AND (YEAR > 2026 OR (YEAR = 2026 AND MONTH >= 4))
 ),
-contract_person_sent_events AS (
+flow_person AS (
   SELECT
     id_rent_flow,
-    id_contract,
     id_contract_person,
-    uuid_person,
-    id_house,
-    binning_value,
-    binning_value_contract_id,
-    user_role,
-    MIN(ts_event) AS ts_first_sent,
-    MAX(ts_event) AS ts_last_sent,
-    COUNT(*) AS n_sent
-  FROM
-    raw_sent_events
-  GROUP BY
-    id_rent_flow, id_contract, id_contract_person, uuid_person, id_house, binning_value, binning_value_contract_id, user_role
+    MAX(CASE WHEN kind = 'sent' THEN id_contract  END) AS id_contract,
+    MAX(CASE WHEN kind = 'sent' THEN uuid_person  END) AS uuid_person,
+    MAX(CASE WHEN kind = 'sent' THEN id_house     END) AS id_house,
+    MAX(CASE WHEN kind = 'sent' THEN id_tenant    END) AS id_tenant,
+    MAX(CASE WHEN kind = 'sent' THEN user_role    END) AS user_role,
+    MIN(CASE WHEN kind = 'sent' THEN ts_event     END) AS ts_first_sent,
+    MAX(CASE WHEN kind = 'sent' THEN ts_event     END) AS ts_last_sent,
+    COUNT(CASE WHEN kind = 'sent' THEN 1 END)          AS n_sent,
+    MAX(CASE WHEN kind = 'signed'   THEN ts_event END) AS ts_signed,
+    MAX(CASE WHEN kind = 'canceled' THEN ts_event END) AS ts_canceled_in_flow
+  FROM rent_flow_events
+  GROUP BY id_rent_flow, id_contract_person
 ),
-contract_signatories AS (
+-- Derive contract-level gates + cancel propagation via windows (no extra scan).
+enriched AS (
   SELECT
-    id_contract,
-    COUNT(DISTINCT id_contract_person) AS number_of_signatories
-  FROM
-    contract_person_sent_events
-  GROUP BY
-    id_contract
-),
-contract_registration_status AS (
-  SELECT
-    id_contract,
-    SUM(CASE WHEN uuid_person IS NULL THEN 1 ELSE 0 END) = 0 AS all_signatories_registered,
-    SUM(CASE WHEN uuid_person IS NULL THEN 1 ELSE 0 END) > 0 AS has_unregistered_signatory
-  FROM
-    contract_person_sent_events
-  GROUP BY
-    id_contract
-),
-contract_canceled_events AS (
-  SELECT
-    CAST(event_properties:id_rent_flow AS STRING) AS id_rent_flow,
-    MAX(ts_event) AS ts_canceled
-  FROM
-    datalake_cdp_clean.transactional
-  WHERE
-    event_name = 'rent_flow_contract_canceled'
-    AND ts_event >= TIMESTAMP '2026-04-24 00:00:00'
-  GROUP BY
-    CAST(event_properties:id_rent_flow AS STRING)
-),
-contract_signed_events AS (
-  SELECT
-    CAST(event_properties:id_rent_flow AS STRING) AS id_rent_flow,
-    TRY_CAST(event_properties:id_contract_person AS INT) AS id_contract_person,
-    MAX(ts_event) AS ts_signed
-  FROM
-    datalake_cdp_clean.transactional
-  WHERE
-    event_name IN ('rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed')
-    AND ts_event >= TIMESTAMP '2026-04-24 00:00:00'
-  GROUP BY
-    CAST(event_properties:id_rent_flow AS STRING),
-    TRY_CAST(event_properties:id_contract_person AS INT)
+    *,
+    MAX(ts_canceled_in_flow) OVER (PARTITION BY id_rent_flow)                AS ts_canceled,
+    COUNT(*)                 OVER (PARTITION BY id_contract)                 AS number_of_signatories,
+    SUM(CASE WHEN uuid_person IS NULL THEN 1 ELSE 0 END)
+                             OVER (PARTITION BY id_contract)                 AS n_unregistered,
+    ABS(CRC32(TO_UTF8(CAST(id_house AS VARCHAR) || '-' || id_tenant))) % 100 AS binning_value,
+    CASE WHEN ts_signed > ts_last_sent THEN ts_signed END                    AS ts_signed_eff
+  FROM flow_person
 )
 SELECT
-  CONCAT(sent.id_rent_flow, '-', CAST(sent.id_contract_person AS STRING)) AS pk_rent_flow_person,
-  sent.id_house,
-  sent.id_contract,
-  sent.id_contract_person,
-  sent.id_rent_flow,
-  sent.uuid_person,
-  CONCAT_WS(', ', CAST(house.address AS STRING), CAST(house.number AS STRING)) AS address_text,
-  sent.user_role,
+  e.id_rent_flow || '-' || CAST(e.id_contract_person AS VARCHAR) AS pk_rent_flow_person,
+  e.id_house,
+  e.id_contract,
+  e.id_contract_person,
+  e.id_rent_flow,
+  e.uuid_person,
+  CONCAT_WS(', ', house.address, house.number) AS address_text,
+  e.user_role,
   cpc.user_email,
   cpc.user_phone,
   cpc.first_name AS user_first_name,
-  canceled.id_rent_flow IS NOT NULL AS is_canceled,
-  signed.id_contract_person IS NOT NULL AS is_signed,
+  e.ts_canceled   IS NOT NULL AS is_canceled,
+  e.ts_signed_eff IS NOT NULL AS is_signed,
   (
-    -- Gate 0: exactly 2 signatories (main tenant and main owner), graduated rollout by first-sent date
-    -- binning_value_contract_id (id_contract % 100) is to be deprecated in favour of binning_value
-    (sig.number_of_signatories = 2 AND (
-      (sent.binning_value_contract_id < 1  AND sent.ts_first_sent >= TIMESTAMP '2026-04-27 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-04-28 00:00:00')
-      OR (sent.binning_value_contract_id < 3  AND sent.ts_first_sent >= TIMESTAMP '2026-04-28 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-07 00:00:00')
-      OR (sent.binning_value_contract_id < 30 AND sent.ts_first_sent >= TIMESTAMP '2026-05-07 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-05-09 00:00:00')
-      OR (sent.binning_value_contract_id < 50 AND sent.ts_first_sent >= TIMESTAMP '2026-05-09 00:00:00' AND sent.ts_first_sent < TIMESTAMP '2026-06-02 00:00:00')
-      OR (sent.binning_value_contract_id < 10 AND sent.ts_first_sent >= TIMESTAMP '2026-06-02 00:00:00')
-    ))
-    -- Gate 1: all signatories in this contract are registered
-    OR (crs.all_signatories_registered AND sent.binning_value < 0)
-    -- Gate 2: this contract has at least one unregistered signatory
-    OR (crs.has_unregistered_signatory AND sent.binning_value < 0)
+    -- Gate 0: exactly 2 signatories, graduated rollout by first-sent date
+    (e.number_of_signatories = 2
+     AND (e.id_contract % 100) < CASE
+        WHEN e.ts_first_sent >= CAST('2026-06-02 00:00:00' AS TIMESTAMP) THEN 10
+        WHEN e.ts_first_sent >= CAST('2026-05-09 00:00:00' AS TIMESTAMP) THEN 50
+        WHEN e.ts_first_sent >= CAST('2026-05-07 00:00:00' AS TIMESTAMP) THEN 30
+        WHEN e.ts_first_sent >= CAST('2026-04-28 00:00:00' AS TIMESTAMP) THEN 3
+        WHEN e.ts_first_sent >= CAST('2026-04-27 00:00:00' AS TIMESTAMP) THEN 1
+        ELSE 0
+     END)
+    -- Gate 1: all signatories registered
+    OR (e.n_unregistered = 0 AND e.binning_value < 0)
+    -- Gate 2: contract has an unregistered signatory
+    OR (e.n_unregistered > 0 AND e.binning_value < 0)
   ) AS is_participant,
-  sent.n_sent,
-  DATE_FORMAT(sent.ts_first_sent, 'yyyy-MM-dd HH:mm:ss') AS ts_first_sent,
-  DATE_FORMAT(sent.ts_last_sent, 'yyyy-MM-dd HH:mm:ss') AS ts_last_sent,
-  DATE_FORMAT(canceled.ts_canceled, 'yyyy-MM-dd HH:mm:ss') AS ts_canceled,
-  DATE_FORMAT(signed.ts_signed, 'yyyy-MM-dd HH:mm:ss') AS ts_signed
-FROM
-  contract_person_sent_events AS sent
-INNER JOIN
-  datalake_sonia_journeys.closing_contract_person_view AS cpc
-    ON sent.id_contract_person = cpc.id_contract_person
-LEFT JOIN
-  contract_canceled_events AS canceled
-    ON sent.id_rent_flow = canceled.id_rent_flow
-LEFT JOIN
-  contract_signed_events AS signed
-    ON sent.id_rent_flow = signed.id_rent_flow
-    AND sent.id_contract_person = signed.id_contract_person
-    AND signed.ts_signed > sent.ts_last_sent
-LEFT JOIN
-  contract_signatories AS sig
-    ON sent.id_contract = sig.id_contract
-LEFT JOIN
-  contract_registration_status AS crs
-    ON sent.id_contract = crs.id_contract
-INNER JOIN
-  datalake_ebdb_clean.house
-    ON sent.id_house = house.id
-LEFT JOIN
-  dw_public.dim_person AS dp
-    ON sent.uuid_person = dp.uuid_person
-WHERE
-  (dp.has_right_to_be_forgotten = false OR dp.has_right_to_be_forgotten IS NULL)
+  e.n_sent,
+  DATE_FORMAT(e.ts_first_sent,  '%Y-%m-%d %T') AS ts_first_sent,
+  DATE_FORMAT(e.ts_last_sent,   '%Y-%m-%d %T') AS ts_last_sent,
+  DATE_FORMAT(e.ts_canceled,    '%Y-%m-%d %T') AS ts_canceled,
+  DATE_FORMAT(e.ts_signed_eff,  '%Y-%m-%d %T') AS ts_signed
+FROM enriched AS e
+INNER JOIN datalake_sonia_journeys.closing_contract_person_view AS cpc
+  ON e.id_contract_person = cpc.id_contract_person
+INNER JOIN datalake_ebdb_clean.house
+  ON e.id_house = house.id
+WHERE e.n_sent > 0 -- drop canceled-only helper rows & signed-only persons

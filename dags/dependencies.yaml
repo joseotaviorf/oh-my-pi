@@ -3945,7 +3945,6 @@ bietlejuice.enrich_similarity_score:
 bietlejuice.enrich_sonia_journeys:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
-  - bietlejuice.dw_person:load-dw-public-dim-person:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_proposal_fast_lane:load-clean-proposal:first-run-of-day

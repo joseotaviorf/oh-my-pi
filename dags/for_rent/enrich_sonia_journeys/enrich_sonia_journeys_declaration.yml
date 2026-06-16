@@ -20,3 +20,6 @@ workflow:
     closing_contract_participant_view:
       sync: [trino]
       sql_dialect: trino
+    closing_audience_view:
+      sync: [trino]
+      sql_dialect: trino
