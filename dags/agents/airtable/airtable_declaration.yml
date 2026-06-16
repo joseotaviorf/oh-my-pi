@@ -25,6 +25,11 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   tables_customization:
+    activated:
+      extra_spark_job_arguments:
+      - base_id: app1Xchm7V2ypMlBQ
+        table_id: tblXIVyaK8QFpjLdy
+      - view: viwWbSdPz8p3TEow6
     cr_occurrences:
       extra_spark_job_arguments:
       - base_id: app1Xchm7V2ypMlBQ

@@ -1,0 +1,11 @@
+---
+table_name: datalake_airtable.activated
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 10000
+    severity_level: Error
+column_level_validations:
+  id_airtable_record:
+    is_complete:
+      severity_level: Error
