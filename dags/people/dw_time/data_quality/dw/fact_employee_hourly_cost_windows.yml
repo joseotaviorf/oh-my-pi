@@ -3,6 +3,9 @@ table_name: dw_time.fact_employee_hourly_cost_windows
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: -50

@@ -12,7 +12,9 @@ description: |
   hourly_rate_applied denormalized on the hours-bank fact when a single rate per balance row is enough.
 
   Source rows live in datalake_oitchau_clean.employee_costs (Integrations API costs data ingested by oitchau_api), joined
-  through employees.id_employee_profile and registration to PIN person_number.
+  through employees.id_employee_profile and registration to PIN person_number. The ETL keeps the latest available
+  snapshot per id_cost_segment (not scoped to the Airflow load date) because Oitchau no longer maintains hourly cost;
+  payroll is the authoritative cost source until a folha-based replacement is modeled.
 columns:
   sk_employee_cost_window:
     description: |

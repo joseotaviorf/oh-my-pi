@@ -1,4 +1,4 @@
-WITH deduped_employee_cost_rows AS (
+WITH ranked_employee_cost_rows AS (
     SELECT
         id_cost_segment,
         id_employee_profile,
@@ -7,15 +7,6 @@ WITH deduped_employee_cost_rows AS (
         dt_period_ended AS dt_hourly_cost_segment_ended,
         cost_segment_status,
         ts_load,
-        year,
-        month,
-        day
-    FROM
-        datalake_oitchau_clean.employee_costs
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
-            AND DATE('{load_end_date}')
-    QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY
                 id_cost_segment
@@ -24,15 +15,28 @@ WITH deduped_employee_cost_rows AS (
                 year DESC,
                 month DESC,
                 day DESC
-        ) = 1
+        ) AS row_number_latest
+    FROM
+        datalake_oitchau_clean.employee_costs
 ),
-employee_registration AS (
+deduped_employee_cost_rows AS (
+    SELECT
+        id_cost_segment,
+        id_employee_profile,
+        hourly_rate_amount,
+        dt_hourly_cost_segment_started,
+        dt_hourly_cost_segment_ended,
+        cost_segment_status,
+        ts_load
+    FROM
+        ranked_employee_cost_rows
+    WHERE
+        row_number_latest = 1
+),
+ranked_employee_registration AS (
     SELECT
         id_employee_profile,
-        id_external
-    FROM
-        datalake_oitchau_clean.employees
-    QUALIFY
+        id_external,
         ROW_NUMBER() OVER (
             PARTITION BY
                 id_employee_profile
@@ -41,7 +45,18 @@ employee_registration AS (
                 year DESC,
                 month DESC,
                 day DESC
-        ) = 1
+        ) AS row_number_latest
+    FROM
+        datalake_oitchau_clean.employees
+),
+employee_registration AS (
+    SELECT
+        id_employee_profile,
+        id_external
+    FROM
+        ranked_employee_registration
+    WHERE
+        row_number_latest = 1
 ),
 employee_hourly_costs_with_person AS (
     SELECT
