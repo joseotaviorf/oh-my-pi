@@ -7,13 +7,15 @@ workflow:
   layer: raw
   type: custom_ingestion
   load_spark_job: load_parquet_batch_inference_into_datalake
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
 
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
     - s3://data-science.s3.data.quintoandar.com.br/search_monitoring/data
-    - "{{ macros.ds_add(data_interval_start | ds, 1) }}" # this refers to the next day. This only makes sense when the DAG runs daily.
+    - "{load_start_date}"
     - "{table_name}"
     - "{partitions}"
     - parquet
