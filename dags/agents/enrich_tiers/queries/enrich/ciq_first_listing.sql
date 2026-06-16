@@ -91,25 +91,25 @@ WITH first_listing_conditions AS (
         --- INVALIDATION REASON DUPLICATED - previous house
         CASE
             WHEN is_valid_duplicated_previous_house IS NOT FALSE THEN NULL
-            WHEN previous_house.house_listing_status IN ('RENTED', 'PUBLISHED') THEN "[Duplicate listing] A previous house listing is still active or rented."
+            WHEN previous_house.house_listing_status IN ('RENTED', 'PUBLISHED') THEN "[Duplicate listing - Previous house] The previous house is still active or rented."
             WHEN COALESCE(t.id_ciq_user_rent, t.id_ciq_user_sale) = COALESCE(previous_house.id_ciq_user_rent, previous_house.id_ciq_user_sale) 
-                THEN "[Duplicate listing] The previous listing was not sold and was published by the same CIQ user."
+                THEN "[Duplicate listing - Previous house] The previous house was not sold and was published by the same CIQ user."
             WHEN DATE_DIFF(t.ts_first_listing, previous_house.ts_last_depublication) <= 7 AND previous_house.supply_source = '3P'
-                THEN "[Duplicate listing] The last depublication for a 3P listing occurred less than 7 days ago."
+                THEN "[Duplicate listing - Previous house] The last depublication of the previous house for a 3P listing occurred less than 7 days ago."
             WHEN DATE_DIFF(t.ts_first_listing, previous_house.ts_last_depublication) <= 60 AND previous_house.supply_source <> '3P'
-                THEN "[Duplicate listing] The last depublication for a CIQ listing occurred less than 60 days ago."
+                THEN "[Duplicate listing - Previous house] The last depublication of the previous house for a CIQ listing occurred less than 60 days ago."
         END AS reason_invalidation_duplicated_previous_house,
 
         --- INVALIDATION REASON DUPLICATED - first house
         CASE
             WHEN is_valid_duplicated_first_house IS NOT FALSE THEN NULL
-            WHEN first_house.house_listing_status IN ('RENTED', 'PUBLISHED') THEN "[Duplicate listing] A first house listing is still active or rented."
+            WHEN first_house.house_listing_status IN ('RENTED', 'PUBLISHED') THEN "[Duplicate listing - First house] The first house is still active or rented."
             WHEN COALESCE(t.id_ciq_user_rent, t.id_ciq_user_sale) = COALESCE(first_house.id_ciq_user_rent, first_house.id_ciq_user_sale) 
-                THEN "[Duplicate listing] The first listing was not sold and was published by the same CIQ user."
+                THEN "[Duplicate listing - First house] The first house was not sold and was published by the same CIQ user."
             WHEN DATE_DIFF(t.ts_first_listing, first_house.ts_last_depublication) <= 7 AND first_house.supply_source = '3P'
-                THEN "[Duplicate listing] The last depublication for a 3P listing occurred less than 7 days ago."
+                THEN "[Duplicate listing - First house] The last depublication of the first house for a 3P listing occurred less than 7 days ago."
             WHEN DATE_DIFF(t.ts_first_listing, first_house.ts_last_depublication) <= 60 AND first_house.supply_source <> '3P'
-                THEN "[Duplicate listing] The last depublication for a CIQ listing occurred less than 60 days ago."
+                THEN "[Duplicate listing - First house] The last depublication of the first house for a CIQ listing occurred less than 60 days ago."
         END AS reason_invalidation_duplicated_first_house,
 
         --- INVALIDATION REASON HYBRID RULE (RENT)
@@ -154,11 +154,12 @@ WITH first_listing_conditions AS (
     FROM 
         datalake_listing_deduplication.valid_first_listing AS t
     LEFT JOIN
-        datalake_listing_deduplication.valid_first_listing AS previous_house
-            ON previous_house.id_house = t.id_similar_previous_house
-    LEFT JOIN
         datalake_listing_deduplication.valid_first_listing AS first_house
             ON first_house.id_house = t.id_similar_first_house
+    LEFT JOIN
+        datalake_listing_deduplication.valid_first_listing AS previous_house
+            ON previous_house.id_house = t.id_similar_previous_house
+            AND t.id_similar_first_house <> t.id_similar_previous_house
     WHERE
         COALESCE(t.id_ciq_user_rent, t.id_ciq_user_sale) IS NOT NULL
         AND (
@@ -264,7 +265,7 @@ SELECT
         ),
         FILTER(
             ARRAY(
-                COALESCE(ufl.reason_invalidation_duplicated_previous_house, ufl.reason_invalidation_duplicated_first_house),
+                COALESCE(ufl.reason_invalidation_duplicated_first_house, ufl.reason_invalidation_duplicated_previous_house),
                 ufl.reason_invalidation_hybrid,
                 ufl.reason_invalidation_indica_ai,
                 ufl.reason_invalidation_general_rule
