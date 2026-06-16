@@ -9,6 +9,12 @@
 -- whose derived load window equals the validation's own conf window, (3)
 -- fastest successful prod run in 14d with wall >= 480s. Conf is a pickled dict
 -- stored as bytea-hex text; fields are extracted via unhex+regexp.
+--
+-- Promotion thresholds align with scripts/promote_rightsizing_validations.py:
+-- REGRESSION_TOLERANCE_PCT = 5.0, STRONG_POSITIVE_COST_PCT = -15.0, MEM_WARN = 82
+-- is_decisive_validation_run mirrors decisive_row_for_dag() newest-first scan.
+-- outcome/promotion_action CASE order matches decide_promotion_action(): runtime
+-- fail, incomplete pairing (extend), cost, wall, mem warn, pass/promote.
 -- ============================================================================
 WITH validation_runs_raw AS (
     SELECT
@@ -441,13 +447,14 @@ scored AS (
             AND p.val_failure_count = 0
             AND p.val_avg_cost_usd IS NOT NULL
             AND p.prod_avg_cost_usd IS NOT NULL
-            AND p.val_avg_cost_usd < p.prod_avg_cost_usd
+            AND p.prod_avg_cost_usd > 0
+            AND (p.val_avg_cost_usd - p.prod_avg_cost_usd) / p.prod_avg_cost_usd * 100.0 <= 5.0
             AND (
                 (
                     COALESCE(c.schedule_interval_minutes, 1440.0) > 120
                     AND p.val_wall_p50_min IS NOT NULL
                     AND p.prod_wall_p50_min IS NOT NULL
-                    AND p.val_wall_p50_min <= 1.5 * p.prod_wall_p50_min
+                    AND p.val_wall_p50_min <= p.prod_wall_p50_min * 1.05
                 )
                 OR (
                     COALESCE(c.schedule_interval_minutes, 1440.0) <= 120
@@ -455,27 +462,29 @@ scored AS (
                     AND p.prod_wall_p95_min IS NOT NULL
                     AND p.val_wall_p95_min <= GREATEST(
                         0.8 * COALESCE(c.schedule_interval_minutes, 60.0),
-                        p.prod_wall_p95_min
+                        p.prod_wall_p95_min * 1.05
                     )
                 )
             )
         )                                                                            AS is_promote_eligible,
         CASE
             WHEN p.val_failure_count > 0 THEN 'fail'
+            WHEN p.val_clean_run_count < 1 THEN 'extend'
             WHEN p.val_avg_cost_usd IS NOT NULL
              AND p.prod_avg_cost_usd IS NOT NULL
-             AND p.val_avg_cost_usd >= p.prod_avg_cost_usd THEN 'fail'
-            WHEN p.val_clean_run_count < 1 THEN 'extend'
+             AND p.prod_avg_cost_usd > 0
+             AND (p.val_avg_cost_usd - p.prod_avg_cost_usd) / p.prod_avg_cost_usd * 100.0 > 5.0
+                THEN 'fail'
             WHEN COALESCE(c.schedule_interval_minutes, 1440.0) > 120
              AND p.val_wall_p50_min IS NOT NULL
              AND p.prod_wall_p50_min IS NOT NULL
-             AND p.val_wall_p50_min > 1.5 * p.prod_wall_p50_min THEN 'fail'
+             AND p.val_wall_p50_min > p.prod_wall_p50_min * 1.05 THEN 'fail'
             WHEN COALESCE(c.schedule_interval_minutes, 1440.0) <= 120
              AND p.val_wall_p95_min IS NOT NULL
              AND p.prod_wall_p95_min IS NOT NULL
              AND p.val_wall_p95_min > GREATEST(
                 0.8 * COALESCE(c.schedule_interval_minutes, 60.0),
-                p.prod_wall_p95_min
+                p.prod_wall_p95_min * 1.05
              ) THEN 'fail'
             WHEN GREATEST(COALESCE(p.val_drv_mem_p95, 0), COALESCE(p.val_wrk_mem_p95, 0)) > 82
                 THEN 'warn'
@@ -483,13 +492,14 @@ scored AS (
              AND p.val_failure_count = 0
              AND p.val_avg_cost_usd IS NOT NULL
              AND p.prod_avg_cost_usd IS NOT NULL
-             AND p.val_avg_cost_usd < p.prod_avg_cost_usd
+             AND p.prod_avg_cost_usd > 0
+             AND (p.val_avg_cost_usd - p.prod_avg_cost_usd) / p.prod_avg_cost_usd * 100.0 <= 5.0
              AND (
                 (
                     COALESCE(c.schedule_interval_minutes, 1440.0) > 120
                     AND p.val_wall_p50_min IS NOT NULL
                     AND p.prod_wall_p50_min IS NOT NULL
-                    AND p.val_wall_p50_min <= 1.5 * p.prod_wall_p50_min
+                    AND p.val_wall_p50_min <= p.prod_wall_p50_min * 1.05
                 )
                 OR (
                     COALESCE(c.schedule_interval_minutes, 1440.0) <= 120
@@ -497,7 +507,7 @@ scored AS (
                     AND p.prod_wall_p95_min IS NOT NULL
                     AND p.val_wall_p95_min <= GREATEST(
                         0.8 * COALESCE(c.schedule_interval_minutes, 60.0),
-                        p.prod_wall_p95_min
+                        p.prod_wall_p95_min * 1.05
                     )
                 )
              ) THEN 'pass'
@@ -505,34 +515,37 @@ scored AS (
         END                                                                          AS outcome,
         CASE
             WHEN p.val_failure_count > 0 THEN 'reject'
+            WHEN p.val_clean_run_count < 1 THEN 'extend'
             WHEN p.val_avg_cost_usd IS NOT NULL
              AND p.prod_avg_cost_usd IS NOT NULL
-             AND p.val_avg_cost_usd >= p.prod_avg_cost_usd THEN 'reject'
+             AND p.prod_avg_cost_usd > 0
+             AND (p.val_avg_cost_usd - p.prod_avg_cost_usd) / p.prod_avg_cost_usd * 100.0 > 5.0
+                THEN 'reject'
             WHEN COALESCE(c.schedule_interval_minutes, 1440.0) > 120
              AND p.val_wall_p50_min IS NOT NULL
              AND p.prod_wall_p50_min IS NOT NULL
-             AND p.val_wall_p50_min > 1.5 * p.prod_wall_p50_min THEN 'reject'
+             AND p.val_wall_p50_min > p.prod_wall_p50_min * 1.05 THEN 'reject'
             WHEN COALESCE(c.schedule_interval_minutes, 1440.0) <= 120
              AND p.val_wall_p95_min IS NOT NULL
              AND p.prod_wall_p95_min IS NOT NULL
              AND p.val_wall_p95_min > GREATEST(
                 0.8 * COALESCE(c.schedule_interval_minutes, 60.0),
-                p.prod_wall_p95_min
+                p.prod_wall_p95_min * 1.05
              ) THEN 'reject'
-            WHEN p.val_clean_run_count < 1 THEN 'extend'
             WHEN GREATEST(COALESCE(p.val_drv_mem_p95, 0), COALESCE(p.val_wrk_mem_p95, 0)) > 82
                 THEN 'extend'
             WHEN p.val_clean_run_count >= 1
              AND p.val_failure_count = 0
              AND p.val_avg_cost_usd IS NOT NULL
              AND p.prod_avg_cost_usd IS NOT NULL
-             AND p.val_avg_cost_usd < p.prod_avg_cost_usd
+             AND p.prod_avg_cost_usd > 0
+             AND (p.val_avg_cost_usd - p.prod_avg_cost_usd) / p.prod_avg_cost_usd * 100.0 <= 5.0
              AND (
                 (
                     COALESCE(c.schedule_interval_minutes, 1440.0) > 120
                     AND p.val_wall_p50_min IS NOT NULL
                     AND p.prod_wall_p50_min IS NOT NULL
-                    AND p.val_wall_p50_min <= 1.5 * p.prod_wall_p50_min
+                    AND p.val_wall_p50_min <= p.prod_wall_p50_min * 1.05
                 )
                 OR (
                     COALESCE(c.schedule_interval_minutes, 1440.0) <= 120
@@ -540,7 +553,7 @@ scored AS (
                     AND p.prod_wall_p95_min IS NOT NULL
                     AND p.val_wall_p95_min <= GREATEST(
                         0.8 * COALESCE(c.schedule_interval_minutes, 60.0),
-                        p.prod_wall_p95_min
+                        p.prod_wall_p95_min * 1.05
                     )
                 )
              ) THEN 'promote'
@@ -549,6 +562,104 @@ scored AS (
     FROM paired AS p
     LEFT JOIN dag_cadence AS c
         ON p.prod_airflow_dag_id = c.prod_airflow_dag_id
+),
+with_signals AS (
+    SELECT
+        s.*,
+        (
+            s.val_failure_count = 0
+            AND (
+                (s.delta_cost_pct IS NOT NULL AND s.delta_cost_pct <= -15.0)
+                OR (
+                    s.delta_cost_pct IS NOT NULL
+                    AND s.delta_cost_pct <= 5.0
+                    AND (
+                        (
+                            COALESCE(s.schedule_interval_minutes, 1440.0) > 120
+                            AND s.val_wall_p50_min IS NOT NULL
+                            AND s.prod_wall_p50_min IS NOT NULL
+                            AND s.val_wall_p50_min <= s.prod_wall_p50_min * 1.05
+                        )
+                        OR (
+                            COALESCE(s.schedule_interval_minutes, 1440.0) <= 120
+                            AND s.val_wall_p95_min IS NOT NULL
+                            AND s.prod_wall_p95_min IS NOT NULL
+                            AND s.val_wall_p95_min <= GREATEST(
+                                0.8 * COALESCE(s.schedule_interval_minutes, 60.0),
+                                s.prod_wall_p95_min * 1.05
+                            )
+                        )
+                    )
+                )
+            )
+        )                                                                            AS has_strong_positive_signal
+    FROM scored AS s
+),
+windowed AS (
+    SELECT
+        w.*,
+        ROW_NUMBER() OVER (
+            PARTITION BY w.prod_airflow_dag_id
+            ORDER BY w.val_ts_started ASC
+        )                                                                            AS validation_attempt_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY w.prod_airflow_dag_id
+            ORDER BY w.val_ts_started DESC
+        ) = 1                                                                        AS is_latest_validation_run,
+        LAG(w.outcome) OVER (
+            PARTITION BY w.prod_airflow_dag_id
+            ORDER BY w.val_ts_started
+        )                                                                            AS prior_outcome,
+        LAG(w.val_failure_count) OVER (
+            PARTITION BY w.prod_airflow_dag_id
+            ORDER BY w.val_ts_started
+        )                                                                            AS prior_val_failure_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY w.prod_airflow_dag_id
+            ORDER BY
+                CASE
+                    WHEN w.promotion_action IN ('promote', 'reject')
+                      OR w.outcome = 'warn' THEN 0
+                    WHEN w.has_strong_positive_signal THEN 1
+                    ELSE 2
+                END,
+                w.val_ts_started DESC
+        ) = 1                                                                        AS is_decisive_validation_run,
+        (
+            (
+                LAG(w.outcome) OVER (
+                    PARTITION BY w.prod_airflow_dag_id ORDER BY w.val_ts_started
+                ) = 'fail'
+                AND w.outcome IN ('pass', 'warn')
+            )
+            OR (
+                LAG(w.val_failure_count) OVER (
+                    PARTITION BY w.prod_airflow_dag_id ORDER BY w.val_ts_started
+                ) = 1
+                AND w.val_failure_count = 0
+                AND (
+                    (
+                        w.val_avg_cost_usd IS NOT NULL
+                        AND LAG(w.val_avg_cost_usd) OVER (
+                            PARTITION BY w.prod_airflow_dag_id ORDER BY w.val_ts_started
+                        ) IS NOT NULL
+                        AND w.val_avg_cost_usd < LAG(w.val_avg_cost_usd) OVER (
+                            PARTITION BY w.prod_airflow_dag_id ORDER BY w.val_ts_started
+                        )
+                    )
+                    OR (
+                        w.val_wall_p50_min IS NOT NULL
+                        AND LAG(w.val_wall_p50_min) OVER (
+                            PARTITION BY w.prod_airflow_dag_id ORDER BY w.val_ts_started
+                        ) IS NOT NULL
+                        AND w.val_wall_p50_min < LAG(w.val_wall_p50_min) OVER (
+                            PARTITION BY w.prod_airflow_dag_id ORDER BY w.val_ts_started
+                        )
+                    )
+                )
+            )
+        )                                                                            AS is_improved_vs_prior_attempt
+    FROM with_signals AS w
 )
 SELECT
     prod_airflow_dag_id,
@@ -607,5 +718,12 @@ SELECT
     is_promote_eligible,
     outcome,
     promotion_action,
+    validation_attempt_number,
+    is_latest_validation_run,
+    is_decisive_validation_run,
+    prior_outcome,
+    prior_val_failure_count,
+    is_improved_vs_prior_attempt,
+    has_strong_positive_signal,
     CURRENT_TIMESTAMP()                                                            AS ts_load
-FROM scored
+FROM windowed

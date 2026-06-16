@@ -210,11 +210,15 @@ See `docs/platform/cluster_rightsizing_feedback_loop_plan.md` for the design.
   `enrich_rightsizing_outcomes` — one row per validation Airflow run, paired
   with the reference prod run selected by `trigger_cluster_validation_dags.py`
   (`--from-prod-run`). `scripts/promote_rightsizing_validations.py` picks the
-  latest row per DAG by `val_ts_started` (the table has no latest flag; `reference_match_source` records how each run was paired: `conf_run_id`, `conf_window`, or `heuristic`). Columns include
-  `is_promote_eligible`, `outcome`, and
-  `promotion_action` precomputed. Promotion bar: ≥1 clean validation run,
-  cost below prod, wall ≤ 1.5× prod p50 (or the cadence limit for ≤2h
-  schedules); `mem_p95 > 82` holds for one more run.
+  **newest decisive** validation run per DAG (`is_decisive_validation_run` in
+  the table): promote, reject, warn, or strong-positive extend — not blind
+  latest timestamp. Filter BI aggregates with `is_decisive_validation_run = true`
+  (one row per DAG). `reference_match_source` records pairing:
+  `conf_run_id`, `conf_window`, or `heuristic`. Columns include
+  `is_promote_eligible`, `outcome`, `promotion_action`, and attempt metadata.
+  Promotion bar: ≥1 clean validation run, cost within +5% of prod, wall within
+  +5% of prod reference (and cadence SLA for ≤2h schedules); `mem_p95 > 82`
+  holds for one more run.
   Deploy note: table lives in `datalake_databricks_health.enrich_rightsizing_outcomes`
   (same UC schema as query_history / daily_cluster_health). The orphaned
   `datalake_rightsizing_outcomes.enrich_rightsizing_outcomes` entry from the v1

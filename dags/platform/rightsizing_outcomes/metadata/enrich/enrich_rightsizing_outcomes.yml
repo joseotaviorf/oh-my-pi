@@ -7,7 +7,11 @@ description: |
   prod run selected by trigger_cluster_validation_dags.py (--from-prod-run).
 
   Feeds scripts/promote_rightsizing_validations.py (promotion gate) and the
-  post-promotion watch ledger. Promotion picks the latest run per DAG by val_ts_started; pairing uses the conf-persisted reference run id, exact window match, or fastest-run heuristic (see reference_match_source).
+  post-promotion watch ledger. Promotion picks the newest decisive run per DAG
+  (promote/reject/warn or strong-positive extend), not blind latest timestamp;
+  pairing uses the conf-persisted reference run id, exact window match, or
+  fastest-run heuristic (see reference_match_source). Cost and wall allow up to
+  +5% vs prod reference before fail (REGRESSION_TOLERANCE_PCT).
 domain: Data Ops & Governance
 owner: data-platform-team@quintoandar.com.br
 columns:
@@ -233,15 +237,49 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
   is_promote_eligible:
     description: |
-      True when validation has a clean run, costs less than reference prod, and wall
-      time passes the cadence-aware threshold.
+      True when validation has a clean run, cost within +5% of reference prod,
+      and wall time passes the cadence-aware threshold (+5% slack on prod wall).
   outcome:
     description: |
       pass / warn / fail / extend classification. `warn` when mem P95 > 82;
-      `fail` on failures, cost regression, or wall breach; `extend` when incomplete.
+      `fail` on failures, cost regression > +5%, or wall breach; `extend` when
+      incomplete pairing or awaiting more evidence.
   promotion_action:
     description: |
       Recommended gate action — promote, reject, or extend — aligned with
-      scripts/promote_rightsizing_validations.py.
+      scripts/promote_rightsizing_validations.py (newest decisive run per DAG).
+  validation_attempt_number:
+    description: Ordinal attempt per prod DAG ordered by val_ts_started ascending.
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  is_latest_validation_run:
+    description: True for the most recent validation attempt by val_ts_started per prod DAG.
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  is_decisive_validation_run:
+    description: |
+      True for the row promotion would use — newest promote/reject/warn signal, or
+      newest strong-positive extend, per prod DAG.
+  prior_outcome:
+    description: Outcome of the immediately prior validation attempt for the same prod DAG.
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  prior_val_failure_count:
+    description: val_failure_count from the immediately prior validation attempt.
+    lineage:
+      - datalake_astro_clean.dag_run.state
+  is_improved_vs_prior_attempt:
+    description: |
+      True when this attempt is strictly better than the prior one (e.g. fail to
+      pass/warn, or runtime fail to clean run with lower cost or wall).
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  has_strong_positive_signal:
+    description: |
+      True when val_failure_count = 0 and observed savings (delta_cost_pct <= -15)
+      or cost/wall within +5% tolerance — relevant even when outcome is extend
+      due to incomplete Databricks pairing.
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
   ts_load:
     description: Timestamp the row was written by the DAG.

@@ -34,7 +34,8 @@ DEFAULT_DAGS_ROOT = REPO_ROOT / "dags"
 DEFAULT_LEDGER_PATH = REPO_ROOT / "scripts" / "rightsizing_promotion_ledger.json"
 
 SLA_CADENCE_MAX_INTERVAL_MIN = 120.0
-WALL_INFLATION_MAX = 1.5
+REGRESSION_TOLERANCE_PCT = 5.0
+STRONG_POSITIVE_COST_PCT = -15.0
 MEM_WARN_THRESHOLD = 82.0
 COST_REGRESSION_PCT = 15.0
 VALIDATION_EXTEND_MAX_DAYS = 14
@@ -148,22 +149,57 @@ def _mem_p95_max(row: dict[str, Any], prefix: str = "val") -> float | None:
     return max(v for v in (driver, worker) if v is not None)
 
 
+def _delta_cost_pct(row: dict[str, Any]) -> float | None:
+    explicit = _f(row.get("delta_cost_pct"))
+    if explicit is not None:
+        return explicit
+    prod_cost = _f(row.get("prod_avg_cost_usd"))
+    val_cost = _f(row.get("val_avg_cost_usd"))
+    if prod_cost is None or val_cost is None or prod_cost <= 0:
+        return None
+    return (val_cost - prod_cost) / prod_cost * 100.0
+
+
+def _cost_exceeds_tolerance(row: dict[str, Any]) -> bool:
+    delta = _delta_cost_pct(row)
+    if delta is None:
+        return False
+    return delta > REGRESSION_TOLERANCE_PCT
+
+
 def _wall_passes(row: dict[str, Any]) -> bool:
     interval = _f(row.get("schedule_interval_minutes")) or 1440.0
     prod_wall_p50 = _f(row.get("prod_wall_p50_min"))
     prod_wall_p95 = _f(row.get("prod_wall_p95_min"))
     val_wall_p50 = _f(row.get("val_wall_p50_min"))
     val_wall_p95 = _f(row.get("val_wall_p95_min"))
+    wall_tolerance = 1.0 + REGRESSION_TOLERANCE_PCT / 100.0
 
     if interval > SLA_CADENCE_MAX_INTERVAL_MIN:
         if prod_wall_p50 is None or val_wall_p50 is None or prod_wall_p50 <= 0:
             return False
-        return val_wall_p50 <= WALL_INFLATION_MAX * prod_wall_p50
+        return val_wall_p50 <= prod_wall_p50 * wall_tolerance
 
     if prod_wall_p95 is None or val_wall_p95 is None:
         return False
-    sla_limit = max(0.8 * interval, prod_wall_p95)
+    sla_limit = max(0.8 * interval, prod_wall_p95 * wall_tolerance)
     return val_wall_p95 <= sla_limit
+
+
+def _row_has_validation_activity(row: dict[str, Any]) -> bool:
+    return _i(row.get("val_run_count")) > 0 or _i(row.get("val_clean_run_count")) > 0
+
+
+def _has_strong_positive_signal(row: dict[str, Any]) -> bool:
+    """Observed savings or acceptable wall despite incomplete pairing (extend rows)."""
+    if _i(row.get("val_failure_count")) > 0:
+        return False
+    delta = _delta_cost_pct(row)
+    if delta is not None and delta <= STRONG_POSITIVE_COST_PCT:
+        return True
+    if delta is not None and delta <= REGRESSION_TOLERANCE_PCT and _wall_passes(row):
+        return True
+    return False
 
 
 def decide_promotion_action(
@@ -175,8 +211,6 @@ def decide_promotion_action(
     dag_id = str(row.get("prod_airflow_dag_id") or row.get("dag_id") or "").strip()
     val_failure_count = _i(row.get("val_failure_count"))
     val_clean_run_count = _i(row.get("val_clean_run_count"))
-    prod_cost = _f(row.get("prod_avg_cost_usd"))
-    val_cost = _f(row.get("val_avg_cost_usd"))
     mem_p95 = _mem_p95_max(row, prefix="val")
 
     if val_failure_count > 0:
@@ -185,22 +219,6 @@ def decide_promotion_action(
             action="reject",
             outcome="fail",
             reason="validation run had task or Databricks failure",
-        )
-
-    if val_cost is not None and prod_cost is not None and val_cost >= prod_cost:
-        return PromotionDecision(
-            dag_id=dag_id,
-            action="reject",
-            outcome="fail",
-            reason="validation cost is not below prod baseline",
-        )
-
-    if not _wall_passes(row):
-        return PromotionDecision(
-            dag_id=dag_id,
-            action="reject",
-            outcome="fail",
-            reason="validation wall time exceeds cadence-aware threshold",
         )
 
     if val_clean_run_count < 1:
@@ -224,6 +242,25 @@ def decide_promotion_action(
             reason="awaiting first successful validation run",
         )
 
+    if _cost_exceeds_tolerance(row):
+        return PromotionDecision(
+            dag_id=dag_id,
+            action="reject",
+            outcome="fail",
+            reason=(
+                f"validation cost exceeds prod baseline by more than "
+                f"{REGRESSION_TOLERANCE_PCT:.0f}%"
+            ),
+        )
+
+    if not _wall_passes(row):
+        return PromotionDecision(
+            dag_id=dag_id,
+            action="reject",
+            outcome="fail",
+            reason="validation wall time exceeds cadence-aware threshold",
+        )
+
     if mem_p95 is not None and mem_p95 > MEM_WARN_THRESHOLD:
         return PromotionDecision(
             dag_id=dag_id,
@@ -236,8 +273,55 @@ def decide_promotion_action(
         dag_id=dag_id,
         action="promote",
         outcome="pass",
-        reason="clean validation run with lower cost and acceptable wall time",
+        reason="clean validation run with acceptable cost and wall time",
     )
+
+
+def decisive_row_for_dag(
+    rows: list[dict[str, Any]],
+    dag_id: str,
+    *,
+    validation_age_days: int | None = None,
+) -> dict[str, Any] | None:
+    """Newest validation run with a decisive signal (promote/reject/warn or strong extend)."""
+    ordered = _rows_for_dag(rows, dag_id)
+    if not ordered:
+        return None
+
+    active = [
+        (
+            row,
+            decide_promotion_action(row, validation_age_days=validation_age_days),
+        )
+        for row in ordered
+        if _row_has_validation_activity(row)
+    ]
+    if not active:
+        return ordered[-1]
+
+    for row, decision in reversed(active):
+        if decision.action in ("promote", "reject") or decision.outcome == "warn":
+            return row
+
+    for row, decision in reversed(active):
+        if decision.outcome == "extend" and _has_strong_positive_signal(row):
+            return row
+
+    return ordered[-1]
+
+
+def decisive_row_per_dag(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    decisive: dict[str, dict[str, Any]] = {}
+    dag_ids = {
+        str(row.get("prod_airflow_dag_id") or row.get("dag_id") or "").strip()
+        for row in rows
+    }
+    dag_ids.discard("")
+    for dag_id in dag_ids:
+        row = decisive_row_for_dag(rows, dag_id)
+        if row is not None:
+            decisive[dag_id] = row
+    return decisive
 
 
 def _rows_for_dag(rows: list[dict[str, Any]], dag_id: str) -> list[dict[str, Any]]:
@@ -258,49 +342,26 @@ def decide_promotion_for_dag(
 ) -> tuple[PromotionDecision, dict[str, Any] | None]:
     """Return one promotion decision for a DAG; returns (decision, deciding row).
 
-    Validation-run grain: the deciding row is the latest validation run by
-    ``val_ts_started`` (the table has no precomputed latest flag; latest is derived here). Legacy daily grain: newest
-    decisive signal among days with validation activity wins.
+    Picks the newest decisive validation signal: promote, reject, warn, or a
+    strong-positive extend (post-fix improvement). Falls back to the latest row
+    when every attempt is a plain extend.
     """
-    ordered = _rows_for_dag(rows, dag_id)
-    if _has_validation_run_grain(ordered) and ordered:
-        latest_row = ordered[-1]
+    row = decisive_row_for_dag(
+        rows, dag_id, validation_age_days=validation_age_days
+    )
+    if row is None:
         return (
-            decide_promotion_action(
-                latest_row, validation_age_days=validation_age_days
+            PromotionDecision(
+                dag_id=dag_id,
+                action="extend",
+                outcome="extend",
+                reason="no outcomes rows for DAG",
             ),
-            latest_row,
-        )
-    per_day = [
-        (row, decide_promotion_action(row, validation_age_days=validation_age_days))
-        for row in ordered
-    ]
-    active = [
-        (row, decision)
-        for row, decision in per_day
-        if _i(row.get("val_run_count")) > 0 or _i(row.get("val_clean_run_count")) > 0
-    ]
-
-    for row, decision in reversed(active):
-        if decision.action in ("promote", "reject") or decision.outcome == "warn":
-            return decision, row
-    # no validation activity at all in the window: extend / age-out
-    fallback_row = ordered[-1] if ordered else None
-    if fallback_row is not None:
-        return (
-            decide_promotion_action(
-                fallback_row, validation_age_days=validation_age_days
-            ),
-            fallback_row,
+            None,
         )
     return (
-        PromotionDecision(
-            dag_id=dag_id,
-            action="extend",
-            outcome="extend",
-            reason="no outcomes rows for DAG",
-        ),
-        None,
+        decide_promotion_action(row, validation_age_days=validation_age_days),
+        row,
     )
 
 

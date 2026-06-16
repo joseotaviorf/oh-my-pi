@@ -24,7 +24,7 @@ def _row(**kwargs) -> dict:
         "val_avg_cost_usd": "0.80",
         "prod_wall_p50_min": "10.0",
         "prod_wall_p95_min": "15.0",
-        "val_wall_p50_min": "12.0",
+        "val_wall_p50_min": "10.4",
         "val_wall_p95_min": "14.0",
         "val_clean_run_count": "2",
         "val_failure_count": "0",
@@ -46,8 +46,16 @@ class TestDecidePromotionAction:
         assert decision.action == "reject"
         assert decision.outcome == "fail"
 
-    def test_reject_when_validation_cost_not_below_prod(self):
+    def test_reject_when_validation_cost_exceeds_tolerance(self):
         decision = prv.decide_promotion_action(_row(val_avg_cost_usd="1.10"))
+        assert decision.action == "reject"
+
+    def test_promote_when_cost_within_five_percent_tolerance(self):
+        decision = prv.decide_promotion_action(_row(val_avg_cost_usd="1.03"))
+        assert decision.action == "promote"
+
+    def test_reject_when_cost_above_five_percent_tolerance(self):
+        decision = prv.decide_promotion_action(_row(val_avg_cost_usd="1.06"))
         assert decision.action == "reject"
 
     def test_extend_when_no_clean_validation_runs(self):
@@ -81,7 +89,17 @@ class TestDecidePromotionAction:
         )
         assert decision.action == "promote"
 
-    def test_reject_when_unconstrained_wall_exceeds_1_5x_prod_p50(self):
+    def test_promote_for_hourly_when_wall_within_five_percent_of_prod(self):
+        decision = prv.decide_promotion_action(
+            _row(
+                schedule_interval_minutes="60",
+                prod_wall_p95_min="40.0",
+                val_wall_p95_min="42.0",
+            )
+        )
+        assert decision.action == "promote"
+
+    def test_reject_when_unconstrained_wall_exceeds_five_percent_of_prod(self):
         decision = prv.decide_promotion_action(
             _row(
                 schedule_interval_minutes="240",
@@ -270,7 +288,7 @@ class TestDecidePromotionForDagWindow:
 
 
 class TestValidationRunGrain:
-    def test_uses_latest_validation_run_row(self):
+    def test_two_clean_passes_picks_latest_decisive_run(self):
         rows = [
             _row(
                 validation_airflow_run_id="manual__2026-06-08",
@@ -284,6 +302,104 @@ class TestValidationRunGrain:
         decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
         assert decision.action == "promote"
         assert row["validation_airflow_run_id"] == "manual__2026-06-10"
+
+    def test_failure_newer_than_pass_rejects(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__pass",
+                val_dt="2026-06-08",
+                val_ts_started="2026-06-08 10:00:00",
+            ),
+            _row(
+                validation_airflow_run_id="manual__fail",
+                val_dt="2026-06-10",
+                val_ts_started="2026-06-10 10:00:00",
+                val_failure_count="1",
+                val_run_count="1",
+            ),
+        ]
+        decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert decision.action == "reject"
+        assert row["validation_airflow_run_id"] == "manual__fail"
+
+    def test_pass_newer_than_failure_promotes(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__fail",
+                val_dt="2026-06-08",
+                val_ts_started="2026-06-08 10:00:00",
+                val_failure_count="1",
+                val_run_count="1",
+            ),
+            _row(
+                validation_airflow_run_id="manual__pass",
+                val_dt="2026-06-10",
+                val_ts_started="2026-06-10 10:00:00",
+            ),
+        ]
+        decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert decision.action == "promote"
+        assert row["validation_airflow_run_id"] == "manual__pass"
+
+    def test_mem_warn_newer_than_pass_holds_promotion(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__pass",
+                val_dt="2026-06-08",
+                val_ts_started="2026-06-08 10:00:00",
+            ),
+            _row(
+                validation_airflow_run_id="manual__warn",
+                val_dt="2026-06-10",
+                val_ts_started="2026-06-10 10:00:00",
+                val_drv_mem_p95="90.0",
+                val_run_count="1",
+            ),
+        ]
+        decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert decision.action == "extend"
+        assert decision.outcome == "warn"
+        assert row["validation_airflow_run_id"] == "manual__warn"
+
+    def test_pass_newer_than_mem_warn_promotes(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__warn",
+                val_dt="2026-06-08",
+                val_ts_started="2026-06-08 10:00:00",
+                val_drv_mem_p95="90.0",
+                val_run_count="1",
+            ),
+            _row(
+                validation_airflow_run_id="manual__pass",
+                val_dt="2026-06-10",
+                val_ts_started="2026-06-10 10:00:00",
+            ),
+        ]
+        decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert decision.action == "promote"
+        assert row["validation_airflow_run_id"] == "manual__pass"
+
+    def test_latest_extend_does_not_hide_older_pass(self):
+        rows = [
+            _row(
+                validation_airflow_run_id="manual__pass",
+                val_dt="2026-06-08",
+                val_ts_started="2026-06-08 10:00:00",
+            ),
+            _row(
+                validation_airflow_run_id="manual__extend",
+                val_dt="2026-06-10",
+                val_ts_started="2026-06-10 10:00:00",
+                val_clean_run_count="0",
+                val_avg_cost_usd="",
+                val_wall_p50_min="",
+                val_wall_p95_min="",
+            ),
+        ]
+        decision, row = prv.decide_promotion_for_dag(rows, "bietlejuice.test_dag")
+        assert decision.action == "promote"
+        assert row["validation_airflow_run_id"] == "manual__pass"
 
     def test_same_day_picks_latest_val_ts_started(self):
         rows = [
@@ -337,3 +453,34 @@ class TestValidationRunGrain:
             latest["bietlejuice.test_dag"]["validation_airflow_run_id"]
             == "manual__newer"
         )
+
+    def test_decisive_row_per_dag_uses_newest_decisive_signal(self):
+        rows = [
+            _row(
+                prod_airflow_dag_id="bietlejuice.test_dag",
+                validation_airflow_run_id="manual__pass",
+                val_dt="2026-06-08",
+                val_ts_started="2026-06-08 10:00:00",
+            ),
+            _row(
+                prod_airflow_dag_id="bietlejuice.test_dag",
+                validation_airflow_run_id="manual__extend",
+                val_dt="2026-06-10",
+                val_ts_started="2026-06-10 10:00:00",
+                val_clean_run_count="0",
+                val_avg_cost_usd="",
+            ),
+        ]
+        decisive = prv.decisive_row_per_dag(rows)
+        assert (
+            decisive["bietlejuice.test_dag"]["validation_airflow_run_id"]
+            == "manual__pass"
+        )
+
+    def test_has_strong_positive_signal_on_large_savings(self):
+        row = _row(
+            val_clean_run_count="0",
+            val_avg_cost_usd="0.50",
+            prod_avg_cost_usd="1.00",
+        )
+        assert prv._has_strong_positive_signal(row) is True
