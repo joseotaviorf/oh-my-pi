@@ -5,33 +5,45 @@
 -- Bookings and visits - first dates and counts
 WITH sale_booking AS (
     SELECT
-        CONCAT(b.id_visitor, '_',b.id_house) AS id_sale_flow,
-        b.id_visitor AS id_buyer,
-        b.id_house,
-        MIN(b.ts_created) AS ts_first_booking_created,
-        MIN(CASE WHEN b.is_visit_completed THEN b.ts_booking_utc END) AS ts_first_visit_completed,
-        COUNT(DISTINCT b.id) AS nbr_bookings,
-        COUNT(DISTINCT CASE WHEN b.is_visit_completed THEN b.id END) AS nbr_visits_completed
+        CONCAT(vs.id_visitor, '_',vs.id_house) AS id_sale_flow,
+        vs.id_visitor AS id_buyer,
+        vs.id_house,
+        MIN(vs.ts_schedule_created) AS ts_first_booking_created,
+        MIN(CASE WHEN vs.is_completed THEN vs.ts_schedule_visit END) AS ts_first_visit_completed,
+        COUNT(DISTINCT vs.id_schedule) AS nbr_bookings,
+        COUNT(DISTINCT CASE WHEN vs.is_completed THEN vs.id_visit END) AS nbr_visits_completed
     FROM
-        datalake_booking.booking AS b
+        datalake_visit.visit_schedules AS vs
     WHERE
-        b.visit_intent = 'SALE'
-        AND b.type = 'Visita'
+        vs.business_context = 'SALE'
     GROUP BY 1, 2, 3
 ),
 notary AS (
+    WITH notary_ranked AS (
+        SELECT
+            id_notary,
+            id_sales_flow,
+            status,
+            DATE(ts_started) AS dt_started,
+            DATE(ts_ended) AS dt_ended,
+            DATE(ts_ended) AS dt_house_registry_ended,
+            DATE(ts_buyer_received_keys) AS dt_buyer_received_keys,
+            ROW_NUMBER() OVER (PARTITION BY id_notary ORDER BY ts_updated DESC) AS rn
+        FROM
+            datalake_sales_flow_clean.notary
+    )
     SELECT
         id_notary,
         id_sales_flow,
         status,
-        DATE(ts_started) AS dt_started,
-        DATE(ts_ended) AS dt_ended,
-        DATE(ts_ended) AS dt_house_registry_ended,
-        DATE(ts_buyer_received_keys) AS dt_buyer_received_keys
+        dt_started,
+        dt_ended,
+        dt_house_registry_ended,
+        dt_buyer_received_keys
     FROM
-        datalake_sales_flow_clean.notary
-    QUALIFY 
-        ROW_NUMBER() OVER (PARTITION BY id_notary ORDER BY ts_updated DESC) = 1
+        notary_ranked
+    WHERE
+        rn = 1
 ),
 -- Talk to agent events - first dates and counts
 sale_talk_to_agent AS (
@@ -86,23 +98,33 @@ current_region AS (
         datalake_ebdb_clean.house AS h
 ),
 base AS (
+    WITH base_ranked AS (
+        SELECT
+            ha.id_user,
+            ha.id_house,
+            cr.id_region,
+            FROM_UNIXTIME(ure.ts_revision/1000) AS first_update,
+            ROW_NUMBER() OVER (PARTITION BY ha.id_user, id_house ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) ASC) AS rn
+        FROM
+            datalake_ebdb_clean.house_aud AS ha
+        LEFT JOIN
+            datalake_ebdb_clean.user_revision_entity AS ure
+                ON ha.rev = ure.id
+        LEFT JOIN
+            current_region AS cr
+                ON ha.id_house = cr.id
+        WHERE
+            ha.id_user IS NOT NULL
+    )
     SELECT
-        ha.id_user,
-        ha.id_house,
-        cr.id_region,
-        FROM_UNIXTIME(ure.ts_revision/1000) AS first_update
+        id_user,
+        id_house,
+        id_region,
+        first_update
     FROM
-        datalake_ebdb_clean.house_aud AS ha
-    LEFT JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure
-            ON ha.rev = ure.id
-    LEFT JOIN
-        current_region AS cr
-            ON ha.id_house = cr.id
+        base_ranked
     WHERE
-        ha.id_user IS NOT NULL
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ha.id_user, id_house ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) ASC) = 1
+        rn = 1
 ),
 h_with_lag AS (
     SELECT
@@ -124,7 +146,7 @@ ajusted_house AS (
             WHEN lag_id_user IS NULL -- First seller
                 -- Arbitrarily low timestamp before operations began, for every house to have an associated seller at any point
                 -- (fixes problems caused by Casa Mineira historical migration)
-                THEN '2010-01-01'::TIMESTAMP 
+                THEN CAST('2010-01-01' AS TIMESTAMP)
             ELSE CAST(ts_first_day_as_seller AS TIMESTAMP)
         END AS ts_first_day_as_seller,
         CAST(ts_last_day_as_seller AS TIMESTAMP) AS ts_last_day_as_seller
@@ -143,22 +165,34 @@ sale_listing_status AS (
         status_history = "PUBLISHED"
 ),
 house_info AS (
+    WITH house_info_ranked AS (
+        SELECT
+            h.id_house AS id_house,
+            h.id_user AS id_seller,
+            h.id_region,
+            ts_first_day_as_seller,
+            ts_last_day_as_seller,
+            sls.ts_first_publication AS ts_first_listing,
+            ROW_NUMBER() OVER (PARTITION BY h.id_house, h.id_user ORDER BY sls.ts_status_started ASC) AS rn
+        FROM
+            ajusted_house AS h
+        LEFT JOIN
+            sale_listing_status AS sls
+                ON sls.id_house = h.id_house
+                AND sls.id_region = h.id_region
+                AND sls.ts_status_started BETWEEN ts_first_day_as_seller AND ts_last_day_as_seller
+    )
     SELECT
-        h.id_house AS id_house,
-        h.id_user AS id_seller,
-        h.id_region,
+        id_house,
+        id_seller,
+        id_region,
         ts_first_day_as_seller,
         ts_last_day_as_seller,
-        sls.ts_first_publication AS ts_first_listing
+        ts_first_listing
     FROM
-        ajusted_house AS h
-    LEFT JOIN
-        sale_listing_status AS sls
-            ON sls.id_house = h.id_house
-            AND sls.id_region = h.id_region
-            AND sls.ts_status_started BETWEEN ts_first_day_as_seller AND ts_last_day_as_seller
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY h.id_house, h.id_user ORDER BY sls.ts_status_started ASC) = 1
+        house_info_ranked
+    WHERE
+        rn = 1
 ),
 sale_flows AS (
 SELECT

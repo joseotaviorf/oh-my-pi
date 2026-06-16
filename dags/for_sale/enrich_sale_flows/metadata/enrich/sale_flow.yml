@@ -12,20 +12,20 @@ columns:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.id_house
       - datalake_talk_to_agent.talk_to_agent_events.id_user
-      - datalake_booking.booking.id_house
-      - datalake_booking.booking.id_visitor
+      - datalake_visit.visit_schedules.id_house
+      - datalake_visit.visit_schedules.id_visitor
       - datalake_sale_offer.sale_offer.id_sale_flow
     description: ID of the sale flow. It is created by combining the property ID and the buyer ID.
   id_buyer:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.id_user
-      - datalake_booking.booking.id_visitor
+      - datalake_visit.visit_schedules.id_visitor
       - datalake_sale_offer.sale_offer.id_buyer
     description: ID of the buyer. Can be joined with the table dw_public.dim_user.
   id_house:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.id_house
-      - datalake_booking.booking.id_house
+      - datalake_visit.visit_schedules.id_house
       - datalake_sale_offer.sale_offer.id_house
     description: "ID of the listing. It can be joined with: dw_house.dim_house, dw_sale.dim_listing and etc."
   id_seller:
@@ -39,15 +39,14 @@ columns:
   first_event:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: It shows the first event made by the buyer in the sale flow. 
+    description: It shows the first event made by the buyer in the sale flow.
   higher_intent_before_offer:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Shows the event with the highest intent to buy before the offer.
     categories:
@@ -59,12 +58,11 @@ columns:
   higher_intent_after_offer:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Shows the event with the highest intent to buy after the offer. 
-    categories: 
+    description: Shows the event with the highest intent to buy after the offer.
+    categories:
       only_Offer: Stopped at the offer.
       VB_after_OS: Booked a visit in the listing after the offer.
       VC_after_OS: Performed a visit in the listing after the offer.
@@ -78,8 +76,8 @@ columns:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.id_user
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.id_visitor
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.id_visitor
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.id_buyer
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Whether the sale flow is the first for that buyer.
@@ -87,20 +85,19 @@ columns:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.id_house
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.id_house
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.id_house
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.id_house
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Whether the sale flow is the first for that house.
   flow_type:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Type of sale flow. In other words, what was the buyer's journey in that listing.
-    categories: 
+    categories:
       VB: The buyer only booked visits.
       VB_VC: The buyer performed visits.
       VB_VC_OS: The buyer performed visits and made an offer.
@@ -118,12 +115,12 @@ columns:
     description: Maximum percentage discount on an offer in relation to the published listing price made by the buyer.
   bookings:
     lineage:
-      - datalake_booking.booking.id
+      - datalake_visit.visit_schedules.id_schedule
     description: Quantity of visits booked in the sale flow.
   visits_completed:
     lineage:
-      - datalake_booking.booking.id
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.id_visit
+      - datalake_visit.visit_schedules.is_completed
     description: Quantity of visits completed in the sale flow.
   offers_submitted:
     lineage:
@@ -136,19 +133,19 @@ columns:
   days_first_publication_to_first_event:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_listings.sale_listing_status.ts_first_publication
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first publication and the first event for that sales flow.
   days_first_publication_to_first_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_listings.sale_listing_status.ts_first_publication
     description: Number of days between the first publication and the first booking created for that sales flow.
   days_first_publication_to_first_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.is_completed
       - datalake_sale_listings.sale_listing_status.ts_first_publication
     description: Number of days between the first publication and the first visit completed for that sales flow.
   days_first_publication_to_first_offer_submitted:
@@ -174,86 +171,86 @@ columns:
   days_first_event_to_first_visit_completed:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.ts_schedule_created
+      - datalake_visit.visit_schedules.is_completed
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first event and the first visit completed for that sales flow.
   days_first_event_to_first_offer_submitted:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first event and the first offer submitted for that sales flow.
   days_first_event_to_first_offer_accepted:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_accepted
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first event and the first offer accepted for that sales flow.
   days_first_event_to_sale_agreement_signed:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first event and the signing of the sale agreement for that sales flow.
   days_first_event_to_house_registry_ended:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sales_flow_clean.notary.ts_ended
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first event and the end date of the house registry for that sales flow.
   days_first_booking_created_to_first_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.ts_schedule_created
+      - datalake_visit.visit_schedules.is_completed
     description: Number of days between the first booking created and the first visit completed for that sales flow.
   days_first_booking_created_to_first_offer_submitted:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first booking created and the first offer submitted for that sales flow.
   days_first_booking_created_to_first_offer_accepted:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Number of days between the first booking created and the first offer accepted for that sales flow.
   days_first_booking_created_to_sale_agreement_signed:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Number of days between the first booking created and the signing of the sale agreement for that sales flow.
   days_first_booking_created_to_house_registry_ended:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sales_flow_clean.notary.ts_ended
     description: Number of days between the first booking created and the end date of the house registry for that sales flow.
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.is_completed
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first visit completed and the first offer submitted for that sales flow.
   days_first_visit_completed_to_first_offer_accepted:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.is_completed
       - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Number of days between the first visit completed and the first offer accepted for that sales flow.
   days_first_visit_completed_to_sale_agreement_signed:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.is_completed
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Number of days between the first visit completed and the signing of the sale agreement for that sales flow.
   days_first_visit_completed_to_house_registry_ended:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.is_completed
       - datalake_sales_flow_clean.notary.ts_ended
     description: Number of days between the first visit completed and the end date of the house registry for that sales flow.
   days_first_offer_submitted_to_first_offer_accepted:
@@ -283,7 +280,7 @@ columns:
   ts_first_event:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
       - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp of the first event in the context of the sale. It could be a visit, a direct offer or talk to the agent.
   ts_first_tta_message_sent:
@@ -292,12 +289,12 @@ columns:
     description: Timestamp of the first talk to agent event for that sales flow.
   ts_first_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
     description: Timestamp of the first booking created for that sales flow.
   ts_first_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.visit_fup
+      - datalake_visit.visit_schedules.ts_schedule_visit
+      - datalake_visit.visit_schedules.is_completed
     description: Timestamp of the first visit completed for that sales flow.
   ts_first_offer_submitted:
     lineage:

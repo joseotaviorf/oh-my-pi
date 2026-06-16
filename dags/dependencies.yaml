@@ -3617,10 +3617,10 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.sales_flow:load-clean-address-data:first-run-of-day
   - bietlejuice.sales_flow:load-clean-house-aud:first-run-of-day
   - bietlejuice.sales_flow:load-clean-notary:first-run-of-day
