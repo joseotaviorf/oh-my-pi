@@ -113,18 +113,34 @@ class DeltaLoader:
         if exists and not is_delta:
             logger.info(f"Path {path} is not a Delta Table. Running conversion.")
             self._convert_to_delta_table(table_name)
+            exists = self.spark.catalog.tableExists(table_name)
+            if exists:
+                try:
+                    DeltaTable.forName(self.spark, table_name)
+                    is_delta = True
+                except AnalysisException:
+                    is_delta = False
         if not exists or not is_delta:
-            logger.info(
-                f"Table {table_name} does not exist. Creating a new empty table {table_name} on location."
-            )
-            self._create_empty_table(
-                table_name,
-                path,
-                source_df,
-                partition_by,
-                replace_if_exists=False,
-                column_mapping_mode=column_mapping_mode,
-            )
+            if path and self._delta_exists_at_path(path):
+                logger.info(
+                    f"Delta data exists at {path} but {table_name} is missing from or "
+                    "invalid in the metastore. Registering external table from location."
+                )
+                self._register_delta_table_at_path(table_name, path)
+                exists = True
+                is_delta = True
+            else:
+                logger.info(
+                    f"Table {table_name} does not exist. Creating a new empty table {table_name} on location."
+                )
+                self._create_empty_table(
+                    table_name,
+                    path,
+                    source_df,
+                    partition_by,
+                    replace_if_exists=False,
+                    column_mapping_mode=column_mapping_mode,
+                )
 
         if not merge_on:
             logger.info(f"Writing to table {table_name} on path {path}.")
@@ -173,6 +189,19 @@ class DeltaLoader:
             builder = builder.partitionedBy(*partition_by)
         builder = builder.location(path)
         return builder.execute()
+
+    def _delta_exists_at_path(self, path: str) -> bool:
+        """True when ``path`` already contains a Delta transaction log."""
+        if not path:
+            return False
+        return DeltaTable.isDeltaTable(self.spark, path)
+
+    def _register_delta_table_at_path(self, table_name: str, path: str) -> None:
+        """Register existing Delta files in the metastore without rewriting schema."""
+        quoted_table = _quote_sql_table_name(table_name)
+        self.spark.sql(
+            f"CREATE TABLE IF NOT EXISTS {quoted_table} USING DELTA LOCATION '{path}'"
+        )
 
     @staticmethod
     def convert_schema_to_nullable(schema: StructField) -> StructField:

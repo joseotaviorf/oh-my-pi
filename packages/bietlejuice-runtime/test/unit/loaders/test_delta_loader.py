@@ -40,7 +40,7 @@ class TestDeltaLoader:
     @pytest.fixture
     def mock_delta_table(self, delta_table_builder_mock, mock_target_df):
         with mock.patch("bietlejuice.loaders.delta_loader.DeltaTable") as delta_table:
-            delta_table.isDeltaTable.return_value = True
+            delta_table.isDeltaTable.return_value = False
             delta_table.createIfNotExists.return_value = delta_table_builder_mock
             delta_table.createOrReplace.return_value = delta_table_builder_mock
             delta_table.forName.return_value = mock_target_df
@@ -100,6 +100,34 @@ class TestDeltaLoader:
         delta_table_builder_mock.location.assert_called_once_with(path)
         delta_table_builder_mock.partitionedBy.assert_called_once_with(*partition_by)
         delta_table_builder_mock.execute.assert_called_once()
+
+    def test_registers_existing_delta_at_path_when_metastore_missing(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        delta_table_builder_mock,
+        mock_source_df,
+    ):
+        table_name = "test_database.test_table"
+        path = "s3://bucket/transactional/schema/table/"
+        mock_spark_context.spark.catalog.tableExists.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            "DELTA_TABLE_NOT_FOUND"
+        )
+        mock_delta_table.isDeltaTable.return_value = True
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        delta_loader.load_table(table_name, path, mock_source_df)
+
+        mock_delta_table.isDeltaTable.assert_called_once_with(
+            mock_spark_context.spark, path
+        )
+        mock_spark_context.spark.sql.assert_any_call(
+            "CREATE TABLE IF NOT EXISTS `test_database`.`test_table` USING DELTA "
+            f"LOCATION '{path}'"
+        )
+        mock_delta_table.createIfNotExists.assert_not_called()
+        delta_table_builder_mock.execute.assert_not_called()
 
     def test_create_empty_table_converts_not_nullable_to_nullable(
         self,
