@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_ebdb_user.user.id
       - datalake_gsheets_clean.users_cx_plaquinhas.id_user
-      - datalake_greenseer.sessions.id_user
+      - datalake_greenseer_clean.session.memory
   id_contact:
     description: Unique identifier of the contact.
   event_name:

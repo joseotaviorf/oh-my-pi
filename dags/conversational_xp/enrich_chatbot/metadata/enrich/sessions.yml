@@ -10,9 +10,8 @@ columns:
     lineage:
     - datalake_copilot_service_clean.session.id
   id_sauron_session:
-    description: 'Sauron session ID'
+    description: 'Numeric identifier of the legacy Sauron session linked to this chatbot session. Sauron was the CS routing service handling WhatsApp and in-app chats before Copilot Service; NULL for sessions with no corresponding Sauron record (Copilot-only or SSS-backed sessions).'
     lineage:
-    - datalake_greenseer_clean.session.id_session
     - datalake_sauron_clean.session.id
   id_langfuse_session:
     description: 'Langfuse session ID (external_id in Copilot raw layer). NULL when session has no Langfuse trace'
@@ -31,7 +30,7 @@ columns:
     lineage:
     - datalake_customer_support.tickets.id_ticket
   id_user:
-    description: 'User ID for the session'
+    description: 'QuintoAndar internal user identifier (EBDB id_user) of the person who initiated this chatbot session. Sourced from Copilot Service session data or derived from the linked Sauron session; NULL when the session cannot be attributed to an authenticated user.'
     lineage:
     - datalake_copilot_service_clean.session.id_user
     - datalake_sauron_clean.session.user_data

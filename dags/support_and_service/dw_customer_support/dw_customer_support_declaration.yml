@@ -20,10 +20,6 @@ workflow:
     fact_analysts_performance:
       - fact_customer_contacts
   tables_customization:
-    fact_user_blocks:
-      partitions: [year, month, day]
-      extraction_type: incremental
-      z_order_by: [sk_user, channel]
     fact_single_door_events:
       partitions: [year, month, day]
       extraction_type: incremental

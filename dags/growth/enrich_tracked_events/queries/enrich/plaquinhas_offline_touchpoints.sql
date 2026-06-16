@@ -13,47 +13,28 @@ WITH legacy_chat_flow AS (
     LOWER(qmt.queue_name) LIKE '%plaquinhas%'
     AND  user.id > 0
 ),
--- New chat flows
-pre_chatbot_sessions AS (
+plaquinhas_sessions_dedup AS (
   SELECT
-    id_session,
-    ts_started
+    COALESCE(
+      GET_JSON_OBJECT(memory, '$.legacy.user_data.user.id'),
+      GET_JSON_OBJECT(memory, '$.basic.user.id')
+    ) AS id_user,
+    ts_started AS ts_event,
+    ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) AS rn
   FROM
     datalake_greenseer_clean.session
   WHERE
-    LOWER(id_pipeline) = 'whatsapp_direct_transfer'
-    AND LOWER(GET_JSON_OBJECT(memory, '$.basic.session.department_key')) = 'rent_board_test'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
+    ts_started >= DATE('2023-03-20')
+    AND LOWER(id_pipeline) IN ('whatsapp_real_estate_signs', 'whatsapp_real_state_signs')
 ),
-
-pos_chatbot_sessions AS (
-  SELECT
-    id_user,
-    id_session,
-    ts_started
-  FROM
-    datalake_greenseer.sessions
-  WHERE
-    ts_started >= DATE('2023-03-20') -- data de inicio do bot de plaquinhas
-    AND LOWER(id_pipeline) IN ('whatsapp_real_state_signs', 'whatsapp_real_estate_signs')
-),
-
 plaquinhas_sessions AS (
   SELECT
-    gs.id_user,
-    gs.ts_started AS ts_event
-  FROM
-    datalake_greenseer.sessions AS gs
-  INNER JOIN
-    pre_chatbot_sessions AS pcs
-      ON pcs.id_session = gs.id_session
-  UNION ALL
-  SELECT
     id_user,
-    ts_started AS ts_event
+    ts_event
   FROM
-    pos_chatbot_sessions
+    plaquinhas_sessions_dedup
+  WHERE
+    rn = 1
 ),
 
 total_chat AS (
@@ -100,7 +81,10 @@ ivr_events AS (
       to_phone_number LIKE "%40202507%"
       AND ts_ivr_started  - INTERVAL 3 HOUR >= "2022-10-17"
     )
-  GROUP BY ALL
+  GROUP BY
+    id_call,
+    from_phone_number,
+    to_phone_number
 ),
 
 flex_events AS (

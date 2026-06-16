@@ -248,7 +248,6 @@ expected_times_to_finish:
   bietlejuice.enrich_golden_set: 05:02
   bietlejuice.enrich_google_search_console: "14:35"
   bietlejuice.enrich_google_search_console_classified: "14:40"
-  bietlejuice.enrich_greenseer: 08:04
   bietlejuice.enrich_growth_automatic_daily_costs: "10:16"
   bietlejuice.enrich_growth_commission_costs: 07:51
   bietlejuice.enrich_growth_costs_sharing_rules: 09:51

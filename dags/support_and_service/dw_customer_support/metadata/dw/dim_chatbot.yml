@@ -49,7 +49,11 @@ columns:
   theme:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Theme of the session.
+    description: Predicted conversation theme assigned by the Greenseer classification model for the chatbot session, extracted from the predictions tags (v4) stored in the session memory JSON.
+  theme_details:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Detailed theme classification from the Greenseer predictions tags for the chatbot session.
   channel:
     lineage:
       - datalake_greenseer.sessions.memory
