@@ -58,6 +58,7 @@ steps:
         path: &datahub_path
           include:
             - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/metric_entities/**"
             - "dags/governance/datahub_business_context/load_collections_context.py"
             - "dags/governance/datahub_business_context/datahub_domain_catalog.py"
             - "dags/governance/datahub_business_context/push_all_entities.py"

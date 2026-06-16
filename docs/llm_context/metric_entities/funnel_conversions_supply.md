@@ -1,6 +1,6 @@
 # Supply Funnel Conversions
 
-## Overview
+## Overview 
 
 **Supply Funnel Conversions** measures the volume and conversion rates between sequential stages of the property acquisition (supply) funnel. The funnel tracks a property's journey from initial contact to published listing through these ordered stages:
 

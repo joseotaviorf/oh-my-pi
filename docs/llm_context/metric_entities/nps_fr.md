@@ -1,6 +1,6 @@
 # NPS FR
 
-## Overview
+## Overview 
 
 **NPS FR** is the official Net Promoter Score for the For Rent product. It is a **weighted average** of the NPS computed independently for each journey (onboarding, ongoing, offboarding), using quarterly weights defined by the CX team.
 
