@@ -1,8 +1,5 @@
 cluster:
-  type: emr_7_12_min_memory_3_workers_cluster
+  type: consolidation_m_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    master_node_type_id: m7a.xlarge
-    node_type_id: r7a.2xlarge
-    spark_conf:
-      spark.driver.memory: 6g
-      spark.driver.memoryOverhead: 2g
+    num_workers: 3

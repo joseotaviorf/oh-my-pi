@@ -1,8 +1,5 @@
 cluster:
-  type: emr_7_12_min_master_med_memory_3_workers_cluster
+  type: consolidation_m_general_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    task_nodes:
-      instance_count: 2
-    spark_conf:
-      spark.driver.memory: 10g
-      spark.driver.maxResultSize: 4g
+    num_workers: 3
