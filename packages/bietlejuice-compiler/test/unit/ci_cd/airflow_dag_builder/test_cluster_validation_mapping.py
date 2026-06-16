@@ -400,7 +400,7 @@ class TestComputeValidationOverrides:
         resolved = ConfigurationService().get_config(
             "emr_7_12_consolidation_s_memory_cluster"
         )
-        assert resolved.get("master_node_type_id") == "r7g.xlarge"
+        assert resolved.get("master_node_type_id") == "m7g.xlarge"
         assert "driver_node_type_id" not in resolved
 
 

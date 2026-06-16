@@ -1695,12 +1695,12 @@ emr_cluster_base: &emr_cluster_anchor
         spark.shuffle.service.enabled: "true"
         spark.dynamicAllocation.minExecutors: "1"
         spark.dynamicAllocation.maxExecutors: "6"
-        spark.executor.memory: 8g
+        spark.executor.memory: 3g
         spark.executor.cores: "2"
-        spark.executor.memoryOverhead: 2g
-        spark.driver.memory: 8g
-        spark.driver.memoryOverhead: 2g
-        spark.yarn.am.memory: 8g
+        spark.executor.memoryOverhead: 1g
+        spark.driver.memory: 2g
+        spark.driver.memoryOverhead: 1g
+        spark.yarn.am.memory: 2g
         spark.yarn.am.cores: "1"
         spark.sql.adaptive.enabled: "true"
         spark.sql.adaptive.coalescePartitions.enabled: "true"
@@ -1771,122 +1771,11 @@ emr_cluster_base: &emr_cluster_anchor
 
 emr_consolidation_base: &emr_consolidation_anchor
     <<: *emr_cluster_anchor
+    master_node_type_id: m7g.xlarge
     aws_attributes:
         <<: *emr_aws_anchor
         availability: ON_DEMAND
         task_availability: SPOT
-    # Aligned with Databricks consolidation tiers (gen7 m7g/r7g/c7g ↔ gen6 m6g/r6g/c6g).
-    # Multi-worker prod: 1 CORE (ON_DEMAND) + 1 TASK (SPOT). Driver/YARN RM on master.
-    # Single-node: master-only (core_nodes.instance_count=0); driver + executors on master.
-
-emr_spark_single_node: &emr_spark_single_node
-    spark.dynamicAllocation.maxExecutors: "4"
-    spark.executor.instances: "2"
-
-emr_spark_xs_general: &emr_spark_xs_general
-    spark.driver.memory: 4g
-    spark.driver.memoryOverhead: 1g
-    spark.executor.memory: 4g
-    spark.executor.memoryOverhead: 1g
-    spark.executor.cores: "2"
-
-emr_spark_s_general: &emr_spark_s_general
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 8g
-    spark.executor.memoryOverhead: 2g
-    spark.executor.cores: "4"
-
-emr_spark_m_general: &emr_spark_m_general
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 12g
-    spark.executor.memoryOverhead: 2g
-    spark.executor.cores: "4"
-
-emr_spark_l_general: &emr_spark_l_general
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 24g
-    spark.executor.memoryOverhead: 4g
-    spark.executor.cores: "4"
-
-emr_spark_xl_general: &emr_spark_xl_general
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 48g
-    spark.executor.memoryOverhead: 4g
-    spark.executor.cores: "4"
-
-emr_spark_xs_compute: &emr_spark_xs_compute
-    spark.driver.memory: 2g
-    spark.driver.memoryOverhead: 512m
-    spark.executor.memory: 2g
-    spark.executor.memoryOverhead: 512m
-    spark.executor.cores: "2"
-
-emr_spark_s_compute: &emr_spark_s_compute
-    spark.driver.memory: 4g
-    spark.driver.memoryOverhead: 1g
-    spark.executor.memory: 4g
-    spark.executor.memoryOverhead: 1g
-    spark.executor.cores: "4"
-
-emr_spark_m_compute: &emr_spark_m_compute
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 8g
-    spark.executor.memoryOverhead: 2g
-    spark.executor.cores: "4"
-
-emr_spark_l_compute: &emr_spark_l_compute
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 16g
-    spark.executor.memoryOverhead: 2g
-    spark.executor.cores: "4"
-
-emr_spark_xl_compute: &emr_spark_xl_compute
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 32g
-    spark.executor.memoryOverhead: 4g
-    spark.executor.cores: "4"
-
-emr_spark_xs_memory: &emr_spark_xs_memory
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 8g
-    spark.executor.memoryOverhead: 2g
-    spark.executor.cores: "2"
-
-emr_spark_s_memory: &emr_spark_s_memory
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 12g
-    spark.executor.memoryOverhead: 2g
-    spark.executor.cores: "4"
-
-emr_spark_m_memory: &emr_spark_m_memory
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 24g
-    spark.executor.memoryOverhead: 4g
-    spark.executor.cores: "4"
-
-emr_spark_l_memory: &emr_spark_l_memory
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 48g
-    spark.executor.memoryOverhead: 4g
-    spark.executor.cores: "4"
-
-emr_spark_xl_memory: &emr_spark_xl_memory
-    spark.driver.memory: 8g
-    spark.driver.memoryOverhead: 2g
-    spark.executor.memory: 96g
-    spark.executor.memoryOverhead: 8g
-    spark.executor.cores: "4"
 
 emr_7_12_med_general_cluster:
     <<: *emr_cluster_anchor
@@ -2086,297 +1975,212 @@ emr_7_12_min_master_2xlarge_6_workers_cluster:
         availability: ON_DEMAND
 
 ##### EMR Consolidation Cluster Presets (presets) #####
-# Aligned with Databricks consolidation tiers. Prod: 2 workers (1 CORE + 1 TASK).
+# See emr_consolidation_base anchor above. Prod: 2 workers (1 CORE + 1 TASK).
 
 ##### EMR Compute (c7g — consolidation family) #####
 
 emr_7_12_consolidation_xs_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.large
     core_nodes:
-        node_type_id: c7g.large
+        node_type_id: c7g.2xlarge
         instance_count: 1
     task_nodes:
-        node_type_id: c7g.large
+        node_type_id: c7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_xs_compute
 
 emr_7_12_consolidation_s_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.xlarge
     core_nodes:
-        node_type_id: c7g.xlarge
+        node_type_id: c7g.2xlarge
         instance_count: 1
     task_nodes:
-        node_type_id: c7g.xlarge
+        node_type_id: c7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_s_compute
 
 emr_7_12_consolidation_m_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.2xlarge
     core_nodes:
         node_type_id: c7g.2xlarge
         instance_count: 1
     task_nodes:
         node_type_id: c7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_m_compute
 
 emr_7_12_consolidation_l_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.4xlarge
     core_nodes:
         node_type_id: c7g.4xlarge
         instance_count: 1
     task_nodes:
         node_type_id: c7g.4xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_l_compute
 
 emr_7_12_consolidation_xl_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.8xlarge
     core_nodes:
         node_type_id: c7g.8xlarge
         instance_count: 1
     task_nodes:
         node_type_id: c7g.8xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_xl_compute
 
 ##### EMR General (m7g — consolidation family) #####
 
 emr_7_12_consolidation_xs_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.large
     core_nodes:
-        node_type_id: m7g.large
+        node_type_id: m7g.2xlarge
         instance_count: 1
     task_nodes:
-        node_type_id: m7g.large
+        node_type_id: m7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_xs_general
 
 emr_7_12_consolidation_s_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.xlarge
     core_nodes:
-        node_type_id: m7g.xlarge
+        node_type_id: m7g.2xlarge
         instance_count: 1
     task_nodes:
-        node_type_id: m7g.xlarge
+        node_type_id: m7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_s_general
 
 emr_7_12_consolidation_m_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.2xlarge
     core_nodes:
         node_type_id: m7g.2xlarge
         instance_count: 1
     task_nodes:
         node_type_id: m7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_m_general
 
 emr_7_12_consolidation_l_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.4xlarge
     core_nodes:
         node_type_id: m7g.4xlarge
         instance_count: 1
     task_nodes:
         node_type_id: m7g.4xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_l_general
 
 emr_7_12_consolidation_xl_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.8xlarge
     core_nodes:
         node_type_id: m7g.8xlarge
         instance_count: 1
     task_nodes:
         node_type_id: m7g.8xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_xl_general
 
-##### EMR General single-node (master-only) #####
+##### EMR General single-node #####
 
 emr_7_12_consolidation_xs_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.large
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_xs_general
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: m7g.2xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_s_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_s_general
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: m7g.2xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_m_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.2xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_m_general
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: m7g.2xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_l_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.4xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_l_general
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: m7g.4xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_xl_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.8xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_xl_general
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: m7g.8xlarge
+        instance_count: 1
 
 ##### EMR Memory (r7g — consolidation family) #####
 
 emr_7_12_consolidation_xs_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.large
     core_nodes:
-        node_type_id: r7g.large
+        node_type_id: r7g.2xlarge
         instance_count: 1
     task_nodes:
-        node_type_id: r7g.large
+        node_type_id: r7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_xs_memory
 
 emr_7_12_consolidation_s_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.xlarge
     core_nodes:
-        node_type_id: r7g.xlarge
+        node_type_id: r7g.2xlarge
         instance_count: 1
     task_nodes:
-        node_type_id: r7g.xlarge
+        node_type_id: r7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_s_memory
 
 emr_7_12_consolidation_m_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.2xlarge
     core_nodes:
         node_type_id: r7g.2xlarge
         instance_count: 1
     task_nodes:
         node_type_id: r7g.2xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_m_memory
 
 emr_7_12_consolidation_l_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.4xlarge
     core_nodes:
         node_type_id: r7g.4xlarge
         instance_count: 1
     task_nodes:
         node_type_id: r7g.4xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_l_memory
 
 emr_7_12_consolidation_xl_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.8xlarge
     core_nodes:
         node_type_id: r7g.8xlarge
         instance_count: 1
     task_nodes:
         node_type_id: r7g.8xlarge
         instance_count: 1
-    spark_conf:
-        <<: *emr_spark_xl_memory
 
-##### EMR Memory single-node (master-only) #####
+##### EMR Memory single-node #####
 
 emr_7_12_consolidation_xs_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.large
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_xs_memory
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: r7g.2xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_s_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_s_memory
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: r7g.2xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_m_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.2xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_m_memory
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: r7g.2xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_l_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.4xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_l_memory
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: r7g.4xlarge
+        instance_count: 1
 
 emr_7_12_consolidation_xl_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.8xlarge
     core_nodes:
-        instance_count: 0
-    spark_conf:
-        <<: *emr_spark_xl_memory
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        node_type_id: r7g.8xlarge
+        instance_count: 1
 ##### Consolidation Cluster Presets #####
 # Naming: consolidation_{size}_{family}_cluster
 # Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32

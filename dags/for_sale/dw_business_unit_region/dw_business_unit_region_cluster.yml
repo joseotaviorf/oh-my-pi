@@ -1,2 +1,3 @@
 cluster:
-  type: emr_7_12_min_general_2_workers_cluster
+  type: consolidation_s_general_cluster
+  databricks_conn_id: databricks_new_env

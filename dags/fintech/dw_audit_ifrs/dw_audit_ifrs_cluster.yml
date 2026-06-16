@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_med_memory_cluster
+  type: consolidation_m_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    spark_conf:
-      spark.driver.memory: 8g
+    num_workers: 3
