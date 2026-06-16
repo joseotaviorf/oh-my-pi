@@ -2,7 +2,7 @@ database_name: datalake_langfuse_clean
 table_name: scores
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Scores from Langfuse. Each row represents a single evaluation score assigned to a trace or observation, used for tracking LLM quality and performance."
+description: "Scores from Langfuse. Each row represents a single evaluation score assigned to a trace or observation, used for tracking LLM quality and performance. Z-ordered by ts_created for efficient time-range queries."
 columns:
   id_score:
     description: unique identifier for the score
@@ -33,7 +33,7 @@ columns:
     lineage:
       - datalake_langfuse_raw.scores.comment
   data_type:
-    description: data type of the score value (e.g., numeric, boolean, categorical)
+    description: data type of the score value, determining whether value or string_value is populated
     lineage:
       - datalake_langfuse_raw.scores.data_type
   environment:
@@ -41,11 +41,11 @@ columns:
     lineage:
       - datalake_langfuse_raw.scores.environment
   name:
-    description: name of the score metric (e.g., relevance, correctness)
+    description: name of the evaluation metric this score measures
     lineage:
       - datalake_langfuse_raw.scores.name
   source:
-    description: origin of the score (e.g., API, annotation, evaluation)
+    description: origin system or mechanism that produced this score
     lineage:
       - datalake_langfuse_raw.scores.source
   string_value:
@@ -61,18 +61,18 @@ columns:
     lineage:
       - datalake_langfuse_raw.scores.timestamp
   year:
-    description: year partition
+    description: calendar year extracted from the score creation timestamp
     lineage:
       - datalake_langfuse_raw.scores.year
   month:
-    description: month partition
+    description: calendar month extracted from the score creation timestamp
     lineage:
       - datalake_langfuse_raw.scores.month
   day:
-    description: day partition
+    description: calendar day extracted from the score creation timestamp
     lineage:
       - datalake_langfuse_raw.scores.day
   hour:
-    description: hour partition
+    description: calendar hour extracted from the score creation timestamp
     lineage:
       - datalake_langfuse_raw.scores.hour

@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_copilot_service_raw.voice_call_attempt.voice_session_id
   state:
-    description: "The voice call attempt state"
+    description: "Lifecycle state of this individual call attempt within the voice session."
     lineage:
       - datalake_copilot_service_raw.voice_call_attempt.state
   ts_created:

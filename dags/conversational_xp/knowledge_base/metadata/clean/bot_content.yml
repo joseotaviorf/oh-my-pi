@@ -10,11 +10,11 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.bot_content.id
   id_content:
-    description: "The content identifier"
+    description: "FK to the knowledge-base content item this bot content belongs to."
     lineage:
     - datalake_knowledge_base_raw.bot_content.content_id
   title:
-    description: "The title of the bot content"
+    description: "Human-readable title of the bot content item displayed to users."
     lineage:
     - datalake_knowledge_base_raw.bot_content.title
   country:
@@ -42,7 +42,7 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.bot_content.questions
   status:
-    description: "The status of the bot content"
+    description: "Publication status controlling visibility of this bot content."
     lineage:
     - datalake_knowledge_base_raw.bot_content.status
   department_front:

@@ -14,7 +14,7 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.meta_information_bot_content.bot_content_id
   bot_content_order:
-    description: "The order of the bot content for the meta information"
+    description: "Display position of this bot content within the meta information record; lower values appear first."
     lineage:
     - datalake_knowledge_base_raw.meta_information_bot_content.bot_content_order
   

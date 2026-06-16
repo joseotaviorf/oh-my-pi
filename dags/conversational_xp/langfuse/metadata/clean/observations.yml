@@ -2,7 +2,7 @@ database_name: datalake_langfuse_clean
 table_name: observations
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Observations from Langfuse."
+description: "Each row represents a single observation (span, generation, or event) recorded within an LLM trace by the Langfuse observability platform. Loaded hourly via custom ingestion. Used by the Conversational XP team to monitor latency, token usage, and cost per model call. Z-ordered by ts_started for efficient time-range queries."
 columns:
   id_observation:
     description: unique identifier for the observation
@@ -45,11 +45,11 @@ columns:
     lineage:
       - datalake_langfuse_raw.observations.model_parameters
   name:
-    description: name of the observation
+    description: human-readable label assigned to this observation within the trace
     lineage:
       - datalake_langfuse_raw.observations.name
   type:
-    description: type of observation (e.g., generation, span, event)
+    description: classification of the observation within the Langfuse tracing model
     lineage:
       - datalake_langfuse_raw.observations.type
   level:
@@ -77,18 +77,18 @@ columns:
     lineage:
       - datalake_langfuse_raw.observations.end_time
   year:
-    description: year partition
+    description: calendar year extracted from the observation start timestamp
     lineage:
       - datalake_langfuse_raw.observations.year
   month:
-    description: month partition
+    description: calendar month extracted from the observation start timestamp
     lineage:
       - datalake_langfuse_raw.observations.month
   day:
-    description: day partition
+    description: calendar day extracted from the observation start timestamp
     lineage:
       - datalake_langfuse_raw.observations.day
   hour:
-    description: hour partition
+    description: calendar hour extracted from the observation start timestamp
     lineage:
-      - datalake_langfuse_raw.observations.hour 
+      - datalake_langfuse_raw.observations.hour

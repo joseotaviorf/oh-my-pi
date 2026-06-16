@@ -3,11 +3,11 @@ database_name: datalake_search
 table_name: demand_balancer
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
-description: Predictions from Demand Balancer model.
+description: "Predictions from Demand Balancer model. Partitioned by year, month, day, and model_version — filter on these columns for partition pruning."
 
 columns:
   id_house:
-    description: ID of the house.
+    description: Unique identifier of the house listing for which the prediction was generated.
     lineage:
       - datalake_search.demand_balancer.id_house
   prediction:
@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_search.demand_balancer.prediction
   model_version:
-    description: Version of the model used to generate the prediction.
+    description: Version of the model used to generate the prediction. Also a partition key — filter on this column for partition pruning.
     lineage:
       - datalake_search.demand_balancer.model_version
   timestamp_available:

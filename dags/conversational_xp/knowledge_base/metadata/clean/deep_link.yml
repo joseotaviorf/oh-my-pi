@@ -10,15 +10,15 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.deep_link.id
   id_content:
-    description: "The content identifier"
+    description: "FK to the knowledge-base content item this deep link belongs to."
     lineage:
     - datalake_knowledge_base_raw.deep_link.content_id
   title:
-    description: "The title of the deep link"
+    description: "Human-readable title displayed to the user for this deep link."
     lineage:
     - datalake_knowledge_base_raw.deep_link.title
   label:
-    description: "The label of the deep link"
+    description: "Short button or action label shown to the user when presenting this link."
     lineage:
     - datalake_knowledge_base_raw.deep_link.label
   link:
@@ -26,11 +26,11 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.deep_link.link
   description:
-    description: "The description of the deep link"
+    description: "Longer explanatory text providing context for this deep link destination."
     lineage:
     - datalake_knowledge_base_raw.deep_link.description
   status:
-    description: "The status of the deep link"
+    description: "Publication status controlling visibility of this deep link."
     lineage:
     - datalake_knowledge_base_raw.deep_link.status
   ts_updated:

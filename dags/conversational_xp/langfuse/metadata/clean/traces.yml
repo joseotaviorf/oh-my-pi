@@ -2,7 +2,7 @@ database_name: datalake_langfuse_clean
 table_name: traces
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Traces from Langfuse. Each row represents a single LLM application trace, used for monitoring conversational experiences and tracking end-to-end request flows."
+description: "Traces from Langfuse. Each row represents a single LLM application trace, used for monitoring conversational experiences and tracking end-to-end request flows. Z-ordered by ts_created for efficient time-range queries."
 columns:
   id_trace:
     description: unique identifier for the trace
@@ -61,18 +61,18 @@ columns:
     lineage:
       - datalake_langfuse_raw.traces.timestamp
   year:
-    description: year partition
+    description: calendar year extracted from the trace creation timestamp
     lineage:
       - datalake_langfuse_raw.traces.year
   month:
-    description: month partition
+    description: calendar month extracted from the trace creation timestamp
     lineage:
       - datalake_langfuse_raw.traces.month
   day:
-    description: day partition
+    description: calendar day extracted from the trace creation timestamp
     lineage:
       - datalake_langfuse_raw.traces.day
   hour:
-    description: hour partition
+    description: calendar hour extracted from the trace creation timestamp
     lineage:
       - datalake_langfuse_raw.traces.hour

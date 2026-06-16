@@ -10,11 +10,11 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.meta_information.id
   id_content:
-    description: "The content identifier"
+    description: "FK to the knowledge-base content item this metadata record belongs to."
     lineage:
     - datalake_knowledge_base_raw.meta_information.content_id
   theme:
-    description: "The theme of the meta information"
+    description: "Thematic category grouping the content item within the knowledge base."
     lineage:
     - datalake_knowledge_base_raw.meta_information.theme
   product:
@@ -30,7 +30,7 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.meta_information.tags
   status:
-    description: "The status of the meta information"
+    description: "Publication status controlling visibility of this metadata record."
     lineage:
     - datalake_knowledge_base_raw.meta_information.status
   department_front:

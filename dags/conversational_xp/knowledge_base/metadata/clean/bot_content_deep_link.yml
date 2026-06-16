@@ -14,7 +14,7 @@ columns:
     lineage:
     - datalake_knowledge_base_raw.bot_content_deep_link.deep_link_id
   deep_link_order:
-    description: "The order of the deep link for the bot content"
+    description: "Display position of this deep link within the bot content item; lower values appear first."
     lineage:
     - datalake_knowledge_base_raw.bot_content_deep_link.deep_link_order
   
