@@ -1,0 +1,71 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: ai_legal_analysis_lego_contract_execution_change_log
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Audit log of field-level substitutions applied by the Lego Contract Autonomous Mode on Sales Flow
+  execution records. A row is recorded when the value submitted by the analyst (or left blank) in
+  Vendas differs from the value produced by the Lego Contract AI analysis — but only for assessments
+  classified as high confidence. Manual edits made directly by analysts in Vendas are NOT captured
+  here; this table exclusively reflects autonomous substitutions performed by the Lego Contract system.
+  To obtain the id_sales_flow, join id_legocontract_execution with
+  datalake_sales_flow_clean.ai_legal_analysis_lego_contract_execution.id.
+columns:
+  id:
+    description: Primary key of the change log record in the clean layer.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.id
+  id_legocontract_execution:
+    description: |
+      Foreign key to the parent ai_legal_analysis_lego_contract_execution record.
+      Join with datalake_sales_flow_clean.ai_legal_analysis_lego_contract_execution.id
+      to obtain id_sales_flow and link to the sales flow (offer) context.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.lego_contract_execution_id
+  type:
+    description: |
+      Category of the changed field, grouping assessments by section in Sales Flow.
+      Known value: HOUSE_ANALYSIS (house-level legal attributes such as liens, acquisition type, and tenure).
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.type
+  field:
+    description: |
+      Name of the field that was modified on the parent Lego contract execution.
+      For HOUSE_ANALYSIS, known fields include: house_emphyteusis_status, house_affordable_housing,
+      house_has_environmental_or_zoning_restrictions, house_government_housing_restrictions,
+      house_inalienability_clause, house_has_instituted_usufruct, house_acquisition_type
+      (values: PURCHASE_AND_SALE, PARTITION, DONATION, ADJUDICATION), house_incommunicability_clause,
+      house_judicial_lien, house_property_collateral, house_property_lien, house_has_recent_transaction,
+      house_social_housing, house_has_transaction_in_family, house_unseizability_clause,
+      house_was_fgts_used, house_has_fiduciary_lien (values: DOES_NOT, YES_PAID, YES_DEBT).
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.field
+  old_value:
+    description: Previous value of the changed field before the update was applied.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.old_value
+  new_value:
+    description: New value of the changed field after the update was applied.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.new_value
+  ts_created:
+    description: Timestamp when the change log record was created in the source database.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.created_at
+  ts_updated:
+    description: Timestamp when the change log record was last updated in the source database.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.updated_at
+  year:
+    description: Year derived from the CDC ingestion timestamp.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.year
+  month:
+    description: Month derived from the CDC ingestion timestamp.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.month
+  day:
+    description: Day derived from the CDC ingestion timestamp.
+    lineage:
+      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution_change_log.day

@@ -1,0 +1,22 @@
+dag:
+  name: sales_flow_daily
+  schedule_start_date: 2026, 6, 15
+  schedule_interval: "@daily"
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Daily CDC DAG for low-frequency Sales Flow tables. 
+      This DAG imports the tables from [Sales Flow](https://github.com/quintoandar/sales-flow), a service responsible
+      for the management of ForSale's operations after receiving an offer.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: salesflow
+  custom_schema: sales_flow
+  dbutils_secret_key: SALESFLOW_DB
+  tables_customization:
+    ai_legal_analysis_lego_contract_execution_change_log:
+      clean_table_name: ai_legal_analysis_lego_contract_execution_change_log
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
