@@ -64,9 +64,9 @@ O funil tem dois grandes blocos:
 | **Credit Model** | Modelo de financiamento | `dim_sale_agreement.credit_model` |
 | **Payment Method** | Método de pagamento da transação | `dim_sale_agreement.payment_method` |
 | **Domi / Vandinha** | Agente conversacional de AI em desenvolvimento para suporte EoP | — |
-| **Lego Contract** | Sistema de validação e geração automatizada de CCV (Legal Ops). Recebe dados do formulário do SalesFlow (imóvel, compradores, vendedores) e documentos enviados pelo EN, extrai informações dos documentos via API e compara com os dados do formulário. O resultado de cada validação (assessment) é exibido no Copilot/Drawer do SalesFlow para revisão dos analistas. | `datalake_legalops_clean.contract_analysis_request`, `datalake_legalops.lego_analysis_results` |
+| **Lego Contract** | Sistema de validação e geração automatizada de CCV (Legal Ops). Recebe dados do formulário do SalesFlow (imóvel, compradores, vendedores) e documentos enviados pelo EN, extrai informações dos documentos via API e compara com os dados do formulário. O resultado de cada validação (assessment) é exibido no Copilot/Drawer do SalesFlow para revisão dos analistas. | `datalake_legalops_clean.contract_analysis_request`, `datalake_legalops_clean.lego_analysis_results` |
 | **Contract Analysis** | Processo de análise automática dos dados do contrato pelo LegoContract. Cada contrato tem no mínimo uma análise obrigatória; analistas podem disparar análises adicionais sob demanda. Cada execução retorna um resultado JSON com assessments por seção (house, buyers, sellers). | `datalake_legalops_clean.contract_analysis_request` |
-| **Assessment** | Unidade atômica de validação dentro de uma análise de contrato. Cada assessment verifica uma regra específica (ex: `house_address_number`, `seller_is_house_holder`) e retorna um `validation_id` (ex: H05, SL01, B01), `assessment_status` e `assessment_consolidated_status`. | `datalake_legalops.lego_analysis_results` |
+| **Lego Assessment** | Unidade atômica de validação dentro de uma análise de contrato. Cada assessment verifica uma regra específica (ex: `house_address_number`, `seller_is_house_holder`) e retorna um `validation_id` (ex: H05, SL01, B01), `assessment_status` e `assessment_consolidated_status`. | `datalake_legalops_clean.lego_analysis_results` |
 | **Legaut** | Sistema interno de automações e crawlers de Due Diligence | — |
 
 ---
@@ -374,13 +374,13 @@ Fibonacci (Mar/26, 5 cidades): NBP = 20.715, RBP = 9.138, Total = 29.853.
 | `dim_ticket` | `dw_customer_support` | Atributos de ticket | `group_name`, `subject`. |
 | `closing_flow` | `datalake_sale_closing_flows` | Raw EoP (camada datalake) | Preferir `dw_sale.fact_closing_flows` para análises DW. |
 | `contract_analysis_request` | `datalake_legalops_clean` | 1 linha por execução de análise | Fonte raw das análises do LegoContract. Contém o JSON completo `contract_analysis_result` com todos os assessments aninhados. Usar `status = 'DONE'` para filtrar análises concluídas. |
-| `lego_analysis_results` | `datalake_legalops` | 1 linha por assessment por id_sales_flow por execução de análise | **Tabela enrich** — assessments já explodidos do JSON. Fonte principal para métricas de performance do LegoContract (confiabilidade, taxa de falha, evolução por validation_id). Join com tabelas EoF via `id_sales_flow`. |
+| `lego_analysis_results` | `datalake_legalops_clean` | 1 linha por assessment por id_sales_flow por execução de análise | **Custom clean table** produzida pela DAG `dags/for_sale/legalops_custom`. Lê diretamente de `datalake_legalops_raw.contract_analysis_request` e explode o JSON `full_analysis` em uma linha por assessment. Fonte principal para métricas de performance do LegoContract (confiabilidade, taxa de falha, evolução por validation_id). Join com tabelas EoF via `id_sales_flow`. |
 | `ai_legal_analysis_lego_contract_execution` | `datalake_sales_flow_clean` | 1 linha por execução Lego Contract | Tabela-ponte entre o change log e o sales flow. Contém `id` (PK), `id_legocontract_execution`, e `id_sales_flow` (FK para o sales flow / oferta). Usar para obter `id_sales_flow` a partir de registros do change log. |
 | `ai_legal_analysis_lego_contract_execution_change_log` | `datalake_sales_flow_clean` | 1 linha por substituição autônoma de campo | Registra substituições realizadas pelo **Lego Contract Autonomous Mode**: uma linha é gerada quando o valor submetido pelo analista em Vendas (ou deixado em branco) difere do valor gerado pela IA — **apenas para assessments com alta confiabilidade**. ⚠️ Edições manuais feitas diretamente pelos analistas no Vendas **não** são capturadas aqui. Cada linha registra `type` (seção, ex: `HOUSE_ANALYSIS`), `field`, `old_value` (valor do analista/branco) e `new_value` (valor substituído pela IA). Join: `id_legocontract_execution → datalake_sales_flow_clean.ai_legal_analysis_lego_contract_execution.id` para obter `id_sales_flow`. Campos `HOUSE_ANALYSIS` conhecidos: `house_acquisition_type`, `house_has_fiduciary_lien`, `house_was_fgts_used`, `house_property_lien`, `house_social_housing`, entre outros. |
 
 > ⚠️ `dim_sale_agreement` só tem linhas para ofertas que **chegaram à etapa de acordo**. Sempre LEFT JOIN a partir de `fact_offers`.
 
-### 6.5 Colunas de `lego_analysis_results` (datalake_legalops)
+### 6.5 Colunas de `lego_analysis_results` (datalake_legalops_clean)
 
 Grain: 1 linha por assessment por `id_sales_flow` por `analysis_date`. Um mesmo `id_sales_flow` pode ter múltiplas linhas por dia se mais de uma análise foi executada (análises on-demand do analista geram novos registros).
 
@@ -708,7 +708,7 @@ SELECT
         COUNT(*) FILTER (WHERE assessment_confidence = 'HIGH') * 100.0
         / NULLIF(COUNT(*), 0),
     1)                                                                                  AS high_confidence_pct
-FROM datalake_legalops.lego_analysis_results
+FROM datalake_legalops_clean.lego_analysis_results
 GROUP BY 1, 2, 3
 ORDER BY 1 DESC, 5 DESC
 ```
@@ -720,7 +720,7 @@ WITH latest AS (
     SELECT
         id_sales_flow,
         MAX(analysis_date) AS last_analysis_date
-    FROM datalake_legalops.lego_analysis_results
+    FROM datalake_legalops_clean.lego_analysis_results
     GROUP BY 1
 )
 SELECT
@@ -731,7 +731,7 @@ SELECT
     r.assessment_status,
     r.assessment_consolidated_status,
     r.assessment_confidence
-FROM datalake_legalops.lego_analysis_results r
+FROM datalake_legalops_clean.lego_analysis_results r
 JOIN latest l
     ON r.id_sales_flow = l.id_sales_flow
     AND r.analysis_date = l.last_analysis_date
@@ -754,7 +754,7 @@ SELECT
         COUNT(*) FILTER (WHERE assessment_confidence = 'LOW') * 100.0
         / NULLIF(COUNT(*), 0),
     1)                                                                           AS low_confidence_pct
-FROM datalake_legalops.lego_analysis_results
+FROM datalake_legalops_clean.lego_analysis_results
 WHERE analysis_date >= DATE_ADD('month', -3, CURRENT_DATE)  -- últimos 3 meses
 GROUP BY 1, 2
 HAVING COUNT(*) >= 30  -- excluir assessments com poucos dados
