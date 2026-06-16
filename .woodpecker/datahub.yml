@@ -107,7 +107,7 @@ steps:
       DATAHUB_TOKEN:
         from_secret: datahub_token
     commands:
-      - uv run python dags/governance/datahub_business_context/push_all_entities.py
+      - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
     when:
       - event: push
         branch: [master, hotfix/*]
