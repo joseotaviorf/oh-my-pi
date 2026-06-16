@@ -1,7 +1,7 @@
 ---
 kafka_brokers: lkc-2yo85o-j29g53.us-east-1.aws.glb.confluent.cloud:9092
 kafka_topic: forno_security-data-gateway.findings
-kafka_consumer_group: bi_etl_security_data_gateway_findings
+kafka_consumer_group: security-data-gateway-bi-etl-ejuice-forno
 kafka_api_key_secret: SECURITY_DATA_GATEWAY_KAFKA_API_KEY
 kafka_api_secret_secret: SECURITY_DATA_GATEWAY_KAFKA_API_SECRET
 path_prefix: s3://
