@@ -1502,6 +1502,157 @@ class TestSqlAndRowMapping:
         assert "NOT REGEXP_LIKE(airflow_dag_id, '__validation$')" in sql
         assert "NOT REGEXP_LIKE(airflow_dag_id, '__validation$')" in amd_sql
 
+    def test_latest_era_sql_includes_validation_when_flag_on(self):
+        sql = build_sql(
+            days=14,
+            min_days=3,
+            min_runs=3,
+            include_validation_runs=True,
+            recent_era_min_days=1,
+            recent_era_min_runs=2,
+        )
+        assert "COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)) >= 1" in sql
+        assert "COUNT(*) >= 2" in sql
+        assert "COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)) >= 3" not in sql
+        assert "validation_runs" in sql
+        assert "bietlejuice.%__validation" in sql
+        assert "REGEXP_REPLACE(airflow_dag_id, '__validation$', '')" in sql
+        assert "dag_max_gen" in sql
+        assert "latest_config" in sql
+        assert "observed_max_gen" in sql
+        assert "arm_runs_prod" in sql
+        assert "arm_runs_validation" in sql
+        assert "metrics_era_generation" in sql
+        assert "metrics_include_validation" in sql
+        assert "FALSE                                                                 AS config_changed_in_window" in sql
+        assert "rn_cost" not in sql
+        assert "FROM dominant_config" not in sql
+        assert "dominant_config AS (" not in sql
+
+    def test_latest_era_sql_same_latest_filter_matches_nvme(self):
+        sql = build_sql(
+            days=14,
+            min_days=1,
+            min_runs=1,
+            include_validation_runs=True,
+            validation_config_filter="same-latest",
+        )
+        assert "shape_matched WHERE is_validation_run" in sql
+        assert "gd\\." in sql or "gd\\\\." in sql
+
+    def test_latest_era_sql_all_filter_unions_validation_on_max_gen(self):
+        sql = build_sql(
+            days=14,
+            min_days=1,
+            min_runs=1,
+            include_validation_runs=True,
+            validation_config_filter="all",
+        )
+        assert "SELECT * FROM era_runs WHERE is_validation_run" in sql
+
+    def test_latest_era_sql_pins_target_generation(self):
+        sql = build_sql(
+            days=14,
+            min_days=1,
+            min_runs=1,
+            include_validation_runs=True,
+            target_generation=7,
+        )
+        assert "7                                            AS metrics_generation" in sql
+
+    def test_build_sql_rejects_unknown_validation_filter(self):
+        with pytest.raises(ValueError, match="validation_config_filter"):
+            build_sql(
+                days=14,
+                min_days=1,
+                min_runs=1,
+                include_validation_runs=True,
+                validation_config_filter="bogus",
+            )
+
+    def test_row_to_metrics_parses_validation_mix_fields(self):
+        metrics = rcs._row_to_metrics(
+            {
+                "airflow_dag_id": "bietlejuice.test_dag",
+                "arm_days": "2",
+                "arm_runs": "5",
+                "arm_runs_prod": "1",
+                "arm_runs_validation": "4",
+                "metrics_era_generation": "7",
+                "metrics_include_validation": "true",
+                "driver_node_type": "m7g.xlarge",
+                "worker_node_type": "m7g.xlarge",
+                "worker_count": "2",
+                "arm_total_cost_usd": "10",
+                "arm_avg_cost_per_run_usd": "2",
+                "wall_p50_min": "10",
+                "wall_p95_min": "12",
+                "dominant_config_run_share": "1.0",
+                "dominant_config_cost_share": "1.0",
+                "config_changed_in_window": "false",
+                "latest_config_runs": "5",
+                "latest_config_days": "2",
+            }
+        )
+        assert metrics.arm_runs_prod == 1
+        assert metrics.arm_runs_validation == 4
+        assert metrics.metrics_era_generation == 7
+        assert metrics.metrics_include_validation is True
+
+    def test_classify_uses_validation_thickened_era_without_recent_config_change(self):
+        m = _m(
+            arm_days=2,
+            arm_runs=5,
+            latest_config_runs=5,
+            latest_config_days=2,
+            config_changed_in_window=False,
+            dominant_config_run_share=1.0,
+            dominant_config_cost_share=1.0,
+            metrics_include_validation=True,
+            arm_runs_validation=4,
+        )
+        assert classify(m, recent_era_min_runs=2, recent_era_min_days=1) != "recent_config_change"
+        assert (
+            classify(m, min_days=3, min_runs=3, recent_era_min_runs=2, recent_era_min_days=1)
+            != "needs_more_arm_data"
+        )
+
+    def test_classify_validation_mode_uses_recent_era_eligibility_thresholds(self):
+        thin_validation = _m(
+            arm_days=1,
+            arm_runs=2,
+            config_changed_in_window=False,
+            dominant_config_run_share=1.0,
+            dominant_config_cost_share=1.0,
+            metrics_include_validation=True,
+        )
+        assert (
+            classify(
+                thin_validation,
+                min_days=3,
+                min_runs=3,
+                recent_era_min_days=1,
+                recent_era_min_runs=2,
+            )
+            != "needs_more_arm_data"
+        )
+        assert (
+            classify(
+                _m(
+                    arm_days=1,
+                    arm_runs=2,
+                    config_changed_in_window=False,
+                    dominant_config_run_share=1.0,
+                    dominant_config_cost_share=1.0,
+                ),
+                min_days=3,
+                min_runs=3,
+                recent_era_min_days=1,
+                recent_era_min_runs=2,
+            )
+            == "needs_more_arm_data"
+        )
+
     def test_amd_sql_matches_arm_filters_and_percentiles(self):
         amd_sql = rcs.build_amd_sql(days=90, min_days=3, min_runs=3, amd_min_runs=3)
 

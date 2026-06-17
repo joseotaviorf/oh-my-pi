@@ -53,6 +53,11 @@ Usage
   uv run --no-project --with "trino==0.337.0,pandas,...,orjson" \\
       python scripts/recommend_cluster_specs.py --trino --list
 
+  # Post-migration: mix prod + __validation on latest ARM generation (e.g. Gen7):
+  uv run --no-project --with "trino==0.337.0,pandas,...,orjson" \\
+      python scripts/recommend_cluster_specs.py --trino --list \\
+      --include-validation-runs --days 14
+
 Docs: docs/platform/cluster_spec_recommender_runbook.md
       docs/platform/cluster_spec_recommender_algorithm.md
 
@@ -441,6 +446,10 @@ class DagMetrics:
     dbu_negotiated_price_missing: bool = False
     is_any_photon: bool = False
     is_any_local_nvme: bool = False
+    arm_runs_prod: int | None = None
+    arm_runs_validation: int | None = None
+    metrics_era_generation: int | None = None
+    metrics_include_validation: bool = False
 
     @property
     def topology(self) -> str:
@@ -1975,8 +1984,14 @@ def classify(
     # (eligible_dags) does not apply to an established switch.
     if _recent_config_change_thin(m, recent_era_min_days, recent_era_min_runs):
         return "recent_config_change"
+    eligibility_min_days = (
+        recent_era_min_days if m.metrics_include_validation else min_days
+    )
+    eligibility_min_runs = (
+        recent_era_min_runs if m.metrics_include_validation else min_runs
+    )
     if not m.config_changed_in_window and (
-        m.arm_days < min_days or m.arm_runs < min_runs
+        m.arm_days < eligibility_min_days or m.arm_runs < eligibility_min_runs
     ):
         return "needs_more_arm_data"
 
@@ -2331,6 +2346,10 @@ class Recommendation:
     driver_override_node_type_id: str | None = None
     rec_runtime_engine: str | None = None  # "STANDARD" when normalizing Photon off
     review_flags: str = ""  # "|"-joined Spark-review markers (io_scan_review, ...)
+    arm_runs_prod: int | None = None
+    arm_runs_validation: int | None = None
+    metrics_era_generation: int | None = None
+    metrics_include_validation: bool = False
     projected: ProjectedMetrics = field(default_factory=ProjectedMetrics)
 
 
@@ -2882,6 +2901,10 @@ def build_recommendation(
         config_changed_in_window=m.config_changed_in_window,
         latest_config_runs=m.latest_config_runs,
         latest_config_days=m.latest_config_days,
+        arm_runs_prod=m.arm_runs_prod,
+        arm_runs_validation=m.arm_runs_validation,
+        metrics_era_generation=m.metrics_era_generation,
+        metrics_include_validation=m.metrics_include_validation,
         driver_action=cohort if cohort.startswith("driver_") else None,
         worker_action=cohort if not cohort.startswith("driver_") else None,
         blocking_reason=projected.blocked_reason,
@@ -3127,6 +3150,278 @@ JOIN eligible_dags
 ORDER BY arm_total_cost_usd DESC
 """
 
+# NVMe-normalized node type for config matching (mirror _strip_nvme in Python).
+_NVME_STRIP_SQL = (
+    "REGEXP_REPLACE(LOWER({col}), '^([cmr][0-9]+)gd\\.', '$1g.')"
+)
+
+_ARM_GENERATION_SQL = (
+    "CAST(REGEXP_EXTRACT(LOWER(COALESCE(worker_node_type, driver_node_type)), "
+    "'^[cmr]([0-9]+)g', 1) AS INTEGER)"
+)
+
+_RUNS_METRICS_COLUMNS = """\
+        dt_dag_run_started,
+        driver_node_type,
+        worker_node_type,
+        worker_count,
+        primary_min_autoscale_workers,
+        primary_max_autoscale_workers,
+        total_dbu_cost_usd                               AS dbu_cost_usd,
+        total_dbu_consumed,
+        total_ec2_cost_calculated_usd                    AS ec2_cost_usd,
+        ec2_spot_hours,
+        ec2_on_demand_hours,
+        total_cost_usd,
+        total_wall_clock_seconds,
+        weighted_avg_p50_driver_cpu_busy_percent         AS drv_cpu_p50,
+        weighted_avg_p95_driver_cpu_busy_percent         AS drv_cpu_p95,
+        weighted_avg_p50_driver_mem_used_percent         AS drv_mem_p50,
+        weighted_avg_p95_driver_mem_used_percent         AS drv_mem_p95,
+        weighted_avg_p95_driver_cpu_wait_percent         AS drv_wait_p95,
+        weighted_avg_p50_worker_cpu_busy_percent         AS wrk_cpu_p50,
+        weighted_avg_p95_worker_cpu_busy_percent         AS wrk_cpu_p95,
+        weighted_avg_p50_worker_mem_used_percent         AS wrk_mem_p50,
+        weighted_avg_p95_worker_mem_used_percent         AS wrk_mem_p95,
+        weighted_avg_p95_worker_cpu_wait_percent         AS wrk_wait_p95,
+        weighted_avg_local_disk_utilization_pct_p95      AS local_disk_p95,
+        total_memory_bytes_spilled,
+        total_disk_bytes_spilled,
+        max_peak_execution_memory_bytes,
+        max_jvm_heap_bytes,
+        total_gc_time_ms,
+        total_executor_run_time_ms,
+        max_task_skew_ratio,
+        is_ec2_estimated,
+        ec2_pricing_missing,
+        dbu_negotiated_price_missing,
+        is_any_photon,
+        is_any_local_nvme"""
+
+_VALIDATION_CONFIG_FILTERS = frozenset({"same-latest", "all"})
+
+_TRINO_SQL_LATEST_ERA_TEMPLATE = """\
+-- ARM cohort metrics: latest-generation era (prod + optional __validation runs)
+-- Generated by recommend_cluster_specs.py; do not hand-edit.
+WITH prod_runs AS (
+    SELECT
+        airflow_dag_id,
+        {runs_metrics_columns},
+        CAST(FALSE AS BOOLEAN)                                               AS is_validation_run,
+        CASE
+            WHEN REGEXP_LIKE(
+                LOWER(COALESCE(worker_node_type, driver_node_type)),
+                '^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)[.]'
+            ) THEN 'arm'
+            ELSE 'x86'
+        END AS arch,
+        {arm_generation_sql}                                                 AS arm_generation
+    FROM dw_databricks_health.fact_databricks_dag_run
+    WHERE dt_dag_run_started >= CURRENT_DATE - INTERVAL '{days}' DAY
+      AND airflow_dag_id LIKE 'bietlejuice.%'
+      AND airflow_dag_id IS NOT NULL
+      AND NOT REGEXP_LIKE(airflow_dag_id, '__validation$')
+      AND is_job_on_interactive = FALSE
+      AND is_any_task_failed = FALSE
+      AND is_any_databricks_run_failed = FALSE
+      AND COALESCE(total_cost_usd, 0) > 0
+),
+validation_runs AS (
+    SELECT
+        REGEXP_REPLACE(airflow_dag_id, '__validation$', '')                  AS airflow_dag_id,
+        {runs_metrics_columns},
+        CAST(TRUE AS BOOLEAN)                                                AS is_validation_run,
+        CASE
+            WHEN REGEXP_LIKE(
+                LOWER(COALESCE(worker_node_type, driver_node_type)),
+                '^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)[.]'
+            ) THEN 'arm'
+            ELSE 'x86'
+        END AS arch,
+        {arm_generation_sql}                                                 AS arm_generation
+    FROM dw_databricks_health.fact_databricks_dag_run
+    WHERE dt_dag_run_started >= CURRENT_DATE - INTERVAL '{days}' DAY
+      AND airflow_dag_id LIKE 'bietlejuice.%__validation'
+      AND is_job_on_interactive = FALSE
+      AND is_any_task_failed = FALSE
+      AND is_any_databricks_run_failed = FALSE
+      AND COALESCE(total_cost_usd, 0) > 0
+),
+combined_runs AS (
+    SELECT * FROM prod_runs WHERE arch = 'arm'
+    UNION ALL
+    SELECT * FROM validation_runs WHERE arch = 'arm'
+),
+dag_max_gen AS (
+    SELECT
+        airflow_dag_id,
+        MAX(arm_generation)                                                  AS observed_max_gen
+    FROM combined_runs
+    GROUP BY airflow_dag_id
+),
+effective_gen AS (
+    SELECT
+        airflow_dag_id,
+        {metrics_generation_expr}                                            AS metrics_generation
+    FROM dag_max_gen
+),
+era_runs AS (
+    SELECT
+        cr.*,
+        eg.metrics_generation
+    FROM combined_runs AS cr
+    INNER JOIN effective_gen AS eg
+        ON cr.airflow_dag_id = eg.airflow_dag_id
+        AND cr.arm_generation = eg.metrics_generation
+),
+config_runs AS (
+    SELECT
+        airflow_dag_id,
+        {norm_driver_sql}                                                    AS norm_driver,
+        {norm_worker_sql}                                                    AS norm_worker,
+        worker_count,
+        primary_min_autoscale_workers,
+        primary_max_autoscale_workers,
+        ARBITRARY(driver_node_type)                                          AS driver_node_type,
+        ARBITRARY(worker_node_type)                                          AS worker_node_type,
+        COUNT(*)                                                             AS config_run_count,
+        COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                      AS config_day_count,
+        MAX(dt_dag_run_started)                                              AS config_last_run
+    FROM era_runs
+    GROUP BY
+        airflow_dag_id,
+        {norm_driver_sql},
+        {norm_worker_sql},
+        worker_count,
+        primary_min_autoscale_workers,
+        primary_max_autoscale_workers
+),
+latest_config AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY airflow_dag_id
+            ORDER BY config_last_run DESC, config_run_count DESC
+        )                                                                    AS rn_latest
+    FROM config_runs
+),
+shape_matched AS (
+    SELECT
+        er.*,
+        lc.config_run_count                                                  AS latest_config_runs,
+        lc.config_day_count                                                  AS latest_config_days
+    FROM era_runs AS er
+    INNER JOIN latest_config AS lc
+        ON er.airflow_dag_id = lc.airflow_dag_id
+        AND {norm_driver_sql_on_er} = lc.norm_driver
+        AND {norm_worker_sql_on_er} = lc.norm_worker
+        AND COALESCE(CAST(er.worker_count AS VARCHAR), '__autoscale__')
+            = COALESCE(CAST(lc.worker_count AS VARCHAR), '__autoscale__')
+        AND COALESCE(CAST(er.primary_min_autoscale_workers AS VARCHAR), '__fixed__')
+            = COALESCE(CAST(lc.primary_min_autoscale_workers AS VARCHAR), '__fixed__')
+        AND COALESCE(CAST(er.primary_max_autoscale_workers AS VARCHAR), '__fixed__')
+            = COALESCE(CAST(lc.primary_max_autoscale_workers AS VARCHAR), '__fixed__')
+        AND lc.rn_latest = 1
+),
+arm_runs AS (
+    SELECT * FROM shape_matched WHERE NOT is_validation_run
+    UNION ALL
+    {validation_arm_runs_branch}
+),
+eligible_dags AS (
+    SELECT airflow_dag_id
+    FROM arm_runs
+    GROUP BY airflow_dag_id
+    HAVING COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)) >= {min_days}
+       AND COUNT(*) >= {min_runs}
+),
+dag_cadence AS (
+    SELECT
+        airflow_dag_id,
+        ROUND(
+            COUNT(*) / CAST(NULLIF(COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)), 0) AS DOUBLE),
+            3
+        )                                                                    AS runs_per_day,
+        ROUND(
+            1440.0 / NULLIF(
+                COUNT(*) / CAST(NULLIF(COUNT(DISTINCT CAST(dt_dag_run_started AS DATE)), 0) AS DOUBLE),
+                0
+            ),
+            1
+        )                                                                    AS schedule_interval_minutes
+    FROM arm_runs
+    GROUP BY airflow_dag_id
+),
+per_dag AS (
+    SELECT
+        airflow_dag_id,
+        COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                      AS arm_days,
+        COUNT(*)                                                              AS arm_runs,
+        COUNT_IF(NOT is_validation_run)                                       AS arm_runs_prod,
+        COUNT_IF(is_validation_run)                                           AS arm_runs_validation,
+        ARBITRARY(metrics_generation)                                         AS metrics_era_generation,
+        TRUE                                                                  AS metrics_include_validation,
+        ARBITRARY(driver_node_type)                                           AS driver_node_type,
+        ARBITRARY(worker_node_type)                                           AS worker_node_type,
+        ARBITRARY(worker_count)                                               AS worker_count,
+        ARBITRARY(primary_min_autoscale_workers)                              AS primary_min_autoscale_workers,
+        ARBITRARY(primary_max_autoscale_workers)                              AS primary_max_autoscale_workers,
+        ROUND(SUM(total_cost_usd), 4)                                         AS arm_total_cost_usd,
+        ROUND(AVG(total_cost_usd), 6)                                         AS arm_avg_cost_per_run_usd,
+        ROUND(SUM(total_cost_usd), 4)                                         AS arm_total_cost_estimate_usd,
+        ROUND(AVG(total_cost_usd), 6)                                         AS arm_avg_total_cost_estimate_usd,
+        ROUND(SUM(ec2_cost_usd), 4)                                           AS arm_total_ec2_cost_usd,
+        ROUND(AVG(ec2_cost_usd), 6)                                           AS arm_avg_ec2_cost_usd,
+        ROUND(SUM(dbu_cost_usd), 4)                                           AS arm_total_dbu_cost_usd,
+        ROUND(AVG(dbu_cost_usd), 6)                                           AS arm_avg_dbu_cost_usd,
+        ROUND(AVG(total_dbu_consumed), 6)                                     AS arm_avg_dbu_consumed,
+        ROUND(SUM(ec2_spot_hours), 4)                                         AS ec2_spot_hours,
+        ROUND(SUM(ec2_on_demand_hours), 4)                                    AS ec2_on_demand_hours,
+        1.0                                                                   AS dominant_config_run_share,
+        1.0                                                                   AS dominant_config_cost_share,
+        FALSE                                                                 AS config_changed_in_window,
+        ARBITRARY(latest_config_runs)                                         AS latest_config_runs,
+        ARBITRARY(latest_config_days)                                         AS latest_config_days,
+        ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.5)  / 60.0, 1)  AS wall_p50_min,
+        ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.95) / 60.0, 1)  AS wall_p95_min,
+        ROUND(APPROX_PERCENTILE(drv_cpu_p50, 0.5), 1)                       AS drv_cpu_p50,
+        ROUND(APPROX_PERCENTILE(drv_cpu_p95, 0.95), 1)                       AS drv_cpu_p95,
+        ROUND(APPROX_PERCENTILE(drv_mem_p50, 0.5), 1)                         AS drv_mem_p50,
+        ROUND(APPROX_PERCENTILE(drv_mem_p95, 0.95), 1)                        AS drv_mem_p95,
+        ROUND(APPROX_PERCENTILE(drv_wait_p95, 0.95), 1)                        AS drv_wait_p95,
+        ROUND(APPROX_PERCENTILE(wrk_cpu_p50, 0.5), 1)                         AS wrk_cpu_p50,
+        ROUND(APPROX_PERCENTILE(wrk_cpu_p95, 0.95), 1)                        AS wrk_cpu_p95,
+        ROUND(APPROX_PERCENTILE(wrk_mem_p50, 0.5), 1)                         AS wrk_mem_p50,
+        ROUND(APPROX_PERCENTILE(wrk_mem_p95, 0.95), 1)                        AS wrk_mem_p95,
+        ROUND(APPROX_PERCENTILE(wrk_wait_p95, 0.95), 1)                       AS wrk_wait_p95,
+        ROUND(APPROX_PERCENTILE(local_disk_p95, 0.95), 1)                     AS local_disk_p95,
+        SUM(total_memory_bytes_spilled)                                       AS total_memory_bytes_spilled,
+        SUM(total_disk_bytes_spilled)                                         AS total_disk_bytes_spilled,
+        MAX(max_peak_execution_memory_bytes)                                  AS max_peak_execution_memory_bytes,
+        MAX(max_jvm_heap_bytes)                                               AS max_jvm_heap_bytes,
+        SUM(total_gc_time_ms)                                                 AS total_gc_time_ms,
+        SUM(total_executor_run_time_ms)                                       AS total_executor_run_time_ms,
+        MAX(max_task_skew_ratio)                                              AS max_task_skew_ratio,
+        BOOL_OR(is_ec2_estimated)                                             AS is_ec2_estimated,
+        BOOL_OR(ec2_pricing_missing)                                          AS ec2_pricing_missing,
+        BOOL_OR(dbu_negotiated_price_missing)                                 AS dbu_negotiated_price_missing,
+        BOOL_OR(is_any_photon)                                                AS is_any_photon,
+        BOOL_OR(is_any_local_nvme)                                            AS is_any_local_nvme
+    FROM arm_runs
+    GROUP BY airflow_dag_id
+)
+SELECT
+    per_dag.*,
+    dag_cadence.runs_per_day,
+    dag_cadence.schedule_interval_minutes
+FROM per_dag
+JOIN dag_cadence
+    ON per_dag.airflow_dag_id = dag_cadence.airflow_dag_id
+JOIN eligible_dags
+    ON per_dag.airflow_dag_id = eligible_dags.airflow_dag_id
+ORDER BY arm_total_cost_usd DESC
+"""
+
 
 _MEMORY_HISTORY_SQL_TEMPLATE = """\
 -- Per-DAG long-window memory footprint (ARM + AMD) for right-sizing insurance.
@@ -3208,8 +3503,53 @@ def build_task_sql(days: int) -> str:
     return _TASK_SQL_TEMPLATE.format(days=days)
 
 
-def build_sql(days: int, min_days: int, min_runs: int) -> str:
-    return _TRINO_SQL_TEMPLATE.format(days=days, min_days=min_days, min_runs=min_runs)
+def build_sql(
+    days: int,
+    min_days: int,
+    min_runs: int,
+    *,
+    include_validation_runs: bool = False,
+    validation_config_filter: str = "same-latest",
+    target_generation: int | None = None,
+    recent_era_min_days: int = _DEFAULT_RECENT_ERA_MIN_DAYS,
+    recent_era_min_runs: int = _DEFAULT_RECENT_ERA_MIN_RUNS,
+) -> str:
+    if not include_validation_runs:
+        return _TRINO_SQL_TEMPLATE.format(days=days, min_days=min_days, min_runs=min_runs)
+
+    if validation_config_filter not in _VALIDATION_CONFIG_FILTERS:
+        raise ValueError(
+            f"validation_config_filter must be one of {sorted(_VALIDATION_CONFIG_FILTERS)}, "
+            f"got {validation_config_filter!r}"
+        )
+
+    norm_driver = _NVME_STRIP_SQL.format(col="driver_node_type")
+    norm_worker = _NVME_STRIP_SQL.format(col="COALESCE(worker_node_type, '')")
+    norm_driver_er = _NVME_STRIP_SQL.format(col="er.driver_node_type")
+    norm_worker_er = _NVME_STRIP_SQL.format(col="COALESCE(er.worker_node_type, '')")
+
+    if validation_config_filter == "same-latest":
+        validation_branch = "SELECT * FROM shape_matched WHERE is_validation_run"
+    else:
+        validation_branch = "SELECT * FROM era_runs WHERE is_validation_run"
+
+    metrics_generation_expr = (
+        str(target_generation) if target_generation is not None else "observed_max_gen"
+    )
+
+    return _TRINO_SQL_LATEST_ERA_TEMPLATE.format(
+        days=days,
+        min_days=recent_era_min_days,
+        min_runs=recent_era_min_runs,
+        runs_metrics_columns=_RUNS_METRICS_COLUMNS,
+        arm_generation_sql=_ARM_GENERATION_SQL,
+        metrics_generation_expr=metrics_generation_expr,
+        norm_driver_sql=norm_driver,
+        norm_worker_sql=norm_worker,
+        norm_driver_sql_on_er=norm_driver_er,
+        norm_worker_sql_on_er=norm_worker_er,
+        validation_arm_runs_branch=validation_branch,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -4213,6 +4553,14 @@ def _row_to_metrics(row: dict[str, Any]) -> DagMetrics:
         dbu_negotiated_price_missing=_b(row.get("dbu_negotiated_price_missing")),
         is_any_photon=_b(row.get("is_any_photon")),
         is_any_local_nvme=_b(row.get("is_any_local_nvme")),
+        arm_runs_prod=_i(row.get("arm_runs_prod")) if row.get("arm_runs_prod") not in (None, "") else None,
+        arm_runs_validation=_i(row.get("arm_runs_validation"))
+        if row.get("arm_runs_validation") not in (None, "")
+        else None,
+        metrics_era_generation=_i(row.get("metrics_era_generation"))
+        if row.get("metrics_era_generation") not in (None, "")
+        else None,
+        metrics_include_validation=_b(row.get("metrics_include_validation")),
     )
 
 
@@ -4288,6 +4636,10 @@ _CSV_FIELDS = [
     # Evidence
     "arm_days",
     "arm_runs",
+    "arm_runs_prod",
+    "arm_runs_validation",
+    "metrics_era_generation",
+    "metrics_include_validation",
     "arm_total_cost_usd",
     "arm_avg_cost_per_run_usd",
     "arm_total_cost_estimate_usd",
@@ -4687,6 +5039,25 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "fleet: retarget every DAG on an older generation."
         ),
     )
+    parser.add_argument(
+        "--include-validation-runs",
+        action="store_true",
+        help=(
+            "Union __validation runs into ARM metrics using latest-generation-era "
+            "selection (max ARM gen per DAG, latest config by time). Ignores "
+            "pre-migration dominant-config blending."
+        ),
+    )
+    parser.add_argument(
+        "--validation-config-filter",
+        choices=sorted(_VALIDATION_CONFIG_FILTERS),
+        default="same-latest",
+        help=(
+            "With --include-validation-runs: same-latest keeps validation rows "
+            "matching the latest cluster shape (NVMe-normalized); all unions "
+            "every validation run on the metrics generation."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -4754,8 +5125,23 @@ def main(argv: list[str] | None = None) -> int:
 
     # Fetch metrics
     if args.trino:
-        sql = build_sql(args.days, args.min_days, args.min_runs)
+        sql = build_sql(
+            args.days,
+            args.min_days,
+            args.min_runs,
+            include_validation_runs=args.include_validation_runs,
+            validation_config_filter=args.validation_config_filter,
+            target_generation=args.target_generation,
+            recent_era_min_days=args.recent_era_min_days,
+            recent_era_min_runs=args.recent_era_min_runs,
+        )
         print(f"Querying Trino ({trino_host}) …", file=sys.stderr)
+        if args.include_validation_runs:
+            print(
+                "Metrics mode: latest-generation era "
+                f"(validation filter={args.validation_config_filter})",
+                file=sys.stderr,
+            )
         metrics = fetch_from_trino(sql, trino_host)
     else:
         metrics = load_from_csv(args.metrics_csv)

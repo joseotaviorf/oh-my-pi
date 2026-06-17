@@ -56,6 +56,8 @@ Useful flags:
 | `--target-generation-general` | off | Per-family override for general nodes (defaults to `--target-generation`) |
 | `--target-generation-memory` | off | Per-family override for memory nodes (defaults to `--target-generation`) |
 | `--retarget-scope` | `bounded` | `bounded`: retarget only DAGs with an actionable change; `fleet`: retarget all Gen-6 DAGs |
+| `--include-validation-runs` | off | Union `__validation` runs into ARM metrics using **latest-generation-era** selection (see below) |
+| `--validation-config-filter` | `same-latest` | With `--include-validation-runs`: `same-latest` keeps validation rows matching the latest cluster shape (NVMe-normalized); `all` unions every validation run on the metrics generation |
 
 Set `TRINO_HOST` to point at a non-prod Trino endpoint without changing the command line:
 
@@ -176,6 +178,32 @@ ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlo
 | `insufficient_validation_data` | No usable validation cost row |
 
 Use this before promoting DAGs that already ran in shadow validation — it is a sanity check, not a substitute for a fresh validation run after changing the recommended spec.
+
+### 3c. Post-migration / thin prod telemetry (`--include-validation-runs`)
+
+After a fleet-wide generation bump (e.g. Gen6 → Gen7), prod rows in `fact_databricks_dag_run` may lag Airflow. Shadow `__validation` twins often already ran on the promoted shape. Use **latest-generation-era** metrics mode to size on Gen7 telemetry without waiting for DW sync.
+
+**Default (flag off):** prod-only input, **dominant-config** selection (`rn_recent` + cost-dominant `config_changed_in_window`). Gen6 history in the lookback window can gate sizing via `recent_config_change` / `mixed_config_review`.
+
+**With `--include-validation-runs`:** unions prod + `__validation` runs mapped to prod DAG ids. Per DAG:
+
+1. Keep only the **highest ARM generation** in the window (e.g. Gen7; Gen6 dropped).
+2. Pick the **latest cluster shape by time** within that generation (not cost-dominant).
+3. Pool prod + validation runs on that shape (`--validation-config-filter same-latest`, NVMe-normalized; or `all` for every validation run on that generation).
+
+Classifier migration noise is neutralized in SQL (`config_changed_in_window = false`, dominant shares = 1.0). SQL eligibility and the classifier use **`--recent-era-min-days` / `--recent-era-min-runs`** (defaults 1 / 2), not the stricter window `--min-days` / `--min-runs` (defaults 3 / 3), so thin Gen7 validation signal is not dropped when prod DW rows lag. `recommendations.csv` adds `arm_runs_prod`, `arm_runs_validation`, `metrics_era_generation`, and `metrics_include_validation`.
+
+```bash
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+  python scripts/recommend_cluster_specs.py \
+  --trino --list \
+  --include-validation-runs \
+  --days 14
+```
+
+Optional: pin generation with `--target-generation 7` (metrics use Gen7 even when auto-max would differ). This is separate from `--target-generation` retargeting of **recommended** node types.
+
+`--validation-outcomes` is unchanged — post-hoc projected-vs-observed check only; it does not feed the metrics pool.
 
 ---
 
