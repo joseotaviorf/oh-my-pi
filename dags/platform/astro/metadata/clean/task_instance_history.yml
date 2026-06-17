@@ -2,7 +2,7 @@
 database_name: datalake_astro_clean
 table_name: task_instance_history
 owner: gustavo.miller@quintoandar.com.br
-domain: platform
+domain: Data Platform
 columns:
   id_task:
     lineage:

@@ -1,2 +1,3 @@
 database_name: datalake_dependency_tree_raw
 table_name: dependency_tree
+domain: Data Life Cycle

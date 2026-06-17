@@ -2,7 +2,7 @@
 database_name: datalake_astro_clean
 table_name: dag
 owner: gustavo.miller@quintoandar.com.br
-domain: platform
+domain: Data Platform
 columns:
   id_dag:
     lineage:

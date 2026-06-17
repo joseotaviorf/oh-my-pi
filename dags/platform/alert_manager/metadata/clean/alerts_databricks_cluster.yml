@@ -1,5 +1,6 @@
 database_name: datalake_alert_manager_clean
 table_name: alerts_databricks_cluster
+domain: Data Platform
 columns:
   id:
     lineage:

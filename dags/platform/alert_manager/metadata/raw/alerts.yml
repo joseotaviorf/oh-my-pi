@@ -1,2 +1,3 @@
 database_name: datalake_alert_manager_raw
 table_name: alerts
+domain: Data Platform
