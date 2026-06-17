@@ -3,3 +3,10 @@ cluster:
   databricks_conn_id: databricks_new
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
+validation:
+  cluster:
+    type: consolidation_m_memory_single_node_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
+  allow_custom_spark_job: true

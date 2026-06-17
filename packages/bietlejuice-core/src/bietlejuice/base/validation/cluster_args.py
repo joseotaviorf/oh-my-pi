@@ -137,6 +137,16 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
         prod_custom = {
             key: value for key, value in prod_custom.items() if key != "runtime_engine"
         }
+    if (
+        validation_cluster_type.startswith("consolidation_")
+        and not validation_cluster_type.endswith("_single_node_cluster")
+        and "num_workers" not in validation_custom
+    ):
+        prod_custom = {
+            key: value for key, value in prod_custom.items() if key != "num_workers"
+        }
     if prod_custom or validation_custom:
         merged["custom_configurations"] = {**prod_custom, **validation_custom}
+    else:
+        merged.pop("custom_configurations", None)
     return merged

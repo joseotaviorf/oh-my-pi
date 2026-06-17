@@ -59,11 +59,15 @@ class TestClusterValidationConfig:
         with pytest.raises(AssertionError, match="consolidation_"):
             validator.validate(declaration)
 
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
     def test_rejects_same_cluster_as_prod_without_overrides(self, validator):
+        ConfigurationService._instance_cache.clear()
         declaration = _base_declaration(type="databricks_16_4_med_general_fleet")
         declaration["cluster"]["type"] = "consolidation_s_general_cluster"
         declaration["validation"]["cluster"]["type"] = "consolidation_s_general_cluster"
-        with pytest.raises(AssertionError, match="distinguishing overrides"):
+        with pytest.raises(
+            AssertionError, match="resolves to the same effective cluster"
+        ):
             validator.validate(declaration)
 
     @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
@@ -394,3 +398,147 @@ class TestMergeValidationClusterArgs:
         resolved = merge_cluster_configuration(merged, ConfigurationService())
         assert resolved["node_type_id"].startswith("m7g.")
         assert resolved["driver_node_type_id"] == "m6g.xlarge"
+
+    def test_strips_prod_num_workers_for_multi_node_type_only_validation(self):
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "m7g.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_memory_cluster",
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert "custom_configurations" not in merged
+
+    def test_clears_custom_configurations_when_both_empty_after_strip(self):
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m7g.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_memory_cluster",
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert "custom_configurations" not in merged
+
+    def test_type_only_validation_keeps_non_topology_prod_custom(self):
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "single_user_name": "user@example.com",
+                "data_security_mode": "SINGLE_USER",
+                "spark_conf": {
+                    "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod"
+                },
+                "num_workers": 3,
+                "driver_node_type_id": "m7g.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"] == {
+            "single_user_name": "user@example.com",
+            "data_security_mode": "SINGLE_USER",
+            "spark_conf": {
+                "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod"
+            },
+        }
+        assert "num_workers" not in merged["custom_configurations"]
+        assert "driver_node_type_id" not in merged["custom_configurations"]
+
+    def test_keeps_explicit_validation_num_workers_for_keep_worker_count(self):
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {"num_workers": 3},
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"]["num_workers"] == 3
+        assert "driver_node_type_id" not in merged["custom_configurations"]
+
+
+class TestClusterValidationTypeOnlyPresetDefaults:
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_allows_enrich_fairness_style_type_only_validation(self, validator):
+        ConfigurationService._instance_cache.clear()
+        declaration = _base_declaration(type="consolidation_xs_memory_cluster")
+        declaration["cluster"]["type"] = "consolidation_xs_memory_cluster"
+        declaration["cluster"]["custom_configurations"] = {
+            "single_user_name": "user@example.com",
+            "data_security_mode": "SINGLE_USER",
+            "spark_conf": {
+                "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod"
+            },
+            "num_workers": 3,
+            "driver_node_type_id": "m7g.xlarge",
+        }
+        declaration["validation"]["cluster"] = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+        }
+        declaration["validation"]["allow_custom_spark_job"] = True
+        validator.validate(declaration)
+
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_allows_enrich_marketing_style_type_only_validation(self, validator):
+        ConfigurationService._instance_cache.clear()
+        declaration = _base_declaration(type="consolidation_xs_memory_cluster")
+        declaration["cluster"]["type"] = "consolidation_xs_memory_cluster"
+        declaration["cluster"]["custom_configurations"] = {
+            "num_workers": 3,
+            "driver_node_type_id": "m7g.xlarge",
+        }
+        declaration["validation"]["cluster"] = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new_env",
+        }
+        validator.validate(declaration)
+
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_allows_twilio_style_driver_only_downsize(self, validator):
+        ConfigurationService._instance_cache.clear()
+        declaration = _base_declaration(type="consolidation_xs_memory_cluster")
+        declaration["cluster"]["type"] = "consolidation_xs_memory_cluster"
+        declaration["cluster"]["custom_configurations"] = {
+            "driver_node_type_id": "m7g.xlarge",
+        }
+        declaration["validation"]["cluster"] = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_libraries": [{"whl": "s3://bucket/client.whl"}],
+        }
+        declaration["validation"]["allow_custom_spark_job"] = True
+        validator.validate(declaration)
+
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_type_only_resolves_to_preset_workers_not_prod_override(self):
+        ConfigurationService._instance_cache.clear()
+        prod = {
+            "type": "consolidation_xs_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "m7g.xlarge",
+            },
+        }
+        validation = {"type": "consolidation_xs_memory_cluster"}
+        merged = merge_validation_cluster_args(prod, validation)
+        resolved = merge_cluster_configuration(merged, ConfigurationService())
+        assert resolved["num_workers"] == 2
+        assert resolved["driver_node_type_id"] == "r7g.large"
+        assert not validation_resolves_to_prod_spec(
+            prod, validation, ConfigurationService()
+        )

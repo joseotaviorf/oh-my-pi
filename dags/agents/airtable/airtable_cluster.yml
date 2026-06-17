@@ -11,3 +11,15 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
+validation:
+  cluster:
+    type: consolidation_xs_general_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - whl: '{artifacts_bucket}/airtable-api-client-python/quintoandar_airtable_api_client-0.1.0-py2.py3-none-any.whl'
+    custom_configurations:
+      spark_conf:
+        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
+        spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      driver_node_type_id: r7g.large
+  allow_custom_spark_job: true

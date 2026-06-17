@@ -11,3 +11,10 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     num_workers: 1
     spark_version: 16.4.x-scala2.12
+validation:
+  cluster:
+    type: consolidation_s_general_single_node_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: people-analytics
+      permission_level: CAN_MANAGE

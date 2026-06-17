@@ -12,3 +12,16 @@ cluster:
       spark.executor.heartbeatInterval: 100s
       spark.network.timeout: 600s
       spark.metrics.appStatusSource.enabled: 'true'
+validation:
+  cluster:
+    type: consolidation_s_memory_single_node_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      spark_conf:
+        spark.driver.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
+        spark.executor.extraJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC
+        spark.executor.heartbeatInterval: 100s
+        spark.network.timeout: 600s
+        spark.metrics.appStatusSource.enabled: 'true'
+      spark_env_vars:
+        GLUE_ASSUME_ROLE_ARN: '{{ var.value.get(''glue_assume_role_arn'', '''') }}'

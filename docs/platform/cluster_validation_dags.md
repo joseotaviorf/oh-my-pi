@@ -35,7 +35,7 @@ validation:
 
 **Skip validation** when the fully-resolved validation cluster spec equals prod's effective spec — the validation would validate nothing. This covers prod already being the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r7g.2xlarge` worker and driver) and any re-stated prod spec whose preset plus overlaid `custom_configurations` resolve to prod's running config (e.g. a just-promoted preset re-recommended from lagging history). The generator omits the `validation:` block entirely (`validation_resolves_to_prod_spec`, comparing `merge_cluster_configuration` of prod vs `merge_validation_cluster_args(prod, validation)`).
 
-When validation is emitted, `validation.cluster.type` may match prod `cluster.type` when `validation.cluster` specifies distinguishing overrides (for example `custom_configurations`). It must still differ from prod when no overrides are present (enforced by `DAGDeclarationValidator`). `DAGDeclarationValidator` also rejects any `validation.cluster` whose resolved spec equals prod's effective spec, even when it carries overrides — a re-stated prod spec validates nothing.
+When validation is emitted, `validation.cluster.type` may match prod `cluster.type`. Same preset with **no** `validation.cluster.custom_configurations` is valid when the resolved validation spec differs from prod (for example preset-default `num_workers: 2` vs prod override `num_workers: 3`, or preset driver vs prod driver override). `DAGDeclarationValidator` rejects only `validation.cluster` whose **resolved** spec equals prod's effective spec (`validation_resolves_to_prod_spec`), comparing `merge_cluster_configuration` of prod vs `merge_validation_cluster_args(prod, validation)`.
 
 Existing validation blocks are also checked against generator output. `validate-cluster-validation-files` fails when a validation-stage `*_cluster.yml` is missing generated effective-prod overrides, so stale blocks should be regenerated instead of relying on runtime fallback behavior.
 
@@ -75,7 +75,8 @@ Implementation: `packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder
 Rules enforced by `DAGDeclarationValidator`:
 
 - `validation.cluster.type` must start with `consolidation_`
-- Must differ from prod `cluster.type` when `validation.cluster` has no distinguishing overrides; same preset is allowed with explicit override fields (for example `custom_configurations`)
+- Resolved validation spec must differ from prod effective spec (`validation_resolves_to_prod_spec`); same preset type with empty `validation.cluster.custom_configurations` is allowed when merge yields a real topology change (preset defaults apply, including `num_workers` — prod worker overrides are not inherited)
+- Do not echo preset-default `num_workers` in validation YAML; the cluster recommender omits them by design and `make audit-cluster-instance-families` rejects redundant preset echoes on prod blocks
 - DAGs with `load_spark_job` need `validation.allow_custom_spark_job: true`
 
 ## Generated Airflow DAG

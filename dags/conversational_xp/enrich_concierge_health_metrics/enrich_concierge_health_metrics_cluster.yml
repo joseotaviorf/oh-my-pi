@@ -4,3 +4,10 @@ cluster:
   access_control_list:
     group_name: data-products
     permission_level: CAN_MANAGE
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: data-products
+      permission_level: CAN_MANAGE
