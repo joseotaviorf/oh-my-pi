@@ -1,5 +1,6 @@
 database_name: datalake_hefesto_clean
 table_name: account
+domain: Support and Services
 columns:
   id_account:
     lineage:

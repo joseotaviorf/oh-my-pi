@@ -1,5 +1,6 @@
 database_name: datalake_tracksale_raw
 table_name: answer
+domain: Support and Services
 columns:
   alternative_email:
     tags:

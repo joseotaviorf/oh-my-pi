@@ -2,7 +2,7 @@
 database_name: dw_offboarding
 table_name: fact_house_listing_terminations
 description: This table aims to facilitate the retention track of the listings that were/are in the termination step.
-domain: ForRent
+domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_termination:

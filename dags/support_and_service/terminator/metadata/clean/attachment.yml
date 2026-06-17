@@ -1,5 +1,6 @@
 database_name: datalake_terminator_clean
 table_name: attachment
+domain: Support and Services
 columns:
   id:
     lineage:

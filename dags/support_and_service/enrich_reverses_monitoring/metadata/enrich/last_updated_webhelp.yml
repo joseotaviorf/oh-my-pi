@@ -2,7 +2,7 @@
 database_name: datalake_reverses_monitoring
 table_name: last_updated_webhelp
 owner: rodrigo.kreuzberg@quintoandar.com.br
-domain: Data S&S
+domain: Support and Services
 description: Enrichment table with the aim of obtaining information about the execution of reverse webhelp dags, the granularity of this
   table follows the "table_name" column.
 columns:

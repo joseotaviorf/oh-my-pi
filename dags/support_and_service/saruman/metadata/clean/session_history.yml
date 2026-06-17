@@ -1,6 +1,7 @@
 ---
 database_name: datalake_saruman_clean
 table_name: session_history
+domain: Support and Services
 columns:
   id:
     lineage:

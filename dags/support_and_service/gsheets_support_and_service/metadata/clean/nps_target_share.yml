@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: nps_target_share
+domain: Support and Services
 columns:
   support:
     description: "Campaign group in full."

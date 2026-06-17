@@ -1,5 +1,6 @@
 database_name: datalake_chat_fup_clean
 table_name: message_voting
+domain: Support and Services
 columns:
   id:
     lineage:

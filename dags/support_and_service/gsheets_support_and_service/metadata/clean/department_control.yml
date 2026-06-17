@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: department_control
+domain: Support and Services
 columns:
   department:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: csat_vistoria_iq_saida
+domain: Support and Services
 columns:
   email:
     tags:

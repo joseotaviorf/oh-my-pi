@@ -1,5 +1,6 @@
 database_name: datalake_terminator_clean
 table_name: negotiation_aud
+domain: Support and Services
 columns:
   id:
     lineage:

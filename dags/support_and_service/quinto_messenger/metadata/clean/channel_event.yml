@@ -1,5 +1,6 @@
 database_name: datalake_quinto_messenger_clean
 table_name: channel_event
+domain: Support and Services
 columns:
   id:
     lineage:

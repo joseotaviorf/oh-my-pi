@@ -1,5 +1,6 @@
 database_name: datalake_zendesk_clean
 table_name: ticket_fields
+domain: Support and Services
 columns:
   id_ticket_fields:
     lineage:

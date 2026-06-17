@@ -1,5 +1,6 @@
 database_name: datalake_chattermill_raw
 table_name: responses
+domain: Support and Services
 columns:
   tags:
     tags:

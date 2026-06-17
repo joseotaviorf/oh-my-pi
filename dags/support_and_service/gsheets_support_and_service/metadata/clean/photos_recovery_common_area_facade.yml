@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: photos_recovery_common_area_facade
+domain: Support and Services
 columns:
   id_house:
     lineage:

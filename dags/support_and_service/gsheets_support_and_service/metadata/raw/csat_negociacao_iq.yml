@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: csat_negociacao_iq
+domain: Support and Services
 columns:
   token:
     tags:

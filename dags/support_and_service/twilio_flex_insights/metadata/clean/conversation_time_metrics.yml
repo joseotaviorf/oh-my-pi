@@ -1,5 +1,6 @@
 database_name: datalake_twilio_flex_insights_clean
 table_name: conversation_time_metrics
+domain: Support and Services
 columns:
   id_conversation:
     lineage:

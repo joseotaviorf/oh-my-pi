@@ -3,7 +3,7 @@ table_name: fact_nps_dispatches
 description:
   "Table with metrics related to NPS dispatches, which are campaign surveys
   sent to a customer (usually daily). Each line is a dispatch to an unique customer."
-domain: Support and Service
+domain: Support and Services
 owner: ae-ss@quintoandar.com.br
 columns:
   sk_nps_dispatch:

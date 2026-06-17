@@ -1,5 +1,6 @@
 database_name: datalake_bigfone_clean
 table_name: ivr_closed_history
+domain: Support and Services
 columns:
   id_ivr:
     lineage:

@@ -1,5 +1,6 @@
 database_name: datalake_taskmaster_clean
 table_name: task
+domain: Support and Services
 columns:
   id:
     lineage:

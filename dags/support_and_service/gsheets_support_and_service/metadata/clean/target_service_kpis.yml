@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: target_service_kpis
+domain: Support and Services
 columns:
   metric_name:
     lineage:

@@ -1,5 +1,6 @@
 database_name: datalake_bigfone_clean
 table_name: scheduled_call_task
+domain: Support and Services
 columns:
   id:
     lineage:

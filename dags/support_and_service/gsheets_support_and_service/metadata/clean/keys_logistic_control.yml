@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: keys_logistic_control
+domain: Support and Services
 columns:
   id_contract:
     lineage:

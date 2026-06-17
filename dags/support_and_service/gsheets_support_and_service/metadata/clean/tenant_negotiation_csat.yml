@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: tenant_negotiation_csat
+domain: Support and Services
 columns:
   id_csat_answer:
     lineage:

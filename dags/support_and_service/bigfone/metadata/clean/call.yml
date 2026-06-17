@@ -1,5 +1,6 @@
 database_name: datalake_bigfone_clean
 table_name: call
+domain: Support and Services
 columns:
   id_source_unique:
     lineage:

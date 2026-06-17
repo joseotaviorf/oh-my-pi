@@ -1,5 +1,6 @@
 database_name: datalake_help_center_api_clean
 table_name: call_request
+domain: Support and Services
 columns:
   id:
     lineage:

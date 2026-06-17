@@ -1,6 +1,7 @@
 ---
 database_name: datalake_offboarding
 table_name: ongoing
+domain: Support and Services
 columns:
   id:
     lineage:

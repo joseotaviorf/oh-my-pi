@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: service_city_holidays
+domain: Support and Services
 columns:
   id_city:
     lineage:

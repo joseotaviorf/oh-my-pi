@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: tool_access_mapping
+domain: Support and Services
 columns:
   complete_name:
     tags:

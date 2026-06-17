@@ -1,5 +1,6 @@
 database_name: datalake_hefesto_clean
 table_name: worker_portfolio_unit
+domain: Support and Services
 columns:
   id_unit:
     lineage:

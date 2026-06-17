@@ -1,6 +1,7 @@
 ---
 database_name: datalake_internal_chat_clean
 table_name: internal_chat_messages
+domain: Support and Services
 columns:
   id_chat:
     lineage:

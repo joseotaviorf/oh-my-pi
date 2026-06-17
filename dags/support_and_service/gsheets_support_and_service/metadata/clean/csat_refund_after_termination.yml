@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: csat_refund_after_termination
+domain: Support and Services
 columns:
   customer_experience_feedback:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: agendamento_vistoria_entrada
+domain: Support and Services
 columns:
   bairro:
     tags:

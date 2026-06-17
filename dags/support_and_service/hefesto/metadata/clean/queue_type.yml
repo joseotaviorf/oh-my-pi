@@ -1,5 +1,6 @@
 database_name: datalake_hefesto_clean
 table_name: queue_type
+domain: Support and Services
 columns:
   id_queue_type:
     lineage:

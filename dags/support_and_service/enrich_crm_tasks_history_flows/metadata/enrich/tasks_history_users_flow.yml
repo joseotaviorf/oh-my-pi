@@ -1,5 +1,6 @@
 database_name: datalake_crm_tasks_history_flows
 table_name: tasks_history_users_flow
+domain: Support and Services
 columns:
     id_task:
       lineage:

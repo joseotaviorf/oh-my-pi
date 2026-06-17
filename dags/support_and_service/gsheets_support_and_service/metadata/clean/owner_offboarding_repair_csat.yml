@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: owner_offboarding_repair_csat
+domain: Support and Services
 columns:
   email:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tag_sla_target
+domain: Support and Services
 columns:
   journey:
     lineage:

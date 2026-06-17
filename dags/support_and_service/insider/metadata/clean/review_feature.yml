@@ -1,5 +1,6 @@
 database_name: datalake_insider_clean
 table_name: review_feature
+domain: Support and Services
 columns:
   id:
     lineage:

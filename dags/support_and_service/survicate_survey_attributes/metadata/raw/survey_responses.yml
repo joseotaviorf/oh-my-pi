@@ -1,2 +1,3 @@
 database_name: datalake_survicate_test_raw
 table_name: survey_responses
+domain: Support and Services
