@@ -1,5 +1,10 @@
 cluster:
-  type: consolidation_l_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_memory_cluster
   custom_configurations:
-    num_workers: 3
+    task_nodes:
+      instance_count: 2
+    spark_conf:
+      spark.driver.cores: '4'
+      spark.executor.memory: 24g
+      spark.dynamicAllocation.minExecutors: '2'
+      spark.dynamicAllocation.maxExecutors: '12'

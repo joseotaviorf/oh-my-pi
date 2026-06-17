@@ -1,3 +1,11 @@
 cluster:
-  type: consolidation_m_general_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_min_general_2_workers_cluster
+  custom_configurations:
+    master_node_type_id: m7g.2xlarge
+    node_type_id: m7g.2xlarge
+    spark_conf:
+      spark.driver.memory: 4g
+      spark.executor.cores: "1"
+      spark.executor.memory: 3g
+      spark.dynamicAllocation.minExecutors: "2"
+      spark.dynamicAllocation.maxExecutors: "8"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _mapped_worker_and_driver,
@@ -401,7 +402,7 @@ class TestComputeValidationOverrides:
         resolved = ConfigurationService().get_config(
             "emr_7_12_consolidation_s_memory_cluster"
         )
-        assert resolved.get("master_node_type_id") == "m7g.xlarge"
+        assert resolved.get("master_node_type_id") == "r7g.xlarge"
         assert "driver_node_type_id" not in resolved
 
 
@@ -1079,3 +1080,39 @@ class TestBuildRightsizingValidationClusterSpec:
         )
 
         assert spec is None
+
+
+class TestEmrConsolidationSparkDefaults:
+    def test_emr_consolidation_preset_keeps_hive_catalog_defaults(self):
+        service = ConfigurationService()
+        preset = service.get_config(
+            "emr_7_12_consolidation_xl_memory_single_node_cluster"
+        )
+
+        spark_conf = preset["spark_conf"]
+        assert spark_conf["spark.sql.catalogImplementation"] == "hive"
+        assert spark_conf["spark.sql.legacy.createHiveTableByDefault"] == "true"
+        assert spark_conf["spark.driverEnv.SPARK_RUNTIME"] == "emr"
+
+    def test_cluster_custom_spark_conf_overrides_without_dropping_defaults(self):
+        service = ConfigurationService()
+        cluster_args = {
+            "type": "emr_7_12_consolidation_xl_memory_single_node_cluster",
+            "custom_configurations": {
+                "spark_conf": {
+                    "spark.driver.memory": "8g",
+                    "spark.driver.cores": "4",
+                    "spark.executor.memory": "24g",
+                    "spark.executor.cores": "4",
+                    "spark.dynamicAllocation.minExecutors": "2",
+                    "spark.dynamicAllocation.maxExecutors": "24",
+                }
+            },
+        }
+        effective = merge_cluster_configuration(cluster_args, service)
+        spark_conf = effective["spark_conf"]
+
+        assert spark_conf["spark.sql.catalogImplementation"] == "hive"
+        assert spark_conf["spark.driverEnv.SPARK_RUNTIME"] == "emr"
+        assert spark_conf["spark.driver.memory"] == "8g"
+        assert spark_conf["spark.dynamicAllocation.maxExecutors"] == "24"

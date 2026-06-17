@@ -1,5 +1,2 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    num_workers: 3
+  type: emr_7_12_min_memory_3_workers_cluster
