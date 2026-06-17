@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: projreparos_espelhamento_dl
+domain: Cross
 columns:
   analista_responsavel:
     lineage:

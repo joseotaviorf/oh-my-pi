@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: supply_processor_status_reasons
+domain: Growth
 columns:
     id_reason:
         lineage:

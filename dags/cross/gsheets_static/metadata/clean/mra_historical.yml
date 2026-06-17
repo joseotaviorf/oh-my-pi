@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: mra_historical
+domain: Cross
 columns:
   anticipation_cost:
     lineage:

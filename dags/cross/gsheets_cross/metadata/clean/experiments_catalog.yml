@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: experiments_catalog
+domain: For Rent
 columns:
   experiment_owner_email:
     lineage:

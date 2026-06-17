@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: for_sale_segmentation_survey
+domain: Cross
 columns:
   email:
     tags:

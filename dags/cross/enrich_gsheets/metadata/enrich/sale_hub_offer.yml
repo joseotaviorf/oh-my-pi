@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets
 table_name: sale_hub_offer
+domain: For Sale
 columns:
   id_offer:
     lineage:

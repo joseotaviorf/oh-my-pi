@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_2019
+domain: For Rent
 columns:
   city_group:
     lineage:

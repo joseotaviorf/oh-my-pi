@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: pld_suspicion_list
+domain: For Rent
 columns:
   id_suspicion:
     lineage:

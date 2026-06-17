@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: fdic_liquidation_2021
+domain: For Rent
 columns:
   id_vx_security:
     lineage:

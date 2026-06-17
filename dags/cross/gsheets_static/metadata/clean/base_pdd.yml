@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: base_pdd
+domain: Fintech
 columns:
     id_invoice:
         lineage:

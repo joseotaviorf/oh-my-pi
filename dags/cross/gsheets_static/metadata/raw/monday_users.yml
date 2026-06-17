@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: monday_users
+domain: Cross
 columns:
   id_monday:
     tags:

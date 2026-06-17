@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: from_to_cancellation
+domain: Support and Services
 columns:
   reason:
     lineage:

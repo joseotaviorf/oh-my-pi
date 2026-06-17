@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: survival_estimation
+domain: Cross
 columns:
   first_rentals:
     lineage:

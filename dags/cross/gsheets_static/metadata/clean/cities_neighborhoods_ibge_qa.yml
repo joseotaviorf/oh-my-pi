@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: cities_neighborhoods_ibge_qa
+domain: Cross
 columns:
   city_name_qa:
     lineage:

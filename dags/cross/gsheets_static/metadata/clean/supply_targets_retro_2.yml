@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: supply_targets_retro_2
+domain: Growth
 columns:
   dt_target:
     description: Date of the target.

@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: legacy_doorman
+domain: Cross
 columns:
   id_short_house:
     lineage:

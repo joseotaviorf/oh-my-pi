@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: pro_owner_analyst
+domain: For Rent
 columns:
   id_cluster:
     lineage:

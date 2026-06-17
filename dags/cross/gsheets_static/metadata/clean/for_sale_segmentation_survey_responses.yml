@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: for_sale_segmentation_survey_responses
+domain: For Sale
 columns:
   email:
     lineage:

@@ -1,3 +1,4 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: dags_sla_exclusion_list
+domain: Cross

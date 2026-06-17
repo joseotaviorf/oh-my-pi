@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: affected_areas_natural_disaster_rs
+domain: Fintech
 columns:
   city_name:
     lineage:

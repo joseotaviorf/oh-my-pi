@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: looker_folders_domains
+domain: "Data Ops & Governance"

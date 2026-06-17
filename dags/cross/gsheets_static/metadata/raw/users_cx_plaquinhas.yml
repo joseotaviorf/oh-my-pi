@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: users_cx_plaquinhas
+domain: Cross
 columns:
   email:
     tags:

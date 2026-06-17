@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: marketing_affiliates_targets_replanning
+domain: Growth
 columns:
   city_group:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tracking_catalog_user_properties
+domain: "Data Ops & Governance"
 columns:
   project_name:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: nexxera_holly_days
+domain: Fintech
 columns:
   holly_day:
     lineage:

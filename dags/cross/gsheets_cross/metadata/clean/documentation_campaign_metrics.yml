@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: documentation_campaign_metrics
+domain: "Data Ops & Governance"
 columns:
   quarter:
     lineage:

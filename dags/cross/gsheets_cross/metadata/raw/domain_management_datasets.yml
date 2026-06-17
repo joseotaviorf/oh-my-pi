@@ -1,3 +1,4 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: domain_management_datasets
+domain: "Data Ops & Governance"

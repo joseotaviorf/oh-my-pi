@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: ticket_rate_classification
+domain: Cross
 columns:
   macro_taxonomy:
     lineage:

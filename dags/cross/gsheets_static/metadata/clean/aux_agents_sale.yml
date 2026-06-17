@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: aux_agents_sale
+domain: For Sale
 columns:
     id_agent:
         lineage:

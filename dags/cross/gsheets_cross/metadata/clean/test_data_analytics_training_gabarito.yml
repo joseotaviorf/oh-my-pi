@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: test_data_analytics_training_gabarito
+domain: "Data Ops & Governance"
 columns:
   class:
     lineage:

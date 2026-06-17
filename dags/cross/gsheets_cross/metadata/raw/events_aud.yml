@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: events_aud
+domain: Cross
 columns:
   owner:
     tags:

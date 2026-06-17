@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: supply_targets_retro_cohort
+domain: Growth
 columns:
   dt_week_started:
     description: Week of the target.

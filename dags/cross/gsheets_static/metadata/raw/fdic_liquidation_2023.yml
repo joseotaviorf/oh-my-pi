@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: fdic_liquidation_2023
+domain: For Rent
 columns:
   cedentecnpjcpf:
     tags:

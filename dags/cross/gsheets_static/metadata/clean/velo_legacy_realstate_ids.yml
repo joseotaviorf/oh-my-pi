@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: velo_legacy_realstate_ids
+domain: Cross
 columns:
   id_realstate_legacy:
     lineage:

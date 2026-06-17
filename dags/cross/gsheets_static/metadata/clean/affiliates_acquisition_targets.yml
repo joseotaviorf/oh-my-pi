@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: affiliates_acquisition_targets
+domain: Growth
 columns:
   mkt_origin:
     lineage:

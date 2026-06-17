@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: metabase_collections_domains
+domain: "Data Ops & Governance"
 columns:
   domain:
     lineage:

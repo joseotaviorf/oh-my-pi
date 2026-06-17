@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: autonomous_agent_payment_data_lead_origin
+domain: Agents
 columns:
   name:
     lineage:

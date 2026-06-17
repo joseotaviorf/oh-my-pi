@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: supply_listing_historical_reprocessing_2023
+domain: Growth
 columns:
   id_lead:
     lineage:

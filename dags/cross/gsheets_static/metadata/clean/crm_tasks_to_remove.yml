@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: crm_tasks_to_remove
+domain: Support and Services 
 columns:
   id_task:
     lineage:

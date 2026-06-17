@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_static_clean
 table_name: cyber_collection_actions
 owner: bianca.martins@quintoandar.com.br
-domain: cross
+domain: Fintech
 description: Table to map the actions, result and complement as cpc, alo, esforco and promisse
 columns:
   action_code:
