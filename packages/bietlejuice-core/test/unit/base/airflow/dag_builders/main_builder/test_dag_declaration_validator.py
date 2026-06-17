@@ -555,3 +555,37 @@ class TestDAGDeclarationValidatorQueryViewWorkflow:
         # act & assert
         with pytest.raises(AssertionError, match=error_match):
             dag_declaration_validator.validate(dag_declaration=base_declaration)
+
+
+class TestDAGDeclarationValidatorClusterValidationExemptions:
+    @pytest.fixture
+    def dag_declaration_validator(self):
+        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
+            DAGDeclarationValidator,
+        )
+
+        return DAGDeclarationValidator()
+
+    def test_excluded_dag_skips_noop_cluster_diff_check(
+        self, dag_declaration_validator
+    ):
+        cluster = {
+            "type": "consolidation_l_general_cluster",
+            "databricks_conn_id": "databricks_new_env",
+            "custom_configurations": {
+                "driver_node_type_id": "m7g.xlarge",
+                "node_type_id": "m7gd.4xlarge",
+                "runtime_engine": "PHOTON",
+                "num_workers": 4,
+            },
+        }
+        dag_declaration = {
+            "dag": {"name": "enrich_search", "owner": "Data Engineering"},
+            "workflow": {"type": "query", "layer": "enrich"},
+            "cluster": cluster,
+            "validation": {"cluster": cluster},
+        }
+
+        dag_declaration_validator.validate_cluster_validation_cluster_diff(
+            dag_declaration=dag_declaration
+        )

@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from bietlejuice.base.airflow.cluster_config_resolver import (
+    CLUSTER_VALIDATION_EXCLUDED_DAGS,
     merge_cluster_configuration,
     validation_resolves_to_prod_spec,
 )
@@ -43,10 +44,6 @@ PHASE2_WORKFLOWS = frozenset(
     }
 )
 SKIP_CLUSTER_PREFIXES = ("emr_",)
-
-# DAGs opted out of generated validation.cluster (e.g. custom Spark jobs without
-# cluster_validation write support yet).
-CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset({"reverse_kyc"})
 
 INSTANCE_SUFFIX_TO_TIER = {
     "medium": "xs",

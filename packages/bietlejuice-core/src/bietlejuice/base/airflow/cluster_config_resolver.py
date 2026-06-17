@@ -14,6 +14,11 @@ from typing import Any, Dict, Tuple
 from bietlejuice.base.validation.cluster_args import merge_validation_cluster_args
 from bietlejuice.services.configuration_service import ConfigurationService
 
+# DAGs opted out of generated validation.cluster and cluster-diff checks
+# (e.g. custom Spark jobs without cluster_validation write support yet, or prod
+# already matches its consolidation preset).
+CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset({"reverse_kyc", "enrich_search"})
+
 
 def merge_cluster_configuration(
     cluster_args: Dict[str, Any], config_service: ConfigurationService

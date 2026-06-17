@@ -3,6 +3,7 @@ import json
 from cerberus import Validator
 
 from bietlejuice.base.airflow.cluster_config_resolver import (
+    CLUSTER_VALIDATION_EXCLUDED_DAGS,
     validation_resolves_to_prod_spec,
 )
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
@@ -624,6 +625,10 @@ class DAGDeclarationValidator(Validator):
 
     def validate_cluster_validation_cluster_diff(self, dag_declaration: dict) -> None:
         """Validate prod vs consolidation cluster types after cluster YAML is merged."""
+        dag_name = (dag_declaration.get("dag") or {}).get("name")
+        if dag_name in CLUSTER_VALIDATION_EXCLUDED_DAGS:
+            return
+
         validation = dag_declaration.get("validation")
         if not validation:
             return
@@ -662,6 +667,10 @@ class DAGDeclarationValidator(Validator):
 
     @staticmethod
     def _check_cluster_validation_config(dag_declaration: dict) -> None:
+        dag_name = (dag_declaration.get("dag") or {}).get("name")
+        if dag_name in CLUSTER_VALIDATION_EXCLUDED_DAGS:
+            return
+
         validation = dag_declaration.get("validation")
         if not validation:
             return

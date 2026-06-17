@@ -508,15 +508,24 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is None
 
-    def test_excluded_dag_omits_validation(self):
+    @pytest.mark.parametrize("dag_name", ["reverse_kyc", "enrich_search"])
+    def test_excluded_dag_omits_validation(self, dag_name):
         declaration = {
-            "dag": {"name": "reverse_kyc"},
+            "dag": {"name": dag_name},
             "workflow": {
-                "type": "load_access",
-                "layer": "reverse",
-                "load_spark_job": "load_reverse_kyc",
+                "type": "load_access" if dag_name == "reverse_kyc" else "query",
+                "layer": "reverse" if dag_name == "reverse_kyc" else "enrich",
+                **(
+                    {"load_spark_job": "load_reverse_kyc"}
+                    if dag_name == "reverse_kyc"
+                    else {}
+                ),
             },
-            "cluster": {"type": "databricks_13_3_med_general_cluster"},
+            "cluster": {
+                "type": "databricks_13_3_med_general_cluster"
+                if dag_name == "reverse_kyc"
+                else "consolidation_l_general_cluster"
+            },
         }
         spec = build_validation_cluster_spec(
             cluster_args=declaration["cluster"],
