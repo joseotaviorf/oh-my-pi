@@ -2,6 +2,7 @@
 dag:
   name: enrich_sonia_journeys
   owner: Data ForRent
+  schedule_interval: null
   schedule_start_date: 2026, 4, 8
   documentation:
     dag_purpose: |
