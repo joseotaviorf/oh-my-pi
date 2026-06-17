@@ -2,7 +2,7 @@ database_name: datalake_chatmanager_clean
 table_name: chat_user_group
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Chat user group associations"
+description: "One row per user-conversation membership in the chat-manager service, establishing which chat users belong to which chat groups. Tracks membership state, read position (last_read_index), and the user's role (profile) within the conversation."
 columns:
   id_chat_group:
     description: "FK to the chat group this membership record belongs to."

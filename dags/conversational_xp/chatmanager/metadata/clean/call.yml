@@ -2,7 +2,7 @@ database_name: datalake_chatmanager_clean
 table_name: call
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Call records from chat-manager service"
+description: "One row per voice call attempt made through the chat-manager service, including caller and callee leg details, call state, result, and duration. Supports analysis of voice interactions between QuintoAndar agents and users on the Conversational XP platform."
 columns:
   id:
     description: "Internal primary key for the call record in chat-manager."

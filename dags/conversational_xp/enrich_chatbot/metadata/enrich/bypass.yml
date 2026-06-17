@@ -3,7 +3,7 @@ database_name: datalake_chatbot
 table_name: bypass
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: Pre-bot action bypasses extracted from Langfuse session traces, including inside sales bypasses from observations.
+description: "Pre-bot action bypasses extracted from Langfuse session traces, one row per session-bypass combination. Includes inside sales bypasses detected from observations. Z-ordered by id_langfuse_session for efficient session-level lookups."
 columns:
   id_langfuse_session:
     description: "Langfuse session identifier"

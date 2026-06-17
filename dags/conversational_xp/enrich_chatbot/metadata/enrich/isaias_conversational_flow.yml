@@ -3,7 +3,7 @@ database_name: datalake_chatbot
 table_name: isaias_conversational_flow
 owner: alexandre.gimenez@quintoandar.com.br
 domain: Conversational XP
-description: "Success and disqualification signals for the Isaias conversational flow per Langfuse session."
+description: "Success and disqualification signals for the Isaias conversational flow, one row per Langfuse session. Captures lead qualification outcomes (name captured, address confirmed) and disqualification steps from the conversation pipeline. Z-ordered by id_langfuse_session for efficient session-level lookups."
 columns:
   id_langfuse_session:
     description: "Langfuse session identifier."

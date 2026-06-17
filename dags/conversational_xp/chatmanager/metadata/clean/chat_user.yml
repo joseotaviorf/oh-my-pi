@@ -2,7 +2,7 @@ database_name: datalake_chatmanager_clean
 table_name: chat_user
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Chat users from chat-manager service"
+description: "One row per chat participant registered in the chat-manager service. Links external participants (tenants, landlords, agents) to their chat identity via id_participant and id_origin. Used to join conversation records to QuintoAndar user entities."
 columns:
   id:
     description: "Internal primary key for the chat user record."

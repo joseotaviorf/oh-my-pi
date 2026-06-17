@@ -3,7 +3,7 @@ database_name: datalake_chatbot
 table_name: evals
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Aggregated evaluation scores from Langfuse per session. IMPORTANT: backfilled evals will replace previous evals for the same session."
+description: "Aggregated LLM evaluation scores from Langfuse, one row per session. Backfilled evals replace previous scores for the same session. Z-ordered by id_langfuse_session for efficient session-level lookups."
 columns:
   id_langfuse_session:
     description: "Langfuse session identifier"

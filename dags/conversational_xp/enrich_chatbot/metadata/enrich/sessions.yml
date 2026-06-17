@@ -3,7 +3,7 @@ database_name: datalake_chatbot
 table_name: sessions
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: Table containing session data for all chatbot hosts.
+description: "One row per chatbot session across all hosts (Copilot Service, Sauron/SSS legacy, Greenseer). Joins Copilot session IDs, Sauron numeric IDs, SSS public IDs, and Langfuse session IDs into a unified session entity. Z-ordered by [ts_created, id_session, id_sauron_session, id_task, id_ticket] for efficient session-range lookups."
 columns:
   id_session:
     description: 'Copilot Service session ID. NULL for old bot (Greenseer) sessions'

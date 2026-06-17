@@ -2,7 +2,7 @@ database_name: datalake_chatmanager_clean
 table_name: chat_group
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "Chat groups from chat-manager service"
+description: "One row per conversation thread in the chat-manager service, representing a group of participants exchanging messages. Tracks thread metadata including type, state, last message, and the messaging vendor. Used by the Conversational XP team to analyze chat activity and conversation health."
 columns:
   id:
     description: "Internal primary key for the chat group record."

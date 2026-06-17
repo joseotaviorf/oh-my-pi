@@ -3,7 +3,7 @@ database_name: datalake_chatbot
 table_name: messages
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: Table containing message data, includes both human-human and human-AI conversations with message sequencing and timing information.
+description: "One row per chat message across all chatbot sessions, covering both human-to-human and human-to-AI conversations. Includes message sequencing, sender type, and timing. Z-ordered by ts_created for efficient time-range queries."
 columns:
   id_message:
     description: 'Unique key for an individual chat message within a session'
