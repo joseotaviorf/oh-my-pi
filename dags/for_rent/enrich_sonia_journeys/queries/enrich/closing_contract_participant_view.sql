@@ -67,7 +67,8 @@ SELECT
       OR (binning_value_contract_id < 3  AND ts_created >= TIMESTAMP '2026-04-28 00:00:00' AND ts_created < TIMESTAMP '2026-05-07 00:00:00')
       OR (binning_value_contract_id < 30 AND ts_created >= TIMESTAMP '2026-05-07 00:00:00' AND ts_created < TIMESTAMP '2026-05-09 00:00:00')
       OR (binning_value_contract_id < 50 AND ts_created >= TIMESTAMP '2026-05-09 00:00:00' AND ts_created < TIMESTAMP '2026-06-02 00:00:00')
-      OR (binning_value_contract_id < 10 AND ts_created >= TIMESTAMP '2026-06-02 00:00:00')
+      OR (binning_value_contract_id < 10 AND ts_created >= TIMESTAMP '2026-06-02 00:00:00' AND ts_created < TIMESTAMP '2026-06-17 18:00:00')
+      OR (binning_value_contract_id < 50 AND ts_created >= TIMESTAMP '2026-06-17 18:00:00')
     ))
     OR (binning_value < 0)
   ) AS is_participant,

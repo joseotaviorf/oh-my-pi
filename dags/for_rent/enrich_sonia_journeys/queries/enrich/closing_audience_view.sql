@@ -26,7 +26,7 @@ rent_flow_events AS (
         'rent_flow_tenant_contract_sent',   'rent_flow_owner_contract_sent',
         'rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed',
         'rent_flow_contract_canceled')
-    AND (YEAR > 2026 OR (YEAR = 2026 AND MONTH >= 4))
+    AND (YEAR > 2026 OR (YEAR = 2026 AND MONTH > 6) OR (YEAR = 2026 AND MONTH = 6 AND DAY >= 17))
 ),
 flow_person AS (
   SELECT
@@ -75,11 +75,7 @@ SELECT
     -- Gate 0: exactly 2 signatories, graduated rollout by first-sent date
     (e.number_of_signatories = 2
      AND (e.id_contract % 100) < CASE
-        WHEN e.ts_first_sent >= CAST('2026-06-02 00:00:00' AS TIMESTAMP) THEN 10
-        WHEN e.ts_first_sent >= CAST('2026-05-09 00:00:00' AS TIMESTAMP) THEN 50
-        WHEN e.ts_first_sent >= CAST('2026-05-07 00:00:00' AS TIMESTAMP) THEN 30
-        WHEN e.ts_first_sent >= CAST('2026-04-28 00:00:00' AS TIMESTAMP) THEN 3
-        WHEN e.ts_first_sent >= CAST('2026-04-27 00:00:00' AS TIMESTAMP) THEN 1
+        WHEN e.ts_first_sent >= CAST('2026-06-17 18:00:00' AS TIMESTAMP) THEN 50
         ELSE 0
      END)
     -- Gate 1: all signatories registered
