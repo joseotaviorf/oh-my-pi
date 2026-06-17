@@ -144,6 +144,29 @@ class TestEmrJobClusterEngineRetries:
         kwargs = mock_create.call_args.kwargs
         assert kwargs["retries"] == 3
         assert "retry_delay" not in kwargs
+        assert kwargs["deferrable"] is True
+        assert (
+            "airflow_emr_create_cluster_deferrable"
+            not in kwargs["cluster_configuration"]
+        )
+
+    def test_create_cluster_airflow_emr_create_cluster_deferrable_false(self, emr_ctx):
+        mock_create = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(create_cls=mock_create)
+        merged = {**self._MERGED, "airflow_emr_create_cluster_deferrable": False}
+        engine = EmrJobClusterEngine(emr_ctx, merged, MagicMock())
+        with patcher:
+            engine.create_execute_cluster_task(
+                config_service=MagicMock(),
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+        kwargs = mock_create.call_args.kwargs
+        assert kwargs["deferrable"] is False
+        assert (
+            "airflow_emr_create_cluster_deferrable"
+            not in kwargs["cluster_configuration"]
+        )
 
     def test_create_cluster_override_retries_and_delay(self, emr_ctx):
         emr_ctx.cluster_args["emr_task_retries"] = 7

@@ -27,6 +27,10 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 _EXECUTE_JOB_CLUSTER_TASK_ID = "execute-job-cluster"
 
+# Merged cluster YAML (preset + declaration ``custom_configurations``) may set this.
+# Stripped before ``QuintoAndarEmrCreateClusterOperator`` / EMR translate. Not an EMR API field.
+_AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE = "airflow_emr_create_cluster_deferrable"
+
 _DEFAULT_EMR_TASK_RETRIES = 3
 
 _EMR_EXTRA_SPARK_SUBMIT_ARGS = [
@@ -283,11 +287,20 @@ class EmrJobClusterEngine(JobClusterEngine):
 
         from emr_plugin import QuintoAndarEmrCreateClusterOperator
 
+        cluster_configuration = dict(self._merged_cluster_configuration)
+        if _AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE in cluster_configuration:
+            deferrable = bool(
+                cluster_configuration.pop(_AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE)
+            )
+        else:
+            deferrable = True
+
         return QuintoAndarEmrCreateClusterOperator(
             task_id=task_id,
-            cluster_configuration=dict(self._merged_cluster_configuration),
+            cluster_configuration=cluster_configuration,
             aws_conn_id=self._ctx.aws_conn_id,
             dag=self._ctx.dag,
+            deferrable=deferrable,
             execution_timeout=timedelta(
                 hours=BaseTaskCreator._DEFAULT_EXECUTION_TIMEOUT_HOURS
             ),

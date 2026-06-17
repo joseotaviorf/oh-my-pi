@@ -2829,6 +2829,8 @@ datazord_base_checkpoint_location: "s3://wonka.s3.forno.data.quintoandar.com.br/
 
 wonka_cluster_emr:
     <<: *emr_cluster_anchor
+    # Airflow-only (stripped before EMR API); avoids deferred create-cluster resume issues on forno.
+    airflow_emr_create_cluster_deferrable: false
     init_scripts:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
