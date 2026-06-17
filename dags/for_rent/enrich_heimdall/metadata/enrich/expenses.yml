@@ -1,6 +1,7 @@
 ---
 database_name: datalake_heimdall
 table_name: expenses
+domain: For Rent
 columns:
   id:
     lineage:

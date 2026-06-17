@@ -1,5 +1,6 @@
 database_name: datalake_repairs_clean
 table_name: repair_request_chat
+domain: For Rent
 columns:
   id:
     lineage:

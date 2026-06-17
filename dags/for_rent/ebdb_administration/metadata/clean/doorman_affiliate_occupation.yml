@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: doorman_affiliate_occupation
+domain: For Rent
 columns:
   id:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: base_bandaids
+domain: For Rent
 columns:
   key:
     lineage:

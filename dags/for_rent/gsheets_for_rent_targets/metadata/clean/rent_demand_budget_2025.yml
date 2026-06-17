@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: rent_demand_budget_2025
+domain: For Rent
 columns:
   business_type:
     lineage:

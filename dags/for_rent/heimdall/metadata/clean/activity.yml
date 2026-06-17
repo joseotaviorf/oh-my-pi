@@ -1,5 +1,6 @@
 database_name: datalake_heimdall_clean
 table_name: activity
+domain: For Rent
 columns:
   id:
     lineage:

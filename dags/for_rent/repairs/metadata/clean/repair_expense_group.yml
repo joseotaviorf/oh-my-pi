@@ -1,5 +1,6 @@
 database_name: datalake_repairs_clean
 table_name: repair_expense_group
+domain: For Rent
 columns:
   id:
     lineage:

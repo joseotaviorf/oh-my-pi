@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: carteirizados_info
+domain: For Rent
 columns:
   name:
     tags:

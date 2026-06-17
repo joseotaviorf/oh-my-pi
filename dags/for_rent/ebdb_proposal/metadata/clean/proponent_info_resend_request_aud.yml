@@ -1,6 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: proponent_info_resend_request_aud
+domain: For Rent
 columns:
   id:
     lineage:

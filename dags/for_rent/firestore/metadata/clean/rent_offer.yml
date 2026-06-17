@@ -1,6 +1,7 @@
 ---
 database_name: datalake_firestore_clean
 table_name: rent_offer
+domain: For Rent
 columns:
   id:
     lineage:

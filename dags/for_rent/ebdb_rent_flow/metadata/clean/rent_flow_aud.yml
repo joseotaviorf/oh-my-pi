@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: rent_flow_aud
+domain: For Rent
 columns:
   id_rent_flow:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: property_fee
+domain: For Rent
 columns:
   id:
     lineage:

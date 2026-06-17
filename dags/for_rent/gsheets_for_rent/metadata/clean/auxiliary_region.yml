@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: auxiliary_region
+domain: For Rent
 columns:
   id:
     lineage:

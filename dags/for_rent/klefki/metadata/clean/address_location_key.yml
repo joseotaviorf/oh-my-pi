@@ -1,6 +1,7 @@
 ---
 database_name: datalake_klefki_clean
 table_name: address_location_key
+domain: For Rent
 columns:
   id_address_location_key:
     lineage:

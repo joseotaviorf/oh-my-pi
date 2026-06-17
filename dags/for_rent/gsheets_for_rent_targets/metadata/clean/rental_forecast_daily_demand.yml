@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_forecast_daily_demand
+domain: For Rent
 columns:
   city_group:
     lineage:

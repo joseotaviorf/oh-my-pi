@@ -1,3 +1,4 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: contracts_signed_average_ticket_targets
+domain: For Rent

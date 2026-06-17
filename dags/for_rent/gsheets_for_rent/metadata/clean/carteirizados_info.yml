@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: carteirizados_info
+domain: For Rent
 columns:
   id_client:
     lineage:

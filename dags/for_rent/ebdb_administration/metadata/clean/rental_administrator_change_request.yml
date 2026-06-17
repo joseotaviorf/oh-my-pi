@@ -1,6 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: rental_administrator_change_request
+domain: For Rent
 columns:
   id_rental_administrator_change_request:
     lineage:

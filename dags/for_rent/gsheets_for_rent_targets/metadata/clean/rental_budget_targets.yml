@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_budget_targets
+domain: For Rent
 columns:
   contact_onboarding_moving_actual:
     lineage:

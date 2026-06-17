@@ -1,6 +1,7 @@
 ---
 database_name: datalake_klefki_clean
 table_name: key_return_preferred_location
+domain: For Rent
 columns:
   id_key_return_preferred_location:
     lineage:

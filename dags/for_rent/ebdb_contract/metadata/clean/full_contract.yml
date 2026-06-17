@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: full_contract
+domain: For Rent
 columns:
   ts_agent_comission_calculated:
     lineage:

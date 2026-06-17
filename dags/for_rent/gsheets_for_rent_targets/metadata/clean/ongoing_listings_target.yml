@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: ongoing_listings_target
+domain: For Rent
 columns:
   business_context:
     description: Business context of the listing.

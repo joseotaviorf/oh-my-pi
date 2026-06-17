@@ -1,6 +1,7 @@
 ---
 database_name: datalake_condominium_payments_clean
 table_name: non_payment_report_invoice
+domain: For Rent
 columns:
   id:
     lineage:

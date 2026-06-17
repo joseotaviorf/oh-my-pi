@@ -1,5 +1,6 @@
 database_name: datalake_repairs_clean
 table_name: instant_approval_preference
+domain: For Rent
 columns:
   id_house:
     lineage:
