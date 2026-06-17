@@ -41,7 +41,13 @@ search_event AS (
       LOWER(ss.business_context) = 'rent'
       AND ss.search_rendering_type != "N/A"
       AND ss.event_type = 'Search'
-      AND ss.year >= 2022
+      -- Fact scan bounded to the reprocess window + the {days_past} lookback.
+      -- search_session_event is partitioned by (year, month, day) derived from the
+      -- event date, so filter on MAKE_DATE(year, month, day) for day-level partition
+      -- pruning. A year-only predicate would scan every month/day in those years.
+      AND MAKE_DATE(ss.year, ss.month, ss.day)
+            BETWEEN DATE_SUB(DATE('{start_date}'), {days_reprocess} + {days_past})
+                AND DATE('{end_date}')
   GROUP BY 1,2,3
 
 
@@ -69,7 +75,11 @@ unique_valid_offers AS (
        ON 
           rent_flow.id_rent_flow = voffer.id_rent_flow
     WHERE 
-       rent_flow.ts_created > '2022-02-01'
+       -- Flow fact bounded to the reprocess window. rent_flows is partitioned by
+       -- country_code only (no date partitions), so this ts_created predicate is a
+       -- data filter, not partition pruning - it still caps the rows fed into the join.
+       rent_flow.ts_created >= DATE_SUB(DATE('{start_date}'), {days_reprocess})
+       AND rent_flow.ts_created < DATE_ADD(DATE('{end_date}'), 1)
     GROUP BY 1,2
 
 ),

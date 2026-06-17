@@ -10,21 +10,33 @@ workflow:
     "days_past": 14
     "days_past_21": 21
     "days_past_30": 30
+    # Reprocess window (N): how many trailing days of flow-event partitions each
+    # run recomputes. Must be >= the maximum late-arrival/restatement lag of
+    # rent_flows.ts_created / sale_flow.ts_first_event, otherwise late flows for
+    # older dates will be missed. Tune with the Search team.
+    "days_reprocess": 30
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  # Serialized so the two heavy targets do not run concurrently on the same
+  # cluster (avoids Spark fair-scheduler task preemption / "preempted by
+  # scheduler" churn). Order: amplitude_user_device -> item_interaction -> item_interaction_sale.
   inner_dependencies:
     item_interaction:
       - amplitude_user_device
     item_interaction_sale:
-      - amplitude_user_device
+      - item_interaction
   tables_customization:
+    # amplitude_user_device stays full: it is the identity-resolution dimension
+    # (id -> id_amplitude_main) and needs broad history.
     item_interaction:
+      extraction_type: incremental
       partitions:
         - year
         - month
         - day
         - interaction_type
     item_interaction_sale:
+      extraction_type: incremental
       partitions:
         - year
         - month

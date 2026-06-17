@@ -41,7 +41,13 @@ search_event AS (
       LOWER(ss.business_context) = 'sale'
       AND ss.search_rendering_type != "N/A"
       AND ss.event_type = 'Search'
-      AND ss.year >= 2022
+      -- Fact scan bounded to the reprocess window + the {days_past} lookback.
+      -- search_session_event is partitioned by (year, month, day) derived from the
+      -- event date, so filter on MAKE_DATE(year, month, day) for day-level partition
+      -- pruning. A year-only predicate would scan every month/day in those years.
+      AND MAKE_DATE(ss.year, ss.month, ss.day)
+            BETWEEN DATE_SUB(DATE('{start_date}'), {days_reprocess} + {days_past})
+                AND DATE('{end_date}')
   GROUP BY 1,2,3
 ),
 
@@ -53,7 +59,11 @@ sale_flow AS (
   FROM
     datalake_sale_flows.sale_flow
   WHERE
-    sale_flow.ts_first_event >= '2022-01-01'
+    -- Flow fact bounded to the reprocess window. sale_flow is unpartitioned, so this
+    -- ts_first_event predicate is a data filter, not partition pruning - it still caps
+    -- the rows fed into the join.
+    sale_flow.ts_first_event >= DATE_SUB(DATE('{start_date}'), {days_reprocess})
+    AND sale_flow.ts_first_event < DATE_ADD(DATE('{end_date}'), 1)
     AND sale_flow.flow_type IN (
       'VB', -- The buyer only booked visits
       'VB_VC', -- The buyer performed visits 
