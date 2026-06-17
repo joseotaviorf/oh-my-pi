@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: offboarding_payments_expenses
+domain: Fintech
 columns:
   id_contract:
     lineage:

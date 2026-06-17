@@ -2,7 +2,7 @@
 database_name: dw_fintech_snapshot_quintocred
 table_name: quintocred_company_plan
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id:
     description: "Unique identifier (ID) for the company plan record"

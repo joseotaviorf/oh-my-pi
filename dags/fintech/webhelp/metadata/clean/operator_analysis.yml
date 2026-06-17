@@ -2,7 +2,7 @@
 database_name: datalake_webhelp_clean
 table_name: operator_analysis
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Login/logout webhelp operators
 columns:
   actuation_cell:

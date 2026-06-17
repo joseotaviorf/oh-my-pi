@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_test_proposals
+domain: Fintech
 columns:
   executive:
     lineage:

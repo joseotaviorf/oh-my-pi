@@ -2,7 +2,7 @@
 database_name: datalake_collections_quintoandar
 table_name: installment
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description:
   Table that consolidates installment data from Trato Feito, Cyber, and
   Recupera systems. It harmonizes fields and adjusts values for consistency, especially

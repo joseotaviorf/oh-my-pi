@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: delayed_portfolio_base
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   This report is a list of overdue invoices, whether original, or ongoing or broken agreements. It is basically the active billing portfolio.
   Invoices that are left out: paid, to due, paused.

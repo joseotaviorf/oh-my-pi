@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: business_rules_bonus
+domain: Fintech
 columns:
   service_line:
     lineage:

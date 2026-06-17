@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: installment
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Installment table from Trato Feito product"
 columns:
   id:

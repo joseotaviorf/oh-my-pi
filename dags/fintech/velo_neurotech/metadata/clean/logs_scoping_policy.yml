@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_neurotech_clean
 table_name: logs_scoping_policy
+domain: Fintech
 columns:
   id_proposal:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_paschoalotto_raw
 table_name: geqlendereco
+domain: Fintech
 columns:
   endereco_str:
     tags:

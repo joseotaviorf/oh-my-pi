@@ -1,7 +1,7 @@
 database_name: datalake_docx
 table_name: credit_evaluation
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table with the credit evaluation of the tenant"
 columns:
   id:

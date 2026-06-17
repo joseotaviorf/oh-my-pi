@@ -1,5 +1,6 @@
 database_name: datalake_velo_zendesk_clean
 table_name: group_memberships
+domain: Fintech
 columns:
   id_group_memberships:
     lineage:

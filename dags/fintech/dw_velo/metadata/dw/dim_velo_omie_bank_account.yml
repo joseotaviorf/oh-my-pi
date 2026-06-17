@@ -2,7 +2,7 @@
 database_name: dw_velo
 table_name: dim_velo_omie_bank_account
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Dimension with Bank Account from Velo, registered on OMIE systems.
 columns:
   sk_bank_account:

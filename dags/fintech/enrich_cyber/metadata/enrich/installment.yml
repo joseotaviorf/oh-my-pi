@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: installment
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table granularity - installments of agreements/negotiations
 columns:
   id_agreement_installment:

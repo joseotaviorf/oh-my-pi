@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: categories
+domain: Fintech
 columns:
   id_category:
     lineage:

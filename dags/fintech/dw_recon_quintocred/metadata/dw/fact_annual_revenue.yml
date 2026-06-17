@@ -1,7 +1,7 @@
 database_name: dw_recon_quintocred
 table_name: fact_annual_revenue
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Data from customer revenue in QuintoCred recon context."
 columns:
   sk_propose:

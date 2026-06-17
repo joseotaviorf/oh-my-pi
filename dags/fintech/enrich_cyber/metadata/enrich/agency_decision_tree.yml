@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: agency_decision_tree
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Agency/advisory decision tree
 columns:
   level:

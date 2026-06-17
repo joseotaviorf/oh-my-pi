@@ -2,7 +2,7 @@
 database_name: datalake_docpilot_clean
 table_name: processed_message
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This table stores the messages received from the DocPilot worker"
 columns:
   id_subscriber:

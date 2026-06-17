@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: mova_lra_owners
+domain: Fintech
 columns:
   ccb_number:
     lineage:

@@ -3,7 +3,7 @@ database_name: datalake_losses
 table_name: bill_items
 description: "Enrich table with the invoice's bill items"
 owner: bianca.martinss@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_invoice:
     lineage:

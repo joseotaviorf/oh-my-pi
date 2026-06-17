@@ -1,5 +1,6 @@
 database_name: datalake_docx_clean
 table_name: credit_evaluation_proponent_aud
+domain: Fintech
 columns:
   id_credit_evaluation_proponent:
     lineage:

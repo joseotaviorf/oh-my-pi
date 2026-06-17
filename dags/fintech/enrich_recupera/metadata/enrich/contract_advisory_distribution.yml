@@ -2,7 +2,7 @@
 database_name: datalake_recupera
 table_name: contract_advisory_distribution
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Contract distribution between advisories
 columns:
   id_contract:

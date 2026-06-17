@@ -1,7 +1,7 @@
 database_name: dw_neurotech_quintocred
 table_name: fact_credit_flow
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Data from logs_scoping_policy and logs_credit_granting, contains all information from manual and automatic assessment."
 columns:
   sk_propose:

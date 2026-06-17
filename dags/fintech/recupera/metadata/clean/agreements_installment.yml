@@ -7,7 +7,7 @@ description: |
   Original Table Name: TBL_DEPARA_ACORDOS_PARC_5A.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_installment:
     description: "Installment ID"

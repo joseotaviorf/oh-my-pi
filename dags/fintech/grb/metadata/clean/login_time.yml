@@ -2,7 +2,7 @@
 database_name: datalake_grb_clean
 table_name: login_time
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table contains data related to the work hours of employees in the organization. It includes details such as the total time spent on breaks, logged-in time, talking time, and time without assistance. This data can be used to analyze work patterns, identify potential productivity issues, and evaluate the effectiveness of training programs. It can also help in tracking individual employee performance and identifying areas for improvement.
 columns:
   id_operator_cyber:

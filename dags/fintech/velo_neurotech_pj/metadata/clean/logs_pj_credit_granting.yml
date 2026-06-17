@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_neurotech_pj_clean
 table_name: logs_pj_credit_granting
+domain: Fintech
 columns:
   id_proposal:
     lineage:

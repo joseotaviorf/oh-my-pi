@@ -1,7 +1,7 @@
 ---
 database_name: datalake_google_calendar_clean
 table_name: mexican_holidays
-domain: cross
+domain: Cross
 owner: data-ae-fintech@quintoandar.com.br
 columns:
   id:

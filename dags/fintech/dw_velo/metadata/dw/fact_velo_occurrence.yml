@@ -2,7 +2,7 @@
 database_name: dw_velo
 table_name: fact_velo_occurrence
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Fact table responsible for the Occurrence context of Velo
 columns:
   sk_occurrence:

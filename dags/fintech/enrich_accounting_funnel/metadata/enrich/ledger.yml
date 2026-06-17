@@ -2,7 +2,7 @@
 database_name: datalake_accounting_funnel
 table_name: ledger
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table ledger from SAP with the last 18 months of data"
 columns:
   id_transaction:

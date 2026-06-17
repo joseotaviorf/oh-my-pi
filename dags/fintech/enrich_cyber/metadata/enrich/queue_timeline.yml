@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: queue_timeline
 owner: juliana.hocihara@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table responsible for creating a timeline for each contract, showing its position in the three existing queues (segmentation, agreement and eviction)
 columns:
   id_contract_external:

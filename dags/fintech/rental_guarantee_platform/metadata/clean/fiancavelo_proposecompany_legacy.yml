@@ -1,7 +1,7 @@
 ---
 database_name: datalake_velo_clean
 table_name: fiancavelo_proposecompany_legacy
-domain: fintech
+domain: Fintech
 owner: data-ae-fintech@quintoandar.com.br
 columns:
   id:

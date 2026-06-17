@@ -1,7 +1,7 @@
 database_name: dw_rental_payments
 table_name: fact_invoice_status_changes
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This table materializes the temporal monthly evolution of a given status of an invoice and the financial value of that status"
 columns:
   sk_invoice:

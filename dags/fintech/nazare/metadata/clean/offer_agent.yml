@@ -1,6 +1,7 @@
 ---
 database_name: datalake_nazare_clean
 table_name: offer_agent
+domain: Fintech
 columns:
   id_offer_agent:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: debt
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Debts/invoices that were negotiated. Table granularity - invoices
 columns:
   id_debtor:

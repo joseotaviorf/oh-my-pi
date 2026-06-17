@@ -1,7 +1,7 @@
 database_name: datalake_retsuko_clean
 table_name: monthly_closing_checks
 owner: rodrigo.guedes@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Seu Barriga's checks, alerts and informations about monthly closing"
 columns:
   id:

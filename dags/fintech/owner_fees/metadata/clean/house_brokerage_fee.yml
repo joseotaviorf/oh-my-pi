@@ -1,5 +1,6 @@
 database_name: datalake_owner_fees_clean
 table_name: house_brokerage_fee
+domain: Fintech
 columns:
   id:
     lineage:

@@ -1,5 +1,6 @@
 database_name: datalake_fastforward_clean
 table_name: installment_plan_aud
+domain: Fintech
 columns:
   id_installment_plan:
     lineage:

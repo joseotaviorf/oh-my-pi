@@ -1,6 +1,7 @@
 ---
 database_name: datalake_nazare_clean
 table_name: tier_bonus
+domain: Fintech
 columns:
   id_tier_bonus:
     lineage:

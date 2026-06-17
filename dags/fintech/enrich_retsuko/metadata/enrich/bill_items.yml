@@ -2,7 +2,7 @@
 database_name: datalake_retsuko
 table_name: bill_items
 owner: leticia.silveira@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Granular table by bill items with data from the last 3 years"
 columns:
   id_contract:

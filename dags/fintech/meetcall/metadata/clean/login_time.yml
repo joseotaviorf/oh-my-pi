@@ -1,7 +1,7 @@
 database_name: datalake_meetcall_clean
 table_name: login_time
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table contains data related to the work hours of Meetcall employees. It includes key metrics such as pause time, logged-in duration, talk time, and idle time. The data can be used to monitor operator productivity, understand workload patterns, and support operational decision-making related to workforce management.
 columns:
   id_record:

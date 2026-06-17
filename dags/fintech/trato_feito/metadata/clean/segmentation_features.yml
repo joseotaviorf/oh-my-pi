@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: segmentation_features
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Segmentation features calculated for Trato Feito contracts, used for modeling and collections analysis.
 columns:
   id:

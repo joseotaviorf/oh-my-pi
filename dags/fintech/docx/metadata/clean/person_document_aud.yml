@@ -2,7 +2,7 @@
 database_name: datalake_docx_clean
 table_name: person_document_aud
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This auditated table stores any document submitted by a person, and any modification related to the document.
 columns:
   id:

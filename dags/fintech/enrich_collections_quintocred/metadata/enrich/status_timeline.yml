@@ -2,7 +2,7 @@
 database_name: datalake_collections_quintocred
 table_name: status_timeline
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Intermediate table to create status timeline on delinquency_timeline"
 columns:
   id:

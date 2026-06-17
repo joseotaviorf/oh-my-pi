@@ -1,6 +1,7 @@
 ---
 database_name: datalake_recupera_raw
 table_name: records
+domain: Fintech
 columns:
   customer_name:
     tags:

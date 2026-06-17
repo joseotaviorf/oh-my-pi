@@ -2,7 +2,7 @@
 database_name: datalake_retsuko
 table_name: entry
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Information about entries from invoices"
 columns:
   id:

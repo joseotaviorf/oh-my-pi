@@ -1,7 +1,7 @@
 database_name: datalake_velo
 table_name: propose_values_legacy
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing Velo's proposes detailed info (only 2.0 not migrated proposes)"
 columns:
   id_propose_values:

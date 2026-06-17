@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_clean
 table_name: veloscore_personal
+domain: Fintech
 columns:
   id:
     lineage:

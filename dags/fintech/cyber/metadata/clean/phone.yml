@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: phone
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   id_phone:

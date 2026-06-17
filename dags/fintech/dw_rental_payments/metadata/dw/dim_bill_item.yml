@@ -1,7 +1,7 @@
 database_name: dw_rental_payments
 table_name: dim_bill_item
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This table contains information about the bill items of an invoice"
 columns:
   sk_invoice:

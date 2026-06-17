@@ -1,7 +1,7 @@
 database_name: dw_credit_analysis
 table_name: fact_early_credit
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table with the LAST early credit analysis information of the tenant"
 columns:
   sk_early_credit_analysis:

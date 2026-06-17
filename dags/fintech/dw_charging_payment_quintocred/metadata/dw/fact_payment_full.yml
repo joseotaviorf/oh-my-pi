@@ -2,7 +2,7 @@
 database_name: dw_charging_payment_quintocred
 table_name: fact_payment_full
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   There are some differences between delinquency_timeline and fact_payment_full, the delinquency_timeline brings daily data and fact_payment_full brings monthly.
   We do not consider Guarranty and Termination delinquencies in fact_payment_full.

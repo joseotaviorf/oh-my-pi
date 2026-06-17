@@ -1,5 +1,6 @@
 database_name: datalake_docx_clean
 table_name: folder_reference_type
+domain: Fintech
 columns:
   id:
     lineage:

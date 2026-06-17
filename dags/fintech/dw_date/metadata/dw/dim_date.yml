@@ -2,7 +2,7 @@
 database_name: dw_public
 table_name: dim_date
 owner: fintech-ae@quintoandar.com.br
-domain: cross
+domain: Cross
 description: Table that has all base structures for hadling dates on QuintoAndar
 columns:
   sk_date:

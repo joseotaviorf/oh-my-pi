@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: historical_agreements
 owner: bianca.martins@quintoandar.com
-domain: fintech
+domain: Fintech
 description: |
   Historical table according to the contracts selected in the negotiation.
   This table will contain information about the contracts that were selected in the negotiation and will be updated when the agreement is recorded.

@@ -3,7 +3,7 @@ database_name: dw_losses
 table_name: fact_provision
 description: This table is the fact table for the provision information regarding the losses modelation.
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   sk_invoice:
     lineage:

@@ -2,7 +2,7 @@
 database_name: dw_charging_payment_quintocred
 table_name: fact_charging_payment
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   id:

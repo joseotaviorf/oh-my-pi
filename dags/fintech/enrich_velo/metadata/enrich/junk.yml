@@ -2,7 +2,7 @@
 database_name: datalake_velo
 table_name: junk
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Junk table to Velo model
 columns:
   id_junk:

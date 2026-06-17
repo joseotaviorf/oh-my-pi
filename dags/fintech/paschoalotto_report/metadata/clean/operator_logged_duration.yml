@@ -2,7 +2,7 @@
 database_name: datalake_paschoalotto_report_clean
 table_name: operator_logged_duration
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table contains information about login, logout and operating time of operators
 columns:
   id:

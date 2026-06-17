@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: process_eviction
+domain: Fintech
 columns:
   landlord_emails:
     tags:

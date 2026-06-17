@@ -1,6 +1,7 @@
 ---
 database_name: datalake_nexxera_raw
 table_name: adjustments
+domain: Fintech
 columns:
   col_2:
     tags:

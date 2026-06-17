@@ -2,7 +2,7 @@
 database_name: datalake_sap_gateway_clean
 table_name: sync_sap_job
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   id_sync_sap_job:

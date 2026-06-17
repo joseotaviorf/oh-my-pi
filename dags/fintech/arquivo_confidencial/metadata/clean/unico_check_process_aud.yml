@@ -1,5 +1,6 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: unico_check_process_aud
+domain: Fintech
 columns:
   id:
     lineage:

@@ -1,7 +1,7 @@
 database_name: datalake_cyber
 table_name: users
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table mapping users to agency groups, including deduplication and name standardization for company names.
 columns:
   id_user:

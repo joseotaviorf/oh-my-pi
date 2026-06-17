@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: payments
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table granularity - installments of the negotiation that were paid
 columns:
   id_contract:

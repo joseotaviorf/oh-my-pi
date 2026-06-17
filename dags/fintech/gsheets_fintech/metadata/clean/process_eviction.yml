@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: process_eviction
+domain: Fintech
 columns:
   id_contract:
     lineage:

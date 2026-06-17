@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_omie_raw
 table_name: clients
+domain: Fintech
 columns:
   cnpj_cpf:
     tags:

@@ -2,7 +2,7 @@
 database_name: metric_fintech__velo
 table_name: rating_funnel
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Metric with relation between week, neurotech rating analysis and the acquisition funnel for QuintoCred. \n PS: The rating used is always the LAST one for each propose."
 columns:
   date:

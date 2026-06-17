@@ -1,7 +1,7 @@
 ---
 database_name: datalake_docx_clean
 table_name: person_document_info
-domain: fintech
+domain: Fintech
 description: This table stores the details of any document submitted by a person. Each row represents a piece of document attached to a person.
 columns:
   id:

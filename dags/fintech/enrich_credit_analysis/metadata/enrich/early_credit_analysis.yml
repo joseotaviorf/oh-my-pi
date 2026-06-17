@@ -3,7 +3,7 @@ database_name: datalake_credit_analysis
 table_name: early_credit_analysis
 description: "Enrich table with the early credit analysis information"
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_house:
     lineage:

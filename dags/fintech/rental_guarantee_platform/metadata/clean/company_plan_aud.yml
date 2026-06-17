@@ -2,7 +2,7 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: company_plan_aud
 owner: athos.sampayo@quintoandar.com.br
-domain: platform
+domain: Fintech
 description:
 columns:
   id:

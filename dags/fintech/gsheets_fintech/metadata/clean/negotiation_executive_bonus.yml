@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: negotiation_executive_bonus
+domain: Fintech
 columns:
   id_negotiation_executive:
     lineage:

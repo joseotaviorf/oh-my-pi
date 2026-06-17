@@ -1,6 +1,7 @@
 ---
 database_name: datalake_invoice_preview_clean
 table_name: invoice_preview
+domain: Fintech
 columns:
   id_contract:
     lineage:

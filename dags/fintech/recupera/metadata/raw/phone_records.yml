@@ -1,6 +1,7 @@
 ---
 database_name: datalake_recupera_raw
 table_name: phone_records
+domain: Fintech
 columns:
   phone_number:
     tags:

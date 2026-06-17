@@ -8,7 +8,7 @@ description: |
   All indicators can be found at the spreadsheet [Cad_Indicadores QuintoAndar_22022023](https://docs.google.com/spreadsheets/d/1LO6aI8Dh3nCWmwQ7vby8rsY6dGb2GHBz/edit#gid=1344425930)
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."

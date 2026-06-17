@@ -1,5 +1,6 @@
 database_name: datalake_iaf_clean
 table_name: employee
+domain: Fintech
 columns:
     id:
         lineage:

@@ -2,7 +2,7 @@
 database_name: dw_losses
 table_name: fact_losses
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table that apply all necessary filters and add all necessary columns to calculate losses
 columns:
   sk_contract:

@@ -2,7 +2,7 @@
 database_name: dw_public_snapshot
 table_name: dim_contract_snapshot
 owner: ae-finance-fintech@quintoandar.com.br
-domain: "fintech"
+domain: Fintech
 description: "dw_rent.dim_contract monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_contract:

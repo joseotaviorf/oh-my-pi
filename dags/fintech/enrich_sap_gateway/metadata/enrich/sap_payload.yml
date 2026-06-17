@@ -2,7 +2,7 @@
 database_name: datalake_sap_gateway
 table_name: sap_payload
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing SAP payload information from sync jobs"
 columns:
   id_sync_sap_job:

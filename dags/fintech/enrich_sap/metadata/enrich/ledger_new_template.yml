@@ -2,7 +2,7 @@
 database_name: datalake_pas
 table_name: ledger_new_template
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table ledger from SAP B1 with the 4HANA template"
 columns:
   id_transaction:

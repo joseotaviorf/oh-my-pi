@@ -2,7 +2,7 @@
 database_name: datalake_paschoalotto_clean
 table_name: collection_history
 owner: bianca.martins@quintoandar.com.br
-domain: Fintechs
+domain: Fintech
 description: Situation history in customer contact status
 columns:
   id_collection_history:

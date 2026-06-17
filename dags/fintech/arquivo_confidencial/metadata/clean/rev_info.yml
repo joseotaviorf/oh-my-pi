@@ -1,5 +1,6 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: rev_info
+domain: Fintech
 columns:
   rev:
     lineage:

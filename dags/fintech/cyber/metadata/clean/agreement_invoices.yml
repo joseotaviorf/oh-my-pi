@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: agreement_invoices
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Invoices created by the agreements installments. Table granularity - Installment of Negotiation
 columns:
   id_invoice:

@@ -2,7 +2,7 @@
 database_name: dw_recon_quintocred_snapshot
 table_name: fact_receivable_guarantees
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   sk_propose:
     description: ''

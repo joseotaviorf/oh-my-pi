@@ -1,5 +1,6 @@
 database_name: datalake_vans_clean
 table_name: file_payment
+domain: Fintech
 columns:
   id_file:
     lineage:

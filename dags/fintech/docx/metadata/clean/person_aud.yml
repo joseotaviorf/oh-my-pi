@@ -2,7 +2,7 @@
 database_name: datalake_docx_clean
 table_name: person_aud
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table stores the auditated data from users who authenticate in 5A plastform (users) or interact with our products (person).
 columns:
   id:

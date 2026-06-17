@@ -2,7 +2,7 @@
 database_name: datalake_paschoalotto_clean
 table_name: collection_actions
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: It represents the paschoalotto report 'RETORNO' that contains data about collection
 columns:
   id_action:

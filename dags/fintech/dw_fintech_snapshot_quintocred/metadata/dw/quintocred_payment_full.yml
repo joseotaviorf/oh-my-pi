@@ -2,7 +2,7 @@
 database_name: dw_fintech_snapshot_quintocred
 table_name: fact_payment_full
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   sk_propose:

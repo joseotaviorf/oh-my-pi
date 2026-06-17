@@ -2,7 +2,7 @@
 database_name: datalake_docx_clean
 table_name: group
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: 'This table stores the data about a group (i.e group of tenants, owners, etc) and its activities.'
 columns:
   id_group:

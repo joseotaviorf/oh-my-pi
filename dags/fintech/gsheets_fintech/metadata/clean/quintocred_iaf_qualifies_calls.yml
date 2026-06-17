@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_iaf_qualifies_calls
+domain: Fintech
 columns:
   qualifies:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_docx
 table_name: credit_evaluation_events
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: The table credit_evaluation_events extracts specific events timestamps related to the credit evaluation process.
 columns:
   id_credit_evaluation:

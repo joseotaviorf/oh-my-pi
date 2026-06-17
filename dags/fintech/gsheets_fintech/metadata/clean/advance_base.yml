@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: advance_base
+domain: Fintech
 columns:
   id_offer:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: aux_commission
+domain: Fintech
 columns:
   commission_type:
     lineage:

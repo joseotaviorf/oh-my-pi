@@ -1,7 +1,7 @@
 database_name: dw_recon_quintocred_snapshot
 table_name: fact_pending_transfers_summarized
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Data from pending transfers in QuintoCred recon context."
 columns:
   sk_propose:

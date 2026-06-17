@@ -2,7 +2,7 @@
 database_name: datalake_agreement_hourly
 table_name: negotiation
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table updated hourly with Trato Feito negotiation data.
 columns:
   id_negotiation:

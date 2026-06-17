@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: expected_evers
+domain: Fintech
 columns:
   model_key:
     lineage:

@@ -3,7 +3,7 @@ database_name: datalake_losses
 table_name: provision_factor
 description: This is the enrich table to list the provision factor that should be used on the provision formula.
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   sk_factor_risk:
     description: Id of the factor risk.

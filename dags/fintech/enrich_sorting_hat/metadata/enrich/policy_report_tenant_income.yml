@@ -2,7 +2,7 @@
 database_name: datalake_sorting_hat
 table_name: policy_report_tenant_income
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table stores all the data about the tenant income policy. The data is processed by the income engine, which gets information from several sources (bureau, docx, main) to calculate the elected income from a proposal.
 columns:
   id_analysis_machine:

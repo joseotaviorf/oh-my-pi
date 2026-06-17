@@ -2,7 +2,7 @@ database_name: datalake_ebdb_clean
 table_name: bypass_term
 description: This table has the data related to the bypass term signed by the owner on the first VB (visit booked).
 owner: herivelto.junior@quintoandar.com.br
-domain: Data ForSale
+domain: For Sale
 columns:
   id:
     description: Unique ID for this record.

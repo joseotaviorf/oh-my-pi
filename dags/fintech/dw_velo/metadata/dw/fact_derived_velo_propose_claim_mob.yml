@@ -2,7 +2,7 @@
 database_name: dw_velo
 table_name: fact_derived_velo_propose_claim_mob
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This is a derived fact table that materializes the temporal monthly evolution (based on MOB) of a given status of an propose and the claim values related to it. \n MOB (Months on books) definition: which is the number of months that have completed since the reference date (creation date or due date) of an claim"
 columns:
   sk_propose:

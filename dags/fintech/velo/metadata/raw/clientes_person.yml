@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_raw
 table_name: clientes_person
+domain: Fintech
 columns:
   name:
     tags:

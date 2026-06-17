@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: bill
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table for storing debts that may or may not be sent to the collector. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
   id:

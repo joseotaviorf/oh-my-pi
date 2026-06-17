@@ -1,6 +1,7 @@
 ---
 database_name: datalake_payable_accounts_transactions_clean
 table_name: accounts_payable
+domain: Fintech
 columns:
   accrual_year_month:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: queue_decision_tree
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Queue decision
 columns:
   level:

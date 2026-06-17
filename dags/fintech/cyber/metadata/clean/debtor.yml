@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: debtor
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   This table stores information about people related to the debtor. The first 3 relationships
   are generally co-debtors who add and update each other to and from the host system via update (process

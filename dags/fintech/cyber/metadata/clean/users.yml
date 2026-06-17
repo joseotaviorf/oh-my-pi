@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: users
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This Table Contains all general data on system users.
 columns:
   id_user:

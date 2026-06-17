@@ -2,7 +2,7 @@
 database_name: datalake_docx_clean
 table_name: group_authorization
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: 'This table stores all authorization details issued to a group.'
 columns:
   id:

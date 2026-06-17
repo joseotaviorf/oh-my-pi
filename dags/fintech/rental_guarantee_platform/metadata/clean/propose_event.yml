@@ -1,6 +1,7 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: propose_event
+domain: Fintech
 columns:
   id:
     lineage:

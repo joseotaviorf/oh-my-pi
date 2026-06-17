@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_coincident_targets
+domain: Fintech
 columns:
   evaluation_started:
     lineage:

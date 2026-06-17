@@ -1,7 +1,7 @@
 database_name: datalake_velo
 table_name: transaction_entries
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Enriched table responsible for the transaction entries (itens in a transaction) for the Velo context.
 columns:
   id_transaction_entry:

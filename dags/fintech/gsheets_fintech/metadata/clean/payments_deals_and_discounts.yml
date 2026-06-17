@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: payments_deals_and_discounts
+domain: Fintech
 columns:
   sk_request:
     lineage:

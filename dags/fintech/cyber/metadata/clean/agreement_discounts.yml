@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: agreement_discounts
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Information on discounts granted in agreements. Table granularity - id_agreement.
 columns:
   id_agreement:

@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: imovelweb_customer_portfolio
+domain: Fintech
 columns:
   sk_sap:
     lineage:

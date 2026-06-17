@@ -2,7 +2,7 @@
 database_name: datalake_itau_statements_clean
 table_name: statement_067000392216
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id:
     lineage:

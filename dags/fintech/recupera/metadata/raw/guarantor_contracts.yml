@@ -1,6 +1,7 @@
 ---
 database_name: datalake_recupera_raw
 table_name: guarantor_contracts
+domain: Fintech
 columns:
   name:
     tags:

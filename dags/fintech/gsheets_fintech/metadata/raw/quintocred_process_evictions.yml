@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_fintech_clean
 table_name: quintocred_process_evictions
+domain: Fintech
 columns:
   parte_contraria_nome:
     tags:

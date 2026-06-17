@@ -1,6 +1,6 @@
 database_name: dw_payment
 table_name: dim_invoice
-domain: fintech
+domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 description: "Information about invoices issued by SeuBarriga for ForRent contracts"
 columns:

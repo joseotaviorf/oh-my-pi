@@ -1,7 +1,7 @@
 database_name: datalake_velo
 table_name: transaction_category
 owner: "@ae-finance-fintech"
-domain: "fintech"
+domain: Fintech
 description: Dimension with the details of the category
 columns:
   id_category:

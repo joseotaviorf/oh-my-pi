@@ -1,6 +1,7 @@
 ---
 database_name: datalake_robin_hood_clean
 table_name: accounting_entry_balance
+domain: Fintech
 columns:
   id:
     lineage:

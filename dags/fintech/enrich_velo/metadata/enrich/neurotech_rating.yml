@@ -2,7 +2,7 @@
 database_name: datalake_velo
 table_name: neurotech_rating
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Base table to process neurotech rating analysis for proposes
 columns:
   id_propose:

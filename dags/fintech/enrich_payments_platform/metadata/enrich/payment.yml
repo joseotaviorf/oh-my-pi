@@ -2,7 +2,7 @@
 database_name: datalake_payments_platform
 table_name: payment
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_payment:
     description: Unique identifier for the payment record (generated using MONOTONICALLY_INCREASING_ID())

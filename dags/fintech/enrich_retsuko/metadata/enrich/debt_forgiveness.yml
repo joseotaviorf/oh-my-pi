@@ -2,7 +2,7 @@
 database_name: datalake_retsuko
 table_name: debt_forgiveness
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Debt forgiveness data with forgiveness details"
 columns:
   id_contract:

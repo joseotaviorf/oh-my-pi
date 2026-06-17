@@ -1,7 +1,7 @@
 database_name: datalake_velo_zendesk
 table_name: custom_fields
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing the most important custom fields from zendesk tickets"
 columns:
     id_ticket:

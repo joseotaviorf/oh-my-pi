@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_fintech_clean
 table_name: for_sale_platform_invoice_control
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_offer:
     lineage:

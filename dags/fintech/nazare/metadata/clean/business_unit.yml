@@ -1,6 +1,7 @@
 ---
 database_name: datalake_nazare_clean
 table_name: business_unit
+domain: Fintech
 columns:
   id_business_unit:
     lineage:

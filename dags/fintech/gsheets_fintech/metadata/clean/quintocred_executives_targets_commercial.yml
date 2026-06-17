@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_executives_targets_commercial
+domain: Fintech
 columns:
   portfolio:
     lineage:

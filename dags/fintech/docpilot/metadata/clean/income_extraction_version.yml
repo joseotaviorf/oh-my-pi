@@ -2,7 +2,7 @@
 database_name: datalake_docpilot_clean
 table_name: income_extraction_version
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This table stores any modification in the income extraction processed by the DocPilot service. It is an audit table."
 columns:
   id_external:

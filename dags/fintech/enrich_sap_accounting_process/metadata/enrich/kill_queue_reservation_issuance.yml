@@ -2,7 +2,7 @@
 database_name: datalake_sap_accounting_process
 table_name: kill_queue_reservation_issuance
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Enriched data from kill queue reservation issuance process, tracking compliance between source and SAP accounting data"
 columns:
   id_accounting_process:

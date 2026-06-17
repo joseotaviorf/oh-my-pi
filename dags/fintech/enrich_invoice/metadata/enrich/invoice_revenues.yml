@@ -2,7 +2,7 @@
 database_name: datalake_invoice
 table_name: invoice_revenues
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing data from invoice revenues"
 columns:
   id_invoice_entry:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_recupera_raw
 table_name: complementary_records
+domain: Fintech
 columns:
   bank_branch_code:
     tags:

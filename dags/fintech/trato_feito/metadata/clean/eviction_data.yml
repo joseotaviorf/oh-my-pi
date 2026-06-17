@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: eviction_data
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Overtuning data for the eviction process.
 columns:
   id:

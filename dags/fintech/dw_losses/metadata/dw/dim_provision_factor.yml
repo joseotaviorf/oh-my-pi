@@ -3,7 +3,7 @@ database_name: dw_losses
 table_name: dim_provision_factor
 description: This is a junk dimension to list the provision factor that should be used on the formula.
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   sk_factor_risk:
     lineage:

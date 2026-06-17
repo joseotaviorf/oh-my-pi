@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: installment_charges
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "It is a table that references the billing data that was created at checkout, where their model is built through orders and charges. Here we link a charge (checkout) with an installment (tf)"
 columns:
   id:

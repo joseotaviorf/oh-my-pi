@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: qc_qa_ops_targets
+domain: Fintech
 columns:
   sla_claim_total:
     lineage:

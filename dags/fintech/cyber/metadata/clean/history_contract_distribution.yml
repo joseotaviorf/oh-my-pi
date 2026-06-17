@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: history_contract_distribution
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   Historical table with agency redistribution performance. Table granularity - id_contract + contract_group.
   New records are inserted with each new distribution, maintaining the complete history of distributions.

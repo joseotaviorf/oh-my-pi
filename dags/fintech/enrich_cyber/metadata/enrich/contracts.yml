@@ -2,7 +2,7 @@
 database_name: datalake_cyber
 table_name: contracts
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Contracts table
 columns:
   id_contract:

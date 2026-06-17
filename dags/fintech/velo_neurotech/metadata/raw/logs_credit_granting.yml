@@ -1,3 +1,4 @@
 ---
 database_name: datalake_velo_neurotech_raw
 table_name: logs_credit_granting
+domain: Fintech

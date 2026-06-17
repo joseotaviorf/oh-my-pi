@@ -2,7 +2,7 @@
 database_name: datalake_revenue_lines
 table_name: service_fee
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing service fee and payment data by contract"
 columns:
   id_contract_ebdb:

@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: target_nps_weekly
+domain: Fintech
 columns:
   nps_global:
     lineage:

@@ -1,3 +1,4 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: country
+domain: Fintech

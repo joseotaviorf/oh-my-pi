@@ -2,7 +2,7 @@
 database_name: metric_fintech__velo
 table_name: claims_emission
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Metrics related to QuintoCred claims emissions"
 columns:
     dt_emission:

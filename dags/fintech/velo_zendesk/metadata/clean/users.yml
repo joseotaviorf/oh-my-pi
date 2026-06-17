@@ -1,5 +1,6 @@
 database_name: datalake_velo_zendesk_clean
 table_name: users
+domain: Fintech
 columns:
   id_user:
     lineage:

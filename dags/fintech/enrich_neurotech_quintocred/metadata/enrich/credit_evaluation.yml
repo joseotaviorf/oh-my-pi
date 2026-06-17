@@ -1,7 +1,7 @@
 database_name: datalake_neurotech_quintocred
 table_name: credit_evaluation
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Data from logs_credit_granting, contains all engine credit assessment information."
 columns:
   id_propose:

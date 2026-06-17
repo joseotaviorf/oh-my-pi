@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: stilingue_data
+domain: Fintech
 columns:
   id_manifestation:
     lineage:

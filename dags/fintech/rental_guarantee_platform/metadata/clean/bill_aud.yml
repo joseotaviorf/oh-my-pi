@@ -1,7 +1,7 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: bill_aud
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id:
     lineage:

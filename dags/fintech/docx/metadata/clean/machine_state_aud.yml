@@ -2,7 +2,7 @@
 database_name: datalake_docx_clean
 table_name: machine_state_aud
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_machine_state:
     lineage:

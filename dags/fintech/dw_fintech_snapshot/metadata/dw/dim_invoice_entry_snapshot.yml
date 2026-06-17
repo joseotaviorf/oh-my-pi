@@ -2,7 +2,7 @@
 database_name: dw_payment_snapshot
 table_name: dim_invoice_entry_snapshot
 owner: "@ae-finance-fintech"
-domain: "fintech"
+domain: Fintech
 description: "dw_payment.dim_invoice_entry monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   sk_invoice_entry:

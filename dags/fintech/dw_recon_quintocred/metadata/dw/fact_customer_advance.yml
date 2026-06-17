@@ -1,7 +1,7 @@
 database_name: dw_recon_quintocred
 table_name: fact_customer_advance
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Data from customer advance in QuintoCred recon context."
 columns:
   sk_propose:

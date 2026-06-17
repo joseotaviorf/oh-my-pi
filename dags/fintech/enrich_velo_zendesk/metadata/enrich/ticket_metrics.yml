@@ -1,7 +1,7 @@
 database_name: datalake_velo_zendesk
 table_name: ticket_metrics
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing zendesk tickets metrics"
 columns:
   id_ticket:

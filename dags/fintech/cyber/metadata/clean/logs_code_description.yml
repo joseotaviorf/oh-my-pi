@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: logs_code_description
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Contains valid action, result, function and screen codes.
 columns:
   code:

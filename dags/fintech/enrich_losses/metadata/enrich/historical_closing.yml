@@ -3,7 +3,7 @@ database_name: datalake_losses
 table_name: historical_closing
 description: "Enrich table with the losses model informations for the fact tables"
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id_invoice:
     lineage:

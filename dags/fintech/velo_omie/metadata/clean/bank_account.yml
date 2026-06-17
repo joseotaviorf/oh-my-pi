@@ -1,6 +1,7 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: bank_account
+domain: Fintech
 columns:
   id_account:
     lineage:

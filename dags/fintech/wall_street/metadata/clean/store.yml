@@ -2,7 +2,7 @@
 database_name: datalake_wall_street_clean
 table_name: store
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id:
     lineage:

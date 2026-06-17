@@ -1,6 +1,7 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: group_trailer
+domain: Fintech
 description: "Table containing all establishment group data from nexxera files (id_registration = 99). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_registration:

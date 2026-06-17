@@ -2,7 +2,7 @@
 database_name: dw_revenue_lines
 table_name: dim_management_fee
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table containing management fee and payment data by contract"
 columns:
   sk_management_fee:

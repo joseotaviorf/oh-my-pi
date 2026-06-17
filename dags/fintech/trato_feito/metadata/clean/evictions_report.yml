@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: evictions_report
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table is mainly used by the SWE team. It contains the data that support the tracking of the eviction process.
 columns:
   id:

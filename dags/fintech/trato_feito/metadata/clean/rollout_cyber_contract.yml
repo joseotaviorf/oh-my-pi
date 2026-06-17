@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: rollout_cyber_contract
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Stores the contract the was migrated from recupera to cyber
 columns:
   id_external:

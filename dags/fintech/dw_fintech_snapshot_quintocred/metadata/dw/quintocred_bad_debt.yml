@@ -1,7 +1,7 @@
 database_name: dw_fintech_snapshot_quintocred
 table_name: quintocred_bad_debt
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   origin_table:

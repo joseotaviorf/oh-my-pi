@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_hourly_clean
 table_name: payment
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Data about the payment of the negotiation installments"
 columns:
   id:

@@ -2,7 +2,7 @@
 database_name: datalake_docx
 table_name: person_document_information
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: The table person_document_information consolidates data from multiple sources related to the submission of a document during the credit evaluation process by a person.
 columns:
   id_person_document_info:

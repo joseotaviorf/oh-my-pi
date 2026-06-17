@@ -1,6 +1,7 @@
 ---
 database_name: datalake_recupera_raw
 table_name: operators
+domain: Fintech
 columns:
   document_type:
     tags:

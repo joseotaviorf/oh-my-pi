@@ -1,5 +1,6 @@
 database_name: datalake_vans_clean
 table_name: bank_boleto
+domain: Fintech
 columns:
   id:
     lineage:

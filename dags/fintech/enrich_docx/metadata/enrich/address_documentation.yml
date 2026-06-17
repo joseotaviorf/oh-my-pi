@@ -1,7 +1,7 @@
 database_name: datalake_docx
 table_name: address_documentation
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table with the address documentation of the tenant"
 columns:
   id:

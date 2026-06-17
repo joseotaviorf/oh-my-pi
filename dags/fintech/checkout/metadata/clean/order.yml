@@ -2,7 +2,7 @@
 database_name: datalake_checkout_clean
 table_name: order
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 columns:
   id:
     lineage:

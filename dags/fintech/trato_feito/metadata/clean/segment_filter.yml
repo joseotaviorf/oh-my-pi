@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: segment_filter
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   id_segment_filter:

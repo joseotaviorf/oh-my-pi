@@ -1,6 +1,7 @@
 ---
 database_name: datalake_sap_4hana_clean
 table_name: journal_entries
+domain: Fintech
 columns:
   year:
     lineage:

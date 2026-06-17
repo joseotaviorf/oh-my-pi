@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: early_termination_fee_fines
+domain: Fintech
 columns:
   requester_email:
     lineage:

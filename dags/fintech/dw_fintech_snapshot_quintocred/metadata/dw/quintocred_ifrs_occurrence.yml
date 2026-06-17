@@ -2,7 +2,7 @@
 database_name: dw_fintech_snapshot_quintocred
 table_name: quintocred_ifrs_occurrence
 owner: guilherme.sacramento@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "dw_velo.quintocred_ifrs_occurrence monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
   origin_table:

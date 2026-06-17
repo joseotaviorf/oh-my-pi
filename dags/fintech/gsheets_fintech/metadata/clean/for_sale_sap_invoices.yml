@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: for_sale_sap_invoices
+domain: Fintech
 columns:
   document_number:
     lineage:

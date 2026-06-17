@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: eviction
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table stores all the data produced by Conka system for the eviction process.
 columns:
   id:
