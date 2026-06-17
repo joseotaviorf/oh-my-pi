@@ -256,6 +256,61 @@ class TestEmrJobClusterEngineRetries:
         step_kwargs = mock_submit.build_spark_submit_step.call_args.kwargs
         assert step_kwargs["deploy_mode"] == "cluster"
 
+    def test_submit_steps_does_not_set_interpreter_by_default(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="optimize-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert "spark.pyspark.python" not in flat
+        assert "spark.pyspark.driver.python" not in flat
+
+    def test_submit_steps_python_interpreter_path_injects_confs(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-wonka-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                python_interpreter_path="/home/hadoop/venv/bin/python",
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert "spark.pyspark.python=/home/hadoop/venv/bin/python" in flat
+        assert "spark.pyspark.driver.python=/home/hadoop/venv/bin/python" in flat
+
+    def test_submit_steps_empty_python_interpreter_path_is_noop(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-wonka-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                python_interpreter_path="",
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert "spark.pyspark.python" not in flat
+
     def test_terminate_matches_retry_kwargs(self, emr_ctx):
         emr_ctx.cluster_args["emr_retry_delay_seconds"] = 45
         mock_term = MagicMock()

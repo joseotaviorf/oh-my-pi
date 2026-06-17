@@ -101,6 +101,8 @@ setup_emr() {
 		exit 1
 	}
 
+	# For Wonka DAGs, this path for the PEX-based Python interpreter needs to be the same as the one
+	# set in `packages/bietlejuice-core/src/bietlejuice/base/airflow/task_creators/load_wonka_task_creator.py`.
 	chmod a+rx /home/hadoop
 	chmod -R a+rX "$venv_dir"
 	echo "Bootstrap complete. Venv: $venv_dir — $("$venv_dir/bin/python" --version 2>&1)"
