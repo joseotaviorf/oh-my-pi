@@ -1,6 +1,7 @@
 ---
 database_name: datalake_batch_inference_clean
 table_name: batch_inference
+domain: MLOps
 columns:
   model_name:
     lineage:
