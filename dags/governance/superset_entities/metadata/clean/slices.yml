@@ -2,7 +2,7 @@
 database_name: datalake_superset_clean
 table_name: slices
 description: Table that lists all charts in Superset and their metadata
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

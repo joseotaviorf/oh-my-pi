@@ -2,7 +2,7 @@
 database_name: datalake_jira
 table_name: issue_status_changes
 description: Status changes from the Issues in Jira
-domain: governance
+domain: "Data Ops & Governance"
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   id_issue:

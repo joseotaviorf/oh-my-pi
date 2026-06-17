@@ -2,7 +2,7 @@
 database_name: datalake_inmetro_clean
 table_name: data_profiles
 description: Information provided about data profiles
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   repo:

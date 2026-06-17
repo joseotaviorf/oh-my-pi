@@ -1,2 +1,3 @@
 database_name: datalake_inmetro_raw
 table_name: data_profiles
+domain: "Data Ops & Governance"

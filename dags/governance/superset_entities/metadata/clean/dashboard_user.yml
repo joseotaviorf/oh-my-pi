@@ -2,7 +2,7 @@
 database_name: datalake_superset_clean
 table_name: dashboard_user
 description: Table that links dashboards to owner users
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

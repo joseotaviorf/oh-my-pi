@@ -1,7 +1,7 @@
 database_name: datalake_health_metrics
 table_name: table_historical_executions
 owner: wesley.doliveira@quintoandar.com.br
-domain: Data Governance
+domain: "Data Ops & Governance"
 description: WIP
 columns:
   table_name:

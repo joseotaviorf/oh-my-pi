@@ -2,7 +2,7 @@
 database_name: datalake_superset_clean
 table_name: query
 description: Information about queries executed in the system
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

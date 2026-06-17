@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: report_card
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: "Data Ops & Governance"
 description: Information about report cards in Metabase
 columns:
   id:

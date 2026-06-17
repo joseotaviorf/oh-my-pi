@@ -1,7 +1,7 @@
 database_name: datalake_health_metrics
 table_name: dag_alerts_metrics
 owner: wesley.doliveira@quintoandar.com.br
-domain: Data Governance
+domain: "Data Ops & Governance"
 description: WIP
 columns:
   dag_name:

@@ -2,7 +2,7 @@
 database_name: datalake_superset_clean
 table_name: tag
 description: Table that lists all tags in Superset (TAG feature not being used)
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

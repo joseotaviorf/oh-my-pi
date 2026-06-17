@@ -1,2 +1,3 @@
 database_name: datalake_jira_raw
 table_name: projects
+domain: "Data Ops & Governance"

@@ -2,7 +2,7 @@
 database_name: datalake_superset_clean
 table_name: sql_metrics
 description: Table that lists all metrics registered on datasets on Superset
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

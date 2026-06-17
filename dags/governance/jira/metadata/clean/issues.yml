@@ -1,7 +1,7 @@
 database_name: datalake_jira_clean
 table_name: issues
 description: Its purpose is to store information related to cards
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   change_log:

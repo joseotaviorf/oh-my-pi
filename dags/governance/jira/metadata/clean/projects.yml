@@ -1,7 +1,7 @@
 database_name: datalake_jira_clean
 table_name: projects
 description: Information about projects
-domain: governance
+domain: "Data Ops & Governance"
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   avatar_urls:

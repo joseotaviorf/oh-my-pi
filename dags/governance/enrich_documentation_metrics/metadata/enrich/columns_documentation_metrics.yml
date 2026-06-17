@@ -1,6 +1,7 @@
 ---
 database_name: datalake_documentation_metrics_clean
 table_name: columns_documentation_metrics
+domain: "Data Ops & Governance"
 columns:
   layer:
     lineage:

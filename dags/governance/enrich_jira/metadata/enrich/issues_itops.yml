@@ -2,7 +2,7 @@
 database_name: datalake_jira
 table_name: issues_itops
 description: this table contains the help desk tickets of the ITOps team
-domain: Governance
+domain: "Data Ops & Governance"
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   id:

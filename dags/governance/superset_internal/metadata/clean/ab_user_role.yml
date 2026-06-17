@@ -2,7 +2,7 @@
 database_name: datalake_superset_clean
 table_name: ab_user_role
 description: Information about the relationship between users and the table
-domain: Data Governance
+domain: "Data Ops & Governance"
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

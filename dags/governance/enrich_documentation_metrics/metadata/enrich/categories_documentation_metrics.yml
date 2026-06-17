@@ -2,7 +2,7 @@
 database_name: datalake_documentation_metrics
 table_name: categories_documentation_metrics
 owner: augusto.torres@quintoandar.com.br
-domain: DataOps & Governance
+domain: "Data Ops & Governance"
 description: Table with stats of category columns documentation.
 columns:
   layer:
