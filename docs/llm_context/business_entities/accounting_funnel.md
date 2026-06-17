@@ -111,6 +111,7 @@ Grain: **one row per accounting event × view** (a single event can appear once 
 | `accounting_name` | Account / accounting description |
 | `source_amount` | Amount that **should** be created based on the source entry |
 | `sap_amount` | Amount actually accounted in SAP |
+| `accounting_balance` | Net SAP ledger balance for the entry and account (`SUM(debit_credit)` in the ledger, by `id_finance_entity_entry` × `account_number`). Available on Retsuko transactional and third-parties enrich models (straw and reverse straw). |
 | `is_completeness` | Completeness assertion (same ID throughout the funnel until SAP) |
 | `is_correctness` | Correctness assertion (right amount, right account at Gateway + SAP) |
 | `is_temporality` | Temporality assertion (created in SAP at the right time) |

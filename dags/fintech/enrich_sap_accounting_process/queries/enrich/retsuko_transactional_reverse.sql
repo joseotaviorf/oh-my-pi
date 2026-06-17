@@ -439,16 +439,17 @@ sap_entity AS (
       )
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
     SELECT
         f.id_finance_entity,
         s.id_feature,
         s.hash,
         s.type,
-        s.status as sync_sap_job_status,
-        w.status as sap_send_status,
-        w.webhook_status as sap_processed_status,
-        w.errors AS webhook_error
+        s.status AS sync_sap_job_status,
+        w.status AS sap_send_status,
+        w.webhook_status AS sap_processed_status,
+        w.errors AS webhook_error,
+        ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) AS rn
     FROM
         datalake_sap_gateway_clean.feature f
     LEFT JOIN
@@ -462,7 +463,22 @@ sap_gateway AS (
         AND s.type IN ('LCM')
         AND s.status NOT IN ('ignore', 'ignored')
         AND DATE(f.ts_created) >= DATE('2025-01-01')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) = 1
+),
+
+sap_gateway AS (
+    SELECT
+        id_finance_entity,
+        id_feature,
+        hash,
+        type,
+        sync_sap_job_status,
+        sap_send_status,
+        sap_processed_status,
+        webhook_error
+    FROM
+        sap_gateway_ranked
+    WHERE
+        rn = 1
 ),
 
 sap AS (
@@ -483,6 +499,15 @@ sap AS (
         dt_reference >= '2025-01-01'
         AND account_number IN (211406, 113404, 113480)
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+),
+
+accounting_balance AS (
+  SELECT
+      id_finance_entity_entry,
+      account_number,
+      SUM(debit_credit) AS accounting_balance
+  FROM sap
+  GROUP BY 1, 2
 )
 ,
 
@@ -513,12 +538,16 @@ base AS (
         FALSE AS is_compliance,
         CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
         CAST(SUM(COALESCE(sl_hash.debit_credit, 0)) AS DECIMAL(12,2)) AS sap_amount,
+        CAST(SUM(COALESCE(a.accounting_balance, 0)) AS DECIMAL(12,2)) AS accounting_balance,
         r.dt_source_trigger AS dt_source_trigger,
         sl_hash.dt_sap_created AS dt_sap_created,
         sl_hash.dt_sap_reference AS dt_sap_reference,
         r.id_finance_entity_entry as id_finance_entity_entry_r
     FROM
         sap AS sl_hash
+    LEFT JOIN 
+        accounting_balance a
+            ON sl_hash.id_finance_entity_entry = a.id_finance_entity_entry AND sl_hash.account_number = a.account_number
     LEFT JOIN
         sap_gateway AS sg
             ON sl_hash.hash = sg.hash
@@ -532,7 +561,7 @@ base AS (
         OR  (sl_hash.id_finance_entity_entry  = r.id_finance_entity_entry)
         OR ((sl_hash.id_finance_entity = r.id_finance_entity) AND (r.account_number = sl_hash.account_number))
             )
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24
 )
 SELECT
     id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY id_accounting_process ORDER BY dt_sap_created) AS id_accounting_process,
@@ -547,6 +576,7 @@ SELECT
     accounting_name,
     source_amount,
     sap_amount,
+    accounting_balance,
     is_completeness,
     is_correctness,
     is_temporality,

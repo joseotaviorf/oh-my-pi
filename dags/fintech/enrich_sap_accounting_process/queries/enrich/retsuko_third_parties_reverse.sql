@@ -159,6 +159,23 @@ UNION ALL
     AND at.type IN ('contract', 'tenant','landlord')
 ),
 
+sap_entity_ranked AS (
+  SELECT
+    id_finance_entity,
+    id_sap_gateway_feature,
+    version,
+    event,
+    status,
+    failed_status,
+    failed_reason,
+    ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) AS rn
+  FROM
+    datalake_retsuko_clean.sap_entity
+  WHERE
+    id_finance_entity IS NOT NULL
+    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
+),
+
 sap_entity AS (
   SELECT
     id_finance_entity,
@@ -169,22 +186,21 @@ sap_entity AS (
     failed_status,
     failed_reason
   FROM
-    datalake_retsuko_clean.sap_entity
+    sap_entity_ranked
   WHERE
-    id_finance_entity IS NOT NULL
-    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
+    rn = 1
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
   SELECT
     f.id_finance_entity,
     s.id_feature,
     s.hash,
-    s.status as sync_sap_job_status,
-    w.status as sap_send_status,
-    w.webhook_status as sap_processed_status,
-    w.errors AS webhook_error
+    s.status AS sync_sap_job_status,
+    w.status AS sap_send_status,
+    w.webhook_status AS sap_processed_status,
+    w.errors AS webhook_error,
+    ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY w.ts_updated) AS rn
   FROM
     datalake_sap_gateway_clean.feature f
   LEFT JOIN
@@ -197,7 +213,64 @@ sap_gateway AS (
     s.erp_solution IN ('S4')
     AND s.type = 'LCM'
     AND s.status NOT IN ('ignore', 'ignored')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY w.ts_updated) = 1
+),
+
+sap_gateway AS (
+  SELECT
+    id_finance_entity,
+    id_feature,
+    hash,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM
+    sap_gateway_ranked
+  WHERE
+    rn = 1
+),
+
+sap_ledger_113412_ranked AS (
+  SELECT
+    id_transaction,
+    id_finance_entity,
+    id_finance_entity_entry,
+    id_business_entity,
+    hash,
+    account_number,
+    accrual_year_month,
+    source_client,
+    created_by,
+    DATE(dt_created) AS dt_sap_created,
+    DATE(dt_reference) AS dt_sap_reference,
+    debit_credit,
+    ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY dt_created DESC) AS rn
+  FROM
+    datalake_pas.ledger
+  WHERE
+    TRUE
+    AND account_number IN ('113412')
+    AND dt_reference >= '2025-01-01'
+),
+
+sap_ledger_113412_deduped AS (
+  SELECT
+    id_transaction,
+    id_finance_entity,
+    id_finance_entity_entry,
+    id_business_entity,
+    hash,
+    account_number,
+    accrual_year_month,
+    source_client,
+    created_by,
+    dt_sap_created,
+    dt_sap_reference,
+    debit_credit
+  FROM
+    sap_ledger_113412_ranked
+  WHERE
+    rn = 1
 ),
 
 sap AS (
@@ -234,17 +307,22 @@ sap AS (
     accrual_year_month,
     source_client,
     created_by,
-    DATE(dt_created) AS dt_sap_created,
-    DATE(dt_reference) AS dt_sap_reference,
+    dt_sap_created,
+    dt_sap_reference,
     debit_credit
   FROM
-    datalake_pas.ledger
-  WHERE
-    TRUE
-    AND account_number IN ('113412')
-    AND dt_reference >= '2025-01-01'
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY dt_created DESC) = 1
+    sap_ledger_113412_deduped
 ),
+
+accounting_balance AS (
+  SELECT
+      id_finance_entity_entry,
+      account_number,
+      SUM(debit_credit) AS accounting_balance
+  FROM sap
+  GROUP BY 1, 2
+),
+
 base AS (
 SELECT 
         ('RE-RTSK-TP-'|| sl_hash.id_transaction || '-' || COALESCE(sl_hash.account_number, '')) AS id_accounting_process,
@@ -300,29 +378,35 @@ SELECT
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23
 )
 SELECT
-    id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY id_accounting_process ORDER BY dt_sap_created) AS id_accounting_process,
-    id_business_entity,
-    id_finance_entity,
-    id_finance_entity_entry,
-    version,
-    business_unit,
-    source_name,
-    accounting_type,
-    account_number,
-    accounting_name,
-    source_amount,
-    sap_amount,
-    is_completeness,
-    is_correctness,
-    is_temporality,
-    is_compliance,
-    accounting_process_status,
-    error_description,
-    accrual_year_month,
-    dt_source_trigger,
-    dt_sap_reference,
-    dt_sap_created
-FROM base
+    base.id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY base.id_accounting_process ORDER BY base.dt_sap_created) AS id_accounting_process,
+    base.id_business_entity,
+    base.id_finance_entity,
+    base.id_finance_entity_entry,
+    base.version,
+    base.business_unit,
+    base.source_name,
+    base.accounting_type,
+    base.account_number,
+    base.accounting_name,
+    base.source_amount,
+    base.sap_amount,
+    CAST(COALESCE(ab.accounting_balance, 0) AS DECIMAL(12,2)) AS accounting_balance,
+    base.is_completeness,
+    base.is_correctness,
+    base.is_temporality,
+    base.is_compliance,
+    base.accounting_process_status,
+    base.error_description,
+    base.accrual_year_month,
+    base.dt_source_trigger,
+    base.dt_sap_reference,
+    base.dt_sap_created
+FROM
+    base
+LEFT JOIN
+    accounting_balance ab
+        ON base.id_finance_entity_entry = ab.id_finance_entity_entry
+        AND base.account_number = ab.account_number
 WHERE
-  (account_number IN ('211413', '211415', '113406', '113411') AND (error_description NOT IN ('source-rental-guarantee', 'manual transaction') OR error_description IS NULL))
-  OR account_number = '113412'
+  (base.account_number IN ('211413', '211415', '113406', '113411') AND (base.error_description NOT IN ('source-rental-guarantee', 'manual transaction') OR base.error_description IS NULL))
+  OR base.account_number = '113412'

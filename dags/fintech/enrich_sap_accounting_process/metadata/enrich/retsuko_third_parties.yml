@@ -55,6 +55,10 @@ columns:
     description: Value recorded in SAP.
     lineage:
       - datalake_pas.ledger.debit_credit
+  accounting_balance:
+    description: Net SAP ledger balance for the finance entity entry and account number, calculated as the sum of all debit_credit values in the SAP ledger for that id_finance_entity_entry and account_number combination.
+    lineage:
+      - datalake_pas.ledger.debit_credit
   is_completeness:
     description: Indicates whether there is a corresponding entry/invoice in SAP.
     lineage:
