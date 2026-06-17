@@ -88,7 +88,7 @@ columns:
       - datalake_sap_accounting_process.retsuko_transactional_third_parties.version
       - datalake_sap_accounting_process.retsuko_third_parties.version
       - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.version
-    description: "Accounting Version"
+    description: "Sequential revision number of the finance entity entry used to track re-postings and corrections in SAP"
   business_unit:
     lineage:
       - datalake_sap_accounting_process.retsuko_provision.business_unit
@@ -154,7 +154,7 @@ columns:
       - datalake_sap_accounting_process.retsuko_transactional_third_parties.account_number
       - datalake_sap_accounting_process.retsuko_third_parties.account_number
       - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.account_number
-    description: "Account Number from SAP"
+    description: "General ledger account code in SAP chart of accounts where the entry was posted"
   accounting_name:
     lineage:
       - datalake_sap_accounting_process.retsuko_provision.accounting_name
@@ -205,6 +205,25 @@ columns:
       - datalake_sap_accounting_process.retsuko_third_parties.sap_amount
       - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.sap_amount
     description: "Amount that was accounted in SAP"
+  accounting_balance:
+    lineage:
+      - datalake_sap_accounting_process.retsuko_provision.sap_amount
+      - datalake_sap_accounting_process.retsuko_revenue_share.sap_amount
+      - datalake_sap_accounting_process.retsuko_revenue_accounting.sap_amount
+      - datalake_sap_accounting_process.retsuko_invoice.sap_amount
+      - datalake_sap_accounting_process.retsuko_invoice_unified.sap_amount
+      - datalake_sap_accounting_process.kill_queue_reservation_issuance.sap_amount
+      - datalake_sap_accounting_process.for_rent_bank_settlement.sap_amount
+      - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.sap_amount
+      - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.sap_amount
+      - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.sap_amount
+      - datalake_sap_accounting_process.retsuko_transactional.accounting_balance
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties.sap_amount
+      - datalake_sap_accounting_process.retsuko_third_parties.accounting_balance
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.sap_amount
+      - datalake_sap_accounting_process.retsuko_transactional_reverse.accounting_balance
+      - datalake_sap_accounting_process.retsuko_third_parties_reverse.accounting_balance
+    description: "Net SAP ledger balance for the finance entity entry and account number; equals sap_amount when the enrich source does not expose accounting_balance"
   is_completeness:
     lineage:
       - datalake_sap_accounting_process.retsuko_provision.is_completeness
@@ -290,7 +309,7 @@ columns:
       - datalake_sap_accounting_process.retsuko_transactional_third_parties.accounting_process_status
       - datalake_sap_accounting_process.retsuko_third_parties.accounting_process_status
       - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.accounting_process_status
-    description: "Status of the accounting process"
+    description: "Outcome label indicating whether the accounting funnel completed, failed, or is still pending"
   error_description:
     lineage:
       - datalake_sap_accounting_process.retsuko_provision.error_description
@@ -322,7 +341,7 @@ columns:
       - datalake_sap_accounting_process.retsuko_transactional_third_parties.accrual_year_month
       - datalake_sap_accounting_process.retsuko_third_parties.accrual_year_month
       - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.accrual_year_month
-    description: "Accrual year month from from accounting entry"
+    description: "Competence period in YYYY-MM format used to attribute revenue and expenses to the correct fiscal month"
   dt_source_trigger:
     lineage:
       - datalake_sap_accounting_process.retsuko_provision.dt_source_trigger
