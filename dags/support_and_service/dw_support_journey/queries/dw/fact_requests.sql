@@ -1,12 +1,12 @@
 SELECT
     id_event AS sk_event,
-    id_case,
-    id_event_type,
-    id_account,
-    id_owner,
-    id_created_by,
-    id_case_milestone,
-    id_last_modified_by,
+    id_case AS sk_case,
+    id_event_type AS sk_event_type,
+    id_account AS sk_account,
+    id_owner AS sk_owner,
+    id_created_by AS sk_created_by,
+    id_case_milestone AS sk_case_milestone,
+    id_last_modified_by AS sk_last_modified_by,
     case_number,
     record_type_name,
     type,
@@ -31,7 +31,8 @@ SELECT
     closed_date AS ts_closed,
     _is_current AS is_current,
     _effective_timestamp AS ts_effective,
-    _expired_timestamp AS ts_expired
+    _expired_timestamp AS ts_expired,
+    NOW() AS ts_load
 FROM
     core_support_journey.cases
 WHERE

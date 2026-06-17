@@ -9,32 +9,32 @@ columns:
     description: Surrogate key uniquely identifying a case event version (grain of the table). System-generated upstream as a hash of id_record, transaction_key and commit_number, so it is unique per event.
     lineage:
       - core_support_journey.cases.id_event
-  id_case:
-    description: Unique identifier of the support Case in Salesforce, sourced from id_record in the upstream Salesforce tables. A Case spans multiple rows in this table as it changes over time (SCD history), so only one version is current (is_current = true) at any given moment, bounded by the ts_effective / ts_expired validity window.
+  sk_case:
+    description: Surrogate key referencing the support Case in Salesforce, sourced from id_record in the upstream Salesforce tables. A Case spans multiple rows in this table as it changes over time (SCD history), so only one version is current (is_current = true) at any given moment, bounded by the ts_effective / ts_expired validity window.
     lineage:
       - core_support_journey.cases.id_case
-  id_event_type:
-    description: Identifier of the event type associated with the case event.
+  sk_event_type:
+    description: Surrogate key referencing the event type associated with the case event.
     lineage:
       - core_support_journey.cases.id_event_type
-  id_account:
-    description: Identifier of the account related to the case.
+  sk_account:
+    description: Surrogate key referencing the account related to the case.
     lineage:
       - core_support_journey.cases.id_account
-  id_owner:
-    description: Identifier of the user that currently owns the case.
+  sk_owner:
+    description: Surrogate key referencing the user that currently owns the case.
     lineage:
       - core_support_journey.cases.id_owner
-  id_created_by:
-    description: Identifier of the user that created the case.
+  sk_created_by:
+    description: Surrogate key referencing the user that created the case.
     lineage:
       - core_support_journey.cases.id_created_by
-  id_case_milestone:
-    description: Identifier of the case milestone tracking the SLA for the case.
+  sk_case_milestone:
+    description: Surrogate key referencing the case milestone tracking the SLA for the case.
     lineage:
       - core_support_journey.cases.id_case_milestone
-  id_last_modified_by:
-    description: Identifier of the user that last modified the case.
+  sk_last_modified_by:
+    description: Surrogate key referencing the user that last modified the case.
     lineage:
       - core_support_journey.cases.id_last_modified_by
   case_number:
@@ -137,3 +137,5 @@ columns:
     description: SCD valid-to timestamp - the moment this case version was superseded by a newer one; the current version carries a 9999 sentinel (year 9999) instead of a real date, so it is never expired. Each [ts_effective, ts_expired) window is half-open and non-overlapping per id_case, so point-in-time queries use ts_effective <= T AND ts_expired > T.
     lineage:
       - core_support_journey.cases._expired_timestamp
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse table by the ingestion pipeline. Built from NOW() at load time.

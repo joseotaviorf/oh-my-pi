@@ -9,62 +9,54 @@ columns:
     description: Surrogate key uniquely identifying a service event (grain of the table). Built directly from id_event of the core services model, so it is unique per event.
     lineage:
       - core_support_journey.services.id_event
-  id_event:
-    description: Unique identifier of the service event in the source system.
-    lineage:
-      - core_support_journey.services.id_event
-  id_event_type:
-    description: Identifier of the event type associated with the service event.
+  sk_event_type:
+    description: Surrogate key referencing the event type associated with the service event.
     lineage:
       - core_support_journey.services.id_event_type
-  id_session:
-    description: Identifier of the service session the event belongs to.
+  sk_session:
+    description: Surrogate key referencing the service session the event belongs to.
     lineage:
       - core_support_journey.services.id_session
-  id_support_session:
-    description: Identifier of the support session (Support Session Service source) related to the event.
+  sk_support_session:
+    description: Surrogate key referencing the support session (Support Session Service source) related to the event.
     lineage:
       - core_support_journey.services.id_support_session
-  id_task:
-    description: Identifier of the task associated with the service event.
+  sk_task:
+    description: Surrogate key referencing the task associated with the service event.
     lineage:
       - core_support_journey.services.id_task
-  id_task_event:
-    description: Identifier of the task event associated with the service event.
+  sk_task_event:
+    description: Surrogate key referencing the task event associated with the service event.
     lineage:
       - core_support_journey.services.id_task_event
-  id_channel:
-    description: Identifier of the messaging channel associated with the service event.
+  sk_channel:
+    description: Surrogate key referencing the messaging channel associated with the service event.
     lineage:
       - core_support_journey.services.id_channel
-  id_reservation:
-    description: Identifier of the reservation related to the service event.
+  sk_reservation:
+    description: Surrogate key referencing the reservation related to the service event.
     lineage:
       - core_support_journey.services.id_reservation
-  id_call:
-    description: Identifier of the call related to the service event.
+  sk_call:
+    description: Surrogate key referencing the call related to the service event.
     lineage:
       - core_support_journey.services.id_call
-  id_user:
-    description: Identifier of the user (customer) related to the service event. Built by casting id_user to BIGINT and defaulting to -1 when the user is unknown.
+  sk_user:
+    description: Surrogate key referencing the user (customer) related to the service event. Built by casting id_user to BIGINT and defaulting to -1 when the user is unknown.
     lineage:
       - core_support_journey.services.id_user
-  id_worker:
-    description: Identifier of the worker (service agent) handling the event. Built as the MD5 hash of worker_email, defaulting to the hash of 'NULL' when the email is missing.
+  sk_analyst:
+    description: Surrogate key referencing the analyst (service agent) handling the event. Built as the MD5 hash of the analyst email, defaulting to the hash of 'NULL' when the email is missing.
     lineage:
       - core_support_journey.services.worker_email
-  id_queue:
-    description: Identifier of the routing queue the event was assigned to. Built as the MD5 hash of queue_name, defaulting to the hash of 'NULL' when the queue is missing.
+  sk_queue:
+    description: Surrogate key referencing the routing queue the event was assigned to. Built as the MD5 hash of queue_name, defaulting to the hash of 'NULL' when the queue is missing.
     lineage:
       - core_support_journey.services.queue_name
-  id_source_ctwa:
-    description: Identifier of the Click-To-WhatsApp (CTWA) ad source that originated the service event.
+  sk_source_ctwa:
+    description: Surrogate key referencing the Click-To-WhatsApp (CTWA) ad source that originated the service event.
     lineage:
       - core_support_journey.services.id_source_ctwa
-  worker_email:
-    description: Email of the worker (service agent) that handled the service event.
-    lineage:
-      - core_support_journey.services.worker_email
   database_source:
     description: Source database/system from which the service event was ingested.
     lineage:
