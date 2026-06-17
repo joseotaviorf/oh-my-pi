@@ -1,5 +1,6 @@
 database_name: datalake_listing_flow
 table_name: listing_flow
+domain: Growth
 columns:
   id_lead:
     lineage:

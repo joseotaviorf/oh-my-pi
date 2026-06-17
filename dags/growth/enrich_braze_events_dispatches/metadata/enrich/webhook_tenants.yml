@@ -2,7 +2,7 @@
 database_name: datalake_braze_dispatches
 table_name: webhook_tenants
 owner: data-growth
-domain: growth
+domain: Growth
 description: Table with details about communications sent through webhook.
 columns:
   id_user:

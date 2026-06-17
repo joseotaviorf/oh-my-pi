@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: provisioned_costs_import
+domain: Growth
 columns:
   mkt_origin:
     lineage:

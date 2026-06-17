@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: offers_hub_central
+domain: Growth
 columns:
   agent:
     tags:

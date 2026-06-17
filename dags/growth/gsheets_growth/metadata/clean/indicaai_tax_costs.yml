@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: indicaai_tax_costs
+domain: Growth
 columns:
   table_name:
     lineage:

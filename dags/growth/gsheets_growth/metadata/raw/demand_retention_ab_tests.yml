@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: demand_retention_ab_tests
+domain: Growth
 columns:
   id_user:
     tags:

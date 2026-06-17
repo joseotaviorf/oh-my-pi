@@ -1,7 +1,7 @@
 database_name: datalake_braze_dispatches_user
 table_name: tenants_events
 owner: leticia.lima@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
   id_user:

@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: proj_agent_manager
+domain: Growth
 columns:
   id_user:
     lineage:

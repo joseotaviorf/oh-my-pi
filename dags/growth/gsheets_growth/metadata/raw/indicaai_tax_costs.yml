@@ -1,3 +1,4 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: indicaai_tax_costs
+domain: Growth

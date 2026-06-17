@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: costs_targets
+domain: Growth
 columns:
   business:
     lineage:

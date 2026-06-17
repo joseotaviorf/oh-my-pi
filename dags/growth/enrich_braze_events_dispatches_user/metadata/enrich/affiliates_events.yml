@@ -1,7 +1,7 @@
 database_name: datalake_braze_dispatches_user
 table_name: affiliates_events
 owner: data-growth@quintoandar.com
-domain: growth
+domain: Growth
 description: This table contains details about event related/realized by affiliates, e.g. dispatches or clicks.
 columns:
   id_user_dispatch:

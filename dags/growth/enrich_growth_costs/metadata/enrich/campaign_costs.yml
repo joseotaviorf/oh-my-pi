@@ -2,7 +2,7 @@
 database_name: enrich_growth_costs
 table_name: campaign_costs
 owner: henrique.paulo@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This enrich table consolidates campaign costs
 columns:
   date:

@@ -1,5 +1,6 @@
 database_name: datalake_wololo_clean
 table_name: whatsapp_aud
+domain: Growth
 columns:
   phone_number:
     lineage:

@@ -1,5 +1,6 @@
 database_name: datalake_top_of_funnel_demand
 table_name: first_user_interaction
+domain: Growth
 columns:
   id:
     lineage:

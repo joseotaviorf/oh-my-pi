@@ -1,6 +1,7 @@
 ---
 database_name: dw_datamarts
 table_name: tenant_prospect_status
+domain: Growth
 columns:
   sk_client:
     lineage:

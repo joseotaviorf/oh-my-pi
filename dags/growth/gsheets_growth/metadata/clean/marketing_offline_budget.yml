@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: marketing_offline_budget
+domain: Growth
 columns:
   city_group:
     lineage:

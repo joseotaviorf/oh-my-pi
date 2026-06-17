@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: csat_vistoria_iq_entrada
+domain: Growth
 columns:
   email:
     tags:

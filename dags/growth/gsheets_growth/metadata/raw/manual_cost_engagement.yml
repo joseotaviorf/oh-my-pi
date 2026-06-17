@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: manual_cost_engagement
+domain: Growth
 columns:
   city_group:
     tags:

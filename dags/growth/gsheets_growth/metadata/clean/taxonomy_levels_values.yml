@@ -1,7 +1,7 @@
 database_name: datalake_gsheets_clean
 table_name: taxonomy_levels_values
 owner: thiago.jesus@quintoandar.com
-domain: growth
+domain: Growth
 description: Each row of this table is a pair of key-value for the Growth Taxonomy, used to classify media results and costs.
 columns:
   taxonomy_level:

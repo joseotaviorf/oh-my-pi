@@ -2,7 +2,7 @@
 database_name: datalake_demand_flows
 table_name: buyer_prospect_status
 owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
+domain: Growth
 description: Each row of this table is status change event according to Growths buyer prospect journey rules. 
   This enrich is equivalent to an Slowly Changing Dimension (SCD), so the same buyer prospect will have multiple lines to track its status changes across the time.
 columns:

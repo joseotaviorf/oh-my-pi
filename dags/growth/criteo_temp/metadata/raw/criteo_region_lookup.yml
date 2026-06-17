@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: criteo_region_lookup
+domain: Growth

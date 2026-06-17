@@ -1,5 +1,6 @@
 database_name: datalake_listing_flow
 table_name: discards_reason_by_context
+domain: Growth
 columns:
   id_lead:
     lineage:

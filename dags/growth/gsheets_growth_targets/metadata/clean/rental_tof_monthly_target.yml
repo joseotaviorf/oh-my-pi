@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: rental_tof_monthly_target
+domain: Growth
 columns:
   behavior_type:
     lineage:

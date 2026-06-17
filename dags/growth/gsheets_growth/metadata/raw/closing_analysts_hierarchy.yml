@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: closing_analysts_hierarchy
+domain: Growth
 columns:
   analyst_3:
     tags:

@@ -1,5 +1,6 @@
 database_name: datalake_amplitude_user
 table_name: user_affiliate_origin
+domain: Growth
 columns:
   id_user:
     lineage:

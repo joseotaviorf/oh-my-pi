@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: marketing_offline_manual_share_city_group
+domain: Growth
 columns:
   id_rule_city_group:
     lineage:

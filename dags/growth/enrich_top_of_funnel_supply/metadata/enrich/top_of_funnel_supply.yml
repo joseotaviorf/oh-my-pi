@@ -1,6 +1,7 @@
 ---
 database_name: datalake_top_of_funnel_supply
 table_name: top_of_funnel_supply
+domain: Growth
 columns:
   utm_campaign:
     lineage:

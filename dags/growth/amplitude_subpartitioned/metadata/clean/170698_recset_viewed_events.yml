@@ -1,5 +1,6 @@
 database_name: datalake_amplitude_clean
 table_name: 170698_recset_viewed_events
+domain: Growth
 columns:
   id_amplitude:
     lineage:

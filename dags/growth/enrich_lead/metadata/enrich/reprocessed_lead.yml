@@ -1,5 +1,6 @@
 database_name: datalake_lead
 table_name: reprocessed_lead
+domain: Growth
 columns:
   id:
     lineage:

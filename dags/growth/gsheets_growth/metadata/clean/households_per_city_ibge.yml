@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: households_per_city_ibge
+domain: Growth
 columns:
   cities:
     lineage:

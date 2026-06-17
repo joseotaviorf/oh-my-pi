@@ -1,6 +1,7 @@
 ---
 database_name: datalake_marketing_segmentations
 table_name: lost_listings
+domain: Growth
 columns:
   sk_house_listing:
     lineage:

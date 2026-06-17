@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: affiliates_monthly_expected_results
+domain: Growth
 columns:
   sk_date:
     lineage:

@@ -2,7 +2,7 @@
 database_name: dw_growth
 table_name: fact_media_platform_metrics
 owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This fact table consolidates media platform metrics, including campaign performance, costs, and regional data, enriched with campaign historical information and business rules. Note that this table does not have a unique identifier per row, as multiple rows may represent overlapping or aggregated data depending on the metrics and dimensions involved.
 columns:
   sk_campaign:

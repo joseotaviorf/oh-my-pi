@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: marketshare_units_and_tenants
+domain: Growth
 columns:
   cluster:
     lineage:

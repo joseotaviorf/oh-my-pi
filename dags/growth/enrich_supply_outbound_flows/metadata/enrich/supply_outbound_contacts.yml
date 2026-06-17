@@ -1,5 +1,6 @@
 database_name: datalake_supply_outbound_flows
 table_name: supply_outbound_contacts
+domain: Growth
 columns:
   id_wololo_prospect:
     lineage:

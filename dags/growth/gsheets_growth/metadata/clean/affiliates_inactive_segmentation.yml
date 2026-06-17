@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: affiliates_inactive_segmentation
+domain: Growth
 columns:
   id_user:
     lineage:

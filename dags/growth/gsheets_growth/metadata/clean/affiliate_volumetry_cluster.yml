@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: affiliate_volumetry_cluster
+domain: Growth
 columns:
   sk_user:
     lineage:

@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: sale_tof_monthly_target
+domain: Growth

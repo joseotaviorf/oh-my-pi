@@ -2,7 +2,7 @@
 database_name: datalake_demand_consolidated_targets
 table_name: demand_consolidated_targets
 owner: uilson.bonfim@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This Table aims to consolidate Targets for Growth@Demand. It includes ToF (Daily, Weekly and Monthly), Prospects and Marketing Cost. It is composed by the union of all of these metrics.
 columns:
   behavior_type:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: affiliates_manual_cost_engagement_history
+domain: Growth
 columns:
   city_group:
     lineage:

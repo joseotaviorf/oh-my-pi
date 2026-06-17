@@ -1,5 +1,6 @@
 database_name: datalake_expected_contribution_margin
 table_name: expected_contribution_margin_by_event
+domain: Growth
 description: This table contains the estimated monthly revenue that each ForRent contract will bring to QuintoAndar.
 columns:
   id_rent_flow:

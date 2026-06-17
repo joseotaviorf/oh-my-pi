@@ -1,5 +1,6 @@
 database_name: datalake_wololo_clean
 table_name: rev_info
+domain: Growth
 columns:
   rev:
     lineage:

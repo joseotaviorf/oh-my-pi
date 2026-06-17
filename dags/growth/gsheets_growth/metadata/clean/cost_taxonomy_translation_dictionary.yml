@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: cost_taxonomy_translation_dictionary
 owner: uilson.bonfim@quintoandar.com.br
-domain: growth
+domain: Growth
 description: GSheets that translates Marketing Platform Campaigns to the new Taxonomy
 columns:
   account_name:

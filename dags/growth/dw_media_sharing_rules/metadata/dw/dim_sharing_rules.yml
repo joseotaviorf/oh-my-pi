@@ -2,7 +2,7 @@
 database_name: dw_growth
 table_name: dim_sharing_rules
 owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This dimension consolidates cost-sharing rules by date and segmentation attributes.
 columns:
   bk_sharing_rules:

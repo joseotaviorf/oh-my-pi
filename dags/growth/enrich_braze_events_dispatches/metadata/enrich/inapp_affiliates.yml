@@ -2,7 +2,7 @@
 database_name: datalake_braze_dispatches
 table_name: inapp_affiliates
 owner: data-growth@quintoandar.com
-domain: growth
+domain: Growth
 description: Table with details about communications sent in-app to affiliates.
 columns:
   id_user_braze:

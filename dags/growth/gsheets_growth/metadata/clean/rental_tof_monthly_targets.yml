@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_tof_monthly_targets
+domain: Growth
 columns:
   city_group:
     lineage:

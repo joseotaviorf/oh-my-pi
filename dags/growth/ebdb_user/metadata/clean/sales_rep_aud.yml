@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: sales_rep_aud
+domain: Growth
 columns:
   id_sales_rep:
     lineage:

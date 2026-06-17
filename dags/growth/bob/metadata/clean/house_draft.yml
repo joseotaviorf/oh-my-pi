@@ -1,5 +1,6 @@
 database_name: datalake_bob_clean
 table_name: house_draft
+domain: Growth
 columns:
   id:
     lineage:

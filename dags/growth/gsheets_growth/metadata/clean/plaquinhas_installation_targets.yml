@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: plaquinhas_installation_targets
+domain: Growth
 columns:
   business_context:
     lineage:

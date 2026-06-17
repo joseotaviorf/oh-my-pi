@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: taxonomy_demand_exception_flow
+domain: Growth
 columns:
   utm_campaign:
     description: The utm_campaign of the campaign that doesn't follow the naming convention.

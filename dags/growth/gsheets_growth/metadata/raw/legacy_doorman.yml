@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: legacy_doorman
+domain: Growth
 columns:
   id_short_house:
     tags:

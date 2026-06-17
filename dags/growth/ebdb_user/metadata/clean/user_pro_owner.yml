@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: user_pro_owner
+domain: Growth
 columns:
   id:
     lineage:

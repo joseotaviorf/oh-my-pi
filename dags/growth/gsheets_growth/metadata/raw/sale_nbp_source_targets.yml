@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: sale_nbp_source_targets
+domain: Growth
 columns:
   city_group:
     tags:

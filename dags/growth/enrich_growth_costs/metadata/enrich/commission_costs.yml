@@ -2,7 +2,7 @@
 database_name: enrich_growth_costs
 table_name: commission_costs
 owner: henrique.paulo@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This enrich table consolidates commission costs and manual taxes
 columns:
   source_name:

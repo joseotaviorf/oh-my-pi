@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: voucherify_users
+domain: Growth
 columns:
   sk_user:
     lineage:

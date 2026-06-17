@@ -1,5 +1,6 @@
 database_name: datalake_wololo_clean
 table_name: round_aud
+domain: Growth
 columns:
   id_prospect:
     lineage:

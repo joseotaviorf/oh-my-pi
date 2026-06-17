@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: marketing_costs_google_ad_type_flags
+domain: Growth
 columns:
   ad_type:
     lineage:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: daily_target_supply_sale
+domain: Growth
 columns:
   id_date:
     lineage:

@@ -1,5 +1,6 @@
 database_name: datalake_rene_descartes_clean
 table_name: house_lead_aud
+domain: Growth
 columns:
   id:
     lineage:

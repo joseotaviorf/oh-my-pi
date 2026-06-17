@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: encm_conversion_probability_backward_looking
+domain: Growth
 columns:
   date_start:
     lineage:

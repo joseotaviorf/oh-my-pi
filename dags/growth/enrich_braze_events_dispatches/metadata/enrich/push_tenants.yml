@@ -2,7 +2,7 @@
 database_name: datalake_braze_dispatches
 table_name: push_tenants
 owner: data-growth
-domain: growth
+domain: Growth
 description: Table with details about communications sent through push.
 columns:
   id_user:

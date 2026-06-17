@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: keys_logistic_control
+domain: Growth
 columns:
   email:
     tags:
