@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: reconciliation_item
+domain: For Sale
 columns:
   buyer_document:
     tags:

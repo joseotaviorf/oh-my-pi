@@ -1,6 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: ccv_rule
+domain: For Sale
 columns:
   id_ccv_rule:
     lineage:

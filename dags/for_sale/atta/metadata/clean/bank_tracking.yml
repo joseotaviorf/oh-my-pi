@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_clean
 table_name: bank_tracking
+domain: For Sale
 columns:
   id:
     lineage:

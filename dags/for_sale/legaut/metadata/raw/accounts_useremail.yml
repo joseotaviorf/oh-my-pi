@@ -1,6 +1,7 @@
 ---
 database_name: datalake_legaut_raw
 table_name: accounts_useremail
+domain: For Sale
 columns:
   id:
     tags:

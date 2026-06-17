@@ -1,2 +1,3 @@
 database_name: datalake_casa_mineira_crm_raw
 table_name: bairro
+domain: For Sale

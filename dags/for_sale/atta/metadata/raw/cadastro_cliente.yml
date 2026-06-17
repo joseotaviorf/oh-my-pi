@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: cadastro_cliente
+domain: For Sale
 columns:
   b_nome:
     tags:

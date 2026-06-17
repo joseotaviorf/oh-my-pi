@@ -2,7 +2,7 @@
 database_name: datalake_legaut_clean
 table_name: crawlers_crawler_key_type
 owner: leonardo.soares@quintoandar.com.br
-domain: for_sale
+domain: For Sale
 description: Table with the types of keys used by the crawlers
 columns:
   id:

@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: business_unit_region
+domain: For Sale
 columns:
   id_region:
     lineage:

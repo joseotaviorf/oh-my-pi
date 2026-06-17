@@ -1,5 +1,6 @@
 database_name: datalake_risk_and_mortgage_clean
 table_name: offer_pre_analysis
+domain: For Sale
 columns:
   id:
     lineage:

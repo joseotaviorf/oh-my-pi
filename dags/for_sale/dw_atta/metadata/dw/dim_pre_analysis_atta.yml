@@ -1,7 +1,7 @@
 database_name: dw_atta
 table_name: dim_pre_analysis_atta
 description: dimension with the details from atta partners
-domain: Data ForSale
+domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
   sk_pre_analysis:

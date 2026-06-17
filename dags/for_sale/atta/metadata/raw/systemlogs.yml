@@ -1,5 +1,6 @@
 database_name: datalake_atta_raw
 table_name: systemlogs
+domain: For Sale
 columns:
   UserId:
     tags:

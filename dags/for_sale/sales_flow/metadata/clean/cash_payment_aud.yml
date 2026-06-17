@@ -1,6 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: cash_payment_aud
+domain: For Sale
 columns:
   id_cash_payment_aud:
     lineage:

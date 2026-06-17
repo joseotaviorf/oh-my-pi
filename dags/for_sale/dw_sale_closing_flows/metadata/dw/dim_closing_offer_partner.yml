@@ -1,7 +1,7 @@
 database_name: dw_sale
 table_name: dim_closing_offer_partner
 description: This table contains information about financed proposals, including their BU`s, Buyer`s name and etc.
-domain: Data ForSale
+domain: For Sale
 owner: matheus.sampaio@quintoandar.com.br
 columns:
   sk_offer:

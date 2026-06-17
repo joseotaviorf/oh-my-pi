@@ -1,5 +1,6 @@
 database_name: datalake_legaut_clean
 table_name: crawlers_company
+domain: For Sale
 columns:
   id:
     lineage:

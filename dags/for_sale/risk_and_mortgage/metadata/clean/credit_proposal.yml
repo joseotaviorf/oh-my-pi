@@ -1,5 +1,6 @@
 database_name: datalake_risk_and_mortgage_clean
 table_name: credit_proposal
+domain: For Sale
 columns:
   id:
     lineage:

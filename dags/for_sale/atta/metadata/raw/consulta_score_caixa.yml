@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: consulta_score_caixa
+domain: For Sale
 columns:
   ID_USUARIO:
     tags:

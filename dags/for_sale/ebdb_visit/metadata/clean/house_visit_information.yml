@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: house_visit_information
+domain: For Sale
 columns:
   id_house:
     lineage:

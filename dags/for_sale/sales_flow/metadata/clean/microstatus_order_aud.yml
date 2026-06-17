@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: microstatus_order_aud
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: Micro status order type aud table.
 columns:

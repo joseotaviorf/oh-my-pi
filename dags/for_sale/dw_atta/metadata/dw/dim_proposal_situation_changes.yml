@@ -1,7 +1,7 @@
 database_name: dw_atta
 table_name: dim_proposal_situation_changes
 description: dimension bringing all leadtimes for each situation on the proposal
-domain: Data ForSale
+domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
   sk_proposal:

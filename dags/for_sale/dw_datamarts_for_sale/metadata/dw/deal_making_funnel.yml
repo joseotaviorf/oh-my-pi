@@ -1,6 +1,7 @@
 ---
 database_name: dw_datamarts
 table_name: deal_making_funnel
+domain: For Sale
 columns:
   id_offer:
     lineage:

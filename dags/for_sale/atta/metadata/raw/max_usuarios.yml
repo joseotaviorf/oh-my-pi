@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: max_usuarios
+domain: For Sale
 columns:
   nome:
     tags:

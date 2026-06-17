@@ -1,7 +1,7 @@
 database_name: dw_atta
 table_name: fact_pre_analysis_proposal_flow
 description: Fact table containing data from pre analysis and proposal flows
-domain: Data ForSale
+domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
     sk_pre_analysis_proposal_flow:

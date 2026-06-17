@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_for_sale_clean
 table_name: magellan_roadmap
 owner: leonardo.soares@quintoandar.com.br
-domain: for_sale
+domain: For Sale
 description: Table with the roadmap of the magellan project
 columns:
   task:

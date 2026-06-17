@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: parceiro
+domain: For Sale
 columns:
   nome:
     tags:

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_clean
 table_name: franchise_info
+domain: For Sale
 columns:
   id_franchise:
     lineage:

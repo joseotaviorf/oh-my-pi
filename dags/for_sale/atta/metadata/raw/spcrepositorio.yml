@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: spcrepositorio
+domain: For Sale
 columns:
   CPF:
     tags:

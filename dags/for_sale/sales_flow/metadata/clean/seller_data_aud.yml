@@ -1,6 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: seller_data_aud
+domain: For Sale
 columns:
   id_seller:
     lineage:

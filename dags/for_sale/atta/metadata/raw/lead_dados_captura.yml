@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: lead_dados_captura
+domain: For Sale
 columns:
   Nome:
     tags:

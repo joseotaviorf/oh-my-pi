@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: sale_extra_cohorts_targets_2025
+domain: For Sale
 columns:
   bp2bp_w_ccv:
     lineage:

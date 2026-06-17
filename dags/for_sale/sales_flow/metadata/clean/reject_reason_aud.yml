@@ -1,5 +1,6 @@
 database_name: datalake_sales_flow_clean
 table_name: reject_reason_aud
+domain: For Sale
 columns:
   id:
     lineage:

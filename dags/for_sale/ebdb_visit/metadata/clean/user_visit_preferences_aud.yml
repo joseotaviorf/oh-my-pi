@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: user_visit_preferences_aud
+domain: For Sale
 columns:
   id:
     lineage:

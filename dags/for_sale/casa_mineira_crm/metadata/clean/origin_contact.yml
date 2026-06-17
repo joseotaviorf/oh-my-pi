@@ -1,6 +1,7 @@
 ---
 database_name: datalake_casa_mineira_crm_clean
 table_name: origin_contact
+domain: For Sale
 columns:
   id:
     lineage:

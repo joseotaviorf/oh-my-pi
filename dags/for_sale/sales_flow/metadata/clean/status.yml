@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: status
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: The main idea of the table is to relate microstatus and macrostatus with their respective names and labels. From the table is possible to identify the hierarchy of ForSale status.
 columns:

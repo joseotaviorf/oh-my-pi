@@ -1,6 +1,6 @@
 database_name: datalake_atta
 table_name: proposal_situation_changes
-domain: Data ForSale
+domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 description: "Table containing the leadtime for each proposal situation"
 columns:

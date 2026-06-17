@@ -2,7 +2,7 @@
 database_name: datalake_sales_flow_clean
 table_name: screening_buyer
 owner: leonardo.soares@quintoandar.com.br
-domain: for_sale
+domain: For Sale
 description: "The primary purpose of the screening_buyer table is to 
   store the status of the screening/validation form for buyer, 
   indicating whether the form is complete or pending, as well as capturing any 

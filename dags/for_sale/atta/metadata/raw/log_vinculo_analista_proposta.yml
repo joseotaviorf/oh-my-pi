@@ -1,3 +1,4 @@
 ---
 database_name: datalake_atta_raw
 table_name: log_vinculo_analista_proposta
+domain: For Sale

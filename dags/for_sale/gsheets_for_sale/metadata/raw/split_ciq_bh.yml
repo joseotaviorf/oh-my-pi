@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_raw
 table_name: split_ciq_bh
+domain: For Sale
 columns:
   name_participante:
     tags:

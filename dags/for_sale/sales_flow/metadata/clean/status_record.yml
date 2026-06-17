@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: status_record
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: The main objective of the table is registered all status changes throughout the sales process. A status can coincide with another status on the same date.
 columns:

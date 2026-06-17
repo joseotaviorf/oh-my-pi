@@ -2,7 +2,7 @@
 database_name: datalake_atta
 table_name: partner_info
 description: Table containing the details from atta partners
-domain: Data ForSale
+domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
   id_partner:

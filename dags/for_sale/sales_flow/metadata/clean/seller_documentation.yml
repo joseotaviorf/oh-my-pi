@@ -2,7 +2,7 @@
 database_name: datalake_sales_flow_clean
 table_name: seller_documentation
 description: Table that contains the information about the seller documentation process.
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:

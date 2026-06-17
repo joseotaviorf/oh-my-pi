@@ -1,5 +1,6 @@
 database_name: datalake_sale_potential_listing
 table_name: potential_listing_lead_tasks
+domain: For Sale
 columns:
   id:
     lineage:

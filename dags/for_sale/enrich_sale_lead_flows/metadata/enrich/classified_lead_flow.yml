@@ -2,7 +2,7 @@
 database_name: datalake_sale_lead_flows
 table_name: classified_lead_flow
 description: Enriched table to track the lead from Classificados.
-domain: Data ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id_classified_lead:

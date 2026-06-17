@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: microstatus_order
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: The main objective of the microstatus table is to identify which is the microstage of the process of offer, from created to its delivery keys.
 columns:

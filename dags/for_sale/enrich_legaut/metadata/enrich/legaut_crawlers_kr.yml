@@ -1,6 +1,7 @@
 ---
 database_name: datalake_legaut
 table_name: legaut_crawlers_kr
+domain: For Sale
 columns:
   id_crawler:
     lineage:

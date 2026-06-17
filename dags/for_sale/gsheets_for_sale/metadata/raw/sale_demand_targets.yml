@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: sale_demand_targets
+domain: For Sale

@@ -1,6 +1,7 @@
 ---
 database_name: dw_datamarts
 table_name: sale_lead_flow
+domain: For Sale
 columns:
   sk_lead:
     lineage:

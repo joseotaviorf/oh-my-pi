@@ -1,6 +1,7 @@
 ---
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_status
+domain: For Sale
 columns:
   id_sales_flow:
     lineage:

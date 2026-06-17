@@ -1,7 +1,7 @@
 database_name: dw_atta
 table_name: dim_franchise_atta
 description: dimension with the details from atta franchises
-domain: Data ForSale
+domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
   sk_franchise:

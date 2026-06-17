@@ -1,5 +1,6 @@
 database_name: datalake_casa_mineira_crm_raw
 table_name: imagem
+domain: For Sale
 columns:
   url_original:
     tags:

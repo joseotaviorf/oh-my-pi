@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: sale_supply_targets_cohort_2024
+domain: For Sale

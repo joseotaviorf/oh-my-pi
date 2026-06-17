@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: closing_type_aud
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: Closing type Aud table.
 columns:

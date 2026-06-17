@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: cliente_vendedor
+domain: For Sale
 columns:
   nm_vendedor:
     tags:

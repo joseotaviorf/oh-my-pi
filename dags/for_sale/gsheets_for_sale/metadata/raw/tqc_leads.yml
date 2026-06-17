@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: tqc_leads
+domain: For Sale
 columns:
   agent_email:
     tags:

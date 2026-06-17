@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: agent_tiers_rounds
+domain: For Sale
 columns:
   round:
     lineage:

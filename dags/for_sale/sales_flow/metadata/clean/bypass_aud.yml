@@ -2,7 +2,7 @@
 database_name: datalake_sales_flow_clean
 table_name: bypass_aud
 owner: herivelto.junior@quintoandar.com.br
-domain: ForSale
+domain: For Sale
 description: Bypass Aud table.
 columns:
   id:

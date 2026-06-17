@@ -1,6 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: shop_window_listing_business_context
+domain: For Sale
 columns:
   id:
     lineage:

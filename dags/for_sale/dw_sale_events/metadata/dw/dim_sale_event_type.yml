@@ -1,4 +1,5 @@
 ---
 database_name: dw_sale
 table_name: dim_sale_event_type
+domain: For Sale
 columns:

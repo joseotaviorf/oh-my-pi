@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: hub_agents_hierarchy
+domain: For Sale
 columns:
   id_agent:
     lineage:

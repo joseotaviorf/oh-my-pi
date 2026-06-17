@@ -3,7 +3,7 @@ database_name: datalake_visit
 table_name: visit_fitting
 description: Information about Rent and Sale visit fitting.
   Each row is an unique visit fitting solicitation.
-domain: Data ForSale
+domain: For Sale
 owner: matheus.sampaio@quintoandar.com.br
 columns:
   id:

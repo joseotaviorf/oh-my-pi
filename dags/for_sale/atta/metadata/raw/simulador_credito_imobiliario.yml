@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_raw
 table_name: simulador_credito_imobiliario
+domain: For Sale
 columns:
   NomeTitular:
     tags:

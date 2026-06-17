@@ -1,5 +1,6 @@
 database_name: datalake_casa_mineira_crm_raw
 table_name: visita_solicitacao
+domain: For Sale
 columns:
   contato_id:
     tags:

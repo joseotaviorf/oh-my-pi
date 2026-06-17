@@ -2,7 +2,7 @@
 database_name: datalake_sales_flow_clean
 table_name: payment_rules
 owner: leonardo.soares@quintoandar.com.br
-domain: for_sale
+domain: For Sale
 description: "The payment_rules table contains data related to the 'Triagem CCV' process within the Sales department. This 
   process involves the creation of CCVs (Contracts) through LegalOps team input, where client and property information is entered. Based 
   on this information, a CCV is generated automatically"

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_atta_clean
 table_name: partner_category
+domain: For Sale
 columns:
   id:
     lineage:

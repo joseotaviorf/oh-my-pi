@@ -2,7 +2,7 @@
 database_name: datalake_sales_flow_clean
 table_name: house_registration_order
 owner: herivelto.junior@quintoandar.com.br
-domain: ForSale
+domain: For Sale
 description: null
 columns:
   id:

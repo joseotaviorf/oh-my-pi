@@ -1,5 +1,6 @@
 database_name: datalake_nps_answer_drivers
 table_name: answer_drivers
+domain: For Sale
 columns:
   id_answer:
     lineage:

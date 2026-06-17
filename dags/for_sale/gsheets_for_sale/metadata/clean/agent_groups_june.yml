@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: agent_groups_june
+domain: For Sale
 columns:
   sk_agent:
     lineage:
