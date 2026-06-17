@@ -1326,9 +1326,9 @@ bietlejuice.dw_time:
   - bietlejuice.pin_core:load-clean-assignment-extra-info:first-run-of-day
 bietlejuice.dw_user:
   - bietlejuice.amplitude_subpartitioned:load-clean-283048-register-form-completed-events:first-run-of-day
+  - bietlejuice.core_region:load-core-region:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_finance:load-clean-bank:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-data:first-run-of-day

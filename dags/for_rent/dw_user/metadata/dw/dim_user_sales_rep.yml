@@ -1,8 +1,13 @@
 database_name: dw_quintoandar
 table_name: dim_user_sales_rep
-description: Information about Sales Rep users from Inside Sales companies. Each line is an unique user sales rep, identified by the sk_user_sales_rep.
+description: >
+  Dimension table with one row per Inside Sales representative contracted by QuintoAndar's
+  partner companies, sourced from datalake_ebdb_user.user_sales_rep. Contains identity,
+  contact, and employment data (company, start date, active status) for sales rep users.
+  Might contain PII data.
+  Used by Growth analytics to track sales rep performance and tenure. Partitioned by country_code.
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_user_sales_rep:
     lineage:
@@ -15,24 +20,24 @@ columns:
   name:
     lineage:
     - datalake_ebdb_user.user_sales_rep.name
-    description: "Name of the sales rep."
+    description: "Full name of the Inside Sales representative as registered in QuintoAndar's system."
   email:
     lineage:
     - datalake_ebdb_user.user_sales_rep.email
-    description: "Email of the sales rep."
+    description: "Corporate email address of the sales rep, used for internal identification and communication."
   phone_number:
     lineage:
     - datalake_ebdb_user.user_sales_rep.phone_number
-    description: "Phone number of the sales rep."
+    description: "Contact phone number of the sales rep registered in the system for operational communication."
   admin_type:
     lineage:
     - datalake_ebdb_user.user_sales_rep.admin_type
-    description: "Admin type that the sales rep user has."
+    description: "Permission level granted to the sales rep user, controlling which internal tools and modules they can access."
     categories:
-      Admin: ''
-      AtendimentoParceiros: ''
-      Normal: ''
-      Sudo: ''
+      Admin: 'Full administrative access to the system.'
+      AtendimentoParceiros: 'Access restricted to partner service operations.'
+      Normal: 'Standard access level for regular sales rep operations.'
+      Sudo: 'Superuser access with elevated permissions across the system.'
   sales_company:
     lineage:
     - datalake_ebdb_user.user_sales_rep.sales_company

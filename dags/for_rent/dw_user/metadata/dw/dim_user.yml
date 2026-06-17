@@ -1,13 +1,18 @@
 database_name: dw_public
 table_name: dim_user
-description: Information about users registered at QuintoAndar. Each line is an unique user.
-domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+description: >
+  Dimension table with one row per unique user registered in QuintoAndar's platform, sourced
+  from datalake_ebdb_user. Covers all user roles — tenant, house owner, agent, affiliate,
+  doorman affiliate, photographer, Inside Sales analyst, and partner agent. Might contain PII data.
+  Key for user-level analysis across the full rental funnel and for joining role-specific dimension
+  tables (dim_user_doorman, dim_partner_agent). Partitioned by country_code.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_user:
     lineage:
     - datalake_ebdb_user.user.id
-    description: Unique ID of user, it's the primary key of this table.
+    description: Unique ID of user, it's the primary key of this table. It's the EBDB.Usuario.id. 
   sk_doorman_joined_date:
     lineage:
     - datalake_ebdb_user.affiliate_data.ts_doorman_joined
@@ -19,7 +24,7 @@ columns:
   uuid_person:
     lineage:
     - datalake_ebdb_user.user.uuid_person
-    description: Unique ID of user, in uuid format.
+    description: Unique Person uuid. It's the EBDB.Person.uuid_person.
   dados_agente_id:
     lineage:
     - datalake_ebdb_user.user.id_agent
@@ -51,7 +56,7 @@ columns:
   id_partner:
     lineage:
     - datalake_big_agent.agent_current_program.id_partner
-    description: Id of the partner.
+    description: Identifier of the B2B partner company associated with the user, when the user is a partner agent. Joinable with dim_partner.
   predecessor_user_list:
     lineage:
     - datalake_ebdb_user.user_merge.predecessor_user_list
@@ -196,7 +201,7 @@ columns:
   email:
     lineage:
     - datalake_ebdb_user.user.email
-    description: Email of user.
+    description: Primary email address used by the user to authenticate and receive communications from QuintoAndar.
   ts_last_self_validation_email:
     description: Timestamp of when the user carried out the most recent self validation for their email.
   email_alternativo:
@@ -237,11 +242,11 @@ columns:
     description: City of user's address.
   estado_nome:
     lineage:
-    - datalake_ebdb_clean.state.name
+    - core_region.region.state_name
     description: Full state name of user's address.
   estado_abreviacao:
     lineage:
-    - datalake_ebdb_clean.state.abbreviation
+    - core_region.region.state_abbreviation
     description: State acronym of user's address.
   tipo_admin:
     lineage:
@@ -399,11 +404,11 @@ columns:
   first_pre_proposal_date:
     lineage:
     - datalake_ebdb_clean.pre_proposal.ts_created
-    description: Date of when the user's first pre proposal.
+    description: Date when the user submitted their first pre-proposal (interest form for a listing), marking the start of the rental funnel.
   first_proposal_accepted_date:
     lineage:
     - datalake_ebdb_clean.proposal.ts_created
-    description: Date of when the user's first proposal accepted.
+    description: Date when the user had their first rental proposal accepted by the landlord, indicating qualification for a contract.
   first_contract_date:
     lineage:
     - datalake_ebdb_clean.contract.ts_created

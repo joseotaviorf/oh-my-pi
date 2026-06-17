@@ -1,8 +1,12 @@
 database_name: dw_public
 table_name: dim_partner_agent
-description: Real estate agents from companies partnering with QuintoAndar in our B2B model (see dim_partner table). Each line is a partner company's real estate agent.
-domain: For Rent
-owner: felipe.chies@quintoandar.com.br
+description: >
+  Dimension table with one row per real estate agent working within a B2B partner company in
+  QuintoAndar's network, sourced from datalake_ebdb_clean.partner_agent. Each agent is linked to
+  a partner company (id_partner) and a QuintoAndar user account (id_user). Used alongside
+  dim_partner to analyse partner agent activity and status. Partitioned by country_code.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_partner_agent:
     lineage:
@@ -37,7 +41,7 @@ columns:
   type:
     lineage:
     - datalake_ebdb_clean.partner_agent.type
-    description: Partner agent's type.
+    description: Role classification of the partner agent within the B2B partner company.
     categories:
       OPERATIONS_AGENT: Type of the agent is Operations.
   ts_created:

@@ -57,14 +57,22 @@ booking_counts AS (
         dt_houses_owned = DATE_ADD(DATE(CURRENT_DATE()), -1)
     GROUP BY 1
  ),
+ user_secretariat_ranked AS (
+    SELECT
+        id_secretariat_user,
+        ts_allocation_ended,
+        ROW_NUMBER() OVER (PARTITION BY id_secretariat_user ORDER BY version DESC) AS rn
+    FROM
+        datalake_hub_services.secretariat_allocation_history
+ ),
  user_secretariat AS (
     SELECT
         id_secretariat_user,
         ts_allocation_ended
     FROM
-        datalake_hub_services.secretariat_allocation_history
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_secretariat_user ORDER BY version DESC) = 1
+        user_secretariat_ranked
+    WHERE
+        rn = 1
  ),
 email_and_phone_number_self_validations AS (
     SELECT
@@ -77,6 +85,16 @@ email_and_phone_number_self_validations AS (
         validation_type = 'SELF'
         AND type IN ('EMAIL', 'PHONE')
     GROUP BY value, type
+),
+state_from_core AS (
+    SELECT DISTINCT
+        id_state,
+        state_name,
+        state_abbreviation
+    FROM
+        core_region.region
+    WHERE
+        id_state IS NOT NULL
 )
 
 SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
@@ -128,8 +146,8 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     NULLIF(u.neighborhood, '') AS bairro,
     NULLIF(u.zip_code, '') AS cep,
     NULLIF(u.city, '') AS cidade,
-    s.name AS estado_nome,
-    s.abbreviation AS estado_abreviacao,
+    s.state_name AS estado_nome,
+    s.state_abbreviation AS estado_abreviacao,
     u.admin_type AS tipo_admin,
     b.code AS dadosbancarios_banco_codigo,
     b.name AS dadosbancarios_banco,
@@ -180,8 +198,8 @@ LEFT JOIN
     booking_counts AS b_counts
         ON b_counts.id_visitor = u.id
 LEFT JOIN
-    datalake_ebdb_clean.state AS s
-        ON s.id = u.id_state
+    state_from_core AS s
+        ON s.id_state = u.id_state
 LEFT JOIN
     datalake_ebdb_user.agent_data AS ag
         ON ag.id = u.id_agent

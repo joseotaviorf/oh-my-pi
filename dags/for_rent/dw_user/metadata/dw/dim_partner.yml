@@ -1,8 +1,12 @@
 database_name: dw_public
 table_name: dim_partner
-description: A company partnering with QuintoAndar in our B2B model. Each line is a partner company.
-domain: For Rent
-owner: felipe.chies@quintoandar.com.br
+description: >
+  Dimension table with one row per company operating as a B2B partner in QuintoAndar's agent
+  network program, sourced from datalake_ebdb_clean.partner. Covers partner types ranging from
+  autonomous agents to prime and executive partners. Used by For Rent analytics to track partner
+  company attributes, UTM acquisition data, and partnership lifecycle. Partitioned by country_code.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_partner:
     lineage:
@@ -19,14 +23,14 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: 'Country code of the partner. Its also a table partition.'
+    description: 'ISO country code identifying the market where the partner operates. Used to filter by country and is also the table partition.'
     categories:
       BR: 'Brazil country code.'
       MX: 'Mexico country code.'
   name:
     lineage:
     - datalake_ebdb_clean.partner.name
-    description: 'Name of the partner.'
+    description: 'Legal company name of the partner as registered in QuintoAndar''s system.'
   trade_name:
     lineage:
     - datalake_ebdb_clean.partner.trade_name
@@ -50,7 +54,7 @@ columns:
   type:
     lineage:
     - datalake_ebdb_clean.partner.type
-    description: 'Type of the partner.'
+    description: 'Business model classification of the partner within QuintoAndar''s B2B program.'
     categories:
       AUTONOMOUS_AGENT: 'Partner is an Autonomous agent.'
       PRIME: 'Partner is a Prime agent.'
@@ -59,15 +63,15 @@ columns:
   city:
     lineage:
     - datalake_ebdb_clean.partner.city
-    description: 'City of the partner.'
+    description: 'City where the partner company is headquartered or primarily operates.'
   state_abbreviation:
     lineage:
-    - datalake_ebdb_clean.state.abbreviation
-    description: 'State abbreviation of the partner.'
+    - core_region.region.state_abbreviation
+    description: 'Two-letter Brazilian state abbreviation (e.g. SP, RJ) of the partner''s operating location.'
   state_name:
     lineage:
-    - datalake_ebdb_clean.state.name
-    description: 'State Name of the partner.'
+    - core_region.region.state_name
+    description: 'Full name of the Brazilian state where the partner company is located.'
   internal_locality_code:
     description: 'Internal locality code, calculated based on the partner city and state. Ex: (L001, L002, L003).'
   utm_campaign:

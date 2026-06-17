@@ -1,8 +1,13 @@
 database_name: dw_public
 table_name: dim_user_doorman
-description: Information about doormen (a subset of all affiliates) registered at QuintoAndar. Each line is a user doorman.
+description: >
+  Dimension table with one row per doorman registered in QuintoAndar's affiliate doorman
+  program, sourced from datalake_ebdb_user.user_doorman. Doormen are building employees
+  (concierge, janitor, guard, etc.) who refer prospective tenants and receive affiliate rewards.
+  Contains workplace location, occupation type, and program enrollment data. Joinable with
+  dim_user via sk_user_affiliate = dados_afiliado_id. Partitioned by country_code.
 domain: For Rent
-owner: 'kleber.inoue@quintoandar.com'
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_user_doorman:
     lineage:
@@ -21,7 +26,7 @@ columns:
   occupation_id:
     lineage:
     - datalake_ebdb_user.user_doorman.id_doorman_occupation
-    description: Doorman Occupation ID.
+    description: Identifier of the doorman's occupation type within the building (e.g. doorman, janitor, guard). Joinable with the occupation lookup.
   work_place_id:
     lineage:
     - datalake_ebdb_user.user_doorman.id_place

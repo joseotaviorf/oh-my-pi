@@ -4,8 +4,8 @@ description: Table that consolidates the historical category of a owner.
   The categorization of the owner does not come from production databases. It's created by the Data team.
   In this table we're not bringing the B2B users.
   Each line of this table is an unique owner category, which is identified by the sk_owner_category column.
-domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_owner_category:
     lineage:
@@ -17,7 +17,7 @@ columns:
   sk_owner:
     lineage:
       - datalake_pro_owners.owner_category.id_owner
-    description: Key to identify the landlord/owner of a house.
+    description: Key to identify the landlord/owner of a house. It's the EBDB.Usuario.id. 
       It can be joined with dim_user using sk_user
   country_code:
     lineage:
