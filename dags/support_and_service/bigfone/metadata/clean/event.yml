@@ -98,6 +98,12 @@ columns:
       created.
     lineage:
       - datalake_bigfone_raw.event.metadata
+  tags:
+    description: JSON object of task tags grouped by type (tagsByType), classifying
+      the call-handling task (e.g. reason or subject) as set in the Twilio task
+      attributes.
+    lineage:
+      - datalake_bigfone_raw.event.metadata
   csat_1:
     description: First customer satisfaction (CSAT) survey score collected for the
       call.

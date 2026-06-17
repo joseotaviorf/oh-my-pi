@@ -22,6 +22,7 @@ SELECT
     GET_JSON_OBJECT(metadata,'$.event_data.WorkerAttributes.email') AS worker_email,
     GET_JSON_OBJECT(metadata,'$.event_data.TaskCanceledReason') AS task_cancelation_reason,
     GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.steps') AS ivr_steps,
+    GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.tagsByType') AS tags,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-3') AS INT) AS csat_3,
