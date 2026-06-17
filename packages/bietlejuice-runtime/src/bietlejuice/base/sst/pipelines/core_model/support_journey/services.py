@@ -183,29 +183,40 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             )
         )
 
-        return call_event_df.join(
-            session_df, F.col("id_task_call") == F.col("source_identity"), how="inner"
-        ).select(
-            "id_session",
-            "id_support_session",
-            "id_user",
-            "database_source",
-            "id_task",
-            "id_reservation",
-            "id_call",
-            "id_worker",
-            F.col("source").alias("service_type"),
-            "direction",
-            "channel_type",
-            "bpo_name",
-            "queue_name",
-            "worker_email",
-            "from_phone_number",
-            "task_cancelation_reason",
-            "to_phone_number",
-            "waiting_time_sec",
-            F.col("ts_created").alias("ts_task_created"),
-            F.col("ts_updated").alias("ts_task_updated"),
+        final_call_df = (
+            call_event_df.join(
+                session_df,
+                F.col("id_task_call") == F.col("source_identity"),
+                how="inner",
+            )
+            .select(
+                "id_task_event",
+                "id_session",
+                "id_support_session",
+                "id_user",
+                "database_source",
+                "id_task",
+                "id_reservation",
+                "id_call",
+                "id_worker",
+                F.col("source").alias("service_type"),
+                "direction",
+                "channel_type",
+                "bpo_name",
+                "queue_name",
+                "worker_email",
+                "from_phone_number",
+                "task_cancelation_reason",
+                "to_phone_number",
+                "waiting_time_sec",
+                F.col("ts_created").alias("ts_task_created"),
+                F.col("ts_updated").alias("ts_task_updated"),
+            )
+            .withColumn("dedup_ts", F.col("ts_task_updated"))
+        )
+
+        return get_latest_version_from_df(
+            final_call_df, ["id_task_event"], final_call_df.columns, ["dedup_ts"]
         )
 
     def _build_chats_results_df(
@@ -337,7 +348,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
 
         union_ias_ws = ias.unionByName(ws, allowMissingColumns=True)
 
-        return (
+        final_chat_df = (
             task_events_df.alias("t")
             .join(
                 union_ias_ws.alias("u"),
@@ -408,6 +419,10 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 F.col("t.ts_updated").alias("ts_task_updated"),
                 F.col("t.task_attributes"),
             )
+        ).withColumn("dedup_ts", F.col("ts_task_updated"))
+
+        return get_latest_version_from_df(
+            final_chat_df, ["id_task_event"], final_chat_df.columns, ["dedup_ts"]
         )
 
     def _build_target_df(
