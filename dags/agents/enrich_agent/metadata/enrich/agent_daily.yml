@@ -13,12 +13,6 @@ columns:
       processing date (CURRENT_DATE), uniquely identifying each agent-day row.
     lineage:
       - datalake_agent_accreditation.agent.id_agent
-  sk_agent_daily:
-    description: |
-      Primary key of the daily snapshot. Built as MD5 of agent identifier and the
-      processing date (CURRENT_DATE), uniquely identifying each agent-day row.
-    lineage:
-      - datalake_agent_accreditation.agent.id_agent_daily
   id_agent:
     lineage:
       - datalake_agent_accreditation.agent.id_agent
