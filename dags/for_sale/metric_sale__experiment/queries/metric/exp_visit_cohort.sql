@@ -6,6 +6,7 @@ WITH visit AS (
         fv.sk_owner,
         fv.sk_first_associated_agent,
         dv.business_context,
+        dv.behavior,
         dv.dt_created,
         dv.ts_visit_first_confirmed,
         dv.ts_visit_done,
@@ -81,8 +82,8 @@ visit_exp AS (
                 ON exp.identifier_type = 'VISITOR'
                 AND visit.sk_visitor = exp.sk_identifier
                 AND visit.business_context = exp.business_context
-                AND visit.dt_created::DATE >= exp.dt_started
-                AND visit.dt_created::DATE <= exp.dt_ended
+                AND DATE(visit.dt_created) >= exp.dt_started
+                AND DATE(visit.dt_created) <= exp.dt_ended
     ),
     visit_by_visit AS (
         SELECT
@@ -116,8 +117,8 @@ visit_exp AS (
                 ON exp.identifier_type = 'VISIT'
                 AND visit.sk_visit = exp.sk_identifier
                 AND visit.business_context = exp.business_context
-                AND visit.dt_created::DATE >= exp.dt_started
-                AND visit.dt_created::DATE <= exp.dt_ended
+                AND DATE(visit.dt_created) >= exp.dt_started
+                AND DATE(visit.dt_created) <= exp.dt_ended
     ),
     visit_by_owner AS (
         SELECT
@@ -151,8 +152,14 @@ visit_exp AS (
                 ON exp.identifier_type = 'OWNER'
                 AND visit.sk_owner = exp.sk_identifier
                 AND visit.business_context = exp.business_context
-                AND visit.dt_created::DATE >= exp.dt_started
-                AND visit.dt_created::DATE <= exp.dt_ended
+                AND DATE(visit.dt_created) >= exp.dt_started
+                AND DATE(visit.dt_created) <= exp.dt_ended
+        WHERE
+            exp.name_experiment != 'visits_triangulation_owner'
+            OR (
+                exp.name_experiment = 'visits_triangulation_owner'
+                AND visit.behavior IN ('INSTANT_BOOKING', 'CONFIRMATION_SUPPLY')
+            )
     )
     SELECT
         sk_neotribe_exp,
@@ -431,7 +438,7 @@ exp_cohort AS (
         visit_exp
     JOIN
         dw_public.dim_date
-            ON dim_date.date >= visit_exp.dt_created::DATE
+            ON dim_date.date >= DATE(visit_exp.dt_created)
             AND dim_date.date <= visit_exp.dt_exp_ended
 )
 SELECT
