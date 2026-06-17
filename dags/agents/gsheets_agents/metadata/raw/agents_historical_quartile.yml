@@ -1,2 +1,3 @@
 database_name: datalake_gsheets_raw
 table_name: agents_historical_quartile
+domain: Agents

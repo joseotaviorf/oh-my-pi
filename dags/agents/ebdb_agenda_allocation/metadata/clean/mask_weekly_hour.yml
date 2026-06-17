@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: mask_weekly_hour
+domain: Agents
 columns:
   id:
     lineage:

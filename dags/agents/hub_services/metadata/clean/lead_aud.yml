@@ -1,6 +1,7 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: lead_aud
+domain: Agents
 columns:
   id:
     lineage:

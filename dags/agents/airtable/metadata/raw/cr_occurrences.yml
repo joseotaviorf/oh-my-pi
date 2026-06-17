@@ -1,6 +1,7 @@
 ---
 database_name: datalake_airtable_raw
 table_name: cr_occurrences
+domain: Agents
 columns:
   ql_id_do_agente:
     tags:

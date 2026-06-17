@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: agent_specific_hour_aud
+domain: Agents
 columns:
   id:
     lineage:

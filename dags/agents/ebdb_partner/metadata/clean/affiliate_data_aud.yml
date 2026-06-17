@@ -1,5 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: affiliate_data_aud
+domain: Agents
 columns:
   id_affiliate_data:
     lineage:
