@@ -1224,6 +1224,9 @@ bietlejuice.reverse_regions_polygon:
 bietlejuice.reverse_robbyson_access:
   add:
     - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
+bietlejuice.reverse_reports:
+  add:
+    - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
 bietlejuice.reverse_anonymization:
   remove:
     - bietlejuice.astro:load-clean-dag:first-run-of-day

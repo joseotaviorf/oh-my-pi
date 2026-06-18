@@ -74,7 +74,8 @@ LEFT JOIN
         ON isa.sk_cost_center_version = cc.sk_cost_center_version
 LEFT JOIN
     dw_employee_details.dim_management_hierarchy AS mh
-        ON isa.sk_hierarchy_version = mh.sk_hierarchy_version
+        ON mh.assignment_number = isa.assignment_number
+        AND mh.is_current = TRUE
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS mgr_snap
         ON mgr_snap.assignment_number = mh.manager_assignment_number

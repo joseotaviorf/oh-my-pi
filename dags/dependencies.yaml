@@ -4759,7 +4759,9 @@ bietlejuice.reverse_rent_listings_report_load:
 bietlejuice.reverse_reports:
   - bietlejuice.dw_compensation:load-dw-compensation-dim-job:first-run-of-day
   - bietlejuice.dw_compensation:load-dw-compensation-fact-salary-table-targets:first-run-of-day
+  - bietlejuice.dw_demographics:load-dw-demographics-dim-employee-disability:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-contact:first-run-of-day
+  - bietlejuice.dw_employee_details:load-dw-employee-details-dim-documentation:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-employee:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-management-hierarchy:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-fact-assignment-snapshots:first-run-of-day
@@ -4771,6 +4773,7 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-vacation-balances:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-codex-pin-sync-drift:first-run-of-day
+  - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
 bietlejuice.reverse_sale_listings_report:

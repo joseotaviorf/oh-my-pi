@@ -78,3 +78,33 @@ workflow:
       extra_spark_job_arguments:
         - "1Y_EvoW6IG3uHpfvDp2Ur8ikwJk8qNtX978iNK_XVzFs"
         - "Agendamentos"
+
+    # --- External reports notebook migration ---
+    infosec_employee_roster:
+      extra_spark_job_arguments:
+        - "19rND8lkHWR99AJVgf7pAI9mJQ_bkkECHOyP0b7zfNoo"
+        - "PIN"
+    compliance_employee_roster:
+      extra_spark_job_arguments:
+        - "1_3VUrs066sRdtQhzKz71g5S64ZlONbewj575BHWCk3E"
+        - "base"
+    itops_employee_contact_roster:
+      extra_spark_job_arguments:
+        - "15cDUEPUHT9FWtWMX5hvgJjRMCIP288FYj1Kvl3hYuwg"
+        - "(Grupo) PIN_ITOps"
+    heads_employee_leadership_roster:
+      extra_spark_job_arguments:
+        - "1jyMMfZbfhV6olXFDAY5By1ptwyUOOJ5wqONAWLuqqsM"
+        - "base"
+    dp_employee_master:
+      extra_spark_job_arguments:
+        - "1il9Cl7fuyXQ7AKrso-AQVN0A4LDEE1-vtgcv-rqSEDU"
+        - "base"
+    procurement_employee_manager_roster:
+      extra_spark_job_arguments:
+        - "1WNIqQi1uRYoBKxrGFLsJ0HGsLSVCvxNJpYl36eQcjQE"
+        - "base_atualizada_diariamente"
+    dei_employee_diversity_roster:
+      extra_spark_job_arguments:
+        - "12ao2yTFNffNaZWlb72hlU7mSS_WTob9MMs4UsFJLdBg"
+        - "base"

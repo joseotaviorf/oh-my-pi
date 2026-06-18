@@ -1,6 +1,3 @@
--- Migration of the base_public_no_banda cell from the external_reports notebook.
--- Source: datalake_people_analytics_sandbox.base_completa_hierarquia (deprecated)
--- Replacement: DW 2.0 tables; active-only filter.
 WITH
     dt_inicio_person AS (
         SELECT
@@ -18,22 +15,7 @@ WITH
     )
 SELECT
     e.person_number AS matricula,
-    CASE
-        WHEN bu.business_unit_name = 'Deel - QuintoAndar' THEN 'QuintoAndar SP'
-        WHEN bu.business_unit_name IN (
-            'Classifieds Latam',
-            'OneLoop S.R.L.',
-            'Grupo Navent S.R.L.',
-            'Dridco S.A.U.',
-            'SOLUSER SOLUCIONES Y SERVICIOS SA DE CV',
-            'DRIDCO MEXICO SA DE CV',
-            'TECNOLOGÍA PARA INMOBILIARIAS SA DE CV'
-        ) THEN 'Classifieds'
-        WHEN bu.business_unit_name = 'Atta' THEN 'ATTA'
-        WHEN bu.business_unit_name = 'Benvi MX' THEN 'Benvi México'
-        WHEN bu.business_unit_name = 'Benvi PT' THEN 'QuintoAndar Portugal'
-        ELSE bu.business_unit_name
-    END AS empresa,
+    bu.consolidated_business_unit_name AS empresa,
     LOWER(TRIM(e.name)) AS nome,
     LOWER(e.work_email) AS email,
     'ativo' AS status,
@@ -115,7 +97,8 @@ LEFT JOIN
         ON f.sk_business_unit = bu.sk_business_unit
 LEFT JOIN
     dw_employee_details.dim_management_hierarchy AS h
-        ON f.sk_hierarchy_version = h.sk_hierarchy_version
+        ON h.assignment_number = f.assignment_number
+        AND h.is_current = TRUE
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS mng_snap
         ON mng_snap.assignment_number = h.manager_assignment_number
