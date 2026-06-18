@@ -22,65 +22,38 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_tables_documentation_to_raw"
 
+TABLES_DOCUMENTATION_SCHEMA = (
+    "database_name string, table_name string, domain string, "
+    "owner string, table_description string"
+)
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_documentation_from_bucket(
-    bucket, documentation_prefix, metadata_prefix, spark_client
-):
+def _as_string(value):
+    if value is None:
+        return None
+    if isinstance(value, str):
+        text = value.strip()
+        return text or None
+    if isinstance(value, (int, float, bool)):
+        return str(value)
+    return None
+
+
+def get_tables_documentation_from_bucket(bucket, metadata_prefix, spark_client):
     s3_client = boto3.client("s3")
-    documentation_paths = get_documentation_paths_from_bucket(
-        bucket, documentation_prefix, s3_client
-    )
-    documentation_contents = get_content_from_paths(
-        bucket, documentation_paths, s3_client
-    )
-
-    documentation_content = extract_table_rows_from_docs(documentation_contents)
-
     metadata_paths = get_metadata_paths_from_bucket(bucket, metadata_prefix, s3_client)
     metadata_contents = get_content_from_paths(bucket, metadata_paths, s3_client)
-    apply_domain_overlay(
-        documentation_content, extract_domain_map_from_docs(metadata_contents)
-    )
-
-    # creates df from documentation dict
-    if not documentation_content:
-        return spark_client.create_dataframe(
-            [],
-            schema="database_name string, table_name string, domain string, owner string, table_description string",
-        )
+    table_rows = extract_table_rows_from_metadata(metadata_contents)
 
     documentation_df = spark_client.create_dataframe(
-        Row(**doc) for doc in documentation_content
+        [Row(**doc) for doc in table_rows],
+        schema=TABLES_DOCUMENTATION_SCHEMA,
     )
 
-    # reducing number of partitions
-    documentation_df = documentation_df.coalesce(1)
-
-    return documentation_df
-
-
-def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
-    pages = s3_client.get_paginator("list_objects_v2").paginate(
-        Bucket=bucket, Prefix=prefix
-    )
-
-    bucket_objects = []
-    for page in pages:
-        if "Contents" in page:
-            bucket_objects.extend(page["Contents"])
-
-    documentation_paths = [
-        obj["Key"]
-        for obj in bucket_objects
-        if "documentation/" in obj["Key"]
-        and "/categories/" not in obj["Key"]
-        and "documentation/atlas/" not in obj["Key"]
-    ]
-
-    return documentation_paths
+    return documentation_df.coalesce(1)
 
 
 def get_metadata_paths_from_bucket(bucket, prefix, s3_client):
@@ -94,17 +67,17 @@ def get_metadata_paths_from_bucket(bucket, prefix, s3_client):
             bucket_objects.extend(page["Contents"])
 
     return [
-        obj["Key"] for obj in bucket_objects if obj["Key"].endswith((".yml", ".yaml"))
+        obj["Key"]
+        for obj in bucket_objects
+        if len(obj["Key"].split("/")) == 3 and obj["Key"].endswith((".yml", ".yaml"))
     ]
 
 
-def get_content_from_paths(bucket, documentation_paths, s3_client):
-    documentation_contents = []
-    for file_path in documentation_paths:
+def get_content_from_paths(bucket, file_paths, s3_client):
+    contents = []
+    for file_path in file_paths:
         try:
-            documentation_contents.append(
-                load_yaml_from_bucket(bucket, file_path, s3_client)
-            )
+            contents.append(load_yaml_from_bucket(bucket, file_path, s3_client))
         except IncompleteReadError as e:
             logger.error(f"Error getting stream for {file_path}")
             logger.error(e)
@@ -112,7 +85,7 @@ def get_content_from_paths(bucket, documentation_paths, s3_client):
         except Exception as e:
             logger.warning(f"Failed to load or parse {file_path}: {e}")
 
-    return documentation_contents
+    return contents
 
 
 def load_yaml_from_bucket(bucket, prefix, s3_client):
@@ -120,57 +93,37 @@ def load_yaml_from_bucket(bucket, prefix, s3_client):
     return yaml.safe_load(file_object["Body"])
 
 
-def extract_table_rows_from_docs(docs):
+def extract_table_rows_from_metadata(docs):
     """
-    Flattens the content of the documentation files to a list of dicts, each representing a
-    row of the tables_documentation table.
-    Collects Schema, Table, Domain, Owner and Description.
+    Flattens metadata/{database}/{table}.yml files into rows for tables_documentation.
     """
     rows = []
     for doc in docs:
         if not doc:
             continue
 
-        doc_database_name = doc.get("database_name")
-        doc_table_name = doc.get("name") or doc.get("table_name")
+        database_name = _as_string(doc.get("database_name"))
+        table_name = _as_string(doc.get("table_name"))
 
-        doc_domain = doc.get("domain")
+        if not database_name or not table_name:
+            if doc.get("database_name") or doc.get("table_name"):
+                logger.warning(
+                    "m=extract_table_rows_from_metadata, msg=skipping row with invalid "
+                    "database_name or table_name types"
+                )
+            continue
 
-        doc_owner = doc.get("owner")
-        doc_description = doc.get("description")
-
-        if doc_database_name and doc_table_name:
-            rows.append(
-                {
-                    "database_name": doc_database_name,  # Schema
-                    "table_name": doc_table_name,  # Table
-                    "domain": doc_domain,  # Domain
-                    "owner": doc_owner,
-                    "table_description": doc_description,
-                }
-            )
+        rows.append(
+            {
+                "database_name": database_name,
+                "table_name": table_name,
+                "domain": _as_string(doc.get("domain")),
+                "owner": _as_string(doc.get("owner")),
+                "table_description": _as_string(doc.get("description")),
+            }
+        )
 
     return rows
-
-
-def extract_domain_map_from_docs(docs):
-    domain_by_fqn = {}
-    for doc in docs:
-        if not doc:
-            continue
-        database_name = doc.get("database_name")
-        table_name = doc.get("table_name")
-        domain = doc.get("domain")
-        if database_name and table_name and domain:
-            domain_by_fqn[(database_name, table_name)] = domain
-    return domain_by_fqn
-
-
-def apply_domain_overlay(rows, domain_by_fqn):
-    for row in rows:
-        domain = domain_by_fqn.get((row["database_name"], row["table_name"]))
-        if domain:
-            row["domain"] = domain
 
 
 if __name__ == "__main__":
@@ -182,7 +135,6 @@ if __name__ == "__main__":
     parser.add_argument("execution_date_str", type=str)
     parser.add_argument("partitions", type=str)
     parser.add_argument("documentation_bucket", type=str)
-    parser.add_argument("documentation_prefix", type=str)
     parser.add_argument("metadata_prefix", type=str)
 
     add_validation_target_args(parser)
@@ -195,7 +147,6 @@ if __name__ == "__main__":
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
     partition_cols = ast.literal_eval(args.partitions)
     documentation_bucket = args.documentation_bucket
-    documentation_prefix = args.documentation_prefix
     metadata_prefix = args.metadata_prefix
 
     bucket_suffix = (
@@ -232,8 +183,8 @@ if __name__ == "__main__":
     )
     spark_metastore_service.create_database(write_database_name)
 
-    documentation_df = get_documentation_from_bucket(
-        documentation_bucket, documentation_prefix, metadata_prefix, spark_client
+    documentation_df = get_tables_documentation_from_bucket(
+        documentation_bucket, metadata_prefix, spark_client
     )
 
     documentation_df = (

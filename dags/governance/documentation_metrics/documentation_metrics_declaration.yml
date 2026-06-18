@@ -32,7 +32,6 @@ workflow:
     tables_documentation:
       extra_spark_job_arguments:
         - "data-documentation.s3"
-        - "documentation/"
         - "metadata/"
     columns_documentation:
       extra_spark_job_arguments:
