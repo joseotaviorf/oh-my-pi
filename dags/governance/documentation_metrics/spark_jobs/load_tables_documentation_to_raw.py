@@ -26,14 +26,24 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_documentation_from_bucket(bucket, prefix, spark_client):
+def get_documentation_from_bucket(
+    bucket, documentation_prefix, metadata_prefix, spark_client
+):
     s3_client = boto3.client("s3")
-    documentation_paths = get_documentation_paths_from_bucket(bucket, prefix, s3_client)
+    documentation_paths = get_documentation_paths_from_bucket(
+        bucket, documentation_prefix, s3_client
+    )
     documentation_contents = get_content_from_paths(
         bucket, documentation_paths, s3_client
     )
 
     documentation_content = extract_table_rows_from_docs(documentation_contents)
+
+    metadata_paths = get_metadata_paths_from_bucket(bucket, metadata_prefix, s3_client)
+    metadata_contents = get_content_from_paths(bucket, metadata_paths, s3_client)
+    apply_domain_overlay(
+        documentation_content, extract_domain_map_from_docs(metadata_contents)
+    )
 
     # creates df from documentation dict
     if not documentation_content:
@@ -53,6 +63,27 @@ def get_documentation_from_bucket(bucket, prefix, spark_client):
 
 
 def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
+    pages = s3_client.get_paginator("list_objects_v2").paginate(
+        Bucket=bucket, Prefix=prefix
+    )
+
+    bucket_objects = []
+    for page in pages:
+        if "Contents" in page:
+            bucket_objects.extend(page["Contents"])
+
+    documentation_paths = [
+        obj["Key"]
+        for obj in bucket_objects
+        if "documentation/" in obj["Key"]
+        and "/categories/" not in obj["Key"]
+        and "documentation/atlas/" not in obj["Key"]
+    ]
+
+    return documentation_paths
+
+
+def get_metadata_paths_from_bucket(bucket, prefix, s3_client):
     pages = s3_client.get_paginator("list_objects_v2").paginate(
         Bucket=bucket, Prefix=prefix
     )
@@ -122,6 +153,26 @@ def extract_table_rows_from_docs(docs):
     return rows
 
 
+def extract_domain_map_from_docs(docs):
+    domain_by_fqn = {}
+    for doc in docs:
+        if not doc:
+            continue
+        database_name = doc.get("database_name")
+        table_name = doc.get("table_name")
+        domain = doc.get("domain")
+        if database_name and table_name and domain:
+            domain_by_fqn[(database_name, table_name)] = domain
+    return domain_by_fqn
+
+
+def apply_domain_overlay(rows, domain_by_fqn):
+    for row in rows:
+        domain = domain_by_fqn.get((row["database_name"], row["table_name"]))
+        if domain:
+            row["domain"] = domain
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str)
@@ -132,6 +183,7 @@ if __name__ == "__main__":
     parser.add_argument("partitions", type=str)
     parser.add_argument("documentation_bucket", type=str)
     parser.add_argument("documentation_prefix", type=str)
+    parser.add_argument("metadata_prefix", type=str)
 
     add_validation_target_args(parser)
     args = parser.parse_args()
@@ -144,6 +196,7 @@ if __name__ == "__main__":
     partition_cols = ast.literal_eval(args.partitions)
     documentation_bucket = args.documentation_bucket
     documentation_prefix = args.documentation_prefix
+    metadata_prefix = args.metadata_prefix
 
     bucket_suffix = (
         ".data.quintoandar.com.br"
@@ -180,7 +233,7 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(write_database_name)
 
     documentation_df = get_documentation_from_bucket(
-        documentation_bucket, documentation_prefix, spark_client
+        documentation_bucket, documentation_prefix, metadata_prefix, spark_client
     )
 
     documentation_df = (
