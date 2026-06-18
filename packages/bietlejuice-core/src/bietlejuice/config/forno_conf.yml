@@ -1863,6 +1863,12 @@ emr_cluster_base: &emr_cluster_anchor
           Properties:
               hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
               hive.metastore.glue.skip-archive: "true"
+              aws.glue.cache.table.enable: "true"
+              aws.glue.cache.table.size: "1000"
+              aws.glue.cache.table.ttl-mins: "30"
+              aws.glue.cache.db.enable: "true"
+              aws.glue.cache.db.size: "1000"
+              aws.glue.cache.db.ttl-mins: "30"
         - Classification: yarn-site
           Properties:
               yarn.resourcemanager.scheduler.enable-preemption: "true"

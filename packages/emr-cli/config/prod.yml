@@ -31,6 +31,12 @@ configurations:
       hive.metastore.client.factory.class:
         "com.amazonaws.glue.catalog.metastore.AWSG\
         lueDataCatalogHiveClientFactory"
+      aws.glue.cache.table.enable: "true"
+      aws.glue.cache.table.size: "1000"
+      aws.glue.cache.table.ttl-mins: "30"
+      aws.glue.cache.db.enable: "true"
+      aws.glue.cache.db.size: "1000"
+      aws.glue.cache.db.ttl-mins: "30"
   - Classification: yarn-site
     Properties:
       yarn.resourcemanager.scheduler.enable-preemption: "true"
