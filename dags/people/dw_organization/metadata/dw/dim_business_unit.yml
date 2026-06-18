@@ -14,7 +14,27 @@ columns:
     lineage:
       - datalake_people.business_unit.id_organization
   business_unit_name:
-    description: Business unit name.
+    description: |
+      Official business unit label from PIN, representing the
+      local branch used for headcount allocation and organizational reporting.
+    lineage:
+      - datalake_people.business_unit.business_unit_name
+  consolidated_business_unit_name:
+    description: |
+      Consolidated business unit label for downstream exports and reporting (legacy empresa).
+      Rolls up related legal entities and BUs into a single group name; unmapped values
+      keep the original business_unit_name.
+    categories:
+      "QuintoAndar SP":
+        Deel contractor label for QuintoAndar Brazil operations. Source business_unit_name Deel - QuintoAndar.
+      Classifieds:
+        Consolidated Classifieds Latam umbrella. Source business_unit_name values Classifieds Latam, OneLoop S.R.L., Grupo Navent S.R.L., Dridco S.A.U., SOLUSER SOLUCIONES Y SERVICIOS SA DE CV, DRIDCO MEXICO SA DE CV, and TECNOLOGÍA PARA INMOBILIARIAS SA DE CV.
+      ATTA:
+        Standardized Atta brand label. Source business_unit_name Atta.
+      "Benvi México":
+        Mexico consumer-facing Benvi brand. Source business_unit_name Benvi MX.
+      "QuintoAndar Portugal":
+        Portugal operating label. Source business_unit_name Benvi PT and Remote (international contractors under Benvi PT, replacing Deel).
     lineage:
       - datalake_people.business_unit.business_unit_name
   ts_load:
