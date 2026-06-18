@@ -26,10 +26,14 @@ workflow:
       has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     dim_event_definition:
       has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     dim_contact:
       has_hive_sync: false
       vacuum_retention_hours: 168
@@ -46,7 +50,11 @@ workflow:
       has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     dim_employee:
       has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"

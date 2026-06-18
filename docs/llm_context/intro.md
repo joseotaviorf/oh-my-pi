@@ -29,10 +29,8 @@ DataHub MCP tools (your first stop — see "How to Use This Context" above):
 
 ### Supplementary source — entity MD files
 
-The `business_entities/` folder contains **one markdown file per business entity** with business rules, mandatory dos/don'ts, JOIN recipes, and edge cases not yet encoded in DataHub. Consult an entity file **after DataHub** when the user's question requires domain patterns or nuances. Every entity file includes a **DataHub catalog** section **after Overview** with direct links to its DataHub **Data Product** and **golden query** (`Query` entity). CI publishes catalog metadata from the MD via [`generate_and_push_datahub_entities.py`](../../packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py) and [`load_collections_context.py`](../../dags/governance/datahub_business_context/load_collections_context.py); some domains (e.g. collections) also list dataset schema links inline.
+The `business_entities/` folder contains **one markdown file per business entity** with business rules, mandatory dos/don'ts, JOIN recipes, and edge cases not yet encoded in DataHub. Consult an entity file **after DataHub** when the user's question requires domain patterns or nuances. Every entity file includes a **DataHub catalog** section with direct links to its DataHub **Data Product** and **golden query** (`Query` entity). CI publishes catalog metadata from the MD via [`generate_and_push_datahub_entities.py`](../../packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py) and [`load_collections_context.py`](../../dags/governance/datahub_business_context/load_collections_context.py); some domains also list dataset schema links inline.
 The roles of the two layers and when to reach for each are covered in "How to Use This Context" above; this section covers their **file structure**.
-
-The `business_entities/` folder contains **one markdown file per business entity** with business rules, mandatory dos/don'ts, JOIN recipes, and edge cases not yet encoded in DataHub. Every entity file includes a **DataHub catalog** section **after Overview** with direct links to its DataHub **Data Product**, **golden query** (`Query` entity), and YAML preset under `dags/governance/datahub_business_context/datahub_entities/` used by [`load_collections_context.py`](../../dags/governance/datahub_business_context/load_collections_context.py); some domains (e.g. collections) also list dataset schema links inline.
 
 The `metric_entities/` folder contains **one markdown file per official metric**, thin on schema (it delegates that to its linked business entity) and thick on the metric's definition, scope, exact calculation, canonical filter, and weight sources.
 
@@ -42,7 +40,7 @@ Each **business entity** file follows a standard structure:
 |---------|-------------------|
 | **Overview** | What the entity is, its lifecycle stages, and key timestamps — use this to understand the domain before answering |
 | **Related Metric Entities** | Plain list of the official metric(s) that build on this entity — see "Cross-link sections" below |
-| **DataHub catalog** | Direct UI links to the Data Product and golden Query entity, plus structured-property and loader YAML references |
+| **DataHub catalog** | Direct UI links to the Data Product and golden Query entity; dataset links (CI-published from the MD on merge to master) |
 | **Glossary and Synonyms** | Domain-specific jargon, common names, and terms — use this to map the user's question to the right technical term |
 | **Tables** | Available tables by layer (DW, Enrich) with aliases, descriptions, key fields, and type caveats — use this to pick the right table |
 | **Key Metrics** | Common KPIs and which columns compute them — use this to answer metric questions correctly |

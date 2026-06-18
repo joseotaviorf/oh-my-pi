@@ -89,11 +89,13 @@ To provide accurate answers, consult the entity files when the user's question r
     - [references/business_entities/conversation_explorer.md](references/business_entities/conversation_explorer.md) — Conversation Explorer sampled Wall-E chatbot sessions (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations.
     - [references/business_entities/contact.md](references/business_entities/contact.md) — Contact and support interactions (calls, chats).
     - [references/business_entities/department.md](references/business_entities/department.md) — Support queue routing and SLA targets.
+    - [references/business_entities/employee_details.md](references/business_entities/employee_details.md) — People DW employee identity, contacts, hierarchy, and daily assignment snapshots (colaborador / headcount / quadro).
     - [references/business_entities/fs-transact.md](references/business_entities/fs-transact.md) — FS Transact — For Sale transaction funnel: EoF (Offer Submitted → CCV → Closed Deal) and EoP (CCV → CRI → key delivery), 1P scope, Buyer Prospect, lead times by payment track, and LegoContract contract analysis & assessment performance metrics (funil de transação de venda / CCV / Closed Deal / EoP / análise de contratos / LegoContract / assessments / performance de validações).
     - [references/business_entities/inspection.md](references/business_entities/inspection.md) — Property inspections.
     - [references/business_entities/losses.md](references/business_entities/losses.md) — Accounting write-offs and provisioning.
     - [references/business_entities/matthew.md](references/business_entities/matthew.md) — Matthew, the AI collections agent for tenants with open balances (WhatsApp + in-app).
     - [references/business_entities/nps.md](references/business_entities/nps.md) — Net Promoter Score campaigns.
+    - [references/business_entities/organization.md](references/business_entities/organization.md) — People DW org reference: cost centers, business units, and jobs (centro de custo / time / BU).
     - [references/business_entities/payments.md](references/business_entities/payments.md) — Payments transactional domain (Checkout, BOLETO/CREDIT_CARD/PIX, settlement, refunds).
     - [references/business_entities/recovery_collections_fr_tenants.md](references/business_entities/recovery_collections_fr_tenants.md) — Recovery analytics for For-Rent tenants (overdue debt collection performance).
     - [references/business_entities/recs.md](references/business_entities/recs.md) — Recommendation exposures and downstream journey attribution (recomendações / carrossel de recomendação).

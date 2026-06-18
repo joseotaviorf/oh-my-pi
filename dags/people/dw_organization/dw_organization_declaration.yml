@@ -22,9 +22,15 @@ workflow:
     dim_cost_center:
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     dim_business_unit:
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     dim_job:
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
