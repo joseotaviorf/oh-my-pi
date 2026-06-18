@@ -1,7 +1,7 @@
 database_name: datalake_amplitude_clean
 table_name: 170698_fs_mortgage_track_status_viewed_events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
 description: This table contains fs_mortgage_track_status_viewed events from app 170698.
   It tracks user interactions and includes relevant metadata and user properties.
 columns:
@@ -14,39 +14,39 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.ids_amplitude_attributed
   id_app:
-    description: Id from the origin app
     lineage:
     - datalake_amplitude_clean.events.id_app
+    description: Amplitude project identifier filtering events to a specific QuintoAndar mobile or web application.
   id_device:
-    description: Device identifier
     lineage:
     - datalake_amplitude_clean.events.id_device
+    description: Amplitude-generated device identifier used to stitch sessions on the same physical device.
   id_event:
-    description: Event identifier
     lineage:
     - datalake_amplitude_clean.events.id_event
+    description: Amplitude insert identifier for the ingested row within the export batch.
   id_session:
-    description: Session identifier
     lineage:
     - datalake_amplitude_clean.events.id_session
+    description: Amplitude session identifier grouping events within the same user session window.
   id_inserted:
-    description: Inserted identifier
     lineage:
     - datalake_amplitude_clean.events.id_inserted
+    description: Surrogate insert identifier assigned during Amplitude batch ingestion.
   id_user:
     description: User identifier (same as sk_user from the product database)
     lineage:
     - datalake_amplitude_clean.events.id_user
   id_schema:
-    description: Schema identifier
     lineage:
     - datalake_amplitude_clean.events.id_schema
+    description: Amplitude schema version identifier for the exported event payload format.
   idfa:
-    description: IDFA
+    description: Unique identifier for iOS devices used for tracking and advertising purposes (Identifier for Advertisers)
     lineage:
     - datalake_amplitude_clean.events.idfa
   adid:
-    description: adid
+    description: Unique identifier for Android devices used for advertising and analytics purposes (Android Advertising ID)
     lineage:
     - datalake_amplitude_clean.events.adid
   uuid:
@@ -58,69 +58,69 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
   amplitude_event_type:
-    description: Event name
     lineage:
     - datalake_amplitude_clean.events.amplitude_event_type
+    description: Internal Amplitude classification of the raw ingestion event type before project-specific mapping.
   city:
-    description: Amplitude city
     lineage:
     - datalake_amplitude_clean.events.city
+    description: City name inferred by Amplitude from the client IP address at event time.
   country:
-    description: Amplitude country
     lineage:
     - datalake_amplitude_clean.events.country
+    description: ISO country code inferred by Amplitude from the client IP address at event time.
   region:
-    description: Amplitude region
     lineage:
     - datalake_amplitude_clean.events.region
+    description: State or region name inferred by Amplitude from the client IP address.
   data:
-    description: Amplitude data
     lineage:
     - datalake_amplitude_clean.events.data
+    description: Raw JSON payload with additional Amplitude ingestion metadata not mapped to top-level columns.
   device_brand:
-    description: Brand of the device
     lineage:
     - datalake_amplitude_clean.events.device_brand
+    description: Hardware brand reported by the device operating system (for example Apple or Samsung).
   device_carrier:
-    description: Carrier of the device
     lineage:
     - datalake_amplitude_clean.events.device_carrier
+    description: Mobile network carrier name reported by the device when available.
   device_family:
-    description: Amplitude device family
     lineage:
     - datalake_amplitude_clean.events.device_family
+    description: Device family grouping from Amplitude device detection (for example iPhone or Android).
   device_manufacturer:
-    description: Device manufacturer
     lineage:
     - datalake_amplitude_clean.events.device_manufacturer
+    description: Device manufacturer name reported by the operating system.
   device_model:
-    description: Model of the device
     lineage:
     - datalake_amplitude_clean.events.device_model
+    description: Specific device model string reported by the operating system.
   device_type:
-    description: Type of the device
     lineage:
     - datalake_amplitude_clean.events.device_type
+    description: Coarse device category from Amplitude (for example mobile, tablet, or desktop).
   dma:
-    description: DMA
+    description: Designated Market Area (DMA) code representing the media market where the event occurred, as identified by Amplitude
     lineage:
     - datalake_amplitude_clean.events.dma
   event_type:
-    description: Event name
     lineage:
     - datalake_amplitude_clean.events.event_type
+    description: Product event name tracked in Amplitude (for example offer_submitted or offer_canceled_new).
   event_properties:
-    description: Properties from the event
     lineage:
     - datalake_amplitude_clean.events.event_properties
+    description: JSON object with custom event attributes sent by the application at track time.
   is_attribution_event:
     description: Flag that identifies if the event is a attribution one.
     lineage:
     - datalake_amplitude_clean.events.is_attribution_event
   ip_address:
-    description: IP from user
     lineage:
     - datalake_amplitude_clean.events.ip_address
+    description: Client IP address at event time, used for geolocation inference by Amplitude.
   location_lat:
     description: Latitude of the user
     lineage:
@@ -138,11 +138,11 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.os_version
   platform:
-    description: User platform
     lineage:
     - datalake_amplitude_clean.events.platform
+    description: Amplitude platform label for the originating client (for example iOS, Android, or Web).
   library:
-    description: Library
+    description: Name and version of the SDK library used to send the event to Amplitude
     lineage:
     - datalake_amplitude_clean.events.library
   is_paying:
@@ -150,21 +150,21 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.is_paying
   start_version:
-    description: Start version
     lineage:
     - datalake_amplitude_clean.events.start_version
+    description: Application version installed when the user first opened the application.
   language:
-    description: Language
+    description: Device or browser language setting reported at event time.
     lineage:
     - datalake_amplitude_clean.events.language
   version_name:
-    description: Version name
     lineage:
     - datalake_amplitude_clean.events.version_name
+    description: Current application version name active when the event was triggered.
   sample_rate:
-    description: Rate of sample
     lineage:
     - datalake_amplitude_clean.events.sample_rate
+    description: Amplitude ingestion sampling rate applied to the event (1.0 means no sampling).
   user_properties:
     description: Properties that describes the user
     lineage:
