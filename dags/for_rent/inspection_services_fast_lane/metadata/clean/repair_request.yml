@@ -44,7 +44,7 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.repair_request.type
-    description: A repair request type.
+    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -102,7 +102,7 @@ columns:
   is_finished:
     lineage:
       - datalake_inspection_services_raw.repair_request.finished
-    description: Boolean flag indicating whether the repair request has been completed
+    description: Indicates whether the repair request was reviewed and finalized by an admin during the contestation analysis (AC) stage. In the source system it is set to true only when an admin updates the repair while the inspection is in contestation analysis; repairs that never reach that stage stay false. Despite the name, it does not mean the physical repair was completed.
   has_automatically_identified:
     lineage:
       - datalake_inspection_services_raw.repair_request.automatically_identified

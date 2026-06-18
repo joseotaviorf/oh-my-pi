@@ -9,7 +9,7 @@ SELECT
     comment,
     exempted_by,
     type,
-    cost,
+    cost_amount AS cost,
     title,
     repair_service,
     responsibility,

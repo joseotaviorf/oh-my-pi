@@ -47,10 +47,18 @@ columns:
     lineage:
       - datalake_inspection_services_clean.contestation.id_reviewer
     description: Identification key of the user who made the contestation.
+  requester_type:
+    lineage:
+      - datalake_inspection_services_clean.reviewer.reviewer_type
+    description: Role type of the user who opened the repair request (e.g. TENANT, OWNER, ADMIN, INSPECTIONS_SERVICE).
+  granted_type:
+    lineage:
+      - datalake_inspection_services_clean.reviewer.reviewer_type
+    description: Role type of the reviewer who granted or assessed the exemption for the repair request (e.g. OWNER, ADMIN).
   type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
-    description: A repair request type.
+    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -68,7 +76,7 @@ columns:
   cost:
     lineage:
       - datalake_inspection_services_clean.repair_request.cost
-    description: Estimated repair cost
+    description: Most recent repair cost in BRL for the repair request.
   repair_type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
@@ -85,26 +93,37 @@ columns:
     lineage:
       - datalake_inspection_services_clean.repair_request.repair_service
     description: Repair service requested
+  total_media:
+    lineage:
+      - datalake_inspections.report_review_media.id_media
+    description: Count of distinct media files (photos or videos) associated with the repair request.
   total_tenant_contestation:
+    lineage:
+      - datalake_inspection_services_clean.contestation.id_contestation
     description: Numerical information indicating the total number of objections made by the tenant during the review.
   total_tenant_budget_approval_contestation:
+    lineage:
+      - datalake_inspection_services_clean.contestation.id_contestation
     description: Numerical information indicating the total number of objections made by the tenant during the budget approval step.
   total_owner_budget_approval_contestation:
+    lineage:
+      - datalake_inspection_services_clean.contestation.id_contestation
     description: Numerical information indicating the total number of objections made by the owner during the budget approval step.
-  has_media:
-    description: Indicates whether media was generated for the repair request
-  has_tenant_contestation:
-    description: Indicates that there are objections from the tenant to the repair request during the review.
-  has_tenant_budget_approval_contestation:
-    description: Boolean information indicating whether the tenant contested the repair in question at the budget approval stage.
-  has_owner_budget_approval_contestation:
-    description: Boolean information indicating whether the owner contested the repair in question at the budget approval stage.
   is_cost_absorbed_by_company:
+    lineage:
+      - datalake_inspection_services_clean.repair_request.responsibility
+      - datalake_inspection_services_clean.repair_request.is_exempted
     description: The cost of the repair will be absorbed by the 5A
   is_cost_absorbed_by_tenant:
-    description: The cost of the repair will be absorbed by the tenant
+    lineage:
+      - datalake_inspection_services_clean.repair_request.responsibility
+      - datalake_inspection_services_clean.repair_request.is_exempted
+    description: Indicates whether the tenant bears the repair cost, derived as true when the repair responsibility is TENANT and the request was not exempted.
   is_cost_absorbed_by_owner:
-    description: The cost of repair will be absorbed by the owner
+    lineage:
+      - datalake_inspection_services_clean.repair_request.responsibility
+      - datalake_inspection_services_clean.repair_request.is_exempted
+    description: Indicates whether the property owner bears the repair cost, derived as true when the repair responsibility is OWNER or the request was exempted.
   is_exempted:
     lineage:
       - datalake_inspection_services_clean.repair_request.is_exempted
@@ -116,13 +135,24 @@ columns:
       - datalake_inspection_services_clean.repair_request.is_exempted_from_budget
     description: Flag that indicates whether the repair request was exempted by the owner in the budget approval stage.
   is_exempted_by_owner:
-    description: The repair request was exempted by the owner
+    lineage:
+      - datalake_inspection_services_clean.repair_request.is_exempted
+      - datalake_inspection_services_clean.reviewer.reviewer_type
+    description: Indicates whether the repair was exempted by the property owner, true when the granting reviewer type is OWNER and the request is flagged as exempted.
   is_requested_by_owner:
-    description: The repair request was requested by the owner
+    lineage:
+      - datalake_inspection_services_clean.reviewer.reviewer_type
+    description: Indicates whether the repair request was opened by the property owner, true when the requesting reviewer type is OWNER.
+  exempted_on_ar:
+    lineage:
+      - datalake_inspection_services_clean.repair_request.is_finished
+      - datalake_inspection_services_clean.repair_request.is_exempted
+      - datalake_inspection_services_clean.reviewer.reviewer_type
+    description: Indicates whether the repair was exempted specifically during the Repair Analysis (AR) stage, derived as true when the request is exempted, is not yet finished (AC stage not reached), and the granting reviewer is an admin.
   is_finished:
     lineage:
       - datalake_inspection_services_clean.repair_request.is_finished
-    description: Repair request ended
+    description: Indicates whether the repair request was reviewed and finalized by an admin during the contestation analysis (AC) stage. In the source system it is set to true only when an admin updates the repair while the inspection is in contestation analysis; repairs that never reach that stage stay false. Despite the name, it does not mean the physical repair was completed.
   has_automatically_identified:
     lineage:
       - datalake_inspection_services_clean.repair_request.has_automatically_identified
@@ -151,8 +181,6 @@ columns:
     lineage:
       - datalake_inspection_services_clean.repair_request.ts_updated
     description: Record update date
-  ts_load:
-    description: Date and time when the data was loaded.
   year:
     lineage:
       - datalake_inspection_services_clean.repair_request.year

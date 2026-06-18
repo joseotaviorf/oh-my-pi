@@ -1,7 +1,7 @@
 ---
 database_name: dw_inspections
 table_name: dim_repair_request
-description: Data defining the type of repair requested
+description: Dimension describing each repair request at its most recent state (one row per repair request, deduplicated by ts_updated), including type, cost, responsibility, service, and the item/room it refers to.
 domain: For Rent
 owner: data-ae-for-rent@quintoandar.com.br
 columns:
@@ -12,7 +12,7 @@ columns:
   type:
     lineage:
       - datalake_inspections.repair_request.type
-    description: A repair request type.
+    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -22,7 +22,7 @@ columns:
   cost:
     lineage:
       - datalake_inspections.repair_request.cost
-    description: Estimated repair cost
+    description: Most recent repair cost in BRL for the repair request.
   repair_type:
     lineage:
       - datalake_inspections.repair_request.type

@@ -11,24 +11,24 @@ columns:
     description: Unique identification key for the record in the repair request history.
   id_repair_request:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.reviewer_id
+      - datalake_inspection_services_raw.repair_request_history.repair_request_id
     description: Repair request identification key.
   id_reviewer:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.main_id
+      - datalake_inspection_services_raw.repair_request_history.reviewer_id
     description: Reviewer identification key.
   id_granted_by:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.responsibility
-    description: Reviewer who assessed whether a repair was exempted. Being an owner or member of AN1
+      - datalake_inspection_services_raw.repair_request_history.granted_by_id
+    description: Reviewer who assessed whether a repair was exempted. Being an owner or member of AN1.
   id_last_reviewer:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.item_group_id
+      - datalake_inspection_services_raw.repair_request_history.last_reviewer_id
     description: Identification key of the last reviewer of the repair request.
   uuid:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.granted_by_id
-    description: Repair Request unique identifier (uuid)
+      - datalake_inspection_services_raw.repair_request_history.uuid
+    description: Repair Request unique identifier (uuid).
   cost:
     lineage:
       - datalake_inspection_services_raw.repair_request_history.cost_amount
@@ -53,11 +53,11 @@ columns:
       AUTOMATIC: Automatic pricing by InspectionsService
   title:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.uuid
+      - datalake_inspection_services_raw.repair_request_history.title
     description: Information about the item linked to the repair request.
   origin:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.type
+      - datalake_inspection_services_raw.repair_request_history.origin
     description: Descriptive information indicating at which stage the request arose.
     categories:
       REPAIR_ANALYSIS: Repair analysis stage (AR).
@@ -66,12 +66,12 @@ columns:
       BUDGET_APPROVAL: Budget approval stage.
   repair_service:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.comment
-    description: Descriptive information indicating which service was requested in the request.
+      - datalake_inspection_services_raw.repair_request_history.repair_service
+    description: Descriptive information indicating which service was requested in the repair request.
   type:
     lineage:
       - datalake_inspection_services_raw.repair_request_history.type
-    description: A repair request type.
+    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -80,27 +80,27 @@ columns:
       OTHER: Other types not listed.
   comment:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.title
+      - datalake_inspection_services_raw.repair_request_history.comment
     description: Commentary detailing the repair needed.
   responsibility:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.cost
+      - datalake_inspection_services_raw.repair_request_history.responsibility
     description: Indicates who will be responsible for the repair, as well as whether QuintoAndar will absorb a repair.
   is_from_analysis:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.exempted
-    description: Indicates whether the repair request was created by AN1
+      - datalake_inspection_services_raw.repair_request_history.from_analysis
+    description: Indicates whether the repair request was created by AN1.
   is_exempted:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.is_exempted_from_budget
+      - datalake_inspection_services_raw.repair_request_history.exempted
     description: Indicates whether the repair suggested by the AN1 team was exempted by the owner or a member of AN1.
   ts_created:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.from_analysis
+      - datalake_inspection_services_raw.repair_request_history.created_at
     description: Creation date.
   ts_updated:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.finished
+      - datalake_inspection_services_raw.repair_request_history.updated_at
     description: Update date.
   year:
     lineage:
