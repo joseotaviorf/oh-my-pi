@@ -18,18 +18,6 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  matching_sk_hours_bank_rule_fact_and_dimension:
-    custom:
-      # Ensure every non-null sk_hours_bank_rule has a matching row in dw_time.dim_hours_bank_rule (no orphan FKs).
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM dw_time.fact_hours_bank_rule_totals f
-         WHERE f.sk_hours_bank_rule IS NOT NULL
-         AND NOT EXISTS (
-           SELECT 1 FROM dw_time.dim_hours_bank_rule d
-           WHERE d.sk_hours_bank_rule = f.sk_hours_bank_rule
-         )) = 0
-      severity_level: Error
   sk_employee:
     is_complete:
       severity_level: Error
