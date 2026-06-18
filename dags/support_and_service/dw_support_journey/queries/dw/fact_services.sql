@@ -38,6 +38,8 @@ SELECT
     se.task_cancelation_reason,
     se.url_source_ctwa,
     se.type_source_ctwa,
+    se.theme,
+    se.theme_detail,
     se.waiting_time_sec,
     se.seconds_to_first_response,
     CASE

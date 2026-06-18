@@ -1,6 +1,7 @@
 """Unit tests for SupportJourneyServicesCoreModelPipeline (services table)."""
 
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -91,30 +92,31 @@ class TestSupportJourneyServicesBuildTsFilter:
     @pytest.mark.parametrize(
         "partition_date, delta_hours, expected_min, expected_max",
         [
-            # Regression: negative delta_hours must keep the upper bound at the
-            # END of the partition day (next-day midnight), otherwise every
-            # event happening during partition_date itself is dropped.
+            # build_ts_filter anchors the window at partition_date 00:00 UTC and
+            # shifts it by signed delta_hours. A negative delta places the
+            # half-open window before the anchor (processing whole prior days);
+            # a positive delta places it after.
             (
                 "2026-05-27",
                 -24,
                 "2026-05-26T00:00:00.000+00:00",
-                "2026-05-28T00:00:00.000+00:00",
+                "2026-05-27T00:00:00.000+00:00",
             ),
             (
                 "2026-05-27",
                 -72,
                 "2026-05-24T00:00:00.000+00:00",
-                "2026-05-28T00:00:00.000+00:00",
+                "2026-05-27T00:00:00.000+00:00",
             ),
             (
                 "2026-05-27",
                 80,
                 "2026-05-27T00:00:00.000+00:00",
-                "2026-05-31T08:00:00.000+00:00",
+                "2026-05-30T08:00:00.000+00:00",
             ),
         ],
     )
-    def test_window_covers_full_partition_day(
+    def test_window_bounds(
         self,
         pipeline_with_spec,
         partition_date,
@@ -123,20 +125,28 @@ class TestSupportJourneyServicesBuildTsFilter:
         expected_max,
     ):
         # act
-        min_ts, max_ts = pipeline_with_spec.build_ts_filter(
-            partition_date, delta_hours=delta_hours
+        ts_filter = pipeline_with_spec.build_ts_filter(
+            partition_date, delta_hours=delta_hours, col="ts_event"
         )
 
-        # assert
-        assert min_ts == expected_min
-        assert max_ts == expected_max
+        # assert: build_ts_filter returns a half-open Spark filter
+        # (min_ts <= col < max_ts); the literal bounds are rendered in the
+        # Column expression string.
+        filter_str = str(ts_filter)
+        assert expected_min in filter_str
+        assert expected_max in filter_str
 
-    def test_negative_delta_does_not_end_at_partition_start(self, pipeline_with_spec):
+    def test_negative_delta_processes_previous_day(self, pipeline_with_spec):
         # act
-        _, max_ts = pipeline_with_spec.build_ts_filter("2026-05-27", delta_hours=-24)
+        ts_filter = pipeline_with_spec.build_ts_filter(
+            "2026-05-27", delta_hours=-24, col="ts_event"
+        )
 
-        # assert: the buggy behaviour ended the window at partition-day midnight
-        assert max_ts != "2026-05-27T00:00:00.000+00:00"
+        # assert: a -24h delta yields the full previous day window,
+        # [previous_day 00:00, partition_date 00:00).
+        filter_str = str(ts_filter)
+        assert "2026-05-26T00:00:00.000+00:00" in filter_str
+        assert "2026-05-27T00:00:00.000+00:00" in filter_str
 
 
 class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
@@ -152,11 +162,15 @@ class TestSupportJourneyServicesCoreModelPipelineCreateCoreModel:
         # act
         pipeline.create_core_model(spark)
 
-        # assert
+        # assert: the existence check is anchored on the previous partition
+        # day (partition_date - 24h), not on partition_date itself.
+        previous_partition_date = (
+            datetime.strptime(cfg.partition_date, "%Y-%m-%d") - timedelta(hours=24)
+        ).strftime("%Y-%m-%d")
         mock_partition_has_data.assert_called_once_with(
             spark,
             "core_support_journey.services",
-            cfg.partition_date,
+            previous_partition_date,
             None,
         )
         spark.table.assert_not_called()

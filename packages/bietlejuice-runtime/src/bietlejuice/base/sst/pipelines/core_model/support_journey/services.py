@@ -105,46 +105,37 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         col: Optional[str] = None,
     ):
         """
-        Build a timestamp range covering the full partition_date calendar day,
-        extended by signed delta_hours.
+        Build a half-open timestamp filter on ``col`` anchored at
+        ``partition_date`` 00:00 UTC and extended by signed ``delta_hours``.
 
-        The window always spans the whole partition day
-        [partition_date 00:00, partition_date + 1 day 00:00) so that events
-        occurring during the partition day are never dropped. ``delta_hours``
-        extends the window backward (negative) or forward (positive).
-
-        The upper bound is exclusive (``col < max_ts``) to avoid overlapping
-        the next partition's first instant.
+        The window is bounded by the anchor (``partition_date`` 00:00 UTC) and
+        the anchor shifted by ``delta_hours``. A negative ``delta_hours`` places
+        the window before the anchor; a positive one places it after. The lower
+        bound is inclusive and the upper bound is exclusive
+        (``min_ts <= col < max_ts``).
 
         Examples
         --------
         delta_hours = 80:
-            min_ts = partition_date
-            max_ts = partition_date + 1 day + 80h
+            min_ts = partition_date 00:00
+            max_ts = partition_date 00:00 + 80h
 
         delta_hours = -80:
-            min_ts = partition_date - 80h
-            max_ts = partition_date + 1 day
+            min_ts = partition_date 00:00 - 80h
+            max_ts = partition_date 00:00
         """
-        partition_start = datetime.strptime(partition_date, "%Y-%m-%d").replace(
+        partition = datetime.strptime(partition_date, "%Y-%m-%d").replace(
             tzinfo=timezone.utc
         )
-        partition_end = partition_start + timedelta(days=1)
+        delta_partition = partition + timedelta(hours=delta_hours)
 
-        if delta_hours >= 0:
-            min_dt = partition_start
-            max_dt = partition_end + timedelta(hours=delta_hours)
-        else:
-            min_dt = partition_start + timedelta(hours=delta_hours)
-            max_dt = partition_end
+        min_dt = min(partition, delta_partition)
+        max_dt = max(partition, delta_partition)
 
         min_ts = min_dt.isoformat(timespec="milliseconds")
         max_ts = max_dt.isoformat(timespec="milliseconds")
 
-        if col:
-            return (F.col(col) >= F.lit(min_ts)) & (F.col(col) < F.lit(max_ts))
-
-        return min_ts, max_ts
+        return (F.col(col) >= F.lit(min_ts)) & (F.col(col) < F.lit(max_ts))
 
     def _build_call_events_df(
         self,
@@ -152,7 +143,13 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         session_df: DataFrame,
         bigfone_table: str,
     ) -> DataFrame:
+        # For workflow_name == IVR Events -> URA, we don't have a direction, so we're settign it to inbound
+        # For inbound calls, we're using id_call as id_task_call
+        # For outbound calls, we're using id_task as id_task_call
 
+        direction_cond = F.when(
+            F.col("workflow_name") == F.lit("IVR Events"), F.lit("inbound")
+        ).otherwise(F.col("direction"))
         call_event_df = (
             spark.table(bigfone_table)
             .where(
@@ -160,16 +157,29 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                     self.cfg.partition_date, delta_hours=-24, col="ts_cdc_transaction"
                 )
             )
+            .withColumn("direction", direction_cond)
             .where(F.col("id_call").isNotNull() | F.col("id_task").isNotNull())
             .select(
                 F.col("id").alias("id_task_event"),
-                F.coalesce(F.col("id_task"), F.col("id_call")).alias("id_task_call"),
                 "id_task",
                 "id_call",
                 "id_reservation",
                 "id_worker",
                 "direction",
                 "channel_type",
+                F.get_json_object("tags", "$.contact_subject_tag").alias("theme"),
+                F.get_json_object("tags", "$.contact_subject_detail_tag").alias(
+                    "theme_detail"
+                ),
+                F.get_json_object("tags", "$.journey_step_tag").alias(
+                    "journey_step_tag"
+                ),
+                F.get_json_object("tags", "$.customer_type_tag").alias(
+                    "customer_type_tag"
+                ),
+                F.get_json_object("tags", "$.contact_reason_tag").alias(
+                    "contact_reason_tag"
+                ),
                 "bpo_name",
                 "queue_name",
                 "worker_email",
@@ -186,7 +196,8 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         final_call_df = (
             call_event_df.join(
                 session_df,
-                F.col("id_task_call") == F.col("source_identity"),
+                (F.col("id_task") == F.col("source_identity"))
+                | (F.col("id_call") == F.col("source_identity")),
                 how="inner",
             )
             .select(
@@ -200,6 +211,11 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 "id_call",
                 "id_worker",
                 F.col("source").alias("service_type"),
+                "theme",
+                "theme_detail",
+                "journey_step_tag",
+                "customer_type_tag",
+                "contact_reason_tag",
                 "direction",
                 "channel_type",
                 "bpo_name",
@@ -324,6 +340,15 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             "task_status",
             "task_outcome",
             F.col("completion_reason").alias("task_completion_reason"),
+            F.get_json_object("tags", "$.contact_subject_tag").alias("theme"),
+            F.get_json_object("tags", "$.contact_subject_detail_tag").alias(
+                "theme_detail"
+            ),
+            F.get_json_object("tags", "$.journey_step_tag").alias("journey_step_tag"),
+            F.get_json_object("tags", "$.customer_type_tag").alias("customer_type_tag"),
+            F.get_json_object("tags", "$.contact_reason_tag").alias(
+                "contact_reason_tag"
+            ),
             "channel_status",
             "bpo_name",
             "bpo_selection_reason",
@@ -347,6 +372,26 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         ws = whatsapp_chats_df.alias("ws")
 
         union_ias_ws = ias.unionByName(ws, allowMissingColumns=True)
+
+        # Resolve the inbound/outbound direction for chat service events.
+        # created_by = 'hsm_sent' marks a company-initiated WhatsApp HSM
+        # (template) message and is always outbound, regardless of whether the
+        # task is a SPOC task — otherwise these events fall through to the
+        # inbound default and are misclassified.
+        is_spoc_task_col = F.col("t.is_spoc_task")
+        created_by_col = F.coalesce(F.col("u.created_by"))
+        chat_direction_cond = (
+            F.when(created_by_col == "hsm_sent", F.lit("outbound"))
+            .when(
+                is_spoc_task_col & (created_by_col == "human_support"),
+                F.lit("inbound"),
+            )
+            .when(
+                is_spoc_task_col & (created_by_col == "user"),
+                F.lit("outbound"),
+            )
+            .otherwise(F.lit("inbound"))
+        )
 
         final_chat_df = (
             task_events_df.alias("t")
@@ -380,23 +425,17 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 F.when(F.col("u.source") == "internal_chat", F.lit("in app"))
                 .otherwise(F.col("u.source"))
                 .alias("origin"),
-                F.when(
-                    F.col("t.is_spoc_task")
-                    & (F.coalesce(F.col("u.created_by")) == "human_support"),
-                    F.lit("inbound"),
-                )
-                .when(
-                    F.col("t.is_spoc_task")
-                    & (F.coalesce(F.col("u.created_by")) == "user"),
-                    F.lit("outbound"),
-                )
-                .otherwise(F.lit("inbound"))
-                .alias("direction"),
+                chat_direction_cond.alias("direction"),
                 F.col("t.worker_email"),
                 F.col("t.channel_type"),
                 F.col("t.task_status"),
                 F.col("t.task_outcome"),
                 F.col("t.task_completion_reason"),
+                F.col("t.theme"),
+                F.col("t.theme_detail"),
+                F.col("t.journey_step_tag"),
+                F.col("t.customer_type_tag"),
+                F.col("t.contact_reason_tag"),
                 F.col("t.bpo_name"),
                 F.col("t.bpo_selection_reason"),
                 F.col("t.seconds_to_first_response"),
@@ -550,10 +589,14 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         expected_schema = self.table_spec["schema"]["columns"]
         schema_column_names = list(expected_schema.keys())
 
+        previous_partition_date = (
+            datetime.strptime(self.cfg.partition_date, "%Y-%m-%d") - timedelta(hours=24)
+        ).strftime("%Y-%m-%d")
+
         if partition_has_data(
             spark,
             target_full_table_name,
-            self.cfg.partition_date,
+            previous_partition_date,
             None,
         ):
             self.logger.info(

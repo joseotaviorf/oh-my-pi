@@ -65,6 +65,21 @@ schema:
     service_type:
       type: string
       required: true
+    theme:
+      type: string
+      required: true
+    theme_detail:
+      type: string
+      required: true
+    journey_step_tag:
+      type: string
+      required: true
+    customer_type_tag:
+      type: string
+      required: true
+    contact_reason_tag:
+      type: string
+      required: true
     direction:
       type: string
       required: true
@@ -182,6 +197,6 @@ schema:
     _last_updated_at:
       type: string
       required: true
-min_columns: 51
-max_columns: 51
+min_columns: 56
+max_columns: 56
 strict: true

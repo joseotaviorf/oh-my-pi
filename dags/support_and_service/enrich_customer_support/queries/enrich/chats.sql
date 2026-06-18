@@ -1,14 +1,23 @@
-WITH task_queues AS (
+WITH task_queues_ranked AS (
+  SELECT
+    id_task,
+    id_queue,
+    queue_name,
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) AS rn
+  FROM
+    datalake_quinto_messenger_clean.task_event
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 60 DAY AND DATE("{load_end_date}")
+),
+task_queues AS (
   SELECT
     id_task,
     id_queue,
     queue_name
   FROM
-    datalake_quinto_messenger_clean.task_event
+    task_queues_ranked
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 60 DAY AND DATE("{load_end_date}")
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
+    rn = 1
 ),
 sauron_session_data AS (
   SELECT
@@ -91,7 +100,7 @@ whatsapp_sessions AS (
   WHERE
     MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
 ),
-tasks AS (
+tasks_ranked AS (
   SELECT
     id_channel,
     id_chat,
@@ -124,13 +133,47 @@ tasks AS (
     url_source_ctwa,
     type_source_ctwa,
     total_inactivity_time,
-    last_inactivity_time
+    last_inactivity_time,
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) AS rn
   FROM
     datalake_quinto_messenger_clean.task
   WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
+),
+tasks AS (
+  SELECT
+    id_channel,
+    id_chat,
+    id_task,
+    id_worker,
+    worker_email,
+    from_phone_number,
+    twilio_phone_number,
+    customer_email,
+    channel_type,
+    task_status,
+    task_outcome,
+    task_completion_reason,
+    channel_status,
+    bpo_name,
+    bpo_selection_reason,
+    assigned_to,
+    seconds_to_first_response,
+    is_forwarded,
+    is_per_team_task,
+    is_spoc_task,
+    ts_created,
+    ts_updated,
+    task_attributes,
+    id_source_ctwa,
+    url_source_ctwa,
+    type_source_ctwa,
+    total_inactivity_time,
+    last_inactivity_time
+  FROM
+    tasks_ranked
+  WHERE
+    rn = 1
 )
 SELECT
   t.id_channel,
@@ -150,6 +193,7 @@ SELECT
     ELSE COALESCE(ias.source, ws.source)
     END AS origin,
   CASE
+    WHEN COALESCE(ias.created_by, ws.created_by) = 'hsm_sent' THEN 'outbound'
     WHEN t.is_spoc_task IS TRUE AND COALESCE(ias.created_by, ws.created_by) = 'human_support' THEN 'inbound'
     WHEN t.is_spoc_task IS TRUE AND COALESCE(ias.created_by, ws.created_by) = 'user' THEN 'outbound'
     ELSE 'inbound'

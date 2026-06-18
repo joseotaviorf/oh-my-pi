@@ -108,6 +108,14 @@ columns:
     description: Type of the Click-To-WhatsApp (CTWA) ad source that originated the service event.
     lineage:
       - core_support_journey.services.type_source_ctwa
+  theme:
+    description: Contact subject (theme) classifying what the service event was about, used to group interactions by topic for service analysis.
+    lineage:
+      - core_support_journey.services.theme
+  theme_detail:
+    description: Detailed contact subject (sub-theme) refining the theme with a more specific classification of what the service event was about.
+    lineage:
+      - core_support_journey.services.theme_detail
   waiting_time_sec:
     description: Time the customer waited before being served, in seconds.
     lineage:
