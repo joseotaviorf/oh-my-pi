@@ -44,8 +44,17 @@ workflow:
       - sale_flow_past_30_days
       - rent_outlier_users_past_30_days
       - sale_outlier_users_past_30_days
+    tof_global_metrics:
+      - search_impressions
+      - recs_impressions_processed
+      - lpv_global_metrics
+      - rent_flow_past_30_days
+      - sale_flow_past_30_days
     global_metrics:
       - search_impressions
+    tof_global_metrics:
+      - search_impressions
+      - recs_impressions_processed
     experiment_config_processed:
       - experiment_config
   tables_customization:
@@ -75,6 +84,11 @@ workflow:
         - month
         - day
     lpv_global_metrics:
+      partitions:
+        - year
+        - month
+        - day
+    tof_global_metrics:
       partitions:
         - year
         - month

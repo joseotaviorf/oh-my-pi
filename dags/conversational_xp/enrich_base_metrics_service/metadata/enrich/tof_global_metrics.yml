@@ -1,0 +1,116 @@
+database_name: datalake_search
+table_name: tof_global_metrics
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Table with ids, dimensions, metrics and timestamps for global funnel metrics after Top of Funnel (ToF) actions.
+columns:
+  ids:
+    description: |
+      A JSON object identifying the entities used to connect the first Top of Funnel action to later rent or sale funnel events:
+      - `id_user`: user who performed the Top of Funnel action.
+      - `id_house`: attributed property linked to the subsequent funnel event, when available.
+    lineage:
+      - datalake_search.search_impressions.ids
+      - datalake_search.recs_impressions_processed.ids
+      - datalake_search.lpv_global_metrics.ids
+      - datalake_search.rent_flow_past_30_days.id_house
+      - datalake_search.sale_flow_past_30_days.id_house
+  dimensions:
+    description: |
+      A JSON object describing the business context of the Top of Funnel action:
+      - `business_context`: journey context for the action, either rent or sale.
+      - `city`: attributed property city linked to the subsequent funnel event, when available.
+      - `is_outlier_user`: flag indicating whether the user is treated as an outlier in the source ToF event.
+    lineage:
+      - datalake_search.search_impressions.dimensions
+      - datalake_search.recs_impressions_processed.dimensions
+      - datalake_search.lpv_global_metrics.dimensions
+      - wonka.house_main.city
+  variants:
+    description: A json mapping experiment names to the variant allocated to the user at the ToF action time.
+    lineage:
+      - datalake_search.search_impressions.variants
+      - datalake_search.recs_impressions_processed.variants
+      - datalake_search.lpv_global_metrics.variants
+  metrics:
+    description: |
+      A json with ToF and subsequent global funnel binary indicators. The `tof` metric identifies the Top of Funnel action: search, recommendation, or LPV.
+      `global_visit_booked` (VB - Visits Booked) means the user booked a visit after the ToF action.
+      `global_visit_completed` (VC - Visit Completed) means the user completed a visit after the ToF action.
+      `global_offer` (O - Offer) means the user reached an offer event after the ToF action. In rent this metrics considers both OSs and DOs
+      `global_direct_offer` (DO - Direct offer) means the user reached a direct-offer event after the ToF action.
+      `global_submitted_offer` (OS - Offer Submitted) means the user submitted an offer after the ToF action. For Rent it implies the user did a visit beforehand.
+      `global_offer_approved` (OA - Offer Approved) means the user's offer was approved after the ToF action.
+      `global_contract_signed` (CS - Contract Signed) means the user signed a contract after the ToF action.
+      This table can be used to compute ToF conversion metrics, such as ToF2VB, where VB means Visits Booked.
+    lineage:
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  timestamps:
+    description: |
+      A JSON object with the first Top of Funnel action timestamp and subsequent global funnel event timestamps:
+      - `ts_tof`: timestamp of the first Top of Funnel action for the user, business context, date, and experiment variants.
+      - `ts_global_visit_booked`: timestamp when the user booked a visit after the Top of Funnel action.
+      - `ts_global_visit_completed`: timestamp when the user completed a visit after the Top of Funnel action.
+      - `ts_global_offer`: timestamp when the user reached an offer event after the Top of Funnel action. In rent this metrics considers both OSs and DOs
+      - `ts_global_direct_offer`: timestamp when the user reached a direct-offer event after the Top of Funnel action.
+      - `ts_global_submitted_offer`: timestamp when the user submitted an offer after the Top of Funnel action. In rent this implies the user did a visit beforehand.
+      - `ts_global_offer_approved`: timestamp when the user's offer was approved after the Top of Funnel action.
+      - `ts_global_contract_signed`: timestamp when the user signed a contract after the Top of Funnel action.
+    lineage:
+      - datalake_search.search_impressions.timestamps
+      - datalake_search.recs_impressions_processed.timestamps
+      - datalake_search.lpv_global_metrics.timestamps
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  date:
+    description: The calendar date of a ToF action for the user, business context, and experiment variants.
+    lineage:
+      - datalake_search.search_impressions.date
+      - datalake_search.recs_impressions_processed.date
+      - datalake_search.lpv_global_metrics.date
+  year:
+    description: The year of a ToF action for the user, business context, and experiment variants.
+    lineage:
+      - datalake_search.search_impressions.year
+      - datalake_search.recs_impressions_processed.year
+      - datalake_search.lpv_global_metrics.year
+  month:
+    description: The month of a ToF action for the user, business context, and experiment variants.
+    lineage:
+      - datalake_search.search_impressions.month
+      - datalake_search.recs_impressions_processed.month
+      - datalake_search.lpv_global_metrics.month
+  day:
+    description: The day of a ToF action for the user, business context, and experiment variants.
+    lineage:
+      - datalake_search.search_impressions.day
+      - datalake_search.recs_impressions_processed.day
+      - datalake_search.lpv_global_metrics.day
+  week:
+    description: The ISO week number of a ToF action for the user, business context, and experiment variants.
+    lineage:
+      - datalake_search.search_impressions.week
+      - datalake_search.recs_impressions_processed.week
+      - datalake_search.lpv_global_metrics.week
