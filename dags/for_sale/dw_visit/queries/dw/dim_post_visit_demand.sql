@@ -21,6 +21,7 @@ SELECT
     house_neighborhood,
     house_cost_benefit,
     house_condominium_features,
+    house_other,
     house_ad_discrepancies,
     evaluation_domain,
     is_visit_completed_by_demand,

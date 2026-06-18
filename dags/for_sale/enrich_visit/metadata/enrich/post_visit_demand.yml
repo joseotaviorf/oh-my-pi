@@ -22,7 +22,7 @@ columns:
   channel:
     lineage:
       - datalake_visit.visit_status_events.channel
-    description: Channel of the visit.
+    description: Channel of visit finalization by demand.
   agent_rating:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected
@@ -137,6 +137,13 @@ columns:
     categories:
       GOOD: Condominium features were rated positively.
       NEEDS_IMPROVEMENT: Condominium features need improvement.
+  house_other:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Other aspects of house evaluation.
+    categories:
+      GOOD: House performed well in other aspects.
+      NEEDS_IMPROVEMENT: House needs improvement in other aspects.
   house_ad_discrepancies:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected

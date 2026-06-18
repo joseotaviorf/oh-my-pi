@@ -12,11 +12,11 @@ columns:
   sk_visit:
     lineage:
       - datalake_visit.post_visit_demand.id_visit
-    description: Key of visit.
+    description: Unique identifier of the visit being evaluated.
   channel:
     lineage:
       - datalake_visit.post_visit_demand.channel
-    description: Channel of the visit.
+    description: Channel of visit finalization by demand.
   agent_rating:
     lineage:
       - datalake_visit.post_visit_demand.agent_rating
@@ -131,6 +131,13 @@ columns:
     categories:
       GOOD: Condominium features were rated positively.
       NEEDS_IMPROVEMENT: Condominium features need improvement.
+  house_other:
+    lineage:
+      - datalake_visit.post_visit_demand.house_other
+    description: Other aspects of house evaluation.
+    categories:
+      GOOD: House performed well in other aspects.
+      NEEDS_IMPROVEMENT: House needs improvement in other aspects.
   house_ad_discrepancies:
     lineage:
       - datalake_visit.post_visit_demand.house_ad_discrepancies
