@@ -2,8 +2,9 @@
 #
 # All images (ci-base, ci-jdk, devcontainer) are built for linux/amd64 + linux/arm64
 # via the ECR-hosted Kaniko plugin (plugins/docker) with privileged: true for QEMU
-# binfmt registration. GITHUB_TOKEN is passed via environment; the plugin stages
-# /kaniko/run/secrets/GITHUB_TOKEN for Dockerfile RUN steps. The plugin pushes a
+# binfmt registration. GITHUB_TOKEN is passed via settings.github_token
+# (PLUGIN_GITHUB_TOKEN); the plugin stages /kaniko/run/secrets/GITHUB_TOKEN for
+# Dockerfile RUN steps. The plugin pushes a
 # manifest list per tag so consumers get the right arch automatically.
 # Layer 5 adds prod-devcontainer-* ECR publish on master.
 #
@@ -32,8 +33,7 @@ steps:
         - linux/amd64
         - linux/arm64
       no_push: true
-    environment:
-      GITHUB_TOKEN:
+      github_token:
         from_secret: github_token
     when:
       event: pull_request
@@ -59,8 +59,7 @@ steps:
       platforms:
         - linux/amd64
         - linux/arm64
-    environment:
-      GITHUB_TOKEN:
+      github_token:
         from_secret: github_token
     when:
       - path:
@@ -89,8 +88,7 @@ steps:
       platforms:
         - linux/amd64
         - linux/arm64
-    environment:
-      GITHUB_TOKEN:
+      github_token:
         from_secret: github_token
     when:
       - path:
@@ -119,8 +117,7 @@ steps:
       platforms:
         - linux/amd64
         - linux/arm64
-    environment:
-      GITHUB_TOKEN:
+      github_token:
         from_secret: github_token
     when:
       - path:
