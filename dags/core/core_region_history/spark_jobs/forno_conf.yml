@@ -10,6 +10,7 @@ business_unit_region_history_event_configs:
   - tracked_col: created_at
     target_col: ts_created
     target_type: timestamp
+    value_precision: millisecond
 
 BUSINESS_UNIT_HISTORY_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit"
 business_unit_history_event_configs:
@@ -34,3 +35,4 @@ business_unit_history_event_configs:
   - tracked_col: created_at
     target_col: ts_created
     target_type: timestamp
+    value_precision: millisecond

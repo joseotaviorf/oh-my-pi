@@ -29,6 +29,16 @@ DEFAULT_CANONICALIZE_TIE_BREAKERS = [
     "cdc_transaction_id",
 ]
 
+# Opt-in precisions for the ``value_precision`` event-config key. A tracked
+# timestamp column is truncated to the requested precision *before* change
+# detection (and storage), so byte-level rendering differences that do not
+# change the business value stop emitting spurious events. The canonical case:
+# a CDC snapshot (``op_cdc='r'``) renders ``created_at`` at millisecond
+# precision while streaming ``c``/``u`` rows render it at microsecond
+# precision; ``value_precision: millisecond`` collapses both to one value so an
+# immutable column emits exactly one event.
+SUPPORTED_VALUE_PRECISIONS = ("second", "millisecond", "microsecond")
+
 
 class HistoryBuilder:
     """Converts transactional CDC rows into narrow, fixed-schema event rows.
@@ -82,6 +92,10 @@ class HistoryBuilder:
             op_col: CDC operation column (e.g. ``"op_cdc"``).
             event_configs: List of dicts with ``tracked_col`` and either
                 ``event_name`` or ``target_col`` (``ev_{target_col}`` if omitted).
+                Optional ``value_precision`` (``second`` / ``millisecond`` /
+                ``microsecond``) truncates a tracked timestamp column before
+                change detection, so snapshot vs streaming-CDC render
+                differences on an immutable column stop emitting extra events.
             event_type: ``"cdc"`` or ``"outbox_pattern"``.
             event_origin: Fully qualified source table name
                 (e.g. ``"datalake_ebdb_transactional.contrato"``).
@@ -136,6 +150,13 @@ class HistoryBuilder:
         df_source = df.select(*[F.col(c) for c in cols_to_select])
         df_source = HistoryBuilder._materialize_json_derived_columns(
             df_source, json_derived_columns
+        )
+        # Normalize tracked-timestamp precision before any dedupe / change
+        # detection so the snapshot (millis) and streaming-CDC (micros) renders
+        # of an immutable column compare equal and emit a single event.
+        value_precisions = HistoryBuilder._extract_value_precisions(event_configs)
+        df_source = HistoryBuilder._normalize_value_precisions(
+            df_source, value_precisions
         )
 
         spark = df_source.sparkSession
@@ -217,6 +238,12 @@ class HistoryBuilder:
                     f"event_configs[{i}] must declare both 'source_col' and "
                     f"'json_path' when using JSON-derived tracking"
                 )
+            precision = ec.get("value_precision")
+            if precision is not None and precision not in SUPPORTED_VALUE_PRECISIONS:
+                raise ValueError(
+                    f"event_configs[{i}] has unsupported value_precision "
+                    f"'{precision}'; expected one of {SUPPORTED_VALUE_PRECISIONS}"
+                )
             resolve_event_name(ec, index=i)
 
     @staticmethod
@@ -262,6 +289,56 @@ class HistoryBuilder:
             for ec in event_configs
             if "default_value" in ec
         }
+
+    @staticmethod
+    def _extract_value_precisions(
+        event_configs: List[Dict[str, str]],
+    ) -> Dict[str, str]:
+        """Extract columns that declare a ``value_precision`` from event_configs.
+
+        Returns a dict mapping tracked_col → precision unit (one of
+        ``SUPPORTED_VALUE_PRECISIONS``). Only entries that explicitly declare
+        ``value_precision`` are included.
+        """
+        return {
+            ec["tracked_col"]: ec["value_precision"]
+            for ec in event_configs
+            if "value_precision" in ec
+        }
+
+    @staticmethod
+    def _normalize_value_precisions(
+        df: DataFrame, value_precisions: Dict[str, str]
+    ) -> DataFrame:
+        """Truncate tracked timestamp columns to their declared precision.
+
+        Applied before dedupe / LAG / change detection so the truncated value
+        drives both the comparison and the stored ``value``. A no-op when
+        ``value_precisions`` is empty.
+        """
+        for col_name, precision in value_precisions.items():
+            df = df.withColumn(
+                col_name, HistoryBuilder._truncate_timestamp(col_name, precision)
+            )
+        return df
+
+    @staticmethod
+    def _truncate_timestamp(col_name: str, precision: str):
+        """Return a Column truncating ``col_name`` (cast to timestamp) to precision.
+
+        Uses Spark SQL functions available since Spark 3.1 (``date_trunc``,
+        ``unix_micros``, ``timestamp_micros``, ``pmod``) so the rewrite runs
+        identically on Databricks DBR 16.4 and EMR Spark 3.5.
+        """
+        ts = f"CAST(`{col_name}` AS TIMESTAMP)"
+        if precision == "second":
+            return F.expr(f"date_trunc('SECOND', {ts})")
+        if precision == "millisecond":
+            return F.expr(
+                f"timestamp_micros(unix_micros({ts}) - pmod(unix_micros({ts}), 1000))"
+            )
+        # microsecond: cast-only, canonicalizes representation without loss.
+        return F.expr(ts)
 
     @staticmethod
     def _resolve_tie_breaker_columns(

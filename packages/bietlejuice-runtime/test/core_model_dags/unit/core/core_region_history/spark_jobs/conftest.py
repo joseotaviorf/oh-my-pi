@@ -24,6 +24,7 @@ BUR_EVENT_CONFIGS = [
         "tracked_col": "created_at",
         "target_col": "ts_created",
         "target_type": "timestamp",
+        "value_precision": "millisecond",
     },
 ]
 
@@ -50,6 +51,7 @@ BU_EVENT_CONFIGS = [
         "tracked_col": "created_at",
         "target_col": "ts_created",
         "target_type": "timestamp",
+        "value_precision": "millisecond",
     },
 ]
 

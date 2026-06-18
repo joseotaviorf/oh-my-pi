@@ -1251,3 +1251,124 @@ class TestHistoryBuilderCanonicalization:
         # assert -- latest ts_cdc_transaction wins; one row per (id, ts)
         assert len(status_rows) == 1
         assert status_rows[0]["value"] == "new"
+
+
+# ---------------------------------------------------------------------------
+# value_precision: normalize tracked timestamps before change detection
+# ---------------------------------------------------------------------------
+
+TS_PRECISION_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("created_at", TimestampType(), True),
+        StructField("op_cdc", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+    ]
+)
+
+# Mirrors the observed core_region.business_unit_history bug: an immutable
+# created_at rendered at microsecond precision on streaming CDC rows and at
+# millisecond precision on the snapshot (op_cdc='r') row.
+MICROS_VALUE = datetime(2022, 7, 13, 19, 51, 35, 816026)
+MILLIS_VALUE = datetime(2022, 7, 13, 19, 51, 35, 816000)
+
+
+def _ts_precision_configs(value_precision=None):
+    config = {
+        "tracked_col": "created_at",
+        "target_col": "ts_created",
+        "target_type": "timestamp",
+    }
+    if value_precision is not None:
+        config["value_precision"] = value_precision
+    return [config]
+
+
+class TestHistoryBuilderValuePrecision:
+    """Tests for the opt-in ``value_precision`` timestamp normalization."""
+
+    def _build(self, spark_session, data, value_precision=None):
+        df = spark_session.createDataFrame(data, TS_PRECISION_SCHEMA)
+        return HistoryBuilder.build_history_for_columns(
+            df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=_ts_precision_configs(value_precision),
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+        )
+
+    def test_millisecond_precision_collapses_micros_millis_to_one_event(
+        self, spark_session
+    ):
+        # arrange -- create (micros), snapshot (millis), update (micros): the
+        # value is immutable but its render flips precision across rows.
+        data = [
+            ("1", MICROS_VALUE, "c", datetime(2025, 5, 9, 17, 14, 25)),
+            ("1", MILLIS_VALUE, "r", datetime(2025, 5, 12, 0, 0, 0)),
+            ("1", MICROS_VALUE, "u", datetime(2025, 5, 29, 19, 21, 24)),
+        ]
+        result = self._build(spark_session, data, value_precision="millisecond")
+        rows = [r for r in result.collect() if r["event_name"] == "ev_ts_created"]
+
+        # assert -- normalized to millisecond, all three render equal -> one event
+        assert len(rows) == 1
+        assert rows[0]["value"] == "2022-07-13 19:51:35.816"
+
+    def test_without_value_precision_micros_millis_flip_emits_multiple_events(
+        self, spark_session
+    ):
+        # arrange -- same data, no normalization (documents the bug being fixed)
+        data = [
+            ("1", MICROS_VALUE, "c", datetime(2025, 5, 9, 17, 14, 25)),
+            ("1", MILLIS_VALUE, "r", datetime(2025, 5, 12, 0, 0, 0)),
+            ("1", MICROS_VALUE, "u", datetime(2025, 5, 29, 19, 21, 24)),
+        ]
+        result = self._build(spark_session, data, value_precision=None)
+        rows = [r for r in result.collect() if r["event_name"] == "ev_ts_created"]
+
+        # assert -- each precision flip is seen as a change -> three events
+        assert len(rows) == 3
+
+    def test_second_precision_truncates_subsecond_and_collapses(self, spark_session):
+        # arrange -- two renders differing only below the second
+        data = [
+            ("2", MICROS_VALUE, "c", datetime(2025, 5, 9, 17, 14, 25)),
+            ("2", MILLIS_VALUE, "u", datetime(2025, 5, 29, 19, 21, 24)),
+        ]
+        result = self._build(spark_session, data, value_precision="second")
+        rows = [r for r in result.collect() if r["event_name"] == "ev_ts_created"]
+
+        # assert -- truncated to the second, both render equal -> one event
+        assert len(rows) == 1
+        assert rows[0]["value"] == "2022-07-13 19:51:35"
+
+    def test_genuine_value_change_still_emits_after_normalization(self, spark_session):
+        # arrange -- a real change above the normalized precision must survive
+        later = datetime(2023, 1, 1, 10, 0, 0, 500000)
+        data = [
+            ("3", MICROS_VALUE, "c", datetime(2025, 5, 9, 17, 14, 25)),
+            ("3", later, "u", datetime(2025, 5, 29, 19, 21, 24)),
+        ]
+        result = self._build(spark_session, data, value_precision="millisecond")
+        rows = [r for r in result.collect() if r["event_name"] == "ev_ts_created"]
+
+        # assert -- distinct millisecond values -> two events
+        assert len(rows) == 2
+
+    def test_unsupported_value_precision_raises_value_error(self, spark_session):
+        data = [("4", MICROS_VALUE, "c", datetime(2025, 5, 9, 17, 14, 25))]
+        df = spark_session.createDataFrame(data, TS_PRECISION_SCHEMA)
+        with pytest.raises(ValueError, match="unsupported value_precision"):
+            HistoryBuilder.build_history_for_columns(
+                df,
+                entity_name="contract",
+                id_col="id",
+                ts_col="ts_database_transaction",
+                op_col="op_cdc",
+                event_configs=_ts_precision_configs(value_precision="nanosecond"),
+                event_type="cdc",
+                event_origin=SOURCE_TABLE,
+            )
