@@ -24,3 +24,6 @@ workflow:
     closing_audience_view:
       sync: [trino]
       sql_dialect: trino
+    ep2ds_view:
+      sync: [trino]
+      sql_dialect: trino

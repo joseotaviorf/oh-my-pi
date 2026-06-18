@@ -1,27 +1,39 @@
 WITH
   rent_flow_events AS (
     SELECT
-      CAST(cdp_tx.id_event AS STRING) AS id_event,
+      CAST(cdp_tx.id_event AS VARCHAR) AS id_event,
       TRY_CAST(cdp_tx.id_user AS BIGINT) AS id_user,
-      CAST(cdp_tx.id_person AS STRING) AS uuid_user,
-      TRY_CAST(cdp_tx.event_properties:id_house AS BIGINT) AS id_house,
-      CAST(cdp_tx.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
-      TRY_CAST(cdp_tx.event_properties:id_documentation AS BIGINT) AS id_proposal,
+      CAST(cdp_tx.id_person AS VARCHAR) AS uuid_user,
+      TRY_CAST(JSON_EXTRACT_SCALAR(cdp_tx.event_properties, '$.id_house') AS BIGINT) AS id_house,
+      JSON_EXTRACT_SCALAR(cdp_tx.event_properties, '$.id_rent_flow') AS id_rent_flow,
+      TRY_CAST(JSON_EXTRACT_SCALAR(cdp_tx.event_properties, '$.id_documentation') AS BIGINT) AS id_proposal,
       cdp_tx.event_name,
       cdp_tx.ts_event
     FROM
       datalake_cdp_clean.transactional AS cdp_tx
     WHERE
-      cdp_tx.event_name IN (
+      cdp_tx.application = 'rental-offer'
+      AND cdp_tx.journey_step = 'documentation'
+      AND cdp_tx.event_name IN (
         'rent_flow_tenant_credit_positive',
         'rent_flow_tenant_credit_positive_with_guarantee',
         'rent_flow_tenant_documentation_submitted',
         'rent_flow_documentation_canceled'
       )
-      AND TRY_CAST(cdp_tx.id_user AS BIGINT) IS NOT NULL
+      AND cdp_tx.id_user IS NOT NULL
       AND cdp_tx.id_person IS NOT NULL
-      AND cdp_tx.event_properties:id_rent_flow IS NOT NULL
-      AND cdp_tx.ts_event >= TIMESTAMP '2026-05-28 00:00:00'
+      AND (
+        YEAR > YEAR(CURRENT_DATE - INTERVAL '10' DAY)
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '10' DAY)
+          AND MONTH > MONTH(CURRENT_DATE - INTERVAL '10' DAY)
+        )
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '10' DAY)
+          AND MONTH = MONTH(CURRENT_DATE - INTERVAL '10' DAY)
+          AND DAY >= DAY(CURRENT_DATE - INTERVAL '10' DAY)
+        )
+      )
   ),
   credit_positive_ranked AS (
     SELECT
@@ -47,6 +59,7 @@ WITH
       )
       AND rfe.id_event IS NOT NULL
       AND rfe.id_proposal IS NOT NULL
+      AND rfe.id_rent_flow IS NOT NULL
   ),
   credit_positive_flows AS (
     SELECT
@@ -86,6 +99,8 @@ WITH
       ) AS ts_documentation_sent
     FROM
       rent_flow_events AS rfe
+    WHERE
+      rfe.id_rent_flow IS NOT NULL
     GROUP BY
       rfe.uuid_user,
       rfe.id_rent_flow
@@ -119,7 +134,7 @@ WITH
       ef.ts_documentation_sent,
       ef.documentation_sent,
       COALESCE(ef.has_documentation_canceled, FALSE) = FALSE AS is_active_rent_flow,
-      trim(us_ebdb.email) AS user_email,
+      TRIM(us_ebdb.email) AS user_email,
       REPLACE(us_ebdb.main_phone, '+', '') AS user_phone,
       SPLIT_PART(us_ebdb.name, ' ', 1) AS user_first_name,
       hs.address,
@@ -141,17 +156,15 @@ WITH
       LEFT JOIN datalake_ebdb_clean.house AS hs ON ef.id_house = hs.id
   )
 SELECT
-  CONCAT(ef.id_event, '_', ef.uuid_user) AS pk_event_user,
+  ef.id_event || '_' || ef.uuid_user AS pk_event_user,
   ef.id_event,
   ef.id_rent_flow,
   ef.id_user,
   ef.uuid_user,
   ef.id_proposal,
-  CONCAT(
-    'https://www.quintoandar.com.br/documentacao/',
-    CAST(ef.id_proposal AS STRING),
-    '?source_platform=sonia&utm_source=sonia'
-  ) AS documentation_url,
+  'https://www.quintoandar.com.br/documentacao/'
+    || CAST(ef.id_proposal AS VARCHAR)
+    || '?source_platform=sonia&utm_source=sonia' AS documentation_url,
   ef.id_house,
   ef.is_active_rent_flow,
   ef.documentation_sent,
@@ -159,9 +172,9 @@ SELECT
   ef.user_email,
   ef.user_phone,
   ef.user_first_name,
-  CONCAT_WS(', ', ef.address, CAST(ef.number AS STRING)) AS address_text,
-  ABS(CRC32(ENCODE(ef.uuid_user, 'utf-8'))) % 100 AS binning_value,
-  date_format(ef.ts_evaluation_positive, 'yyyy-MM-dd HH:mm:ss') AS ts_evaluation_positive,
-  date_format(ef.ts_documentation_sent, 'yyyy-MM-dd HH:mm:ss') AS ts_documentation_sent
+  CONCAT_WS(', ', ef.address, CAST(ef.number AS VARCHAR)) AS address_text,
+  ABS(CRC32(TO_UTF8(ef.uuid_user))) % 100 AS binning_value,
+  DATE_FORMAT(ef.ts_evaluation_positive, '%Y-%m-%d %T') AS ts_evaluation_positive,
+  DATE_FORMAT(ef.ts_documentation_sent, '%Y-%m-%d %T') AS ts_documentation_sent
 FROM
   enriched_flows AS ef;
