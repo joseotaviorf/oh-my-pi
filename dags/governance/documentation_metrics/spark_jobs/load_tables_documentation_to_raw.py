@@ -62,15 +62,9 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
         if "Contents" in page:
             bucket_objects.extend(page["Contents"])
 
-    documentation_paths = [
-        obj["Key"]
-        for obj in bucket_objects
-        if "documentation/" in obj["Key"]
-        and "/categories/" not in obj["Key"]
-        and "documentation/atlas/" not in obj["Key"]
+    return [
+        obj["Key"] for obj in bucket_objects if obj["Key"].endswith((".yml", ".yaml"))
     ]
-
-    return documentation_paths
 
 
 def get_content_from_paths(bucket, documentation_paths, s3_client):

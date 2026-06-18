@@ -30,7 +30,7 @@ def get_documentation_from_bucket(bucket, prefix, spark_client):
     s3_client = boto3.client("s3")
     documentation_paths = get_documentation_paths_from_bucket(bucket, prefix, s3_client)
     documentation_contents = get_content_from_paths(
-        documentation_bucket, documentation_paths, s3_client
+        bucket, documentation_paths, s3_client
     )
     documentation_content = extract_rows_from_docs(documentation_contents)
 
@@ -52,7 +52,8 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
 
     bucket_objects = []
     for page in pages:
-        bucket_objects.extend(page["Contents"])
+        if "Contents" in page:
+            bucket_objects.extend(page["Contents"])
 
     documentation_paths = [
         obj["Key"]
