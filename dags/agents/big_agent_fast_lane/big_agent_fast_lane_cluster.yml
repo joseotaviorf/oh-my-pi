@@ -1,2 +1,3 @@
 cluster:
-  type: emr_7_12_min_master_2xlarge_workers_1_task_cluster
+  type: consolidation_m_general_cluster
+  databricks_conn_id: databricks_new

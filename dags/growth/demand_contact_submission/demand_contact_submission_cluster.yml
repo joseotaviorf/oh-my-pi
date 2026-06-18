@@ -1,7 +1,3 @@
 cluster:
-  type: emr_7_12_consolidation_s_general_cluster
-  custom_configurations:
-    spark_conf:
-      spark.executor.memory: 6g
-      spark.driver.memory: 6g
-      spark.dynamicAllocation.maxExecutors: "4"
+  type: consolidation_m_memory_single_node_cluster
+  databricks_conn_id: databricks_new
