@@ -1,0 +1,102 @@
+database_name: datalake_search
+table_name: lpv_global_metrics
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Table with ids, dimensions, metrics and timestamps related to user global metrics after Listing Page Viewed (LPV) events.
+columns:
+  ids:
+    description: |
+      A json with the identifiers that define the LPV global metrics grain.
+      `id_house` identifies the property/listing viewed in the Listing Page Viewed event.
+      `id_user` identifies the user who viewed that property/listing.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
+  dimensions:
+    description: |
+      A json with business dimensions for the LPV event.
+      `business_context` indicates whether the viewed listing belongs to the rent or sale experience.
+      `city` identifies the latest known city of the viewed property/listing.
+      `is_outlier_user` flags users classified as rent or sale outliers in the past 30 days.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.business_context
+      - datalake_search.rent_outlier_users_past_30_days.id_user
+      - datalake_search.sale_outlier_users_past_30_days.id_user
+      - wonka.house_main.city
+  variants:
+    description: A json mapping experiment names to the variant allocated to the user at the LPV event time.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.user_properties
+      - datalake_search.experiment_config_processed.experiment_name
+      - datalake_search.experiment_config_processed.variant_standard_name
+  metrics:
+    description: |
+      A json with LPV and subsequent global funnel binary indicators. The `lpv` metric identifies the Listing Page Viewed event.
+      `global_visit_booked` (VB - Visits Booked) means the user booked a visit after the LPV.
+      `global_visit_completed` (VC - Visit Completed) means the user completed a visit after the LPV.
+      `global_offer` (O - Offer) means the user reached an offer event after the LPV. In rent this metrics considers both OSs and DOs
+      `global_direct_offer` (DO - Direct offer) means the user reached a direct-offer event after the LPV.
+      `global_submitted_offer` (OS - Offer Submitted) means the user submitted an offer after the LPV For Rent it implies the user did a visit beforehand.
+      `global_offer_approved` (OA - Offer Approved) means the user's offer was approved after the LPV.
+      `global_contract_signed` (CS - Contract Signed) means the user signed a contract after the LPV.
+      This table can be used to compute LPV conversion metrics, such as LPV2VB, where VB means Visits Booked.
+    lineage:
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  timestamps:
+    description: |
+      A json with the first LPV timestamp and the subsequent global funnel event timestamps.
+      `ts_lpv` is the first Listing Page Viewed timestamp for the user, property/listing, business context, and date.
+      `ts_global_visit_booked` is the first rent or sale visit booked timestamp after the LPV.
+      `ts_global_visit_completed` is the first rent or sale visit completed timestamp after the LPV.
+      `ts_global_offer` is the first rent or sale offer timestamp after the LPV. In rent this metrics considers both OSs and DOs
+      `ts_global_direct_offer` is the first rent direct-offer timestamp after the LPV.
+      `ts_global_submitted_offer` is the first rent offer-submitted timestamp after the LPV. For Rent it implies the user did a visit beforehand.
+      `ts_global_offer_approved` is the first rent or sale offer approved timestamp after the LPV.
+      `ts_global_contract_signed` is the first rent or sale contract signed timestamp after the LPV.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  date:
+    description: The calendar date of an LPV event for the user, house, and business context.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  year:
+    description: The year of an LPV event for the user, house, and business context.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  month:
+    description: The month of an LPV event for the user, house, and business context.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  day:
+    description: The day of an LPV event for the user, house, and business context.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  week:
+    description: The ISO week number of an LPV event for the user, house, and business context.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
