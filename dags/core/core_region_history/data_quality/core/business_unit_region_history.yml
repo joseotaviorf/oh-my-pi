@@ -24,6 +24,7 @@ column_level_validations:
       severity_level: Error
       values:
         - ev_business_context
+        - ev_ts_created
   event_type:
     is_complete:
       severity_level: Error

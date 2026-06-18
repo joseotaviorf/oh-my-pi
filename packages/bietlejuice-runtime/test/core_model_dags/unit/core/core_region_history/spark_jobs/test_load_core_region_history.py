@@ -197,6 +197,28 @@ class TestBURHistoryEvents:
         event_names = {r["event_name"] for r in result.collect()}
         assert "ev_business_context" in event_names
 
+    def test_created_at_emits_single_ev_ts_created(
+        self,
+        spark_session,
+        transactional_bur_df,
+        mock_configuration_bur,
+    ):
+        """created_at is immutable, so exactly one ev_ts_created per region-hub pair."""
+        job = CoreRegionHistorySparkJob()
+        args = _make_args("business_unit_region_history")
+
+        with patch(
+            f"{_MODULE}.HistoricalHelper.load_transactional_data",
+            return_value=transactional_bur_df,
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        ts_created_rows = [
+            r for r in result.collect() if r["event_name"] == "ev_ts_created"
+        ]
+        assert len(ts_created_rows) == 1
+        assert ts_created_rows[0]["value"] == "2024-03-01 08:00:00"
+
     def test_update_emits_ev_business_context_on_change(
         self,
         spark_session,
@@ -297,9 +319,13 @@ class TestBURHistoryFilterValues:
         ):
             result = job.create_core_model(spark_session, args)
 
-        assert result.count() == 0, (
+        event_names = [r["event_name"] for r in result.collect()]
+        # The null business_context row is dropped by _filter_value_filled, but the
+        # immutable created_at still emits a non-null ev_ts_created on insert.
+        assert "ev_business_context" not in event_names, (
             "Rows with null business_context should be filtered out by _filter_value_filled"
         )
+        assert event_names == ["ev_ts_created"]
 
 
 # ---------------------------------------------------------------------------
@@ -349,7 +375,7 @@ class TestBUHistorySchema:
 
 
 class TestBUHistoryEvents:
-    def test_insert_emits_all_six_tracked_columns(
+    def test_insert_emits_all_tracked_columns(
         self,
         spark_session,
         transactional_bu_df,
@@ -377,10 +403,33 @@ class TestBUHistoryEvents:
             "ev_negotiation_type",
             "ev_operational_context",
             "ev_business_context",
+            "ev_ts_created",
         }
         assert expected.issubset(insert_event_names), (
             f"INSERT should emit all tracked columns. Missing: {expected - insert_event_names}"
         )
+
+    def test_created_at_emits_single_ev_ts_created(
+        self,
+        spark_session,
+        transactional_bu_df,
+        mock_configuration_bu,
+    ):
+        """created_at is immutable, so exactly one ev_ts_created per hub."""
+        job = CoreRegionHistorySparkJob()
+        args = _make_args("business_unit_history")
+
+        with patch(
+            f"{_MODULE}.HistoricalHelper.load_transactional_data",
+            return_value=transactional_bu_df,
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        ts_created_rows = [
+            r for r in result.collect() if r["event_name"] == "ev_ts_created"
+        ]
+        assert len(ts_created_rows) == 1
+        assert ts_created_rows[0]["value"] == "2024-03-01 08:00:00"
 
     def test_update_emits_only_changed_column(
         self,
@@ -407,6 +456,8 @@ class TestBUHistoryEvents:
         assert "ev_hub_name" in update_event_names
         assert "ev_sdr_type" not in update_event_names
         assert "ev_business_context" not in update_event_names
+        # created_at is immutable, so no ev_ts_created event on update
+        assert "ev_ts_created" not in update_event_names
 
     def test_event_type_is_cdc_for_all_rows(
         self,

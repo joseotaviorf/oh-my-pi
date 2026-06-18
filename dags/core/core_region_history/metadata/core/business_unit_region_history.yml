@@ -34,9 +34,11 @@ columns:
   event_name:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_context
+      - datalake_hub_services_transactional.business_unit_region.created_at
     description: Resolved event name for the changed field.
     categories:
       ev_business_context: Change in business_context (SALE or RENT), including association creation and deletion.
+      ev_ts_created: Initial value of created_at (association creation timestamp). Immutable, so emitted once per region-hub pair.
   event_type:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.op_cdc
@@ -44,7 +46,8 @@ columns:
   value:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_context
-    description: New value of the changed column as string (e.g. SALE or RENT).
+      - datalake_hub_services_transactional.business_unit_region.created_at
+    description: New value of the changed column as string (e.g. SALE or RENT). For ev_ts_created, the association creation timestamp.
   payload:
     description: Reserved; null for CDC in this pipeline.
   ts_transaction:

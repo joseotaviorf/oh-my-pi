@@ -31,6 +31,7 @@ columns:
       - datalake_hub_services_transactional.business_unit.negotiation_type
       - datalake_hub_services_transactional.business_unit.operational_context
       - datalake_hub_services_transactional.business_unit.business_context
+      - datalake_hub_services_transactional.business_unit.created_at
     description: Resolved event name (ev_{target_col}) for the changed field.
     categories:
       ev_hub_name: Change in name.
@@ -39,6 +40,7 @@ columns:
       ev_negotiation_type: Change in negotiation_type.
       ev_operational_context: Change in operational_context.
       ev_business_context: Change in business_context.
+      ev_ts_created: Initial value of created_at (hub creation timestamp). Immutable, so emitted once per hub.
   event_type:
     lineage:
       - datalake_hub_services_transactional.business_unit.op_cdc
@@ -51,7 +53,8 @@ columns:
       - datalake_hub_services_transactional.business_unit.negotiation_type
       - datalake_hub_services_transactional.business_unit.operational_context
       - datalake_hub_services_transactional.business_unit.business_context
-    description: New value of the changed column as string.
+      - datalake_hub_services_transactional.business_unit.created_at
+    description: New value of the changed column as string. For ev_ts_created, the hub creation timestamp.
   payload:
     description: Reserved; null for CDC in this pipeline.
   ts_transaction:

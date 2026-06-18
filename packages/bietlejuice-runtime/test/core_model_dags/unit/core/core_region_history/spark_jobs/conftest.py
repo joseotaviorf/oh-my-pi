@@ -20,6 +20,11 @@ BUR_EVENT_CONFIGS = [
         "target_col": "business_context",
         "target_type": "string",
     },
+    {
+        "tracked_col": "created_at",
+        "target_col": "ts_created",
+        "target_type": "timestamp",
+    },
 ]
 
 BU_EVENT_CONFIGS = [
@@ -40,6 +45,11 @@ BU_EVENT_CONFIGS = [
         "tracked_col": "business_context",
         "target_col": "business_context",
         "target_type": "string",
+    },
+    {
+        "tracked_col": "created_at",
+        "target_col": "ts_created",
+        "target_type": "timestamp",
     },
 ]
 
@@ -119,6 +129,7 @@ def transactional_bur_df(spark_session):
             StructField("business_unit_id", StringType(), True),
             StructField("region_id", StringType(), True),
             StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
             StructField("op_cdc", StringType(), True),
             StructField("ts_database_transaction", TimestampType(), True),
             StructField("ts_cdc_transaction", TimestampType(), True),
@@ -130,6 +141,7 @@ def transactional_bur_df(spark_session):
             "20",
             "10",
             "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
             "c",
             datetime(2024, 3, 1, 8, 0, 0),
             datetime(2024, 3, 1, 8, 0, 1),
@@ -139,6 +151,7 @@ def transactional_bur_df(spark_session):
             "20",
             "10",
             "RENT",
+            datetime(2024, 3, 1, 8, 0, 0),
             "u",
             datetime(2024, 3, 5, 10, 0, 0),
             datetime(2024, 3, 5, 10, 0, 1),
@@ -156,6 +169,7 @@ def transactional_bur_null_context_df(spark_session):
             StructField("business_unit_id", StringType(), True),
             StructField("region_id", StringType(), True),
             StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
             StructField("op_cdc", StringType(), True),
             StructField("ts_database_transaction", TimestampType(), True),
             StructField("ts_cdc_transaction", TimestampType(), True),
@@ -167,6 +181,7 @@ def transactional_bur_null_context_df(spark_session):
             "30",
             "10",
             None,
+            datetime(2024, 4, 1, 8, 0, 0),
             "c",
             datetime(2024, 4, 1, 8, 0, 0),
             datetime(2024, 4, 1, 8, 0, 1),
@@ -187,6 +202,7 @@ def transactional_bu_df(spark_session):
             StructField("negotiation_type", StringType(), True),
             StructField("operational_context", StringType(), True),
             StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
             StructField("op_cdc", StringType(), True),
             StructField("ts_database_transaction", TimestampType(), True),
             StructField("ts_cdc_transaction", TimestampType(), True),
@@ -201,6 +217,7 @@ def transactional_bu_df(spark_session):
             "STANDARD",
             "SAO_PAULO",
             "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
             "c",
             datetime(2024, 3, 1, 8, 0, 0),
             datetime(2024, 3, 1, 8, 0, 1),
@@ -213,6 +230,7 @@ def transactional_bu_df(spark_session):
             "STANDARD",
             "SAO_PAULO",
             "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
             "u",
             datetime(2024, 3, 10, 9, 0, 0),
             datetime(2024, 3, 10, 9, 0, 1),

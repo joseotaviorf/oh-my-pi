@@ -26,6 +26,7 @@ column_level_validations:
         - ev_negotiation_type
         - ev_operational_context
         - ev_business_context
+        - ev_ts_created
   event_type:
     is_complete:
       severity_level: Error
