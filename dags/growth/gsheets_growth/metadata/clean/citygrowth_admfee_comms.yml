@@ -3,7 +3,7 @@ database_name: datalake_gsheets_clean
 table_name: citygrowth_admfee_comms
 description: City growth admin fee communications from forms_negociacao_taxas sheet; owner email and email variable content for fee negotiation.
 domain: Growth
-owner: data-growth@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 columns:
   is_send_email:
     lineage:
@@ -11,7 +11,7 @@ columns:
     description: Flag indicating whether to send email to the owner (Sim/Não).
   email_owner:
     lineage:
-      - datalake_gsheets_raw.citygrowth_admfee_comms._email_do_proprietario
+      - datalake_gsheets_raw.citygrowth_admfee_comms.email_do_proprietario
     description: Email address of the property owner (proprietário).
   id_house:
     lineage:
