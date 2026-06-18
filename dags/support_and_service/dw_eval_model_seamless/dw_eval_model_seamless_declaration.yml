@@ -1,0 +1,22 @@
+dag:
+  name: dw_eval_model_seamless
+  schedule_start_date: 2026, 4, 1
+  catchup: false
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Builds DW tables to evaluate seamless model outputs against observed
+      offboarding contact behavior.
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: eval_model_seamless
+  default_extraction_type: full
+  default_partitions: []
+  tables_customization:
+    eval_model_seamless_offboarding:
+      z_order_by: [id_contract, id_request, ts_created, tipo_ticket]
+    eval_model_seamless_offboarding_v3:
+      z_order_by: [id_contract, id_request, ts_created, tipo_ticket]
+

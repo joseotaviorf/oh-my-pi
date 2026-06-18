@@ -67,28 +67,40 @@ pre_tickets AS (
     AND CAST(ft.ts_created AS DATE) >= ADD_MONTHS(CURRENT_DATE(), -6)
 ),
 
--- Salesforce mediation cases as another contact signal (no user key; contract-level).
-salesforce AS (
+salesforce_cases_perspective AS (
   SELECT DISTINCT
-    NULL AS id_user,
-    CAST(case_number AS STRING) AS id_ticket,
-    CAST(c.id_contract AS INT) AS id_contract_ticket,
-    CAST(c.ts_created AS DATE) AS day_ticket_started,
-    CASE WHEN rt.record_type_name IN ('Mediação') AND c.omni_channel_queue NOT IN ('Squad 7 - Mediação') THEN 'mediacao' 
-         WHEN rt.record_type_name IN ('Reagendamento de Vistoria') THEN 'Reagendamento de Vistoria' ELSE NULL END AS tipo_ticket
-  FROM datalake_salesforce_clean.cases AS c
-  INNER JOIN datalake_salesforce_clean.record_types AS rt
-     ON rt.id_record_type = c.id_record_type
-  WHERE c.is_deleted = FALSE
-    AND CAST(c.ts_created AS DATE) >= DATE('2026-04-01')
-    AND CAST(c.ts_created AS DATE) >= ADD_MONTHS(CURRENT_DATE(), -6)
-    AND c.case_status NOT IN ('CANCELED')
+    cp.sk_user AS id_user,
+    CAST(cp.case_number AS STRING) AS id_ticket,
+    COALESCE(CAST(cp.sk_contract AS INT), -1) AS id_contract_ticket,
+    CAST(cp.ts_started AS DATE) AS day_ticket_started,
+    CASE
+      WHEN cp.record_type_name = 'Reagendamento de Vistoria'
+        THEN 'Reagendamento de Vistoria'
+      WHEN cp.last_team LIKE 'Escalados%'
+        THEN 'back escaladado'
+      WHEN cp.record_type_name = 'Mediação'
+        AND cp.last_department <> 'Squad 7 - Mediação'
+        THEN 'mediacao'
+    END AS tipo_ticket
+  FROM dw_bpo_performance.cases_perspective cp
+  WHERE cp.platform = 'SalesForce'
+    AND cp.status NOT IN ('CANCELED')
+    AND CAST(cp.ts_started AS DATE) >= DATE('2026-04-01')
+    AND CAST(cp.ts_started AS DATE) >= ADD_MONTHS(CURRENT_DATE(), -6)
+    AND (
+      cp.record_type_name = 'Reagendamento de Vistoria'
+      OR cp.last_team LIKE 'Escalados%'
+      OR (
+        cp.record_type_name = 'Mediação'
+        AND cp.last_department <> 'Squad 7 - Mediação'
+      )
+    )
 ),
 
 tickets AS (
   SELECT * FROM pre_tickets
   UNION ALL
-  SELECT * FROM salesforce
+  SELECT * FROM salesforce_cases_perspective
 ),
 
 -- Map offboarding users to contracts via enrich rent flows (tenant prospect or owner).

@@ -1,11 +1,10 @@
 ---
-database_name: datalake_eval_model_seamless
-table_name: eval_model_seamless_offboarding
+database_name: dw_eval_model_seamless
+table_name: eval_model_seamless_offboarding_v3
 description: >
-  Enriched dataset for offline evaluation of the seamless offboarding model: SPOC-eligible
-  termination rows with classified support contact (tipo_ticket), joined to
-  users-and-journeys-ml predictions; rows are filtered using per-contract ticket presence
-  without exposing aggregate helper columns.
+  DW dataset for offline evaluation of the seamless offboarding model:
+  one row per SPOC-eligible termination contract with model prediction,
+  ticket classification, and matched support or Salesforce ticket when present.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -13,6 +12,7 @@ columns:
     description: Rental contract identifier from Terminator, aligned with listing contract keys.
     lineage:
       - datalake_terminator_clean.termination.id_contract
+      - dw_rent.dim_contract.id_contract
   id_request:
     description: Model request identifier from the Emlio input JSON payload (users-and-journeys-ml-service).
     lineage:
@@ -47,13 +47,20 @@ columns:
       contract timeline for model evaluation.
     lineage:
       - dw_customer_support.fact_tickets.sk_ticket
-      - datalake_salesforce_clean.cases.case_number
+      - dw_bpo_performance.cases_perspective.case_number
   tipo_ticket:
     description: >
-      Support contact bucket matched to the contract timeline (front, escalated back,
-      exit inspection scheduling, Salesforce mediation); null when no classified match on that row.
+      Support contact bucket matched to the contract timeline: front, escalated
+      back, reinspection scheduling, or mediation; null when no classified match.
     lineage:
-      - datalake_customer_support.tickets.id_ticket
+      - dw_customer_support.fact_tickets.sk_ticket
+      - dw_customer_support.dim_department.department
+      - dw_customer_support.dim_taxonomy.motivation
+      - dw_bpo_performance.cases_perspective.case_number
+      - dw_bpo_performance.cases_perspective.last_team
+      - dw_bpo_performance.cases_perspective.record_type_name
+      - dw_bpo_performance.cases_perspective.status
+      - dw_offboarding.obt_offboarding.has_mediation_ticket
   ts_created:
     description: Termination record creation timestamp in Terminator.
     lineage:
@@ -62,3 +69,4 @@ columns:
     description: Emlio service log timestamp for the model call linked to this termination.
     lineage:
       - datalake_emlio_clean.emlio_logs.ts_log
+

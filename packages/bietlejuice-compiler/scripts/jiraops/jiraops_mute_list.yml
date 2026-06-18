@@ -11,6 +11,7 @@ DAG:
     - bietlejuice.demand_balancer_service
     - bietlejuice.dw_buyer_prospect
     - bietlejuice.dw_collections_landlord
+    - bietlejuice.dw_eval_model_seamless
     - bietlejuice.dw_recon_quintocred_snapshot
     - bietlejuice.dw_support_journey ## New dag
     - bietlejuice.enrich_ai_collections_quintoandar
@@ -21,7 +22,6 @@ DAG:
     - bietlejuice.enrich_crawler_loft
     - bietlejuice.enrich_crawler_olx
     - bietlejuice.enrich_demand_consolidated_targets
-    - bietlejuice.enrich_eval_model_seamless
     - bietlejuice.enrich_expected_contribution_margin
     - bietlejuice.enrich_find_health_metrics
     - bietlejuice.enrich_google_search_console_classified
