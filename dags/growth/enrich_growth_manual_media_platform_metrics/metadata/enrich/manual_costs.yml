@@ -1,9 +1,15 @@
 ---
 database_name: datalake_growth_media_platform
 table_name: manual_costs
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that consolidates costs extract from manual growth marketing input
+description: |
+  Enriched daily manual marketing spend from Google Sheets and historical cost inputs, unified with
+  optional cost-sharing rule allocations at campaign and region grain. Excludes Google, Facebook, and
+  Criteo costs covered by automated platform pipelines; consumed by growth media platform and
+  consolidated marketing metrics. Partitioned by year, month, and day (derived from dt_cost). Always
+  filter on all three partition columns in WHERE clauses to enable partition pruning; align partition
+  filters with the dt_cost date range being analyzed.
 columns:
   bk_sharing_rules:
     description: Business key for sharing rules
@@ -46,12 +52,6 @@ columns:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.account_name
       - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.account_name
       - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.account_name
-  campaign_name:
-    description: Name of campaign segmentation
-    lineage:
-      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
-      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
-      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
@@ -71,7 +71,7 @@ columns:
       - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.utm_content
       - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_content
   campaign_business_context:
-    description: Business context of the campaign
+    description: QuintoAndar product line or operating segment targeted by the marketing campaign, such as rentals or for-sale listings
     lineage:
       - datalake_growth_costs.historical_marketing_manual_costs.campaign_business_context
       - datalake_gsheets_clean.marketing_manual_costs.campaign_business_context
@@ -129,28 +129,28 @@ columns:
       - datalake_growth_costs.historical_marketing_manual_costs_name_convention.clicks
       - datalake_gsheets_clean.marketing_manual_costs_name_convention.clicks
   dt_cost:
-    description: Date associated with the campaign cost
+    description: Calendar date of the manual marketing spend record; source for year, month, and day partition columns.
     lineage:
       - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs.dt_cost
       - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
   year:
-    description: Extracted year from the campaign cost date
+    description: Table partition column (year). Derived from dt_cost at enrich load. Required in WHERE clauses for partition pruning — always combine with month and day to restrict scans to the smallest date window needed.
     lineage:
       - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs.dt_cost
       - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
   month:
-    description: Extracted month from the campaign cost date
+    description: Table partition column (month, 1–12). Derived from dt_cost at enrich load. Must be filtered together with year and day in every query to enable partition pruning; omitting any partition column disables pruning.
     lineage:
       - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs.dt_cost
       - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
   day:
-    description: Extracted day from the campaign cost date
+    description: Table partition column (day, 1–31). Derived from dt_cost at enrich load. Always filter with year and month to narrow the scan to specific days; e.g. WHERE year = 2025 AND month = 1 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
       - datalake_gsheets_clean.marketing_manual_costs.dt_cost
