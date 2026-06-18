@@ -39,6 +39,7 @@ class BaseTaskCreator(ABC):
         job_parameters: list,
         spark_job_prefix: str = None,
         execution_timeout_hours: int = _DEFAULT_EXECUTION_TIMEOUT_HOURS,
+        python_interpreter_path: str = None,
     ) -> BaseOperator:
         """
         Returns a task that runs a Spark Job in the base spark jobs path, with the given name, task id, and parameters.
@@ -48,6 +49,9 @@ class BaseTaskCreator(ABC):
         task_id: The task id.
         job_parameters: The parameters to be passed to the Spark Job.
         spark_job_prefix: If provided, it will replace /base/ in the path of the Spark Job.
+        python_interpreter_path: On EMR, run this step on the given Python interpreter
+            (sets ``spark.pyspark.[driver.]python``) instead of the default EMR Python.
+            Ignored on Databricks.
         """
         spark_job_directory = self.dag_execution_context.base_spark_jobs_path
         if spark_job_prefix is not None:
@@ -67,6 +71,7 @@ class BaseTaskCreator(ABC):
             task_id=task_id,
             job_parameters=job_parameters,
             execution_timeout_hours=execution_timeout_hours,
+            python_interpreter_path=python_interpreter_path,
         )
 
     @classmethod
