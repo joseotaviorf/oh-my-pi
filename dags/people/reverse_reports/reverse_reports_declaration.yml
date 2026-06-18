@@ -42,7 +42,6 @@ workflow:
         - "16VHUJRdYCXrwbVouHGQvcAwmyAK_ySPNnkhfFE6m904"
         - "salary_tables"
     jobs:
-      # column_mapping_mode name: legacy compensation sheet headers are Portuguese (banda, familia_cargo, trilha, etc.).
       column_mapping_mode: name
       extra_spark_job_arguments:
         - "16VHUJRdYCXrwbVouHGQvcAwmyAK_ySPNnkhfFE6m904"
@@ -64,6 +63,21 @@ workflow:
       extra_spark_job_arguments:
         - "1_yTiwS3IhdOO9wn7yP4sGfRAAoYhZSHxZhszFYH0zx4"
         - "OrgUnitClassification"
+
+    # --- Vacation and absence ---
+    # Use context: Vacation-balance panorama for active MLSP / GRPQA (BR QuintoAndar) employees. Replaces the legacy Oracle BI vacation-due report.
+    # Business Owner: isabela.silva@quintoandar.com.br
+    vacation_balances:
+      extra_spark_job_arguments:
+        - "1Y_EvoW6IG3uHpfvDp2Ur8ikwJk8qNtX978iNK_XVzFs"
+        - "Painel Geral"
+    # Use context: Approved vacation and intern-recess schedules (past and future) for active MLSP / GRPQA employees. Replaces the legacy Oracle BI vacation-and-leave report.
+    # Business Owner: isabela.silva@quintoandar.com.br
+    # Governance: docs/vacation_schedules.md
+    vacation_schedules:
+      extra_spark_job_arguments:
+        - "1Y_EvoW6IG3uHpfvDp2Ur8ikwJk8qNtX978iNK_XVzFs"
+        - "Agendamentos"
 
     # --- Data People (Forno) ---
     column_mapping_delta_test_pin:

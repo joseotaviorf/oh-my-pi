@@ -6,7 +6,11 @@ absence_entries_ranked AS (
         pe.id_absence_type,
         pe.dt_started,
         pe.dt_ended,
+        pe.dt_period_started,
+        pe.dt_period_ended,
         pe.days_duration,
+        CAST(pe.vacation_cash_out_request AS INT) AS days_cash_out_requested,
+        pe.advance_13th_salary,
         pe.approval_status_code,
         pe.absence_status_code,
         ROW_NUMBER() OVER (
@@ -25,7 +29,11 @@ absence_entries AS (
         id_absence_type,
         dt_started,
         dt_ended,
+        dt_period_started,
+        dt_period_ended,
         days_duration,
+        days_cash_out_requested,
+        advance_13th_salary,
         approval_status_code,
         absence_status_code
     FROM
@@ -40,7 +48,11 @@ base_ranked AS (
         ae.id_absence_type,
         ae.dt_started,
         ae.dt_ended,
+        ae.dt_period_started,
+        ae.dt_period_ended,
         ae.days_duration,
+        ae.days_cash_out_requested,
+        ae.advance_13th_salary,
         ae.approval_status_code,
         ae.absence_status_code,
         im.id_assignment,
@@ -66,7 +78,11 @@ base AS (
         id_absence_type,
         dt_started,
         dt_ended,
+        dt_period_started,
+        dt_period_ended,
         days_duration,
+        days_cash_out_requested,
+        advance_13th_salary,
         approval_status_code,
         absence_status_code,
         id_assignment,
@@ -87,6 +103,7 @@ SELECT
     b.person_number,
     b.assignment_number,
     b.days_duration AS days_requested,
+    b.days_cash_out_requested,
     b.approval_status_code = 'APPROVED'
         AND b.absence_status_code <> 'ORA_WITHDRAWN' AS is_approved,
     b.absence_status_code = 'ORA_WITHDRAWN' AS is_withdrawn,
@@ -94,8 +111,15 @@ SELECT
     b.approval_status_code = 'APPROVED'
         AND b.absence_status_code <> 'ORA_WITHDRAWN'
         AND b.dt_started <= CURRENT_DATE() AS is_effective,
+    CASE
+        WHEN b.advance_13th_salary IN ('S', 'Y') THEN TRUE
+        WHEN b.advance_13th_salary = 'N' THEN FALSE
+        ELSE NULL
+    END AS is_13th_salary_advance,
     b.dt_started AS dt_absence_started,
     b.dt_ended AS dt_absence_ended,
+    b.dt_period_started AS dt_acquisitive_period_started,
+    b.dt_period_ended AS dt_acquisitive_period_ended,
     NOW() AS ts_load
 FROM
     base AS b

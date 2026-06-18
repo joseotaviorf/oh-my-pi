@@ -4765,6 +4765,9 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-job:first-run-of-day
   - bietlejuice.dw_people:load-dw-people-fact-employees:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-fact-vacation-balances:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-codex-pin-sync-drift:first-run-of-day
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day

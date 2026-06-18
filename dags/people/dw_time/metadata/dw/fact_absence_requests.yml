@@ -43,6 +43,10 @@ columns:
     description: Number of days the employee requested for the absence.
     lineage:
       - datalake_pin_absence_clean.person_entry.days_duration
+  days_cash_out_requested:
+    description: Vacation cash-out days requested (abono pecuniário) for vacation requests; sold-back vacation days. Null/zero for non-vacation or no cash-out.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   is_approved:
     description: TRUE when the manager approved the request. FALSE if denied, pending, or withdrawn.
     lineage:
@@ -62,6 +66,10 @@ columns:
       - datalake_pin_absence_clean.person_entry.approval_status_code
       - datalake_pin_absence_clean.person_entry.absence_status_code
       - datalake_pin_absence_clean.person_entry.dt_started
+  is_13th_salary_advance:
+    description: TRUE when the employee requested the 13th-salary advance (adiantamento do 13º) with the vacation; FALSE when declined; null when not applicable.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.advance_13th_salary
   dt_absence_started:
     description: Date when the employee requested the absence to start.
     lineage:
@@ -70,5 +78,13 @@ columns:
     description: Date when the employee requested the absence to end.
     lineage:
       - datalake_pin_absence_clean.person_entry.dt_ended
+  dt_acquisitive_period_started:
+    description: Start date of the vacation acquisitive period (período aquisitivo) the request draws from; parsed from the source period attribute.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.dt_period_started
+  dt_acquisitive_period_ended:
+    description: End date of the vacation acquisitive period (período aquisitivo) the request draws from; parsed from the source period attribute.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.dt_period_ended
   ts_load:
     description: When this record was last loaded into the data warehouse.
