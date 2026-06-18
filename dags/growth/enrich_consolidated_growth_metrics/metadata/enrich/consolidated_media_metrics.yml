@@ -1,13 +1,25 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: consolidated_media_metrics
-owner: cristina.cardoso@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that union costs extract from growth marketing platforms
+description: |
+  Enrich layer unifying paid media costs and performance metrics across seven marketing platforms
+  (Google, Facebook, Criteo, RTB, Mitula, Trovit, Braze). Grain is one row per calendar day
+  (id_date), origin, account, campaign, and UTM dimensions after cost-sharing rules, city_group
+  mapping, and campaign taxonomy enrichment. Built from the seven platform consolidated tables in
+  this DAG. Consumed by daily_costs and top_of_funnel_supply pipelines. Physically partitioned by
+  id_date (integer YYYYMMDD, default_partitions in enrich_consolidated_growth_metrics DAG); no
+  Z-ORDER is configured. Always filter id_date in WHERE clauses for partition pruning.
 columns:
   id_date:
-    description: Date segmentation
+    description: |
+      Table partition column (integer calendar date, YYYYMMDD). Propagated from each platform
+      consolidated table. Required in WHERE clauses for partition pruning — restrict to the
+      smallest date window needed. Example: WHERE id_date BETWEEN 20260101 AND 20260131. Queries
+      without id_date filters will scan the entire table.
     lineage:
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.id_date
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.id_date
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.id_date
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.id_date
@@ -15,10 +27,33 @@ columns:
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.id_date
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.id_date
   origin:
-    description: Marketing platform where data were extracted from
-  account_name:
-    description: Account name segmentation
+    description: |
+      Marketing platform identifier for the consolidated row. Set per source table in the UNION ALL
+      (google, facebook, criteo, rtb, mitula, trovit, braze).
+    categories:
+      google: Google Ads
+      facebook: Facebook Ads
+      criteo: Criteo
+      rtb: RTB House
+      mitula: Mitula (Lifull)
+      trovit: Trovit (Lifull)
+      braze: Braze referral notifications
+  business_context:
+    description: |
+      QuintoAndar product line (rent or sale) assigned by the cost-sharing rule matched on
+      id_rule (first segment of campaign_name) and id_date. UTM-modified rules
+      (utm_campaign_modified) take precedence over standard rules when present.
     lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.business_context
+    categories:
+      rent: Rental (for-rent) business line
+      sale: For-sale business line
+  account_name:
+    description: |
+      Account or advertiser name from the source platform consolidated table (e.g. Google Ads
+      account_snake_case, Facebook account_name_snake_case, indica_ai_notification for Braze).
+    lineage:
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.account_name
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.account_name
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.account_name
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.account_name
@@ -26,8 +61,12 @@ columns:
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.account_name
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.account_name
   campaign_name:
-    description: Name of campaign segmentation
+    description: |
+      Campaign identifier from the source platform. Used as the join key to sharing rules via the
+      first dot-separated segment (id_rule) and to derive campaign_origin_acquisition and
+      campaign_name_convention_media_setup.
     lineage:
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.campaign_name
@@ -35,18 +74,39 @@ columns:
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
   country_code:
-    description: Country code the campaign belongs to.
+    description: ISO country code for the campaign market (BR or MX).
     lineage:
-      - datalake_consolidated_growth_metrics.braze_consolidated_metrics
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.country_code
-  campaign_origin_acquisition:
-    description: mkt_origin which marketing campaign was intent to destiate effort
+    categories:
+      BR: Brazil
+      MX: Mexico
+  campaign_name_convention_media_setup:
+    description: |
+      Standardized campaign naming convention for media setup taxonomy. Resolved from
+      cost_taxonomy_translation_dictionary when a match exists on account_name, campaign_name,
+      report_type, ad_type, and origin; otherwise parsed from dot-separated campaign_name
+      segments (positions 2–7 joined by dot).
     lineage:
+      - datalake_gsheets_clean.cost_taxonomy_translation_dictionary.campaign_name_convention
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
+  campaign_origin_acquisition:
+    description: |
+      Marketing acquisition origin inferred from campaign_name keyword patterns. Used to classify
+      spend directed at Calculator, New Channels, Agents, Doorman, or other acquisition programs.
+    lineage:
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.campaign_name
@@ -54,36 +114,48 @@ columns:
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
     categories:
-      Agents: ''
-      New Channels: ''
-      Other: ''
-      Doorman: ''
+      Calculator: Campaign name contains calc (mortgage calculator acquisition)
+      New Channels: Campaign name contains newchannel
+      Agents: Campaign name contains agents (real estate agent acquisition)
+      Doorman: Campaign name contains doorman (porteiro program)
+      Other: No matching acquisition keyword pattern
   city_group:
-    description: City group segmentation
+    description: |
+      QuintoAndar geographic market cluster for cost allocation. For Braze, taken directly from
+      braze_consolidated_metrics.city_group. For other platforms, resolved in priority order from
+      city_group_old_campaigns_historic, UTM-modified sharing rule, standard sharing rule, region
+      lookup on id_rule, or Not Mapped when no match exists.
     lineage:
-      - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.city_group
+      - datalake_consolidated_marketing_costs.city_group_old_campaigns_historic.city_group
+      - datalake_growth_costs_sharing_rules.sharing_rules.city_group
       - datalake_region.region.city_group
   report_type:
-    description: Type of report extracted from google ads platform
+    description: |
+      Google Ads report type for the consolidated row. Populated only for origin = google
+      (KEYWORDS, AD, CAMPAIGN, or VIDEO performance reports); null for all other platforms.
     lineage:
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.report_type
     categories:
-      VIDEO_PERFORMANCE_REPORT: ''
-      CAMPAIGN_PERFORMANCE_REPORT: ''
-      AD_PERFORMANCE_REPORT: ''
-      KEYWORDS_PERFORMANCE_REPORT: ''
+      VIDEO_PERFORMANCE_REPORT: Google Ads video performance report
+      CAMPAIGN_PERFORMANCE_REPORT: Google Ads campaign-level performance report
+      AD_PERFORMANCE_REPORT: Google Ads ad-level performance report
+      KEYWORDS_PERFORMANCE_REPORT: Google Ads keywords performance report
   ad_type:
-    description: Type of ad report extracted from google ads platform. For other platforms, ad_type = other
+    description: |
+      Google Ads ad type classification from ad_type_flags mapping. Populated only for
+      origin = google; null for all other platforms.
     lineage:
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.ad_type
     categories:
-      display_ad: ''
-      other: ''
-      dsa_ad: ''
-      resp_search_ad: ''
-      exp_text_ad: ''
+      display_ad: Display ad format
+      other: Unmapped or non-standard ad type
+      dsa_ad: Dynamic search ad
+      resp_search_ad: Responsive search ad
+      exp_text_ad: Expanded text ad
   utm_campaign:
-    description: utm_campaign applied on growth marketing platform
+    description: |
+      UTM campaign parameter from the source platform. Null for Braze notification costs.
     lineage:
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.utm_campaign
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.utm_campaign
@@ -92,59 +164,77 @@ columns:
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.utm_campaign
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.utm_campaign
   utm_term:
-    description: utm_term applied on growth marketing platform
+    description: |
+      UTM term parameter from the source platform. Populated for Google (ad group or keyword) and
+      Facebook (ad set name); null for other platforms.
     lineage:
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.utm_term
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.utm_term
   utm_content:
-    description: utm_content applied on growth marketing platform
+    description: |
+      UTM content parameter from the source platform. Populated for Google (ad id) and Facebook
+      (ad name); null for other platforms.
     lineage:
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.utm_content
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.utm_content
   desktop_cost:
-    description: Cost spent on desktop plataform
+    description: |
+      Desktop advertising spend in BRL after applying the cost-sharing rule share factor
+      (COALESCE sr_utm.share, sr.share, 1). Zero for Criteo, RTB, and Braze.
     lineage:
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.desktop_cost
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.desktop_cost
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.desktop_cost
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.desktop_cost
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
   mobile_cost:
-    description: Cost spent on mobile plataform
+    description: |
+      Mobile advertising spend in BRL after applying the cost-sharing rule share factor
+      (COALESCE sr_utm.share, sr.share, 1). Zero for Criteo, RTB, and Braze.
     lineage:
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.mobile_cost
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.mobile_cost
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.mobile_cost
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.mobile_cost
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
   other_cost:
-    description: Cost from any platform different from desktop or mobile
+    description: |
+      Non-desktop/non-mobile advertising spend in BRL after applying the cost-sharing rule share
+      factor. Primary cost column for Criteo and RTB; also includes Facebook and Google other
+      devices. Zero for Braze.
     lineage:
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.other_cost
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.other_cost
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.other_cost
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.other_cost
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
   total_cost:
-    description: Total cost
+    description: |
+      Total advertising spend in BRL across all devices after applying the cost-sharing rule share
+      factor. For Braze, mapped from braze_consolidated_metrics.cost (notification unit costs).
     lineage:
+      - datalake_consolidated_growth_metrics.braze_consolidated_metrics.cost
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.total_cost
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.total_cost
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.total_cost
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.total_cost
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.total_cost
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.total_cost
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
   impressions:
-    description: Impressions from growth marketing platform
+    description: |
+      Ad impressions after applying the cost-sharing rule share factor. Zero for Mitula, Trovit,
+      and Braze (not reported by those platforms).
     lineage:
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.impressions
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.impressions
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.impressions
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.impressions
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
   clicks:
-    description: Clicks from growth marketing platform
+    description: |
+      Ad clicks after applying the cost-sharing rule share factor. Zero for Braze (notification
+      costs only, no click tracking in this pipeline).
     lineage:
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.clicks
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.clicks
@@ -152,13 +242,4 @@ columns:
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.clicks
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.clicks
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.clicks
-      - datalake_marketing_costs_sharing_rules.sharing_rules.share
-  business_context:
-    description: To which business context (Rent or Sale) the metrics belongs to.
-    lineage:
-      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.business_context
-      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.business_context
-      - datalake_consolidated_growth_metrics.google_consolidated_metrics.business_context
-      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.business_context
-      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.business_context
-      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.business_context
+      - datalake_growth_costs_sharing_rules.sharing_rules.share

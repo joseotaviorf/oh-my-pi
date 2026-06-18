@@ -1,63 +1,120 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: braze_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that consolidates metrics extracted from braze platform
+description: |
+  Enrich layer estimating Braze referral notification costs (Indica Aí, Doorman) from webhook
+  delivery volumes. Grain is one row per calendar day (id_date), notification campaign, channel
+  (SMS/WhatsApp), context, and city_group after cost-sharing rules. Unit costs are applied to
+  notification_count from datalake_braze_webhook_notification.webhook_notification_volumes.
+  Consumed by consolidated_media_metrics. Physically partitioned by id_date (integer YYYYMMDD,
+  default_partitions in enrich_consolidated_growth_metrics DAG); no Z-ORDER is configured. Always
+  filter id_date in WHERE clauses for partition pruning.
 columns:
   id_date:
-    description: Date segmentation
+    description: |
+      Table partition column (integer calendar date, YYYYMMDD). Derived from dt_webhook_sent.
+      Required in WHERE clauses for partition pruning — restrict to the smallest date window
+      needed. Example: WHERE id_date BETWEEN 20260101 AND 20260131. Queries without id_date
+      filters will scan the entire table.
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.dt_webhook_sent
+  origin:
+    description: Marketing platform identifier. Always braze for this table.
+    categories:
+      braze: Braze customer engagement platform
+  account_name:
+    description: |
+      Fixed account label for all Braze referral notification costs in this pipeline. Always
+      indica_ai_notification, grouping Indica Aí and Doorman webhook volumes under a single
+      account for downstream consolidated_media_metrics joins.
   campaign_name:
-    description: Name of campaign segmentation
+    description: |
+      Synthetic campaign key combining marketing vertical and delivery channel
+      (e.g. ia_notification_acq_SMS, ia_notification_eng_Whatsapp). Vertical is acq when
+      canvas_name starts with acq, otherwise eng. For major city_groups, the name is suffixed
+      with business_context (_rent or _sale) to reflect the 50/50 rent/sale cost split.
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.canvas_name
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
+      - datalake_marketing_costs_sharing_rules.a028a.business_context
+      - datalake_marketing_costs_sharing_rules.a034a.business_context
+      - datalake_marketing_costs_sharing_rules.a033a.business_context
   country_code:
-    description: Country code the campaign belongs to.
+    description: ISO country code for the notification market (BR or MX).
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.country_code
-  ia_general:
-    description: Informs the type of notification.
-    lineage:
-      - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
     categories:
-      SMS: 'SMS notification'
-      Whatsapp: 'Whatsapp notification'
-  context:
-    description: Supply operation channel belloging to Referals origin
-    lineage:
-      - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
-    categories:
-      Indica Aí - General: ''
-      Doorman: ''
-      Indica Aí - Agents: ''
-  city_group:
-    description: City group segmentation
-    lineage:
-      - datalake_marketing_costs_sharing_rules.a028a.city_group
-  cost:
-    description: Segmented
-    lineage:
-      - datalake_braze_webhook_notification.webhook_notification_volumes.notification_count
-  funnel_side:
-    description: Informs the side of the funnel, in this case, the affiliates side.
+      BR: Brazil
+      MX: Mexico
   business_context:
-    description: Business context.
+    description: |
+      QuintoAndar product line (rent or sale) assigned by the cost-sharing rule matching the
+      referral context. Sourced from a028a (Indica Aí General), a034a (Indica Aí Agents), or
+      a033a (Doorman) on id_date.
     lineage:
       - datalake_marketing_costs_sharing_rules.a028a.business_context
       - datalake_marketing_costs_sharing_rules.a034a.business_context
       - datalake_marketing_costs_sharing_rules.a033a.business_context
-  origin:
-    description: Growth marketing platform
     categories:
-      braze: ''
-  account_name:
-    description: Accont name at braze platform
+      rent: Rental (for-rent) business line
+      sale: For-sale business line
+  ia_general:
+    description: |
+      Notification delivery channel derived from rule_status. Determines the unit cost applied
+      to notification_count (SMS vs WhatsApp).
+    lineage:
+      - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
+    categories:
+      SMS: SMS delivery via SupplyAffiliateSms rule
+      Whatsapp: WhatsApp delivery via SupplyAffiliateGenericMessage or SupplyDoormanNews rule
+  context:
+    description: |
+      Referral program segment derived from canvas_name. Identifies whether the cost belongs to
+      the general Indica Aí supply affiliate program, the agent referral program, or the
+      Doorman (porteiro) program. Drives which cost-sharing rule is applied (a028a, a034a, or
+      a033a).
+    lineage:
+      - datalake_braze_webhook_notification.webhook_notification_volumes.canvas_name
+    categories:
+      Indica Aí - General: General supply affiliate referral notifications (Indica Aí)
+      Doorman: Doorman (porteiro) referral program notifications
+      Indica Aí - Agents: Real estate agent referral program notifications
+  city_group:
+    description: |
+      QuintoAndar geographic market cluster for cost allocation, sourced from the matching
+      sharing rule (a028a, a034a, or a033a). Defaults to Not Mapped when no rule match exists.
+    lineage:
+      - datalake_marketing_costs_sharing_rules.a028a.city_group
+      - datalake_marketing_costs_sharing_rules.a034a.city_group
+      - datalake_marketing_costs_sharing_rules.a033a.city_group
+  funnel_side:
+    description: |
+      Marketplace funnel side for the notification cost. Always affiliates, reflecting
+      supply-side referral programs (Indica Aí and Doorman).
+    categories:
+      affiliates: Supply-side affiliate referral funnel
   utm_campaign:
-    description: utm_campaign applied on growth marketing platform
+    description: |
+      UTM campaign parameter. Not applicable for Braze webhook notification costs; always null
+      in this table.
   utm_term:
-    description: utm_term applied on growth marketing platform
+    description: |
+      UTM term parameter. Not applicable for Braze webhook notification costs; always null
+      in this table.
   utm_content:
-    description: utm_content applied on growth marketing platform
+    description: |
+      UTM content parameter. Not applicable for Braze webhook notification costs; always null
+      in this table.
+  cost:
+    description: |
+      Estimated notification cost in BRL for the reporting date. Computed as notification_count
+      multiplied by the channel unit rate (SMS 0.046; WhatsApp 0.007 × 5.4), then scaled by
+      the sharing rule share factor. Halved (× 0.5) for major city_groups subject to the
+      rent/sale business_context split.
+    lineage:
+      - datalake_braze_webhook_notification.webhook_notification_volumes.notification_count
+      - datalake_marketing_costs_sharing_rules.a028a.share
+      - datalake_marketing_costs_sharing_rules.a034a.share
+      - datalake_marketing_costs_sharing_rules.a033a.share

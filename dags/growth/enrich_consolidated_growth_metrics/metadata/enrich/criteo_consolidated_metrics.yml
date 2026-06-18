@@ -1,12 +1,22 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: criteo_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that consolidates metrics extracted from criteo ads platform
+description: |
+  Enrich layer consolidating Criteo campaign performance and spend. Grain is one row per calendar
+  day (id_date) and campaign from datalake_criteo_campaigns_clean.criteo_campaigns. All spend is
+  mapped to other_cost and total_cost (Criteo does not split by device). Consumed by
+  consolidated_media_metrics. Physically partitioned by id_date (integer YYYYMMDD,
+  default_partitions in enrich_consolidated_growth_metrics DAG); no Z-ORDER is configured. Always
+  filter id_date in WHERE clauses for partition pruning.
 columns:
   id_date:
-    description: Date segmentation
+    description: |
+      Table partition column (integer calendar date, YYYYMMDD). Derived from dt_attribution.
+      Required in WHERE clauses for partition pruning — restrict to the smallest date window
+      needed. Example: WHERE id_date BETWEEN 20260101 AND 20260131. Queries without id_date
+      filters will scan the entire table. Joins with dim_date.sk_date.
     lineage:
       - datalake_criteo_campaigns_clean.criteo_campaigns.dt_attribution
   campaign_name:
@@ -18,9 +28,12 @@ columns:
     lineage:
       - datalake_criteo_campaigns_clean.criteo_campaigns.advertiser_name
   country_code:
-    description: Country code the campaign belongs to.
+    description: ISO country code for the campaign market (BR or MX).
     lineage:
       - datalake_criteo_campaigns_clean.criteo_campaigns.country_code
+    categories:
+      BR: Brazil
+      MX: Mexico
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
@@ -30,7 +43,7 @@ columns:
     lineage:
       - datalake_criteo_campaigns_clean.criteo_campaigns.cost
   total_cost:
-    description: Total cost
+    description: Sum of advertising spend in BRL across all devices for the reporting date
     lineage:
       - datalake_criteo_campaigns_clean.criteo_campaigns.cost
   clicks:

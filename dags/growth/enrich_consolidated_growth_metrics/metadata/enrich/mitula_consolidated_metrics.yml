@@ -1,9 +1,15 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: mitula_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that consolidates metrics extracted from mitula platform
+description: |
+  Enrich layer consolidating Mitula (Lifull) campaign spend and clicks. Grain is one row per
+  calendar day (id_date) and campaign from datalake_lifull_campaigns_clean.mitula_campaigns. Costs
+  are split into desktop and mobile; impressions are not available for this platform. Consumed by
+  consolidated_media_metrics. Physically partitioned by id_date (integer YYYYMMDD,
+  default_partitions in enrich_consolidated_growth_metrics DAG); no Z-ORDER is configured. Always
+  filter id_date in WHERE clauses for partition pruning.
 columns:
   campaign_name:
     description: Name of campaign segmentation
@@ -14,9 +20,12 @@ columns:
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.account_name
   country_code:
-    description: Country code the account belongs to.
+    description: ISO country code for the campaign market (BR or MX).
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.country_code
+    categories:
+      BR: Brazil
+      MX: Mexico
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
@@ -30,7 +39,7 @@ columns:
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.mobile_cost
   total_cost:
-    description: Total cost
+    description: Sum of advertising spend in BRL across all devices for the reporting date
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.total_cost
   clicks:
@@ -38,4 +47,8 @@ columns:
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.clicks
   id_date:
-    description: Date segmentation
+    description: |
+      Table partition column (integer calendar date, YYYYMMDD). Derived from dt_attribution.
+      Required in WHERE clauses for partition pruning — restrict to the smallest date window
+      needed. Example: WHERE id_date BETWEEN 20260101 AND 20260131. Queries without id_date
+      filters will scan the entire table. Joins with dim_date.sk_date.

@@ -264,10 +264,78 @@ videos_metrics AS (
         1,2,3,4,5,6,7,8,9
 )
 
-SELECT * FROM keywords_metrics
+SELECT
+    id_date,
+    campaign_name,
+    account_name,
+    country_code,
+    report_type,
+    ad_type,
+    utm_term,
+    utm_content,
+    utm_campaign,
+    desktop_cost,
+    mobile_cost,
+    other_cost,
+    total_cost,
+    impressions,
+    clicks,
+    conversions
+FROM keywords_metrics
 UNION ALL
-SELECT * FROM ads_metrics
+SELECT
+    id_date,
+    campaign_name,
+    account_name,
+    country_code,
+    report_type,
+    ad_type,
+    utm_term,
+    utm_content,
+    utm_campaign,
+    desktop_cost,
+    mobile_cost,
+    other_cost,
+    total_cost,
+    impressions,
+    clicks,
+    conversions
+FROM ads_metrics
 UNION ALL
-SELECT * FROM campaigns_metrics
+SELECT
+    id_date,
+    campaign_name,
+    account_name,
+    country_code,
+    report_type,
+    ad_type,
+    utm_term,
+    utm_content,
+    utm_campaign,
+    desktop_cost,
+    mobile_cost,
+    other_cost,
+    total_cost,
+    impressions,
+    clicks,
+    conversions
+FROM campaigns_metrics
 UNION ALL
-SELECT * FROM videos_metrics
+SELECT
+    id_date,
+    campaign_name,
+    account_name,
+    country_code,
+    report_type,
+    ad_type,
+    utm_term,
+    utm_content,
+    utm_campaign,
+    desktop_cost,
+    mobile_cost,
+    other_cost,
+    total_cost,
+    impressions,
+    clicks,
+    conversions
+FROM videos_metrics

@@ -1,12 +1,23 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: facebook_consolidated_metrics
-owner: 'henrique.paulo@quintoandar.com.br'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that consolidates metrics extracted from facebook ads platform
+description: |
+  Enrich layer consolidating Facebook Ads spend and performance with device breakdown. Grain is
+  one row per calendar day (id_date), campaign, account, ad set (utm_term), and ad (utm_content),
+  aggregated from datalake_growth_facebook_insights.facebook_insights_impression_device. Costs are
+  split into desktop, mobile, and other by impression_device. Consumed by consolidated_media_metrics.
+  Physically partitioned by id_date (integer YYYYMMDD, default_partitions in
+  enrich_consolidated_growth_metrics DAG); no Z-ORDER is configured. Always filter id_date in WHERE
+  clauses for partition pruning.
 columns:
   id_date:
-    description: Date segmentation
+    description: |
+      Table partition column (integer calendar date, YYYYMMDD). Derived from year, month, and day
+      of facebook_insights_impression_device. Required in WHERE clauses for partition pruning —
+      restrict to the smallest date window needed. Example: WHERE id_date BETWEEN 20260101 AND
+      20260131. Queries without id_date filters will scan the entire table. Joins with dim_date.sk_date.
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_impression_device.day
       - datalake_growth_facebook_insights.facebook_insights_impression_device.month
@@ -20,9 +31,12 @@ columns:
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_impression_device.account_name_snake_case
   country_code:
-    description: Country code the account belongs to.
+    description: ISO country code for the campaign market (BR or MX).
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_impression_device.country_code
+    categories:
+      BR: Brazil
+      MX: Mexico
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
@@ -42,7 +56,7 @@ columns:
   other_cost:
     description: Cost from any platform different from desktop or mobile
   total_cost:
-    description: Total cost
+    description: Sum of advertising spend in BRL across all devices for the reporting date
   impressions:
     description: Impressions from facebook ads platform
   clicks:

@@ -1,12 +1,23 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: google_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that consolidates metrics extracted from google ads platform
+description: |
+  Enrich layer consolidating Google Ads performance across report types (keywords, ads, campaigns,
+  videos). Grain is one row per calendar day (id_date), campaign, report_type, ad_type, and UTM
+  dimensions. Report type is resolved via a mapping logic that picks the most granular available
+  report per campaign from datalake_google_ads_clean performance tables. Costs are split by device
+  (desktop, mobile, other). Consumed by consolidated_media_metrics. Physically partitioned by
+  id_date (integer YYYYMMDD, default_partitions in enrich_consolidated_growth_metrics DAG); no
+  Z-ORDER is configured. Always filter id_date in WHERE clauses for partition pruning.
 columns:
   id_date:
-    description: Date segmentation
+    description: |
+      Table partition column (integer calendar date, YYYYMMDD). Derived from dt_loaded across
+      Google Ads performance reports. Required in WHERE clauses for partition pruning — restrict
+      to the smallest date window needed. Example: WHERE id_date BETWEEN 20260101 AND 20260131.
+      Queries without id_date filters will scan the entire table. Joins with dim_date.sk_date.
     lineage:
       - datalake_google_ads_clean.ads_performance.dt_loaded
       - datalake_google_ads_clean.campaigns_performance.dt_loaded
@@ -27,12 +38,15 @@ columns:
       - datalake_google_ads_clean.keywords_performance.account_descriptive_name
       - datalake_google_ads_clean.videos_performance.account_descriptive_name
   country_code:
-    description: Country code the account belongs to.
+    description: ISO country code for the campaign market (BR or MX).
     lineage:
       - datalake_google_ads_clean.ads_performance.country_code
       - datalake_google_ads_clean.campaigns_performance.country_code
       - datalake_google_ads_clean.keywords_performance.country_code
       - datalake_google_ads_clean.videos_performance.country_code
+    categories:
+      BR: Brazil
+      MX: Mexico
   report_type:
     description: Type of report extracted from google ads platform
     lineage:
@@ -91,7 +105,7 @@ columns:
       - datalake_google_ads_clean.keywords_performance.cost
       - datalake_google_ads_clean.videos_performance.cost
   total_cost:
-    description: Total cost
+    description: Sum of advertising spend in BRL across all devices for the reporting date
     lineage:
       - datalake_google_ads_clean.ads_performance.cost
       - datalake_google_ads_clean.campaigns_performance.cost
