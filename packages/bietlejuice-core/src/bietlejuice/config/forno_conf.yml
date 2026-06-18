@@ -2843,6 +2843,8 @@ wonka_cluster_emr:
           args: []
     spark_conf:
         <<: *emr_cluster_spark_conf_anchor
+        spark.pyspark.driver.python: /home/hadoop/venv/bin/python
+        spark.pyspark.python: /home/hadoop/venv/bin/python
         spark.jars.packages: "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.kafka:kafka-clients:3.5.1"
     spark_env_vars:
         PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"

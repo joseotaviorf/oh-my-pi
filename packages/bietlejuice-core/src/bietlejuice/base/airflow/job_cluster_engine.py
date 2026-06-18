@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import Any, Dict, List, Optional, Sequence
@@ -75,11 +74,7 @@ class JobClusterEngine(ABC):
         task_id: str,
         job_parameters: List[Any],
         execution_timeout_hours: int,
-        python_interpreter_path: Optional[str] = None,
     ) -> BaseOperator:
-        """``python_interpreter_path`` runs the step on the given Python
-        interpreter on EMR (sets ``spark.pyspark.[driver.]python``); ignored on
-        Databricks, where the interpreter is cluster-level."""
         pass
 
     @property
@@ -230,17 +225,7 @@ class DatabricksJobClusterEngine(JobClusterEngine):
         task_id: str,
         job_parameters: List[Any],
         execution_timeout_hours: int,
-        python_interpreter_path: Optional[str] = None,
     ) -> BaseOperator:
-
-        if python_interpreter_path is not None:
-            logging.warning(
-                "[DatabricksJobClusterEngine] The 'python_interpreter_path' argument"
-                " is ignored in Databricks: interpreter is set at the cluster level."
-            )
-
-        _ = python_interpreter_path
-
         return QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id=self._ctx.databricks_conn_id,
             dag=self._ctx.dag,
@@ -322,20 +307,6 @@ class EmrJobClusterEngine(JobClusterEngine):
             **self._emr_operator_retry_kwargs(),
         )
 
-    @staticmethod
-    def _python_interpreter_spark_args(
-        python_interpreter_path: Optional[str],
-    ) -> List[str]:
-        """Per-step interpreter override; empty unless a path is given."""
-        if not python_interpreter_path:
-            return []
-        return [
-            "--conf",
-            f"spark.pyspark.python={python_interpreter_path}",
-            "--conf",
-            f"spark.pyspark.driver.python={python_interpreter_path}",
-        ]
-
     def create_spark_python_task(
         self,
         *,
@@ -343,7 +314,6 @@ class EmrJobClusterEngine(JobClusterEngine):
         task_id: str,
         job_parameters: List[Any],
         execution_timeout_hours: int,
-        python_interpreter_path: Optional[str] = None,
     ) -> BaseOperator:
         create_id = self._ctx.emr_active_create_cluster_task_id
         if not create_id:
@@ -361,7 +331,6 @@ class EmrJobClusterEngine(JobClusterEngine):
                 self._merged_cluster_configuration.get("emr_deploy_mode", "client")
             ),
             extra_spark_args=list(_EMR_EXTRA_SPARK_SUBMIT_ARGS)
-            + self._python_interpreter_spark_args(python_interpreter_path)
             + [
                 "--conf",
                 f"spark.openlineage.parentJobName={{{{ dag.dag_id }}}}.{task_id}",

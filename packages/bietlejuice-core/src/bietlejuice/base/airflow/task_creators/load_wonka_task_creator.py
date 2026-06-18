@@ -12,14 +12,6 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
     _TASK_ID_TEMPLATE = "load-wonka-{table_name}"
     SPARK_JOB_NAME = "load_wonka"
 
-    # Wonka runs from a dedicated PEX virtualenv created on EMR by
-    # install_pex_generic.sh (venv_dir=/home/hadoop/venv). Shared bietlejuice
-    # jobs (optimize/vacuum) must keep using the default EMR Python, so this is
-    # applied only to the load-wonka step, not cluster-wide.
-    # For Wonka DAGs, this path for the PEX-based Python interpreter needs to be the same as the one
-    # set in `packages/bietlejuice-compiler/scripts/wonka/install_pex_generic.sh`.
-    _PEX_PYTHON_INTERPRETER_PATH = "/home/hadoop/venv/bin/python"
-
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         parameters = [
             self.dag_execution_context.workflow_args["wonka_config"]["pipeline_runner"]
@@ -45,8 +37,6 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
             task_id,
             parameters,
             execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
-            # Note: python_interpreter_path is ignored when running on Databricks
-            python_interpreter_path=self._PEX_PYTHON_INTERPRETER_PATH,
         )
 
     def create_task(
