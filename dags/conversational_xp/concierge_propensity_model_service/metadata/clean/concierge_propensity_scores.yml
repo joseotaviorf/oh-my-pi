@@ -1,0 +1,55 @@
+---
+database_name: datalake_search
+table_name: concierge_propensity_scores
+owner: francisco.cristovao@quintoandar.com
+domain: Conversational XP
+description: >
+  Daily propensity scores for eligible concierge users, produced by the
+  concierge-propensity-model-batch quintoml job. Each row is one user scored
+  on a given day. Used to drive concierge outbound communication targeting.
+
+columns:
+  id_user:
+    description: Identifier of the user scored by the propensity model.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.id_user
+  dt_scored:
+    description: Calendar date on which the propensity score was computed.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.scoring_date
+  score:
+    description: Raw model probability of the user returning to the platform within 7 days of the scoring date.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.score
+  effective_score:
+    description: Calibrated score after applying null-rate correction and eligibility bypass logic.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.effective_score
+  suppression_threshold:
+    description: Minimum effective_score required to send a concierge message; users below this are suppressed.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.suppression_threshold
+  is_eligibility_bypass:
+    description: True when the user was force-included regardless of predicted score.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.is_eligibility_bypass
+  is_suppressed:
+    description: True when the user's effective score is below the suppression threshold and will not receive a message.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.is_suppressed
+  model_version:
+    description: Identifier of the model version that produced this score (e.g. concierge-propensity-model-V1).
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.model_version
+  year:
+    description: Year partition derived from the ingestion date.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.year
+  month:
+    description: Month partition derived from the ingestion date.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.month
+  day:
+    description: Day partition derived from the ingestion date.
+    lineage:
+      - datalake_concierge_propensity_model_service_raw.concierge_propensity_scores.day

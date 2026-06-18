@@ -1,0 +1,33 @@
+dag:
+  name: concierge_propensity_model_service
+  schedule_start_date: 2025, 1, 1
+  owner: Data Conversational XP
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_concierge_propensity_inference_scores_raw
+  default_partitions: [year, month, day, model_version]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - s3://quintoml-s3-data-quintoandar-com-br/inference/concierge/concierge-propensity-model-batch/
+    - "{{ macros.ds_add(data_interval_start | ds, 1) }}" # this refers to the next day. This only makes sense when the DAG runs daily.
+    - "{table_name}"
+    - "{partitions}"
+    - parquet
+
+  default_extraction_type: incremental
+
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
+
+  tables_customization:
+    concierge_propensity_scores:
+      partitions:
+        - year
+        - month
+        - day
+        - model_version
