@@ -243,6 +243,9 @@ bietlejuice.dw_table_snapshot:
 bietlejuice.dw_tenant_documentation:
   remove:
     - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request-aud:first-run-of-day
+bietlejuice.dw_time:
+  remove:
+    - bietlejuice.oitchau_month_close_api:load-clean-hoursbank-totals-month-close:first-run-of-day
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent:first-run-of-day
