@@ -10,7 +10,8 @@ dag:
 
       To add a new export:
         1. Create queries/reverse/{table_name}.sql
-        2. Add the table to tables_customization with extra_spark_job_arguments: [sheet_id, sheet_tab]
+        2. Add the table under the matching requesting-team block in tables_customization
+           with extra_spark_job_arguments: [sheet_id, sheet_tab]
         3. In the SQL, set `year` / `month` / `day` from `{load_start_date}`. Never use
            `CURRENT_DATE()` for those partitions — `load_to_gsheet` reads only the
            `load_start_date` slice; mismatch → empty sheet. Those columns are not sent to
@@ -35,39 +36,38 @@ workflow:
     - "{environment}"
 
   tables_customization:
+    # --- Compensation ---
     salary_tables:
       extra_spark_job_arguments:
-        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
+        - "16VHUJRdYCXrwbVouHGQvcAwmyAK_ySPNnkhfFE6m904"
         - "salary_tables"
     jobs:
-      extra_spark_job_arguments:
-        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
-        - "jobs"
-    column_mapping_delta_test_pin:
+      # column_mapping_mode name: legacy compensation sheet headers are Portuguese (banda, familia_cargo, trilha, etc.).
       column_mapping_mode: name
       extra_spark_job_arguments:
-        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
-        - "column_mapping_delta_test_pin"
-    # Use context: Exports active employees (without salary band) from DW 2.0 to PIN. "Public Pin"
-    # Migrated from: /Workspace/People/People_Analytics/Daily_Pipeline/external_reports (cell base_public_no_banda)
-    # Governance: docs/people_public_gsheet_exports.md
+        - "16VHUJRdYCXrwbVouHGQvcAwmyAK_ySPNnkhfFE6m904"
+        - "jobs"
+
+    # --- General - People Team ---
     public_information:
       extra_spark_job_arguments:
         - "1lf1CIn8GRvHOnNm0imZ8z01w_NXtjv16zbPqD5GP8-k"
         - "base - PIN"
-    # Use context: Used as the basis for the load that updates Codex data in PIN.
-    # Business Owner: jessica.mlara@quintoandar.com.br
-    # Data Owner: gabriel.berger@quintoandar.com.br
+
+    # --- FP&A / CODEX → PIN ---
     organization_codex_pin_sync:
-      # column_mapping_mode name: PIN columns follow Oracle flexfield naming (includes "=" between segment and context); the lake needs Delta "name" mapping so those headers load without errors.
       column_mapping_mode: name
       extra_spark_job_arguments:
         - "1_yTiwS3IhdOO9wn7yP4sGfRAAoYhZSHxZhszFYH0zx4"
         - "Organization"
-    # Use context: Used as the basis for the load that updates Codex data in PIN.
-    # Business Owner: jessica.mlara@quintoandar.com.br
-    # Data Owner: gabriel.berger@quintoandar.com.br
     org_unit_classification_codex_pin_sync:
       extra_spark_job_arguments:
         - "1_yTiwS3IhdOO9wn7yP4sGfRAAoYhZSHxZhszFYH0zx4"
         - "OrgUnitClassification"
+
+    # --- Data People (Forno) ---
+    column_mapping_delta_test_pin:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU"
+        - "column_mapping_delta_test_pin"
