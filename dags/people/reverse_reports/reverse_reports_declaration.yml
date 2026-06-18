@@ -78,10 +78,3 @@ workflow:
       extra_spark_job_arguments:
         - "1Y_EvoW6IG3uHpfvDp2Ur8ikwJk8qNtX978iNK_XVzFs"
         - "Agendamentos"
-
-    # --- Data People (Forno) ---
-    column_mapping_delta_test_pin:
-      column_mapping_mode: name
-      extra_spark_job_arguments:
-        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU"
-        - "column_mapping_delta_test_pin"
