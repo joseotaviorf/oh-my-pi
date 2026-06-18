@@ -7,6 +7,10 @@ description: >
   Table with LegoContract assessment results, exploded from the full_analysis JSON. Each row represents one assessment within a contract analysis
   request (each contract analysis have many different assessments), enabling tracking of validation results by assessment type over time.
 columns:
+  id_contract_analysis_job:
+    description: Identifier of the contract analysis job execution that produced this assessment result. Joins with id_contract_analysis_job from datalake_legalops_clean.contract_analysis_request.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.contract_analysis_job_id
   id_sales_flow:
     description: Foreign key to the sales flow associated with this contract analysis. Joins with all id_sales_flow from datalake_sales_flow_clean tables.
     lineage:
@@ -35,3 +39,11 @@ columns:
     description: Confidence level of the validation assessment indicates if the validation has HIGH/LOW/MEDIUM confidence in its result.
     lineage:
       - datalake_legalops_raw.contract_analysis_request.full_analysis
+  ts_analysis_started:
+    description: Timestamp when the contract analysis job started processing the request in LegoContract.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.analysis_started_at
+  ts_analysis_end:
+    description: Timestamp when the contract analysis job finished processing the request in LegoContract.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.analysis_ended_at

@@ -1,7 +1,10 @@
 WITH base AS (
   SELECT
+    contract_analysis_job_id AS id_contract_analysis_job,
     sales_flow_id AS id_sales_flow,
     DATE(created_at) AS analysis_date,
+    analysis_started_at AS ts_analysis_started,
+    analysis_ended_at AS ts_analysis_end,
     full_analysis
   FROM datalake_legalops_raw.contract_analysis_request
   WHERE status = 'DONE'
@@ -9,8 +12,11 @@ WITH base AS (
 
 parsed AS (
   SELECT
+    id_contract_analysis_job,
     id_sales_flow,
     analysis_date,
+    ts_analysis_started,
+    ts_analysis_end,
     from_json(
       get_json_object(full_analysis, '$.validation_results'),
       'array<struct<rule_id:string,status:string,assessments:array<struct<validation_id:string,confidence:string,subsection:string,assessment_type:string,assessment_status:string,assessment_target:string,assessment_consolidated_status:string>>>>'
@@ -20,20 +26,26 @@ parsed AS (
 
 exploded_validations AS (
   SELECT
+    id_contract_analysis_job,
     id_sales_flow,
     analysis_date,
+    ts_analysis_started,
+    ts_analysis_end,
     vr AS validation_result
   FROM parsed
   LATERAL VIEW explode(validation_results) t AS vr
 )
 
 SELECT
+  id_contract_analysis_job,
   id_sales_flow,
   analysis_date,
   assessment.validation_id                   AS validation_id,
   assessment.assessment_target               AS assessment_name,
   assessment.assessment_status               AS assessment_status,
   assessment.assessment_consolidated_status  AS assessment_consolidated_status,
-  assessment.confidence                      AS assessment_confidence
+  assessment.confidence                      AS assessment_confidence,
+  ts_analysis_started,
+  ts_analysis_end
 FROM exploded_validations
 LATERAL VIEW explode(validation_result.assessments) t AS assessment
