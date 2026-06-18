@@ -9,9 +9,9 @@ workflow:
   custom_schema: ciq
   tables_customization:
     fact_ciq_listing_purchase:
-      partitions: [year, month, day]
+      merge_on: [sk_listing_purchase]
+      partitions: [ts_updated]
       extraction_type: incremental
-      merge_on: [sk_house, sk_contract, sk_partner]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"

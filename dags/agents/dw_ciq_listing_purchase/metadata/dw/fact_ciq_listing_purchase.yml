@@ -2,12 +2,20 @@
 database_name: dw_ciq
 table_name: fact_ciq_listing_purchase
 description: >
-  Fact for eligible CIQ listing purchase rows from datalake_ciq.ciq_listing_purchase with sk_* keys.
-  Incremental load on the greatest of contract signed and payment timestamps; merge on house, contract,
-  and partner per declaration.
+  Fact for CIQ_FULL rent listing-purchase rows joining ciq_listing_purchase with
+  listing_purchase_pricing for acquisition tiers. Incremental load on contract signed or
+  payment dates; merge on house, house listing, contract, and partner per declaration.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
+  sk_listing_purchase:
+    description: Listing purchase surrogate key on the anchor capture row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_listing_purchase
+  sk_listing_duplicity:
+    description: Duplicity surrogate key from listing_purchase_pricing when a similar house matched.
+    lineage:
+      - datalake_ciq.listing_purchase_pricing.id_listing_duplicity
   sk_house:
     description: House surrogate key.
     lineage:
@@ -16,6 +24,10 @@ columns:
     description: House listing surrogate key.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_house_listing
+  sk_similar_house:
+    description: Similar house id from listing_purchase_pricing when present.
+    lineage:
+      - datalake_ciq.listing_purchase_pricing.id_similar_house
   sk_contract:
     description: Rent contract surrogate key.
     lineage:
@@ -32,10 +44,6 @@ columns:
     description: CIQ user surrogate key (id_ciq_user in enrich).
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_ciq_user
-  sk_internal_agent:
-    description: Big-agent internal agent surrogate key.
-    lineage:
-      - datalake_ciq.ciq_listing_purchase.id_internal_agent
   sk_enrollment:
     description: Enrollment surrogate key for CIQ_FULL.
     lineage:
@@ -44,22 +52,94 @@ columns:
     description: Owner user surrogate key.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_owner
+  sk_address_parsed_duplicity:
+    description: Parsed address duplicity key from listing deduplication.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_address_parsed_duplicity
+  sk_atlas_duplicity:
+    description: Atlas property-dedup duplicity id when present.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_atlas_duplicity
+  city_name:
+    description: Normalized city name for regional pricing rules.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.city_name
+  city_group:
+    description: Commercial city group for ongoing-rentals segmentation.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.city_group
+  supply_source:
+    description: Rent supply funnel origin label at funnel step six.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.supply_source
+  listing_status:
+    description: Listing status from house listing or business context.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.listing_status
+  contract_status:
+    description: Contract status from core contract.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.contract_status
   payment_status:
-    description: Payment lifecycle from enrich.
+    description: Payment lifecycle from ciq_listing_purchase enrich.
     lineage:
       - datalake_ciq.ciq_listing_purchase.payment_status
   pricing_type:
-    description: Pricing segment from enrich.
+    description: Commercial pricing segment prefix from ciq_listing_purchase.
     lineage:
       - datalake_ciq.ciq_listing_purchase.pricing_type
-  purchase_value:
-    description: Reference purchase amount from enrich.
+  pricing_type_reason:
+    description: Full human-readable pricing segment explanation from ciq_listing_purchase.
     lineage:
-      - datalake_ciq.ciq_listing_purchase.purchase_value
+      - datalake_ciq.ciq_listing_purchase.pricing_type_reason
+  acquisition_type:
+    description: Acquisition price bucket (full-price, reduced-price, or not-eligible).
+    lineage:
+      - datalake_ciq.listing_purchase_pricing.acquisition_type
+  acquisition_type_reason:
+    description: Human-readable acquisition outcome combining pricing and duplicity signals.
+    lineage:
+      - datalake_ciq.listing_purchase_pricing.acquisition_type_reason
+  purchase_value:
+    description: Reference listing-purchase amount in BRL from acquisition_type tiers.
+    lineage:
+      - datalake_ciq.listing_purchase_pricing.purchase_value
   amount_paid:
     description: Paid amount from enrich when Robin Hood matches.
     lineage:
       - datalake_ciq.ciq_listing_purchase.amount_paid
+  total_days_since_house_inactived:
+    description: Inactive listing-version days when in qualifying inactive state.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.total_days_since_house_inactived
+  has_similiar_house_by_address_parsed:
+    description: True when address-parsed deduplication flags duplicates for the house.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.has_similiar_house_by_address_parsed
+  has_similiar_house_by_atlas:
+    description: True when an Atlas house deduplication row exists for the house.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.has_similiar_house_by_atlas
+  has_republication:
+    description: True when a later house listing version exists after the current one.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.has_republication
+  is_first_contract_signed_by_house:
+    description: True when this listing version is the first signed contract on the house.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_first_contract_signed_by_house
+  is_last_house_listing:
+    description: True when this row is the last house listing version on the house.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_last_house_listing
+  is_house_inactive:
+    description: True when the listing version is in qualifying inactive state.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_house_inactive
+  is_eligible:
+    description: True when the house has a signed rent contract timestamp.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_eligible
   is_paid:
     description: Payment presence flag from enrich.
     lineage:
@@ -72,16 +152,30 @@ columns:
     description: Contract signature timestamp from enrich.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+  ts_next_contract_signed:
+    description: Next contract signature timestamp on the same house when present.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_next_contract_signed
+  ts_previous_contract_signed:
+    description: Previous contract signature timestamp on the same house when present.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_previous_contract_signed
+  ts_house_inactived:
+    description: Listing version start when inactive; null when the listing is active.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_inactived
   ts_house_registration:
     description: CIQ agency registration timestamp for the house.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_house_registration
   ts_first_listing:
-    description: First rent listing timestamp from enrich.
+    description: First publication timestamp from listing business context.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_first_listing
   ts_updated:
-    description: Greatest of contract signed and payment timestamps used as incremental activity driver.
+    description: >
+      Greatest of contract signed and payment timestamps used as incremental activity driver
+      and partition column.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_contract_signed
       - datalake_ciq.ciq_listing_purchase.dt_paid

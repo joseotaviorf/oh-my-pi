@@ -1,13 +1,13 @@
 ---
-table_name: dw_ciq.fact_listing_purchase_exclusion
+table_name: dw_ciq.fact_listing_purchase_duplicity
 alert_channel: "#agents-data-alarms"
 column_level_validations:
+  sk_listing_duplicity:
+    is_complete:
+      severity_level: Error
+  sk_listing_purchase:
+    is_complete:
+      severity_level: Error
   sk_house:
-    is_complete:
-      severity_level: Error
-  sk_paid_contract:
-    is_complete:
-      severity_level: Error
-  sk_similar_paid_house:
     is_complete:
       severity_level: Error

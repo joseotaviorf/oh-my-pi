@@ -1,40 +1,55 @@
 SELECT
+    clp.id_listing_purchase AS sk_listing_purchase,
+    lpp.id_listing_duplicity AS sk_listing_duplicity,
     clp.id_house AS sk_house,
     clp.id_house_listing AS sk_house_listing,
+    lpp.id_similar_house AS sk_similar_house,
     clp.id_contract AS sk_contract,
     clp.id_accounting_entry AS sk_accounting_entry,
     clp.id_partner AS sk_partner,
     clp.id_ciq_user AS sk_user,
-    clp.id_internal_agent AS sk_internal_agent,
     clp.id_enrollment AS sk_enrollment,
     clp.id_owner AS sk_owner,
+    clp.id_address_parsed_duplicity AS sk_address_parsed_duplicity,
+    clp.id_atlas_duplicity AS sk_atlas_duplicity,
+    clp.city_name,
+    clp.city_group,
+    clp.supply_source,
+    clp.listing_status,
+    clp.contract_status,
     clp.payment_status,
     clp.pricing_type,
-    clp.purchase_value,
+    clp.pricing_type_reason,
+    lpp.acquisition_type,
+    lpp.acquisition_type_reason,
+    lpp.purchase_value,
     clp.amount_paid,
+    clp.total_days_since_house_inactived,
+    clp.has_similiar_house_by_address_parsed,
+    clp.has_similiar_house_by_atlas,
+    clp.has_republication,
+    clp.is_first_contract_signed_by_house,
+    clp.is_last_house_listing,
+    clp.is_house_inactive,
+    clp.is_eligible,
     clp.is_paid,
     clp.dt_paid,
     clp.ts_contract_signed,
+    clp.ts_next_contract_signed,
+    clp.ts_previous_contract_signed,
+    clp.ts_house_inactived,
     clp.ts_house_registration,
     clp.ts_first_listing,
-    GREATEST(
-        clp.ts_contract_signed, 
-        clp.dt_paid
-    ) AS ts_updated,
+    COALESCE(GREATEST(clp.ts_contract_signed, clp.dt_paid), clp.ts_contract_signed) AS ts_updated,
     NOW() AS ts_load,
     clp.year,
     clp.month,
     clp.day
 FROM
     datalake_ciq.ciq_listing_purchase AS clp
+JOIN
+    datalake_ciq.listing_purchase_pricing AS lpp
+        ON lpp.id_listing_purchase = clp.id_listing_purchase
 WHERE
-    clp.is_eligible IS TRUE
-    AND DATE(GREATEST(
-        clp.ts_contract_signed, 
-        clp.dt_paid
-    )) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-    ROW_NUMBER() OVER (
-        PARTITION BY clp.id_house, clp.id_contract, clp.id_partner
-        ORDER BY GREATEST(clp.ts_contract_signed, clp.dt_paid) DESC NULLS LAST
-    ) = 1
+    DATE(clp.ts_contract_signed) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    OR DATE(clp.dt_paid) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

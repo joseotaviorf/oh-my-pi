@@ -2,16 +2,25 @@
 database_name: datalake_ciq
 table_name: ciq_listing_purchase
 description: >
-  Enrich grain per house in RENT with CIQ_FULL: house listing and contract path, Robin Hood listing-purchase
-  payment, address-parsed and Atlas duplicity keys, ciq_costs purchase value, pricing segment, and
-  inactivity days derived from house_listing version windows.
+  Enrich grain per house listing version in CIQ context: rent listing and contract path, Robin Hood
+  listing-purchase payment, address-parsed and Atlas duplicity keys, city group, supply source,
+  pricing segment from listing business context transition rules, and inactivity days from house_listing
+  version windows.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
+  id_listing_purchase:
+    description: >
+      Surrogate key (XXHASH64) over house, house listing, partner, CIQ user, business context,
+      and consultant type for the listing-purchase grain.
+    lineage:
+      - core_house.house.id_house
+      - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_big_agent.house_consultant_history.id_partner
   id_house:
     description: House identifier in CIQ capture context.
     lineage:
-      - datalake_big_agent.house_consultant_history.id_house
+      - core_house.house.id_house
   id_partner:
     description: CIQ partner id from house consultant history.
     lineage:
@@ -25,9 +34,9 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.id_contract
   id_owner:
-    description: Owner user id from core contract.
+    description: Owner user id from core house.
     lineage:
-      - core_contract.contract.id_owner
+      - core_house.house.id_owner
   id_ciq_user:
     description: CIQ user id from house consultant history.
     lineage:
@@ -37,7 +46,7 @@ columns:
     lineage:
       - datalake_big_agent.house_consultant_history.id_internal_agent
   id_enrollment:
-    description: Big-agent enrollment id for CIQ_FULL assignment.
+    description: Big-agent enrollment id for CIQ assignment.
     lineage:
       - datalake_big_agent.house_consultant_history.id_enrollment
   id_accounting_entry:
@@ -49,7 +58,7 @@ columns:
     lineage:
       - datalake_listing_deduplication.listing_deduplication.id_address_parsed_short
   id_atlas_duplicity:
-    description: Property-dedup duplicity output id when Atlas marks a similar house for this listing.
+    description: Property-dedup duplicity output id when Atlas marks the house.
     lineage:
       - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
   address:
@@ -60,39 +69,68 @@ columns:
     description: First listing order from address-parsed deduplication for ordering captures on the same key.
     lineage:
       - datalake_listing_deduplication.listing_deduplication.first_listing_order
+  city_name:
+    description: Normalized city name resolved from core house city and region reference tables.
+    lineage:
+      - core_house.house.city
+      - datalake_region.region.city_name
+  city_group:
+    description: Commercial city group used for regional pricing segmentation.
+    lineage:
+      - datalake_region.region.city_group
+  supply_source:
+    description: Rent supply funnel origin label at funnel step six (CIQ or other channel).
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.company_report_origin
+  business_context:
+    description: Listing business context from EBDB clean (for example RENT or SALE).
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+  consultant_type:
+    description: CIQ consultant type from house consultant history (for example CIQ_FULL).
+    lineage:
+      - datalake_big_agent.house_consultant_history.consultant_type
+  listing_status:
+    description: Listing status from house listing version or listing business context fallback.
+    lineage:
+      - datalake_ebdb_listing.house_listing.status
+      - datalake_ebdb_clean.listing_business_context.status
   contract_status:
     description: Contract status from core contract.
     lineage:
       - core_contract.contract.status
   payment_status:
     description: >
-      Derived lifecycle: cancelled, paid when accounting entry exists, not_eligible without signed contract,
-      otherwise pending.
+      Derived lifecycle: cancelled, paid when accounting entry exists, not-eligible without signed
+      contract, otherwise pending.
     lineage:
       - core_contract.contract.status
       - datalake_robin_hood.accounting_entry.id
       - datalake_ebdb_listing.house_listing.ts_contract_signed
+  pricing_type_reason:
+    description: >
+      Full human-readable pricing segment from transition rules on first publication date,
+      listing status, contract path, and hybrid creation order.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_clean.listing_business_context.status
+      - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
   pricing_type:
     description: >
-      Commercial segment from valid_first_listing and contract dates
-      (hybrid, new-listings, ongoing-rentals, ongoing-listings).
+      Commercial segment prefix parsed from pricing_type_reason
+      (hybrid, new-listings, ongoing-rentals, ongoing-listings, or not-eligible).
     lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
       - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
-      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
-      - datalake_ebdb_listing.house_listing.ts_contract_signed
-      - datalake_ebdb_listing.house_listing.id_contract
-  purchase_value:
-    description: Reference listing-purchase amount from ciq_costs for city and contract signature month.
-    lineage:
-      - datalake_gsheets_clean.ciq_costs.total_costs_ciq_full_for_rent
   amount_paid:
     description: Due amount on the matched Robin Hood accounting entry when present.
     lineage:
       - datalake_robin_hood.accounting_entry.due_amount
   total_days_since_house_inactived:
     description: >
-      Days between listing version start and end when the listing version is in a qualifying inactive state;
-      zero when not inactive.
+      Days between listing version start and end when the listing version is in a qualifying inactive
+      state; zero when not inactive.
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_start
       - datalake_ebdb_listing.house_listing.ts_listing_version_end
@@ -106,9 +144,26 @@ columns:
     description: True when an Atlas house deduplication row exists for this house.
     lineage:
       - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
+  has_republication:
+    description: True when a later house listing version exists after the current one.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  is_first_contract_signed_by_house:
+    description: True when this listing version is the first signed contract on the house.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
+  is_last_contract_signed_by_house:
+    description: True when this listing version is the most recent signed contract on the house.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
+  is_last_house_listing:
+    description: True when this row is the last house listing version on the house.
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_last_version
   is_house_inactive:
     description: >
-      True when the house listing version is OPTED_OUT or UNPUBLISHED with status_reason different from RENTED.
+      True when the house listing version is OPTED_OUT or UNPUBLISHED with status_reason different
+      from RENTED.
     lineage:
       - datalake_ebdb_listing.house_listing.status
       - datalake_ebdb_listing.house_listing.status_reason
@@ -133,13 +188,11 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_contract_signed
   ts_next_contract_signed:
-    description: Next contract signature timestamp on the same house listing when present.
+    description: Next contract signature timestamp on the same house when present.
     lineage:
-      - datalake_ebdb_listing.house_listing.ts_next_contract_signed
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
   ts_previous_contract_signed:
-    description: >
-      Previous contract signature timestamp on the same house (LAG by listing version),
-      used for ongoing-rentals pricing segmentation.
+    description: Previous contract signature timestamp on the same house (LAG by listing version).
     lineage:
       - datalake_ebdb_listing.house_listing.ts_contract_signed
   ts_house_inactived:
@@ -151,9 +204,9 @@ columns:
     lineage:
       - datalake_big_agent.house_consultant_history.ts_agency_created
   ts_first_listing:
-    description: First rent listing timestamp from valid_first_listing when available.
+    description: First publication timestamp from listing business context.
     lineage:
-      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
   ts_load:
     description: Timestamp when this enrich row was materialized.
   year:

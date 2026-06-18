@@ -4,27 +4,24 @@ table_name: atlas_house_deduplication
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 description: >
-  Enrich join of property-dedup similar_property candidates with duplicity_output verdicts, keyed by
-  house id and similar house id for Atlas-based listing purchase exclusion and CIQ deduplication flows.
+  Enrich projection of property-dedup similar_property evaluations joined to duplicity_output
+  verdicts, one row per duplicity outcome keyed by house id (id_property) for Atlas-based CIQ
+  listing purchase and deduplication flows.
 columns:
   id_duplicity:
     description: Duplicity output id (rules-engine outcome row for the similar-property evaluation).
     lineage:
       - datalake_property_dedup_clean.duplicity_output.id
   id_house:
-    description: House id on Main for the listing being checked (similar_property.id).
-    lineage:
-      - datalake_property_dedup_clean.similar_property.id
-  id_similar_house:
-    description: House id of the candidate duplicate property (similar_property.id_property).
+    description: House id on Main for the property evaluated (similar_property.id_property).
     lineage:
       - datalake_property_dedup_clean.similar_property.id_property
   id_owner:
-    description: Owner person id on the candidate similar property when present.
+    description: Owner person id on the evaluated property when present.
     lineage:
       - datalake_property_dedup_clean.similar_property.id_owner
   action_type:
-    description: Rules-engine action for this candidate (BLOCK, ALERT, or ALLOW).
+    description: Rules-engine action for this evaluation (BLOCK, ALERT, or ALLOW).
     lineage:
       - datalake_property_dedup_clean.duplicity_output.action_type
     categories:
@@ -36,18 +33,18 @@ columns:
     lineage:
       - datalake_property_dedup_clean.duplicity_output.duplicity_reason
   is_same_property_owner:
-    description: True when the candidate listing owner matches the admin who triggered the duplicity check.
+    description: True when the evaluated listing owner matches the admin who triggered the duplicity check.
     lineage:
       - datalake_property_dedup_clean.similar_property.is_same_property_owner
-  ts_created:
-    description: Timestamp when the similar_property evaluation row was created.
-    lineage:
-      - datalake_property_dedup_clean.similar_property.ts_created
   ts_action:
     description: Timestamp when the duplicity output row was created.
     lineage:
       - datalake_property_dedup_clean.duplicity_output.ts_created
-  ts_property_updated:
-    description: Last property update timestamp on Main at evaluation time for the candidate.
+  ts_created:
+    description: Timestamp when the similar_property evaluation row was created.
     lineage:
-      - datalake_property_dedup_clean.similar_property.ts_property_updated
+      - datalake_property_dedup_clean.similar_property.ts_created
+  ts_updated:
+    description: Last update timestamp on the similar_property evaluation row.
+    lineage:
+      - datalake_property_dedup_clean.similar_property.ts_updated

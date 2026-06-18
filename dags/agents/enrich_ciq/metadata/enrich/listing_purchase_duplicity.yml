@@ -1,0 +1,149 @@
+---
+database_name: datalake_ciq
+table_name: listing_purchase_duplicity
+description: >
+  Similar-house duplicity comparison for CIQ_FULL rent listing purchase: last available capture
+  per listing purchase joined to address-parsed peers and/or Atlas duplicity, keyed by
+  id_listing_duplicity for acquisition pricing and portfolio exclusion rules.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_listing_duplicity:
+    description: >
+      Surrogate key (XXHASH64) over anchor listing purchase, similar house, similar CIQ user,
+      consultant type, and business context.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_listing_purchase
+  id_listing_purchase:
+    description: Listing purchase surrogate key on the anchor capture row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_listing_purchase
+  id_house:
+    description: House id of the anchor capture row used as the comparison anchor.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house
+  id_ciq_user:
+    description: CIQ user id on the anchor capture row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  id_owner:
+    description: Owner user id on the anchor capture row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+  id_contract:
+    description: Contract id on the anchor capture row when present.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_contract
+  id_atlas_duplicity:
+    description: Atlas duplicity output id on the anchor row when property-dedup flagged the house.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
+  id_address_parsed_duplicity:
+    description: Address-parsed duplicity key shared with peer houses on the same parsed address.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_address_parsed_duplicity
+  id_similar_listing_purchase:
+    description: Listing purchase surrogate key on the matched address-parsed peer row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_listing_purchase
+  id_similar_house:
+    description: House id of the address-parsed peer with earlier first_listing_order on the same key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house
+  id_similar_house_ciq_user:
+    description: CIQ user id on the matched address-parsed peer row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  id_similar_house_owner:
+    description: Owner user id on the matched address-parsed peer row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+  id_similar_contract:
+    description: Contract id on the matched address-parsed peer row when present.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_contract
+  similar_house_listing_status:
+    description: Listing status on the matched address-parsed peer row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.listing_status
+  atlas_duplicity_action:
+    description: Atlas rules-engine action on the anchor row (BLOCK, ALERT, or ALLOW).
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.action_type
+  atlas_duplicity_reason:
+    description: Atlas deduplication rule name that fired on the anchor row.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.duplicity_reason
+  similar_house_consultant_type:
+    description: Consultant type on the matched peer row (for example CIQ_FULL).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.consultant_type
+  similar_house_business_context:
+    description: Business context on the matched peer row (for example RENT).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.business_context
+  total_days_since_house_inactived:
+    description: Inactive listing-version days on the matched peer row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.total_days_since_house_inactived
+  is_similiar_house_inactive:
+    description: True when the matched peer row is in qualifying inactive listing state.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_house_inactive
+  is_similiar_house_paid:
+    description: True when the matched peer row has a Robin Hood payment occurrence.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_paid
+  is_same_ciq:
+    description: True when anchor and peer rows share the same CIQ user id.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  is_same_owner:
+    description: >
+      True when anchor and peer share the same owner id, or Atlas marks same property owner
+      on the anchor duplicity row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+      - datalake_listing_deduplication.atlas_house_deduplication.is_same_property_owner
+  is_address_parsed_duplicity:
+    description: True when an address-parsed peer match exists for the anchor row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_address_parsed_duplicity
+  is_atlas_atlas_duplicity:
+    description: True when an Atlas duplicity row exists on the anchor house.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
+  is_publication_blocked_by_atlas:
+    description: True when Atlas action_type is BLOCK on the anchor duplicity row.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.action_type
+  has_similiar_house_republication:
+    description: True when the matched peer row has a later republication listing version.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.has_republication
+  dt_similiar_house_paid:
+    description: Payment date on the matched peer row when paid.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.dt_paid
+  dt_similiar_house_contract_termination:
+    description: Contract termination date on the matched peer row when present.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.dt_contract_termination
+  ts_similiar_house_contract_signed:
+    description: Contract signature timestamp on the matched peer row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+  ts_similiar_house_inactived:
+    description: Inactivity start timestamp on the matched peer row when inactive.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_inactived
+  ts_house_registration:
+    description: CIQ agency registration timestamp for the anchor house row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_registration
+  ts_similiar_house_registration:
+    description: CIQ agency registration timestamp for the matched peer house row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_registration
+  ts_load:
+    description: Timestamp when this enrich row was materialized.

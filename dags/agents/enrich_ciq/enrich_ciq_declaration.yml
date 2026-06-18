@@ -9,8 +9,13 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    listing_purchase_exclusion:
+    listing_purchase_duplicity:
       - ciq_listing_purchase
+    listing_purchase_pricing:
+      - listing_purchase_duplicity
+      - ciq_listing_purchase
+    ciq_listing_purchase:
+      - ciq_supply_events_tracking
     ciq_agents:
       - ciq_users
     daily_ciq_info:

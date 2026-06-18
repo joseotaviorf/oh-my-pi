@@ -1,0 +1,64 @@
+---
+database_name: datalake_ciq
+table_name: listing_purchase_pricing
+description: >
+  Acquisition pricing enrich for CIQ_FULL rent captures: maps pricing_type segments and
+  duplicity signals to acquisition_type (full-price, reduced-price, not-eligible) and
+  purchase_value (0, 150, or 1000 BRL). Grain is id_listing_purchase with optional
+  id_listing_duplicity from the last paid similar house.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_listing_purchase:
+    description: Listing purchase surrogate key on the anchor capture row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_listing_purchase
+  id_listing_duplicity:
+    description: Duplicity surrogate key from the last paid similar-house match when present.
+    lineage:
+      - datalake_ciq.listing_purchase_duplicity.id_listing_duplicity
+  id_house:
+    description: House identifier for the CIQ listing-purchase capture being priced.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house
+  id_house_listing:
+    description: House listing id on the base listing-purchase row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house_listing
+  id_similar_house:
+    description: House id of the matched similar-house peer used in pricing rules.
+    lineage:
+      - datalake_ciq.listing_purchase_duplicity.id_similar_house
+  pricing_type:
+    description: Commercial pricing segment prefix from pricing_type_reason on the base row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.pricing_type
+  pricing_type_reason:
+    description: Full human-readable pricing segment explanation from ciq_listing_purchase.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.pricing_type_reason
+  acquisition_type_reason:
+    description: >
+      Human-readable acquisition outcome combining pricing_type, city_group, supply_source, and
+      similar-house duplicity signals from listing_purchase_duplicity.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.pricing_type_reason
+      - datalake_ciq.listing_purchase_duplicity.dt_similiar_house_contract_termination
+      - datalake_ciq.listing_purchase_duplicity.similar_house_listing_status
+      - datalake_ciq.listing_purchase_duplicity.is_same_owner
+  acquisition_type:
+    description: >
+      Acquisition price bucket prefix parsed from acquisition_type_reason
+      (full-price, reduced-price, or not-eligible).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.pricing_type
+      - datalake_ciq.listing_purchase_duplicity.is_same_owner
+  purchase_value:
+    description: >
+      Reference listing-purchase amount in BRL derived from acquisition_type
+      (0 for not-eligible, 150 for reduced-price, 1000 for full-price).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.pricing_type
+      - datalake_ciq.listing_purchase_duplicity.is_same_owner
+  ts_load:
+    description: Timestamp when this enrich row was materialized.
