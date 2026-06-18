@@ -3,10 +3,10 @@ database_name: dw_ciq
 table_name: fact_ciq_listing_purchase
 description: >
   Fact for CIQ_FULL rent listing-purchase rows joining ciq_listing_purchase with
-  listing_purchase_pricing for acquisition tiers. Incremental load on contract signed or
-  payment dates; merge on house, house listing, contract, and partner per declaration.
+  listing_purchase_pricing for acquisition tiers. Full enrich snapshot merged on
+  sk_listing_purchase; matched rows update only while is_paid is not true.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   sk_listing_purchase:
     description: Listing purchase surrogate key on the anchor capture row.
@@ -172,13 +172,6 @@ columns:
     description: First publication timestamp from listing business context.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_first_listing
-  ts_updated:
-    description: >
-      Greatest of contract signed and payment timestamps used as incremental activity driver
-      and partition column.
-    lineage:
-      - datalake_ciq.ciq_listing_purchase.ts_contract_signed
-      - datalake_ciq.ciq_listing_purchase.dt_paid
   ts_load:
     description: Timestamp when this DW row was materialized.
   year:

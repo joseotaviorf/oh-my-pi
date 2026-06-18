@@ -6,7 +6,7 @@ description: >
   per listing purchase joined to address-parsed peers and/or Atlas duplicity, keyed by
   id_listing_duplicity for acquisition pricing and portfolio exclusion rules.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_listing_duplicity:
     description: >

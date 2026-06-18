@@ -7,7 +7,7 @@ description: >
   purchase_value (0, 150, or 1000 BRL). Grain is id_listing_purchase with optional
   id_listing_duplicity from the last paid similar house.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_listing_purchase:
     description: Listing purchase surrogate key on the anchor capture row.

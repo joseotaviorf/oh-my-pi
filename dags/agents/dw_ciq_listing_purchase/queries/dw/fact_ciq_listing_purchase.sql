@@ -40,7 +40,6 @@ SELECT
     clp.ts_house_inactived,
     clp.ts_house_registration,
     clp.ts_first_listing,
-    COALESCE(GREATEST(clp.ts_contract_signed, clp.dt_paid), clp.ts_contract_signed) AS ts_updated,
     NOW() AS ts_load,
     clp.year,
     clp.month,
@@ -50,6 +49,3 @@ FROM
 JOIN
     datalake_ciq.listing_purchase_pricing AS lpp
         ON lpp.id_listing_purchase = clp.id_listing_purchase
-WHERE
-    DATE(clp.ts_contract_signed) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    OR DATE(clp.dt_paid) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

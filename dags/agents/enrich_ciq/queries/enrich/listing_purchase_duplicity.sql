@@ -5,15 +5,13 @@ WITH atlas_house_deduplication AS (
         dep.action_type,
         dep.duplicity_reason,
         dep.is_same_property_owner,
-        FIRST_VALUE(dep.id_duplicity) OVER (
-            PARTITION BY dep.id_house 
-            ORDER BY dep.ts_action DESC, dep.ts_updated DESC
-        ) = dep.id_duplicity AS is_last_duplicity,
         dep.ts_action,
         dep.ts_created,
         dep.ts_updated
     FROM
         datalake_listing_deduplication.atlas_house_deduplication AS dep
+    WHERE
+        dep.is_last_duplicity IS TRUE
 ),
 ciq_listing_purchase AS (
     SELECT
@@ -61,7 +59,6 @@ ciq_listing_purchase AS (
     LEFT JOIN
         atlas_house_deduplication AS atlas
             ON atlas.id_house = clp.id_house
-            AND atlas.is_last_duplicity IS TRUE
 )
 SELECT DISTINCT
     XXHASH64(

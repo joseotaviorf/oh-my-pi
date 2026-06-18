@@ -36,6 +36,11 @@ columns:
     description: True when the evaluated listing owner matches the admin who triggered the duplicity check.
     lineage:
       - datalake_property_dedup_clean.similar_property.is_same_property_owner
+  is_last_duplicity:
+    description: >
+      True when this row is the latest duplicity outcome for the house, by duplicity_output.ts_created.
+    lineage:
+      - datalake_property_dedup_clean.duplicity_output.ts_created
   ts_action:
     description: Timestamp when the duplicity output row was created.
     lineage:

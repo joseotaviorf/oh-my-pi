@@ -251,6 +251,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_listing_deduplication.atlas_house_deduplication AS ahd
         ON ahd.id_house = h.id_house
+        AND ahd.is_last_duplicity IS TRUE
 LEFT JOIN
     datalake_listing_deduplication.valid_first_listing AS vfl
         ON vfl.id_house = h.id_house

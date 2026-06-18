@@ -7,7 +7,7 @@ description: >
   pricing segment from listing business context transition rules, and inactivity days from house_listing
   version windows.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_listing_purchase:
     description: >

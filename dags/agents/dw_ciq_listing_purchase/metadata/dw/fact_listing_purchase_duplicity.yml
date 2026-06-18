@@ -6,7 +6,7 @@ description: >
   address-parsed peers and/or Atlas duplicity, sourced from datalake_ciq.listing_purchase_duplicity.
   Full reload grain keyed by sk_listing_duplicity.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   sk_listing_duplicity:
     description: Surrogate key for the anchor-to-peer duplicity comparison row.

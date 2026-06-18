@@ -5,6 +5,10 @@ SELECT
     do.action_type,
     do.duplicity_reason,
     sp.is_same_property_owner,
+    FIRST_VALUE(do.id) OVER (
+        PARTITION BY sp.id_property 
+        ORDER BY do.ts_created DESC
+    ) = do.id AS is_last_duplicity,
     do.ts_created AS ts_action,
     sp.ts_created,
     sp.ts_updated
