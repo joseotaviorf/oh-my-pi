@@ -3,7 +3,14 @@ database_name: datalake_growth_facebook_insights
 table_name: facebook_insights_region
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This enrich table consolidates Facebook advertising insights data by region from multiple Facebook advertising accounts
+description: |
+  Enrich layer consolidating Facebook Ads Insights with geographic region breakdown across seven
+  QuintoAndar ad accounts. Grain is one row per ad, region, and reporting day (dt_start). Metrics
+  include clicks, impressions, inline link clicks, spend, and actions. Built by UNION ALL of
+  per-account clean tables in datalake_facebook_insights_region_clean. Consumed by growth marketing
+  pipelines (e.g. facebook_metrics, campaign_name_history). Physically partitioned by year, month,
+  and day derived from dt_start (default_partitions in enrich_facebook_insights DAG);
+  Always filter year, month, and day together for partition pruning.
 columns:
   id_ad:
     description: Unique identifier for the Facebook ad
@@ -46,7 +53,7 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.id_campaign
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.id_campaign
   account_name:
-    description: Name of the Facebook advertising account
+    description: Human-readable label assigned to the Facebook ad creative in Ads Managervertising account
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.account_name
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.account_name
@@ -56,7 +63,7 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.account_name
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.account_name
   account_name_snake_case:
-    description: Name of the Facebook advertising account in snake_case format
+    description: Human-readable label assigned to the Facebook ad creative in Ads Managervertising account in snake_case format
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.account_name_snake_case
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.account_name_snake_case
@@ -76,7 +83,7 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.country_code
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.country_code
   ad_name:
-    description: Name of the Facebook ad
+    description: Human-readable label assigned to the Facebook ad creative in Ads Manager
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.ad_name
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.ad_name
@@ -86,7 +93,7 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.ad_name
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.ad_name
   adset_name:
-    description: Name of the Facebook ad set
+    description: Human-readable label assigned to the Facebook ad creative in Ads Manager set
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.adset_name
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.adset_name
@@ -96,7 +103,7 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.adset_name
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.adset_name
   campaign_name:
-    description: Name of the Facebook campaign
+    description: Human-readable label of the parent Facebook campaign grouping related ads
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.campaign_name
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.campaign_name
@@ -166,7 +173,10 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.spend
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.spend
   dt_start:
-    description: Start date of the reporting period for the Facebook ad insights
+    description: |
+      Start date of the Facebook Insights reporting period (one calendar day per row). Source column
+      for partition columns year, month, and day. Prefer filtering year/month/day for partition
+      pruning; when filtering on dt_start directly, keep predicates aligned with those partitions.
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.dt_start
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.dt_start
@@ -186,7 +196,10 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.dt_stop
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.dt_stop
   year:
-    description: Year extracted from the reporting period
+    description: |
+      Table partition column (year). Derived from dt_start. Required in WHERE clauses for partition
+      pruning — always combine with month and day to restrict scans to the smallest date window
+      needed. Queries without partition filters will scan the entire table.
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.year
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.year
@@ -196,7 +209,10 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.year
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.year
   month:
-    description: Month extracted from the reporting period
+    description: |
+      Table partition column (month, 1–12). Derived from dt_start. Must be filtered together with
+      year and day in every query to enable partition pruning; omitting any partition column
+      disables pruning and forces a full scan.
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.month
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.month
@@ -206,7 +222,10 @@ columns:
       - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.month
       - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.month
   day:
-    description: Day extracted from the reporting period
+    description: |
+      Table partition column (day, 1–31). Derived from dt_start. Always the last partition column —
+      filter with year and month to narrow the scan to specific days. Example:
+      WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.day
       - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.day

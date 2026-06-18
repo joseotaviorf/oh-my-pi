@@ -3,7 +3,14 @@ database_name: datalake_growth_facebook_insights
 table_name: facebook_insights_impression_device
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This enrich table consolidates Facebook Insights data with impression device breakdown from multiple Facebook ad accounts
+description: |
+  Enrich layer consolidating Facebook Ads Insights with impression-device breakdown across seven
+  QuintoAndar ad accounts. Grain is one row per ad, impression device, and reporting day (dt_start).
+  Metrics include clicks, impressions, inline link clicks, spend, and actions. Built by UNION ALL
+  of per-account clean tables in datalake_facebook_insights_impression_device_clean. Consumed by
+  growth marketing consolidated metrics (e.g. facebook_consolidated_metrics). Physically partitioned
+  by year, month, and day derived from dt_start (default_partitions in enrich_facebook_insights DAG);
+  Always filter year, month, and day together for partition pruning.
 columns:
   id_ad:
     description: Unique identifier for the Facebook ad
@@ -46,7 +53,7 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.id_campaign
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.id_campaign
   account_name:
-    description: Name of the Facebook ad account
+    description: Human-readable label assigned to the Facebook ad creative in Ads Manager account
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.account_name
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.account_name
@@ -76,7 +83,7 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.country_code
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.country_code
   ad_name:
-    description: Name of the Facebook ad
+    description: Human-readable label assigned to the Facebook ad creative in Ads Manager
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.ad_name
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.ad_name
@@ -86,7 +93,7 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.ad_name
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.ad_name
   adset_name:
-    description: Name of the Facebook ad set
+    description: Human-readable label assigned to the Facebook ad creative in Ads Manager set
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.adset_name
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.adset_name
@@ -96,7 +103,7 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.adset_name
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.adset_name
   campaign_name:
-    description: Name of the Facebook campaign
+    description: Human-readable label of the parent Facebook campaign grouping related ads
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.campaign_name
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.campaign_name
@@ -166,7 +173,10 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.spend
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.spend
   dt_start:
-    description: Start date of the reporting period
+    description: |
+      Start date of the Facebook Insights reporting period (one calendar day per row). Source column
+      for partition columns year, month, and day. Prefer filtering year/month/day for partition
+      pruning; when filtering on dt_start directly, keep predicates aligned with those partitions.
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.dt_start
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.dt_start
@@ -186,7 +196,10 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.dt_stop
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.dt_stop
   year:
-    description: Year extracted from the start date
+    description: |
+      Table partition column (year). Derived from dt_start. Required in WHERE clauses for partition
+      pruning — always combine with month and day to restrict scans to the smallest date window
+      needed. Queries without partition filters will scan the entire table.
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.year
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.year
@@ -196,7 +209,10 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.year
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.year
   month:
-    description: Month extracted from the start date
+    description: |
+      Table partition column (month, 1–12). Derived from dt_start. Must be filtered together with
+      year and day in every query to enable partition pruning; omitting any partition column
+      disables pruning and forces a full scan.
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.month
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.month
@@ -206,7 +222,10 @@ columns:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.month
       - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.month
   day:
-    description: Day extracted from the start date
+    description: |
+      Table partition column (day, 1–31). Derived from dt_start. Always the last partition column —
+      filter with year and month to narrow the scan to specific days. Example:
+      WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.day
       - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.day
