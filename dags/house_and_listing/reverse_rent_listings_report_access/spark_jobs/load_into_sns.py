@@ -8,6 +8,10 @@ import boto3
 from pyspark.sql.functions import make_date
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_into_sns"
@@ -18,37 +22,38 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    (
-        dag_name,
-        database_name,
-        table_name,
-        event_type,
-        load_start_date,
-        load_end_date,
-        sns_topic_arn,
-    ) = parse_arguments()
-    config_service = ConfigurationService(dag_name)
-    sns_topic_arn = config_service.get_config(sns_topic_arn)
+    job_args = parse_arguments()
+
+    if is_validation_run(
+        job_args["target_database_name"],
+        job_args["target_table_name"],
+    ):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping reverse SNS export in cluster validation mode"
+        )
+        return
+
+    config_service = ConfigurationService(job_args["dag_name"])
+    sns_topic_arn = config_service.get_config(job_args["sns_topic_arn"])
     logger.info(
-        f"""m=__main__, database_name={database_name}, table_name={table_name},
-        event_type={event_type}, sns_topic_arn={sns_topic_arn}, load_start_date={load_start_date},
-        load_end_date={load_end_date}"""
+        f"""m=__main__, database_name={job_args["database_name"]}, table_name={job_args["table_name"]},
+        event_type={job_args["event_type"]}, sns_topic_arn={sns_topic_arn}, load_start_date={job_args["load_start_date"]},
+        load_end_date={job_args["load_end_date"]}"""
     )
 
     load_table_into_sns(
-        database_name,
-        table_name,
-        event_type,
+        job_args["database_name"],
+        job_args["table_name"],
+        job_args["event_type"],
         sns_topic_arn,
-        load_start_date,
-        load_end_date,
+        job_args["load_start_date"],
+        job_args["load_end_date"],
     )
 
 
-def parse_arguments() -> Tuple[str, str, str, str, datetime]:
+def parse_arguments() -> dict:
     """
     Parse the arguments passed to the job.
-    Returns a tuple with the DAG name, database name, table name, event type, load start and end date.
     """
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -65,26 +70,20 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument(
         "sns_topic_arn", help="ARN of the SNS topic to send the messages to"
     )
-
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
-    dag_name = args.dag_name
-    database_name = args.database_name
-    table_name = args.table_name
-    event_type = args.event_type
-    load_start_date = args.load_start_date
-    load_end_date = args.load_end_date
-    sns_topic_arn = args.sns_topic_arn
-
-    return (
-        dag_name,
-        database_name,
-        table_name,
-        event_type,
-        load_start_date,
-        load_end_date,
-        sns_topic_arn,
-    )
+    return {
+        "dag_name": args.dag_name,
+        "database_name": args.database_name,
+        "table_name": args.table_name,
+        "event_type": args.event_type,
+        "load_start_date": args.load_start_date,
+        "load_end_date": args.load_end_date,
+        "sns_topic_arn": args.sns_topic_arn,
+        "target_database_name": args.target_database_name,
+        "target_table_name": args.target_table_name,
+    }
 
 
 def load_table_into_sns(

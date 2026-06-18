@@ -6,9 +6,15 @@ from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
+from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
@@ -16,6 +22,61 @@ JOB_NAME = "load_batch_inference_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def load_raw_data(
+    df,
+    environment,
+    source,
+    datalake_bucket,
+    table_name,
+    raw_partition_cols,
+    target_database_name=None,
+    target_table_name=None,
+):
+    spark_client = SparkClient()
+    s3_loader = S3Loader()
+
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
+    format_options = SparkTableStorageFormat.PARQUET
+
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service.create_database(write_database_name)
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
+    s3_loader.load_df(
+        df=df,
+        s3_path=f"{write_location}{write_table_name}",
+        format_options=format_options,
+        partitions=raw_partition_cols,
+    )
+
+    spark_metastore_loader.update_metastore(
+        df=df,
+        database_name=write_database_name,
+        table_name=write_table_name,
+        format_options=format_options,
+        database_location=write_location,
+        partitions=raw_partition_cols,
+    )
+    spark_metastore_service.create_new_partitions_from_df(
+        df=df,
+        database_name=write_database_name,
+        table_name=write_table_name,
+        partition_cols=raw_partition_cols,
+    )
 
 
 def main():
@@ -31,7 +92,7 @@ def main():
         "load_end_date",
         help="End date (exclusive) for the period to ingest. Format: '%Y-%m-%d'",
     )
-
+    add_validation_target_args(parser)
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
@@ -57,15 +118,6 @@ def main():
 
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
-
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
-
-    spark_metastore_service = SparkMetastoreService(spark_client)
-
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
 
     dt_start = datetime.strptime(load_start_date, "%Y-%m-%d").date()
     dt_end = datetime.strptime(load_end_date, "%Y-%m-%d").date()
@@ -107,15 +159,15 @@ def main():
     for next_df in dfs[1:]:
         df = df.unionByName(next_df, allowMissingColumns=True)
 
-    path = f"{database_location}{table_name}"
-    logger.info(f"m=__main__, msg=Loading data into {path}...")
-
-    (
-        df.write.format("parquet")
-        .mode("overwrite")
-        .option("path", path)
-        .partitionBy(raw_partition_cols)
-        .saveAsTable(database_name + "." + table_name)
+    load_raw_data(
+        df,
+        environment,
+        source,
+        datalake_bucket,
+        table_name,
+        raw_partition_cols,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
 
 

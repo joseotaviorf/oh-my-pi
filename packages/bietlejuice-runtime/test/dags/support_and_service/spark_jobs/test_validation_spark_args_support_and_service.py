@@ -14,6 +14,7 @@ _JOB_PATHS = [
     "dags/support_and_service/comms_manager_rules/spark_jobs/load_comms_manager_rules.py",
     "dags/support_and_service/internal_chat/spark_jobs/load_internal_chat_raw.py",
     "dags/support_and_service/reclameaqui/spark_jobs/load_reclameaqui_tickets.py",
+    "dags/support_and_service/reverse_webhelp_access/spark_jobs/load_into_azure_blob_storage.py",
     "dags/support_and_service/salesforce/spark_jobs/load_salesforce_raw.py",
     "dags/support_and_service/survicate_respondent_attributes/spark_jobs/load_survicate_respondent_attributes_raw.py",
     "dags/support_and_service/survicate_survey_attributes/spark_jobs/load_survicate_survey_attributes_raw.py",
@@ -26,15 +27,25 @@ _JOB_PATHS = [
 ]
 
 
+_REVERSE_EXPORT_JOBS = {
+    "dags/support_and_service/reverse_webhelp_access/spark_jobs/load_into_azure_blob_storage.py",
+}
+
+
 @pytest.mark.parametrize("job_path", _JOB_PATHS)
 def test_spark_job_registers_validation_write_flags(job_path: str):
     text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
     assert "add_validation_target_args" in text or "--target-database-name" in text
-    assert "resolve_datalake_write_target" in text
+    if job_path in _REVERSE_EXPORT_JOBS:
+        assert "is_validation_run" in text
+    else:
+        assert "resolve_datalake_write_target" in text
 
 
 @pytest.mark.parametrize("job_path", _JOB_PATHS)
 def test_spark_job_resolve_uses_validation_target_args(job_path: str):
+    if job_path in _REVERSE_EXPORT_JOBS:
+        pytest.skip("reverse export jobs do not resolve datalake write targets")
     text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
     for block in re.findall(
         r"resolve_datalake_write_target\((.*?)\)", text, flags=re.DOTALL

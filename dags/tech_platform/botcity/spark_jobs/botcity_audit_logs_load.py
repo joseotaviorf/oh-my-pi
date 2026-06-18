@@ -8,12 +8,19 @@ from pyspark.sql.types import StringType, StructField, StructType
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import spark
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "botcity_audit_logs_load"
 logger = QuintoAndarLogger(JOB_NAME)
+_CLEAN_LAYER = LayerEnum.CLEAN.value
 
 
 def parse_arguments():
@@ -25,6 +32,7 @@ def parse_arguments():
     arg_parser.add_argument("execution_date")
     arg_parser.add_argument("table_name")
     arg_parser.add_argument("partition_cols")
+    add_validation_target_args(arg_parser)
 
     args = arg_parser.parse_args()
     args.partition_cols = ast.literal_eval(args.partition_cols)
@@ -169,9 +177,36 @@ def main():
     )
     clean_data_frame = clean_df(raw_data_frame)
 
+    database_name, database_location, _ = DatalakeMetastoreService.get_layer_info(
+        args.env, args.schema, args.datalake_bucket, _CLEAN_LAYER
+    )
+    if args.target_database_name and args.target_table_name:
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=args.table_name,
+                prod_location=database_location,
+                bucket=args.datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
+        write_path = f"{write_location.rstrip('/')}/{write_table_name}"
+    else:
+        write_database_name = database_name
+        write_table_name = args.table_name
+        write_path = (
+            f"s3://{args.datalake_bucket}/clean/{args.schema}/{args.table_name}/"
+        )
+
+    logger.info(
+        f"m=__main__, write_database={write_database_name}, "
+        f"write_table={write_table_name}, write_path={write_path}"
+    )
+
     DeltaLoader().load_table(
-        table_name=f"datalake_{args.schema}_clean.{args.table_name}",
-        path=f"s3://{args.datalake_bucket}/clean/{args.schema}/{args.table_name}/",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=write_path,
         source_df=clean_data_frame,
         partition_by=args.partition_cols,
         merge_on=["id_event"],

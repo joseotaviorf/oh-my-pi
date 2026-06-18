@@ -39,6 +39,12 @@ for _mod in _SPARK_STUBS:
 from dags.tech_platform.application_audit_logs.spark_jobs.application_audit_logs_load import (  # noqa: E402
     parse_arguments as parse_application_audit_logs_args,
 )
+from dags.tech_platform.botcity.spark_jobs.botcity_audit_logs_load import (  # noqa: E402
+    parse_arguments as parse_botcity_args,
+)
+from dags.tech_platform.identitynow.spark_jobs.account_activities_load import (  # noqa: E402
+    parse_arguments as parse_identitynow_account_activities_args,
+)
 from dags.tech_platform.identitynow.spark_jobs.events_load import (  # noqa: E402
     parse_arguments as parse_identitynow_events_args,
 )
@@ -238,6 +244,35 @@ _IDENTITYNOW_EVENTS_POSITIONAL = [
     '["year", "month", "day"]',
 ]
 
+_IDENTITYNOW_ACCOUNT_ACTIVITIES_POSITIONAL = [
+    "identitynow",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "identitynow_audit_logs",
+    "2024-01-01T00:00:00+00:00",
+    "account_activities",
+    '["year", "month", "day"]',
+]
+
+_BOTCITY_POSITIONAL = [
+    "botcity",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "botcity_audit_logs",
+    "2024-01-01T00:00:00+00:00",
+    "audit_logs",
+    '["year", "month", "day", "hour"]',
+]
+
+_OPENAPI_POSITIONAL = [
+    "openapi",
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "access_logs",
+    "2024-01-01T00:00:00+00:00",
+    "openapi",
+]
+
 _CYPRESS_REPORTS_POSITIONAL = [
     _TEST_ENV,
     _TEST_BUCKET,
@@ -248,15 +283,19 @@ _CYPRESS_REPORTS_POSITIONAL = [
 
 _TECH_PLATFORM_JOB_PATHS = [
     "dags/tech_platform/application_audit_logs/spark_jobs/application_audit_logs_load.py",
+    "dags/tech_platform/botcity/spark_jobs/botcity_audit_logs_load.py",
     "dags/tech_platform/cloudfront/spark_jobs/cloudfront_logs_load.py",
     "dags/tech_platform/cypress_reports/spark_jobs/load_cypress_reports_raw.py",
-    "dags/tech_platform/vault/spark_jobs/events_load.py",
+    "dags/tech_platform/identitynow/spark_jobs/account_activities_load.py",
     "dags/tech_platform/identitynow/spark_jobs/events_load.py",
+    "dags/tech_platform/openapi/spark_jobs/openapi_load.py",
+    "dags/tech_platform/vault/spark_jobs/events_load.py",
 ]
 
 _EVENTS_LOAD_JOB_PATHS = [
-    "dags/tech_platform/vault/spark_jobs/events_load.py",
+    "dags/tech_platform/identitynow/spark_jobs/account_activities_load.py",
     "dags/tech_platform/identitynow/spark_jobs/events_load.py",
+    "dags/tech_platform/vault/spark_jobs/events_load.py",
 ]
 
 _ZSCALER_POSITIONAL = [
@@ -427,6 +466,16 @@ class TestTechPlatformSparkJobValidationArgs:
                 _IDENTITYNOW_EVENTS_POSITIONAL,
                 "datalake_identitynow_audit_logs_clean___events",
             ),
+            (
+                parse_identitynow_account_activities_args,
+                _IDENTITYNOW_ACCOUNT_ACTIVITIES_POSITIONAL,
+                "datalake_identitynow_audit_logs_clean___account_activities",
+            ),
+            (
+                parse_botcity_args,
+                _BOTCITY_POSITIONAL,
+                "datalake_botcity_audit_logs_clean___audit_logs",
+            ),
         ],
     )
     def test_log_jobs_accept_validation_flags(
@@ -494,6 +543,27 @@ class TestTechPlatformSparkJobValidationArgs:
                 )
             ),
         )
+        monkeypatch.setattr(
+            "dags.tech_platform.identitynow.spark_jobs.account_activities_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(
+                        side_effect=lambda key: {
+                            "input_path": "s3://input",
+                            "output_path": "s3://output",
+                        }[key]
+                    )
+                )
+            ),
+        )
+        monkeypatch.setattr(
+            "dags.tech_platform.botcity.spark_jobs.botcity_audit_logs_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(return_value="path/{}/{}/{}")
+                )
+            ),
+        )
         args = parse_fn()
 
         assert args.target_database_name == _VALIDATION_DB
@@ -512,6 +582,11 @@ class TestTechPlatformSparkJobValidationArgs:
             (parse_cypress_reports_args, _CYPRESS_REPORTS_POSITIONAL),
             (parse_vault_events_args, _VAULT_EVENTS_POSITIONAL),
             (parse_identitynow_events_args, _IDENTITYNOW_EVENTS_POSITIONAL),
+            (
+                parse_identitynow_account_activities_args,
+                _IDENTITYNOW_ACCOUNT_ACTIVITIES_POSITIONAL,
+            ),
+            (parse_botcity_args, _BOTCITY_POSITIONAL),
         ],
     )
     def test_log_jobs_default_without_validation_flags(
@@ -565,6 +640,27 @@ class TestTechPlatformSparkJobValidationArgs:
                             "output_path": "s3://output",
                         }[key]
                     )
+                )
+            ),
+        )
+        monkeypatch.setattr(
+            "dags.tech_platform.identitynow.spark_jobs.account_activities_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(
+                        side_effect=lambda key: {
+                            "input_path": "s3://input",
+                            "output_path": "s3://output",
+                        }[key]
+                    )
+                )
+            ),
+        )
+        monkeypatch.setattr(
+            "dags.tech_platform.botcity.spark_jobs.botcity_audit_logs_load.ConfigurationService",
+            MagicMock(
+                return_value=MagicMock(
+                    get_config=MagicMock(return_value="path/{}/{}/{}")
                 )
             ),
         )

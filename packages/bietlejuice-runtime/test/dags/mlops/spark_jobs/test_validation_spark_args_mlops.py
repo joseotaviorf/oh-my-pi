@@ -7,6 +7,7 @@ import pytest
 _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
+    "dags/mlops/batch_inference/spark_jobs/load_parquet_into_datalake.py",
     "dags/mlops/emlio/spark_jobs/load_emlio_raw.py",
     "dags/mlops/evidently_ml_monitor/spark_jobs/load_evidently_ml_monitor_raw.py",
 ]

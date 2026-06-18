@@ -17,6 +17,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat, spark
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -107,6 +111,7 @@ def parse_arguments():
     arg_parser.add_argument("schema")
     arg_parser.add_argument("execution_date")
     arg_parser.add_argument("table_name")
+    add_validation_target_args(arg_parser)
     args = arg_parser.parse_args()
 
     args.execution_date = parser.parse(args.execution_date)
@@ -143,9 +148,19 @@ def main():
     )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     FullTableLoaderPipeline(
-        database_name, args.table_name, database_location, LayerEnum.RAW, None
+        write_database_name, write_table_name, write_location, LayerEnum.RAW, None
     ).load_and_register(df, format_options)
 
 

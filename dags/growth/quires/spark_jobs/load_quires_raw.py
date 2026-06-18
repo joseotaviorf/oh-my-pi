@@ -129,6 +129,11 @@ if __name__ == "__main__":
     load_end_date = args.load_end_date
     table_name = args.table_name
 
+    if load_start_date > load_end_date:
+        raise ValueError(
+            f"load_start_date ({load_start_date}) must be <= load_end_date ({load_end_date})"
+        )
+
     config_service = ConfigurationService(source)
     api_url = config_service.get_config("api_url")
     raw_partition_cols = config_service.get_config("raw_partition_cols")

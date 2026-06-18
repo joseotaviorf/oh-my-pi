@@ -2,11 +2,14 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from typing import Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_into_azure_blob_storage"
@@ -16,19 +19,21 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    (
-        environment,
-        dag_name,
-        database_name,
-        table_name,
-        azure_container_name,
-        table_context,
-        execution_date,
-    ) = parse_arguments()
+    job_args = parse_arguments()
+
+    if is_validation_run(
+        job_args["target_database_name"],
+        job_args["target_table_name"],
+    ):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping reverse Azure export in cluster validation mode"
+        )
+        return
+
     logger.info(
-        f"""m=__main__, environment={environment}, dag_name={dag_name}, database_name={database_name},
-        table_name={table_name}, azure_container_name={azure_container_name}, execution_date={execution_date}
-        table_context={table_context}"""
+        f"""m=__main__, environment={job_args["environment"]}, dag_name={job_args["dag_name"]}, database_name={job_args["database_name"]},
+        table_name={job_args["table_name"]}, azure_container_name={job_args["azure_container_name"]}, execution_date={job_args["execution_date"]}
+        table_context={job_args["table_context"]}"""
     )
 
     storage_account_name, storage_account_access_key = get_azure_credentials()
@@ -36,24 +41,21 @@ def main():
         f"fs.azure.account.key.{storage_account_name}.blob.core.windows.net",
         f"{storage_account_access_key}",
     )
-    blob_storage_path = (
-        f"wasbs://{azure_container_name}@{storage_account_name}.blob.core.windows.net/"
-    )
+    blob_storage_path = f"wasbs://{job_args['azure_container_name']}@{storage_account_name}.blob.core.windows.net/"
 
     load_table_in_azure_blob_storage(
-        dag_name,
-        database_name,
-        table_name,
+        job_args["dag_name"],
+        job_args["database_name"],
+        job_args["table_name"],
         blob_storage_path,
-        table_context,
-        execution_date,
+        job_args["table_context"],
+        job_args["execution_date"],
     )
 
 
-def parse_arguments() -> Tuple[str, str, str, str, datetime]:
+def parse_arguments() -> dict:
     """
     Parse the arguments passed to the job.
-    Returns a tuple with the database name, table name, event type, ARN of the SNS topic and execution date.
     """
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -66,28 +68,24 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
     parser.add_argument("table_context")
+    add_validation_target_args(parser)
 
     args = parser.parse_args()
 
-    environment = args.env
-    dag_name = args.dag_name
-    database_name = args.database_name
-    table_name = args.table_name
-    execution_date = datetime.fromisoformat(args.execution_date)
-    table_context = args.table_context
-
-    config_service = ConfigurationService(dag_name)
+    config_service = ConfigurationService(args.dag_name)
     azure_container_name = config_service.get_config("azure_container_name")
 
-    return (
-        environment,
-        dag_name,
-        database_name,
-        table_name,
-        azure_container_name,
-        table_context,
-        execution_date,
-    )
+    return {
+        "environment": args.env,
+        "dag_name": args.dag_name,
+        "database_name": args.database_name,
+        "table_name": args.table_name,
+        "azure_container_name": azure_container_name,
+        "table_context": args.table_context,
+        "execution_date": datetime.fromisoformat(args.execution_date),
+        "target_database_name": args.target_database_name,
+        "target_table_name": args.target_table_name,
+    }
 
 
 def get_azure_credentials():

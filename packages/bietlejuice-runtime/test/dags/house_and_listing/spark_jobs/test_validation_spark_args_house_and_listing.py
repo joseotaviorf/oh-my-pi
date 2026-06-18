@@ -13,10 +13,12 @@ _JOB_PATHS = [
     "dags/house_and_listing/dw_pricing/spark_jobs/load_fact_price_suggested.py",
     "dags/house_and_listing/enrich_ebdb_pricing/spark_jobs/load_house_suggestion_changes.py",
     "dags/house_and_listing/enrich_ebdb_pricing/spark_jobs/load_listing_price_change.py",
+    "dags/house_and_listing/reverse_rent_listings_report_access/spark_jobs/load_into_sns.py",
     "dags/house_and_listing/reverse_sale_unavailable_listings_access/spark_jobs/load_into_s3.py",
 ]
 
 _REVERSE_EXPORT_JOBS = {
+    "dags/house_and_listing/reverse_rent_listings_report_access/spark_jobs/load_into_sns.py",
     "dags/house_and_listing/reverse_sale_unavailable_listings_access/spark_jobs/load_into_s3.py",
 }
 

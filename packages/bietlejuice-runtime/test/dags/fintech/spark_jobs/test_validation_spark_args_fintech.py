@@ -8,6 +8,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
     "dags/fintech/arquivo_confidencial_integration_report/spark_jobs/load_incremental_arquivo_confidencial_raw.py",
+    "dags/fintech/collections_score_batch_inference/spark_jobs/load_parquet_into_datalake.py",
     "dags/fintech/cyber/spark_jobs/load_cyber_raw.py",
     "dags/fintech/cyber_audit_log/spark_jobs/load_cyber_audit_log_raw.py",
     "dags/fintech/cyber_bureau/spark_jobs/load_cyber_raw.py",

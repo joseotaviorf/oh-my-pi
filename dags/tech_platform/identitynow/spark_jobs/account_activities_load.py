@@ -8,13 +8,21 @@ from pyspark.sql.types import ArrayType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import spark
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
+from bietlejuice.base.validation.target_resolver import managed_table_fqn
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "identitynow_account_activities_load"
 logger = QuintoAndarLogger(JOB_NAME)
+_CLEAN_LAYER = LayerEnum.CLEAN.value
 
 
 def parse_arguments():
@@ -34,6 +42,7 @@ def parse_arguments():
         required=False,
         default=None,
     )
+    add_validation_target_args(arg_parser)
     args = arg_parser.parse_args()
 
     args.partition_cols = ast.literal_eval(args.partition_cols)
@@ -291,19 +300,48 @@ def main():
     raw_df = load_df(input_path)
     df = clean_df(raw_df)
 
-    full_clean_table_name = f"datalake_{args.schema}_clean.{args.table_name}"
+    database_name, database_location, _ = DatalakeMetastoreService.get_layer_info(
+        args.env, args.schema, args.datalake_bucket, _CLEAN_LAYER
+    )
+    if args.target_database_name and args.target_table_name:
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=args.table_name,
+                prod_location=database_location,
+                bucket=args.datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
+        write_path = f"{write_location.rstrip('/')}/{write_table_name}"
+    else:
+        write_database_name = database_name
+        write_table_name = args.table_name
+        write_path = f"{args.output_path}/clean/{args.schema}/{args.table_name}/"
+
+    full_table_name = managed_table_fqn(
+        prod_database=database_name,
+        prod_table=args.table_name,
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
-            table_privileges_dict, full_clean_table_name
+            table_privileges_dict, full_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(
-            full_clean_table_name
-        )
+        table_privileges = TablePrivileges.from_environment_default(full_table_name)
+
+    logger.info(
+        f"m=__main__, write_database={write_database_name}, "
+        f"write_table={write_table_name}, write_path={write_path}"
+    )
+
     loader = DeltaLoader()
     loader.load_table(
-        table_name=full_clean_table_name,
-        path=f"{args.output_path}/clean/{args.schema}/{args.table_name}/",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=write_path,
         source_df=df,
         partition_by=args.partition_cols,
     )
