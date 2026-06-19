@@ -1,33 +1,42 @@
 WITH docs_demand_resend_events AS (
   SELECT
-    id_event,
-    id_person AS uuid_person,
-    TRY_CAST(event_properties:id_house AS INT) AS id_house,
-    CAST(event_properties:id_rent_flow AS STRING) AS id_rent_flow,
-    ts_event
-  FROM datalake_cdp_clean.transactional
+    cdp_tx.id_event,
+    cdp_tx.id_person AS uuid_person,
+    TRY_CAST(JSON_EXTRACT_SCALAR(cdp_tx.event_properties, '$.id_house') AS INT) AS id_house,
+    JSON_EXTRACT_SCALAR(cdp_tx.event_properties, '$.id_rent_flow') AS id_rent_flow,
+    cdp_tx.ts_event
+  FROM datalake_cdp_clean.transactional AS cdp_tx
   WHERE
-    event_name = 'rent_flow_tenant_documentation_resend'
-    -- SFMC handover cutover: this view feeds the SFMC pipeline only for events
-    -- at/after 2026-05-19 08:30 BRT. Events strictly before that are still
-    -- handled by the legacy Hightouch query. The malformed-payload window
-    -- (Jan/Feb 2026) is well before the cutover, so no extra lower bound
-    -- is needed.
-    AND ts_event >= TIMESTAMP '2026-05-19 08:30:00'
+    cdp_tx.event_name = 'rent_flow_tenant_documentation_resend'
+    AND cdp_tx.application = 'rental-offer'
+    AND cdp_tx.journey_step = 'documentation'
+    AND (
+        YEAR > YEAR(CURRENT_DATE - INTERVAL '1' DAY)
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '1' DAY)
+          AND MONTH > MONTH(CURRENT_DATE - INTERVAL '1' DAY)
+        )
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '1' DAY)
+          AND MONTH = MONTH(CURRENT_DATE - INTERVAL '1' DAY)
+          AND DAY >= DAY(CURRENT_DATE - INTERVAL '1' DAY)
+        )
+      )
+    AND ts_event >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
 )
 SELECT
-  CONCAT(CAST(e.id_event AS STRING), '-', e.uuid_person) AS pk_event_user,
+  CONCAT(e.id_event, '-', e.uuid_person) AS pk_event_user,
   e.id_event,
   e.id_house,
   e.id_rent_flow,
   e.uuid_person,
   u.id AS id_user,
   u.email AS user_email,
-  split(trim(u.name), ' ')[0] AS user_first_name,
-  replace(u.main_phone, '+', '') AS user_phone,
-  concat_ws(', ', CAST(h.address AS STRING), CAST(h.number AS STRING)) AS address_text,
-  abs(crc32(encode(e.uuid_person, 'utf-8'))) % 100 AS binning_value,
-  date_format(e.ts_event, 'yyyy-MM-dd HH:mm:ss') AS ts_event
+  SPLIT(TRIM(u.name), ' ')[1] AS user_first_name,
+  REPLACE(u.main_phone, '+', '') AS user_phone,
+  CONCAT_WS(', ', h.address, h.number) AS address_text,
+  ABS(CRC32(TO_UTF8(e.uuid_person))) % 100 AS binning_value,
+  DATE_FORMAT(e.ts_event,  '%Y-%m-%d %T') AS ts_event
 FROM docs_demand_resend_events AS e
   INNER JOIN datalake_ebdb_clean.user AS u
     ON e.uuid_person = u.uuid_person

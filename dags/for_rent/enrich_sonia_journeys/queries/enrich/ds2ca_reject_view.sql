@@ -2,29 +2,43 @@ WITH docs_rejected_events AS (
   SELECT
     id_event,
     id_user,
-    CAST(id_person AS VARCHAR) AS uuid_person,
-    CAST(json_extract_scalar(json_parse(event_properties), '$.proposal_id') AS INT) AS id_proposal,
-    CAST(json_extract(json_parse(event_properties), '$.party_rejection_reasons') AS ARRAY(VARCHAR)) AS party_rejection_reasons,
+    id_person AS uuid_person,
+    CAST(JSON_EXTRACT_SCALAR(JSON_PARSE(event_properties), '$.proposal_id') AS INT) AS id_proposal,
+    CAST(JSON_EXTRACT(JSON_PARSE(event_properties), '$.party_rejection_reasons') AS ARRAY(VARCHAR)) AS party_rejection_reasons,
+    JSON_EXTRACT_SCALAR(JSON_PARSE(event_properties), '$.status') AS analysis_status,
     ts_event,
     event_properties
   FROM datalake_cdp_clean.transactional
   WHERE
     event_name = 'tenant_rent_documentation_analysis_result_event'
-    AND ts_event >= TIMESTAMP '2026-05-26 12:00:00'
-    AND json_extract_scalar(json_parse(event_properties), '$.status') = 'REJECTED'
+    AND application = 'sorting_hat'
+    AND journey_step = 'documentation'
+    AND (
+        YEAR > YEAR(CURRENT_DATE - INTERVAL '1' DAY)
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '1' DAY)
+          AND MONTH > MONTH(CURRENT_DATE - INTERVAL '1' DAY)
+        )
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '1' DAY)
+          AND MONTH = MONTH(CURRENT_DATE - INTERVAL '1' DAY)
+          AND DAY >= DAY(CURRENT_DATE - INTERVAL '1' DAY)
+        )
+      )
+    AND ts_event >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
 )
 SELECT
-  CAST(ae.id_event AS VARCHAR) || '-' || ae.uuid_person AS pk_event_user,
+  CONCAT(ae.id_event, '-', ae.uuid_person) AS pk_event_user,
   ae.id_event,
   p.id_house,
   ae.id_user,
   ae.uuid_person,
-  split(trim(u.name), ' ')[1] AS user_first_name,
-  replace(u.main_phone, '+', '') AS user_phone,
+  SPLIT(TRIM(u.name), ' ')[1] AS user_first_name,
+  REPLACE(u.main_phone, '+', '') AS user_phone,
   u.email AS user_email,
-  date_format(ae.ts_event, '%Y-%m-%d %H:%i:%s') AS ts_event,
-  abs(crc32(to_utf8(ae.uuid_person))) % 100 AS binning_value,
-  concat_ws(', ', CAST(h.address AS VARCHAR), CAST(h.number AS VARCHAR)) AS address_text,
+  DATE_FORMAT(ae.ts_event,  '%Y-%m-%d %T') AS ts_event,
+  ABS(CRC32(TO_UTF8(ae.uuid_person))) % 100 AS binning_value,
+  CONCAT_WS(', ', h.address, h.number) AS address_text,
   CASE
     WHEN cardinality(ae.party_rejection_reasons) > 0 
       AND cardinality(
@@ -51,4 +65,5 @@ LEFT JOIN datalake_ebdb_clean.house AS h
   ON p.id_house = h.id
 LEFT JOIN datalake_ebdb_clean.user AS u
   ON ae.uuid_person = u.uuid_person
+WHERE ae.analysis_status = 'REJECTED'
   

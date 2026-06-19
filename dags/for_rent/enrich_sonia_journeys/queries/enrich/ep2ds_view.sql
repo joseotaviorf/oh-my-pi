@@ -34,6 +34,7 @@ WITH
           AND DAY >= DAY(CURRENT_DATE - INTERVAL '10' DAY)
         )
       )
+      AND ts_event >= CURRENT_TIMESTAMP - INTERVAL '10' DAY
   ),
   credit_positive_ranked AS (
     SELECT

@@ -8,7 +8,18 @@ WITH contract_created_events AS (
   WHERE
     event_name = 'contract_created'
     AND application = 'mainstreamer'
-    AND YEAR >= 2026
+    AND (
+        YEAR > YEAR(CURRENT_DATE - INTERVAL '7' DAY)
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '7' DAY)
+          AND MONTH > MONTH(CURRENT_DATE - INTERVAL '7' DAY)
+        )
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '7' DAY)
+          AND MONTH = MONTH(CURRENT_DATE - INTERVAL '7' DAY)
+          AND DAY >= DAY(CURRENT_DATE - INTERVAL '7' DAY)
+        )
+      )
     AND ts_event >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
 ),
 contract_created AS (

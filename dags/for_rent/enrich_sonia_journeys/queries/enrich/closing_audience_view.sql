@@ -22,11 +22,27 @@ rent_flow_events AS (
     END AS kind,
     ts_event
   FROM datalake_cdp_clean.transactional
-  WHERE event_name IN (
+  WHERE 
+    application = 'rental-offer'
+    AND journey_step = 'on_contract'
+    AND event_name IN (
         'rent_flow_tenant_contract_sent',   'rent_flow_owner_contract_sent',
         'rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed',
         'rent_flow_contract_canceled')
-    AND (YEAR > 2026 OR (YEAR = 2026 AND MONTH > 6) OR (YEAR = 2026 AND MONTH = 6 AND DAY >= 17))
+    AND (
+        YEAR > YEAR(CURRENT_DATE - INTERVAL '30' DAY)
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '30' DAY)
+          AND MONTH > MONTH(CURRENT_DATE - INTERVAL '30' DAY)
+        )
+        OR (
+          YEAR = YEAR(CURRENT_DATE - INTERVAL '30' DAY)
+          AND MONTH = MONTH(CURRENT_DATE - INTERVAL '30' DAY)
+          AND DAY >= DAY(CURRENT_DATE - INTERVAL '30' DAY)
+        )
+      )
+    AND ts_event >= CURRENT_TIMESTAMP - INTERVAL '30' DAY
+    AND ts_event >= TIMESTAMP '2026-06-17 00:00:00'
 ),
 flow_person AS (
   SELECT
