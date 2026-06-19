@@ -94,7 +94,10 @@ steps:
       DATAHUB_TOKEN:
         from_secret: datahub_token
     commands:
-      - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
+      # PR validation: scoped to changed MDs only (avoids failing on pre-existing empty
+      # shells unrelated to this PR), warn-only for brand-new entities that don't exist
+      # in DataHub until the post-merge push.
+      - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose --changed-only --skip-missing
     when:
       - event: pull_request
         path: *datahub_path
@@ -108,7 +111,11 @@ steps:
       DATAHUB_TOKEN:
         from_secret: datahub_token
     commands:
-      - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
+      # Post-push validation: strict + deep, scoped to the MDs republished in THIS push
+      # (--changed-only). Hard-fails if a just-published product has an empty description,
+      # zero golden queries, or zero linked assets. Scoping avoids failing on pre-existing
+      # empty/legacy products unrelated to the current change.
+      - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose --strict --deep --changed-only
     when:
       - event: push
         branch: [master, hotfix/*]

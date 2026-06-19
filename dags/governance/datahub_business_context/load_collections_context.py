@@ -1200,19 +1200,24 @@ def _duplicate_structured_property_message(errors: list[Any]) -> bool:
 
 
 def ensure_dp_golden_struct_property(qualified_name: str) -> None:
-    """Idempotent CreateStructuredProperty: URN type restricted to Query."""
+    """Idempotent CreateStructuredProperty: URN type restricted to Query.
+
+    MULTIPLE cardinality — a Data Product can have several golden queries, all pinned to
+    the sidebar. (Idempotent: if the property already exists this create is a no-op, so the
+    cardinality here only takes effect on a fresh DataHub.)
+    """
 
     inp: dict[str, Any] = {
         "qualifiedName": qualified_name,
         "id": qualified_name,
         "displayName": "Golden query",
         "description": (
-            "Canonical validated SQL for this Data Product, stored as a Query entity "
+            "Canonical validated SQL for this Data Product, stored as Query entities "
             "(navigable from the sidebar)."
         ),
         "valueType": STRUCTURED_PROPERTY_VALUE_TYPE_URN_POINTER,
         "typeQualifier": {"allowedTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_QUERY]},
-        "cardinality": "SINGLE",
+        "cardinality": "MULTIPLE",
         "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
         "settings": {
             "showInAssetSummary": True,
@@ -1263,15 +1268,19 @@ def _merged_dp_structured_props(
     dp_urn: str,
     *,
     golden_sp_qname: str,
-    golden_query_urn_val: str,
+    golden_query_urn_vals: list[str],
     legacy_skip_urns: Optional[frozenset[str]] = None,
 ) -> Optional[list[dict[str, Any]]]:
-    """Merge existing Data Product structured properties with golden-query sidebar entry."""
+    """Merge existing Data Product structured properties with golden-query sidebar entry.
+
+    ``golden_query_urn_vals`` is a list — the golden-query structured property is MULTIPLE
+    cardinality, so all of a product's Query URNs land in the sidebar.
+    """
 
     golden_sp_urn = structured_property_urn(golden_sp_qname)
     our_row = {
         "structuredPropertyUrn": golden_sp_urn,
-        "values": [{"stringValue": golden_query_urn_val}],
+        "values": [{"stringValue": u} for u in golden_query_urn_vals],
     }
     legacy_skip = set(legacy_skip_urns or frozenset())
     fetch = _post(_FETCH_DATA_PRODUCT_STRUCTURED_PROPERTIES, {"urn": dp_urn})
@@ -1338,7 +1347,7 @@ def _merged_structured_property_input_params(
     return _merged_dp_structured_props(
         dp_urn,
         golden_sp_qname=cx.golden_query_structured_property_qualified_name,
-        golden_query_urn_val=cx.golden_query_urn,
+        golden_query_urn_vals=[cx.golden_query_urn],
         legacy_skip_urns=cx.legacy_structured_property_urns_to_drop,
     )
 
@@ -1383,9 +1392,25 @@ def push_golden_query_structured_property() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _curated_dataset_subject_urns(cfg: dict[str, Any]) -> list[str]:
-    gq = cfg.get("golden_query")
-    assert isinstance(gq, dict), "golden_query must be a mapping"
+def _get_all_golden_queries(cfg: dict[str, Any]) -> list[dict[str, Any]]:
+    """Normalize golden queries to a list. Accepts plural ``golden_queries:`` (preferred)
+    or singular ``golden_query:`` (legacy, treated as a one-item list)."""
+    plural = cfg.get("golden_queries")
+    if isinstance(plural, list):
+        return [q for q in plural if isinstance(q, dict)]
+    singular = cfg.get("golden_query")
+    if isinstance(singular, dict):
+        return [singular]
+    return []
+
+
+def _golden_query_subject_urns(gq: dict[str, Any]) -> list[str]:
+    """Dataset URNs for one golden query's ``subjects`` (list of {schema, table}).
+
+    Returns an empty list when ``subjects`` is absent or malformed — the caller
+    (``_curated_push_one_golden_query``) treats an empty list as a per-query failure
+    and logs it via ``_fail`` without aborting the whole product run.
+    """
     raw_subj = gq.get("subjects") or []
     rows = raw_subj if isinstance(raw_subj, list) else []
     urns = []
@@ -1393,9 +1418,10 @@ def _curated_dataset_subject_urns(cfg: dict[str, Any]) -> list[str]:
         if isinstance(row, dict) and row.get("schema") and row.get("table"):
             urns.append(_urn(str(row["schema"]), str(row["table"])))
     if not urns:
-        raise SystemExit(
-            "`golden_query.subjects` (list of {schema, table}) is required "
-            "for data_product_curated_entity",
+        name = gq.get("name") or "<unnamed>"
+        print(
+            f"  ! golden query {name!r} has no valid `subjects` — skipping",
+            file=sys.stderr,
         )
     return urns
 
@@ -1428,6 +1454,87 @@ def _filter_registered_dataset_urns(urns: list[str]) -> list[str]:
     return registered
 
 
+# batchSetDataProduct is EXCLUSIVE (one dataset → one product). This reverse-relationship
+# query lets us refuse to steal a dataset already owned by a *different* product.
+_GET_DATASET_OWNER_PRODUCT = """
+query GetDatasetOwnerProduct($urn: String!) {
+  dataset(urn: $urn) {
+    relationships(input: {
+      types: ["DataProductContains"], direction: INCOMING, start: 0, count: 1
+    }) {
+      relationships { entity { urn } }
+    }
+  }
+}
+"""
+
+
+_OWNER_UNKNOWN = object()  # sentinel: lookup failed, cannot determine ownership
+
+
+def _get_dataset_current_product_urn(dataset_urn: str) -> Any:
+    """Return the Data Product URN that currently owns ``dataset_urn``, or None.
+
+    Returns the ``_OWNER_UNKNOWN`` sentinel when the GraphQL call fails or returns no
+    data — callers must distinguish "unowned" (None) from "lookup error" (sentinel) so
+    that transient API errors don't silently allow reassignment.
+
+    Uses the INCOMING ``DataProductContains`` relationship (the ``dataset.dataProduct``
+    GraphQL field does not exist in this DataHub version).
+    """
+    try:
+        data = _post(_GET_DATASET_OWNER_PRODUCT, {"urn": dataset_urn})
+    except Exception:
+        return _OWNER_UNKNOWN
+    dataset_node = _graphql_field(data, "dataset")
+    if not dataset_node:
+        # GraphQL returned no data — cannot confirm unowned; treat as unknown.
+        return _OWNER_UNKNOWN
+    rels = (dataset_node.get("relationships") or {}).get("relationships") or []
+    for rel in rels:
+        owner = ((rel or {}).get("entity") or {}).get("urn")
+        if owner:
+            return str(owner)
+    return None
+
+
+def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]:
+    """Drop datasets already owned by a *different* product (prevents ownership theft).
+
+    Keep a dataset when it is unowned or already owned by this product (idempotent).
+    Skip (fail-closed) when ownership cannot be determined — a transient API error must
+    not silently permit reassignment.
+    A conflict is logged loudly (naming both products) so it surfaces in CI and can be
+    resolved by editing the YAMLs — the authoring rule (SKILL step 4) is the real fix;
+    this is the defense-in-depth backstop.
+    """
+    assignable: list[str] = []
+    for urn in urns:
+        owner = _get_dataset_current_product_urn(urn)
+        if owner is _OWNER_UNKNOWN:
+            print(
+                f"  ! ownership lookup failed for {urn} — skipping (fail-closed). "
+                f"Retry when DataHub is reachable.",
+                file=sys.stderr,
+            )
+        elif owner is None or owner == this_product_urn:
+            assignable.append(urn)
+        else:
+            print(
+                f"  ! ownership conflict: {urn}\n"
+                f"      already owned by {owner} — NOT reassigning to {this_product_urn}. "
+                f"Remove it from one of the two products' `datasets:` to resolve.",
+                file=sys.stderr,
+            )
+    skipped = len(urns) - len(assignable)
+    if skipped:
+        print(
+            f"  -> assigning {len(assignable)}/{len(urns)} datasets "
+            f"({skipped} skipped — owned by another product or lookup failed)"
+        )
+    return assignable
+
+
 def curated_push_assets(cfg: dict[str, Any]) -> None:
     print("\n[1/7] DataProduct assets (datasets only)...")
     pid = str(cfg["data_product_id"])
@@ -1437,14 +1544,16 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     if not isinstance(pdesc_raw, str) or not pdesc_raw.strip():
         raise SystemExit("product_description (non-empty string) is required")
 
-    urns = _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg))
+    dp_u = _data_product_urn(pid)
+    urns = _filter_assignable_urns(
+        _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
+    )
     if not urns:
         _fail(
             "curated.batchSetDataProduct",
             "no datasets from YAML are registered in DataHub",
         )
         return
-    dp_u = _data_product_urn(pid)
 
     create_root = _graphql_root(
         _CREATE_DATA_PRODUCT,
@@ -1623,31 +1732,38 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
 
 
 def _curated_extra_query_discovery_urls(cfg: dict[str, Any]) -> list[str]:
-    assert isinstance(cfg.get("golden_query"), dict)
-    keeper = str(cfg["golden_query"]["stable_urn"])
-    name_frag = str(cfg["golden_query"]["name"])
-    blob = _post(_SEARCH_QUERIES, {"frag": name_frag})
-    if blob is None:
-        return []
-    urls: list[str] = []
-    rs = ((blob.get("search") or {}).get("searchResults")) or []
+    """Discovery deep-links for queries matching any golden query's name — minus the
+    keeper URNs (every golden query's stable_urn is a keeper)."""
+    gqs = _get_all_golden_queries(cfg)
+    keepers = {str(gq.get("stable_urn") or "").strip() for gq in gqs}
+    name_frags = {str(gq.get("name") or "").strip() for gq in gqs if gq.get("name")}
+    urls: set[str] = set()
     ui_base = DATAHUB_UI_ORIGIN.rstrip("/")
-    for row in rs:
-        ent_u = (((row.get("entity") or {}).get("urn")) or "").strip()
-        if not ent_u.startswith("urn:li:query:"):
+    for frag in name_frags:
+        blob = _post(_SEARCH_QUERIES, {"frag": frag})
+        if blob is None:
             continue
-        if ent_u == keeper:
-            continue
-        urls.append(f"{ui_base}/query/{ent_u}")
-    return sorted(set(urls))
+        rs = ((blob.get("search") or {}).get("searchResults")) or []
+        for row in rs:
+            ent_u = (((row.get("entity") or {}).get("urn")) or "").strip()
+            if not ent_u.startswith("urn:li:query:"):
+                continue
+            if ent_u in keepers:
+                continue
+            urls.add(f"{ui_base}/query/{ent_u}")
+    return sorted(urls)
 
 
 def curated_purge_discovery_links(cfg: dict[str, Any]) -> None:
     print("\n[4/7] Purge golden-query deep links...")
-    keeper_u = str(cfg["golden_query"]["stable_urn"])
+    gqs = _get_all_golden_queries(cfg)
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     ui_base = DATAHUB_UI_ORIGIN.rstrip("/")
-    targets = {f"{ui_base}/query/{keeper_u}"}
+    targets = {
+        f"{ui_base}/query/{str(gq['stable_urn']).strip()}"
+        for gq in gqs
+        if gq.get("stable_urn")
+    }
     targets.update(_curated_extra_query_discovery_urls(cfg))
     yaml_extra = cfg.get("extra_discovery_link_urls_remove") or []
     if isinstance(yaml_extra, list):
@@ -1673,23 +1789,29 @@ def curated_purge_discovery_links(cfg: dict[str, Any]) -> None:
             _ok("Removed golden-query Summary URL (if present)")
 
 
-def curated_push_create_query(cfg: dict[str, Any]) -> None:
-    print("\n[5/7] Golden Query entity...")
-    gq = cfg["golden_query"]
-    assert isinstance(gq, dict)
+def _curated_push_one_golden_query(gq: dict[str, Any]) -> Optional[str]:
+    """Create/upsert one golden Query entity. Returns its URN, or None on failure.
+
+    Prefers a stable-URN REST upsert (idempotent); falls back to GraphQL ``createQuery``.
+    """
     name = str(gq["name"])
     desc_text = str(gq.get("description") or name).strip()
     sql_txt = str(gq.get("sql") or "").strip()
     stable_urn = str(gq.get("stable_urn") or "").strip()
-    subj = _curated_dataset_subject_urns(cfg)
-
+    # Check existence first: an already-published query must stay in the sidebar
+    # even when its YAML subjects are temporarily missing (authoring error).
     if stable_urn and _query_exists(stable_urn):
         _ok(f"Query already exists at {stable_urn}")
-        return
+        return stable_urn
+
+    subj = _golden_query_subject_urns(gq)
+    if not subj:
+        _fail(f"curated.goldenQuery [{name}]", "no valid subjects — new query skipped")
+        return None
 
     if stable_urn and _ingest_query_at_urn(stable_urn, name, desc_text, sql_txt, subj):
         _ok(f"Upserted Query at {stable_urn}")
-        return
+        return stable_urn
 
     root = _graphql_root(
         _CREATE_QUERY,
@@ -1713,29 +1835,54 @@ def curated_push_create_query(cfg: dict[str, Any]) -> None:
             if stable_urn and urn_c != stable_urn:
                 print(
                     f"  ! createQuery returned {urn_c} but YAML stable_urn is "
-                    f"{stable_urn}; sidebar will keep YAML URN (REST ingest failed)",
+                    f"{stable_urn}; sidebar will use the returned URN",
                     file=sys.stderr,
                 )
             _ok(f"Created Query {urn_c}")
-            return
+            return str(urn_c)
     if errs and _errors_indicate_already_exists(errs):
-        print("  -> createQuery duplicate — using YAML golden_query.stable_urn")
-        return
-    _fail("curated.createQuery", json.dumps({"errors": errs, "data": data_n}))
+        print(f"  -> createQuery duplicate for {name!r} — using stable_urn")
+        return stable_urn or None
+    _fail(f"curated.createQuery [{name}]", json.dumps({"errors": errs, "data": data_n}))
+    return None
 
 
-def curated_push_sidebar_struct_props(cfg: dict[str, Any]) -> None:
+def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
+    """Create every golden query and return the URNs that landed (for the sidebar).
+
+    Partial-failure policy: a failed query is logged via ``_fail`` (non-zero exit) but does
+    NOT abort — successful queries still publish and their URNs feed the sidebar, so one bad
+    SQL block cannot wipe the rest.
+    """
+    gqs = _get_all_golden_queries(cfg)
+    print(f"\n[5/7] Golden Query entities ({len(gqs)})...")
+    if not gqs:
+        print("  -> no golden queries in YAML — skipping")
+        return []
+    urns: list[str] = []
+    for gq in gqs:
+        urn = _curated_push_one_golden_query(gq)
+        if urn and urn not in urns:
+            urns.append(urn)
+    return urns
+
+
+def curated_push_sidebar_struct_props(
+    cfg: dict[str, Any], query_urns: list[str]
+) -> None:
     print("\n[6/7] Sidebar structured property...")
     spec_sp = cfg.get("structured_property")
     if not isinstance(spec_sp, dict) or not spec_sp.get("qualified_name"):
         raise SystemExit("`structured_property.qualified_name` is required")
 
-    golden = cfg["golden_query"]
-    assert isinstance(golden, dict)
     pid = str(cfg["data_product_id"])
     dp_u = _data_product_urn(pid)
     q_name = str(spec_sp["qualified_name"])
-    keeper_q = str(golden["stable_urn"])
+
+    keeper_qs = [u for u in query_urns if str(u or "").strip()]
+    if not keeper_qs:
+        print("  -> no golden-query URNs to pin — skipping sidebar upsert")
+        return
 
     raw_legacy = spec_sp.get("legacy_qualified_names_to_drop") or []
     legacy_skip = frozenset(
@@ -1748,7 +1895,7 @@ def curated_push_sidebar_struct_props(cfg: dict[str, Any]) -> None:
     merged_blob = _merged_dp_structured_props(
         dp_u,
         golden_sp_qname=q_name,
-        golden_query_urn_val=keeper_q,
+        golden_query_urn_vals=keeper_qs,
         legacy_skip_urns=legacy_skip,
     )
     if merged_blob is None:
@@ -1774,7 +1921,10 @@ def curated_push_sidebar_struct_props(cfg: dict[str, Any]) -> None:
 
 def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
     print("\n[7/7] Re-affirm dataset-only memberships...")
-    urns_r = _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg))
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+    urns_r = _filter_assignable_urns(
+        _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
+    )
     if not urns_r:
         _fail(
             "curated.datasets.refresh",
@@ -1785,7 +1935,7 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
         _SET_DATA_PRODUCT_ASSETS,
         {
             "input": {
-                "dataProductUrn": _data_product_urn(str(cfg["data_product_id"])),
+                "dataProductUrn": dp_u,
                 "resourceUrns": urns_r,
             },
         },
@@ -1801,8 +1951,8 @@ def run_data_product_curated_entity(spec: dict[str, Any]) -> None:
     curated_push_documentation_link(spec)  # [2/7]
     curated_push_glossary_terms(spec)  # [3/7]
     curated_purge_discovery_links(spec)  # [4/7]
-    curated_push_create_query(spec)  # [5/7]
-    curated_push_sidebar_struct_props(spec)  # [6/7]
+    query_urns = curated_push_all_golden_queries(spec)  # [5/7]
+    curated_push_sidebar_struct_props(spec, query_urns)  # [6/7]
     curated_refresh_dataset_assets(spec)  # [7/7]
 
 

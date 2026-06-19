@@ -72,7 +72,13 @@ from datahub_domain_catalog import (  # noqa: E402
     known_domain_urns,
 )
 
-_MD_DIR = _REPO_ROOT / "docs/llm_context/business_entities"
+# Entity Markdown source directories. Both business and metric entities become Data
+# Products in DataHub (the Woodpecker pipeline triggers on both paths).
+_MD_DIRS = (
+    _REPO_ROOT / "docs/llm_context/business_entities",
+    _REPO_ROOT / "docs/llm_context/metric_entities",
+)
+_MD_PREFIXES = tuple(str(d.relative_to(_REPO_ROOT)) + "/" for d in _MD_DIRS)
 _REFERENCE_DIR = _REPO_ROOT / "dags/governance/datahub_business_context/reference"
 _LOADER = (
     _REPO_ROOT / "dags/governance/datahub_business_context/load_collections_context.py"
@@ -89,13 +95,36 @@ _QUERY_URN_RE = re.compile(
     r"^urn:li:query:" r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
     re.IGNORECASE,
 )
+# Allows an optional ``- `` list marker so it matches both the singular
+# (``  stable_urn: …``) and the plural-list (``  - stable_urn: …``) YAML forms.
 _STABLE_URN_LINE_RE = re.compile(
-    r"^(\s*stable_urn:\s*)(?:urn:li:query:[^\s]+|\S+)\s*$",
+    r"^(\s*(?:-\s+)?stable_urn:\s*)(?:urn:li:query:[^\s]+|\S+)\s*$",
     re.MULTILINE,
 )
 
 _DEFAULT_MODEL = "openai/gpt-5.3-codex"
 _DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
+
+# Markdown ``## `` sections that must NOT be folded into the Data Product description:
+# Tables → linked assets; Synonyms → glossary terms; Golden Queries → Query entities;
+# DataHub catalog → pure tooling pointer. Everything else (Overview, Key Metrics,
+# Dos and Don'ts, Relationships, …) IS the description.
+EXCLUDE_HEADING_PATTERNS = [
+    re.compile(r"^## (Tables|Where to query what)$"),
+    re.compile(r"^## (Synonyms|Glossary and Synonyms)$"),
+    re.compile(r"^## Golden [Qq]uer(y|ies)(:.+)?$"),
+    re.compile(r"^## DataHub catalog$"),
+]
+
+# Matches the whole ``product_description:`` YAML block up to (but not including) the
+# next top-level key (a line starting at column 0 with a non-space character).
+_PRODUCT_DESCRIPTION_BLOCK_RE = re.compile(
+    r"(?ms)^product_description:.*?\n(?=\S)",
+)
+# Used to insert a description block when the LLM omitted one entirely.
+_PRODUCT_DISPLAY_NAME_LINE_RE = re.compile(
+    r"(?m)^product_display_name:.*$",
+)
 
 _CI_YAML_DIR: Path | None = None
 
@@ -118,8 +147,29 @@ def _ci_yaml_dir() -> Path:
     return _CI_YAML_DIR
 
 
+def _check_no_slug_collisions(paths: list[Path]) -> None:
+    """Two MDs with the same stem → one Data Product URN, which is ambiguous. Fail loud."""
+    seen: dict[str, Path] = {}
+    for p in paths:
+        slug = md_path_to_data_product_id(p)
+        if slug in seen and seen[slug] != p:
+            print(
+                f"ERROR: slug collision — {seen[slug].name} and {p.name} both map to "
+                f"data_product_id {slug!r}. Rename one.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        seen[slug] = p
+
+
 def _all_mds() -> list[Path]:
-    return sorted(p for p in _MD_DIR.glob("*.md") if not p.name.startswith("_"))
+    found: list[Path] = []
+    for d in _MD_DIRS:
+        if d.is_dir():
+            found.extend(p for p in d.glob("*.md") if not p.name.startswith("_"))
+    found = sorted(found, key=lambda p: p.name)
+    _check_no_slug_collisions(found)
+    return found
 
 
 def _git_changed_files() -> list[str]:
@@ -148,14 +198,15 @@ def _git_changed_files() -> list[str]:
 
 
 def _changed_mds() -> list[Path]:
-    md_prefix = "docs/llm_context/business_entities/"
-    return [
+    changed = [
         _REPO_ROOT / f
         for f in _git_changed_files()
-        if f.startswith(md_prefix)
+        if f.startswith(_MD_PREFIXES)
         and f.endswith(".md")
         and not Path(f).name.startswith("_")
     ]
+    _check_no_slug_collisions(changed)
+    return changed
 
 
 def _loader_changed_in_commit() -> bool:
@@ -185,14 +236,104 @@ def _resolve_targets(args: argparse.Namespace) -> list[Path]:
     return _changed_mds()
 
 
-def _stable_urn(entity_slug: str) -> str:
-    return f"urn:li:query:{uuid.uuid5(_URN_NAMESPACE, entity_slug)}"
+def _stable_urn_for_query(entity_slug: str, index: int) -> str:
+    """Deterministic per-query URN. Index 0 keeps the legacy ``uuid5(slug)`` value so the
+    first golden query per product retains its existing URN (no re-creation churn)."""
+    key = entity_slug if index == 0 else f"{entity_slug}:{index}"
+    return f"urn:li:query:{uuid.uuid5(_URN_NAMESPACE, key)}"
 
 
-def _enforce_stable_urn(yaml_content: str, stable_urn: str) -> str:
-    if _STABLE_URN_LINE_RE.search(yaml_content):
-        return _STABLE_URN_LINE_RE.sub(rf"\1{stable_urn}", yaml_content, count=1)
-    return yaml_content
+def _enforce_stable_urns(yaml_content: str, entity_slug: str) -> str:
+    """Overwrite every ``stable_urn:`` line in document order with its index-based URN.
+
+    Works for both singular ``golden_query:`` (one line) and plural ``golden_queries:``
+    (N lines) YAML — position in the text matches position in the list. The LLM emits
+    ``"TBD"`` placeholders; CI is the authority for these URNs.
+    """
+    counter = {"i": 0}
+
+    def _repl(m: re.Match) -> str:
+        urn = _stable_urn_for_query(entity_slug, counter["i"])
+        counter["i"] += 1
+        return f"{m.group(1)}{urn}"
+
+    return _STABLE_URN_LINE_RE.sub(_repl, yaml_content)
+
+
+def _should_exclude_heading(line: str) -> bool:
+    return any(p.match(line.strip()) for p in EXCLUDE_HEADING_PATTERNS)
+
+
+def _extract_description_from_md(md_path: Path) -> str:
+    """Full MD body minus Tables / Synonyms / Golden Queries / DataHub-catalog sections.
+
+    This is the single source of truth for the Data Product description — the LLM no
+    longer authors it (see SKILL.md step 2). Mirrors the audit-proven extraction logic.
+    """
+    lines = md_path.read_text().split("\n")
+    result: list[str] = []
+    skip = False
+    for line in lines:
+        if line.startswith("## "):
+            skip = _should_exclude_heading(line)
+        if not skip:
+            result.append(line)
+    content = "\n".join(result).strip()
+    return re.sub(r"\n{3,}", "\n\n", content)
+
+
+def _as_yaml_literal_block(key: str, value: str) -> str:
+    """Render ``key: |`` literal block scalar with every line indented two spaces.
+
+    Literal blocks need no escaping (markdown ``#``, ``:``, quotes, etc. are all safe),
+    so this round-trips arbitrary MD content without mangling — unlike ``yaml.dump``.
+    """
+    indented = "\n".join((f"  {ln}" if ln else "") for ln in value.split("\n"))
+    return f"{key}: |\n{indented}\n"
+
+
+def _inject_description(yaml_content: str, description: str) -> str:
+    """Replace (or insert) ``product_description`` with the full MD-derived text.
+
+    Targeted string surgery — never a full ``yaml.dump`` round-trip — so multiline
+    ``sql:`` blocks and key ordering survive untouched. Falls back to the original text
+    (with a warning) if the result would not parse, so a valid YAML is never corrupted.
+    """
+    block = _as_yaml_literal_block("product_description", description)
+
+    if _PRODUCT_DESCRIPTION_BLOCK_RE.search(yaml_content):
+        candidate = _PRODUCT_DESCRIPTION_BLOCK_RE.sub(
+            lambda _m: block, yaml_content, count=1
+        )
+    elif _PRODUCT_DISPLAY_NAME_LINE_RE.search(yaml_content):
+        candidate = _PRODUCT_DISPLAY_NAME_LINE_RE.sub(
+            lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
+        )
+    else:
+        # No anchor — prepend after the kind line is impossible to locate reliably;
+        # append at end so the loader at least sees a non-empty description.
+        candidate = f"{yaml_content.rstrip()}\n{block}"
+
+    try:
+        parsed = yaml.safe_load(candidate)
+    except yaml.YAMLError as err:
+        print(
+            f"   WARN: description injection produced invalid YAML ({err}); "
+            "keeping LLM-authored description.",
+            file=sys.stderr,
+        )
+        return yaml_content
+    if (
+        not isinstance(parsed, dict)
+        or not str(parsed.get("product_description") or "").strip()
+    ):
+        print(
+            "   WARN: description injection did not yield a non-empty "
+            "product_description; keeping LLM-authored description.",
+            file=sys.stderr,
+        )
+        return yaml_content
+    return candidate
 
 
 def _yaml_domain_urn(yaml_content: str) -> str:
@@ -225,7 +366,6 @@ def _validate_domain_urn(
 
 def _build_messages(
     md_path: Path,
-    stable_urn: str,
     *,
     domains: list[DataHubDomain],
 ) -> list[dict]:
@@ -272,7 +412,6 @@ INPUT: {rel_md}
 FIXED INPUTS (use these verbatim — do not change):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 - data_product_id : {entity_slug}
-- stable_urn      : {stable_urn}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RULES:
@@ -284,12 +423,20 @@ RULES:
 LIVE DATAHUB DOMAIN CATALOG ({len(domains)} domains):
 {domains_block}
 
-- Use the stable_urn above verbatim. Do NOT generate a new UUID.
-- In `datasets`, include only concrete `schema.table` pairs that exist as real tables.
+- Emit ALL golden queries from the Markdown's `## Golden Queries` section as a
+  `golden_queries:` list (plural). For EACH query set `stable_urn: "TBD"` — CI assigns the
+  real deterministic URN per query. Do NOT generate UUIDs yourself.
+- In `datasets`, include only concrete `schema.table` pairs that exist as real tables AND
+  that this product is the PRIMARY OWNER of (its own domain schemas). A table you only JOIN
+  to but that another product owns belongs in the description prose, NOT in `datasets` —
+  listing it would steal it from the other product (assignment is exclusive).
   Never use wildcards (`*`), schema globs (`schema.*`), or placeholder patterns
   (`statement_*`, `reverse_accounts_*`). Omit patterns; expand to explicit names or skip.
 - Glossary term `id` values must match existing DataHub term slugs when the term
   already exists; the loader resolves by display name as fallback.
+- Do NOT hand-author `product_description`. CI overwrites it with the full Markdown body
+  (minus Tables / Synonyms / Golden Queries / DataHub-catalog sections). Emit a one-line
+  placeholder, e.g. `product_description: "(injected by CI from Markdown)"`.
 - Output ONLY the YAML. No markdown fences, no commentary.
 """
 
@@ -459,13 +606,12 @@ def main(argv: list[str] | None = None) -> int:
     for md_path in targets:
         entity_slug = md_path_to_data_product_id(md_path)
         yaml_path = yaml_dir / f"{entity_slug}.datahub.yaml"
-        stable = _stable_urn(entity_slug)
 
         print(f"\n▶  {entity_slug}")
-        print(f"   stable_urn : {stable} (uuid5)")
+        print(f"   query 0 urn : {_stable_urn_for_query(entity_slug, 0)} (uuid5)")
 
         try:
-            messages = _build_messages(md_path, stable, domains=domains)
+            messages = _build_messages(md_path, domains=domains)
             raw = _call_llm(messages, model, base_url, api_key)
         except Exception as err:
             print(f"   ERROR: LLM call failed — {err}", file=sys.stderr)
@@ -482,7 +628,10 @@ def main(argv: list[str] | None = None) -> int:
             failed.append(entity_slug)
             continue
 
-        yaml_content = _enforce_stable_urn(yaml_content, stable)
+        yaml_content = _enforce_stable_urns(yaml_content, entity_slug)
+        yaml_content = _inject_description(
+            yaml_content, _extract_description_from_md(md_path)
+        )
 
         domain_err = _validate_domain_urn(
             _yaml_domain_urn(yaml_content),

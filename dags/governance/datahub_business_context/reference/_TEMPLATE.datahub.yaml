@@ -11,7 +11,8 @@
 #   2. Push to master (or run the generate script locally) — CI publishes to DataHub
 #   3. Verify: python dags/governance/datahub_business_context/smoke_test_datahub.py
 #
-# golden_query.stable_urn is assigned deterministically (uuid5 from entity slug) by CI.
+# Each golden query's stable_urn is assigned deterministically by CI (uuid5 from entity
+# slug for query 0, uuid5 from "slug:N" for the rest). Author them as "TBD".
 #
 # ==============================================================================
 
@@ -30,16 +31,25 @@ structured_property:
   legacy_qualified_names_to_drop:
     - br.com.quintoandar.datahub.{entity_slug_kebab}.golden_query_url
 
-golden_query:
-  stable_urn: urn:li:query:{uuid}
-  name: "Query 1 — ..."
-  description: >-
-    ...
-  subjects:
-    - schema: ...
-      table: ...
-  sql: |
-    ...
+golden_queries:
+  - stable_urn: "TBD"          # CI assigns the deterministic URN per query (uuid5)
+    name: "Query 1 — ..."
+    description: >-
+      ...
+    subjects:
+      - schema: ...
+        table: ...
+    sql: |
+      ...
+  - stable_urn: "TBD"
+    name: "Query 2 — ..."
+    description: >-
+      ...
+    subjects:
+      - schema: ...
+        table: ...
+    sql: |
+      ...
 
 datasets:
   - schema: ...

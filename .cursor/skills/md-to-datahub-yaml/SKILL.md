@@ -45,11 +45,11 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 | `domain_urn` | Collected from user | Direct use, e.g. `urn:li:domain:growth` |
 | `structured_property.qualified_name` | `data_product_id` | `br.com.quintoandar.datahub.{data_product_id}.golden_query` |
 | `structured_property.legacy_qualified_names_to_drop` | `data_product_id` | `[br.com.quintoandar.datahub.{data_product_id}.golden_query_url]` |
-| `golden_query.stable_urn` | Prompt (CI) or generated | Use value supplied by caller if present. Otherwise: `python -c "import uuid; print(uuid.uuid4())"` — generate once per new entity, never change after first push. |
-| `golden_query.name` | `## Golden Queries` H3 title | First H3 under Golden Queries, e.g. `"Query 1 — Contracts signed in a period"` |
-| `golden_query.description` | First sentence below the H3 | One sentence + ` Source: docs/llm_context/business_entities/{entity}.md` |
-| `golden_query.subjects` | SQL `FROM` / `JOIN` clauses in first golden query | Extract `schema.table` pairs; map to `- schema: ...\n  table: ...` |
-| `golden_query.sql` | First SQL code block under `## Golden Queries` | Verbatim SQL, preserve indentation |
+| `golden_queries[].stable_urn` | — | Always `"TBD"`; CI assigns the deterministic URN per query. |
+| `golden_queries[].name` | each `## Golden Queries` H3 title | One entry per H3, e.g. `"Query 1 — Contracts signed in a period"` |
+| `golden_queries[].description` | First sentence below each H3 | One sentence + ` Source: docs/llm_context/business_entities/{entity}.md` |
+| `golden_queries[].subjects` | SQL `FROM` / `JOIN` clauses in that query | Extract `schema.table` pairs; map to `- schema: ...\n  table: ...` |
+| `golden_queries[].sql` | each SQL code block under `## Golden Queries` | Verbatim SQL, preserve indentation |
 | `datasets` | `## Tables` section | Extract every `schema.table` backtick reference from the table rows; deduplicate |
 | `glossary_terms.parent_node_urn` | `domain_urn` | `urn:li:glossaryNode:{domain}` (the part after `urn:li:domain:`) |
 | `glossary_terms.terms[].id` | `## Glossary and Synonyms` bullets | snake_case slug from the bold term, e.g. `closing_entity`, `cc2cs_metric` |
@@ -60,23 +60,30 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 
 ---
 
-## Step 2 — Author `product_description`
+## Step 2 — `product_description` (do NOT hand-author)
 
-The `product_description` is the most important field: it is the primary text shown in DataHub and
-consumed by TARS for entity discovery. Condense the `## Overview` section into a focused description.
+**CI overwrites `product_description` with the full Markdown body**, minus the sections that map to
+other DataHub features:
 
-**Rules:**
-- Target: 3–6 paragraphs, 200–400 words total.
-- Start with what the entity is and why it matters.
-- Include lifecycle stages if present (one sentence each, referencing the key column).
-- Include **Critical rules** from `## Dos and Don'ts` or `## Tables` if they affect how data should be queried (mandatory filters, CAST requirements, dedup patterns, grain caveats).
-- Include **Key metrics** names in a single paragraph or inline.
-- Include **method/status/product_origin** mappings if they are in the Markdown (e.g., payments methods, visit statuses).
-- End every description with: `Further detail and table routing: docs/llm_context/business_entities/{entity}.md`
-- Do NOT duplicate column-level documentation — reference the column name, not its definition.
-- Do NOT mention internal CI/tooling details.
+- `## Tables` / `## Where to query what` → linked assets
+- `## Synonyms` / `## Glossary and Synonyms` → glossary terms
+- `## Golden Queries` (and variants) → Query entities
+- `## DataHub catalog` → tooling pointer only
 
-**Quality bar:** compare to `payments.datahub.yaml` `product_description` — that is the gold standard.
+Everything else — Overview, Key Metrics, Critical rules, Dos and Don'ts, Relationships with Other
+Entities, and all entity-specific sections — IS the description, verbatim from the MD.
+
+**Rule:** emit a one-line placeholder in the YAML; never condense or summarize:
+
+```yaml
+product_description: "(injected by CI from Markdown)"
+```
+
+The extraction + injection happens in
+`packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py`
+(`_extract_description_from_md` → `_inject_description`). There is no word-count target — the full
+content is the deliverable. Keep the MD itself well-structured; that is where description quality
+is controlled now.
 
 ---
 
@@ -120,6 +127,22 @@ Scan the `## Tables` section for every `` `schema.table` `` backtick pair (also 
 
 - Keep only `schema.table` pairs where the schema looks like a real Databricks schema (e.g., `dw_rent`, `datalake_checkout_clean`, `enrich_visits`).
 - **Never emit wildcards or patterns in `datasets`.** DataHub links concrete dataset URNs only. Skip (do not copy to YAML) any reference containing `*`, `…`, or placeholder suffixes like `statement_*`, `reverse_accounts_*`, or `schema.*`. If the Markdown uses a pattern for narrative routing, expand to the real table names listed elsewhere in the same doc, or omit from `datasets` entirely.
+- **CRITICAL — list ONLY tables this product is the PRIMARY OWNER of.** `batchSetDataProduct` is *exclusive*: a dataset can belong to exactly one Data Product. Listing a table owned by another product would steal it and break that product. A table you only JOIN to (owned by another domain) belongs in the description prose / JOIN notes — **not** in `datasets:`.
+  - Primary owner = the product whose domain schema the table lives in. Use this schema-prefix → owner guide:
+
+    | Schema prefix | Primary owner |
+    |---|---|
+    | `datalake_chatbot.*` | `chatbot-sessions` |
+    | `datalake_langfuse_clean.*` | `evals` |
+    | `datalake_conversation_explorer_clean.*` | `conversation-explorer` |
+    | `datalake_ai_collections_quintoandar.*`, `dw_collection_ai_agents.*` | `matthew` |
+    | `dw_collections_segmentation.*` | `collections` |
+    | `datalake_debt_recovery.*`, `metric_fintech.daily_recovery_*`, `dw_evictions.*` | `recovery-collections-fr-tenants` |
+    | `dw_payments_platform.*`, `datalake_checkout_clean.*`, `datalake_wall_street_clean.*`, `datalake_vans_clean.*` | `payments` |
+    | `dw_customer_support.fact_chat_messages` | `contact` |
+    | `dw_customer_support.fact_tickets`, `datalake_customer_support.tickets` | `ticket` |
+
+  - When unsure who owns a shared table, leave it OUT of `datasets:` and mention it in the description instead. The loader has a backstop (`_filter_assignable_urns` in `load_collections_context.py`) that refuses to reassign a table already owned by a different product and logs the conflict — but authoring it correctly here is the real fix.
 - Deduplicate.
 - Output as:
 
@@ -133,17 +156,22 @@ Order: DW tables first (`dw_*`), then enrich (`enrich_*`), then clean/lake (`dat
 
 ---
 
-## Step 5 — Extract `golden_query`
+## Step 5 — Extract `golden_queries` (ALL of them)
 
-Use the **first** Golden Query from `## Golden Queries`:
+Emit **every** Golden Query from `## Golden Queries` as a `golden_queries:` **list** (plural).
+Do NOT stop at the first — a product with 17 queries in its MD must produce 17 list entries.
+
+For each query (in document order):
 
 1. **`name`**: verbatim H3 heading, e.g. `"Query 1 — Contracts signed in a period"`.
 2. **`description`**: first prose sentence under the H3 (before the SQL block) + ` Source: docs/llm_context/business_entities/{entity}.md`.
-3. **`sql`**: verbatim SQL from the first code block. Preserve indentation. Must use Trino SQL dialect (no `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-arg `DATEDIFF`).
-4. **`subjects`**: parse `FROM` and `JOIN` clauses in the SQL to extract `schema.table` pairs.
+3. **`sql`**: verbatim SQL from that query's code block. Preserve indentation. Must use Trino SQL dialect (no `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-arg `DATEDIFF`).
+4. **`subjects`**: parse `FROM` and `JOIN` clauses in that query's SQL to extract `schema.table` pairs.
+5. **`stable_urn`**: always `"TBD"` — CI assigns the real deterministic URN per query
+   (`uuid5(slug)` for query 0, `uuid5(slug:N)` for the rest). Do NOT invent a UUID.
 
-**`stable_urn`:** use the `stable_urn` value injected in the prompt verbatim (CI assigns
-deterministic `uuid5(entity_slug)`). Do NOT invent a new UUID.
+The legacy singular `golden_query:` (one mapping) is still accepted by the loader, but new
+entities should always use the plural list form.
 
 ---
 
@@ -171,16 +199,25 @@ structured_property:
   qualified_name: br.com.quintoandar.datahub.{slug}.golden_query
   legacy_qualified_names_to_drop:
     - br.com.quintoandar.datahub.{slug}.golden_query_url
-golden_query:
-  stable_urn: urn:li:query:{uuid}
-  name: "Query 1 — ..."
-  description: >-
-    ...
-  subjects:
-    - schema: ...
-      table: ...
-  sql: |
-    ...
+golden_queries:
+  - stable_urn: "TBD"          # CI assigns the deterministic URN
+    name: "Query 1 — ..."
+    description: >-
+      ...
+    subjects:
+      - schema: ...
+        table: ...
+    sql: |
+      ...
+  - stable_urn: "TBD"
+    name: "Query 2 — ..."
+    description: >-
+      ...
+    subjects:
+      - schema: ...
+        table: ...
+    sql: |
+      ...
 datasets:
   - schema: ...
     table: ...
