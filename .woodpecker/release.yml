@@ -17,6 +17,7 @@
 #   *sst_pipelines_path         — SST pipeline upload
 #   *metadata_propagation_path  — metadata propagation uploads
 #   *qube_modules_path          — Qube module sync
+#   *luigijr_dag_bundle_path    — luigijr Astro deployment (luigijr/ at repo root)
 #
 # Dependency chains (Woodpecker shares workspace across steps; `depends_on` enforces order;
 # skipped deps cascade-skip downstream steps):
@@ -554,6 +555,75 @@ steps:
       event: push
       branch: [forno]
       path: *qube_modules_path
+
+  # --- luigijr (separate Astro deployment; luigijr/ at repo root) ---
+
+  stage-bietlejuice-tree-luigijr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - rm -rf staging/bietlejuice-luigijr
+      - mkdir -p staging/bietlejuice-luigijr
+      - cp -a packages/bietlejuice-core/src/bietlejuice/. staging/bietlejuice-luigijr/
+      - cp -a packages/bietlejuice-airflow/src/bietlejuice/. staging/bietlejuice-luigijr/
+    when:
+      event: push
+      branch: [feature/luigijr]
+      path: &luigijr_dag_bundle_path
+        include:
+          - "luigijr/**"
+          - "packages/bietlejuice-core/src/**"
+          - "packages/bietlejuice-airflow/src/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
+          - "Makefile"
+        on_empty: false
+
+  create-dag-files-luigijr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make create-luigijr-dag-files
+    when:
+      event: push
+      branch: [feature/luigijr]
+      path: *luigijr_dag_bundle_path
+    depends_on: [setup]
+
+  upload-bi-etl-ejuice-modules-s3-luigijr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/luigijr/dags
+      SOURCE: staging/bietlejuice-luigijr
+    when:
+      event: push
+      branch: [feature/luigijr]
+      path: *luigijr_dag_bundle_path
+    depends_on: [stage-bietlejuice-tree-luigijr]
+
+  upload-dag-packages-dags-s3-luigijr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/luigijr/dags
+      SOURCE: luigijr
+    when:
+      event: push
+      branch: [feature/luigijr]
+      path: *luigijr_dag_bundle_path
+    depends_on: [create-dag-files-luigijr]
+
+  astronomer-deploy-dags-luigijr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:forno-latest
+    pull: true
+    when:
+      event: push
+      branch: [feature/luigijr]
+      path: *luigijr_dag_bundle_path
+    depends_on:
+      [upload-bi-etl-ejuice-modules-s3-luigijr, upload-dag-packages-dags-s3-luigijr]
 
   get-jiraops-credentials-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
