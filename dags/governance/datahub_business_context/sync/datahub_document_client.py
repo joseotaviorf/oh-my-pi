@@ -153,8 +153,18 @@ def _parse_primary_datasets(raw: str) -> list[tuple[str, str]]:
     return pairs
 
 
+def _has_tars_entity_tag(entity: dict[str, Any]) -> bool:
+    tag_names = {
+        (t.get("tag") or {}).get("name") or ""
+        for t in ((entity.get("tags") or {}).get("tags") or [])
+    }
+    return TARS_ENTITY_TAG in tag_names
+
+
 def _entity_to_document(entity: dict[str, Any]) -> Optional[TarsEntityDocument]:
     if not entity or not entity.get("urn"):
+        return None
+    if not _has_tars_entity_tag(entity):
         return None
     info = entity.get("info") or {}
     state = ((info.get("status") or {}).get("state") or "").upper()

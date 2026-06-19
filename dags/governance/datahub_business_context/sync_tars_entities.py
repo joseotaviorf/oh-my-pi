@@ -148,6 +148,11 @@ def _fill_derived_fields(
     return doc
 
 
+_OUTCOME_OK = "ok"
+_OUTCOME_SKIPPED = "skipped"
+_OUTCOME_FAILED = "failed"
+
+
 def _process_document(
     doc: TarsEntityDocument,
     *,
@@ -156,26 +161,39 @@ def _process_document(
     force: bool,
     state: SyncStateStore,
     output_dir: Path,
-) -> bool:
-    print(f"\n▶  {doc.title or doc.urn}  ({doc.urn})")
+) -> str:
+    label = doc.title or doc.urn
 
     meta_errors = _validate_document(doc)
     if meta_errors:
+        print(f"\n✗  {label}  ({doc.urn})", file=sys.stderr)
         for err in meta_errors:
             print(f"  ✗ {err}", file=sys.stderr)
-        return False
+        return _OUTCOME_FAILED
+
+    if not doc.is_published:
+        print(
+            f"\n⏭  {label}  ({doc.urn}) — status is Draft, publish in DataHub to sync"
+        )
+        return _OUTCOME_SKIPPED
 
     content_hash = _content_hash(doc.content)
     if not force and state.is_unchanged(doc.urn, content_hash):
-        print("  → unchanged since last sync — skipping")
-        return True
+        print(f"\n⏭  {label}  ({doc.urn}) — unchanged since last sync")
+        return _OUTCOME_OK
 
     parsed = parse_entity_markdown(doc.content)
     parse_errors = validate_parsed_document(parsed)
     if parse_errors:
+        print(f"\n⏭  {label}  ({doc.urn})")
+        print("  → document is still being authored — skipping until complete:")
         for err in parse_errors:
-            print(f"  ✗ parse: {err}", file=sys.stderr)
-        return False
+            print(f"    • {err}")
+        print("  → Fix the sections above in DataHub, then re-run to sync.")
+        return _OUTCOME_SKIPPED
+
+    # All pre-checks passed — this doc will produce output
+    print(f"\n▶  {label}  ({doc.urn})")
 
     doc = _fill_derived_fields(doc, dry_run=dry_run)
 
@@ -185,10 +203,10 @@ def _process_document(
             "ASCII letters or digits — set data_product_id via structured property in DataHub",
             file=sys.stderr,
         )
-        return False
+        return _OUTCOME_FAILED
     if not _is_safe_data_product_id(doc.data_product_id):
         print(f"  ✗ invalid data_product_id: {doc.data_product_id!r}", file=sys.stderr)
-        return False
+        return _OUTCOME_FAILED
 
     product_id = doc.data_product_id.strip().lower().replace("_", "-")
     dp_urn = f"urn:li:dataProduct:{product_id}"
@@ -200,12 +218,12 @@ def _process_document(
     if dry_run:
         md_path.write_text(md_text, encoding="utf-8")
         print(f"  ✓ dry-run wrote {md_path}")
-        return True
+        return _OUTCOME_OK
 
     if mode == DELIVERY_MODE_GITOPS:
         if not os.environ.get("GITHUB_TOKEN", "").strip():
             print("  ✗ GITHUB_TOKEN required for gitops mode", file=sys.stderr)
-            return False
+            return _OUTCOME_FAILED
         pr = open_sync_pull_request(
             data_product_id=doc.data_product_id,
             md_content=md_text,
@@ -220,7 +238,7 @@ def _process_document(
             delivery_mode=DELIVERY_MODE_GITOPS,
             pr_url=pr.pr_url,
         )
-        return True
+        return _OUTCOME_OK
 
     if mode == DELIVERY_MODE_DIRECT:
         lifecycle = LIFECYCLE_STAGE_PROD if doc.is_published else LIFECYCLE_STAGE_DRAFT
@@ -248,7 +266,7 @@ def _process_document(
                 f"  ✗ loader failed (exit {result.loader_exit_code})",
                 file=sys.stderr,
             )
-            return False
+            return _OUTCOME_FAILED
         if result.backlink_ok:
             print(f"  ✓ pushed {result.data_product_urn} and backlinked document")
             state.mark_synced(
@@ -257,15 +275,15 @@ def _process_document(
                 data_product_id=product_id,
                 delivery_mode=DELIVERY_MODE_DIRECT,
             )
-            return True
+            return _OUTCOME_OK
         print(
             f"  ⚠ pushed {result.data_product_urn} but backlink failed",
             file=sys.stderr,
         )
-        return False
+        return _OUTCOME_FAILED
 
     print(f"  ✗ unknown mode: {mode}", file=sys.stderr)
-    return False
+    return _OUTCOME_FAILED
 
 
 def main() -> int:
@@ -326,9 +344,10 @@ def main() -> int:
     print(f"Mode: {ns.mode} | Documents: {len(documents)} | dry_run={ns.dry_run}")
 
     passed = 0
+    skipped = 0
     failed = 0
     for doc in documents:
-        ok = _process_document(
+        outcome = _process_document(
             doc,
             mode=ns.mode,
             dry_run=ns.dry_run,
@@ -336,12 +355,17 @@ def main() -> int:
             state=state,
             output_dir=ns.output_dir,
         )
-        if ok:
+        if outcome == _OUTCOME_OK:
             passed += 1
+        elif outcome == _OUTCOME_SKIPPED:
+            skipped += 1
         else:
             failed += 1
 
-    print(f"\nResults: {passed} ok / {failed} failed / {len(documents)} total")
+    total = len(documents)
+    print(
+        f"\nResults: {passed} ok / {skipped} skipped / {failed} failed / {total} total"
+    )
     return 1 if failed else 0
 
 
