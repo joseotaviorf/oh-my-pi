@@ -64,7 +64,7 @@ depends_on:
 
 when:
   - event: push
-    branch: [master, hotfix/*, forno]
+    branch: [master, hotfix/*, forno, feature/luigijr]
   - event: tag
 
 clone:
