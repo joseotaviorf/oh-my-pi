@@ -20,10 +20,10 @@ workflow:
   default_partitions: []
   tables_customization:
     fact_requests:
-      z_order_by: [sk_case, case_number, is_current]
+      z_order_by: [sk_case, case_number]
       merge_on: [sk_event]
     fact_services:
-      z_order_by: [sk_session, sk_task, is_current]
+      z_order_by: [sk_session, sk_task]
       merge_on: [sk_event]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start.strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
