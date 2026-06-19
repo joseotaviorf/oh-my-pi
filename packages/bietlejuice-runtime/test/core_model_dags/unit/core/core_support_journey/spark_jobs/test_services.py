@@ -8,6 +8,15 @@ from unittest import mock
 
 import pytest
 import yaml
+from pyspark.sql import SparkSession
+from pyspark.sql.types import (
+    BooleanType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 
 from bietlejuice.base.core_models.helpers.schema_validator import SchemaValidationError
 from bietlejuice.base.sst.domains.salesforce.core_models.config_loader import (
@@ -334,3 +343,233 @@ class TestSupportJourneyServicesCoreModelPipelineRun:
         mock_table_spec_from_cfg.assert_called_once_with(cfg)
         mock_initialize_spark_session.assert_called_once()
         mock_create_core_model.assert_called_once_with(spark)
+
+
+@pytest.fixture(scope="session")
+def spark_session():
+    spark = (
+        SparkSession.builder.appName("SupportJourneyServicesTest")
+        .config("spark.sql.warehouse.dir", "/tmp/spark-warehouse")
+        .config("spark.sql.adaptive.enabled", "false")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "false")
+        .config("spark.ui.enabled", "false")
+        .getOrCreate()
+    )
+    yield spark
+    spark.stop()
+
+
+# Empty source schemas for the chat branches that are irrelevant to the queue
+# attribution scenario (WhatsApp channels). _build_chats_results_df still reads
+# them, so they must exist with the columns the method projects.
+_CHANNEL_SCHEMA = StructType(
+    [
+        StructField("id_channel", StringType(), True),
+        StructField("id_session", StringType(), True),
+        StructField("ts_updated", TimestampType(), True),
+    ]
+)
+
+_TASK_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("id_channel", StringType(), True),
+        StructField("id_chat", StringType(), True),
+        StructField("id_task", StringType(), True),
+        StructField("id_worker", StringType(), True),
+        StructField("worker_email", StringType(), True),
+        StructField("channel_type", StringType(), True),
+        StructField("customer_phone_number", StringType(), True),
+        StructField("customer_contact_info", StringType(), True),
+        StructField("twilio_phone_number", StringType(), True),
+        StructField("customer_email", StringType(), True),
+        StructField("task_status", StringType(), True),
+        StructField("task_outcome", StringType(), True),
+        StructField("completion_reason", StringType(), True),
+        StructField("tags", StringType(), True),
+        StructField("channel_status", StringType(), True),
+        StructField("bpo_name", StringType(), True),
+        StructField("bpo_selection_reason", StringType(), True),
+        StructField("assigned_to", StringType(), True),
+        StructField("seconds_to_first_response", LongType(), True),
+        StructField("is_forwarded", BooleanType(), True),
+        StructField("is_per_team_task", BooleanType(), True),
+        StructField("is_spoc_task", BooleanType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("task_attributes", StringType(), True),
+        StructField("id_source_ctwa", StringType(), True),
+        StructField("url_source_ctwa", StringType(), True),
+        StructField("type_source_ctwa", StringType(), True),
+        StructField("total_inactivity_time", LongType(), True),
+        StructField("last_inactivity_time", LongType(), True),
+        StructField("ts_created", TimestampType(), True),
+        StructField("ts_updated", TimestampType(), True),
+    ]
+)
+
+_CHAT_SCHEMA = StructType(
+    [
+        StructField("id_chat", StringType(), True),
+        StructField("id_session", StringType(), True),
+        StructField("attributes", StringType(), True),
+        StructField("ts_updated", TimestampType(), True),
+    ]
+)
+
+_SESSION_SCHEMA = StructType(
+    [
+        StructField("id_session", StringType(), True),
+        StructField("id_support_session", StringType(), True),
+        StructField("source", StringType(), True),
+        StructField("id_user", StringType(), True),
+        StructField("user_phone", StringType(), True),
+        StructField("user_email", StringType(), True),
+        StructField("created_by", StringType(), True),
+        StructField("source_environment", StringType(), True),
+        StructField("database_source", StringType(), True),
+    ]
+)
+
+_TASK_EVENT_SCHEMA = StructType(
+    [
+        StructField("id_task", StringType(), True),
+        StructField("queue_name", StringType(), True),
+        StructField("ts_updated", TimestampType(), True),
+    ]
+)
+
+
+class TestSupportJourneyServicesQueueAttribution:
+    """Regression coverage for the chat routing-queue resolution.
+
+    Pins the bug where queue_lookup_df collapsed task_event rows with
+    F.max(queue_name) (alphabetically greatest) instead of taking the queue
+    from the most recent event (latest ts_updated), matching the enrich chats
+    query ROW_NUMBER() OVER (PARTITION BY id_task ORDER BY ts_updated DESC) = 1.
+    """
+
+    def _build_chats(self, spark, pipeline_with_spec, task_event_rows):
+        session_df = spark.createDataFrame(
+            [
+                (
+                    "S1",  # id_session
+                    "SS1",  # id_support_session
+                    "chat",  # source
+                    "U1",  # id_user
+                    None,  # user_phone
+                    "customer@example.com",  # user_email
+                    "user",  # created_by
+                    "isaias_inbound",  # source_environment
+                    "support_session_service",  # database_source
+                ),
+            ],
+            _SESSION_SCHEMA,
+        )
+        channel_df = spark.createDataFrame([], _CHANNEL_SCHEMA)
+        chat_df = spark.createDataFrame(
+            [
+                (
+                    "C1",  # id_chat
+                    "SS1",  # id_session (matches session join_key)
+                    '{"channel_type": "web"}',  # attributes
+                    datetime(2026, 5, 26, 9, 0, 0),  # ts_updated
+                ),
+            ],
+            _CHAT_SCHEMA,
+        )
+        task_df = spark.createDataFrame(
+            [
+                (
+                    "EV1",  # id (id_task_event)
+                    None,  # id_channel
+                    "C1",  # id_chat
+                    "T1",  # id_task
+                    "W1",  # id_worker
+                    "worker@example.com",  # worker_email
+                    "web",  # channel_type
+                    None,  # customer_phone_number
+                    None,  # customer_contact_info
+                    None,  # twilio_phone_number
+                    "customer@example.com",  # customer_email
+                    "completed",  # task_status
+                    None,  # task_outcome
+                    None,  # completion_reason
+                    None,  # tags
+                    None,  # channel_status
+                    None,  # bpo_name
+                    None,  # bpo_selection_reason
+                    None,  # assigned_to
+                    10,  # seconds_to_first_response
+                    False,  # is_forwarded
+                    False,  # is_per_team_task
+                    False,  # is_spoc_task
+                    datetime(2026, 5, 26, 12, 0, 0),  # ts_cdc_transaction
+                    None,  # task_attributes
+                    None,  # id_source_ctwa
+                    None,  # url_source_ctwa
+                    None,  # type_source_ctwa
+                    0,  # total_inactivity_time
+                    0,  # last_inactivity_time
+                    datetime(2026, 5, 26, 8, 0, 0),  # ts_created
+                    datetime(2026, 5, 26, 12, 0, 0),  # ts_updated
+                ),
+            ],
+            _TASK_SCHEMA,
+        )
+        task_event_df = spark.createDataFrame(task_event_rows, _TASK_EVENT_SCHEMA)
+
+        table_map = {
+            "qm_channel": channel_df,
+            "qm_chat": chat_df,
+            "qm_task": task_df,
+            "qm_task_event": task_event_df,
+        }
+        spark_stub = mock.MagicMock()
+        spark_stub.table.side_effect = lambda name: table_map[name]
+
+        return pipeline_with_spec._build_chats_results_df(
+            spark_stub,
+            session_df,
+            "qm_channel",
+            "qm_chat",
+            "qm_task",
+            "qm_task_event",
+        )
+
+    def test_resolves_queue_from_most_recent_event(
+        self, spark_session, pipeline_with_spec
+    ):
+        # arrange: the alphabetically greatest queue ("zeta_queue") is the
+        # OLDER event; the most recent event routes to "alpha_queue".
+        task_event_rows = [
+            ("T1", "zeta_queue", datetime(2026, 5, 25, 10, 0, 0)),
+            ("T1", "alpha_queue", datetime(2026, 5, 26, 10, 0, 0)),
+        ]
+
+        # act
+        result = self._build_chats(spark_session, pipeline_with_spec, task_event_rows)
+        rows = result.where("id_task = 'T1'").select("queue_name").collect()
+
+        # assert
+        assert len(rows) == 1
+        assert rows[0]["queue_name"] == "alpha_queue"
+
+    def test_ignores_null_queue_on_latest_event(
+        self, spark_session, pipeline_with_spec
+    ):
+        # arrange: the newest event has a NULL queue_name and must be skipped;
+        # the latest NON-null queue wins. The skipped older event also carries
+        # the alphabetically greatest name, so F.max would mis-attribute it.
+        task_event_rows = [
+            ("T1", "zeta_queue", datetime(2026, 5, 25, 10, 0, 0)),
+            ("T1", "alpha_queue", datetime(2026, 5, 26, 10, 0, 0)),
+            ("T1", None, datetime(2026, 5, 26, 23, 0, 0)),
+        ]
+
+        # act
+        result = self._build_chats(spark_session, pipeline_with_spec, task_event_rows)
+        rows = result.where("id_task = 'T1'").select("queue_name").collect()
+
+        # assert
+        assert len(rows) == 1
+        assert rows[0]["queue_name"] == "alpha_queue"

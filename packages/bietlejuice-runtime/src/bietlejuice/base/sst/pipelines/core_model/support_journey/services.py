@@ -242,11 +242,26 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         qm_channel_table: str,
         qm_chat_table: str,
         qm_task_table: str,
+        qm_task_event_table: str,
     ) -> DataFrame:
 
         chat_filter = self.build_ts_filter(
             self.cfg.partition_date, delta_hours=-72, col="ts_updated"
         )
+
+        # A task can be routed through more than one queue, so we keep the queue_name from
+        # the most recent event per task (latest ts_updated) and left-join it
+        # onto the task events further down. This mirrors the enrich chats query
+        # (ROW_NUMBER() OVER (PARTITION BY id_task ORDER BY ts_updated DESC) = 1).
+        queue_lookup_df = get_latest_version_from_df(
+            spark.table(qm_task_event_table)
+            .where(chat_filter)
+            .where(F.col("queue_name").isNotNull())
+            .select("id_task", "queue_name", "ts_updated"),
+            ["id_task"],
+            ["queue_name"],
+            "ts_updated",
+        ).alias("q")
 
         channel = spark.table(qm_channel_table).where(chat_filter)
         chat_session = session_df.where(F.col("source") == F.lit("chat")).withColumn(
@@ -403,6 +418,11 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 ),
                 how="inner",
             )
+            .join(
+                queue_lookup_df,
+                on=F.col("q.id_task") == F.col("t.id_task"),
+                how="left",
+            )
             .where(F.col("u.id_session").isNotNull())
             .select(
                 F.col("t.id_task_event"),
@@ -438,6 +458,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 F.col("t.contact_reason_tag"),
                 F.col("t.bpo_name"),
                 F.col("t.bpo_selection_reason"),
+                F.col("q.queue_name"),
                 F.col("t.seconds_to_first_response"),
                 F.col("t.is_forwarded"),
                 F.col("t.is_per_team_task"),
@@ -541,6 +562,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             sources["qm_channel"]["table_name"],
             sources["qm_chat"]["table_name"],
             sources["qm_task"]["table_name"],
+            sources["qm_task_event"]["table_name"],
         )
         partition_date, partition_hour = self._partition_cols_from_cdc(
             "ts_task_updated"
