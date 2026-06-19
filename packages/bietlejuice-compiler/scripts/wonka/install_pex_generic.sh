@@ -96,8 +96,41 @@ setup_emr() {
 	}
 
 	echo "Using PEX: $pex_file ($("$python_bin" --version 2>&1))"
-	PEX_TOOLS=1 "$python_bin" "$pex_file" venv "$venv_dir" || {
+	PEX_TOOLS=1 "$python_bin" "$pex_file" venv --pip "$venv_dir" || {
 		echo "Failed to create virtual environment" >&2
+		exit 1
+	}
+
+	# load_wonka.py runs under THIS venv (3.11) but imports bietlejuice
+	# (pipeline_resolver / spark_args). emr_init_script.sh (the first init script) already
+	# downloaded the wheels to /tmp/wheels; install them here so the framework and the PEX
+	# pipeline packages share one interpreter. --no-deps: the venv already carries the heavy
+	# data deps from the PEX, and the imported modules are stdlib-only.
+	local wheels_dir=/tmp/wheels whl
+	local core_whl="${wheels_dir}/bietlejuice_core-latest-py3-none-any.whl"
+	local runtime_whl="${wheels_dir}/bietlejuice_runtime-latest-py3-none-any.whl"
+	local logger_whl
+	logger_whl=$(find "${wheels_dir}" -maxdepth 1 -name 'quintoandar_logger-*.whl' | head -n 1)
+
+	for whl in "$core_whl" "$runtime_whl" "$logger_whl"; do
+		[[ -n "$whl" && -f "$whl" ]] || {
+			echo "ERROR: required wheel missing under ${wheels_dir} ('$whl'); emr_init_script.sh must run first." >&2
+			exit 1
+		}
+	done
+
+	echo "Installing bietlejuice (core+runtime) + quintoandar_logger into venv (no-deps)..."
+	"$venv_dir/bin/python" -m pip install --no-deps "$core_whl" "$runtime_whl" "$logger_whl" || {
+		echo "ERROR: failed to install bietlejuice/quintoandar_logger into $venv_dir" >&2
+		exit 1
+	}
+
+	# Probe a stable bietlejuice-core module to confirm the wheel installed into the venv.
+	# Use spark_args (present on master/prod) rather than a newer module that may not yet
+	# exist in every environment's published wheel, so this shared script works in prod too.
+	echo "Verifying bietlejuice import in venv..."
+	"$venv_dir/bin/python" -c "import bietlejuice.base.validation.spark_args" || {
+		echo "ERROR: bietlejuice import check failed in $venv_dir" >&2
 		exit 1
 	}
 
