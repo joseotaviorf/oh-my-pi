@@ -21,28 +21,3 @@ cluster:
       spark.sql.extensions: org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions
       spark.kryo.registrator: org.apache.sedona.core.serde.SedonaKryoRegistrator
     spark_version: 12.2.x-scala2.12
-    driver_node_type_id: m7g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_libraries:
-    - maven:
-        coordinates: org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating
-    - maven:
-        coordinates: org.datasyslab:geotools-wrapper:1.1.0-25.2
-    - pypi:
-        package: apache-sedona==1.2.1
-    custom_configurations:
-      init_scripts:
-      - s3:
-          destination: '{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh'
-          region: ''
-      - s3:
-          destination: '{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh'
-          region: ''
-      spark_conf:
-        spark.serializer: org.apache.spark.serializer.KryoSerializer
-        spark.sql.extensions: org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions
-        spark.kryo.registrator: org.apache.sedona.core.serde.SedonaKryoRegistrator
-      spark_version: 12.2.x-scala2.12

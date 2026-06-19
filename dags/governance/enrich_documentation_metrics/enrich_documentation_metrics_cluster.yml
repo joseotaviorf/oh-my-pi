@@ -2,14 +2,5 @@ cluster:
   type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    num_workers: 3
     spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     runtime_engine: PHOTON
-    driver_node_type_id: m7g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      runtime_engine: PHOTON

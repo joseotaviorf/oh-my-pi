@@ -1,11 +1,5 @@
 cluster:
-  type: consolidation_l_memory_single_node_cluster
+  type: consolidation_m_memory_single_node_cluster
   databricks_conn_id: databricks_new
   custom_libraries:
   - jar: '{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar'
-validation:
-  cluster:
-    type: consolidation_m_memory_single_node_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - jar: '{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar'

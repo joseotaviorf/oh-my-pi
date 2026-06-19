@@ -3405,6 +3405,2236 @@
         "failure_count": 0,
         "snapshot_through": "2026-06-13"
       }
+    },
+    {
+      "dag_id": "bietlejuice.ada_crawls",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "software-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "r7g.2xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2044,
+        "wall_p50_min": 10.0,
+        "wall_p95_min": 10.0,
+        "mem_p95_max": 29.9,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.airtable",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_libraries": [
+          {
+            "whl": "{artifacts_bucket}/airtable-api-client-python/quintoandar_airtable_api_client-0.1.0-py2.py3-none-any.whl"
+          }
+        ],
+        "custom_configurations": {
+          "driver_node_type_id": "m7g.xlarge",
+          "spark_version": "16.4.x-scala2.12",
+          "spark_conf": {
+            "spark.sql.legacy.json.allowEmptyString.enabled": "true",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0818,
+        "wall_p50_min": 12.8,
+        "wall_p95_min": 12.8,
+        "mem_p95_max": 76.4,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.batch_inference",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xl_general_cluster",
+        "access_control_list": {
+          "group_name": "mlops",
+          "permission_level": "CAN_MANAGE"
+        },
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 4,
+          "driver_node_type_id": "m7g.4xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 6.7969,
+        "wall_p50_min": 63.7,
+        "wall_p95_min": 63.7,
+        "mem_p95_max": 41.9,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.botcity",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "custom_configurations": {
+          "spark_conf": {
+            "spark.sql.legacy.json.allowEmptyString.enabled": "true",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        },
+        "access_control_list": {
+          "group_name": "software-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "databricks_conn_id": "databricks_new"
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1347,
+        "wall_p50_min": 8.8,
+        "wall_p95_min": 8.8,
+        "mem_p95_max": 46.2,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.collections_score_batch_inference",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xl_general_cluster",
+        "access_control_list": {
+          "group_name": "mlops",
+          "permission_level": "CAN_MANAGE"
+        },
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "num_workers": 4,
+          "driver_node_type_id": "m7g.4xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.7587,
+        "wall_p50_min": 9.1,
+        "wall_p95_min": 9.1,
+        "mem_p95_max": 33.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.core_brokers_history",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "spark_conf": {
+            "spark.sql.shuffle.partitions": "8",
+            "spark.databricks.delta.merge.enableLowShuffle": "true",
+            "spark.databricks.adaptive.autoOptimizeShuffle.enabled": "true",
+            "spark.memory.fraction": "0.8",
+            "spark.memory.storageFraction": "0.3",
+            "spark.sql.adaptive.skewJoin.enabled": "true"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0815,
+        "wall_p50_min": 9.6,
+        "wall_p95_min": 9.6,
+        "mem_p95_max": 69.0,
+        "schedule_interval_minutes": 488.1,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.crowdstrike",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.5128,
+        "wall_p50_min": 8.6,
+        "wall_p95_min": 8.6,
+        "mem_p95_max": 29.8,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.cyber_bureau",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_libraries": [
+          {
+            "jar": "{artifacts_bucket}/jars/ojdbc8.jar"
+          }
+        ]
+      },
+      "baseline": {
+        "avg_cost_usd": 0.3212,
+        "wall_p50_min": 8.3,
+        "wall_p95_min": 8.3,
+        "mem_p95_max": 25.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_brokers",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "data_security_mode": "USER_ISOLATION",
+          "driver_node_type_id": "r7g.2xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2516,
+        "wall_p50_min": 11.0,
+        "wall_p95_min": 11.0,
+        "mem_p95_max": 46.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_datamarts_for_sale",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_libraries": [
+          {
+            "maven": {
+              "coordinates": "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
+            }
+          },
+          {
+            "maven": {
+              "coordinates": "org.datasyslab:geotools-wrapper:1.1.0-25.2"
+            }
+          },
+          {
+            "pypi": {
+              "package": "apache-sedona==1.2.1"
+            }
+          }
+        ],
+        "custom_configurations": {
+          "init_scripts": [
+            {
+              "s3": {
+                "destination": "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh",
+                "region": ""
+              }
+            },
+            {
+              "s3": {
+                "destination": "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh",
+                "region": ""
+              }
+            }
+          ],
+          "spark_conf": {
+            "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
+            "spark.sql.extensions": "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions",
+            "spark.kryo.registrator": "org.apache.sedona.core.serde.SedonaKryoRegistrator"
+          },
+          "spark_version": "12.2.x-scala2.12",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0878,
+        "wall_p50_min": 11.1,
+        "wall_p95_min": 11.1,
+        "mem_p95_max": 70.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_devlake",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2921,
+        "wall_p50_min": 9.3,
+        "wall_p95_min": 9.3,
+        "mem_p95_max": 26.3,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_employee",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "people-analytics",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "driver_node_type_id": "r7g.2xlarge",
+          "num_workers": 3,
+          "spark_version": "16.4.x-scala2.12",
+          "aws_attributes": {
+            "ebs_volume_size": 200,
+            "instance_profile_arn": "{{ var.value.instance_profile_secret_arn_people }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1688,
+        "wall_p50_min": 9.3,
+        "wall_p95_min": 9.3,
+        "mem_p95_max": 48.3,
+        "schedule_interval_minutes": 1243.6,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_listing",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION",
+          "num_workers": 3,
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.8491,
+        "wall_p50_min": 11.1,
+        "wall_p95_min": 11.1,
+        "mem_p95_max": 59.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_listing_owners",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.086,
+        "wall_p50_min": 7.7,
+        "wall_p95_min": 7.7,
+        "mem_p95_max": 73.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_search_session_event",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "data_security_mode": "USER_ISOLATION",
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2474,
+        "wall_p50_min": 10.5,
+        "wall_p95_min": 10.5,
+        "mem_p95_max": 49.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_support_journey",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2026,
+        "wall_p50_min": 8.5,
+        "wall_p95_min": 8.5,
+        "mem_p95_max": 23.9,
+        "schedule_interval_minutes": 200.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_user",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION",
+          "num_workers": 3,
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2694,
+        "wall_p50_min": 11.9,
+        "wall_p95_min": 11.9,
+        "mem_p95_max": 92.2,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_user_affiliate",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1339,
+        "wall_p50_min": 9.8,
+        "wall_p95_min": 9.8,
+        "mem_p95_max": 69.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.dw_velo_zendesk",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "spark_version": "13.3.x-scala2.12",
+          "num_workers": 3,
+          "driver_node_type_id": "r7g.large"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.153,
+        "wall_p50_min": 13.7,
+        "wall_p95_min": 13.7,
+        "mem_p95_max": 74.6,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.ebdb_house_historical",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0775,
+        "wall_p50_min": 7.2,
+        "wall_p95_min": 7.2,
+        "mem_p95_max": 70.2,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.ebdb_listing",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "spark_version": "13.3.x-scala2.12"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.4038,
+        "wall_p50_min": 9.0,
+        "wall_p95_min": 9.0,
+        "mem_p95_max": 36.6,
+        "schedule_interval_minutes": 464.5,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.ebdb_rent_flow",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1265,
+        "wall_p50_min": 12.6,
+        "wall_p95_min": 12.6,
+        "mem_p95_max": 78.0,
+        "schedule_interval_minutes": 480.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_ada_crawls",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "r7g.2xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1979,
+        "wall_p50_min": 9.0,
+        "wall_p95_min": 9.0,
+        "mem_p95_max": 31.3,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_affiliates_cost_attributions",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0915,
+        "wall_p50_min": 7.1,
+        "wall_p95_min": 7.1,
+        "mem_p95_max": 73.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_ai_collections_quintoandar",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xl_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.4629,
+        "wall_p50_min": 10.2,
+        "wall_p95_min": 10.2,
+        "mem_p95_max": 35.8,
+        "schedule_interval_minutes": 872.7,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_amplitude_lead",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "num_workers": 4,
+          "driver_node_type_id": "r7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2972,
+        "wall_p50_min": 16.5,
+        "wall_p95_min": 16.5,
+        "mem_p95_max": 93.0,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_atta",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0902,
+        "wall_p50_min": 10.6,
+        "wall_p95_min": 10.6,
+        "mem_p95_max": 74.9,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_b2b",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1829,
+        "wall_p50_min": 9.4,
+        "wall_p95_min": 9.4,
+        "mem_p95_max": 68.5,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_big_agent_incentives",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1503,
+        "wall_p50_min": 12.8,
+        "wall_p95_min": 12.8,
+        "mem_p95_max": 75.0,
+        "schedule_interval_minutes": 1360.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_braze_webhook_notification",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1904,
+        "wall_p50_min": 9.8,
+        "wall_p95_min": 9.8,
+        "mem_p95_max": 71.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_business_model",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "USER_ISOLATION",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1574,
+        "wall_p50_min": 10.7,
+        "wall_p95_min": 10.7,
+        "mem_p95_max": 48.2,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_consumption_bill",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "r7g.large"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1113,
+        "wall_p50_min": 11.0,
+        "wall_p95_min": 11.0,
+        "mem_p95_max": 69.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_credit_analysis",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "num_workers": 3,
+          "spark_version": "16.4.x-scala2.12",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2727,
+        "wall_p50_min": 11.5,
+        "wall_p95_min": 11.5,
+        "mem_p95_max": 56.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_crowdstrike",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1355,
+        "wall_p50_min": 7.8,
+        "wall_p95_min": 7.8,
+        "mem_p95_max": 24.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_customer_support",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "autotermination_minutes": 20,
+          "spark_version": "16.4.x-scala2.12",
+          "num_workers": 15,
+          "aws_attributes": {
+            "first_on_demand": 1,
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1d",
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_size": 300
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 3.4607,
+        "wall_p50_min": 14.0,
+        "wall_p95_min": 14.0,
+        "mem_p95_max": 36.1,
+        "schedule_interval_minutes": 1309.1,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_databricks_usage_costs",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_general_cluster",
+        "access_control_list": {
+          "group_name": "analytical-environment-costs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.2xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2654,
+        "wall_p50_min": 8.6,
+        "wall_p95_min": 8.6,
+        "mem_p95_max": 42.0,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_debt_recovery",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1466,
+        "wall_p50_min": 12.9,
+        "wall_p95_min": 12.9,
+        "mem_p95_max": 76.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_documentation_metrics",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "num_workers": 3,
+          "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}",
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1445,
+        "wall_p50_min": 8.8,
+        "wall_p95_min": 8.8,
+        "mem_p95_max": 73.5,
+        "schedule_interval_minutes": 1189.6,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_ebdb_country",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "spark_version": "16.4.x-scala2.12",
+          "spark_conf": {
+            "spark.sql.sources.partitionOverwriteMode": "static",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0789,
+        "wall_p50_min": 8.9,
+        "wall_p95_min": 8.9,
+        "mem_p95_max": 69.6,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_ebdb_proposal",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "spark_conf": {
+            "spark.sql.sources.partitionOverwriteMode": "static"
+          },
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2671,
+        "wall_p50_min": 9.8,
+        "wall_p95_min": 9.8,
+        "mem_p95_max": 38.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_google_search_console",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2484,
+        "wall_p50_min": 13.8,
+        "wall_p95_min": 13.8,
+        "mem_p95_max": 72.0,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_growth_commission_costs",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION",
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0945,
+        "wall_p50_min": 8.5,
+        "wall_p95_min": 8.5,
+        "mem_p95_max": 74.3,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_hefesto",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0936,
+        "wall_p50_min": 8.9,
+        "wall_p95_min": 8.9,
+        "mem_p95_max": 71.2,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_heimdall",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0967,
+        "wall_p50_min": 8.7,
+        "wall_p95_min": 8.7,
+        "mem_p95_max": 74.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_hubspot_crm",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2245,
+        "wall_p50_min": 14.3,
+        "wall_p95_min": 14.3,
+        "mem_p95_max": 57.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_intune",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1197,
+        "wall_p50_min": 7.0,
+        "wall_p95_min": 7.0,
+        "mem_p95_max": 22.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_marketing_automatic_daily_costs",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0759,
+        "wall_p50_min": 10.2,
+        "wall_p95_min": 10.2,
+        "mem_p95_max": 66.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_offboarding",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "driver_node_type_id": "r7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.4642,
+        "wall_p50_min": 13.8,
+        "wall_p95_min": 13.8,
+        "mem_p95_max": 56.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_owner_fees",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0843,
+        "wall_p50_min": 9.5,
+        "wall_p95_min": 9.5,
+        "mem_p95_max": 67.8,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_person",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1148,
+        "wall_p50_min": 9.6,
+        "wall_p95_min": 9.6,
+        "mem_p95_max": 46.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_pp_multi",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "USER_ISOLATION",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}",
+            "spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled": true
+          },
+          "num_workers": 3,
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.4543,
+        "wall_p50_min": 18.7,
+        "wall_p95_min": 18.7,
+        "mem_p95_max": 76.1,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_region",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "spark_conf": {
+            "spark.sql.sources.partitionOverwriteMode": "static"
+          },
+          "num_workers": 3,
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1331,
+        "wall_p50_min": 9.8,
+        "wall_p95_min": 9.8,
+        "mem_p95_max": 68.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_sale_offer_flows",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1142,
+        "wall_p50_min": 12.5,
+        "wall_p95_min": 12.5,
+        "mem_p95_max": 79.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_sale_salesforce",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0752,
+        "wall_p50_min": 9.8,
+        "wall_p95_min": 9.8,
+        "mem_p95_max": 73.3,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_sale_visit",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2328,
+        "wall_p50_min": 9.8,
+        "wall_p95_min": 9.8,
+        "mem_p95_max": 40.5,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_sale_visit_hubs",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION",
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0881,
+        "wall_p50_min": 8.5,
+        "wall_p95_min": 8.5,
+        "mem_p95_max": 71.3,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_satisfaction_rating",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "availability": "ON_DEMAND"
+          },
+          "driver_node_type_id": "r7g.2xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.446,
+        "wall_p50_min": 10.3,
+        "wall_p95_min": 10.3,
+        "mem_p95_max": 43.0,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_terminator",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0948,
+        "wall_p50_min": 8.3,
+        "wall_p95_min": 8.3,
+        "mem_p95_max": 51.6,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_top_of_funnel_demand",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "r7g.large"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.3577,
+        "wall_p50_min": 15.6,
+        "wall_p95_min": 15.6,
+        "mem_p95_max": 77.6,
+        "schedule_interval_minutes": 993.1,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_tqc_referral",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION",
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1478,
+        "wall_p50_min": 14.4,
+        "wall_p95_min": 14.4,
+        "mem_p95_max": 72.5,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.enrich_trino",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new_env",
+        "custom_configurations": {
+          "num_workers": 3,
+          "runtime_engine": "PHOTON",
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2707,
+        "wall_p50_min": 15.3,
+        "wall_p95_min": 15.3,
+        "mem_p95_max": 72.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.identitynow",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "custom_configurations": {
+          "spark_conf": {
+            "spark.sql.legacy.json.allowEmptyString.enabled": "true",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        },
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "databricks_conn_id": "databricks_new"
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1295,
+        "wall_p50_min": 8.2,
+        "wall_p95_min": 8.2,
+        "mem_p95_max": 49.1,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.idn",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "runtime_engine": "PHOTON"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.5132,
+        "wall_p50_min": 8.5,
+        "wall_p95_min": 8.5,
+        "mem_p95_max": 28.8,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.kodak",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "r7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.9794,
+        "wall_p50_min": 25.7,
+        "wall_p95_min": 25.7,
+        "mem_p95_max": 56.2,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.langfuse",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_libraries": [
+          {
+            "pypi": {
+              "package": "langfuse==3.0.0"
+            }
+          }
+        ],
+        "custom_configurations": {
+          "driver_node_type_id": "r7g.2xlarge",
+          "num_workers": 6,
+          "spark_version": "16.4.x-scala2.12",
+          "spark_conf": {
+            "spark.driver.maxResultSize": "0",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 1.0989,
+        "wall_p50_min": 29.1,
+        "wall_p95_min": 29.1,
+        "mem_p95_max": 42.0,
+        "schedule_interval_minutes": 61.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.legalops",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 32
+          },
+          "num_workers": 1,
+          "driver_node_type_id": "r7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0756,
+        "wall_p50_min": 12.7,
+        "wall_p95_min": 12.7,
+        "mem_p95_max": 55.5,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.legaut",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "spark_version": "13.3.x-scala2.12",
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.6327,
+        "wall_p50_min": 23.1,
+        "wall_p95_min": 23.1,
+        "mem_p95_max": 51.8,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.metric_rent__tickets",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "data_security_mode": "USER_ISOLATION"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2416,
+        "wall_p50_min": 10.6,
+        "wall_p95_min": 10.6,
+        "mem_p95_max": 39.6,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.nazare",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "driver_node_type_id": "m7g.2xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.7664,
+        "wall_p50_min": 16.1,
+        "wall_p95_min": 16.1,
+        "mem_p95_max": 61.8,
+        "schedule_interval_minutes": 1200.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.olos_dialer",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "databricks_16_4_small_general_fleet_2xlarge_single_node",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "analytics-engineers",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1368,
+        "wall_p50_min": 8.6,
+        "wall_p95_min": 8.6,
+        "mem_p95_max": 59.2,
+        "schedule_interval_minutes": 108.5,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.openapi",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "custom_configurations": {
+          "spark_conf": {
+            "spark.sql.legacy.json.allowEmptyString.enabled": "true",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        },
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "databricks_conn_id": "databricks_new"
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2114,
+        "wall_p50_min": 13.0,
+        "wall_p95_min": 13.0,
+        "mem_p95_max": 49.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.plugify_api",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "people-analytics",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 1,
+          "spark_version": "16.4.x-scala2.12"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0645,
+        "wall_p50_min": 9.9,
+        "wall_p95_min": 9.9,
+        "mem_p95_max": 71.3,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.rede_platform",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1501,
+        "wall_p50_min": 11.4,
+        "wall_p95_min": 11.4,
+        "mem_p95_max": 54.6,
+        "schedule_interval_minutes": 514.3,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_aec",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "spark_version": "16.4.x-scala2.12",
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.2378,
+        "wall_p50_min": 10.0,
+        "wall_p95_min": 10.0,
+        "mem_p95_max": 40.3,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_concentrix",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "spark_version": "16.4.x-scala2.12",
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.3242,
+        "wall_p50_min": 14.3,
+        "wall_p95_min": 14.3,
+        "mem_p95_max": 40.8,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_listing_quality_access",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": [
+          {
+            "group_name": "software-engineers",
+            "permission_level": "CAN_MANAGE"
+          },
+          {
+            "group_name": "analytics-engineers",
+            "permission_level": "CAN_MANAGE"
+          }
+        ],
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200,
+            "instance_profile_arn": "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
+          }
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1587,
+        "wall_p50_min": 8.0,
+        "wall_p95_min": 8.0,
+        "mem_p95_max": 38.4,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_listing_quality_load",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": [
+          {
+            "group_name": "software-engineers",
+            "permission_level": "CAN_MANAGE"
+          },
+          {
+            "group_name": "analytics-engineers",
+            "permission_level": "CAN_MANAGE"
+          }
+        ],
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1272,
+        "wall_p50_min": 11.1,
+        "wall_p95_min": 11.1,
+        "mem_p95_max": 78.6,
+        "schedule_interval_minutes": 1371.4,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_rent_liquidity_score_load",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0624,
+        "wall_p50_min": 8.7,
+        "wall_p95_min": 8.7,
+        "mem_p95_max": 65.7,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_rent_listings_report_access",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "custom_configurations": {
+          "aws_attributes": {
+            "first_on_demand": 1,
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1d",
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_size": 200,
+            "instance_profile_arn": "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 3
+        },
+        "databricks_conn_id": "databricks_new"
+      },
+      "baseline": {
+        "avg_cost_usd": 0.6821,
+        "wall_p50_min": 61.7,
+        "wall_p95_min": 61.7,
+        "mem_p95_max": 73.2,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.reverse_webhelp_access",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_m_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "num_workers": 3
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.3012,
+        "wall_p50_min": 12.9,
+        "wall_p95_min": 12.9,
+        "mem_p95_max": 70.6,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.support_session_service",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.1321,
+        "wall_p50_min": 14.2,
+        "wall_p95_min": 14.2,
+        "mem_p95_max": 73.8,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.vault",
+      "promoted_at": "2026-06-18",
+      "previous_cluster_spec": {
+        "type": "consolidation_s_general_cluster",
+        "databricks_conn_id": "databricks_new",
+        "access_control_list": {
+          "group_name": "auditlogs",
+          "permission_level": "CAN_MANAGE"
+        },
+        "custom_configurations": {
+          "spark_conf": {
+            "spark.sql.legacy.json.allowEmptyString.enabled": "true",
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0962,
+        "wall_p50_min": 11.3,
+        "wall_p95_min": 11.3,
+        "mem_p95_max": 79.4,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-18"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.vespucio_service",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_xs_memory_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": {
+          "single_user_name": "{{ var.value.databricks_single_user_name }}",
+          "data_security_mode": "SINGLE_USER",
+          "spark_conf": {
+            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
+          },
+          "aws_attributes": {
+            "ebs_volume_size": 200
+          },
+          "num_workers": 3,
+          "driver_node_type_id": "m7g.xlarge"
+        }
+      },
+      "baseline": {
+        "avg_cost_usd": 0.0937,
+        "wall_p50_min": 10.9,
+        "wall_p95_min": 10.9,
+        "mem_p95_max": 74.0,
+        "schedule_interval_minutes": 1440.0,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
+    },
+    {
+      "dag_id": "bietlejuice.wall_street",
+      "promoted_at": "2026-06-17",
+      "previous_cluster_spec": {
+        "type": "consolidation_l_memory_single_node_cluster",
+        "databricks_conn_id": "databricks_new",
+        "custom_libraries": [
+          {
+            "jar": "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
+          }
+        ]
+      },
+      "baseline": {
+        "avg_cost_usd": 0.3424,
+        "wall_p50_min": 7.9,
+        "wall_p95_min": 7.9,
+        "mem_p95_max": 34.8,
+        "schedule_interval_minutes": 472.1,
+        "failure_count": 0,
+        "snapshot_through": "2026-06-17"
+      }
     }
   ]
 }
