@@ -1630,6 +1630,10 @@ emr_cluster_base: &emr_cluster_anchor
               - "{{ var.value.databricks_s3_bucket }}"
               - "{{ dag.dag_id }}"
     custom_tags:
+        - key: dag_id
+          value: "{{ dag.dag_id }}"
+        - key: application
+          value: "{{ dag.dag_id }}"
         - key: app
           value: airflow
         - key: resource-name
@@ -1642,6 +1646,8 @@ emr_cluster_base: &emr_cluster_anchor
           value: data-engineering
         - key: data-classification
           value: private
+        - key: sensitive-data
+          value: "true"
         - key: cost-center
           value: c052
         - key: provisioner
