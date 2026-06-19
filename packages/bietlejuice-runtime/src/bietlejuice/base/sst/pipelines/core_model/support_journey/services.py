@@ -573,11 +573,12 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
                 "id_event",
                 F.sha2(
                     F.concat_ws(
-                        "_",
+                        "&",
                         F.col("id_session"),
                         F.col("id_support_session"),
                         F.col("id_task"),
                         F.col("id_task_event"),
+                        F.col("ts_task_updated"),
                     ),
                     256,
                 ),
@@ -585,11 +586,12 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             .withColumn(
                 "id_event_type",
                 F.concat_ws(
-                    "_",
+                    "&",
                     F.lit("id_session"),
                     F.lit("id_support_session"),
                     F.lit("id_task"),
                     F.lit("id_task_event"),
+                    F.lit("ts_task_updated"),
                 ),
             )
             .withColumn("partition_date", partition_date)
