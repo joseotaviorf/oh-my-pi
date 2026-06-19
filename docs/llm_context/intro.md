@@ -88,6 +88,7 @@ Each **metric entity** file follows a different, leaner structure focused on the
 - `business_entities/matthew.md` — Collections AI agent for tenants with open balances (agente Matthew / cobrança IA)
 - `business_entities/nps.md` — Net Promoter Score campaigns via Tracksale (NPS)
 - `business_entities/organization.md` — People DW org reference: cost centers, business units, and jobs (centro de custo / time / BU)
+- `business_entities/org_chart.md` — Public active workforce org chart: manager, job, cost center, Codex taxonomy, P&T teams (organograma / quadro ativo)
 - `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/recovery_collections_fr_tenants.md` — Overdue debt recovery rate analytics for For-Rent tenants (recuperação / cobrança FR / wallet / recovery rate)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)

@@ -3,7 +3,10 @@ database_name: datalake_people_public
 table_name: org_chart
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Information about team structures based on the organizational chart.
+description: |-
+  Current-state organizational chart for active employees and contractors (assignment types E and C).
+  Grain is one row per active assignment_number with manager, job, cost center, Codex taxonomy, and Product & Technology team formation attributes.
+  Terminated and inactive assignments are excluded at load time; use datalake_people.identifier_mapping or dw_employee_details for full employment history.
 columns:
   assignment_number:
     description: Registration number of the worker.
@@ -57,7 +60,7 @@ columns:
     lineage:
       - datalake_hr_system_clean.organizations.product
   vertical:
-    description: Vertical of the worker.
+    description: Business vertical of the employee's cost center from PIN Oracle HCM Organization DFF (datalake_hr_system_clean.organizations). Allowed values are Ops, Tech, and Corp; NULL when the cost center has no organization match or the DFF field is blank.
     lineage:
       - datalake_hr_system_clean.organizations.vertical
   vice_presidency:

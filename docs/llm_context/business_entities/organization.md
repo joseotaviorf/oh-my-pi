@@ -29,6 +29,7 @@ For the full business-facing schema guide, see `dags/people/dw_organization/docs
 ## Related Business Entities
 
 - `employee_details.md` — daily assignment snapshots and employee identity; join on `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version`.
+- `org_chart.md` — denormalized current org chart for active employees (`datalake_people_public.org_chart`) without DW joins.
 
 ## Glossary and Synonyms
 

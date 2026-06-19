@@ -38,6 +38,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Related Business Entities
 
 - `organization.md` — cost center, business unit, and job reference dimensions joined via `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version` on the fact.
+- `org_chart.md` — lightweight current org chart for active employees (`datalake_people_public.org_chart`) when DW joins are not needed.
 
 ## Glossary and Synonyms
 
