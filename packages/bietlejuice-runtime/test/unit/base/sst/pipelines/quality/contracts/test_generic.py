@@ -159,13 +159,15 @@ class TestRun:
         )
 
         with patch.object(checks, "_freshness_check_partition") as mock_check:
-            with patch.object(checks.logger, "info") as mock_info:
-                checks.run()
+            with patch.object(checks, "_freshness_check") as mock_freshness:
+                with patch.object(checks.logger, "info") as mock_info:
+                    checks.run()
 
         mock_info.assert_called_once()
         assert TABLE in mock_info.call_args[0][0]
         assert "Starting generic contract checks" in mock_info.call_args[0][0]
         mock_check.assert_called_once()
+        mock_freshness.assert_called_once()
         spark.createDataFrame.assert_called_once()
         mock_validate_and_write.assert_called_once()
 
@@ -216,7 +218,10 @@ class TestRun:
         spark.createDataFrame.assert_called_once()
         mock_validate_and_write.assert_called_once()
         rows = spark.createDataFrame.call_args[0][0]
-        assert len(rows) == 1
-        assert rows[0]["status"] == "failed"
-        assert rows[0]["count_rows"] == 0
-        assert rows[0]["metric_name"] == "freshness_partition"
+        assert len(rows) == 2
+        assert all(row["status"] == "failed" for row in rows)
+        assert all(row["count_rows"] == 0 for row in rows)
+        assert {row["metric_name"] for row in rows} == {
+            "freshness_partition",
+            "freshness",
+        }

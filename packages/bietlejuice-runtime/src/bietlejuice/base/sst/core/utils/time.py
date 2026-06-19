@@ -93,6 +93,45 @@ def build_hour_window(partition_date: str, partition_hour: str) -> tuple[str, st
     )
 
 
+def is_weekend_window(partition_date: str, partition_hour: str = None) -> bool:
+    """
+    Return ``True`` when the partition falls inside the weekend window:
+    from Friday 18:00 (inclusive) until Monday 08:00 (exclusive).
+
+    ``partition_hour`` is optional and may legitimately be ``"00"`` (midnight).
+    When it is ``None`` (no hourly partition), the window is evaluated at day
+    granularity and only fully-contained days count: Saturday and Sunday return
+    ``True``, while the partial Friday/Monday boundary days return ``False``.
+
+    Args:
+        partition_date: Date string in ``YYYY-MM-DD`` format.
+        partition_hour: Hour string (``HH``), or ``None`` when not partitioned by hour.
+
+    Example:
+        ``("2026-06-19", "18")`` (Friday 18h) -> ``True``
+        ``("2026-06-19", "00")`` (Friday 00h) -> ``False``
+        ``("2026-06-22", "08")`` (Monday 08h) -> ``False``
+        ``("2026-06-20", None)`` (Saturday)   -> ``True``
+    """
+    date = datetime.strptime(partition_date, "%Y-%m-%d")
+    weekday = date.weekday()  # Monday=0 ... Sunday=6
+
+    if weekday in (5, 6):  # Saturday, Sunday
+        return True
+
+    if partition_hour is None:
+        # Without an hour we cannot place the Friday/Monday boundary, so be
+        # conservative and only treat the full weekend days as the window.
+        return False
+
+    hour = int(partition_hour)
+    if weekday == 4:  # Friday
+        return hour >= 18
+    if weekday == 0:  # Monday
+        return hour < 8
+    return False
+
+
 def build_partition_time_window(
     partition_date: str,
     partition_hour: str,

@@ -11,7 +11,10 @@ from bietlejuice.base.sst.core.utils.common import (
     retrieve_spark_session,
     validate_and_write,
 )
-from bietlejuice.base.sst.core.utils.time import build_partition_time_window
+from bietlejuice.base.sst.core.utils.time import (
+    build_partition_time_window,
+    is_weekend_window,
+)
 
 
 class GenericContractQualityChecks:
@@ -67,7 +70,7 @@ class GenericContractQualityChecks:
         )
         if self.partition_date and self.partition_hour:
             self._freshness_check_partition()
-        # self._freshness_check()
+        self._freshness_check()
 
         quality_checks_df = self.spark.createDataFrame(
             self.quality_checks_data, self.quality_checks_schema
@@ -90,6 +93,16 @@ class GenericContractQualityChecks:
                 failed_metric.append(metric["metric_name"])
 
         if len(failed_metric) > 0:
+            is_weekend = self.partition_date is not None and is_weekend_window(
+                self.partition_date, self.partition_hour
+            )
+            if is_weekend:
+                self.logger.warning(
+                    f"m=run, msg=Failed contract checks for {self.table_name} during "
+                    f"weekend window (Fri 18h-Mon 8h), skipping failure. "
+                    f"failed metrics: {failed_metric}"
+                )
+                return
             raise ValueError(
                 f"m=run, msg=Failed contract checks for {self.table_name}, failed metrics: {failed_metric}"
             )
