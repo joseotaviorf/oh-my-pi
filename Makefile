@@ -875,6 +875,27 @@ validate-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
+.PHONY: register-datahub-context-props
+## One-time registration of TARS entity structured properties on DataHub DOCUMENT entities.
+## Requires DATAHUB_GRAPHQL_URL and DATAHUB_TOKEN env vars.
+register-datahub-context-props:
+	@echo ""
+	@echo "Registering TARS entity structured properties on DataHub DOCUMENT entities"
+	@echo "=========="
+	@echo ""
+	@uv run python dags/governance/datahub_business_context/register_tars_document_structured_properties.py
+
+.PHONY: validate-context-docs
+## Dry-run the TARS entity sync: parse all published tars-entity Context Documents and
+## report validation errors without pushing to DataHub or opening PRs.
+## Requires DATAHUB_GRAPHQL_URL and DATAHUB_TOKEN env vars.
+validate-context-docs:
+	@echo ""
+	@echo "Validating TARS entity Context Documents (dry-run)"
+	@echo "=========="
+	@echo ""
+	@uv run python dags/governance/datahub_business_context/sync_tars_entities.py --dry-run --force
+
 .PHONY: validate-fair-metadata
 validate-fair-metadata:
 	@echo ""

@@ -1,0 +1,4 @@
+# Sync state — do not commit (local / CI runtime)
+.tars_entity_sync_state.json
+sync_output/*
+!sync_output/.gitkeep

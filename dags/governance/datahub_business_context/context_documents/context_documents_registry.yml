@@ -1,0 +1,28 @@
+# Registry of DataHub Context Documents managed from Git.
+#
+# Each entry maps a markdown file in context_documents/ to a stable DataHub
+# document ID (→ urn:li:document:{id}).  The push script keeps these in sync:
+#
+#   python dags/governance/datahub_business_context/push_context_documents.py
+#
+# Rules:
+#   - `id` is permanent — changing it creates a new document in DataHub.
+#   - `parent_id` must reference another `id` in this list (push order: parents first).
+#   - `state` controls visibility: PUBLISHED = visible to all users.
+#   - `show_in_global_context` = true → appears in the top-level Documents sidebar.
+
+documents:
+  - id: tars-entity-authoring-guide
+    source_file: AUTHORING_GUIDE.md
+    title: "TARS Entity Authoring Guide"
+    sub_type: Process Guide
+    state: PUBLISHED
+    show_in_global_context: true
+
+  - id: tars-entity-template
+    source_file: TARS_ENTITY_TEMPLATE.md
+    title: "TARS Entity Template"
+    sub_type: Process Guide
+    state: PUBLISHED
+    parent_id: tars-entity-authoring-guide
+    show_in_global_context: true

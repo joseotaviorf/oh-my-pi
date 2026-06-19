@@ -10,6 +10,10 @@
 #   • dags/governance/datahub_business_context/push_all_entities.py  (deprecated push wrapper)
 #   • dags/governance/datahub_business_context/smoke_test_datahub.py  (smoke test)
 #   • dags/governance/datahub_business_context/reference/**  (LLM reference YAMLs)
+#   • dags/governance/datahub_business_context/context_documents/**  (guide + template MDs)
+#   • dags/governance/datahub_business_context/push_context_documents.py  (doc push script)
+#   • dags/governance/datahub_business_context/sync/**  (TARS entity sync modules)
+#   • dags/governance/datahub_business_context/sync_tars_entities.py  (sync orchestrator)
 #   • packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
 #   • .woodpecker/datahub.yml
 #
@@ -18,15 +22,20 @@
 #   push-datahub-business-context — LLM → ephemeral YAML → DataHub via
 #                                   generate_and_push_datahub_entities.py (push only)
 #   validate-datahub-entities — smoke full catalog on pull_request (no push-only deps)
-#   validate-datahub-entities-post-push — smoke --changed-only after publish (push only;
+#   validate-datahub-entities-post-push — smoke after publish (push only;
 #       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
 #       depends_on push-datahub-business-context fails on pull_request)
+#   sync-tars-entities — sync_tars_entities.py (direct mode) for DataHub Context Documents
+#                         tagged tars-entity
+#   push-context-documents — push_context_documents.py on push to master / hotfix/*
+#                             (idempotent; stable document IDs)
 #
 # Secrets required (configure in Woodpecker repo settings):
 #   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push step)
 #   datahub_api_key_prod     — prod DataHub PAT with editor role (push step)
 #   datahub_graphql_url      — DataHub GraphQL endpoint (validate step)
 #   datahub_token            — DataHub PAT (validate step)
+#   github_token             — GitHub PAT with repo write access (gitops mode only)
 #   Vault (prod)             — OPENAI_API_KEY for LiteLLM (push step only)
 #
 # This pipeline does NOT depend on lint / tests / validations so it can run
@@ -121,3 +130,43 @@ steps:
         branch: [master, hotfix/*]
         path: *datahub_path
     depends_on: [push-datahub-business-context]
+
+  sync-tars-entities:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url
+      DATAHUB_TOKEN:
+        from_secret: datahub_token
+      TARS_SYNC_MODE: direct
+    commands:
+      - uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct
+    when:
+      - event: push
+        branch: [master, hotfix/*]
+        path:
+          include:
+            - "docs/llm_context/business_entities/**"
+            - "dags/governance/datahub_business_context/sync/**"
+            - "dags/governance/datahub_business_context/sync_tars_entities.py"
+          on_empty: false
+
+  push-context-documents:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url
+      DATAHUB_TOKEN:
+        from_secret: datahub_token
+    commands:
+      - uv run python dags/governance/datahub_business_context/push_context_documents.py
+    when:
+      - event: push
+        branch: [master, hotfix/*]
+        path:
+          include:
+            - "dags/governance/datahub_business_context/context_documents/**"
+            - "dags/governance/datahub_business_context/push_context_documents.py"
+          on_empty: false

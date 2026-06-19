@@ -1904,6 +1904,23 @@ def curated_push_sidebar_struct_props(
             "merge aborted (see stderr)",
         )
         return
+
+    lifecycle_stage = str(cfg.get("lifecycle_stage") or "").strip().lower()
+    if lifecycle_stage:
+        lifecycle_qname = "br.com.quintoandar.datahub.data_product.lifecycle_stage"
+        lifecycle_sp_urn = structured_property_urn(lifecycle_qname)
+        merged_blob = [
+            row
+            for row in merged_blob
+            if row.get("structuredPropertyUrn") != lifecycle_sp_urn
+        ]
+        merged_blob.append(
+            {
+                "structuredPropertyUrn": lifecycle_sp_urn,
+                "values": [{"stringValue": lifecycle_stage}],
+            }
+        )
+
     upl = _post(
         _UPSERT_STRUCTURED_PROPERTIES,
         {

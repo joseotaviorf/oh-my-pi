@@ -1,0 +1,207 @@
+"""GitOps delivery: open a GitHub PR with the generated MD file (Option A)."""
+
+from __future__ import annotations
+
+import base64
+import json
+import os
+import urllib.error
+import urllib.request
+from dataclasses import dataclass
+from typing import Any, Optional
+
+from sync.constants import (
+    GITHUB_DEFAULT_BRANCH,
+    GITHUB_REPO,
+    MD_OUTPUT_DIR,
+)
+
+
+@dataclass
+class PullRequestResult:
+    pr_url: str
+    branch: str
+    pr_number: int
+
+
+def _github_token() -> str:
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    if not token:
+        raise RuntimeError(
+            "GITHUB_TOKEN is not set (required for gitops delivery mode)"
+        )
+    return token
+
+
+def _api_request(
+    method: str,
+    path: str,
+    body: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    token = _github_token()
+    url = f"https://api.github.com/repos/{GITHUB_REPO}{path}"
+    data = json.dumps(body).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(
+        url,
+        data=data,
+        method=method,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            raw = resp.read().decode("utf-8")
+            return json.loads(raw) if raw else {}
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(
+            f"GitHub API {method} {path} failed ({exc.code}): {detail}"
+        ) from exc
+
+
+def _get_ref_sha(branch: str = GITHUB_DEFAULT_BRANCH) -> str:
+    ref = _api_request("GET", f"/git/ref/heads/{branch}")
+    return str(ref["object"]["sha"])
+
+
+def _get_file_sha(path: str, branch: str = GITHUB_DEFAULT_BRANCH) -> Optional[str]:
+    try:
+        blob = _api_request("GET", f"/contents/{path}?ref={branch}")
+        return str(blob.get("sha"))
+    except RuntimeError as exc:
+        if "404" in str(exc):
+            return None
+        raise
+
+
+def file_exists_on_master(path: str) -> bool:
+    """Return True if ``path`` already exists on the default branch (master)."""
+    return _get_file_sha(path, GITHUB_DEFAULT_BRANCH) is not None
+
+
+def _find_open_pr(branch: str) -> Optional[dict[str, Any]]:
+    """Return the first open PR whose head is `branch`, or None."""
+    owner = GITHUB_REPO.split("/")[0]
+    prs = _api_request("GET", f"/pulls?head={owner}:{branch}&state=open")
+    if isinstance(prs, list) and prs:
+        return prs[0]
+    return None
+
+
+def _create_branch(branch: str, base_sha: str) -> None:
+    _api_request(
+        "POST",
+        "/git/refs",
+        {"ref": f"refs/heads/{branch}", "sha": base_sha},
+    )
+
+
+def _put_file(
+    path: str,
+    content: str,
+    message: str,
+    branch: str,
+    file_sha: Optional[str] = None,
+) -> None:
+    body: dict[str, Any] = {
+        "message": message,
+        "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+        "branch": branch,
+    }
+    if file_sha:
+        body["sha"] = file_sha
+    _api_request("PUT", f"/contents/{path}", body)
+
+
+def open_sync_pull_request(
+    *,
+    data_product_id: str,
+    md_content: str,
+    document_title: str,
+    document_urn: str,
+    is_edit: bool = False,
+) -> PullRequestResult:
+    """Create branch, commit MD file, and open (or update) a PR for engineering review.
+
+    Only the Markdown file is committed. On merge Woodpecker's ``sync-tars-entities``
+    step runs ``sync_tars_entities.py --mode direct``, which reads fresh state from
+    DataHub, generates YAML in memory, and pushes the Data Product — no YAML in the
+    repo is required.
+
+    ``is_edit=True`` means a file already exists on master; the PR title is labelled
+    ``[EDIT]`` so reviewers know they're looking at a diff, not a net-new entity.
+
+    Idempotent: if an open PR already exists on branch ``tars-entity-sync/{data_product_id}``,
+    the MD file is updated in-place on that branch and the existing PR is returned.
+    """
+    entity_slug = data_product_id.replace("-", "_")
+    md_path = f"{MD_OUTPUT_DIR}/{entity_slug}.md"
+    branch = f"tars-entity-sync/{data_product_id}"
+
+    commit_msg = (
+        f"feat(datahub): sync TARS entity '{document_title}' from Context Document"
+    )
+    update_msg = f"chore(datahub): update TARS entity '{document_title}' (re-sync)"
+
+    # ── Check for an existing open PR on this branch first ────────────────────
+    existing_pr = _find_open_pr(branch)
+
+    if existing_pr:
+        # PR is already open — update the MD file on the branch in-place.
+        # Must read SHA from the PR branch (not master) to avoid sha-mismatch errors.
+        md_sha = _get_file_sha(md_path, branch)
+        _put_file(md_path, md_content, update_msg, branch, md_sha)
+        return PullRequestResult(
+            pr_url=str(existing_pr["html_url"]),
+            branch=branch,
+            pr_number=int(existing_pr["number"]),
+        )
+
+    # ── No open PR — create branch, commit MD, and open a new PR ──────────────
+    base_sha = _get_ref_sha()
+    try:
+        _create_branch(branch, base_sha)
+    except RuntimeError as exc:
+        if "Reference already exists" not in str(exc) and "422" not in str(exc):
+            raise
+
+    # Read SHA from master (file won't exist on the freshly cut branch)
+    md_sha = _get_file_sha(md_path, GITHUB_DEFAULT_BRANCH)
+    _put_file(md_path, md_content, commit_msg, branch, md_sha)
+
+    pr_body = (
+        f"## TARS entity self-service sync\n\n"
+        f"Auto-generated from DataHub Context Document:\n\n"
+        f"- **Document:** `{document_urn}`\n"
+        f"- **Title:** {document_title}\n"
+        f"- **Data Product ID:** `{data_product_id}`\n\n"
+        f"### File\n\n"
+        f"- `{md_path}`\n\n"
+        f"### On merge\n\n"
+        f"Woodpecker `sync-tars-entities` runs automatically and pushes the Data "
+        f"Product to DataHub in memory (no YAML file needed in the repo).\n\n"
+        f"### Review checklist\n\n"
+        f"- [ ] Golden query SQL is valid Trino\n"
+        f"- [ ] All `schema.table` pairs exist in DataHub\n"
+        f"- [ ] Woodpecker `sync-tars-entities` passes after merge\n"
+    )
+    kind_label = "[EDIT]" if is_edit else "[NEW]"
+    pr = _api_request(
+        "POST",
+        "/pulls",
+        {
+            "title": f"[TARS entity sync]{kind_label} {document_title} ({data_product_id})",
+            "head": branch,
+            "base": GITHUB_DEFAULT_BRANCH,
+            "body": pr_body,
+        },
+    )
+    return PullRequestResult(
+        pr_url=str(pr.get("html_url", "")),
+        branch=branch,
+        pr_number=int(pr.get("number", 0)),
+    )

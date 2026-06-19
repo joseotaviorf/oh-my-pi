@@ -1,0 +1,206 @@
+# DataHub Metadata Policies — TARS Entity Context Documents
+#
+# Import these policies in DataHub UI: Settings → Access → Policies → + New Policy
+# Or apply via DataHub CLI / OpenAPI when bulk-provisioning.
+#
+# Tag marker: urn:li:tag:tars-entity
+# Document type: Process Guide (Context Document)
+#
+# Prerequisites:
+#   1. Create tag `tars-entity` in DataHub (Settings → Tags).
+#   2. Register structured properties via register_tars_document_structured_properties.py
+#   3. Create corpGroup URNs for each domain steward group (see domain_stewards below).
+
+spec_version: 1
+kind: tars_entity_metadata_policies
+
+# ---------------------------------------------------------------------------
+# Domain steward groups (Backstage / IAM — adjust URNs to match your deployment)
+# ---------------------------------------------------------------------------
+domain_stewards:
+  fintech:
+    domain_urn: urn:li:domain:fintech
+    steward_group: urn:li:corpGroup:data-stewards-fintech
+    contributor_group: urn:li:corpGroup:fintech-analysts
+  growth:
+    domain_urn: urn:li:domain:growth
+    steward_group: urn:li:corpGroup:data-stewards-growth
+    contributor_group: urn:li:corpGroup:growth-analysts
+  people:
+    domain_urn: urn:li:domain:people
+    steward_group: urn:li:corpGroup:data-stewards-people
+    contributor_group: urn:li:corpGroup:people-analysts
+  supply:
+    domain_urn: urn:li:domain:supply
+    steward_group: urn:li:corpGroup:data-stewards-supply
+    contributor_group: urn:li:corpGroup:supply-analysts
+  rent:
+    domain_urn: urn:li:domain:rent
+    steward_group: urn:li:corpGroup:data-stewards-rent
+    contributor_group: urn:li:corpGroup:rent-analysts
+  sale:
+    domain_urn: urn:li:domain:sale
+    steward_group: urn:li:corpGroup:data-stewards-sale
+    contributor_group: urn:li:corpGroup:sale-analysts
+
+governance_admin_group: urn:li:corpGroup:data-governance
+
+# ---------------------------------------------------------------------------
+# Policy definitions (one per row — create in DataHub UI)
+# ---------------------------------------------------------------------------
+policies:
+
+  # --- Contributors: draft-only in their domain --------------------------------
+
+  - name: "TARS Entity — Contributors create drafts (domain-scoped)"
+    description: >
+      Business users in domain contributor groups can create and edit Context
+      Documents tagged tars-entity within their domain, but only while in Draft state.
+    type: METADATA
+    state: ACTIVE
+    privileges:
+      - CREATE_ENTITY
+      - EDIT_ENTITY
+      - EDIT_DOCUMENT_CONTENT
+    resources:
+      filter:
+        criteria:
+          - field: ENTITY
+            values:
+              - DOCUMENT
+            condition: EQUAL
+          - field: TAG
+            values:
+              - urn:li:tag:tars-entity
+            condition: EQUAL
+          - field: DOMAIN
+            values:
+              - "{{ domain_urn }}"
+            condition: EQUAL
+    actors:
+      groups:
+        - "{{ contributor_group }}"
+    # Apply once per domain_stewards entry (fintech, growth, people, …)
+
+  - name: "TARS Entity — Contributors cannot publish"
+    description: >
+      Contributors can save drafts but cannot toggle Published state.
+      Publish is reserved for domain stewards and governance admins.
+    type: METADATA
+    state: ACTIVE
+    privileges:
+      - EDIT_ENTITY
+    resources:
+      filter:
+        criteria:
+          - field: ENTITY
+            values:
+              - DOCUMENT
+            condition: EQUAL
+          - field: TAG
+            values:
+              - urn:li:tag:tars-entity
+            condition: EQUAL
+    actors:
+      groups:
+        - "{{ contributor_group }}"
+    # DENY policy (set effect: DENY in UI when creating)
+
+  # --- Domain stewards: full document lifecycle in their domain --------------
+
+  - name: "TARS Entity — Domain stewards manage documents"
+    description: >
+      Domain data stewards can create, edit, publish, and unpublish tars-entity
+      documents in their domain. They act as the approval gate before sync.
+    type: METADATA
+    state: ACTIVE
+    privileges:
+      - CREATE_ENTITY
+      - EDIT_ENTITY
+      - EDIT_DOCUMENT_CONTENT
+      - MANAGE_DOCUMENTS
+    resources:
+      filter:
+        criteria:
+          - field: ENTITY
+            values:
+              - DOCUMENT
+            condition: EQUAL
+          - field: TAG
+            values:
+              - urn:li:tag:tars-entity
+            condition: EQUAL
+          - field: DOMAIN
+            values:
+              - "{{ domain_urn }}"
+            condition: EQUAL
+    actors:
+      groups:
+        - "{{ steward_group }}"
+
+  # --- Governance admin: cross-domain override --------------------------------
+
+  - name: "TARS Entity — Governance admin full access"
+    description: >
+      Data Governance squad can manage all tars-entity documents across domains,
+      including unpublishing and structured-property corrections.
+    type: METADATA
+    state: ACTIVE
+    privileges:
+      - CREATE_ENTITY
+      - EDIT_ENTITY
+      - EDIT_DOCUMENT_CONTENT
+      - MANAGE_DOCUMENTS
+      - DELETE_ENTITY
+    resources:
+      filter:
+        criteria:
+          - field: ENTITY
+            values:
+              - DOCUMENT
+            condition: EQUAL
+          - field: TAG
+            values:
+              - urn:li:tag:tars-entity
+            condition: EQUAL
+    actors:
+      groups:
+        - urn:li:corpGroup:data-governance
+
+  # --- Read access: all authenticated users on published docs -----------------
+
+  - name: "TARS Entity — All users read published documents"
+    description: >
+      Any authenticated DataHub user can view published tars-entity documents
+      (required for Ask DataHub / TARS grounding).
+    type: METADATA
+    state: ACTIVE
+    privileges:
+      - VIEW_ENTITY_PAGE
+    resources:
+      filter:
+        criteria:
+          - field: ENTITY
+            values:
+              - DOCUMENT
+            condition: EQUAL
+          - field: TAG
+            values:
+              - urn:li:tag:tars-entity
+            condition: EQUAL
+    actors:
+      allUsers: true
+
+# ---------------------------------------------------------------------------
+# Rollout checklist (manual steps in DataHub UI)
+# ---------------------------------------------------------------------------
+#
+# 1. Create tag `tars-entity` (display name: "TARS Entity Context").
+# 2. For each domain in domain_stewards:
+#    a. Clone "Contributors create drafts" policy → set DOMAIN + contributor_group.
+#    b. Clone "Contributors cannot publish" as DENY policy.
+#    c. Clone "Domain stewards manage documents" → set DOMAIN + steward_group.
+# 3. Create governance admin policy (cross-domain).
+# 4. Create read policy for all users.
+# 5. Pin AUTHORING_GUIDE.md content as a top-level Context Document in DataHub.
+# 6. Pin TARS_ENTITY_TEMPLATE.md as a child document under the guide.

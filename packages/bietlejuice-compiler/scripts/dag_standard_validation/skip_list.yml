@@ -59,11 +59,26 @@ dags_not_using_builder:
   - platform/notify_stale_dags/notify_stale_dags.py
   - platform/notify_airbyte_key_rotation/notify_airbyte_key_rotation.py
   - governance/notify_dag_rotation/notify_dag_rotation.py
+  # Standalone governance scripts — not Airflow DAG files; no DAG object to validate.
   - governance/datahub_business_context/datahub_curated_urns.py
   - governance/datahub_business_context/datahub_domain_catalog.py
   - governance/datahub_business_context/load_collections_context.py
   - governance/datahub_business_context/push_all_entities.py
   - governance/datahub_business_context/smoke_test_datahub.py
+  - governance/datahub_business_context/push_context_documents.py
+  - governance/datahub_business_context/push_tars_policies.py
+  - governance/datahub_business_context/register_tars_document_structured_properties.py
+  - governance/datahub_business_context/sync_tars_entities.py
+  - governance/datahub_business_context/sync/constants.py
+  - governance/datahub_business_context/sync/datahub_client.py
+  - governance/datahub_business_context/sync/datahub_document_client.py
+  - governance/datahub_business_context/sync/direct_delivery.py
+  - governance/datahub_business_context/sync/document_parser.py
+  - governance/datahub_business_context/sync/github_delivery.py
+  - governance/datahub_business_context/sync/sync_state.py
+  - governance/datahub_business_context/sync/yaml_generator.py
+  - governance/datahub_business_context/sync/__init__.py
+  - governance/sync_tars_entities/sync_tars_entities_dag.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
 
 database_ingestion_without_cdc:

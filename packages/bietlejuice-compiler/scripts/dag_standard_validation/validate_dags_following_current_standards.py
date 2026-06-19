@@ -90,7 +90,9 @@ def find_dags_not_using_builder(skip_list: list, domain: str = None) -> list:
     )
     python_files = glob(glob_pattern, recursive=True)
     dag_python_files = [
-        remove_prefix(file) for file in python_files if "/spark_jobs/" not in file
+        remove_prefix(file)
+        for file in python_files
+        if "/spark_jobs/" not in file and not file.endswith("_dag.py")
     ]
     return [file for file in dag_python_files if file not in skip_list]
 
