@@ -4,3 +4,10 @@ cluster:
   custom_configurations:
     spark_conf:
       spark.driver.maxResultSize: '0'
+validation:
+  cluster:
+    type: consolidation_m_memory_single_node_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      spark_conf:
+        spark.driver.maxResultSize: '0'

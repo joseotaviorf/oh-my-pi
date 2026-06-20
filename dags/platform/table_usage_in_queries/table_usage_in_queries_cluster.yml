@@ -8,3 +8,10 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     spark_version: 13.3.x-scala2.12
     num_workers: 3
+validation:
+  cluster:
+    type: consolidation_xs_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_configurations:
+      spark_version: 13.3.x-scala2.12
+  allow_custom_spark_job: true

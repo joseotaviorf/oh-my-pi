@@ -4,3 +4,12 @@ cluster:
   access_control_list:
     group_name: data-products
     permission_level: CAN_MANAGE
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new_env
+    access_control_list:
+      group_name: data-products
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      driver_node_type_id: r7g.large
