@@ -1,0 +1,144 @@
+---
+alwaysApply: false
+globs: "dags/**/queries/**/*.sql,dags/**/*_declaration.yml,dags/**/metadata/**/*.yml"
+---
+# LLM Context Impact — TARS Entity-Doc Drift Check
+
+**Complementary to** `make validate-metadata-files-content` / `validate-lineage-consistency`. CI does not enforce this — the goal is to keep `docs/llm_context/business_entities/` in sync so TARS does not silently generate SQL against an outdated schema.
+
+Run this check whenever any of the following is touched:
+- `.sql` file under `dags/{domain}/{dag_name}/queries/`
+- `*_declaration.yml`
+- `dags/{domain}/{dag_name}/metadata/{layer}/*.yml`
+- User asks to open a PR, or to run the necessary validations, or mentions golden queries / business entities / `docs/llm_context/`
+
+## Step 1 — Gather the changeset
+
+```bash
+git diff --name-only origin/master...HEAD   # or HEAD for uncommitted changes
+```
+
+Bucket each changed path:
+
+| Bucket | Pattern | Path |
+|--------|---------|------|
+| Modified existing SQL | `dags/{domain}/{dag_name}/queries/{layer}/{table}.sql` (existed on master) | A |
+| New SQL | Same pattern, new file | B |
+| Removed SQL | Same pattern, deleted | A (deprecation) |
+| New DAG declaration | New `*_declaration.yml` | B |
+| Modified DAG declaration | Existing `*_declaration.yml` | A + B depending on diff |
+| Modified metadata | `dags/{domain}/{dag_name}/metadata/{layer}/{table}.yml` | A |
+
+## Step 2 — Path A: modified or removed existing tables
+
+### 2.1 Fully-qualified table name
+Read `dags/{domain}/{dag_name}/metadata/{layer}/{table}.yml` and extract `database_name` + `table_name`.
+Identifier: `{database_name}.{table_name}` (e.g. `dw_rent.fact_contracts`).
+If the metadata file is missing, stop and report — `make validate-metadata-files-exist` will fail.
+
+### 2.2 Column-level diff
+```bash
+git diff origin/master -- {sql_path}
+```
+Extract from the diff:
+- **Removed columns** — identifiers on `-` lines no longer aliased in SELECT
+- **Renamed columns** — same expression, different alias on a `-`/`+` pair
+- **Added columns** — identifiers on `+` lines absent from the previous version
+- **Grain/filter changes** — added/removed `WHERE`, `GROUP BY`, `ROW_NUMBER`, `DISTINCT`, `JOIN`, `HAVING`
+
+For a deleted `.sql`, all columns are removed and the table is being deprecated.
+
+### 2.3 Search entity context docs
+Grep `docs/llm_context/business_entities/*.md` for `{database_name}.{table_name}`.
+Fall back to bare `{table_name}` only when it is reasonably unique (skip generic names like `events`, `users`, `tickets`).
+
+For each matched file, record which section the hit belongs to (`## Tables`, `## Key Metrics`, `## Relationships with Other Entities`, `## Dos and Don'ts`, `## Golden Queries`).
+
+### 2.4 Golden Query column cross-check
+For each entity doc with hits in `## Golden Queries`, read the SQL blocks and check:
+- **Removed column** referenced in SELECT / JOIN / WHERE / GROUP BY / ORDER BY → **broken query**
+- **Renamed column** referenced under the old name → **broken, flag for update**
+- **Filter contradiction** — SQL now hard-filters on a value the Golden Query also filters → **flag for review**
+
+Also check `## Tables` rows: if the row description mentions a column or behavior that the diff removes or changes, flag it.
+
+### 2.5 Path A findings
+For each `(entity_doc, table, section, issue)` tuple capture:
+- Entity doc path
+- Section + specific line range
+- One-sentence explanation of staleness
+- Concrete edit suggestion (e.g. `remove "dt_signed_legacy" from Query 2 SELECT at line 268`)
+
+If no entity doc references the table, record explicit "no entity-doc impact" — silence is information.
+
+## Step 3 — Path B: new DAGs and new tables
+
+### 3.1 Description quality
+For each `description:` field in new declaration and metadata YAMLs, check:
+- **Length** ≥ 80 characters (shorter = likely a shallow one-liner)
+- **Depth** — answers at least 2 of: what business entity it represents, who consumes it, what the grain is, why it exists
+- **Business vocabulary** — includes PT-BR / business terms analysts use (e.g. "ticket", "contrato", "visita"), not just the technical identifier
+
+For each failing description, **propose an improved version inline** — do not just say "expand it".
+
+### 3.2 Candidate entity docs
+For each new table, map `dags/{domain}/` + the `domain:` field in the metadata YAML to entity docs. Match keywords in the table name and joined tables against `## Glossary and Synonyms` and `## Tables` sections of each candidate. Read each candidate's `## Overview` to confirm topical fit.
+
+Verdict per new table (choose one):
+- **Belongs in existing entity doc** — list path + sections to extend (`## Tables` row at minimum; add a Golden Query if it is a fact/metric table analysts will commonly query)
+- **No good fit, but analytically important** (`dw_*` fact, `dw_*` dimension without coverage, `metric_*`) — recommend creating a new entity doc via the `create-entity-doc` skill
+- **Internal / not analyst-facing** (raw, clean, infra, pure plumbing) — state this explicitly; no coverage needed
+
+### 3.3 Path B findings
+For each new DAG / table:
+- Whether the description meets the bar (show the improved version if not)
+- Candidate entity docs to extend (exact section)
+- Whether to create a new entity doc, with suggested file name
+
+## Step 4 — Report format
+
+```markdown
+## LLM Context Impact Report - TARS
+
+### Action required (Golden Queries or Tables sections likely broken)
+- `dw_customer_support.fact_tickets` — removed column: `dt_signed_legacy`
+  - `docs/llm_context/business_entities/ticket.md`
+    - `## Golden Queries` — Query 2, line 268: SELECT references `dt_signed_legacy`. Remove or replace with `dt_signed`.
+    - `## Tables` — row at line 41 mentions "signed-date timeline". Verify it still applies.
+
+### Should review (context may be stale)
+- `dw_rent.dim_contract` — grain change: new DISTINCT added.
+  - `docs/llm_context/business_entities/contract.md` — `## Dos and Don'ts` (lines 92–104) should mention new dedup semantics.
+
+### New DAGs / tables
+- `payments_invoices_recovery` (new DAG)
+  - Description too short. Suggested:
+    > "Loads recovery-stage invoice events from Salesforce CRM, producing `dw_collections.fact_recovery_invoices` consumed by the Collections squad for SLA dashboards and the cobrança_recuperação report."
+  - `dw_collections.fact_recovery_invoices` → add row in `## Tables` of `docs/llm_context/business_entities/recovery_collections_fr_tenants.md`
+
+### Informational
+- `dw_customer_support.fact_ticket_events` touched; only referenced in `## Tables` (line 42) — no Golden Query update needed.
+- `dw_internal.audit_log_raw` is a raw-internal table — no entity-doc coverage needed.
+```
+
+**Severity rubric:**
+- **Action required** — Golden Query directly references removed/renamed column, Tables row promises behavior that no longer holds, or deprecated table is still listed.
+- **Should review** — grain/filter changed but no obvious break; columns added (queries still work but invisible to TARS, can give wrong answers to TARS users); description generic.
+- **Informational** — table touched but no entity doc references it, or only a passing mention.
+
+## Step 5 — Offer to apply edits
+
+After the report, ask whether to apply the updates. **Match the user's language** (PT-BR, EN, ES, etc.).
+
+If yes:
+1. Edit each entity doc with scoped replacements using the line ranges from the report.
+2. Follow section conventions from `.cursor/skills/create-entity-doc/SKILL.md` (Trino SQL in Golden Queries, bullet-list in Glossary, no column duplication from metadata YAML).
+3. Re-grep entity docs to confirm no stale references remain.
+4. Report what changed, file by file.
+
+## Notes
+
+- This check is **advisory** — it does not block CI, but will be revised by automated validation step.
+- For large renames/removals affecting many tables, run the `impact-analysis` skill first and feed its table list into this check.
+- Skip bare `{table_name}` grep for generic names (`events`, `tickets`, `users`); rely on the FQN to avoid false positives.
+- When unsure whether a new table needs coverage, default to "Should review" with a question rather than silently ignoring it.
