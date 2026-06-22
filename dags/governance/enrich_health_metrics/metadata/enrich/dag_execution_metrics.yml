@@ -1,46 +1,50 @@
 database_name: datalake_health_metrics
 table_name: dag_execution_metrics
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: This table contains metrics of each DAG execution.
+description: >
+  Enrich-layer execution timing for each DAG run, enriched with owner-level median start
+  time, end time, and duration computed on top-reference SLA days. Grain is one row per
+  DAG execution from dag_historical_executions. Supports SLA benchmarking and runtime
+  anomaly detection against historical baselines.
 columns:
   dag_name:
-    description: Unique name identifier of the executed DAG.
+    description: Airflow DAG identifier for the pipeline run whose start, end, and duration metrics are recorded.
     lineage:
       - datalake_health_metrics.dag_historical_executions.dag_name
   dag_owner:
-    description: Name of the owner or team responsible for the DAG.
+    description: Email or team name responsible for the DAG, carried forward from dag_historical_executions.
     lineage:
       - datalake_health_metrics.dag.dag_owner
   dag_layer:
-    description: Processing layer of the DAG.
+    description: Consolidated data-lake layer label for tables produced by the DAG, carried forward from dag_historical_executions.
     lineage:
       - datalake_health_metrics.table.dag_layer
   dt_executed:
-    description: Date on which the DAG was executed.
+    description: Calendar date of the DAG run, matching the logical execution date in dag_historical_executions.
     lineage:
       - datalake_health_metrics.dag_historical_executions.dt_executed
   ts_dag_started:
-    description: Timestamp marking the start of the DAG execution.
+    description: UTC timestamp when the first cluster lifecycle task (create-cluster or execute-job-cluster) entered running state for the run.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_dag_started
   ts_dag_ended:
-    description: Timestamp marking the end of the DAG execution.
+    description: UTC timestamp when the last cluster lifecycle task (terminate-cluster or job-cluster-finished) reached success for the run.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_dag_ended
   duration_in_minutes:
-    description: DAG execution time in minutes.
+    description: Elapsed minutes between ts_dag_started and ts_dag_ended for the individual DAG execution.
     lineage:
       - datalake_health_metrics.dag_historical_executions.duration_in_minutes
   ts_median_started:
-    description: The median timestamp representing when the DAG execution starts.
+    description: Median clock time of day when the DAG owner historically starts runs on top-reference SLA days, used as a baseline comparison.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_median_started
   ts_median_ended:
-    description: The median timestamp representing when the DAG execution ends.
+    description: Median clock time of day when the DAG owner historically finishes runs on top-reference SLA days, used as a baseline comparison.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_median_ended
   duration_median_in_minutes:
-    description: Median DAG execution time in minutes.
+    description: Median run duration in minutes for the DAG owner on top-reference SLA days, used as a baseline comparison.
     lineage:
       - datalake_health_metrics.dag_historical_executions.duration_median_in_minutes

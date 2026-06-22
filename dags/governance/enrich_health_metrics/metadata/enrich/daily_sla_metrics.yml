@@ -1,26 +1,30 @@
 database_name: datalake_health_metrics
 table_name: daily_sla_metrics
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: WIP
+description: >
+  Daily SLA compliance rollup per DAG owner, counting how many active DAGs finished within
+  the configured deadline on each execution date. Non-dw_datamarts DAGs must complete by
+  08:00 BRT and dw_datamarts DAGs by 10:30 BRT on the logical date. Excludes DAGs on
+  the SLA exclusion sheet and internal governance teams. Grain is one row per owner and date.
 columns:
   dag_owner:
-    description: WIP
+    description: Email or team name of the DAG owner whose fleet SLA ratio is computed for the execution date.
     lineage:
       - datalake_health_metrics.daily_sla_metrics.dag_owner
   dt_executed:
-    description: WIP
+    description: Calendar date on which SLA compliance is evaluated against dag_historical_executions finish timestamps.
     lineage:
       - datalake_health_metrics.daily_sla_metrics.dt_executed
   total_dags:
-    description: WIP
+    description: Count of distinct active DAGs owned by the team on the execution date, excluding SLA exclusion and governance teams.
     lineage:
       - datalake_health_metrics.daily_sla_metrics.total_dags
   dags_sla_ok:
-    description: WIP
+    description: Count of distinct DAGs whose run finished within the SLA deadline on the execution date; null when the run missed SLA.
     lineage:
       - datalake_health_metrics.daily_sla_metrics.dags_sla_ok
   ratio_sla_ok:
-    description: WIP
+    description: Share of owned DAGs that met SLA on the execution date, rounded to two decimals as dags_sla_ok divided by total_dags.
     lineage:
       - datalake_health_metrics.daily_sla_metrics.ratio_sla_ok

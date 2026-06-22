@@ -1,88 +1,185 @@
----
 database_name: dw_pipeline
 table_name: fact_pipeline_metrics
-description: This incremental fact table has the pipeline metrics by each line and execution date, which we store it as a snapshot.
-  Each line is an unique line/DAG owner related to an specific snapshot date, identified by the sk_line and sk_snapshot_date. 
-domain: Cross
 owner: isadora.gallerani@quintoandar.com.br
+domain: Cross
+description: >
+  Incremental DW fact table of daily pipeline SLA and execution metrics aggregated by DAG owner
+  line, loaded by dw_pipeline from datalake_pipeline.dag_sla_information. Grain is one row per
+  line and snapshot date. Partitioned by year, month, day — filter on snapshot date. Supports
+  line-level SLA dashboards and operational reporting.
 columns:
   sk_line:
     lineage:
       - datalake_pipeline.dag_sla_information.id_line
-    description: Key that identifies the line/DAG owner. Joins with dw_pipeline.dim_line.
+    description: Surrogate key of the DAG owner line; joins to dw_pipeline.dim_line.
   sk_snapshot_date:
-    description: Key of the snapshot date. Joins with dw_public.dim_date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Date key in yyyyMMdd format for the snapshot date; joins to dw_public.dim_date.
   sla:
-    description: The line SLA. It's the calculation of the amount of DAGs inside SLA divided by the total amount of active and unpaused
-      DAGs, plus the amount of DAGs that are in the special scheduler list but that executed today, minus the total amount of DAGs
-      that should be ignored (in the SLA exclusion list, in the special scheduler list or with ignored runs) 
+    lineage:
+      - datalake_pipeline.dag_sla_information.is_inside_sla
+      - datalake_pipeline.dag_sla_information.is_active_and_unpaused
+      - datalake_pipeline.dag_sla_information.is_in_ignoring_list
+      - datalake_pipeline.dag_sla_information.is_special_scheduler_executed
+      - datalake_pipeline.dag_sla_information.is_intraday_dag
+    description: Line SLA percentage calculated as DAGs inside SLA divided by eligible active unpaused DAGs plus special-scheduler DAGs that executed, excluding ignored DAGs.
   total_active_dags:
-    description: The total amount of active DAGs that the line has til the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_active
+    description: Count of distinct active DAGs owned by the line on the snapshot date.
   total_active_unpaused_dags:
-    description: The total amount of active and unpaused DAGs that the line has til the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_active_and_unpaused
+    description: Count of distinct active and unpaused DAGs expected to run on the snapshot date.
   total_dags_executed:
-    description: The total amount of DAGs that were executed in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+    description: Count of distinct DAGs that had at least one execution on the snapshot date.
   total_dags_special_scheduler:
-    description: The total amount of DAGs that has an special scheduler condition (e.g. DAGs that runs only on Fridays, only on the day 15th,
-      etc.) and that are listed on the gsheet.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_special_scheduler
+    description: Count of distinct DAGs listed in the special scheduler Google Sheet on the snapshot date.
   total_dags_special_scheduler_executed:
-    description: The total amount of DAGs that has an special scheduler condition (e.g. DAGs that runs only on Fridays, only on the day 15th,
-      etc.) and that are listed on the gsheet and that executed on the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_special_scheduler_executed
+    description: Count of distinct special-scheduler DAGs that actually executed on the snapshot date.
   total_intraday_dags:
-    description: The total amount of active DAGs that the line has that are intraday DAGs in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_intraday_dag
+    description: Count of distinct active DAGs with intraday schedules (hourly or more frequent) on the snapshot date.
   total_dags_in_sla_exclusion_list:
-    description: The total amount of active DAGs that are in the SLA exclusion list in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_in_sla_exclusion_list
+    description: Count of distinct active DAGs in the SLA exclusion Google Sheet on the snapshot date.
   total_dags_ignoring_list:
-    description: The total amount of active DAGs that are in the ignoring list in the specific date, which means DAGs
-      that are in the SLA exclusion list and/or in the special scheduler list and/or with NULL SLA, which might happen because
-      it's the first DAG run ever or a manual run.
-      Here we apply a distinct over every id_dag, so the sum of total_dags_in_sla_exclusion_list + total_dags_special_scheduler_executed 
-      + total_dags_with_null_sla may not be the same number of the total_dags_ignoring_list, since there may have DAGs added in both lists.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_in_ignoring_list
+    description: Count of distinct active DAGs excluded from SLA calculation (exclusion list, special scheduler without run, or null SLA).
   total_dags_inside_sla:
-    description: The total amount of active DAGs that the line has that are inside our SLA in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_inside_sla
+    description: Count of distinct active DAGs marked as inside SLA on the snapshot date.
   total_dags_outside_sla:
-    description: The total amount of active DAGs that the line has that are outside our SLA in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_outside_sla
+    description: Count of distinct active DAGs marked as outside SLA on the snapshot date.
   total_dags_null_sla:
-    description: The total amount of active DAGs that the line has that are with SLA marked as null in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_null_sla
+    description: Count of distinct active DAGs with null SLA status on the snapshot date.
   total_success_dags:
-    description: The total amount of active DAGs that the line has that marked as successful in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_run_successful
+    description: Count of distinct DAGs with a successful run on the snapshot date.
   total_failed_dags:
-    description: The total amount of active DAGs that the line has that are marked as failed in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_run_failed
+    description: Count of distinct DAGs with a failed run on the snapshot date.
   total_dags_with_manual_run:
-    description: The total amount of active DAGs that the line has that had manual DAG runs in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_manual_run
+    description: Count of distinct DAGs that had a manually triggered run on the snapshot date.
   total_dags_triggered_by_mediator:
-    description: The total amount of active DAGs that the line has that are triggered by Mediator in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_run_triggered_by_mediator
+    description: Count of distinct DAGs whose run was triggered by the Mediator on the snapshot date.
   total_raw_clean_dags:
-    description: The total amount of active DAGs that the line has that are in the raw/clean layers in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag.layer
+    description: Count of distinct active DAGs in the raw/clean layer on the snapshot date.
   total_raw_clean_dags_excuted:
-    description: The total amount of active DAGs that the line has that are in the raw/clean layers and that had a run in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+      - datalake_pipeline.dag.layer
+    description: Count of distinct raw/clean layer DAGs that executed on the snapshot date.
   total_enrich_dags:
-    description: The total amount of active DAGs that the line has that are in the enrich layer in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag.layer
+    description: Count of distinct active DAGs in the enrich layer on the snapshot date.
   total_enrich_dags_executed:
-    description: The total amount of active DAGs that the line has that are in the enrich layer and that had a run in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+      - datalake_pipeline.dag.layer
+    description: Count of distinct enrich layer DAGs that executed on the snapshot date.
   total_dw_dags:
-    description: The total amount of active DAGs that the line has that are in the dw layer in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag.layer
+    description: Count of distinct active DAGs in the dw layer on the snapshot date.
   total_dw_dags_executed:
-    description: The total amount of active DAGs that the line has that are in the DW layer and that had a run in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+      - datalake_pipeline.dag.layer
+    description: Count of distinct dw layer DAGs that executed on the snapshot date.
   total_metric_dags:
-    description: The total amount of active DAGs that the line has that are in the metric layer in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag.layer
+    description: Count of distinct active DAGs in the metric layer on the snapshot date.
   total_metric_dags_executed:
-    description: The total amount of active DAGs that the line has that are in the metric layer and that had a run in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+      - datalake_pipeline.dag.layer
+    description: Count of distinct metric layer DAGs that executed on the snapshot date.
   total_reverse_dags:
-    description: The total amount of active DAGs that the line has that are in the reverse layer in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag.layer
+    description: Count of distinct active DAGs in the reverse layer on the snapshot date.
   total_reverse_dags_executed:
-    description: The total amount of active DAGs that the line has that are in the reverse layer and that had a run in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+      - datalake_pipeline.dag.layer
+    description: Count of distinct reverse layer DAGs that executed on the snapshot date.
   total_datamart_dags:
-    description: The total amount of active DAGs that the line has that are loading datamarts in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag.is_datamart
+    description: Count of distinct active DAGs loading datamarts on the snapshot date.
   total_datamart_dags_executed:
-    description: The total amount of active DAGs that the line has that are loading datamarts and that had a run in the specific date.
+    lineage:
+      - datalake_pipeline.dag_sla_information.id_dag
+      - datalake_pipeline.dag_sla_information.is_executed
+      - datalake_pipeline.dag.is_datamart
+    description: Count of distinct datamart-loading DAGs that executed on the snapshot date.
   dt_snapshot:
-    description: Date of the snapshot.
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Calendar date of the daily pipeline metrics snapshot, aligned to the dag_sla_information dt_snapshot.
   ts_load:
-    description: Timestamp of when the data was loaded into our systems.
+    description: Timestamp when this fact row was loaded into the DW by the dw_pipeline DAG.
   year:
-    description: Year of the snapshot. Also, a partition of the table.
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Year component of dt_snapshot, used for Hive partitioning — include in filters for partition pruning.
   month:
-    description: Month of the snapshot. Also, a partition of the table.
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Month component of dt_snapshot, used for Hive partitioning — include in filters for partition pruning.
   day:
-    description: Day of the snapshot. Also, a partition of the table.
+    lineage:
+      - datalake_pipeline.dag_sla_information.dt_snapshot
+    description: Day component of dt_snapshot, used for Hive partitioning — include in filters for partition pruning.

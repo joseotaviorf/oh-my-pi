@@ -1,94 +1,129 @@
----
 database_name: datalake_pipeline
 table_name: dag_sla_information
-description:
-  This table consolidates information about a DAG SLA. With it, it's possible to understand
-  why a DAG was marked as inside/outslide SLA or why a line couldn't achieve 100% on the SLA.
-domain: Cross
 owner: isadora.gallerani@quintoandar.com.br
+domain: Cross
+description: >
+  Incremental enrich-layer daily snapshot of per-DAG SLA status for bi-etl-ejuice Airflow DAGs,
+  built by enrich_pipeline from dag runs, pause events, and Google Sheet exclusion lists. Grain is
+  one row per DAG and snapshot date. Partitioned by year, month, day — filter on snapshot date.
+  Supports SLA debugging and line-level pipeline metrics.
 columns:
   id_dag:
     lineage:
       - datalake_pipeline.dag.id_dag
-    description:  DAG id, which is also the DAG name on Airflow.
+    description: Airflow DAG identifier, matching the DAG name in Composer.
   id_line:
     lineage:
       - datalake_pipeline.dag.id_line
-    description: DAG line id, which is also known as the "DAG owner".
+    description: Surrogate key of the DAG owner line; joins to datalake_pipeline.line.
   is_active:
-    description: Boolean flag indicating if the DAG is active.
+    lineage:
+      - datalake_pipeline.dag.ts_first_event
+      - datalake_airflow.dag.ts_last_scheduler_ran
+    description: Boolean flag indicating whether the DAG was active on the snapshot date.
   is_active_and_unpaused:
-    description: Boolean flag indicating if the DAG is active and unpaused, which means that it's
-      expected that it will run.
+    lineage:
+      - datalake_astro_clean.dag.is_paused
+      - datalake_airflow.log.event
+    description: Boolean flag indicating whether the DAG was active and unpaused, meaning a run was expected.
   is_executed:
-    description: Boolean flag indicating if the DAG had an execution.
+    lineage:
+      - datalake_pipeline.dag_run.id_dag
+      - datalake_pipeline.dag_run.ts_data_interval_started
+    description: Boolean flag indicating whether the DAG had at least one run on the snapshot date.
   is_special_scheduler:
-    description: Boolean flag indicating if the DAG is in the special scheduler gsheet list.
+    lineage:
+      - datalake_gsheets_clean.dags_special_scheduler.id_dag
+    description: Boolean flag indicating whether the DAG is listed in the special scheduler Google Sheet.
   is_special_scheduler_executed:
-    description: Boolean flag indicating if the DAG is in the special scheduler gsheet list and
-      had run.
+    lineage:
+      - datalake_gsheets_clean.dags_special_scheduler.id_dag
+      - datalake_pipeline.dag_run.ts_data_interval_started
+    description: Boolean flag indicating whether a special-scheduler DAG actually ran on the snapshot date.
   is_in_sla_exclusion_list:
-    description: Boolean flag indicating if the DAG is in the SLA exclusion gsheet list.
+    lineage:
+      - datalake_gsheets_clean.dags_sla_exclusion_list.dag
+    description: Boolean flag indicating whether the DAG is listed in the SLA exclusion Google Sheet.
   is_in_ignoring_list:
-    description: Boolean flag indicating if the DAG is being ignored on the SLA calculation for a
-      a few reasons (it needs to be active and unpaused, and then may be part of the SLA exclusion list,
-      or it's part of the special scheduler list and hadn't run, is in its first execution ever, etc.)
+    lineage:
+      - datalake_gsheets_clean.dags_special_scheduler.id_dag
+      - datalake_gsheets_clean.dags_sla_exclusion_list.dag
+      - datalake_pipeline.dag_run.is_first_execution_inside_sla
+    description: Boolean flag indicating whether the DAG is excluded from SLA calculation (exclusion list, special scheduler without run, or first-run null SLA).
   is_inside_sla:
-    description: Boolean flag indicating if the DAG is marked as inside the SLA.
+    lineage:
+      - datalake_pipeline.dag_run.is_first_execution_inside_sla
+    description: Boolean flag indicating whether the DAG first successful execution completed within SLA on the snapshot date.
   is_outside_sla:
-    description: Boolean flag indicating if the DAG is marked as outside the SLA.
+    lineage:
+      - datalake_pipeline.dag_run.is_first_execution_inside_sla
+    description: Boolean flag indicating whether the DAG first successful execution missed SLA on the snapshot date.
   is_null_sla:
-    description: Boolean flag indicating if the DAG is marked as null SLA, which means that for some
-      reason it's not considered in the SLA calculation.
+    lineage:
+      - datalake_pipeline.dag_run.is_first_execution_inside_sla
+      - datalake_gsheets_clean.dags_special_scheduler.id_dag
+      - datalake_gsheets_clean.dags_sla_exclusion_list.dag
+    description: Boolean flag indicating whether SLA status is null because the DAG is ignored or had no evaluable run.
   has_possible_problem:
-    description: Boolean flag indicating if the DAG has a possible problem related to its SLA information.
-      This column can be used to debug why a DAG is not being considered on the SLA.
+    lineage:
+      - datalake_pipeline.dag_run.is_first_execution_inside_sla
+      - datalake_astro_clean.dag.is_paused
+      - datalake_gsheets_clean.dags_special_scheduler.id_dag
+      - datalake_gsheets_clean.dags_sla_exclusion_list.dag
+    description: Boolean flag highlighting DAGs that are active and unpaused but lack a clear SLA classification, useful for debugging.
   is_run_successful:
-    description: Boolean flag indicating if the DAG run was successful.
+    lineage:
+      - datalake_pipeline.dag_run.state
+    description: Boolean flag indicating whether the DAG run on the snapshot date ended in success state.
   is_run_failed:
-    description: Boolean flag indicating if the DAG run has failed.
+    lineage:
+      - datalake_pipeline.dag_run.state
+    description: Boolean flag indicating whether the DAG run on the snapshot date ended in failed state.
   is_manual_run:
-    description: Boolean flag indicating if the DAG run was manually created.
+    lineage:
+      - datalake_pipeline.dag_run.is_manual_run
+    description: Boolean flag indicating whether the DAG run on the snapshot date was manually triggered.
   is_run_triggered_by_mediator:
-    description: Boolean flag indicating if the DAG run was triggered by the Mediator.
+    lineage:
+      - datalake_pipeline.dag_run.is_triggered_by_mediator
+    description: Boolean flag indicating whether the DAG run on the snapshot date was triggered by the Mediator.
   is_intraday_dag:
     lineage:
       - datalake_astro_clean.dag.schedule_interval
-    description: Boolean flag indicating if the DAG has an intraday schedule (hourly or more frequent).
+    description: Boolean flag indicating whether the DAG schedule is intraday (hourly or more frequent).
   dt_snapshot:
     lineage:
       - datalake_quintoandar.aux_date.date
-    description: Date of the snapshot.
+    description: Calendar date of the daily SLA evaluation snapshot, one row per active DAG per date.
   dt_run:
     lineage:
       - datalake_pipeline.dag_run.ts_data_interval_started
-    description: The DAG run date, which usually is D-1.
+    description: Data interval date of the DAG run evaluated for SLA, typically D-1 relative to the snapshot.
   ts_first_execution_success:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success
-    description: The UTC timestamp of when the DAG execution has first received a successful state.
-      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
-      successful timestamp will be shown.
+    description: UTC timestamp of the first successful task state in the DAG run, accounting for re-triggers and manual clears.
   ts_first_execution_success_brt:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success_brt
-    description: The timestamp of when the DAG execution has first received a successful state, in
-      Brasilia (BR) timezone.
-      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
-      successful timestamp will be shown.
+    description: Brasilia timezone timestamp of the first successful task state in the DAG run.
   ts_last_table_task_successful:
     lineage:
       - datalake_pipeline.dag_run.ts_last_table_task_successful
-    description: UTC timestamp of when the last table of the DAG executed successfully. This timestamp
-      will only be assigned if all the tables of the DAG had run inside the expected SLA.
+    description: UTC timestamp when the last table task succeeded, set only when all table tasks met SLA.
   ts_last_table_task_successful_brt:
     lineage:
       - datalake_pipeline.dag_run.ts_last_table_task_successful_brt
-    description: BRT timestamp of when the last table of the DAG executed successfully. This timestamp
-      will only be assigned if all the tables of the DAG had run inside the expected SLA.
+    description: Brasilia timezone timestamp when the last table task succeeded within SLA.
   year:
-    description: Year of the snapshot. Also, a partition of the table.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: Year component of dt_snapshot, used for Hive partitioning — include in filters for partition pruning.
   month:
-    description: Month of the snapshot. Also, a partition of the table.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: Month component of dt_snapshot, used for Hive partitioning — include in filters for partition pruning.
   day:
-    description: Day of the snapshot. Also, a partition of the table.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: Day component of dt_snapshot, used for Hive partitioning — include in filters for partition pruning.

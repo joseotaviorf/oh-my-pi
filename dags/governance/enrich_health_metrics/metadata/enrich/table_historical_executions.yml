@@ -1,42 +1,46 @@
 database_name: datalake_health_metrics
 table_name: table_historical_executions
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: WIP
+description: >
+  Task-level execution history for each table registered in dag inventory, scoped to
+  Airflow log events that fall inside the parent DAG run window from dag_historical_executions.
+  Grain is one row per table, DAG, task, and execution date with measured task start,
+  end, and duration. Supports table-grain SLA and runtime analysis.
 columns:
   table_name:
-    description: WIP
+    description: Fully qualified lake table name (database.table) whose load task timing is captured for the execution date.
     lineage:
       - datalake_dag_inventory_clean.table.table
   dag_name:
-    description: WIP
+    description: Airflow DAG identifier that orchestrates the load task for the table on the execution date.
     lineage:
       - datalake_dag_inventory_clean.table.dag
   task:
-    description: WIP
+    description: Airflow task id within the DAG that materializes or refreshes the table, matched against running and success log events.
     lineage:
       - datalake_dag_inventory_clean.table.task
   dag_owner:
-    description: WIP
+    description: Email or team name responsible for the owning DAG, with Airflow service accounts and commas stripped from the log owner field.
     lineage:
       - datalake_airflow.log.owner
   dag_layer:
-    description: WIP
+    description: Data-lake layer label assigned to the table in dag inventory, indicating whether it belongs to raw, clean, enrich, or downstream zones.
     lineage:
       - datalake_dag_inventory_clean.table.layer
   dt_executed:
-    description: WIP
+    description: Calendar date of the table load, aligned with log event dates and constrained to the parent DAG run window.
     lineage:
       - datalake_airflow.log.ts_executed
   ts_task_started:
-    description: WIP
+    description: UTC timestamp of the earliest running or success log event for the load task on the execution date.
     lineage:
       - datalake_airflow.log.ts_event
   ts_task_ended:
-    description: WIP
+    description: UTC timestamp of the latest running or success log event for the load task on the execution date.
     lineage:
       - datalake_airflow.log.ts_event
   duration_in_minutes:
-    description: WIP
+    description: Elapsed minutes between ts_task_started and ts_task_ended for the table load task within the DAG run.
     lineage:
       - datalake_airflow.log.ts_event

@@ -1,57 +1,61 @@
 database_name: datalake_health_metrics
 table_name: dag_alerts_metrics
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: WIP
+description: >
+  Daily enrich snapshot of operational alert and incident counts per active Airflow DAG,
+  built from task failures, OpsGenie notifications, Databricks cluster alerts, DEI Jira
+  tickets, and Inmetro data-quality validations. Grain is one row per DAG and calendar
+  execution date since 2021-01-01. Supports DAG health monitoring and on-call triage.
 columns:
   dag_name:
-    description: DAG's name.
+    description: Airflow DAG identifier for the active pipeline whose alert counts are aggregated on the execution date.
     lineage:
       - datalake_airflow.dag.dag_name
   dag_owner:
-    description: DAG's owner.
+    description: Email or team name responsible for the DAG, with Airflow service accounts and commas stripped from the owners field.
     lineage:
       - datalake_airflow.dag.owners
   dag_layer:
-    description: WIP
+    description: Consolidated data-lake layer label for tables owned by the DAG, derived from dag inventory and normalized when raw or clean layers co-exist.
     lineage:
       - datalake_dag_inventory_clean.table
   dt_executed:
-    description: Execution date.
+    description: Calendar date for which alert volumes are counted, expanded from the aux_date spine for every non-paused DAG.
     lineage:
       - datalake_quintoandar.aux_date.date
   qt_failed_airflow_tasks:
-    description: Quantity of failed Airflow tasks during DAG's execution.
+    description: Count of distinct Airflow task failures recorded for the DAG on the execution date.
     lineage:
       - datalake_airflow.task_fail.dag_name
       - datalake_airflow.task_fail.ts_executed
   qt_opsgenie_alerts:
-    description: Quantity of OpsGenie alerts during DAG's execution.
+    description: Count of distinct OpsGenie alerts opened for the DAG on the execution date, regardless of on-call routing.
     lineage:
       - datalake_opsgenie.alerts.id_alert
   qt_opsgenie_on_call_alerts:
-    description: Quantity of OpsGenie alerts during on-call DAG's execution.
+    description: Count of OpsGenie alerts that triggered an on-call phone notification during weekday morning or weekend afternoon windows on the execution date.
     lineage:
       - datalake_opsgenie.alerts.id_alert
       - datalake_opsgenie.alerts.ts_created
       - datalake_opsgenie.jira_alert_actions.is_call_notification_sent
   qt_cluster_cpu_alerts:
-    description: Quantity of CPU usage Databricks cluster alerts during DAG's execution.
+    description: Count of Databricks cluster CPU threshold alerts fired for jobs associated with the DAG on the execution date.
     lineage:
       - datalake_alert_manager_clean.alerts_databricks_cluster.dag_name
       - datalake_alert_manager_clean.alerts_databricks_cluster.alert_name
   qt_cluster_memory_swap_alerts:
-    description: Quantity of memory SWAP usage Databricks cluster alerts during DAG's execution.
+    description: Count of Databricks cluster memory-swap threshold alerts fired for jobs associated with the DAG on the execution date.
     lineage:
       - datalake_alert_manager_clean.alerts_databricks_cluster.dag_name
       - datalake_alert_manager_clean.alerts_databricks_cluster.alert_name
   qt_dei_incidents:
-    description: Quantity of DEI incidents associated with DAG.
+    description: Count of Data Engineering Incidents Jira issues whose summary references the DAG and were created on the execution date.
     lineage:
       - datalake_jira.issues.dag_name
       - datalake_jira.issues.ts_created
   qt_failed_data_quality_tests:
-    description: Quantity of Data Quality tests failed.
+    description: Count of distinct Inmetro data-quality test suites that returned error for tables owned by the DAG on the execution date.
     lineage:
       - datalake_inmetro_clean.data_validations.database
       - datalake_inmetro_clean.data_validations.table

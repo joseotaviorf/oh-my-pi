@@ -1,34 +1,38 @@
 database_name: datalake_health_metrics
 table_name: dag_historical_executions
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: This table contains the historical of each DAG execution.
+description: >
+  Base enrich history of DAG run timing derived from Airflow cluster lifecycle logs
+  for every non-paused DAG crossed with calendar dates since 2021-01-01. Grain is one
+  row per DAG and execution date with measured start, end, and duration. Feeds SLA
+  metrics, execution benchmarks, and table-level health downstream.
 columns:
   dag_name:
-    description: Unique name identifier of the executed DAG.
+    description: Airflow DAG identifier for the pipeline whose cluster lifecycle events define the run window on the execution date.
     lineage:
       - datalake_airflow.log.id_dag
   dag_owner:
-    description: Name of the owner or team responsible for the DAG.
+    description: Email or team name responsible for the DAG, with Airflow service accounts and commas stripped from the owners field.
     lineage:
       - datalake_airflow.dag.owners
   dag_layer:
-    description: Processing layer of the DAG.
+    description: Consolidated data-lake layer label for tables owned by the DAG, derived from dag inventory and normalized when raw or clean layers co-exist.
     lineage:
       - datalake_dag_inventory_clean.table
   dt_executed:
-    description: Date on which the DAG was executed.
+    description: Calendar date assigned to the DAG run, aligned with Airflow log event dates for cluster start and finish tasks.
     lineage:
       - datalake_airflow.log.ts_executed
   ts_dag_started:
-    description: Timestamp marking the start of the DAG execution.
+    description: UTC timestamp of the earliest running event for create-cluster or execute-job-cluster tasks on the execution date.
     lineage:
       - datalake_airflow.log.ts_event
   ts_dag_ended:
-    description: Timestamp marking the end of the DAG execution.
+    description: UTC timestamp of the latest success event for terminate-cluster or job-cluster-finished tasks on the execution date.
     lineage:
       - datalake_airflow.log.ts_event
   duration_in_minutes:
-    description: Total duration of the DAG execution in minutes.
+    description: Elapsed minutes between ts_dag_started and ts_dag_ended, representing total cluster lifecycle time for the run.
     lineage:
       - datalake_airflow.log.ts_event

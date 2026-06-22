@@ -1,54 +1,58 @@
 database_name: datalake_health_metrics
 table_name: table_execution_metrics
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: WIP
+description: >
+  Enrich-layer table load timing for each inventory task, enriched with owner-level median
+  start time, end time, and duration computed on top-reference SLA days. Grain is one row
+  per table, DAG, task, and execution date from table_historical_executions. Supports
+  comparing individual table runtimes against historical baselines for the same owner.
 columns:
   table_name:
-    description: WIP
+    description: Fully qualified lake table name whose load task timing and benchmark medians are recorded for the execution date.
     lineage:
       - datalake_health_metrics.table_historical_executions.table_name
   dag_name:
-    description: WIP
+    description: Airflow DAG identifier that orchestrates the table load, carried forward from table_historical_executions.
     lineage:
       - datalake_health_metrics.table_historical_executions.dag_name
   dag_owner:
-    description: WIP
+    description: Email or team name responsible for the owning DAG, carried forward from table_historical_executions.
     lineage:
       - datalake_health_metrics.table_historical_executions.dag_owner
   dag_layer:
-    description: WIP
+    description: Data-lake layer label for the table, carried forward from table_historical_executions.
     lineage:
       - datalake_health_metrics.table_historical_executions.dag_layer
   task:
-    description: WIP
+    description: Airflow task id that materializes the table, carried forward from table_historical_executions.
     lineage:
       - datalake_health_metrics.table_historical_executions.task
   dt_executed:
-    description: WIP
+    description: Calendar date of the table load, matching table_historical_executions.
     lineage:
       - datalake_health_metrics.table_historical_executions.dt_executed
   ts_task_started:
-    description: WIP
+    description: UTC timestamp when the table load task first entered running or success state for the execution date.
     lineage:
       - datalake_health_metrics.table_historical_executions.ts_task_started
   ts_task_ended:
-    description: WIP
+    description: UTC timestamp when the table load task last reached running or success state for the execution date.
     lineage:
       - datalake_health_metrics.table_historical_executions.ts_task_ended
   duration_in_minutes:
-    description: WIP
+    description: Elapsed minutes between ts_task_started and ts_task_ended for the individual table load on the execution date.
     lineage:
       - datalake_health_metrics.table_historical_executions.duration_in_minutes
   ts_median_started:
-    description: WIP
+    description: Median clock time of day when the DAG owner historically starts table loads on top-reference SLA days, used as a baseline comparison.
     lineage:
       - datalake_health_metrics.table_historical_executions.ts_median_started
   ts_median_ended:
-    description: WIP
+    description: Median clock time of day when the DAG owner historically finishes table loads on top-reference SLA days, used as a baseline comparison.
     lineage:
       - datalake_health_metrics.table_historical_executions.ts_median_ended
   duration_median_in_minutes:
-    description: WIP
+    description: Median table load duration in minutes for the DAG owner on top-reference SLA days, used as a baseline comparison.
     lineage:
       - datalake_health_metrics.table_historical_executions.duration_median_in_minutes

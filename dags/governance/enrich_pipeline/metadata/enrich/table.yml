@@ -1,56 +1,56 @@
----
 database_name: datalake_pipeline
 table_name: table
-description: This table has all the tables created in Airflow (except for Reverse layer),
-  identified by the id_table. The table might be active (still being loaded) or not.
-domain: Cross
 owner: isadora.gallerani@quintoandar.com.br
+domain: Cross
+description: >
+  Full-refresh enrich-layer inventory of tables loaded by bi-etl-ejuice Airflow DAGs (excluding
+  reverse layer), built by enrich_pipeline from dag inventory and pipeline DAG metadata. Grain is
+  one row per table, DAG, and task combination. Supports data catalog and pipeline dependency
+  reporting.
 columns:
   id_table:
     lineage:
       - datalake_dag_inventory_clean.table.table
-    description: Table id, which is the table schema + table name. It may not be unique, since a table
-      ca be executed by different DAGs.
+    description: Composite table identifier (schema.table) from dag inventory; not unique because multiple DAGs may load the same table.
   id_dag:
     lineage:
       - datalake_pipeline.dag.id_dag
-    description: DAG id, which is also the DAG name on Airflow related to the table.
+    description: Airflow DAG identifier that loads this table, matching the DAG name in Composer.
   id_task:
     lineage:
       - datalake_dag_inventory_clean.table.task
-    description: Task id, which is the task name of the DAG on Airflow that creates the table.
+    description: Airflow task name within id_dag responsible for creating or updating this table.
   id_line:
     lineage:
       - datalake_pipeline.dag.id_line
-    description: Unique id that identifies the line that is the owner of the table.
+    description: Surrogate key of the DAG owner line; joins to datalake_pipeline.line.
   table_name:
     lineage:
       - datalake_dag_inventory_clean.table.table
-    description: Table name.
+    description: Unqualified table name extracted from the dag inventory table identifier.
   schema:
     lineage:
       - datalake_dag_inventory_clean.table.table
-    description: Schema of the table.
+    description: Hive schema name extracted from the dag inventory table identifier.
   layer:
     lineage:
       - datalake_dag_inventory_clean.table.layer
-    description: Layer of the table.
+    description: Data lake layer of the table (for example raw, clean, enrich, dw, or metric).
   avg_file_size_in_bytes:
     lineage:
       - datalake_dag_inventory_clean.table.avg_file_size_in_bytes
-    description: Table's average file zie in bytes.
+    description: Average file size in bytes for the table as reported by the latest dag inventory snapshot.
   is_delta:
     lineage:
       - datalake_dag_inventory_clean.table.is_delta
-    description: Boolean flag indicating if the table is in Delta.
+    description: Boolean flag indicating whether the table is stored in Delta Lake format.
   is_active:
-    description: Boolean flag indicating if the table is still being loaded or not.
+    description: Boolean flag indicating whether the table appeared in the most recent dag inventory snapshot.
   is_certified_layer:
-    description: Boolean flag indicating if the table's layer is certified, which means that the tables is from a DW or Metric layer
-      and is not a datamart.
+    description: Boolean flag indicating whether the table is in a certified layer (dw or metric, excluding datamarts).
   dt_last_updated:
-    description: Date of when the table was loaded to the last time. It might be D-1, if the table is still active.
     lineage:
       - datalake_dag_inventory_clean.table.year
       - datalake_dag_inventory_clean.table.month
       - datalake_dag_inventory_clean.table.day
+    description: Date of the dag inventory snapshot that last recorded this table.

@@ -1,14 +1,18 @@
 database_name: datalake_health_metrics
 table_name: top_reference_sla_days
-owner: wesley.doliveira@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: WIP
+description: >
+  Reference calendar dates per DAG owner where daily SLA ratio matched or exceeded the
+  owner's best ratio in the last month, limited to the twenty most recent such days
+  within the last six months. Grain is one row per owner and reference date. Feeds
+  median execution benchmarks in dag_execution_metrics and table_execution_metrics.
 columns:
   dag_owner:
-    description: WIP
+    description: Email or team name whose historically strong SLA days are selected as the baseline window for median timing metrics.
     lineage:
       - datalake_health_metrics.dag_historical_executions.dag_owner
   dt_executed:
-    description: WIP
+    description: Calendar date on which the owner achieved a SLA ratio at or above their recent best, qualifying it as a reference day for benchmarks.
     lineage:
       - datalake_health_metrics.dag_historical_executions.dt_executed

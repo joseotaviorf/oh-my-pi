@@ -1,30 +1,31 @@
----
 database_name: dw_pipeline
 table_name: dim_line
-description: This dimension table has all the lines responsible for bi-etl-ejuice's Airflow DAGs.
-  Each line is an unique line/DAG owner, identified by the sk_line key.
-  In order to create this key, we looked for the first DAG event of each line. As an example,
-  if it was just created a new DAG with a new owner (Data Agents), the first event of the DAG would
-  be the cluster/job creation, and then we would assign this timestamp as the first DAG event of the
-  Data Agents line.
-domain: Cross
 owner: isadora.gallerani@quintoandar.com.br
+domain: Cross
+description: >
+  This dimension table has all the lines responsible for bi-etl-ejuice's Airflow DAGs.
+  Each line is a unique line/DAG owner, identified by the sk_line key. In order to create this key,
+  we looked for the first DAG event of each line. As an example, if it was just created a new DAG
+  with a new owner (Data Agents), the first event of the DAG would be the cluster/job creation,
+  and then we would assign this timestamp as the first DAG event of the Data Agents line.
+  Loaded as a full-refresh DW dimension by the dw_pipeline DAG. Grain is one row per line,
+  keyed by sk_line.
 columns:
   sk_line:
     lineage:
       - datalake_pipeline.line.id_line
-    description: Unique key that identifies the line.
+    description: Surrogate key that uniquely identifies the DAG owner line; joins to fact_pipeline_metrics and other pipeline facts.
   line_name:
     lineage:
       - datalake_pipeline.line.line_name
-    description: Name of the line.
+    description: Human-readable name of the DAG owner line as declared in Airflow (for example Data Engineering or Data Growth).
   is_data_line:
     lineage:
       - datalake_pipeline.line.is_data_line
-    description: Boolean flag indicating if the line is from the Data area.
+    description: Boolean flag indicating whether the line belongs to a Data area Analytics Engineering team.
   ts_line_first_event:
     lineage:
       - datalake_pipeline.line.ts_line_first_event
-    description: Timestamp of when the line's first DAG event happened.
+    description: Timestamp of the earliest Airflow DAG event recorded for this line, used to establish line history.
   ts_load:
-    description: Timestamp of when the data was loaded into our systems.
+    description: Timestamp when this dimension row was loaded into the DW by the dw_pipeline DAG.
