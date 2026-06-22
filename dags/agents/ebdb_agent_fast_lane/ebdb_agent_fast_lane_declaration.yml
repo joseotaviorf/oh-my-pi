@@ -1,12 +1,12 @@
 dag:
-  name: offer_agent_link_fast_lane
+  name: ebdb_agent_fast_lane
   schedule_start_date: 2026, 6, 22
   schedule_interval: 0,30 * * * *
   owner: Data Agents
   documentation:
     dag_purpose: |
-      CDC ingestion of EBDB OfferAgentLink and OfferAgentLink_AUD into datalake_ebdb (same clean tables as ebdb_agent).
-      Runs every 30 minutes so offer–agent associations stay fresh for downstream analytics.
+      DAG containing EBDB agent-context tables that run every 30 minutes (OfferAgentLink and OfferAgentLink_AUD).
+      Writes to datalake_ebdb_raw / datalake_ebdb_clean, same tables as ebdb_agent.
 workflow:
   type: cdc
   layer: raw
