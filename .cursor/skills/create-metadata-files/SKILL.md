@@ -33,6 +33,8 @@ Use this skill when:
 
 Every `.sql` file in `queries/{layer}/` **must** have a matching `.yml` in `metadata/{layer}/` with the same base name. CI fails without it.
 
+The metadata file name must be `{table_name}.yml`, and the YAML `table_name` field must be **identical** to that file stem (without `.yml`). Example: `fact_agent_daily.yml` requires `table_name: fact_agent_daily`. A mismatch (e.g. `dim_media_setup.yml` with `table_name: media_setup`) fails `validate-metadata-files-content`.
+
 ## Workflow: Create metadata for new SQL files
 
 Use this workflow when you have **new** `.sql` files (tables) that don't have corresponding metadata yet. It reuses existing validation scripts — no new scripts required.
@@ -433,6 +435,7 @@ make validate-lineage-consistency
 ## Common failure patterns
 
 - `description too short`: use meaningful descriptions with at least 10 characters.
+- `table_name / filename mismatch`: CI fails if `table_name` in YAML does not equal the file stem — rename the file to `{table_name}.yml` or update `table_name` to match the file name.
 - `domain` regex mismatch: use an exact allowed domain for that layer (see [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc)).
 - `owner` regex mismatch: use a valid email format.
 - metric column missing `dimension` or `metric`: add exactly one.

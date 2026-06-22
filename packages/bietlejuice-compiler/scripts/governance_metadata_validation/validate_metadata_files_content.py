@@ -16,6 +16,7 @@ from scripts.services.metadata_file_service import (
     MetadataFileService,
     MetricValidateLayerException,
     ReverseMetadataFileException,
+    TableNameMismatchException,
 )
 
 with open(f"{Path(__file__).parent}/skip_list.yml") as f:
@@ -119,6 +120,26 @@ def get_metadata_file_paths(mode, input, domain=None):
     return result
 
 
+def _format_validation_error(error):
+    """Return (file_path or None, list of human-readable error lines)."""
+    file_path = getattr(error, "data", None)
+    if getattr(error, "errors", None):
+        return file_path, list(error.errors)
+    return file_path, [str(error).strip()]
+
+
+def _print_validation_failures(failures, indent=""):
+    for error in failures:
+        file_path, messages = _format_validation_error(error)
+        if file_path:
+            print(f"{indent}{file_path}")
+            message_indent = indent + "  "
+        else:
+            message_indent = indent
+        for message in messages:
+            print(f"{message_indent}{message}")
+
+
 def output_results(results, verbose):
     print(f"Validated {len(results['passed']) + len(results['failed'])} files\n")
     if results["passed"]:
@@ -128,8 +149,7 @@ def output_results(results, verbose):
         print()
     if results["failed"]:
         print("Files that failed the validation:")
-        for result in results["failed"]:
-            print(f"{result}")
+        _print_validation_failures(results["failed"], indent="  ")
         print()
     if results["skipped"]:
         print("Files skipped:")
@@ -156,6 +176,8 @@ def main():
             except ReverseMetadataFileException as error:
                 results["failed"].append(error)
             except MetricValidateLayerException as error:
+                results["failed"].append(error)
+            except TableNameMismatchException as error:
                 results["failed"].append(error)
         else:
             results["skipped"].append(file)

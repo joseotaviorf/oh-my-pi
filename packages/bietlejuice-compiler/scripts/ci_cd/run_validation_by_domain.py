@@ -149,6 +149,25 @@ def _separator(domain: str, ok: bool) -> str:
     return f"━━━ {domain} {icon} {bar}"
 
 
+def _failure_section(output: str) -> str:
+    """Reprint the failure block already emitted by the domain validation."""
+    marker = "Files that failed the validation:"
+    if marker not in output:
+        return ""
+
+    section = output.split(marker, 1)[1]
+    lines = [marker]
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("make[") or stripped.startswith("Leaving directory"):
+            break
+        if stripped.startswith("From https://github.com"):
+            break
+        lines.append(line.rstrip())
+
+    return "\n".join(lines).strip()
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
@@ -210,6 +229,7 @@ def main() -> None:
             ordered_results[future_map[future]] = future.result()
 
     failed: List[str] = []
+    failed_details: List[Tuple[str, str]] = []
     for domain, rc, output in ordered_results:  # type: ignore[misc]
         ok = rc == 0
         print(_separator(domain, ok), flush=True)
@@ -217,10 +237,18 @@ def main() -> None:
             print(output, flush=True)
         if not ok:
             failed.append(domain)
+            section = _failure_section(output)
+            if section:
+                failed_details.append((domain, section))
 
     print("=" * 62, flush=True)
     if failed:
         print(f"FAILED ({len(failed)}): {', '.join(failed)}", flush=True)
+        if failed_details:
+            print(flush=True)
+            for domain, section in failed_details:
+                print(f"[{domain}]", flush=True)
+                print(section, flush=True)
         sys.exit(1)
     else:
         print(f"All {len(domains)} domain(s) passed ✓", flush=True)

@@ -35,6 +35,19 @@ class MetricValidateLayerException(Exception):
         )
 
 
+class TableNameMismatchException(Exception):
+    def __init__(self, file, file_table_name, yaml_table_name):
+        self.data = file
+        self.errors = [
+            f"Error: table_name in YAML ('{yaml_table_name}') does not match the file name ('{file_table_name}'). "
+            f"Rename the file to '{yaml_table_name}.yml' or update table_name to '{file_table_name}'."
+        ]
+        super().__init__(
+            f"file={file}, file_table_name={file_table_name}, yaml_table_name={yaml_table_name}, "
+            f"msg=table_name in YAML does not match the file name"
+        )
+
+
 class MetadataFileService:
     """
     Class used to validate and extract information from metadata files
@@ -283,6 +296,15 @@ class MetadataFileService:
         yaml_data = yamale.make_data(file_path)
         table_info = MetadataFileService._get_info_from_path(file_path)
         layer = table_info["layer"]
+
+        with open(file_path) as f:
+            content = yaml.safe_load(f)
+        yaml_table_name = content.get("table_name", "")
+        file_table_name = table_info["table_name"]
+        if yaml_table_name != file_table_name:
+            raise TableNameMismatchException(
+                file_path, file_table_name, yaml_table_name
+            )
 
         if layer == "raw":
             return yamale.validate(self.schemas["raw"], yaml_data)
