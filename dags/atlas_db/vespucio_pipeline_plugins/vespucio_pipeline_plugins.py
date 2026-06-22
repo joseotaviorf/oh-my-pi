@@ -196,6 +196,14 @@ plugin_tasks = [
             "--overwrite_schema",
         ],
     ),
+    create_task(
+        entry_point="plugins_metrics_reporter",
+        parameters=[
+            f"--input_house_compounds={Tables.house_compounds}",
+            f"--input_condo_compounds={Tables.condo_compounds}",
+            f"--input_listings_houses={Tables.listings}",
+        ],
+    ),
 ]
 
 zordominium_tasks = [
