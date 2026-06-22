@@ -1,26 +1,39 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: domain_management_metrics
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Domain reassignment workflow for business metrics. Tracks current and proposed FAIR domains, maturity level, and approval status for Data Ops governance.
 columns:
   metrics_name:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.metrics_name
+    description: Name of the business metric subject to domain reassignment in the governance workflow.
   maturity_level:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.maturity_level
+    description: Documentation or governance maturity level of the metric at the time of review.
   current_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.current_domain
+    description: FAIR domain currently assigned to the metric before the proposed change.
   updated_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.updated_domain
+    description: Proposed FAIR domain to assign to the metric after governance approval.
   editor:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.editor
+    description: Person who submitted or last edited the metric domain reassignment request.
   status:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.status
+    description: Approval status of the metric domain reassignment in the governance workflow.
   updated_at:
     lineage:
       - datalake_gsheets_raw.domain_management_metrics.updated_at
+    description: Timestamp of the most recent update to the metric domain reassignment request.
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metrics.ts_load
+    description: Timestamp of when the domain management metric row was loaded into the lake.

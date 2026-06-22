@@ -1,23 +1,35 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: domain_management_metabase_dashboards
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Domain reassignment workflow for Metabase dashboards. Tracks current and proposed FAIR domains, editors, and approval status for Data Ops governance.
 columns:
   dashboard_name:
     lineage:
       - datalake_gsheets_raw.domain_management_metabase_dashboards.dashboard_name
+    description: Title or display name of the Metabase dashboard under domain reassignment review.
   current_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_metabase_dashboards.current_domain
+    description: FAIR domain currently assigned to the Metabase dashboard before the proposed change.
   updated_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_metabase_dashboards.updated_domain
+    description: Proposed FAIR domain to assign to the Metabase dashboard after governance approval.
   editor:
     lineage:
       - datalake_gsheets_raw.domain_management_metabase_dashboards.editor
+    description: Person who submitted or last edited the dashboard domain reassignment request.
   status:
     lineage:
       - datalake_gsheets_raw.domain_management_metabase_dashboards.status
+    description: Approval status of the Metabase dashboard domain reassignment in the governance workflow.
   updated_at:
     lineage:
       - datalake_gsheets_raw.domain_management_metabase_dashboards.updated_at
+    description: Timestamp of the most recent update to the dashboard domain reassignment request.
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.domain_management_metabase_dashboards.ts_load
+    description: Timestamp of when the domain management Metabase dashboard row was loaded into the lake.

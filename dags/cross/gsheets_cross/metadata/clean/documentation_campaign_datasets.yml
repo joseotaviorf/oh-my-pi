@@ -1,35 +1,47 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: documentation_campaign_datasets
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Documentation campaign progress tracking for lake datasets by business line and layer. Captures table-level description coverage metrics used by Data Ops governance reviews.
 columns:
   quarter:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.quarter
+    description: Calendar quarter when the documentation campaign snapshot was recorded.
   year_month:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.year_month
+    description: Year and month reference period for the documentation campaign dataset row.
   line:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.line
+    description: Business line or squad responsible for the dataset in the documentation campaign.
   layer:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.layer
+    description: Data lake layer of the dataset being tracked (raw, clean, enrich, dw, or metric).
   table_name:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.table_name
+    description: Fully qualified or logical name of the dataset evaluated in the documentation campaign.
   has_description:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.has_description
+    description: Boolean flag indicating whether the dataset has a substantive table description.
   count_columns:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.count_columns
+    description: Total number of columns in the dataset included in the documentation coverage review.
   pct_columns_has_description:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.pct_columns_has_description
+    description: Percentage of columns with substantive descriptions in the dataset at snapshot time.
   comment:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.comment
+    description: Free-text reviewer comment about documentation status or remediation actions for the dataset.
   ts_load:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_datasets.ts_load
+    description: Timestamp of when the documentation campaign dataset row was loaded into the lake.

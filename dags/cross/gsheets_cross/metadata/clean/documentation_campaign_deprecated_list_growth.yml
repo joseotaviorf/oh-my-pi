@@ -1,20 +1,27 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: documentation_campaign_deprecated_list_growth
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Growth-domain deprecated tables tracked during the documentation campaign. Static list used by Data Ops to flag datasets scheduled for retirement or replacement.
 columns:
   table_name:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_deprecated_list_growth.table_name
+    description: Name of the Growth dataset marked as deprecated in the documentation campaign.
   owner:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_deprecated_list_growth.owner
+    description: Email of the dataset owner accountable for the deprecated Growth table.
   layer:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_deprecated_list_growth.layer
+    description: Data lake layer where the deprecated Growth dataset resides.
   observacao:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_deprecated_list_growth.observacao
+    description: Reviewer notes explaining why the Growth dataset is deprecated or how to migrate consumers.
   ts_load:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_deprecated_list_growth.ts_load
+    description: Timestamp of when the deprecated Growth dataset row was loaded into the lake.

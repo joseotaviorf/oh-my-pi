@@ -1,26 +1,39 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: domain_management_looker_dashboards
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Domain reassignment workflow for Looker dashboards. Tracks current and proposed FAIR domains, editors, and approval status for Data Ops governance.
 columns:
   dashboard_name:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.dashboard_name
+    description: Title or display name of the Looker dashboard under domain reassignment review.
   url:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.url
+    description: URL link to the Looker dashboard asset in the BI platform.
   current_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.current_domain
+    description: FAIR domain currently assigned to the Looker dashboard before the proposed change.
   updated_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.updated_domain
+    description: Proposed FAIR domain to assign to the Looker dashboard after governance approval.
   editor:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.editor
+    description: Person who submitted or last edited the dashboard domain reassignment request.
   status:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.status
+    description: Approval status of the Looker dashboard domain reassignment in the governance workflow.
   updated_at:
     lineage:
       - datalake_gsheets_raw.domain_management_looker_dashboards.updated_at
+    description: Timestamp of the most recent update to the dashboard domain reassignment request.
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.domain_management_looker_dashboards.ts_load
+    description: Timestamp of when the domain management Looker dashboard row was loaded into the lake.

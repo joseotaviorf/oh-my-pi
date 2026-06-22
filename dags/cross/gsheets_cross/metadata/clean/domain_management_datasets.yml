@@ -1,29 +1,43 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: domain_management_datasets
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Domain reassignment workflow for lake datasets by DAG. Tracks current and proposed FAIR domains, editors, and approval status for Data Ops governance.
 columns:
   table:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.table
+    description: Lake table name subject to domain reassignment in the governance workflow.
   dag:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.dag
+    description: Airflow DAG that produces or owns the dataset under domain review.
   dag_owners:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.dag_owners
+    description: Declared owners of the DAG associated with the dataset domain change request.
   current_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.current_domain
+    description: FAIR domain currently assigned to the dataset before the proposed change.
   updated_domain:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.updated_domain
+    description: Proposed FAIR domain to assign to the dataset after governance approval.
   editor:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.editor
+    description: Person who submitted or last edited the domain reassignment request.
   status:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.status
+    description: Approval status of the dataset domain reassignment in the governance workflow.
   updated_at:
     lineage:
       - datalake_gsheets_raw.domain_management_datasets.updated_at
+    description: Timestamp of the most recent update to the domain reassignment request.
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.domain_management_datasets.ts_load
+    description: Timestamp of when the domain management dataset row was loaded into the lake.

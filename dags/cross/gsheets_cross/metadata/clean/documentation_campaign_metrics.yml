@@ -1,35 +1,47 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: documentation_campaign_metrics
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Documentation campaign tracking for business metrics by line and maturity level. Captures metric ownership and governance comments for the Data Ops documentation initiative.
 columns:
   quarter:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.quarter
+    description: Calendar quarter when the metric documentation campaign snapshot was recorded.
   year_month:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.year_month
+    description: Year and month reference period for the metric documentation campaign row.
   line:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.line
+    description: Business line or squad responsible for the metric in the documentation campaign.
   metric_name:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.metric_name
+    description: Name of the business metric evaluated in the documentation campaign.
   business_stage:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.business_stage
+    description: Funnel or business stage associated with the metric definition.
   hierarchy_level:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.hierarchy_level
+    description: Hierarchical level of the metric within the business metrics taxonomy.
   created_by:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.created_by
+    description: Person or team that originally created or registered the metric definition.
   maturity_level:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.maturity_level
+    description: Documentation or governance maturity level assigned to the metric in the campaign.
   comment:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.comment
+    description: Free-text reviewer comment about documentation status or remediation for the metric.
   ts_load:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metrics.ts_load
+    description: Timestamp of when the metric documentation campaign row was loaded into the lake.

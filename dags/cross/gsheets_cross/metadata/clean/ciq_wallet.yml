@@ -1,20 +1,23 @@
+---
 database_name: datalake_gsheets_clean
 table_name: ciq_wallet
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
+description: CIQ partner wallet assignments linking partners to linked portfolios and quality clusters. Static reference used by Agents operations to manage CIQ partner segmentation.
 columns:
   id_partner:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.id_partner
-    description: Id of the partner.
+    description: Numeric identifier of the CIQ partner associated with the wallet assignment.
   carteira_vinculada:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.carteira_vinculada
-    description: Wallet linked to the partner.
+    description: Portfolio or wallet name linked to the CIQ partner in the assignment.
   cluster:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.cluster
-    description: Partner segmentation based on quality and house attraction profile.
+    description: Partner quality cluster based on attraction profile and house performance segmentation.
   ts_load:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.ts_load
-    description: Timestamp of when the table was loaded.
+    description: Timestamp of when the CIQ wallet reference data was loaded into the lake.

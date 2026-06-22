@@ -1,38 +1,51 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: documentation_campaign_metabase_dashboards
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Documentation campaign tracking for Metabase dashboards by business line. Captures ownership, usage views, and reviewer comments for governance documentation initiatives.
 columns:
   quarter:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.quarter
+    description: Calendar quarter when the Metabase dashboard documentation snapshot was recorded.
   year_month:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.year_month
+    description: Year and month reference period for the Metabase dashboard documentation row.
   line:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.line
+    description: Business line or squad responsible for the Metabase dashboard in the campaign.
   dashboard_path:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.dashboard_path
+    description: Metabase collection path where the dashboard is organized in the BI platform.
   id_dashboard:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.id_dashboard
+    description: Unique Metabase identifier of the dashboard tracked in the documentation campaign.
   dashboard_title:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.dashboard_title
+    description: Human-readable title of the Metabase dashboard under documentation review.
   ownership:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.ownership
+    description: Declared owner or accountable team for the Metabase dashboard asset.
   views:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.views
+    description: Count of dashboard views recorded during the documentation campaign period.
   ts_last_view:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.ts_last_view
+    description: Timestamp of the most recent view of the Metabase dashboard before the snapshot.
   comment:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.comment
+    description: Free-text reviewer comment about documentation status or follow-up for the dashboard.
   ts_load:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_metabase_dashboards.ts_load
+    description: Timestamp of when the Metabase dashboard documentation row was loaded into the lake.
