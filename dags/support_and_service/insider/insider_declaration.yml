@@ -1,7 +1,7 @@
 dag:
   name: insider
   schedule_start_date: 2019, 5, 31
-  schedule_interval: 30 1 * * *
+  schedule_interval: 0 1,8,17 * * *
   owner: Data SS
   documentation:
     dag_purpose: |
@@ -33,4 +33,3 @@ workflow:
       raw_primary_keys: ["id"]
     user_revision_entity:
       raw_primary_keys: ["id"]
-
