@@ -1285,6 +1285,7 @@ bietlejuice.dw_smart_price:
 bietlejuice.dw_supply:
   - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_ciq:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
@@ -1302,6 +1303,7 @@ bietlejuice.dw_supply_staging:
   - bietlejuice.dw_media_sharing_rules:load-dw-growth-dim-sharing-rules:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_supply:load-dw-growth-obt-supply:first-run-of-day
+  - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_media_platform_scd:load-enrich-campaign-name-history:first-run-of-day
   - bietlejuice.enrich_supply_leads:load-enrich-inbound-attribution:first-run-of-day
   - bietlejuice.enrich_supply_staging:load-enrich-supply-targets:first-run-of-day
@@ -2704,6 +2706,7 @@ bietlejuice.enrich_growth_costs:
   - bietlejuice.dw_media_platform_metrics:load-dw-growth-fact-media-platform-metrics:first-run-of-day
   - bietlejuice.dw_media_sharing_rules:load-dw-growth-dim-sharing-rules:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-performance:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
@@ -4062,6 +4065,7 @@ bietlejuice.enrich_supply_staging:
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_supply:load-dw-growth-fact-supply-events:first-run-of-day
   - bietlejuice.dw_supply:load-dw-growth-obt-supply:first-run-of-day
+  - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
 bietlejuice.enrich_supply_taxonomy:
   - bietlejuice.bob:load-clean-registrar:first-run-of-day
@@ -4392,6 +4396,7 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_taxonomy:load-dw-growth-dim-media-setup:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-quintoandar-classifieds-events:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
 bietlejuice.metric_observability__dags:

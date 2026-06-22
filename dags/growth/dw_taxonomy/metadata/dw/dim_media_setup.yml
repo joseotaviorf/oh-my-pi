@@ -1,6 +1,6 @@
 ---
 database_name: dw_growth
-table_name: media_setup
+table_name: dim_media_setup
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Each row of this table is a combination of growth media setup taxonomy values (campaign_strategy_intent, funnel_side, campaign_business_context, campaign_landing_page, behavior_type, medium and source).
