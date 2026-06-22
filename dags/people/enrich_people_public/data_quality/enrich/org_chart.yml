@@ -19,9 +19,6 @@ column_level_validations:
   is_active:
     is_complete:
       severity_level: Warning
-    is_contained_in:
-      values: [true]
-      severity_level: Error
   assignment_status_type:
     is_contained_in:
       values: ['ACTIVE']
