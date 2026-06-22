@@ -1,37 +1,52 @@
----
-database_name: datalake_documentation_metrics_clean
+owner: vitor.carneiro@quintoandar.com.br
+database_name: datalake_documentation_metrics
 table_name: columns_documentation_metrics
-domain: "Data Ops & Governance"
+domain: Data Ops & Governance
 columns:
   layer:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.layer
+    - datalake_documentation_metrics_clean.columns_metastore.layer
+    description: Data lake layer (raw, clean, enrich, dw, metric) of the documented
+      column.
   database_name:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.database_name
+    - datalake_documentation_metrics_clean.columns_metastore.database_name
+    description: Metastore database name of the column evaluated for documentation
+      coverage.
   table_name:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.table_name
+    - datalake_documentation_metrics_clean.columns_metastore.table_name
+    description: Metastore table name of the column evaluated for documentation coverage.
   column_name:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.column_name
+    - datalake_documentation_metrics_clean.columns_metastore.column_name
+    description: Metastore column name evaluated for documentation and join metadata.
   has_description:
     lineage:
-      - datalake_documentation_metrics_clean.columns_documentation.has_description
+    - datalake_documentation_metrics_clean.columns_documentation.has_description
+    description: Boolean flag indicating whether governance YAML documents the column.
   has_joins_with_column:
     lineage:
-      - datalake_documentation_metrics_clean.columns_documentation.has_joins_with_column
+    - datalake_documentation_metrics_clean.columns_documentation.has_joins_with_column
+    description: Boolean flag indicating whether lineage join metadata exists for
+      the column.
   dt_ingested:
     lineage:
-      - datalake_documentation_metrics_clean.categories_documentation.year
-      - datalake_documentation_metrics_clean.categories_documentation.month
-      - datalake_documentation_metrics_clean.categories_documentation.day
+    - datalake_documentation_metrics_clean.categories_documentation.year
+    - datalake_documentation_metrics_clean.categories_documentation.month
+    - datalake_documentation_metrics_clean.categories_documentation.day
+    description: Snapshot date when documentation coverage metrics were computed.
   year:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.year
+    - datalake_documentation_metrics_clean.columns_metastore.year
+    description: Column year on columns_documentation_metrics.
   month:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.month
+    - datalake_documentation_metrics_clean.columns_metastore.month
+    description: Column month on columns_documentation_metrics.
   day:
     lineage:
-      - datalake_documentation_metrics_clean.columns_metastore.day
+    - datalake_documentation_metrics_clean.columns_metastore.day
+    description: Column day on columns_documentation_metrics.
+description: Enriched join of metastore columns with documentation coverage flags
+  for FAIR assessments.
