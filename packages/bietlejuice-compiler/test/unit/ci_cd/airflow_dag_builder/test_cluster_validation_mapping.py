@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _mapped_worker_and_driver,
@@ -401,7 +402,7 @@ class TestComputeValidationOverrides:
         resolved = ConfigurationService().get_config(
             "emr_7_12_consolidation_s_memory_cluster"
         )
-        assert resolved.get("master_node_type_id") == "m7g.xlarge"
+        assert resolved.get("master_node_type_id") == "r7g.xlarge"
         assert "driver_node_type_id" not in resolved
 
 
@@ -1088,3 +1089,165 @@ class TestBuildRightsizingValidationClusterSpec:
         )
 
         assert spec is None
+
+
+class TestEmrConsolidationSparkDefaults:
+    def test_emr_consolidation_preset_keeps_hive_catalog_defaults(self):
+        service = ConfigurationService()
+        preset = service.get_config(
+            "emr_7_12_consolidation_xl_memory_single_node_cluster"
+        )
+
+        spark_conf = preset["spark_conf"]
+        assert spark_conf["spark.sql.catalogImplementation"] == "hive"
+        assert spark_conf["spark.sql.legacy.createHiveTableByDefault"] == "true"
+        assert spark_conf["spark.driverEnv.SPARK_RUNTIME"] == "emr"
+
+    def test_cluster_custom_spark_conf_overrides_without_dropping_defaults(self):
+        service = ConfigurationService()
+        cluster_args = {
+            "type": "emr_7_12_consolidation_xl_memory_single_node_cluster",
+            "custom_configurations": {
+                "spark_conf": {
+                    "spark.driver.memory": "8g",
+                    "spark.driver.cores": "4",
+                    "spark.executor.memory": "24g",
+                    "spark.executor.cores": "4",
+                    "spark.dynamicAllocation.minExecutors": "2",
+                    "spark.dynamicAllocation.maxExecutors": "24",
+                }
+            },
+        }
+        effective = merge_cluster_configuration(cluster_args, service)
+        spark_conf = effective["spark_conf"]
+
+        assert spark_conf["spark.sql.catalogImplementation"] == "hive"
+        assert spark_conf["spark.driverEnv.SPARK_RUNTIME"] == "emr"
+        assert spark_conf["spark.driver.memory"] == "8g"
+        assert spark_conf["spark.dynamicAllocation.maxExecutors"] == "24"
+
+
+def _map_dbr_instance_to_emr(instance_type: str) -> str:
+    """Forno DBR uses gen6; EMR consolidation uses gen7."""
+    for gen6, gen7 in (("m6g", "m7g"), ("r6g", "r7g"), ("c6g", "c7g")):
+        instance_type = instance_type.replace(gen6, gen7)
+    return instance_type
+
+
+def _emr_consolidation_preset_names():
+    tiers = ("xs", "s", "m", "l", "xl")
+    families = ("compute", "general", "memory")
+    presets = [
+        f"emr_7_12_consolidation_{tier}_{family}_cluster"
+        for tier in tiers
+        for family in families
+    ]
+    for tier in tiers:
+        for family in ("general", "memory"):
+            presets.append(
+                f"emr_7_12_consolidation_{tier}_{family}_single_node_cluster"
+            )
+    return presets
+
+
+def _dbr_counterpart(emr_preset: str) -> str:
+    suffix = emr_preset.removeprefix("emr_7_12_")
+    return suffix
+
+
+def _parse_memory_gib(value: str) -> float:
+    normalized = value.strip().lower()
+    if normalized.endswith("g"):
+        return float(normalized[:-1])
+    if normalized.endswith("m"):
+        return float(normalized[:-1]) / 1024
+    raise ValueError(f"unsupported memory value: {value}")
+
+
+# Graviton instance RAM (GiB) for master budget checks.
+_INSTANCE_RAM_GIB = {
+    "c7g.large": 4,
+    "c7g.xlarge": 8,
+    "c7g.2xlarge": 16,
+    "c7g.4xlarge": 32,
+    "c7g.8xlarge": 64,
+    "m7g.large": 8,
+    "m7g.xlarge": 16,
+    "m7g.2xlarge": 32,
+    "m7g.4xlarge": 64,
+    "m7g.8xlarge": 128,
+    "r7g.large": 16,
+    "r7g.xlarge": 32,
+    "r7g.2xlarge": 64,
+    "r7g.4xlarge": 128,
+    "r7g.8xlarge": 256,
+}
+
+
+class TestEmrConsolidationDbrParity:
+    @pytest.mark.parametrize("emr_preset", _emr_consolidation_preset_names())
+    def test_topology_matches_databricks_consolidation_preset(self, emr_preset):
+        service = ConfigurationService()
+        dbr_preset = service.get_config(_dbr_counterpart(emr_preset))
+        emr = service.get_config(emr_preset)
+
+        expected_master = _map_dbr_instance_to_emr(dbr_preset["driver_node_type_id"])
+        assert emr.get("master_node_type_id") == expected_master
+
+        num_workers = dbr_preset["num_workers"]
+        if num_workers == 0:
+            assert emr["core_nodes"]["instance_count"] == 0
+            assert emr.get("task_nodes") is None
+            return
+
+        expected_worker = _map_dbr_instance_to_emr(dbr_preset["node_type_id"])
+        assert emr["core_nodes"]["node_type_id"] == expected_worker
+        assert emr["core_nodes"]["instance_count"] == 1
+        if num_workers == 2:
+            assert emr["task_nodes"]["node_type_id"] == expected_worker
+            assert emr["task_nodes"]["instance_count"] == 1
+        else:
+            assert emr.get("task_nodes") is None
+
+    @pytest.mark.parametrize("emr_preset", _emr_consolidation_preset_names())
+    def test_consolidation_core_and_task_fleets_use_spot(self, emr_preset):
+        emr = ConfigurationService().get_config(emr_preset)
+        aws = emr["aws_attributes"]
+        assert aws["availability"] == "SPOT"
+        assert aws["task_availability"] == "SPOT"
+
+
+class TestEmrConsolidationMasterMemorySizing:
+    @pytest.mark.parametrize(
+        "emr_preset,yarn_am,driver",
+        [
+            ("emr_7_12_consolidation_xs_compute_cluster", "512m", "1g"),
+            ("emr_7_12_consolidation_s_general_cluster", "2g", "6g"),
+            ("emr_7_12_consolidation_l_memory_cluster", "4g", "12g"),
+            ("emr_7_12_consolidation_xl_memory_cluster", "6g", "16g"),
+        ],
+    )
+    def test_tier_master_memory_not_flat_eight_gb(self, emr_preset, yarn_am, driver):
+        spark_conf = ConfigurationService().get_config(emr_preset)["spark_conf"]
+        assert spark_conf["spark.yarn.am.memory"] == yarn_am
+        assert spark_conf["spark.driver.memory"] == driver
+        assert spark_conf["spark.yarn.am.memory"] != "8g" or emr_preset.endswith(
+            "_general_cluster"
+        )
+
+    @pytest.mark.parametrize("emr_preset", _emr_consolidation_preset_names())
+    def test_master_memory_within_instance_budget(self, emr_preset):
+        if emr_preset.endswith("_single_node_cluster"):
+            pytest.skip(
+                "single-node runs executors on master; budget checked separately"
+            )
+        emr = ConfigurationService().get_config(emr_preset)
+        spark_conf = emr["spark_conf"]
+        master_type = emr["master_node_type_id"]
+        instance_ram = _INSTANCE_RAM_GIB[master_type]
+        used_gib = (
+            _parse_memory_gib(spark_conf["spark.driver.memory"])
+            + _parse_memory_gib(spark_conf["spark.driver.memoryOverhead"])
+            + _parse_memory_gib(spark_conf["spark.yarn.am.memory"])
+        )
+        assert used_gib <= instance_ram * 0.7
