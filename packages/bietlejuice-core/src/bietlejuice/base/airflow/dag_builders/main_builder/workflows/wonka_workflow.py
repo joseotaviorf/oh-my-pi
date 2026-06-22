@@ -18,7 +18,6 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
-from bietlejuice.base.pipeline.environment_enum import EnvironmentEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 logger = logging.getLogger("WonkaWorkflow")
@@ -43,14 +42,6 @@ class WonkaWorkflow(BaseWorkflow):
             dataset_dependencies,
             **kwargs,
         )
-
-        if (
-            self.env == EnvironmentEnum.PROD
-            and self.cluster_args.get("type") == "wonka_cluster_emr"
-        ):
-            raise RuntimeError(
-                "Wonka EMR is not enabled in prod; use cluster.type: wonka_cluster"
-            )
 
         wonka_dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
         if self.is_validation:

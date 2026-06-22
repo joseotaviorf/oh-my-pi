@@ -164,9 +164,9 @@ class TestWonkaWorkflowClusterPresetSelection:
         assert workflow.cluster_args["spark_version"] == "emr-7.12.0"
 
     @patch.dict(os.environ, {"ENVIRONMENT": "prod"}, clear=False)
-    def test_emr_preset_raises_in_prod(self, config_presets):
-        with pytest.raises(RuntimeError, match="Wonka EMR is not enabled in prod"):
-            self._workflow({"type": "wonka_cluster_emr"}, config_presets)
+    def test_emr_preset_allowed_in_prod(self, config_presets):
+        workflow = self._workflow({"type": "wonka_cluster_emr"}, config_presets)
+        assert workflow.cluster_args["spark_version"] == "emr-7.12.0"
 
     @patch.dict(os.environ, {"ENVIRONMENT": "prod"}, clear=False)
     def test_databricks_preset_allowed_in_prod(self, config_presets):
