@@ -6,13 +6,3 @@ cluster:
       ebs_volume_size: 200
     data_security_mode: USER_ISOLATION
     runtime_engine: PHOTON
-    driver_node_type_id: m7g.xlarge
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      data_security_mode: USER_ISOLATION
-      runtime_engine: PHOTON

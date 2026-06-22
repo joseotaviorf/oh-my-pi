@@ -1,8 +1,2 @@
 cluster:
   type: emr_7_12_consolidation_m_general_cluster
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      driver_node_type_id: m7g.2xlarge

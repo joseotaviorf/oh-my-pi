@@ -13,14 +13,3 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     driver_node_type_id: m7g.2xlarge
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      data_security_mode: USER_ISOLATION

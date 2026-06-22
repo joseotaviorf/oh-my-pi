@@ -5,28 +5,8 @@ cluster:
   - pypi:
       package: kafka-python==2.0.3
   custom_configurations:
-    autotermination_minutes: 20
-    num_workers: 3
-    spark_version: 13.3.x-scala2.12
     aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
-      availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
     spark_conf:
       spark.driver.maxResultSize: '0'
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - pypi:
-        package: kafka-python==2.0.3
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.driver.maxResultSize: '0'
-      spark_version: 13.3.x-scala2.12
-  allow_custom_spark_job: true
+    spark_version: 13.3.x-scala2.12

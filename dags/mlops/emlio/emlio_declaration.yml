@@ -16,7 +16,7 @@ workflow:
     - "{schema}"
     - "{partitions}"
     - "{{ data_interval_start | ds }}"
-  execution_timeout_hours: 5
+  execution_timeout_hours: 6
   default_extraction_type: incremental
   tables_customization:
     emlio_logs:

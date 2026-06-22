@@ -4,14 +4,5 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 300
-    num_workers: 13
+    num_workers: 11
     driver_node_type_id: r7g.2xlarge
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 300
-      num_workers: 11
-      driver_node_type_id: r7g.2xlarge
