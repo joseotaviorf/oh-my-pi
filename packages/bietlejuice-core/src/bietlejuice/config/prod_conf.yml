@@ -1603,11 +1603,15 @@ emr_cluster_base: &emr_cluster_anchor
     master_node_type_id: m7a.xlarge
     core_nodes:
         node_type_id: m7a.xlarge
-        instance_count: 2
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.xlarge
+        instance_count: 1
     autotermination_minutes: 20
     emr_auto_terminate: false
     aws_attributes: &emr_aws_anchor
         availability: ON_DEMAND
+        task_availability: SPOT
         ebs_volume_count: 1
         ebs_volume_size: 200
         ebs_volume_type: GENERAL_PURPOSE_SSD
@@ -1785,10 +1789,12 @@ emr_consolidation_base: &emr_consolidation_anchor
     <<: *emr_cluster_anchor
     aws_attributes:
         <<: *emr_aws_anchor
-        availability: SPOT
+        availability: ON_DEMAND
         task_availability: SPOT
+    task_nodes:
+        instance_count: 0
     # Aligned with Databricks consolidation tiers (gen7 m7g/r7g/c7g ↔ gen6 m6g/r6g/c6g).
-    # Multi-worker prod: 1 CORE (SPOT) + 1 TASK (SPOT). Driver/YARN RM on master.
+    # Multi-worker prod: 1 CORE (ON_DEMAND) + N TASK (SPOT). Driver/YARN RM on master.
     # Single-node: master-only (core_nodes.instance_count=0); driver + executors on master.
 emr_spark_single_node: &emr_spark_single_node
     spark.dynamicAllocation.maxExecutors: "4"
@@ -1937,7 +1943,10 @@ emr_7_12_med_general_3_workers_cluster:
     master_node_type_id: m7a.2xlarge
     core_nodes:
         node_type_id: m7a.2xlarge
-        instance_count: 3
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.2xlarge
+        instance_count: 2
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
@@ -1949,7 +1958,10 @@ emr_7_12_med_general_photon_cluster:
     master_node_type_id: m7a.xlarge
     core_nodes:
         node_type_id: m7a.xlarge
-        instance_count: 3
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.xlarge
+        instance_count: 2
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -1961,7 +1973,10 @@ emr_7_12_med_memory_general_cluster:
     master_node_type_id: r7a.xlarge
     core_nodes:
         node_type_id: r7a.xlarge
-        instance_count: 3
+        instance_count: 1
+    task_nodes:
+        node_type_id: r7a.xlarge
+        instance_count: 2
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -1987,7 +2002,10 @@ emr_7_12_min_general_2_workers_cluster:
     master_node_type_id: m7a.xlarge
     core_nodes:
         node_type_id: m7a.xlarge
-        instance_count: 2
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
@@ -1998,7 +2016,10 @@ emr_7_12_min_general_3_workers_cluster:
     master_node_type_id: m7a.xlarge
     core_nodes:
         node_type_id: m7a.xlarge
-        instance_count: 3
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.xlarge
+        instance_count: 2
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
@@ -2010,7 +2031,10 @@ emr_7_12_min_memory_3_workers_cluster:
     master_node_type_id: r7a.xlarge
     core_nodes:
         node_type_id: r7a.xlarge
-        instance_count: 3
+        instance_count: 1
+    task_nodes:
+        node_type_id: r7a.xlarge
+        instance_count: 2
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2021,19 +2045,23 @@ emr_7_12_med_general_2_workers_cluster:
     master_node_type_id: m7a.2xlarge
     core_nodes:
         node_type_id: m7a.2xlarge
-        instance_count: 2
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.2xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
         availability: ON_DEMAND
 
-# DBR databricks_16_4_small_general_fleet_2xlarge_single_node → 1 master + 1 worker
+# DBR databricks_16_4_small_general_fleet_2xlarge_single_node → master-only (num_workers=0)
 emr_7_12_small_general_2xlarge_single_node_cluster:
     <<: *emr_cluster_anchor
     master_node_type_id: m7a.2xlarge
     core_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
+        instance_count: 0
+    task_nodes:
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2045,7 +2073,10 @@ emr_7_12_small_general_2xlarge_2_workers_cluster:
     master_node_type_id: m7a.2xlarge
     core_nodes:
         node_type_id: m7a.2xlarge
-        instance_count: 2
+        instance_count: 1
+    task_nodes:
+        node_type_id: m7a.2xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200

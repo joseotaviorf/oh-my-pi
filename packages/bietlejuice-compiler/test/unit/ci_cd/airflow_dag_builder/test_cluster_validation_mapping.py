@@ -1197,7 +1197,8 @@ class TestEmrConsolidationDbrParity:
         num_workers = dbr_preset["num_workers"]
         if num_workers == 0:
             assert emr["core_nodes"]["instance_count"] == 0
-            assert emr.get("task_nodes") is None
+            task_nodes = emr.get("task_nodes")
+            assert task_nodes is None or task_nodes.get("instance_count", 0) == 0
             return
 
         expected_worker = _map_dbr_instance_to_emr(dbr_preset["node_type_id"])
@@ -1210,11 +1211,29 @@ class TestEmrConsolidationDbrParity:
             assert emr.get("task_nodes") is None
 
     @pytest.mark.parametrize("emr_preset", _emr_consolidation_preset_names())
-    def test_consolidation_core_and_task_fleets_use_spot(self, emr_preset):
+    def test_consolidation_core_on_demand_with_spot_tasks(self, emr_preset):
         emr = ConfigurationService().get_config(emr_preset)
         aws = emr["aws_attributes"]
-        assert aws["availability"] == "SPOT"
-        assert aws["task_availability"] == "SPOT"
+        if emr_preset.endswith("_single_node_cluster"):
+            return
+        assert aws["availability"] == "ON_DEMAND"
+        task_count = (emr.get("task_nodes") or {}).get("instance_count", 0)
+        if task_count > 0:
+            assert aws["task_availability"] == "SPOT"
+
+
+class TestEmrSmallGeneralSingleNodeTopology:
+    def test_small_general_2xlarge_single_node_is_master_only(self):
+        service = ConfigurationService()
+        dbr = service.get_config(
+            "databricks_16_4_small_general_fleet_2xlarge_single_node"
+        )
+        emr = service.get_config("emr_7_12_small_general_2xlarge_single_node_cluster")
+
+        assert dbr["num_workers"] == 0
+        assert emr["core_nodes"]["instance_count"] == 0
+        task_nodes = emr.get("task_nodes")
+        assert task_nodes is None or task_nodes.get("instance_count", 0) == 0
 
 
 class TestEmrConsolidationMasterMemorySizing:
