@@ -72,6 +72,22 @@ columns:
       natural end, after any negotiated discounts.
     lineage:
       - dw_offboarding.fact_terminations.fee_final_amount
+  total_tenant_repair_review_cost:
+    description: |
+      Total monetary cost (in BRL) of repair items under tenant responsibility at the
+      review stage, after owner interaction with the report and before contestation
+      analysis. Computed as the sum of ar_cost for repairs that were not auto-identified-rejected,
+      not exempted by the owner, and not exempted during repair analysis.
+    lineage:
+      - dw_offboarding.fact_terminations.total_tenant_repair_review_cost
+  total_tenant_repair_review_contestation_cost:
+    description: |
+      Total monetary cost (in BRL) of repair items that were contested by the tenant
+      at the review stage. Subset of total_tenant_repair_review_cost, restricted to
+      repairs where the tenant submitted at least one contestation
+      (total_tenant_contestation > 0).
+    lineage:
+      - dw_offboarding.fact_terminations.total_tenant_repair_review_contestation_cost
   final_tenant_inspection_cost:
     description: |
       Total inspection (repair) cost charged to the tenant, as a gross amount before any

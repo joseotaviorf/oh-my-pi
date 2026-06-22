@@ -109,6 +109,8 @@ SELECT DISTINCT
     --Values:
     dc.rent AS rent_value,
     ft.fee_final_amount,
+    ft.total_tenant_repair_review_cost,
+    ft.total_tenant_repair_review_contestation_cost,
     i.total_cost AS final_tenant_inspection_cost,
     --Categories:
     dt.category AS termination_category,
