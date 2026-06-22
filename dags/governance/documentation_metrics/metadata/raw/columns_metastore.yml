@@ -1,4 +1,21 @@
 ---
 database_name: datalake_documentation_metrics_raw
 table_name: columns_metastore
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest of Spark information_schema column inventory at documentation_metrics job runtime (not from the documentation bucket), loaded daily at 05:00 UTC.
+columns:
+  layer:
+    description: Data lake layer of the physical table in the metastore snapshot.
+  database_name:
+    description: Hive schema name of the table containing the physical column.
+  table_name:
+    description: Table name within database_name for the physical column row.
+  column_name:
+    description: Name of the physical column present in the Spark metastore snapshot.
+  year:
+    description: Year of the data load date, used for Hive partitioning.
+  month:
+    description: Month of the data load date, used for Hive partitioning.
+  day:
+    description: Day of the data load date, used for Hive partitioning.

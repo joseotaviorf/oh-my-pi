@@ -1,38 +1,42 @@
 database_name: datalake_documentation_metrics_clean
 table_name: dag_metadata
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: This column provides the data from this table
+description: >
+  Daily snapshot of bietlejuice Airflow DAG metadata parsed from repo declarations at
+  documentation_metrics job runtime (not from the documentation bucket). Ingested incrementally
+  each day (05:00 UTC). Grain is one row per layer, dag_name, and database_name per load date.
+  Partitioned by year, month, day — filter on ingestion date for partition pruning.
 columns:
   layer:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.layer
-    description: This column indicates the layer of this table
+    description: Data lake layer (raw, clean, core, enrich, dw, metric) associated with the DAG and table.
   dag_name:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.dag_name
-    description: This column indicates the name of the dag on Airflow.
+    description: Airflow DAG name in bi-etl-ejuice that owns or produces tables in the registered database.
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.database_name
-    description: This column indicates the schema name of the table
+    description: Hive schema name of tables produced or maintained by the registered DAG at this layer.
   has_lineage_from_product:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.has_lineage_from_product
-    description: This column shows whether or not the data has lineage from product databases. DEPRECATED.
+    description: Deprecated flag indicating whether the DAG ingests lineage from product databases. No longer used in coverage metrics.
   owner:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.owner
-    description: This column contains the name of the team associated with the data
+    description: Team or contact name associated with the DAG in Airflow, as registered for governance tracking.
   year:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.year
-    description: This column indicates the year this table was updated
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.month
-    description: This column indicates the month in which the table was updated
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.day
-    description: This column indicates the day the table was updated
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

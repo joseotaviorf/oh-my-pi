@@ -1,4 +1,27 @@
 ---
 database_name: datalake_documentation_metrics_raw
 table_name: columns_documentation
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest of column documentation YAML from the data-documentation S3 bucket (documentation/ prefix), loaded daily by documentation_metrics after CI publishes metadata on merge.
+columns:
+  database_name:
+    description: Hive schema of the documented table as declared in governance metadata YAML.
+  table_name:
+    description: Table name for which column documentation was exported from governance YAML.
+  table_description:
+    description: Table description from governance metadata for the documented table.
+  owner:
+    description: Corporate email of the table owner declared in governance metadata YAML.
+  column_name:
+    description: Name of the column whose documentation was exported from governance YAML.
+  column_description:
+    description: Business description of the column from governance metadata YAML.
+  joins_with_column:
+    description: Boolean flag indicating whether the column metadata declares a joins_with_column relationship.
+  year:
+    description: Year of the data load date, used for Hive partitioning.
+  month:
+    description: Month of the data load date, used for Hive partitioning.
+  day:
+    description: Day of the data load date, used for Hive partitioning.

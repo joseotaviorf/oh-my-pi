@@ -1,35 +1,40 @@
 database_name: datalake_documentation_metrics_clean
 table_name: lineage_and_tags
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table records the lineage of the data
+description: >
+  Daily snapshot of lineage and tag coverage per table from the aggregated file
+  metadata/all_lineage_tags_data.yml in the data-documentation S3 bucket. The file is
+  published on bi-etl-ejuice metadata deploy and ingested incrementally by documentation_metrics
+  (daily 05:00 UTC). Grain is one row per database_name and table_name per load date.
+  Partitioned by year, month, day — filter on ingestion date. Consumed by fairness
+  assessment and governance documentation dashboards.
 columns:
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.database_name
-    description: This column indicates the schema name of the table
+    description: Hive schema name of the table whose lineage and tag coverage is being measured.
   table_name:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.table_name
-    description: This column indicates the name of the tables
+    description: Table name within database_name for the lineage and tag coverage row.
   has_lineage:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.has_lineage
-    description: This column indicates whether the data has lineage
+    description: Boolean flag indicating whether governance metadata YAML declares upstream lineage for this table.
   has_tags:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.has_tags
-    description: This column indicates whether the data has associated tags
+    description: Boolean flag indicating whether governance metadata YAML declares classification tags on this table.
   year:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.year
-    description: This column indicates the year this table was updated
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.month
-    description: This column indicates the month in which the table was updated
-
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.day
-    description: This column indicates the day the table was updated
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

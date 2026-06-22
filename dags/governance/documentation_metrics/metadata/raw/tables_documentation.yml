@@ -2,21 +2,21 @@ database_name: datalake_documentation_metrics_raw
 table_name: tables_documentation
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table provides the documentation about tables, created and maintained through bi-etl-ejuice
+description: Raw ingest of table-level governance YAML from the data-documentation S3 bucket (metadata/ prefix), loaded daily by documentation_metrics after CI publishes metadata on merge. Partitioned by year, month, day.
 columns:
   database_name:
-    description: This column indicates the schema name of the table
+    description: Hive schema name of the table whose governance metadata was exported from S3.
   table_name:
-    description: This column indicates the name of the tables
+    description: Table name within database_name for the exported governance metadata row.
   domain:
-    description: The domain that the table belongs to
+    description: FAIR domain allowlist value assigned to the table in governance metadata YAML.
   owner:
-    description: The user or team responsible for the table
+    description: Corporate email of the person or team responsible for the table in governance metadata.
   table_description:
-    description: The description of the table contents
+    description: Substantive table description from governance metadata explaining grain and business purpose.
   year:
-    description: The year this data was ingested
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
-    description: The month this data was ingested
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
-    description: The day this data was ingested
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

@@ -1,46 +1,52 @@
 database_name: datalake_documentation_metrics_clean
 table_name: columns_documentation
-owner: rafael.augusto@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Provides documentation info about each column we have in the data-documentation bucket
+description: >
+  Daily snapshot of column-level documentation read from governance YAML in the data-documentation
+  S3 bucket (documentation/ prefix). YAML is published on each bi-etl-ejuice metadata deploy
+  (CI upload_metadata_files_into_s3) and ingested incrementally by documentation_metrics
+  (daily 05:00 UTC). Grain is one row per database_name, table_name, and column_name per load
+  date. Partitioned by year, month, day — filter on ingestion date for partition pruning.
+  Feeds documentation coverage and FAIR column-description metrics.
 columns:
   database_name:
-    description: The database name
+    description: Hive schema (database) of the documented table as declared in bi-etl-ejuice governance metadata YAML.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.database_name
   table_name:
-    description: The table name
+    description: Table name within the schema for which column documentation was exported from governance YAML.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.table_name
   table_description:
-    description: The table description
+    description: Substantive table description from governance metadata explaining grain, source system, and business purpose of the documented table.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.table_description
   owner:
-    description: user who's responsible for the table
+    description: Corporate email of the table owner declared in governance metadata YAML for the documented table.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.owner
   column_name:
-    description: the column name
+    description: Name of the column within the documented table whose description is being tracked for coverage metrics.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.column_name
   column_description:
-    description: the column description
+    description: Business description of the column from governance metadata YAML, used to measure documentation completeness and FAIR F2-02 compliance.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.column_description
   joins_with_column:
-    description: if the column has the joins with column field
+    description: Boolean flag indicating whether the column metadata declares a joins_with_column relationship to another column.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.has_joins_with_column
   year:
-    description: ingestion year
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.year
   month:
-    description: ingestion month
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.month
   day:
-    description: ingestion day
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_raw.columns_documentation.day

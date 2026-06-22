@@ -48,5 +48,8 @@ columns:
     lineage:
     - datalake_documentation_metrics_clean.columns_metastore.day
     description: Column day on columns_documentation_metrics.
-description: Enriched join of metastore columns with documentation coverage flags
-  for FAIR assessments.
+description: >
+  Enriched column-level documentation coverage metrics built from documentation_metrics
+  clean tables (metastore inventory joined with bucket-sourced columns_documentation).
+  Rebuilt when enrich_documentation_metrics runs after the daily documentation_metrics
+  ingest (05:00 UTC). Used for FAIR F2-02 and documentation coverage assessments.

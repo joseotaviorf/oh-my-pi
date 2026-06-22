@@ -1,34 +1,39 @@
 database_name: datalake_documentation_metrics_clean
 table_name: columns_metastore
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: lists all the columns in the metastore
+description: >
+  Daily snapshot of physical columns from Spark information_schema at documentation_metrics
+  job runtime (not from the documentation bucket). Ingested incrementally each day (05:00 UTC)
+  to compare documented columns against the live metastore for I1-01 interoperability checks.
+  Grain is one row per layer, database, table, and column per load date. Partitioned by year,
+  month, day — filter on ingestion date.
 columns:
   layer:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.layer
-    description: This column indicates the layer of this table
+    description: Data lake layer (raw, clean, core, enrich, dw, metric) of the physical table in the metastore snapshot.
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.database_name
-    description: This column indicates the schema name of the table
+    description: Hive schema name of the table containing the physical column in the metastore snapshot.
   table_name:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.table_name
-    description: This column indicates the name of the tables
+    description: Table name within database_name for the physical column row in the metastore snapshot.
   column_name:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.column_name
-    description: Indicates the name of the column
+    description: Name of the physical column present in the Spark metastore snapshot for the given table.
   year:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.year
-    description: This column indicates the year this table was updated
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.month
-    description: This column indicates the month in which the table was updated
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.day
-    description: This column indicates the day the table was updated
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

@@ -1,34 +1,50 @@
 ---
 database_name: datalake_documentation_metrics
 table_name: tables_documentation_metrics
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Enriched table-level documentation coverage metrics built from documentation_metrics clean
+  tables (metastore inventory joined with bucket-sourced tables_documentation signals).
+  Rebuilt when enrich_documentation_metrics runs after the daily documentation_metrics ingest
+  (05:00 UTC). Grain is one row per layer, database, and table per load date. Partitioned
+  by year, month, day — filter on ingestion date for partition pruning.
 columns:
   layer:
+    description: Data lake layer of the table in the metastore inventory snapshot being evaluated for documentation coverage.
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.layer
   database_name:
+    description: Hive schema name of the table whose table-level documentation coverage is measured.
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.database_name
   table_name:
+    description: Table name within database_name for the documentation coverage metrics row.
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.table_name
   has_description:
+    description: Boolean flag indicating whether governance metadata YAML provides a substantive table description for this table.
     lineage:
       - datalake_documentation_metrics_clean.columns_documentation.has_description
   has_owner:
+    description: Boolean flag indicating whether governance metadata YAML declares an owner email for this table.
     lineage:
       - datalake_documentation_metrics_clean.columns_documentation.has_owner
   dt_ingested:
+    description: Calendar date when the documentation metrics snapshot was loaded, derived from year, month, and day partitions.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.year
       - datalake_documentation_metrics_clean.categories_documentation.month
       - datalake_documentation_metrics_clean.categories_documentation.day
   year:
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.year
   month:
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.month
   day:
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.day

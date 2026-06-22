@@ -1,12 +1,17 @@
 ---
 database_name: datalake_documentation_metrics
 table_name: categories_documentation_metrics
-owner: augusto.torres@quintoandar.com.br
-domain: "Data Ops & Governance"
-description: Table with stats of category columns documentation.
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Enriched category-documentation coverage metrics built from documentation_metrics clean
+  tables (bucket-sourced category YAML joined with metastore inventory). Rebuilt when
+  enrich_documentation_metrics runs after the daily documentation_metrics ingest (05:00 UTC).
+  Grain is one row per layer, database, table, column, and category value per load date.
+  Partitioned by year, month, day — filter on ingestion date for partition pruning.
 columns:
   layer:
-    description: Indicates the data architecture layer of the tables
+    description: Data lake layer of the table whose categorized column is being measured for documentation coverage.
     categories: 
       raw: Datalake raw layer.
       clean: Datalake clean layer.
@@ -16,40 +21,40 @@ columns:
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.layer
   database_name:
-    description: Database name, indicate the first part of the full table name in the format <database_name>.<table_name>.
+    description: Hive schema name; first segment of the fully qualified table name in database_name.table_name format.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.database_name
   table_name:
-    description: Table name, indicate the second part of the full table name in the format <database_name>.<table_name>.
+    description: Table name within database_name for the categorized column being evaluated.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.table_name
   column_name:
-    description: Column name.
+    description: Name of the column that carries a category classification tag in governance metadata YAML.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.column_name
   value:
-    description: The value of the categories. Possible values for the column.
+    description: Category tag value assigned to the column in governance metadata (for example pii or confidential).
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.value
   has_description:
-    description: Indicate if a category has description.
+    description: Boolean flag indicating whether the categorized column has a non-empty description in governance metadata.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.has_description
   dt_ingested:
-    description: Ingestion datetime.
+    description: Calendar date when the documentation metrics snapshot was loaded, derived from year, month, and day partitions.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.year
       - datalake_documentation_metrics_clean.categories_documentation.month
       - datalake_documentation_metrics_clean.categories_documentation.day
   year:
-    description: Ingestion year.
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.year
   month:
-    description: Ingestion month.
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.month
   day:
-    description: Ingestion day.
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.day

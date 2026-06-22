@@ -1,4 +1,23 @@
 ---
 database_name: datalake_documentation_metrics_raw
 table_name: dag_metadata
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest of bietlejuice DAG declarations parsed from the repo at documentation_metrics job runtime (not from the documentation bucket), loaded daily at 05:00 UTC.
+columns:
+  layer:
+    description: Data lake layer associated with the DAG and registered database.
+  dag_name:
+    description: Airflow DAG name in bi-etl-ejuice that owns or produces tables in the registered database.
+  database_name:
+    description: Hive schema name of tables produced or maintained by the registered DAG at this layer.
+  has_lineage_from_product:
+    description: Deprecated flag indicating whether the DAG ingests lineage from product databases.
+  owner:
+    description: Team or contact name associated with the DAG in Airflow governance tracking.
+  year:
+    description: Year of the data load date, used for Hive partitioning.
+  month:
+    description: Month of the data load date, used for Hive partitioning.
+  day:
+    description: Day of the data load date, used for Hive partitioning.

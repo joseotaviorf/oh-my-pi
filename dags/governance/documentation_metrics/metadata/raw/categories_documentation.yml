@@ -1,4 +1,25 @@
 ---
 database_name: datalake_documentation_metrics_raw
 table_name: categories_documentation
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest of category-tagged column YAML from the data-documentation S3 bucket (documentation/ prefix), loaded daily by documentation_metrics after CI publishes metadata on merge.
+columns:
+  layer:
+    description: Data lake layer of the table whose categorized column was exported from governance YAML.
+  database_name:
+    description: Hive schema name of the table containing the categorized column.
+  table_name:
+    description: Table name within database_name for the categorized column row.
+  column_name:
+    description: Name of the column that carries a category classification tag in governance metadata.
+  value:
+    description: Category tag value assigned to the column in governance metadata.
+  has_description:
+    description: Boolean flag indicating whether the categorized column has a non-empty description in governance metadata.
+  year:
+    description: Year of the data load date, used for Hive partitioning.
+  month:
+    description: Month of the data load date, used for Hive partitioning.
+  day:
+    description: Day of the data load date, used for Hive partitioning.
