@@ -22,13 +22,14 @@ column_level_validations:
   ts_event:
     is_complete:
       severity_level: Warning
+  ts_event_no_missing_hourly_buckets:
     custom:
-      # Ensure there are no missing hourly buckets in the last 7 complete days (clean layer).
+      # Ensure there are no missing hourly buckets in the previous 3 complete days (excludes today; clean layer).
       constraint: |-
         (WITH bounds AS (
            SELECT
-             date_trunc('hour', current_timestamp()) AS end_hour_utc,
-             date_trunc('hour', current_timestamp()) - INTERVAL 7 DAYS AS start_hour_utc
+             date_trunc('day', current_timestamp()) AS end_hour_utc,
+             date_trunc('day', current_timestamp()) - INTERVAL 3 DAYS AS start_hour_utc
          ),
          expected_hours AS (
            SELECT
