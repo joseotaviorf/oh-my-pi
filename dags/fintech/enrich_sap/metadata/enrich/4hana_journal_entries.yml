@@ -1,117 +1,159 @@
 ---
-database_name: datalake_sap
+database_name: datalake_pas
 table_name: 4hana_journal_entries
-owner: ae-finance-fintech@quintoandar.com.br
+owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
+description: >
+  Enrich view of SAP 4HANA journal entries sourced from datalake_sap_4hana_clean.journal_entries.
+  Each row represents one deduplicated accounting document line (grain: id_transaction + id_company
+  + id_line + fiscal_year, keeping the latest record by date). Consumed by fintech finance
+  reconciliation and ledger pipelines.
 columns:
   id_transaction:
+    description: SAP document number that uniquely identifies the accounting transaction.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_transaction
+    - datalake_sap_4hana_clean.journal_entries.id_transaction
   id_company:
+    description: SAP company code identifying the legal entity that posted the document.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_company
+    - datalake_sap_4hana_clean.journal_entries.id_company
   id_finance_entity:
+    description: Finance entity identifier associated with the journal entry in the QuintoAndar system.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_finance_entity
+    - datalake_sap_4hana_clean.journal_entries.id_finance_entity
   id_finance_entity_entry:
+    description: Identifier for a specific entry within the finance entity record.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_finance_entity_entry
+    - datalake_sap_4hana_clean.journal_entries.id_finance_entity_entry
   id_business_entity:
+    description: Business entity (e.g., property or contract) linked to the transaction.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_business_entity
+    - datalake_sap_4hana_clean.journal_entries.id_business_entity
   id_external_payment:
+    description: External payment identifier referenced in the SAP document, if applicable.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_external_payment
+    - datalake_sap_4hana_clean.journal_entries.id_external_payment
   id_line:
+    description: Line item number within the accounting document; combined with id_transaction forms the document line key.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.id_line
+    - datalake_sap_4hana_clean.journal_entries.id_line
   source_client:
+    description: SAP client identifier of the source system that originated the document.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.source_client
+    - datalake_sap_4hana_clean.journal_entries.source_client
   fiscal_year:
+    description: SAP fiscal year in which the document was posted.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.fiscal_year
+    - datalake_sap_4hana_clean.journal_entries.fiscal_year
   accrual_year_month:
+    description: Accrual period in YYYYMM format, used to determine the accounting month allocation.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.accrual_year_month
+    - datalake_sap_4hana_clean.journal_entries.accrual_year_month
   document_amount:
+    description: Monetary amount of the document line in the document currency.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.document_amount
+    - datalake_sap_4hana_clean.journal_entries.document_amount
   account_shortname:
+    description: Short descriptive name of the SAP general ledger account associated with the entry.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.account_shortname
+    - datalake_sap_4hana_clean.journal_entries.account_shortname
   account_number:
+    description: SAP general ledger account number that classifies the type of posting.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.account_number
+    - datalake_sap_4hana_clean.journal_entries.account_number
   user_type:
+    description: SAP document type classification indicating the user or origin of the posting.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.user_type
+    - datalake_sap_4hana_clean.journal_entries.user_type
   accounting_rule:
+    description: SAP posting rule applied to determine how the document is processed in the ledger.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.accounting_rule
+    - datalake_sap_4hana_clean.journal_entries.accounting_rule
   indicator:
+    description: Debit/credit indicator or posting-type flag on the document line.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.indicator
+    - datalake_sap_4hana_clean.journal_entries.indicator
   memo_line:
+    description: Short reference text assigned to the document line item.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.memo_line
+    - datalake_sap_4hana_clean.journal_entries.memo_line
   cost_center_code:
+    description: SAP cost center to which the document line is allocated for cost accounting.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.cost_center_code
+    - datalake_sap_4hana_clean.journal_entries.cost_center_code
   location_profit_code:
+    description: SAP profit center or location code used for managerial reporting segmentation.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.location_profit_code
+    - datalake_sap_4hana_clean.journal_entries.location_profit_code
   managerial_code:
+    description: Managerial account grouping code for internal financial reporting purposes.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.managerial_code
+    - datalake_sap_4hana_clean.journal_entries.managerial_code
   posting_key:
+    description: SAP posting key (2-digit code) that determines the debit/credit side and account type of the entry.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.posting_key
+    - datalake_sap_4hana_clean.journal_entries.posting_key
   posting_period:
+    description: Accounting period within the fiscal year (1–16) to which the document is assigned.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.posting_period
+    - datalake_sap_4hana_clean.journal_entries.posting_period
   accounting_type:
+    description: SAP document type (e.g., SA, AB) that categorises the nature of the transaction.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.accounting_type
+    - datalake_sap_4hana_clean.journal_entries.accounting_type
   memo:
+    description: Free-text memo or header text of the journal entry provided by the posting user.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.memo
+    - datalake_sap_4hana_clean.journal_entries.memo
   material:
+    description: SAP material number associated with the document line, if applicable.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.material
+    - datalake_sap_4hana_clean.journal_entries.material
   created_by:
+    description: SAP user ID of the person who created the document.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.created_by
+    - datalake_sap_4hana_clean.journal_entries.created_by
   xblnr:
+    description: External document reference number (Referenzbelegnummer) provided by the originating system.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.xblnr
+    - datalake_sap_4hana_clean.journal_entries.xblnr
   currency_code:
+    description: ISO 4217 currency code of the document amount (e.g., BRL, USD).
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.currency_code
+    - datalake_sap_4hana_clean.journal_entries.currency_code
   comments:
+    description: Additional comments or notes appended to the journal entry.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.comments
+    - datalake_sap_4hana_clean.journal_entries.comments
   hash:
+    description: Hash key computed over the document line fields, used for deduplication and change detection across loads.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.hash
+    - datalake_sap_4hana_clean.journal_entries.hash
   dt_tax:
+    description: Tax-relevant date of the document, used for fiscal reporting obligations.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.dt_tax
+    - datalake_sap_4hana_clean.journal_entries.dt_tax
   dt_accrual:
+    description: Accrual date that determines the accounting period to which the entry is allocated.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.dt_accrual
+    - datalake_sap_4hana_clean.journal_entries.dt_accrual
   dt_created:
+    description: Date the document was originally created in SAP.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.dt_created
+    - datalake_sap_4hana_clean.journal_entries.dt_created
   dt_updated:
+    description: Date the document record was last updated in SAP.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.dt_updated
+    - datalake_sap_4hana_clean.journal_entries.dt_updated
   year:
+    description: Calendar year of the entry date, derived from the source record timestamp.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.year
+    - datalake_sap_4hana_clean.journal_entries.year
   month:
+    description: Calendar month of the entry date, derived from the source record timestamp.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.month
+    - datalake_sap_4hana_clean.journal_entries.month
   day:
+    description: Calendar day of the entry date, derived from the source record timestamp.
     lineage:
-    - datalake_sap_4hana_raw.journal_entries.day
+    - datalake_sap_4hana_clean.journal_entries.day

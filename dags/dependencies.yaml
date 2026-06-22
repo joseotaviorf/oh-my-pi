@@ -1448,6 +1448,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry:first-run-of-day
+  - bietlejuice.enrich_sap:load-enrich-4hana-journal-entries-bank-account:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger-new-template:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-cod-locale:first-run-of-day
   - bietlejuice.monopoly:load-clean-accounting-entry:first-run-of-day
