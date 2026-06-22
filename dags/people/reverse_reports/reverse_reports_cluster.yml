@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_xs_memory_cluster
+  type: consolidation_m_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: people-analytics
@@ -17,4 +17,4 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       instance_profile_arn: '{{ var.value.instance_profile_secret_arn_people }}'
-    num_workers: 3
+    num_workers: 5
