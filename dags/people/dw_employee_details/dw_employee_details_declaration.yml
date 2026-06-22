@@ -10,6 +10,7 @@ workflow:
   layer: dw
   custom_schema: employee_details
   bucket_config_name: people_bucket
+  has_hive_sync: false
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -23,13 +24,11 @@ workflow:
       - dim_management_hierarchy
   tables_customization:
     fact_assignment_snapshots:
-      has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
       table_properties:
         "delta.enableDeletionVectors": "false"
     dim_event_definition:
-      has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
       table_properties:
@@ -47,13 +46,11 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     dim_management_hierarchy:
-      has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
       table_properties:
         "delta.enableDeletionVectors": "false"
     dim_employee:
-      has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true
       table_properties:
