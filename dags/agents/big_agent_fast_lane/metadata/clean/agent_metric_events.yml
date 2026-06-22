@@ -1,0 +1,64 @@
+database_name: datalake_big_agent_clean
+table_name: agent_metric_events
+description: |
+  Events recording agent metric values consumed from Kafka, with deduplication
+  via event_id, and partitioned by year, month and day.
+domain: Agents
+owner: mahmoud.ali@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.id
+    description: Primary key of the agent metric event record.
+  id_event:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.event_id
+    description: Unique identifier of the event, used for idempotent deduplication.
+  uuid_person:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.person_uuid
+    description: UUID of the person (agent) this metric event belongs to.
+  id_user:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.user_id
+    description: Numeric user identifier associated with the agent.
+  dt_reference:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.reference_date
+    description: Reference date for which the metric value applies.
+  metric_name:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.metric_name
+    description: Name of the metric being recorded.
+  metric_value:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.metric_value
+    description: Numeric value of the metric.
+  ts_source_created:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.source_created_at
+    description: Timestamp when the metric was originally created in the source system.
+  ts_source_updated:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.source_updated_at
+    description: Timestamp of the last update to this metric in the source system.
+  revision:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.revision
+    description: Revision number of the metric value, used to order successive updates.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.created_at
+    description: Timestamp when this event record was persisted locally.
+  year:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.agent_metric_events.day
+    description: Partition day.

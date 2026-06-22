@@ -19,6 +19,7 @@ workflow:
   tables_customization:
     agency: {}
     agency_aud: {}
+    agent_metric_events: {}
     agent: {}
     agent_aud: {}
     earning_invalidations: {}
