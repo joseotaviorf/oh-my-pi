@@ -1,7 +1,7 @@
 ---
 database_name: datalake_jira_bugs
 table_name: comments
-description: Comments extracted from Jira Bugs project issues (normalized text)
+description: Comments extracted from Jira Bugs project issues (normalized text). Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by id_issue, id_comment, ts_updated, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -42,12 +42,12 @@ columns:
   year:
     lineage:
       - datalake_jira_clean.issues.fields.comment.comments.created
-    description: Comment creation year
+    description: Comment creation year Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
     lineage:
       - datalake_jira_clean.issues.fields.comment.comments.created
-    description: Comment creation month
+    description: Comment creation month Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
     lineage:
       - datalake_jira_clean.issues.fields.comment.comments.created
-    description: Comment creation day
+    description: Comment creation day Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.

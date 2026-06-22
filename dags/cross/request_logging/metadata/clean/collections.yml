@@ -1,6 +1,6 @@
 database_name: datalake_request_logging_clean
 table_name: collections
-description: Clean layer table for collections request logging. Each row
+description: Clean layer table for collections request logging. Each row. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by ts_request, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
   projects raw collections fields with stable id_* keys and ts_request derived
   from the raw timestamp column for merge and Z-order alignment with other
   request-logging cleans.

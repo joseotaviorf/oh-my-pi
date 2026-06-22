@@ -1,6 +1,6 @@
 database_name: datalake_request_logging_clean
 table_name: visits
-description: Clean-layer of visits domain from request logging.
+description: Clean-layer of visits domain from request logging. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by ts_request, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
   Each row is one request logging enriched from JSON in the raw visits table.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
@@ -34,10 +34,10 @@ columns:
       - datalake_request_logging_raw.visits.timestamp
     description: Timestamp when the request was recorded in the source system.
   year:
-    description: Calendar year when the request was loaded.
+    description: Calendar year when the request was loaded. Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
-    description: Calendar month when the request was loaded.
+    description: Calendar month when the request was loaded. Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
-    description: Calendar day when the request was loaded.
+    description: Calendar day when the request was loaded. Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   hour:
     description: Hour of day (0–23) when the request was loaded.

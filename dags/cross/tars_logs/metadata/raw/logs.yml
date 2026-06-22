@@ -1,6 +1,6 @@
 database_name: datalake_tars_raw
 table_name: logs
-description: Raw JSON log files downloaded from Google Drive for the TARS chatbot. One row per file with the full JSON content as a string.
+description: Raw JSON log files downloaded from Google Drive for the TARS chatbot. One row per file with the full JSON content as a string. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: Cross
 owner: william.angelo@quintoandar.com.br
 columns:
