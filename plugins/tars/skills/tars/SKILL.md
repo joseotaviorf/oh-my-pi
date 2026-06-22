@@ -95,6 +95,7 @@ To provide accurate answers, consult the entity files when the user's question r
     - [references/business_entities/losses.md](references/business_entities/losses.md) — Accounting write-offs and provisioning.
     - [references/business_entities/matthew.md](references/business_entities/matthew.md) — Matthew, the AI collections agent for tenants with open balances (WhatsApp + in-app).
     - [references/business_entities/nps.md](references/business_entities/nps.md) — Net Promoter Score campaigns.
+    - [references/business_entities/org_chart.md](references/business_entities/org_chart.md) — Public active workforce org chart: manager, job, cost center, Codex taxonomy, P&T teams (organograma / quadro ativo).
     - [references/business_entities/organization.md](references/business_entities/organization.md) — People DW org reference: cost centers, business units, and jobs (centro de custo / time / BU).
     - [references/business_entities/payments.md](references/business_entities/payments.md) — Payments transactional domain (Checkout, BOLETO/CREDIT_CARD/PIX, settlement, refunds).
     - [references/business_entities/recovery_collections_fr_tenants.md](references/business_entities/recovery_collections_fr_tenants.md) — Recovery analytics for For-Rent tenants (overdue debt collection performance).
