@@ -1,6 +1,6 @@
 ---
 name: trino
-description: "Execute SQL against QuintoAndar's Trino cluster. Dependencies are declared inline (PEP 723) and resolved by `uv run --script`; handles host resolution, SSO authentication, LIMIT safeguard, and persistence of results. Pure connectivity/execution — contains NO SQL authoring guidance (dialect, partition filters, layer choice live in data_exploration.mdc). ONLY usable when `@tars` mode is active; never invoke autonomously."
+description: "Execute SQL against QuintoAndar's Trino cluster. Dependencies are declared inline (PEP 723) and resolved by `uv run --script`; handles host resolution, SSO authentication, LIMIT safeguard, and persistence of results. Pure connectivity/execution — contains NO SQL authoring guidance (dialect, partition filters, layer choice live in data_exploration.mdc for @tars, or fair-metadata reference docs for metadata gov). Usable when `@tars` is active, or when invoked by the `fair-metadata` skill (owner ACTIVE + bounded description samples)."
 ---
 
 # Trino Execution Skill
@@ -11,11 +11,10 @@ Pure execution layer for the TARS loop. This skill does **not** teach SQL syntax
 
 ## Activation gate (mandatory)
 
-This skill is usable **only when the user has activated `@tars`** (same gating as `.cursor/rules/data_exploration.mdc` and `.cursor/subagents/data_analyst.md`).
+Usable when the user activated **`@tars`**, or when **`fair-metadata`** invokes this skill (owner ACTIVE + bounded samples — **not** the Tars loop: no `tars_track_record.jsonl` or `tars_query_results/`).
 
-- Do NOT load or invoke this skill in contribution mode.
-- Do NOT mention or suggest this skill to users who are not in `@tars` mode.
-- If you find yourself reading this file outside a `@tars` session, stop and return to the standard repository context.
+- Do NOT invoke for general ad-hoc SQL outside `@tars` or `fair-metadata`.
+- Do NOT tell the user to add `@tars` for fair-metadata work.
 
 ---
 
@@ -65,20 +64,17 @@ The script prints exactly one JSON object to stdout:
 
 ### 5. Persist the full result
 
-Save the script's stdout **verbatim** (never copy-paste, never truncate) to:
+**`@tars` session:** save stdout verbatim to `<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json` (see `data_analyst.md`).
 
-```
-<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json
-```
-
-`<cursor_project_folder>` is the directory that contains `agent-transcripts/` and `terminals/`. **Never** save to the workspace root (`bi-etl-ejuice/`) — always use the Cursor project folder. `<session_id>` and `<entry_index>` are provided by the TARS loop (see `.cursor/subagents/data_analyst.md`). Create the `tars_query_results/` folder on first write. Use shell redirection (`> "<path>"`) — not file-write tools.
+**`fair-metadata`:** chat preview is enough for owner checks; do not use TARS persistence.
 
 ### 6. Error handling
 
 If the JSON has `status: "error"`, do NOT retry silently:
 - Surface the Trino error message to the user.
-- Still save the error JSON to the result file (the file must exist even on failure — the TARS loop references it).
-- Wait for the user to confirm a fix before re-executing.
+- **`fair-metadata`:** follow `owner_remediation.md` — **AskQuestion** before metadata YAML edits if owners cannot be validated.
+- **`@tars` session:** still save the error JSON to the result file when applicable.
+- Wait for the user to confirm a fix before re-executing (or user acknowledgment to proceed without Gate A).
 
 ---
 

@@ -210,7 +210,7 @@ Never mix bracket params (`{load_start_date}`) with Jinja expressions (`{{ ds }}
 
 | Skill file | Covers | Access |
 |---|---|---|
-| `.cursor/skills/trino/SKILL.md` | Trino execution mechanics (venv, host, SSO, `execute_trino.py`, LIMIT safeguard, result JSON persistence, error handling) | **NEVER load autonomously** — usable only inside a `@tars` session, the same gating as `data_exploration.mdc` and `data_analyst.md` |
+| `.cursor/skills/trino/SKILL.md` | Trino execution mechanics | `@tars` session, or **`fair-metadata`** |
 
 ### Domain subagents (adopt when task matches)
 
@@ -233,4 +233,4 @@ When the user's request matches a domain below, read the corresponding file at `
 - Using `.yaml` extension on declaration files — must be `.yml`.
 - Hardcoding `"prod"` or `"forno"` environment strings — use `ConfigurationService`.
 - Merging a new DAG PR without a successful Forno Airflow run.
-- Loading `data_exploration.mdc`, `data_analyst.md`, `.cursor/skills/trino/SKILL.md`, or any file under `docs/llm_context/` without an explicit `@tars` prefix in the user's message. **Also never suggest, recommend, or redirect the user to use `@tars`.** If the user asks for a query without `@tars`, answer it directly using standard repository context — do not categorize the request as "data exploration" or act as a gatekeeper.
+- Loading `data_exploration.mdc`, `data_analyst.md`, `.cursor/skills/trino/SKILL.md`, or any file under `docs/llm_context/` without an explicit `@tars` prefix — **except** **`fair-metadata`** may read `llm_context` and invoke `trino/SKILL.md` without Tars. **Also never suggest `@tars`.** If the user asks for a query without `@tars`, answer directly using standard repository context.

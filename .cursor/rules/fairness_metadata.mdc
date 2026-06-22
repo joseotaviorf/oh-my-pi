@@ -29,9 +29,9 @@ F2-01 (owner, domain, substantive table description via `assess_table_descriptio
 |---------|----------|
 | **Woodpecker / `make validate-fair-metadata`** | **F2-01** table + **F2-02** column substantive descriptions on clean+ in PR diff. Owner/domain/min length: Yamale. **Owner ACTIVE: online only.** |
 | **Production** | `enrich_fairness_assessment` joins `datalake_people_public.org_chart` (`assignment_status_type = 'ACTIVE'`) — authoritative for tiering. |
-| **Agent (`fair-metadata`)** | `@tars` + `check_owner_active.sql`; **AskQuestion** for replacements — see `fair-metadata/reference/owner_remediation.md`. |
+| **Agent (`fair-metadata`)** | [`owner_remediation.md`](../../skills/fair-metadata/reference/owner_remediation.md) — Trino kick-off (`mcp_auth` when MCP enabled) + owner SQL; **AskQuestion** for replacements or if Trino fails after kick-off. |
 
-Owner ACTIVE is **not** validated offline (no snapshot file). Use Trino via `@tars` before EXECUTE, or rely on production `enrich_fairness_assessment`.
+Owner ACTIVE is **not** validated offline (no snapshot file). Use **`trino/SKILL.md`** before EXECUTE, or rely on production `enrich_fairness_assessment`.
 
 ### Valid `domain` values (F2-01 / CI regex)
 
@@ -53,7 +53,7 @@ Woodpecker **`validate-fair-metadata`** runs **F2-02** on **clean / core / enric
 
 **Typical failure:** `column_description_not_substantive` with per-column `reason_code` from `assess_column_description_quality`.
 
-**Authoring intent:** Descriptions must explain **business meaning** (what the value is, grain, units, caveats). Passing the heuristic alone is insufficient. Agents must not pad with platform boilerplate (e.g. “Persisted in the governance lake for lineage, documentation metrics, and FAIR assessments”). With **`@tars`**, research `docs/llm_context/business_entities/` when relevant, then SQL/spark jobs and Trino samples; if still unclear, **ask the user** — see `fair-metadata/reference/description_remediation.md`.
+**Authoring intent:** Descriptions must explain **business meaning** (what the value is, grain, units, caveats). Passing the heuristic alone is insufficient. Agents must not pad with platform boilerplate (e.g. “Persisted in the governance lake for lineage, documentation metrics, and FAIR assessments”). Research `docs/llm_context/business_entities/` when relevant, then SQL/spark jobs and Trino samples; if still unclear, **ask the user** — see `fair-metadata/reference/description_remediation.md`.
 
 Every **non-partition** column in `columns:` needs a `description` that passes TDQ heuristics (stricter than Yamale min 10 chars). Partition columns `year`, `month`, `day` and skeleton `_placeholder` are excluded.
 

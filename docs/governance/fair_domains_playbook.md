@@ -4,13 +4,13 @@ How **domains and product lines** **audit** and **fix** metadata in bi-etl-ejuic
 
 ## One rule
 
-**FAIR audit or remediation → start with `@tars`.** Same thread: after the first `@tars` message you can say `go ahead` without repeating it.
+**FAIR audit or remediation → skill `fair-metadata`** (Trino via `trino/SKILL.md`, not `@tars`).
 
 ## Three flows
 
 | Goal | What to do | Cursor mode |
 |------|------------|-------------|
-| **Audit** by domain or owner | `@tars Audit FAIR for domain {folder}` (e.g. `for_rent`, `governance`) — default scope: folder `dags/{folder}/`; YAML `domain:` field: see mapping table in `fair-metadata/reference/domain_disambiguation.md` | Agent or Ask |
+| **Audit** by domain or owner | `Audit FAIR for domain {folder}` (e.g. `for_rent`, `governance`) — default scope: folder `dags/{folder}/`; YAML `domain:` field: see mapping table in `fair-metadata/reference/domain_disambiguation.md` | Agent or Ask |
 | **Fix** after reviewing the plan | `go ahead` (same thread, after plan posted) | **Agent** |
 | **New table** in your PR | `create-metadata-files` + validators below | Any |
 
@@ -33,17 +33,19 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
 | When | What it checks |
 |------|----------------|
 | **Woodpecker on PR** | F2-01 table + F2-02 column substantive descriptions on clean+ metadata in the diff |
-| **Lake** (`fairness_assessment`) | Full tier + Platform checks; query via `@tars` |
+| **Lake** (`fairness_assessment`) | Full tier + Platform checks; query via `trino/SKILL.md` |
 
 Perfect metadata in a PR can still show tier &lt; 2 in the lake if Platform-owned checks fail — not a metadata-PR action.
 
 ## Owner ACTIVE — important
 
-**Green CI ≠ ACTIVE owner.** Woodpecker does not call `org_chart`. Before merge, verify with `@tars` + `fair-metadata/sql/check_owner_active.sql`.
+**Green CI ≠ ACTIVE owner.** Woodpecker does not call `org_chart`. Before merge, verify with `trino/SKILL.md` + `fair-metadata/sql/check_owner_active.sql`.
+
+On the **first FAIR audit turn**, follow **`fair-metadata/reference/owner_remediation.md`** (Trino kick-off): call **`mcp_auth`** when the Trino MCP plugin is enabled, before posting a plan with UNVERIFIED owners.
 
 ## CI failed on one file?
 
-Use **`fix-ci-failure`** (SQL/declaration only; no `@tars` required) or fix manually. Bulk remediation → **`fair-metadata`** with `@tars`.
+Use **`fix-ci-failure`** (SQL/declaration only) or fix manually. Bulk remediation → **`fair-metadata`**.
 
 ## References
 

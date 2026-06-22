@@ -26,7 +26,7 @@ make audit-fair-metadata-scope domain=<scope>
 
 Report Gate A (owners), Gate B (F2-01 table + F2-02 columns on clean+), Gate C (physical layout on all layers), and raw-layer summary (optional column docs — not blocking).
 
-### A2. Lake (`@tars`, supplementary)
+### A2. Lake (`trino/SKILL.md`, supplementary)
 
 `sql/list_tables_for_remediation.sql` + `checks_result_json` for production tier — does **not** replace A1.
 
@@ -34,7 +34,7 @@ Report Gate A (owners), Gate B (F2-01 table + F2-02 columns on clean+), Gate C (
 
 ## Phase B — Validate owners (Gate A — none skipped)
 
-Every distinct owner in the inventory — see [`owner_remediation.md`](owner_remediation.md).
+Every distinct owner in the inventory — see [`owner_remediation.md`](owner_remediation.md) (Trino kick-off with `mcp_auth` when MCP enabled). Missing owners → **AskQuestion in PLAN**, not deferred to EXECUTE.
 
 ---
 

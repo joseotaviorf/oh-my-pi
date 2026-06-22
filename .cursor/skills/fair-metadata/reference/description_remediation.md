@@ -51,12 +51,12 @@ If the only way to pass F2-01/F2-02 is filler → **stop**, research, or **ask t
 
 | Priority | Source | What to extract |
 |----------|--------|-----------------|
-| 1 | `docs/llm_context/business_entities/*.md` | Entity glossary (`@tars`) |
+| 1 | `docs/llm_context/business_entities/*.md` | Entity glossary |
 | 2 | `queries/{layer}/{table}.sql` | Grain, joins, selected fields |
 | 3 | `spark_jobs/*.py` | Raw ingest shape |
 | 4 | `*_declaration.yml` | Workflow intent |
 | 5 | Another layer (substantive only) | Do not copy weak text |
-| 6 | Trino samples (`@tars`) | Enums, null rate |
+| 6 | Trino samples (`trino/SKILL.md`) | Enums, null rate |
 
 For **Data Ops & Governance** (Superset, Jira, Metabase, …): SQL + product semantics; ask user when unclear.
 
@@ -66,12 +66,24 @@ For **Data Ops & Governance** (Superset, Jira, Metabase, …): SQL + product sem
 
 **Column `description`:** what the value represents, units/timezone, FK relationships, derivation when computed.
 
+## YAML shape (required for CI)
+
+`validate-fair-metadata` parses each changed metadata file **before** F2-01/F2-02. Invalid YAML fails with scanner errors (`could not find expected ':'`, `expected <block end>`).
+
+When editing table or column `description` (Gate B or Gate C append):
+
+1. Keep all prose **inside** the `description` scalar — use `description: |` (see `dags/growth/hightouch_logs/metadata/clean/sync_runs_trino.yml`) or an indented block under `description:`.
+2. **Never** add continuation lines at column 1 (e.g. partition text after the first `description:` line).
+3. Quote values that start with `[` or contain unescaped `'` / `:` mid-string, or use `|`.
+
+After EXECUTE edits, run `make validate-metadata-files-content` then `make validate-fair-metadata` on the branch.
+
 ## Workflow per table (max ~10 tables per PR in EXECUTE)
 
 1. Scope audit lists failing table (`F2-01`) and column (`F2-02`) entries with `reason_code`.
 2. Draft from research — table description first, then one column at a time.
 3. Re-run scope audit Gate B on user scope.
-4. CI: `make validate-fair-metadata` on branch (PR diff).
+4. CI: `make validate-metadata-files-content` then `make validate-fair-metadata` on branch (PR diff).
 
 ## Scope vs PR diff
 

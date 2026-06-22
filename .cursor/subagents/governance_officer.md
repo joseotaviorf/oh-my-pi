@@ -41,5 +41,5 @@ When a column declares `privacy.piiType`, use the catalog-derived `classificatio
 ## Skills to invoke
 
 - **`review-pr`**: before opening a PR — catches CI including metadata, FAIR, and PII
-- **`fair-metadata`**: requires **`@tars`**. PLAN first (`plan_gate.md`); EXECUTE only after user approves — then F2-01/F2-02 and lineage-consistency
+- **`fair-metadata`**: **`trino/SKILL.md`** + **`docs/llm_context/`**. PLAN first (`plan_gate.md`); EXECUTE only after user approves
 - **`impact-analysis`**: before renaming or removing any table or column that carries personal data

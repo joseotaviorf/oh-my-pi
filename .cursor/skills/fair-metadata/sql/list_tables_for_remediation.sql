@@ -2,7 +2,7 @@
 -- fairness_classification = filter/sort by human-readable class only.
 -- fairness_assessment (join on ts_assessed) = checks_result_json required to remediate.
 -- Do not use classification without checks_result_json.
--- Run via Trino (@tars). Adjust filters as needed.
+-- Run via trino/SKILL.md (fair-metadata).
 
 SELECT
     fc.database_name,

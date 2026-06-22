@@ -1,8 +1,9 @@
--- Most recent enrich_fairness_assessment RUN for one table (primary remediation input).
--- One row per FQN per run (partition year/month/day); ORDER BY ts_assessed DESC = latest execution.
--- Run via Trino (@tars). Zero rows → table never assessed; use pointual checks instead.
--- Point FQN lookup: ORDER BY ts_assessed DESC LIMIT 1 returns the latest run across
--- partitions; a fixed day window would miss tables assessed less frequently.
+-- Latest assessment row for one FQN (primary remediation input from enrich_fairness_assessment).
+-- Grain: one row per (database_name, table_name, year, month, day).
+-- Run via trino/SKILL.md (fair-metadata; optional).
+-- Zero rows → table never assessed; use pointual checks instead.
+-- Latest row = highest ts_assessed for this FQN across all partitions (no lake-wide or
+-- sliding partition window — those miss tables whose last run predates the global newest partition).
 
 SELECT
     database_name,

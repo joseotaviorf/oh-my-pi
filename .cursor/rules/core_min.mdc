@@ -21,11 +21,11 @@ Never hardcode `"prod"`, `"forno"`, S3 paths, secret keys, or DB connection stri
 
 ## TARS gating
 
-Loading `data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, or any file under `docs/llm_context/` requires an **explicit `@tars` prefix** in the user's message. NEVER suggest, recommend, or redirect the user to use `@tars`. Do not act as a gatekeeper for ad-hoc SQL questions — answer them directly with standard repo context.
+Loading `data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, `.cursor/skills/trino/SKILL.md`, or any file under `docs/llm_context/` requires an **explicit `@tars` prefix** — **except** **`fair-metadata`** and Authoring under **`fairness_metadata.mdc`** (auto-loaded on `**/metadata/**/*.yml`) may read `docs/llm_context/**` and invoke `trino/SKILL.md` without Tars. NEVER suggest `@tars`.
 
 ## Hard constraints
 
 - DAG declaration files: `.yml` extension only (never `.yaml`).
 - After editing a declaration: run `make create-dag-files` so the `_dag.py` is regenerated.
 - A successful Forno Airflow run is **mandatory** before merging any new DAG.
-- FAIR remediation: **`@tars` required** — skill `fair-metadata` (`fair-metadata/reference/plan_gate.md`): plan first, no metadata YAML edits until user approves execution; then `make validate-fair-metadata` (F2-01/F2-02); see `fairness_metadata.mdc`.
+- FAIR metadata: skill **`fair-metadata`** — `trino/SKILL.md` + `docs/llm_context/`; PLAN first (`plan_gate.md`); see `fairness_metadata.mdc`.

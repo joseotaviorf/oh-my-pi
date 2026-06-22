@@ -30,4 +30,4 @@ See **`fair_requirement_glossary.md`** for business names and fix guidance (F2-0
 
 ## Agents
 
-Skill: `.cursor/skills/fair-metadata/SKILL.md` — requires **`@tars`**, PLAN gate in `reference/plan_gate.md`.
+Skill: `.cursor/skills/fair-metadata/SKILL.md` — uses **`trino/SKILL.md`** (not `@tars`); PLAN gate in `reference/plan_gate.md`.

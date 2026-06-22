@@ -1,5 +1,5 @@
 -- Verify metadata owner is an ACTIVE employee (F2-01 owner_not_active_employee).
--- Run via Trino (@tars) before setting owner in metadata YAML.
+-- Run via trino/SKILL.md (fair-metadata).
 -- Replace :owner_email with the value from metadata ``owner`` (lowercase trim).
 
 SELECT

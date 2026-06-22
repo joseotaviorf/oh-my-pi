@@ -1,6 +1,6 @@
 ---
 name: fair-metadata
-description: "FAIR metadata audit and remediation by user scope (repo folder, YAML domain allowlist, owner, table). Disambiguate repo folder vs YAML domain: for any domain or product line. PLAN default — no metadata YAML edits until explicit execute approval. Read reference/plan_gate.md first."
+description: "FAIR metadata audit and remediation by user scope (repo folder, YAML domain allowlist, owner, table). Disambiguate repo folder vs YAML domain. PLAN default — no metadata YAML edits until explicit execute approval. Gate A Trino kick-off in reference/owner_remediation.md. Read reference/plan_gate.md first."
 ---
 
 # FAIR metadata
@@ -28,15 +28,15 @@ Resolve scope first → publish **closed inventory** (`N files`) → run **Gates
 
 ---
 
-## `@tars` — when required
+## Trino and context
 
-| Task | `@tars` required? |
-|------|------------------|
-| Scope inventory, Gate B (substantive descriptions) | No — local CLI + read declarations |
-| Gate A owner ACTIVE via `org_chart` / lake | Yes — Trino [`sql/check_owner_active.sql`](sql/check_owner_active.sql) |
-| Business semantics from lake samples / `llm_context` | Yes |
+| Task | How |
+|------|-----|
+| Scope inventory, Gate B (substantive descriptions) | `make audit-fair-metadata-scope` + read declarations |
+| Gate A owner ACTIVE | [`reference/owner_remediation.md`](reference/owner_remediation.md) — Trino kick-off (`mcp_auth` when MCP enabled) + owner SQL |
+| Business semantics | **`docs/llm_context/**`** + repo SQL; bounded Trino samples when unclear |
 
-Without `@tars`, run Gate B locally; mark Gate A owners **UNVERIFIED** until Trino confirms ACTIVE. Do **not** block the audit turn — proceed with the plan and flag owners pending verification.
+**Trino failure or UNVERIFIED owners:** only after kick-off in `owner_remediation.md` — **AskQuestion** to acknowledge risk and continue PLAN. That acknowledgment does **not** authorize EXECUTE.
 
 For CI-only red builds without FAIR scope work, use **`fix-ci-failure`**.
 
@@ -48,7 +48,7 @@ Run on **every file in the closed scope inventory** before the PLAN deliverable 
 
 | Gate | What | Tool |
 |------|------|------|
-| **A — Owners** | Every distinct `owner:` present; ACTIVE verified **online** before EXECUTE | `@tars` + `check_owner_active.sql` (Gate A offline lists MISSING / UNVERIFIED only) |
+| **A — Owners** | Every distinct `owner:` disposition recorded (ACTIVE via Trino, replacement, or UNVERIFIED in plan) | [`owner_remediation.md`](reference/owner_remediation.md) + owner SQL |
 | **B — Descriptions** | Substantive **table** (F2-01) + **column** (F2-02) descriptions on **clean / core / enrich / dw / metric** | `make audit-fair-metadata-scope domain=…` or `--audit --domain …` |
 | **C — Physical Layout** | Partition/z-order from declaration reflected in metadata descriptions (**all layers**) | Read `*_declaration.yml` + metadata — see **Gate C** below |
 | **Raw (optional)** | Column docs on raw encouraged, **not required** | Scope audit prints a raw summary only — never blocks |
@@ -75,7 +75,7 @@ For **each metadata file in scope** (any layer — raw, clean, core, enrich, dw,
 5. Otherwise, check that metadata **descriptions** mention those columns and advise filtering on them (partition pruning, z-order data skipping). Table `description` should summarize the layout when config exists.
 6. **Example:** `dags/growth/hightouch_logs/metadata/clean/sync_runs_trino.yml`.
 
-On EXECUTE: append layout guidance to existing column/table descriptions — do not replace business semantics. Do not invent columns not present in the declaration.
+On EXECUTE: append layout guidance to existing column/table descriptions — do not replace business semantics. Do not invent columns not present in the declaration. Follow **YAML shape** in [`reference/description_remediation.md`](reference/description_remediation.md) so `validate-fair-metadata` can parse the file (invalid YAML fails CI before F2 checks).
 
 ```bash
 # Example: full governance domain audit
@@ -90,7 +90,7 @@ uv run --project packages/bietlejuice-runtime python \
 make audit-fair-metadata-scope fqn=datalake_metabase_clean.metabase_table
 ```
 
-**Done criteria:** Gate A — no MISSING owners without user decision; ACTIVE verified via `@tars` before EXECUTE; Gate B — 0 F2-01/F2-02 description failures in clean+; Gate C — 0 tables with declaration layout config missing partition/z-order docs in metadata.
+**Done criteria:** Gate A disposition — no MISSING `owner:` without user decision; each owner ACTIVE (Trino), replaced via AskQuestion, or UNVERIFIED with PLAN acknowledgment **recorded in the remediation plan** (UNVERIFIED ≠ ACTIVE). Gate B — 0 F2-01/F2-02 description failures in clean+; Gate C — 0 tables with declaration layout config missing partition/z-order docs in metadata.
 
 ---
 
@@ -99,7 +99,7 @@ make audit-fair-metadata-scope fqn=datalake_metabase_clean.metabase_table
 | Phase | Trigger | Allowed | Forbidden |
 |-------|---------|---------|-----------|
 | **PLAN** (default) | audite / melhore FAIR / remediar domain or owner | Scope audit, Trino, read repo, AskQuestion, plan in chat | Edit `dags/**/metadata/**` |
-| **EXECUTE** | “pode executar”, “approved”, “go ahead”, “aplica o plano” | Edit approved paths; re-run gates + CI validators | Execute without completed PLAN checklist |
+| **EXECUTE** | “pode executar”, “approved”, “go ahead”, “aplica o plano”, “executa o plano” | Edit approved paths; re-run gates + CI validators | Execute without completed PLAN checklist |
 
 Ambiguous replies (“ok”, “continua”) → stay in PLAN.
 
@@ -112,12 +112,13 @@ Ambiguous replies (“ok”, “continua”) → stay in PLAN.
 1. **Disambiguate domain names** for **any** domain or product line request — [`reference/domain_disambiguation.md`](reference/domain_disambiguation.md) (repo folder vs YAML allowlist).
 2. **Scope:** [`reference/scoping.md`](reference/scoping.md) — match user intent exactly.
 3. **Inventory:** list all YAML paths; count `N files`; show in plan (include repo folder vs YAML `domain:` in the plan header).
-4. **Gates A/B/C:** run `make audit-fair-metadata-scope …` (or CLI `--audit` with scope flags); apply Gate C per subsection above on the inventory.
-5. **Lake (optional, `@tars`):** [`sql/list_tables_for_remediation.sql`](sql/list_tables_for_remediation.sql) for production `checks_result_json` — supplements local gates, does not replace them.
+4. **Gates B/C (offline):** run `make audit-fair-metadata-scope …` (or CLI `--audit` with scope flags); apply Gate C per subsection above on the inventory.
+5. **Gate A (online):** [`reference/owner_remediation.md`](reference/owner_remediation.md) — Trino kick-off + owner SQL.
+6. **Lake (optional):** [`sql/list_tables_for_remediation.sql`](sql/list_tables_for_remediation.sql) via `trino/SKILL.md` for production `checks_result_json` — supplements local gates, does not replace them.
 
 ### Step 1 — Owners
 
-[`reference/owner_remediation.md`](reference/owner_remediation.md). Every distinct owner in scope must be ACTIVE or **AskQuestion** for replacement. **None skipped.**
+[`reference/owner_remediation.md`](reference/owner_remediation.md). Every distinct owner must be ACTIVE, **AskQuestion** for replacement (missing / invalid / inactive), or UNVERIFIED only after kick-off failure. **None skipped.** Do **not** defer missing-owner decisions to EXECUTE batches.
 
 ### Step 2 — Post plan and stop
 
@@ -139,9 +140,9 @@ Prerequisites: [`reference/plan_gate.md`](reference/plan_gate.md) checklist (all
 
 ```bash
 make audit-fair-metadata-scope domain=<scope>
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-content
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
-CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-content
 ```
 
 4. Commit only if the user asks.
@@ -156,7 +157,7 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-conte
 | `reference/scoping.md` | Scope resolution |
 | `reference/domain_disambiguation.md` | Repo folder vs YAML `domain:` allowlist (all domains) |
 | `reference/remediation_plan.md` | Plan template |
-| `reference/owner_remediation.md` | Gate A |
+| `reference/owner_remediation.md` | Gate A — Trino kick-off + dispositions + AskQuestion |
 | `reference/description_remediation.md` | Gate B |
 | `reference/woodpecker_layer_gates.md` | Layer rules + CI |
 | `docs/governance/fair_domains_playbook.md` | Domains playbook entry point |
@@ -168,3 +169,6 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-conte
 - Document columns on `metadata/raw/` or restore `-pii`/`-confidential` tags there
 - Use governance-lake filler to pass F2-02
 - Guess owners or substitute without **AskQuestion**
+- Treat Trino/owner **AskQuestion** as execute approval — post the plan and wait for a separate explicit execute message
+- Mark owners UNVERIFIED without calling **`mcp_auth`** when Trino MCP is enabled
+- Defer missing-owner **AskQuestion** to EXECUTE — resolve in PLAN

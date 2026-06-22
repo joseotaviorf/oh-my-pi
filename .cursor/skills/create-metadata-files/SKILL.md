@@ -111,7 +111,7 @@ After the skeleton exists, run FAIR authoring checks on changed metadata (does *
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
 ```
 
-Fix F2-01/F2-02 per **`fairness_metadata.mdc`**. For **bulk FAIR remediation or domain audits**, use **`fair-metadata`** with **`@tars`** — PLAN gate mandatory (`.cursor/skills/fair-metadata/reference/plan_gate.md`): post plan and stop; no metadata edits until user approves execution. Creating a **new** table skeleton in this skill is allowed; rewriting many files for FAIR is not — that goes through the plan workflow.
+Fix F2-01/F2-02 per **`fairness_metadata.mdc`**. For **bulk FAIR remediation or domain audits**, use **`fair-metadata`** — PLAN gate mandatory (`.cursor/skills/fair-metadata/reference/plan_gate.md`): post plan and stop; no metadata edits until user approves execution. Creating a **new** table skeleton in this skill is allowed; rewriting many files for FAIR is not — that goes through the plan workflow.
 
 ### Step 4 — Run validate-lineage-consistency (metadata ↔ SQL, sqlglot)
 

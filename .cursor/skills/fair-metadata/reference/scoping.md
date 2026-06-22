@@ -50,7 +50,7 @@ find "dags/${DOMAIN}" -path '*/metadata/*/*.yml' | sort
 
 Read `database_name` + `table_name` from each YAML. Cross-check `dags/${DOMAIN}/**/*_declaration.yml`.
 
-### Lake (supplementary, `@tars`)
+### Lake (supplementary, `trino/SKILL.md`)
 
 [`sql/list_tables_for_remediation.sql`](../sql/list_tables_for_remediation.sql) — production `checks_result_json` for priority and Platform vs domain-remediable failures. **Does not replace** local Gates A/B/C on the full repo inventory.
 
@@ -72,13 +72,13 @@ Narrow to one domain when the user says so:
 rg -l '^owner:\s*<OWNER_EMAIL>\s*$' "dags/${DOMAIN}" --glob '**/metadata/*/*.yml'
 ```
 
-### Lake (`@tars`, supplementary)
+### Lake (`trino/SKILL.md`, supplementary)
 
 [`sql/list_tables_for_remediation.sql`](../sql/list_tables_for_remediation.sql) filtered by owner in `tables_documentation`, or the owner query in the previous version of this doc — for **`checks_result_json`** and `owner_not_active_employee`.
 
 ### Gate A
 
-Collect **every distinct** `owner:` from the inventory — verify **each** is ACTIVE with `check_owner_active.sql` via `@tars` before EXECUTE. **No owner skipped.**
+Collect **every distinct** `owner:` from the inventory — verify **each** is ACTIVE with `check_owner_active.sql` via **`trino/SKILL.md`** before EXECUTE. **No owner skipped.**
 
 ---
 
@@ -118,7 +118,7 @@ Woodpecker **validate-fair-metadata** runs on **changed files only**. A domain-w
 
 ## General rules
 
-1. **`checks_result_json`** (lake, `@tars`) is authoritative for **production tier** — local gates are authoritative for **repo state before merge**.
+1. **`checks_result_json`** (lake, via `trino/SKILL.md`) is authoritative for **production tier** — local gates are authoritative for **repo state before merge**.
 2. **Repo inventory** is authoritative for **where to edit**.
 3. Max **~10 tables per PR** for EXECUTE; prefer **clean → enrich → dw** over raw.
 4. Combine scope flags to **intersect** (e.g. `--domain governance --owner x@…`).
