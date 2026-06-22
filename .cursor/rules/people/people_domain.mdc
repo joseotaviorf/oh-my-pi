@@ -113,6 +113,71 @@ has_size_variation:
 
 **Stable reference tables** (e.g. `dim_job`, `dim_business_unit`): use `less_than_or_equal_to: 10` instead.
 
+### Ad-hoc SQL and pre-merge DQ validation — Databricks CLI (not Trino)
+
+**People lake tables are not available in Trino.** For triaging Inmetro alerts, validating `custom` constraints from `data_quality/**/*.yml`, or any ad-hoc query against People schemas (`datalake_people*`, `datalake_pin_*`, `dw_*` People domains), use the **Databricks CLI** against **production** — not the Trino skill.
+
+**Scope — does not override `@tars`:** `.cursor/rules/data_exploration.mdc` (Data Exploration / `@tars`) remains **Trino-only** for ad-hoc analyst queries. This section applies only to **People pipeline work** under `dags/people/` when the target tables are absent from Trino (DQ pre-merge checks, Inmetro triage, contributor validation). Do not use Databricks CLI for `@tars` sessions.
+
+#### Workspace and authentication
+
+`PROD` and `quintoandar_prod` below are **local Databricks CLI / Unity Catalog names** in `~/.databrickscfg` and the prod workspace — not pipeline environment strings. The **ConfigurationService** rule (never hardcode `"prod"` in DAG SQL or Spark jobs) does not apply to this operator runbook.
+
+| Item | Value |
+|------|--------|
+| **Workspace host** | `https://dbc-931ee6e0-6803.cloud.databricks.com` |
+| **Workspace ID** | `4531937035440038` |
+| **CLI profile** | `PROD` in `~/.databrickscfg` (`auth_type = databricks-cli`) |
+| **OAuth** | `https://dbc-931ee6e0-6803.cloud.databricks.com/oidc` |
+| **Unity Catalog (prod)** | `quintoandar_prod` — prefix SQL with `USE CATALOG quintoandar_prod;` |
+
+**Token env conflicts:** If `databricks` returns `more than one authorization method configured`, unset `DATABRICKS_TOKEN`, `DATABRICKS_HOST`, and `DATABRICKS_USERNAME` for the session:
+
+```bash
+env -u DATABRICKS_TOKEN -u DATABRICKS_HOST -u DATABRICKS_USERNAME databricks … -p PROD
+```
+
+#### People test clusters — use whichever is RUNNING
+
+Two all-purpose clusters are available for People ad-hoc work. **Pick the one in `RUNNING` state**; do not start a cluster unless the user explicitly asks.
+
+| Cluster name | Cluster ID | HTTP path (SQL) |
+|--------------|--------------|-----------------|
+| Tests - People Analytics | `0119-124615-zurgst68` | `sql/protocolv1/o/4531937035440038/0119-124615-zurgst68` |
+| Tests - AE @ People | `1107-173945-rr76o3kf` | `sql/protocolv1/o/4531937035440038/1107-173945-rr76o3kf` |
+
+List current state:
+
+```bash
+env -u DATABRICKS_TOKEN -u DATABRICKS_HOST -u DATABRICKS_USERNAME \
+  databricks clusters list -p PROD -o json \
+  | python3 -c "import json,sys; ids={'0119-124615-zurgst68','1107-173945-rr76o3kf'}; [print(c['cluster_id'], c['cluster_name'], c['state']) for c in json.load(sys.stdin) if c['cluster_id'] in ids]"
+```
+
+#### Run SQL via Commands API
+
+Use the cluster **ID** (not the HTTP path) with the Databricks REST API through the CLI:
+
+```bash
+CLUSTER_ID="<running-cluster-id>"   # e.g. 0119-124615-zurgst68
+PROFILE="PROD"
+DBX="env -u DATABRICKS_TOKEN -u DATABRICKS_HOST -u DATABRICKS_USERNAME databricks"
+
+# 1) Create SQL context
+CTX=$($DBX api post /api/1.2/contexts/create -p "$PROFILE" -o json \
+  --json "{\"clusterId\": \"$CLUSTER_ID\", \"language\": \"sql\"}" | python3 -c "import json,sys; print(json.load(sys.stdin)['id'])")
+
+# 2) Execute (always set catalog for People tables)
+CMD=$($DBX api post /api/1.2/commands/execute -p "$PROFILE" -o json \
+  --json "{\"clusterId\": \"$CLUSTER_ID\", \"contextId\": \"$CTX\", \"language\": \"sql\", \"command\": \"USE CATALOG quintoandar_prod; SELECT COUNT(*) FROM dw_compensation.dim_job\"}" \
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['id'])")
+
+# 3) Poll until status is Finished
+$DBX api get "/api/1.2/commands/status?clusterId=$CLUSTER_ID&contextId=$CTX&commandId=$CMD" -p "$PROFILE" -o json
+```
+
+For **Inmetro `custom` constraints**, run the inner `SELECT` from the YAML `constraint` block (expect `COUNT(*) = 0`). JDBC/ODBC clients can use the HTTP path from the table above with `AuthMech=3` and a personal access token — prefer the CLI workflow for agents.
+
 ---
 
 ## Git Workflow — Pull and Conflict Resolution
