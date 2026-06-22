@@ -26,13 +26,13 @@
 #       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
 #       depends_on push-datahub-business-context fails on pull_request)
 #   sync-tars-entities — sync_tars_entities.py (direct mode) for DataHub Context Documents
-#                         tagged tars-entity
+#                         tagged tars-entity (uses prod API key — same as push step)
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
 #
 # Secrets required (configure in Woodpecker repo settings):
-#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push step)
-#   datahub_api_key_prod     — prod DataHub PAT with editor role (push step)
+#   datahub_graphql_url_prod — prod DataHub GraphQL endpoint (push + sync-tars-entities)
+#   datahub_api_key_prod     — prod DataHub PAT with editor role (push + sync-tars-entities)
 #   datahub_graphql_url      — DataHub GraphQL endpoint (validate step)
 #   datahub_token            — DataHub PAT (validate step)
 #   github_token             — GitHub PAT with repo write access (gitops mode only)
@@ -136,9 +136,9 @@ steps:
     pull: true
     environment:
       DATAHUB_GRAPHQL_URL:
-        from_secret: datahub_graphql_url
+        from_secret: datahub_graphql_url_prod
       DATAHUB_TOKEN:
-        from_secret: datahub_token
+        from_secret: datahub_api_key_prod
       TARS_SYNC_MODE: direct
     commands:
       - uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct
