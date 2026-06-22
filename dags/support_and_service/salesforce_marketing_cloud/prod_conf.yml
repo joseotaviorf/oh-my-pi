@@ -5,8 +5,8 @@ datalake_bucket: "5a-datalake-prod"
 raw_schema: "datalake_sfmc_raw"
 clean_schema: "datalake_sfmc_clean"
 objects_config:
-  sonia_closing_sendable:
-    external_identifier: "D7673084-AAF7-4F9C-8E9B-A5BE7EA45E42"
+  sonia_closing:
+    external_identifier: "838C41AA-2280-4177-9498-81DAE4434AE8"
   sonia_ep2ds_v2:
     external_identifier: "D6CB733C-9191-45FE-A01E-F9FCB2C6F62C"
   sonia_ds2ca_resend:
