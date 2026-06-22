@@ -1134,6 +1134,15 @@ def _map_dbr_instance_to_emr(instance_type: str) -> str:
     return instance_type
 
 
+def _emr_instance_type(dbr_instance_type: str) -> str:
+    """Map DBR instance type to EMR, enforcing xlarge as the minimum size."""
+    mapped = _map_dbr_instance_to_emr(dbr_instance_type)
+    family, size = mapped.rsplit(".", 1)
+    if size == "large":
+        return f"{family}.xlarge"
+    return mapped
+
+
 def _emr_consolidation_preset_names():
     tiers = ("xs", "s", "m", "l", "xl")
     families = ("compute", "general", "memory")
@@ -1191,7 +1200,7 @@ class TestEmrConsolidationDbrParity:
         dbr_preset = service.get_config(_dbr_counterpart(emr_preset))
         emr = service.get_config(emr_preset)
 
-        expected_master = _map_dbr_instance_to_emr(dbr_preset["driver_node_type_id"])
+        expected_master = _emr_instance_type(dbr_preset["driver_node_type_id"])
         assert emr.get("master_node_type_id") == expected_master
 
         num_workers = dbr_preset["num_workers"]
@@ -1201,7 +1210,7 @@ class TestEmrConsolidationDbrParity:
             assert task_nodes is None or task_nodes.get("instance_count", 0) == 0
             return
 
-        expected_worker = _map_dbr_instance_to_emr(dbr_preset["node_type_id"])
+        expected_worker = _emr_instance_type(dbr_preset["node_type_id"])
         assert emr["core_nodes"]["node_type_id"] == expected_worker
         assert emr["core_nodes"]["instance_count"] == 1
         if num_workers == 2:

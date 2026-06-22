@@ -1,4 +1,2 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_cluster
-  custom_configurations:
-    driver_node_type_id: r7g.xlarge
+  type: emr_7_12_consolidation_s_memory_cluster

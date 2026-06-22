@@ -2377,9 +2377,9 @@ emr_7_12_min_master_2xlarge_6_workers_cluster:
 
 emr_7_12_consolidation_xs_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.large
+    master_node_type_id: c7g.xlarge
     core_nodes:
-        node_type_id: c7g.large
+        node_type_id: c7g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xs_compute, *emr_cluster_spark_conf_anchor]
@@ -2424,9 +2424,9 @@ emr_7_12_consolidation_xl_compute_cluster:
 
 emr_7_12_consolidation_xs_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.large
+    master_node_type_id: m7g.xlarge
     core_nodes:
-        node_type_id: m7g.large
+        node_type_id: m7g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xs_general, *emr_cluster_spark_conf_anchor]
@@ -2471,7 +2471,7 @@ emr_7_12_consolidation_xl_general_cluster:
 
 emr_7_12_consolidation_xs_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.large
+    master_node_type_id: m7g.xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2523,9 +2523,9 @@ emr_7_12_consolidation_xl_general_single_node_cluster:
 
 emr_7_12_consolidation_xs_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.large
+    master_node_type_id: r7g.xlarge
     core_nodes:
-        node_type_id: r7g.large
+        node_type_id: r7g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xs_memory, *emr_cluster_spark_conf_anchor]
@@ -2570,7 +2570,7 @@ emr_7_12_consolidation_xl_memory_cluster:
 
 emr_7_12_consolidation_xs_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.large
+    master_node_type_id: r7g.xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
