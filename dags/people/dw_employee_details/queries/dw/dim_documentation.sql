@@ -96,25 +96,31 @@ person_periods AS (
 person_numbers AS (
     SELECT
         ap.id_person,
-        ap.person_number
-    FROM
-        datalake_pin_core_clean.all_people AS ap
-    INNER JOIN
-        valid_employees AS emp
-            ON ap.id_person = emp.id_person
-    QUALIFY
+        ap.person_number,
         ROW_NUMBER() OVER (
             PARTITION BY
                 ap.id_person
             ORDER BY
                 ap.dt_effective_started DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.all_people AS ap
+    INNER JOIN
+        valid_employees AS emp
+            ON ap.id_person = emp.id_person
 ),
 legal_names AS (
     SELECT
         pr.id_person,
         pr.dt_valid_from,
-        pn.documented_full_name AS legal_name
+        pn.documented_full_name AS legal_name,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                pr.id_person,
+                pr.dt_valid_from
+            ORDER BY
+                pn.dt_effective_started DESC
+        ) AS rn
     FROM
         person_periods AS pr
     INNER JOIN
@@ -126,14 +132,6 @@ legal_names AS (
                 pn.dt_effective_ended >= pr.dt_valid_from
                 OR pn.dt_effective_ended IS NULL
             )
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                pr.id_person,
-                pr.dt_valid_from
-            ORDER BY
-                pn.dt_effective_started DESC
-        ) = 1
 ),
 legislative_info AS (
     SELECT
@@ -144,7 +142,14 @@ legislative_info AS (
         pl.ctps_series,
         pl.vote_registration_number AS electoral_registration_number,
         pl.electoral_zone,
-        pl.polling_station AS electoral_polling_station
+        pl.polling_station AS electoral_polling_station,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                pr.id_person,
+                pr.dt_valid_from
+            ORDER BY
+                pl.dt_effective_started DESC
+        ) AS rn
     FROM
         person_periods AS pr
     INNER JOIN
@@ -156,14 +161,6 @@ legislative_info AS (
                 pl.dt_effective_ended >= pr.dt_valid_from
                 OR pl.dt_effective_ended IS NULL
             )
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                pr.id_person,
-                pr.dt_valid_from
-            ORDER BY
-                pl.dt_effective_started DESC
-        ) = 1
 ),
 national_ids AS (
     SELECT
@@ -172,16 +169,7 @@ national_ids AS (
         ni.national_identifier_type,
         ni.national_identifier_number,
         ni.issuing_state,
-        ni.issuing_authority
-    FROM
-        person_periods AS pr
-    INNER JOIN
-        datalake_pin_core_clean.national_identifiers AS ni
-            ON pr.id_person = ni.id_person
-            AND ni.legislation_code = 'BR'
-            AND ni.ts_updated <= pr.dt_valid_from
-            AND ni.national_identifier_type IN ('CPF', 'RG', 'PIS')
-    QUALIFY
+        ni.issuing_authority,
         ROW_NUMBER() OVER (
             PARTITION BY
                 pr.id_person,
@@ -189,7 +177,15 @@ national_ids AS (
                 ni.national_identifier_type
             ORDER BY
                 ni.ts_updated DESC
-        ) = 1
+        ) AS rn
+    FROM
+        person_periods AS pr
+    INNER JOIN
+        datalake_pin_core_clean.national_identifiers AS ni
+            ON pr.id_person = ni.id_person
+            AND ni.legislation_code = 'BR'
+            AND DATE(ni.ts_updated) <= pr.dt_valid_from
+            AND ni.national_identifier_type IN ('CPF', 'RG', 'PIS')
 ),
 birth_info AS (
     SELECT
@@ -199,21 +195,20 @@ birth_info AS (
         p.father_name,
         p.town_of_birth AS birth_town,
         p.region_of_birth AS birth_state,
-        p.country_of_birth AS birth_country
-    FROM
-        person_periods AS pr
-    LEFT JOIN
-        datalake_pin_core_clean.person AS p
-        ON pr.id_person = p.id_person
-        AND DATE(p.ts_updated) <= pr.dt_valid_from
-    QUALIFY
+        p.country_of_birth AS birth_country,
         ROW_NUMBER() OVER (
             PARTITION BY
                 pr.id_person,
                 pr.dt_valid_from
             ORDER BY
                 p.ts_updated DESC
-        ) = 1
+        ) AS rn
+    FROM
+        person_periods AS pr
+    LEFT JOIN
+        datalake_pin_core_clean.person AS p
+        ON pr.id_person = p.id_person
+        AND DATE(p.ts_updated) <= pr.dt_valid_from
 ),
 daily_snapshot AS (
     SELECT
@@ -243,18 +238,22 @@ daily_snapshot AS (
     LEFT JOIN
         person_numbers AS pn
             ON pr.id_person = pn.id_person
+            AND pn.rn = 1
     LEFT JOIN
         legal_names AS ln
             ON pr.id_person = ln.id_person
             AND pr.dt_valid_from = ln.dt_valid_from
+            AND ln.rn = 1
     LEFT JOIN
         birth_info AS bi
             ON pr.id_person = bi.id_person
             AND pr.dt_valid_from = bi.dt_valid_from
+            AND bi.rn = 1
     LEFT JOIN
         legislative_info AS li
             ON pr.id_person = li.id_person
             AND pr.dt_valid_from = li.dt_valid_from
+            AND li.rn = 1
     LEFT JOIN
         datalake_pin_core_clean.foundation_lookup_value AS flv
             ON li.marital_status = flv.lookup_code
@@ -265,16 +264,19 @@ daily_snapshot AS (
             ON pr.id_person = cpf.id_person
             AND pr.dt_valid_from = cpf.dt_valid_from
             AND cpf.national_identifier_type = 'CPF'
+            AND cpf.rn = 1
     LEFT JOIN
         national_ids AS rg
             ON pr.id_person = rg.id_person
             AND pr.dt_valid_from = rg.dt_valid_from
             AND rg.national_identifier_type = 'RG'
+            AND rg.rn = 1
     LEFT JOIN
         national_ids AS pis
             ON pr.id_person = pis.id_person
             AND pr.dt_valid_from = pis.dt_valid_from
             AND pis.national_identifier_type = 'PIS'
+            AND pis.rn = 1
 ),
 snapshot_with_changes AS (
     SELECT
