@@ -4363,6 +4363,8 @@ bietlejuice.enrich_visit:
   - bietlejuice.insider:load-clean-review-feature:first-run-of-day
   - bietlejuice.insider:load-clean-review:first-run-of-day
   - bietlejuice.request_logging:load-clean-visits:first-run-of-day
+bietlejuice.enrich_visit_ia:
+  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
 bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-contact:first-run-of-day
   - bietlejuice.wololo:load-clean-prospect-aud:first-run-of-day

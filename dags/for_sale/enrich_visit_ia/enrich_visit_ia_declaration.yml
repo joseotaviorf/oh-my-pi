@@ -1,0 +1,17 @@
+dag:
+  name: enrich_visit_ia
+  owner: Data ForSale
+  schedule_start_date: 2026, 6, 22
+  documentation:
+    dag_purpose: |
+      Enriched Visit models scoped to conversational AI channels (Wall-E, Concierge, Sonia,
+      Isaias and unified CONVERSATIONAL flows).
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  tables_customization:
+    visit_observations:
+      partitions: [year, month, day]
+      z_order_by: [ts_started]
+      merge_on: [id_observation]
