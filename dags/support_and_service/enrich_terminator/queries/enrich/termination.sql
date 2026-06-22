@@ -14,22 +14,32 @@ expanded_entries AS (
         from_json(entries, 'array<string>')
     ) AS entry
 ),
-first_td AS (
-    SELECT DISTINCT
+first_td_ranked AS (
+    SELECT
         id AS id_termination,
-        TO_DATE(GET_JSON_OBJECT(entry, '$.fromVacancyDate'), 'yyyy-MM-dd') AS original_dt_termination
+        TO_DATE(GET_JSON_OBJECT(entry, '$.fromVacancyDate'), 'yyyy-MM-dd') AS original_dt_termination,
+        ROW_NUMBER() OVER (
+            PARTITION BY id
+            ORDER BY to_timestamp(get_json_object(entry, '$.rescheduledAt'), 'dd/MM/yyyy HH:mm:ss') ASC
+        ) AS rn
     FROM
         expanded_entries
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY id 
-        ORDER BY to_timestamp(get_json_object(entry, '$.rescheduledAt'), 'dd/MM/yyyy HH:mm:ss') ASC
-    ) = 1
 ),
-last_inspection_synch AS(
+first_td AS (
+    SELECT DISTINCT
+        id_termination,
+        original_dt_termination
+    FROM
+        first_td_ranked
+    WHERE
+        rn = 1
+),
+last_inspection_synch_ranked AS (
     SELECT
         t.id,
         ib.id_external AS id_exit_inspection,
-        DATE(ib.ts_inspected) AS dt_last_inspection_synch
+        DATE(ib.ts_inspected) AS dt_last_inspection_synch,
+        ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY ib.ts_inspected DESC) AS rn
     FROM
         datalake_terminator_clean.termination AS t
     JOIN
@@ -39,17 +49,25 @@ last_inspection_synch AS(
         ib.ts_inspected IS NOT NULL
         AND ib.inspection_type = 'offboarding'
         AND ib.status <> 'cancelled'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY ib.ts_inspected DESC) = 1
 ),
-last_negotiation AS (
-    SELECT 
+last_inspection_synch AS (
+    SELECT
+        id,
+        id_exit_inspection,
+        dt_last_inspection_synch
+    FROM
+        last_inspection_synch_ranked
+    WHERE
+        rn = 1
+),
+last_negotiation_ranked AS (
+    SELECT
         tf.id_termination,
         tfn.discount_percentage AS fee_discount_percentage,
         tfn.discount_value AS fee_discount_value,
         COALESCE(tfn.final_amount, tf.tenant_amount) AS fee_final_amount,
-        tf.tenant_payment_method:['installments'] AS fee_number_of_installments,
-        tf.tenant_payment_method:['paymentOption'] AS fee_payment_option,
+        GET_JSON_OBJECT(tf.tenant_payment_method, '$.installments') AS fee_number_of_installments,
+        GET_JSON_OBJECT(tf.tenant_payment_method, '$.paymentOption') AS fee_payment_option,
         tfn.status AS fee_negotiation_status,
         CASE
             WHEN COALESCE(tfn.final_amount, tf.tenant_amount) > 0 THEN TRUE
@@ -57,15 +75,32 @@ last_negotiation AS (
         END AS has_early_termination_fee,
         tf.is_fee_prior_notice,
         tfn.ts_created AS ts_fee_negotiation_created,
-        tfn.ts_updated AS ts_fee_negotiation_updated
+        tfn.ts_updated AS ts_fee_negotiation_updated,
+        ROW_NUMBER() OVER (PARTITION BY tf.id_termination ORDER BY tfn.ts_updated DESC) AS rn
     FROM
         datalake_terminator_clean.termination_fee AS tf
     LEFT JOIN
         datalake_terminator_clean.termination_fee_negotiation AS tfn
             ON tf.id = tfn.id_termination_fee
               AND tfn.status = 'CONFIRMED'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY tf.id_termination ORDER BY tfn.ts_updated DESC) = 1
+),
+last_negotiation AS (
+    SELECT
+        id_termination,
+        fee_discount_percentage,
+        fee_discount_value,
+        fee_final_amount,
+        fee_number_of_installments,
+        fee_payment_option,
+        fee_negotiation_status,
+        has_early_termination_fee,
+        is_fee_prior_notice,
+        ts_fee_negotiation_created,
+        ts_fee_negotiation_updated
+    FROM
+        last_negotiation_ranked
+    WHERE
+        rn = 1
 ),
 contract_info AS (
     SELECT
@@ -151,6 +186,23 @@ repair_metrics AS (
             AND rr.is_exempted_by_owner IS NOT TRUE
             AND rr.exempted_on_ar = FALSE
         ) AS total_tentant_repair_review,
+        SUM(CASE  
+            WHEN NOT (rr.has_automatically_identified IS TRUE AND rr.has_automatic_identification_accepted IS FALSE)
+                AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
+                AND rr.is_exempted_by_owner IS NOT TRUE
+                AND rr.exempted_on_ar = FALSE
+            THEN rr.ar_cost 
+            ELSE 0 END
+        ) AS total_tenant_repair_review_cost,
+        SUM(CASE  
+            WHEN NOT (rr.has_automatically_identified IS TRUE AND rr.has_automatic_identification_accepted IS FALSE)
+                AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
+                AND rr.is_exempted_by_owner IS NOT TRUE
+                AND rr.exempted_on_ar = FALSE
+                AND rr.total_tenant_contestation > 0
+            THEN rr.ar_cost
+            ELSE 0 END
+        ) AS total_tenant_repair_review_contestation_cost,
         COUNT_IF(rr.total_tenant_contestation <> 0) AS total_tenant_contestation,
         COUNT_IF(rr.is_finished AND rr.is_exempted) AS repairs_exempted_ac,
         COUNT_IF(rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner IS NOT TRUE) AS repairs_absorbed_ac,
@@ -174,21 +226,31 @@ repair_metrics AS (
     GROUP BY 
         rr.id_contract
 ),
-early_info AS (
+early_info_ranked AS (
     SELECT
         ib.id_contract,
         ib.has_early_mediation,
-        b.is_early_both_agree
-    FROM 
+        b.is_early_both_agree,
+        ROW_NUMBER() OVER (PARTITION BY ib.id_contract ORDER BY ib.ts_updated DESC) AS rn
+    FROM
         datalake_inspections.inspection_booking AS ib
-    LEFT JOIN 
+    LEFT JOIN
         datalake_inspection_services_clean.budget AS b
             ON ib.id_inspection = b.id_inspection
-    WHERE 
-      ib.inspection_type = 'offboarding'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ib.id_contract ORDER BY ib.ts_updated DESC) = 1
-)
+    WHERE
+        ib.inspection_type = 'offboarding'
+),
+early_info AS (
+    SELECT
+        id_contract,
+        has_early_mediation,
+        is_early_both_agree
+    FROM
+        early_info_ranked
+    WHERE
+        rn = 1
+),
+termination_ranked AS (
 SELECT
     t.id AS id_termination,
     t.id_contract,
@@ -259,6 +321,8 @@ SELECT
     rm.total_tentant_repair_ar,
     rm.repairs_exempted_by_owner_review,
     rm.total_tentant_repair_review,
+    rm.total_tenant_repair_review_cost,
+    rm.total_tenant_repair_review_contestation_cost,
     rm.total_tenant_contestation,
     rm.repairs_exempted_ac,
     rm.repairs_absorbed_ac,
@@ -280,7 +344,8 @@ SELECT
     cdr.ts_declined,
     YEAR(t.ts_updated) AS year,
     MONTH(t.ts_updated) AS month,
-    DAY(t.ts_updated) AS day
+    DAY(t.ts_updated) AS day,
+    ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY t.ts_updated DESC) AS rn
 FROM
     datalake_terminator_clean.termination AS t
 LEFT JOIN
@@ -335,5 +400,89 @@ LEFT JOIN
         ON t.id_contract = ei.id_contract 
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY t.ts_updated DESC) = 1
+)
+SELECT
+    id_termination,
+    id_contract,
+    id_exit_inspection,
+    id_house,
+    id_house_listing,
+    id_region,
+    id_workflow_assignee,
+    id_zendesk_task,
+    team,
+    cancellation_info,
+    category,
+    requested_by,
+    source,
+    status,
+    feedback,
+    reason,
+    rescheduling_history,
+    workflow_current_step,
+    fee_negotiation_status,
+    fee_payment_option,
+    checklist_item,
+    decline_person,
+    task_type,
+    responsible_off_manager_email,
+    repair_resolution,
+    is_spoc,
+    is_spoc_eligible,
+    is_spoc_control_group,
+    is_relisting,
+    has_automatically_closed_task,
+    is_contract_b2b,
+    is_before_contract_start,
+    has_been_rescheduled,
+    is_checklist_active,
+    is_checklist_done,
+    is_relisting_enabled,
+    is_early_relisting_enabled,
+    is_exit_inspection_opt_out,
+    has_early_termination_fee,
+    is_fee_prior_notice,
+    has_repair_by_tenant_needed,
+    has_automatic_repair_analysis,
+    is_automatic_repair_analysis_opted_out,
+    has_landlord_comment,
+    has_bandaid,
+    has_repairs,
+    leadtime_request_to_vacancy,
+    fee_discount_percentage,
+    fee_discount_value,
+    fee_final_amount,
+    fee_number_of_installments,
+    total_repairs_requested,
+    repairs_added_by_5a_review,
+    repairs_added_by_owner_review,
+    total_unset_repairs,
+    repairs_exempted_in_ar,
+    total_tentant_repair_ar,
+    repairs_exempted_by_owner_review,
+    total_tentant_repair_review,
+    total_tenant_repair_review_cost,
+    total_tenant_repair_review_contestation_cost,
+    total_tenant_contestation,
+    repairs_exempted_ac,
+    repairs_absorbed_ac,
+    total_tentant_repair_ac,
+    repair_cost,
+    spoc_wave,
+    dt_termination,
+    dt_original_termination,
+    dt_last_rescheduled,
+    ts_termination_request,
+    ts_termination_updated,
+    ts_termination_canceled,
+    ts_termination_finished,
+    ts_fee_negotiation_created,
+    ts_fee_negotiation_updated,
+    ts_declined,
+    year,
+    month,
+    day
+FROM
+    termination_ranked
+WHERE
+    rn = 1

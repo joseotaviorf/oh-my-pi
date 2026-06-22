@@ -77,6 +77,23 @@ columns:
     lineage:
       - datalake_inspection_services_clean.repair_request.cost
     description: Most recent repair cost in BRL for the repair request.
+  ar_cost:
+    lineage:
+      - datalake_inspection_services_clean.repair_request_history.cost
+      - datalake_inspection_services_clean.repair_request_history.origin
+    description:
+      Repair cost in BRL as set at the Repair Analysis (AR) stage, before any
+      negotiation. Aggregated as MAX(cost) from repair_request_history rows with
+      origin REPAIR_ANALYSIS; null when no AR-stage pricing exists for the repair.
+  ar_cost_source:
+    lineage:
+      - datalake_inspection_services_clean.repair_request_history.cost_source
+      - datalake_inspection_services_clean.repair_request_history.origin
+    description: |
+      Origin of the AR-stage pricing: MANUAL (set by the OPS team) or AUTOMATIC
+      (set by InspectionsService). Null when no AR-stage cost was recorded.
+      Aggregated as MAX(cost_source) from repair_request_history rows with
+      origin REPAIR_ANALYSIS.
   repair_type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type

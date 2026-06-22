@@ -20,7 +20,35 @@ repair_request_media AS (
     WHERE
         origin = "repair_request"
     GROUP BY 1
-)
+),
+ar_ranked AS (
+    SELECT
+        id_repair_request,
+        cost AS ar_cost,
+        cost_source AS ar_cost_source,
+        ts_updated AS ts_ar_cost,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_repair_request
+            ORDER BY ts_updated DESC                            
+        ) AS rn
+    FROM
+        datalake_inspection_services_clean.repair_request_history
+    WHERE
+        origin = 'REPAIR_ANALYSIS'
+        AND cost IS NOT NULL
+),
+ar_stage AS (
+    SELECT
+        id_repair_request,
+        ar_cost,
+        ar_cost_source,
+        ts_ar_cost
+    FROM    
+        ar_ranked
+    WHERE
+        rn = 1
+),
+repair_request_ranked AS (
 SELECT
     rr.id_repair_request,
     ins.id_inspection,
@@ -40,6 +68,8 @@ SELECT
     ig.name AS item_name,
     ro.room_name,
     rr.cost,
+    ars.ar_cost,
+    ars.ar_cost_source,
     rr.repair_service,
     rr.comment,
     rrm.total_media,
@@ -74,7 +104,8 @@ SELECT
     rr.ts_granted,
     rr.year,
     rr.month,
-    rr.day
+    rr.day,
+    ROW_NUMBER() OVER (PARTITION BY rr.id_repair_request ORDER BY rr.ts_updated DESC, c.id_contestation DESC) AS rn
 FROM
     datalake_inspection_services_clean.repair_request AS rr
 LEFT JOIN
@@ -104,5 +135,55 @@ LEFT JOIN
 LEFT JOIN
     repair_request_media AS rrm
       ON rr.id_repair_request = rrm.id_repair_request
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY rr.id_repair_request ORDER BY rr.ts_updated DESC) = 1
+LEFT JOIN
+    ar_stage AS ars
+      ON ars.id_repair_request = rr.id_repair_request
+)
+SELECT
+    id_repair_request,
+    id_inspection,
+    id_contract,
+    id_contestation,
+    id_item_group,
+    id_room,
+    id_assessment,
+    id_requester,
+    id_granted_by,
+    id_contestation_requester,
+    requester_type,
+    granted_type,
+    responsibility,
+    repair_type,
+    type,
+    item_name,
+    room_name,
+    cost,
+    ar_cost,
+    ar_cost_source,
+    repair_service,
+    comment,
+    total_media,
+    total_tenant_contestation,
+    total_tenant_budget_approval_contestation,
+    total_owner_budget_approval_contestation,
+    has_automatically_identified,
+    has_automatic_identification_accepted,
+    is_cost_absorbed_by_company,
+    is_cost_absorbed_by_tenant,
+    is_cost_absorbed_by_owner,
+    is_finished,
+    is_exempted,
+    is_exempted_by_owner_from_budget,
+    is_requested_by_owner,
+    is_exempted_by_owner,
+    exempted_on_ar,
+    ts_created,
+    ts_updated,
+    ts_granted,
+    year,
+    month,
+    day
+FROM
+    repair_request_ranked
+WHERE
+    rn = 1

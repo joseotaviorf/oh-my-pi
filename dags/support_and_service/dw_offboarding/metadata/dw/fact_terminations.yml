@@ -111,6 +111,22 @@ columns:
     description: Total repairs under tenant's responsibility under review. Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
     lineage:
       - datalake_terminator.termination.total_tentant_repair_review
+  total_tenant_repair_review_cost:
+    description:
+      Total repair cost in BRL for repairs under tenant's responsibility in the
+      review stage, using the AR-stage pricing before any negotiation. Mirrors the
+      same population as total_tentant_repair_review; repairs without AR-stage
+      pricing contribute 0 to the sum.
+    lineage:
+      - datalake_terminator.termination.total_tenant_repair_review_cost
+  total_tenant_repair_review_contestation_cost:
+    description:
+      Total repair cost in BRL for repairs under tenant's responsibility in the
+      review stage that were also contested by the tenant, using the AR-stage
+      pricing before any negotiation. Subset of total_tenant_repair_review_cost
+      restricted to repairs with at least one tenant contestation.
+    lineage:
+      - datalake_terminator.termination.total_tenant_repair_review_contestation_cost
   total_tenant_contestation:
     description: Total repairs that had tenant contestation.
     lineage:

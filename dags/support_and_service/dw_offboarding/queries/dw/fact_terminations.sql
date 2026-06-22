@@ -1,13 +1,23 @@
-WITH spoc_contracts AS (
+WITH spoc_contracts_ranked AS (
+    SELECT
+        id_contract,
+        id_termination,
+        id_worker_twilio,
+        id_analyst,
+        ROW_NUMBER() OVER (PARTITION BY id_contract, id_termination ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_hefesto.spoc_offboarding_contracts
+),
+spoc_contracts AS (
     SELECT
         id_contract,
         id_termination,
         id_worker_twilio,
         id_analyst
     FROM
-        datalake_hefesto.spoc_offboarding_contracts
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_contract, id_termination ORDER BY ts_updated DESC) = 1
+        spoc_contracts_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     t.id_termination AS sk_termination,
@@ -36,6 +46,8 @@ SELECT
     t.total_tentant_repair_ar,
     t.repairs_exempted_by_owner_review,
     t.total_tentant_repair_review,
+    t.total_tenant_repair_review_cost,
+    t.total_tenant_repair_review_contestation_cost,
     t.total_tenant_contestation,
     t.repairs_exempted_ac,
     t.repairs_absorbed_ac,

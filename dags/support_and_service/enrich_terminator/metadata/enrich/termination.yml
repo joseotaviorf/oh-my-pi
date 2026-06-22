@@ -69,7 +69,11 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.feedback
   reason:
-    description: Reason of the termination.
+    description: |
+      Primary reason for the termination as extracted from the feedback JSON field
+      (datalake_terminator_clean.termination.feedback). Populated when the tenant
+      or owner provides a reason during the offboarding flow; null when no reason
+      was recorded.
     lineage:
       - datalake_terminator_clean.termination.feedback
   rescheduling_history:
@@ -77,11 +81,20 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.rescheduling_history
   workflow_current_step:
-    description: Termination workflow step.
+    description: |
+      Current step in the termination workflow at load time (e.g. PENDING,
+      REPAIR_ANALYSIS, CONTESTATION_ANALYSIS, FINISHED). Sourced from
+      datalake_terminator_clean.termination_workflow.current_step; represents
+      the last recorded step for the termination at the moment the pipeline ran.
     lineage:
       - datalake_terminator_clean.termination_workflow.current_step
   fee_negotiation_status:
-    description: Termination fee negotiation status.
+    description: |
+      Status of the early termination fee negotiation at load time (e.g. CONFIRMED,
+      PENDING, CANCELED). CONFIRMED indicates the negotiated amount is settled and
+      used as the final fee value; other statuses indicate the negotiation is still
+      in progress or was not finalized. Null when no fee negotiation exists for
+      the termination.
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.status
   fee_payment_option:
@@ -265,6 +278,32 @@ columns:
       - datalake_inspections.repair_request.responsibility
       - datalake_inspections.repair_request.is_exempted_by_owner
       - datalake_inspections.repair_request.exempted_on_ar
+  total_tenant_repair_review_cost:
+    description:
+      Total repair cost in BRL for repairs counted in total_tentant_repair_review,
+      using the AR-stage pricing (ar_cost) before any negotiation. Repairs without
+      AR-stage pricing contribute 0 to the sum.
+    lineage:
+      - datalake_inspections.repair_request.ar_cost
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+      - datalake_inspections.repair_request.exempted_on_ar
+  total_tenant_repair_review_contestation_cost:
+    description:
+      Total repair cost in BRL for repairs counted in total_tentant_repair_review
+      that were contested by the tenant in the review stage (total_tenant_contestation
+      greater than zero), using the AR-stage pricing (ar_cost). Repairs without
+      AR-stage pricing or without a tenant contestation contribute 0 to the sum.
+    lineage:
+      - datalake_inspections.repair_request.ar_cost
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+      - datalake_inspections.repair_request.exempted_on_ar
+      - datalake_inspections.repair_request.total_tenant_contestation
   total_tenant_contestation:
     description: Total repairs that had tenant contestation (total_tenant_contestation <> 0).
     lineage:
