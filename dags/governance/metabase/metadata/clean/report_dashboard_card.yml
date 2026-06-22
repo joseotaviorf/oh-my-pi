@@ -1,66 +1,71 @@
 database_name: datalake_metabase_clean
 table_name: report_dashboard_card
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about report cards that are part of dashboards in Metabase
+description: >
+  Clean-layer snapshot of question cards placed on Metabase dashboards, replicated from the
+  Metabase PostgreSQL report_dashboardcard table via CDC (metabase DAG, ingest at 05:00, 08:00,
+  and 12:00 UTC). Grain is one row per card placement on a dashboard per load date. Partitioned
+  by year, month, day — filter on ingestion date. Supports governance analytics on dashboard
+  composition and visualization layout.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.id
-    description: Unique Id table
+    description: Primary key from Metabase report_dashboardcard identifying a distinct card placement on a dashboard grid.
   id_card:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.card_id
-    description: Identifier of the card that the report dashboard card belongs to
+    description: Foreign key to report_card.id for the saved question rendered in this dashboard tile.
   id_dashboard:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.dashboard_id
-    description: Dashboard id
+    description: Foreign key to report_dashboard.id for the dashboard that contains this card placement.
   id_entity:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.entity_id
-    description: Identifier of entity that the report dashboard card belongs to
+    description: Stable UUID Metabase assigns to the dashboard tile for cross-version references and embedding.
   size_x:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.sizex
-    description: Report card width
+    description: Width of the dashboard tile measured in Metabase grid columns on the layout canvas.
   size_y:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.sizey
-    description: Report card height
+    description: Height of the dashboard tile measured in Metabase grid rows on the layout canvas.
   row:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.row
-    description: Report card position
+    description: Zero-based row coordinate of the tile top-left corner on the Metabase dashboard grid.
   column:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.col
-    description: Sets the column position of the report card
+    description: Zero-based column coordinate of the tile top-left corner on the Metabase dashboard grid.
   parameter_mappings:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.parameter_mappings
-    description: Parameter mappings used in a query
+    description: JSON wiring map connecting dashboard filter parameters to fields on the underlying question card.
   visualization_settings:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.visualization_settings
-    description: Display and formatting settings
+    description: JSON blob of chart formatting overrides such as colors, axes, and labels applied on the dashboard tile.
   ts_created:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.created_at
-    description: Date it was created
+    description: Timestamp when the card was first added to the dashboard layout in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.updated_at
-    description: Date it was updated
+    description: Timestamp when tile size, position, or visualization settings were last changed in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

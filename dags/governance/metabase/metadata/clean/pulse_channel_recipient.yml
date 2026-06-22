@@ -1,18 +1,22 @@
 database_name: datalake_metabase_clean
 table_name: pulse_channel_recipient
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Who will receive the report sent by a Pulse channel
+description: >
+  Clean-layer snapshot of Metabase Pulse subscribers replicated from the Metabase PostgreSQL
+  pulse_channel_recipient table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC).
+  Grain is one row per user subscribed to a delivery channel per load. Supports governance analytics
+  on who receives scheduled reports and alert notifications from Metabase.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse_channel_recipient.id
-    description: Unique Id table
+    description: Primary key from Metabase pulse_channel_recipient identifying a distinct subscriber on a delivery channel.
   id_pulse_channel:
     lineage:
       - datalake_metabase_raw.pulse_channel_recipient.pulse_channel_id
-    description: Channel ID where the Pulse report will be sent
+    description: Foreign key to pulse_channel.id for the email or Slack route that delivers the Pulse to this user.
   id_user:
     lineage:
       - datalake_metabase_raw.pulse_channel_recipient.user_id
-    description: Identifier of the user that will receive the Pulse report
+    description: Foreign key to core_user.id for the Metabase account that receives the Pulse on this channel.

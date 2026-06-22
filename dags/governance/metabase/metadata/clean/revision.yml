@@ -1,42 +1,46 @@
 database_name: datalake_metabase_clean
 table_name: revision
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Stores object revision history in Metabase
+description: >
+  Clean-layer snapshot of Metabase content revision history replicated from the Metabase PostgreSQL
+  revision table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one row
+  per revision event per load. Supports governance analytics on who changed dashboards, questions,
+  and other Metabase artifacts and when those edits occurred.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.revision.id
-    description: Unique Id table
+    description: Primary key from Metabase revision identifying a distinct audit entry for a content change event.
   id_user_revisor:
     lineage:
       - datalake_metabase_raw.revision.user_id
-    description: ID of the user who made the review
+    description: Foreign key to core_user.id for the account that authored this revision entry.
   id_model:
     lineage:
       - datalake_metabase_raw.revision.model_id
-    description: Revision model id
+    description: Primary key of the Metabase entity that was revised (for example dashboard or card id).
   model:
     lineage:
       - datalake_metabase_raw.revision.model
-    description: Review model
+    description: Metabase entity type name for the revised object (for example Card, Dashboard, or Collection).
   object:
     lineage:
       - datalake_metabase_raw.revision.object
-    description: Contains information about the query
+    description: JSON snapshot of the entity state after the change, stored by Metabase for rollback and audit.
   message:
     lineage:
       - datalake_metabase_raw.revision.message
-    description: Additional information about execution
+    description: Optional user-supplied note describing why the change was made, when provided in Metabase UI.
   is_reversion:
     lineage:
       - datalake_metabase_raw.revision.is_reversion
-    description: Whether the action is a rollback of a previous change
+    description: When true, the revision restores a prior snapshot rather than applying a forward edit.
   is_creation:
     lineage:
       - datalake_metabase_raw.revision.is_creation
-    description: If the action corresponds to the creation of a new record
+    description: When true, the revision records the initial creation of the Metabase entity rather than an update.
   ts_revision:
     lineage:
       - datalake_metabase_raw.revision.timestamp
-    description: Date a review was made
+    description: Timestamp when the content change was recorded in Metabase revision history (UTC).

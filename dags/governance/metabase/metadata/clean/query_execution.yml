@@ -1,62 +1,66 @@
 database_name: datalake_metabase_clean
 table_name: query_execution
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Query execution information
+description: >
+  Clean-layer snapshot of individual Metabase query runs replicated from the Metabase PostgreSQL
+  query_execution table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is
+  one row per query execution event per load. Supports governance analytics on BI query volume,
+  latency, errors, and usage by dashboard, card, or Pulse context.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.query_execution.id
-    description: Unique Id table
+    description: Primary key from Metabase query_execution identifying a distinct warehouse query run event.
   id_user_executor:
     lineage:
       - datalake_metabase_raw.query_execution.executor_id
-    description: Executor ID
+    description: Foreign key to core_user.id for the account that triggered the query (null for system or Pulse runs).
   id_card:
     lineage:
       - datalake_metabase_raw.query_execution.card_id
-    description: Identifier of the card that the query execution belongs to
+    description: Foreign key to report_card.id when the query was issued from a saved question (null otherwise).
   id_dashboard:
     lineage:
       - datalake_metabase_raw.query_execution.dashboard_id
-    description: Dashboard Id
+    description: Foreign key to report_dashboard.id when the query ran in dashboard context (null otherwise).
   id_pulse:
     lineage:
       - datalake_metabase_raw.query_execution.pulse_id
-    description: Identifier of the pulse that the query execution belongs to
+    description: Foreign key to pulse.id when the query was executed as part of a scheduled Pulse delivery.
   id_database:
     lineage:
       - datalake_metabase_raw.query_execution.database_id
-    description: Database Id
+    description: Foreign key to metabase_database.id for the connected warehouse targeted by the executed query.
   hash:
     lineage:
       - datalake_metabase_raw.query_execution.hash
-    description: Hash value in bytes
+    description: Binary query fingerprint linking this execution to the deduplicated SQL stored in the query table.
   hash_string:
     lineage:
       - datalake_metabase_raw.query_execution.hash_string
-    description: Stores a generated hash value
+    description: String form of the query fingerprint derived from hash for joins with the query catalog table.
   context:
     lineage:
       - datalake_metabase_raw.query_execution.context
-    description: Contextual information associated with a query
+    description: Metabase execution context code (for example ad-hoc, dashboard, pulse, or internal) describing why the query ran.
   result_rows:
     lineage:
       - datalake_metabase_raw.query_execution.result_rows
-    description: Stores results returned by an operation performed on the database
+    description: Number of rows returned by the warehouse for this execution (zero when the query failed or returned empty).
   error_message:
     lineage:
       - datalake_metabase_raw.query_execution.error
-    description: Error message
+    description: Warehouse or Metabase error text when the execution failed (null on successful runs).
   running_time_in_milliseconds:
     lineage:
       - datalake_metabase_raw.query_execution.running_time
-    description: Execution time
+    description: End-to-end execution duration in milliseconds recorded by Metabase for this warehouse query run.
   is_native:
     lineage:
       - datalake_metabase_raw.query_execution.native
-    description: Operation is native to the database or system
+    description: When true, the execution used native SQL written by the user rather than the Metabase query builder.
   ts_started:
     lineage:
       - datalake_metabase_raw.query_execution.started_at
-    description: Date the operation was initiated
+    description: Timestamp when Metabase submitted the query to the warehouse (UTC).

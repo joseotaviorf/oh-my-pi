@@ -1,74 +1,78 @@
 database_name: datalake_metabase_clean
 table_name: report_dashboard
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about dashboards created in Metabase
+description: >
+  Clean-layer snapshot of Metabase dashboards replicated from the Metabase PostgreSQL
+  report_dashboard table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is
+  one row per dashboard per load date. Partitioned by year, month, day — filter on ingestion date.
+  Supports governance analytics on dashboard ownership, embedding, and archival status.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.report_dashboard.id
-    description: Unique table id
+    description: Primary key from Metabase report_dashboard identifying a distinct analytics dashboard artifact.
   id_user_creator:
     lineage:
       - datalake_metabase_raw.report_dashboard.creator_id
-    description: Unique creator id
+    description: Foreign key to core_user.id for the account that originally created the dashboard in Metabase.
   id_collection:
     lineage:
       - datalake_metabase_raw.report_dashboard.collection_id
-    description: Colection id
+    description: Foreign key to collection.id for the folder where the dashboard is stored in the content hierarchy.
   name:
     lineage:
       - datalake_metabase_raw.report_dashboard.name
-    description: Dashboard name in Metabase
+    description: User-defined title of the dashboard displayed in Metabase navigation and sharing dialogs.
   description:
     lineage:
       - datalake_metabase_raw.report_dashboard.description
-    description: Detailed description of the dashboard in Metabase
+    description: Free-text summary authored in Metabase explaining the dashboard purpose and intended audience.
   position:
     lineage:
       - datalake_metabase_raw.report_dashboard.position
-    description: Display position of a dashboard within a Metabase interface
+    description: Legacy sort index for the dashboard within Metabase listing views (largely superseded by collection_position).
   collection_position:
     lineage:
       - datalake_metabase_raw.report_dashboard.collection_position
-    description: Position of a dashboard within a collection in Metabase
+    description: Sort order of the dashboard within its parent collection folder in the Metabase UI.
   parameters:
     lineage:
       - datalake_metabase_raw.report_dashboard.parameters
-    description: Parameters used in queries
+    description: JSON array of dashboard-level filter parameters wired to underlying question cards.
   embedding_params:
     lineage:
       - datalake_metabase_raw.report_dashboard.embedding_params
-    description: Parameters used to embed a visualization
+    description: JSON map of signed embedding parameters required when the dashboard is embedded in external apps.
   is_archived:
     lineage:
       - datalake_metabase_raw.report_dashboard.archived
-    description: If it is archived
+    description: Boolean flag indicating the dashboard was archived and hidden from default Metabase browsing.
   has_show_in_getting_started:
     lineage:
       - datalake_metabase_raw.report_dashboard.show_in_getting_started
-    description: Whether to display the preview in the Getting Started section
+    description: When true, the dashboard is featured in Metabase Getting Started onboarding for new users.
   is_enabled_for_embedding:
     lineage:
       - datalake_metabase_raw.report_dashboard.enable_embedding
-    description: Whether the visualization can be embedded in external systems
+    description: When true, the dashboard can be embedded in external applications via Metabase signed embedding.
   ts_created:
     lineage:
       - datalake_metabase_raw.report_dashboard.created_at
-    description: Date it was created
+    description: Timestamp when the dashboard was first saved in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.report_dashboard.updated_at
-    description: Date it was updated
+    description: Timestamp when dashboard layout, filters, or metadata were last modified in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.report_dashboard.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.report_dashboard.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.report_dashboard.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

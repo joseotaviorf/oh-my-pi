@@ -1,30 +1,34 @@
 database_name: datalake_metabase_clean
 table_name: pulse_card
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Store information about pulse cards
+description: >
+  Clean-layer snapshot of question cards attached to Metabase Pulse subscriptions, replicated from
+  the Metabase PostgreSQL pulse_card table via CDC (metabase DAG, ingest at 05:00, 08:00, and
+  12:00 UTC). Grain is one row per card included in a Pulse per load. Supports governance analytics
+  on which saved questions are emailed or alerted to subscribers.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse_card.id
-    description: Unique Id table
+    description: Primary key from Metabase pulse_card identifying a distinct question attached to a Pulse delivery.
   id_pulse:
     lineage:
       - datalake_metabase_raw.pulse_card.pulse_id
-    description: Identifier of the pulse that the card belongs to
+    description: Foreign key to pulse.id for the subscription or alert that includes this saved question card.
   id_card:
     lineage:
       - datalake_metabase_raw.pulse_card.card_id
-    description: Identifier of the card that the pulse card belongs to
+    description: Foreign key to the Metabase report_card.id question whose results are rendered in the Pulse email.
   position:
     lineage:
       - datalake_metabase_raw.pulse_card.position
-    description: Numerical position of a card
+    description: Display order of the question within the Pulse email body when multiple cards are attached.
   has_csv_included:
     lineage:
       - datalake_metabase_raw.pulse_card.include_csv
-    description: Indicates whether a CSV file is included
+    description: When true, Metabase attaches a CSV export of the question results to the Pulse delivery.
   has_xls_included:
     lineage:
       - datalake_metabase_raw.pulse_card.include_xls
-    description: Indicates whether an xls file is included
+    description: When true, Metabase attaches an Excel export of the question results to the Pulse delivery.

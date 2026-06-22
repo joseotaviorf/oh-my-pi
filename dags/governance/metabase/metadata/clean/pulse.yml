@@ -1,66 +1,70 @@
 database_name: datalake_metabase_clean
 table_name: pulse
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Contains refined and structured data related to pulse measurements
+description: >
+  Clean-layer snapshot of Metabase Pulse subscriptions and alerts replicated from the Metabase
+  PostgreSQL pulse table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is
+  one row per Pulse definition per load date. Partitioned by year, month, day — filter on ingestion
+  date. Supports governance analytics on scheduled reports, alert rules, and subscription ownership.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse.id
-    description: Unique Id table
+    description: Primary key from Metabase pulse identifying a distinct scheduled report or alert subscription.
   id_user_creator:
     lineage:
       - datalake_metabase_raw.pulse.creator_id
-    description: Unique creator id
+    description: Foreign key to core_user.id for the account that created the Pulse subscription or alert.
   id_collection:
     lineage:
       - datalake_metabase_raw.pulse.collection_id
-    description: Collection Id
+    description: Foreign key to collection.id for the folder where the Pulse is stored in Metabase content hierarchy.
   name:
     lineage:
       - datalake_metabase_raw.pulse.name
-    description: Pulse name
+    description: User-defined title of the Pulse subscription shown in Metabase scheduling and alert settings.
   collection_position:
     lineage:
       - datalake_metabase_raw.pulse.collection_position
-    description: Collection position
+    description: Sort order of the Pulse within its parent collection folder in the Metabase UI.
   alert_condition:
     lineage:
       - datalake_metabase_raw.pulse.alert_condition
-    description: Condition that triggers an alert
+    description: Metabase alert rule predicate (for example rows, goal, or progress) that triggers notification delivery.
   is_archived:
     lineage:
       - datalake_metabase_raw.pulse.archived
-    description: If the record has been archived
+    description: Boolean flag indicating the Pulse was archived and no longer sends scheduled or alert notifications.
   is_skipped_if_empty:
     lineage:
       - datalake_metabase_raw.pulse.skip_if_empty
-    description: is_skipped_if_empty
+    description: When true, Metabase skips sending the Pulse when the underlying question returns zero result rows.
   has_alert_if_first_only:
     lineage:
       - datalake_metabase_raw.pulse.alert_first_only
-    description: Indicates that an alert should be generated only for the first event
+    description: When true, alert notifications fire only on the first qualifying event rather than on every match.
   has_alert_if_above_goal:
     lineage:
       - datalake_metabase_raw.pulse.alert_above_goal
-    description: Indicates whether an alert should be generated when the value exceeds the target
+    description: When true, alert notifications fire when the measured value exceeds the configured goal threshold.
   ts_created:
     lineage:
       - datalake_metabase_raw.pulse.created_at
-    description: Date it was created
+    description: Timestamp when the Pulse subscription or alert was first created in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.pulse.updated_at
-    description: Date it was updated
+    description: Timestamp when Pulse settings, cards, or delivery channels were last modified in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.pulse.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.pulse.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.pulse.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

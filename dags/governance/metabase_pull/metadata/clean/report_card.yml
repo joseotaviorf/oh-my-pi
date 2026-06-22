@@ -1,82 +1,86 @@
 database_name: datalake_metabase_clean
 table_name: report_card
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: "Data Ops & Governance"
-description: Information about report cards in Metabase
+description: >
+  Incremental clean layer of Metabase saved questions (report cards) pulled from the
+  Metabase application database. Each row mirrors a question definition including query
+  payload, visualization settings, and embedding configuration. Grain is one row per
+  question id per load date. Partitioned by year, month, day.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.report_card.id
-    description: Unique question id
+    description: Unique Metabase question identifier, stable across incremental loads.
   id_user_creator:
     lineage:
       - datalake_metabase_raw.report_card.creator_id
-    description: Unique creator id
+    description: Metabase user id of the person who originally created the saved question.
   id_database:
     lineage:
       - datalake_metabase_raw.report_card.database_id
-    description: Database id
+    description: Metabase database connection id backing the saved question query.
   id_table:
     lineage:
       - datalake_metabase_raw.report_card.table_id
-    description: Table id
+    description: Metabase table id when the question is built from the simple query builder.
   id_collection:
     lineage:
       - datalake_metabase_raw.report_card.collection_id
-    description: Colection id
+    description: Metabase collection id where the question is filed for navigation and permissions.
   name:
     lineage:
       - datalake_metabase_raw.report_card.name
-    description: Question name
+    description: Question title shown to Metabase users in collections and dashboards.
   description:
     lineage:
       - datalake_metabase_raw.report_card.description
-    description: Detailed description about the report card
+    description: Free-text description authored in Metabase explaining what the question answers.
   display:
     lineage:
       - datalake_metabase_raw.report_card.display
-    description: Report view type in Metabase
+    description: Default visualization type configured for the question, such as table or bar chart.
   query_type:
     lineage:
       - datalake_metabase_raw.report_card.query_type
-    description: Shows the type of query
+    description: Metabase query mode, such as native SQL versus the graphical query builder.
   dataset_query:
     lineage:
       - datalake_metabase_raw.report_card.dataset_query
-    description: Query code executed
+    description: Serialized Metabase query definition including SQL or MBQL and parameter bindings.
   visualization_settings:
     lineage:
       - datalake_metabase_raw.report_card.visualization_settings
-    description: Preview Provided Settings
+    description: JSON settings controlling chart axes, colors, and other visualization options.
   embedding_params:
     lineage:
       - datalake_metabase_raw.report_card.embedding_params
-    description: Configuration parameters
+    description: Parameter configuration exposed when the question is embedded in external applications.
   is_enabled_for_embedding:
     lineage:
       - datalake_metabase_raw.report_card.enable_embedding
-    description: Whether visualization can be incorporated into external systems
+    description: Flag indicating whether the question is allowed to be embedded outside Metabase.
   is_archived:
     lineage:
       - datalake_metabase_raw.report_card.archived
-    description: If it is archived
+    description: Flag indicating whether the question was archived and hidden from default Metabase browsing.
   ts_created:
     lineage:
       - datalake_metabase_raw.report_card.created_at
-    description: Date it was created
+    description: Timestamp when the question was first saved in Metabase.
   ts_updated:
     lineage:
       - datalake_metabase_raw.report_card.updated_at
-    description: Date it was updated
+    description: Timestamp of the most recent update to the question definition or metadata.
   year:
     lineage:
       - datalake_metabase_raw.report_card.year
-    description: Year created
+    description: Year of the load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.report_card.month
-    description: Month created
+    description: Month of the load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.report_card.day
-    description: Day created
+    description: Day of the load date, used for Hive partitioning — include in filters for partition pruning.

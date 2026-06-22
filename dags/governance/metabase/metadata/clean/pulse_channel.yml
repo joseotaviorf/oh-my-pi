@@ -1,62 +1,66 @@
 database_name: datalake_metabase_clean
 table_name: pulse_channel
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about the channels through which Pulse reports are sent
+description: >
+  Clean-layer snapshot of Metabase Pulse delivery channels replicated from the Metabase PostgreSQL
+  pulse_channel table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
+  row per delivery channel per load date. Partitioned by year, month, day — filter on ingestion
+  date. Supports governance analytics on email and Slack subscription schedules.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse_channel.id
-    description: Unique table id
+    description: Primary key from Metabase pulse_channel identifying a distinct delivery route for a Pulse subscription.
   id_pulse:
     lineage:
       - datalake_metabase_raw.pulse_channel.pulse_id
-    description: Identifier of the pulse that the channel belongs to
+    description: Foreign key to pulse.id for the subscription whose results are sent through this delivery channel.
   channel_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.channel_type
-    description: Channel type
+    description: Delivery mechanism for the Pulse (for example email or slack) as configured in Metabase settings.
   details:
     lineage:
       - datalake_metabase_raw.pulse_channel.details
-    description: Channel details
+    description: JSON configuration for the channel such as Slack webhook URL, email subject, or recipient overrides.
   schedule_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_type
-    description: Schedule type
+    description: Metabase cadence category controlling Pulse delivery (for example hourly, daily, weekly, or monthly).
   schedule_frame:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_frame
-    description: Exact time when the Pulse report will be sent
+    description: Relative scheduling frame within the cadence (for example first or last weekday of the period).
   schedule_hour:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_hour
-    description: Exact time of day a Pulse report will be sent
+    description: Hour of day (0–23) when Metabase sends the Pulse on the configured schedule (server timezone).
   schedule_day:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_day
-    description: Specific day a Pulse report will be sent
+    description: Day-of-week or day-of-month value paired with schedule_type to pin the exact send window.
   is_enabled:
     lineage:
       - datalake_metabase_raw.pulse_channel.enabled
-    description: The setting is on or off
+    description: Boolean flag indicating whether Metabase actively sends this Pulse through the configured channel.
   ts_created:
     lineage:
       - datalake_metabase_raw.pulse_channel.created_at
-    description: Date it was created
+    description: Timestamp when the delivery channel was first configured for the Pulse in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.pulse_channel.updated_at
-    description: Date it was updated
+    description: Timestamp when channel settings or schedule were last modified in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.pulse_channel.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.pulse_channel.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.pulse_channel.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

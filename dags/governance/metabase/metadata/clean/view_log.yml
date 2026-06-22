@@ -1,26 +1,30 @@
 database_name: datalake_metabase_clean
 table_name: view_log
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Log view records within the metabase
+description: >
+  Clean-layer snapshot of Metabase content view events replicated from the Metabase PostgreSQL
+  view_log table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one row
+  per recorded view event per load. Supports governance analytics on dashboard and question
+  consumption, user engagement, and BI asset popularity.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.view_log.id
-    description: Unique Id table
+    description: Primary key from Metabase view_log identifying a distinct user view event on a BI artifact.
   id_user_viewer:
     lineage:
       - datalake_metabase_raw.view_log.user_id
-    description: User ID who viewed
+    description: Foreign key to core_user.id for the account that opened or viewed the Metabase artifact.
   id_model:
     lineage:
       - datalake_metabase_raw.view_log.model_id
-    description: Identifier of the model that the view log belongs to
+    description: Primary key of the viewed Metabase entity (for example dashboard id or card id).
   model:
     lineage:
       - datalake_metabase_raw.view_log.model
-    description: Model type
+    description: Metabase entity type name for the viewed artifact (for example dashboard or card).
   ts_viewed:
     lineage:
       - datalake_metabase_raw.view_log.timestamp
-    description: Data from the last time viewed
+    description: Timestamp when the user viewed the artifact in Metabase (UTC).
