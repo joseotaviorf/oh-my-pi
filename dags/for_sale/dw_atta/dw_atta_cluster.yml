@@ -1,8 +1,10 @@
 cluster:
   type: emr_7_12_consolidation_xs_memory_cluster
   custom_configurations:
-    driver_node_type_id: r7g.2xlarge
+    master_node_type_id: r7g.2xlarge
     core_nodes:
       instance_count: 1
     task_nodes:
       instance_count: 2
+    spark_conf:
+      spark.driver.memory: 12g
