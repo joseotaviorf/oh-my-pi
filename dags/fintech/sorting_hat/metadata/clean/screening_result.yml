@@ -11,6 +11,10 @@ columns:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.score
     description: Model or rules-based screening score for the proposal.
+  calibrated_score:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.calibrated_score
+    description: Normalized screening score calibrated for credit policy thresholds and risk bucketing.
   risk_category:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.risk_category

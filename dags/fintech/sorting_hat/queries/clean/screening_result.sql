@@ -1,6 +1,7 @@
 select
     id,
     score,
+    calibrated_score,
     risk_category,
     liquidity,
     proposal_id as id_proposal,
