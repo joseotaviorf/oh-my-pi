@@ -1,0 +1,28 @@
+dag:
+  name: offer_agent_link_fast_lane
+  schedule_start_date: 2026, 6, 22
+  schedule_interval: 0,30 * * * *
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      CDC ingestion of EBDB OfferAgentLink and OfferAgentLink_AUD into datalake_ebdb (same clean tables as ebdb_agent).
+      Runs every 30 minutes so offer–agent associations stay fresh for downstream analytics.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  dbutils_secret_key: EBDB_DB
+  source_database: ebdb
+  source_schema: ebdb
+  custom_schema: ebdb
+  execution_timeout_hours: 0.5
+  tables_customization:
+    OfferAgentLink:
+      clean_table_name: offer_agent_link
+      raw_primary_keys: ["id"]
+    OfferAgentLink_AUD:
+      clean_table_name: offer_agent_link_aud
+      raw_primary_keys: ["id", "rev"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
