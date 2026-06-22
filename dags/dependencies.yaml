@@ -718,8 +718,6 @@ bietlejuice.dw_eval_model_seamless:
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-obt-offboarding:first-run-of-day
   - bietlejuice.emlio:load-clean-emlio-logs:first-run-of-day
-  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
-  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.dw_evictions:
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day

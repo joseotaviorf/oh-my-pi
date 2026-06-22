@@ -15,8 +15,6 @@ workflow:
   default_extraction_type: full
   default_partitions: []
   tables_customization:
-    eval_model_seamless_offboarding:
-      z_order_by: [id_contract, id_request, ts_created, tipo_ticket]
     eval_model_seamless_offboarding_v3:
       z_order_by: [id_contract, id_request, ts_created, tipo_ticket]
 
