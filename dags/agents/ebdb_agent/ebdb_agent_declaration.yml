@@ -35,6 +35,8 @@ workflow:
       clean_table_name: capability
     ClientPortfolio:
       clean_table_name: client_portfolio
+    ClientPortfolioMigration:
+      clean_table_name: client_portfolio_migration
     DadosAgente:
       clean_table_name: agent_data
     DadosAgente_AUD:

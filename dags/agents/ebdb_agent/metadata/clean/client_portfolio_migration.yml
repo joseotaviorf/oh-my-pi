@@ -1,0 +1,27 @@
+---
+database_name: datalake_ebdb_clean
+table_name: client_portfolio_migration
+domain: Agents
+owner: gustavo.guerra@quintoandar.com.br
+description: Client portfolio migration records tracking agent migration status during the portfolio migration process.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.clientportfoliomigration.id
+    description: Unique identifier for the client portfolio migration record.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.clientportfoliomigration.agent_uuid
+    description: UUID of the agent associated with the portfolio migration.
+  status:
+    lineage:
+      - datalake_ebdb_raw.clientportfoliomigration.status
+    description: Current status of the client portfolio migration for the agent.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.clientportfoliomigration.created_at
+    description: Timestamp when the client portfolio migration record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.clientportfoliomigration.updated_at
+    description: Timestamp when the client portfolio migration record was last updated.
