@@ -38,15 +38,16 @@ column_level_validations:
         ) = 0
       severity_level: Warning
   employment_type:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
     custom:
-      # Allowed set and job_family mapping; unknown dimension row may have NULL employment_type
+      # NULL only when job_family is NULL; allowed set and job_family mapping for current active jobs
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_compensation.dim_job
          WHERE (
+             employment_type IS NULL
+             AND job_family IS NOT NULL
+           )
+           OR (
              employment_type IS NOT NULL
              AND employment_type NOT IN ('clt', 'intern', 'young apprentice')
            )
