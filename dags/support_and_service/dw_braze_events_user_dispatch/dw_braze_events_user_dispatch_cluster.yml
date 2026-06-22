@@ -1,6 +1,5 @@
 cluster:
-  type: consolidation_s_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_s_general_cluster
 validation:
   cluster:
     type: consolidation_xs_memory_cluster
