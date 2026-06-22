@@ -5,6 +5,7 @@ description: |
   This table contains enriched fields regarding the chaves_na_mao crawler data.
   It transforms and flattens the original struct fields from the clean table into
   individual columns for easier analysis and consumption.
+  Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by address_city, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 
   **Key Transformations:**
   - Extracts and flattens JSON struct fields (address, price, house_info, etc.) into individual columns

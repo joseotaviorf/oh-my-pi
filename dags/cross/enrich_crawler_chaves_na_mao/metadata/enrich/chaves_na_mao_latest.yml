@@ -5,6 +5,7 @@ description: |
   This table contains the most recent update for each listing regarding the chaves_na_mao crawler data.
   It provides a deduplicated view of the datalake_crawler_chaves_na_mao.chaves_na_mao table, showing only
   the most recent record per listing (id_house) based on the partition (year, month, day).
+  When filtering by address_city, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 
   **Deduplication Logic:**
   - Returns the latest update per listing using ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY make_date(year, month, day) DESC) = 1
@@ -100,7 +101,7 @@ columns:
     lineage:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.listing_url
     description: |
-      The url of the listing.
+      Public URL of the listing page on the Chaves na Mão portal, extracted from crawl metadata in the clean layer.
   total_area:
     lineage:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.total_area

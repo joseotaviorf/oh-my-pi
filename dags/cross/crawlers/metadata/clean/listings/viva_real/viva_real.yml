@@ -1,55 +1,75 @@
 ---
 database_name: datalake_crawlers_listings_clean
 table_name: viva_real
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Clean layer of Viva Real competitor listings crawled from the legacy listings pipeline. Contains structured listing attributes partitioned by crawl date for market intelligence analysis.
 columns:
   id:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.id
+    description: Unique listing identifier assigned by the Viva Real crawler in the source platform feed.
   origin:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.origin
+    description: Source platform label for the listing, always identifying the Viva Real origin.
   address:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.address
+    description: Structured address fields of the listing including city, neighborhood, state, and street.
   region:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.region
+    description: Regional grouping or macro-area label assigned to the listing by the crawler provider.
   geolocation:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.geolocation
+    description: Latitude and longitude coordinates of the listing location scraped from Viva Real.
   listing_name:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.name
+    description: Title or headline text of the property listing as published on the Viva Real platform.
   crawl_metadata:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.crawl_metadata
+    description: Crawl execution metadata for the listing, including the source URL and scrape timestamps.
   house_info:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.house_info
+    description: Property characteristics such as area, bedrooms, bathrooms, suites, and amenities.
   type:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.type
+    description: Listing availability flags indicating whether the property is rentable, buyable, or both.
   image_urls:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.image_urls
+    description: Array of image URLs associated with the property listing on the Viva Real platform.
   contact_information:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.contact_information
+    description: Advertiser contact details such as agency name and phone numbers from the listing.
   price:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.price
+    description: Structured price information for rent and sale including fees and taxes when available.
   date_info:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.date_info
+    description: Timestamp metadata about when the listing was created or last updated on Viva Real.
   city:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.city
+    description: City name associated with the listing used for partitioning and geographic filtering.
   year:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.year
+    description: Year partition of the crawl date when the Viva Real listing snapshot was ingested.
   month:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.month
+    description: Month partition of the crawl date when the Viva Real listing snapshot was ingested.
   day:
     lineage:
       - datalake_crawlers_listings_raw.vivareal.day
+    description: Day partition of the crawl date when the Viva Real listing snapshot was ingested.

@@ -1,49 +1,67 @@
 ---
 database_name: datalake_crawlers_listings_clean
 table_name: em_casa
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Clean layer of Em Casa competitor listings crawled from the legacy listings pipeline. Contains structured listing attributes partitioned by crawl date for market intelligence analysis.
 columns:
   id:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.id
+    description: Unique listing identifier assigned by the Em Casa crawler in the source platform feed.
   image_urls:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.image_urls
+    description: Array of image URLs associated with the property listing on the Em Casa platform.
   geolocation:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.geolocation
+    description: Latitude and longitude coordinates of the listing location scraped from Em Casa.
   listing_name:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.name
+    description: Title or headline text of the property listing as published on the Em Casa platform.
   address:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.address
+    description: Structured address fields of the listing including city, neighborhood, state, and street.
   crawl_metadata:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.crawl_metadata
+    description: Crawl execution metadata for the listing, including the source URL and scrape timestamps.
   metadata:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.metadata
+    description: Additional platform-specific metadata captured during the Em Casa listing crawl.
   price:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.price
+    description: Structured price information for rent and sale including fees and taxes when available.
   type:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.type
+    description: Listing availability flags indicating whether the property is rentable, buyable, or both.
   house_info:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.house_info
+    description: Property characteristics such as area, bedrooms, bathrooms, suites, and amenities.
   date_info:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.date_info
+    description: Timestamp metadata about when the listing was created or last updated on Em Casa.
   city:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.city
+    description: City name associated with the listing used for partitioning and geographic filtering.
   year:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.year
+    description: Year partition of the crawl date when the Em Casa listing snapshot was ingested.
   month:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.month
+    description: Month partition of the crawl date when the Em Casa listing snapshot was ingested.
   day:
     lineage:
       - datalake_crawlers_listings_raw.emcasa.day
+    description: Day partition of the crawl date when the Em Casa listing snapshot was ingested.

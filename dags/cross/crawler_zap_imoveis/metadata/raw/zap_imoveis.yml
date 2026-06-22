@@ -6,5 +6,6 @@ description: |
   It is updated weekly, every Thursday at 00:00 BRT, to update the data from the current week,
   which is provided every Wednesday by the crawler provider.
   It only contains the listings that have the city available.
+  Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by city, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
 owner: mateus.aferreira@quintoandar.com.br

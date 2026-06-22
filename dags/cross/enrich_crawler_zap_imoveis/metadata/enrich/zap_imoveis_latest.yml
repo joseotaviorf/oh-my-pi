@@ -5,6 +5,7 @@ description: |
   This table contains the latest/most recent update for each property from the Zap Imóveis crawler data.
   It provides a deduplicated view of the datalake_crawler_zap_imoveis.zap_imoveis table, showing only
   the most recent record per property (id_house) based on the ts_updated timestamp.
+  When filtering by address_city, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 
   **Deduplication Logic:**
   - Only includes records where ts_updated is not null
@@ -25,7 +26,7 @@ columns:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.id_house_platform
     description: |
-      The id of the house in the zap imoveis platform.
+      The unique listing identifier on the source platform.
   id_house:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.id_house
@@ -51,7 +52,7 @@ columns:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.state
     description: |
-      The state of the house.
+      Brazilian state abbreviation (UF) where the property is located, parsed from the listing address struct.
   address_city:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.address_city
