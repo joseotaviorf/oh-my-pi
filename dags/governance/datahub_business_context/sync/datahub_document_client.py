@@ -11,6 +11,7 @@ from sync.constants import (
     STRUCTURED_PROP_GLOSSARY_PARENT,
     STRUCTURED_PROP_GOLDEN_QUERY_URN,
     STRUCTURED_PROP_PRIMARY_DATASETS,
+    STRUCTURED_PROP_SYNC_STATUS,
     TARS_ENTITY_TAG,
 )
 from sync.datahub_client import post as _dh_post
@@ -304,6 +305,30 @@ def write_golden_query_urn(doc_urn: str, stable_urn: str) -> bool:
         doc_urn,
         {STRUCTURED_PROP_GOLDEN_QUERY_URN: stable_urn},
     )
+
+
+def write_sync_status(
+    doc_urn: str,
+    *,
+    status: str,
+    data_product_urn: str = "",
+    error: str = "",
+) -> bool:
+    """Write sync outcome back to the Context Document structured-property sidebar.
+
+    ``status`` should be ``"PASS"`` or ``"FAIL"``.  On failure, ``error`` is
+    appended so the author can see why directly in the DataHub UI.
+
+    Requires the ``br.com.quintoandar.datahub.tars_entity.sync_status``
+    structured property to exist in DataHub (create it once via the UI or API).
+    """
+    value = status
+    if error:
+        value = f"{status}: {error}"
+    updates: dict[str, str] = {STRUCTURED_PROP_SYNC_STATUS: value}
+    if data_product_urn:
+        updates[STRUCTURED_PROP_DATA_PRODUCT_ID] = data_product_urn.split(":")[-1]
+    return _upsert_document_structured_properties(doc_urn, updates)
 
 
 def search_tars_entity_documents(

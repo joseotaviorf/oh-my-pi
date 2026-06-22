@@ -18,6 +18,7 @@ STRUCTURED_PROP_GOLDEN_QUERY_URN = (
 STRUCTURED_PROP_GLOSSARY_PARENT = (
     "br.com.quintoandar.datahub.tars_entity.glossary_parent_node_urn"
 )
+STRUCTURED_PROP_SYNC_STATUS = "br.com.quintoandar.datahub.tars_entity.sync_status"
 
 GITHUB_REPO = "quintoandar/bi-etl-ejuice"
 GITHUB_DEFAULT_BRANCH = "master"

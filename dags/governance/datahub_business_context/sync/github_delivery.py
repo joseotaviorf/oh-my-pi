@@ -68,6 +68,12 @@ def _get_ref_sha(branch: str = GITHUB_DEFAULT_BRANCH) -> str:
     return str(ref["object"]["sha"])
 
 
+def is_ip_allowlist_error(exc: Exception) -> bool:
+    return "IP allow list" in str(exc) or (
+        "403" in str(exc) and "ip" in str(exc).lower()
+    )
+
+
 def _get_file_sha(path: str, branch: str = GITHUB_DEFAULT_BRANCH) -> Optional[str]:
     try:
         blob = _api_request("GET", f"/contents/{path}?ref={branch}")

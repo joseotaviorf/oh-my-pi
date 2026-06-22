@@ -126,6 +126,8 @@ def _fill_derived_fields(
             **{**doc.__dict__, "data_product_id": _title_to_slug(doc.title)}
         )
         print(f"  → data_product_id derived from title: {doc.data_product_id}")
+    else:
+        print(f"  → data_product_id is: {doc.data_product_id}")
 
     # golden_query_stable_urn: auto-generate and write back so future syncs reuse it
     if not doc.golden_query_stable_urn:
@@ -161,6 +163,7 @@ def _process_document(
     force: bool,
     state: SyncStateStore,
     output_dir: Path,
+    seen_slugs: set[str],
 ) -> str:
     label = doc.title or doc.urn
 
@@ -209,6 +212,16 @@ def _process_document(
         return _OUTCOME_FAILED
 
     product_id = doc.data_product_id.strip().lower().replace("_", "-")
+
+    if product_id in seen_slugs:
+        print(
+            f"  ✗ slug collision: data_product_id {product_id!r} is already claimed by "
+            "another document in this run — set a unique data_product_id via structured "
+            "property in DataHub to resolve the conflict",
+            file=sys.stderr,
+        )
+        return _OUTCOME_FAILED
+    seen_slugs.add(product_id)
     dp_urn = f"urn:li:dataProduct:{product_id}"
     md_text = build_markdown_file(parsed, data_product_urn=dp_urn)
 
@@ -346,6 +359,7 @@ def main() -> int:
     passed = 0
     skipped = 0
     failed = 0
+    seen_slugs: set[str] = set()
     for doc in documents:
         outcome = _process_document(
             doc,
@@ -354,6 +368,7 @@ def main() -> int:
             force=ns.force,
             state=state,
             output_dir=ns.output_dir,
+            seen_slugs=seen_slugs,
         )
         if outcome == _OUTCOME_OK:
             passed += 1

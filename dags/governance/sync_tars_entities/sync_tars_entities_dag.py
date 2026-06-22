@@ -137,7 +137,7 @@ def audit_document(**context) -> dict[str, Any]:
         )
 
     # ── Parse stdout to build XCom payload ────────────────────────────────────
-    # We need: document_urn, document_title, data_product_id, md_path
+    # We need: document_urn, document_title, data_product_id, md_content
     # Example stdout lines:
     #   ▶  Collections TEST  (urn:li:document:d1fd0bc2-...)
     #   → data_product_id derived from title: collections-test
@@ -165,17 +165,28 @@ def audit_document(**context) -> dict[str, Any]:
 
         m = _md_re.search(line)
         if m:
-            current["md_path"] = m.group(1).strip()
+            current["_md_path"] = m.group(1).strip()
 
     if current.get("document_urn"):
         docs.append(current)
 
-    # Validate we captured required fields for every doc
-    missing = [d for d in docs if not all(k in d for k in ("md_path", "data_product_id"))]
+    # Read MD content into XCom so downstream tasks don't depend on the local filesystem
+    # (tasks may run on different workers that don't share /tmp or sync_output/).
+    missing = []
+    for d in docs:
+        md_path = d.pop("_md_path", None)
+        if not md_path or not d.get("data_product_id"):
+            missing.append(d.get("document_urn", "?"))
+            continue
+        p = Path(md_path)
+        if not p.exists():
+            missing.append(f"{d.get('document_urn', '?')} (md not found: {md_path})")
+            continue
+        d["md_content"] = p.read_text(encoding="utf-8")
+
     if missing:
         raise RuntimeError(
-            f"Could not parse output file paths for: "
-            + ", ".join(d.get("document_urn", "?") for d in missing)
+            "Could not read generated MD for: " + ", ".join(missing)
         )
 
     if not docs:
@@ -184,7 +195,7 @@ def audit_document(**context) -> dict[str, Any]:
 
     print(f"\nXCom payload: {len(docs)} document(s) ready for PR")
     for d in docs:
-        print(f"  {d['data_product_id']}: md={d['md_path']}")
+        print(f"  {d['data_product_id']}: {len(d.get('md_content', ''))} chars")
 
     return {"docs": docs}
 
@@ -217,12 +228,15 @@ def classify_entity(**context) -> dict[str, Any]:
     if pkg_dir not in sys.path:
         sys.path.insert(0, pkg_dir)
 
-    from sync.github_delivery import file_exists_on_master  # noqa: PLC0415
+    from sync.constants import MD_OUTPUT_DIR  # noqa: PLC0415
     from sync.datahub_document_client import (  # noqa: PLC0415
         fetch_data_product,
         write_data_product_id,
     )
-    from sync.constants import MD_OUTPUT_DIR  # noqa: PLC0415
+    from sync.github_delivery import (  # noqa: PLC0415
+        file_exists_on_master,
+        is_ip_allowlist_error,
+    )
 
     audit: dict[str, Any] = context["ti"].xcom_pull(task_ids="audit_document") or {}
     docs: list[dict[str, Any]] = audit.get("docs", [])
@@ -238,7 +252,19 @@ def classify_entity(**context) -> dict[str, Any]:
         md_path = f"{MD_OUTPUT_DIR}/{entity_slug}.md"
         dp_urn = f"urn:li:dataProduct:{product_id}"
 
-        is_edit = file_exists_on_master(md_path)
+        try:
+            is_edit = file_exists_on_master(md_path)
+        except RuntimeError as exc:
+            if is_ip_allowlist_error(exc):
+                print(
+                    f"  ⚠ [{dp_id}] GitHub API blocked by org IP allowlist — "
+                    "cannot check if file exists on master, defaulting to NEW. "
+                    "Add the Airflow worker IP to the GitHub org IP allowlist to fix this."
+                )
+                is_edit = False
+            else:
+                raise
+
         existing_dp = fetch_data_product(dp_urn)
 
         doc["is_edit"] = is_edit
@@ -289,11 +315,11 @@ def open_pr(**context) -> None:
     if pkg_dir not in sys.path:
         sys.path.insert(0, pkg_dir)
 
-    from sync.github_delivery import open_sync_pull_request  # noqa: PLC0415
-    try:
-        from sync.datahub_document_client import write_sync_status  # noqa: PLC0415
-    except ImportError:
-        write_sync_status = None  # type: ignore[assignment]
+    from sync.datahub_document_client import write_sync_status  # noqa: PLC0415
+    from sync.github_delivery import (  # noqa: PLC0415
+        is_ip_allowlist_error,
+        open_sync_pull_request,
+    )
 
     failed: list[str] = []
 
@@ -301,15 +327,12 @@ def open_pr(**context) -> None:
         dp_id = doc["data_product_id"]
         doc_urn = doc["document_urn"]
         title = doc.get("document_title", dp_id)
-        md_path = Path(doc["md_path"])
+        md_content = doc.get("md_content", "")
 
-        if not md_path.exists():
-            msg = f"Generated MD file not found for {dp_id}: {md_path}"
-            print(f"  ❌  {msg}")
+        if not md_content:
+            print(f"  ❌  No MD content in XCom payload for {dp_id}")
             failed.append(doc_urn)
             continue
-
-        md_content = md_path.read_text(encoding="utf-8")
 
         is_edit = doc.get("is_edit", False)
         pr_label = "EDIT" if is_edit else "NEW"
@@ -326,18 +349,23 @@ def open_pr(**context) -> None:
             print(f"       branch : {pr.branch}")
             print(f"       type   : {pr_label}")
 
-            # Write PASS back to DataHub document sidebar (optional — only if available)
-            if write_sync_status:
-                write_sync_status(
-                    doc_urn,
-                    status="PASS",
-                    data_product_urn=f"urn:li:dataProduct:{dp_id}",
-                )
+            write_sync_status(
+                doc_urn,
+                status="PASS",
+                data_product_urn=f"urn:li:dataProduct:{dp_id}",
+            )
 
         except Exception as exc:
-            print(f"  ❌  Failed to open PR for {dp_id}: {exc}")
-            if write_sync_status:
-                write_sync_status(doc_urn, status="FAIL", error=f"pr_error: {exc}")
+            if is_ip_allowlist_error(exc):
+                msg = (
+                    f"GitHub API blocked by org IP allowlist for {dp_id}. "
+                    "Add the Airflow worker IP to the GitHub org IP allowlist "
+                    "in Settings → Security → IP allow list."
+                )
+            else:
+                msg = str(exc)
+            print(f"  ❌  Failed to open PR for {dp_id}: {msg}")
+            write_sync_status(doc_urn, status="FAIL", error=f"pr_error: {msg}")
             failed.append(doc_urn)
 
     if failed:
