@@ -185,7 +185,7 @@ def _process_document(
         print(f"\n⏭  {label}  ({doc.urn}) — unchanged since last sync")
         return _OUTCOME_OK
 
-    parsed = parse_entity_markdown(doc.content)
+    parsed = parse_entity_markdown(doc.content, fallback_title=doc.title)
     parse_errors = validate_parsed_document(parsed)
     if parse_errors:
         print(f"\n⏭  {label}  ({doc.urn})")

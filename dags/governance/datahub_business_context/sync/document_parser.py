@@ -198,10 +198,19 @@ def extract_subjects_from_sql(sql: str) -> list[tuple[str, str]]:
     return found
 
 
-def parse_entity_markdown(markdown: str) -> ParsedEntityDocument:
+def parse_entity_markdown(
+    markdown: str, *, fallback_title: str = ""
+) -> ParsedEntityDocument:
     """Parse a TARS entity Context Document body into structured fields."""
     markdown = _MD_ESCAPE_RE.sub(r"\1", markdown)
     title = _extract_title(markdown)
+    _stripped_fallback = fallback_title.strip()
+    if (
+        title == "Untitled Entity"
+        and _stripped_fallback
+        and _stripped_fallback != "Untitled"
+    ):
+        title = _stripped_fallback
     sections = _split_sections(markdown)
 
     overview = _find_section(sections, "overview")
