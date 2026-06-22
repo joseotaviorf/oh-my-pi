@@ -108,3 +108,36 @@ workflow:
       extra_spark_job_arguments:
         - "12ao2yTFNffNaZWlb72hlU7mSS_WTob9MMs4UsFJLdBg"
         - "base"
+
+    # --- people_reports notebook migration (Tier-1 validated) ---
+    # Former notebook view: base_wfa
+    wfa_active_employee_roster:
+      extra_spark_job_arguments:
+        - "1QgICpSG4yJa1-zyvnSyTi0S8GPHf6Xg0hg0rgzg5v3Q"
+        - "base_oficial"
+    # Former notebook view: base_comms
+    comms_employee_roster:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1k69O446Nk2jwfVwqrh2e3lf9LhUlzPE9VBivMTrYcRk"
+        - "Grupo"
+    # Former notebook view: base_bandas_10
+    band_10_plus_roster:
+      extra_spark_job_arguments:
+        - "1L6wdq54Mhze69tXYEFDTcOG2B0GNLFV7NO_hm4Zralg"
+        - "base"
+    # Former notebook view: quintocare_titular
+    quintocare_titular_roster:
+      extra_spark_job_arguments:
+        - "1QgICpSG4yJa1-zyvnSyTi0S8GPHf6Xg0hg0rgzg5v3Q"
+        - "quintocare_titular"
+    # Former notebook view: base_compensation (tab base_analytics_raw)
+    compensation_analytics_raw:
+      extra_spark_job_arguments:
+        - "1A-am4WUHHoFMMbdArbQxhviprC1UHL_Wvt7phOEhJRo"
+        - "base_analytics_raw"
+    # Former notebook view: people_governance_project_management
+    governance_pm_roster:
+      extra_spark_job_arguments:
+        - "19JbdaddwOmC5cTdTWDLSSqFj4Vygehmeq7fDjPhMtp4"
+        - "Base"
