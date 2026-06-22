@@ -1,18 +1,22 @@
 database_name: datalake_metabase_clean
 table_name: permissions
-owner: luisa.ladeira@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about permissions in Metabase
+description: >
+  Clean-layer snapshot of Metabase group permission grants replicated from the Metabase PostgreSQL
+  permissions table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
+  row per permission object assigned to a group per load. Supports governance analytics on data
+  access policies and group-level authorization across Metabase collections and databases.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.permissions.id
-    description: Unique Id of the permission
+    description: Primary key from Metabase permissions identifying a distinct group-level access grant record.
   object:
     lineage:
       - datalake_metabase_raw.permissions.object
-    description: Object that the group has permission
+    description: Metabase permission path string naming the protected resource (collection, database, or table scope).
   id_group:
     lineage:
       - datalake_metabase_raw.permissions.group_id
-    description: Id of the group that has permission
+    description: Foreign key to the Metabase permissions group that receives the access grant on the named object.

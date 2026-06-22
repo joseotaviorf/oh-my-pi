@@ -1,66 +1,70 @@
 database_name: datalake_metabase_clean
 table_name: core_user
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about Metabase users
+description: >
+  Clean-layer snapshot of Metabase user accounts replicated from the Metabase PostgreSQL core_user
+  table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one row per
+  registered user per load date. Partitioned by year, month, day — filter on ingestion date.
+  Supports governance analytics on BI adoption, admin privileges, and login activity.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.core_user.id
-    description: Unique table user ID
+    description: Primary key from Metabase core_user identifying a distinct registered BI platform account.
   email:
     lineage:
       - datalake_metabase_raw.core_user.email
-    description: User email
+    description: Corporate email address used for Metabase login and Pulse subscription delivery.
   first_name:
     lineage:
       - datalake_metabase_raw.core_user.first_name
-    description: First name
+    description: Given name of the person associated with the Metabase account profile.
   last_name:
     lineage:
       - datalake_metabase_raw.core_user.last_name
-    description: Last name of the user
+    description: Family name of the person associated with the Metabase account profile.
   sso_source:
     lineage:
       - datalake_metabase_raw.core_user.sso_source
-    description: The source of the user's authentication
+    description: Identity provider or SSO mechanism used to authenticate the user (for example Google or SAML).
   is_active:
     lineage:
       - datalake_metabase_raw.core_user.is_active
-    description: The collection is activated
+    description: Boolean flag indicating whether the account can sign in and access Metabase resources.
   is_superuser:
     lineage:
       - datalake_metabase_raw.core_user.is_superuser
-    description: Whether the user is a member of the built-in Admin group.
+    description: Boolean flag indicating membership in the built-in Metabase Admin group with full permissions.
   is_qbnewb:
     lineage:
       - datalake_metabase_raw.core_user.is_qbnewb
-    description: If false then the user has been introduced to how the Query Builder
+    description: When true, the user has not yet completed the Metabase Query Builder onboarding walkthrough.
   is_datasetnewb:
     lineage:
       - datalake_metabase_raw.core_user.is_datasetnewb
-    description: If false then the user has been introduced to how the Dataset Builder works
+    description: When true, the user has not yet completed the Metabase Dataset Builder onboarding walkthrough.
   ts_joined:
     lineage:
       - datalake_metabase_raw.core_user.date_joined
-    description: Date and time the user registered in the system
+    description: Timestamp when the user account was first registered in Metabase (UTC).
   ts_last_login:
     lineage:
       - datalake_metabase_raw.core_user.last_login
-    description: Last time the user logged in
+    description: Timestamp of the most recent successful login for the account (UTC, null if never logged in).
   ts_updated:
     lineage:
       - datalake_metabase_raw.core_user.updated_at
-    description: Update date
+    description: Timestamp when the user profile record was last modified in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.core_user.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.core_user.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.core_user.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

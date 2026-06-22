@@ -1,74 +1,79 @@
 database_name: datalake_metabase_clean
 table_name: metabase_database
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about data sources configured in Metabase
+description: >
+  Clean-layer snapshot of data sources configured in Metabase, replicated from the Metabase
+  PostgreSQL metabase_database table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00
+  UTC). Grain is one row per connected warehouse or database per load date. Partitioned by year,
+  month, day — filter on ingestion date. Supports governance analytics on connected data assets
+  and sync schedules.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.metabase_database.id
-    description: Unique ID for each database
+    description: Primary key from Metabase identifying a distinct data source connection registered in the BI tool.
   name:
     lineage:
       - datalake_metabase_raw.metabase_database.name
-    description: Name of database instances
+    description: Human-readable label assigned to the connected warehouse or database in Metabase settings.
   description:
     lineage:
       - datalake_metabase_raw.metabase_database.description
-    description: Description about each database
+    description: Free-text notes describing the business purpose or contents of the connected data source.
   details:
     lineage:
       - datalake_metabase_raw.metabase_database.details
-    description: Information about each data source
+    description: JSON connection parameters for the data source (host, credentials references, and driver options).
   engine:
     lineage:
       - datalake_metabase_raw.metabase_database.engine
-    description: Type of database used for each data source configured in Metabase
+    description: Database driver type backing the connection (for example postgres, presto, or bigquery).
   timezone:
     lineage:
       - datalake_metabase_raw.metabase_database.timezone
-    description: Time zone configured for the data source
+    description: IANA timezone applied when Metabase interprets temporal fields from this data source.
   cache_field_values_schedule:
     lineage:
       - datalake_metabase_raw.metabase_database.cache_field_values_schedule
-    description: Schedule for caching field values
+    description: Cron-style schedule controlling how often Metabase refreshes cached distinct values for filter widgets.
   metadata_sync_schedule:
     lineage:
       - datalake_metabase_raw.metabase_database.metadata_sync_schedule
-    description: Schedule for metadata sync
+    description: Cron-style schedule controlling how often Metabase rescans schemas and tables from the warehouse.
   is_on_demand:
     lineage:
       - datalake_metabase_raw.metabase_database.is_on_demand
-    description: Whether the data source should be loaded on demand
+    description: When true, Metabase loads schema metadata lazily on first access instead of on a fixed schedule.
   is_sample:
     lineage:
       - datalake_metabase_raw.metabase_database.is_sample
-    description: Indicates whether the data source is a sample
+    description: When true, the connection points to Metabase bundled sample data rather than a production warehouse.
   is_full_sync:
     lineage:
       - datalake_metabase_raw.metabase_database.is_full_sync
-    description: Whether this database runs a full metadata sync
+    description: When true, each metadata sync rescans all tables; when false, only changed objects are refreshed.
   has_auto_run_queries:
     lineage:
       - datalake_metabase_raw.metabase_database.auto_run_queries
-    description: Whether this database auto runs queries
+    description: When true, Metabase automatically executes preview queries when a user opens a question or dashboard.
   ts_created:
     lineage:
       - datalake_metabase_raw.metabase_database.created_at
-    description: Date it was created
+    description: Timestamp when the data source connection was first registered in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.metabase_database.updated_at
-    description: Date it was updated
+    description: Timestamp when connection settings or sync configuration were last changed in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.metabase_database.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.metabase_database.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.metabase_database.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

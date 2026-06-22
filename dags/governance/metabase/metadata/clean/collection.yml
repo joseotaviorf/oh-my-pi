@@ -1,34 +1,38 @@
 database_name: datalake_metabase_clean
 table_name: collection
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about collections
+description: >
+  Clean-layer snapshot of Metabase content folders replicated from the Metabase PostgreSQL
+  collection table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is one
+  row per collection folder per load. Supports governance analytics on dashboard organization,
+  ownership, and archival status across Metabase workspaces.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.collection.id
-    description: Collection ID
+    description: Primary key from Metabase collection identifying a folder node in the content tree.
   id_user_personal_owner:
     lineage:
       - datalake_metabase_raw.collection.personal_owner_id
-    description: Collection owner user ID
+    description: Foreign key to core_user.id when the folder is a personal sandbox owned by one user (null for shared folders).
   name:
     lineage:
       - datalake_metabase_raw.collection.name
-    description: Collection name
+    description: Display title of the folder shown in the Metabase navigation sidebar and collection picker.
   description:
     lineage:
       - datalake_metabase_raw.collection.description
-    description: Collection description
+    description: Free-text notes authored in Metabase describing the intended purpose or audience of the folder.
   location:
     lineage:
       - datalake_metabase_raw.collection.location
-    description: Collection location
+    description: Materialized path string encoding the nested position of this folder within the Metabase content hierarchy.
   slug:
     lineage:
       - datalake_metabase_raw.collection.slug
-    description: Collection name slug
+    description: URL-safe identifier derived from the folder title for routing and deep links in Metabase.
   is_archived:
     lineage:
       - datalake_metabase_raw.collection.archived
-    description: Collection is archived
+    description: Boolean flag indicating the folder was archived and hidden from default Metabase browsing views.

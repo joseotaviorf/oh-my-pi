@@ -1,22 +1,26 @@
 database_name: datalake_metabase_clean
 table_name: query
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about queries executed in Metabase
+description: >
+  Clean-layer snapshot of deduplicated Metabase query fingerprints replicated from the Metabase
+  PostgreSQL query table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC). Grain is
+  one row per distinct query hash per load. Supports governance analytics on SQL patterns, query
+  performance baselines, and warehouse load from Metabase-generated SQL.
 columns:
   query:
     lineage:
       - datalake_metabase_raw.query.query
-    description: Stores executed SQL queries
+    description: Canonical SQL text executed by Metabase against connected warehouses, stored once per query hash.
   query_hash:
     lineage:
       - datalake_metabase_raw.query.query_hash
-    description: Hash for the query
+    description: Binary hash fingerprint Metabase uses to deduplicate identical SQL texts across executions.
   query_hash_string:
     lineage:
-      - datalake_metabase_raw.query
-    description: Hash for the query in string
+      - datalake_metabase_raw.query.query_hash
+    description: Base64-encoded string form of query_hash for joins and filtering in downstream governance models.
   average_execution_time_in_milliseconds:
     lineage:
       - datalake_metabase_raw.query.average_execution_time
-    description: Average query execution time
+    description: Rolling average runtime in milliseconds Metabase records for executions sharing this query hash.

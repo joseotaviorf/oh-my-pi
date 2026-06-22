@@ -1,114 +1,118 @@
 database_name: datalake_metabase_clean
 table_name: metabase_field
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about Metabase table columns
+description: >
+  Clean-layer snapshot of column metadata synced by Metabase from connected warehouses, replicated
+  from the Metabase PostgreSQL metabase_field table via CDC (metabase DAG, ingest at 05:00, 08:00,
+  and 12:00 UTC). Grain is one row per synced column per load date. Partitioned by year, month,
+  day — filter on ingestion date. Supports governance analytics on field visibility and semantic typing.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.metabase_field.id
-    description: Id of each field in the table
+    description: Primary key from Metabase identifying a distinct column synced from a connected warehouse table.
   id_table:
     lineage:
       - datalake_metabase_raw.metabase_field.table_id
-    description: Identifier of the table that the field belongs to
+    description: Foreign key to metabase_table.id for the warehouse table that owns this column definition.
   id_parent:
     lineage:
       - datalake_metabase_raw.metabase_field.parent_id
-    description: ID of a top field
+    description: Foreign key to another metabase_field.id when this column is nested under a composite or JSON field.
   id_fk_target_field:
     lineage:
       - datalake_metabase_raw.metabase_field.fk_target_field_id
-    description: Id of a target field that is related to the current table field
+    description: Foreign key to metabase_field.id for the referenced column when Metabase detects a foreign-key relationship.
   name:
     lineage:
       - datalake_metabase_raw.metabase_field.name
-    description: Field name
+    description: Physical column name as reported by the warehouse schema during Metabase metadata sync.
   display_name:
     lineage:
       - datalake_metabase_raw.metabase_field.display_name
-    description: Display name
+    description: User-facing label shown in Metabase questions and dashboards, which may differ from the warehouse name.
   description:
     lineage:
       - datalake_metabase_raw.metabase_field.description
-    description: Field description
+    description: Business description of the column curated in Metabase or inherited from warehouse comments.
   base_type:
     lineage:
       - datalake_metabase_raw.metabase_field.base_type
-    description: Primary data type
+    description: Metabase canonical data type for the column (for example type/Text or type/Integer).
   position:
     lineage:
       - datalake_metabase_raw.metabase_field.position
-    description: The position of the field
+    description: Ordinal position of the column within its parent table as returned by the warehouse catalog.
   field_values:
     lineage:
       - datalake_metabase_raw.metabase_field.has_field_values
-    description: Which type of field it is
+    description: Metabase setting controlling whether distinct values are cached for filter widgets on this column.
   visibility_type:
     lineage:
       - datalake_metabase_raw.metabase_field.visibility_type
-    description: Type of field visibility
+    description: Metabase visibility policy for the column (for example normal, details-only, or retired).
   fingerprint:
     lineage:
       - datalake_metabase_raw.metabase_field.fingerprint
-    description: Statistical summary of data contained in the field
+    description: JSON statistical summary computed by Metabase (min, max, percentiles, or distinct counts) for the column.
   fingerprint_version:
     lineage:
       - datalake_metabase_raw.metabase_field.fingerprint_version
-    description: Fingerprint version number
+    description: Version number of the fingerprint schema used when Metabase serialized the statistical summary.
   database_field_type:
     lineage:
       - datalake_metabase_raw.metabase_field.database_type
-    description: Database field type
+    description: Native warehouse type string for the column as reported during schema sync (for example VARCHAR or BIGINT).
   settings:
     lineage:
       - datalake_metabase_raw.metabase_field.settings
-    description: Custom Settings
+    description: JSON blob of Metabase-specific overrides such as remapped values or currency formatting for the column.
   semantic_type:
     lineage:
       - datalake_metabase_raw.metabase_field.semantic_type
-    description: Semantic type
+    description: Metabase semantic classification (for example type/Email or type/Currency) applied to guide visualizations.
   preview_display:
     lineage:
       - datalake_metabase_raw.metabase_field.preview_display
-    description: Configured preview view
+    description: Metabase setting controlling how sample values appear in table preview panes for this column.
   database_field_effective_type:
     lineage:
       - datalake_metabase_raw.metabase_field.effective_type
-    description: Effective type
+    description: Effective warehouse type after Metabase coercions, which may differ from the raw database_field_type.
   database_field_position:
     lineage:
       - datalake_metabase_raw.metabase_field.database_position
-    description: Database position
+    description: Column ordinal position in the underlying warehouse table catalog, distinct from Metabase UI ordering.
   is_active:
     lineage:
       - datalake_metabase_raw.metabase_field.active
-    description: Field is active
+    description: Boolean flag indicating the column is currently visible and selectable in Metabase questions.
   has_preview_display:
     lineage:
       - datalake_metabase_raw.metabase_field.preview_display
-    description: Configured preview view
+    description: Boolean derived from preview_display indicating whether a custom preview rendering is configured.
   ts_last_analyzed:
     lineage:
       - datalake_metabase_raw.metabase_field.last_analyzed
-    description: Date of last analysis
+    description: Timestamp when Metabase last computed fingerprints or value statistics for this column (UTC).
   ts_created:
     lineage:
       - datalake_metabase_raw.metabase_field.created_at
-    description: Date it was created
+    description: Timestamp when the column metadata row was first created in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.metabase_field.updated_at
-    description: Date it was updated
+    description: Timestamp when column metadata or semantic settings were last modified in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.metabase_field.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.metabase_field.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.metabase_field.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

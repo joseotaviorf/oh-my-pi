@@ -1,66 +1,70 @@
 database_name: datalake_metabase_clean
 table_name: metabase_table
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Table structure information within the Metabase system
+description: >
+  Clean-layer snapshot of warehouse tables registered in Metabase, replicated from the Metabase
+  PostgreSQL metabase_table table via CDC (metabase DAG, ingest at 05:00, 08:00, and 12:00 UTC).
+  Grain is one row per synced table per load date. Partitioned by year, month, day — filter on
+  ingestion date. Supports governance analytics on exposed datasets and visibility policies.
 columns:
   id:
     lineage:
       - datalake_metabase_raw.metabase_table.id
-    description: Unique table id
+    description: Primary key from Metabase identifying a distinct warehouse table synced into the BI catalog.
   id_database:
     lineage:
       - datalake_metabase_raw.metabase_table.db_id
-    description: Database id
+    description: Foreign key to metabase_database.id for the connected data source that owns this warehouse table.
   name:
     lineage:
       - datalake_metabase_raw.metabase_table.name
-    description: Table name
+    description: Physical table name as reported by the warehouse during Metabase metadata synchronization.
   display_name:
     lineage:
       - datalake_metabase_raw.metabase_table.display_name
-    description: Display name
+    description: User-facing label shown in Metabase pickers, which may differ from the underlying warehouse name.
   description:
     lineage:
       - datalake_metabase_raw.metabase_table.description
-    description: Description table
+    description: Business description of the warehouse table curated in Metabase or inherited from source comments.
   entity_type:
     lineage:
       - datalake_metabase_raw.metabase_table.entity_type
-    description: Entity type
+    description: Metabase entity classification (for example entity/UserTable or entity/EventTable) guiding default visuals.
   schema:
     lineage:
       - datalake_metabase_raw.metabase_table.schema
-    description: Table schema
+    description: Warehouse schema or namespace containing the physical table (for example public or analytics).
   visibility_type:
     lineage:
       - datalake_metabase_raw.metabase_table.visibility_type
-    description: Visibility type of a table
+    description: Metabase visibility policy controlling whether the table appears in the default data browser.
   is_active:
     lineage:
       - datalake_metabase_raw.metabase_table.active
-    description: The table is active
+    description: Boolean flag indicating the table is currently available for questions and dashboard cards in Metabase.
   has_table_showing_in_getting_started:
     lineage:
       - datalake_metabase_raw.metabase_table.show_in_getting_started
-    description: Start guide appears
+    description: When true, the table is promoted in Metabase Getting Started onboarding content for new users.
   ts_created:
     lineage:
       - datalake_metabase_raw.metabase_table.created_at
-    description: Date it was created
+    description: Timestamp when the table metadata row was first created in Metabase (UTC).
   ts_updated:
     lineage:
       - datalake_metabase_raw.metabase_table.updated_at
-    description: Date it was updated
+    description: Timestamp when table metadata or visibility settings were last modified in Metabase (UTC).
   year:
     lineage:
       - datalake_metabase_raw.metabase_table.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_metabase_raw.metabase_table.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_metabase_raw.metabase_table.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
