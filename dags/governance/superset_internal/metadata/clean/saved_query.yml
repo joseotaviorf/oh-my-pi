@@ -1,83 +1,87 @@
 ---
 database_name: datalake_superset_clean
 table_name: saved_query
-description: Table with Superset saved queries. This is a personal features that only the creator can see.
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of personal SQL Lab saved queries in Apache Superset replicated from the
+  Superset PostgreSQL saved_query table via CDC (superset_internal, daily 00:00 UTC). Grain is one
+  row per saved query per load date. Queries are private to their creator in Superset. Partitioned
+  by year, month, day — filter on ingestion date. Supports reuse-pattern and SQL-governance analytics.
 columns:
   id:
     lineage:
       - datalake_superset_raw.saved_query.id
-    description: Superset saved query id.
+    description: Primary key from Superset saved_query identifying a personal SQL Lab bookmark record.
   id_user:
     lineage:
       - datalake_superset_raw.saved_query.id_user
-    description: Superset id to identify the user who created the saved query.
+    description: Foreign key to ab_user.id for the Superset account that owns this saved query.
   id_database:
     lineage:
       - datalake_superset_raw.saved_query.id_database
-    description: Superset id to identify the database associated with saved query.
+    description: Foreign key to the Superset database connection targeted by the saved SQL statement.
   uuid:
     lineage:
       - datalake_superset_raw.saved_query.uuid
-    description: Universally Unique Identifier
+    description: Universally unique identifier assigned by Superset for stable saved-query references.
   label:
     lineage:
       - datalake_superset_raw.saved_query.label
-    description: Saved query name.
+    description: Human-readable title assigned by the user to label the saved SQL Lab query.
   schema:
     lineage:
       - datalake_superset_raw.saved_query.schema
-    description: What schemas compose the saved query.
+    description: Default database schema context stored with the saved query for SQL Lab execution.
   sql:
     lineage:
       - datalake_superset_raw.saved_query.sql
-    description: Saved query sql code.
+    description: Full SQL statement stored in the saved query and executed from SQL Lab when reopened.
   description:
     lineage:
       - datalake_superset_raw.saved_query.description
-    description: Save query description about query purpose.
+    description: Free-text note from the creator explaining the business purpose of the saved query.
   id_user_changed:
     lineage:
       - datalake_superset_raw.saved_query.id_user_changed
-    description: Superset id to identify the user who performed the last update.
+    description: Foreign key to ab_user.id for the account that last edited this saved query definition.
   id_user_created:
     lineage:
       - datalake_superset_raw.saved_query.id_user_created
-    description: Superset id to identify the user who created saved query.
+    description: Foreign key to ab_user.id for the account that originally created this saved query.
   extra_json:
     lineage:
       - datalake_superset_raw.saved_query.extra_json
-    description: Superset extra params aggregated in a json field.
+    description: JSON blob with additional Superset metadata attached to the saved query record.
   last_run:
     lineage:
       - datalake_superset_raw.saved_query.last_run
-    description: Las execution datetime. NaT if the query not executed yet.
+    description: Timestamp of the most recent execution of this saved query in SQL Lab (null if never run).
   rows:
     lineage:
       - datalake_superset_raw.saved_query.rows
-    description: Number of rows returned by saved query.
+    description: Row count returned by the last execution of this saved query in SQL Lab.
   template_parameters:
     lineage:
       - datalake_superset_raw.saved_query.template_parameters
-    description: Superset frontend params aggregated in a json field.
+    description: JSON map of Jinja template parameters configured for parameterized saved queries.
   ts_created:
     lineage:
       - datalake_superset_raw.saved_query.ts_created
-    description: Timestamp when this entry was created.
+    description: Timestamp when the saved query record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.saved_query.ts_changed
-    description: Timestamp when this entry was modified.
+    description: Timestamp when the saved query definition was last modified in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.saved_query.year
-    description: Executed year.
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.saved_query.month
-    description: Executed month.
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.saved_query.day
-    description: Executed day.
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

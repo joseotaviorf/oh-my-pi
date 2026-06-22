@@ -1,55 +1,59 @@
 ---
 database_name: datalake_superset_clean
 table_name: logs
-description: Detailed information about the operations carried out in the system
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset user action audit events replicated from the Superset
+  PostgreSQL logs table via CDC (superset_internal, daily 00:00 UTC). Grain is one row per logged
+  action per load date. Partitioned by year, month, day — filter on event ingestion date. Supports
+  governance analytics on dashboard and chart usage, query activity, and administrative operations.
 columns:
   id:
     lineage:
       - datalake_superset_raw.logs.id
-    description: Unique table id
+    description: Primary key from Superset logs identifying a distinct user action audit event record.
   id_user:
     lineage:
       - datalake_superset_raw.logs.user_id
-    description: ID of the user who created logs
+    description: Foreign key to ab_user.id for the Superset account that performed the logged action.
   id_dashboard:
     lineage:
       - datalake_superset_raw.logs.dashboard_id
-    description: Dashboard ID
+    description: Foreign key to the Superset dashboard involved in the action, when applicable (null otherwise).
   id_slice:
     lineage:
       - datalake_superset_raw.logs.slice_id
-    description: Slice ID
+    description: Foreign key to the Superset chart (slice) involved in the action, when applicable (null otherwise).
   action:
     lineage:
       - datalake_superset_raw.logs.action
-    description: Type of operation
+    description: Superset action code describing the operation (for example chart_view, dashboard_edit, or query).
   json:
     lineage:
       - datalake_superset_raw.logs.json
-    description: Additional logs information
+    description: JSON payload with additional context about the action (parameters, filters, or error details).
   duration_ms:
     lineage:
       - datalake_superset_raw.logs.duration_ms
-    description: Duration time
+    description: Elapsed time in milliseconds for the logged operation, when Superset records execution duration.
   referrer:
     lineage:
       - datalake_superset_raw.logs.referrer
-    description: Link URL
+    description: HTTP referrer URL from which the user navigated to trigger the logged Superset action.
   ts_event:
     lineage:
       - datalake_superset_raw.logs.dttm
-    description: Time it was registered
+    description: Timestamp when the user action occurred in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.logs.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.logs.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.logs.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

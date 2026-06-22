@@ -1,71 +1,79 @@
 ---
 database_name: datalake_superset_clean
 table_name: ab_user
-description: Information about system users
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset application users replicated from the Superset PostgreSQL
+  database via CDC (superset_internal, daily 00:00 UTC). Grain is one row per registered user
+  account per load date. Partitioned by year, month, day — filter on ingestion date. Supports
+  governance analytics on Superset identity, login activity, and account lifecycle.
 columns:
   id:
     lineage:
       - datalake_superset_raw.ab_user.id
-    description: Unique table id
+    description: Primary key from Superset ab_user identifying a distinct application account record.
   id_user_created:
     lineage:
       - datalake_superset_raw.ab_user.created_by_fk
-    description: User ID who created tables
+    description: Foreign key to ab_user.id for the account that originally created this user record.
   id_user_changed:
     lineage:
       - datalake_superset_raw.ab_user.changed_by_fk
-    description: User ID who modified tables
+    description: Foreign key to ab_user.id for the account that last modified this user profile.
   first_name:
     lineage:
       - datalake_superset_raw.ab_user.first_name
-    description: User's first name
+    description: User's given name as registered in the Superset account profile.
   last_name:
     lineage:
       - datalake_superset_raw.ab_user.last_name
-    description: About user name
+    description: User's family name as registered in the Superset account profile.
   username:
     lineage:
       - datalake_superset_raw.ab_user.username
-    description: Email user
+    description: Login username (typically corporate email) used to authenticate into Superset.
+  password:
+    lineage:
+      - datalake_superset_raw.ab_user.password
+    description: Hashed password credential stored by Superset for local authentication (replicated as-is from source).
   email:
     lineage:
       - datalake_superset_raw.ab_user.email
-    description: Email user
+    description: Corporate email address associated with the Superset account for notifications and SSO.
   is_active:
     lineage:
       - datalake_superset_raw.ab_user.active
-    description: User is active
+    description: Boolean flag indicating whether the account is enabled for Superset login and access.
   login_count:
     lineage:
       - datalake_superset_raw.ab_user.login_count
-    description: Login count
+    description: Cumulative number of successful Superset authentication events recorded for the user.
   fail_login_count:
     lineage:
       - datalake_superset_raw.ab_user.fail_login_count
-    description: Failed login count
+    description: Cumulative count of failed login attempts tracked before account lockout thresholds.
   ts_created:
     lineage:
       - datalake_superset_raw.ab_user.created_on
-    description: When created
+    description: Timestamp when the user record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.ab_user.changed_on
-    description: When it was modified
+    description: Timestamp when the user profile was last updated in Superset (UTC).
   ts_last_login:
     lineage:
       - datalake_superset_raw.ab_user.last_login
-    description: Last login date
+    description: Timestamp of the most recent successful Superset login for the user (UTC).
   year:
     lineage:
       - datalake_superset_raw.ab_user.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.ab_user.month
-    description: Moth created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.ab_user.day
-    description: Day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

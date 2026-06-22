@@ -1,135 +1,139 @@
 ---
 database_name: datalake_superset_clean
 table_name: query
-description: Information about queries executed in the system
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of SQL Lab query executions in Apache Superset replicated from the Superset
+  PostgreSQL query table via CDC (superset_internal, daily 00:00 UTC). Grain is one row per executed
+  or attempted query per load date. Partitioned by year, month, day — filter on execution date.
+  Used for governance analytics on ad-hoc query volume, performance, errors, and user behavior.
 columns:
   id:
     lineage:
       - datalake_superset_raw.query.id
-    description: Query identifier
+    description: Primary key from Superset query identifying a distinct SQL Lab execution attempt record.
   id_client:
     lineage:
       - datalake_superset_raw.query.client_id
-    description: Client identifier.
+    description: Browser session client identifier assigned by Superset SQL Lab for the query tab.
   id_database:
     lineage:
       - datalake_superset_raw.query.database_id
-    description: Database identifier. It connects to the db table on id.
+    description: Foreign key to the Superset database connection selected as the query execution target.
   id_sql_editor:
     lineage:
       - datalake_superset_raw.query.sql_editor_id
-    description: SQL Editor identifier.
+    description: Identifier of the SQL Lab editor tab session that initiated this query execution.
   id_user:
     lineage:
       - datalake_superset_raw.query.user_id
-    description: User identifier. It connects to the ab_user table on id.
+    description: Foreign key to ab_user.id for the Superset account that submitted the SQL Lab query.
   tmp_table_name:
     lineage:
       - datalake_superset_raw.query.tmp_table_name
-    description: Name of the temporary table associated with the executed query
+    description: Name of the temporary table created when the query runs as CREATE TABLE AS SELECT (CTAS).
   tab_name:
     lineage:
       - datalake_superset_raw.query.tab_name
-    description: Name on the describe on the sql lab tab.
+    description: User-visible label of the SQL Lab tab where the query was composed and executed.
   status:
     lineage:
       - datalake_superset_raw.query.status
-    description: Marks whether the query is a success or failed.
+    description: Execution outcome of the query (for example success, failed, running, or timed_out).
   schema:
     lineage:
       - datalake_superset_raw.query.schema
-    description: Schema selected on the left panel.
+    description: Target database schema selected in SQL Lab for query execution context.
   sql:
     lineage:
       - datalake_superset_raw.query.sql
-    description: SQL query executed.
+    description: Full SQL statement submitted by the user in SQL Lab before engine-specific rewriting.
   select_sql:
     lineage:
       - datalake_superset_raw.query.select_sql
-    description: Query SQL code
+    description: SELECT portion of the submitted SQL, extracted when Superset splits CTAS statements.
   executed_sql:
     lineage:
       - datalake_superset_raw.query.executed_sql
-    description: SQL code actually executed. Only filled when the query is executed.
+    description: SQL statement actually sent to the database engine after Superset preprocessing and limits.
   limit:
     lineage:
       - datalake_superset_raw.query.limit
-    description: Row limit imposed on the query
+    description: Maximum number of rows Superset requested the engine to return for this query run.
   select_as_cta:
     lineage:
       - datalake_superset_raw.query.select_as_cta
-    description: Writing to create a CTE
+    description: Boolean flag indicating whether the user chose to persist results as a new table (CTAS).
   select_as_cta_used:
     lineage:
       - datalake_superset_raw.query.select_as_cta_used
-    description: Tells if the query was used as a CTE
+    description: Boolean flag indicating whether the CTAS option was applied during this execution.
   progress:
     lineage:
       - datalake_superset_raw.query.progress
-    description: How much of the query has been executed. Usally is 0 or 100.
+    description: Percentage of query execution completed as reported by Superset (typically 0 or 100).
   rows:
     lineage:
       - datalake_superset_raw.query.rows
-    description: How many rows is returned by the query
+    description: Number of result rows returned by the query engine for this execution.
   error_message:
     lineage:
       - datalake_superset_raw.query.error_message
-    description: Error message shown to the user explaining why the query failed.
+    description: Error text surfaced to the user when the query failed in SQL Lab or the database engine.
   results_key:
     lineage:
       - datalake_superset_raw.query.results_key
-    description: Result key
+    description: Cache key Superset uses to retrieve stored query results from the async results backend.
   tracking_url:
     lineage:
       - datalake_superset_raw.query.tracking_url
-    description: Query details url. Usually is already out of date.
+    description: URL pointing to query execution details in the Superset async worker or engine UI.
   extra_json:
     lineage:
       - datalake_superset_raw.query.extra_json
-    description: More details about the query, such as columns list, error messages, etc
+    description: JSON blob with supplemental execution metadata (columns, engine logs, or Celery task info).
   tmp_schema_name:
     lineage:
       - datalake_superset_raw.query.tmp_schema_name
-    description: Name of the temporary schema associated with the executed query
+    description: Schema name where a CTAS temporary table would be created for this query run.
   ctas_method:
     lineage:
       - datalake_superset_raw.query.ctas_method
-    description: Type of method used to create the table
+    description: Strategy Superset used to materialize CTAS results (for example TABLE or VIEW).
   limiting_factor:
     lineage:
       - datalake_superset_raw.query.limiting_factor
-    description: Factor that limited the consultation
+    description: Component that capped result size (for example QUERY, DROPDOWN, or NOT_LIMITED).
   ts_start_running:
     lineage:
       - datalake_superset_raw.query.start_running_time
-    description: Unixtimestamp when the query started running.
+    description: Unix epoch timestamp when the query began executing on the database engine.
   ts_end_result_backend:
     lineage:
       - datalake_superset_raw.query.end_result_backend_time
-    description: Date the query result was finalized in the backend
+    description: Timestamp when query results were fully written to the Superset async results backend.
   ts_start:
     lineage:
       - datalake_superset_raw.query.start_time
-    description: Unixtimestamp when the query started
+    description: Unix epoch timestamp when Superset accepted and queued the query for execution.
   ts_changed:
     lineage:
       - datalake_superset_raw.query.changed_on
-    description: Timestamp when this entry was modified.
+    description: Timestamp when this query record was last updated in Superset (UTC).
   ts_end:
     lineage:
       - datalake_superset_raw.query.end_time
-    description: Unixtimestamp when the query ended.
+    description: Unix epoch timestamp when query execution finished (success or failure).
   year:
     lineage:
       - datalake_superset_raw.query.year
-    description: Executed year
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.query.month
-    description: Executed month
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.query.day
-    description: Executed day
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

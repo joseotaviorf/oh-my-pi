@@ -1,15 +1,19 @@
 ---
 database_name: datalake_superset_clean
 table_name: ab_role
-description: Access type information
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset Flask-AppBuilder access roles replicated from the
+  Superset PostgreSQL application database via CDC (superset_internal, daily 00:00 UTC). Grain is
+  one row per role definition per load date. Partitioned by year, month, day — filter on ingestion
+  date. Used for governance analytics on Superset permission and access-control coverage.
 columns:
   id:
     lineage:
       - datalake_superset_raw.ab_role.id
-    description: Id access
+    description: Primary key from Superset ab_role identifying a distinct permission role in the application.
   name:
     lineage:
       - datalake_superset_raw.ab_role.name
-    description: Role name
+    description: Human-readable role label configured in Superset (for example Admin, Alpha, or sql_lab).

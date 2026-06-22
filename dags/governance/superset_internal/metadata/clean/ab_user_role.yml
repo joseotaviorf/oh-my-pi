@@ -1,19 +1,23 @@
 ---
 database_name: datalake_superset_clean
 table_name: ab_user_role
-description: Information about the relationship between users and the table
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of user-to-role assignments in Apache Superset replicated from the Superset
+  PostgreSQL database via CDC (superset_internal, daily 00:00 UTC). Grain is one row per user and
+  role membership link per load date. Partitioned by year, month, day — filter on ingestion date.
+  Used to analyze Superset RBAC coverage and role distribution across accounts.
 columns:
   id:
     lineage:
       - datalake_superset_raw.ab_user_role.id
-    description: Unique table id
+    description: Primary key from Superset ab_user_role identifying a distinct user-to-role membership row.
   id_user:
     lineage:
       - datalake_superset_raw.ab_user_role.user_id
-    description: User id
+    description: Foreign key to ab_user.id for the Superset account receiving the assigned access role.
   id_role:
     lineage:
       - datalake_superset_raw.ab_user_role.role_id
-    description: Role ID
+    description: Foreign key to ab_role.id for the permission role granted to the Superset user account.
