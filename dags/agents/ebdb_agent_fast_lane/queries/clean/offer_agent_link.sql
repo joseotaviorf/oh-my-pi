@@ -1,3 +1,4 @@
+-- Clean layer for EBDB OfferAgentLink (ebdb_agent_fast_lane DAG).
 SELECT
     id,
     offer_id AS id_offer,
