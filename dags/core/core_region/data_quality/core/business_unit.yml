@@ -1,0 +1,68 @@
+---
+table_name: core_region.business_unit
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_core_business_unit:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_business_unit:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  ts_business_unit_updated:
+    is_complete:
+      severity_level: Error
+  # Grain-set parity: every id_business_unit in the core table must exist in clean and
+  # vice-versa (clean.business_unit is one row per id). Expect 0 one-sided rows.
+  matching_grain_business_unit_core_and_clean:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+           SELECT core.id_business_unit AS core_id, clean.id AS clean_id
+           FROM core_region.business_unit core
+           FULL OUTER JOIN datalake_hub_services_clean.business_unit clean
+             ON core.id_business_unit = clean.id
+           WHERE core.id_business_unit IS NULL OR clean.id IS NULL
+        )) = 0
+      severity_level: Warning
+  # Attribute parity vs clean (null-safe). The current-state attributes must match the
+  # latest clean values. Expect 0 mismatches.
+  matching_attributes_business_unit_core_and_clean:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM core_region.business_unit core
+         JOIN datalake_hub_services_clean.business_unit clean
+           ON core.id_business_unit = clean.id
+         WHERE NOT (
+           core.hub_name <=> clean.hub_name
+           AND core.business_context <=> clean.business_context
+           AND core.sdr_type <=> clean.sdr_type
+           AND core.negotiation_type <=> clean.negotiation_type
+           AND core.lead_types <=> clean.lead_types
+           AND core.operational_context <=> clean.operational_context
+         )) = 0
+      severity_level: Warning
+  # ts_created parity vs clean, compared at second granularity to absorb the
+  # millisecond/microsecond rendering difference between history and clean. Expect 0.
+  matching_ts_created_second_business_unit_core_and_clean:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM core_region.business_unit core
+         JOIN datalake_hub_services_clean.business_unit clean
+           ON core.id_business_unit = clean.id
+         WHERE NOT (
+           DATE_TRUNC('SECOND', core.ts_business_unit_created)
+             <=> DATE_TRUNC('SECOND', clean.ts_created)
+         )) = 0
+      severity_level: Warning

@@ -1,0 +1,77 @@
+database_name: core_region
+table_name: business_unit
+domain: Data Platform
+owner: gustavo.alencar@quintoandar.com.br
+description: >
+  Current-state Core Model for the Hub Services business_unit (hub) entity. One row per hub
+  (id_business_unit) holding the latest value of each tracked attribute (hub_name,
+  business_context, sdr_type, negotiation_type, lead_types, operational_context), reconstructed
+  from the narrow history table core_region.business_unit_history via CurrentStateBuilder
+  (latest value per attribute by transaction time). It mirrors datalake_hub_services_clean.business_unit
+  and is the source of truth for hub attributes in the region domain; consumed by region/hub
+  analytics and downstream core/dw models.
+columns:
+  sk_core_business_unit:
+    lineage:
+      - core_region.business_unit_history.id_business_unit
+    description: Surrogate key for the business_unit entity (SHA256 of entity type and
+      id_business_unit). Always unique; shares the same hash basis as the history table.
+  id_business_unit:
+    lineage:
+      - core_region.business_unit_history.id_business_unit
+    description: Business unit (Hub) primary key, sourced from the Hub Services business_unit table
+      id. Natural grain of this table.
+  hub_name:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Current display name of the hub (latest ev_hub_name value from history).
+  business_context:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Current business context served by the hub (SALE or RENT), the latest ev_business_context value from history.
+    categories:
+      SALE: Hub operates in the for-sale context.
+      RENT: Hub operates in the for-rent context.
+  sdr_type:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Current SDR (sales development representative) type configured for the hub (latest ev_sdr_type value from history).
+  negotiation_type:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Current negotiation type configured for the hub (latest ev_negotiation_type value from history).
+  lead_types:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Current lead types handled by the hub, stored as the source's stringified list value (latest ev_lead_types value from history).
+  operational_context:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Current operational context of the hub, e.g. the operating region/market label (latest ev_operational_context value from history).
+  ts_business_unit_created:
+    lineage:
+      - core_region.business_unit_history.value
+    description: Hub creation timestamp. Mirrors the source's current created_at (the latest
+      ev_ts_created value); reflects the live source value rather than a guaranteed-immutable
+      original creation date, as the source has been observed to bulk-reset created_at.
+  ts_business_unit_updated:
+    lineage:
+      - core_region.business_unit_history.ts_transaction
+    description: Hub last-update timestamp, derived as the maximum CDC database transaction time
+      across the hub's history events. This is the change-data-capture commit time, not the
+      source updated_at column.
+  ts_load:
+    description: Timestamp when this Core Model row was last loaded; set to current_timestamp()
+      during the ETL process.
+  year:
+    lineage:
+      - core_region.business_unit_history.ts_transaction
+    description: Year extracted from ts_business_unit_updated. Used as partition column.
+  month:
+    lineage:
+      - core_region.business_unit_history.ts_transaction
+    description: Month extracted from ts_business_unit_updated. Used as partition column.
+  day:
+    lineage:
+      - core_region.business_unit_history.ts_transaction
+    description: Day of month extracted from ts_business_unit_updated. Used as partition column.

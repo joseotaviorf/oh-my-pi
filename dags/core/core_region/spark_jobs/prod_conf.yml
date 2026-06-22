@@ -7,3 +7,37 @@ REGION_CONFIG_TABLE: "datalake_ebdb_clean.region_config"
 
 merge_on: ["id_region"]
 when_matched_update_condition: "source.ts_region_updated > target.ts_region_updated"
+
+# --- business_unit / business_unit_region current-state models (load_core_business_unit) ---
+# Built from the narrow history tables (core_region_history DAG) via CurrentStateBuilder.
+# event_configs are attribute-only plus ts_created (event_name ev_ts_created -> latest value =
+# current state, verified to mirror clean). ts_updated is derived as MAX(ts_transaction) in the job.
+BUSINESS_UNIT_HISTORY_TABLE: "core_region.business_unit_history"
+business_unit_merge_on: ["id_business_unit"]
+business_unit_when_matched_update_condition: "source.ts_business_unit_updated > target.ts_business_unit_updated"
+business_unit_event_configs:
+  - target_col: hub_name
+    target_type: string
+  - target_col: sdr_type
+    target_type: string
+  - target_col: lead_types
+    target_type: string
+  - target_col: negotiation_type
+    target_type: string
+  - target_col: operational_context
+    target_type: string
+  - target_col: business_context
+    target_type: string
+  - target_col: ts_business_unit_created
+    target_type: timestamp
+    event_name: ev_ts_created
+
+BUSINESS_UNIT_REGION_HISTORY_TABLE: "core_region.business_unit_region_history"
+business_unit_region_merge_on: ["id_region", "id_business_unit"]
+business_unit_region_when_matched_update_condition: "source.ts_business_unit_region_updated > target.ts_business_unit_region_updated"
+business_unit_region_event_configs:
+  - target_col: business_context
+    target_type: string
+  - target_col: ts_business_unit_region_created
+    target_type: timestamp
+    event_name: ev_ts_created

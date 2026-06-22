@@ -1,0 +1,76 @@
+# Schema validation file for core_region.business_unit
+# Path: dags/core/core_region/schemas/core/business_unit.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_business_unit:
+    type: string
+    required: true
+
+  # Business unit (Hub) identifier
+  id_business_unit:
+    type: bigint
+    required: true
+
+  # Hub display name
+  hub_name:
+    type: string
+    required: true
+
+  # Business context served (SALE/RENT)
+  business_context:
+    type: string
+    required: true
+
+  # SDR type
+  sdr_type:
+    type: string
+    required: true
+
+  # Negotiation type
+  negotiation_type:
+    type: string
+    required: true
+
+  # Lead types (stringified list from source)
+  lead_types:
+    type: string
+    required: true
+
+  # Operational context
+  operational_context:
+    type: string
+    required: true
+
+  # Hub creation timestamp (current source created_at)
+  ts_business_unit_created:
+    type: timestamp
+    required: true
+
+  # Hub last-update timestamp (MAX CDC transaction time)
+  ts_business_unit_updated:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 14
+max_columns: 14
+strict: true

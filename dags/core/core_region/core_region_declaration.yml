@@ -29,4 +29,34 @@ workflow:
       z_order_by: [id_region]
       table_properties:
         "delta.enableChangeDataFeed": "true"
+    business_unit:
+      load_spark_job: load_core_business_unit
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [year, month, day]
+      z_order_by: [id_business_unit]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+    business_unit_region:
+      load_spark_job: load_core_business_unit
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [year, month, day]
+      z_order_by: [id_region, id_business_unit]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
 
