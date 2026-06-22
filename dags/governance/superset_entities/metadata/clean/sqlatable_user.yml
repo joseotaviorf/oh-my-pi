@@ -1,19 +1,23 @@
 ---
 database_name: datalake_superset_clean
 table_name: sqlatable_user
-description: Table that links datasets to owner users
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dataset ownership assignments replicated from the
+  Superset PostgreSQL sqlatable_user junction table via CDC (superset_entities, daily 00:00 UTC).
+  Grain is one row per dataset-owner user pairing. Full snapshot without date partitions — use
+  for governance analytics on dataset stewardship and accountable ownership coverage.
 columns:
   id:
     lineage:
       - datalake_superset_raw.sqlatable_user.id
-    description: ID unique table
+    description: Primary key from Superset sqlatable_user identifying a distinct dataset-owner assignment record.
   id_user:
     lineage:
       - datalake_superset_raw.sqlatable_user.user_id
-    description: ID user
+    description: Foreign key to ab_user.id for the Superset account designated as owner of the dataset.
   id_table:
     lineage:
       - datalake_superset_raw.sqlatable_user.table_id
-    description: ID table created
+    description: Foreign key to tables.id for the dataset assigned to the owner user.

@@ -1,51 +1,55 @@
 ---
 database_name: datalake_superset_clean
 table_name: tag
-description: Table that lists all tags in Superset (TAG feature not being used)
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset tag definitions replicated from the Superset PostgreSQL
+  tag table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per tag per load date.
+  Partitioned by year, month, day — filter on ingestion date. Supports governance analytics on
+  content labeling; the tagging feature has limited adoption at QuintoAndar.
 columns:
   id:
     lineage:
       - datalake_superset_raw.tag.id
-    description: Unique ID of each record in the system
+    description: Primary key from Superset tag identifying a distinct tag definition record.
   id_user_created:
     lineage:
       - datalake_superset_raw.tag.created_by_fk
-    description: ID of the user who created the tag
+    description: Foreign key to ab_user.id for the Superset account that originally created the tag.
   id_user_changed:
     lineage:
       - datalake_superset_raw.tag.changed_by_fk
-    description: ID of the user who made the last change
+    description: Foreign key to ab_user.id for the account that last modified the tag definition.
   tag_name:
     lineage:
       - datalake_superset_raw.tag.name
-    description: Tag name
+    description: Display name of the tag used to label dashboards, charts, or datasets in Superset.
   type:
     lineage:
       - datalake_superset_raw.tag.type
-    description: Tag type
+    description: Tag category distinguishing custom labels from system-generated tag types in Superset.
   description:
     lineage:
       - datalake_superset_raw.tag.description
-    description: Tag description
+    description: Free-text explanation of the tag purpose, intended usage, or classification criteria.
   ts_created:
     lineage:
       - datalake_superset_raw.tag.created_on
-    description: When it was created
+    description: Timestamp when the tag record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.tag.changed_on
-    description: When it was modified
+    description: Timestamp when the tag definition was last updated in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.tag.year
-    description: The year it was created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.tag.month
-    description: The month it was created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.tag.day
-    description: The day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

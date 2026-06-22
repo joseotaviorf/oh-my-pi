@@ -1,67 +1,71 @@
 ---
 database_name: datalake_superset_clean
 table_name: table_schema
-description: Table that lists all tables and their schemas.
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset SQL Lab table browser state replicated from the Superset
+  PostgreSQL table_schema table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per
+  saved schema exploration entry per load date. Partitioned by year, month, day — filter on
+  ingestion date. Supports governance analytics on SQL Lab usage patterns and database catalog browsing.
 columns:
   id:
     lineage:
       - datalake_superset_raw.table_schema.id
-    description: Unique ID of each record in the system
+    description: Primary key from Superset table_schema identifying a distinct SQL Lab schema browser entry.
   id_user_created:
     lineage:
       - datalake_superset_raw.table_schema.created_by_fk
-    description: ID of the user who created the table schema
+    description: Foreign key to ab_user.id for the Superset account that saved this schema browser state.
   id_user_changed:
     lineage:
       - datalake_superset_raw.table_schema.changed_by_fk
-    description: ID of the user who made the last change
+    description: Foreign key to ab_user.id for the account that last modified the schema browser entry.
   id_tab_state:
     lineage:
       - datalake_superset_raw.table_schema.tab_state_id
-    description: Table State ID
+    description: Foreign key to the SQL Lab tab state session that owns this schema browser snapshot.
   id_database:
     lineage:
       - datalake_superset_raw.table_schema.database_id
-    description: ID of the database the table belongs to
+    description: Foreign key to the Superset database connection being browsed in SQL Lab.
   extra_json:
     lineage:
       - datalake_superset_raw.table_schema.extra_json
-    description: Additional information in JSON format
+    description: JSON payload with supplemental schema browser metadata such as column selections or filters.
   schema:
     lineage:
       - datalake_superset_raw.table_schema.schema
-    description: Table schema name
+    description: Database schema name displayed in the SQL Lab table browser for the connected database.
   table:
     lineage:
       - datalake_superset_raw.table_schema.table
-    description: Schema table name
+    description: Table or view name within the schema that the user expanded or inspected in SQL Lab.
   description:
     lineage:
       - datalake_superset_raw.table_schema.description
-    description: Description of shema
+    description: Free-text notes the user attached to the schema browser entry for context or documentation.
   expanded:
     lineage:
       - datalake_superset_raw.table_schema.expanded
-    description: Indicates whether the table is displaying more details
+    description: Boolean flag indicating whether the table node was expanded in the SQL Lab schema tree UI.
   ts_created:
     lineage:
       - datalake_superset_raw.table_schema.created_on
-    description: When it was created
+    description: Timestamp when the schema browser entry was first saved in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.table_schema.changed_on
-    description: When it was modified
+    description: Timestamp when the schema browser entry was last updated in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.table_schema.year
-    description: The year it was created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.table_schema.month
-    description: The month it was created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.table_schema.day
-    description: The day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

@@ -1,19 +1,23 @@
 ---
 database_name: datalake_superset_clean
 table_name: dashboard_slices
-description: Table that links dashboards to slices
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dashboard-to-chart membership links replicated from the
+  Superset PostgreSQL dashboard_slices junction table via CDC (superset_entities, daily 00:00 UTC).
+  Grain is one row per dashboard-chart association. Full snapshot without date partitions — use for
+  governance analytics on dashboard composition, chart reuse, and content lineage.
 columns:
   id:
     lineage:
       - datalake_superset_raw.dashboard_slices.id
-    description: This column represents an unique ID for the combination of id_dashboard and id_slice.
+    description: Primary key from Superset dashboard_slices identifying a distinct dashboard-chart link record.
   id_dashboard:
     lineage:
       - datalake_superset_raw.dashboard_slices.dashboard_id
-    description: Contains the ID of each dashboard
+    description: Foreign key to dashboards.id for the dashboard that includes the associated chart.
   id_slice:
     lineage:
       - datalake_superset_raw.dashboard_slices.slice_id
-    description: This column represents the ID of each slice
+    description: Foreign key to slices.id for the chart placed on the associated dashboard.

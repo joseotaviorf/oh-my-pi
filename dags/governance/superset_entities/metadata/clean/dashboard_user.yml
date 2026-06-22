@@ -1,19 +1,23 @@
 ---
 database_name: datalake_superset_clean
 table_name: dashboard_user
-description: Table that links dashboards to owner users
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dashboard ownership assignments replicated from the
+  Superset PostgreSQL dashboard_user junction table via CDC (superset_entities, daily 00:00 UTC).
+  Grain is one row per dashboard-owner user pairing. Full snapshot without date partitions — use
+  for governance analytics on dashboard stewardship and accountable ownership coverage.
 columns:
   id:
     lineage:
       - datalake_superset_raw.dashboard_user.id
-    description: Unique ID for the relationship between user and dashboard
+    description: Primary key from Superset dashboard_user identifying a distinct dashboard-owner assignment record.
   id_user:
     lineage:
       - datalake_superset_raw.dashboard_user.user_id
-    description: Unique user ID
+    description: Foreign key to ab_user.id for the Superset account designated as owner of the dashboard.
   id_dashboard:
     lineage:
       - datalake_superset_raw.dashboard_user.dashboard_id
-    description: Unique dashboard ID
+    description: Foreign key to dashboards.id for the dashboard assigned to the owner user.

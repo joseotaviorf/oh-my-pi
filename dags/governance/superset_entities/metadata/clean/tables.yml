@@ -1,127 +1,131 @@
 ---
 database_name: datalake_superset_clean
 table_name: tables
-description: Table that lists all tables in Superset and their metadata
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dataset (sqlatable) definitions replicated from the
+  Superset PostgreSQL tables table via CDC (superset_entities, daily 00:00 UTC). Grain is one row
+  per dataset per load date. Partitioned by year, month, day — filter on ingestion date. Supports
+  governance analytics on dataset inventory, SQL definitions, cache settings, and schema bindings.
 columns:
   id:
     lineage:
       - datalake_superset_raw.tables.id
-    description: Unique ID of each record in the system
+    description: Primary key from Superset tables identifying a distinct dataset (sqlatable) record.
   id_database:
     lineage:
       - datalake_superset_raw.tables.database_id
-    description: ID of the database the table belongs to
+    description: Foreign key to the Superset database connection that hosts the underlying physical or virtual table.
   id_user_created:
     lineage:
       - datalake_superset_raw.tables.created_by_fk
-    description: User ID that created the table
+    description: Foreign key to ab_user.id for the Superset account that originally registered the dataset.
   id_user_changed:
     lineage:
       - datalake_superset_raw.tables.changed_by_fk
-    description: ID of the user who made the last change
+    description: Foreign key to ab_user.id for the account that last modified the dataset configuration.
   table_name:
     lineage:
       - datalake_superset_raw.tables.table_name
-    description: Table names
+    description: Dataset name as displayed in Superset chart builders and dataset management screens.
   main_dttm_col:
     lineage:
       - datalake_superset_raw.tables.main_dttm_col
-    description: Main date column
+    description: Name of the primary datetime column Superset uses for time-range filters on this dataset.
   offset:
     lineage:
       - datalake_superset_raw.tables.offset
-    description: Data position
+    description: Time offset in seconds applied to the main datetime column for timezone or reporting adjustments.
   description:
     lineage:
       - datalake_superset_raw.tables.description
-    description: Table description
+    description: Free-text business description of the dataset purpose, grain, and intended consumers.
   is_featured:
     lineage:
       - datalake_superset_raw.tables.is_featured
-    description: DEPRECATED
+    description: Deprecated Superset flag formerly used to highlight datasets on the homepage (no longer active).
   cache_timeout:
     lineage:
       - datalake_superset_raw.tables.cache_timeout
-    description: Cache expiration time
+    description: Dataset-level cache duration in seconds before Superset re-executes underlying queries.
   default_endpoint:
     lineage:
       - datalake_superset_raw.tables.default_endpoint
-    description: Default access point
+    description: Default Superset UI route opened when navigating directly to this dataset.
   schema:
     lineage:
       - datalake_superset_raw.tables.schema
-    description: Table schema
+    description: Database schema name where the physical table or view backing the dataset resides.
   sql_code:
     lineage:
       - datalake_superset_raw.tables.sql
-    description: SQL code for the tables
+    description: SQL statement defining a virtual dataset when the datasource is a custom query rather than a physical table.
   params:
     lineage:
       - datalake_superset_raw.tables.params
-    description: Table parameters
+    description: JSON parameters for dataset-level configuration such as remote cache or certification metadata.
   perm:
     lineage:
       - datalake_superset_raw.tables.perm
-    description: Table database
+    description: Permission string encoding the fully qualified dataset path used for Superset access control.
   filter_select_enabled:
     lineage:
       - datalake_superset_raw.tables.filter_select_enabled
-    description: Indicates whether the table has a filter
+    description: Boolean flag indicating whether ad-hoc filter dropdowns are enabled for this dataset in Explore.
   fetch_values_predicate:
     lineage:
       - datalake_superset_raw.tables.fetch_values_predicate
-    description: Shows the table predicate
+    description: SQL predicate appended when Superset loads distinct values for filter dropdowns on this dataset.
   is_sqllab_view:
     lineage:
       - datalake_superset_raw.tables.is_sqllab_view
-    description: Shows if the table is a view in SQL Lab
+    description: Boolean flag indicating whether the dataset was created as a saved SQL Lab view.
   template_params:
     lineage:
       - datalake_superset_raw.tables.template_params
-    description: Parameters used to configure a template
+    description: Jinja template parameters available for dynamic SQL substitution in virtual datasets.
   schema_perm:
     lineage:
       - datalake_superset_raw.tables.schema_perm
-    description: Parameter schema
+    description: Permission string for the database schema associated with this dataset.
   extra:
     lineage:
       - datalake_superset_raw.tables.extra
-    description: Stores additional info
+    description: JSON blob with supplemental dataset metadata such as certification tags or engine hints.
   uuid:
     lineage:
       - datalake_superset_raw.tables.uuid
-    description: Stores a unique key to identify each view
+    description: Globally unique identifier assigned to the dataset for API references and external integrations.
   is_managed_externally:
     lineage:
       - datalake_superset_raw.tables.is_managed_externally
-    description: Whether the table is being managed by another system
+    description: Boolean flag indicating whether dataset definitions are owned and updated by an external system.
   external_url:
     lineage:
       - datalake_superset_raw.tables.external_url
-    description: Table external link
+    description: URL pointing to the authoritative dataset definition when managed outside Superset.
   normalize_columns:
     lineage:
       - datalake_superset_raw.tables.normalize_columns
-    description: Indicates whether data columns are being adjusted
+    description: Boolean flag indicating whether Superset normalizes column names to lowercase on ingest.
   ts_created:
     lineage:
       - datalake_superset_raw.tables.created_on
-    description: When it was created
+    description: Timestamp when the dataset record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.tables.changed_on
-    description: When it was modified
+    description: Timestamp when the dataset configuration was last updated in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.tables.year
-    description: The year it was created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.tables.month
-    description: The month it was created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.tables.day
-    description: The day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

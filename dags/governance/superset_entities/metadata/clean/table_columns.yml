@@ -1,95 +1,99 @@
 ---
 database_name: datalake_superset_clean
 table_name: table_columns
-description: Table that lists all dashboards in Superset and their metadata
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dataset column definitions replicated from the Superset
+  PostgreSQL table_columns table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per
+  column per load date. Partitioned by year, month, day — filter on ingestion date. Supports
+  governance analytics on dataset schema coverage, column types, and Explore filter configuration.
 columns:
   id:
     lineage:
       - datalake_superset_raw.table_columns.id
-    description: Unique ID of each record in the system
+    description: Primary key from Superset table_columns identifying a distinct dataset column record.
   id_table:
     lineage:
       - datalake_superset_raw.table_columns.table_id
-    description: Unique identifier for each table
+    description: Foreign key to tables.id for the Superset dataset that contains this column definition.
   id_user_created:
     lineage:
       - datalake_superset_raw.table_columns.created_by_fk
-    description: ID of the user who created the table column
+    description: Foreign key to ab_user.id for the Superset account that originally registered the column.
   id_user_changed:
     lineage:
       - datalake_superset_raw.table_columns.changed_by_fk
-    description: ID of the user who made the last change
+    description: Foreign key to ab_user.id for the account that last modified the column metadata.
   column_name:
     lineage:
       - datalake_superset_raw.table_columns.column_name
-    description: Column name within a table
+    description: Physical or logical column name as exposed to Superset charts and SQL on the dataset.
   type:
     lineage:
       - datalake_superset_raw.table_columns.type
-    description: Column data type
+    description: Superset data type assigned to the column (for example VARCHAR, BIGINT, or DATETIME).
   groupby:
     lineage:
       - datalake_superset_raw.table_columns.groupby
-    description: Indicates whether data has been grouped
+    description: Boolean flag indicating whether the column is available as a dimension for grouping in Explore.
   filterable:
     lineage:
       - datalake_superset_raw.table_columns.filterable
-    description: Indicates whether the data has been filtered
+    description: Boolean flag indicating whether the column can be used as a filter control in Superset Explore.
   description:
     lineage:
       - datalake_superset_raw.table_columns.description
-    description: Description about the table column
+    description: Free-text business description of the column meaning, grain, and valid value ranges.
   expression:
     lineage:
       - datalake_superset_raw.table_columns.expression
-    description: Column description
+    description: SQL expression defining a calculated column when the field is derived rather than physical.
   verbose_name:
     lineage:
       - datalake_superset_raw.table_columns.verbose_name
-    description: Descriptive column name
+    description: Human-readable label displayed for the column in Superset chart builders and tooltips.
   python_date_format:
     lineage:
       - datalake_superset_raw.table_columns.python_date_format
-    description: Stores the date format used in the Python standard
+    description: Python strftime pattern Superset uses to parse and format datetime values for this column.
   uuid:
     lineage:
       - datalake_superset_raw.table_columns.uuid
-    description: Stores a unique key to identify each view
+    description: Globally unique identifier assigned to the column for API references and external integrations.
   extra:
     lineage:
       - datalake_superset_raw.table_columns.extra
-    description: Column extra infos
+    description: JSON blob with supplemental column metadata such as certification tags or engine hints.
   advanced_data_type:
     lineage:
       - datalake_superset_raw.table_columns.advanced_type
-    description: Advanced data type
-  is_ddtm:
+    description: Extended Superset data type classification for specialized rendering or validation rules.
+  is_dttm:
     lineage:
       - datalake_superset_raw.table_columns.is_dttm
-    description: Indicates if the data is ddtm format
+    description: Boolean flag indicating whether Superset treats this column as a datetime dimension.
   is_active:
     lineage:
       - datalake_superset_raw.table_columns.is_active
-    description: Indicates if the column is active
+    description: Boolean flag indicating whether the column is enabled and visible in Superset Explore.
   ts_created:
     lineage:
       - datalake_superset_raw.table_columns.created_ons
-    description: When it was created
+    description: Timestamp when the column record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.table_columns.changed_on
-    description: When it was modified
+    description: Timestamp when the column metadata was last updated in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.table_columns.year
-    description: The year it was created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.table_columns.month
-    description: The month it was created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.table_columns.day
-    description: The day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

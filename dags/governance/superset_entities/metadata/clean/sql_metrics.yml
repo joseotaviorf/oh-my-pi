@@ -1,83 +1,87 @@
 ---
 database_name: datalake_superset_clean
 table_name: sql_metrics
-description: Table that lists all metrics registered on datasets on Superset
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dataset metric definitions replicated from the Superset
+  PostgreSQL sql_metrics table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per
+  metric per load date. Partitioned by year, month, day — filter on ingestion date. Supports
+  governance analytics on metric inventory, aggregation expressions, and dataset-level KPI coverage.
 columns:
   id:
     lineage:
       - datalake_superset_raw.sql_metrics.id
-    description: Unique ID for each record in the system
+    description: Primary key from Superset sql_metrics identifying a distinct dataset metric record.
   id_table:
     lineage:
       - datalake_superset_raw.sql_metrics.table_id
-    description: ID of each table
+    description: Foreign key to tables.id for the Superset dataset that owns this metric definition.
   id_user_created:
     lineage:
       - datalake_superset_raw.sql_metrics.created_by_fk
-    description: ID of the user who created the record
+    description: Foreign key to ab_user.id for the Superset account that originally created the metric.
   id_user_changed:
     lineage:
       - datalake_superset_raw.sql_metrics.changed_by_fk
-    description: ID of the user who made the last change
+    description: Foreign key to ab_user.id for the account that last modified the metric definition.
   metric_name:
     lineage:
       - datalake_superset_raw.sql_metrics.metric_name
-    description: Metric name
+    description: Internal metric identifier referenced in Superset chart configurations and SQL expressions.
   verbose_name:
     lineage:
       - datalake_superset_raw.sql_metrics.verbose_name
-    description: Metric Description
+    description: Human-readable label displayed for the metric in Superset Explore and chart tooltips.
   metric_type:
     lineage:
       - datalake_superset_raw.sql_metrics.metric_type
-    description: Type of metric used
+    description: Superset metric classification (for example count, sum, or custom) governing default behavior.
   expression:
     lineage:
       - datalake_superset_raw.sql_metrics.expression
-    description: Expression used
+    description: SQL or Superset expression that computes the metric value from underlying dataset columns.
   description:
     lineage:
       - datalake_superset_raw.sql_metrics.description
-    description: Detailed explanation of the metric
+    description: Free-text business definition explaining what the metric measures and how it should be interpreted.
   d3format:
     lineage:
       - datalake_superset_raw.sql_metrics.d3format
-    description: Data display format
+    description: D3 number format string controlling how metric values render in charts (for example ,.2f or $,.0f).
   warning_text:
     lineage:
       - datalake_superset_raw.sql_metrics.warning_text
-    description: Alert messages
+    description: User-facing caution message displayed alongside the metric when data quality or usage caveats apply.
   extra:
     lineage:
       - datalake_superset_raw.sql_metrics.extra
-    description: Additional notice information
+    description: JSON blob with supplemental metric metadata such as certification tags or engine-specific hints.
   uuid:
     lineage:
       - datalake_superset_raw.sql_metrics.uuid
-    description: Stores a unique key to identify each view
+    description: Globally unique identifier assigned to the metric for API references and external integrations.
   currency:
     lineage:
       - datalake_superset_raw.sql_metrics.is_currency
-    description: Type of currency
+    description: Boolean flag indicating whether the metric represents a monetary value requiring currency formatting.
   ts_created:
     lineage:
       - datalake_superset_raw.sql_metrics.created_on
-    description: When it was created
+    description: Timestamp when the metric record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.sql_metrics.changed_on
-    description: When it was modified
+    description: Timestamp when the metric definition was last updated in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.sql_metrics.year
-    description: The year it was created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.sql_metrics.month
-    description: The month it was created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.sql_metrics.day
-    description: The day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

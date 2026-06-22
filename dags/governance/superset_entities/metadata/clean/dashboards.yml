@@ -1,86 +1,91 @@
+---
 database_name: datalake_superset_clean
 table_name: dashboards
-description: Table that lists all dashboards in Superset and their metadata
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Clean-layer snapshot of Apache Superset dashboard definitions replicated from the Superset
+  PostgreSQL dashboards table via CDC (superset_entities, daily 00:00 UTC). Grain is one row per
+  dashboard per load date. Partitioned by year, month, day — filter on ingestion date. Supports
+  governance analytics on dashboard inventory, publication status, certification, and layout metadata.
 columns:
   id:
     lineage:
       - datalake_superset_raw.dashboards.id
-    description: Unique ID of each record in the system
+    description: Primary key from Superset dashboards identifying a distinct dashboard record.
   id_user_created:
     lineage:
       - datalake_superset_raw.dashboards.created_by_fk
-    description: ID of the user who created the dashboard
+    description: Foreign key to ab_user.id for the Superset account that originally created the dashboard.
   id_user_changed:
     lineage:
       - datalake_superset_raw.dashboards.changed_by_fk
-    description: ID of the user who changed the dashboard
+    description: Foreign key to ab_user.id for the account that last modified the dashboard configuration.
   dashboard_title:
     lineage:
       - datalake_superset_raw.dashboards.dashboard_title
-    description: Dashboard title
+    description: User-visible title displayed in the Superset dashboard list and navigation menus.
   position_json:
     lineage:
       - datalake_superset_raw.dashboards.position_json
-    description: Describes the dashboards elements and their relationships.
+    description: JSON layout describing chart tiles, grid positions, and component relationships on the dashboard canvas.
   css:
     lineage:
       - datalake_superset_raw.dashboards.css
-    description: Contains information about the layout of the dashboards
+    description: Custom CSS rules applied to override default Superset styling for this dashboard.
   json_metadata:
     lineage:
       - datalake_superset_raw.dashboards.json_metadata
-    description: Stores dashboard settings and data
+    description: JSON blob with dashboard-level settings such as color scheme, filter scopes, and native filter configuration.
   description:
     lineage:
       - datalake_superset_raw.dashboards.description
-    description: Always empty since version 3.1.1 doesn't allow edition on this field. It's kept for compatibility reasons.
+    description: Free-text dashboard description field; typically empty in Superset 3.1.1+ where inline editing was removed.
   slug:
     lineage:
       - datalake_superset_raw.dashboards.slug
-    description: Stores a simplified version of the panel name or title
+    description: URL-friendly identifier used in Superset dashboard permalinks and routing paths.
   published:
     lineage:
       - datalake_superset_raw.dashboards.published
-    description: Brings a boolean value that indicates whether the dashboard is published or not
+    description: Boolean flag indicating whether the dashboard is published and visible to non-owner users.
   uuid:
     lineage:
       - datalake_superset_raw.dashboards.uuid
-    description: Stores a distinct key for each dashboard
+    description: Globally unique identifier assigned to the dashboard for API references and external integrations.
   certified_by:
     lineage:
       - datalake_superset_raw.dashboards.certified_by
-    description: If the dashboard is certified
+    description: Name or team label of the person or group that certified the dashboard as trusted for consumption.
   certification_details:
     lineage:
       - datalake_superset_raw.dashboards.certification_details
-    description: Which team created the dashboard
+    description: Free-text notes explaining the certification rationale, scope, or responsible team.
   is_managed_externally:
     lineage:
       - datalake_superset_raw.dashboards.is_managed_externally
-    description: Indicates whether the dashboard is managed externally
+    description: Boolean flag indicating whether dashboard content is owned and updated by an external system.
   external_url:
     lineage:
       - datalake_superset_raw.dashboards.external_url
-    description: Shows the dashboard url
+    description: URL pointing to the authoritative dashboard definition when managed outside Superset.
   ts_created:
     lineage:
       - datalake_superset_raw.dashboards.created_on
-    description: When it was created
+    description: Timestamp when the dashboard record was first created in Superset (UTC).
   ts_changed:
     lineage:
       - datalake_superset_raw.dashboards.changed_on
-    description: When it was modified
+    description: Timestamp when the dashboard configuration was last updated in Superset (UTC).
   year:
     lineage:
       - datalake_superset_raw.dashboards.year
-    description: The year it was created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_superset_raw.dashboards.month
-    description: The month it was created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_superset_raw.dashboards.day
-    description: The day it was created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.
