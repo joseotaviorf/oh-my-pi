@@ -3,141 +3,144 @@ database_name: datalake_hub_services_clean
 table_name: visitor_prospection_aud
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Visitor prospection process in Hub Services.
+description: |
+  Envers audit history for visitor prospection rows in Hub Services, capturing each revision of the
+  denormalized agent worklist entry (visitor, responsible agent, reminder, and lead-priority fields).
+  One row per revision per prospection id; join to rev_info on rev for the editing user and timestamp.
 columns:
   id:
+    description: Primary key of the visitor prospection entity whose change is recorded in this audit row.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.id
   id_visitor:
+    description: Visitor being prospected in the agent queue at the time of this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.visitor_id
-    description: Unique identifier for visitor.
+      - datalake_hub_services_raw.visitor_prospection_aud.visitor_id
   id_responsible:
+    description: Hub user id of the agent assigned to this prospection task in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.responsible_id
-    description: Unique identifier for responsible.
+      - datalake_hub_services_raw.visitor_prospection_aud.responsible_id
   id_reminder:
+    description: Linked reminder id when the prospection row was tied to a scheduled follow-up.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_id
-    description: Unique identifier for reminder.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_id
   id_reminder_type:
+    description: Reminder type catalog id denormalized onto the prospection row in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_id
-    description: Unique identifier for reminder type.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_id
   priority_lead_status:
+    description: Lead status bucket used to prioritize the visitor in agent queues for this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_status
-    description: Value of priority lead status in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_status
   priority_lead_type:
+    description: Lead type dimension used alongside status for queue ordering rules in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_type
-    description: Value of priority lead type in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_type
   reminder_type_name:
+    description: Display name of the linked reminder type copied for list rendering without joins.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_name
-    description: Value of reminder type name in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_name
   reminder_status:
+    description: Current status of the linked reminder on this prospection row in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_status
-    description: Value of reminder status in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_status
   reminder_creation_method:
+    description: How the linked reminder was created (manual, automated, import, etc.) in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_creation_method
-    description: Value of reminder creation method in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_creation_method
   reminder_event_type:
+    description: Visitor event type associated with the linked reminder, when applicable.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_event_type
-    description: Value of reminder event type in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_event_type
   sorting_order:
+    description: Numeric rank assigned by Hub Services to order this row in agent worklists.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.sorting_order
-    description: Value of sorting order in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.sorting_order
   version:
+    description: Optimistic locking version from the Hub Services source row at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.version
   rev:
+    description: Envers revision number linking this audit row to rev_info for editor and change time.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.rev
-    description: Value of rev in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.rev
   rev_end:
+    description: Envers revision that closed this audit interval; null while the revision is still current.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.revend
-    description: Value of rev end in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.revend
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.revtype
-    description: Value of rev type in the source record.
+      - datalake_hub_services_raw.visitor_prospection_aud.revtype
   mod_visitor_id:
+    description: Envers flag indicating visitor_id changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.visitor_id_mod
-    description: Audit flag for changes to visitor id.
+      - datalake_hub_services_raw.visitor_prospection_aud.visitor_id_mod
   mod_responsible_id:
+    description: Envers flag indicating responsible_id changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.responsible_id_mod
-    description: Audit flag for changes to responsible id.
+      - datalake_hub_services_raw.visitor_prospection_aud.responsible_id_mod
   mod_reminder_id:
+    description: Envers flag indicating reminder_id changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_id_mod
-    description: Audit flag for changes to reminder id.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_id_mod
   mod_reminder_type_id:
+    description: Envers flag indicating reminder_type_id changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_id_mod
-    description: Audit flag for changes to reminder type id.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_id_mod
   mod_priority_lead_status:
+    description: Envers flag indicating priority_lead_status changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_status_mod
-    description: Audit flag for changes to priority lead status.
+      - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_status_mod
   mod_priority_lead_type:
+    description: Envers flag indicating priority_lead_type changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_type_mod
-    description: Audit flag for changes to priority lead type.
+      - datalake_hub_services_raw.visitor_prospection_aud.priority_lead_type_mod
   mod_reminder_type_name:
+    description: Envers flag indicating reminder_type_name changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_name_mod
-    description: Audit flag for changes to reminder type name.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_type_name_mod
   mod_reminder_status:
+    description: Envers flag indicating reminder_status changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_status_mod
-    description: Audit flag for changes to reminder status.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_status_mod
   mod_reminder_creation_method:
+    description: Envers flag indicating reminder_creation_method changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_creation_method_mod
-    description: Audit flag for changes to reminder creation method.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_creation_method_mod
   mod_reminder_event_type:
+    description: Envers flag indicating reminder_event_type changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_event_type_mod
-    description: Audit flag for changes to reminder event type.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_event_type_mod
   mod_sorting_order:
+    description: Envers flag indicating sorting_order changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.sorting_order_mod
-    description: Audit flag for changes to sorting order.
+      - datalake_hub_services_raw.visitor_prospection_aud.sorting_order_mod
   mod_reminder_date:
+    description: Envers flag indicating the reminder date changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_date_mod
-    description: Audit flag for changes to reminder date.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_date_mod
   ts_reminder:
+    description: Local date and time when the linked reminder should fire for the agent in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.reminder_date
-    description: Timestamp of reminder.
+      - datalake_hub_services_raw.visitor_prospection_aud.reminder_date
   ts_created:
+    description: UTC timestamp when the prospection row was originally created in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.visitor_prospection_aud.created_at
   ts_updated:
+    description: UTC timestamp of the last update to the prospection row before this audit capture.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.visitor_prospection_aud.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.visitor_prospection_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.visitor_prospection_aud.month
   day:
+    description: Day partition of the clean load; always include year and month for efficient scans.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection_aud.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.visitor_prospection_aud.day
