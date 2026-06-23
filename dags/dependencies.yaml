@@ -1848,6 +1848,7 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status:first-run-of-day
+  - bietlejuice.enrich_prospect_status:load-enrich-conversion-events:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
@@ -2327,6 +2328,7 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status:first-run-of-day
+  - bietlejuice.enrich_prospect_status:load-enrich-conversion-events:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-tenant-prospect-status:first-run-of-day
   - bietlejuice.enrich_rental_transact:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
