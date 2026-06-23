@@ -25,6 +25,7 @@ SELECT
     additionals_total,
     fixed_reference,
     operation_business,
+    status,
     schedule_date AS dt_schedule,
     created_at AS ts_created,
     updated_at AS ts_updated

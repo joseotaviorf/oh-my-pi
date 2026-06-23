@@ -35,3 +35,5 @@ workflow:
       clean_table_name: invoices
     invoices_aud:
       clean_table_name: invoices_aud
+    company_contract_type:
+      clean_table_name: company_contract_type

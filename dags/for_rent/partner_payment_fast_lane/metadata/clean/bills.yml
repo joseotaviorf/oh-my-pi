@@ -43,6 +43,10 @@ columns:
     lineage:
       - datalake_partner_payment_raw.bills.payment_provider
     description: Name of the external system responsible for processing the payment.
+  errors:
+    lineage:
+      - datalake_partner_payment_raw.bills.errors
+    description: Array containing error messages returned by the payment provider during bill payment processing. Empty or null when the bill was processed without errors.
   ts_created:
     lineage:
       - datalake_partner_payment_raw.bills.created_at

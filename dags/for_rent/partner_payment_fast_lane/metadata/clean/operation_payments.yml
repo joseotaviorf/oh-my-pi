@@ -13,79 +13,79 @@ columns:
   id_user:
     lineage:
       - datalake_partner_payment_raw.operation_payments.user_id
-    description: ID of the user.
+    description: Internal user identifier of the agent in the Partner Payment system.
   id_operation_event:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operation_event_id
-    description: ID of the event.
+    description: Foreign key referencing the operation event that triggered this payment record. Null when no specific event is linked.
   uuid_person:
     lineage:
       - datalake_partner_payment_raw.operation_payments.person_uuid
-    description: UUID of the person.
+    description: UUID identifying the person (agent) in the person identity service.
   id_operation:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operation_id
-    description: ID of the operation.
+    description: Identifier of the source operation (inspection or photo session) this payment is for.
   id_house:
     lineage:
       - datalake_partner_payment_raw.operation_payments.house_id
-    description: ID of the house.
+    description: Identifier of the property (house) where the operation was performed.
   id_operating_city:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operating_city_id
-    description: ID of the city where the agent works.
+    description: Identifier of the city where the operation was performed, used for regional pricing.
   id_agent:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_id
-    description: ID of the agent.
+    description: Identifier of the inspection or photo-session agent who performed the operation.
   id_agent_payment:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_payment_id
-    description: ID of the agent payment.
+    description: Foreign key referencing the agent payment batch this operation payment belongs to.
   id_bill:
     lineage:
       - datalake_partner_payment_raw.operation_payments.bill_id
-    description: ID of the bill.
+    description: Foreign key referencing the bill associated with this operation payment. Null until the payment is assigned to a bill.
   uuid_company:
     lineage:
       - datalake_partner_payment_raw.operation_payments.company_uuid
-    description: UUID of the company.
+    description: UUID of the company the agent belongs to at the time of the operation.
   currency:
     lineage:
       - datalake_partner_payment_raw.operation_payments.currency
-    description: The currency of the record.
+    description: ISO 4217 currency code for the payment amounts (e.g. BRL).
   version:
     lineage:
       - datalake_partner_payment_raw.operation_payments.version
-    description: Operation Payment Version.
+    description: Optimistic locking version of the record. Incremented on each update.
   agent_type:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_type
-    description: Type of the agent.
+    description: Type of agent who performed the operation (e.g. INSPECTOR, PHOTOGRAPHER).
   agent_status:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_status
-    description: Status of the agent.
+    description: Employment status of the agent at the time the payment was recorded (e.g. ACTIVE, INACTIVE).
   contract_type:
     lineage:
       - datalake_partner_payment_raw.operation_payments.contract_type
-    description: Type of the contract of the agent.
+    description: Contract type of the agent, which determines the payment calculation model applied (e.g. FIXED, VARIABLE).
   operation_type:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operation_type
-    description: Type of operation performed by the agent.
+    description: Category of the operation performed (e.g. INSPECTION, PHOTO_SESSION). Drives the applicable payment rules.
   operation_agent_status:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operation_agent_status
-    description: Status of operation performed by the agent
+    description: Status of the agent's participation in this specific operation (e.g. CONFIRMED, CANCELLED).
   house_area:
     lineage:
       - datalake_partner_payment_raw.operation_payments.house_area
-    description: Area of the house.
+    description: Area of the property in square meters, used as an input factor for meter-based payment calculations.
   house_reference:
     lineage:
       - datalake_partner_payment_raw.operation_payments.house_reference
-    description: Information about the house.
+    description: Human-readable reference code for the property (house) where the operation was performed.
   meters_base_reference:
     lineage:
       - datalake_partner_payment_raw.operation_payments.meters_base_reference
@@ -110,6 +110,10 @@ columns:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operation_business
     description: Reference to the business source of the operation.
+  status:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.status
+    description: The status of the operation payment within its processing lifecycle (e.g. CREATED, APPROVED, CANCELLED).
   dt_schedule:
     lineage:
       - datalake_partner_payment_raw.operation_payments.schedule_date

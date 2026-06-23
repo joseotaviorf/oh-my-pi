@@ -35,6 +35,10 @@ workflow:
       clean_table_name: assessment_aud
       clean_primary_keys: [id_assessment, rev]
       raw_primary_keys: [id, rev]
+    assessment_interaction:
+      clean_table_name: assessment_interaction
+      clean_primary_keys: [id_assessment_interaction]
+      raw_primary_keys: [id]
     assessment_details:
       clean_table_name: assessment_details
       clean_primary_keys: [id_assessment_detail]

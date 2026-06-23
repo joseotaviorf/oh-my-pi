@@ -1,0 +1,68 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: assessment_interaction
+description: >-
+  Records each attempt by an owner or tenant to access an assessment during the review or
+  budget-approval flow. Each row captures whether the user was successfully granted access
+  (OPEN) or blocked (BLOCKED), which user and flow triggered the attempt, and any error detail
+  when the interaction failed. Primarily used to drive the compulsory-approval decision process,
+  where the service determines whether both parties have completed their review steps.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_assessment_interaction:
+    description: "Auto-generated primary key for the assessment interaction record."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.id
+  id_assessment:
+    description: "Foreign key referencing the assessment that was accessed. Indexed at the source together with flow_type for efficient lookup."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.assessment_id
+  id_user:
+    description: "Identifier of the user (owner or tenant) who performed the interaction. References an internal user ID from the inspections service."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.user_id
+  interaction_type:
+    description: "Outcome of the access attempt. OPEN means the user successfully accessed the assessment; BLOCKED means access was denied due to a validation error or flow restriction."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.interaction_type
+    categories:
+      OPEN: User successfully accessed the assessment.
+      BLOCKED: User was denied access to the assessment.
+  user_type:
+    description: "Role of the user who performed the interaction within the inspection flow."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.user_type
+    categories:
+      OWNER: Property owner (landlord).
+      TENANT: Current tenant of the property.
+      UNKNOWN_TENANT: Tenant whose identity could not be resolved at interaction time.
+      OTHER: User with a role other than owner or tenant (e.g. internal staff).
+      UNKNOWN: User role could not be determined.
+  flow_type:
+    description: "Inspection review phase in which the interaction occurred. REVIEW corresponds to the first review round; BUDGET_APPROVAL to the second round where repair costs are contested or approved."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.flow_type
+    categories:
+      REVIEW: First review phase where owner and tenant evaluate the inspection report.
+      BUDGET_APPROVAL: Second review phase where repair budget is approved or disputed.
+  error_detail:
+    description: "Human-readable description of the error when interaction_type is BLOCKED. Null when the interaction was successful (OPEN)."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.error_detail
+  ts_created:
+    description: "Timestamp when the interaction record was created in the source system. Set automatically at insert time; never updated."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.created_at
+  year:
+    description: "Year of the CDC update date, used as partition column."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.year
+  month:
+    description: "Month of the CDC update date, used as partition column."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.month
+  day:
+    description: "Day of the CDC update date, used as partition column."
+    lineage:
+      - datalake_inspection_services_raw.assessment_interaction.day
