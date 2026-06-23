@@ -5,7 +5,7 @@ description: |
   One row per earning calculation with contract, sales flow, cart, receiver, incentive system,
   revenue amounts, and author context. Incrementally loaded and partitioned by earning creation date.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_earning:
     lineage:

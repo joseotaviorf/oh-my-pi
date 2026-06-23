@@ -5,7 +5,7 @@ description: |
   new_earnings_aud (DEMAND_CONVERSION_FR) with legacy contract_aud when no earning source
   exists for the contract.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_revision:
     lineage:

@@ -5,7 +5,7 @@ description: |
   One row per Jaiminho WhatsApp outbound message sent via the corretores_relacionamento
   environment, optionally linked to a Dominic broker chatbot session on the same user.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_notification:
     description: Unique identifier of the Jaiminho notification (merge key).

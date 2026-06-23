@@ -6,7 +6,7 @@ description: |
   visit cancellations, lead conversion, and the progress from offer submission to contract signing. By focusing on weekly aggregated data, 
   these metrics help evaluate agents' productivity, identify potential inefficiencies, and support decision-making in the sales and rental processes.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   business_context:
     lineage:

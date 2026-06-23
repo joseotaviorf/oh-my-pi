@@ -4,7 +4,7 @@ description: |
   Events recording agent metric values consumed from Kafka, with deduplication
   via event_id, and partitioned by year, month and day.
 domain: Agents
-owner: mahmoud.ali@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -4,7 +4,7 @@ description: |
   Author context per Big Agent earning, one row per earning and author identifier after deduplication
   to the latest update in the load window. Enriched with EBDB user identifiers when uuid_person matches.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_earning:
     lineage:

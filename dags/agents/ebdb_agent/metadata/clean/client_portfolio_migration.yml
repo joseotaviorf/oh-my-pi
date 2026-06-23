@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: client_portfolio_migration
 domain: Agents
-owner: gustavo.guerra@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Client portfolio migration records tracking agent migration status during the portfolio migration process.
 columns:
   id:
