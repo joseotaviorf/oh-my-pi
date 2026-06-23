@@ -1,11 +1,12 @@
 ---
 database_name: datalake_ada_crawls_clean
 table_name: issues_overview_report
-owner: joao.lmelo@quintoandar.com.br
+owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
   This table contains summary records of anomalies/issues found in QuintoAndar's weekly webcrawl. It is updated weekly, 
-  every Wednesday at 00:00 BRT, to update the data from the current week.
+  every Wednesday at 00:00 BRT, to update the data from the current week. Partitioned by year, month, day, and device;
+  filter on dt_report (and partition columns) for incremental loads between load_start_date and load_end_date.
 columns:
   issue_name:
     description: |
@@ -26,11 +27,14 @@ columns:
     lineage:
       - datalake_ada_crawls_raw.issues_overview_report.Description
   how_to_fix:
-    description: How to fix the issue.
+    description: |
+      Recommended remediation steps exported by Screaming Frog for the detected issue type, describing what to change
+      on the page or site configuration to resolve the SEO anomaly.
     lineage:
       - datalake_ada_crawls_raw.issues_overview_report.`How To Fix`
   help_url:
-    description: Help URL for the issue.
+    description: |
+      Screaming Frog documentation URL for the issue, linking to guidance on diagnosis and best practices for fixing it.
     lineage:
       - datalake_ada_crawls_raw.issues_overview_report.`Help URL`
   url_count:

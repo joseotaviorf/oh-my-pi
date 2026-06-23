@@ -1,12 +1,13 @@
 ---
 database_name: datalake_ada_crawls_clean
 table_name: issues
-owner: joao.lmelo@quintoandar.com.br
+owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
   This table contains records of detected issues/anomalies in weekly web crawled data of QuintoAndar's 
   website using Screaming Frog SEO Spider. It is updated weekly, every Wednesday at 00:00 BRT, to update
-  the data from the current week.
+  the data from the current week. Partitioned by year, month, day, and device; filter on dt_report (and partition
+  columns) for incremental loads between load_start_date and load_end_date.
 columns:
   address:
     description: The URL in which the issue was detected.

@@ -1,5 +1,5 @@
 ---
 database_name: datalake_ada_crawls_raw
 table_name: issues
-owner: joao.lmelo@quintoandar.com.br
+owner: caio.francisco@quintoandar.com.br
 domain: Growth

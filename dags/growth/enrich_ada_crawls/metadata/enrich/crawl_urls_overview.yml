@@ -1,11 +1,12 @@
 ---
 database_name: datalake_ada_crawls
 table_name: crawl_urls_overview
-owner: joao.lmelo@quintoandar.com.br
+owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
   This table provides a clustered and segmented overview of URLs from the ADA crawl clean datalake, aggregating 
-  issues at the URL-address level.
+  issues at the URL-address level. Partitioned by year, month, day, and device; filter on dt_report (and partition
+  columns) for incremental loads between load_start_date and load_end_date.
 columns:
   address:
     description: The URL of the page.
@@ -253,7 +254,9 @@ columns:
     lineage:
       - datalake_ada_crawls_clean.internal_all.ts_crawl
   dt_report:
-    description: The crawl date.
+    description: |
+      Calendar date of the weekly ADA Screaming Frog crawl for the row; used in incremental filters and joins
+      with datalake_ada_crawls_clean.internal_all and issues on address, device, and dt_report.
     lineage:
       - datalake_ada_crawls_clean.internal_all.dt_report
   device:
