@@ -1,37 +1,51 @@
+---
 database_name: datalake_gsheets_clean
 table_name: cities_neighborhoods_ibge_qa
+owner: henrique.paulo@quintoandar.com.br
 domain: Cross
+description: QA mapping between QuintoAndar city and neighborhood names and official IBGE census labels. Includes household counts from census variables for market sizing and geographic validation.
 columns:
   city_name_qa:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.city_name
+    description: City name as maintained in the internal QA reference spreadsheet.
   city_group_qa:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.city_group
+    description: QuintoAndar city group associated with the QA city label.
   region_code_qa:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.region_code
+    description: Internal region code used to group cities in the QA geographic reference.
   neighborhood_name_qa:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.name
+    description: Neighborhood name as recorded in the QA spreadsheet before IBGE alignment.
   neighborhood_name_ibge:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.nm_bairro
+    description: Official IBGE neighborhood name matched to the QA neighborhood label.
   city_name_ibge:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.nm_municip
+    description: Official IBGE municipality name corresponding to the QA city entry.
   microregion_name_ibge:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.nm_micro
+    description: IBGE microregion name associated with the municipality in the mapping.
   total_private_households:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.v002
+    description: Census count of total private households (IBGE variable V002) for the area.
   rented_private_households:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.v008
+    description: Census count of rented private households (IBGE variable V008) in the area.
   apartment_rented_private_households:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.v180
+    description: Census count of rented apartment households (IBGE variable V180) in the area.
   dt_reference:
     lineage:
       - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.date
+    description: Reference date of the census extract used in the QA neighborhood mapping.

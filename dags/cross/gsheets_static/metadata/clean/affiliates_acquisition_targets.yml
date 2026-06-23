@@ -1,34 +1,47 @@
+---
 database_name: datalake_gsheets_clean
 table_name: affiliates_acquisition_targets
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Monthly affiliate acquisition targets and budgets by marketing origin, channel, medium, and source. Maintained in Google Sheets for Growth planning and performance tracking against NAU, NU, and OAU goals.
 columns:
   mkt_origin:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_origin
+    description: High-level marketing origin taxonomy used to group affiliate acquisition efforts.
   mkt_channel:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_channel
+    description: Marketing channel classification for the affiliate acquisition campaign.
   mkt_medium:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_medium
+    description: Marketing medium dimension (for example paid, organic, or referral) for the target row.
   mkt_source:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_source
+    description: Specific marketing source identifier within the selected channel and medium.
   target_nau:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.target_nau
+    description: Planned count of new active users to be acquired through affiliates in the period.
   budget:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.budget
+    description: Budget amount allocated to affiliate acquisition for the marketing slice and date.
   target_nu:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.target_nu
+    description: Planned count of new users attributed to affiliate programs in the target period.
   target_oau:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.target_oau
+    description: Planned count of other active users expected from affiliate acquisition initiatives.
   new_target_nau:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.new_target_nau
+    description: Revised NAU target value after replanning or updated affiliate forecasts.
   dt_target:
     lineage:
       - datalake_gsheets_raw.affiliates_acquisition_targets.data
+    description: Calendar date to which the affiliate acquisition targets and budget apply.

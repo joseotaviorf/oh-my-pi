@@ -1,44 +1,59 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: aux_agents_sale
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Auxiliary reference of For Sale agents with accreditation status, suspension history, and activation timelines. Maintained in Google Sheets for broker operations and quality monitoring.
 columns:
-    id_agent:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.id
-    permanent_disaccreditation:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.descred_permanente
-    days_since_activation:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.dias_desde_ativacao
-    reason_disqualification:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.motivo_descredenciamento
-    suspension_reason:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.motivo_suspensao
-    status:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.status
-    agent_type:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.tipo_agent
-    dt_activation:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.data_ativacao
-    dt_last_deaccreditation:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.data_last_descredenciamento
-    dt_last_return_deaccreditation:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_descredenciamento
-    dt_last_suspension:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.data_last_suspensao
-    dt_last_return_suspension:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_suspensao
-    dt_week_accreditation:
-        lineage:
-            - datalake_gsheets_raw.aux_agents_sale.semana_credenciamento
+  id_agent:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.id
+    description: Unique identifier of the For Sale agent in the auxiliary reference sheet.
+  permanent_disaccreditation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.descred_permanente
+    description: Flag or label indicating whether the agent was permanently disaccredited.
+  days_since_activation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.dias_desde_ativacao
+    description: Number of days elapsed since the agent last became active in the program.
+  reason_disqualification:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.motivo_descredenciamento
+    description: Business reason recorded when the agent was disqualified or disaccredited.
+  suspension_reason:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.motivo_suspensao
+    description: Reason documented when the agent account was suspended from operations.
+  status:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.status
+    description: Current operational status of the agent in the For Sale broker program.
+  agent_type:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.tipo_agent
+    description: Classification of the agent role or partner type within For Sale operations.
+  dt_activation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.data_ativacao
+    description: Date when the agent was activated and authorized to operate listings.
+  dt_last_deaccreditation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.data_last_descredenciamento
+    description: Most recent date when the agent was removed from the accredited broker base.
+  dt_last_return_deaccreditation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_descredenciamento
+    description: Date when the agent returned to accredited status after a prior disaccreditation.
+  dt_last_suspension:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.data_last_suspensao
+    description: Most recent date when the agent account was suspended from activity.
+  dt_last_return_suspension:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_suspensao
+    description: Date when the agent resumed operations after the latest suspension period.
+  dt_week_accreditation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale.semana_credenciamento
+    description: Week start date associated with the agent accreditation cohort or milestone.

@@ -1,53 +1,71 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: autonomous_agent_listing
+owner: gabriel.salla@quintoandar.com
 domain: Agents
+description: Funnel of autonomous agent listing leads captured via Google Sheets. Tracks partner and user identifiers, contact data, UTM attribution, and milestone dates from visit through term signature.
 columns:
   id_user_lead:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.id_user_lead
+    description: Identifier of the user lead in the autonomous agent acquisition funnel.
   id_partner:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.id_partner
+    description: Partner identifier associated with the autonomous agent lead source.
   user_email:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.user_email
+    description: Email address provided by the lead during the autonomous agent signup flow.
   user_name:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.user_name
+    description: Full name of the lead as captured in the autonomous agent listing form.
   phone:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.phone
+    description: Phone number submitted by the lead for contact and qualification follow-up.
   lead_origin:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.lead_origin
+    description: Business origin label describing how the autonomous agent lead entered the funnel.
   utm_source:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.utm_source
+    description: UTM source parameter from the marketing link that generated the lead.
   utm_campaing:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.utm_campaing
+    description: UTM campaign parameter associated with the autonomous agent acquisition link.
   city_group:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.city_group
+    description: QuintoAndar city group where the lead expressed interest in operating.
   dt_visitor:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_visitor
+    description: Date when the lead first visited the autonomous agent landing experience.
   dt_lead:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_lead
+    description: Date when the contact was registered as a lead in the autonomous agent program.
   dt_qualified_lead:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_qualified_lead
+    description: Date when the lead met qualification criteria for the autonomous agent pipeline.
   dt_qualified_registred:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_qualified_registred
+    description: Date when the qualified lead completed registration in the partner system.
   dt_term_sent:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_term_sent
+    description: Date when contractual terms were sent to the lead for signature.
   dt_term_signed:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_term_signed
+    description: Date when the lead signed the autonomous agent participation terms.
   dt_logged_in:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_listing.dt_logged_in
+    description: Date when the lead first logged into the autonomous agent platform after onboarding.

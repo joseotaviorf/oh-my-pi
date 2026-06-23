@@ -1,26 +1,35 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: autonomous_agent_payment_data_form_origin
+owner: gabriel.salla@quintoandar.com
 domain: Agents
+description: Payment and identity data for autonomous agents collected through the form-origin onboarding path. Used by Agents operations to register payout eligibility and validate personal details.
 columns:
   name:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.nome
+    description: Legal name of the autonomous agent as submitted in the payment registration form.
   email:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.email
+    description: Contact email used for payment notifications and agent account communication.
   cpf:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.cpf
+    description: Brazilian individual taxpayer number (CPF) provided for payment compliance checks.
   pis:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.pis
+    description: PIS social contribution number required for payroll and payout registration.
   mothers_name:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.nome_mae
+    description: Mother's full name collected for identity validation in payment onboarding.
   fathers_name:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.nome_pai
+    description: Father's full name collected for identity validation in payment onboarding.
   marital_status:
     lineage:
       - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.estado_civil
+    description: Marital status declared by the agent in the payment registration form.

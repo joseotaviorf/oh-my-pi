@@ -1,22 +1,31 @@
+---
 database_name: datalake_gsheets_clean
 table_name: census_subnormal_crowding_areas
+owner: henrique.paulo@quintoandar.com.br
 domain: Cross
+description: IBGE 2010 subnormal agglomeration boundaries used as a geographic reference layer. One row per crowding area polygon with city and state identifiers for spatial and market analyses.
 columns:
   id_city_census:
     lineage:
       - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.city_census_id
+    description: Census identifier of the municipality associated with the subnormal agglomeration.
   id_crowding_area:
     lineage:
       - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.crowding_area_id
+    description: Unique identifier of the subnormal agglomeration polygon within the census dataset.
   polygon:
     lineage:
       - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.polygon
+    description: Geometry representation of the subnormal agglomeration boundary for spatial joins.
   crowding_area_name:
     lineage:
       - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.crowding_area_name
+    description: Official name of the subnormal agglomeration area as defined by IBGE.
   city_name:
     lineage:
       - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.city_name
+    description: Municipality name where the subnormal agglomeration is located.
   uf:
     lineage:
       - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.uf
+    description: Brazilian state code (UF) of the municipality containing the agglomeration.

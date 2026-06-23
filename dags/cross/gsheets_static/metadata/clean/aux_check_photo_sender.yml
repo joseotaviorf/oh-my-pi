@@ -1,32 +1,43 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: aux_check_photo_sender
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Manual photo quality review outcomes for listing photo jobs. Tracks analyst decisions, final classifications, and plaquinha placement checks used by Growth supply quality operations.
 columns:
   id_house:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.house_id
+    description: Lake identifier of the house whose listing photos were reviewed.
   id_photo_job:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.job_id_fl
+    description: Identifier of the photo job or batch submitted for manual quality review.
   analyzed_by:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.analisado_por
+    description: Name or login of the analyst who performed the photo quality assessment.
   final_user_sender:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.user_sender_final
+    description: User or role recorded as the final sender responsible for the photo submission.
   final_classification:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.classificacao_final
+    description: Final quality classification assigned to the photo set after review.
   final_classification_reason:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.classificacao_motivo_final
+    description: Reason code or label explaining the final photo quality classification.
   final_classification_comments:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.classificacao_comentarios_final
+    description: Free-text comments supporting the analyst final photo quality decision.
   sign_placement:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.tem_plaquinha
+    description: Indicator of whether the listing photos include the expected plaquinha placement.
   dt_analyzed:
     lineage:
       - datalake_gsheets_raw.aux_check_photo_sender.analisado_em
+    description: Timestamp when the photo quality review was completed by the analyst.

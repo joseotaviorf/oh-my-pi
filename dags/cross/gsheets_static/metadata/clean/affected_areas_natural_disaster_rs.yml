@@ -1,16 +1,23 @@
+---
 database_name: datalake_gsheets_clean
 table_name: affected_areas_natural_disaster_rs
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: Reference list of cities and neighborhoods impacted by the Rio Grande do Sul natural disaster, sourced from Google Sheets. Used by Fintech and operations teams to flag contracts and listings in affected areas.
 columns:
   city_name:
     lineage:
       - datalake_gsheets_raw.affected_areas_natural_disaster_rs.city_name
+    description: Municipality name where the impacted neighborhood is located.
   house_neighborhood:
     lineage:
       - datalake_gsheets_raw.affected_areas_natural_disaster_rs.house_neighborhood
+    description: Neighborhood name within the city that is considered impacted by the disaster.
   key:
     lineage:
       - datalake_gsheets_raw.affected_areas_natural_disaster_rs.key
+    description: Composite lookup key combining city and neighborhood for matching lake records.
   is_impacted:
     lineage:
       - datalake_gsheets_raw.affected_areas_natural_disaster_rs.impacted
+    description: Boolean flag indicating whether the city-neighborhood pair is marked as disaster-impacted.

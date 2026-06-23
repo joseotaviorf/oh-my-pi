@@ -1,95 +1,127 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: base_pdd
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: Provision for doubtful debts (PDD) invoice snapshot exported from Google Sheets. One row per invoice with contract context, payment status, delay buckets, and geographic attributes for Fintech risk reporting.
 columns:
-    id_invoice:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_id
-    id_contract:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.contract_id
-    qty_invoice:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.qty_invoice
-    contract_version:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.contract_version
-    invoice_type:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_type
-    invoice_competence_renegotiated:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.competencia_invoice_renegociada
-    invoice_amount:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_amount
-    invoice_status:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_status
-    invoice_paid_amount:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_paid_amount
-    invoice_paid_date:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_paid_date
-    invoice_paid_via:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_paid_via
-    contract_guarantee:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.contract_guarantee
-    invoice_account_type:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_account_type
-    invoice_indentifier:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_indentifier
-    our_number:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.our_number
-    delay_invoice_at_closure:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.delay_invoice_at_closure
-    delay_contamined_at_closure:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.delay_contamined_at_closure
-    delay_invoice_range:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.delay_invoice_range
-    delay_contamined_range:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.delay_contamined_range
-    city_name:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.city_name
-    city_group:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.city_group
-    provisional_group:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.grupoprovisao
-    dt_contract_signature:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.contract_signature_date
-    dt_accrual_year_month:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.accrual_year_month
-    dt_invoice_original_due:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_original_due_date
-    dt_invoice_due:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_due_date
-    dt_invoice_created:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_created_at
-    dt_invoice_sent:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.invoice_sent_at
-    dt_contract_due_date_min:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.contract_due_date_min
-    dt_processing:
-        lineage:
-            - datalake_gsheets_raw.base_pdd.dt_processamento
+  id_invoice:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_id
+    description: Unique identifier of the invoice included in the PDD calculation base.
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.contract_id
+    description: Rental contract identifier linked to the invoice in the PDD dataset.
+  qty_invoice:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.qty_invoice
+    description: Sequential invoice number or count position within the contract billing history.
+  contract_version:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.contract_version
+    description: Version label of the contract terms applicable when the invoice was issued.
+  invoice_type:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_type
+    description: Business category of the invoice (for example rent, fee, or adjustment).
+  invoice_competence_renegotiated:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.competencia_invoice_renegociada
+    description: Competence period reassigned after invoice renegotiation or reprovisioning.
+  invoice_amount:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_amount
+    description: Original billed amount of the invoice in BRL before partial payments.
+  invoice_status:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_status
+    description: Current lifecycle status of the invoice in the collections system.
+  invoice_paid_amount:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_paid_amount
+    description: Amount in BRL already paid against the invoice at the processing date.
+  invoice_paid_date:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_paid_date
+    description: Calendar date when the invoice payment was recorded in collections.
+  invoice_paid_via:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_paid_via
+    description: Payment channel or method used to settle the invoice amount.
+  contract_guarantee:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.contract_guarantee
+    description: Guarantee product or coverage type associated with the underlying contract.
+  invoice_account_type:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_account_type
+    description: Accounting classification of the invoice for ledger and provision mapping.
+  invoice_indentifier:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_indentifier
+    description: External or legacy identifier used to reconcile the invoice across systems.
+  our_number:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.our_number
+    description: Bank slip (nosso número) reference tied to the invoice collection document.
+  delay_invoice_at_closure:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.delay_invoice_at_closure
+    description: Days the invoice was overdue at the portfolio closure snapshot date.
+  delay_contamined_at_closure:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.delay_contamined_at_closure
+    description: Contaminated delay days counted for provision at the closure snapshot date.
+  delay_invoice_range:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.delay_invoice_range
+    description: Bucket label classifying current invoice delay for PDD segmentation.
+  delay_contamined_range:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.delay_contamined_range
+    description: Bucket label for contaminated delay used in doubtful debt provisioning rules.
+  city_name:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.city_name
+    description: Municipality name of the property tied to the contract behind the invoice.
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.city_group
+    description: QuintoAndar city group aggregation for geographic PDD reporting.
+  provisional_group:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.grupoprovisao
+    description: Provision group assigned to the invoice for expected loss calculation.
+  dt_contract_signature:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.contract_signature_date
+    description: Date when the rental contract associated with the invoice was signed.
+  dt_accrual_year_month:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.accrual_year_month
+    description: Accrual year-month period to which the invoice revenue is attributed.
+  dt_invoice_original_due:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_original_due_date
+    description: Original due date of the invoice before renegotiation or extensions.
+  dt_invoice_due:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_due_date
+    description: Effective due date used for delay and provision calculations.
+  dt_invoice_created:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_created_at
+    description: Timestamp when the invoice record was created in the billing platform.
+  dt_invoice_sent:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.invoice_sent_at
+    description: Timestamp when the invoice was sent to the tenant or payer.
+  dt_contract_due_date_min:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.contract_due_date_min
+    description: Earliest contractual due date reference applied to the invoice portfolio.
+  dt_processing:
+    lineage:
+      - datalake_gsheets_raw.base_pdd.dt_processamento
+    description: Processing date of the PDD snapshot when the row was exported to the sheet.
