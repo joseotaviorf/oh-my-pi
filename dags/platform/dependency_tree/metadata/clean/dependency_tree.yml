@@ -1,36 +1,40 @@
+---
 database_name: datalake_dependency_tree_clean
 table_name: dependency_tree
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Life Cycle
-description: >
-  DAG dependency tree with direct and indirect relationships,
-  including depth information for each DAG.
+description: |
+  Tabular Airflow DAG dependency graph derived from the raw dependencies.yaml ingest.
+  One row per (id_dag, id_dependency_dag, id_dependency_task, dependency_depth) edge,
+  including direct and indirect upstream relationships and the maximum depth per DAG.
+  Used by Data Life Cycle for orchestration lineage and downstream dependency analytics.
+  Not date-partitioned.
 columns:
   id_dag:
-    description: ID of the DAG being analyzed.
+    description: Airflow DAG identifier being analyzed (the dependent DAG in this edge).
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.dag
   id_dependency_dag:
-    description: ID of a DAG that id_dag depends on (directly or indirectly).
+    description: Upstream Airflow DAG that id_dag depends on, directly or transitively.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.up_level_dag_dependency
   id_dependency_task:
-    description: Task-level detail of the dependency (format dag_id:task_id).
+    description: Task-level upstream reference when the dependency is task-scoped, formatted as dag_id:task_id.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.up_level_task_dependency
   dependency_run_suffix:
-    description: Run frequency modifier declared on this dependency edge (e.g. 'first-run-of-day'). Null when no modifier is set.
+    description: Run-frequency modifier on the dependency edge (e.g. first-run-of-day). Null when no modifier applies.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.up_level_run_suffix
   dependency_depth:
-    description: Hop distance from id_dag to id_dependency_dag. 0 means direct dependency, 1+ means indirect.
+    description: Hop count from id_dag to id_dependency_dag. Zero means a direct dependency; higher values are indirect.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.level
   is_direct_dependency:
-    description: True when dependency_depth is 0 (id_dependency_dag is a direct dependency of id_dag).
+    description: True when dependency_depth is zero (id_dependency_dag is an immediate upstream of id_dag).
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.level
   dag_max_depth:
-    description: Maximum dependency depth for id_dag across all its dependencies. Indicates how deep the DAG's dependency tree goes.
+    description: Maximum dependency_depth across all edges for id_dag, indicating how deep its upstream graph reaches.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.level

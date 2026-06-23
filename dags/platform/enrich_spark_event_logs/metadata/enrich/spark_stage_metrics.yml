@@ -28,8 +28,11 @@ description: |
   bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md. The
   DAG-level NVMe filter (per A2 of that doc) becomes possible once this table
   has ~7 days of data.
+
+  Partitioned by dt_stage_completed (UTC date of stage completion). Filter on
+  dt_stage_completed for partition pruning when scanning event-log history.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   id_spark_app:
     description: Spark application identifier (e.g. `app-20260418-1234-5678`). Extracted from the event log directory name `eventlog-v2-<spark_app_id>/`.
@@ -92,7 +95,7 @@ columns:
   is_stage_failed:
     description: TRUE if `stage_failure_reason` is not NULL.
   dt_stage_completed:
-    description: Date the stage completed, derived from the event log's `Completion Time` (UTC, milliseconds since epoch).
+    description: UTC calendar date when the stage completed, derived from the event log Completion Time. Partition column; filter on this date for pruning.
   ts_stage_submitted:
     description: Timestamp the stage was submitted to the scheduler, from the event log's `Submission Time`.
   ts_stage_completed:

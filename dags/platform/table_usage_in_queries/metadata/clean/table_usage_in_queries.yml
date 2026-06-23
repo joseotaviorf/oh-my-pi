@@ -1,48 +1,49 @@
 ---
 database_name: datalake_databricks_clean
 table_name: table_usage_in_queries
-description: Each row represents a pair of (query, table used in the query) in bietlejuice queries.
-  The tables are extracted from the queries using a simple regex pattern. Additionally, it is important
-  to mention that, since old query files are not removed from S3, many rows identified in the snapshot
-  are not up-to-date. Join with a separate table, like dag_inventory, to get only the currently existing tables.
-  The snapshot is taken daily.
-domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Daily snapshot of tables referenced in bi-etl-ejuice SQL query files. Each row is
+  one (query file, used_table) pair extracted via regex from S3-stored queries.
+  Stale rows persist when old query files remain in S3 after deletion from the repo;
+  join dag_inventory or filter by ts_query_last_modified for current tables only.
+  Source for bietlejuice_table_dependencies. Partitioned by year, month, and day
+  (snapshot date). Filter on year, month, and day for partition pruning.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   query_table_name:
-    description: The name of the query file, without the extension or directory.
+    description: Query file base name without directory path or file extension.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.query_table_name
   query_dag_name:
-    description: The name of the DAG package that contains the query.
+    description: DAG package folder name that contains the query file.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.query_dag_name
   query_layer:
-    description: The layer of the query.
+    description: Processing layer of the query (raw, clean, enrich, dw, metric, etc.).
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.query_layer
   query_path:
-    description: The path of the query file.
+    description: Repository-relative path to the SQL file within bi-etl-ejuice.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.query_path
   used_table:
-    description: The name of the table used in the query.
+    description: Fully qualified table name parsed from the query body.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.used_table
   ts_query_last_modified:
-    description: The timestamp of the last modification of the query file.
+    description: S3 last-modified timestamp of the query file; use to detect stale inventory rows.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.query_last_modified
   year:
-    description: Year of the snapshot.
+    description: Snapshot year partition. Filter with month and day for pruning.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.year
   month:
-    description: Month of the snapshot.
+    description: Snapshot month partition. Filter with year and day for pruning.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.month
   day:
-    description: Day of the snapshot.
+    description: Snapshot day partition. Filter with year and month for pruning.
     lineage:
       - datalake_databricks_raw.table_usage_in_queries.day
-  

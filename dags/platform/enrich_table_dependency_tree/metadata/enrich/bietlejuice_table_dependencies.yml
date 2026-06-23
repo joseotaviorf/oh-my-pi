@@ -2,35 +2,40 @@
 database_name: datalake_databricks
 table_name: bietlejuice_table_dependencies
 description: |
-  "Associates each dependent table with a dependency table. This data is extracted from bietlejuice queries daily."
-domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+  Daily direct table-to-table dependencies inferred from bi-etl-ejuice SQL files.
+  Each row links a dependent table (the query output) to a source table referenced in
+  that query, resolved via dag_inventory and regex-based table_usage_in_queries.
+  Exact and fuzzy matching cover standard and non-standard DAG naming (datamarts, crawlers).
+  Used for lineage, cost attribution, and Trino usage rollups. Partitioned by year,
+  month, and day (execution date). Filter on year, month, and day for partition pruning.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   dependent_dag_name:
-    description: Name of the Airflow DAG that loads the dependent table on bietlejuice
+    description: Airflow DAG that materializes the dependent table in bi-etl-ejuice.
     lineage:
       - datalake_dag_inventory_clean.table.dag
   dependent_task_name:
-    description: Name of the Airflow task that loads the dependent table on bietlejuice
+    description: Airflow task within dependent_dag_name that writes the dependent table.
     lineage:
       - datalake_dag_inventory_clean.table.task
   dependent_table_name:
-    description: Name of the dependent table (i.e., table that depends on the other table)
+    description: Fully qualified dependent table (schema.table) produced by the query.
     lineage:
       - datalake_dag_inventory_clean.table.table
   dependency_table_name:
-    description: Name of the dependency table (i.e., table that the dependent table depends on)
+    description: Source table referenced in the dependent query (the upstream dependency).
     lineage:
       - datalake_databricks_clean.table_usage_in_queries.used_table
   year:
-    description: Year of the execution date
+    description: Execution-date year partition. Filter with month and day for pruning.
     lineage:
       - datalake_databricks_clean.table_usage_in_queries.year
   month:
-    description: Month of the execution date
+    description: Execution-date month partition. Filter with year and day for pruning.
     lineage:
       - datalake_databricks_clean.table_usage_in_queries.month
   day:
-    description: Day of the execution date
+    description: Execution-date day partition. Filter with year and month for pruning.
     lineage:
       - datalake_databricks_clean.table_usage_in_queries.day

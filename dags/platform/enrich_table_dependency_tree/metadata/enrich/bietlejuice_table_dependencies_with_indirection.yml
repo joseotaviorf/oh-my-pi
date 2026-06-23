@@ -2,29 +2,35 @@
 database_name: datalake_databricks
 table_name: bietlejuice_table_dependencies_with_indirection
 description: |
-  "Associates each dependent table with a dependency table (either a direct or indirect dependent). This data is extracted from bietlejuice queries daily."
-domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+  Enriched dependency graph listing both direct and indirect upstream tables for each dependent
+  bietlejuice-managed table. Each row links a dependent_table_name to a dependency_table_name at
+  a given hop level (1 = direct, 2+ = indirect). Built daily from bietlejuice_table_dependencies
+  and Spark graph traversal. Partitioned by year, month, and day (execution date). Always filter
+  on year, month, and day in WHERE clauses for partition pruning.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   dependent_table_name:
-    description: Name of the dependent table (i.e., table that depends on the other table)
+    description: Fully qualified table that ultimately depends on dependency_table_name.
     lineage:
-      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.dependent_table_name
+      - datalake_databricks.bietlejuice_table_dependencies.dependent_table_name
   dependency_table_name:
-    description: Name of the dependency table (i.e., table that the dependent table depends on)
+    description: Upstream source table at the given hop level (direct or indirect ancestor).
     lineage:
-      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.dependency_table_name
+      - datalake_databricks.bietlejuice_table_dependencies.dependency_table_name
   level:
-    description: Level of the dependency (1 for direct dependencies, 2 or more for indirect dependencies)
+    description: Dependency hop count. One is a direct reference; two or more is an indirect ancestor.
+    lineage:
+      - datalake_databricks.bietlejuice_table_dependencies.dependent_table_name
   year:
-    description: Year of the execution date
+    description: Execution-date year partition. Filter with month and day for pruning.
     lineage:
-      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.year
+      - datalake_databricks.bietlejuice_table_dependencies.year
   month:
-    description: Month of the execution date
+    description: Execution-date month partition. Filter with year and day for pruning.
     lineage:
-      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.month
+      - datalake_databricks.bietlejuice_table_dependencies.month
   day:
-    description: Day of the execution date
+    description: Execution-date day partition. Filter with year and month for pruning.
     lineage:
-      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.day
+      - datalake_databricks.bietlejuice_table_dependencies.day

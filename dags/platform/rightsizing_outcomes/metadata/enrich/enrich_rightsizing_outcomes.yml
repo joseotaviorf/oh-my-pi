@@ -12,8 +12,11 @@ description: |
   pairing uses the conf-persisted reference run id, exact window match, or
   fastest-run heuristic (see reference_match_source). Cost and wall allow up to
   +5% vs prod reference before fail (REGRESSION_TOLERANCE_PCT).
+
+  Partitioned by val_dt (UTC calendar date of validation run start). Filter on
+  val_dt for partition pruning when querying validation history.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   prod_airflow_dag_id:
     description: Production Airflow DAG identifier (validation twins strip the `__validation` suffix).
@@ -36,7 +39,7 @@ columns:
     lineage:
       - datalake_astro_clean.dag_run.ts_ended
   val_dt:
-    description: UTC calendar date of validation execution (`DATE(val_ts_started)`). Partition column.
+    description: UTC calendar date of validation execution (DATE(val_ts_started)). Partition column; filter on val_dt for pruning.
     lineage:
       - datalake_astro_clean.dag_run.ts_started
   reference_prod_airflow_run_id:

@@ -18,8 +18,11 @@ description: |
   compared week includes billable_usage machine-hour estimates before retained
   node_timeline coverage or missing EC2 prices.
 
+  Partitioned by year, month, and day (derived from dt_window_end). Filter on year,
+  month, and day for partition pruning when querying historical windows.
+
 domain: Data Life Cycle
-owner: jose.rferreira@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   airflow_dag_id:
     lineage:
