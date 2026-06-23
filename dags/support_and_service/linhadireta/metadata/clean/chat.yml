@@ -1,46 +1,66 @@
 database_name: datalake_linhadireta_clean
 table_name: chat
+description: >
+  One row per chat conversation created in the Linhadireta platform, QuintoAndar's
+  direct communication channel built on Sendbird. Captures the entity context (e.g.,
+  property, contract), activity status, interaction timestamps, and routing tags.
+  Source system is Linhadireta.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_linhadireta_raw.chat.id
+    description: Unique identifier for the chat conversation in Linhadireta.
   sendbird_url:
     lineage:
       - datalake_linhadireta_raw.chat.sendbird_url
+    description: URL of the corresponding Sendbird channel that hosts this chat conversation.
   metadata:
     lineage:
       - datalake_linhadireta_raw.chat.metadata
+    description: JSON blob with additional contextual attributes about the chat, such as source system and routing configuration.
   entity:
     lineage:
       - datalake_linhadireta_raw.chat.entity
+    description: Type of the business entity associated with this chat (e.g., property, contract, rental), identifying the context of the conversation.
   id_entity:
     lineage:
       - datalake_linhadireta_raw.chat.entity_id
+    description: Identifier of the specific business entity (of the type in entity) that this chat is linked to.
   is_active:
     lineage:
       - datalake_linhadireta_raw.chat.active
+    description: Boolean flag indicating whether this chat conversation is currently active and open for messages.
   ts_created:
     lineage:
       - datalake_linhadireta_raw.chat.created_at
+    description: Timestamp when the chat conversation was created in Linhadireta.
   ts_last_modified:
     lineage:
       - datalake_linhadireta_raw.chat.last_modified_at
+    description: Timestamp of the last modification to the chat record (e.g., status change or metadata update).
   created_by_id:
     lineage:
       - datalake_linhadireta_raw.chat.created_by_id
+    description: Identifier of the user or system that created this chat conversation in Linhadireta.
   ts_finalized:
     lineage:
       - datalake_linhadireta_raw.chat.finalized_at
+    description: Timestamp when the chat conversation was closed or finalized, null if still active.
   tags:
     lineage:
       - datalake_linhadireta_raw.chat.tags
+    description: JSON array of tags applied to the chat for routing, categorization, or workflow purposes.
   ts_first_user_interaction:
     lineage:
       - datalake_linhadireta_raw.chat.first_user_interaction_at
+    description: Timestamp of the first message sent by the primary user (customer) in this chat conversation.
   ts_first_other_user_interaction:
     lineage:
       - datalake_linhadireta_raw.chat.first_other_user_interaction_at
+    description: Timestamp of the first message sent by another participant (e.g., agent or counterpart) in this chat conversation.
   last_contexts:
     lineage:
       - datalake_linhadireta_raw.chat.last_contexts
+    description: JSON array representing the most recent context states of the chat, used to track the latest routing or workflow context.

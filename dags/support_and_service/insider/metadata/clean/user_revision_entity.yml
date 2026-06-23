@@ -1,13 +1,22 @@
 database_name: datalake_insider_clean
 table_name: user_revision_entity
+description: >
+  One row per audit revision entry in the Insider platform, linking a data change
+  to the user who triggered it and the timestamp of the revision. Used to attribute
+  Hibernate Envers audit revisions (referenced by review_aud.rev) to specific users
+  for traceability. Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_insider_raw.user_revision_entity.id
+    description: Revision sequence number that links to the rev field in audit tables (e.g., review_aud.rev).
   id_user:
     lineage:
       - datalake_insider_raw.user_revision_entity.user_id
+    description: Identifier of the Insider platform user who triggered the data change recorded in this revision.
   ts_revised:
     lineage:
       - datalake_insider_raw.user_revision_entity.timestamp
+    description: Timestamp when the revision was created, converted from Unix milliseconds to datetime (yyyy-MM-dd HH:mm:ss).

@@ -1,13 +1,21 @@
 database_name: datalake_linhadireta_clean
 table_name: user_chats
+description: >
+  Bridge table with one row per user-to-chat association in Linhadireta, representing
+  which chats each user is enrolled in. Mirrors the inverse perspective of chat_users,
+  used to query all chats belonging to a given user. Source system is Linhadireta.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_linhadireta_raw.user_chats.id
+    description: Unique identifier for the user-to-chat association record in Linhadireta.
   id_user:
     lineage:
       - datalake_linhadireta_raw.user_chats.user_id
+    description: Identifier of the Linhadireta user (from user table) enrolled in this chat.
   id_chat:
     lineage:
       - datalake_linhadireta_raw.user_chats.chat_id
+    description: Identifier of the chat conversation (from chat table) this user is enrolled in.

@@ -1,28 +1,42 @@
 database_name: datalake_insider_clean
 table_name: review
+description: >
+  One row per peer or quality review submitted in the Insider platform. Captures the
+  reviewer and the entity being reviewed, the review type and current status, any
+  classification labels, and an optional comment. Used to track quality evaluation
+  processes for support agents or service areas. Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_insider_raw.review.id
+    description: Unique identifier for the review record in the Insider platform.
   id_reviewed:
     lineage:
       - datalake_insider_raw.review.reviewed_id
+    description: Identifier of the entity (agent, team, or resource) being evaluated in this review.
   id_reviewer:
     lineage:
       - datalake_insider_raw.review.reviewer_id
+    description: Identifier of the user who submitted this review in the Insider platform.
   labels:
     lineage:
       - datalake_insider_raw.review.labels
+    description: JSON array of classification labels applied to this review (e.g., quality category, escalation flag).
   status:
     lineage:
       - datalake_insider_raw.review.status
+    description: Current lifecycle status of the review (e.g., pending, completed, cancelled).
   type:
     lineage:
       - datalake_insider_raw.review.type
+    description: Type of review indicating the evaluation context or methodology applied (e.g., peer review, quality audit).
   comment:
     lineage:
       - datalake_insider_raw.review.comment
+    description: Optional free-text comment submitted by the reviewer to explain or contextualize the evaluation scores.
   dt_creation:
     lineage:
       - datalake_insider_raw.review.creation_date
+    description: Date when the review was created in the Insider platform.

@@ -1,40 +1,59 @@
 database_name: datalake_insider_clean
 table_name: review_aud
+description: >
+  Audit history table with one row per version snapshot of a review record in the
+  Insider platform. Captures every state change to a review (status, labels, comment)
+  with revision metadata including the revision number, change type, and the revision
+  that superseded this snapshot. Used to track the full lifecycle of each review.
+  Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_review:
     lineage:
       - datalake_insider_raw.review_aud.id
+    description: Identifier of the review record (from review table) this audit entry belongs to.
   id_reviewed:
     lineage:
       - datalake_insider_raw.review_aud.reviewed_id
+    description: Identifier of the entity being evaluated in the reviewed review at this revision snapshot.
   id_reviewer:
     lineage:
       - datalake_insider_raw.review_aud.reviewer_id
+    description: Identifier of the user who submitted the review at this revision snapshot.
   rev:
     lineage:
       - datalake_insider_raw.review_aud.rev
+    description: Revision sequence number identifying this specific version of the review record in the audit history.
   labels:
     lineage:
       - datalake_insider_raw.review_aud.labels
+    description: JSON array of classification labels on the review at this revision snapshot.
   status:
     lineage:
       - datalake_insider_raw.review_aud.status
+    description: Lifecycle status of the review at this revision snapshot (e.g., pending, completed, cancelled).
   mod_is_status:
     lineage:
       - datalake_insider_raw.review_aud.status_mod
+    description: Boolean flag indicating whether the status field was modified in this revision compared to the previous one.
   type:
     lineage:
       - datalake_insider_raw.review_aud.type
+    description: Type of review at this revision snapshot, indicating the evaluation context or methodology.
   rev_type:
     lineage:
       - datalake_insider_raw.review_aud.revtype
+    description: Hibernate Envers revision type code indicating the operation (0=insert, 1=update, 2=delete) that created this audit entry.
   comment:
     lineage:
       - datalake_insider_raw.review_aud.comment
+    description: Free-text reviewer comment on the review at this revision snapshot.
   revend:
     lineage:
       - datalake_insider_raw.review_aud.revend
+    description: Revision number of the next audit entry that superseded this snapshot, null if this is the current version.
   dt_creation:
     lineage:
       - datalake_insider_raw.review_aud.creation_date
+    description: Date when the original review was created; consistent across all audit revisions of the same review.

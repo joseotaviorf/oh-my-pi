@@ -1,13 +1,22 @@
 database_name: datalake_insider_clean
 table_name: template
+description: >
+  One row per review template configured in the Insider platform. Templates define the
+  structure and type of evaluation to be applied, grouping features and resources for
+  a specific review context. Only active templates are used to generate new reviews.
+  Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_insider_raw.template.id
+    description: Unique identifier for the review template in the Insider platform.
   is_active:
     lineage:
       - datalake_insider_raw.template.active
+    description: Boolean flag indicating whether this template is currently active and available to generate new reviews.
   type:
     lineage:
       - datalake_insider_raw.template.type
+    description: Type of review template, classifying the evaluation context or methodology it is designed for (e.g., peer review, quality audit).

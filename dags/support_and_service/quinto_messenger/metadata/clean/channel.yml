@@ -1,64 +1,94 @@
 database_name: datalake_quinto_messenger_clean
 table_name: channel
+description: >
+  One row per messaging channel in Quinto Messenger, representing a Twilio Conversations
+  channel (e.g., WhatsApp, SMS, voice) linked to a customer session. Tracks channel
+  status, type, participant counts, and routing attributes. Partitioned by year, month
+  and day for query efficiency. Source system is Quinto Messenger.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.channel.id
+    description: Internal Quinto Messenger identifier for the channel record.
   id_channel:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_id
-  is_session:
+    description: Twilio Conversations channel SID that uniquely identifies this channel in the Twilio platform.
+  id_session:
     lineage:
       - datalake_quinto_messenger_raw.channel.source_id
+    description: Session identifier linking this channel to the originating customer interaction session.
   id_source_unique:
     lineage:
       - datalake_quinto_messenger_raw.channel.source_uuid
+    description: UUID of the originating source event that triggered the creation of this channel.
   channel_status:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_status
+    description: Current status of the Twilio channel (e.g., active, inactive, closed).
   channel_type:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_attributes
+    description: Communication channel type extracted from channel attributes (e.g., whatsapp, sms, voice).
   user_phone:
     lineage:
       - datalake_quinto_messenger_raw.channel.user_phone
+    description: Phone number of the customer who initiated contact through this channel.
   twilio_phone_number:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_attributes
+    description: Twilio phone number assigned to handle inbound and outbound messages on this channel.
   number_of_messages:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_attributes
+    description: Total number of messages exchanged in this channel, extracted from the channel resource JSON.
   number_of_members:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_attributes
+    description: Number of participants currently enrolled in this channel, extracted from the channel resource JSON.
   channel_attributes:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_attributes
+    description: Raw JSON payload with all Twilio channel attributes, including routing configuration and custom metadata.
   channel_resource:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_resource
+    description: Raw JSON payload describing Twilio channel resource details such as message and member counts.
   channel_proxy:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_proxy
+    description: JSON payload with proxy session details when this channel uses Twilio Proxy for number masking.
   source:
     lineage:
       - datalake_quinto_messenger_raw.channel.source
+    description: Originating system or entry point that created this channel (e.g., whatsapp, webchat, inbound call).
+  is_forwarded:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_attributes
+    description: Flag indicating whether this channel was forwarded from another channel or entry point, extracted from channel attributes.
   ts_created:
     lineage:
       - datalake_quinto_messenger_raw.channel.created_at
+    description: Timestamp when the channel was created in Quinto Messenger.
   ts_updated:
     lineage:
       - datalake_quinto_messenger_raw.channel.updated_at
+    description: Timestamp of the last update to the channel record.
   year:
     lineage:
       - datalake_quinto_messenger_raw.channel.year
+    description: Year extracted from the channel creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_quinto_messenger_raw.channel.month
+    description: Month extracted from the channel creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_quinto_messenger_raw.channel.day
+    description: Day extracted from the channel creation date. Partition column — filter on this column to enable partition pruning.
   year_month:
     lineage:
       - datalake_quinto_messenger_raw.channel.year_month
+    description: Year and month concatenated (YYYYMM) from the channel creation date, used as an alternative partition filter.

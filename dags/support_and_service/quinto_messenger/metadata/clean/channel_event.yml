@@ -1,49 +1,70 @@
 database_name: datalake_quinto_messenger_clean
 table_name: channel_event
+description: >
+  One row per event emitted on a Quinto Messenger channel, typically representing an
+  individual message or a channel lifecycle change (e.g., message received, channel
+  opened). Message content and metadata are flattened from the event payload JSON.
+  Partitioned by year, month and day. Source system is Quinto Messenger.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.id
+    description: Unique identifier for the channel event record in Quinto Messenger.
   id_channel:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.channel_id
+    description: Identifier of the channel (from channel table) on which this event occurred.
   id_message:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_payload
+    description: Twilio Message SID extracted from the event payload, identifying the specific message associated with this event.
   source:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_payload
+    description: Source of the event extracted from the payload (e.g., SDK, API), indicating how the event was triggered.
   from_phone_number:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_payload
+    description: Phone number of the sender who originated the message, extracted from the event payload.
   message_body:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_payload
+    description: Text content of the message associated with this event, extracted from the event payload.
   message_index:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_payload
+    description: Sequential index of the message within the channel, extracted from the event payload.
   event_type:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_type
+    description: Type of channel event (e.g., onMessageAdded, onChannelUpdated) indicating what occurred on the channel.
   event_payload:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_payload
+    description: Raw JSON payload from Twilio containing the full event data, kept as source for fields not yet flattened.
   ts_created:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.created_at
+    description: Timestamp when the channel event was recorded in Quinto Messenger.
   ts_updated:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.updated_at
+    description: Timestamp of the last update to the channel event record.
   year:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.year
+    description: Year extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.month
+    description: Month extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.day
+    description: Day extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   year_month:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.year_month
+    description: Year and month concatenated (YYYYMM) from the event creation date, used as an alternative partition filter.

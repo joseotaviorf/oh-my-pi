@@ -1,31 +1,45 @@
 database_name: datalake_linhadireta_clean
 table_name: user
+description: >
+  One row per user registered in the Linhadireta platform. Captures identity attributes
+  (name, email, phone, nickname) and the corresponding Sendbird user ID used to link
+  this record to Sendbird chat sessions. Source system is Linhadireta.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_linhadireta_raw.user.id
+    description: Unique identifier for the user record in the Linhadireta platform.
   name:
     lineage:
       - datalake_linhadireta_raw.user.name
+    description: Full name of the user as registered in Linhadireta.
   email:
     lineage:
       - datalake_linhadireta_raw.user.email
+    description: Email address of the user registered in Linhadireta.
   phone:
     lineage:
       - datalake_linhadireta_raw.user.phone
+    description: Phone number of the user registered in Linhadireta.
   ts_created:
     lineage:
       - datalake_linhadireta_raw.user.created_at
+    description: Timestamp when the user account was created in Linhadireta.
   ts_last_modified:
     lineage:
       - datalake_linhadireta_raw.user.last_modified_at
+    description: Timestamp of the last modification to the user record in Linhadireta.
   id_sendbird:
     lineage:
       - datalake_linhadireta_raw.user.sendbird_id
+    description: Sendbird user ID that links this Linhadireta user to their corresponding Sendbird account for chat sessions.
   access_token:
     lineage:
       - datalake_linhadireta_raw.user.access_token
+    description: Authentication token used by this user to access the Sendbird chat platform via Linhadireta.
   nickname:
     lineage:
       - datalake_linhadireta_raw.user.nickname
+    description: Display nickname of the user shown in Linhadireta chat conversations, which may differ from their full name.

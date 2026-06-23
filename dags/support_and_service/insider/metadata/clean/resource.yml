@@ -1,13 +1,22 @@
 database_name: datalake_insider_clean
 table_name: resource
+description: >
+  Lookup table with one row per evaluable resource defined in the Insider platform.
+  Resources represent the entities being reviewed (e.g., support agents, teams, or
+  service areas) and are referenced by review templates and individual review records.
+  Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_insider_raw.resource.id
+    description: Unique identifier for the evaluable resource in the Insider platform.
   name:
     lineage:
       - datalake_insider_raw.resource.name
+    description: Internal name of the resource as registered in Insider (e.g., agent group name or service area label).
   translations:
     lineage:
       - datalake_insider_raw.resource.translations
+    description: JSON map of locale-to-label translations for the resource name, supporting multilingual display in review interfaces.

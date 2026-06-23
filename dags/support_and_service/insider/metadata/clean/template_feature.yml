@@ -1,28 +1,42 @@
 database_name: datalake_insider_clean
 table_name: template_feature
+description: >
+  One row per feature configured within a review template in the Insider platform.
+  Defines which evaluation features and resources are included in a template, their
+  display order, whether they are required, and the visible rating options subset.
+  Supports hierarchical feature grouping via a parent reference. Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_insider_raw.template_feature.id
+    description: Unique identifier for the template feature configuration record in Insider.
   id_feature:
     lineage:
       - datalake_insider_raw.template_feature.feature_id
+    description: Identifier of the evaluation feature (from feature table) included in this template configuration.
   id_template:
     lineage:
       - datalake_insider_raw.template_feature.template_id
+    description: Identifier of the review template (from template table) this feature configuration belongs to.
   id_resource:
     lineage:
       - datalake_insider_raw.template_feature.resource_id
+    description: Identifier of the resource (from resource table) this feature is scoped to within the template.
   id_parent:
     lineage:
       - datalake_insider_raw.template_feature.parent_id
+    description: Identifier of the parent template feature record, used to define hierarchical groupings of features within the template.
   priority_order:
     lineage:
       - datalake_insider_raw.template_feature.priority_order
+    description: Numeric value defining the display order of this feature within the review template form.
   is_required:
     lineage:
       - datalake_insider_raw.template_feature.required
+    description: Boolean flag indicating whether reviewers must provide a rating for this feature when completing a review.
   visible_options:
     lineage:
       - datalake_insider_raw.template_feature.visible_options
+    description: JSON array specifying the subset of rating options from feature.rating_options that are visible to reviewers for this template feature.

@@ -1,19 +1,31 @@
 database_name: datalake_insider_clean
 table_name: feature
+description: >
+  Lookup table with one row per evaluation feature defined in the Insider platform.
+  Features represent specific dimensions or criteria used to rate support resources
+  (e.g., communication quality, technical accuracy). Includes the available rating
+  options, rendering configuration, and translations for each feature.
+  Source system is Insider.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_insider_raw.feature.id
+    description: Unique identifier for the evaluation feature in the Insider platform.
   name:
     lineage:
       - datalake_insider_raw.feature.name
+    description: Internal name of the evaluation feature used to identify it across templates and reviews.
   rating_options:
     lineage:
       - datalake_insider_raw.feature.rating_options
+    description: JSON array listing the selectable rating options available for this feature (e.g., score values or labels).
   render_type:
     lineage:
       - datalake_insider_raw.feature.render_type
+    description: UI rendering type that determines how this feature is displayed in the review form (e.g., stars, scale, checkbox).
   translations:
     lineage:
       - datalake_insider_raw.feature.translations
+    description: JSON map of locale-to-label translations for the feature name and options, supporting multilingual review interfaces.

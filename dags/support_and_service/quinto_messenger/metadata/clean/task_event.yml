@@ -1,46 +1,66 @@
 database_name: datalake_quinto_messenger_clean
 table_name: task_event
+description: >
+  One row per lifecycle event emitted on a Twilio TaskRouter task in Quinto Messenger.
+  Captures routing transitions (e.g., task assigned, completed, transferred) with queue
+  and channel context extracted from the event payload. Partitioned by year, month and
+  day. Source system is Quinto Messenger.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.id
+    description: Unique identifier for the task event record in Quinto Messenger.
   id_task:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.task_id
+    description: Identifier of the task (from task table) on which this event occurred.
   id_event:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_id
+    description: Twilio event SID that uniquely identifies this task event in the Twilio platform.
   id_queue:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_payload
+    description: Twilio TaskRouter Queue SID extracted from the event payload, identifying the queue involved in this routing event.
   event_type:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_type
+    description: Type of task event (e.g., task.created, task.assigned, task.completed) indicating the routing lifecycle step.
   event_payload:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_payload
+    description: Raw JSON payload from Twilio containing the full task event data, kept as source for fields not yet flattened.
   queue_name:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_payload
+    description: Human-readable name of the TaskRouter queue involved in this event, extracted from the event payload.
   channel_name:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_payload
+    description: Unique name of the Twilio task channel (e.g., voice, chat) associated with this event, extracted from the payload.
   ts_created:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.created_at
+    description: Timestamp when the task event was recorded in Quinto Messenger.
   ts_updated:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.updated_at
+    description: Timestamp of the last update to the task event record.
   year:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.year
+    description: Year extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.month
+    description: Month extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.day
+    description: Day extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   year_month:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.year_month
+    description: Year and month concatenated (YYYYMM) from the event creation date, used as an alternative partition filter.
