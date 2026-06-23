@@ -4,15 +4,15 @@ columns:
   id_amplitude:
     lineage:
       - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   id_app:
     lineage:
       - datalake_amplitude_clean.events.id_app
-    description: Column id_app from Amplitude events
+    description: Amplitude project identifier filtering events to a specific QuintoAndar mobile or web application.
   id_user:
     lineage:
       - datalake_amplitude_clean.events.id_user
-    description: Column id_user from Amplitude events
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
   intent:
     lineage:
       - datalake_amplitude_clean.events.event_properties
@@ -32,11 +32,11 @@ columns:
   event_type:
     lineage:
       - datalake_amplitude_clean.events.event_type
-    description: Column event_type from Amplitude events
+    description: Product event name tracked in Amplitude (for example offer_submitted or offer_canceled_new).
   event_properties:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Column event_properties from Amplitude events
+    description: JSON object with custom event attributes sent by the application at track time.
   ts_event_properties:
     lineage:
       - datalake_amplitude_clean.events.event_properties
@@ -44,11 +44,11 @@ columns:
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   ts_processed:
     lineage:
       - datalake_amplitude_clean.events.ts_processed
-    description: Column ts_processed from Amplitude events
+    description: Timestamp when the event was processed in the ETL pipeline before landing in the clean layer.
   year:
     lineage:
       - datalake_amplitude_clean.events.year
@@ -61,7 +61,7 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.day
     description: Column day from Amplitude events
-owner: guilherme.rocha@quintoandar.com.br
-domain: For Sale
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
 description: This table contains concierge events from app 170698. It tracks
   user interactions and includes relevant metadata and user properties.

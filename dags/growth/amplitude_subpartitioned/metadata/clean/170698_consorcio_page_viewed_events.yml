@@ -4,7 +4,7 @@ columns:
   id_amplitude:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
@@ -16,7 +16,7 @@ columns:
   id_event:
     lineage:
     - datalake_amplitude_clean.events.id_event
-    description: Column id_event from Amplitude events
+    description: Amplitude insert identifier for the ingested row within the export batch.
   id_app:
     lineage:
     - datalake_amplitude_clean.events.id_app
@@ -32,11 +32,11 @@ columns:
   city:
     lineage:
     - datalake_amplitude_clean.events.city
-    description: Column city from Amplitude events
+    description: City name inferred by Amplitude from the client IP address at event time.
   country:
     lineage:
     - datalake_amplitude_clean.events.country
-    description: Column country from Amplitude events
+    description: ISO country code inferred by Amplitude from the client IP address at event time.
   ep_costumer_journey:
     lineage:
     - datalake_amplitude_clean.events.event_properties
@@ -96,31 +96,31 @@ columns:
   event_properties:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Column event_properties from Amplitude events
+    description: JSON object with custom event attributes sent by the application at track time.
   user_properties:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column user_properties from Amplitude events
+    description: JSON object with persistent user-level attributes set by the application or Amplitude.
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   ts_server_uploaded:
     lineage:
     - datalake_amplitude_clean.events.ts_server_uploaded
-    description: Column ts_server_uploaded from Amplitude events
+    description: Timestamp when the event was exported from Amplitude to the data lake ingestion pipeline.
   ts_client_event:
     lineage:
     - datalake_amplitude_clean.events.ts_client_event
-    description: Column ts_client_event from Amplitude events
+    description: Timestamp when the event was recorded on the client device, in UTC.
   ts_client_uploaded:
     lineage:
     - datalake_amplitude_clean.events.ts_client_uploaded
-    description: Column ts_client_uploaded from Amplitude events
+    description: Timestamp when the mobile or web client uploaded the event batch to Amplitude servers.
   ts_processed:
     lineage:
     - datalake_amplitude_clean.events.ts_processed
-    description: Column ts_processed from Amplitude events
+    description: Timestamp when the event was processed in the ETL pipeline before landing in the clean layer.
   year:
     lineage:
     - datalake_amplitude_clean.events.year
