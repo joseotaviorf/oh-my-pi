@@ -1,3 +1,29 @@
 database_name: datalake_inmetro_raw
 table_name: data_profiles
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest layer for data_profiles, loaded by the parent governance DAG
+  before clean transformation.
+columns:
+  repo:
+    description: Source repository that produced the profile (for example bi-etl-ejuice
+      or wonka).
+  layer:
+    description: Derived data lake layer inferred from repository and schema name
+      (raw, clean, enrich, dw_staging, or feature_sets).
+  database:
+    description: Hive schema name of the profiled table in the source repository.
+  table:
+    description: Table name within the database that was profiled by Inmetro.
+  inmetro_info:
+    description: JSON payload with column-level profiling statistics returned by the
+      Inmetro profiler.
+  year:
+    description: Year of the data load date, used for Hive partitioning — include
+      in filters for partition pruning.
+  month:
+    description: Month of the data load date, used for Hive partitioning — include
+      in filters for partition pruning.
+  day:
+    description: Day of the data load date, used for Hive partitioning — include in
+      filters for partition pruning.

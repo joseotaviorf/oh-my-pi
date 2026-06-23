@@ -1,3 +1,56 @@
 database_name: datalake_inmetro_raw
 table_name: data_validations
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest layer for data_validations, loaded by the parent governance
+  DAG before clean transformation.
+columns:
+  repo:
+    description: Source repository that produced the validation run (for example bi-etl-ejuice
+      or wonka).
+  layer:
+    description: Derived data lake layer inferred from repository and schema name
+      (raw, clean, enrich, dw_staging, metric, or feature_sets).
+  database:
+    description: Hive schema name of the table that was validated by the Great Expectations
+      suite.
+  table:
+    description: Table name within the database that was subject to the validation
+      suite.
+  suite_name:
+    description: Name of the Great Expectations validation suite executed against
+      the table.
+  suite_result:
+    description: Overall outcome of the validation suite (for example success or failure),
+      normalized to lowercase.
+  validations_count:
+    description: Total number of individual validation expectations executed in the
+      suite run.
+  success_count:
+    description: Count of validation expectations that passed in the suite run.
+  failure_count:
+    description: Count of validation expectations that failed in the suite run.
+  success_rate:
+    description: Ratio of successful validations to total validations, expressed as
+      a decimal between 0 and 1.
+  metadata:
+    description: JSON serialization of the full validation run metadata from Inmetro,
+      including run timestamps and counts.
+  validations:
+    description: JSON array of individual validation expectation results with status
+      and details for each check.
+  ts_execution_utc:
+    description: UTC timestamp when the validation suite finished executing, parsed
+      from run metadata.
+  ts_execution_local:
+    description: Validation execution timestamp converted to America/Sao_Paulo local
+      timezone.
+  year:
+    description: Year of the data load date, used for Hive partitioning — include
+      in filters for partition pruning.
+  month:
+    description: Month of the data load date, used for Hive partitioning — include
+      in filters for partition pruning.
+  day:
+    description: Day of the data load date, used for Hive partitioning — include in
+      filters for partition pruning.

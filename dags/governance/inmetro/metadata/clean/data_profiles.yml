@@ -1,40 +1,43 @@
----
 database_name: datalake_inmetro_clean
 table_name: data_profiles
-description: Information provided about data profiles
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Incremental clean-layer snapshot of Inmetro data profiling results ingested from the Inmetro S3
+  bucket (bi-etl-ejuice and Wonka DAGs). Grain is one row per source repository, data lake layer,
+  schema, and table per load date. Partitioned by year, month, day — filter on ingestion date.
+  Supports data quality monitoring of profiled tables across the lake.
 columns:
   repo:
     lineage:
       - datalake_inmetro_raw.data_profiles.repo
-    description: Repository name
+    description: Source repository that produced the profile (for example bi-etl-ejuice or wonka).
   layer:
     lineage:
       - datalake_inmetro_raw.data_profiles.repo
       - datalake_inmetro_raw.data_profiles.database
-    description: Layer name
+    description: Derived data lake layer inferred from repository and schema name (raw, clean, enrich, dw_staging, or feature_sets).
   database:
     lineage:
       - datalake_inmetro_raw.data_profiles.database
-    description: Schema name
+    description: Hive schema name of the profiled table in the source repository.
   table:
     lineage:
       - datalake_inmetro_raw.data_profiles.table
-    description: Table name
+    description: Table name within the database that was profiled by Inmetro.
   inmetro_info:
     lineage:
       - datalake_inmetro_raw.data_profiles.inmetro_info
-    description: Additional information tables
+    description: JSON payload with column-level profiling statistics returned by the Inmetro profiler.
   year:
     lineage:
       - datalake_inmetro_raw.data_profiles.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_inmetro_raw.data_profiles.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_inmetro_raw.data_profiles.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

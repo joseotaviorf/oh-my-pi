@@ -1,76 +1,79 @@
----
 database_name: datalake_inmetro_clean
 table_name: data_validations
-escription: Information about validations applied to data
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Incremental clean-layer snapshot of Inmetro Great Expectations validation results ingested from
+  the Inmetro S3 bucket. Grain is one row per source repository, schema, table, and validation suite
+  per execution date. Partitioned by year, month, day — filter on ingestion date. Supports data
+  quality monitoring of validation outcomes across the lake.
 columns:
   repo:
     lineage:
       - datalake_inmetro_raw.data_validations.repo
-    description: Repository name
+    description: Source repository that produced the validation run (for example bi-etl-ejuice or wonka).
   layer:
     lineage:
       - datalake_inmetro_raw.data_validations.repo
       - datalake_inmetro_raw.data_validations.database
-    description: Repository and database where feature_sets are stored
+    description: Derived data lake layer inferred from repository and schema name (raw, clean, enrich, dw_staging, metric, or feature_sets).
   database:
     lineage:
       - datalake_inmetro_raw.data_validations.database
-    description: Schema name
+    description: Hive schema name of the table that was validated by the Great Expectations suite.
   table:
     lineage:
       - datalake_inmetro_raw.data_validations.table
-    description: Validation suite name
+    description: Table name within the database that was subject to the validation suite.
   suite_name:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Validation suite name
+    description: Name of the Great Expectations validation suite executed against the table.
   suite_result:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Validation tests result
+    description: Overall outcome of the validation suite (for example success or failure), normalized to lowercase.
   validations_count:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Total number of validations
+    description: Total number of individual validation expectations executed in the suite run.
   success_count:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Total number of successful validations
+    description: Count of validation expectations that passed in the suite run.
   failure_count:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Total number of validations that failed
+    description: Count of validation expectations that failed in the suite run.
   success_rate:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Success rate
+    description: Ratio of successful validations to total validations, expressed as a decimal between 0 and 1.
   metadata:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Additional information about the data validation process
+    description: JSON serialization of the full validation run metadata from Inmetro, including run timestamps and counts.
   validations:
     lineage:
       - datalake_inmetro_raw.data_validations.validations
-    description: Validations used in o test the data
+    description: JSON array of individual validation expectation results with status and details for each check.
   ts_execution_utc:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Timestamp for this run in UTC format
+    description: UTC timestamp when the validation suite finished executing, parsed from run metadata.
   ts_execution_local:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
-    description: Timestamp for the given run in local time zone
+    description: Validation execution timestamp converted to America/Sao_Paulo local timezone.
   year:
     lineage:
       - datalake_inmetro_raw.data_validations.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_inmetro_raw.data_validations.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_inmetro_raw.data_validations.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

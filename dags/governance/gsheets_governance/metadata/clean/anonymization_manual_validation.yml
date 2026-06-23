@@ -1,17 +1,21 @@
 database_name: datalake_gsheets_clean
 table_name: anonymization_manual_validation
-owner: augusto.torres@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about anonymization manual validation.
+description: >
+  Clean layer of manual PII classification decisions maintained in the anonymization governance
+  Google Sheet and ingested by gsheets_governance. Each row records a human review of whether a
+  lake column contains personal data and, when applicable, RAE exception metadata. Grain is one
+  row per id_entity (database.table.column) per sheet load.
 columns:
   id_entity:
     lineage:
       - datalake_gsheets_raw.anonymization_manual_validation.id_entity
-    description: Id entity, field composed by database_name, table_name and column_name.
+    description: Composite key built from database_name, table_name, and column_name for the evaluated field.
   manual_eval:
     lineage:
       - datalake_gsheets_raw.anonymization_manual_validation.manual_eval
-    description: Manual result. Used to anonymize columns.
+    description: Human-assigned PII category used to drive anonymization rules for the column.
     categories:
       "Telefone": PII data, indicate the column is a telefone number.
       "Email": PII data, indicate the column is an user email.
@@ -23,19 +27,19 @@ columns:
       "Dados bancários": PII data, indicate colunns have bank information.
       "RAE": PII data, RAE is Record of Anonymization Exceptions, indicate the column is an exception and must be desnonymizate.
       "N/A": Indicate the column is not a PII data.
-    requester:
-      lineage:
-        - datalake_gsheets_raw.anonymization_manual_validation.id_entity.requester
-      description: Case is a RAE, Record of Anonymization Exceptions, this column indicate the email of who request the exception
-    aproved_by:
-      lineage:
-        - datalake_gsheets_raw.anonymization_manual_validation.id_entity.aproved_by
-      description: Who validated the field as a PII, if is a RAE, Record of Anonymization Exceptions, case indicate who aproove the exception.
-    justification:
-      lineage:
-        - datalake_gsheets_raw.anonymization_manual_validation.id_entity.justification
-      description: Indicate why this columns is a exception in the Anonymization proccess.
+  requester:
+    lineage:
+      - datalake_gsheets_raw.anonymization_manual_validation.requester
+    description: Email of the person who requested a Record of Anonymization Exception for this column.
+  aproved_by:
+    lineage:
+      - datalake_gsheets_raw.anonymization_manual_validation.aproved_by
+    description: Email of the governance reviewer who approved the manual PII classification or RAE exception.
+  justification:
+    lineage:
+      - datalake_gsheets_raw.anonymization_manual_validation.justification
+    description: Business rationale explaining why the column is exempt from standard anonymization rules.
   ts_ingested:
     lineage:
       - datalake_gsheets_raw.anonymization_manual_validation.ts_ingested
-    description: Timestamp represent the manual eval ingestion time.
+    description: Timestamp when the manual evaluation row was ingested from the Google Sheet source.

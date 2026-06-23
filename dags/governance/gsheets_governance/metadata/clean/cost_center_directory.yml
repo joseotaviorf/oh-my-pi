@@ -2,14 +2,15 @@ database_name: datalake_gsheets_clean
 table_name: cost_center_directory
 owner: gustavo.alencar@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about an organization's cost centers
-
+description: >
+  Clean mapping of QuintoAndar cost center codes to normalized business lines, sourced from the
+  de_para_cc_diretoria Google Sheet via gsheets_governance. Grain is one row per cost_center.
 columns:
   cost_center:
     lineage:
       - datalake_gsheets_raw.de_para_cc_diretoria.cost_center
-    description: Cost center code
+    description: Organizational cost center code used for finance allocation and headcount reporting.
   line:
     lineage:
       - datalake_gsheets_raw.de_para_cc_diretoria.linha_normalizada
-    description: Line of Quinto Andar
+    description: Normalized QuintoAndar business line associated with the cost center.

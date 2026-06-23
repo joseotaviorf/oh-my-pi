@@ -1,4 +1,65 @@
----
 database_name: datalake_metrics_governance_raw
 table_name: metrics_registration
-domain: "Data Ops & Governance"
+owner: luisa.ladeira@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest layer for metrics_registration, loaded by the parent governance
+  DAG before clean transformation.
+columns:
+  metric_name:
+    description: Official registered name of the governed business metric in the metrics
+      catalog.
+  metric_acronym:
+    description: Short abbreviation or acronym used to reference the metric in dashboards
+      and discussions.
+  metric_description:
+    description: Narrative definition of the metric purpose, business context, and
+      how it should be interpreted.
+  company_line:
+    description: QuintoAndar company line or domain that owns and maintains the metric
+      definition.
+  business_stage:
+    description: Maturity stage of the metric in the governance lifecycle from experiment
+      to official use.
+  hierarchy_level:
+    description: Reporting tier of the metric within the company hierarchy, such as
+      company, squad, or product.
+  maturity_level:
+    description: Reliability or trust level assigned to the metric based on data quality
+      and adoption.
+  created_by:
+    description: Email of the person who originally registered the metric in the catalog.
+  updated_by:
+    description: Email of the person who last edited the metric registration record.
+  approved_by:
+    description: Email of the governance approver who validated the metric for official
+      use.
+  is_additive:
+    description: Flag indicating whether the metric values can be summed safely across
+      dimensions.
+  is_active:
+    description: Flag indicating whether the metric is currently active in the governed
+      catalog.
+  link_to_metric:
+    description: URL to a dashboard or document where the metric is published for
+      consumers.
+  metric_calculation:
+    description: Formula or SQL logic describing how the metric is computed from source
+      data.
+  observations:
+    description: Free-text notes capturing caveats, dependencies, or implementation
+      details for the metric.
+  has_datamart:
+    description: Flag indicating whether the metric is materialized as a physical
+      table in the lake.
+  datamart_name:
+    description: Fully qualified table name when the metric is materialized in a datamart
+      or metric layer.
+  ts_created:
+    description: Timestamp when the metric was first registered in the intake form.
+  ts_updated:
+    description: Timestamp of the most recent edit to the metric registration record.
+  ts_load:
+    description: Timestamp when this row was ingested into the raw layer by the
+      metrics_governance DAG.
+  metric_source:
+    description: Origin system or intake channel where the metric registration was submitted.

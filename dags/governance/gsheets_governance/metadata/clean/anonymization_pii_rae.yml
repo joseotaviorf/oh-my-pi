@@ -1,70 +1,74 @@
 database_name: datalake_gsheets_clean
 table_name: anonymization_pii_rae
-owner: augusto.torres@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Information about PII columns exception.
+description: >
+  Clean layer of Record of Anonymization Exception (RAE) cases maintained in the governance Google
+  Sheet and ingested by gsheets_governance. Each row documents a column exempt from standard PII
+  anonymization, including approval workflow, LGPD impact, and review dates. Grain is one row per
+  id_rae.
 columns:
   id_rae:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.rae_id
-    description: Id exceptions case.
+    description: Unique identifier of the RAE exception case in the governance spreadsheet.
   full_columns_name:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.full_columns_name
-    description: Id entity, field composed by database_name, table_name and column_name.
+    description: Fully qualified column name (database.table.column) covered by the RAE exception.
   exception_type:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.exception_type
-    description: Type/Cause this use case is an exceptions to PII anonymization.
+    description: Category or cause explaining why the column qualifies as an anonymization exception.
   has_pii:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.contains_pii
-    description: In case a false positive, Indicatess there`s no pii data.
+    description: Boolean indicating whether the column actually contains PII (false for false positives).
   data_subject_type:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.data_subject_type
-    description: Indicates correctly PII classification.
+    description: LGPD data-subject classification applied to the column under the exception.
   requester:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.requester
-    description: Person requesting the use of case as a RAE.
+    description: Person who submitted the RAE use case for governance review.
   justification:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.justification
-    description: Justificaton why is a exception.
+    description: Business justification for exempting the column from anonymization.
   comments:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.comments
-    description: RAE requester comment to justify the exception use case.
+    description: Additional notes from the requester supporting the RAE submission.
   status:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.status
-    description: Indicates the RAE status.
+    description: Current workflow status of the RAE case (for example pending, approved, or rejected).
   lgpd_impact:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.lgpd_impact
-    description: Indicates if the exceptions was removed from anonymization.
+    description: Indicates whether the approved exception removes the column from anonymization pipelines.
   focal_points:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.focal_points
-    description: Responsible to the RAE use case.
+    description: Governance contacts responsible for ongoing review of the RAE case.
   approved_by:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.approved_by
-    description: RAE uses case aproover.
+    description: Person who formally approved the RAE exception for production use.
   dt_activation:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.date_of_activation
-    description: RAE removal from anonymization date.
+    description: Date when the column was removed from anonymization following RAE approval.
   dt_approval:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.approval_date
-    description: RAE approval from anonymization date
+    description: Date when the RAE case received final governance approval.
   dt_last_reviewed:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.last_review
-    description: Last time the RAE was reviewed.
+    description: Date of the most recent periodic review of the active RAE exception.
   pull_request:
     lineage:
       - datalake_gsheets_raw.anonymization_pii_rae.pull_request
-    description: Pull request link.
+    description: URL or reference to the bi-etl-ejuice pull request implementing the approved RAE change.

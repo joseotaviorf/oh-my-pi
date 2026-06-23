@@ -1,28 +1,32 @@
 ---
 database_name: datalake_metrics_governance_clean
 table_name: metrics_registration
-owner: augusto.torres@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table contains information about the metrics registered.
+description: >
+  Clean layer of the governed metrics catalog sourced from the metrics registration intake
+  form. Each row describes an approved business metric including definition, calculation,
+  ownership, and materialization status. Grain is one row per registered metric per load
+  date. Partitioned by year, month, day.
 columns:
     metric_name:
-      description: Metric name.
+      description: Official registered name of the governed business metric in the metrics catalog.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.name
     metric_acronym:
-      description: Summary or abbreviation that identifies the metric.
+      description: Short abbreviation or acronym used to reference the metric in dashboards and discussions.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.acronym
     metric_description:
-      description: Metric description. Define the purpose of the metric and how it is calculated. If necessary, include information about the metric's context and use case.
+      description: Narrative definition of the metric purpose, business context, and how it should be interpreted.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.description
     company_line: 
-      description: Domain of the metric.
+      description: QuintoAndar company line or domain that owns and maintains the metric definition.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.company_line
     business_stage:
-      description: Indicates which business flow the metric fits.
+      description: Maturity stage of the metric in the governance lifecycle from experiment to official use.
       categories:
         Alpha: Alpha level metric.
         Beta: Beta level metric.
@@ -30,62 +34,78 @@ columns:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.business_stage
     hierarchy_level:
-      description: Metric hierarchy.
+      description: Reporting tier of the metric within the company hierarchy, such as company, squad, or product.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.hierarchy_level
     maturity_level:
-      description: Metric rely level.
+      description: Reliability or trust level assigned to the metric based on data quality and adoption.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.maturity_level
     created_by:
-      description: Metric creator email.
+      description: Email of the person who originally registered the metric in the catalog.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.created_by
     updated_by:
-      description: Metric updater email.
+      description: Email of the person who last edited the metric registration record.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.updated_by
     approved_by:
-      description: Metric approver email.
+      description: Email of the governance approver who validated the metric for official use.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.approved_by
     is_additive:
-      description: Flag to identify if the metric is additive.
+      description: Flag indicating whether the metric values can be summed safely across dimensions.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.is_additive
     is_active:
-      description: Flag to identify if the metric is active.
+      description: Flag indicating whether the metric is currently active in the governed catalog.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.is_active
     link_to_metric:
-      description: Link to a dashboard using the metric. 
+      description: URL to a dashboard or document where the metric is published for consumers.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.link_to_metric
     metric_calculation:
-      description: Metric calculation method.
+      description: Formula or SQL logic describing how the metric is computed from source data.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.calculation
     observations:
-      description: Field to register additional information.
+      description: Free-text notes capturing caveats, dependencies, or implementation details for the metric.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.observations
     has_datamart:
-      description: Flag to identify if the metric is materialized in a table.
+      description: Flag indicating whether the metric is materialized as a physical table in the lake.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.has_datamart
     datamart_name:
-      description: If the metric is materialized in a table, the name of the table.
+      description: Fully qualified table name when the metric is materialized in a datamart or metric layer.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.datamart_name
+    metric_source:
+      description: Origin system or intake channel where the metric registration was submitted.
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.metric_source
     ts_created:
-      description: Metric create timestamp.
+      description: Timestamp when the metric was first registered in the intake form.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.ts_created
     ts_updated:
-      description: Metric update timestamp.s
+      description: Timestamp of the most recent edit to the metric registration record.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.ts_updated
     ts_load:
-      description: Ingestion load timestamp.
+      description: Timestamp when this row was ingested into the clean layer by the metrics_governance DAG.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.ts_load
+    year:
+      description: Year of the load date, used for Hive partitioning — include in filters for partition pruning.
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.year
+    month:
+      description: Month of the load date, used for Hive partitioning — include in filters for partition pruning.
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.month
+    day:
+      description: Day of the load date, used for Hive partitioning — include in filters for partition pruning.
+      lineage:
+        - datalake_metrics_governance_raw.metrics_registration.day

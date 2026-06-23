@@ -1,17 +1,21 @@
 database_name: datalake_gsheets_clean
 table_name: looker_users_history
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: User activity history within the source platform
-
+description: >
+  Clean history of Looker user activity events sourced from the looker_users_history Google Sheet
+  via gsheets_governance. Each row records when a user entered the platform. Grain is one row per
+  user_email and ts_entered.
 columns:
-    user_email:
-        lineage:
-            - datalake_gsheets_raw.looker_users_history.user_email
-        description: User email
-    platform:
-        description: Source platform
-    ts_entered:
-        lineage:
-            - datalake_gsheets_raw.looker_users_history.history_created_date
-        description: Record Entry Date
+  user_email:
+    lineage:
+      - datalake_gsheets_raw.looker_users_history.user_email
+    description: Email address of the Looker user associated with the activity event.
+  platform:
+    description: >
+      Analytics platform where the activity occurred; currently always looker for rows loaded from
+      this sheet.
+  ts_entered:
+    lineage:
+      - datalake_gsheets_raw.looker_users_history.history_created_date
+    description: Timestamp when the user activity event was recorded in the source platform.
