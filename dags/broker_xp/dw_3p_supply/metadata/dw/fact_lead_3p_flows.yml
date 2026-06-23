@@ -113,11 +113,11 @@ columns:
   ts_last_processing_photos_in_bsp:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.ts_last_processing_photos_in_bsp
-    description: Last timestamp when lead was in PROCESSING (photos) in BSP.
+    description: UTC timestamp of the most recent transition into the PROCESSING_PHOTOS stage within the BSP workflow; null if the lead never reached that stage.
   ts_first_registered_from_bsp_to_main:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.ts_first_registered_from_bsp_to_main
-    description: First timestamp when lead was registered from BSP to main.
+    description: UTC timestamp of the first transition from the BSP pipeline into the main QuintoAndar supply system.
   ts_availability_check_start:
     lineage:
       - datalake_3p_supply.listing_draft_status.ts_availability_check_start

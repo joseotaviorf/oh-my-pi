@@ -3,6 +3,7 @@ table_name: dim_broker_regions
 description: |
   Bridge dimension linking each core_brokers.brokers_product row to regions parsed from region_list,
   enriched with attributes from core_region.region. One row per broker product and region id token.
+  Z-ordered on sk_broker_region to enable data skipping when filtering by broker-region surrogate key.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -13,6 +14,7 @@ columns:
     description: |
       Surrogate key for the broker-product-to-region relationship; CONCAT_WS with separator 0 between
       sk_broker_product and sk_region, where sk_region is the token from EXPLODE(SPLIT(region_list, ',')).
+      Filter on this column to benefit from z-order data skipping.
   sk_broker:
     lineage:
       - core_brokers.brokers_product.sk_broker

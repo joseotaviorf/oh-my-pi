@@ -174,7 +174,7 @@ columns:
   has_red_flag_aspect_ratio:
     lineage:
       - datalake_kodak_clean.image_inspection.has_red_flag_aspect_ratio
-    description: Image-level red flag for aspect ratio.
+    description: True when Kodak's computer vision model detected an abnormal width-to-height ratio that may indicate a non-property or cropped image.
   has_red_flag_casamineira:
     lineage:
       - datalake_kodak_clean.image_inspection.has_red_flag_casamineira
@@ -194,7 +194,7 @@ columns:
   has_red_flag_media_modification:
     lineage:
       - datalake_kodak_clean.image_inspection.has_red_flag_media_modification
-    description: Image-level media modification red flag.
+    description: True when Kodak's model detected signs of digital editing (filters, watermarks, or composition changes) in the image.
   has_red_flag_not_property:
     lineage:
       - datalake_kodak_clean.image_inspection.has_red_flag_not_property
@@ -228,7 +228,7 @@ columns:
   ts_image_inspection_group_created:
     lineage:
       - datalake_kodak_clean.image_inspection_group.ts_created
-    description: When the inspection group was created.
+    description: UTC timestamp when the image inspection group record was created in Kodak; marks when the batch inspection job was initiated.
   ts_image_inspection_updated:
     lineage:
       - datalake_kodak_clean.image_inspection.ts_updated

@@ -3,7 +3,7 @@ database_name: datalake_signup_clean
 table_name: user_registration_history
 owner: vitor.musachio@quintoandar.com.br
 domain: Broker XP
-description: This table contains the history of user registrations in the QuintoAndar platform.
+description: This table contains the history of user registrations in the QuintoAndar platform. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 columns:
   id:
     lineage:
@@ -40,12 +40,12 @@ columns:
   year:
     lineage:
       - datalake_signup_raw.user_registration_history.year
-    description: The year of the operation execution.
+    description: Calendar year of the operation execution. Partition column — include in WHERE clause to enable partition pruning.
   month:
     lineage:
       - datalake_signup_raw.user_registration_history.month
-    description: The month of the operation execution.
+    description: Calendar month of the operation execution. Partition column — include in WHERE clause to enable partition pruning.
   day:
     lineage:
       - datalake_signup_raw.user_registration_history.day
-    description: The day of the operation execution.
+    description: Calendar day of the operation execution. Partition column — include in WHERE clause to enable partition pruning.

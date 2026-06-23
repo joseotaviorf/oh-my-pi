@@ -52,7 +52,7 @@ columns:
   current_bsp_status_reason:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.status_reason
-    description: Reason for current BSP status.
+    description: Freetext reason code recorded in the lead status-changes log at the moment the current BSP stage was set; explains why the lead is in its present BSP status.
   current_main_status:
     lineage:
       - datalake_3p_supply.listing_draft_status.current_main_status

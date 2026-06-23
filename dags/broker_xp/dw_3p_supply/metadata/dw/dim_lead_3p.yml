@@ -104,7 +104,7 @@ columns:
   owner_agent_relationship:
     lineage:
       - datalake_3p_supply.lead_3p.owner_agent_relationship
-    description: Relationship between owner and agent from lead data.
+    description: Type of commercial relationship between the property owner and the assigned broker agent at lead creation time (e.g. exclusive or non-exclusive representation).
   access_type:
     lineage:
       - datalake_3p_supply.lead_3p.access_type
@@ -124,7 +124,7 @@ columns:
   construction_year:
     lineage:
       - datalake_3p_supply.lead_3p.construction_year
-    description: Year of construction from lead data.
+    description: Four-digit year the building was completed, as declared by the owner in the 3P platform intake form.
   block:
     lineage:
       - datalake_3p_supply.lead_3p.block
@@ -200,11 +200,11 @@ columns:
   ts_sale_business_context_created:
     lineage:
       - datalake_3p_supply.lead_3p.ts_sale_business_context_created
-    description: Timestamp when the SALE business context was created for this lead.
+    description: UTC timestamp when the SALE business context row was first inserted for this lead in the BSP; null when no SALE context exists.
   ts_rent_business_context_created:
     lineage:
       - datalake_3p_supply.lead_3p.ts_rent_business_context_created
-    description: Timestamp when the RENT business context was created for this lead.
+    description: UTC timestamp when the RENT business context row was first inserted for this lead in the BSP; null when no RENT context exists.
   ts_lead_created_broker_crm:
     lineage:
       - datalake_3p_supply.lead_3p.ts_lead_created_broker_crm

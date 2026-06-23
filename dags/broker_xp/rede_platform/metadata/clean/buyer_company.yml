@@ -3,7 +3,7 @@ database_name: datalake_rede_platform_clean
 table_name: buyer_company
 owner: vitor.musachio@quintoandar.com.br
 domain: Broker XP
-description: This table contains the history of buyer company relations in the Rede Platform service.
+description: This table contains the history of buyer company relations in the Rede Platform service. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 columns:
   id:
     description: The unique identifier for the buyer company.
@@ -38,8 +38,14 @@ columns:
     lineage:
       - datalake_rede_platform_raw.buyer_company.finished_at
   year:
-    description: The year of the buyer company relation.
+    description: Calendar year of the buyer company relation. Partition column — include in WHERE clause to enable partition pruning.
+    lineage:
+      - datalake_rede_platform_raw.buyer_company.year
   month:
-    description: The month of the buyer company relation.
+    description: Calendar month of the buyer company relation. Partition column — include in WHERE clause to enable partition pruning.
+    lineage:
+      - datalake_rede_platform_raw.buyer_company.month
   day:
-    description: The day of the buyer company relation.
+    description: Calendar day of the buyer company relation. Partition column — include in WHERE clause to enable partition pruning.
+    lineage:
+      - datalake_rede_platform_raw.buyer_company.day

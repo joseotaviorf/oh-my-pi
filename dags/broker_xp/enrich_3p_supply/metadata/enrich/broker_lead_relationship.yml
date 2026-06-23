@@ -26,9 +26,11 @@ description: |
     latest contract activation (per uuid_company, business_context,
     ts_partner_contract_start)
 
+  Z-ordered on sk_lead_3p_flow to support data skipping for flow-level lookups.
+
 columns:
   sk_lead_3p_flow:
-    description: "Surrogate key for the lead flow: id_lead_3p * 10 for SALE, id_lead_3p * 10 + 1 for RENT (long)"
+    description: "Surrogate key for the lead flow: id_lead_3p * 10 for SALE, id_lead_3p * 10 + 1 for RENT (long). Filter on this column to benefit from z-order data skipping."
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.sk_lead_3p_flow
   id_lead_3p:
