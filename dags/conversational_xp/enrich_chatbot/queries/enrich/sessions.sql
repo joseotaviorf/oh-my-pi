@@ -24,7 +24,7 @@ WITH langfuse AS (
     t.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
     AND o.ts_started >= DATE('{load_start_date}') - INTERVAL 7 DAY
 ),
-chatbot_sessions AS (
+chatbot_sessions_ranked AS (
   SELECT
     cs.id AS id_session,
     cs.id_external AS id_langfuse_session,
@@ -51,11 +51,12 @@ chatbot_sessions AS (
       cs.user_phone_number,
       sss.user_phone,
       s.user_phone,
-      sss.user_data:["user_phone"],
-      s.user_data:["user_phone"]
+      GET_JSON_OBJECT(sss.user_data, '$.user_phone'),
+      GET_JSON_OBJECT(s.user_data, '$.user_phone')
     ) AS user_phone_number,
     cs.ts_created,
-    COALESCE(sss.ts_updated, s.ts_updated) AS ts_updated
+    COALESCE(sss.ts_updated, s.ts_updated) AS ts_updated,
+    ROW_NUMBER() OVER (PARTITION BY cs.id ORDER BY cs.ts_created DESC) AS rn
   FROM
     datalake_copilot_service_clean.session AS cs
   INNER JOIN
@@ -69,35 +70,71 @@ chatbot_sessions AS (
       ON s.id = TRY_CAST(cs.id_sauron_session AS BIGINT)
   WHERE
     cs.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY cs.id ORDER BY cs.ts_created DESC) = 1
 ),
-chats_by_sauron AS (
+chatbot_sessions AS (
+  SELECT
+    id_session,
+    id_langfuse_session,
+    id_sss_session,
+    id_sauron_session,
+    id_user,
+    bot,
+    source,
+    source_environment,
+    status,
+    user_phone_number,
+    ts_created,
+    ts_updated
+  FROM
+    chatbot_sessions_ranked
+  WHERE
+    rn = 1
+),
+chats_by_sauron_ranked AS (
   SELECT
     c.id_task,
     c.id_session AS id_sauron_session,
     c.id_sss_session,
-    c.queue_name AS last_queue
+    c.queue_name AS last_queue,
+    ROW_NUMBER() OVER (PARTITION BY c.id_session ORDER BY c.ts_created DESC) AS rn
   FROM
     datalake_customer_support.chats AS c
   WHERE
     c.ts_created >= DATE('{load_start_date}') - INTERVAL 15 DAY
     AND c.id_session IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY c.id_session ORDER BY c.ts_created DESC) = 1
 ),
-chats_by_sss AS (
+chats_by_sauron AS (
+  SELECT
+    id_task,
+    id_sauron_session,
+    id_sss_session,
+    last_queue
+  FROM
+    chats_by_sauron_ranked
+  WHERE
+    rn = 1
+),
+chats_by_sss_ranked AS (
   SELECT
     c.id_task,
     c.id_sss_session,
-    c.queue_name AS last_queue
+    c.queue_name AS last_queue,
+    ROW_NUMBER() OVER (PARTITION BY c.id_sss_session ORDER BY c.ts_created DESC) AS rn
   FROM
     datalake_customer_support.chats AS c
   WHERE
     c.ts_created >= DATE('{load_start_date}') - INTERVAL 15 DAY
     AND c.id_sss_session IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY c.id_sss_session ORDER BY c.ts_created DESC) = 1
+),
+chats_by_sss AS (
+  SELECT
+    id_task,
+    id_sss_session,
+    last_queue
+  FROM
+    chats_by_sss_ranked
+  WHERE
+    rn = 1
 ),
 tickets AS (
   SELECT
@@ -123,7 +160,7 @@ SELECT
   s.user_phone_number,
   s.bot,
   CASE
-    WHEN s.source = 'whatsapp' THEN s.source
+    WHEN s.source = 'whatsapp' THEN 'whatsapp'
     WHEN s.source = 'internal_chat' THEN 'in app'
     ELSE 'unknown'
   END AS channel,
@@ -156,3 +193,5 @@ LEFT JOIN
 LEFT JOIN
   tickets AS tk
     ON tk.id_twilio = COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task)
+WHERE
+  s.ts_created < DATE_ADD(DATE('{load_end_date}'), 1)
