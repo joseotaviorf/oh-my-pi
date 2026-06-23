@@ -4,19 +4,27 @@ domain: Growth
 columns:
   id_ticket:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.id_ticket
+    - datalake_gsheets_raw.plaquinhas_installation_pp_organic.id_ticket
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   dt_install:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.dt_install
+    - datalake_gsheets_raw.plaquinhas_installation_pp_organic.dt_install
+    description: Calendar date associated with the metric, target, or event represented in this row.
   id_house:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.id_house
+    - datalake_gsheets_raw.plaquinhas_installation_pp_organic.id_house
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   client_type:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.client_type
+    - datalake_gsheets_raw.plaquinhas_installation_pp_organic.client_type
+    description: Attribute sourced from the `plaquinhas_installation_pp_organic` reference sheet and consumed by Growth analytics pipelines.
   business_context:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.business_context
+    - datalake_gsheets_raw.plaquinhas_installation_pp_organic.business_context
+    description: Attribute sourced from the `plaquinhas_installation_pp_organic` reference sheet and consumed by Growth analytics pipelines.
   state:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.state
+    - datalake_gsheets_raw.plaquinhas_installation_pp_organic.state
+    description: Attribute sourced from the `plaquinhas_installation_pp_organic` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `plaquinhas_installation_pp_organic` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

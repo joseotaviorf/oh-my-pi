@@ -4,10 +4,15 @@ domain: Growth
 columns:
   sk_user:
     lineage:
-      - datalake_gsheets_raw.affiliate_volumetry_cluster.sk_user
+    - datalake_gsheets_raw.affiliate_volumetry_cluster.sk_user
+    description: Attribute sourced from the `affiliate_volumetry_cluster` reference sheet and consumed by Growth analytics pipelines.
   affiliate_volumetry:
     lineage:
-      - datalake_gsheets_raw.affiliate_volumetry_cluster.affiliate_volumetry
+    - datalake_gsheets_raw.affiliate_volumetry_cluster.affiliate_volumetry
+    description: Attribute sourced from the `affiliate_volumetry_cluster` reference sheet and consumed by Growth analytics pipelines.
   start_date:
     lineage:
-      - datalake_gsheets_raw.affiliate_volumetry_cluster.start_date
+    - datalake_gsheets_raw.affiliate_volumetry_cluster.start_date
+    description: Attribute sourced from the `affiliate_volumetry_cluster` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliate_volumetry_cluster` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

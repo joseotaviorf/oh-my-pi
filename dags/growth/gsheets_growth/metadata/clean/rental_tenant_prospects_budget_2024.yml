@@ -4,43 +4,59 @@ domain: Growth
 columns:
   behavior_type:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.behavior_type
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.behavior_type
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
   campaign_strategy_intent:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.campaign_strategy_intent
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.campaign_strategy_intent
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.city_group
-  date:
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.city_group
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
+  dt_budget:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.date
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.date
+    description: Calendar date of the tenant prospect budget row used for incremental loads and planning joins.
   funnel_side:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.funnel_side
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.funnel_side
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_channel
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_channel
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_medium
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_medium
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_origin
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_origin
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_source
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_source
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   ntp_target:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.ntp
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.ntp
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   operation_channel:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.operation_channel
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.operation_channel
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
   referral_type:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.referral_type
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.referral_type
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
   rtp_target:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.rtp
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.rtp
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   tier:
     lineage:
-      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.tier
+    - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.tier
+    description: Attribute sourced from the `rental_tenant_prospects_budget_2024` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rental_tenant_prospects_budget_2024` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,37 +4,38 @@ domain: Growth
 columns:
   city_group:
     tags:
-      - Public
+    - Public
   context:
     tags:
-      - Public
+    - Public
   mkt_origin:
     tags:
-      - Public
+    - Public
   mkt_channel:
     tags:
-      - Public
+    - Public
   mkt_medium:
     tags:
-      - Public
+    - Public
   mkt_source:
     tags:
-      - Public
+    - Public
   nbp_target:
     tags:
-      - Public
+    - Public
   rbp_target:
     tags:
-      - Public
+    - Public
   week_start:
     tags:
-      - Public
+    - Public
   month:
     tags:
-      - Public
+    - Public
   year:
     tags:
-      - Public
+    - Public
   date:
     tags:
-      - Public
+    - Public
+owner: gabriel.salla@quintoandar.com

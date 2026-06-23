@@ -4,37 +4,51 @@ domain: Growth
 columns:
   city:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.city
+    - datalake_gsheets_raw.rental_rtp_targets.city
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   daily_churn:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.daily_churn
+    - datalake_gsheets_raw.rental_rtp_targets.daily_churn
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   daily_recovered:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.daily_recovered
+    - datalake_gsheets_raw.rental_rtp_targets.daily_recovered
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   daily_retained:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.daily_retained
+    - datalake_gsheets_raw.rental_rtp_targets.daily_retained
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   daily_inactive_by_renting:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.daily_inactive_by_renting
+    - datalake_gsheets_raw.rental_rtp_targets.daily_inactive_by_renting
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   activetp_eom:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.activetp_eom
+    - datalake_gsheets_raw.rental_rtp_targets.activetp_eom
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   activetp_som:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.activetp_som
+    - datalake_gsheets_raw.rental_rtp_targets.activetp_som
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   week_start:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.week_start
+    - datalake_gsheets_raw.rental_rtp_targets.week_start
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   weekly_recurrent:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.weekly_recurrent
+    - datalake_gsheets_raw.rental_rtp_targets.weekly_recurrent
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   month:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.month
+    - datalake_gsheets_raw.rental_rtp_targets.month
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
   monthly_recurrent:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.monthly_recurrent
+    - datalake_gsheets_raw.rental_rtp_targets.monthly_recurrent
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
   date:
     lineage:
-      - datalake_gsheets_raw.rental_rtp_targets.date
+    - datalake_gsheets_raw.rental_rtp_targets.date
+    description: Attribute sourced from the `rental_rtp_targets` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rental_rtp_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,5 +4,6 @@ domain: Growth
 columns:
   sk_user:
     tags:
-      - PII
-      - Confidential
+    - PII
+    - Confidential
+owner: gabriel.salla@quintoandar.com

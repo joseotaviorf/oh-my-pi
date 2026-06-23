@@ -1,50 +1,50 @@
 database_name: datalake_gsheets_clean
 table_name: rental_ntp_source_targets
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: Transformed table created from a Google Sheets file in order to input new tenant prospects and recovered tenant prospects targets into datalake
 columns:
   tier:
     description: Group of city groups related to ***
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.tier
+    - datalake_gsheets_raw.rental_ntp_source_targets.tier
   city_group:
     description: City group of the target
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.city_group
+    - datalake_gsheets_raw.rental_ntp_source_targets.city_group
   mkt_channel:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.mkt_channel
+    - datalake_gsheets_raw.rental_ntp_source_targets.mkt_channel
   mkt_medium:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.mkt_medium
+    - datalake_gsheets_raw.rental_ntp_source_targets.mkt_medium
   mkt_source:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.mkt_source
+    - datalake_gsheets_raw.rental_ntp_source_targets.mkt_source
   ntp_target:
-    description: nTP target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.ntp_target
+    - datalake_gsheets_raw.rental_ntp_source_targets.ntp_target
   rtp_target:
-    description: rTP target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.rtp_target
+    - datalake_gsheets_raw.rental_ntp_source_targets.rtp_target
   week_start:
-    description: Week of the target
+    description: Attribute sourced from the `rental_ntp_source_targets` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.week_start
+    - datalake_gsheets_raw.rental_ntp_source_targets.week_start
   month:
-    description: Month of the target
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.month
+    - datalake_gsheets_raw.rental_ntp_source_targets.month
   year:
-    description: Year of the target
+    description: Hive partition column (year) for incremental reads; combine with business date filters when querying historical snapshots.
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.year
+    - datalake_gsheets_raw.rental_ntp_source_targets.year
   dt_target:
-    description: Date of the target
+    description: Calendar date associated with the metric, target, or event represented in this row.
     lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.date
+    - datalake_gsheets_raw.rental_ntp_source_targets.date

@@ -1,3 +1,4 @@
 database_name: datalake_gsheets_raw
 table_name: affiliate_type_targets
 domain: Growth
+owner: gabriel.salla@quintoandar.com

@@ -5,19 +5,27 @@ domain: Growth
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_targets.city_goup
+    - datalake_gsheets_raw.rental_tof_monthly_targets.city_goup
+    description: Attribute sourced from the `rental_tof_monthly_targets` reference sheet and consumed by Growth analytics pipelines.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_targets.mkt_channel
+    - datalake_gsheets_raw.rental_tof_monthly_targets.mkt_channel
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_targets.mkt_medium
+    - datalake_gsheets_raw.rental_tof_monthly_targets.mkt_medium
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_targets.mkt_source
+    - datalake_gsheets_raw.rental_tof_monthly_targets.mkt_source
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   tof_users_target:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_targets.tof_users_target
+    - datalake_gsheets_raw.rental_tof_monthly_targets.tof_users_target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   dt_month_started:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_targets.month_start
+    - datalake_gsheets_raw.rental_tof_monthly_targets.month_start
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rental_tof_monthly_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

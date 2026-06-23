@@ -4,16 +4,23 @@ domain: Growth
 columns:
   business_context:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.business_context
+    - datalake_gsheets_raw.plaquinhas_installation_targets.business_context
+    description: Attribute sourced from the `plaquinhas_installation_targets` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.city_group
+    - datalake_gsheets_raw.plaquinhas_installation_targets.city_group
+    description: Attribute sourced from the `plaquinhas_installation_targets` reference sheet and consumed by Growth analytics pipelines.
   listing_type:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.listing_type
+    - datalake_gsheets_raw.plaquinhas_installation_targets.listing_type
+    description: Attribute sourced from the `plaquinhas_installation_targets` reference sheet and consumed by Growth analytics pipelines.
   new_installed_plaquinhas_target:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.new_installed_plaquinhas_target
+    - datalake_gsheets_raw.plaquinhas_installation_targets.new_installed_plaquinhas_target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   dt_target:
     lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.date
+    - datalake_gsheets_raw.plaquinhas_installation_targets.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `plaquinhas_installation_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

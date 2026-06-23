@@ -2,3 +2,4 @@ database_name: datalake_gsheets_raw
 table_name: supply_inputs_click_to_whatsapp
 domain: Growth
 description: Supply inputs for click to whatsapp campaigns.
+owner: gabriel.salla@quintoandar.com

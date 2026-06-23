@@ -4,19 +4,27 @@ domain: Growth
 columns:
   bonus_base:
     lineage:
-      - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.bonus_base
+    - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.bonus_base
+    description: Attribute sourced from the `promotional_bonus_user_cluster_targets` reference sheet and consumed by Growth analytics pipelines.
   bonus_boost:
     lineage:
-      - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.bonus_boost
+    - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.bonus_boost
+    description: Attribute sourced from the `promotional_bonus_user_cluster_targets` reference sheet and consumed by Growth analytics pipelines.
   sk_user:
     lineage:
-      - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.sk_user
+    - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.sk_user
+    description: Attribute sourced from the `promotional_bonus_user_cluster_targets` reference sheet and consumed by Growth analytics pipelines.
   target_base:
     lineage:
-      - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.target_base
+    - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.target_base
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   target_boost:
     lineage:
-      - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.target_boost
+    - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.target_boost
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   year_month:
     lineage:
-      - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.year_month
+    - datalake_gsheets_raw.promotional_bonus_user_cluster_targets.year_month
+    description: Attribute sourced from the `promotional_bonus_user_cluster_targets` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `promotional_bonus_user_cluster_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

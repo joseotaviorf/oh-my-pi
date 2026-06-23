@@ -4,37 +4,51 @@ domain: Growth
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.city_group
+    - datalake_gsheets_raw.sale_nbp_source_targets.city_group
+    description: Attribute sourced from the `sale_nbp_source_targets` reference sheet and consumed by Growth analytics pipelines.
   context:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.context
+    - datalake_gsheets_raw.sale_nbp_source_targets.context
+    description: Attribute sourced from the `sale_nbp_source_targets` reference sheet and consumed by Growth analytics pipelines.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_origin
+    - datalake_gsheets_raw.sale_nbp_source_targets.mkt_origin
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_channel
+    - datalake_gsheets_raw.sale_nbp_source_targets.mkt_channel
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_medium
+    - datalake_gsheets_raw.sale_nbp_source_targets.mkt_medium
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_source
+    - datalake_gsheets_raw.sale_nbp_source_targets.mkt_source
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   nbp_target:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.nbp_target
+    - datalake_gsheets_raw.sale_nbp_source_targets.nbp_target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   rbp_target:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.rbp_target
+    - datalake_gsheets_raw.sale_nbp_source_targets.rbp_target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   week_start:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.week_start
+    - datalake_gsheets_raw.sale_nbp_source_targets.week_start
+    description: Attribute sourced from the `sale_nbp_source_targets` reference sheet and consumed by Growth analytics pipelines.
   month:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.month
+    - datalake_gsheets_raw.sale_nbp_source_targets.month
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
   year:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.year
+    - datalake_gsheets_raw.sale_nbp_source_targets.year
+    description: Hive partition column (year) for incremental reads; combine with business date filters when querying historical snapshots.
   dt_target:
     lineage:
-      - datalake_gsheets_raw.sale_nbp_source_targets.date
+    - datalake_gsheets_raw.sale_nbp_source_targets.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `sale_nbp_source_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

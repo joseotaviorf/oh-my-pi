@@ -1,34 +1,34 @@
 database_name: datalake_gsheets_clean
 table_name: sale_flows_targets
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: Table created from a Google Sheets file in order to input sale_flows targets into datalake
 columns:
   city_group:
     description: City group of the sale flow target
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.city_group
+    - datalake_gsheets_raw.sale_flows_targets.city_group
   sf_target:
-    description: Sale flow target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.sf_target
+    - datalake_gsheets_raw.sale_flows_targets.sf_target
   sf_type:
     description: Sale flow specification
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.sf_type
+    - datalake_gsheets_raw.sale_flows_targets.sf_type
   week_start:
     description: Week start of the sale flow target
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.week_start
+    - datalake_gsheets_raw.sale_flows_targets.week_start
   month:
     description: Month of the sale flow target
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.month
+    - datalake_gsheets_raw.sale_flows_targets.month
   year:
     description: Year of the sale flow target
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.year
+    - datalake_gsheets_raw.sale_flows_targets.year
   date:
     description: Date of the sale flow target
     lineage:
-      - datalake_gsheets_raw.sale_flows_targets.date
+    - datalake_gsheets_raw.sale_flows_targets.date

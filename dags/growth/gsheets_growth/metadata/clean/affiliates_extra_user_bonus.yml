@@ -4,13 +4,23 @@ domain: Growth
 columns:
   sk_user:
     lineage:
-      - datalake_gsheets_raw.affiliates_extra_user_bonus.sk_user
+    - datalake_gsheets_raw.affiliates_extra_user_bonus.sk_user
+    description: Attribute sourced from the `affiliates_extra_user_bonus` reference sheet and consumed by Growth analytics pipelines.
   business_context:
     lineage:
-      - datalake_gsheets_raw.affiliates_extra_user_bonus.business_context
+    - datalake_gsheets_raw.affiliates_extra_user_bonus.business_context
+    description: Attribute sourced from the `affiliates_extra_user_bonus` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.affiliates_extra_user_bonus.city_group
+    - datalake_gsheets_raw.affiliates_extra_user_bonus.city_group
+    description: Attribute sourced from the `affiliates_extra_user_bonus` reference sheet and consumed by Growth analytics pipelines.
   bonus:
     lineage:
-      - datalake_gsheets_raw.affiliates_extra_user_bonus.bonus
+    - datalake_gsheets_raw.affiliates_extra_user_bonus.bonus
+    description: Attribute sourced from the `affiliates_extra_user_bonus` reference sheet and consumed by Growth analytics pipelines.
+  date:
+    lineage:
+    - datalake_gsheets_raw.affiliates_extra_user_bonus.date
+    description: Calendar date when the extra affiliate user bonus applies in the reference sheet.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliates_extra_user_bonus` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,43 +4,59 @@ domain: Growth
 columns:
   base:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.base
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.base
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
   base_type:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.tipo_de_base
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.tipo_de_base
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
   dt_mailing:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.data_mailing
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.data_mailing
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_prospect:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_prospect
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_prospect
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_qualified:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_qualified
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_qualified
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_availalable_qualified:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_availalable_qualified
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_availalable_qualified
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_opportunity:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_opp
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_opp
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_first_listing:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_first_listing
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_first_listing
+    description: Calendar date associated with the metric, target, or event represented in this row.
   id_house:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.id_house
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.id_house
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   main_phone:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.telefone_principal
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.telefone_principal
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
   reprocessing_channel:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.canal_reprocessamento
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.canal_reprocessamento
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
   reprocessing_version:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.versao_do_reprocessamento
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.versao_do_reprocessamento
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
   sales_company:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.sales_company
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.sales_company
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
   sk_lead:
     lineage:
-      - datalake_gsheets_raw.supply_listing_historical_reprocessing.sk_lead
+    - datalake_gsheets_raw.supply_listing_historical_reprocessing.sk_lead
+    description: Attribute sourced from the `supply_listing_historical_reprocessing` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `supply_listing_historical_reprocessing` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,49 +4,67 @@ domain: Growth
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.city_group
+    - datalake_gsheets_raw.affiliate_type_targets.city_group
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   tier:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.tier
+    - datalake_gsheets_raw.affiliate_type_targets.tier
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   business:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.business
+    - datalake_gsheets_raw.affiliate_type_targets.business
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   supply_origin:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.supply_origin
+    - datalake_gsheets_raw.affiliate_type_targets.supply_origin
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   supply_type_of_user:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.supply_type_of_user
+    - datalake_gsheets_raw.affiliate_type_targets.supply_type_of_user
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   new_users:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.new_users
+    - datalake_gsheets_raw.affiliate_type_targets.new_users
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   active_users:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.active_users
+    - datalake_gsheets_raw.affiliate_type_targets.active_users
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   total_users:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.total_users
+    - datalake_gsheets_raw.affiliate_type_targets.total_users
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   prospects:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.prospects
+    - datalake_gsheets_raw.affiliate_type_targets.prospects
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.qualifieds
+    - datalake_gsheets_raw.affiliate_type_targets.qualifieds
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   cost:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.cost
+    - datalake_gsheets_raw.affiliate_type_targets.cost
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   target_month:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.target_month
+    - datalake_gsheets_raw.affiliate_type_targets.target_month
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   quarter:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.quarter
+    - datalake_gsheets_raw.affiliate_type_targets.quarter
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   half_year:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.half_year
+    - datalake_gsheets_raw.affiliate_type_targets.half_year
+    description: Attribute sourced from the `affiliate_type_targets` reference sheet and consumed by Growth analytics pipelines.
   dt_target:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.target_date
+    - datalake_gsheets_raw.affiliate_type_targets.target_date
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_week_started:
     lineage:
-      - datalake_gsheets_raw.affiliate_type_targets.week_start
+    - datalake_gsheets_raw.affiliate_type_targets.week_start
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliate_type_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

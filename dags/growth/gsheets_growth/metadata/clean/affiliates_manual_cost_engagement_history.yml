@@ -5,28 +5,39 @@ domain: Growth
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.city_group
+    - datalake_gsheets_raw.manual_cost_engagement_history.city_group
+    description: Attribute sourced from the `affiliates_manual_cost_engagement_history` reference sheet and consumed by Growth analytics pipelines.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.mkt_origin
+    - datalake_gsheets_raw.manual_cost_engagement_history.mkt_origin
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   commission_listing_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.commission_listing
+    - datalake_gsheets_raw.manual_cost_engagement_history.commission_listing
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   commission_rent_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.commission_rent
+    - datalake_gsheets_raw.manual_cost_engagement_history.commission_rent
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   commission_mgm_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.commission_mgm
+    - datalake_gsheets_raw.manual_cost_engagement_history.commission_mgm
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   promotional_bonus_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.promotional_bonus
+    - datalake_gsheets_raw.manual_cost_engagement_history.promotional_bonus
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   notification_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.notification
+    - datalake_gsheets_raw.manual_cost_engagement_history.notification
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   other_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.other
+    - datalake_gsheets_raw.manual_cost_engagement_history.other
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   dt_cost:
     lineage:
-      - datalake_gsheets_raw.manual_cost_engagement_history.date
+    - datalake_gsheets_raw.manual_cost_engagement_history.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliates_manual_cost_engagement_history` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

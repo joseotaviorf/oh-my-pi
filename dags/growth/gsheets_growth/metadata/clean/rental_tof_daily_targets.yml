@@ -1,42 +1,43 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_tof_daily_targets
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: Transformed table created from a Google Sheets file in order to input daily top of funnel targets into datalake
 columns:
   daily_tof_target:
-    description: ToF users target
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.daily_tof_target
+    - datalake_gsheets_raw.rental_tof_daily_targets.daily_tof_target
   city_group:
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.city_group
+    - datalake_gsheets_raw.rental_tof_daily_targets.city_group
+    description: Attribute sourced from the `rental_tof_daily_targets` reference sheet and consumed by Growth analytics pipelines.
   mkt_channel:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.mkt_channel
+    - datalake_gsheets_raw.rental_tof_daily_targets.mkt_channel
   mkt_medium:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.mkt_medium
+    - datalake_gsheets_raw.rental_tof_daily_targets.mkt_medium
   mkt_source:
     description: Level of the Growth Marketing Taxonomy
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.mkt_source
+    - datalake_gsheets_raw.rental_tof_daily_targets.mkt_source
   day:
-    description: Day of the target
+    description: Hive partition column (day) for incremental reads; combine with business date filters when querying historical snapshots.
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.dia
+    - datalake_gsheets_raw.rental_tof_daily_targets.dia
   dt_week_started:
     description: Week start of the target
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.week_start
+    - datalake_gsheets_raw.rental_tof_daily_targets.week_start
   month:
-    description: Month of the target
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.month
+    - datalake_gsheets_raw.rental_tof_daily_targets.month
   dt_target:
-    description: Date of the target
+    description: Calendar date associated with the metric, target, or event represented in this row.
     lineage:
-      - datalake_gsheets_raw.rental_tof_daily_targets.date
+    - datalake_gsheets_raw.rental_tof_daily_targets.date

@@ -7,57 +7,57 @@ description: This table serves as a data dictionary designed to categorize, segm
 columns:
   id:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.id
+    - datalake_gsheets_raw.taxonomy_supply.id
     description: This column likely represents a unique identifier for each data entry in the dataset, allowing for easy reference and tracking.
   medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.utm_medium
+    - datalake_gsheets_raw.taxonomy_supply.utm_medium
     description: This column likely contains information about the medium used in a UTM parameter, which is often used to track and analyze online marketing campaigns.
   source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.utm_source
+    - datalake_gsheets_raw.taxonomy_supply.utm_source
     description: This column likely contains data about the source in a UTM parameter, specifying the origin or platform where the user encountered a marketing campaign.
   campaign:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.utm_campaign
+    - datalake_gsheets_raw.taxonomy_supply.utm_campaign
     description: This column likely stores information related to the specific marketing campaign or promotion that brought the user to a landing page. It might include campaign names or codes.
   is_branded:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.is_branded
+    - datalake_gsheets_raw.taxonomy_supply.is_branded
     description: This column contains a binary flag (e.g., 1 for branded and 0 for non-branded) indicating whether the campaign is branded or not.
   audience:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.campaign_intent
+    - datalake_gsheets_raw.taxonomy_supply.campaign_intent
     description: This column may describe the intent or purpose of the marketing campaign.
   payment_type:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.behaviour_type
+    - datalake_gsheets_raw.taxonomy_supply.behaviour_type
     description: This column likely classifies the user's behavior or interaction on the website.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.mkt_medium
+    - datalake_gsheets_raw.taxonomy_supply.mkt_medium
     description: Similar to utm_medium, this column contains data about the marketing medium used
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.mkt_source
+    - datalake_gsheets_raw.taxonomy_supply.mkt_source
     description: This column provides information about the marketing source, similar to utm_source, but specific to the marketing medium being analyzed. It could include platform names or sources.
   landing_page:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.landing_page
+    - datalake_gsheets_raw.taxonomy_supply.landing_page
     description: This column provides the identifier of the landing page where users arrived after clicking on a marketing campaign link.
   content_page:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.content_page
+    - datalake_gsheets_raw.taxonomy_supply.content_page
     description: This column may store information about the content page users interacted with before register on the website.
   campaign_context:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.campaign_context
+    - datalake_gsheets_raw.taxonomy_supply.campaign_context
     description: This column may provide additional context or details about the marketing campaign, helping to categorize and understand its purpose or target audience better.
   funnel_side:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.funnel_side
+    - datalake_gsheets_raw.taxonomy_supply.funnel_side
     description: This column might indicate which side of the growth funnel the user is currently in.
   owner:
     lineage:
-      - datalake_gsheets_raw.taxonomy_supply.owner
+    - datalake_gsheets_raw.taxonomy_supply.owner
     description: This column probably identifies the owner or team responsible for input this category.

@@ -4,91 +4,123 @@ domain: Growth
 columns:
   id_user:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.sk_user
+    - datalake_gsheets_raw.affiliates_active_segmentation.sk_user
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   type:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.type
+    - datalake_gsheets_raw.affiliates_active_segmentation.type
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   cluster:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.cluster
+    - datalake_gsheets_raw.affiliates_active_segmentation.cluster
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   segment:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.segment
+    - datalake_gsheets_raw.affiliates_active_segmentation.segment
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   recency:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.recency
+    - datalake_gsheets_raw.affiliates_active_segmentation.recency
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   frequency:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.frequency
+    - datalake_gsheets_raw.affiliates_active_segmentation.frequency
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   soft_lead_last_month:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.soft_lead_last_month
+    - datalake_gsheets_raw.affiliates_active_segmentation.soft_lead_last_month
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   soft_lead_last_three_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.soft_lead_last_three_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.soft_lead_last_three_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   total_soft_lead:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.total_soft_lead
+    - datalake_gsheets_raw.affiliates_active_segmentation.total_soft_lead
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   lead_last_month:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_month
+    - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_month
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   lead_last_three_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_three_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_three_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   lead_last_six_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_six_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_six_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   lead_last_twelve_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_twelve_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_twelve_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   total_lead:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.total_lead
+    - datalake_gsheets_raw.affiliates_active_segmentation.total_lead
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   qualified_last_month:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_month
+    - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_month
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   qualified_last_three_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_three_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_three_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   qualified_last_six_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_six_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_six_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   qualified_last_twelve_months:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_twelve_months
+    - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_twelve_months
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   total_qualified:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.total_qualified
+    - datalake_gsheets_raw.affiliates_active_segmentation.total_qualified
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   l2q_lm:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_lm
+    - datalake_gsheets_raw.affiliates_active_segmentation.l2q_lm
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   l2q_l3m:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l3m
+    - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l3m
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   l2q_l6m:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l6m
+    - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l6m
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   l2q_l12m:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l12m
+    - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l12m
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   l2q_total:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_total
+    - datalake_gsheets_raw.affiliates_active_segmentation.l2q_total
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   recency_score:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.recencyscore
+    - datalake_gsheets_raw.affiliates_active_segmentation.recencyscore
+    description: Numeric score computed for segmentation or ranking within the reference sheet.
   frequency_score:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.frequencyscore
+    - datalake_gsheets_raw.affiliates_active_segmentation.frequencyscore
+    description: Numeric score computed for segmentation or ranking within the reference sheet.
   value_score:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.valuescore
+    - datalake_gsheets_raw.affiliates_active_segmentation.valuescore
+    description: Numeric score computed for segmentation or ranking within the reference sheet.
   rfm:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.rfm
+    - datalake_gsheets_raw.affiliates_active_segmentation.rfm
+    description: Attribute sourced from the `affiliates_active_segmentation` reference sheet and consumed by Growth analytics pipelines.
   dt_joined_program:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.date_joined_program
+    - datalake_gsheets_raw.affiliates_active_segmentation.date_joined_program
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_month_joined_program:
     lineage:
-      - datalake_gsheets_raw.affiliates_active_segmentation.month_joined_program
+    - datalake_gsheets_raw.affiliates_active_segmentation.month_joined_program
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliates_active_segmentation` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

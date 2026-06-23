@@ -4,31 +4,43 @@ domain: Growth
 columns:
   sk_date:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.sk_date
+    - datalake_gsheets_raw.ltvoutput.sk_date
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   sk_user_lead_affiliate:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.sk_user_lead_affiliate
+    - datalake_gsheets_raw.ltvoutput.sk_user_lead_affiliate
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   ltv:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.ltv
+    - datalake_gsheets_raw.ltvoutput.ltv
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   avg_daily_prospects_last_6_months:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.avg_daily_prospects_last_6_months
+    - datalake_gsheets_raw.ltvoutput.avg_daily_prospects_last_6_months
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   avg_p2fl_last_6_months:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.avg_p2fl_last_6_months
+    - datalake_gsheets_raw.ltvoutput.avg_p2fl_last_6_months
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   avg_p2q_last_6_months:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.avg_p2q_last_6_months
+    - datalake_gsheets_raw.ltvoutput.avg_p2q_last_6_months
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   avg_rent_value_last_6_months:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.avg_rent_value_last_6_months
+    - datalake_gsheets_raw.ltvoutput.avg_rent_value_last_6_months
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   cluster:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.cluster
+    - datalake_gsheets_raw.ltvoutput.cluster
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   expected_indications:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.expected_indications
+    - datalake_gsheets_raw.ltvoutput.expected_indications
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
   survival_prob:
     lineage:
-      - datalake_gsheets_raw.ltvoutput.survival_prob
+    - datalake_gsheets_raw.ltvoutput.survival_prob
+    description: Attribute sourced from the `affiliates_monthly_expected_results` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliates_monthly_expected_results` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

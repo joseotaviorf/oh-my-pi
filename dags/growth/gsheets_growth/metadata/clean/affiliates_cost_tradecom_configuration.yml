@@ -5,10 +5,15 @@ domain: Growth
 columns:
   commission_rate:
     lineage:
-      - datalake_gsheets_raw.tradecom_configuration.rate
+    - datalake_gsheets_raw.tradecom_configuration.rate
+    description: Attribute sourced from the `affiliates_cost_tradecom_configuration` reference sheet and consumed by Growth analytics pipelines.
   dt_from:
     lineage:
-      - datalake_gsheets_raw.tradecom_configuration.date_from
+    - datalake_gsheets_raw.tradecom_configuration.date_from
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_until:
     lineage:
-      - datalake_gsheets_raw.tradecom_configuration.date_until
+    - datalake_gsheets_raw.tradecom_configuration.date_until
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `affiliates_cost_tradecom_configuration` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -1,5 +1,5 @@
 database_name: datalake_gsheets_raw
 table_name: rental_ntp_source_targets
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: Table created from a Google Sheets file in order to input new tenant prospects and recovered tenant prospects targets into datalake

@@ -4,16 +4,23 @@ domain: Growth
 columns:
   dt_mailing:
     lineage:
-      - datalake_gsheets_raw.supply_listing_cross_historical.data_mailing
+    - datalake_gsheets_raw.supply_listing_cross_historical.data_mailing
+    description: Calendar date associated with the metric, target, or event represented in this row.
   id_house:
     lineage:
-      - datalake_gsheets_raw.supply_listing_cross_historical.id_house
+    - datalake_gsheets_raw.supply_listing_cross_historical.id_house
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   main_phone:
     lineage:
-      - datalake_gsheets_raw.supply_listing_cross_historical.telefone_principal
+    - datalake_gsheets_raw.supply_listing_cross_historical.telefone_principal
+    description: Attribute sourced from the `supply_listing_cross_historical` reference sheet and consumed by Growth analytics pipelines.
   reprocessing_context:
     lineage:
-      - datalake_gsheets_raw.supply_listing_cross_historical.contexto_reprocessamento
+    - datalake_gsheets_raw.supply_listing_cross_historical.contexto_reprocessamento
+    description: Attribute sourced from the `supply_listing_cross_historical` reference sheet and consumed by Growth analytics pipelines.
   sales_company:
     lineage:
-      - datalake_gsheets_raw.supply_listing_cross_historical.sales_company
+    - datalake_gsheets_raw.supply_listing_cross_historical.sales_company
+    description: Attribute sourced from the `supply_listing_cross_historical` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `supply_listing_cross_historical` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

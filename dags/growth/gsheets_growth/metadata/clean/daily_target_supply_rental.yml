@@ -4,58 +4,87 @@ domain: Growth
 columns:
   id_date:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.date
+    - datalake_gsheets_raw.base_supply_souce_for_rent.date
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   concat_cost:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.concat_cost
+    - datalake_gsheets_raw.base_supply_souce_for_rent.concat_cost
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   concat_prospects:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.concat_prospects
+    - datalake_gsheets_raw.base_supply_souce_for_rent.concat_prospects
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   concat_qualifieds:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.concat_qualifieds
+    - datalake_gsheets_raw.base_supply_souce_for_rent.concat_qualifieds
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   concat_date:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.concat_date
+    - datalake_gsheets_raw.base_supply_souce_for_rent.concat_date
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   cost_per_source:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.cost_per_source
+    - datalake_gsheets_raw.base_supply_souce_for_rent.cost_per_source
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   prospects:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.prospects
+    - datalake_gsheets_raw.base_supply_souce_for_rent.prospects
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.qualifieds
+    - datalake_gsheets_raw.base_supply_souce_for_rent.qualifieds
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
+  opportunities:
+    lineage:
+    - datalake_gsheets_raw.base_supply_souce_for_rent.opportunities
+    description: Daily supply opportunity target count for rental acquisition planning by city group.
+  first_listings:
+    lineage:
+    - datalake_gsheets_raw.base_supply_souce_for_rent.first_listings
+    description: Daily first-listing target count for rental supply planning by city group and channel.
   city_group:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.city_group
+    - datalake_gsheets_raw.base_supply_souce_for_rent.city_group
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   supply_channel:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.supply_channel
+    - datalake_gsheets_raw.base_supply_souce_for_rent.supply_channel
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   supply_medium:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.supply_medium
+    - datalake_gsheets_raw.base_supply_souce_for_rent.supply_medium
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   supply_origin:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.supply_origin
+    - datalake_gsheets_raw.base_supply_souce_for_rent.supply_origin
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   supply_source:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.supply_source
+    - datalake_gsheets_raw.base_supply_souce_for_rent.supply_source
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   tier:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.tier
+    - datalake_gsheets_raw.base_supply_souce_for_rent.tier
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   dt_week_started:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.week_start
+    - datalake_gsheets_raw.base_supply_souce_for_rent.week_start
+    description: Calendar date associated with the metric, target, or event represented in this row.
   quarter:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.quarter
+    - datalake_gsheets_raw.base_supply_souce_for_rent.quarter
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.halfyear
+    - datalake_gsheets_raw.base_supply_souce_for_rent.halfyear
+    description: Attribute sourced from the `daily_target_supply_rental` reference sheet and consumed by Growth analytics pipelines.
   month:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.month
+    - datalake_gsheets_raw.base_supply_souce_for_rent.month
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
   dt_target:
     lineage:
-      - datalake_gsheets_raw.base_supply_souce_for_rent.date
+    - datalake_gsheets_raw.base_supply_souce_for_rent.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `daily_target_supply_rental` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

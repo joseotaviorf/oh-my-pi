@@ -4,34 +4,47 @@ domain: Growth
 columns:
   id_user:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.IdUser
+    - datalake_gsheets_raw.estrutura_gerente_corretor.IdUser
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   id_user_supervisor:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.IdUserSupervisor
+    - datalake_gsheets_raw.estrutura_gerente_corretor.IdUserSupervisor
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   condition:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.Condicao
+    - datalake_gsheets_raw.estrutura_gerente_corretor.Condicao
+    description: Attribute sourced from the `proj_agent_manager` reference sheet and consumed by Growth analytics pipelines.
   dt_started:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.DataInicioCarteira
+    - datalake_gsheets_raw.estrutura_gerente_corretor.DataInicioCarteira
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_mentorship_nh_ended:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.DataFimMentoriaNH
+    - datalake_gsheets_raw.estrutura_gerente_corretor.DataFimMentoriaNH
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_entrance:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.DataEntradaCarteira
+    - datalake_gsheets_raw.estrutura_gerente_corretor.DataEntradaCarteira
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_ended:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.DataSaidaCarteira
+    - datalake_gsheets_raw.estrutura_gerente_corretor.DataSaidaCarteira
+    description: Calendar date associated with the metric, target, or event represented in this row.
   responsible_analyst:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.AnalistaResponsavel
+    - datalake_gsheets_raw.estrutura_gerente_corretor.AnalistaResponsavel
+    description: Attribute sourced from the `proj_agent_manager` reference sheet and consumed by Growth analytics pipelines.
   weeks:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.Semanas
+    - datalake_gsheets_raw.estrutura_gerente_corretor.Semanas
+    description: Attribute sourced from the `proj_agent_manager` reference sheet and consumed by Growth analytics pipelines.
   mentorship_status:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.StatusMentoria
+    - datalake_gsheets_raw.estrutura_gerente_corretor.StatusMentoria
+    description: Attribute sourced from the `proj_agent_manager` reference sheet and consumed by Growth analytics pipelines.
   abandonment_reason:
     lineage:
-      - datalake_gsheets_raw.estrutura_gerente_corretor.MotivoAbandono
+    - datalake_gsheets_raw.estrutura_gerente_corretor.MotivoAbandono
+    description: Attribute sourced from the `proj_agent_manager` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `proj_agent_manager` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.
