@@ -1,0 +1,37 @@
+dag:
+  name: update_oncall_spreadsheet
+  schedule_interval: 0 12 * * *
+  owner: Data People
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      Daily update of on-call hours spreadsheets for AE and DPE squads.
+      Retrieves the previous shift's on-call engineer(s) from the Jira Ops schedule
+      and appends an entry to the monthly Google Sheet tab for payroll processing.
+
+      Migrated from the Databricks '[OpsGenie] Daily update OnCall GSheet' notebooks. 
+      Two tasks run in parallel: one for the AE squad (task=ae) and one
+      for the DPE squad (task=dpe).
+
+      Credentials required in Databricks secrets (scope `quintoandar`):
+        - JIRA_OPS_API: JSON with `username`, `token`, `cloud_id` for Jira Ops API.
+        - GOOGLE_SERVICE_ACCOUNT_CREDENTIALS: JSON key of the GSheets service account.
+
+      Google Sheets access: share each target sheet (Editor permission) with
+        gsheets-access@quintoandardata.iam.gserviceaccount.com
+        (from GOOGLE_SERVICE_ACCOUNT_CREDENTIALS, scope `quintoandar`).
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  has_hive_sync: false
+  bucket_config_name: people_bucket
+  load_spark_job: update_oncall_spreadsheet
+  spark_job_arguments:
+    - "{table_name}"
+    - "{environment}"
+  tables_customization:
+    ae:
+      extraction_type: full
+    dpe:
+      extraction_type: full
