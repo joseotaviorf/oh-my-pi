@@ -1,7 +1,8 @@
 ---
 database_name: datalake_hightouch_logs_raw
-table_name: sync_audience_membership_trino
+table_name: audience_membership_trino
 domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 description: Hightouch audience membership tracking for marketing campaigns and customer segmentation from Trino source
 columns:
   ht_audience_id:

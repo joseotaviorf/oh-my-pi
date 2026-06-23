@@ -17,6 +17,7 @@ description: |
   predicates with id_sync to benefit from Z-order clustering on id_sync.
   Hightouch documentation: https://hightouch.com/docs/syncs/warehouse-sync-logs (Sync runs table);
   warehouse schema reference: https://hightouch.com/docs/developer-tools/warehouse-tables.
+  Partitioned by year, month, and day — filter all partition columns in WHERE. Z-ordered by id_sync on clean.
 columns:
   id_sync:
     description: |

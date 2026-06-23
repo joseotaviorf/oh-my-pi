@@ -2,7 +2,7 @@
 database_name: datalake_hightouch_logs_raw
 table_name: sync_changelog_trino
 domain: Growth
-owner: bruno.sbrito@quintoandar.com.br
+owner: bruno.sbrito@quintoandar.com
 description: Hightouch reverse ETL sync changelog tracking row-level operations from Trino S3 exports
 columns:
   sync_id:

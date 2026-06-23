@@ -18,6 +18,7 @@ description: |
   predicates with id_audience to benefit from Z-order clustering on id_audience.
   Hightouch documentation: https://hightouch.com/docs/customer-studio/audience-snapshots;
   warehouse schema reference: https://hightouch.com/docs/developer-tools/warehouse-tables.
+  Partitioned by year, month, and day — filter all partition columns in WHERE. Z-ordered by id_audience on clean.
 columns:
   id_audience:
     description: |

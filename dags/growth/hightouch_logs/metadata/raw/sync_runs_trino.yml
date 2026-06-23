@@ -2,6 +2,7 @@
 database_name: datalake_hightouch_logs_raw
 table_name: sync_runs_trino
 domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 description: Hightouch reverse ETL sync run execution metrics tracking data pipeline performance from Trino to marketing destinations
 columns:
   sync_id:

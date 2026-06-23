@@ -2,6 +2,7 @@
 database_name: datalake_hightouch_logs_raw
 table_name: sync_snapshot_trino
 domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 description: Hightouch warehouse sync snapshot per row from Trino export (current row status per sync), sourced from CDP parquet under hightouch_audit
 columns:
   sync_id:
