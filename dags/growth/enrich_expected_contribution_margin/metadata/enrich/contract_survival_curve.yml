@@ -5,13 +5,14 @@ description: This table contains the contract survival curve of all contracts si
 columns:
   quarter:
     lineage:
-      - datalake_ebdb_contract.contract
+    - datalake_ebdb_contract.contract
     description: Quarter identifier (it's in YYYY-MM-DD format).
   days_since_start:
     lineage:
-      - datalake_ebdb_contract.contract
+    - datalake_ebdb_contract.contract
     description: Number of days since the contract started.
   survival_probability:
     lineage:
-      - datalake_ebdb_contract.contract
+    - datalake_ebdb_contract.contract
     description: The survival probability (survival curve) for a given _quarter_ and _days_since_start_.
+owner: gabriel.salla@quintoandar.com

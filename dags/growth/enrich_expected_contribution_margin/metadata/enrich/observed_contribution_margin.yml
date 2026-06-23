@@ -5,62 +5,63 @@ description: This table contains the monthly revenue that each ForRent contract 
 columns:
   id_rent_flow:
     lineage:
-      - datalake_rent_demand_events.rent_demand_events.id_rent_flow
-    description: Key of the rent flow
+    - datalake_rent_demand_events.rent_demand_events.id_rent_flow
+    description: Surrogate key of the ForRent demand flow event used in expected contribution margin modeling.
   id_house:
     lineage:
-      - datalake_rent_demand_events.rent_demand_events.id_house
-      - dw_rental_contribution_margin.fact_house_listing_revenues.id_house
-    description: Key of the house
+    - datalake_rent_demand_events.rent_demand_events.id_house
+    - dw_rental_contribution_margin.fact_house_listing_revenues.id_house
+    description: QuintoAndar property identifier associated with the contract in the margin projection.
   id_tenant_prospect:
     lineage:
-      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
-    description: Key of the tenant prospect (also known as id_user in other tables)
+    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+    description: Tenant prospect identifier (equivalent to id_user in demand tables) for the rent funnel event.
   id_contract:
     lineage:
-      - datalake_ebdb_clean.contract.id
-      - datalake_rent_demand_events.rent_demand_events.id_contract
-      - dw_rental_contribution_margin.fact_house_listing_revenues.id_contract
-      - datalake_losses.provision.id_contract
-    description: Key of the contract
+    - datalake_ebdb_clean.contract.id
+    - datalake_rent_demand_events.rent_demand_events.id_contract
+    - dw_rental_contribution_margin.fact_house_listing_revenues.id_contract
+    - datalake_losses.provision.id_contract
+    description: Business attribute `id_contract` materialized by the observed_contribution_margin pipeline.
   contract_start_month:
     lineage:
-      - datalake_losses.provision.dt_closing
-      - dw_rental_contribution_margin.fact_house_listing_revenues.dt_month_start
-      - dw_rental_contribution_margin.fact_house_listing_revenues.contract_lifetime
+    - datalake_losses.provision.dt_closing
+    - dw_rental_contribution_margin.fact_house_listing_revenues.dt_month_start
+    - dw_rental_contribution_margin.fact_house_listing_revenues.contract_lifetime
     description: The month in which the contract started. In yyyy-MM-01 format.
   contract_termination_month:
     lineage:
-      - datalake_ebdb_clean.contract.dt_termination
+    - datalake_ebdb_clean.contract.dt_termination
     description: The month in which the contratect was terminated or null if the contract is still open. In yyyy-MM-01 format.
   month_of_year:
     lineage:
-      - datalake_losses.provision.dt_closing
-      - dw_rental_contribution_margin.fact_house_listing_revenues.dt_month_start
-    description: The month in which the revenue was generated. In yyyy-MM-01 format.
+    - datalake_losses.provision.dt_closing
+    - dw_rental_contribution_margin.fact_house_listing_revenues.dt_month_start
+    description: Calendar month index used as a partition dimension for survival and margin tables.
   months_since_contract_start:
     lineage:
-      - dw_rental_contribution_margin.fact_house_listing_revenues.contract_lifetime
-    description: The age of the contract in months.
+    - dw_rental_contribution_margin.fact_house_listing_revenues.contract_lifetime
+    description: Contract age in months since signature, used as a survival curve dimension.
   gross_revenue:
     lineage:
-      - dw_rental_contribution_margin.fact_house_listing_revenues.gross_revenue
+    - dw_rental_contribution_margin.fact_house_listing_revenues.gross_revenue
     description: The total revenue received by QuintoAndar for a given (contract, month), ignoring the costs.
   net_revenue:
     lineage:
-      - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
+    - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
     description: The total revenue received by QuintoAndar minus the Sales Tax and the Revenue Sharing on Brokerage costs.
   net_revenue_after_losses:
     lineage:
-      - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
-      - datalake_losses.provision.provision_balance_p4_delay_e
-      - datalake_losses.provision.id_contract
-      - datalake_losses.provision.dt_closing
+    - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
+    - datalake_losses.provision.provision_balance_p4_delay_e
+    - datalake_losses.provision.id_contract
+    - datalake_losses.provision.dt_closing
     description: The net_revenue received by QuintoAndar minus the losses.
   contribution_margin:
     lineage:
-      - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
-      - datalake_losses.fact_provision.provision_balance_p4_delay_e
-      - datalake_losses.fact_provision.id_contract
-      - datalake_losses.fact_provision.dt_closing
+    - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
+    - datalake_losses.fact_provision.provision_balance_p4_delay_e
+    - datalake_losses.fact_provision.id_contract
+    - datalake_losses.fact_provision.dt_closing
     description: The contribution margin that the (contract, month) generated to QuintoAndar.
+owner: gabriel.salla@quintoandar.com

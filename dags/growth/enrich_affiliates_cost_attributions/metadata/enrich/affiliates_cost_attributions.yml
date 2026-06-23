@@ -2,63 +2,63 @@
 database_name: datalake_affiliates_cost_attributions
 table_name: affiliates_cost_attributions
 domain: Growth
-owner: "@data-growth"
+owner: gabriel.salla@quintoandar.com
 description: This table contains detailed information about various costs attributed to affiliates.
 columns:
   id_date:
-    description: The date of the recorded transaction or activity or commission.
+    description: Calendar date key for the daily marketing cost row; joins to the shared date dimension.
     lineage:
-      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.ts_commission_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.dt_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.dt_cost
+    - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.ts_commission_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.dt_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.dt_cost
   city_group:
-    description: The related city group of the cost.
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
-      - datalake_region.region.city_group
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.city_group
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.city_group
+    - datalake_region.region.city_group
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.city_group
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.city_group
   mkt_origin:
-    description: The marketing origin value.
+    description: Marketing origin label from taxonomy used to attribute spend to acquisition programs.
     lineage:
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.mkt_origin
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.mkt_origin
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.mkt_origin
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.mkt_origin
   commission_listing_cost:
     description: Total fixed commission cost for published listing referrals.
     lineage:
-      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_listing_cost
+    - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_listing_cost
   commission_rent_cost:
     description: Total commission cost based on a percentage of each rental listing referral.
     lineage:
-      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_rent_cost
+    - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_rent_cost
   commission_mgm_cost:
     description: Combined commission costs related to management referrals.
     lineage:
-      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_mgm_cost
+    - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_mgm_cost
   promotional_bonus_cost:
     description: Total cost of promotional bonuses awarded to affiliates.
     lineage:
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.promotional_bonus_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.promotional_bonus_cost
   notification_cost:
     description: Total costs of incurred sending notifications.
     lineage:
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.notification_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.notification_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.notification_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.notification_cost
   other_cost:
     description: Aggregate of various costs not explicitly categorized.
     lineage:
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.other_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.other_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.other_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.other_cost
   commission_tradecom_cost:
     description: Total commission cost adjusted by the trade commission rate.
     lineage:
-      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_listing_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_rent_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_mgm_cost
-      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.promotional_bonus_cost
-      - datalake_gsheets_clean.affiliates_cost_tradecom_configuration.commission_rate
+    - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_listing_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_rent_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_mgm_cost
+    - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.promotional_bonus_cost
+    - datalake_gsheets_clean.affiliates_cost_tradecom_configuration.commission_rate

@@ -2,51 +2,51 @@
 database_name: datalake_ebdb_affiliates_cost
 table_name: affiliates_engagement_cost
 domain: Growth
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 description: This table contains detailed data regarding transactions and engagements related to affiliates.
 columns:
   id_user:
-    description: Unique identifier of the user.
+    description: QuintoAndar user identifier of the affiliate participant in the engagement transaction.
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
   id_region:
-    description: Identifier for the region.
+    description: Region identifier of the listing or lead geography tied to the affiliate commission.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_affiliates:
-    description: Unique identifier for the affiliate.
+    description: Affiliate program identifier linking the user to Indica Aí or related referral programs.
     lineage:
-      - datalake_ebdb_clean.user.id_affiliates
+    - datalake_ebdb_clean.user.id_affiliates
   id_agent:
-    description:  Identifier of the agent involved in the affiliate engagement, if applicable.
+    description: Agent identifier when the affiliate engagement involves a field agent intermediary.
     lineage:
-      - datalake_ebdb_clean.lead.id_agent
-      - datalake_ebdb_clean.user.id_agent
+    - datalake_ebdb_clean.lead.id_agent
+    - datalake_ebdb_clean.user.id_agent
   affiliate_type:
-    description:  Type of affiliate.
+    description: Affiliate program type label (for example Indica Aí, Doorman) for commission classification.
     lineage:
-      - datalake_ebdb_clean.lead.affiliate_type
+    - datalake_ebdb_clean.lead.affiliate_type
   commission_type:
-    description: Type of commission associated with the engagement.
+    description: Accounting transaction type code that determines how the affiliate commission is booked.
     lineage:
-      - datalake_ebdb_clean.account_transaction.type
+    - datalake_ebdb_clean.account_transaction.type
   commission_cost:
-    description: The cost of the commission associated with the affiliate engagement.
+    description: Monetary commission amount attributed to the affiliate engagement in local currency.
     lineage:
-      - datalake_ebdb_clean.account_transaction.value
+    - datalake_ebdb_clean.account_transaction.value
   ts_commission_cost:
-    description: Timestamp when the commission cost was incurred.
+    description: Timestamp when the affiliate commission transaction was recorded in EBDB.
     lineage:
-      - datalake_ebdb_clean.account_transaction.ts_transaction
+    - datalake_ebdb_clean.account_transaction.ts_transaction
   year:
     description: Year of the date when the commission cost was incurred.
     lineage:
-      - datalake_ebdb_clean.account_transaction.ts_transaction
+    - datalake_ebdb_clean.account_transaction.ts_transaction
   month:
     description: Month of the date when the commission cost was incurred.
     lineage:
-      - datalake_ebdb_clean.account_transaction.ts_transaction
+    - datalake_ebdb_clean.account_transaction.ts_transaction
   day:
     description: Day of the date when the commission cost was incurred.
     lineage:
-      - datalake_ebdb_clean.account_transaction.ts_transaction   
+    - datalake_ebdb_clean.account_transaction.ts_transaction
