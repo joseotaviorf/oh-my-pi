@@ -4,43 +4,43 @@ columns:
   id_amplitude:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
-    description: Column id_user from Amplitude events
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
   id_device:
     lineage:
     - datalake_amplitude_clean.events.id_device
-    description: Column id_device from Amplitude events
+    description: Amplitude-generated device identifier used to stitch sessions on the same physical device.
   id_house:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Column id_house from Amplitude events
+    description: QuintoAndar listing identifier parsed from the JSON analytics payload for property joins.
   country_code:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column country_code from Amplitude events
+    description: Analytics attribute 'country code' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   event_type:
     lineage:
     - datalake_amplitude_clean.events.event_type
-    description: Column event_type from Amplitude events
+    description: Product event name tracked in Amplitude (for example offer_submitted or offer_canceled_new).
   user_properties:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column user_properties from Amplitude events
+    description: JSON object with persistent user-level attributes set by the application or Amplitude.
   event_properties:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Column event_properties from Amplitude events
+    description: JSON object with custom event attributes sent by the application at track time.
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   ts_processed:
     lineage:
     - datalake_amplitude_clean.events.ts_processed
-    description: Column ts_processed from Amplitude events
+    description: Timestamp when the event was processed in the ETL pipeline before landing in the clean layer.
   year:
     lineage:
     - datalake_amplitude_clean.events.year
@@ -54,6 +54,7 @@ columns:
     - datalake_amplitude_clean.events.day
     description: Column day from Amplitude events
 owner: eduardo.soares@quintoandar.com.br
-domain: Growth
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
 description: This table contains relisting_early_visits_confirmed events from app
   183047. It tracks user interactions and includes relevant metadata and user properties.
