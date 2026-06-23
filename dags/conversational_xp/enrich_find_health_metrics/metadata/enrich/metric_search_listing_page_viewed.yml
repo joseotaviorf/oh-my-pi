@@ -11,11 +11,11 @@ columns:
   id_user:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
-    description: ID of the user.
+    description: QuintoAndar user identifier of the person who viewed the listing page, sourced from Amplitude tracking events.
   id_search:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: ID of the search.
+    description: Unique identifier of the search session that led the user to the listing page, extracted from Amplitude event properties.
   business_context:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -47,7 +47,7 @@ columns:
   house_city:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: City of the property.
+    description: City where the viewed property is located, used to analyze listing page views by geographic market.
   house_macro_region:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -55,7 +55,7 @@ columns:
   house_state:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: State of the property.
+    description: Brazilian state (UF) where the viewed property is located, used for regional breakdowns of listing page view metrics.
   house_country:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -71,7 +71,7 @@ columns:
   sale_value:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: Value of the sale.
+    description: Asking sale price in BRL of the property at the time of the listing page viewed event, extracted from Amplitude event properties.
   ts_event:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event

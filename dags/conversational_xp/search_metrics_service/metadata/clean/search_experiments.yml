@@ -106,14 +106,14 @@ columns:
     description: "Relative difference in conversion rates between groups"
     lineage:
       - datalake_search.search_experiments.conversion_rate_diff_rel
-  ci_lower_bound:
-    description: "Lower bound of the confidence interval"
+  lower_bound:
+    description: "Lower bound of the confidence interval for the relative conversion rate difference between treatment and baseline."
     lineage:
-      - datalake_search.search_experiments.ci_lower_bound
-  ci_upper_bound:
-    description: "Upper bound of the confidence interval"
+      - datalake_search_metrics_service_raw.search_experiments.lower_bound
+  upper_bound:
+    description: "Upper bound of the confidence interval for the relative conversion rate difference between treatment and baseline."
     lineage:
-      - datalake_search.search_experiments.ci_upper_bound
+      - datalake_search_metrics_service_raw.search_experiments.upper_bound
   mde:
     description: "Minimum Detectable Effect for the experiment"
     lineage:
@@ -166,14 +166,14 @@ columns:
     description: "Marginal relative difference in conversion rates"
     lineage:
       - datalake_search.search_experiments.conversion_rate_diff_rel_marginal
-  ci_lower_bound_rel_marginal:
-    description: "Lower bound of marginal relative confidence interval"
+  lower_bound_marginal:
+    description: "Lower bound of the marginal confidence interval for the relative conversion rate difference after applying experiment filters."
     lineage:
-      - datalake_search.search_experiments.ci_lower_bound_rel_marginal
-  ci_upper_bound_rel_marginal:
-    description: "Upper bound of marginal relative confidence interval"
+      - datalake_search_metrics_service_raw.search_experiments.lower_bound_marginal
+  upper_bound_marginal:
+    description: "Upper bound of the marginal confidence interval for the relative conversion rate difference after applying experiment filters."
     lineage:
-      - datalake_search.search_experiments.ci_upper_bound_rel_marginal
+      - datalake_search_metrics_service_raw.search_experiments.upper_bound_marginal
   significance_marginal:
     description: "Statistical significance for marginal analysis"
     lineage:

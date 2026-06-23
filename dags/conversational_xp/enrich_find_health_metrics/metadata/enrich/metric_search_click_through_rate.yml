@@ -7,7 +7,7 @@ columns:
   id_search:
     lineage:
     - datalake_search.search_impressions.id_search
-    description: Id of the search.
+    description: Unique identifier of the search session that produced the listing impression, used to join with search_impressions and attribute clicks to a specific search.
   id_house:
     lineage:
     - datalake_search.search_impressions.id_house
@@ -19,7 +19,7 @@ columns:
   house_city:
     lineage:
     - datalake_search.search_impressions.house_city
-    description: The city of the house.
+    description: City where the listed property is located, used to slice search click-through rate metrics by geographic market.
   platform:
     lineage:
     - datalake_search.search_impressions.platform
