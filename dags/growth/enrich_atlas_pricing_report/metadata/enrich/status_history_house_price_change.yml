@@ -1,6 +1,33 @@
----
 database_name: datalake_atlas_pricing_report
-table_name: status_history_price_change
-owner: '@data-growth'
-domain: Growth
-description: WIP
+table_name: status_history_house_price_change
+owner: gabriel.mota@quintoandar.com.br
+domain: Atlas DB
+description: |
+  Status history of house listing price changes for rent and sale contexts, unioned
+  from fact_listing_price_changes and sale_listing_price_changes sources.
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+    description: House identifier for the listing whose price changed.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: Business context of the listing (RENT or SALE), uppercased.
+  status:
+    description: Status label for the price change event; constant PRICE_CHANGE.
+  price:
+    lineage:
+      - dw_quintoandar.fact_listing_price_changes.rent
+      - datalake_sale_listings.sale_listing_price_changes.sale_price
+    description: Rounded listing price after the change for the business context.
+  ts_price_started:
+    lineage:
+      - dw_quintoandar.fact_listing_price_changes.ts_price_started
+      - datalake_sale_listings.sale_listing_price_changes.ts_price_started
+    description: Timestamp when the price period started.
+  ts_price_ended:
+    lineage:
+      - dw_quintoandar.fact_listing_price_changes.ts_price_ended
+      - datalake_sale_listings.sale_listing_price_changes.ts_price_ended
+    description: Timestamp when the price period ended.
