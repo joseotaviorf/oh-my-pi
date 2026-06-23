@@ -20,7 +20,9 @@ columns:
   id_company:
     lineage:
       - datalake_hubspot_clean.company.id_company
-    description: ID of the company in HubSpot.
+    description: >
+      Numeric HubSpot company object identifier for this revision; with ts_updated and the daily partition
+      columns it defines the grain of each history snapshot row.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -48,7 +50,9 @@ columns:
   zip_code:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: ZIP code of the company.
+    description: >
+      Postal code (CEP) of the company headquarters address as captured in HubSpot, used for geographic
+      segmentation and sales territory analysis.
   city:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -99,7 +103,9 @@ columns:
   life_cycle_stage:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: In which stage the company is in HubSpot.
+    description: >
+      HubSpot lifecycle stage for the company record (for example lead or customer), indicating CRM funnel
+      maturity independently of Rede Sale or Rent membership status.
   mkt_campain:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -162,7 +168,9 @@ columns:
   sale_member_category:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Category of the sale member.
+    description: >
+      Current Rede Sale partner tier in HubSpot (Prata, Ouro, Diamante), used by Operations to segment
+      sale-side broker benefits and performance programs.
     categories:
       Prata: 'Silver'
       Ouro: 'Gold'
@@ -170,7 +178,9 @@ columns:
   rent_member_category:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Category of the rent member.
+    description: >
+      Current Rede Rent partner tier in HubSpot (Prata, Ouro, Diamante), used to segment rent-side broker
+      benefits and performance programs.
     categories:
       Prata: 'Silver'
       Ouro: 'Gold'
@@ -186,15 +196,21 @@ columns:
   sale_member_category_history:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: History of the sale member category.
+    description: >
+      Array of historical Rede Sale tier changes from HubSpot property history; each element records the
+      tier value and the timestamp when HubSpot registered the update.
   rent_member_category_history:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: History of the rent member category.
+    description: >
+      Array of historical Rede Rent tier changes from HubSpot property history; each element records the
+      tier value and the timestamp when HubSpot registered the update.
   company_cluster_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
-    description: History of the company cluster.
+    description: >
+      Array of historical portfolio-assignment cluster (carteirizacao) values from HubSpot, tracking how
+      Operations classified the partner company over time.
   lead_origin:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -252,7 +268,10 @@ columns:
   cnpj_unique:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Unique CNPJ of the company, cleaned to have only numbers and letters. Property configured in HubSpot to be used as a unique identifier for the company, do not accept duplicate values.
+    description: >
+      System-enforced unique CNPJ for the company (HubSpot property cnpj_unico), cleaned to digits and
+      letters. Must be single-valued within each HubSpot revision (id_company, ts_updated) and unique
+      across companies at that revision grain; validated by data quality checks on this history table.
   rfc:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -272,11 +291,15 @@ columns:
   sale_lead_status:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Sale status of the company lead in HubSpot.
+    description: >
+      Rede Sale lead or membership status from HubSpot hs_lead_status on this daily snapshot (for example
+      Membro or Parceiro), before archived or merged normalization applied in the company snapshot table.
   rent_lead_status:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Rent status of the company lead in HubSpot.
+    description: >
+      Rede Rent lead or membership status from HubSpot for-rent lead property on this daily snapshot,
+      before archived or merged normalization applied in the company snapshot table.
   lead_status_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
@@ -284,11 +307,15 @@ columns:
   sale_lead_status_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
-    description: History of the sale status of the company lead in HubSpot.
+    description: >
+      Array of historical Rede Sale status transitions from HubSpot hs_lead_status property history, used to
+      reconstruct membership timelines and attribute broker status changes.
   rent_lead_status_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
-    description: History of the rent status of the company lead in HubSpot.
+    description: >
+      Array of historical Rede Rent status transitions from HubSpot for-rent lead property history, used to
+      reconstruct rent-side membership timelines.
   report_link:
       lineage:
         - datalake_hubspot_clean.company.properties
@@ -360,7 +387,9 @@ columns:
   monthly_average_new_rental_contracts:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Monthly average of new rental contracts.
+    description: >
+      Self-reported average count of new rental contracts per month from HubSpot farming qualification,
+      used as a capacity signal when sizing Rede Rent partner programs.
   num_managers:
     lineage:
       - datalake_hubspot_clean.company.properties

@@ -1,56 +1,81 @@
 database_name: datalake_brokers
 table_name: hubspot_brokers_history
 description: >
-  Enriched HubSpot company history with broker surrogate keys, mapping sale_lead_status to ACTIVE/INACTIVE
-  broker_status. One row per detected change event per HubSpot company. A change event is emitted whenever
-  broker_status, company_cluster, cluster_performance, or id_hubspot_owner transitions (NULL-safe for owner
-  changes), plus the first observed revision per sk_broker. Source companies are deduplicated by CNPJ keeping
-  the most recently updated record that is a Rede Sale member, not archived and not merged into another company.
+  Enriched change-event history that links HubSpot Rede Sale company revisions to the broker model in
+  core_brokers.brokers via CNPJ. Grain is one row per detected change per id_hubspot_company: a row is
+  emitted when broker_status, company_cluster, cluster_performance, or id_hubspot_owner transitions
+  (NULL-safe for owner changes), plus the first observed revision per sk_broker. broker_status maps
+  sale_lead_status to ACTIVE when the value is Membro and INACTIVE otherwise. Consumed by
+  datalake_brokers.broker_status_history for HubSpot-sourced membership periods (through 2026-01-31),
+  dw_brokers.dim_broker for the current account manager, and dw_brokers.dim_broker_account_manager_history
+  for owner assignment timelines. Only HubSpot companies that have ever been Rede Sale members, are not
+  archived, and were not merged into another company enter the pipeline. Because HubSpot historically
+  allowed duplicate companies with the same legacy cnpj, source companies are deduplicated to one
+  id_company per effective CNPJ before joining core_brokers.brokers. Effective CNPJ is COALESCE(cnpj_unique,
+  cnpj): cnpj_unique is the system-enforced unique identifier in HubSpot and is preferred when populated;
+  when cnpj_unique is still null the legacy cnpj is used and ties are broken by the most recently updated
+  company.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker
-    description: Surrogate key identifying the broker.
+    description: >
+      Surrogate key of the broker in core_brokers.brokers, resolved by matching the effective CNPJ
+      (COALESCE(cnpj_unique, cnpj) from datalake_hubspot.company) to core_brokers.brokers.cnpj. Rows
+      without a matching broker are excluded by the inner join.
   id_hubspot_company:
     lineage:
       - datalake_hubspot.company_history.id_company
-    description: Identification of the company registered on HubSpot.
+    description: >
+      HubSpot company object id for the deduplicated Rede Sale member company whose history revision
+      produced this change event. Versioning columns broker_version and is_current are scoped to this id.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner
     description: >
-      Identification of the HubSpot owner (account manager) associated with the company on this revision.
-      A change in this field across consecutive HubSpot company_history records triggers a new row in this
-      table, even when broker_status, company_cluster and cluster_performance are unchanged.
+      HubSpot owner id (account manager) assigned to the company on this revision. A change in this field
+      across consecutive company_history records for the same sk_broker triggers a new row even when
+      broker_status, company_cluster, and cluster_performance are unchanged.
   cnpj:
     lineage:
-      - datalake_hubspot.company_history.cnpj
-    description: Brazilian corporate tax ID (CNPJ) of the broker company.
+      - datalake_hubspot.company.cnpj_unique
+      - datalake_hubspot.company.cnpj
+    description: >
+      Effective Brazilian corporate tax ID used to join core_brokers.brokers. Uses cnpj_unique, the
+      HubSpot field with a system-enforced uniqueness constraint, when populated; otherwise falls back to
+      the legacy cnpj field. This is the canonical CNPJ for broker linkage in this table, not the raw
+      cnpj column from company_history.
   broker_status:
     lineage:
       - datalake_hubspot.company_history.sale_lead_status
-    description: Broker status derived from HubSpot sale_lead_status. ACTIVE when sale_lead_status is 'Membro', INACTIVE otherwise.
+    description: >
+      Normalized Rede Sale membership status derived from sale_lead_status on the HubSpot history
+      revision. ACTIVE when sale_lead_status equals Membro; INACTIVE for any other value.
     categories:
       ACTIVE: Broker with sale_lead_status equal to 'Membro'.
       INACTIVE: Broker with sale_lead_status different from 'Membro'.
   company_cluster:
     lineage:
       - datalake_hubspot.company_history.company_cluster
-    description: Classification assigned by the Operations team to the Rede partner company.
+    description: >
+      Portfolio-assignment cluster (carteirizacao) assigned by the Operations team to the Rede partner
+      company on this revision. A value change triggers a new change event.
   cluster_performance:
     lineage:
       - datalake_hubspot.company_history.cluster_performance
-    description: Performance classification of the company cluster.
+    description: >
+      Performance tier of the company cluster on this revision. A value change triggers a new change event.
   broker_version:
     description: >
-      Sequential version of the change event within the same id_hubspot_company, ordered by ts_updated DESC.
-      Version 1 is the most recent revision; higher numbers are older.
+      Sequential version number of change events within the same id_hubspot_company, ordered by ts_updated
+      descending. Version 1 is the most recent event; higher numbers are older events.
   is_current:
     description: >
-      True for the most recent revision per id_hubspot_company (broker_version = 1), otherwise false. Use this
-      flag to retrieve the current account manager and broker status from this table.
+      True for the most recent change event per id_hubspot_company (broker_version = 1). Use with
+      id_hubspot_owner to read the current HubSpot account manager assignment for that company; dim_broker
+      joins on sk_broker with is_current = true for the broker-level current manager.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.
@@ -58,6 +83,8 @@ columns:
   ts_updated:
     lineage:
       - datalake_hubspot.company_history.ts_updated
-    description: Timestamp of the company history record update on HubSpot.
+    description: >
+      Timestamp of the HubSpot company_history revision that originated this change event. Defines event
+      ordering for broker_version and is the effective time of the status, cluster, or owner change.
   ts_load:
     description: Timestamp of when the record was loaded or last updated by the ETL process.

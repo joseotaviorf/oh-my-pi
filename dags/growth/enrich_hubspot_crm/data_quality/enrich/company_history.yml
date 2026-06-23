@@ -9,6 +9,50 @@ column_level_validations:
   id_company:
     is_complete:
       severity_level: Error
-  cnpj_unique:
-    is_unique:
+  cnpj_unique_consistent_at_company_revision:
+    custom:
+      # Within the same HubSpot revision (id_company, ts_updated), cnpj_unique must be single-valued
+      # even when the row appears in more than one daily partition load.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             id_company,
+             ts_updated
+           FROM
+             datalake_hubspot.company_history
+           WHERE
+             cnpj_unique IS NOT NULL
+           GROUP BY
+             id_company,
+             ts_updated
+           HAVING COUNT(DISTINCT cnpj_unique) > 1
+         )
+        ) = 0
+      severity_level: Error
+  cnpj_unique_unique_at_company_revision:
+    custom:
+      # cnpj_unique must be unique across companies at each HubSpot revision grain (id_company, ts_updated).
+      # Collapses duplicate partition rows before checking cross-company uniqueness.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            cnpj_unique,
+            COUNT(*) AS cnt
+          FROM (
+            SELECT
+              id_company,
+              ts_updated,
+              MAX(cnpj_unique) AS cnpj_unique
+            FROM
+              datalake_hubspot.company_history
+            WHERE
+              cnpj_unique IS NOT NULL
+            GROUP BY
+              id_company,
+              ts_updated
+          ) AS company_revisions
+          GROUP BY ALL
+          HAVING COUNT(*) > 1
+        ) AS dup_cnpj_unique) = 0
       severity_level: Error

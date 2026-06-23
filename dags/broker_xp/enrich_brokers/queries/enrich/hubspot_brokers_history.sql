@@ -1,8 +1,13 @@
 WITH brokers_members_ranked AS (
   SELECT
     c.id_company,
-    c.cnpj,
-    ROW_NUMBER() OVER(PARTITION BY c.cnpj ORDER BY c.ts_updated DESC) AS rn
+    COALESCE(c.cnpj_unique, c.cnpj) AS cnpj,
+    ROW_NUMBER() OVER(
+      PARTITION BY COALESCE(c.cnpj_unique, c.cnpj)
+      ORDER BY
+        (c.cnpj_unique IS NOT NULL) DESC,
+        c.ts_updated DESC
+    ) AS rn
   FROM
     datalake_hubspot.company AS c
   WHERE
@@ -24,7 +29,7 @@ broker_history AS (
     cb.sk_broker,
     ch.id_company AS id_hubspot_company,
     ch.id_hubspot_owner,
-    ch.cnpj,
+    bm.cnpj,
     CASE
       WHEN ch.sale_lead_status = 'Membro' THEN 'ACTIVE'
       ELSE 'INACTIVE'

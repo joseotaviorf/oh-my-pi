@@ -14,12 +14,13 @@ column_level_validations:
       severity_level: Error
   cnpj:
     custom:
-      # HubSpot company: no duplicate CNPJ among active sale members (non-archived, not merged).
-      # Matches brokers_members filters in hubspot_brokers_history.sql; duplicates would break sk_broker join logic.
+      # HubSpot company: no duplicate effective CNPJ among active sale members (non-archived, not merged).
+      # Effective CNPJ = COALESCE(cnpj_unique, cnpj); matches brokers_members dedup in hubspot_brokers_history.sql.
+      # Duplicates would break sk_broker join logic and the table grain.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT
-            c.cnpj,
+            COALESCE(c.cnpj_unique, c.cnpj) AS cnpj,
             COUNT(*) AS cnt
           FROM
             datalake_hubspot.company AS c
@@ -27,7 +28,7 @@ column_level_validations:
             c.has_been_sale_member
               AND NOT(c.is_archived)
               AND NOT(c.is_merged_into_other_company)
-              AND c.cnpj IS NOT NULL
+              AND COALESCE(c.cnpj_unique, c.cnpj) IS NOT NULL
           GROUP BY ALL
           HAVING COUNT(*) > 1
         ) AS dup_cnpj) = 0

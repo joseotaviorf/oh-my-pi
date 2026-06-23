@@ -56,7 +56,9 @@ columns:
   zip_code:
     lineage:
       - datalake_hubspot.company_history.zip_code
-    description: ZIP code of the company.
+    description: >
+      Postal code (CEP) of the company headquarters address as captured in HubSpot, used for geographic
+      segmentation and sales territory analysis.
   city:
     lineage:
       - datalake_hubspot.company_history.city
@@ -109,7 +111,9 @@ columns:
   life_cycle_stage:
     lineage:
       - datalake_hubspot.company_history.life_cycle_stage
-    description: In which stage the company is in HubSpot.
+    description: >
+      HubSpot lifecycle stage for the company record (for example lead or customer), indicating CRM funnel
+      maturity independently of Rede Sale or Rent membership status.
   mkt_campain:
     lineage:
       - datalake_hubspot.company_history.mkt_campain
@@ -172,7 +176,9 @@ columns:
   sale_member_category:
     lineage:
       - datalake_hubspot.company_history.sale_member_category
-    description: Category of the sale member.
+    description: >
+      Current Rede Sale partner tier in HubSpot (Prata, Ouro, Diamante), used by Operations to segment
+      sale-side broker benefits and performance programs.
     categories:
       Prata: 'Silver'
       Ouro: 'Gold'
@@ -180,7 +186,9 @@ columns:
   rent_member_category:
     lineage:
       - datalake_hubspot.company_history.rent_member_category
-    description: Category of the rent member.
+    description: >
+      Current Rede Rent partner tier in HubSpot (Prata, Ouro, Diamante), used to segment rent-side broker
+      benefits and performance programs.
     categories:
       Prata: 'Silver'
       Ouro: 'Gold'
@@ -196,15 +204,21 @@ columns:
   sale_member_category_history:
     lineage:
       - datalake_hubspot.company_history.sale_member_category_history
-    description: History of the sale member category.
+    description: >
+      Array of historical Rede Sale tier changes from HubSpot property history; each element records the
+      tier value and the timestamp when HubSpot registered the update.
   rent_member_category_history:
     lineage:
       - datalake_hubspot.company_history.rent_member_category_history
-    description: History of the rent member category.
+    description: >
+      Array of historical Rede Rent tier changes from HubSpot property history; each element records the
+      tier value and the timestamp when HubSpot registered the update.
   company_cluster_history:
     lineage:
       - datalake_hubspot.company_history.company_cluster_history
-    description: History of the company cluster.
+    description: >
+      Array of historical portfolio-assignment cluster (carteirizacao) values from HubSpot, tracking how
+      Operations classified the partner company over time.
   lead_origin:
     lineage:
       - datalake_hubspot.company_history.lead_origin
@@ -263,7 +277,10 @@ columns:
   cnpj_unique:
     lineage:
       - datalake_hubspot.company_history.cnpj_unique
-    description: Unique CNPJ of the company, cleaned to have only numbers and letters. Property configured in HubSpot to be used as a unique identifier for the company, do not accept duplicate values.
+    description: >
+      System-enforced unique CNPJ for the company (HubSpot property cnpj_unico), cleaned to digits and
+      letters. Required and unique among companies with sale_lead_status equal to Membro in this snapshot;
+      validated by data quality checks on the current-state table.
   rfc:
     lineage:
       - datalake_hubspot.company_history.rfc
@@ -283,11 +300,16 @@ columns:
   sale_lead_status:
     lineage:
       - datalake_hubspot.company_history.sale_lead_status
-    description: Status of the company sale lead in HubSpot.
+    description: >
+      Current Rede Sale lead or membership status in HubSpot (for example Membro or Parceiro). Archived or
+      merged companies are normalized to Archived in this snapshot; drives broker ACTIVE/INACTIVE mapping
+      downstream.
   rent_lead_status:
     lineage:
       - datalake_hubspot.company_history.rent_lead_status
-    description: Status of the company rent lead in HubSpot.
+    description: >
+      Current Rede Rent lead or membership status in HubSpot for the for-rent product lane. Archived or
+      merged companies are normalized to Archived in this snapshot.
   lead_status_history:
     lineage:
       - datalake_hubspot.company_history.lead_status_history
@@ -295,11 +317,15 @@ columns:
   sale_lead_status_history:
     lineage:
       - datalake_hubspot.company_history.sale_lead_status_history
-    description: History of the company sale lead status in HubSpot.
+    description: >
+      Array of historical Rede Sale status transitions from HubSpot hs_lead_status property history, used to
+      reconstruct membership timelines and attribute broker status changes.
   rent_lead_status_history:
     lineage:
       - datalake_hubspot.company_history.rent_lead_status_history
-    description: History of the company rent lead status in HubSpot.
+    description: >
+      Array of historical Rede Rent status transitions from HubSpot for-rent lead property history, used to
+      reconstruct rent-side membership timelines.
   report_link:
     lineage:
       - datalake_hubspot.company_history.report_link
@@ -371,7 +397,9 @@ columns:
   monthly_average_new_rental_contracts:
     lineage:
       - datalake_hubspot.company_history.monthly_average_new_rental_contracts
-    description: Monthly average of new rental contracts.
+    description: >
+      Self-reported average count of new rental contracts per month from HubSpot farming qualification,
+      used as a capacity signal when sizing Rede Rent partner programs.
   num_managers:
     lineage:
       - datalake_hubspot.company_history.num_managers

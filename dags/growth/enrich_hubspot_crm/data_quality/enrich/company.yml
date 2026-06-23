@@ -11,6 +11,30 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  cnpj_unique:
-    is_unique:
+  cnpj_unique_complete_for_sale_membro:
+    custom:
+      # HubSpot enforces cnpj_unique for active Rede Sale members; every Membro company must have it populated.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_hubspot.company
+         WHERE sale_lead_status = 'Membro'
+           AND cnpj_unique IS NULL
+        ) = 0
+      severity_level: Error
+  cnpj_unique_unique_for_sale_membro:
+    custom:
+      # cnpj_unique must not repeat among companies with sale_lead_status = Membro in the current-state snapshot.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            cnpj_unique,
+            COUNT(*) AS cnt
+          FROM
+            datalake_hubspot.company
+          WHERE
+            sale_lead_status = 'Membro'
+            AND cnpj_unique IS NOT NULL
+          GROUP BY ALL
+          HAVING COUNT(*) > 1
+        ) AS dup_cnpj_unique) = 0
       severity_level: Error
