@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: tarefas_salesforce
-description: Table that contains the Salesforce tasks data.
+description: Salesforce task records for BPO performance reporting, tracking case-linked tasks with termination status, leadtime, and workflow dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   id_task:
     lineage:
@@ -46,11 +46,11 @@ columns:
   termination_status:
     lineage:
       - dw_offboarding.dim_termination.status
-    description: Status of the termination.
+    description: Current termination workflow status of the Salesforce case linked to the task.
   case_status:
     lineage:
       - datalake_salesforce_clean.cases.case_status
-    description: Status of the case.
+    description: Current workflow status of the Salesforce case associated with the task.
   is_case_closed:
     lineage:
       - datalake_salesforce_clean.cases.is_closed
@@ -58,15 +58,15 @@ columns:
   subject:
     lineage:
       - datalake_salesforce_clean.task.subject
-    description: Subject of the task.
+    description: Subject line describing the purpose of the Salesforce task for BPO tracking.
   status:
     lineage:
       - datalake_salesforce_clean.task.status
-    description: Status of the task.
+    description: Current workflow status of the Salesforce task (e.g. open, completed).
   task_subtype:
     lineage:
       - datalake_salesforce_clean.task.task_subtype
-    description: Subtype of the task.
+    description: Salesforce task subtype classification for BPO performance categorization.
   has_relisting_flow:
     lineage:
       - datalake_salesforce_clean.relisting_context.has_relisting_flow
@@ -107,7 +107,7 @@ columns:
     lineage:
       - datalake_salesforce_clean.task.ts_created
       - datalake_salesforce_clean.task.ts_completed
-    description: Leadtime of the task.
+    description: Elapsed time in days from task creation to completion for BPO SLA reporting.
   sla_task:
     lineage:
       - datalake_salesforce_clean.task.status
@@ -135,4 +135,4 @@ columns:
   ts_load:
     lineage:
       - NOW()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

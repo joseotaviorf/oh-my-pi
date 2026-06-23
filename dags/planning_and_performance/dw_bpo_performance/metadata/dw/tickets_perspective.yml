@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: tickets_perspective
-description: Table with pre-calculated information for tickets via Zendesk.
+description: Pre-calculated Zendesk ticket perspective for BPO submission, aggregating ticket attributes, SLA metrics, and agent dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: alef.vieiras@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -467,4 +467,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

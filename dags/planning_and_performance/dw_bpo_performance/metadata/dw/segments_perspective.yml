@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: segments_perspective
-description: Table with Segments rules that applies rules to contacts via Twilio.
+description: Twilio segment contact records with applied routing rules for BPO performance reporting, including handling time and agent organization context. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: alef.vieiras@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_interaction:
     lineage:
@@ -96,7 +96,7 @@ columns:
   total_handling_time:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_handling_time
-    description: Total contact time
+    description: Total handling time in seconds for the Twilio segment contact interaction.
   total_talk_time:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_talk_time
@@ -168,7 +168,7 @@ columns:
   agent_organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
-    description: Agent Organization
+    description: BPO vendor organization to which the agent handling the segment contact belongs.
   agent_dt_start:
     lineage:
       - dw_customer_support.dim_analyst.dt_agent_start
@@ -301,11 +301,11 @@ columns:
   type_call:
     lineage:
       - dw_customer_support.fact_ivr_interactions.type
-    description: Type of interaction.
+    description: Classification of the Twilio segment contact interaction type (e.g. inbound, outbound).
   bot:
     lineage:
       - datalake_chatbot.sessions.bot
-    description: Type of interaction.
+    description: Classification of the Twilio segment contact interaction type (e.g. inbound, outbound).
   transfer_reason:
     lineage:
       - dw_customer_support.fact_customer_contacts.status
@@ -340,4 +340,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

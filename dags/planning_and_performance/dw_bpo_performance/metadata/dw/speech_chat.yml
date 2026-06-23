@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: speech_chat
-description: Table that contains the speech chat metrics for bpo performance.
+description: Speech analytics chat message records for BPO performance monitoring, linking chat content to support ticket and agent context. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -31,7 +31,7 @@ columns:
   message:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.message_body
-    description: Content of the message.
+    description: Full text content of the chat message captured by speech analytics for BPO review.
   message_from:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.from_phone_number
@@ -51,4 +51,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

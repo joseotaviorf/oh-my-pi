@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: tmr
-description: Table that contains the TMR metric and more details for bpo performance.
+description: Time to Mean Resolution (TMR) metric details for BPO performance analysis, complementing ticket resolution time reporting with taxonomy context. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   dt_created:
     lineage:
@@ -45,4 +45,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

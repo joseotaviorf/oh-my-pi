@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: tickets_transferred
-description: Table that contains the tickets transferred data for bpo performance.
+description: Support tickets transferred between departments for BPO performance monitoring, tracking origin, destination team, and agent assignment. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -23,19 +23,19 @@ columns:
   department:
     lineage:
       - dw_customer_support.dim_department.department
-    description: Department name.
+    description: Name of the support department that received the transferred ticket.
   team:
     lineage:
       - dw_customer_support.dim_department.team
-    description: Department team.
+    description: Support team within the destination department that owns the transferred ticket.
   organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
-    description: Agent organization.
+    description: BPO vendor organization of the agent who handled the transferred ticket.
   agent_email:
     lineage:
       - dw_customer_support.dim_analyst.email
-    description: Agent email.
+    description: Work email of the support agent assigned to the transferred ticket.
   theme:
     lineage:
       - dw_customer_support.dim_taxonomy.theme
@@ -67,7 +67,7 @@ columns:
   ticket_origin:
     lineage:
       - dw_customer_support.fact_customer_contacts.origin
-    description: Origin of the ticket.
+    description: Source department or workflow from which the ticket was transferred.
   task_transferred:
     lineage:
       - dw_customer_support.fact_customer_contacts.status
@@ -85,7 +85,7 @@ columns:
   status:
     lineage:
       - dw_customer_support.fact_customer_contacts.status
-    description: Status of the task.
+    description: Current workflow status of the transferred ticket after the handoff.
   ts_started:
     lineage:
       - dw_customer_support.fact_customer_contacts.ts_task_created
@@ -164,4 +164,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

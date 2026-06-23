@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: speech_call
-description: Table that contains the speech call metrics for bpo performance.
+description: Speech analytics call records for BPO performance monitoring, capturing caller and destination numbers, call direction, provider, and recording metadata. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   id_source_unique:
     lineage:
@@ -12,19 +12,19 @@ columns:
   caller_phone_number:
     lineage:
       - datalake_customer_support.calls.from_phone_number
-    description: The phone number of the caller.
+    description: Phone number of the customer or agent who initiated the speech analytics call.
   destination_phone_number:
     lineage:
       - datalake_customer_support.calls.to_phone_number
-    description: The phone number of the destination.
+    description: Phone number that received the speech analytics call.
   direction:
     lineage:
       - datalake_customer_support.calls.direction
-    description: The direction of the call.
+    description: Call direction indicator (inbound or outbound) for the speech analytics record.
   provider:
     lineage:
       - 'Twilio'
-    description: Provider of the call.
+    description: Telephony provider that routed the speech analytics call (e.g. Twilio).
   agent_email:
     lineage:
       - datalake_customer_support.calls.worker_email
@@ -40,7 +40,7 @@ columns:
   recording_url:
     lineage:
       - datalake_bigfone_clean.call.recording_url
-    description: URL of the recording of the call.
+    description: URL link to the audio recording of the speech analytics call session.
   ts_started:
     lineage:
       - datalake_bigfone_clean.call.ts_started
@@ -64,4 +64,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

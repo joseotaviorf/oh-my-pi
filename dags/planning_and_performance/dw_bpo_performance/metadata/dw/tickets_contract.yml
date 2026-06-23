@@ -1,6 +1,6 @@
 database_name: dw_bpo_performance
 table_name: tickets_contract
-description: Table containing contracts linked to Zendesk tickets.
+description: Rental contracts linked to Zendesk support tickets for BPO performance reporting and contract-level ticket analysis. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Support and Services
 owner: alef.vieira@quintoandar.com.br
 columns:
@@ -100,4 +100,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

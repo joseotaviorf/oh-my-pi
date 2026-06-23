@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: taxonomy
-description: Table that contains the taxonomy data for bpo performance.
+description: Support ticket taxonomy dimensions for BPO performance analysis, mapping channel, queue, theme, and area classifications to ticket volumes. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -11,7 +11,7 @@ columns:
   channel:
     lineage:
       - dw_customer_support.fact_customer_contacts.channel
-    description: Channel of the ticket.
+    description: Support channel through which tickets in this taxonomy slice were opened.
   organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
@@ -19,7 +19,7 @@ columns:
   queue:
     lineage:
       - dw_customer_support.dim_department.department
-    description: Queue of the ticket.
+    description: Routing queue assigned to tickets in this taxonomy dimension for BPO workload analysis.
   step:
     lineage:
       - dw_customer_support.dim_taxonomy.journey
@@ -35,7 +35,7 @@ columns:
   theme:
     lineage:
       - dw_customer_support.dim_taxonomy.theme
-    description: Theme of the ticket.
+    description: Taxonomy theme classifying the subject matter of tickets in this dimension.
   theme_detail:
     lineage:
       - dw_customer_support.dim_taxonomy.theme_detail
@@ -43,7 +43,7 @@ columns:
   area:
     lineage:
       - dw_customer_support.dim_taxonomy.sub_journey
-    description: Area of the ticket.
+    description: Business area within customer support associated with this taxonomy classification.
   email:
     lineage:
       - dw_customer_support.dim_analyst.email
@@ -67,4 +67,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance_views
 table_name: twilio_chat_aht
-description: Table that contains the Twilio chat AHT data for bpo performance.
+description: Twilio chat Average Handling Time (AHT) metrics for BPO performance reporting, measuring agent chat session duration and productivity. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   dt_task_created_local:
     lineage:
@@ -59,5 +59,5 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
     
