@@ -11,19 +11,21 @@ table_level_validations:
     greater_than_or_equal_to: -10
     less_than_or_equal_to: 50
     severity_level: Warning
-  custom:
-    constraint: |-
-      (SELECT COUNT(*)
-       FROM (
-         SELECT 1
-         FROM datalake_alias_clean.listing_fingerprint
-         GROUP BY uuid_company, id_listing_original
-         HAVING COUNT(*) > 1
-       )
-      ) = 0
-    severity_level: Error
 
 column_level_validations:
+  unique_uuid_company_id_listing_original:
+    custom:
+      # Composite key (uuid_company, id_listing_original) must be unique.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT 1
+           FROM datalake_alias_clean.listing_fingerprint
+           GROUP BY uuid_company, id_listing_original
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error
   uuid_company:
     is_complete:
       severity_level: Error
