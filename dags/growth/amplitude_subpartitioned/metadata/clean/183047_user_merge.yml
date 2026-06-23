@@ -1,29 +1,42 @@
 ---
 database_name: datalake_amplitude_clean
 table_name: 183047_user_merge
+owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
+description: |
+  Amplitude user identity merge events for app 183047. One row per merge operation linking
+  a prior Amplitude device ID to a merged canonical ID after account stitching. Sourced from
+  the raw user_merge export and partitioned by year, month, and day on merge timestamps.
 columns:
   id_amplitude:
+    description: Amplitude device or user identifier before the merge operation was applied.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.amplitude_id
   id_amplitude_merged:
+    description: Target Amplitude identifier that absorbed the pre-merge identity after stitching.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.merged_amplitude_id
   id_app:
+    description: Amplitude project scope identifier for the merge event within the 183047 app.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.scope
   ts_merge:
+    description: Client-side timestamp when Amplitude recorded the user identity merge, in UTC.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.merge_time
   ts_server_merge:
+    description: Server-side timestamp when Amplitude processed the merge on ingestion, in UTC.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.merge_server_time
   year:
+    description: Partition year derived from ts_merge for pruning high-volume merge history.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.merge_time
   month:
+    description: Partition month derived from ts_merge; filter together with year and day.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.merge_time
   day:
+    description: Partition day derived from ts_merge; always combine with year and month filters.
     lineage:
       - datalake_amplitude_raw.183047_user_merge.merge_time
