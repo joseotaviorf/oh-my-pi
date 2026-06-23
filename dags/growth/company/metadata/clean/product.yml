@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Product catalog defining business lines and services offered within QuintoAndar's ecosystem. Partners must be associated with specific products to access corresponding features and revenue sharing opportunities. Supports flexible many-to-many relationships with companies through company_product junction table.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   PRODUCT STRATEGY:
   - Platform services: Core technology and infrastructure offerings

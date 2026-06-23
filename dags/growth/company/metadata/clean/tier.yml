@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Classification entity representing business tiers for products or company categorizations in QuintoAndar's partner data model. Each tier corresponds to a unique business contract condition, feature bundle, or eligibility group, and can be attached to company-product relationships (e.g., for commission structure, product offering levels, or workflow gating).
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   BUSINESS RULES:
   - Tiers define levels (such as Bronze, Silver, Gold) for business entities, enabling differentiated product offerings and operational flows.

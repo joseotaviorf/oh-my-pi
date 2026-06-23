@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   User membership and role assignment matrix linking people to companies, products, and organizational roles. Enables flexible multi-company, multi-product, multi-role relationships where individuals can have different permissions across various business contexts. Critical for access control, organizational reporting, and partner management.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   ACCESS CONTROL MODEL:
   - Matrix-based permissions: Person × Company × Product × Profile = Specific Access Rights

@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Organizational role definitions and permission templates for access control across QuintoAndar's partner ecosystem. Profiles define standardized roles that can be assigned to users within specific company-product contexts through member_profile relationships.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   ACCESS CONTROL MODEL:
   - Role-based permissions: Profiles define capabilities and access levels

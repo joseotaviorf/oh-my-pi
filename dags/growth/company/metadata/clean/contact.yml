@@ -6,6 +6,7 @@ domain: Growth
 description: |
   Contact information for companies including emails and phone numbers.
   Supports multiple contact information per company.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 columns:
   id:
     lineage:

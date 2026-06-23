@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Organizational hierarchy definition table establishing role structures and reporting relationships within specific product contexts. Defines how profiles (roles) relate to each other hierarchically within different business products, enabling complex organizational structures and approval workflows.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   HIERARCHICAL FRAMEWORK:
   - Product-scoped hierarchies: Different role structures for different business products
