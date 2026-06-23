@@ -1,0 +1,116 @@
+database_name: datalake_vault_audit_logs_clean
+table_name: events
+description: |
+  Clean-layer HashiCorp Vault audit events ingested from S3 audit log payloads.
+  One row per authentication or secret-access request with policy outcomes.
+domain: Tech Platform
+owner: thiago.costa@quintoandar.com.br
+columns:
+  ts_event:
+    lineage:
+    - s3_auditlogs_bucket.time
+    description: Timestamp when the Vault audit event was recorded.
+  id_request:
+    lineage:
+    - s3_auditlogs_bucket.request.id
+    description: Unique identifier of the Vault audit request.
+  type:
+    lineage:
+    - s3_auditlogs_bucket.type
+    description: Event type label from the Vault audit payload.
+  time:
+    lineage:
+    - s3_auditlogs_bucket.time
+    description: Raw event time field from the Vault audit payload.
+  display_name:
+    lineage:
+    - s3_auditlogs_bucket.auth.display_name
+    description: Display name of the authenticated Vault principal.
+  policies:
+    lineage:
+    - s3_auditlogs_bucket.auth.policies
+    description: Authentication policies attached to the Vault principal.
+  token_policies:
+    lineage:
+    - s3_auditlogs_bucket.auth.token_policies
+    description: Token policies evaluated during the Vault authentication.
+  allowed:
+    lineage:
+    - s3_auditlogs_bucket.auth.policy_results.allowed
+    description: Whether Vault policy evaluation allowed the request.
+  granting_policies:
+    lineage:
+    - s3_auditlogs_bucket.auth.policy_results.granting_policies
+    description: Policies that granted access in the Vault evaluation result.
+  role:
+    lineage:
+    - s3_auditlogs_bucket.auth.metadata.role
+    description: Authentication role associated with the Vault request.
+  entity_id:
+    lineage:
+    - s3_auditlogs_bucket.auth.entity_id
+    description: Vault entity identifier tied to the authenticated session.
+  token_type:
+    lineage:
+    - s3_auditlogs_bucket.auth.token_type
+    description: Type of Vault token issued or used in the request.
+  token_ttl:
+    lineage:
+    - s3_auditlogs_bucket.auth.token_ttl
+    description: Time-to-live configured for the issued Vault token.
+  token_issue_time:
+    lineage:
+    - s3_auditlogs_bucket.auth.token_issue_time
+    description: Timestamp when the Vault token was issued to the client.
+  request_id:
+    lineage:
+    - s3_auditlogs_bucket.request.id
+    description: Request identifier echoed in the Vault audit event payload.
+  client_id:
+    lineage:
+    - s3_auditlogs_bucket.request.client_id
+    description: Client identifier associated with the Vault audit request.
+  operation:
+    lineage:
+    - s3_auditlogs_bucket.request.operation
+    description: Vault API operation executed in the audited request.
+  mount_point:
+    lineage:
+    - s3_auditlogs_bucket.request.mount_point
+    description: Vault secrets engine mount point targeted by the request.
+  mount_type:
+    lineage:
+    - s3_auditlogs_bucket.request.mount_type
+    description: Type of Vault mount backing the requested secrets path.
+  namespace:
+    lineage:
+    - s3_auditlogs_bucket.request.namespace.id
+    description: Vault namespace identifier scoped to the audited request.
+  path:
+    lineage:
+    - s3_auditlogs_bucket.request.path
+    description: Secrets path accessed in the Vault audit request.
+  remote_address:
+    lineage:
+    - s3_auditlogs_bucket.request.remote_address
+    description: Source IP address that initiated the Vault request.
+  remote_port:
+    lineage:
+    - s3_auditlogs_bucket.request.remote_port
+    description: Source network port used by the Vault request client.
+  year:
+    lineage:
+    - s3_auditlogs_bucket.time
+    description: Event year partition
+  month:
+    lineage:
+    - s3_auditlogs_bucket.time
+    description: Event month partition
+  day:
+    lineage:
+    - s3_auditlogs_bucket.time
+    description: Event day partition
+  hour:
+    lineage:
+    - s3_auditlogs_bucket.time
+    description: Hour bucket used to partition Vault audit events.
