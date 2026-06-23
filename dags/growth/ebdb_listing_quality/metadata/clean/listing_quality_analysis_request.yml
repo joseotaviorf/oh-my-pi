@@ -1,8 +1,8 @@
 database_name: datalake_ebdb_clean
 table_name: listing_quality_analysis_request
-domain: Growth
+owner: bruna.prates@quintoandar.com.br
 description: Listing quality Analysis Request records produced by the ListingQuality service from the EBDB main database, used to store/add manual analysis requests of ListingsQuality.
-owner: data.growth@quintoandar.com.br
+domain: Growth
 columns:
   id:
     lineage:

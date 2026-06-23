@@ -1,8 +1,8 @@
 database_name: datalake_ebdb_clean
 table_name: listing_quality
-domain: Growth
+owner: bruna.prates@quintoandar.com.br
 description: Listing quality verification records produced by the ListingQuality service from the EBDB main database, used to evaluate listings before publication and route them to the analyst queue.
-owner: data.growth@quintoandar.com.br
+domain: Growth
 columns:
   id:
     lineage:

@@ -1,9 +1,9 @@
 ---
 database_name: datalake_ebdb_condo
 table_name: condo_amenities
-owner: andre.melo@quintoandar.com.br
-domain: Growth
+owner: vitor.musachio@quintoandar.com.br
 description: Every row of this table corresponds to a condo amenity associated with a house.
+domain: Growth
 columns:
   id_house:
     lineage:
