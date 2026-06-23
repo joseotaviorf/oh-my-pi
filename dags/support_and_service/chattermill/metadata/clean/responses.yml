@@ -1,49 +1,70 @@
 database_name: datalake_chattermill_clean
 table_name: responses
+description: >
+  One row per customer feedback response ingested from Chattermill, an AI-powered
+  feedback analytics platform. Captures the satisfaction score, raw and processed
+  comments, AI-generated tags and themes, and contextual user attributes. Partitioned
+  by year, month and day for query efficiency. Source system is Chattermill.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_chattermill_raw.responses.id
+    description: Unique identifier for the feedback response record in Chattermill.
   score:
     lineage:
       - datalake_chattermill_raw.responses.score
+    description: Numeric satisfaction or NPS score submitted by the customer as part of their feedback response.
   comment:
     lineage:
       - datalake_chattermill_raw.responses.comment
+    description: Processed or translated version of the customer's free-text feedback comment.
   original_comment:
     lineage:
       - datalake_chattermill_raw.responses.original_comment
+    description: Original verbatim free-text comment submitted by the customer, before any processing or translation.
   user_attributes:
     lineage:
       - datalake_chattermill_raw.responses.user_attributes
+    description: JSON blob with contextual attributes about the customer who submitted the response (e.g., segment, contract type).
   data_type:
     lineage:
       - datalake_chattermill_raw.responses.data_type
+    description: Type of feedback data collected (e.g., NPS, CSAT, review), as classified by Chattermill.
   data_source:
     lineage:
       - datalake_chattermill_raw.responses.data_source
+    description: Source system or channel from which the feedback was originally collected (e.g., survey, app store, support ticket).
   dataset:
     lineage:
       - datalake_chattermill_raw.responses.dataset
+    description: Name of the Chattermill dataset grouping this response, used to segment feedback by product area or campaign.
   tags:
     lineage:
       - datalake_chattermill_raw.responses.tags
+    description: List of AI-generated tags assigned by Chattermill to categorize topics mentioned in the feedback comment.
   themes:
     lineage:
       - datalake_chattermill_raw.responses.themes
+    description: Higher-level themes identified by Chattermill's AI across the feedback comment, aggregating related tags.
   created_at:
     lineage:
       - datalake_chattermill_raw.responses.created_at
+    description: Timestamp when the feedback response was created or received in Chattermill.
   updated_at:
     lineage:
       - datalake_chattermill_raw.responses.updated_at
+    description: Timestamp of the last update to the feedback response record in Chattermill.
   year:
     lineage:
       - datalake_chattermill_raw.responses.year
+    description: Year extracted from the response creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_chattermill_raw.responses.month
+    description: Month extracted from the response creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_chattermill_raw.responses.day
+    description: Day extracted from the response creation date. Partition column — filter on this column to enable partition pruning.

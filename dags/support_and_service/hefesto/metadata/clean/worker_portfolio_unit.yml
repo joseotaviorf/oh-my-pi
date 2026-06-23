@@ -1,37 +1,54 @@
 database_name: datalake_hefesto_clean
 table_name: worker_portfolio_unit
+description: >
+  One row per unit within a worker's portfolio in Hefesto. Each unit represents an
+  individual item or task (e.g., a specific property or contract) that is part of a
+  broader portfolio assignment. Tracks the unit's status, origin, and user persona.
+  Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_unit:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.id
+    description: Unique identifier for the worker portfolio unit record in Hefesto.
   ts_created:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.created_at
+    description: Timestamp when the portfolio unit was created in Hefesto.
   ts_updated:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.updated_at
+    description: Timestamp of the last update to the portfolio unit record.
   status:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.status
+    description: Current status of the portfolio unit (e.g., pending, in_progress, completed, cancelled).
   worker_portfolio_id:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.worker_portfolio_id
+    description: Identifier of the parent worker portfolio assignment (from worker_portfolio table) this unit belongs to.
   origin_identifier:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.origin_identifier
-  user_persona: 
+    description: External identifier from the originating system (e.g., property or contract ID) that this portfolio unit represents.
+  user_persona:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.user_persona
+    description: Persona or role of the user associated with this portfolio unit (e.g., tenant, owner, buyer), describing the user's relationship to the unit.
   metadata:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.metadata
+    description: JSON blob with additional contextual attributes about this portfolio unit from the originating system.
   year:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.year
+    description: Year extracted from the unit creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.month
+    description: Month extracted from the unit creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.day
+    description: Day extracted from the unit creation date. Partition column — filter on this column to enable partition pruning.

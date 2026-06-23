@@ -1,57 +1,80 @@
 database_name: datalake_hefesto_clean
 table_name: worker_portfolio
+description: >
+  One row per portfolio assignment in Hefesto, linking a support agent (worker) to a
+  specific user or contract they are responsible for servicing via a task queue. Captures
+  the originating entity context, the chat session if applicable, and the current
+  assignment status. Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_portfolio:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.id
+    description: Internal Hefesto identifier for the worker portfolio assignment record.
   id_worker:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.worker_id
+    description: Identifier of the support agent (from worker table) assigned to this portfolio.
   id_queue:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.queue_id
+    description: Identifier of the task queue (from queue table) through which this portfolio assignment was routed.
   id_user:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.user_identifier
       - datalake_hefesto_raw.worker_portfolio.user_id
+    description: Identifier of the QuintoAndar user (customer or internal) assigned to this worker's portfolio; coalesced from user_id and user_identifier.
   id_contract:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.contract_id
+    description: Identifier of the contract associated with this portfolio assignment, when applicable.
   id_entity_origin:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_id
+    description: Identifier of the originating business entity (e.g., property, contract, ticket) that triggered this portfolio assignment.
   context_identifier:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.context_identifier
+    description: Contextual identifier used to group or link this portfolio assignment to a broader interaction context.
   user_identifier_type:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.user_identifier_type
+    description: Type of identifier used for id_user (e.g., user_id, email, phone), indicating the format of the user reference.
   id_chat:
     lineage:
-      - datalake_hefesto_raw.worker_portfolio.chat_uuid,
+      - datalake_hefesto_raw.worker_portfolio.chat_uuid
+    description: UUID of the chat session linked to this portfolio assignment, when the interaction originated from a chat channel.
   status:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.status
+    description: Current status of the portfolio assignment (e.g., active, completed, cancelled).
   entity_origin:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_name
-      - datalake_hefesto_raw.worker_portfolio.context_group   
+      - datalake_hefesto_raw.worker_portfolio.context_group
+    description: Name of the originating business entity or context group; coalesced from entity_origin_name and context_group.
   entity_origin_persona:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_persona
+    description: Persona or role of the entity origin, describing the relationship type between the user and the originating entity.
   ts_created:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.created_at
+    description: Timestamp when the worker portfolio assignment was created in Hefesto.
   ts_updated:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.updated_at
+    description: Timestamp of the last update to the worker portfolio assignment record.
   year:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.year
+    description: Year extracted from the portfolio creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.month
+    description: Month extracted from the portfolio creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.day
+    description: Day extracted from the portfolio creation date. Partition column — filter on this column to enable partition pruning.

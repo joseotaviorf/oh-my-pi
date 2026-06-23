@@ -1,34 +1,50 @@
 database_name: datalake_hefesto_clean
 table_name: queue_event
+description: >
+  One row per event recorded on a Twilio TaskRouter task queue in Hefesto. Captures
+  configuration changes and lifecycle events (e.g., queue created, updated, deleted)
+  with the author who triggered the change and the queue attributes at event time.
+  Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_queue_event:
     lineage:
       - datalake_hefesto_raw.queue_event.id
+    description: Unique identifier for the queue event record in Hefesto.
   id_queue:
     lineage:
       - datalake_hefesto_raw.queue_event.queue_id
+    description: Identifier of the task queue (from queue table) on which this event occurred.
   queue_friendly_name:
     lineage:
       - datalake_hefesto_raw.queue_event.queue_friendly_name
+    description: Human-readable display name of the task queue at the time the event was recorded.
   queue_attributes:
     lineage:
       - datalake_hefesto_raw.queue_event.queue_attributes
+    description: JSON blob with the queue's routing attributes captured at the moment of the event.
   event_type:
     lineage:
       - datalake_hefesto_raw.queue_event.event_type
+    description: Type of event that occurred on the queue (e.g., queue.created, queue.updated, queue.deleted).
   author:
     lineage:
       - datalake_hefesto_raw.queue_event.author
+    description: Identifier or name of the user or system that triggered this queue event.
   ts_created:
     lineage:
       - datalake_hefesto_raw.queue_event.created_at
+    description: Timestamp when the queue event was recorded in Hefesto.
   year:
     lineage:
       - datalake_hefesto_raw.queue_event.year
+    description: Year extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.queue_event.month
+    description: Month extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.queue_event.day
+    description: Day extracted from the event creation date. Partition column — filter on this column to enable partition pruning.

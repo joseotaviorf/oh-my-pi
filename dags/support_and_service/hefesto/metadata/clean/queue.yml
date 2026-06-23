@@ -1,40 +1,58 @@
 database_name: datalake_hefesto_clean
 table_name: queue
+description: >
+  One row per Twilio TaskRouter task queue configured in Hefesto. Queues group support
+  tasks by type or priority and route work to the appropriate agents. Includes the queue
+  display name, routing attributes, priority order, and the account it belongs to.
+  Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_queue:
     lineage:
       - datalake_hefesto_raw.queue.id
+    description: Internal Hefesto identifier for the task queue record.
   id_queue_twilio:
     lineage:
       - datalake_hefesto_raw.queue.queue_sid
+    description: Twilio TaskRouter Queue SID that uniquely identifies this queue in the Twilio platform.
   id_account:
     lineage:
       - datalake_hefesto_raw.queue.account_id
+    description: Identifier of the Hefesto account (from account table) this queue belongs to.
   id_type:
     lineage:
       - datalake_hefesto_raw.queue.type_id
+    description: Identifier of the queue type (from queue_type table) that classifies this queue's purpose.
   queue_friendly_name:
     lineage:
       - datalake_hefesto_raw.queue.queue_friendly_name
+    description: Human-readable display name of the task queue as configured in Twilio TaskRouter.
   attributes:
     lineage:
       - datalake_hefesto_raw.queue.attributes
+    description: JSON blob with additional queue configuration attributes such as routing rules and eligibility filters.
   order:
     lineage:
       - datalake_hefesto_raw.queue.order
+    description: Numeric priority order of this queue relative to others in the same account.
   ts_created:
     lineage:
       - datalake_hefesto_raw.queue.created_at
+    description: Timestamp when the queue was created in Hefesto.
   ts_updated:
     lineage:
       - datalake_hefesto_raw.queue.updated_at
+    description: Timestamp of the last update to the queue record.
   year:
     lineage:
       - datalake_hefesto_raw.queue.year
+    description: Year extracted from the queue creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.queue.month
+    description: Month extracted from the queue creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.queue.day
+    description: Day extracted from the queue creation date. Partition column — filter on this column to enable partition pruning.

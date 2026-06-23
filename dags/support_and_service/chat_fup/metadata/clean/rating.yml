@@ -1,47 +1,66 @@
----
 database_name: datalake_chat_fup_clean
 table_name: rating
+description: >
+  One row per CSAT (Customer Satisfaction) rating submitted through the Chat Fup
+  platform. Captures the user's score, optional free-text comment, the tool being
+  evaluated, the communication channel, and the CSAT survey version. Used to measure
+  support quality across channels. Source system is Chat Fup.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_rating:
     lineage:
       - datalake_chat_fup_raw.rating.id
+    description: Unique identifier for the CSAT rating record.
   id_origin:
     lineage:
       - datalake_chat_fup_raw.rating.id_origin
+    description: Identifier of the originating interaction (e.g., chat session or ticket) that triggered this rating.
   id_user:
     lineage:
       - datalake_chat_fup_raw.rating.user_id
+    description: Identifier of the QuintoAndar user who submitted the rating.
   evaluated_tool:
     lineage:
       - datalake_chat_fup_raw.rating.evaluated_tool
+    description: Name of the support tool or channel being evaluated in this rating (e.g., chat, bot, email).
   csat_version:
     lineage:
       - datalake_chat_fup_raw.rating.csat_version
+    description: Version of the CSAT survey form presented to the user when this rating was collected.
   channel:
     lineage:
       - datalake_chat_fup_raw.rating.channel
+    description: Communication channel through which the interaction was conducted and rated (e.g., chat, whatsapp, email).
   grade:
     lineage:
       - datalake_chat_fup_raw.rating.grade
+    description: Numeric satisfaction score given by the user, typically on a scale defined by the CSAT version.
   comment:
     lineage:
       - datalake_chat_fup_raw.rating.comment
+    description: Optional free-text comment left by the user to explain or complement their satisfaction score.
   meta:
     lineage:
       - datalake_chat_fup_raw.rating.meta
+    description: JSON blob with additional metadata about the rating context, such as survey trigger and agent info.
   ts_created:
     lineage:
       - datalake_chat_fup_raw.rating.created_at
+    description: Timestamp when the rating was submitted by the user.
   ts_updated:
     lineage:
       - datalake_chat_fup_raw.rating.updated_at
+    description: Timestamp of the last update to the rating record.
   year:
     lineage:
       - datalake_chat_fup_raw.rating.year
+    description: Year extracted from the rating creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_chat_fup_raw.rating.month
+    description: Month extracted from the rating creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_chat_fup_raw.rating.day
+    description: Day extracted from the rating creation date. Partition column — filter on this column to enable partition pruning.

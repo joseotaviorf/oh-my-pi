@@ -1,31 +1,45 @@
 database_name: datalake_bigfone_clean
 table_name: call
+description: >
+  One row per telephony call recorded in Bigfone. Captures inbound and outbound calls
+  handled by the support team, including caller and destination numbers, call direction,
+  provider, and start/end timestamps. Source system is Bigfone.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_source_unique:
     lineage:
       - datalake_bigfone_raw.call.uuid
+    description: Unique identifier for the call record, sourced from Bigfone's UUID field.
   caller_phone_number:
     lineage:
       - datalake_bigfone_raw.call.caller_phone_number
+    description: Phone number of the party who initiated the call.
   destination_phone_number:
     lineage:
       - datalake_bigfone_raw.call.destination_phone_number
+    description: Phone number of the party who received the call.
   direction:
     lineage:
       - datalake_bigfone_raw.call.direction
+    description: Indicates whether the call was inbound (received by support) or outbound (placed by support).
   provider:
     lineage:
       - datalake_bigfone_raw.call.provider
+    description: Telephony provider that handled the call (e.g., Bigfone, Twilio).
   metadata:
     lineage:
       - datalake_bigfone_raw.call.metadata
+    description: JSON blob with additional call attributes from the provider, such as SIP headers and routing info.
   recording_url:
     lineage:
       - datalake_bigfone_raw.call.recording_url
+    description: URL pointing to the audio recording of the call, hosted by the telephony provider.
   ts_started:
     lineage:
       - datalake_bigfone_raw.call.start_time
+    description: Timestamp when the call was connected and started.
   ts_ended:
     lineage:
       - datalake_bigfone_raw.call.end_time
+    description: Timestamp when the call ended or was disconnected.

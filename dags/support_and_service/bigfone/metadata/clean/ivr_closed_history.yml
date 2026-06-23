@@ -1,22 +1,33 @@
 database_name: datalake_bigfone_clean
 table_name: ivr_closed_history
+description: >
+  One row per closed IVR (Interactive Voice Response) interaction in Bigfone. Records
+  when a user requested a callback or was routed through the IVR flow, including the
+  routing strategy applied and the originating channel. Source system is Bigfone.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ivr:
     lineage:
       - datalake_bigfone_raw.ivrclosedhistory.id
+    description: Unique identifier for the IVR closed interaction record.
   id_user:
     lineage:
       - datalake_bigfone_raw.ivrclosedhistory.user_id
+    description: Identifier of the QuintoAndar user who triggered or was involved in the IVR interaction.
   user_phone:
     lineage:
       - datalake_bigfone_raw.ivrclosedhistory.user_phone
+    description: Phone number of the user involved in the IVR interaction.
   origin:
     lineage:
       - datalake_bigfone_raw.ivrclosedhistory.origin
+    description: Channel or entry point that originated the IVR interaction (e.g., web, app, inbound call).
   strategy:
     lineage:
       - datalake_bigfone_raw.ivrclosedhistory.strategy
+    description: IVR routing strategy applied to handle the interaction (e.g., queue assignment, overflow rule).
   ts_requested:
     lineage:
       - datalake_bigfone_raw.ivrclosedhistory.requested_at
+    description: Timestamp when the user requested the IVR interaction or callback.

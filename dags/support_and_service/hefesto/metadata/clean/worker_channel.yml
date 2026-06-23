@@ -1,46 +1,65 @@
 database_name: datalake_hefesto_clean
 table_name: worker_channel
+description: >
+  One row per communication channel configured for a support agent (worker) in Hefesto
+  via Twilio TaskRouter. Each worker can have multiple channels (e.g., voice, chat) with
+  individual capacity limits and availability flags. Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_worker_channel:
     lineage:
       - datalake_hefesto_raw.worker_channel.id
+    description: Internal Hefesto identifier for the worker channel configuration record.
   id_worker_channel_twilio:
     lineage:
       - datalake_hefesto_raw.worker_channel.sid
+    description: Twilio TaskRouter Worker Channel SID that uniquely identifies this channel in the Twilio platform.
   id_worker:
     lineage:
       - datalake_hefesto_raw.worker_channel.worker_id
+    description: Identifier of the support agent (from worker table) this channel configuration belongs to.
   id_task_channel_twilio:
     lineage:
       - datalake_hefesto_raw.worker_channel.task_channel_sid
+    description: Twilio Task Channel SID identifying the channel type (e.g., voice, chat) defined at workspace level.
   id_worker_twilio:
     lineage:
       - datalake_hefesto_raw.worker_channel.worker_sid
+    description: Twilio Worker SID of the agent associated with this channel, used to correlate with Twilio-side data.
   name:
     lineage:
       - datalake_hefesto_raw.worker_channel.name
+    description: Name of the communication channel assigned to this worker (e.g., voice, chat, default).
   capacity:
     lineage:
       - datalake_hefesto_raw.worker_channel.capacity
+    description: Maximum number of concurrent tasks the worker can handle simultaneously on this channel.
   is_available:
     lineage:
       - datalake_hefesto_raw.worker_channel.available
+    description: Boolean flag indicating whether the worker is currently available to receive tasks on this channel.
   ts_created:
     lineage:
       - datalake_hefesto_raw.worker_channel.created_at
+    description: Timestamp when the worker channel configuration was created in Hefesto.
   ts_updated:
     lineage:
       - datalake_hefesto_raw.worker_channel.updated_at
+    description: Timestamp of the last update to the worker channel configuration record.
   ts_last_event:
     lineage:
       - datalake_hefesto_raw.worker_channel.last_event_at
+    description: Timestamp of the most recent event (e.g., availability change) on this worker channel.
   year:
     lineage:
       - datalake_hefesto_raw.worker_channel.year
+    description: Year extracted from the channel creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.worker_channel.month
+    description: Month extracted from the channel creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.worker_channel.day
+    description: Day extracted from the channel creation date. Partition column — filter on this column to enable partition pruning.

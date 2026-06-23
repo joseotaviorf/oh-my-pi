@@ -1,38 +1,55 @@
 database_name: datalake_hefesto_clean
 table_name: worker_portfolio_event
+description: >
+  One row per lifecycle event recorded on a worker portfolio assignment in Hefesto.
+  Tracks state transitions and actions taken on a portfolio (e.g., assignment created,
+  file attached, status changed), including the author and a description of the event.
+  Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.id
+    description: Unique identifier for the worker portfolio event record in Hefesto.
   id_portfolio:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.portfolio_id
       - datalake_hefesto_raw.worker_portfolio_event.worker_portfolio_id
+    description: Identifier of the worker portfolio (from worker_portfolio table) on which this event occurred; coalesced from portfolio_id and worker_portfolio_id.
   id_portfolio_file:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.portfolio_file_id
+    description: Identifier of the portfolio file (attachment) associated with this event, when a file was attached or modified.
   event_type:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.external_id
+    description: Type or external identifier of the event, classifying the action that occurred on the portfolio.
   author:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.author
+    description: Identifier or name of the user or system that triggered this portfolio event.
   description:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.description
+    description: Human-readable description of the event, providing context about what changed or occurred on the portfolio.
   portfolio_unit_id:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.portfolio_unit_id
+    description: Identifier of the specific portfolio unit (from worker_portfolio_unit table) involved in this event, when applicable.
   ts_created:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.created_at
+    description: Timestamp when this portfolio event was recorded in Hefesto.
   year:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.year
+    description: Year extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.month
+    description: Month extracted from the event creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.day
+    description: Day extracted from the event creation date. Partition column — filter on this column to enable partition pruning.

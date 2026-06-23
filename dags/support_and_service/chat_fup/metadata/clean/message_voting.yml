@@ -1,40 +1,58 @@
 database_name: datalake_chat_fup_clean
 table_name: message_voting
+description: >
+  One row per vote cast on a chat message in the Chat Fup platform. Captures user
+  feedback on individual chat messages, including the taxonomy category assigned and
+  whether the message was considered effective. Used to evaluate bot and agent message
+  quality. Source system is Chat Fup.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_chat_fup_raw.message_voting.id
+    description: Unique identifier for the message vote record.
   id_message:
     lineage:
       - datalake_chat_fup_raw.message_voting.message_id
+    description: Identifier of the chat message that received this vote.
   id_content:
     lineage:
       - datalake_chat_fup_raw.message_voting.content_id
+    description: Identifier of the content or template associated with the voted message.
   id_session:
     lineage:
       - datalake_chat_fup_raw.message_voting.session_id
+    description: Identifier of the chat session in which the voted message was sent.
   id_user:
     lineage:
       - datalake_chat_fup_raw.message_voting.user_id
+    description: Identifier of the user who cast the vote on the message.
   taxonomy:
     lineage:
       - datalake_chat_fup_raw.message_voting.taxonomy
+    description: Category label assigned to the message vote, classifying the type of feedback or intent.
   is_effective:
     lineage:
       - datalake_chat_fup_raw.message_voting.is_effective
+    description: Boolean flag indicating whether the voted message was considered effective in resolving or addressing the user's need.
   ts_created:
     lineage:
       - datalake_chat_fup_raw.message_voting.created_at
+    description: Timestamp when the message vote was created.
   ts_updated:
     lineage:
       - datalake_chat_fup_raw.message_voting.updated_at
+    description: Timestamp of the last update to the message vote record.
   year:
     lineage:
       - datalake_chat_fup_raw.message_voting.year
+    description: Year extracted from the vote creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_chat_fup_raw.message_voting.month
+    description: Month extracted from the vote creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_chat_fup_raw.message_voting.day
+    description: Day extracted from the vote creation date. Partition column — filter on this column to enable partition pruning.

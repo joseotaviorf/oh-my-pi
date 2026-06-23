@@ -1,43 +1,62 @@
 database_name: datalake_chat_fup_clean
 table_name: chats_chat
+description: >
+  One row per chat session handled in the Chat Fup platform. Records the customer and
+  attendant involved, whether the chat was answered by a bot or a human agent, the
+  associated support ticket, and key timestamps (creation, first attendance, last update).
+  Source system is Chat Fup.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_chat_fup_raw.chats_chat.id
+    description: Unique identifier for the chat session in the Chat Fup platform.
   id_ticket:
     lineage:
       - datalake_chat_fup_raw.chats_chat.ticket_id
+    description: Identifier of the support ticket linked to this chat session.
   attendant_email:
     lineage:
       - datalake_chat_fup_raw.chats_chat.attendant_email
+    description: Email address of the support agent who attended this chat session.
   ts_created:
     lineage:
       - datalake_chat_fup_raw.chats_chat.created_at
+    description: Timestamp when the chat session was created in Chat Fup.
   ts_updated:
     lineage:
       - datalake_chat_fup_raw.chats_chat.updated_at
+    description: Timestamp of the last update to the chat session record.
   attendant_name:
     lineage:
       - datalake_chat_fup_raw.chats_chat.attendant_name
+    description: Full name of the support agent who attended this chat session.
   is_bot_answered:
     lineage:
       - datalake_chat_fup_raw.chats_chat.bot_answered
+    description: Boolean flag indicating whether the chat was answered and resolved by an automated bot rather than a human agent.
   customer_email:
     lineage:
       - datalake_chat_fup_raw.chats_chat.customer_email
+    description: Email address of the customer who initiated the chat session.
   customer_name:
     lineage:
       - datalake_chat_fup_raw.chats_chat.customer_name
+    description: Full name of the customer who initiated the chat session.
   customer_phone:
     lineage:
       - datalake_chat_fup_raw.chats_chat.customer_phone
+    description: Phone number of the customer who initiated the chat session.
   ts_attended:
     lineage:
       - datalake_chat_fup_raw.chats_chat.attended_at
+    description: Timestamp when a support agent first attended (responded to) the chat session.
   group_name:
     lineage:
       - datalake_chat_fup_raw.chats_chat.group_name
+    description: Name of the support group or queue to which this chat session was routed.
   ts_ticket_updated:
     lineage:
       - datalake_chat_fup_raw.chats_chat.ticket_updated_at
+    description: Timestamp of the last update to the linked support ticket associated with this chat.

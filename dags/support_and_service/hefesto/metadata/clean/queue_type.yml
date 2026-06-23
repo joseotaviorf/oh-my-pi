@@ -1,13 +1,21 @@
 database_name: datalake_hefesto_clean
 table_name: queue_type
+description: >
+  Lookup table with one row per task queue type defined in Hefesto. Classifies queues
+  by their functional category (e.g., support tier, channel type) and is referenced by
+  the queue table to categorize routing queues. Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_queue_type:
     lineage:
       - datalake_hefesto_raw.queue_type.id
+    description: Unique identifier for the queue type record in Hefesto.
   name:
     lineage:
       - datalake_hefesto_raw.queue_type.name
+    description: Short name label identifying the queue type category (e.g., tier1, chat, voice).
   description:
     lineage:
       - datalake_hefesto_raw.queue_type.description
+    description: Human-readable explanation of what this queue type represents and how it is used in routing.

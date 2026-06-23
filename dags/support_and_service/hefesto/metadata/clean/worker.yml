@@ -1,40 +1,58 @@
 database_name: datalake_hefesto_clean
 table_name: worker
+description: >
+  One row per support agent (worker) registered in Hefesto via Twilio TaskRouter. Tracks
+  agent identity, activity status, and timestamps for creation, last update, and last
+  routing event. Used to understand agent availability and activity over time.
+  Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_worker:
     lineage:
       - datalake_hefesto_raw.worker.id
+    description: Internal Hefesto identifier for the support agent (worker) record.
   id_worker_twilio:
     lineage:
       - datalake_hefesto_raw.worker.sid
+    description: Twilio TaskRouter Worker SID that uniquely identifies this agent in the Twilio platform.
   name:
     lineage:
       - datalake_hefesto_raw.worker.name
+    description: Full display name of the support agent as registered in Twilio TaskRouter.
   email:
     lineage:
       - datalake_hefesto_raw.worker.email
+    description: Email address of the support agent associated with this worker record.
   attributes:
     lineage:
       - datalake_hefesto_raw.worker.attributes
+    description: JSON blob with additional worker configuration attributes such as skills, BPO affiliation, and routing eligibility.
   active:
     lineage:
       - datalake_hefesto_raw.worker.active
+    description: Boolean flag indicating whether the agent is currently active and available for task routing in Hefesto.
   ts_created:
     lineage:
       - datalake_hefesto_raw.worker.created_at
+    description: Timestamp when the worker record was created in Hefesto.
   ts_updated:
     lineage:
       - datalake_hefesto_raw.worker.updated_at
+    description: Timestamp of the last update to the worker record in Hefesto.
   ts_last_event:
     lineage:
       - datalake_hefesto_raw.worker.last_event_at
+    description: Timestamp of the most recent routing event (e.g., activity change, task assignment) for this worker.
   year:
     lineage:
       - datalake_hefesto_raw.worker.year
+    description: Year extracted from the worker creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_hefesto_raw.worker.month
+    description: Month extracted from the worker creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_hefesto_raw.worker.day
+    description: Day extracted from the worker creation date. Partition column — filter on this column to enable partition pruning.

@@ -1,16 +1,25 @@
 database_name: datalake_hefesto_clean
 table_name: account
+description: >
+  One row per Hefesto account, representing a Twilio TaskRouter configuration used to
+  route support tasks to agents. Links QuintoAndar's internal account identifier to the
+  corresponding Twilio account, workspace, and workflow SIDs. Source system is Hefesto.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_account:
     lineage:
       - datalake_hefesto_raw.account.id
+    description: Internal Hefesto identifier for the Twilio account configuration record.
   id_account_twilio:
     lineage:
       - datalake_hefesto_raw.account.account_sid
+    description: Twilio Account SID that identifies the Twilio account associated with this Hefesto configuration.
   id_workspace_twilio:
     lineage:
       - datalake_hefesto_raw.account.workspace_sid
+    description: Twilio TaskRouter Workspace SID that groups queues, workers, and workflows for this account.
   id_workflow_twilio:
     lineage:
       - datalake_hefesto_raw.account.workflow_sid
+    description: Twilio TaskRouter Workflow SID that defines the routing logic applied to tasks in this account.
