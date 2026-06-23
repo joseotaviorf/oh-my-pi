@@ -1,155 +1,206 @@
----
 database_name: datalake_amplitude_clean
 table_name: events
+owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
+description: Clean Amplitude events table materialized from datalake_amplitude_raw.events. One row per ingested analytics event with standardized column names, typed timestamps, and partition columns year, month, and day. Serves as the parent source for event-type subpartitions in amplitude_subpartitioned and Growth enrich pipelines.
 columns:
   id_amplitude:
     lineage:
-      - datalake_amplitude_raw.events.amplitude_id
+    - datalake_amplitude_raw.events.amplitude_id
+    description: Amplitude distinct user identifier from raw export (amplitude_id).
   ids_amplitude_attributed:
     lineage:
-      - datalake_amplitude_raw.events.amplitude_attribution_ids
+    - datalake_amplitude_raw.events.amplitude_attribution_ids
+    description: Attributed Amplitude IDs array from raw export for identity stitching.
   adid:
     lineage:
-      - datalake_amplitude_raw.events.adid
+    - datalake_amplitude_raw.events.adid
+    description: Android advertising identifier from the raw Amplitude export payload.
   amplitude_event_type:
     lineage:
-      - datalake_amplitude_raw.events.amplitude_event_type
+    - datalake_amplitude_raw.events.amplitude_event_type
+    description: Internal Amplitude event classification from the raw export.
   id_app:
     lineage:
-      - datalake_amplitude_raw.events.app
+    - datalake_amplitude_raw.events.app
+    description: Amplitude project or application identifier from the raw export app field.
   city:
     lineage:
-      - datalake_amplitude_raw.events.city
+    - datalake_amplitude_raw.events.city
+    description: City inferred by Amplitude geolocation in the raw export.
   ts_client_event:
     lineage:
-      - datalake_amplitude_raw.events.client_event_time
+    - datalake_amplitude_raw.events.client_event_time
+    description: Client-side event timestamp from raw export client_event_time, in UTC.
   ts_client_uploaded:
     lineage:
-      - datalake_amplitude_raw.events.client_upload_time
+    - datalake_amplitude_raw.events.client_upload_time
+    description: Timestamp when the client uploaded the event batch to Amplitude servers.
   country:
     lineage:
-      - datalake_amplitude_raw.events.country
+    - datalake_amplitude_raw.events.country
+    description: ISO country code from raw export geolocation fields.
   data:
     lineage:
-      - datalake_amplitude_raw.events.data
+    - datalake_amplitude_raw.events.data
+    description: Additional raw JSON metadata from the Amplitude export not mapped to columns.
   ts_server_received:
     lineage:
-      - datalake_amplitude_raw.events.server_received_time
+    - datalake_amplitude_raw.events.server_received_time
+    description: Server received timestamp from raw export server_received_time.
   device_brand:
     lineage:
-      - datalake_amplitude_raw.events.device_brand
+    - datalake_amplitude_raw.events.device_brand
+    description: Device hardware brand from the raw Amplitude export.
   device_carrier:
     lineage:
-      - datalake_amplitude_raw.events.device_carrier
+    - datalake_amplitude_raw.events.device_carrier
+    description: Mobile carrier name from the raw Amplitude export when available.
   device_family:
     lineage:
-      - datalake_amplitude_raw.events.device_family
+    - datalake_amplitude_raw.events.device_family
+    description: Device family grouping from Amplitude device detection in raw export.
   id_device:
     lineage:
-      - datalake_amplitude_raw.events.device_id
+    - datalake_amplitude_raw.events.device_id
+    description: Amplitude device identifier (device_id) from the raw export.
   device_manufacturer:
     lineage:
-      - datalake_amplitude_raw.events.device_manufacturer
+    - datalake_amplitude_raw.events.device_manufacturer
+    description: Device manufacturer from the raw Amplitude export.
   device_model:
     lineage:
-      - datalake_amplitude_raw.events.device_model
+    - datalake_amplitude_raw.events.device_model
+    description: Device model string from the raw Amplitude export.
   device_type:
     lineage:
-      - datalake_amplitude_raw.events.device_type
+    - datalake_amplitude_raw.events.device_type
+    description: Coarse device category from raw export (mobile, tablet, or desktop).
   dma:
     lineage:
-      - datalake_amplitude_raw.events.dma
+    - datalake_amplitude_raw.events.dma
+    description: US designated market area code from raw export geolocation when applicable.
   id_event:
     lineage:
-      - datalake_amplitude_raw.events.event_id
+    - datalake_amplitude_raw.events.event_id
+    description: Amplitude event identifier (event_id) from the raw export batch.
   ts_event:
     lineage:
-      - datalake_amplitude_raw.events.event_time
+    - datalake_amplitude_raw.events.event_time
+    description: Canonical event timestamp (event_time) from the raw export, in UTC.
   event_type:
     lineage:
-      - datalake_amplitude_raw.events.event_type
+    - datalake_amplitude_raw.events.event_type
+    description: Product event name tracked in Amplitude from the raw export.
   event_properties:
     lineage:
-      - datalake_amplitude_raw.events.event_properties
+    - datalake_amplitude_raw.events.event_properties
+    description: JSON object with custom event attributes from the raw export payload.
   is_attribution_event:
     lineage:
-      - datalake_amplitude_raw.events.is_attribution_event
+    - datalake_amplitude_raw.events.is_attribution_event
+    description: Flag from raw export indicating an attribution-classified event.
   idfa:
     lineage:
-      - datalake_amplitude_raw.events.idfa
+    - datalake_amplitude_raw.events.idfa
+    description: Apple Identifier for Advertisers from the raw export when available.
   ip_address:
     lineage:
-      - datalake_amplitude_raw.events.ip_address
+    - datalake_amplitude_raw.events.ip_address
+    description: Client IP address captured in the raw Amplitude export.
   location_lat:
     lineage:
-      - datalake_amplitude_raw.events.location_lat
+    - datalake_amplitude_raw.events.location_lat
+    description: Latitude from raw export geolocation or device GPS.
   location_lng:
     lineage:
-      - datalake_amplitude_raw.events.location_lng
+    - datalake_amplitude_raw.events.location_lng
+    description: Longitude from raw export geolocation or device GPS.
   os_name:
     lineage:
-      - datalake_amplitude_raw.events.os_name
+    - datalake_amplitude_raw.events.os_name
+    description: Operating system name from the raw Amplitude export.
   os_version:
     lineage:
-      - datalake_amplitude_raw.events.os_version
+    - datalake_amplitude_raw.events.os_version
+    description: Operating system version string from the raw Amplitude export.
   platform:
     lineage:
-      - datalake_amplitude_raw.events.platform
+    - datalake_amplitude_raw.events.platform
+    description: Amplitude platform label (iOS, Android, or Web) from raw export.
   library:
     lineage:
-      - datalake_amplitude_raw.events.library
+    - datalake_amplitude_raw.events.library
+    description: Amplitude SDK library name and version from the raw export.
   is_paying:
     lineage:
-      - datalake_amplitude_raw.events.paying
+    - datalake_amplitude_raw.events.paying
+    description: Paying-user flag from raw export user billing metadata.
   region:
     lineage:
-      - datalake_amplitude_raw.events.region
+    - datalake_amplitude_raw.events.region
+    description: State or region from raw export IP geolocation.
   ts_server_uploaded:
     lineage:
-      - datalake_amplitude_raw.events.server_upload_time
+    - datalake_amplitude_raw.events.server_upload_time
+    description: Server upload timestamp from raw export server_upload_time.
   id_session:
     lineage:
-      - datalake_amplitude_raw.events.session_id
+    - datalake_amplitude_raw.events.session_id
+    description: Amplitude session identifier (session_id) from the raw export.
   start_version:
     lineage:
-      - datalake_amplitude_raw.events.start_version
+    - datalake_amplitude_raw.events.start_version
+    description: Application version at first open from raw export start_version.
   ts_user_created:
     lineage:
-      - datalake_amplitude_raw.events.user_creation_time
+    - datalake_amplitude_raw.events.user_creation_time
+    description: User profile creation timestamp from raw export user_creation_time.
   id_user:
     lineage:
-      - datalake_amplitude_raw.events.user_id
+    - datalake_amplitude_raw.events.user_id
+    description: Amplitude user identifier (user_id) from the raw export for identity joins.
   user_properties:
     lineage:
-      - datalake_amplitude_raw.events.user_properties
+    - datalake_amplitude_raw.events.user_properties
+    description: JSON object with persistent user attributes from the raw export.
   language:
     lineage:
-      - datalake_amplitude_raw.events.language
+    - datalake_amplitude_raw.events.language
+    description: Device or browser language from the raw Amplitude export.
   uuid:
     lineage:
-      - datalake_amplitude_raw.events.uuid
+    - datalake_amplitude_raw.events.uuid
+    description: Universally unique event identifier from the raw Amplitude export.
   version_name:
     lineage:
-      - datalake_amplitude_raw.events.version_name
+    - datalake_amplitude_raw.events.version_name
+    description: Active application version name when the event was triggered.
   id_schema:
     lineage:
-      - datalake_amplitude_raw.events.schema
+    - datalake_amplitude_raw.events.schema
+    description: Amplitude schema version identifier from the raw export.
   ts_processed:
     lineage:
-      - datalake_amplitude_raw.events.processed_time
+    - datalake_amplitude_raw.events.processed_time
+    description: Pipeline processing timestamp from raw export processed_time.
   id_inserted:
     lineage:
-      - datalake_amplitude_raw.events.insert_id
+    - datalake_amplitude_raw.events.insert_id
+    description: Insert identifier (insert_id) from the raw Amplitude export batch.
   sample_rate:
     lineage:
-      - datalake_amplitude_raw.events.sample_rate
+    - datalake_amplitude_raw.events.sample_rate
+    description: Ingestion sampling rate from raw export (1.0 means no sampling).
   year:
     lineage:
-      - datalake_amplitude_raw.events.year
+    - datalake_amplitude_raw.events.year
+    description: Table partition column (year). Derived from event timestamps at clean ingestion. Filter together with month and day for partition pruning.
   month:
     lineage:
-      - datalake_amplitude_raw.events.month
+    - datalake_amplitude_raw.events.month
+    description: Table partition column (month). Derived from event timestamps at clean ingestion. Must be filtered with year and day on this high-volume table.
   day:
     lineage:
-      - datalake_amplitude_raw.events.day
+    - datalake_amplitude_raw.events.day
+    description: Table partition column (day). Derived from event timestamps at clean ingestion. Always combine with year and month in WHERE clauses.

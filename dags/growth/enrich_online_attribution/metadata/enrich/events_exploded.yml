@@ -1,207 +1,214 @@
----
 database_name: datalake_online_attribution
 table_name: events_exploded
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-owner: henrique.miamoto@quintoandar.com.br
-description: This table contains information about amplitude events for the tenants main project.
+description: 'Exploded Amplitude event stream for the tenants main project with parsed event_properties and
+
+  user_properties fields used for online attribution. One row per Amplitude event in the load
+
+  window with web UTM parameters, Adjust/AppsFlyer mobile attribution fields, and partition
+
+  columns year, month, and day. Source for enrich_online_attribution.online_attribution.
+
+  '
 columns:
   event_type_sanitized:
-    description: name of the amplitude event, in lower and snake case.
+    description: Sanitized Amplitude event name in lower snake_case for stable joins across platforms.
     lineage:
-      - datalake_amplitude_clean.events.event_type
+    - datalake_amplitude_clean.events.event_type
   event_type:
-    description: name of the amplitude event
+    description: Raw Amplitude event type string as tracked in the product analytics SDK.
     lineage:
-      - datalake_amplitude_clean.events.event_type
+    - datalake_amplitude_clean.events.event_type
   ts_event:
-    description: timestamp when the event occourred
+    description: Timestamp when the Amplitude event occurred on the client, in UTC.
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+    - datalake_amplitude_clean.events.ts_event
   id_user:
-    description: sk_user of the user that did the event
+    description: QuintoAndar user identifier associated with the Amplitude event when logged in.
     lineage:
-      - datalake_amplitude_clean.events.id_user
+    - datalake_amplitude_clean.events.id_user
   id_amplitude:
-    description: key to identify the amplitude user
+    description: Amplitude distinct user identifier used for cross-session identity stitching.
     lineage:
-      - datalake_amplitude_clean.events.id_amplitude
+    - datalake_amplitude_clean.events.id_amplitude
   id_session:
-    description: key of the session
+    description: Amplitude session identifier grouping events within the same browsing session.
     lineage:
-      - datalake_amplitude_clean.events.id_session
+    - datalake_amplitude_clean.events.id_session
   id_house:
-    description: key of the house
+    description: QuintoAndar property identifier parsed from event_properties when present on the event.
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+    - datalake_amplitude_clean.events.event_properties
   id_firestore:
-    description: key of the firestore database
+    description: Firestore document identifier parsed from event_properties for offer or listing entities.
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+    - datalake_amplitude_clean.events.event_properties
   amplitude_platform:
-    description: platform where the event was made
+    description: Amplitude platform label indicating where the event was captured (web, iOS, or Android).
     lineage:
-      - datalake_amplitude_clean.events.platform
+    - datalake_amplitude_clean.events.platform
   visit_code:
-    description: code to identify the visit
+    description: Visit scheduling code parsed from event_properties for visit funnel attribution.
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+    - datalake_amplitude_clean.events.event_properties
   entrance_uri:
-    description: uri of entrance
+    description: First-page URI or deep link path from user_properties used for web entry attribution.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   attributed_at:
-    description: time where the attribution was made
+    description: Timestamp from user_properties marking when marketing attribution was last assigned.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   uri_event_property:
-    description: uri where the event was made
+    description: Page URI parsed from event_properties indicating where the in-app action occurred.
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+    - datalake_amplitude_clean.events.event_properties
   business_context:
-    description: business context of the event
+    description: Business line context parsed from event_properties (for example Rent or Sale).
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+    - datalake_amplitude_clean.events.event_properties
   web_medium:
-    description: utm medium
+    description: Current web UTM medium parameter extracted from user_properties for campaign tracking.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_source:
-    description: utm source
+    description: Current web UTM source parameter extracted from user_properties for traffic origin.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_campaign:
-    description: utm campaign
+    description: Current web UTM campaign name extracted from user_properties for campaign reporting.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_content:
-    description: utm content
+    description: Current web UTM content variant extracted from user_properties for ad creative differentiation.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_term:
-    description: utm term
+    description: Current web UTM search term extracted from user_properties for paid search keyword tracking.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_last_medium:
-    description: the last utm medium
+    description: Most recent web UTM medium from user_properties before the current event timestamp.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_last_source:
-    description: the last utm source
+    description: Most recent web UTM source from user_properties before the current event timestamp.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_last_campaign:
-    description: the last utm campaign
+    description: Most recent web UTM campaign from user_properties before the current event timestamp.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_last_content:
-    description: the last utm content
+    description: Most recent web UTM content variant from user_properties before the current event.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_last_term:
-    description: the last utm term
+    description: Most recent web UTM search term from user_properties before the current event.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_app_version:
-    description: the version of the app from adjust
+    description: Mobile application version string reported by the Adjust attribution SDK in user_properties.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_adgroup:
-    description: the adgroup from adjust
+    description: Adjust ad group identifier from user_properties for mobile campaign hierarchy reporting.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_campaign:
-    description: the utm campaign from adjust
+    description: Adjust campaign name from user_properties used as mobile UTM campaign equivalent.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_city:
-    description: the city from adjust
+    description: City geo label from Adjust attribution metadata stored in user_properties.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_country:
-    description: the country from adjust
+    description: Country geo label from Adjust attribution metadata stored in user_properties.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_creative:
-    description: the creative from adjust
+    description: Adjust creative identifier from user_properties identifying the served ad variant.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_impression_based:
-    description: the impression based from adjust
+    description: Adjust flag in user_properties indicating whether attribution used impression data.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_reattributed_at:
-    description: the timestamp of attribution from adjust
+    description: Timestamp from Adjust user_properties when the install was reattributed to a new source.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_installed_at:
-    description: the timestamp of app install from adjust
+    description: Timestamp from Adjust user_properties when the application was first installed.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_is_organic:
-    description: the flag that identifies organic campaigns from adjust
+    description: Boolean flag from Adjust user_properties marking organic versus paid install traffic.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_tracking_enabled:
-    description: the flag that identifies if the tracking is enabled from adjust
+    description: Adjust flag in user_properties indicating whether device tracking is enabled.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_tracking_limited:
-    description: the flag that identifies if the tracking is limited from adjust
+    description: Adjust flag in user_properties indicating limited ad tracking on the device.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   adjust_network:
-    description: the network from adjust
+    description: Adjust network or media source name from user_properties for mobile acquisition reporting.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   appsflyer_campaign:
-    description: the campaign from appsflyer
+    description: AppsFlyer campaign name from user_properties for alternate mobile attribution.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   appsflyer_media_source:
-    description: the media/source from appsflyer
+    description: AppsFlyer media source from user_properties identifying the acquisition channel.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   appsflyer_channel:
-    description: the channel from appsflyer
+    description: AppsFlyer channel label from user_properties for sub-network classification.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   appsflyer_installed_at:
-    description: the timestamp of app install from appsflyer
+    description: AppsFlyer install timestamp from user_properties for mobile first-touch timing.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   appsflyer_adset:
-    description: the adset from appsflyer
+    description: AppsFlyer ad set identifier from user_properties within the campaign hierarchy.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   appsflyer_ad:
-    description: the ad from appsflyer
+    description: AppsFlyer ad creative identifier from user_properties for creative-level reporting.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   web_platform:
-    description: the web plataform
+    description: Web platform label from user_properties (for example web_desktop or web_mobile).
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   app_platform:
-    description: the app plataform
+    description: Mobile platform label from user_properties (for example iOS or Android).
     lineage:
-      - datalake_amplitude_clean.events.user_properties
+    - datalake_amplitude_clean.events.user_properties
   gclid:
-    description: key to identify the google click
+    description: Google Click Identifier from the Amplitude event payload for Google Ads conversion matching.
     lineage:
-      - datalake_amplitude_clean.events.gclid
+    - datalake_amplitude_clean.events.gclid
   referrer:
-    description: url referrerd
+    description: HTTP referrer URL captured on the Amplitude event for organic traffic analysis.
     lineage:
-      - datalake_amplitude_clean.events.referrer
+    - datalake_amplitude_clean.events.referrer
   year:
     description: year of event
     lineage:
-      - datalake_amplitude_clean.events.year
+    - datalake_amplitude_clean.events.year
   month:
     description: month of event
     lineage:
-      - datalake_amplitude_clean.events.month
+    - datalake_amplitude_clean.events.month
   day:
     description: day of event
     lineage:
-      - datalake_amplitude_clean.events.day
+    - datalake_amplitude_clean.events.day

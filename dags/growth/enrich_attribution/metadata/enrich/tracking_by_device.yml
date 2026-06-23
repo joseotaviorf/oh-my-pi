@@ -2,7 +2,7 @@
 database_name: datalake_attribution
 table_name: tracking_by_device
 domain: Growth
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 description: |
   Materialized intermediate table that maintains chronological history of touchpoints per id_device.
   Each row represents a consecutive run of the same utm_hash for a device (gap-and-island grouping): a new

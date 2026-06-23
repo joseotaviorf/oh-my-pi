@@ -1,46 +1,69 @@
+---
 database_name: datalake_amplitude_user
 table_name: user_affiliate_origin
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: |
+  First-touch affiliate marketing attribution per QuintoAndar user from Amplitude app 205027.
+  One row per id_user capturing the earliest signup, login, or home page view event with UTM
+  parameters, device context, and inferred city campaign. Used by Growth to attribute affiliate
+  and paid media conversions to geographic campaigns.
 columns:
   id_user:
+    description: QuintoAndar user identifier from the first qualifying Amplitude funnel event per user.
     lineage:
       - datalake_amplitude_clean.events.id_user
   country_code:
+    description: Country code from user_properties ($.country) on the first attributed event.
     lineage:
-      - datalake_amplitude_clean.events.user_properties 
+      - datalake_amplitude_clean.events.user_properties
   utm_source:
+    description: UTM source parameter from user_properties on the first attributed affiliate event.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   utm_medium:
+    description: UTM medium parameter from user_properties on the first attributed affiliate event.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   utm_campaign:
+    description: UTM campaign name from user_properties on the first attributed affiliate event.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   city_campaign:
+    description: |
+      Inferred metropolitan campaign region derived from utm_campaign text (for example RMSP,
+      Rio de Janeiro, or Curitiba) using keyword rules on the cleaned campaign string.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   utm_content:
+    description: UTM content variant from user_properties on the first attributed affiliate event.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   utm_term:
+    description: UTM search term from user_properties on the first attributed affiliate event.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   platform:
+    description: Client platform label from user_properties ($.platform) at first touch.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   device_type:
+    description: Amplitude device category (mobile, tablet, or desktop) at first touch.
     lineage:
       - datalake_amplitude_clean.events.device_type
   user_country:
+    description: ISO country inferred by Amplitude from IP geolocation at first touch.
     lineage:
       - datalake_amplitude_clean.events.country
   region:
+    description: State or region inferred by Amplitude from IP geolocation at first touch.
     lineage:
       - datalake_amplitude_clean.events.region
   city:
+    description: City inferred by Amplitude from IP geolocation at first touch.
     lineage:
       - datalake_amplitude_clean.events.city
   ts_client_event:
+    description: Client-side event timestamp of the first attributed affiliate touchpoint, in UTC.
     lineage:
       - datalake_amplitude_clean.events.ts_client_event

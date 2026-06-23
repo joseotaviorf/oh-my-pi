@@ -2,7 +2,7 @@
 database_name: datalake_online_attribution
 table_name: online_attribution
 domain: Growth
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 description: Table utilized by the Growth team to describe online attribution events for conversion actions (visit schedule confirmed, offer submitted, sale offer form accepted). Combines web attribution data (UTM parameters, Google Click ID) with app attribution data (Adjust, AppsFlyer) to provide a unified view of online marketing channel performance and user acquisition sources.
 columns:
   id_user:
