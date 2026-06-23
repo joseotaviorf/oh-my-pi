@@ -2,4 +2,4 @@ database_name: datalake_iptu_poa_raw
 table_name: iptu_poa
 description: IPTU - Porto Alegre
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br

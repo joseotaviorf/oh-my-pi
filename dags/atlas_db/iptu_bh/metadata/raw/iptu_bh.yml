@@ -2,4 +2,4 @@ database_name: datalake_iptu_bh_raw
 table_name: iptu_bh
 description: IPTU - Belo Horizonte
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br

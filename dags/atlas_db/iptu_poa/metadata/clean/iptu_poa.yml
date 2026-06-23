@@ -4,8 +4,9 @@ description:
   Table extracted from the Porto Alegre City website (https://dadosabertos.poa.br/dataset/iptu). It contains the
   "Imposto sobre a Propriedade Predial e Territorial Urbana (IPTU)" information, including address, complement and
   value
+  Partitioned by year — always filter on this column for partition pruning.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_house:
     lineage:
@@ -23,7 +24,7 @@ columns:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.ano_exercicio
     description: |
-      "IPTU year."
+      "Calendar year of the IPTU tax exercise for this property record in Porto Alegre."
   address_neighborhood:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.nme_endloc_bairro_cdl
@@ -113,32 +114,32 @@ columns:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.vlr_venal_terreno
     description: |
-      "Taxable land value."
+      "Official assessed taxable value of the land (vlr_venal_terreno) in BRL, used as the basis for IPTU calculation in Porto Alegre."
   taxable_built_value:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.vlr_venal_construcoes
     description: |
-      "Taxable built value."
+      "Official assessed taxable value of the built structure (vlr_venal_construcoes) in BRL, used as the basis for IPTU calculation in Porto Alegre."
   taxable_property_value:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.vlr_venal_imovel
     description: |
-      "Taxable property value."
+      "Total assessed taxable value of the property (vlr_venal_imovel) in BRL, combining land and built values in Porto Alegre."
   tax_rate:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.vlr_aliquota
     description: |
-      "Tax rate."
+      "IPTU tax rate (vlr_aliquota) applied to the taxable property value to compute the total tax amount in Porto Alegre."
   iptu_value:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.vlr_imposto
     description: |
-      "IPTU value."
+      "Total IPTU tax amount (vlr_imposto) due for the property in BRL for the given exercise year in Porto Alegre."
   tcrs_value:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.vlr_tcl
     description: |
-      "TCRS value."
+      "Value of the Taxa de Coleta de Lixo (TCL/TCRS solid waste collection fee) charged on the property in Porto Alegre in BRL."
   dt_load:
     lineage:
       - datalake_iptu_poa_raw.iptu_poa.dt_load
