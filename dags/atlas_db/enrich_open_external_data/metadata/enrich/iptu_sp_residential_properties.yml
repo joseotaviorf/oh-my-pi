@@ -4,7 +4,7 @@ table_name: iptu_sp_residential_properties
 description: |
   Table enriched with IPTU data from SP.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   taxpayer_number:
     lineage:
@@ -23,12 +23,12 @@ columns:
     lineage:
       - datalake_iptu_clean.iptu_sp.release_notification_number
     description: |
-      Release Notification Number.
+      São Paulo IPTU release notification number (número da NL) identifying the tax bill issuance document.
   taxpayer_phase:
     lineage:
       - datalake_iptu_clean.iptu_sp.taxpayer_phase
     description: |
-      Taxpayer phase.
+      Administrative phase of the taxpayer record in the São Paulo IPTU system (fase do contribuinte), indicating the registration lifecycle stage.
   street_code:
     lineage:
       - datalake_iptu_clean.iptu_sp.street_code
@@ -66,13 +66,13 @@ columns:
       Most likely neighborhood for that listing.
   address_state:
     description: |
-      State of the property.
+      Brazilian state abbreviation of the property address, enriched from geographic matching.
   address_city:
     description: |
-      IPTU city.
+      City name of the property address, enriched from geographic matching with the IPTU São Paulo source data.
   address_country:
     description: |
-      IPTU country.
+      Country name of the property address, enriched from geographic matching; typically Brazil (Brasil).
   property_use_type:
     lineage:
       - datalake_iptu_clean.iptu_sp.property_use_type
@@ -87,12 +87,12 @@ columns:
     lineage:
       - datalake_iptu_clean.iptu_sp.building_standard_type
     description: |
-      The tier of the building standard type.
+      Tiered classification derived from the building standard type code, grouping São Paulo IPTU construction quality categories into broader tiers.
   land_type:
     lineage:
       - datalake_iptu_clean.iptu_sp.land_type
     description: |
-      Land position.
+      Land position classification from the SP IPTU registry (tipo de terreno), describing the plot's street frontage configuration (e.g. corner, rear, multiple fronts).
     categories:
       "De duas ou mais frentes": "Two or more fronts"
       "De esquina": "Corner"
@@ -165,12 +165,12 @@ columns:
     lineage:
       - datalake_iptu_clean.iptu_sp.first_year_of_taxpayer_life
     description: |
-      Year of the first IPTU of the taxpayer.
+      First calendar year the property appeared as an active taxpayer in the São Paulo IPTU system.
   first_month_of_taxpayer_life:
     lineage:
       - datalake_iptu_clean.iptu_sp.first_month_of_taxpayer_life
     description: |
-      Month of the first IPTU of the taxpayer.
+      First calendar month the property appeared as an active taxpayer in the São Paulo IPTU system.
   ts_registration:
     lineage:
       - datalake_iptu_clean.iptu_sp.dt_registration

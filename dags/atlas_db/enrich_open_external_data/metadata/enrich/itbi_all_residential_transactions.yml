@@ -7,7 +7,7 @@ description: |
   into more than one source file.
   This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_address_transaction:
     lineage:

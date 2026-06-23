@@ -9,7 +9,7 @@ description: |
   Source: https://geosampa.prefeitura.sp.gov.br/PaginasPublicas/_SBC.aspx
   Metadata: (https://metadados.geosampa.prefeitura.sp.gov.br/geonetwork/srv/por/catalog.search#/metadata/b971efa1-aad5-42f3-ad28-18f1f4efe270).
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   taxpayer_number:
     lineage:
@@ -25,12 +25,12 @@ columns:
     lineage:
       - datalake_iptu_raw.iptu_sp.numero_da_nl
     description: |
-      Release Notification Number.
+      São Paulo IPTU release notification number (número da NL) identifying the tax bill issuance document.
   taxpayer_phase:
     lineage:
       - datalake_iptu_raw.iptu_sp.fase_do_contribuinte
     description: |
-      Taxpayer phase.
+      Administrative phase of the taxpayer record in the São Paulo IPTU system (fase do contribuinte), indicating the registration lifecycle stage.
   street_code:
     lineage:
       - datalake_iptu_raw.iptu_sp.codlog_do_imovel
@@ -80,7 +80,7 @@ columns:
     lineage:
       - datalake_iptu_raw.iptu_sp.tipo_de_terreno
     description: |
-      Land position.
+      Land position classification from the SP IPTU registry (tipo de terreno), describing the plot's street frontage configuration (e.g. corner, rear, multiple fronts).
     categories:
       "De duas ou mais frentes": "Two or more fronts"
       "De esquina": "Corner"
@@ -153,12 +153,12 @@ columns:
     lineage:
       - datalake_iptu_raw.iptu_sp.ano_de_inicio_da_vida_do_contribuinte
     description: |
-      Year of the first IPTU of the taxpayer.
+      First calendar year the property appeared as an active taxpayer in the São Paulo IPTU system.
   first_month_of_taxpayer_life:
     lineage:
-      - datalake_iptu_raw.iptu_sp.ano_de_inicio_da_vida_do_contribuinte
+      - datalake_iptu_raw.iptu_sp.mes_de_inicio_da_vida_do_contribuinte
     description: |
-      Month of the first IPTU of the taxpayer.
+      First calendar month the property appeared as an active taxpayer in the São Paulo IPTU system.
   dt_registration:
     lineage:
       - datalake_iptu_raw.iptu_sp.data_do_cadastramento

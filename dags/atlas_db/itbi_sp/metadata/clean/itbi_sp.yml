@@ -5,8 +5,9 @@ description:
   Table extracted from the São Paulo City Hall website.It has all the records of
   transactions that were subject to the ITBI tax (Imposto de Transmissão de Bens Imóveis).
   The ingestion of ITBI BH data occurs on the 15th and 30th of each month.
+  Partitioned by year and month — always filter on both columns for partition pruning.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   iptu_sql_registration_number:
     lineage:
@@ -153,12 +154,12 @@ columns:
     lineage:
       - datalake_itbi_raw.itbi_sp.source_file
     description: |
-      "The source file is the file that contains the ITBI data."
+      "Name of the raw São Paulo ITBI data file from which this transaction record was ingested."
   source_tab:
     lineage:
       - datalake_itbi_raw.itbi_sp.source_tab
     description: |
-      "The source tab is the tab that contains the ITBI data."
+      "Name of the sheet/tab within the source ITBI file that contains this transaction record."
   dt_transaction:
     lineage:
       - datalake_itbi_raw.itbi_sp.data_transacao

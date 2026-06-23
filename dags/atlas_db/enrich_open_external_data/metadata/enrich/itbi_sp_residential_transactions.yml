@@ -7,18 +7,18 @@ description: |
   COMERCIAL HORIZONTAL, COMERCIAL VERTICAL, RESIDENCIAL HORIZONTAL and RESIDENCIAL VERTICAL.
   This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_itbi_transaction_source:
     description: Unique table key, created from the transaction extract file and the IPTU number.
   id_address_transaction:
     lineage:
-      - datalake_itbi_clean.itbi_sp.dt_load
+      - datalake_itbi_clean.itbi_sp.dt_transaction
       - datalake_itbi_clean.itbi_sp.address_neighborhood
       - datalake_itbi_clean.itbi_sp.address_street_name
       - datalake_itbi_clean.itbi_sp.address_number
       - datalake_itbi_clean.itbi_sp.address_complement
-      - datalake_itbi_clean.itbi_sp.address_reference,
+      - datalake_itbi_clean.itbi_sp.address_reference
       - datalake_itbi_clean.itbi_sp.address_zipcode
     description: |
       Unique identifier for each transaction.
