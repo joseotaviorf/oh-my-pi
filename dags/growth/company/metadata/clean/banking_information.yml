@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Financial institution account details for company payment operations. Critical for revenue distribution, commission payments, and financial settlements with partner companies. Supports multiple bank accounts per company for different transaction types (operational, commission, settlement).
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   FINANCIAL OPERATIONS:
   - Partner payments: Commission and revenue share distributions

@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Table that maps the regions of a product to a company. This is used to identify the coverage that a company has in a region.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 columns:
   id:
     lineage:

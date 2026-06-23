@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Junction table implementing many-to-many relationships between companies and legal documents. Enables flexible document management where companies can have multiple compliance documents and documents can be shared across corporate entities for efficiency and compliance.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   RELATIONSHIP PATTERNS:
   - Many-to-many: Single company can have multiple documents for different compliance needs

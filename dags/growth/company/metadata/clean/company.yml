@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Core entity representing legal companies in QuintoAndar's partner ecosystem, supporting the For Brokers paradigm shift. This table stores all legal entities including QuintoAndar itself, partner companies, real estate brokers, and property managers. Features hierarchical relationships (headquarters → branches), logical deletion via status field, and comprehensive audit trails.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   BUSINESS RULES:
   - QuintoAndar itself is stored as a HEADQUARTERS company

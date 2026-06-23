@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Junction table implementing many-to-many relationships between companies and addresses. Enables flexible address management where companies can have multiple operational locations and addresses can be shared across corporate entities.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   RELATIONSHIP PATTERNS:
   - Many-to-many: Single company can have multiple addresses for different purposes

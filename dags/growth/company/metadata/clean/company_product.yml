@@ -3,7 +3,8 @@ database_name: datalake_company_clean
 table_name: company_product
 owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
-description: 'Many-to-many relationship table linking companies to products/services they offer. Enables flexible business models where companies can provide multiple products and products can be offered by multiple partner companies. Includes product-specific configuration settings in JSONB format for customization. Created 2022-10-31 during major architecture refactoring to replace direct company-product foreign keys. Enhanced 2024-07 with status field for product lifecycle management.'
+description: |
+  Many-to-many relationship table linking companies to products/services they offer. Enables flexible business models where companies can provide multiple products and products can be offered by multiple partner companies. Includes product-specific configuration settings in JSONB format for customization. Created 2022-10-31 during major architecture refactoring to replace direct company-product foreign keys. Enhanced 2024-07 with status field for product lifecycle management. Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 columns:
   id_company:
     lineage:

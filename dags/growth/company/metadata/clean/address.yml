@@ -5,6 +5,7 @@ owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
 description: |
   Company address repository for operational locations, legal addresses, and business presence tracking. Supports many-to-many relationships with companies via company_address junction table, enabling companies to have multiple locations and addresses to be shared across corporate entities.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   ADDRESS TYPES & USAGE:
   - Legal addresses: Official registered business addresses for compliance
