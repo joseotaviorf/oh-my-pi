@@ -3,7 +3,7 @@ database_name: datalake_supply_staging
 table_name: supply_costs_allocation_lead
 description: Allocates media costs to supply leads by campaign, city group and planning cluster using lead share for proportional distribution.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   date:
     description: Reference date for costs and leads.
@@ -24,7 +24,7 @@ columns:
     lineage:
       - dw_growth.obt_supply.company_report_origin
   planning_cluster:
-    description: Planning cluster for the lead.
+    description: Marketing channel cluster assigned to the lead for planning and cost allocation (e.g. affiliates, Owner PWA, Price Calculator).
     lineage:
       - dw_growth.obt_supply.planning_cluster
   nm_campaign:

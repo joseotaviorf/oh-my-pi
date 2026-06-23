@@ -3,10 +3,10 @@ database_name: datalake_supply_staging
 table_name: supply_targets
 description: Supply funnel volume targets from QTS budget and OKR sources (rent and sale), unified by date, city group, planning dimensions and company report origin.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   date:
-    description: Budget date.
+    description: Calendar date to which the supply funnel volume target applies.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.date
       - scalability_metrics.sale_supply_budget_2026.date
@@ -57,7 +57,7 @@ columns:
       - scalability_metrics.rent_supply_okr_2026.company_report_origin
       - scalability_metrics.sale_supply_okr_2026.company_report_origin
   prospects:
-    description: Count of prospects.
+    description: Target number of supply prospects expected for the given date and planning dimensions.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.prospects
       - scalability_metrics.sale_supply_budget_2026.prospects
@@ -78,7 +78,7 @@ columns:
       - scalability_metrics.rent_supply_okr_2026.available_qualifieds
       - scalability_metrics.sale_supply_okr_2026.available_qualifieds
   opportunities:
-    description: Count of opportunities.
+    description: Target number of supply opportunities expected for the given date and planning dimensions.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.opportunities
       - scalability_metrics.sale_supply_budget_2026.opportunities

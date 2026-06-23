@@ -3,7 +3,7 @@ database_name: datalake_supply_staging
 table_name: supply_unique_rules
 description: Marks supply records as unique per house or supply key within business context, using funnel stage and opportunity conversion for ranking.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   sk_supply:
     description: Surrogate key for the supply related to the lead.

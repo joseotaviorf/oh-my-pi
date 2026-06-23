@@ -1,9 +1,11 @@
 ---
 database_name: datalake_tof_taxonomy
 table_name: tof_events_with_taxonomy
-description: This table consolidates the Top of Funnel events triggered by each user enriched with taxonomy classifications from Amplitude.
+description: |
+  Consolidates Top of Funnel events triggered by each user enriched with taxonomy classifications from Amplitude.
+  Partitioned by funnel_side — always filter on this column for partition pruning.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   id_tof_user:
     description: "The ID associated with the user. Coalesced from merged and non-merged user ID and Amplitude IDs to ensure user identification."
@@ -89,11 +91,11 @@ columns:
     lineage:
       - datalake_growth_taxonomy.media_setup.source
   taxonomy_aggregation_level_1:
-    description: "Taxonomy aggregation level 1 of the taxonomy management aggregation"
+    description: "Top-level taxonomy grouping from the taxonomy management sheet, used to classify TOF events by marketing channel category."
     lineage:
       - datalake_gsheets_clean.taxonomy_management_aggregation.taxonomy_aggregation_level_1
   taxonomy_aggregation_level_2:
-    description: "Taxonomy aggregation level 2 of the taxonomy management aggregation"
+    description: "Second-level taxonomy grouping from the taxonomy management sheet, providing finer channel classification within level 1."
     lineage:
       - datalake_gsheets_clean.taxonomy_management_aggregation.taxonomy_aggregation_level_2
   tof_event_order_at_all:

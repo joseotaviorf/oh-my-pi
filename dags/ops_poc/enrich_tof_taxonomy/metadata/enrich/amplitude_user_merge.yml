@@ -3,7 +3,7 @@ database_name: datalake_tof_taxonomy
 table_name: amplitude_user_merge
 description: This table consolidates user merge data from Amplitude to provide a unified view of user identities for taxonomy enrichment.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   id_amplitude_merged:
     description: "Unique identifier for the user in Amplitude analytics across all tracked page events after applying user merge rules."

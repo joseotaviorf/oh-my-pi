@@ -2,27 +2,23 @@ database_name: dw_performance_rent
 table_name: send_nps_ppmulti_ongoing
 description: This table filters contracts that will be enabled to trigger NPS surveys for the Ongoing campaign.
 domain: Support and Services
-owner: alef.vieiras@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
     customer_name:
         lineage:
             - datalake_ebdb_clean.contract_person.name
-        description: Customer name.
+        description: Full name of the property owner who will receive the NPS survey for the Ongoing campaign.
     customer_email:
         lineage:
             - datalake_ebdb_clean.contract_person.email
-        description: Customer email.
+        description: Email address of the property owner used to deliver the NPS survey invitation.
     customer_phone:
         lineage:
             - datalake_ebdb_clean.contract_person.phone_number
-        description: Customer Phone Number.
+        description: Phone number of the property owner associated with the contract eligible for the NPS survey.
     campaign_step:
-        lineage:
-            - "null"
         description: Campaign belonging to the client to whom the NPS survey will be sent.
     customer_type:
-        lineage:
-            - "null"
         description: Indicates the type of client (Owner).
     customer_cpf:
         lineage:
@@ -33,12 +29,8 @@ columns:
             - datalake_pp_multi.pp_multi_classification_history.id_owner
         description: Customer identification.
     campaign_type:
-        lineage:
-            - "null"
         description: Indicates which campaign the customer is part of.
     driver_type:
-        lineage:
-            - "null"
         description: Returns the type of customer subscription.
     id_driver:
         lineage:
@@ -49,9 +41,7 @@ columns:
             - datalake_ebdb_clean.contract_person.email
         description: Create a key using the email address with the execution date.
     ts_load:
-        lineage:
-            - now()
-        description: Timestamp of the load.
+        description: Timestamp when this NPS eligibility record was loaded into the data warehouse.
 
 
     

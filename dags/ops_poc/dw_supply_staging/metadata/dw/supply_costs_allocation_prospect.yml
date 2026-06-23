@@ -3,7 +3,7 @@ database_name: dw_supply_staging
 table_name: supply_costs_allocation_prospect
 description: Allocates media costs to supply prospects by business context, campaign, city group and planning cluster using prospect share for proportional distribution. Faalback set to 50/50 between Rent and Sale for prospects without business context or planning cluster.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   date:
     description: Reference date for costs and prospects.

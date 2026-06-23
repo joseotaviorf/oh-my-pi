@@ -1,7 +1,7 @@
 ---
 database_name: dw_supply_staging
 table_name: supply_tof_aggregated
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 domain: Growth
 description: |
   Table that consolidates supply top-of-funnel (TOF) metrics for planning and reporting.

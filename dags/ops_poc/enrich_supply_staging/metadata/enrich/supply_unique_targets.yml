@@ -3,7 +3,7 @@ database_name: datalake_supply_staging
 table_name: supply_unique_targets
 description: Unique supply funnel volume targets by date, city group, planning conversion, operation, cluster and company report origin.
 domain: Growth
-owner: data-ops-poc@quintoandar.com.br
+owner: fabio.soeiro@quintoandar.com.br
 columns:
   date:
     description: Full date field for detailed temporal tracking.
