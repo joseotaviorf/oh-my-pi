@@ -1,19 +1,29 @@
+---
 database_name: datalake_ebdb_clean
 table_name: polygon_region
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Geographic polygon boundaries for EBDB operating regions (PoligonoRegiao), stored as WKT strings
+  decoded from the source geometry. One row per region polygon used for agent territory and allocation rules.
 columns:
   id:
+    description: Surrogate primary key of the region polygon row in EBDB.
     lineage:
       - datalake_ebdb_raw.poligonoregiao.id
   polygon:
+    description: Well-known text (WKT) representation of the region boundary polygon for spatial joins.
     lineage:
       - datalake_ebdb_raw.poligonoregiao.poligono
   id_region:
+    description: Foreign key to the EBDB region entity this polygon defines on the map.
     lineage:
       - datalake_ebdb_raw.poligonoregiao.regiao_id
   ts_updated:
+    description: Timestamp of the last update to the region polygon in EBDB.
     lineage:
       - datalake_ebdb_raw.poligonoregiao.atualizadoem
   ts_created:
+    description: Timestamp when the region polygon row was created in EBDB.
     lineage:
       - datalake_ebdb_raw.poligonoregiao.criadoem

@@ -1,61 +1,86 @@
+---
 database_name: datalake_ebdb_clean
 table_name: agent_specific_hour
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Day-level visit availability schedule for an agent in EBDB, with hourly slots from 08:00 to 20:00
+  and off-work flags. One row per agent and calendar date after CDC extraction from HorarioEspecificoAgente.
+  Primarily consumed by the agents allocation and visit scheduling analytics teams.
 columns:
   id:
+    description: Surrogate primary key of the agent-specific hour row in EBDB.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.id
   id_agent:
+    description: Foreign key to the agent whose availability is defined for the given date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.agente_id
   dt_agent_specific_hour:
+    description: Calendar date for which the hourly availability flags apply.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.data
   is_available_between_08_and_09:
+    description: Whether the agent accepts visits between 08:00 and 09:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel08as09
   is_available_between_09_and_10:
+    description: Whether the agent accepts visits between 09:00 and 10:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel09as10
   is_available_between_10_and_11:
+    description: Whether the agent accepts visits between 10:00 and 11:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel10as11
   is_available_between_11_and_12:
+    description: Whether the agent accepts visits between 11:00 and 12:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel11as12
   is_available_between_12_and_13:
+    description: Whether the agent accepts visits between 12:00 and 13:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel12as13
   is_available_between_13_and_14:
+    description: Whether the agent accepts visits between 13:00 and 14:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel13as14
   is_available_between_14_and_15:
+    description: Whether the agent accepts visits between 14:00 and 15:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel14as15
   is_available_between_15_and_16:
+    description: Whether the agent accepts visits between 15:00 and 16:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel15as16
   is_available_between_16_and_17:
+    description: Whether the agent accepts visits between 16:00 and 17:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel16as17
   is_available_between_17_and_18:
+    description: Whether the agent accepts visits between 17:00 and 18:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel17as18
   is_available_between_18_and_19:
+    description: Whether the agent accepts visits between 18:00 and 19:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel18as19
   is_available_between_19_and_20:
+    description: Whether the agent accepts visits between 19:00 and 20:00 on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.disponivel19as20
   is_supposed_to_be_off_work:
+    description: Planned day-off flag from scheduling rules before actual absence is confirmed.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.isfolga
   is_off_work:
+    description: Confirmed day-off flag indicating the agent is unavailable for visits on this date.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.folga
   ts_updated:
+    description: Timestamp of the last update to this availability row in EBDB.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.atualizadoem
   ts_created:
+    description: Timestamp when this agent-specific hour row was created in EBDB.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente.criadoem

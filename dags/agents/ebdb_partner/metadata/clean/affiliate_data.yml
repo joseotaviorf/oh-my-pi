@@ -1,73 +1,103 @@
+---
 database_name: datalake_ebdb_clean
 table_name: affiliate_data
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Affiliate program profile for brokers and referrers (DadosAfiliado) in EBDB, capturing operating
+  geography, CRECI, payment preferences, verification flags, and commission tracking metadata.
+  One row per affiliate user enrolled in the referral program. Consumed by broker affiliate program
+  analytics and commission tracking workflows.
 columns:
   id:
+    description: Surrogate primary key of the affiliate profile in EBDB.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.id
   id_user:
+    description: Main application user id of the affiliate broker or referrer.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.usuario_id
   id_account_manager:
+    description: User id of the QuintoAndar account manager assigned to this affiliate.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.gerentecontas_id
   id_indicated_by:
+    description: User id of the affiliate who referred this person into the program, when applicable.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.indicadopor_id
   id_gdocs_sheet:
+    description: Google Sheets document id used to track leads or commissions for this affiliate.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.idplanilhagdocs
   id_doorman_affiliate_data:
+    description: Foreign key linking to a related doorman affiliate profile when the roles overlap.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.doormanaffiliatedata_id
   is_active:
+    description: Whether the affiliate is currently active and eligible to receive referrals.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.ativo
   is_verified:
+    description: Whether QuintoAndar has verified the affiliate credentials and onboarding requirements.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.verificado
   is_roof_topper:
+    description: Flag indicating the affiliate participates in the Roof Topper acquisition program.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.rooftopper
   affiliate_type:
+    description: Current affiliate program category assigned in EBDB (canonical type field).
     lineage:
       - datalake_ebdb_raw.dadosafiliado.affiliatetype
   affiliate_type_old:
+    description: Legacy affiliate type value retained for historical compatibility.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.tipoafiliado
   indication_short_url:
+    description: Short URL used by the affiliate to share referral links with prospects.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.indicacaoshorturl
   operation_city:
+    description: Primary city where the affiliate operates and receives leads.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.cidadeatuacao
   main_operation_neighborhoods:
+    description: Comma-separated list of neighborhoods where the affiliate focuses operations.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.principaisbairrosatuacao
   payment_preference:
+    description: Preferred payout method or schedule for affiliate commission settlements.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.preferenciapagamento
   creci_number:
+    description: CRECI license number of the affiliate when acting as a licensed broker.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.numerocreci
   origin:
+    description: Acquisition channel or signup origin that enrolled the affiliate in the program.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.origin
   last_week_balance_communication:
+    description: Week label of the most recent balance statement communication sent to the affiliate.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.semanaultimacomunicacaobalanco
   ts_last_commission_calculation_indicated:
+    description: Timestamp of the last commission calculation for leads this affiliate referred.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.ultimocalculocomissaoindicado
   ts_card_sent_communication:
+    description: Timestamp when a payment-card shipment communication was sent to the affiliate.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.datacomunicacaoenviocartao
   ts_operation_start:
+    description: Timestamp when the affiliate started operating in their declared city.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.inicioatuacao
   ts_created:
+    description: Timestamp when the affiliate profile was created in EBDB.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.criadoem
   ts_updated:
+    description: Timestamp of the last update to the affiliate profile in EBDB.
     lineage:
       - datalake_ebdb_raw.dadosafiliado.atualizadoem

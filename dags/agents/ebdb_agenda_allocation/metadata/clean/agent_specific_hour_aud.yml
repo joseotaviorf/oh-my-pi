@@ -1,67 +1,93 @@
+---
 database_name: datalake_ebdb_clean
 table_name: agent_specific_hour_aud
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Hibernate Envers audit history for day-level agent availability rows in EBDB. One revision per
+  change to hourly visit slots, off-work flags, or the agent/date assignment on HorarioEspecificoAgente.
 columns:
   id:
+    description: Primary key of the agent-specific hour entity captured in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.id
   rev:
+    description: Envers revision number identifying the transaction that produced this audit row.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.revtype
   ts_updated:
+    description: Last update timestamp stored on the availability row in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.atualizadoem
   id_agent:
+    description: Agent id whose availability is defined in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.agente_id
   dt_agent_specific_hour:
+    description: Calendar date for the hourly availability flags in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.data
   is_off_work:
+    description: Day-off flag value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.folga
   is_available_between_08_and_09:
+    description: Availability flag for the 08:00–09:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel08as09
   is_available_between_09_and_10:
+    description: Availability flag for the 09:00–10:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel09as10
   is_available_between_10_and_11:
+    description: Availability flag for the 10:00–11:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel10as11
   is_available_between_11_and_12:
+    description: Availability flag for the 11:00–12:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel11as12
   is_available_between_12_and_13:
+    description: Availability flag for the 12:00–13:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel12as13
   is_available_between_13_and_14:
+    description: Availability flag for the 13:00–14:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel13as14
   is_available_between_14_and_15:
+    description: Availability flag for the 14:00–15:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel14as15
   is_available_between_15_and_16:
+    description: Availability flag for the 15:00–16:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel15as16
   is_available_between_16_and_17:
+    description: Availability flag for the 16:00–17:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel16as17
   is_available_between_17_and_18:
+    description: Availability flag for the 17:00–18:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel17as18
   is_available_between_18_and_19:
+    description: Availability flag for the 18:00–19:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel18as19
   is_available_between_19_and_20:
+    description: Availability flag for the 19:00–20:00 slot in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.disponivel19as20
   id_updated_by:
+    description: User id of the operator who applied the change captured in this audit revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.atualizadopor_id
   mod_is_off_work:
+    description: Envers flag indicating the day-off field changed in this revision.
     lineage:
       - datalake_ebdb_raw.horarioespecificoagente_aud.folga_mod

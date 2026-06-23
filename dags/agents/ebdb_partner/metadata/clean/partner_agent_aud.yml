@@ -1,34 +1,49 @@
+---
 database_name: datalake_ebdb_clean
 table_name: partner_agent_aud
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Hibernate Envers audit history for partner-agent membership changes in EBDB. One row per revision
+  of a PartnerAgent record, including which attributes changed between partner, status, and type.
 columns:
   id:
+    description: Primary key of the partner-agent membership entity captured in this audit revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.id
   id_partner:
+    description: Partner company id linked to the user in this audit revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.partner_id
   id_user:
+    description: Application user id of the partner agent or admin in this audit revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.user_id
   rev:
+    description: Envers revision number identifying the transaction that produced this audit row.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
       - datalake_ebdb_raw.partneragent_aud.revtype
   status:
+    description: Membership status value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.status
   type:
+    description: Role type value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.type
   mod_partner:
+    description: Envers flag indicating partner_id changed in this revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.partner_mod
   mod_status:
+    description: Envers flag indicating status changed in this revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.status_mod
   mod_type:
+    description: Envers flag indicating type changed in this revision.
     lineage:
       - datalake_ebdb_raw.partneragent_aud.type_mod

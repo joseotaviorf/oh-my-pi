@@ -1,55 +1,77 @@
+---
 database_name: datalake_ebdb_clean
 table_name: mask_weekly_hour
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Weekly visit availability mask template linked to an agent work contract in EBDB. Defines which
+  hourly slots from 08:00 to 20:00 are enabled for each weekday before agent-specific overrides apply.
 columns:
   id:
+    description: Surrogate primary key of the weekly hour mask row in EBDB.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.id
   id_work_contract:
+    description: Foreign key to the work contract that inherits this weekly availability mask.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.workcontract_id
   day_of_week:
+    description: Weekday index (EBDB convention) for which the hourly mask applies.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.diadasemana
   has_hours_between_08_and_09_available:
+    description: Whether the mask enables visit scheduling between 08:00 and 09:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel08as09
   has_hours_between_09_and_10_available:
+    description: Whether the mask enables visit scheduling between 09:00 and 10:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel09as10
   has_hours_between_10_and_11_available:
+    description: Whether the mask enables visit scheduling between 10:00 and 11:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel10as11
   has_hours_between_11_and_12_available:
+    description: Whether the mask enables visit scheduling between 11:00 and 12:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel11as12
   has_hours_between_12_and_13_available:
+    description: Whether the mask enables visit scheduling between 12:00 and 13:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel12as13
   has_hours_between_13_and_14_available:
+    description: Whether the mask enables visit scheduling between 13:00 and 14:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel13as14
   has_hours_between_14_and_15_available:
+    description: Whether the mask enables visit scheduling between 14:00 and 15:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel14as15
   has_hours_between_15_and_16_available:
+    description: Whether the mask enables visit scheduling between 15:00 and 16:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel15as16
   has_hours_between_16_and_17_available:
+    description: Whether the mask enables visit scheduling between 16:00 and 17:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel16as17
   has_hours_between_17_and_18_available:
+    description: Whether the mask enables visit scheduling between 17:00 and 18:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel17as18
   has_hours_between_18_and_19_available:
+    description: Whether the mask enables visit scheduling between 18:00 and 19:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel18as19
   has_hours_between_19_and_20_available:
+    description: Whether the mask enables visit scheduling between 19:00 and 20:00 on this weekday.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.horarios_disponivel19as20
   ts_created:
+    description: Timestamp when the weekly hour mask row was created in EBDB.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.criadoem
   ts_updated:
+    description: Timestamp of the last update to the weekly hour mask in EBDB.
     lineage:
       - datalake_ebdb_raw.horariosemanalmascara.atualizadoem

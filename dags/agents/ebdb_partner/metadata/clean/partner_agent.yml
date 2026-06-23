@@ -1,25 +1,37 @@
+---
 database_name: datalake_ebdb_clean
 table_name: partner_agent
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Links application users to partner companies as registered 3P agents or broker admins in EBDB.
+  One row per partner–user membership with role type and lifecycle status on the Marketplace network.
 columns:
   id:
+    description: Surrogate primary key of the partner-agent membership row in EBDB.
     lineage:
       - datalake_ebdb_raw.partneragent.id
   id_partner:
+    description: Foreign key to the partner company this user is affiliated with.
     lineage:
       - datalake_ebdb_raw.partneragent.partner_id
   id_user:
+    description: Main application user id of the person acting as partner agent or admin.
     lineage:
       - datalake_ebdb_raw.partneragent.user_id
   type:
+    description: Role type of the user within the partner organization (e.g. agent, admin).
     lineage:
       - datalake_ebdb_raw.partneragent.type
   status:
+    description: Current membership status of the user on the partner account (active, inactive, etc.).
     lineage:
       - datalake_ebdb_raw.partneragent.status
   ts_updated:
+    description: Timestamp of the last update to this partner-agent membership in EBDB.
     lineage:
       - datalake_ebdb_raw.partneragent.atualizadoem
   ts_created:
+    description: Timestamp when the partner-agent membership was created in EBDB.
     lineage:
       - datalake_ebdb_raw.partneragent.criadoem

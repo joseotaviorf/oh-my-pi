@@ -1,79 +1,110 @@
+---
 database_name: datalake_ebdb_clean
 table_name: affiliate_data_aud
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Hibernate Envers audit history for affiliate program profiles (DadosAfiliado) in EBDB. One row per
+  revision capturing changes to activation, geography, verification, commission counters, and related
+  affiliate attributes.
 columns:
   id_affiliate_data:
+    description: Primary key of the affiliate profile entity captured in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.id
   rev:
+    description: Envers revision number identifying the transaction that produced this audit row.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.revtype
   is_active:
+    description: Active flag value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.ativo
   operation_city:
+    description: Operating city value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.cidadeatuacao
   count_leads_sheet:
+    description: Lead counter from the affiliate tracking spreadsheet at this revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.contadorplanilhadeleads
   closed_contracts:
+    description: Number of closed contracts attributed to the affiliate in this revision snapshot.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.contratosfechados
   id_gdocs_sheet:
+    description: Google Sheets document id linked to the affiliate in this revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.idplanilhagdocs
   ts_operation_start:
+    description: Operation start timestamp value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.inicioatuacao
   payment_preference:
+    description: Payment preference value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.preferenciapagamento
   main_operation_neighborhoods:
+    description: Primary neighborhoods of operation stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.principaisbairrosatuacao
   affiliate_type_old:
+    description: Legacy affiliate type value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.tipoafiliado
   ts_last_commission_calculation_indicated:
+    description: Last commission calculation timestamp stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.ultimocalculocomissaoindicado
   id_user:
+    description: Application user id of the affiliate in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.usuario_id
   is_verified:
+    description: Verification flag value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.verificado
   id_indicated_by:
+    description: Referrer user id stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.indicadopor_id
   mod_is_active:
+    description: Envers flag indicating the active status changed in this revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.ativo_mod
   creci_number:
+    description: CRECI license number stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.numerocreci
   ts_card_sent_communication:
+    description: Card shipment communication timestamp stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.datacomunicacaoenviocartao
   last_week_balance_communication:
+    description: Week label of the last balance communication stored in this revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.semanaultimacomunicacaobalanco
   is_roof_topper:
+    description: Roof Topper program flag value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.rooftopper
   mod_is_roof_topper:
+    description: Envers flag indicating the Roof Topper flag changed in this revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.rooftopper_mod
   origin:
+    description: Signup origin value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.origin
   affiliate_type:
+    description: Current affiliate type value stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.affiliatetype
   id_doorman_affiliate_data:
+    description: Linked doorman affiliate profile id stored in this audit revision.
     lineage:
       - datalake_ebdb_raw.dadosafiliado_aud.doormanaffiliatedata_id

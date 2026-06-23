@@ -1,67 +1,95 @@
+---
 database_name: datalake_ebdb_clean
 table_name: partner
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Registered partner real-estate companies (imobiliárias) in EBDB that operate on QuintoAndar's
+  Marketplace / Rede network. One row per partner with legal identity, contact, address, and
+  partnership start metadata sourced from the Partner table. Consumed by Marketplace broker analytics
+  and Rede partner operations reporting.
 columns:
   id:
+    description: Surrogate primary key of the partner company in EBDB.
     lineage:
       - datalake_ebdb_raw.partner.id
   id_amplitude_device:
+    description: Amplitude device id captured when the partner registered or interacted in tracking flows.
     lineage:
       - datalake_ebdb_raw.partner.amplitudedeviceid
   id_state:
+    description: Foreign key to the EBDB state (UF) where the partner is registered.
     lineage:
       - datalake_ebdb_raw.partner.state_id
   uuid_company:
+    description: Company UUID in the internal Company service backing Magic Link partner onboarding.
     lineage:
       - datalake_ebdb_raw.partner.companyuuid
   name:
+    description: Legal or display name of the partner real-estate company.
     lineage:
       - datalake_ebdb_raw.partner.name
   phone:
+    description: Main contact phone number registered for the partner company.
     lineage:
       - datalake_ebdb_raw.partner.phone
   cnpj:
+    description: Brazilian corporate tax identifier (CNPJ) of the partner company.
     lineage:
       - datalake_ebdb_raw.partner.cnpj
   creci:
+    description: CRECI brokerage license number registered for the partner company.
     lineage:
       - datalake_ebdb_raw.partner.creci
   email:
+    description: Primary business email address of the partner company.
     lineage:
       - datalake_ebdb_raw.partner.email
   address:
+    description: Street address of the partner company's registered office.
     lineage:
       - datalake_ebdb_raw.partner.address
   number:
+    description: Street number component of the partner address.
     lineage:
       - datalake_ebdb_raw.partner.number
   complement:
+    description: Address complement such as suite, floor, or building reference.
     lineage:
       - datalake_ebdb_raw.partner.complement
   city:
+    description: City where the partner company is registered.
     lineage:
       - datalake_ebdb_raw.partner.city
   neighborhood:
+    description: Neighborhood (bairro) of the partner registered address.
     lineage:
       - datalake_ebdb_raw.partner.neighborhood
   zip_code:
+    description: Postal code (CEP) of the partner registered address.
     lineage:
       - datalake_ebdb_raw.partner.zipcode
   type:
+    description: Partner classification type in EBDB (e.g. network broker category).
     lineage:
       - datalake_ebdb_raw.partner.type
   landing_url:
+    description: Custom landing page URL assigned to the partner for lead capture or branding.
     lineage:
       - datalake_ebdb_raw.partner.landingurl
   trade_name:
+    description: Trade name (nome fantasia) used commercially by the partner company.
     lineage:
       - datalake_ebdb_raw.partner.tradename
   ts_partnership_started:
+    description: Timestamp when the partner officially started operating on the QuintoAndar network.
     lineage:
       - datalake_ebdb_raw.partner.partnershipstartsat
   ts_created:
+    description: Timestamp when the partner record was created in EBDB.
     lineage:
       - datalake_ebdb_raw.partner.criadoem
   ts_updated:
+    description: Timestamp of the last update to the partner record in EBDB.
     lineage:
       - datalake_ebdb_raw.partner.atualizadoem
