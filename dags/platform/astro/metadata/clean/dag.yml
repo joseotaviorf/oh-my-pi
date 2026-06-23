@@ -1,95 +1,206 @@
 ---
 database_name: datalake_astro_clean
 table_name: dag
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for DAG definition metadata exported from the Astronomer (Astro) production Airflow
+  internal metadata database. One row per registered DAG per daily export snapshot, keyed by
+  id_dag within the partition. Captures schedule, pause/active flags, ownership, file location,
+  and next-run scheduling hints as seen by the Astro scheduler. Consumed by Data Platform
+  observability analytics and merged downstream in enrich_airflow with legacy Composer metadata.
+  Part of the astro ingestion DAG. Partitioned by year, month, and day (export snapshot date).
+  Always filter on year, month, and day in WHERE clauses to enable partition pruning and avoid
+  full table scans; align partition filters with the ts_last_parsed or ts_next_dagrun window
+  being analyzed. Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
 columns:
   id_dag:
+    description: |
+      Airflow DAG identifier (DAG name). Primary business key for joining to dag_run, task_instance,
+      serialized_dag, and other Astro metadata tables within the same export partition.
     lineage:
       - datalake_astro_raw.dag.dag_id
   id_pickle:
+    description: |
+      Foreign key to the latest serialized pickle snapshot for this DAG in the Astro metadata store.
+      Null when the DAG has never been pickled or only exists as a serialized JSON definition.
     lineage:
       - datalake_astro_raw.dag.pickle_id
   id_root_dag:
+    description: |
+      Parent DAG identifier when this row represents a sub-DAG embedded inside another DAG file.
+      Null for top-level DAGs that are not nested under a TaskGroup subdag construct.
     lineage:
       - datalake_astro_raw.dag.root_dag_id
   dag_display_name:
+    description: |
+      Human-readable DAG title shown in the Astro UI when the DAG author sets an explicit display
+      name; falls back to id_dag when unset.
     lineage:
       - datalake_astro_raw.dag.dag_display_name
   dataset_expression:
+    description: |
+      Serialized logical expression defining which Airflow Datasets must update before this DAG is
+      eligible for dataset-triggered scheduling (Airflow 2.4+ data-aware scheduling).
     lineage:
       - datalake_astro_raw.dag.dataset_expression
   default_view:
+    description: |
+      Default Astro UI view preference for this DAG (grid, graph, duration, gantt, or landing_times).
+      Controls which tab opens first when an operator inspects the DAG in the web interface.
     lineage:
       - datalake_astro_raw.dag.default_view
+  description:
+    description: |
+      Docstring or metadata description of the DAG purpose as stored in the Astro internal
+      metadata database (distinct from this governance table description).
     lineage:
+      - datalake_astro_raw.dag.description
   fileloc:
+    description: |
+      Absolute filesystem path to the Python module where the DAG object is defined inside the
+      Astro deployment image or DAG bundle.
     lineage:
       - datalake_astro_raw.dag.fileloc
   last_pickled:
+    description: |
+      Timestamp when Airflow last serialized this DAG into a pickle blob for faster scheduler parsing.
+      Reflects the most recent successful pickle write, not the latest DAG run.
     lineage:
       - datalake_astro_raw.dag.last_pickled
   owners:
+    description: |
+      Comma-separated list of owner emails or team handles declared on the DAG, used for alerting
+      routing and ownership attribution in observability dashboards.
     lineage:
       - datalake_astro_raw.dag.owners
   schedule_interval:
+    description: |
+      Cron expression, timedelta, or preset string describing how often the scheduler should create
+      new DAG runs. Null for manually triggered or dataset-only DAGs without a timetable.
     lineage:
       - datalake_astro_raw.dag.schedule_interval
   scheduler_lock:
+    description: |
+      Boolean flag indicating whether a scheduler process currently holds the lock to parse and
+      schedule this DAG. True while active scheduling is in progress for this definition.
     lineage:
       - datalake_astro_raw.dag.scheduler_lock
   processor_subdir:
+    description: |
+      Base directory used by the DAG file processor that last parsed this DAG definition inside the
+      Astro deployment, relevant when multiple DAG bundles coexist.
     lineage:
       - datalake_astro_raw.dag.processor_subdir
+  timetable_description:
+    description: |
+      Human-readable schedule summary from the Astro timetable implementation, when available
+      beyond the raw schedule_interval cron string.
     lineage:
+      - datalake_astro_raw.dag.timetable_description
   max_active_runs:
+    description: |
+      Upper limit on concurrent DAG runs in a running or queued state. The scheduler stops creating
+      new runs once this cap is reached for the DAG.
     lineage:
       - datalake_astro_raw.dag.max_active_runs
   max_active_tasks:
+    description: |
+      Maximum number of task instances from this DAG allowed to run concurrently across all active
+      DAG runs, enforcing parallelism throttling at the DAG level.
     lineage:
       - datalake_astro_raw.dag.max_active_tasks
   max_consecutive_failed_dag_runs:
+    description: |
+      Experimental threshold of consecutive failed DAG runs after which the scheduler automatically
+      pauses the DAG to prevent runaway failure loops.
     lineage:
       - datalake_astro_raw.dag.max_consecutive_failed_dag_runs
   has_import_errors:
+    description: |
+      True when the DAG file failed to import during the last processor scan, meaning the DAG is
+      broken and will not schedule until the Python error is fixed.
     lineage:
       - datalake_astro_raw.dag.has_import_errors
   has_task_concurrency_limits:
+    description: |
+      True when at least one task in this DAG declares an explicit concurrency limit (task-level
+      max_active_tis_per_dag or pool slot constraints).
     lineage:
       - datalake_astro_raw.dag.has_task_concurrency_limits
   is_active:
+    description: |
+      False when the DAG has been removed from the codebase or deactivated in metadata while
+      retaining historical run records; inactive DAGs are not scheduled.
     lineage:
       - datalake_astro_raw.dag.is_active
   is_paused:
+    description: |
+      True when an operator or the scheduler has paused the DAG, preventing new DAG runs from being
+      created until explicitly unpaused in the Astro UI or API.
     lineage:
       - datalake_astro_raw.dag.is_paused
   is_subdag:
+    description: |
+      True when this DAG row represents a sub-DAG embedded within a parent DAG rather than a
+      standalone top-level workflow registered in the Astro deployment.
     lineage:
       - datalake_astro_raw.dag.is_subdag
   ts_next_dagrun:
+    description: |
+      Scheduled timestamp for the next DAG run the scheduler intends to create, based on the DAG
+      timetable and the last created run.
     lineage:
       - datalake_astro_raw.dag.next_dagrun
   ts_next_dagrun_create_after:
+    description: |
+      Earliest timestamp after which the scheduler is allowed to materialize the run scheduled at
+      ts_next_dagrun, respecting catchup and create-after constraints.
     lineage:
       - datalake_astro_raw.dag.next_dagrun_create_after
   ts_next_dagrun_data_interval_start:
+    description: |
+      Start of the data interval assigned to the next scheduled DAG run, equivalent to the logical
+      start boundary for that run's processing window.
     lineage:
       - datalake_astro_raw.dag.next_dagrun_data_interval_start
   ts_next_dagrun_data_interval_end:
+    description: |
+      End of the data interval assigned to the next scheduled DAG run, marking the exclusive upper
+      bound of the logical processing window.
     lineage:
       - datalake_astro_raw.dag.next_dagrun_data_interval_end
   ts_last_parsed:
+    description: |
+      Timestamp when the DAG file processor last successfully parsed this DAG definition, indicating
+      how recently Astro refreshed scheduler state from source code.
     lineage:
       - datalake_astro_raw.dag.last_parsed_time
   ts_last_expired:
+    description: |
+      Timestamp when this DAG definition was marked expired in metadata, typically after removal
+      from the deployment or prolonged import failure.
     lineage:
       - datalake_astro_raw.dag.last_expired
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.dag.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.dag.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.dag.day

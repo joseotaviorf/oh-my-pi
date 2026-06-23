@@ -2,10 +2,21 @@
 database_name: datalake_astro_raw
 table_name: dagrun_dataset_event
 owner: gustavo.akashi@quintoandar.com.br
-domain: Data Ops & Governance 
-description: This table contains the events associated with a DAG run. This is an internal Airlfow metadata database table.
+domain: Data Ops & Governance
+description: |
+  Raw layer for the DAG-run-to-dataset-event junction table extracted from the Astronomer (Astro)
+  production Airflow internal metadata database. One row per link between a dataset-triggered DAG
+  run and the dataset update event that satisfied its scheduling condition. Grain is the composite
+  of dag_run_id and event_id per export batch. Landed before clean renaming to id_run and
+  id_event. Consumed by the astro clean transform and by Data Platform observability pipelines
+  tracing dataset-aware scheduling causality. Partitioned by year, month, and day at the raw
+  bucket layout. Downstream clean queries should always filter year, month, and day for pruning.
 columns:
   dag_run_id:
-    description: The ID of the DAG run.
+    description: |
+      Numeric foreign key to the dag_run table in the Astro metadata database, identifying the
+      DAG run that was created because linked dataset events became available for scheduling.
   event_id:
-    description: The ID of the event associated with the DAG run.
+    description: |
+      Numeric foreign key to the dataset_event table in the Astro metadata database, identifying
+      the upstream dataset update event that contributed to triggering the linked DAG run.

@@ -1,36 +1,80 @@
 ---
 database_name: datalake_astro_clean
 table_name: serialized_dag
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for serialized DAG definition snapshots exported from the Astronomer (Astro)
+  production Airflow metadata database. One row per DAG per daily export containing the JSON
+  representation produced by the DAG processor, including task graph structure and operator
+  parameters. Grain is id_dag within the partition snapshot. Consumed by Data Platform
+  observability for DAG structure auditing, dependency analysis, and change detection via
+  dag_hash comparisons across export days. Part of the astro ingestion DAG. Partitioned by year,
+  month, and day (export snapshot date). Always filter on year, month, and day in WHERE clauses
+  to enable partition pruning and avoid full table scans; align filters with ts_last_updated.
+  Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
 columns:
   id_dag:
+    description: |
+      Airflow DAG identifier for this serialized definition. Primary key within the export
+      partition; join to dag.id_dag for scheduling metadata and to dag_run for run history.
     lineage:
       - datalake_astro_raw.serialized_dag.dag_id
   json_data:
+    description: |
+      JSON blob containing the full serialized DAG structure as stored by Airflow's DAG processor,
+      including tasks, dependencies, operator types, and default arguments at parse time.
     lineage:
       - datalake_astro_raw.serialized_dag.data
   fileloc:
+    description: |
+      Absolute filesystem path to the Python module where this DAG was parsed, matching the
+      fileloc in the dag table for cross-validation of definition sources.
     lineage:
       - datalake_astro_raw.serialized_dag.fileloc
   fileloc_hash:
+    description: |
+      Hash fingerprint of the fileloc path string, used internally by Airflow to detect file moves
+      or renames that affect DAG processor caching behavior.
     lineage:
       - datalake_astro_raw.serialized_dag.fileloc_hash
   dag_hash:
+    description: |
+      Content hash of the serialized DAG structure, enabling detection of code changes between
+      export snapshots even when id_dag remains stable.
     lineage:
       - datalake_astro_raw.serialized_dag.dag_hash
   processor_subdir:
+    description: |
+      Base directory used by the DAG file processor that produced this serialized snapshot inside
+      the Astro deployment, relevant when multiple DAG bundles are configured.
     lineage:
       - datalake_astro_raw.serialized_dag.processor_subdir
   ts_last_updated:
+    description: |
+      Timestamp when this serialized DAG row was last refreshed in the Astro metadata database,
+      reflecting the most recent successful parse of the DAG source file.
     lineage:
       - datalake_astro_raw.serialized_dag.last_updated
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.serialized_dag.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.serialized_dag.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.serialized_dag.day

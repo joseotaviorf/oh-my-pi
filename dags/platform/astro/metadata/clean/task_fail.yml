@@ -1,39 +1,86 @@
 ---
 database_name: datalake_astro_clean
 table_name: task_fail
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for failed task attempt records exported from the Astronomer (Astro) production
+  Airflow metadata database. One row per recorded task failure with start/end timestamps and
+  duration, keyed by id_fail within the export partition. Complements task_instance by preserving
+  failure history even after retries succeed. Consumed by Data Platform observability for failure
+  rate analytics and MTTR investigations; merged downstream in enrich_airflow with Composer
+  task_fail history. Part of the astro ingestion DAG. Partitioned by year, month, and day (export
+  snapshot date). Always filter on year, month, and day in WHERE clauses to enable partition
+  pruning and avoid full table scans; align filters with ts_started date ranges.
+  Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
 columns:
   id_fail:
+    description: |
+      Surrogate numeric primary key of the task failure record in the Astro metadata database.
+      Unique identifier for each distinct failed attempt captured in the task_fail table.
     lineage:
       - datalake_astro_raw.task_fail.id
   id_dag:
+    description: |
+      Airflow DAG identifier of the workflow containing the failed task. Join to dag_run and
+      task_instance on id_dag plus id_run for full run context.
     lineage:
       - datalake_astro_raw.task_fail.dag_id
   id_task:
+    description: |
+      Task identifier within id_dag that failed. Together with id_dag, id_run, and map_index
+      locates the specific task instance attempt in task_instance.
     lineage:
       - datalake_astro_raw.task_fail.task_id
   id_run:
+    description: |
+      String run identifier of the DAG run during which this task failure occurred, joinable to
+      dag_run.id_run within the same id_dag.
     lineage:
       - datalake_astro_raw.task_fail.run_id
   map_index:
+    description: |
+      Map index of the mapped task instance when the failure occurred on a dynamically mapped
+      task; -1 or null for standard non-mapped task instances.
     lineage:
       - datalake_astro_raw.task_fail.map_index
   duration:
+    description: |
+      Wall-clock seconds the failed task attempt ran before terminating, computed from start to
+      end timestamps. Useful for distinguishing quick failures from long-running timeouts.
     lineage:
       - datalake_astro_raw.task_fail.duration
   ts_started:
+    description: |
+      Timestamp when the failed task attempt began executing on a worker, marking the start of
+      the attempt that ultimately recorded a failure.
     lineage:
       - datalake_astro_raw.task_fail.start_date
   ts_ended:
+    description: |
+      Timestamp when the failed task attempt terminated, either by exception, timeout, or
+      executor kill signal before any retry was scheduled.
     lineage:
       - datalake_astro_raw.task_fail.end_date
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.task_fail.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.task_fail.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.task_fail.day

@@ -1,39 +1,86 @@
 ---
 database_name: datalake_astro_clean
 table_name: dataset_event
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for Airflow Dataset update events exported from the Astronomer (Astro) production
+  metadata database. One row per dataset outlet event emitted when a task marks a dataset as
+  updated (data-aware scheduling). Links the producing task and run to the affected dataset via
+  id_dataset. Consumed by Data Platform observability to trace which task runs produced dataset
+  updates and to debug dataset-triggered DAG scheduling chains. Part of the astro ingestion DAG.
+  Partitioned by year, month, and day (export snapshot date). Always filter on year, month, and
+  day in WHERE clauses to enable partition pruning and avoid full table scans; align partition
+  filters with ts_event_created date ranges. Example: WHERE year = 2026 AND month = 6 AND day
+  BETWEEN 1 AND 7.
 columns:
   id:
+    description: |
+      Surrogate numeric primary key of the dataset event row in the Astro metadata database.
+      Referenced by dagrun_dataset_event.id_event when a DAG run is triggered by this update.
     lineage:
       - datalake_astro_raw.dataset_event.id
   id_dataset:
+    description: |
+      Foreign key to dataset.id identifying which Dataset URI was updated by the producing task.
+      Join to dataset.uri for the human-readable dataset location string.
     lineage:
       - datalake_astro_raw.dataset_event.dataset_id
   id_source_dag:
+    description: |
+      Airflow DAG identifier of the task that emitted this dataset update event, identifying the
+      upstream workflow responsible for producing the dataset change.
     lineage:
       - datalake_astro_raw.dataset_event.source_dag_id
   id_source_task:
+    description: |
+      Task identifier within id_source_dag that declared the dataset outlet and triggered this
+      event upon successful completion or explicit dataset emission.
     lineage:
       - datalake_astro_raw.dataset_event.source_task_id
   id_source_run:
+    description: |
+      String run identifier of the DAG run during which the producing task emitted this dataset
+      update, joinable to dag_run.id_run within the same id_source_dag.
     lineage:
       - datalake_astro_raw.dataset_event.source_run_id
   source_map_index:
+    description: |
+      Map index of the mapped task instance that produced this event when the source task uses
+      dynamic task mapping; -1 or null for standard non-mapped task instances.
     lineage:
       - datalake_astro_raw.dataset_event.source_map_index
   extra:
+    description: |
+      JSON payload with optional metadata attached to the dataset event by the emitting operator,
+      such as partition keys or custom lineage attributes beyond the dataset URI.
     lineage:
       - datalake_astro_raw.dataset_event.extra
   ts_event_created:
+    description: |
+      Timestamp when Airflow recorded this dataset update event in metadata, marking when the
+      producing task declared the dataset outlet as satisfied for scheduling purposes.
     lineage:
       - datalake_astro_raw.dataset_event.timestamp
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.dataset_event.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.dataset_event.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.dataset_event.day

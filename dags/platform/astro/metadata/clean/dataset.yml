@@ -1,30 +1,68 @@
 ---
 database_name: datalake_astro_clean
 table_name: dataset
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for Airflow Dataset entity metadata exported from the Astronomer (Astro) production
+  metadata database. One row per registered Dataset URI per daily export snapshot. Datasets are
+  the data-aware scheduling primitives (Airflow 2.4+) that DAGs declare as inlets/outlets; this
+  table holds the canonical URI and orphan status for each dataset known to Astro. Consumed by
+  Data Platform observability to map dataset-triggered DAG dependencies and audit orphaned
+  datasets no longer referenced by active tasks. Part of the astro ingestion DAG. Partitioned by
+  year, month, and day (export snapshot date). Always filter on year, month, and day in WHERE
+  clauses to enable partition pruning and avoid full table scans; align partition filters with
+  ts_updated or ts_created date ranges. Example: WHERE year = 2026 AND month = 6 AND day = 15.
 columns:
   id:
+    description: |
+      Surrogate numeric primary key of the Dataset row in the Astro metadata database. Join to
+      dataset_event.id_dataset and dagrun_dataset_event via event linkage tables.
     lineage:
       - datalake_astro_raw.dataset.id
   uri:
+    description: |
+      Canonical Airflow Dataset URI string (e.g. s3://bucket/path, hive://schema.table) uniquely
+      identifying the data asset producers update and consumers wait on for scheduling.
     lineage:
       - datalake_astro_raw.dataset.uri
   is_orphaned:
+    description: |
+      True when no active DAG task currently declares this dataset as an inlet or outlet, meaning
+      the dataset exists in metadata but is not part of any live data-aware dependency graph.
     lineage:
       - datalake_astro_raw.dataset.is_orphaned
   ts_created:
+    description: |
+      Timestamp when this Dataset entity was first registered in the Astro metadata database,
+      typically when a task first emitted a dataset outlet event for this URI.
     lineage:
       - datalake_astro_raw.dataset.created_at
   ts_updated:
+    description: |
+      Timestamp when the Dataset row was last modified in metadata, such as when orphan status
+      changed after DAG code updates removed all references to this URI.
     lineage:
       - datalake_astro_raw.dataset.updated_at
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.dataset.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.dataset.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.dataset.day

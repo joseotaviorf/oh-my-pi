@@ -1,51 +1,110 @@
 ---
 database_name: datalake_astro_clean
 table_name: log
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for structured Airflow log events exported from the Astronomer (Astro) production
+  metadata database. One row per log event recorded by the scheduler, executor, or task lifecycle
+  hooks (not raw task stdout). Captures event type, owning component, and linkage to DAG, task,
+  and run context. Consumed by Data Platform observability for scheduler diagnostics, failure
+  forensics, and audit trails; merged downstream in enrich_airflow with Composer log history.
+  Part of the astro ingestion DAG. Partitioned by year, month, and day (export snapshot date).
+  Always filter on year, month, and day in WHERE clauses to enable partition pruning and avoid
+  full table scans; align partition filters with ts_event date ranges. Example: WHERE year = 2026
+  AND month = 6 AND day BETWEEN 1 AND 7.
 columns:
   id_log:
+    description: |
+      Surrogate numeric primary key of the log event row in the Astro metadata database. Unique
+      within the export partition; use with partition predicates when joining to other tables.
     lineage:
       - datalake_astro_raw.log.id
   id_dag:
+    description: |
+      Airflow DAG identifier associated with this log event. Null for global scheduler events not
+      tied to a specific DAG context.
     lineage:
       - datalake_astro_raw.log.dag_id
   id_task:
+    description: |
+      Task identifier within id_dag when the log event relates to a specific task instance lifecycle
+      transition; null for DAG-level or scheduler-wide events.
     lineage:
       - datalake_astro_raw.log.task_id
   id_run:
+    description: |
+      String run identifier linking this log event to a specific DAG run within id_dag, joinable
+      to dag_run.id_run for run-level context.
     lineage:
       - datalake_astro_raw.log.run_id
   event:
+    description: |
+      Airflow event name describing what occurred (e.g. scheduler heartbeat, task state change,
+      executor callback). Used to filter log streams by lifecycle phase in observability queries.
     lineage:
       - datalake_astro_raw.log.event
   extra:
+    description: |
+      JSON payload with structured details attached to the log event, such as state transitions,
+      exception traces, or scheduler decision metadata beyond the event name.
     lineage:
       - datalake_astro_raw.log.extra
   owner:
+    description: |
+      Internal Airflow component that emitted the log event (e.g. scheduler, executor, worker),
+      identifying which subsystem produced the record.
     lineage:
       - datalake_astro_raw.log.owner
   owner_display_name:
+    description: |
+      Human-readable label for the emitting Airflow component shown in the Astro UI log viewer,
+      corresponding to owner but formatted for display.
     lineage:
       - datalake_astro_raw.log.owner_display_name
   map_index:
+    description: |
+      Map index of the mapped task instance when the log event originates from a dynamically mapped
+      task; -1 or null for standard non-mapped task instances.
     lineage:
       - datalake_astro_raw.log.map_index
   try_number:
+    description: |
+      Attempt number of the task instance when the event was recorded, incrementing on retries and
+      clears to distinguish first-run events from retry cycles.
     lineage:
       - datalake_astro_raw.log.try_number
   ts_event:
+    description: |
+      Timestamp when Airflow recorded this log event in metadata, used as the primary temporal axis
+      for ordering events within a DAG run or task instance.
     lineage:
       - datalake_astro_raw.log.dttm
   ts_executed:
+    description: |
+      Legacy execution date (logical date) associated with the log event's DAG run context,
+      retained for compatibility with Airflow 1.x execution_date semantics in analytics.
     lineage:
       - datalake_astro_raw.log.execution_date
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.log.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.log.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.log.day

@@ -1,72 +1,154 @@
 ---
 database_name: datalake_astro_clean
 table_name: dag_run
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for DAG run execution records exported from the Astronomer (Astro) production
+  Airflow metadata database. One row per DAG run (id is the numeric primary key; id_run is the
+  string run identifier unique within id_dag). Tracks run state, trigger type, data interval,
+  and lifecycle timestamps from queue through completion. Consumed by Data Platform observability
+  for SLA monitoring, failure triage, and runtime analytics; upstream source for enrich_airflow
+  dag_run consolidation with legacy Composer runs. Part of the astro ingestion DAG. Partitioned
+  by year, month, and day (derived from run start or export snapshot). Always filter on year,
+  month, and day in WHERE clauses to enable partition pruning and avoid full table scans; align
+  partition filters with ts_started or ts_executed date ranges. Example: WHERE year = 2026 AND
+  month = 6 AND day BETWEEN 1 AND 7.
 columns:
   id:
+    description: |
+      Surrogate numeric primary key of the DAG run row in the Astro metadata database. Used as the
+      merge key in enrich_airflow (Astro rows receive an offset to avoid Composer ID collisions).
     lineage:
       - datalake_astro_raw.dag_run.id
   id_dag:
+    description: |
+      Airflow DAG identifier this run belongs to. Join to dag.id_dag and task_instance.id_dag to
+      enrich run records with DAG definition and task-level detail.
     lineage:
       - datalake_astro_raw.dag_run.dag_id
   id_run:
+    description: |
+      String run identifier assigned by Airflow (e.g. scheduled__2026-06-01T00:00:00+00:00 or
+      manual__2026-06-01T12:00:00+00:00). Unique per id_dag but not globally across DAGs.
     lineage:
       - datalake_astro_raw.dag_run.run_id
   id_log_template:
+    description: |
+      Foreign key to the log template configuration used when writing structured task logs for
+      this DAG run in Astro's logging subsystem.
     lineage:
       - datalake_astro_raw.dag_run.log_template_id
   id_creating_job:
+    description: |
+      Identifier of the scheduler or triggerer job that created this DAG run row, useful for
+      correlating run creation with a specific scheduler heartbeat cycle.
     lineage:
       - datalake_astro_raw.dag_run.creating_job_id
   state:
+    description: |
+      Current lifecycle state of the DAG run in Airflow (e.g. queued, running, success, failed).
+      Terminal states success and failed indicate the run finished; running means tasks may still
+      be executing.
     lineage:
       - datalake_astro_raw.dag_run.state
   run_type:
+    description: |
+      How the DAG run was initiated: scheduled (timetable), manual (UI/API trigger), backfill,
+      or dataset_triggered (data-aware scheduling satisfied a dataset expression).
     lineage:
       - datalake_astro_raw.dag_run.run_type
   configuration:
+    description: |
+      JSON or pickled configuration payload passed when the run was triggered, containing operator
+      overrides such as conf parameters from a manual trigger or backfill request.
     lineage:
       - datalake_astro_raw.dag_run.conf
   dag_hash:
+    description: |
+      Hash fingerprint of the DAG structure at run creation time, allowing detection of runs
+      executed against a different DAG code version than the current definition.
     lineage:
       - datalake_astro_raw.dag_run.dag_hash
   clear_number:
+    description: |
+      Incrementing counter tracking how many times this logical run slot was cleared and re-run
+      via the Airflow clear operation, distinguishing fresh runs from repeated attempts.
     lineage:
       - datalake_astro_raw.dag_run.clear_number
   had_external_trigger:
+    description: |
+      True when the DAG run was initiated by an external trigger (UI button, REST API, or CLI)
+      rather than the internal scheduler timetable alone.
     lineage:
       - datalake_astro_raw.dag_run.external_trigger
   ts_last_scheduling_decision:
+    description: |
+      Timestamp of the scheduler's most recent attempt to schedule task instances belonging to
+      this DAG run, reflecting ongoing scheduling activity while the run is non-terminal.
     lineage:
       - datalake_astro_raw.dag_run.last_scheduling_decision
   ts_data_interval_started:
+    description: |
+      Inclusive start of the data interval (logical date boundary) this run processes. Equivalent
+      to the logical date lower bound in Airflow 2.x data-interval semantics.
     lineage:
       - datalake_astro_raw.dag_run.data_interval_start
   ts_data_interval_ended:
+    description: |
+      Exclusive end of the data interval this run processes, marking the upper boundary of the
+      logical processing window for scheduled and backfill runs.
     lineage:
       - datalake_astro_raw.dag_run.data_interval_end
   ts_updated:
+    description: |
+      Timestamp when this DAG run row was last modified in the Astro metadata database, used as
+      the incremental watermark for enrich_airflow merge updates.
     lineage:
       - datalake_astro_raw.dag_run.updated_at
   ts_executed:
+    description: |
+      Legacy execution date of the DAG run, aligned with the logical date in Airflow 1.x semantics
+      and still populated for compatibility in mixed-version analytics.
     lineage:
       - datalake_astro_raw.dag_run.execution_date
   ts_queued:
+    description: |
+      Timestamp when the DAG run entered the queued state, waiting for an executor slot before
+      task instances begin running.
     lineage:
       - datalake_astro_raw.dag_run.queued_at
   ts_started:
+    description: |
+      Timestamp when the first task instance in this DAG run started executing, marking the
+      beginning of wall-clock runtime for the run.
     lineage:
       - datalake_astro_raw.dag_run.start_date
   ts_ended:
+    description: |
+      Timestamp when the DAG run reached a terminal state (success or failed). Null while the run
+      is still queued, running, or otherwise in progress.
     lineage:
       - datalake_astro_raw.dag_run.end_date
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.dag_run.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.dag_run.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.dag_run.day

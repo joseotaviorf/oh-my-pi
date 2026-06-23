@@ -2,26 +2,51 @@
 database_name: datalake_astro_clean
 table_name: dagrun_dataset_event
 owner: gustavo.akashi@quintoandar.com.br
-domain: Data Ops & Governance 
-description: This table contains the events associated with a DAG run.
+domain: Data Ops & Governance
+description: |
+  Clean layer for the DAG-run-to-dataset-event junction table exported from the Astronomer (Astro)
+  production Airflow metadata database. One row links a dataset-triggered DAG run (id_run) to each
+  dataset update event (id_event) that satisfied its scheduling condition. Grain is the composite
+  of id_run and id_event within the export partition. Consumed by Data Platform observability to
+  explain why a dataset-triggered DAG run was created and which upstream dataset updates caused it.
+  Part of the astro ingestion DAG. Partitioned by year, month, and day (export snapshot date).
+  Always filter on year, month, and day in WHERE clauses to enable partition pruning and avoid
+  full table scans; join to dag_run and dataset_event on the same partition predicates.
+  Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
 columns:
   id_run:
-    description: The ID of the DAG run.
+    description: |
+      Foreign key to dag_run.id identifying the dataset-triggered DAG run that was created because
+      one or more linked dataset events became available. Pair with id_event for the full junction
+      grain.
     lineage:
       - datalake_astro_raw.dagrun_dataset_event.dag_run_id
   id_event:
-    description: The ID of the event associated with the DAG run.
+    description: |
+      Foreign key to dataset_event.id identifying the upstream dataset update event that contributed
+      to triggering the linked DAG run. A single run may link to multiple events when a dataset
+      expression requires several updates.
     lineage:
       - datalake_astro_raw.dagrun_dataset_event.event_id
   year:
-    description: The year of the event.
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.dagrun_dataset_event.year
   month:
-    description: The month of the event.
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.dagrun_dataset_event.month
   day:
-    description: The day of the event.
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.dagrun_dataset_event.day

@@ -1,96 +1,201 @@
 ---
 database_name: datalake_astro_clean
 table_name: task_instance_history
-owner: gustavo.miller@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Platform
+description: |
+  Clean layer for Airflow task instance history records exported from the Astronomer (Astro)
+  production metadata database. One row per historical state snapshot of a task instance,
+  preserving state transitions beyond the current row in task_instance (Airflow 2.x history
+  table). Grain matches task_instance: (id_task, id_dag, id_run, map_index) plus history
+  versioning within the export partition. Consumed by Data Platform observability for retry
+  timeline reconstruction and state-transition auditing. Part of the astro ingestion DAG.
+  Partitioned by year, month, and day (export snapshot date). Always filter on year, month, and
+  day in WHERE clauses to enable partition pruning and avoid full table scans; align partition
+  filters with ts_started or ts_updated date ranges. Example: WHERE year = 2026 AND month = 6
+  AND day BETWEEN 1 AND 7.
 columns:
   id_task:
+    description: |
+      Task identifier within the DAG for this historical snapshot. Together with id_dag, id_run,
+      and map_index locates the task instance whose past state is recorded here.
     lineage:
       - datalake_astro_raw.task_instance_history.task_id
   id_dag:
+    description: |
+      Airflow DAG identifier containing the task instance whose historical state is captured in
+      this row. Join to dag_run for run-level scheduling context.
     lineage:
       - datalake_astro_raw.task_instance_history.dag_id
   id_run:
+    description: |
+      String run identifier of the DAG run during which this historical task instance state was
+      recorded, joinable to dag_run.id_run within the same id_dag.
     lineage:
       - datalake_astro_raw.task_instance_history.run_id
   id_queued_by_job:
+    description: |
+      Identifier of the scheduler job that queued this task instance for the historical attempt
+      captured in this snapshot row.
     lineage:
       - datalake_astro_raw.task_instance_history.queued_by_job_id
   id_process:
+    description: |
+      Operating-system process ID of the worker process that ran this historical task instance
+      attempt on the worker node.
     lineage:
       - datalake_astro_raw.task_instance_history.pid
   id_trigger:
+    description: |
+      Foreign key to the deferrable trigger record when this historical snapshot reflects a
+      deferred task instance waiting on an async triggerer callback.
     lineage:
       - datalake_astro_raw.task_instance_history.trigger_id
   id_job:
+    description: |
+      Foreign key to the Airflow job record associated with this historical task instance
+      execution attempt in the Astro metadata database.
     lineage:
       - datalake_astro_raw.task_instance_history.job_id
   task_state:
+    description: |
+      Task instance state at the time this history row was written (e.g. queued, running,
+      success, failed). Use ordered ts_updated to reconstruct the full state transition timeline.
     lineage:
       - datalake_astro_raw.task_instance_history.state
   hostname:
+    description: |
+      Hostname of the worker node where this historical task instance attempt executed, enabling
+      worker-level failure pattern analysis across retries.
     lineage:
       - datalake_astro_raw.task_instance_history.hostname
   unixname:
+    description: |
+      Unix username under which the worker process ran this historical task instance attempt on
+      the worker node.
     lineage:
       - datalake_astro_raw.task_instance_history.unixname
   pool:
+    description: |
+      Airflow pool name that governed concurrency for this task instance at the time of this
+      historical snapshot.
     lineage:
       - datalake_astro_raw.task_instance_history.pool
   queue:
+    description: |
+      Executor queue name that routed this historical task instance attempt to a specific worker
+      pool in the Astro deployment.
     lineage:
       - datalake_astro_raw.task_instance_history.queue
   operator:
+    description: |
+      Fully qualified Python class name of the operator for this historical task instance
+      snapshot, identifying the task type at the time of the recorded state.
     lineage:
       - datalake_astro_raw.task_instance_history.operator
   custom_operator_name:
+    description: |
+      Optional custom display name for the operator on this historical snapshot when the DAG
+      author overrides the default operator label.
     lineage:
       - datalake_astro_raw.task_instance_history.custom_operator_name
   executor:
+    description: |
+      Executor type that handled this historical task instance attempt (e.g. CeleryExecutor,
+      KubernetesExecutor), as recorded at snapshot time.
     lineage:
       - datalake_astro_raw.task_instance_history.executor
   task_display_name:
+    description: |
+      Human-readable task label for this historical snapshot shown in the Astro UI when an
+      explicit display name is configured on the task.
     lineage:
       - datalake_astro_raw.task_instance_history.task_display_name
   map_index:
+    description: |
+      Map index of the dynamically mapped task instance for this history row; -1 for standard
+      non-mapped tasks. Required to disambiguate mapped instances sharing id_task.
     lineage:
       - datalake_astro_raw.task_instance_history.map_index
   try_number:
+    description: |
+      Attempt number associated with this historical snapshot, incrementing across retries and
+      clear-and-rerun cycles for the same logical task instance.
     lineage:
       - datalake_astro_raw.task_instance_history.try_number
   max_tries:
+    description: |
+      Maximum retry count configured on the task at the time this historical snapshot was
+      recorded, defining the retry budget before permanent failure.
     lineage:
       - datalake_astro_raw.task_instance_history.max_tries
   duration:
+    description: |
+      Wall-clock seconds the task instance ran during the attempt captured in this history row,
+      from worker start to the recorded state transition.
     lineage:
       - datalake_astro_raw.task_instance_history.duration
   pool_slots:
+    description: |
+      Number of pool slots consumed by this task instance in the historical snapshot, reflecting
+      weighted pool usage at that point in time.
     lineage:
       - datalake_astro_raw.task_instance_history.pool_slots
   priority_weight:
+    description: |
+      Scheduler priority weight assigned to this task instance in the historical snapshot,
+      influencing execution ordering relative to competing tasks.
     lineage:
       - datalake_astro_raw.task_instance_history.priority_weight
   ts_trigger_timeout:
+    description: |
+      Deadline timestamp for deferred trigger completion associated with this historical
+      snapshot, after which the task instance would time out waiting.
     lineage:
       - datalake_astro_raw.task_instance_history.trigger_timeout
   ts_queued:
+    description: |
+      Timestamp when this task instance entered the queued state for the attempt reflected in
+      this history row.
     lineage:
       - datalake_astro_raw.task_instance_history.queued_dttm
   ts_started:
+    description: |
+      Timestamp when the worker began executing the task instance attempt captured in this
+      historical snapshot.
     lineage:
       - datalake_astro_raw.task_instance_history.start_date
   ts_ended:
+    description: |
+      Timestamp when the task instance reached a terminal state for the attempt in this history
+      row; null if the snapshot was taken while still running.
     lineage:
       - datalake_astro_raw.task_instance_history.end_date
   ts_updated:
+    description: |
+      Timestamp when this history row was written to the Astro metadata database, used to order
+      state transitions chronologically for a given task instance.
     lineage:
       - datalake_astro_raw.task_instance_history.updated_at
   year:
+    description: |
+      Table partition column (year). Derived from the daily export snapshot date at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day to
+      restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
     lineage:
       - datalake_astro_raw.task_instance_history.year
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the daily export snapshot date at raw
+      ingestion. Must be filtered together with year and day in every query to enable partition
+      pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_astro_raw.task_instance_history.month
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the daily export snapshot date at raw
+      ingestion. Always filter with year and month to narrow the scan to specific export days.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_astro_raw.task_instance_history.day
