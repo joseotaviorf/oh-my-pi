@@ -1,52 +1,71 @@
+---
 database_name: datalake_gsheets_clean
 table_name: fdic_acquisition_2023
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: 2023 FDIC receivables acquisition register exported from Google Sheets. One row per acquired security with assignor, debtor, amounts, and key dates for For Rent securitization reporting.
 columns:
   id_vx_security:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.idtitulovx
+    description: Internal Vórtx security identifier for the acquired receivable title.
   assignor_cnpj:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.cedentecnpjcpf
+    description: CNPJ or CPF of the assignor (cedente) transferring the receivable.
   assignor_name:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.cedentenome
+    description: Legal name of the assignor entity selling the receivable portfolio.
   withdraw_cnpj_cpf:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.sacadocnpjcpf
+    description: CNPJ or CPF of the debtor (sacado) obligated on the receivable.
   withdraw_name:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.sacadonome
+    description: Legal name of the debtor associated with the acquired receivable.
   type:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.tipo
+    description: Classification of the receivable title in the acquisition file.
   asset_type:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.tipoativo
+    description: Asset type label describing the underlying receivable instrument.
   key_field:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.campochave
+    description: Business key used to reconcile the title across acquisition systems.
   cmc7:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.cmc7
+    description: CMC7 magnetic line encoded on the bank slip when applicable.
   security_number:
     lineage:
-      - datalake_gsheets_raw.fdic_acquisition_2021.numerotitulo
+      - datalake_gsheets_raw.fdic_acquisition_2023.numerotitulo
+    description: Official number of the receivable title in the acquisition batch.
   acquisition_value:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.valoraquisicao
+    description: Price paid to acquire the receivable, expressed in BRL.
   nominal_value:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.valornominal
+    description: Face value of the receivable title before discounts or fees.
   invoice_number:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.numeroboleto
+    description: Bank slip or invoice number linked to the acquired receivable.
   dt_emission:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.dataemissao
+    description: Date when the receivable title was originally issued.
   dt_acquisition:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.dataaquisicao
+    description: Date when QuintoAndar or the fund acquired the receivable title.
   dt_due:
     lineage:
       - datalake_gsheets_raw.fdic_acquisition_2023.datavencimento
+    description: Maturity date when the receivable payment is contractually due.

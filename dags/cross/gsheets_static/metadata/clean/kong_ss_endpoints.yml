@@ -1,19 +1,19 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: kong_ss_endpoints
-description: "S&S Endpoints Relations."
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
-owner: andre.melo@quintoandar.com.br
+description: Catalog of Kong API gateway hosts and endpoints used by Support and Services integrations. Maintained in Google Sheets to document S&S API surface for observability and access reviews.
 columns:
   host:
     lineage:
       - datalake_gsheets_raw.kong_ss_endpoints.host
-    description: "The host address."
+    description: Hostname or domain of the Kong gateway serving the Support and Services API.
   endpoint:
     lineage:
       - datalake_gsheets_raw.kong_ss_endpoints.endpoint
-    description: "The endpoint requested."
+    description: API path or route exposed through the Kong gateway for S&S consumers.
   description:
     lineage:
       - datalake_gsheets_raw.kong_ss_endpoints.description
-    description: "The endpoint description."
+    description: Business description of the endpoint purpose and owning integration.

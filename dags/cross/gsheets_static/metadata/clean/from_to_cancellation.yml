@@ -1,20 +1,29 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: from_to_cancellation
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
+description: Mapping table between legacy and standardized contract cancellation reasons. Used by Support and Services to normalize cancellation taxonomy in CRM and reporting pipelines.
 columns:
   reason:
     lineage:
       - datalake_gsheets_raw.de_para_cancelamento.reason
+    description: Original cancellation reason label from the source CRM taxonomy.
   reason_category:
     lineage:
       - datalake_gsheets_raw.de_para_cancelamento.reason_category
+    description: High-level category grouping the original cancellation reason.
   new_reason:
     lineage:
       - datalake_gsheets_raw.de_para_cancelamento.new_reason
+    description: Standardized cancellation reason applied after the mapping exercise.
   responsible:
     lineage:
       - datalake_gsheets_raw.de_para_cancelamento.responsible
+    description: Team or role accountable for cancellations mapped to this reason.
   count:
     lineage:
       - datalake_gsheets_raw.de_para_cancelamento.count
+    description: Historical count of cancellations observed for the reason combination.
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.

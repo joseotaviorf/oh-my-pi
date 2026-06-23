@@ -1,13 +1,19 @@
+---
 database_name: datalake_gsheets_clean
 table_name: for_sale_marketplace_region_clusters
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Mapping of For Sale marketplace regions to strategic cluster names. Maintained in Google Sheets for regional reporting and hub planning in the sale business line.
 columns:
   id_region:
     lineage:
       - datalake_gsheets_raw.for_sale_marketplace_region_clusters.id_region
+    description: Numeric identifier of the For Sale marketplace region in the reference sheet.
   name:
     lineage:
       - datalake_gsheets_raw.for_sale_marketplace_region_clusters.name
+    description: Display name of the marketplace region covered by the cluster mapping.
   cluster_name:
     lineage:
       - datalake_gsheets_raw.for_sale_marketplace_region_clusters.cluster_name
+    description: Strategic cluster label assigned to the marketplace region for planning.

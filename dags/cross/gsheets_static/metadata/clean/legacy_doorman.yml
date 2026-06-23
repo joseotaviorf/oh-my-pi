@@ -1,55 +1,75 @@
+---
 database_name: datalake_gsheets_clean
 table_name: legacy_doorman
+owner: gabriel.salla@quintoandar.com
 domain: Cross
+description: Legacy doorman referral and concierge lead records migrated from historical operations spreadsheets. Used by Cross teams for reconciling old doorman programs with current listing data.
 columns:
   id_short_house:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.id_short_house
+    description: Short numeric identifier of the house associated with the doorman lead.
   id_doorman:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.id_doorman
+    description: Identifier of the doorman or concierge agent linked to the referral.
   address:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.address
+    description: Property address captured for the doorman referral record.
   status_crm:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.status_crm
+    description: CRM status label of the doorman lead at the last spreadsheet update.
   name_doorman:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.name_doorman
+    description: Name of the doorman or concierge agent responsible for the lead.
   reason:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.reason
+    description: Primary reason or outcome category recorded for the doorman interaction.
   lead_address:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.lead_address
+    description: Address associated with the owner lead referred by the doorman program.
   obs:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.obs
+    description: Free-text observations captured by operations about the doorman case.
   owner_name:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.owner_name
+    description: Name of the property owner linked to the doorman referral lead.
   owner_phone:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.owner_phone
+    description: Phone number of the property owner for follow-up on the referral.
   wage:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.wage
+    description: Wage or compensation amount associated with the doorman service record.
   motive:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.motive
+    description: Motive or trigger that originated the doorman referral request.
   status:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.status
+    description: Operational status of the doorman referral in the legacy workflow.
   phone:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.phone
+    description: Contact phone number used for the doorman or lead communication.
   dt_creation:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.dt_creation
+    description: Date when the doorman referral record was first created in the sheet.
   dt_referral:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.dt_referral
+    description: Date when the owner lead was formally referred through the doorman program.
   dt_last_iteration:
     lineage:
       - datalake_gsheets_raw.legacy_doorman.dt_last_iteration
+    description: Date of the most recent update or follow-up on the doorman case.

@@ -1,34 +1,47 @@
+---
 database_name: datalake_gsheets_clean
 table_name: for_sale_segmentation_survey_responses
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Respondent-level records from the For Sale buyer segmentation survey. Captures demographics, household profile, and assigned audience segment for marketplace strategy analysis.
 columns:
   email:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.email
+      - datalake_gsheets_raw.for_sale_segmentation_survey.email
+    description: Email address of the survey respondent used as the response key.
   age:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.age
+      - datalake_gsheets_raw.for_sale_segmentation_survey.age
+    description: Age bracket or numeric age reported by the survey respondent.
   gender:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.gender
+      - datalake_gsheets_raw.for_sale_segmentation_survey.gender
+    description: Gender identity reported by the respondent in the segmentation survey.
   city:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.city
+      - datalake_gsheets_raw.for_sale_segmentation_survey.city
+    description: City of residence declared by the survey respondent.
   region:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.region
+      - datalake_gsheets_raw.for_sale_segmentation_survey.region
+    description: Geographic region associated with the respondent location.
   people_living_with:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.people_living_with
+      - datalake_gsheets_raw.for_sale_segmentation_survey.people_living_with
+    description: Household composition label describing who lives with the respondent.
   household_monthly_income:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.household_monthly_income
+      - datalake_gsheets_raw.for_sale_segmentation_survey.household_monthly_income
+    description: Monthly household income bracket reported in the segmentation survey.
   marital_status:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.marital_status
+      - datalake_gsheets_raw.for_sale_segmentation_survey.marital_status
+    description: Marital status declared by the respondent for audience profiling.
   segment:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.segment
+      - datalake_gsheets_raw.for_sale_segmentation_survey.segment
+    description: Buyer segment assigned from survey responses for For Sale targeting.
   audience_target:
     lineage:
-      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.audience_target
+      - datalake_gsheets_raw.for_sale_segmentation_survey.audience_target
+    description: Marketing audience target group derived from the segmentation model.

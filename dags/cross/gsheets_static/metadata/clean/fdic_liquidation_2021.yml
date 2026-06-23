@@ -1,79 +1,111 @@
+---
 database_name: datalake_gsheets_clean
 table_name: fdic_liquidation_2021
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: 2021 FDIC receivables liquidation events exported from Google Sheets. Tracks payment, residual values, and occurrence details for securitized rental receivables settled in the year.
 columns:
   id_vx_security:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.idtitulovx
+    description: Internal Vórtx security identifier for the liquidated receivable title.
   id_vortex_security_wave_effect:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.idtitulovortxorigemefeitovagao
+    description: Identifier of the originating Vórtx title that generated the wave effect.
   id_occurrence:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.codigoocorrencia
+    description: Numeric code of the liquidation occurrence event in the register.
   id_invoice_bank:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.numeroboletobanco
+    description: Bank slip number associated with the liquidated receivable payment.
   security_number:
     lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2021.numerotitulo
+    description: Official receivable title number subject to liquidation.
+  assignor_cnpj_cpf:
+    lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.cedentecnpjcpf
+    description: CNPJ or CPF of the assignor (cedente) on the liquidated title.
   assignor_name:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.cedentenome
+    description: Legal name of the assignor entity in the liquidation record.
   withdraw_cnpj_cpf:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.sacadocnpjcpf
+    description: CNPJ or CPF of the debtor (sacado) on the liquidated receivable.
   withdraw_name:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.sacadonome
+    description: Legal name of the debtor associated with the liquidation event.
   occurrence:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.ocorrencia
+    description: Description of the liquidation occurrence type recorded by the fund.
   situation:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.situacao
+    description: Current situation status of the title at liquidation time.
   asset_type:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.tipoativo
+    description: Asset type label of the receivable being liquidated.
   key_field:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.campochave
+    description: Business key used to reconcile the liquidation across systems.
   wave_effect_generator:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.geradorefeitovagao
+    description: Label identifying the generator of the wave effect on the title.
   nominal_value:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.valornominal
+    description: Nominal face value of the receivable before liquidation adjustments.
   payment_value:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.valorpagamento
+    description: Amount effectively paid during the liquidation event in BRL.
   residual_value:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.valorresidual
+    description: Remaining unpaid balance after the liquidation payment is applied.
   reductions:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.abatimentos
+    description: Discount or abatement amount applied to the receivable at liquidation.
   fee:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.juros
+    description: Interest or fee amount recognized in the liquidation calculation.
   partial_payment:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.pagamentoparcial
+    description: Partial payment amount applied before full liquidation of the title.
   description_status:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.statusdescricao
+    description: Numeric status code describing the liquidation outcome stage.
   value_present_opening:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.valorpresenteabertura
+    description: Present value of the receivable at the opening of the reporting period.
   payment_impact:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.impactopagamento
+    description: Financial impact amount attributed to the liquidation payment event.
   dt_due:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.datavencimento
+    description: Original contractual due date of the liquidated receivable.
   dt_payment:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.datapagamento
+    description: Date when the liquidation payment was received or recorded.
   dt_liquidation:
     lineage:
       - datalake_gsheets_raw.fdic_liquidation_2021.dataliquidacao
+    description: Date when the receivable title was formally liquidated in the fund.
