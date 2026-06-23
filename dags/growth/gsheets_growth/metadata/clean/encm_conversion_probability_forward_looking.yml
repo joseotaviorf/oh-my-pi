@@ -1,0 +1,47 @@
+database_name: datalake_gsheets_clean
+table_name: encm_conversion_probability_forward_looking
+owner: uilson.bonfim@quintoandar.com.br
+domain: Growth
+description: Forward-looking ENCM conversion probability coefficients from Google Sheets,
+  cleaned for Growth marketing cost allocation models by city group and business context.
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.city_group
+    description: City group segmentation used to apply the forward-looking conversion probability.
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.business_context
+    description: Business context of the funnel event, such as RENT or SALE.
+  event_name:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.event_name
+    description: Funnel event name associated with the conversion probability coefficient.
+  price_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.price_range
+    description: Price range bucket label for the conversion probability segment.
+  prob_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.prob_conv
+    description: Forward-looking conversion probability applied by the ENCM model.
+  tm_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.tm_conv
+    description: Time-to-conversion parameter paired with the conversion probability.
+  min_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.min_range
+    description: Lower bound of the price range bucket in the conversion model.
+  max_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.max_range
+    description: Upper bound of the price range bucket in the conversion model.
+  date_start:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.date_start
+    description: Start date of the validity window for these conversion coefficients.
+  date_end:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.date_end
+    description: End date of the validity window for these conversion coefficients.
