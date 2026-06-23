@@ -6,6 +6,7 @@ domain: Growth
 description: |
   Identity resolution table that enables person matching and deduplication across multiple systems and platforms.
   Critical for preventing duplicate accounts and enabling seamless user experience across QuintoAndar's ecosystem.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   **Business Context:**
   - Enables cross-system person identification and deduplication

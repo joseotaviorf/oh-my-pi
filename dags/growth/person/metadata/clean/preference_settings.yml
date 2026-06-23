@@ -6,6 +6,7 @@ domain: Growth
 description: |
   User preferences and personalization settings that customize the QuintoAndar experience for each person.
   Enables localization, personalization, and user experience optimization across the platform.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   **Business Context:**
   - Enables personalized user experience and interface customization

@@ -6,6 +6,7 @@ domain: Growth
 description: |
   LGPD/GDPR compliance table tracking data anonymization requests and "Right to be Forgotten" processes.
   Critical for regulatory compliance and privacy law adherence across jurisdictions.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   **Business Context:**
   - Implements GDPR/LGPD "Right to Erasure" requirements

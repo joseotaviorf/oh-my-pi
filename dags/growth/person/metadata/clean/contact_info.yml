@@ -6,6 +6,7 @@ domain: Growth
 description: |
   Contact information for persons including emails, phone numbers, and push notification tokens.
   Supports multiple contact methods per person with priority ranking and validation status.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   **Business Context:**
   - Enables multi-channel communication with users

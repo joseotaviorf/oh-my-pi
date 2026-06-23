@@ -6,6 +6,7 @@ domain: Growth
 description: |
   Physical address information for persons, supporting multi-country address formats and validation.
   Critical for service delivery, compliance verification, and geographic analysis.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   **Business Context:**
   - Enables service delivery and logistics coordination

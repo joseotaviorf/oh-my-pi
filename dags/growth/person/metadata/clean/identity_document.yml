@@ -6,6 +6,7 @@ domain: Growth
 description: |
   Government-issued identity documents for persons, supporting multi-country compliance and identity verification.
   Critical for KYC (Know Your Customer) processes, age verification, and regulatory compliance.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
   
   **Business Context:**
   - Enables identity verification and fraud prevention

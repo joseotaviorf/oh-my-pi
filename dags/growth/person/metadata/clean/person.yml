@@ -6,6 +6,7 @@ domain: Growth
 description: |
   Core entity representing a natural person in QuintoAndar's ecosystem. This table serves as the central registry for all person data,
   supporting multi-country operations (Brazil, Mexico) and acting as the single source of truth for person identity across all systems.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   **Business Context:**
   - Central hub for person/user data management

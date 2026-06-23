@@ -7,6 +7,7 @@ description: |
   Audit table that captures the complete change history of person identity records. Each row represents
   a historical version of an identity entity, tracking all modifications including value changes, scope updates,
   validation status transitions, and identity type modifications.
+  Partitioned by year, month, and day — filter all three partition columns in WHERE for pruning.
 
   **Audit Functionality:**
   - Complete audit trail for all changes made to the person_identity table
