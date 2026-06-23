@@ -1,32 +1,43 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tracking_catalog_user_properties
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Catalog of Amplitude user properties with ownership and lifecycle metadata. Reference used by Data Ops to govern user attribute instrumentation across projects.
 columns:
   project_name:
     lineage:
       - datalake_gsheets_raw.user_properties.project_name
+    description: Tracking project name associated with the user property in the catalog.
   id_app:
     lineage:
       - datalake_gsheets_raw.user_properties.id_app
+    description: Application identifier where the user property is defined or collected.
   user_property:
     lineage:
       - datalake_gsheets_raw.user_properties.user_property
+    description: Name of the user property tracked in the analytics platform.
   first_seen:
     lineage:
       - datalake_gsheets_raw.user_properties.first_seen
+    description: Timestamp when the user property was first observed in production data.
   last_seen:
     lineage:
       - datalake_gsheets_raw.user_properties.last_seen
+    description: Timestamp when the user property was most recently observed in production data.
   description:
     lineage:
       - datalake_gsheets_raw.user_properties.description
+    description: Business description explaining the meaning and usage of the user property.
   type:
     lineage:
       - datalake_gsheets_raw.user_properties.type
+    description: Data type of the user property as stored in the analytics platform.
   status:
     lineage:
       - datalake_gsheets_raw.user_properties.status
+    description: Lifecycle status of the user property in the tracking catalog.
   owner:
     lineage:
       - datalake_gsheets_raw.user_properties.owner
+    description: Person or team accountable for maintaining the user property definition.

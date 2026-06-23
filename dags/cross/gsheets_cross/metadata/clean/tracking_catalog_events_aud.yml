@@ -1,56 +1,79 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tracking_catalog_events_aud
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Audit catalog of product tracking events with ownership and lifecycle metadata. Reference used by Data Ops to govern event instrumentation across apps and platforms.
 columns:
   id_app:
     lineage:
       - datalake_gsheets_raw.events_aud.id_app
+    description: Application identifier associated with the tracked event in the catalog.
   category:
     lineage:
       - datalake_gsheets_raw.events_aud.category
+    description: High-level category grouping the event within the product tracking taxonomy.
   event_type:
     lineage:
       - datalake_gsheets_raw.events_aud.event_type
+    description: Technical event type or name emitted by the application instrumentation.
   business_owner:
     lineage:
       - datalake_gsheets_raw.events_aud.business_owner
+    description: Business stakeholder accountable for the event definition and usage.
   technical_owner:
     lineage:
       - datalake_gsheets_raw.events_aud.technical_owner
+    description: Engineering owner responsible for implementing and maintaining the event.
   squad_ownership:
     lineage:
       - datalake_gsheets_raw.events_aud.squad_ownership
+    description: Product squad that owns the user journey associated with the event.
   platform:
     lineage:
       - datalake_gsheets_raw.events_aud.platform
+    description: Client platform where the event is emitted (web, iOS, Android, or backend).
   project_name:
     lineage:
       - datalake_gsheets_raw.events_aud.project_name
+    description: Tracking project or product area associated with the event in the catalog.
   screen_image_link:
     lineage:
       - datalake_gsheets_raw.events_aud.screen_image_link
+    description: Link to a screenshot illustrating the UI context where the event fires.
   status:
     lineage:
       - datalake_gsheets_raw.events_aud.status
+    description: Lifecycle status of the event in the tracking catalog (active, deprecated, etc.).
   emitting_app:
     lineage:
       - datalake_gsheets_raw.events_aud.emitting_app
+    description: Application or service that emits the event to the analytics pipeline.
   rev_type:
     lineage:
       - datalake_gsheets_raw.events_aud.rev_type
+    description: Audit revision type indicating how the catalog entry was changed.
   rev_user:
     lineage:
       - datalake_gsheets_raw.events_aud.rev_user
+    description: User who performed the catalog revision recorded in the audit trail.
   description:
     lineage:
       - datalake_gsheets_raw.events_aud.description
+    description: Business description explaining when and why the tracking event is fired.
   is_key_event:
     lineage:
       - datalake_gsheets_raw.events_aud.is_key_event
+    description: Boolean flag indicating whether the event is classified as a key business event.
+  ts_rev:
+    lineage:
+      - datalake_gsheets_raw.events_aud.rev_timestamp
+    description: Audit revision timestamp derived from the source rev_timestamp field in milliseconds.
   first_seen:
     lineage:
       - datalake_gsheets_raw.events_aud.first_seen
+    description: Timestamp when the event was first observed in production tracking data.
   last_seen:
     lineage:
       - datalake_gsheets_raw.events_aud.last_seen
+    description: Timestamp when the event was most recently observed in production tracking data.

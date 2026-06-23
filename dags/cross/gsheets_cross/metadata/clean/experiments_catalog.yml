@@ -1,53 +1,55 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: experiments_catalog
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: For Rent product experiments catalog with ownership, hypothesis, and success metrics. Static reference used to track active and planned A/B tests and their Amplitude tagging.
 columns:
   experiment_owner_email:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.email_address
-    description: Email address of the person responsible for the experiment registration.
+    description: Email address of the person responsible for registering and maintaining the experiment.
   experiment_name:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.experiment_name
-    description: Experiment name.
+    description: Official name of the product experiment as registered in the experiments catalog.
   line_owner:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.line
-    description: Line responsible for the experiment.
+    description: Business line accountable for the experiment outcomes and rollout decisions.
   squad_owner:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.squad
-    description: Squad responsible for the experiment.
+    description: Product squad responsible for designing and operating the experiment.
   experiment_type:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.experiment_type
-    description: Experiment type.
+    description: Classification of the experiment methodology or rollout type.
   amplitude_tag:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.user_property_on_amplitude
-    description: Experiment tag on Amplitude's events table (user_properties column).
+    description: Amplitude user property tag used to identify experiment assignment in event data.
   hypothesis:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.hypothesis
-    description: Experiment Hypothesis.
+    description: Stated hypothesis describing the expected impact of the experiment variant.
   success_metric:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.success_metric
-    description: Experiment success metric.
+    description: Primary metric used to evaluate whether the experiment achieved its goal.
   experiment_link:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.experiment_link
-    description: Experiment documentation link.
+    description: URL to experiment design documentation or tracking spreadsheet.
   dt_expected_start:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.expected_start_date
-    description: Date of when the experiment is expected to start.
+    description: Planned start date when the experiment is expected to begin collecting data.
   dt_expected_end:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.expected_end_date
-    description: Date of when the experiment is expected to end.
+    description: Planned end date when the experiment is expected to conclude or be evaluated.
   ts_created:
     lineage:
       - datalake_gsheets_raw.experiments_catalog.timestamp
-    description: Timestamp of when the experiment was registered on the experiment forms.
+    description: Timestamp when the experiment was registered through the experiments intake form.

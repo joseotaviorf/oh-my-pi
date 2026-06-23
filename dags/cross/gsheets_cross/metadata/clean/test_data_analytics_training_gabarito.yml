@@ -1,17 +1,23 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: test_data_analytics_training_gabarito
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Answer key for the Data Analytics training assessment. Static reference with correct responses used to score trainee quiz submissions.
 columns:
   class:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_gabarito.class
+    description: Training class or cohort identifier associated with the assessment answer key.
   question:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_gabarito.question
+    description: Text of the assessment question as presented to trainees.
   answer:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_gabarito.answer
+    description: Correct answer expected for the corresponding training assessment question.
   ts_load:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_gabarito.ts_load
+    description: Timestamp of when the training answer key row was loaded into the lake.

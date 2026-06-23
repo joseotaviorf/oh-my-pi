@@ -1,29 +1,39 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: test_data_analytics_training_quiz_1
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Trainee responses for Data Analytics training quiz 1. Captures participant answers and scores used in internal analytics upskilling programs.
 columns:
-  date:
+  answer_date:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.date
+    description: Timestamp when the trainee submitted quiz 1 responses.
   email:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.email
+    description: Email address of the trainee who completed quiz 1.
   points:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.points
+    description: Total score achieved by the trainee on quiz 1.
   question_1:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.question_1
+    description: Trainee answer submitted for the first question in quiz 1.
   question_2:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.question_2
+    description: Trainee answer submitted for the second question in quiz 1.
   question_3:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.question_3
+    description: Trainee answer submitted for the third question in quiz 1.
   line:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.line
+    description: Business line or team of the trainee who submitted quiz 1.
   ts_load:
     lineage:
       - datalake_gsheets_raw.test_data_analytics_training_quiz_1.ts_load
+    description: Timestamp of when the quiz 1 submission row was loaded into the lake.

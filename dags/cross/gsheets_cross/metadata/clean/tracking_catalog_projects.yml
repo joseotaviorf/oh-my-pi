@@ -1,29 +1,39 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tracking_catalog_projects
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Tracking catalog of analytics projects with ownership and key concepts. Reference used by Data Ops to document instrumentation scope across product lines.
 columns:
   id_app:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.id_app
+    description: Application identifier associated with the tracking project in the catalog.
   project_name:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.project_name
+    description: Name of the analytics or instrumentation project in the tracking catalog.
   description:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.description
+    description: Business description of the tracking project scope and intended consumers.
   owner:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.owner
+    description: Person or team accountable for maintaining the tracking project documentation.
   tracking_tool:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.tracking_tool
+    description: Primary analytics or event collection tool used by the project.
   lines:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.lines
+    description: Business lines covered by the tracking project instrumentation.
   principal_metrics:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.principal_metrics
+    description: Key metrics monitored or defined within the tracking project.
   key_concepts:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_projects.key_concepts
+    description: Core concepts and definitions documented for the tracking project.
