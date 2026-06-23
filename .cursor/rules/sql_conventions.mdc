@@ -525,10 +525,13 @@ The following columns must never appear as stored columns in new enrich or DW SQ
 - Clean tables — mirror the source database for fidelity; PII is allowed but must not be propagated to enrich/DW.
 - Fintech schemas (`cyber*`, `sorting_hat`, `recupera`) — CPF, RG, and mother/father names are required for credit analysis and debt collection under LGPD art. 7 §V. Each table must set `table_privileges` in the DAG declaration. Metadata PII classification (`privacy` section) is **not** required on normal PRs in Phase 1 — see rollout gate above and `governance_metadata.mdc`. Never use the deprecated `personal_data_classification` key (rejected by the validator) nor PII-tier text in `description`.
 - Reverse DAGs — contact PII is required for external API transmission by design; must be sourced from `dim_person` (not `dim_user` or raw clean tables) and subject to the `has_right_to_be_forgotten` guard below.
+- **People domain** (`dags/people/reverse_reports/`) — workforce PII exports (GSheets/API) sourced from Oracle HCM (`pin_*` → `dw_employee_details` / `metric_people`). `dw_public.dim_person` holds platform users only; **do not** add `dim_person` joins or `has_right_to_be_forgotten` guards. See **`people_domain.mdc`** § "Reverse exports".
 
 ### `has_right_to_be_forgotten` — Mandatory Guard for Reverse DAGs
 
 Any reverse DAG query that exports personal data to an external system must include the following filter. Omitting it violates LGPD art. 18 §VI (right to erasure).
+
+**Exception — People domain:** Does **not** apply to SQL under `dags/people/reverse_reports/`. Oracle HCM workforce data is outside `dw_public.dim_person`. Automated reviewers must not flag missing `dim_person` joins on those files; see **`people_domain.mdc`**.
 
 ```sql
 LEFT JOIN
@@ -655,7 +658,7 @@ For the full distinction between `{param}`, `{{ jinja }}`, and literal escapes, 
 - [ ] Incremental loads use `{load_start_date}` / `{load_end_date}` params — no unbounded full scans
 - [ ] Filters applied inside CTEs before joins rather than in the outermost query
 - [ ] Enrich/DW tables use `sk_person` / `id_person` / `uuid_person` as FK — no raw PII columns (`name`/`email`/`phone`/`cpf`/`rg`/`address`) stored in enrich or DW tables
-- [ ] Reverse DAG queries include a `has_right_to_be_forgotten = false` guard via `dim_person` before exporting any personal data to external systems
+- [ ] Reverse DAG queries include a `has_right_to_be_forgotten = false` guard via `dim_person` before exporting any personal data to external systems (**except** `dags/people/reverse_reports/` — see `people_domain.mdc`)
 - [ ] `raw` tables are consumed only by clean-layer queries
 - [ ] Enrich queries use clean/enrich sources (not raw)
 - [ ] DW queries prioritize enrich sources and avoid DW-to-DW reads (except explicit datamarts)

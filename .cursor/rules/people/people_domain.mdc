@@ -1,5 +1,5 @@
 ---
-description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, Confluence People Data space identifiers for Atlassian MCP (cloudId, numeric spaceId, hub pageIds), reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
+description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, reverse export PII (no dim_person guard), Confluence People Data space identifiers for Atlassian MCP (cloudId, numeric spaceId, hub pageIds), reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
 globs: dags/people/**/*
 alwaysApply: false
 ---
@@ -72,6 +72,19 @@ Data is organized by functional domain for schema-level governance and access co
 **People Data:** prefer **`dw_employee_details`** (and sibling domain `dw_*`) for internal queries — fuller model. **`dw_people`** is a slimmer, **public** schema for **non–People** consumers. **Avoid `dw_people`** internally when the need is covered by `dw_employee_details`, unless there is an explicit exception.
 
 When adding new tables, place them in the schema that matches the business domain.
+
+### Reverse exports — `dim_person` / `has_right_to_be_forgotten` does not apply
+
+Repo-wide `sql_conventions.mdc` requires reverse DAGs that export personal data to join `dw_public.dim_person` and filter `has_right_to_be_forgotten = false`. **That rule does not apply to People domain reverse exports** (`dags/people/reverse_reports/`).
+
+| Topic | People domain |
+|-------|----------------|
+| **Identity model** | Workforce records come from **Oracle HCM Cloud**, ingested via **`pin_*` DAGs** (`dw_employee_details`, `metric_people.employee_snapshots`, etc.). **PIN** is the internal name for that ingestion stack — not a separate employee population. |
+| **`dw_public.dim_person`** | Platform **customer/user** identity (`id_user`, `uuid_person`). It does **not** contain Oracle HCM workforce records and is **not** joinable to HR snapshots on `sk_person` or `id_user`. |
+| **Reverse exports** | GSheets/API exports of employee PII (name, CPF, email) are **intentional** for internal consumers (Benefits, HR, InfoSec). Do **not** add `dim_person` joins or `has_right_to_be_forgotten` guards unless a future People-specific erasure source is defined. |
+| **PR review** | Automated reviewers (e.g. Kody) may flag this — dismiss as out of scope for People; cite this section. |
+
+Employee PII in reverse exports is governed by People access controls (`people-team` privileges, restricted GSheet workbooks), not the consumer Person model.
 
 ---
 

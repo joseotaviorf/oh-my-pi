@@ -104,7 +104,7 @@ When `privacy` is not declared yet, infer sensitivity from column semantics, dom
 | No raw PII in enrich/DW | New tables; use `sk_person` / join `dim_person` | SQL (`sql_conventions.mdc` §13) |
 | `table_privileges` | Table carries `sensitive` or `highly_personal` data | DAG declaration |
 | `privacy.k_anonymity ≥ 5` | Metric/qube output derived from `sensitive` data | Qube/metric declaration |
-| `has_right_to_be_forgotten` guard | Reverse DAG exporting contact PII | SQL (`sql_conventions.mdc` §13) |
+| `has_right_to_be_forgotten` guard | Reverse DAG exporting contact PII | SQL (`sql_conventions.mdc` §13); **exempt:** `dags/people/reverse_reports/` (`people_domain.mdc`) |
 
 When a column has `privacy.piiType`, use the catalog-derived `classification` for `table_privileges` and `k_anonymity` decisions. The same logical column should use the same `piiType` and `dataSubjectType` across layers (raw → clean → enrich → dw).
 
