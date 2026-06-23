@@ -12,7 +12,7 @@ columns:
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
-    description: User ID from Amplitude events.
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
   business_context:
     lineage:
     - datalake_amplitude_clean.events.event_properties
@@ -24,7 +24,7 @@ columns:
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Timestamp of the event.
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   year:
     lineage:
     - datalake_amplitude_clean.events.year

@@ -4,67 +4,67 @@ columns:
   id_amplitude:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   id_event:
     lineage:
     - datalake_amplitude_clean.events.id_event
-    description: Column id_event from Amplitude events
+    description: Amplitude insert identifier for the ingested row within the export batch.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
-    description: Column id_user from Amplitude events
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
   company_id:
     lineage:
     - datalake_amplitude_clean.events.company_id
-    description: Column company_id from Amplitude events
+    description: Analytics attribute 'company id' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   email:
     lineage:
     - datalake_amplitude_clean.events.email
-    description: Column email from Amplitude events
+    description: Analytics attribute 'email' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   login_status:
     lineage:
     - datalake_amplitude_clean.events.login_status
-    description: Column login_status from Amplitude events
+    description: Analytics attribute 'login status' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   source:
     lineage:
     - datalake_amplitude_clean.events.source
-    description: Column source from Amplitude events
+    description: Analytics attribute 'source' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   product:
     lineage:
     - datalake_amplitude_clean.events.product
-    description: Column product from Amplitude events
+    description: Analytics attribute 'product' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   role:
     lineage:
     - datalake_amplitude_clean.events.role
-    description: Column role from Amplitude events
+    description: Analytics attribute 'role' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   language:
     lineage:
     - datalake_amplitude_clean.events.language
-    description: Column language from Amplitude events
+    description: Device or browser language setting reported at event time.
   city:
     lineage:
     - datalake_amplitude_clean.events.city
-    description: Column city from Amplitude events
+    description: City name inferred by Amplitude from the client IP address at event time.
   id_device:
     lineage:
     - datalake_amplitude_clean.events.id_device
-    description: Column id_device from Amplitude events
+    description: Amplitude-generated device identifier used to stitch sessions on the same physical device.
   device_type:
     lineage:
     - datalake_amplitude_clean.events.device_type
-    description: Column device_type from Amplitude events
+    description: Coarse device category from Amplitude (for example mobile, tablet, or desktop).
   os_name:
     lineage:
     - datalake_amplitude_clean.events.os_name
-    description: Column os_name from Amplitude events
+    description: Operating system name reported by the client SDK (for example iOS or Android).
   platform:
     lineage:
     - datalake_amplitude_clean.events.platform
-    description: Column platform from Amplitude events
+    description: Amplitude platform label for the originating client (for example iOS, Android, or Web).
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   year:
     lineage:
     - datalake_amplitude_clean.events.year
