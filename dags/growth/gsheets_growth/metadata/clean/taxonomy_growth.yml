@@ -5,57 +5,63 @@ domain: Growth
 columns:
   affiliate_type:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.affiliate_type
+    - datalake_gsheets_raw.taxonomy_growth.affiliate_type
     description: The type of affiliate associated with the lead.
   lead_origin:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.lead_origin
+    - datalake_gsheets_raw.taxonomy_growth.lead_origin
     description: The origin of the lead, such as a website or landing page.
   lead_referring_category:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.lead_referring_category
+    - datalake_gsheets_raw.taxonomy_growth.lead_referring_category
     description: The category of the website or page that referred the lead.
   lead_tracking_medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.lead_tracking_medium
+    - datalake_gsheets_raw.taxonomy_growth.lead_tracking_medium
     description: The tracking medium used to track the lead, such as email or social media.
   lead_tracking_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.lead_tracking_source
+    - datalake_gsheets_raw.taxonomy_growth.lead_tracking_source
     description: The source that generated the lead, such as a specific ad or campaign.
   lead_type:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.lead_type
-    description: The type of lead
+    - datalake_gsheets_raw.taxonomy_growth.lead_type
+    description: Attribute sourced from the `taxonomy_growth` reference sheet and consumed by Growth analytics pipelines.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.mkt_channel
+    - datalake_gsheets_raw.taxonomy_growth.mkt_channel
     description: Inputed marketing channel rule defined to define how he lead, such as a specific product.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.mkt_medium
+    - datalake_gsheets_raw.taxonomy_growth.mkt_medium
     description: Inputed marketing medium used to acquire the lead, such as a specific product.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.mkt_origin
+    - datalake_gsheets_raw.taxonomy_growth.mkt_origin
     description: Inputed origin of the marketing campaign that acquired the lead, such as a specific product.
+  mkt_origin_suggestion_gsheet:
+    lineage:
+    - datalake_gsheets_raw.taxonomy_growth.mkt_origin_suggestion
+    description: Marketing origin suggestion value maintained directly in the Growth taxonomy Google Sheet.
   mkt_origin_suggestion:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.mkt_origin_suggestion
+    - datalake_gsheets_raw.taxonomy_growth.mkt_origin_suggestion
     description: A suggestion for the origin of the marketing campaign that acquired the lead.
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.mkt_source
+    - datalake_gsheets_raw.taxonomy_growth.mkt_source
     description: Inputed source of the marketing campaign that acquired the lead, such as a specific product.
   is_agent_referral:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.is_agent_referral
+    - datalake_gsheets_raw.taxonomy_growth.is_agent_referral
     description: A boolean flag indicating whether the lead was referred by an agent.
   is_branded:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.is_branded
+    - datalake_gsheets_raw.taxonomy_growth.is_branded
     description: A boolean flag indicating whether the lead was acquired through a branded campaign.
   is_ops_direct_register:
     lineage:
-      - datalake_gsheets_raw.taxonomy_growth.is_ops_direct_register
+    - datalake_gsheets_raw.taxonomy_growth.is_ops_direct_register
     description: A boolean flag indicating whether the lead registered directly with the operations team.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `taxonomy_growth` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,34 +4,35 @@ domain: Growth
 description: Table with Mexican regions (state, city, zone and sub zone)
 columns:
   state:
-    lineage: 
-      - datalake_gsheets_raw.mexico_regions.Province
-    description: The state of the region
+    lineage:
+    - datalake_gsheets_raw.mexico_regions.Province
+    description: Attribute sourced from the `mexico_regions` reference sheet and consumed by Growth analytics pipelines.
   city:
     lineage:
-      - datalake_gsheets_raw.mexico_regions.City
-    description: The city of the region
+    - datalake_gsheets_raw.mexico_regions.City
+    description: Attribute sourced from the `mexico_regions` reference sheet and consumed by Growth analytics pipelines.
   zone:
     lineage:
-      - datalake_gsheets_raw.mexico_regions.Zone
-    description: The zone of the region
+    - datalake_gsheets_raw.mexico_regions.Zone
+    description: Attribute sourced from the `mexico_regions` reference sheet and consumed by Growth analytics pipelines.
   sub_zone:
     lineage:
-      - datalake_gsheets_raw.mexico_region.SubZone
+    - datalake_gsheets_raw.mexico_region.SubZone
     description: The sub zone of the region
   state_clean:
-    lineage: 
-      - datalake_gsheets_raw.mexico_regions.Province
+    lineage:
+    - datalake_gsheets_raw.mexico_regions.Province
     description: The normalized state of the region
   city_clean:
     lineage:
-      - datalake_gsheets_raw.mexico_regions.City
+    - datalake_gsheets_raw.mexico_regions.City
     description: The normalized city of the region
   zone_clean:
     lineage:
-      - datalake_gsheets_raw.mexico_regions.Zone
+    - datalake_gsheets_raw.mexico_regions.Zone
     description: The normalized zone of the region
   sub_zone_clean:
     lineage:
-      - datalake_gsheets_raw.mexico_region.SubZone
+    - datalake_gsheets_raw.mexico_region.SubZone
     description: The normalized sub zone of the region
+owner: henrique.paulo@quintoandar.com.br

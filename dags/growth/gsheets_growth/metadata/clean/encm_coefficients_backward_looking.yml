@@ -4,28 +4,39 @@ domain: Growth
 columns:
   date_start:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.date_start
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.date_start
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   date_end:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.date_end
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.date_end
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.city_group
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.city_group
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   business_context:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.business_context
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.business_context
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   event_name:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.event_name
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.event_name
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   coefficient:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.coefficient
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.coefficient
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   constant:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.constant
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.constant
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   gross_takerate:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.gross_takerate
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.gross_takerate
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   survival_curve:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients_backward_looking.survival_curve
+    - datalake_gsheets_raw.encm_coefficients_backward_looking.survival_curve
+    description: Attribute sourced from the `encm_coefficients_backward_looking` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `encm_coefficients_backward_looking` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

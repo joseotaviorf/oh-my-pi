@@ -3,27 +3,41 @@ database_name: datalake_gsheets_clean
 table_name: taxonomy_affiliates
 domain: Growth
 columns:
+  id:
+    lineage:
+    - datalake_gsheets_raw.taxonomy_affiliates.id
+    description: Row identifier from the affiliates taxonomy Google Sheet used for deduplication ordering.
   affiliate_type:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.affiliate_type
+    - datalake_gsheets_raw.taxonomy_affiliates.affiliate_type
+    description: Attribute sourced from the `taxonomy_affiliates` reference sheet and consumed by Growth analytics pipelines.
   tracking_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.tracking_source
+    - datalake_gsheets_raw.taxonomy_affiliates.tracking_source
+    description: Attribute sourced from the `taxonomy_affiliates` reference sheet and consumed by Growth analytics pipelines.
   tracking_medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.tracking_medium
+    - datalake_gsheets_raw.taxonomy_affiliates.tracking_medium
+    description: Attribute sourced from the `taxonomy_affiliates` reference sheet and consumed by Growth analytics pipelines.
   tracking_campaign:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.tracking_campaign
+    - datalake_gsheets_raw.taxonomy_affiliates.tracking_campaign
+    description: Attribute sourced from the `taxonomy_affiliates` reference sheet and consumed by Growth analytics pipelines.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.mkt_origin
+    - datalake_gsheets_raw.taxonomy_affiliates.mkt_origin
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.mkt_channel
+    - datalake_gsheets_raw.taxonomy_affiliates.mkt_channel
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.mkt_medium
+    - datalake_gsheets_raw.taxonomy_affiliates.mkt_medium
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_affiliates.mkt_source
+    - datalake_gsheets_raw.taxonomy_affiliates.mkt_source
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `taxonomy_affiliates` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

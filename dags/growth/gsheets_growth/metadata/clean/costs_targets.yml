@@ -5,46 +5,63 @@ domain: Growth
 columns:
   business:
     lineage:
-      - datalake_gsheets_raw.costs_targets.business
+    - datalake_gsheets_raw.costs_targets.business
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   campaign:
     lineage:
-      - datalake_gsheets_raw.costs_targets.campaign
+    - datalake_gsheets_raw.costs_targets.campaign
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.costs_targets.city_group
+    - datalake_gsheets_raw.costs_targets.city_group
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   planning_mkt_level1:
     lineage:
-      - datalake_gsheets_raw.costs_targets.planning_mkt_level1
+    - datalake_gsheets_raw.costs_targets.planning_mkt_level1
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   planning_mkt_level2:
     lineage:
-      - datalake_gsheets_raw.costs_targets.planning_mkt_level2
+    - datalake_gsheets_raw.costs_targets.planning_mkt_level2
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   planning_mkt_level3:
     lineage:
-      - datalake_gsheets_raw.costs_targets.planning_mkt_level3
+    - datalake_gsheets_raw.costs_targets.planning_mkt_level3
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   tier:
     lineage:
-      - datalake_gsheets_raw.costs_targets.tier
+    - datalake_gsheets_raw.costs_targets.tier
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   monthly_budget:
     lineage:
-      - datalake_gsheets_raw.costs_targets.budget_mensal
+    - datalake_gsheets_raw.costs_targets.budget_mensal
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   quarterly_budget:
     lineage:
-      - datalake_gsheets_raw.costs_targets.budget_quarter
+    - datalake_gsheets_raw.costs_targets.budget_quarter
+    description: Planning target or budget value defined in the Google Sheets source for Growth reporting.
   dt_created:
     lineage:
-      - datalake_gsheets_raw.costs_targets.date
+    - datalake_gsheets_raw.costs_targets.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
   year:
     lineage:
-      - datalake_gsheets_raw.costs_targets.year
+    - datalake_gsheets_raw.costs_targets.year
+    description: Hive partition column (year) for incremental reads; combine with business date filters when querying historical snapshots.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.costs_targets.halfyear
+    - datalake_gsheets_raw.costs_targets.halfyear
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   quarter:
     lineage:
-      - datalake_gsheets_raw.costs_targets.quarter
+    - datalake_gsheets_raw.costs_targets.quarter
+    description: Attribute sourced from the `costs_targets` reference sheet and consumed by Growth analytics pipelines.
   month:
     lineage:
-      - datalake_gsheets_raw.costs_targets.month
+    - datalake_gsheets_raw.costs_targets.month
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
   dt_week:
     lineage:
-      - datalake_gsheets_raw.costs_targets.week
+    - datalake_gsheets_raw.costs_targets.week
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `costs_targets` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -5,16 +5,23 @@ domain: Growth
 columns:
   id_house:
     lineage:
-      - datalake_gsheets_raw.branding_where_is_plaquinha.id_house
+    - datalake_gsheets_raw.branding_where_is_plaquinha.id_house
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   plaquinha_type:
     lineage:
-      - datalake_gsheets_raw.branding_where_is_plaquinha.plaquinha_type
+    - datalake_gsheets_raw.branding_where_is_plaquinha.plaquinha_type
+    description: Attribute sourced from the `branding_where_is_plaquinha` reference sheet and consumed by Growth analytics pipelines.
   installation_type:
     lineage:
-      - datalake_gsheets_raw.branding_where_is_plaquinha.installation_type
+    - datalake_gsheets_raw.branding_where_is_plaquinha.installation_type
+    description: Attribute sourced from the `branding_where_is_plaquinha` reference sheet and consumed by Growth analytics pipelines.
   listing_type:
     lineage:
-      - datalake_gsheets_raw.branding_where_is_plaquinha.listing_type
+    - datalake_gsheets_raw.branding_where_is_plaquinha.listing_type
+    description: Attribute sourced from the `branding_where_is_plaquinha` reference sheet and consumed by Growth analytics pipelines.
   dt_plaquinha:
     lineage:
-      - datalake_gsheets_raw.branding_where_is_plaquinha.date
+    - datalake_gsheets_raw.branding_where_is_plaquinha.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `branding_where_is_plaquinha` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,46 +4,63 @@ domain: Growth
 columns:
   city:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.city
+    - datalake_gsheets_raw.ciq_costs.city
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   comission_cs_ciq_full:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.comission_cs_ciq_full
+    - datalake_gsheets_raw.ciq_costs.comission_cs_ciq_full
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   comission_cs_ciq_manager:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.comission_cs_ciq_manager
+    - datalake_gsheets_raw.ciq_costs.comission_cs_ciq_manager
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   comission_listing:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.comission_listing
+    - datalake_gsheets_raw.ciq_costs.comission_listing
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   comission_listing_fs:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.comission_listing_fs
+    - datalake_gsheets_raw.ciq_costs.comission_listing_fs
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   data:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.data
+    - datalake_gsheets_raw.ciq_costs.data
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   impostos:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.impostos
+    - datalake_gsheets_raw.ciq_costs.impostos
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   month:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.month
+    - datalake_gsheets_raw.ciq_costs.month
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
   other:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.other
+    - datalake_gsheets_raw.ciq_costs.other
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   revshare_cs_ciq_full:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_full
+    - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_full
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   revshare_cs_ciq_manager:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_manager
+    - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_manager
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   total_costs_ciq_full_for_rent:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.total_costs_ciq_full_for_rent
+    - datalake_gsheets_raw.ciq_costs.total_costs_ciq_full_for_rent
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   total_costs_ciq_full_for_sale:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.total_costs_ciq_full_for_sale
+    - datalake_gsheets_raw.ciq_costs.total_costs_ciq_full_for_sale
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   week_start:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.week_start
+    - datalake_gsheets_raw.ciq_costs.week_start
+    description: Attribute sourced from the `ciq_costs` reference sheet and consumed by Growth analytics pipelines.
   year:
     lineage:
-      - datalake_gsheets_raw.ciq_costs.year
+    - datalake_gsheets_raw.ciq_costs.year
+    description: Hive partition column (year) for incremental reads; combine with business date filters when querying historical snapshots.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `ciq_costs` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

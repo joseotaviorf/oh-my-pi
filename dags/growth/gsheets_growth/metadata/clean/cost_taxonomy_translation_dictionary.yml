@@ -1,59 +1,59 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: cost_taxonomy_translation_dictionary
-owner: uilson.bonfim@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: GSheets that translates Marketing Platform Campaigns to the new Taxonomy
 columns:
   account_name:
     description: Marketing plataform account name
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.account_name
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.account_name
   ad_type:
     description: Ad Type from extracted report
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.ad_type
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.ad_type
   behavior_type:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.behavior_type
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.behavior_type
   campaign_business_context:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_business_context
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_business_context
   campaign_name:
     description: Marketing plataform account name
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_name
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_name
   campaign_name_convention:
     description: Traslated Campaign Name to the new taxonomy name convention
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_name_convention
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_name_convention
   campaign_strategy_intent:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_strategy_intent
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.campaign_strategy_intent
   funnel_side:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.funnel_side
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.funnel_side
   landing_page:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.landing_page
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.landing_page
   medium:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.medium
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.medium
   origin:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.origin
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.origin
   report_type:
-    description: Report Type from extracted report  
+    description: Report Type from extracted report
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.report_type
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.report_type
   source:
-    description: Taxonomy Level
+    description: Attribute sourced from the `cost_taxonomy_translation_dictionary` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.source
+    - datalake_gsheets_raw.cost_taxonomy_translation_dictionary.source

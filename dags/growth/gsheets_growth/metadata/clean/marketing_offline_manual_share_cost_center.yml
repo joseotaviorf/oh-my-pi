@@ -4,10 +4,15 @@ domain: Growth
 columns:
   id_rule_cost_center:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_share_cost_center.id_rule_cost_center
+    - datalake_gsheets_raw.marketing_offline_manual_share_cost_center.id_rule_cost_center
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   cost_center:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_share_cost_center.cost_center
+    - datalake_gsheets_raw.marketing_offline_manual_share_cost_center.cost_center
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   share:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_share_cost_center.share
+    - datalake_gsheets_raw.marketing_offline_manual_share_cost_center.share
+    description: Attribute sourced from the `marketing_offline_manual_share_cost_center` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `marketing_offline_manual_share_cost_center` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

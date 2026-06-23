@@ -1,22 +1,22 @@
 database_name: datalake_gsheets_clean
 table_name: taxonomy_levels_values
-owner: thiago.jesus@quintoandar.com
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Each row of this table is a pair of key-value for the Growth Taxonomy, used to classify media results and costs.
 columns:
   taxonomy_level:
     description: Level of the growth taxonomy (funnel side, medium, source, etc.).
     lineage:
-      - datalake_gsheets_raw.taxonomy_levels_values.taxonomy_level
+    - datalake_gsheets_raw.taxonomy_levels_values.taxonomy_level
   value:
     description: Value of that growth taxonomy level (i.e. for funnel side, we have demand, supply, brand, affiliates).
     lineage:
-      - datalake_gsheets_raw.taxonomy_levels_values.value
+    - datalake_gsheets_raw.taxonomy_levels_values.value
   dt_created:
     description: When that taxonomy level value was implemented.
     lineage:
-      - datalake_gsheets_raw.taxonomy_levels_values.dt_created
+    - datalake_gsheets_raw.taxonomy_levels_values.dt_created
   dt_updated:
     description: When that taxonomy level value was updated.
     lineage:
-      - datalake_gsheets_raw.taxonomy_levels_values.dt_updated
+    - datalake_gsheets_raw.taxonomy_levels_values.dt_updated

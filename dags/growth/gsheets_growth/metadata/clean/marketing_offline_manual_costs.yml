@@ -4,76 +4,103 @@ domain: Growth
 columns:
   id_rule_city_group_rent:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.id_rule_city_group_rent
+    - datalake_gsheets_raw.marketing_offline_manual_costs.id_rule_city_group_rent
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   id_rule_city_group_sale:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.id_rule_city_group_sale
+    - datalake_gsheets_raw.marketing_offline_manual_costs.id_rule_city_group_sale
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   email:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.email
+    - datalake_gsheets_raw.marketing_offline_manual_costs.email
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   team:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.team
+    - datalake_gsheets_raw.marketing_offline_manual_costs.team
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   entry_type:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.entry_type
+    - datalake_gsheets_raw.marketing_offline_manual_costs.entry_type
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   invoice_number:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.invoice_number
+    - datalake_gsheets_raw.marketing_offline_manual_costs.invoice_number
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   cnpj:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.cnpj
+    - datalake_gsheets_raw.marketing_offline_manual_costs.cnpj
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   vendor_name:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.vendor_name
+    - datalake_gsheets_raw.marketing_offline_manual_costs.vendor_name
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   description:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.description
+    - datalake_gsheets_raw.marketing_offline_manual_costs.description
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   campaign_name:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.campaign_name
+    - datalake_gsheets_raw.marketing_offline_manual_costs.campaign_name
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   cost_category:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.cost_category
+    - datalake_gsheets_raw.marketing_offline_manual_costs.cost_category
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   cost_subcategory:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.cost_subcategory
+    - datalake_gsheets_raw.marketing_offline_manual_costs.cost_subcategory
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   action:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.action
+    - datalake_gsheets_raw.marketing_offline_manual_costs.action
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   business_context:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.business_context
+    - datalake_gsheets_raw.marketing_offline_manual_costs.business_context
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   cost:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.cost
+    - datalake_gsheets_raw.marketing_offline_manual_costs.cost
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   has_cost_center_share:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.has_cost_center_share
+    - datalake_gsheets_raw.marketing_offline_manual_costs.has_cost_center_share
+    description: Boolean flag indicating whether the record matches the named business condition.
   id_rule_cost_center:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.id_rule_cost_center
+    - datalake_gsheets_raw.marketing_offline_manual_costs.id_rule_cost_center
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   has_city_group_share_1:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.has_city_group_share_1
+    - datalake_gsheets_raw.marketing_offline_manual_costs.has_city_group_share_1
+    description: Boolean flag indicating whether the record matches the named business condition.
   cost_center:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.cost_center
+    - datalake_gsheets_raw.marketing_offline_manual_costs.cost_center
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   has_city_group_share_2:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.has_city_group_share_2
+    - datalake_gsheets_raw.marketing_offline_manual_costs.has_city_group_share_2
+    description: Boolean flag indicating whether the record matches the named business condition.
   city_group:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.city_group
+    - datalake_gsheets_raw.marketing_offline_manual_costs.city_group
+    description: Attribute sourced from the `marketing_offline_manual_costs` reference sheet and consumed by Growth analytics pipelines.
   ts_entry:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.ts_entry
+    - datalake_gsheets_raw.marketing_offline_manual_costs.ts_entry
+    description: Event or load timestamp capturing when the underlying record was created or updated.
   dt_invoice:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.dt_invoice
+    - datalake_gsheets_raw.marketing_offline_manual_costs.dt_invoice
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_service_started:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.dt_service_started
+    - datalake_gsheets_raw.marketing_offline_manual_costs.dt_service_started
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_service_ended:
     lineage:
-      - datalake_gsheets_raw.marketing_offline_manual_costs.dt_service_ended
+    - datalake_gsheets_raw.marketing_offline_manual_costs.dt_service_ended
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `marketing_offline_manual_costs` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

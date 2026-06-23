@@ -5,19 +5,27 @@ domain: Growth
 columns:
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.provisioned_costs_import.cost_origin
+    - datalake_gsheets_raw.provisioned_costs_import.cost_origin
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   city_group:
     lineage:
-      - datalake_gsheets_raw.provisioned_costs_import.city_group
-  source: 
-    lineage: 
-      - datalake_gsheets_raw.provisioned_costs_import.cost_type
-  cost: 
-    lineage: 
-      - datalake_gsheets_raw.provisioned_costs_import.cost 
+    - datalake_gsheets_raw.provisioned_costs_import.city_group
+    description: Attribute sourced from the `provisioned_costs_import` reference sheet and consumed by Growth analytics pipelines.
+  source:
+    lineage:
+    - datalake_gsheets_raw.provisioned_costs_import.cost_type
+    description: Attribute sourced from the `provisioned_costs_import` reference sheet and consumed by Growth analytics pipelines.
+  cost:
+    lineage:
+    - datalake_gsheets_raw.provisioned_costs_import.cost
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   has_real_cost:
-    lineage: 
-      - datalake_gsheets_raw.provisioned_costs_import.has_real_cost 
+    lineage:
+    - datalake_gsheets_raw.provisioned_costs_import.has_real_cost
+    description: Boolean flag indicating whether the record matches the named business condition.
   dt_created:
     lineage:
-      - datalake_gsheets_raw.provisioned_costs_import.date
+    - datalake_gsheets_raw.provisioned_costs_import.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `provisioned_costs_import` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -5,25 +5,26 @@ description: Table with the URLs of Brazilian regions (states, cities and neighb
 columns:
   url_imovelweb_region:
     lineage:
-      - datalake_gsheets_raw.brazilian_regions_url.iw_region_url
+    - datalake_gsheets_raw.brazilian_regions_url.iw_region_url
     description: Region URL following Imovelweb pattern
   url_wimoveis_region:
     lineage:
-      - datalake_gsheets_raw.brazilian_regions_url.wi_region_url
+    - datalake_gsheets_raw.brazilian_regions_url.wi_region_url
     description: Region URL following Wimoveis pattern
   url_casamineira_region:
     lineage:
-      - datalake_gsheets_raw.brazilian_regions_url.cm_region_url
+    - datalake_gsheets_raw.brazilian_regions_url.cm_region_url
     description: Region URL following Casa Mineira pattern
   state:
-    lineage: 
-      - datalake_gsheets_raw.brazilian_regions_url.state
-    description: The state of the region
+    lineage:
+    - datalake_gsheets_raw.brazilian_regions_url.state
+    description: Attribute sourced from the `brazilian_regions_url` reference sheet and consumed by Growth analytics pipelines.
   city:
     lineage:
-      - datalake_gsheets_raw.brazilian_regions_url.city
-    description: The city of the region
+    - datalake_gsheets_raw.brazilian_regions_url.city
+    description: Attribute sourced from the `brazilian_regions_url` reference sheet and consumed by Growth analytics pipelines.
   neighborhood:
     lineage:
-      - datalake_gsheets_raw.brazilian_regions_url.neighborhood
+    - datalake_gsheets_raw.brazilian_regions_url.neighborhood
     description: The neighborhood of the region
+owner: henrique.paulo@quintoandar.com.br

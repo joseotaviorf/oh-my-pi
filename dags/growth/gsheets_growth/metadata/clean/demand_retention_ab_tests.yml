@@ -4,16 +4,23 @@ domain: Growth
 columns:
   id_user:
     lineage:
-      - datalake_gsheets_raw.demand_retention_ab_tests.id_user
+    - datalake_gsheets_raw.demand_retention_ab_tests.id_user
+    description: Business or surrogate identifier used to join this dataset with downstream Growth models.
   media:
     lineage:
-      - datalake_gsheets_raw.demand_retention_ab_tests.media
+    - datalake_gsheets_raw.demand_retention_ab_tests.media
+    description: Attribute sourced from the `demand_retention_ab_tests` reference sheet and consumed by Growth analytics pipelines.
   context:
     lineage:
-      - datalake_gsheets_raw.demand_retention_ab_tests.context
+    - datalake_gsheets_raw.demand_retention_ab_tests.context
+    description: Attribute sourced from the `demand_retention_ab_tests` reference sheet and consumed by Growth analytics pipelines.
   group:
     lineage:
-      - datalake_gsheets_raw.demand_retention_ab_tests.group
+    - datalake_gsheets_raw.demand_retention_ab_tests.group
+    description: Attribute sourced from the `demand_retention_ab_tests` reference sheet and consumed by Growth analytics pipelines.
   dt_import:
     lineage:
-      - datalake_gsheets_raw.demand_retention_ab_tests.dt_import
+    - datalake_gsheets_raw.demand_retention_ab_tests.dt_import
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `demand_retention_ab_tests` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

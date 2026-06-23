@@ -1,52 +1,50 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: mkt_cost_per_source
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table extracted from Gsheets where Planning Team input Growth Marketing Budget. 
+description: Table extracted from Gsheets where Planning Team input Growth Marketing Budget.
 columns:
   business:
     description: Business context segmentation
-    categories: 
-      rent: '' 
+    categories:
+      rent: ''
       sale: ''
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.business
+    - datalake_gsheets_raw.mkt_cost_per_source.business
   city_group:
-    description: City group segmentation
+    description: Attribute sourced from the `mkt_cost_per_source` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.city
+    - datalake_gsheets_raw.mkt_cost_per_source.city
   daily_value:
     description: Budget inserted by Planning for each segmentation
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.daily_value
+    - datalake_gsheets_raw.mkt_cost_per_source.daily_value
   mkt_channel:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.mkt_channel
+    - datalake_gsheets_raw.mkt_cost_per_source.mkt_channel
   mkt_medium:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.mkt_medium
+    - datalake_gsheets_raw.mkt_cost_per_source.mkt_medium
   mkt_source:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.mkt_source
+    - datalake_gsheets_raw.mkt_cost_per_source.mkt_source
   dt_event:
     description: Date segmentation
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.date
+    - datalake_gsheets_raw.mkt_cost_per_source.date
   dt_week_start:
-    description: Week start segmentation
+    description: Calendar date associated with the metric, target, or event represented in this row.
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.week_start
+    - datalake_gsheets_raw.mkt_cost_per_source.week_start
   month:
-    description: Month segmentation
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.month
+    - datalake_gsheets_raw.mkt_cost_per_source.month
   year:
-    description: Year segmentation
+    description: Hive partition column (year) for incremental reads; combine with business date filters when querying historical snapshots.
     lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.year
-  ts_load: 
-    description: Timestamp of loaded data
+    - datalake_gsheets_raw.mkt_cost_per_source.year

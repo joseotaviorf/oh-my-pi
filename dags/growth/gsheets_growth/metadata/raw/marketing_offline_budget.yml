@@ -1,3 +1,4 @@
 database_name: datalake_gsheets_raw
 table_name: marketing_offline_budget
 domain: Growth
+owner: henrique.paulo@quintoandar.com.br

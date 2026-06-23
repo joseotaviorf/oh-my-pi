@@ -4,10 +4,15 @@ domain: Growth
 columns:
   ad_type:
     lineage:
-      - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.ad_type
+    - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.ad_type
+    description: Attribute sourced from the `marketing_costs_google_ad_type_flags` reference sheet and consumed by Growth analytics pipelines.
   flag:
     lineage:
-      - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.flag
+    - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.flag
+    description: Attribute sourced from the `marketing_costs_google_ad_type_flags` reference sheet and consumed by Growth analytics pipelines.
   report_type:
     lineage:
-      - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.report_type
+    - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.report_type
+    description: Attribute sourced from the `marketing_costs_google_ad_type_flags` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `marketing_costs_google_ad_type_flags` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

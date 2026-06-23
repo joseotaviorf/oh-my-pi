@@ -5,13 +5,19 @@ domain: Growth
 columns:
   sk_user:
     lineage:
-      - datalake_gsheets_raw.voucherify_users.Customer_Source_ID
+    - datalake_gsheets_raw.voucherify_users.Customer_Source_ID
+    description: Attribute sourced from the `voucherify_users` reference sheet and consumed by Growth analytics pipelines.
   code:
     lineage:
-      - datalake_gsheets_raw.voucherify_users.Code
+    - datalake_gsheets_raw.voucherify_users.Code
+    description: Attribute sourced from the `voucherify_users` reference sheet and consumed by Growth analytics pipelines.
   dt_expirate_at:
     lineage:
-      - datalake_gsheets_raw.voucherify_users.Expiration_Date
+    - datalake_gsheets_raw.voucherify_users.Expiration_Date
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_created_at:
     lineage:
-      - datalake_gsheets_raw.voucherify_users.Creation_Date
+    - datalake_gsheets_raw.voucherify_users.Creation_Date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `voucherify_users` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

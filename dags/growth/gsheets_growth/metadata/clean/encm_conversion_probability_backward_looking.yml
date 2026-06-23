@@ -4,31 +4,43 @@ domain: Growth
 columns:
   date_start:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.date_start
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.date_start
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   date_end:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.date_end
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.date_end
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.city_group
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.city_group
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   business_context:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.business_context
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.business_context
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   event_name:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.event_name
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.event_name
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   price_range:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.price_range
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.price_range
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   prob_conv:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.prob_conv
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.prob_conv
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   tm_conv:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.tm_conv
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.tm_conv
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   min_range:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.min_range
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.min_range
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
   max_range:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability_backward_looking.max_range
+    - datalake_gsheets_raw.encm_conversion_probability_backward_looking.max_range
+    description: Attribute sourced from the `encm_conversion_probability_backward_looking` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `encm_conversion_probability_backward_looking` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

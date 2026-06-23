@@ -4,25 +4,35 @@ domain: Growth
 columns:
   cluster:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.cluster
+    - datalake_gsheets_raw.marketshare_units_and_tenants.cluster
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   microregion:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.microregion
+    - datalake_gsheets_raw.marketshare_units_and_tenants.microregion
+    description: Attribute sourced from the `marketshare_units_and_tenants` reference sheet and consumed by Growth analytics pipelines.
   state_uf:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.state
+    - datalake_gsheets_raw.marketshare_units_and_tenants.state
+    description: Attribute sourced from the `marketshare_units_and_tenants` reference sheet and consumed by Growth analytics pipelines.
   macroregion:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.macroregion
+    - datalake_gsheets_raw.marketshare_units_and_tenants.macroregion
+    description: Attribute sourced from the `marketshare_units_and_tenants` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.city_group
+    - datalake_gsheets_raw.marketshare_units_and_tenants.city_group
+    description: Attribute sourced from the `marketshare_units_and_tenants` reference sheet and consumed by Growth analytics pipelines.
   vacant_residential_units:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.vacant_residential_units
+    - datalake_gsheets_raw.marketshare_units_and_tenants.vacant_residential_units
+    description: Attribute sourced from the `marketshare_units_and_tenants` reference sheet and consumed by Growth analytics pipelines.
   available_tenants:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.available_tenants
-  year:
+    - datalake_gsheets_raw.marketshare_units_and_tenants.available_tenants
+    description: Attribute sourced from the `marketshare_units_and_tenants` reference sheet and consumed by Growth analytics pipelines.
+  dt_year:
     lineage:
-      - datalake_gsheets_raw.marketshare_units_and_tenants.year
+    - datalake_gsheets_raw.marketshare_units_and_tenants.year
+    description: Reference year for marketshare vacant units and available tenants metrics.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `marketshare_units_and_tenants` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

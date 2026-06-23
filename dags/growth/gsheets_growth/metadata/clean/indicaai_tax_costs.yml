@@ -5,28 +5,39 @@ domain: Growth
 columns:
   table_name:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.table_name
+    - datalake_gsheets_raw.indicaai_tax_costs.table_name
+    description: Attribute sourced from the `indicaai_tax_costs` reference sheet and consumed by Growth analytics pipelines.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.mkt_origin
+    - datalake_gsheets_raw.indicaai_tax_costs.mkt_origin
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
   city_group:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.city_group
+    - datalake_gsheets_raw.indicaai_tax_costs.city_group
+    description: Attribute sourced from the `indicaai_tax_costs` reference sheet and consumed by Growth analytics pipelines.
   vertical:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.vertical
+    - datalake_gsheets_raw.indicaai_tax_costs.vertical
+    description: Attribute sourced from the `indicaai_tax_costs` reference sheet and consumed by Growth analytics pipelines.
   source:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.source
+    - datalake_gsheets_raw.indicaai_tax_costs.source
+    description: Attribute sourced from the `indicaai_tax_costs` reference sheet and consumed by Growth analytics pipelines.
   business_context:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.business_context
+    - datalake_gsheets_raw.indicaai_tax_costs.business_context
+    description: Attribute sourced from the `indicaai_tax_costs` reference sheet and consumed by Growth analytics pipelines.
   costs:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.costs
+    - datalake_gsheets_raw.indicaai_tax_costs.costs
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
   dt_tax_cost:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.dt
+    - datalake_gsheets_raw.indicaai_tax_costs.dt
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_week_started:
     lineage:
-      - datalake_gsheets_raw.indicaai_tax_costs.week_start
+    - datalake_gsheets_raw.indicaai_tax_costs.week_start
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `indicaai_tax_costs` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

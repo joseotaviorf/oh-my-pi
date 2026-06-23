@@ -1,67 +1,75 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: marketing_manual_costs_name_convetion
-owner: uilson.bonfim@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table extracted from Gsheets where Growth teams define Manual Costs specifing using a name convention share rule. This table is used when there is a share rule that can be applied to share costs between city groups. 
+description: Table extracted from Gsheets where Growth teams define Manual Costs specifing using a name convention share rule. This table is used when there is a share rule that can be applied to share costs between city groups.
 columns:
   account_name:
     description: Account name of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.account_name
-  ad_group_name:  
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.account_name
+  ad_group_name:
     description: Ad group name of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.ad_group_name
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.ad_group_name
   behavior_type:
     description: Taxonomy Level
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.behavior_type
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.behavior_type
   campaign_business_context:
     description: Taxonomy Level
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.campaign_business_context
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.campaign_business_context
   campaign_strategy_intent:
     description: Taxonomy Level
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.campaign_strategy_intent
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.campaign_strategy_intent
   campaign_name:
     description: Campagin name of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.campaign_name
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.campaign_name
   cost:
     description: Manual cost attributed for each segmentation
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.cost
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.cost
+  impressions:
+    description: Manual impression volume attributed for each name-convention sharing rule row.
+    lineage:
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.impressions
+  clicks:
+    description: Manual click volume attributed for each name-convention sharing rule row.
+    lineage:
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.clicks
   dt_cost:
     description: Date segmentation
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.dt
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.dt
   funnel_side:
     description: Side/squad intern team owner of that campaing cost
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.funnel_side
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.funnel_side
   landing_page:
     description: Taxonomy Level
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.landing_page
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.landing_page
   medium:
     description: Taxonomy Level
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.medium
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.medium
   id_rule:
     description: Id rule used to share cost between cities
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.id_rule
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.id_rule
   source:
     description: Taxonomy Level
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.source
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.source
   utm_content:
     description: utm_content of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.utm_content
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.utm_content
   utm_term:
     description: utm_term of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_manual_costs_name_convetion.utm_term
+    - datalake_gsheets_raw.marketing_manual_costs_name_convetion.utm_term

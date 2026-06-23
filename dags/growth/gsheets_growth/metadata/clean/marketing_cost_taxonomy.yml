@@ -1,27 +1,27 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: marketing_cost_taxonomy
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table extracted from Gsheets where Growth teams define Growth Taxonomy for mkts level according to the report type
 columns:
   account_name:
     description: Account name of Marketing Ads Platform
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.account_name
+    - datalake_gsheets_raw.marketing_cost_taxonomy.account_name
   report_type:
     description: Type of report extracted from Marketing Ads Platform. Used only for information came from Google Ads platform.
-    categories: 
+    categories:
       APP_AD: App report type
       AD_PERFORMANCE_REPORT: Ads report type
       VIDEO_PERFORMANCE_REPORT: Video report type
       CAMPAIGN_PERFORMANCE_REPORT: Campaign report type
       KEYWORDS_PERFORMANCE_REPORT: Keywords report type
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.report_type
+    - datalake_gsheets_raw.marketing_cost_taxonomy.report_type
   ad_type:
-    description: Type of ad from report type. Used only for information came from Google Ads platform. 
-    categories: 
+    description: Type of ad from report type. Used only for information came from Google Ads platform.
+    categories:
       display_ad: ''
       dsa_ad: ''
       exp_text_ad: ''
@@ -29,20 +29,20 @@ columns:
       other: ''
       resp_search_ad: ''
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.ad_type
+    - datalake_gsheets_raw.marketing_cost_taxonomy.ad_type
   campaign_origin_acquisition:
     description: Mkt_origin campaign intent. Used only for supply/affiliate side.
-    categories: 
+    categories:
       Agents: ''
       Calculator: ''
       Doorman: ''
       New Channels: ''
       Other: ''
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.campaign_origin_aquisition
+    - datalake_gsheets_raw.marketing_cost_taxonomy.campaign_origin_aquisition
   origin:
     description: Marketing Ads Platform which costs were extracetd from
-    categories: 
+    categories:
       criteo: ''
       facebook: ''
       google: ''
@@ -50,61 +50,59 @@ columns:
       linkedin: ''
       mitula: ''
       rtb: ''
-      Taboola: '' 
-      trovit: '' 
+      Taboola: ''
+      trovit: ''
       twitter: ''
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.origin
+    - datalake_gsheets_raw.marketing_cost_taxonomy.origin
   side:
     description: Side/squad intern team owner of that campaing cost
-    categories: 
+    categories:
       affiliates: ''
-      branding: '' 
-      demand: '' 
-      partners: '' 
-      social: '' 
+      branding: ''
+      demand: ''
+      partners: ''
+      social: ''
       supply: ''
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.side
+    - datalake_gsheets_raw.marketing_cost_taxonomy.side
   business_context:
     description: Business context for the account (sale rent or hybrid)
-    categories: 
+    categories:
       sale: ''
-      rent: '' 
+      rent: ''
       hybrid: ''
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.business_context
+    - datalake_gsheets_raw.marketing_cost_taxonomy.business_context
   mkt_category:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_category
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_category
   mkt_flow:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_flow
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_flow
   mkt_completion:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_completion
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_completion
   mkt_origin:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_origin
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_origin
   mkt_channel:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_channel
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_channel
   mkt_medium:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_medium
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_medium
   mkt_source:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_source
+    - datalake_gsheets_raw.marketing_cost_taxonomy.mkt_source
   cost_factor:
-    description: Cost share weight between Desktop and Mobile Cost 
+    description: Cost share weight between Desktop and Mobile Cost
     lineage:
-      - datalake_gsheets_raw.marketing_cost_taxonomy.cost_factor
-  ts_load: 
-    description: Timestamp of loaded data
+    - datalake_gsheets_raw.marketing_cost_taxonomy.cost_factor

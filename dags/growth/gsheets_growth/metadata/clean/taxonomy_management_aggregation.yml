@@ -1,39 +1,39 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: taxonomy_management_aggregation
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table created from a Google Sheets file in order to input taxonomy management aggregation into datalake
 columns:
   funnel_side:
-    description: Funnel side of the taxonomy management aggregation
+    description: Attribute sourced from the `taxonomy_management_aggregation` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.funnel_side
+    - datalake_gsheets_raw.taxonomy_management_aggregation.funnel_side
   campaign_business_context:
-    description: Campaign business context of the taxonomy management aggregation
+    description: Attribute sourced from the `taxonomy_management_aggregation` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.campaign_business_context
+    - datalake_gsheets_raw.taxonomy_management_aggregation.campaign_business_context
   campaign_strategy_intent:
-    description: Campaign strategy intent of the taxonomy management aggregation
+    description: Attribute sourced from the `taxonomy_management_aggregation` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.campaign_strategy_intent
+    - datalake_gsheets_raw.taxonomy_management_aggregation.campaign_strategy_intent
   campaign_landing_page:
-    description: Campaign landing page of the taxonomy management aggregation
+    description: Attribute sourced from the `taxonomy_management_aggregation` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.campaign_landing_page
+    - datalake_gsheets_raw.taxonomy_management_aggregation.campaign_landing_page
   behavior_type:
-    description: Behavior type of the taxonomy management aggregation
+    description: Attribute sourced from the `taxonomy_management_aggregation` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.behavior_type
+    - datalake_gsheets_raw.taxonomy_management_aggregation.behavior_type
   medium:
-    description: Medium of the taxonomy management aggregation
+    description: Attribute sourced from the `taxonomy_management_aggregation` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.medium
+    - datalake_gsheets_raw.taxonomy_management_aggregation.medium
   taxonomy_aggregation_level_1:
-    description: Taxonomy aggregation level 1 of the taxonomy management aggregation
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.taxonomy_aggregation_level_1
+    - datalake_gsheets_raw.taxonomy_management_aggregation.taxonomy_aggregation_level_1
   taxonomy_aggregation_level_2:
-    description: Taxonomy aggregation level 2 of the taxonomy management aggregation
+    description: Marketing taxonomy dimension used to classify campaigns, channels, or acquisition programs.
     lineage:
-      - datalake_gsheets_raw.taxonomy_management_aggregation.taxonomy_aggregation_level_2
+    - datalake_gsheets_raw.taxonomy_management_aggregation.taxonomy_aggregation_level_2

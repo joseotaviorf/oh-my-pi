@@ -4,22 +4,31 @@ domain: Growth
 columns:
   cities:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.cities
+    - datalake_gsheets_raw.households_per_city_ibge.cities
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
   state_uf:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.state_uf
+    - datalake_gsheets_raw.households_per_city_ibge.state_uf
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
   state_name:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.state_name
+    - datalake_gsheets_raw.households_per_city_ibge.state_name
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
   microregion_name:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.microregion_name
+    - datalake_gsheets_raw.households_per_city_ibge.microregion_name
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
   territory_planning:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.territory_planning
+    - datalake_gsheets_raw.households_per_city_ibge.territory_planning
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.city_group
+    - datalake_gsheets_raw.households_per_city_ibge.city_group
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
   households:
     lineage:
-      - datalake_gsheets_raw.households_per_city_ibge.households
+    - datalake_gsheets_raw.households_per_city_ibge.households
+    description: Attribute sourced from the `households_per_city_ibge` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `households_per_city_ibge` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -5,28 +5,30 @@ columns:
   utm_campaign:
     description: The utm_campaign of the campaign that doesn't follow the naming convention.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.utm_campaign
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.utm_campaign
   utm_source:
     description: Campaign's parameter that indicates the sourcer platform.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.utm_source
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.utm_source
   utm_medium:
     description: Campaign's parameter that indicates the medium where the camapign was broadcast.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.utm_medium
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.utm_medium
   correct_utm_campaign:
     description: Correct utm_capaign, following the naming convention.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.correct_utm_campaign
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.correct_utm_campaign
   responsible_team:
     description: Team responsible for that campaign.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.responsible_team
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.responsible_team
   author:
     description: Author that registred the correct utm_campaign.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.dt_updated
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.dt_updated
   dt_created:
     description: When the correct utm_campaign was registred.
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.dt_updated
+    - datalake_gsheets_raw.taxonomy_demand_exception_flow.dt_updated
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `taxonomy_demand_exception_flow` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

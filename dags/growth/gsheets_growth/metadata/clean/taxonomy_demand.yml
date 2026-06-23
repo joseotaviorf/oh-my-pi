@@ -5,46 +5,63 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.id
+    - datalake_gsheets_raw.taxonomy_demand.id
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   app_type:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.app_type
+    - datalake_gsheets_raw.taxonomy_demand.app_type
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   utm_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.utm_source
+    - datalake_gsheets_raw.taxonomy_demand.utm_source
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   utm_medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.utm_medium
+    - datalake_gsheets_raw.taxonomy_demand.utm_medium
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   branded:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.branded
+    - datalake_gsheets_raw.taxonomy_demand.branded
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   category:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.category
+    - datalake_gsheets_raw.taxonomy_demand.category
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   flow:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.flow
+    - datalake_gsheets_raw.taxonomy_demand.flow
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   completion:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.completion
+    - datalake_gsheets_raw.taxonomy_demand.completion
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   origin:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.origin
+    - datalake_gsheets_raw.taxonomy_demand.origin
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   channel:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.channel
+    - datalake_gsheets_raw.taxonomy_demand.channel
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   medium:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.medium
+    - datalake_gsheets_raw.taxonomy_demand.medium
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.source
+    - datalake_gsheets_raw.taxonomy_demand.source
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   platform:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.platform
+    - datalake_gsheets_raw.taxonomy_demand.platform
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   flg_via_reschedule:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.flg_via_reschedule
+    - datalake_gsheets_raw.taxonomy_demand.flg_via_reschedule
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
   first_update_source:
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand.first_update_source
+    - datalake_gsheets_raw.taxonomy_demand.first_update_source
+    description: Attribute sourced from the `taxonomy_demand` reference sheet and consumed by Growth analytics pipelines.
+owner: henrique.paulo@quintoandar.com.br
+description: Reference table `taxonomy_demand` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.
