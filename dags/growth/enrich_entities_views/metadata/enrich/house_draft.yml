@@ -1,10 +1,9 @@
 database_name: datalake_entities_views
 table_name: house_draft
 description: |
-  Enriched view of house draft data that consolidates house draft, house, and owner information for full self-service house drafts.
-  This view only includes house drafts with type 'FULL_SELF_SERVICE', representing property registration drafts created through the self-service flow by the owner.
+  Enriched house draft entity view for the CDP transactional entities pipeline, exposing listing draft attributes from Atlas.
 domain: Growth
-owner: eduardo.soares@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_entity:
     lineage:

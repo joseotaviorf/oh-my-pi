@@ -1,6 +1,7 @@
 database_name: datalake_entities_views
 table_name: onboarding
-description: Enriched view of onboarding data that consolidates tenant, house, and owner information for the onboarding process.
+description: |
+  Enriched onboarding entity view for CDP, capturing supply onboarding steps linked to houses and owners.
 domain: Growth
 owner: marcio.gomes@quintoandar.com.br
 columns:

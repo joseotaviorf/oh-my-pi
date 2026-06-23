@@ -1,10 +1,7 @@
 database_name: datalake_entities_views
 table_name: photo_session
 description: |
-  Enriched view of photo session data that consolidates photographer, house, and job information for photo session processes.
-  This table creates multiple rows per photo session - one row per persona (OWNER and AGENT_PHOTOGRAPHER).
-  Each photo session generates exactly 2 rows (one for OWNER persona and one for AGENT_PHOTOGRAPHER persona).
-  Only includes photo sessions created in 2025 or later (YEAR(ts_created) >= 2025).
+  Enriched photo session entity view for CDP, tracking photographer assignments and session status for listings.
 domain: Growth
 owner: marcio.gomes@quintoandar.com.br
 columns:
@@ -17,8 +14,6 @@ columns:
       - datalake_ebdb_clean.photographer_job.id_house
     description: Foreign key referencing the house entity where the photo session takes place.
   id_contract:
-    lineage:
-      - .id_contract
     description: Contract id related to the photo session. Always NULL for photo sessions as they are not directly linked to contracts.
   id_user:
     lineage:
@@ -30,14 +25,10 @@ columns:
       or the photographer user ID (user.id from user table joined via id_photographer_data) when persona is 'AGENT_PHOTOGRAPHER'.
       Each photo session entity generates two rows with different id_user values based on persona.
   entity:
-    lineage:
-      - .entity
     description: |
       Entity type indicating the photo session type. Set to 'PHOTO_SESSION' for all photo session entities.
       The value is currently the same for all photo sessions regardless of business context (RENT/SALE).
   business_context:
-    lineage:
-      - .business_context
     description: |
       Business context of the photo session. Currently always NULL in the query implementation.
       The field is reserved for future use to indicate 'RENT', 'SALE', or both when business context explosion is implemented.

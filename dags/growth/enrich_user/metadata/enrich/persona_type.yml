@@ -7,6 +7,7 @@ description: |
   built by unioning persona-specific enrich tables in the `enrich_user` DAG.
   Partitioned by `client_type`, `year`, `month`, `day`. Use it in the WHERE clause to enable partition
   pruning and avoid full table scans.
+  Partitioned by year, month, and day — filter year, month, and day together in WHERE.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
