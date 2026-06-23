@@ -2,36 +2,47 @@
 database_name: datalake_gsheets_raw
 table_name: agents_control
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for the support agents control roster. Contains PII — access restricted.
 columns:
   assignee_id:
+    description: Raw assignee identifier for the support agent.
     tags:
       - PII
       - Confidential
   assignee_name:
+    description: Raw name of the support agent from the Google Sheet.
     tags:
       - PII
       - Confidential
   cpf:
+    description: Raw CPF (Brazilian tax identifier) of the support agent.
     tags:
       - PII
       - Confidential
   departamento:
+    description: Raw department name of the support agent.
     tags:
       - Public
   email:
+    description: Raw email address of the support agent.
     tags:
       - Confidential
   gestores:
+    description: Raw manager name(s) for this support agent.
     tags:
       - PII
       - Confidential
   matricula:
+    description: Raw employee registration number (matrícula).
     tags:
       - Public
   nome:
+    description: Raw full name of the support agent.
     tags:
       - PII
       - Confidential
   situacao:
+    description: Raw employment status of the support agent.
     tags:
       - Public

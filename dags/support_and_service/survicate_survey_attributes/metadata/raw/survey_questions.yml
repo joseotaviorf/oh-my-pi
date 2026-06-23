@@ -1,3 +1,5 @@
 database_name: datalake_survicate_test_raw
 table_name: survey_questions
+description: Raw Survicate survey question definitions. One row per question in a survey configuration. Source system is Survicate (test environment).
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br

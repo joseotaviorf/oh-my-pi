@@ -1,6 +1,8 @@
 database_name: datalake_gsheets_raw
 table_name: csat_negociacao_iq
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for tenant (IQ) negotiation CSAT survey responses. Contains PII — access restricted.
 columns:
   token:
     tags:

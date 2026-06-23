@@ -1,6 +1,8 @@
 database_name: datalake_gsheets_raw
 table_name: inspectors_control
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for the property inspectors control roster. Contains PII — access restricted.
 columns:
   beneficiary_document:
     tags:

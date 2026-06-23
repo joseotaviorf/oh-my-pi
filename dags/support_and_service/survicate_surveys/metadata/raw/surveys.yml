@@ -1,3 +1,7 @@
 database_name: datalake_survicate_raw
 table_name: surveys
+description: >
+  Raw Survicate survey configuration data. One row per survey created in the Survicate
+  platform, capturing survey identity and structure. Source system is Survicate.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br

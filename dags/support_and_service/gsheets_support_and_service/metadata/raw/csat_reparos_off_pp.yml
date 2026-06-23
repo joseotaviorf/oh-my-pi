@@ -2,6 +2,8 @@
 database_name: datalake_gsheets_raw
 table_name: csat_reparos_off_pp
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for owner (PP) repair offboarding CSAT survey responses. Contains PII — access restricted.
 columns:
   email:
     tags:

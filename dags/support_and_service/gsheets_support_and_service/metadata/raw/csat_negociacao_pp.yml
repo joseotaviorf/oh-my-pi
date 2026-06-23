@@ -2,6 +2,8 @@
 database_name: datalake_gsheets_raw
 table_name: csat_negociacao_pp
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for owner (PP) negotiation CSAT survey responses. Contains PII — access restricted.
 columns:
   token:
     tags:

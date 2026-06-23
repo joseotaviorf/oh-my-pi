@@ -1,32 +1,42 @@
 database_name: datalake_tracksale_raw
 table_name: answer
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Tracksale NPS survey answers. One row per survey response including PII respondent attributes. Contains PII — access restricted. Source system is Tracksale.
 columns:
   alternative_email:
+    description: Alternative email address of the respondent provided in the survey answer.
     tags:
     - Confidential
   alternative_phone:
+    description: Alternative phone number of the respondent provided in the survey answer.
     tags:
     - Confidential
   assignee:
+    description: Name or identifier of the assignee linked to this survey response.
     tags:
     - PII
     - Confidential
   email:
+    description: Email address of the respondent who submitted this NPS survey answer.
     tags:
     - Confidential
   identification:
+    description: Primary identification value (CPF or ID) of the NPS survey respondent.
     tags:
     - PII
     - Confidential
   name:
+    description: Full name of the NPS survey respondent.
     tags:
     - PII
     - Confidential
   phone:
+    description: Phone number of the NPS survey respondent.
     tags:
     - Confidential
   tags:
+    description: JSON array of tags associated with this survey answer for categorisation and routing.
     tags:
     - PII
     - Confidential

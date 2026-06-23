@@ -1,30 +1,43 @@
 ---
 database_name: datalake_reclameaqui_raw
 table_name: tickets
+description: >
+  Raw Reclame Aqui / HugMe complaint tickets. One row per complaint, containing customer
+  identity, complaint body, company responses, and internal notes. All fields are PII
+  or potentially PII — access restricted. Source system is Reclame Aqui via HugMe API.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   customer:
+    description: Raw JSON object with customer identity attributes from the complaint ticket.
     tags:
       - PII
       - Confidential
   user:
+    description: Raw JSON object with QuintoAndar user attributes linked to this complaint.
     tags:
       - PII
   complaint_content:
+    description: Raw text of the complaint body submitted by the customer on Reclame Aqui.
     tags:
       - PII
   complaint_company_response:
+    description: Raw text of the company's official response to the complaint on Reclame Aqui.
     tags:
       - PII
   customer_considerations:
+    description: Raw text of the customer's additional considerations or follow-up comments on the complaint.
     tags:
       - PII
   company_considerations:
+    description: Raw text of the company's additional considerations following the customer's response.
     tags:
       - PII
   sticky_notes:
+    description: Raw internal sticky notes added by the support team for this complaint ticket.
     tags:
       - PII
   historical:
+    description: Raw JSON array with the historical timeline of actions and status changes for this complaint.
     tags:
       - PII

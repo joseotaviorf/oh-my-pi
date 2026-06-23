@@ -1,3 +1,5 @@
 database_name: datalake_gsheets_raw
 table_name: recuperacao_fachada_e_area_comum
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for facade and common area photo recovery tracking by property.

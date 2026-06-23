@@ -2,6 +2,8 @@
 database_name: datalake_gsheets_raw
 table_name: csat_vistoria_iq_saida
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Google Sheet data for tenant (IQ) exit inspection CSAT survey responses. Contains PII — access restricted.
 columns:
   email:
     tags:

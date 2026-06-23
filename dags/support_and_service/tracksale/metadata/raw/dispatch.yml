@@ -1,8 +1,11 @@
 database_name: datalake_tracksale_raw
 table_name: dispatch
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Tracksale NPS survey dispatch records. One row per survey dispatch to a customer. Contains PII — access restricted. Source system is Tracksale.
 columns:
   customers:
+    description: Raw JSON array with customer identity and contact attributes for this NPS dispatch.
     tags:
     - PII
     - Confidential
