@@ -1,29 +1,42 @@
----
 database_name: datalake_saruman_clean
 table_name: session_history
+description: >
+  One row per state change event in a Saruman support session. Each record captures
+  an event type and its associated payload, providing a full audit trail of status
+  transitions and workflow actions taken during the session lifecycle.
+  Partitioned by year, month and day. Source system is Saruman.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_saruman_raw.session_history.id
+    description: Unique identifier for the session history event record in Saruman.
   id_session:
     lineage:
       - datalake_saruman_raw.session_history.session_id
+    description: Identifier of the parent support session (from session table) this history event belongs to.
   event_type:
     lineage:
       - datalake_saruman_raw.session_history.event_type
+    description: Type of the workflow event that occurred in the session (e.g., status_changed, tag_added, department_transferred).
   history_payload:
     lineage:
       - datalake_saruman_raw.session_history.history_payload
+    description: JSON payload containing the full context of the event, including before/after values and any additional metadata.
   ts_created:
     lineage:
       - datalake_saruman_raw.session_history.created_at
+    description: Timestamp when the session history event was recorded in Saruman.
   year:
     lineage:
       - datalake_saruman_raw.session_history.year
+    description: Year extracted from the event creation timestamp. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_saruman_raw.session_history.month
+    description: Month extracted from the event creation timestamp. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_saruman_raw.session_history.day
+    description: Day extracted from the event creation timestamp. Partition column — filter on this column to enable partition pruning.

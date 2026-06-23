@@ -1,46 +1,63 @@
 database_name: datalake_twilio_flex_insights_clean
 table_name: conversation_time_metrics
+description: >
+  One row per conversation segment from Twilio Flex Insights, capturing granular time
+  metrics for each support interaction. Each record aggregates queue time, talk time,
+  wrap-up time, handling time, waiting time, ring time, and first reply time for a specific
+  conversation-segment pair, enabling SLA compliance and efficiency analysis.
+  Partitioned by year, month and day. Source system is Twilio Flex.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_conversation:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.conversation
+    description: Twilio Flex conversation identifier, linking this metrics record to the specific support interaction.
   id_segment:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.conversation_attribute_4
+    description: Segment identifier extracted from conversation attribute 4, representing a sub-unit of the conversation for routing analysis.
   id_reservation:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.segment
+    description: Twilio TaskRouter reservation identifier for this conversation segment, linking it to the assigned worker reservation.
   total_queue_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_queue_time
+    description: Total time in seconds the conversation spent waiting in the queue before being accepted by an agent.
   total_talk_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_talk_time
+    description: Total time in seconds the agent and customer were actively engaged in conversation.
   total_wrap_up_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_wrap_up_time
+    description: Total time in seconds the agent spent in wrap-up (post-call work) after the conversation ended.
   total_handling_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_handling_time
+    description: Total handling time in seconds, computed as talk time plus wrap-up time, representing the full agent effort for this conversation.
   total_waiting_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_waiting_time
+    description: Total time in seconds the customer waited across all phases of this conversation (queue plus any hold time).
   total_ring_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.ring_time
+    description: Total time in seconds the conversation rang at the agent's workstation before being accepted or abandoned.
   first_reply_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.first_reply_time
-  dt_created:
-    lineage:
-      - datalake_twilio_flex_insights_raw.conversation_time_metrics.date
+    description: Time in seconds from when the conversation was accepted by an agent to when the agent sent the first reply to the customer.
   year:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.year
+    description: Year extracted from the conversation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.month
+    description: Month extracted from the conversation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.day
+    description: Day extracted from the conversation date. Partition column — filter on this column to enable partition pruning.

@@ -1,28 +1,42 @@
 database_name: datalake_tracksale_clean
 table_name: dispatch
+description: >
+  One row per NPS survey dispatch batch in Tracksale. Each record represents a bulk send
+  operation targeting a set of customers, tracking the batch status and the list of
+  customer contacts included in the dispatch.
+  Partitioned by year, month and day. Source system is Tracksale.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_tracksale_raw.dispatch.dispatch_code
+    description: Unique dispatch code identifying this NPS survey batch in Tracksale.
   campaign:
     lineage:
       - datalake_tracksale_raw.dispatch.campaign
+    description: Name or code of the NPS campaign this dispatch batch belongs to.
   customers:
     lineage:
       - datalake_tracksale_raw.dispatch.customers
+    description: JSON array of customer records included in this dispatch batch, containing contact and identification information.
   status:
     lineage:
       - datalake_tracksale_raw.dispatch.status
+    description: Current status of the dispatch batch (e.g., pending, sent, failed), indicating whether survey emails or SMS were successfully delivered.
   ts_created:
     lineage:
       - datalake_tracksale_raw.dispatch.create_time
+    description: Timestamp when the dispatch batch was created in Tracksale.
   year:
     lineage:
       - datalake_tracksale_raw.dispatch.year
+    description: Year extracted from the dispatch creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_tracksale_raw.dispatch.month
+    description: Month extracted from the dispatch creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_tracksale_raw.dispatch.day
+    description: Day extracted from the dispatch creation date. Partition column — filter on this column to enable partition pruning.

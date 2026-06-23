@@ -1,61 +1,115 @@
 database_name: datalake_quinturk_clean
 table_name: task_completion
+description: >
+  One row per annotation completion (submission) in Quinturk. Each record represents
+  a specific annotator's label decisions for a task, with results flattened from the
+  Label Studio result JSON array. Captures lead time, ground truth status, and whether
+  the annotation was cancelled. Partitioned by year, month and day. Source system is
+  Quinturk (Label Studio).
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_quinturk_raw.task_completion.id
+    description: Unique identifier for the annotation completion record in Quinturk.
   id_task:
     lineage:
       - datalake_quinturk_raw.task_completion.task_id
+    description: Identifier of the annotation task (from task table) this completion belongs to.
   id_parent_annotation:
     lineage:
       - datalake_quinturk_raw.task_completion.parent_annotation_id
+    description: Identifier of the parent annotation this completion was derived from, used in correction workflows.
   id_parent_prediction:
     lineage:
       - datalake_quinturk_raw.task_completion.parent_prediction_id
+    description: Identifier of the ML prediction this completion was based on, when the annotator refined a pre-annotation.
   id_completed_by:
     lineage:
       - datalake_quinturk_raw.task_completion.completed_by_id
+    description: Identifier of the user (annotator) who submitted this completion.
   id_last_created_by:
     lineage:
       - datalake_quinturk_raw.task_completion.last_created_by_id
+    description: Identifier of the user who last modified this completion record.
   id_input:
     lineage:
       - datalake_quinturk_raw.task_completion.result.id
+    description: Identifier of the individual result element within the annotation, extracted from the result JSON array.
   input_type:
     lineage:
       - datalake_quinturk_raw.task_completion.result.type
+    description: Type of the annotation result element (e.g., choices, textarea) indicating which labeling control produced this result.
   inpput_origin:
     lineage:
       - datalake_quinturk_raw.task_completion.result.origin
+    description: Origin of the annotation result (e.g., manual, prediction) indicating whether it was hand-labeled or model-generated.
   input_document_name:
     lineage:
       - datalake_quinturk_raw.task_completion.result.from_name
+    description: Name of the Label Studio control element (from the label config) that produced this annotation result.
   input_value:
     lineage:
       - datalake_quinturk_raw.task_completion.result.value
+    description: Struct containing the annotator's choices and text responses for this result element, extracted from the result JSON.
   prediction:
     lineage:
       - datalake_quinturk_raw.task_completion.prediction
+    description: JSON payload with the ML model prediction associated with this completion, used when the annotator refined a pre-annotation.
   lead_time:
     lineage:
       - datalake_quinturk_raw.task_completion.lead_time
+    description: Time in seconds the annotator spent completing this annotation task.
   result_count:
     lineage:
       - datalake_quinturk_raw.task_completion.result_count
+    description: Number of individual result elements in this completion's result JSON array.
   last_action:
     lineage:
       - datalake_quinturk_raw.task_completion.last_action
+    description: Most recent action performed on this completion (e.g., submitted, updated, prediction_created).
   is_ground_truth:
     lineage:
       - datalake_quinturk_raw.task_completion.ground_truth
+    description: Boolean flag indicating whether this completion has been designated as a ground truth annotation for quality benchmarking.
   was_cancelled:
     lineage:
       - datalake_quinturk_raw.task_completion.was_cancelled
+    description: Boolean flag indicating whether the annotator cancelled (skipped) this annotation rather than submitting a label.
   ts_created:
     lineage:
       - datalake_quinturk_raw.task_completion.created_at
+    description: Timestamp when the annotation completion was submitted in Quinturk.
   ts_updated:
     lineage:
       - datalake_quinturk_raw.task_completion.updated_at
+    description: Timestamp of the last update to the annotation completion record.
+  result:
+    lineage:
+      - datalake_quinturk_raw.task_completion.result
+    description: Raw JSON array from Label Studio containing the full annotation results before extraction into structured sub-fields.
+  op_cdc:
+    lineage:
+      - datalake_quinturk_raw.task_completion.op_cdc
+    description: CDC operation type for this record (e.g., insert, update, delete) indicating the change that triggered ingestion.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_quinturk_raw.task_completion.ts_cdc_transaction
+    description: Timestamp of the CDC transaction that captured this change event from the source database.
+  ts_database_transaction:
+    lineage:
+      - datalake_quinturk_raw.task_completion.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system that produced this change.
+  year:
+    lineage:
+      - datalake_quinturk_raw.task_completion.year
+    description: Year extracted from the completion creation date. Partition column.
+  month:
+    lineage:
+      - datalake_quinturk_raw.task_completion.month
+    description: Month extracted from the completion creation date. Partition column.
+  day:
+    lineage:
+      - datalake_quinturk_raw.task_completion.day
+    description: Day extracted from the completion creation date. Partition column.

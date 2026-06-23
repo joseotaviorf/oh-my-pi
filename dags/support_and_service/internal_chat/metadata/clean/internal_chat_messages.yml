@@ -1,65 +1,90 @@
----
 database_name: datalake_internal_chat_clean
 table_name: internal_chat_messages
+description: >
+  One row per message exchanged in QuintoAndar's internal chat system. Each record
+  captures the chat and channel context, participant role, message body, and metadata
+  attributes for every message sent across team communication channels. Partitioned by
+  year, month, day and hour. Source system is Internal Chat.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_chat:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.chatId
+    description: Identifier of the chat session or thread in which this message was sent.
   id_channel:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.vendor
+    description: Identifier of the communication channel (vendor platform) through which this message was delivered.
   id_message:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.vendor
+    description: Unique identifier for this message within its channel, assigned by the vendor platform.
   id_user_external:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.externalUser
+    description: External identifier of the user who sent the message, as assigned by the originating system.
   id_participant:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.participantId
+    description: Identifier of the chat participant record for the message sender within this chat session.
   participant_type:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.participantType
+    description: Type of participant who sent the message (e.g., agent, customer, bot), indicating their role in the conversation.
   chat_group:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.chatGroup
+    description: Group or team identifier this chat belongs to, used to organize chats by department or workflow.
   chat_type:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.chatType
+    description: Classification of the chat type (e.g., direct, group, support), indicating the interaction pattern.
   scope:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.scope
+    description: Visibility scope of the message (e.g., internal, external), indicating whether it is visible to customers or only to agents.
   index:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.index
+    description: Sequential position of this message within the chat, used for ordering messages in the conversation thread.
   mentions:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.mentions
+    description: JSON array of user identifiers mentioned in the message using @-notation.
   vendor:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.vendor
+    description: Vendor platform that delivered this message (e.g., twilio, sendbird), identifying the underlying messaging infrastructure.
   user_external:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.externalUser
+    description: External user reference object containing identity details from the originating system for the message sender.
   message:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.body
+    description: Text content of the message sent in the chat.
   message_attributes:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.attributes
+    description: JSON object with additional platform-specific attributes associated with the message (e.g., message type, formatting, reply context).
   ts_created:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.createdAt
+    description: Timestamp when the message was created and sent in the internal chat system.
   year:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.year
+    description: Year extracted from the message creation timestamp. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.month
+    description: Month extracted from the message creation timestamp. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.day
+    description: Day extracted from the message creation timestamp. Partition column — filter on this column to enable partition pruning.
   hour:
     lineage:
       - datalake_internal_chat_raw.chat5a_messages.hour
+    description: Hour extracted from the message creation timestamp. Partition column — filter on this column to enable partition pruning.

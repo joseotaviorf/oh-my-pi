@@ -1,88 +1,122 @@
 database_name: datalake_tracksale_clean
 table_name: answer
+description: >
+  One row per NPS survey response collected via Tracksale, QuintoAndar's customer
+  satisfaction platform. Each record captures the respondent's NPS score, verbatim
+  comment, contact details, and associated campaign, enabling closed-loop follow-up and
+  satisfaction analysis. Partitioned by year, month and day. Source system is Tracksale.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_tracksale_raw.answer.id
+    description: Unique identifier for the NPS survey response in Tracksale.
   id_campaign:
     lineage:
       - datalake_tracksale_raw.answer.campaign_code
+    description: Code identifying the NPS campaign that triggered this survey response.
   campaign_name:
     lineage:
       - datalake_tracksale_raw.answer.campaign_name
+    description: Display name of the NPS campaign associated with this response.
   name:
     lineage:
       - datalake_tracksale_raw.answer.name
+    description: Full name of the respondent as registered in Tracksale.
   identification:
     lineage:
       - datalake_tracksale_raw.answer.identification
+    description: External identifier of the respondent (e.g., user ID from the source system) used to link the response to a QuintoAndar user.
   email:
     lineage:
       - datalake_tracksale_raw.answer.email
+    description: Primary email address of the respondent used for survey delivery and follow-up.
   alternative_email:
     lineage:
       - datalake_tracksale_raw.answer.alternative_email
+    description: Secondary email address of the respondent, used as a fallback contact channel.
   phone:
     lineage:
       - datalake_tracksale_raw.answer.phone
+    description: Primary phone number of the respondent used for follow-up contact.
   alternative_phone:
     lineage:
       - datalake_tracksale_raw.answer.alternative_phone
+    description: Secondary phone number of the respondent, used as a fallback contact channel.
   priority:
     lineage:
       - datalake_tracksale_raw.answer.priority
+    description: Priority level assigned to this response for follow-up, typically based on NPS score (e.g., high priority for detractors).
   type:
     lineage:
       - datalake_tracksale_raw.answer.type
+    description: Classification of the response type in Tracksale (e.g., nps, csat), indicating the survey methodology used.
   status:
     lineage:
       - datalake_tracksale_raw.answer.status
+    description: Current follow-up status of the response (e.g., new, in_progress, closed), indicating whether the team has acted on it.
   nps_answer:
     lineage:
       - datalake_tracksale_raw.answer.nps_answer
+    description: NPS score submitted by the respondent on a 0–10 scale, where 0–6 are detractors, 7–8 passives, and 9–10 promoters.
   last_nps_answer:
     lineage:
       - datalake_tracksale_raw.answer.last_nps_answer
+    description: Most recent NPS score submitted by the respondent across all surveys, used to track sentiment changes over time.
   nps_comment:
     lineage:
       - datalake_tracksale_raw.answer.nps_comment
+    description: Verbatim open-ended comment provided by the respondent explaining their NPS score.
   justifications:
     lineage:
       - datalake_tracksale_raw.answer.justifications
+    description: JSON array of predefined justification tags selected by the respondent to categorize the reason for their score.
   lot_code:
     lineage:
       - datalake_tracksale_raw.answer.lot_code
+    description: Batch code identifying the dispatch lot that sent the survey to this respondent.
   assignee:
     lineage:
       - datalake_tracksale_raw.answer.assignee
+    description: Identifier of the support agent assigned to follow up with this respondent.
   tags:
     lineage:
       - datalake_tracksale_raw.answer.tags
+    description: JSON array of classification tags applied to this response for routing and reporting.
   categories:
     lineage:
       - datalake_tracksale_raw.answer.categories
+    description: JSON array of business categories associated with this response, used for thematic NPS analysis.
   seconds_spent_answering:
     lineage:
       - datalake_tracksale_raw.answer.elapsed_time
+    description: Time in seconds the respondent spent completing the NPS survey, used to assess response quality.
   ts_deadline:
     lineage:
       - datalake_tracksale_raw.answer.deadline
+    description: Timestamp by which the follow-up action for this response must be completed.
   ts_reminder:
     lineage:
       - datalake_tracksale_raw.answer.reminder_time
+    description: Timestamp when a reminder was or will be sent to the assigned agent to follow up on this response.
   ts_dispatch:
     lineage:
       - datalake_tracksale_raw.answer.dispatch_time
+    description: Timestamp when the NPS survey was dispatched (sent) to the respondent.
   ts_answer_sent:
     lineage:
       - datalake_tracksale_raw.answer.time
+    description: Timestamp when the respondent submitted their NPS answer.
   year:
     lineage:
       - datalake_tracksale_raw.answer.year
+    description: Year extracted from the answer submission timestamp. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_tracksale_raw.answer.month
+    description: Month extracted from the answer submission timestamp. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_tracksale_raw.answer.day
+    description: Day extracted from the answer submission timestamp. Partition column — filter on this column to enable partition pruning.

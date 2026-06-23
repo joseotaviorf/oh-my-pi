@@ -1,65 +1,91 @@
 database_name: datalake_crm_tasks_history_flows
 table_name: tasks_history_resolutions_flow
+description: >
+  One row per CRM task with its resolution attributes and dimensional metadata, built by
+  enriching the raw CRM tasks with workgroup titles, resolution flags, and timing metrics.
+  This enrich layer feeds the dw_crm inspection task dimensions and serves as the
+  authoritative view for task-level resolution analysis. Partitioned by year, month
+  and day. Source system is CRM (MongoDB tasks collection).
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_task:
     lineage:
       - datalake_crm.tasks.id
+    description: Unique identifier for the CRM task record, sourced from the MongoDB tasks collection.
   id_workgroup:
     lineage:
       - datalake_crm.tasks.id_workgroup
+    description: Identifier of the workgroup assigned to this task in the CRM, linking it to the responsible team.
   score_factor:
     lineage:
       - datalake_crm.tasks.score_factor
+    description: Numeric priority weight assigned to the task that controls its order in the analyst backlog queue.
   version:
     lineage:
       - datalake_crm.tasks.version
+    description: MongoDB document version number, incremented on each update to the task record in the CRM.
   origin:
     lineage:
       - datalake_crm.tasks.origin
+    description: Entity type that originated this task in the CRM (e.g., Contrato, Imovel, Vistoria).
   type:
     lineage:
       - datalake_crm.tasks.type
+    description: Task type identifying the specific CRM workflow step or "Manual" for manually created tasks.
   description:
     lineage:
       - datalake_crm.tasks.description
+    description: Free-text description field filled by the analyst with additional context or remarks about the task.
   subject:
     lineage:
       - datalake_crm.tasks.subject
+    description: Main subject heading of the task as displayed to analysts in the CRM interface.
   hours_task_start_to_completed:
     lineage:
       - datalake_crm.tasks.ts_start
       - datalake_crm.tasks.ts_completed
       - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    description: Hours elapsed between the task start and completion timestamps, computed during enrichment to measure resolution speed.
   is_resolved:
     lineage:
       - datalake_crm.tasks.is_resolved
+    description: Boolean flag indicating whether the task has been resolved (completed or closed) in the CRM.
   is_task_auto_completed:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution_history.id_user_action
+    description: Boolean flag indicating whether the task was closed automatically by the CRM system rather than manually by an analyst.
   ts_start:
     lineage:
       - datalake_crm.tasks.ts_start
+    description: Timestamp when the task was started by an analyst in the CRM.
   ts_completed:
     lineage:
       - datalake_crm.tasks.ts_completed
+    description: Timestamp when the task was completed or closed in the CRM.
   ts_silenced_until:
     lineage:
       - datalake_crm.tasks.ts_silenced_until
+    description: Timestamp indicating when a snoozed task will become active again in the analyst queue.
   titles:
     lineage:
       - datalake_crm.tasks.subject
       - datalake_crm.workgroups.title
+    description: Enriched task title combining the task subject with the workgroup title for display and classification purposes.
   workgroups:
     lineage:
       - datalake_crm.tasks.id_workgroup
       - datalake_crm.workgroups.id
+    description: Workgroup name resolved from the workgroup ID, identifying the team responsible for this task.
   year:
     lineage:
       - datalake_crm.tasks.year
+    description: Year extracted from the task creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_crm.tasks.month
+    description: Month extracted from the task creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_crm.tasks.day
+    description: Day extracted from the task creation date. Partition column — filter on this column to enable partition pruning.

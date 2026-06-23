@@ -1,28 +1,42 @@
 database_name: datalake_help_center_api_clean
 table_name: call_request
+description: >
+  One row per customer call-back request submitted via the Help Center API. Each record
+  captures the requesting user, their phone number, the support session context, and the
+  current status of the call-back request, enabling the support team to track and fulfill
+  scheduled contact attempts. Source system is Help Center API.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_help_center_api_raw.t_call_request.id
+    description: Unique identifier for the call-back request in the Help Center API.
   id_user:
     lineage:
       - datalake_help_center_api_raw.t_call_request.user_id
+    description: Identifier of the QuintoAndar user who submitted the call-back request.
   id_session:
     lineage:
       - datalake_help_center_api_raw.t_call_request.session_id
+    description: Identifier of the support session during which the call-back request was initiated.
   user_phone:
     lineage:
       - datalake_help_center_api_raw.t_call_request.user_phone
+    description: Phone number provided by the user to receive the call-back from the support team.
   user_mode:
     lineage:
       - datalake_help_center_api_raw.t_call_request.user_mode
+    description: Role or mode of the user who made the request (e.g., tenant, landlord), indicating their context in the platform.
   department:
     lineage:
       - datalake_help_center_api_raw.t_call_request.department
+    description: Support department responsible for handling the call-back request (e.g., financial, inspections, contracts).
   request_call_status:
     lineage:
       - datalake_help_center_api_raw.t_call_request.request_call_status
+    description: Current status of the call-back request (e.g., pending, fulfilled, cancelled), indicating whether the user has been contacted.
   ts_requested:
     lineage:
       - datalake_help_center_api_raw.t_call_request.requested_at
+    description: Timestamp when the customer submitted the call-back request via the Help Center.

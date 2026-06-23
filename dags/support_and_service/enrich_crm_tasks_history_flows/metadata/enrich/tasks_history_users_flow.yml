@@ -1,71 +1,100 @@
 database_name: datalake_crm_tasks_history_flows
 table_name: tasks_history_users_flow
+description: >
+  One row per user action event on a CRM task, enriched from the tasks resolution
+  history. Each record captures who performed an action on a task, when, what type of
+  action it was, and the resulting task status — forming the complete audit trail of
+  analyst interactions with CRM tasks. Partitioned by year, month and day.
+  Source system is CRM tasks resolution history.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
-    id_task:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.id_task
-    id_receiver:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.id_receiver
-    id_origin:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.id_origin
-    id_assignee:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.id_assignee
-    id_user_action:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.id_user_action
-    id_start_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_start
-    id_completed_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_completed
-    id_next_action_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
-    id_action_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    id_workgroup:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.id_workgroup
-    type:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.type
-    action_user_name:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.action_user_name
-    action_type:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.action_type
-    action_reason:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.action_reason
-    task_status:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.task_status
-    minutes_task_created_to_started:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    task_user_resolve_hours:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.task_user_resolve_hours
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    ts_next_action:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
-    ts_action:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    year:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.year
-    month:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.month
-    day:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.day
+  id_task:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.id_task
+    description: Identifier of the CRM task (from tasks_history_resolutions_flow) this user action belongs to.
+  id_receiver:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.id_receiver
+    description: CRM user ID of the first analyst who received the task when it was assigned by another team or automatically by the system.
+  id_origin:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.id_origin
+    description: Identifier of the origin entity that generated this task in the CRM.
+  id_assignee:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.id_assignee
+    description: Identifier of the analyst assigned to handle this task at the time of the action.
+  id_user_action:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.id_user_action
+    description: Identifier of the analyst who performed this specific action on the task, which may differ from the assignee.
+  id_start_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_start
+    description: Date key derived from the task start timestamp, used as a foreign key to the date dimension.
+  id_completed_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_completed
+    description: Date key derived from the task completion timestamp, used as a foreign key to the date dimension.
+  id_next_action_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
+    description: Date key derived from the scheduled next action timestamp, used as a foreign key to the date dimension.
+  id_action_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    description: Date key derived from the action event timestamp, used as a foreign key to the date dimension.
+  id_workgroup:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.id_workgroup
+    description: Identifier of the workgroup the task was assigned to at the time of this action.
+  type:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.type
+    description: Task type classification at the time of this action, identifying the CRM workflow step this task represents.
+  action_user_name:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.action_user_name
+    description: Full name of the analyst who performed this action on the CRM task.
+  action_type:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.action_type
+    description: Category of action performed (CREATE, UPDATE, RESOLVE, REALIZE, SNOOZE, COMMENT, UPDATE_METADATA), classifying the nature of the analyst interaction.
+  action_reason:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.action_reason
+    description: Free-text reason provided by the analyst explaining why this action was taken on the task.
+  task_status:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.task_status
+    description: Status of the task at the time this action was recorded (e.g., pending, in_progress, resolved, snoozed).
+  minutes_task_created_to_started:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    description: Minutes elapsed between when the task was created and when an analyst first started working on it, measuring response time.
+  task_user_resolve_hours:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.task_user_resolve_hours
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    description: Hours elapsed between when this action started and when it was resolved, measuring per-action handling time.
+  ts_next_action:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
+    description: Timestamp when the next follow-up action on this task is scheduled to occur.
+  ts_action:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    description: Timestamp when this action was performed on the CRM task.
+  year:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.year
+    description: Year extracted from the action timestamp. Partition column — filter on this column to enable partition pruning.
+  month:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.month
+    description: Month extracted from the action timestamp. Partition column — filter on this column to enable partition pruning.
+  day:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution_history.day
+    description: Day extracted from the action timestamp. Partition column — filter on this column to enable partition pruning.

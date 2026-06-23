@@ -1,43 +1,62 @@
 database_name: datalake_tracksale_clean
 table_name: campaign
+description: >
+  One row per NPS campaign configured in Tracksale. Each record defines the campaign
+  settings, aggregate response counts (detractors, passives, promoters), and the survey
+  questions used to measure customer satisfaction for a specific lifecycle event or
+  touchpoint. Source system is Tracksale.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_tracksale_raw.campaign.code
+    description: Unique code identifying the NPS campaign in Tracksale.
   campaign_name:
     lineage:
       - datalake_tracksale_raw.campaign.name
+    description: Human-readable display name of the NPS campaign.
   description:
     lineage:
       - datalake_tracksale_raw.campaign.description
+    description: Text description of the campaign purpose, including the customer lifecycle event or touchpoint it measures.
   detractors:
     lineage:
       - datalake_tracksale_raw.campaign.detractors
+    description: Total number of respondents who gave a detractor score (0–6) in this campaign.
   passives:
     lineage:
       - datalake_tracksale_raw.campaign.passives
+    description: Total number of respondents who gave a passive score (7–8) in this campaign.
   promoters:
     lineage:
       - datalake_tracksale_raw.campaign.promoters
+    description: Total number of respondents who gave a promoter score (9–10) in this campaign.
   dispatches:
     lineage:
       - datalake_tracksale_raw.campaign.dispatches
+    description: Total number of survey dispatch batches sent as part of this campaign.
   answers:
     lineage:
       - datalake_tracksale_raw.campaign.answers
+    description: Total number of completed survey responses received for this campaign.
   comments:
     lineage:
       - datalake_tracksale_raw.campaign.comments
+    description: Total number of verbatim comments provided by respondents in this campaign.
   main_channel:
     lineage:
       - datalake_tracksale_raw.campaign.main_channel
+    description: Primary delivery channel used to send this NPS campaign surveys (e.g., email, sms, whatsapp).
   tags:
     lineage:
       - datalake_tracksale_raw.campaign.tags
+    description: JSON array of classification tags associated with this campaign for reporting and segmentation.
   questions:
     lineage:
       - datalake_tracksale_raw.campaign.questions
+    description: JSON array of survey question definitions configured for this campaign, including the NPS scale question and any follow-up questions.
   ts_created:
     lineage:
       - datalake_tracksale_raw.campaign.create_time
+    description: Timestamp when the NPS campaign was created in Tracksale.

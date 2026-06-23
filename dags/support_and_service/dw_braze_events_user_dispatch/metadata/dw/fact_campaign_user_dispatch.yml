@@ -6,7 +6,7 @@ description: Fact table that contains each dispatch for a user, in a Campaign. C
   received, opened, clicked in case of e-mails. Each line is a dispatch sent from
   Braze.
 domain: Support and Services
-owner: marcus.pinto@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_braze_user:
     lineage:
@@ -31,7 +31,7 @@ columns:
     - datalake_braze_dispatches_user.owners_events.id_campaign
     - datalake_braze_dispatches_user.tenants_events.id_campaign
     - datalake_braze_dispatches_user.affiliates_events.id_campaign
-    description: Key of the campaign.
+    description: Surrogate key identifying the Braze campaign that triggered this user dispatch event.
   sk_variant_campaign:
     lineage:
     - datalake_braze_dispatches_user.owners_events.id_variant_campaign

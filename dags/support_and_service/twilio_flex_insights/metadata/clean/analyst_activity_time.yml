@@ -1,38 +1,42 @@
 database_name: datalake_twilio_flex_insights_clean
 table_name: analyst_activity_time
-description: "Analyst daily activity time from Twilio Flex Insights"
+description: >
+  One row per analyst per activity status per day from Twilio Flex Insights. Each record
+  aggregates the total time a support analyst spent in a given activity state (e.g.,
+  available, busy, offline) on a specific date, enabling workforce management and
+  productivity analysis. Partitioned by year, month and day. Source system is Twilio Flex.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   analyst_email:
-    description: "Analyst email"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.agent_email
+    description: Email address of the support analyst whose activity time is recorded.
   analyst_twilio_team:
-    description: "Analyst Twilio team"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.agent_team
-  activity: 
-    description: "Activity/Status type"
+    description: Twilio Flex team name the analyst belongs to, used for workforce segmentation and reporting.
+  activity:
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.activity
+    description: Activity status type the analyst was in during the recorded period (e.g., Available, Busy, Offline, Break), as defined in Twilio Flex.
   total_activity_time:
-    description: "Total activity/status time in seconds"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.total_activity_time
+    description: Total accumulated time in seconds the analyst spent in the given activity status on the recorded date.
   date:
-    description: "Date of the activity"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.date
+    description: Calendar date for which the analyst activity time is aggregated.
   year:
-    description: "Year of the activity"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.year
+    description: Year extracted from the activity date. Partition column — filter on this column to enable partition pruning.
   month:
-    description: "Month of the activity"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.month
+    description: Month extracted from the activity date. Partition column — filter on this column to enable partition pruning.
   day:
-    description: "Day of the activity"
     lineage:
       - datalake_twilio_flex_insights_raw.analyst_activity_time.day
+    description: Day extracted from the activity date. Partition column — filter on this column to enable partition pruning.

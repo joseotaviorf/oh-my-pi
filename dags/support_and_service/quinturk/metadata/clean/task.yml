@@ -1,55 +1,102 @@
 database_name: datalake_quinturk_clean
 table_name: task
+description: >
+  One row per annotation task in Quinturk, each representing a data item (e.g., a credit
+  proposal) queued for human review and labeling. Tracks annotation progress, proponent
+  identity extracted from task data, and completion status. Partitioned by year, month
+  and day. Source system is Quinturk (Label Studio).
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_quinturk_raw.task.id
+    description: Unique identifier for the annotation task in Quinturk.
   id_project:
     lineage:
       - datalake_quinturk_raw.task.project_id
+    description: Identifier of the annotation project (from project table) this task belongs to.
   id_updated_by:
     lineage:
       - datalake_quinturk_raw.task.updated_by_id
+    description: Identifier of the user who last updated this task record in Quinturk.
   id_file_upload:
     lineage:
       - datalake_quinturk_raw.task.file_upload_id
+    description: Identifier of the file upload batch through which this task was imported into Quinturk, if applicable.
   id_inner:
     lineage:
       - datalake_quinturk_raw.task.inner_id
+    description: Sequential internal ID assigned to the task within its project, used for ordering and display in the Label Studio interface.
   id_proposal:
     lineage:
       - datalake_quinturk_raw.task.data.id_proposal
+    description: Identifier of the credit proposal extracted from the task data JSON, linking this annotation task to the proposal being reviewed.
   total_annotations:
     lineage:
       - datalake_quinturk_raw.task.total_annotations
+    description: Total number of annotations submitted for this task across all annotators.
   cancelled_annotations:
     lineage:
       - datalake_quinturk_raw.task.cancelled_annotations
+    description: Number of annotations that were cancelled or skipped for this task.
   total_predictions:
     lineage:
       - datalake_quinturk_raw.task.total_predictions
+    description: Total number of ML model predictions generated for this task.
   overlap:
     lineage:
       - datalake_quinturk_raw.task.overlap
+    description: Number of annotators assigned to label this task; tasks with overlap > 1 are used for inter-annotator agreement.
   data:
     lineage:
       - datalake_quinturk_raw.task.data
+    description: Raw JSON payload containing the input data for annotation (e.g., proposal attributes, documents to review).
   proponent_cpf:
     lineage:
       - datalake_quinturk_raw.task.data.cpf
+    description: CPF (Brazilian tax ID) of the credit proposal proponent, extracted from the task data JSON.
   proponent_name:
     lineage:
       - datalake_quinturk_raw.task.data.name
+    description: Full name of the credit proposal proponent, extracted from the task data JSON.
   meta:
     lineage:
       - datalake_quinturk_raw.task.meta
+    description: JSON blob with additional metadata about the task, such as import context or custom workflow attributes.
   is_labeled:
     lineage:
       - datalake_quinturk_raw.task.is_labeled
+    description: Boolean flag indicating whether this task has received the minimum required number of annotations to be considered labeled.
   ts_created:
     lineage:
       - datalake_quinturk_raw.task.created_at
+    description: Timestamp when the annotation task was created in Quinturk.
   ts_updated:
     lineage:
       - datalake_quinturk_raw.task.updated_at
+    description: Timestamp of the last update to the annotation task record.
+  op_cdc:
+    lineage:
+      - datalake_quinturk_raw.task.op_cdc
+    description: CDC operation type for this record (e.g., insert, update, delete) indicating the change that triggered ingestion.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_quinturk_raw.task.ts_cdc_transaction
+    description: Timestamp of the CDC transaction that captured this change event from the source database.
+  ts_database_transaction:
+    lineage:
+      - datalake_quinturk_raw.task.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system that produced this change.
+  year:
+    lineage:
+      - datalake_quinturk_raw.task.year
+    description: Year extracted from the task creation date. Partition column.
+  month:
+    lineage:
+      - datalake_quinturk_raw.task.month
+    description: Month extracted from the task creation date. Partition column.
+  day:
+    lineage:
+      - datalake_quinturk_raw.task.day
+    description: Day extracted from the task creation date. Partition column.

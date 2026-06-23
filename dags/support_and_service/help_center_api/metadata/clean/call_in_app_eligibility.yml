@@ -1,19 +1,29 @@
 database_name: datalake_help_center_api_clean
 table_name: call_in_app_eligibility
+description: >
+  One row per user eligibility record for the in-app call feature in the Help Center.
+  Each record tracks whether a given user is eligible to initiate an in-app voice call to
+  support, and the status of that eligibility check. Source system is Help Center API.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_help_center_api_raw.t_call_in_app_eligibility.id
+    description: Unique identifier for the in-app call eligibility record in the Help Center API.
   id_user:
     lineage:
       - datalake_help_center_api_raw.t_call_in_app_eligibility.user_id
+    description: Identifier of the QuintoAndar user whose eligibility for in-app calling is being tracked.
   status:
     lineage:
       - datalake_help_center_api_raw.t_call_in_app_eligibility.status
+    description: Eligibility status indicating whether the user is allowed to use the in-app call feature (e.g., eligible, ineligible, blocked).
   ts_created:
     lineage:
       - datalake_help_center_api_raw.t_call_in_app_eligibility.created_at
+    description: Timestamp when the in-app call eligibility record was created in the Help Center API.
   ts_updated:
     lineage:
       - datalake_help_center_api_raw.t_call_in_app_eligibility.updated_at
+    description: Timestamp of the last update to the in-app call eligibility record.

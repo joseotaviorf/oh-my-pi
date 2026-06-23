@@ -1,41 +1,58 @@
----
 database_name: datalake_saruman_clean
 table_name: pendency
+description: >
+  One row per support case pendency in Saruman, QuintoAndar's internal case management
+  system. Each record represents an action item or blocker (a "pendência") blocking the
+  resolution of a parent support case, including its type, status, and an external URL to
+  the linked task. Partitioned by year, month and day. Source system is Saruman.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_saruman_raw.pendency.id
+    description: Unique identifier for the pendency record in Saruman.
   id_case_pendency:
     lineage:
       - datalake_saruman_raw.pendency.case_pendency_id
+    description: Identifier of the CRM case pendency record that originated this item, linking it to the case management system.
   id_parent_support_case:
     lineage:
       - datalake_saruman_raw.pendency.parent_support_case_id
+    description: Identifier of the parent support case (in Saruman) that this pendency is associated with.
   id_task_pendency:
     lineage:
       - datalake_saruman_raw.pendency.task_pendency_id
+    description: Identifier of the task in the external task management system that this pendency tracks.
   status:
     lineage:
       - datalake_saruman_raw.pendency.status
+    description: Current resolution status of the pendency (e.g., open, resolved, cancelled), indicating whether the blocker has been addressed.
   title:
     lineage:
       - datalake_saruman_raw.pendency.title
+    description: Short descriptive title of the pendency, summarizing the action item or blocker.
   type:
     lineage:
       - datalake_saruman_raw.pendency.type
+    description: Classification of the pendency type (e.g., inspection, document, payment), indicating the category of the required action.
   external_url:
     lineage:
       - datalake_saruman_raw.pendency.external_url
+    description: URL linking this pendency to the corresponding record in the external system (e.g., task tracker or inspection platform).
   ts_created:
     lineage:
       - datalake_saruman_raw.pendency.created_at
+    description: Timestamp when the pendency record was created in Saruman.
   year:
     lineage:
       - datalake_saruman_raw.pendency.year
+    description: Year extracted from the pendency creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_saruman_raw.pendency.month
+    description: Month extracted from the pendency creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_saruman_raw.pendency.day
+    description: Day extracted from the pendency creation date. Partition column — filter on this column to enable partition pruning.

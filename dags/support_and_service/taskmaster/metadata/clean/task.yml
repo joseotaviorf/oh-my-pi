@@ -1,61 +1,87 @@
 database_name: datalake_taskmaster_clean
 table_name: task
+description: >
+  One row per task in Taskmaster, QuintoAndar's internal task orchestration system for
+  support workflows. Each record represents a unit of work linked to a support case,
+  capturing the task type, priority, current status, origin system, and the external
+  identifier for cross-system traceability. Partitioned by year, month and day.
+  Source system is Taskmaster.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_taskmaster_raw.task.id
+    description: Unique identifier for the task in the Taskmaster system.
   id_case:
     lineage:
       - datalake_taskmaster_raw.task.case_id
+    description: Identifier of the parent support case in the CRM system that this Taskmaster task is associated with.
   id_correlation:
     lineage:
       - datalake_taskmaster_raw.task.correlation_id
+    description: Correlation identifier used to group related tasks or link this task to a business workflow event.
   id_external:
     lineage:
       - datalake_taskmaster_raw.task.external_id
+    description: Identifier of the corresponding record in the external system that originated this task (e.g., CRM, inspection platform).
   body:
     lineage:
       - datalake_taskmaster_raw.task.body
+    description: JSON payload containing the task content, including context-specific data fields required to execute the task.
   context_fields:
     lineage:
       - datalake_taskmaster_raw.task.context_fields
+    description: JSON object with additional context fields providing business metadata needed for task execution and routing.
   customer:
     lineage:
       - datalake_taskmaster_raw.task.customer
+    description: JSON object identifying the customer associated with this task, including identifiers and contact information.
   origin:
     lineage:
       - datalake_taskmaster_raw.task.origin
+    description: Name of the system or service that created this task in Taskmaster (e.g., saruman, zendesk, crm).
   priority:
     lineage:
       - datalake_taskmaster_raw.task.priority
+    description: Priority level of the task (e.g., low, medium, high, urgent), used to determine execution order in the workflow queue.
   status:
     lineage:
       - datalake_taskmaster_raw.task.status
+    description: Current lifecycle status of the task (e.g., pending, in_progress, completed, failed), indicating its execution state.
   task_manager:
     lineage:
       - datalake_taskmaster_raw.task.task_manager
+    description: Identifier of the agent or service responsible for managing the execution of this task in Taskmaster.
   type:
     lineage:
       - datalake_taskmaster_raw.task.type
+    description: Task type classification identifying the category of work to be performed (e.g., call, email, inspection, contract review).
   version:
     lineage:
       - datalake_taskmaster_raw.task.version
+    description: Version number of the task definition schema, used for backwards-compatible processing of different task payload formats.
   ts_created:
     lineage:
       - datalake_taskmaster_raw.task.created_at
+    description: Timestamp when the task was created in the Taskmaster system.
   ts_updated:
     lineage:
       - datalake_taskmaster_raw.task.updated_at
+    description: Timestamp of the last update to the task record in Taskmaster.
   ts_external_updated:
     lineage:
       - datalake_taskmaster_raw.task.last_external_update_at
+    description: Timestamp of the last update to the corresponding record in the external system that originated this task.
   year:
     lineage:
       - datalake_taskmaster_raw.task.year
+    description: Year extracted from the task creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_taskmaster_raw.task.month
+    description: Month extracted from the task creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_taskmaster_raw.task.day
+    description: Day extracted from the task creation date. Partition column — filter on this column to enable partition pruning.

@@ -1,85 +1,83 @@
 database_name: dw_crm
 table_name: fact_inspection_tasks
-description:
-  Fact table that contains events data, flags and its related foreign keys
-  on each inspection task grouped by task action
+description: >
+  Fact table with one row per inspection task action event in the CRM. Each record
+  represents a specific action taken on an inspection task (create, update, resolve,
+  comment) by a user, along with foreign keys to the task, contract, house, inspection,
+  and date dimensions. Partitioned by year, month and day. Source system is CRM tasks flow.
 domain: Support and Services
-owner: nathalia.paula@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_task:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
-    description: Key of task in CRM
+    description: Surrogate key referencing the inspection task in dim_inspection_task.
   sk_receiver:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_receiver
-    description:
-      CRM User's ID of the first user assignee which task was assigned
-      by another team or automatically
+    description: CRM user ID of the first assignee who received the task when it was assigned by another team or by the system automatically.
   sk_origin:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
-    description: Key of origin entity that generates a specific task
+    description: Surrogate key referencing the origin entity that generated this inspection task.
   sk_assignee:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_assignee
-    description: Key of task assignee for the specific task
+    description: Surrogate key of the analyst currently assigned to handle this inspection task.
   sk_user_action:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
-    description:
-      Key of analyst who act on the task's action, that may be either the
-      assignee or other one
+    description: Surrogate key of the analyst who performed this specific task action, which may differ from the assignee.
   sk_inspection:
     lineage:
       - datalake_inspections.inspection_booking.id_external
-    description: Inspection ID related to inspection task
+    description: Surrogate key of the property inspection linked to this task.
   sk_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
       - datalake_inspections.inspection_booking.id_contract
       - datalake_listing_contracts.listing_contracts.id_contract
-    description: Contract ID of related to inspection task
+    description: Surrogate key of the rental contract associated with this inspection task.
   sk_house_listing:
     lineage:
       - datalake_listing_contracts.listing_contracts.id_house_listing
-    description: House Listing ID related to inspection task
+    description: Surrogate key of the house listing associated with this inspection task.
   sk_house_owner:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_owner
-    description: House Owner user's ID related to inspection task
+    description: Surrogate key of the property owner user associated with this inspection task.
   sk_tenant:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_client
-    description: User's ID who is tenant related to inspection task
+    description: Surrogate key of the tenant user associated with this inspection task.
   sk_start_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
-    description: Key of task start event
+    description: Date dimension key corresponding to the task start event date.
   sk_completed_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
-    description: Key of task completion event
+    description: Date dimension key corresponding to the task completion event date.
   sk_action_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
-    description: Date Key of task action event
+    description: Date dimension key corresponding to the date when this action was performed on the task.
   sk_task_action_start_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
-    description: Key of task action start event
+    description: Date dimension key corresponding to when this task action started.
   sk_task_action_end_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
-    description: Key of action event on the task ended
+    description: Date dimension key corresponding to when this task action ended.
   action_user_name:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name
-    description: User's name of task assignee who act on the task's action
+    description: Full name of the analyst who performed this specific action on the inspection task.
   action_type:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
-    description: The task's action categories
+    description: Category of action performed on the task (CREATE, UPDATE, RESOLVE, REALIZE, SNOOZE, COMMENT, UPDATE_METADATA).
     categories:
       COMMENT: ""
       CREATE: ""
@@ -91,7 +89,7 @@ columns:
   task_action_type:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
-    description: The task's action categories (CREATE, UPDATE, RESOLVE, REALIZE etc.)
+    description: Redundant action type classification (same categories as action_type) from the task-user perspective join.
     categories:
       COMMENT: ""
       CREATE: ""
@@ -103,32 +101,30 @@ columns:
   task_user_action_resolve_hours:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_resolve_hours
-    description:
-      Hours that the task action takes to be resolved, or the difference
-      hours between action started and ended
+    description: Hours elapsed between when this task action started and when it was resolved or ended, measuring per-action handling time.
   ts_action:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_action
-    description: Timestamp of action event on the task happened
+    description: Timestamp when this action was performed on the inspection task (UTC timezone).
   ts_task_action_start:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_start
-    description: Timestamp of action event on the task started
+    description: Timestamp when this specific task action was started by the analyst (UTC timezone).
   ts_task_action_end:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_end
-    description: Timestamp of action event on the task ended
+    description: Timestamp when this specific task action was completed or ended by the analyst (UTC timezone).
   year:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
-    description: Integer type data that indicates the year in which we had the task in the crm.
+    description: Year of the task action date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
-    description: Integer type data that indicates the month in which we had the task in the crm.
+    description: Month of the task action date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
-    description: Integer type data that indicates the day in which we had the task in the crm.
+    description: Day of the task action date. Partition column — filter on this column to enable partition pruning.
   ts_load:
-    description: Timestamp of data load event (UTC timezone)
+    description: Timestamp when this record was loaded into the dw_crm table (UTC timezone).

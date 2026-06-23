@@ -1,106 +1,158 @@
 database_name: datalake_quinturk_clean
 table_name: project
+description: >
+  One row per annotation project configured in Quinturk, QuintoAndar's internal Label
+  Studio instance. Each project defines the labeling task structure, annotation rules,
+  and ML model integration for a specific review workflow (e.g., proposal validation).
+  Partitioned by year, month and day. Source system is Quinturk (Label Studio).
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_quinturk_raw.project.id
+    description: Unique identifier for the annotation project in Quinturk.
   id_organization:
     lineage:
       - datalake_quinturk_raw.project.organization_id
+    description: Identifier of the organization this project belongs to in Label Studio.
   id_created_by:
     lineage:
       - datalake_quinturk_raw.project.created_by_id
+    description: Identifier of the user who created this annotation project.
   description:
     lineage:
       - datalake_quinturk_raw.project.description
+    description: Human-readable description of the project's purpose and annotation goals.
   label_config:
     lineage:
       - datalake_quinturk_raw.project.label_config
+    description: XML configuration defining the labeling interface (input types, choices, and output fields) for this project.
   expert_instruction:
     lineage:
       - datalake_quinturk_raw.project.expert_instruction
+    description: Detailed instructions shown to annotators explaining how to complete labeling tasks in this project.
   model_version:
     lineage:
       - datalake_quinturk_raw.project.model_version
+    description: Version of the ML model integrated with this project for pre-annotation or active learning.
   title:
     lineage:
       - datalake_quinturk_raw.project.title
+    description: Display title of the annotation project shown in the Quinturk interface.
   maximum_annotations:
     lineage:
       - datalake_quinturk_raw.project.maximum_annotations
+    description: Maximum number of annotations allowed per task in this project before it is considered complete.
   data_types:
     lineage:
       - datalake_quinturk_raw.project.data_types
+    description: JSON object mapping data field names to their types (e.g., text, image) as defined in the label config.
   min_annotations_to_start_training:
     lineage:
       - datalake_quinturk_raw.project.min_annotations_to_start_training
+    description: Minimum number of completed annotations required before ML model training is triggered for this project.
   sampling:
     lineage:
       - datalake_quinturk_raw.project.sampling
+    description: Task sampling strategy used to select which tasks are presented to annotators (e.g., sequential, random, uncertainty).
   task_data_login:
     lineage:
       - datalake_quinturk_raw.project.task_data_login
+    description: Login credential used to access external data sources referenced by tasks in this project, if applicable.
   task_data_password:
     lineage:
       - datalake_quinturk_raw.project.task_data_password
+    description: Password credential used to access external data sources referenced by tasks in this project, if applicable.
   overlap_cohort_percentage:
     lineage:
       - datalake_quinturk_raw.project.overlap_cohort_percentage
+    description: Percentage of tasks assigned to multiple annotators for quality control and inter-annotator agreement measurement.
   control_weights:
     lineage:
       - datalake_quinturk_raw.project.control_weights
+    description: JSON object mapping label control names to their scoring weights for agreement score calculation.
   token:
     lineage:
       - datalake_quinturk_raw.project.token
+    description: API token used to authenticate webhook callbacks and external integrations for this project.
   result_count:
     lineage:
       - datalake_quinturk_raw.project.result_count
+    description: Total number of annotation results (individual label decisions) submitted across all tasks in this project.
   color:
     lineage:
       - datalake_quinturk_raw.project.color
+    description: Hex color code assigned to this project for visual identification in the Quinturk interface.
   skip_queue:
     lineage:
       - datalake_quinturk_raw.project.skip_queue
+    description: Queue name or policy that skipped tasks are moved to when an annotator skips a task in this project.
   parsed_label_config:
     lineage:
       - datalake_quinturk_raw.project.parsed_label_config
+    description: JSON representation of the parsed label_config XML, providing a structured view of the labeling interface definition.
   is_published:
     lineage:
       - datalake_quinturk_raw.project.is_published
+    description: Boolean flag indicating whether this project has been published and is available for annotators to work on.
   is_draft:
     lineage:
       - datalake_quinturk_raw.project.is_draft
+    description: Boolean flag indicating whether this project is still in draft state and not yet ready for annotation.
   is_empty_annotation_enabled:
     lineage:
       - datalake_quinturk_raw.project.enable_empty_annotation
+    description: Boolean flag indicating whether annotators are allowed to submit empty annotations (no labels) for tasks in this project.
   has_instruction:
     lineage:
       - datalake_quinturk_raw.project.show_instruction
+    description: Boolean flag indicating whether the expert_instruction is shown to annotators when they open a task.
   has_annotation_history:
     lineage:
       - datalake_quinturk_raw.project.show_annotation_history
+    description: Boolean flag indicating whether annotators can view the history of previous annotations on a task.
   has_collab_predictions:
     lineage:
       - datalake_quinturk_raw.project.show_collab_predictions
+    description: Boolean flag indicating whether collaborator predictions are shown to annotators as guidance.
   has_ground_truth_first:
     lineage:
       - datalake_quinturk_raw.project.show_ground_truth_first
+    description: Boolean flag indicating whether ground truth annotations are shown first in the task queue.
   has_overlap_first:
     lineage:
       - datalake_quinturk_raw.project.show_overlap_first
+    description: Boolean flag indicating whether tasks requiring multiple annotations (overlap tasks) are prioritized in the queue.
   has_skip_button:
     lineage:
       - datalake_quinturk_raw.project.show_skip_button
+    description: Boolean flag indicating whether annotators see a skip button to defer tasks they cannot label.
   has_auto_evaluate_predictions:
     lineage:
       - datalake_quinturk_raw.project.evaluate_predictions_automatically
+    description: Boolean flag indicating whether ML model predictions are automatically evaluated against submitted annotations.
   has_interactive_reveal_preannotations:
     lineage:
       - datalake_quinturk_raw.project.reveal_preannotations_interactively
+    description: Boolean flag indicating whether pre-annotations from the ML model are revealed interactively as the annotator works.
   ts_created:
     lineage:
       - datalake_quinturk_raw.project.created_at
+    description: Timestamp when the annotation project was created in Quinturk.
   ts_updated:
     lineage:
       - datalake_quinturk_raw.project.updated_at
+    description: Timestamp of the last update to the annotation project record.
+  year:
+    lineage:
+      - datalake_quinturk_raw.project.year
+    description: Year extracted from the project creation date. Partition column.
+  month:
+    lineage:
+      - datalake_quinturk_raw.project.month
+    description: Month extracted from the project creation date. Partition column.
+  day:
+    lineage:
+      - datalake_quinturk_raw.project.day
+    description: Day extracted from the project creation date. Partition column.

@@ -1,230 +1,311 @@
----
 database_name: datalake_reclameaqui_clean
 table_name: tickets
+description: >
+  One row per consumer complaint ticket from Reclame Aqui, Brazil's public consumer
+  complaint platform. Each record captures the full lifecycle of a complaint directed at
+  QuintoAndar, including the complaint text, company response, consumer sentiment rating,
+  treatment times, and all interaction counts. Managed via the HugMe CRM integration.
+  Partitioned by year, month and day. Source system is Reclame Aqui / HugMe.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_reclameaqui_raw.tickets.id
+    description: Internal surrogate identifier for the ticket record in the data lake.
   _id:
     lineage:
       - datalake_reclameaqui_raw.tickets._id
+    description: HugMe internal identifier for the ticket, used to link records across the HugMe CRM system.
   id_external:
     lineage:
       - datalake_reclameaqui_raw.tickets.source_external_id
+    description: Reclame Aqui external complaint identifier, linking this record to the original complaint on the RA platform.
   id_rule:
     lineage:
       - datalake_reclameaqui_raw.tickets.rule_id
+    description: Identifier of the routing or assignment rule in HugMe that was applied to classify or assign this ticket.
   hugme_status:
     lineage:
       - datalake_reclameaqui_raw.tickets.hugme_status
+    description: Current status of the ticket within the HugMe CRM workflow (e.g., new, in_progress, resolved, closed).
   ra_status:
     lineage:
       - datalake_reclameaqui_raw.tickets.ra_status
+    description: Current public status of the complaint on the Reclame Aqui platform (e.g., respondida, não respondida, em análise).
   favorable_assessment:
     lineage:
       - datalake_reclameaqui_raw.tickets.favorable_assessment
+    description: Boolean or score indicating whether the consumer's final assessment of the company response was favorable.
   information_source:
     lineage:
       - datalake_reclameaqui_raw.tickets.information_source
+    description: Source system or integration that delivered this complaint record to HugMe.
   source:
     lineage:
       - datalake_reclameaqui_raw.tickets.source
+    description: Originating channel or platform of the complaint (e.g., reclameaqui, chat, email), identifying where the complaint was first filed.
   company:
     lineage:
       - datalake_reclameaqui_raw.tickets.company
+    description: JSON object with details of the company entity on Reclame Aqui that received the complaint (QuintoAndar's RA profile).
   last_feeling:
     lineage:
       - datalake_reclameaqui_raw.tickets.last_feeling
+    description: Most recent sentiment expressed by the consumer in the complaint thread (e.g., positive, negative, neutral).
   feed_type:
     lineage:
       - datalake_reclameaqui_raw.tickets.feed_type
+    description: Type of the complaint feed entry on Reclame Aqui (e.g., complaint, question, review), classifying the nature of the submission.
   moderation:
     lineage:
       - datalake_reclameaqui_raw.tickets.moderation
+    description: JSON object with moderation details applied to this complaint by the Reclame Aqui platform.
   ra:
     lineage:
       - datalake_reclameaqui_raw.tickets.ra
-  customer:
+    description: JSON object with full Reclame Aqui complaint metadata, including complaint metadata as published on the RA platform.
+  customer_data:
     lineage:
       - datalake_reclameaqui_raw.tickets.customer
+    description: JSON object with the consumer's profile information as registered on Reclame Aqui.
   user:
     lineage:
       - datalake_reclameaqui_raw.tickets.user
+    description: JSON object with the HugMe agent user assigned to handle this complaint ticket.
   account:
     lineage:
       - datalake_reclameaqui_raw.tickets.account
+    description: JSON object with the HugMe account (company profile) this complaint ticket is associated with.
   rafone:
     lineage:
       - datalake_reclameaqui_raw.tickets.rafone
+    description: JSON object with Rafone (RA phone integration) metadata, populated when the complaint involves a phone contact attempt.
   can_like:
     lineage:
       - datalake_reclameaqui_raw.tickets.can_like
+    description: Boolean flag indicating whether the company can mark this complaint with a "like" on Reclame Aqui.
   commentary:
     lineage:
       - datalake_reclameaqui_raw.tickets.commentary
+    description: Internal commentary or notes added by the support team within the HugMe CRM during complaint handling.
   complaint_title:
     lineage:
       - datalake_reclameaqui_raw.tickets.complaint_title
+    description: Title of the consumer complaint as submitted on the Reclame Aqui platform.
   complaint_content:
     lineage:
       - datalake_reclameaqui_raw.tickets.complaint_content
+    description: Full text of the consumer complaint submitted on Reclame Aqui.
   ra_reason:
     lineage:
       - datalake_reclameaqui_raw.tickets.ra_reason
+    description: Reason category assigned by Reclame Aqui to classify the nature of the complaint (e.g., product, service, delivery).
   ra_feeling:
     lineage:
       - datalake_reclameaqui_raw.tickets.ra_feeling
+    description: Consumer's declared sentiment about the company at the time of complaint submission on Reclame Aqui.
   complaint_response_content:
     lineage:
       - datalake_reclameaqui_raw.tickets.complaint_response_content
+    description: Full text of the company's official response to the consumer complaint, as published on Reclame Aqui.
   interactions_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.interactions_count
+    description: Total number of interactions (messages, updates) between the consumer and the company on this complaint thread.
   interactions_not_readed_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.interactions_not_readed_count
+    description: Number of interactions on this complaint that have not yet been read by the assigned support agent.
   consumer_consideration:
     lineage:
       - datalake_reclameaqui_raw.tickets.consumer_consideration
+    description: Consumer's final consideration or rating of the company's response, submitted after the complaint is resolved on RA.
   company_consideration:
     lineage:
       - datalake_reclameaqui_raw.tickets.company_consideration
+    description: Company's final consideration note added in response to the consumer's rating on Reclame Aqui.
   private_treatment_time:
     lineage:
       - datalake_reclameaqui_raw.tickets.private_treatment_time
+    description: Time in seconds spent handling this complaint through private channels before publishing a response on RA.
   public_treatment_time:
     lineage:
       - datalake_reclameaqui_raw.tickets.public_treatment_time
+    description: Time in seconds from complaint creation to the publication of the company's public response on Reclame Aqui.
   rating_time:
     lineage:
       - datalake_reclameaqui_raw.tickets.rating_time
+    description: Time in seconds from the company's response to the consumer's final rating submission on Reclame Aqui.
   rating:
     lineage:
       - datalake_reclameaqui_raw.tickets.rating
+    description: Numeric consumer satisfaction score assigned to the company's response on Reclame Aqui, typically 1–5.
   comments_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.comments_count
+    description: Total number of public comments posted on this complaint thread on Reclame Aqui.
   redistributions_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.redistributions_count
+    description: Number of times this ticket was redistributed to a different agent or team within HugMe.
   redistributions_reason:
     lineage:
       - datalake_reclameaqui_raw.tickets.redistributions_reason
+    description: JSON array of reasons provided for each redistribution of the ticket to a different agent or team.
   ticket_moderations_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.ticket_moderations_count
+    description: Number of moderation actions applied to this complaint ticket on the Reclame Aqui platform.
   ticket_messages_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.ticket_messages_count
+    description: Total number of messages exchanged between the consumer and the company within this complaint thread.
   contact_us:
     lineage:
       - datalake_reclameaqui_raw.tickets.contact_us
+    description: Boolean flag indicating whether the consumer used the "contact us" feature to initiate direct contact alongside the public complaint.
   rating_without_response:
     lineage:
       - datalake_reclameaqui_raw.tickets.rating_without_response
+    description: Boolean flag indicating whether the consumer submitted a rating on Reclame Aqui without the company having responded to the complaint.
   hugme_ticket_type:
     lineage:
       - datalake_reclameaqui_raw.tickets.hugme_ticket_type
+    description: HugMe internal ticket type classification (e.g., complaint, inquiry), used for routing and reporting.
   customer_interactions_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.customer_interactions_count
+    description: Number of interactions initiated by the consumer on this complaint thread.
   company_interactions_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.company_interactions_count
+    description: Number of interactions initiated by the company (support agents) on this complaint thread.
   assignment_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.assignment_count
+    description: Number of times this ticket was assigned or reassigned to an agent within HugMe.
   duplicate_ticket:
     lineage:
       - datalake_reclameaqui_raw.tickets.duplicate_ticket
+    description: Boolean flag indicating whether this ticket was identified as a duplicate of another complaint.
   tags:
     lineage:
       - datalake_reclameaqui_raw.tickets.tags
+    description: JSON array of classification tags applied to this ticket in HugMe for routing, reporting, and analysis.
   extra_data:
     lineage:
       - datalake_reclameaqui_raw.tickets.extra_data
+    description: JSON object with additional platform-specific metadata from HugMe that does not map to standard ticket fields.
   sticky_notes:
     lineage:
       - datalake_reclameaqui_raw.tickets.sticky_notes
+    description: JSON array of internal sticky notes added by agents to this ticket for coordination purposes within HugMe.
   autos:
     lineage:
       - datalake_reclameaqui_raw.tickets.autos
+    description: JSON array of automated actions applied to this ticket by HugMe workflow rules (e.g., auto-replies, auto-assignments).
   personalized_fields:
     lineage:
       - datalake_reclameaqui_raw.tickets.personalized_fields
+    description: JSON object with custom fields defined for this ticket type in HugMe, containing business-specific metadata.
   attached:
     lineage:
       - datalake_reclameaqui_raw.tickets.attached
+    description: JSON array of file attachments linked to this complaint (e.g., screenshots, documents submitted by the consumer or company).
   categories:
     lineage:
       - datalake_reclameaqui_raw.tickets.categories
+    description: JSON array of business categories associated with this complaint, used for thematic analysis and reporting.
   historical:
     lineage:
       - datalake_reclameaqui_raw.tickets.historical
+    description: JSON array of historical state snapshots of this ticket, capturing previous values of key fields for audit purposes.
   interactions:
     lineage:
       - datalake_reclameaqui_raw.tickets.interactions
+    description: JSON array of all interaction records on this complaint thread, including messages from both consumer and company.
   duplicate_tiqt:
     lineage:
       - datalake_reclameaqui_raw.tickets.duplicate_tiqt
+    description: Boolean flag from the TIQT (Ticket Quality Tool) system indicating whether this ticket was identified as a duplicate.
   would_do_business_again:
     lineage:
       - datalake_reclameaqui_raw.tickets.back_doing_business
+    description: Boolean flag indicating whether the consumer stated they would do business with QuintoAndar again after the resolution.
   is_resolved_issue:
     lineage:
       - datalake_reclameaqui_raw.tickets.resolved_issue
+    description: Boolean flag indicating whether the consumer confirmed their issue was resolved by the company's response.
   is_active:
     lineage:
       - datalake_reclameaqui_raw.tickets.active
+    description: Boolean flag indicating whether this complaint ticket is currently active and open on Reclame Aqui.
   is_filed:
     lineage:
       - datalake_reclameaqui_raw.tickets.filed
+    description: Boolean flag indicating whether this ticket has been archived or filed in the HugMe CRM.
   is_requested_moderation:
     lineage:
       - datalake_reclameaqui_raw.tickets.request_moderation
+    description: Boolean flag indicating whether the company requested moderation review of this complaint by the Reclame Aqui team.
   is_requested_evaluation:
     lineage:
       - datalake_reclameaqui_raw.tickets.request_evaluation
+    description: Boolean flag indicating whether the company requested an evaluation or escalation of this complaint through RA processes.
   is_frozen:
     lineage:
       - datalake_reclameaqui_raw.tickets.frozen
+    description: Boolean flag indicating whether this ticket is currently frozen (paused) in the HugMe workflow, preventing further actions.
   ts_created:
     lineage:
       - datalake_reclameaqui_raw.tickets.creation_date
+    description: Timestamp when the consumer complaint was submitted on the Reclame Aqui platform.
   ts_inserted:
     lineage:
       - datalake_reclameaqui_raw.tickets.insertion_date
+    description: Timestamp when the complaint record was first inserted into the HugMe CRM system.
   ts_complaint_response:
     lineage:
       - datalake_reclameaqui_raw.tickets.complaint_response_date
+    description: Timestamp when the company published its official response to the consumer complaint on Reclame Aqui.
   ts_consumer_consideration:
     lineage:
       - datalake_reclameaqui_raw.tickets.consumer_consideration_date
+    description: Timestamp when the consumer submitted their final consideration rating of the company's response.
   ts_company_consideration:
     lineage:
       - datalake_reclameaqui_raw.tickets.company_consideration_date
+    description: Timestamp when the company published its final consideration note in response to the consumer rating.
   ts_last_replica:
     lineage:
       - datalake_reclameaqui_raw.tickets.last_replica_date
+    description: Timestamp of the most recent reply or follow-up message posted on this complaint thread.
   ts_last_modification:
     lineage:
       - datalake_reclameaqui_raw.tickets.last_modification_date
+    description: Timestamp of the last modification to this complaint record in HugMe.
   ts_rating:
     lineage:
       - datalake_reclameaqui_raw.tickets.rating_date
+    description: Timestamp when the consumer submitted their numeric rating of the company's response on Reclame Aqui.
   ts_closed:
     lineage:
       - datalake_reclameaqui_raw.tickets.closed_date
+    description: Timestamp when the complaint ticket was officially closed on Reclame Aqui.
   ts_load:
     lineage:
       - datalake_reclameaqui_raw.tickets.ts_load
+    description: Timestamp when this record was loaded into the data lake by the ETL pipeline.
   year:
     lineage:
       - datalake_reclameaqui_raw.tickets.year
+    description: Year extracted from the complaint creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_reclameaqui_raw.tickets.month
+    description: Month extracted from the complaint creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_reclameaqui_raw.tickets.day
+    description: Day extracted from the complaint creation date. Partition column — filter on this column to enable partition pruning.

@@ -3,7 +3,7 @@ database_name: dw_braze
 table_name: dim_campaign
 description: Dimension table containing information about Braze campaigns related to affiliates, owners, and tenants
 domain: Support and Services
-owner: cristina.cardoso@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_campaign:
     lineage:

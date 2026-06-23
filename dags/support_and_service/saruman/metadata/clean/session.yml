@@ -1,38 +1,54 @@
----
 database_name: datalake_saruman_clean
 table_name: session
+description: >
+  One row per support session in Saruman, representing a single customer interaction
+  assigned to a support department. Each session is linked to a support case and a user,
+  and tracks the department, status, and any routing tags applied during the interaction.
+  Partitioned by year, month and day. Source system is Saruman.
 domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_saruman_raw.session.id
+    description: Unique identifier for the support session in Saruman.
   id_support_case:
     lineage:
       - datalake_saruman_raw.session.support_case_id
+    description: Identifier of the parent support case this session belongs to in Saruman.
   id_user:
     lineage:
       - datalake_saruman_raw.session.user_id
+    description: Identifier of the customer or agent user associated with this support session.
   department:
     lineage:
       - datalake_saruman_raw.session.department
+    description: Support department assigned to handle this session (e.g., inspections, contracts, financial).
   tags:
     lineage:
       - datalake_saruman_raw.session.tags
+    description: JSON array of routing and classification tags applied to this session for reporting and queue management.
   status:
     lineage:
       - datalake_saruman_raw.session.status
+    description: Current status of the support session (e.g., open, closed, pending), indicating its lifecycle stage.
   ts_created:
     lineage:
       - datalake_saruman_raw.session.created_at
+    description: Timestamp when the support session was created in Saruman.
   ts_updated:
     lineage:
       - datalake_saruman_raw.session.updated_at
+    description: Timestamp of the last update to the support session record.
   year:
     lineage:
       - datalake_saruman_raw.session.year
+    description: Year extracted from the session creation date. Partition column — filter on this column to enable partition pruning.
   month:
     lineage:
       - datalake_saruman_raw.session.month
+    description: Month extracted from the session creation date. Partition column — filter on this column to enable partition pruning.
   day:
     lineage:
       - datalake_saruman_raw.session.day
+    description: Day extracted from the session creation date. Partition column — filter on this column to enable partition pruning.
