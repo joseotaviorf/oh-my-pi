@@ -1,82 +1,80 @@
----
 database_name: datalake_trino
 table_name: query_information
 owner: isadora.gallerani@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table contains information about queries events on Trino.
-  Each line will have information about the query and tables used on it, besides information related to 
-  the user that is executing it, in which tool the query is running, etc.
-  The id_query probably won't be unique, since a query may use several tables.
+description: >
+  Incremental enrich-layer snapshot of Trino query events exported from Databricks
+  data_platform_metrics by enrich_trino (daily 05:00 UTC). Grain is one row per query and referenced
+  table per execution date. Partitioned by year, month, day — filter on extraction date. Supports
+  query observability and table usage analytics.
 columns:
   id_query:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.queryId
-    description: Id of the query. 
+    description: Unique Trino query identifier assigned at execution time; not unique in this table because queries may reference multiple tables.
   id_table:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referenced_table
-    description: Id of the table used in the query, which is the concatenation of the database name
-      and the table name -- how the table is referenced on queries.
+    description: Fully qualified table reference (schema.table) used by the query, one row per referenced table.
   tool:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
-    description: Tool in which the query is running into.
+    description: BI or analytics tool that submitted the query (for example Metabase, Superset, Looker, or DataHub).
   id_slice_superset:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
-    description: Id of the slice in Superset that the query corresponds.
+    description: Superset chart slice identifier parsed from the query text when the query originates from Superset.
   id_metabase_card:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
-    description: Id of the card in Metabase that the query corresponds.
+    description: Metabase card identifier parsed from the query text when the query originates from Metabase.
   user:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
-    description: The user that is running the query.
+    description: Username of the person or service account that executed the query in Trino.
   state:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.state
-    description: The state of the query.
+    description: Final execution state of the Trino query (for example FINISHED, FAILED, or RUNNING).
   execution_time:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_time
-    description: The amount of seconds that the query execution took.
+    description: Wall-clock duration of the query execution in seconds.
   database_name:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
-    description: The database name related to the table used in the query. The query might use one or several tables,
-      so it might also have several database names related.
+    description: Hive schema name of a table referenced by the query; a single query may produce multiple rows with different schemas.
   table_name:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
-    description: The table name used in the query. The query might use one or several tables.
+    description: Unqualified table name referenced by the query; paired with database_name to identify the accessed relation.
   execution_hour:
-    lineage: 
+    lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.hour
-    description: Hour in which the query execution started.
+    description: Hour of the day (0–23) when the query execution started.
   dt_extraction:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
-    description: Date of when the extraction happened.
+    description: Calendar date when the query log event was extracted into the datalake.
   ts_execution_started:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_start_time
-    description: The timestamp of when the query execution started.
+    description: Timestamp when Trino began executing the query.
   ts_execution_ended:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_end_time
-    description: The timestamp of when the query execution ended.
+    description: Timestamp when Trino finished or terminated the query execution.
   year:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
-    description: The year of the query execution. Also, a partition of the table.
+    description: Year of the extraction date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
-    description: The month of the query execution. Also, a partition of the table.
+    description: Month of the extraction date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
-    description: The day of the query execution. Also, a partition of the table.
+    description: Day of the extraction date, used for Hive partitioning — include in filters for partition pruning.

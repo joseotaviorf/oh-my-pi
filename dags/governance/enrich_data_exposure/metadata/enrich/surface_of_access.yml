@@ -1,39 +1,43 @@
 ---
 database_name: datalake_data_exposure
 table_name: surface_of_access
-owner: data-platform-team@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table calculates how many users have access to each table from bietlejuice.
+description: >
+  Daily exposure metrics for bietlejuice-managed lake tables, comparing how many Databricks
+  users can read each table against total workspace users. Built from daily_table_privileges
+  joined to dag_inventory and daily_users. Grain is one row per table schema, table name,
+  and load date. Partitioned by year, month, day.
 columns:
   table_schema:
-    description: The schema of the table.
+    description: Hive schema of the bietlejuice-managed table whose Databricks access footprint is measured.
     lineage:
       - datalake_dag_inventory_clean.table
   table_name:
-    description: The name of the table.
+    description: Simple table name within table_schema included in the access exposure calculation.
     lineage:
       - datalake_dag_inventory_clean.table
   total_databricks_users_with_access:
-    description: The total number of Databricks users who have access to the table.
+    description: Count of distinct Databricks users granted direct or group-based read access to the table on the load date.
   total_databricks_users:
-    description: The total number of Databricks users.
+    description: Total distinct Databricks workspace users registered on the load date, used as the exposure denominator.
   total_databricks_active_users_with_access:
-    description: The total number of active Databricks users who have access to the table.
+    description: Count of active Databricks users with read access to the table on the load date.
   total_databricks_active_users:
-    description: The total number of active Databricks users.
+    description: Total active Databricks workspace users on the load date, used as the active-user denominator.
   total_databricks_active_employees_with_access:
-    description: The total number of active Databricks users who are also active QuintoAndar employees who have access to the table.
+    description: Count of active QuintoAndar employees with Databricks read access to the table on the load date.
   total_databricks_active_employees:
-    description: The total number of active Databricks users who are also active QuintoAndar employees.
+    description: Total active QuintoAndar employees with Databricks accounts on the load date.
   year:
-    description: The year of the data partition.
+    description: Year of the load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_databricks.daily_table_privileges.year
   month:
-    description: The month of the data partition.
+    description: Month of the load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_databricks.daily_table_privileges.month
   day:
-    description: The day of the data partition.
+    description: Day of the load date, used for Hive partitioning — include in filters for partition pruning.
     lineage:
       - datalake_databricks.daily_table_privileges.day

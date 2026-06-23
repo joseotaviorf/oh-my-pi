@@ -1,42 +1,46 @@
 ---
 database_name: datalake_anonymization
 table_name: columns_sample_data
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: Table with sample of all datalake tables.
+description: >
+  Incremental snapshot of sample cell values for datalake columns listed in the
+  documentation metrics metastore. The enrich_anonymization Spark job reads each column,
+  captures non-null values, and records sampling status or errors. Grain is one row per
+  layer, database, table, and column per load date. Partitioned by year, month, day.
 columns:
   layer:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.layer
-    description: This column indicates the layer of this table
+    description: Data lake layer of the table whose column is being sampled for PII analysis.
   database_name:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.database_name
-    documentation: This column indicates the schema name of the table
+    description: Hive schema name of the table whose column is being sampled.
   table_name:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.table_name
-    description: This column indicates the name of the tables
+    description: Table name within database_name for the column included in the sampling run.
   column_name:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.column_name
-    description: This column indicates the name of the column
+    description: Name of the column from which non-null sample values were collected.
   sample:
-    description: This colum bring a sample data to this column
+    description: Array of distinct non-null values read from the column, used to infer PII content.
   status:
-    description: Status of sampling process.
+    description: Outcome of the sampling attempt for this column in the current load.
     categories:
       "Success": Represent the success sampling data.
       "Fail": Represent the fail sampling data.
   error_class:
-    description: Get the error class, indicate if it is a DataBricks error or a Spark error.
+    description: Error category when sampling failed, distinguishing Databricks from Spark failures.
   error_message:
-    description: The error message returned.
+    description: Full error message returned when the sampling job could not read the column.
   ts_ingest:
-    description: Indicate the ingestion time, the timestima this gable was updated
+    description: Timestamp when this sampling row was written to the enrich layer.
   year:
-    description: This column indicates the year this table was updated
+    description: Year of the load date, used for Hive partitioning — include in filters for partition pruning.
   month:
-    description: This column indicates the month in which the table was updated
+    description: Month of the load date, used for Hive partitioning — include in filters for partition pruning.
   day:
-    description: This column indicates the day the table was updated
+    description: Day of the load date, used for Hive partitioning — include in filters for partition pruning.

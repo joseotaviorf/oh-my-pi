@@ -1,7 +1,7 @@
 ---
 database_name: datalake_dashboard_governance
 table_name: chart_metadata
-owner: herivelto.junior@quintoandar.com.br
+owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
 description: It aims to extract detailed information about Metabase charts
 columns:
@@ -42,3 +42,20 @@ columns:
     lineage:
       - datalake_metabase_clean.core_user.email
     description: It shows the email addresses of the people who created the chart
+  platform:
+    description: BI platform identifier for the chart source (metabase).
+  status:
+    lineage:
+      - datalake_metabase_clean.report_card.is_archived
+      - datalake_metabase_clean.view_log.ts_last_view
+    description: Lifecycle status of the chart — ACTIVE when recently viewed and not archived, DEPRECATED otherwise.
+  domain:
+    description: QuintoAndar business domain inferred from the chart collection path (null when not mapped).
+  ts_ingested:
+    description: Timestamp when this governance snapshot row was materialized by the enrich_dashboard_governance DAG.
+  year:
+    description: Year of the load date, used for Hive partitioning — include in filters for partition pruning.
+  month:
+    description: Month of the load date, used for Hive partitioning — include in filters for partition pruning.
+  day:
+    description: Day of the load date, used for Hive partitioning — include in filters for partition pruning.
