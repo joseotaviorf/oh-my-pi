@@ -39,14 +39,14 @@ Before answering any visit question, decide which lens applies:
 
 | You need… | Schema / table |
 |-----------|----------------|
-| Consolidated **visit** view (final status, funnel metrics) | `dw_visits.fact_visits` |
-| History of each individual **schedule** (reschedules/attempts) | `dw_visits.fact_visit_schedules` |
-| Detailed visit attributes (source, cancel reason, context) | `dw_visits.dim_visit` |
-| Confirmation details and lifecycle timestamps per schedule | `dw_visits.dim_visit_schedule` |
-| Post-visit evaluations (feedback from demand) | `dw_visits.dim_post_visit_demand` |
-| Property entrance and key management data | `dw_visits.fact_house_entrance` |
+| Consolidated **visit** view (final status, funnel metrics) | `dw_visit.fact_visits` |
+| History of each individual **schedule** (reschedules/attempts) | `dw_visit.fact_visit_schedules` |
+| Detailed visit attributes (source, cancel reason, context) | `dw_visit.dim_visit` |
+| Confirmation details and lifecycle timestamps per schedule | `dw_visit.dim_visit_schedule` |
+| Post-visit evaluations (feedback from demand) | `dw_visit.dim_post_visit_demand` |
+| Property entrance and key management data | `dw_visit.fact_house_entrance` |
 
-### The `dw_visits` building blocks
+### The `dw_visit` building blocks
 
 #### `fact_visits`
 
@@ -97,7 +97,7 @@ SELECT
     SUM(num_visit_booked) AS total_visits_booked,
     SUM(num_visit_completed) AS completed_visits,
     SUM(num_visit_completed) / SUM(num_visit_booked) AS vb2vc_rate
-FROM dw_visits.fact_visits
+FROM dw_visit.fact_visits
 WHERE dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS
 GROUP BY 1
 ORDER BY 1 DESC;
@@ -113,8 +113,8 @@ SELECT
     COUNT(DISTINCT f.sk_visit) AS total_visits,
     SUM(num_visit_completed) AS completed_visits,
     SUM(num_visit_unsuccessful) AS unsuccessful_visits
-FROM dw_visits.fact_visits f
-JOIN dw_visits.dim_house_entrance dim_h ON f.sk_house_entrance = dim_h.sk_house_entrance
+FROM dw_visit.fact_visits f
+JOIN dw_visit.dim_house_entrance dim_h ON f.sk_house_entrance = dim_h.sk_house_entrance
 WHERE f.dt_visit >= CURRENT_DATE - INTERVAL '30' DAYS
 GROUP BY 1
 ORDER BY total_visits DESC;

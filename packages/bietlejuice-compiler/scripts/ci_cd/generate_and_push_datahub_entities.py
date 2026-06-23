@@ -130,6 +130,7 @@ _CI_YAML_DIR: Path | None = None
 
 _DATA_PRODUCT_TYPE_RE = re.compile(r"(?m)^data_product_type:.*$")
 _LIFECYCLE_STAGE_LINE_RE = re.compile(r"(?m)^lifecycle_stage:.*$")
+_DOMAIN_URN_LINE_RE = re.compile(r"(?m)^domain_urn:.*$")
 
 
 def md_path_to_data_product_id(md_path: Path) -> str:
@@ -140,6 +141,22 @@ def md_path_to_data_product_id(md_path: Path) -> str:
 def _md_to_data_product_type(md_path: Path) -> str:
     """Return 'metric' for metric_entities/, 'domain' for everything else."""
     return "metric" if "metric_entities" in md_path.parts else "domain"
+
+
+def _inject_lifecycle_stage(yaml_content: str, default: str = "prod") -> str:
+    """Ensure lifecycle_stage is present; inject default if the LLM omitted it.
+
+    Only injects when the field is absent — never overrides a value the LLM emitted
+    (e.g. draft, review, deprecated).
+    """
+    if _LIFECYCLE_STAGE_LINE_RE.search(yaml_content):
+        return yaml_content  # already present
+    line = f"lifecycle_stage: {default}"
+    if _DOMAIN_URN_LINE_RE.search(yaml_content):
+        return _DOMAIN_URN_LINE_RE.sub(
+            lambda m: f"{m.group(0)}\n{line}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{line}\n"
 
 
 def _inject_data_product_type(yaml_content: str, data_product_type: str) -> str:
@@ -657,6 +674,7 @@ def main(argv: list[str] | None = None) -> int:
         yaml_content = _inject_description(
             yaml_content, _extract_description_from_md(md_path)
         )
+        yaml_content = _inject_lifecycle_stage(yaml_content)
         yaml_content = _inject_data_product_type(
             yaml_content, _md_to_data_product_type(md_path)
         )

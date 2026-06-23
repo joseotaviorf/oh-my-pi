@@ -92,6 +92,19 @@ TOKEN: Optional[str] = os.environ.get("DATAHUB_TOKEN", "").strip() or None
 
 PLATFORM = "databricks"
 
+# Platform probe order for (schema, table) dataset resolution.
+# _resolve_urn() tries each platform in order and returns the first URN found
+# in DataHub. Add "glue" as the second entry when the Databricks → Glue
+# migration completes and Glue datasets start appearing in DataHub.
+_PLATFORM_PROBE_ORDER: list[tuple[str, str]] = [
+    ("trino", "hive.{schema}.{table}"),
+    ("databricks", "{schema}.{table}"),
+    # ("glue", "{schema}.{table}"),  # enable after Databricks → Glue migration
+]
+
+# Per-run cache: avoids re-probing the same (schema, table) pair across steps.
+_URN_CACHE: dict[tuple[str, str], str | None] = {}
+
 FULL_CURATED_BUNDLE_IDS_SUPPORTED: tuple[str, ...] = ("collections_recovery",)
 
 # Fallback anchors when YAML omits domain/glossary (presets normally set explicitly).
@@ -162,8 +175,29 @@ def _ensure_spec_supported(spec: dict[str, Any], path: Path) -> None:
         )
 
 
-def _urn(schema: str, table: str) -> str:
-    return f"urn:li:dataset:(urn:li:dataPlatform:{PLATFORM},{schema}.{table},PROD)"
+def _urn_candidates(schema: str, table: str) -> list[str]:
+    """All candidate DataHub URNs for (schema, table), in _PLATFORM_PROBE_ORDER."""
+    return [
+        f"urn:li:dataset:(urn:li:dataPlatform:{plat},{tmpl.format(schema=schema, table=table)},PROD)"
+        for plat, tmpl in _PLATFORM_PROBE_ORDER
+    ]
+
+
+def _resolve_urn(schema: str, table: str) -> str | None:
+    """Return the first DataHub-registered URN across platforms, or None.
+
+    Probes _PLATFORM_PROBE_ORDER (Trino first, then Databricks, …). Caches
+    results so the same pair is never looked up twice within one script run.
+    """
+    key = (schema, table)
+    if key not in _URN_CACHE:
+        for urn in _urn_candidates(schema, table):
+            if _entity_exists(urn):
+                _URN_CACHE[key] = urn
+                break
+        else:
+            _URN_CACHE[key] = None
+    return _URN_CACHE[key]
 
 
 # ---------------------------------------------------------------------------
@@ -1425,7 +1459,9 @@ def _golden_query_subject_urns(gq: dict[str, Any]) -> list[str]:
     urns = []
     for row in rows:
         if isinstance(row, dict) and row.get("schema") and row.get("table"):
-            urns.append(_urn(str(row["schema"]), str(row["table"])))
+            resolved = _resolve_urn(str(row["schema"]), str(row["table"]))
+            if resolved:
+                urns.append(resolved)
     if not urns:
         name = gq.get("name") or "<unnamed>"
         print(
@@ -1444,10 +1480,23 @@ def _curated_data_product_asset_urns(cfg: dict[str, Any]) -> list[str]:
         if not isinstance(row, dict):
             continue
         if row.get("urn"):
-            # Explicit URN for non-Databricks assets (e.g. Superset datasets)
+            # Explicit URN — no platform probing (e.g. Superset chart datasets).
             out.append(str(row["urn"]))
         elif row.get("schema") and row.get("table"):
-            out.append(_urn(str(row["schema"]), str(row["table"])))
+            schema, table = str(row["schema"]), str(row["table"])
+            resolved = _resolve_urn(schema, table)
+            if resolved:
+                out.append(resolved)
+            else:
+                tried = ", ".join(
+                    c.split("dataPlatform:")[1].split(",")[0]
+                    for c in _urn_candidates(schema, table)
+                )
+                print(
+                    f"  ! skipping dataset not in DataHub: {schema}.{table} "
+                    f"(tried platforms: {tried})",
+                    file=sys.stderr,
+                )
         else:
             print(
                 f"  ! skipping malformed dataset row (no 'urn' or 'schema'+'table'): {row}",
