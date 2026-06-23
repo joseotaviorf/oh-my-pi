@@ -1,0 +1,96 @@
+database_name: datalake_demand_score_report
+table_name: demand_score_report
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: |
+  Daily snapshot of listing demand score metrics from reverse_demand_score Masterfeed,
+  enriched for Growth demand score reporting and partitioned by dt_snapshot.
+columns:
+  id_house:
+    lineage:
+      - reverse_demand_score.listing_demand_score.id_house
+    description: Unique identifier of the house associated with the listing.
+  id_house_listing:
+    lineage:
+      - reverse_demand_score.listing_demand_score.id_house_listing
+    description: Listing identifier from the demand score reverse feed.
+  city_group:
+    lineage:
+      - reverse_demand_score.listing_demand_score.city_group
+    description: City group segmentation of the listing location.
+  city_name:
+    lineage:
+      - reverse_demand_score.listing_demand_score.city_name
+    description: City name where the listing is located.
+  region_code:
+    lineage:
+      - reverse_demand_score.listing_demand_score.region_code
+    description: Region code of the listing location.
+  listing_age:
+    lineage:
+      - reverse_demand_score.listing_demand_score.listing_age
+    description: Age of the For Rent listing in months at snapshot time.
+  quality_score:
+    lineage:
+      - reverse_demand_score.listing_demand_score.quality_score
+    description: Quality score of the For Rent listing at snapshot time.
+  liquidity_score:
+    lineage:
+      - reverse_demand_score.listing_demand_score.liquidity_score
+    description: Liquidity score measuring expected listing conversion potential.
+  qt_lpv_1d_for_rent:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_1d_for_rent
+    description: Count of listing page views in the last 1 day for For Rent.
+  qt_lpv_3d_for_rent:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_3d_for_rent
+    description: Count of listing page views in the last 3 days for For Rent.
+  qt_lpv_7d_for_rent:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_7d_for_rent
+    description: Count of listing page views in the last 7 days for For Rent.
+  qt_lpv_14d_for_rent:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_14d_for_rent
+    description: Count of listing page views in the last 14 days for For Rent.
+  qt_lpv_21d_for_rent:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_rent
+    description: Count of listing page views in the last 21 days for For Rent.
+  qt_lpv_1d_for_sale:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_1d_for_sale
+    description: Count of listing page views in the last 1 day for For Sale.
+  qt_lpv_3d_for_sale:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_3d_for_sale
+    description: Count of listing page views in the last 3 days for For Sale.
+  qt_lpv_7d_for_sale:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_7d_for_sale
+    description: Count of listing page views in the last 7 days for For Sale.
+  qt_lpv_14d_for_sale:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_14d_for_sale
+    description: Count of listing page views in the last 14 days for For Sale.
+  qt_lpv_21d_for_sale:
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_sale
+    description: Count of listing page views in the last 21 days for For Sale.
+  demand_score:
+    lineage:
+      - reverse_demand_score.listing_demand_score.demand_score
+    description: Composite demand score assigned to the listing at snapshot time.
+  dt_publication_for_sale:
+    lineage:
+      - reverse_demand_score.listing_demand_score.dt_publication_for_sale
+    description: Publication date of the listing in the For Sale context.
+  dt_publication_for_rent:
+    lineage:
+      - reverse_demand_score.listing_demand_score.dt_publication_for_rent
+    description: Publication date of the listing in the For Rent context.
+  dt_snapshot:
+    lineage:
+      - reverse_demand_score.listing_demand_score.dt_snapshot
+    description: Snapshot date of the demand score extract; table partition key.
