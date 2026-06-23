@@ -1,0 +1,20 @@
+database_name: datalake_growth_costs_sharing_rules
+table_name: a036a
+owner: uilson.bonfim@quintoandar.com.br
+domain: Growth
+description: Growth marketing cost sharing rule table a036a produced by enrich_growth_costs_sharing_rules.
+columns:
+  id_date:
+    description: Date when the sharing rule allocation was applied.
+  id_rule:
+    description: Identifier of the growth cost sharing rule.
+  funnel_side:
+    description: Marketplace side of business for the allocation rule.
+  country_code:
+    description: Country code used to segment the sharing rule outcome.
+  city_group:
+    description: City group segmentation for the sharing rule outcome.
+  business_context:
+    description: Business context of the sharing rule allocation.
+  share:
+    description: Allocated share factor applied by the rule on the reference date.
