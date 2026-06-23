@@ -3,9 +3,14 @@
 database_name: datalake_databricks
 table_name: daily_table_usage_per_user
 description: |
-  Each row has the granularity of (table, user, day) and contains information about how many times the user accessed the table in the day on Databricks.
+  Daily table access counts per Databricks user from system.access.audit
+  generateTemporaryTableCredential events. One row per (user_email, table_full_name,
+  dt_event) with separate read and read-write operation counts. Used by Data Life Cycle
+  to measure lake table adoption and identify heavy consumers. Partitioned by year, month,
+  and day derived from event_date. Always filter on year, month, and day in WHERE clauses
+  to enable partition pruning when scanning usage history.
 domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   user_email:
     description: Email of the user that queried the table.
@@ -36,14 +41,20 @@ columns:
     lineage:
       - system.access.audit.event_date
   year:
-    description: Year when the events occurred.
+    description: |
+      Partition year derived from event_date. Filter on year, month, and day together to
+      enable partition pruning when querying table usage by user.
     lineage:
       - system.access.audit.event_date
   month:
-    description: Month when the events occurred.
+    description: |
+      Partition month (1–12) derived from event_date. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
     lineage:
       - system.access.audit.event_date
   day:
-    description: Day when the events occurred.
+    description: |
+      Partition day of month derived from event_date. Always include year and month filters
+      alongside day for efficient partition pruning.
     lineage:
       - system.access.audit.event_date

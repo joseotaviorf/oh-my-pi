@@ -27,8 +27,11 @@ description: |
     * `id_databricks_task_run` → `dw_databricks_health.fact_databricks_task_run`
     * `id_cluster`             → `enrich_databricks_health.daily_cluster_health`
     * future `id_warehouse` join → SQL-warehouse fact table.
+
+  Partitioned by year, month, and day derived from ts_started. Always filter on year,
+  month, and day in WHERE clauses to enable partition pruning when scanning statement history.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   id_statement:
     description: Statement (statement-execution) identifier. Primary key of this table; matches the ID surfaced by the Databricks Query History UI.
@@ -292,8 +295,14 @@ columns:
   ts_load:
     description: Timestamp when this row was written by the bietlejuice DAG. Use to audit ingestion freshness vs the source `update_time`.
   year:
-    description: Partition column. `YEAR(ts_started)`.
+    description: |
+      Partition year derived from ts_started (`YEAR(start_time)`). Filter on year, month,
+      and day together to enable partition pruning when querying statement history.
   month:
-    description: Partition column. `MONTH(ts_started)`.
+    description: |
+      Partition month (1–12) derived from ts_started. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
   day:
-    description: Partition column. `DAY(ts_started)`.
+    description: |
+      Partition day of month derived from ts_started. Always include year and month filters
+      alongside day for efficient partition pruning.

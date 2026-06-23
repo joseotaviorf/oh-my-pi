@@ -2,21 +2,31 @@
 database_name: datalake_databricks
 table_name: task_runs
 description: |
-  Each row corresponds to the execution of a task (or single-task job) on Databricks. This is obtained from
-  Overwatch.
+  Deprecated per-task Databricks job execution rows from Overwatch jobrun, scoped to
+  bietlejuice-tagged clusters via unique_clusters. One row per task or single-task job
+  run with terminal state, dependency graph, runtime seconds, and start/end timestamps.
+  Superseded by dw_databricks_health.fact_databricks_task_run. Partitioned by year,
+  month, and day derived from ts_task_started. Always filter on year, month, and day
+  in WHERE clauses to enable partition pruning when scanning task run history.
 domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_job:
-    description: ID of the job
+    description: |
+      Databricks multi-task job definition identifier from Overwatch jobrun.job_id.
+      Links the task run back to the parent Workflows job configuration.
     lineage:
       - overwatch.jobrun.job_id
   id_run:
-    description: ID of the run
+    description: |
+      Parent Databricks job run attempt identifier from Overwatch jobrun.run_id.
+      Groups all task runs that belong to the same job execution.
     lineage:
       - overwatch.jobrun.run_id
   id_cluster:
-    description: ID of the cluster
+    description: |
+      Databricks cluster that executed this task run, joined from unique_clusters on
+      Overwatch cluster_id. Used for cost and shape attribution downstream.
     lineage:
       - datalake_databricks.unique_clusters.id_cluster
   bietlejuice_dag_name:
@@ -24,15 +34,21 @@ columns:
     lineage:
       - datalake_databricks.unique_clusters.bietlejuice_dag_name
   run_name:
-    description: Name of the task
+    description: |
+      Task key or single-task job name from Overwatch jobrun.run_name. Matches bietlejuice
+      Airflow task ids for load-* tasks in downstream cost attribution.
     lineage:
       - overwatch.jobrun.run_name
   terminal_state:
-    description: State of the task
+    description: |
+      Terminal outcome of the task or job run from Overwatch (for example Succeeded,
+      Failed, or Skipped). Only Succeeded load tasks feed load_table_costs.
     lineage:
       - overwatch.jobrun.terminal_state
   task_dependencies:
-    description: Dependencies of the task
+    description: |
+      JSON array of upstream task keys this run waits on before starting, as recorded
+      by Overwatch jobrun.task_dependencies for multi-task job graphs.
     lineage:
       - overwatch.jobrun.task_dependencies
   task_detail:
@@ -40,7 +56,9 @@ columns:
     lineage:
       - overwatch.jobrun.task_detail
   execution_time_in_seconds:
-    description: Execution time of the task in seconds
+    description: |
+      Wall-clock task runtime in seconds from Overwatch task_runtime.runTimeS, spanning
+      cluster setup through task completion for this attempt.
     lineage:
       - overwatch.jobrun.task_runtime.runTimeS
   ts_task_started:
@@ -52,14 +70,20 @@ columns:
     lineage:
       - overwatch.jobrun.task_runtime.endTS
   year:
-    description: Year of the start of the task
+    description: |
+      Partition year derived from ts_task_started. Filter on year, month, and day together to
+      enable partition pruning when querying task run history.
     lineage:
       - overwatch.jobrun.task_runtime.startTS
   month:
-    description: Month of the start of the task
+    description: |
+      Partition month (1–12) derived from ts_task_started. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
     lineage:
       - overwatch.jobrun.task_runtime.startTS
   day:
-    description: Day of the start of the task
+    description: |
+      Partition day of month derived from ts_task_started. Always include year and month filters
+      alongside day for efficient partition pruning.
     lineage:
       - overwatch.jobrun.task_runtime.startTS

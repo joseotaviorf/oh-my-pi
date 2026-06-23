@@ -69,17 +69,32 @@ description: |
   enrich_databricks_usage_costs, enrich_databricks_job_runs and
   databricks_usage. Actual deletion happens in follow-up PRs once this fact
   proves parity (~2 weeks of side-by-side runs).
+
+  Partitioned by year, month, and day derived from dt_task_started. Always filter on year,
+  month, and day in WHERE clauses to enable partition pruning when scanning task-run facts.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   sk_databricks_task_run:
     description: Surrogate key for the task-run. `xxhash64(id_databricks_workspace, id_databricks_run, id_databricks_task_run)`. Stable across re-runs.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.workspace_id
+      - system.lakeflow.job_task_run_timeline.run_id
+      - system.lakeflow.job_task_run_timeline.task_run_id
   sk_databricks_run:
     description: Surrogate key for the parent Databricks job run. Same xxhash64 of (workspace_id, run_id) used by future dim_databricks_run.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.workspace_id
+      - system.lakeflow.job_task_run_timeline.run_id
   sk_databricks_cluster:
     description: Surrogate key for the cluster. `xxhash64(workspace_id, cluster_id)`. Same hash will be used by future dim_databricks_cluster.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.workspace_id
+      - system.lakeflow.job_task_run_timeline.compute_ids
   sk_task_started_date:
     description: Date surrogate key in `yyyyMMdd` integer form, derived from `dt_task_started`. Joinable to a future `dim_date` via `id_date`.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.period_start_time
   id_databricks_workspace:
     description: Databricks workspace identifier.
     lineage:
@@ -588,8 +603,14 @@ columns:
   ts_load:
     description: Timestamp the row was written by the DAG.
   year:
-    description: Year of `dt_task_started` (partition column).
+    description: |
+      Partition year derived from dt_task_started. Filter on year, month, and day together to
+      enable partition pruning when querying task-run facts.
   month:
-    description: Month of `dt_task_started` (partition column).
+    description: |
+      Partition month (1–12) derived from dt_task_started. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
   day:
-    description: Day of `dt_task_started` (partition column).
+    description: |
+      Partition day of month derived from dt_task_started. Always include year and month filters
+      alongside day for efficient partition pruning.

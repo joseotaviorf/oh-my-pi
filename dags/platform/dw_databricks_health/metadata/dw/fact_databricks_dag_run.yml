@@ -15,8 +15,11 @@ description: |
   EC2 source/confidence columns indicate whether values before retained
   node_timeline coverage came from billable_usage machine-hour estimates.
 
+  Partitioned by year, month, and day derived from dt_dag_run_started. Always filter on
+  year, month, and day in WHERE clauses to enable partition pruning when scanning DAG-run facts.
+
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   sk_databricks_dag_run:
     description: Surrogate key — `xxhash64(id_databricks_workspace, airflow_dag_id, unix_ts(minute_bucket))`.
@@ -416,14 +419,20 @@ columns:
   ts_load:
     description: Pipeline load timestamp.
   year:
-    description: Partition — year of `dt_dag_run_started`.
+    description: |
+      Partition year derived from dt_dag_run_started. Filter on year, month, and day together to
+      enable partition pruning when querying logical DAG-run facts.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.dt_task_started
   month:
-    description: Partition — month of `dt_dag_run_started`.
+    description: |
+      Partition month (1–12) derived from dt_dag_run_started. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.dt_task_started
   day:
-    description: Partition — day of `dt_dag_run_started`.
+    description: |
+      Partition day of month derived from dt_dag_run_started. Always include year and month filters
+      alongside day for efficient partition pruning.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.dt_task_started

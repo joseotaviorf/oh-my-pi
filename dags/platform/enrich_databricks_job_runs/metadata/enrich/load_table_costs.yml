@@ -3,13 +3,14 @@
 database_name: datalake_databricks
 table_name: load_table_costs
 description: |
-  Each row has the cost of loading a specific table on Databricks. It includes separate columns for individual
-  (direct) cost, and accumulated (direct + indirect) costs, which corresponds to the cost of the table + the cost
-  of all dependencies.
-  We consider that the cost of a table corresponds to the cost of the cluster divided proportionally to each
-  table based on the execution time of the load tasks.
+  Deprecated daily table load cost attribution for bietlejuice load-* tasks. One row per
+  (dag_name, task_name, table_name, day) with direct DBU/EC2 cost proportional to task
+  runtime share on the cluster plus accumulated cost including dependency tables from the
+  dependency tree. Superseded by dw_databricks_health.fact_databricks_task_run. Partitioned
+  by year, month, and day derived from the task run snapshot date. Always filter on year,
+  month, and day in WHERE clauses to enable partition pruning when scanning load costs.
 domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   dag_name:
     description: Name of the bietlejuice DAG that loads the table
@@ -20,7 +21,9 @@ columns:
     lineage:
       - datalake_databricks.task_runs.run_name
   table_name:
-    description: Name of the table
+    description: |
+      Lake table loaded by the bietlejuice load task, resolved from dag_inventory table
+      registry by matching dag, task, and snapshot date. Null when inventory has no mapping.
     lineage:
       - datalake_dag_inventory_clean.table.table
   individual_table_dbu_cost:
@@ -62,14 +65,20 @@ columns:
     lineage:
       - datalake_databricks.task_runs.ts_task_ended
   year:
-    description: Year of the snapshot
+    description: |
+      Partition year derived from the task run snapshot date. Filter on year, month, and day
+      together to enable partition pruning when querying load cost history.
     lineage:
       - datalake_databricks.task_runs.year
   month:
-    description: Month of the snapshot
+    description: |
+      Partition month (1–12) derived from the task run snapshot date. Combine with year and
+      day predicates in WHERE clauses to avoid full table scans.
     lineage:
       - datalake_databricks.task_runs.month
   day:
-    description: Day of the snapshot
+    description: |
+      Partition day of month derived from the task run snapshot date. Always include year and
+      month filters alongside day for efficient partition pruning.
     lineage:
       - datalake_databricks.task_runs.day

@@ -2,7 +2,7 @@
 database_name: datalake_databricks_pricing
 table_name: dim_ec2_price
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 description: |
   Source-controlled FINAL price dimension: EC2 standard price (USD per hour)
   per instance type and availability. The on_demand rows are a snapshot of

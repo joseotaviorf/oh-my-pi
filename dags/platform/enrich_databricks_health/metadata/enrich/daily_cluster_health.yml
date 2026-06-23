@@ -20,8 +20,11 @@ description: |
 
   Powers the cluster sizing and consolidation work tracked in
   bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md.
+
+  Partitioned by dt_cluster_run. Always filter on dt_cluster_run in WHERE clauses to
+  enable partition pruning when scanning cluster-day health snapshots.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   id_databricks_workspace:
     description: Databricks workspace identifier for the cluster-day. Part of the table grain and required to avoid collisions for reused cluster ids across workspaces.
@@ -242,4 +245,7 @@ columns:
   ts_load:
     description: Timestamp the row was written by the DAG.
   dt_cluster_run:
-    description: UTC date of the cluster's node observations. Partition column.
+    description: |
+      UTC date of the cluster node observations. Partition column — always filter on
+      dt_cluster_run in WHERE clauses to enable partition pruning when querying
+      cluster-day health metrics.

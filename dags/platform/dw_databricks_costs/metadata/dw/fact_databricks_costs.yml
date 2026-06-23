@@ -47,8 +47,11 @@ description: |
   system.compute.node_timeline (EC2 node-hours),
   datalake_databricks_usage_clean.billable_usage (EC2 estimate before retained node_timeline coverage),
   datalake_databricks_pricing.dim_dbu_price, datalake_databricks_pricing.dim_ec2_price.
+
+  Partitioned by year, month, and day derived from dt_usage. Always filter on year, month,
+  and day in WHERE clauses to enable partition pruning when scanning daily cost facts.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   sk_databricks_cost:
     description: |
@@ -58,6 +61,12 @@ columns:
       COALESCE(CAST(id_databricks_job AS STRING), ''))`. Encodes the full
       seven-key grain (id_databricks_job included so a cluster shared by several
       jobs yields one unique row per job).
+    lineage:
+      - system.billing.usage.workspace_id
+      - system.billing.usage.usage_date
+      - system.billing.usage.billing_origin_product
+      - system.billing.usage.sku_name
+      - system.billing.usage.usage_metadata
   id_databricks_workspace:
     description: Databricks workspace identifier (QuintoAndar, Prod, or Forno).
     lineage:
@@ -279,14 +288,20 @@ columns:
   ts_load:
     description: Timestamp the row was written by the DAG.
   year:
-    description: Year of `dt_usage` (partition column).
+    description: |
+      Partition year derived from dt_usage. Filter on year, month, and day together to
+      enable partition pruning when querying daily Databricks cost facts.
     lineage:
       - system.billing.usage.usage_date
   month:
-    description: Month of `dt_usage` (partition column).
+    description: |
+      Partition month (1–12) derived from dt_usage. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
     lineage:
       - system.billing.usage.usage_date
   day:
-    description: Day of `dt_usage` (partition column).
+    description: |
+      Partition day of month derived from dt_usage. Always include year and month filters
+      alongside day for efficient partition pruning.
     lineage:
       - system.billing.usage.usage_date

@@ -2,7 +2,7 @@
 database_name: datalake_databricks_pricing
 table_name: dim_dbu_price
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 description: |
   Source-controlled FINAL price dimension: negotiated Databricks DBU price
   (USD per DBU) by compute type and contract validity window. Single source of

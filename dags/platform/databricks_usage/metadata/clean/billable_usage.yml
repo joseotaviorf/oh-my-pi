@@ -1,8 +1,14 @@
 database_name: datalake_databricks_usage_clean
 table_name: billable_usage
-description: Table with the objective of storing cluster information and execution cost.
+description: |
+  Clean-layer Databricks cluster billing rows from the legacy CSV billing API ingest.
+  One row per cluster execution with DBU consumption, machine hours, cluster shape tags,
+  and execution timestamp. Feeds deprecated cost enrichment DAGs and EC2 estimates in
+  daily_cluster_health before node_timeline retention. Partitioned by year, month, and day
+  derived from ts_execution. Always filter on year, month, and day in WHERE clauses to
+  enable partition pruning when scanning billable usage history.
 domain: Data Life Cycle 
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_cluster:
     description: Identification key of the executed cluster.
@@ -53,14 +59,20 @@ columns:
     lineage:
       - datalake_databricks_usage_raw.billable_usage.timestamp
   year:
-    description: Year extracted from dag execution date.
+    description: |
+      Partition year derived from ts_execution. Filter on year, month, and day together to
+      enable partition pruning when querying cluster billing rows.
     lineage:
       - datalake_databricks_usage_raw.billable_usage.year
   month:
-    description: Month extracted from dag execution date.
+    description: |
+      Partition month (1–12) derived from ts_execution. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
     lineage:
       - datalake_databricks_usage_raw.billable_usage.month
   day:
-    description: Day extracted from dag execution date.
+    description: |
+      Partition day of month derived from ts_execution. Always include year and month filters
+      alongside day for efficient partition pruning.
     lineage:
       - datalake_databricks_usage_raw.billable_usage.day
