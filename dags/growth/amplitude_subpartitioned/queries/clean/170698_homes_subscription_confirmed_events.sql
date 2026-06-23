@@ -1,6 +1,6 @@
 SELECT
     GET_JSON_OBJECT(event_properties, '$.alert_id') AS alert_id,
-id_amplitude,
+    id_amplitude,
     ids_amplitude_attributed,
     id_app,
     id_device,
