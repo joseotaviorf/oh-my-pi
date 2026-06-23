@@ -1,644 +1,254 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_price_edit_confirmed_button_clicked_events
+owner: bruna.prates@quintoandar.com.br
 domain: Growth
+description: 'Price Edit Confirmed Button Clicked events from the QuintoAndar product surface (Amplitude app 183047). One row per tracked event, materialized as an incremental subpartition of datalake_amplitude_clean.events filtered by event_type = ''price_edit_confirmed_button_clicked''. Includes parsed event_properties and user_properties fields used for funnel and attribution analysis. Partitioned by year, month, and day — always filter on all three partition columns in WHERE clauses to enable partition pruning; align filters with ts_event or dt_event.
+
+  '
 columns:
   id_amplitude:
     lineage:
-      - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    - datalake_amplitude_clean.events.id_amplitude
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   ids_amplitude_attributed:
     lineage:
-      - datalake_amplitude_clean.events.ids_amplitude_attributed
-    description: Column ids_amplitude_attributed from Amplitude events
+    - datalake_amplitude_clean.events.ids_amplitude_attributed
+    description: Array of Amplitude IDs linked to the same user identity after attribution merging across devices.
   id_house:
     lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column id_house from Amplitude events
+    - datalake_amplitude_clean.events.id_house
+    description: Analytics field 'id_house' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
   id_user:
     lineage:
-      - datalake_amplitude_clean.events.id_user
-    description: Column id_user from Amplitude events
+    - datalake_amplitude_clean.events.id_user
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
+  up_ab_beakman_owner_price_feedback:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Analytics field 'up_ab_beakman_owner_price_feedback' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
   id_device:
     lineage:
-      - datalake_amplitude_clean.events.id_device
-    description: Column id_device from Amplitude events
-  id_event:
-    lineage:
-      - datalake_amplitude_clean.events.id_event
-    description: Column id_event from Amplitude events
+    - datalake_amplitude_clean.events.id_device
+    description: Amplitude-generated device identifier used to stitch sessions on the same physical device.
   id_app:
     lineage:
-      - datalake_amplitude_clean.events.id_app
-    description: Column id_app from Amplitude events
-  uuid:
+    - datalake_amplitude_clean.events.id_app
+    description: Amplitude project identifier filtering events to a specific QuintoAndar mobile or web application.
+  id_event:
     lineage:
-      - datalake_amplitude_clean.events.uuid
-    description: Column uuid from Amplitude events
-  adid:
-    lineage:
-      - datalake_amplitude_clean.events.adid
-    description: Column adid from Amplitude events
+    - datalake_amplitude_clean.events.id_event
+    description: Amplitude insert identifier for the ingested row within the export batch.
   id_session:
     lineage:
-      - datalake_amplitude_clean.events.id_session
-    description: Column id_session from Amplitude events
-  id_schema:
-    lineage:
-      - datalake_amplitude_clean.events.id_schema
-    description: Column id_schema from Amplitude events
+    - datalake_amplitude_clean.events.id_session
+    description: Amplitude session identifier grouping events within the same user session window.
   id_inserted:
     lineage:
-      - datalake_amplitude_clean.events.id_inserted
-    description: Column id_inserted from Amplitude events
+    - datalake_amplitude_clean.events.id_inserted
+    description: Surrogate insert identifier assigned during Amplitude batch ingestion.
+  id_schema:
+    lineage:
+    - datalake_amplitude_clean.events.id_schema
+    description: Amplitude schema version identifier for the exported event payload format.
   idfa:
     lineage:
-      - datalake_amplitude_clean.events.idfa
-    description: Column idfa from Amplitude events
-  event_type:
+    - datalake_amplitude_clean.events.idfa
+    description: Apple Identifier for Advertisers captured on iOS devices when tracking permission allows.
+  adid:
     lineage:
-      - datalake_amplitude_clean.events.event_type
-    description: Column event_type from Amplitude events
+    - datalake_amplitude_clean.events.adid
+    description: Android advertising identifier (Google Advertising ID) captured from the device when available.
+  uuid:
+    lineage:
+    - datalake_amplitude_clean.events.uuid
+    description: Universally unique identifier for the ingested event row in the Amplitude export.
   amplitude_event_type:
     lineage:
-      - datalake_amplitude_clean.events.amplitude_event_type
-    description: Column amplitude_event_type from Amplitude events
-  up_ab_beakman_owner_house_setup:
-    lineage:
-      - datalake_amplitude_clean.events.user_properties
-    description: Column up_ab_beakman_owner_house_setup from Amplitude events
-  ep_business_context:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_business_context from Amplitude events
-  ep_total_tasks:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_total_tasks from Amplitude events
-  ep_pending_tasks:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_pending_tasks from Amplitude events
-  ep_rent_price_task_status:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_rent_price_task_status from Amplitude events
-  ep_sale_price_task_status:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_sale_price_task_status from Amplitude events
-  ep_available_hours_task_status:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_available_hours_task_status from Amplitude events
-  ep_key_location_task_status:
-    lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column ep_key_location_task_status from Amplitude events
+    - datalake_amplitude_clean.events.amplitude_event_type
+    description: Internal Amplitude classification of the raw ingestion event type before project-specific mapping.
   city:
     lineage:
-      - datalake_amplitude_clean.events.city
-    description: Column city from Amplitude events
+    - datalake_amplitude_clean.events.city
+    description: City name inferred by Amplitude from the client IP address at event time.
   country:
     lineage:
-      - datalake_amplitude_clean.events.country
-    description: Column country from Amplitude events
-  data:
-    lineage:
-      - datalake_amplitude_clean.events.data
-    description: Column data from Amplitude events
-  device_brand:
-    lineage:
-      - datalake_amplitude_clean.events.device_brand
-    description: Column device_brand from Amplitude events
-  device_carrier:
-    lineage:
-      - datalake_amplitude_clean.events.device_carrier
-    description: Column device_carrier from Amplitude events
-  device_family:
-    lineage:
-      - datalake_amplitude_clean.events.device_family
-    description: Column device_family from Amplitude events
-  device_manufacturer:
-    lineage:
-      - datalake_amplitude_clean.events.device_manufacturer
-    description: Column device_manufacturer from Amplitude events
-  device_model:
-    lineage:
-      - datalake_amplitude_clean.events.device_model
-    description: Column device_model from Amplitude events
-  device_type:
-    lineage:
-      - datalake_amplitude_clean.events.device_type
-    description: Column device_type from Amplitude events
-  dma:
-    lineage:
-      - datalake_amplitude_clean.events.dma
-    description: Column dma from Amplitude events
-  ip_address:
-    lineage:
-      - datalake_amplitude_clean.events.ip_address
-    description: Column ip_address from Amplitude events
-  location_lat:
-    lineage:
-      - datalake_amplitude_clean.events.location_lat
-    description: Column location_lat from Amplitude events
-  location_lng:
-    lineage:
-      - datalake_amplitude_clean.events.location_lng
-    description: Column location_lng from Amplitude events
-  os_name:
-    lineage:
-      - datalake_amplitude_clean.events.os_name
-    description: Column os_name from Amplitude events
-  os_version:
-    lineage:
-      - datalake_amplitude_clean.events.os_version
-    description: Column os_version from Amplitude events
-  platform:
-    lineage:
-      - datalake_amplitude_clean.events.platform
-    description: Column platform from Amplitude events
-  library:
-    lineage:
-      - datalake_amplitude_clean.events.library
-    description: Column library from Amplitude events
+    - datalake_amplitude_clean.events.country
+    description: ISO country code inferred by Amplitude from the client IP address at event time.
   region:
     lineage:
-      - datalake_amplitude_clean.events.region
-    description: Column region from Amplitude events
-  start_version:
+    - datalake_amplitude_clean.events.region
+    description: State or region name inferred by Amplitude from the client IP address.
+  data:
     lineage:
-      - datalake_amplitude_clean.events.start_version
-    description: Column start_version from Amplitude events
-  language:
+    - datalake_amplitude_clean.events.data
+    description: Raw JSON payload with additional Amplitude ingestion metadata not mapped to top-level columns.
+  device_brand:
     lineage:
-      - datalake_amplitude_clean.events.language
-    description: Column language from Amplitude events
-  version_name:
+    - datalake_amplitude_clean.events.device_brand
+    description: Hardware brand reported by the device operating system (for example Apple or Samsung).
+  device_carrier:
     lineage:
-      - datalake_amplitude_clean.events.version_name
-    description: Column version_name from Amplitude events
-  sample_rate:
+    - datalake_amplitude_clean.events.device_carrier
+    description: Mobile network carrier name reported by the device when available.
+  device_family:
     lineage:
-      - datalake_amplitude_clean.events.sample_rate
-    description: Column sample_rate from Amplitude events
+    - datalake_amplitude_clean.events.device_family
+    description: Device family grouping from Amplitude device detection (for example iPhone or Android).
+  device_manufacturer:
+    lineage:
+    - datalake_amplitude_clean.events.device_manufacturer
+    description: Device manufacturer name reported by the operating system.
+  device_model:
+    lineage:
+    - datalake_amplitude_clean.events.device_model
+    description: Specific device model string reported by the operating system.
+  device_type:
+    lineage:
+    - datalake_amplitude_clean.events.device_type
+    description: Coarse device category from Amplitude (for example mobile, tablet, or desktop).
+  dma:
+    lineage:
+    - datalake_amplitude_clean.events.dma
+    description: US designated market area code inferred from IP geolocation when applicable.
+  event_type:
+    lineage:
+    - datalake_amplitude_clean.events.event_type
+    description: Product event name tracked in Amplitude (for example offer_submitted or offer_canceled_new).
   event_properties:
     lineage:
-      - datalake_amplitude_clean.events.event_properties
-    description: Column event_properties from Amplitude events
-  user_properties:
+    - datalake_amplitude_clean.events.event_properties
+    description: JSON object with custom event attributes sent by the application at track time.
+  ep_annual_property_tax:
     lineage:
-      - datalake_amplitude_clean.events.user_properties
-    description: Column user_properties from Amplitude events
-  is_paying:
+    - datalake_amplitude_clean.events.event_properties
+    description: Analytics field 'ep_annual_property_tax' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
+  ep_business_context:
     lineage:
-      - datalake_amplitude_clean.events.is_paying
-    description: Column is_paying from Amplitude events
+    - datalake_amplitude_clean.events.event_properties
+    description: Analytics field 'ep_business_context' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
+  ep_click_origin:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Analytics field 'ep_click_origin' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
+  ep_condo:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Analytics field 'ep_condo' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
+  ep_price:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Analytics field 'ep_price' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
+  ep_total_listing_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Analytics field 'ep_total_listing_value' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
   is_attribution_event:
     lineage:
-      - datalake_amplitude_clean.events.is_attribution_event
-    description: Column is_attribution_event from Amplitude events
+    - datalake_amplitude_clean.events.is_attribution_event
+    description: Flag indicating whether Amplitude classified this event as part of an attribution window.
+  ip_address:
+    lineage:
+    - datalake_amplitude_clean.events.ip_address
+    description: Client IP address at event time, used for geolocation inference by Amplitude.
+  location_lat:
+    lineage:
+    - datalake_amplitude_clean.events.location_lat
+    description: Latitude inferred from IP geolocation or device GPS when provided.
+  location_lng:
+    lineage:
+    - datalake_amplitude_clean.events.location_lng
+    description: Longitude inferred from IP geolocation or device GPS when provided.
+  os_name:
+    lineage:
+    - datalake_amplitude_clean.events.os_name
+    description: Operating system name reported by the client SDK (for example iOS or Android).
+  os_version:
+    lineage:
+    - datalake_amplitude_clean.events.os_version
+    description: Operating system version string reported by the client SDK.
+  platform:
+    lineage:
+    - datalake_amplitude_clean.events.platform
+    description: Amplitude platform label for the originating client (for example iOS, Android, or Web).
+  library:
+    lineage:
+    - datalake_amplitude_clean.events.library
+    description: Amplitude SDK library name and version used to send the event.
+  is_paying:
+    lineage:
+    - datalake_amplitude_clean.events.is_paying
+    description: Amplitude user property flag indicating whether the user is marked as paying in the project.
+  start_version:
+    lineage:
+    - datalake_amplitude_clean.events.start_version
+    description: Application version installed when the user first opened the application.
+  language:
+    lineage:
+    - datalake_amplitude_clean.events.language
+    description: Device or browser language setting reported at event time.
+  version_name:
+    lineage:
+    - datalake_amplitude_clean.events.version_name
+    description: Current application version name active when the event was triggered.
+  sample_rate:
+    lineage:
+    - datalake_amplitude_clean.events.sample_rate
+    description: Amplitude ingestion sampling rate applied to the event (1.0 means no sampling).
+  user_properties:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: JSON object with persistent user-level attributes set by the application or Amplitude.
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
+  ts_server_uploaded:
+    lineage:
+    - datalake_amplitude_clean.events.ts_server_uploaded
+    description: Timestamp when the event was exported from Amplitude to the data lake ingestion pipeline.
+  ts_user_created:
+    lineage:
+    - datalake_amplitude_clean.events.ts_user_created
+    description: Timestamp when the Amplitude user profile was first created, in UTC.
+  ts_client_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_client_event
+    description: Timestamp when the event was recorded on the client device, in UTC.
+  ts_client_uploaded:
+    lineage:
+    - datalake_amplitude_clean.events.ts_client_uploaded
+    description: Timestamp when the mobile or web client uploaded the event batch to Amplitude servers.
   ts_server_received:
     lineage:
-      - datalake_amplitude_clean.events.ts_server_received
-    description: Column ts_server_received from Amplitude events
-  ts_client_received:
-    lineage:
-      - datalake_amplitude_clean.events.ts_client_received
-    description: Column ts_client_received from Amplitude events
-  ts_client_sent:
-    lineage:
-      - datalake_amplitude_clean.events.ts_client_sent
-    description: Column ts_client_sent from Amplitude events
-  ts_server_upload:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_upload
-    description: Column ts_server_upload from Amplitude events
-  ts_server_ingest:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_ingest
-    description: Column ts_server_ingest from Amplitude events
-  ts_server_processed:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_processed
-    description: Column ts_server_processed from Amplitude events
-  ts_server_export:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export
-    description: Column ts_server_export from Amplitude events
-  ts_server_export_amplitude:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude
-    description: Column ts_server_export_amplitude from Amplitude events
-  ts_server_export_amplitude_analytics:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics
-    description: Column ts_server_export_amplitude_analytics from Amplitude events
-  ts_server_export_amplitude_analytics_2:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_2
-    description: Column ts_server_export_amplitude_analytics_2 from Amplitude events
-  ts_server_export_amplitude_analytics_3:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_3
-    description: Column ts_server_export_amplitude_analytics_3 from Amplitude events
-  ts_server_export_amplitude_analytics_4:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_4
-    description: Column ts_server_export_amplitude_analytics_4 from Amplitude events
-  ts_server_export_amplitude_analytics_5:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_5
-    description: Column ts_server_export_amplitude_analytics_5 from Amplitude events
-  ts_server_export_amplitude_analytics_6:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_6
-    description: Column ts_server_export_amplitude_analytics_6 from Amplitude events
-  ts_server_export_amplitude_analytics_7:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_7
-    description: Column ts_server_export_amplitude_analytics_7 from Amplitude events
-  ts_server_export_amplitude_analytics_8:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_8
-    description: Column ts_server_export_amplitude_analytics_8 from Amplitude events
-  ts_server_export_amplitude_analytics_9:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_9
-    description: Column ts_server_export_amplitude_analytics_9 from Amplitude events
-  ts_server_export_amplitude_analytics_10:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_10
-    description: Column ts_server_export_amplitude_analytics_10 from Amplitude events
-  ts_server_export_amplitude_analytics_11:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_11
-    description: Column ts_server_export_amplitude_analytics_11 from Amplitude events
-  ts_server_export_amplitude_analytics_12:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_12
-    description: Column ts_server_export_amplitude_analytics_12 from Amplitude events
-  ts_server_export_amplitude_analytics_13:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_13
-    description: Column ts_server_export_amplitude_analytics_13 from Amplitude events
-  ts_server_export_amplitude_analytics_14:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_14
-    description: Column ts_server_export_amplitude_analytics_14 from Amplitude events
-  ts_server_export_amplitude_analytics_15:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_15
-    description: Column ts_server_export_amplitude_analytics_15 from Amplitude events
-  ts_server_export_amplitude_analytics_16:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_16
-    description: Column ts_server_export_amplitude_analytics_16 from Amplitude events
-  ts_server_export_amplitude_analytics_17:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_17
-    description: Column ts_server_export_amplitude_analytics_17 from Amplitude events
-  ts_server_export_amplitude_analytics_18:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_18
-    description: Column ts_server_export_amplitude_analytics_18 from Amplitude events
-  ts_server_export_amplitude_analytics_19:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_19
-    description: Column ts_server_export_amplitude_analytics_19 from Amplitude events
-  ts_server_export_amplitude_analytics_20:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_20
-    description: Column ts_server_export_amplitude_analytics_20 from Amplitude events
-  ts_server_export_amplitude_analytics_21:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_21
-    description: Column ts_server_export_amplitude_analytics_21 from Amplitude events
-  ts_server_export_amplitude_analytics_22:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_22
-    description: Column ts_server_export_amplitude_analytics_22 from Amplitude events
-  ts_server_export_amplitude_analytics_23:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_23
-    description: Column ts_server_export_amplitude_analytics_23 from Amplitude events
-  ts_server_export_amplitude_analytics_24:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_24
-    description: Column ts_server_export_amplitude_analytics_24 from Amplitude events
-  ts_server_export_amplitude_analytics_25:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_25
-    description: Column ts_server_export_amplitude_analytics_25 from Amplitude events
-  ts_server_export_amplitude_analytics_26:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_26
-    description: Column ts_server_export_amplitude_analytics_26 from Amplitude events
-  ts_server_export_amplitude_analytics_27:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_27
-    description: Column ts_server_export_amplitude_analytics_27 from Amplitude events
-  ts_server_export_amplitude_analytics_28:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_28
-    description: Column ts_server_export_amplitude_analytics_28 from Amplitude events
-  ts_server_export_amplitude_analytics_29:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_29
-    description: Column ts_server_export_amplitude_analytics_29 from Amplitude events
-  ts_server_export_amplitude_analytics_30:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_30
-    description: Column ts_server_export_amplitude_analytics_30 from Amplitude events
-  ts_server_export_amplitude_analytics_31:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_31
-    description: Column ts_server_export_amplitude_analytics_31 from Amplitude events
-  ts_server_export_amplitude_analytics_32:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_32
-    description: Column ts_server_export_amplitude_analytics_32 from Amplitude events
-  ts_server_export_amplitude_analytics_33:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_33
-    description: Column ts_server_export_amplitude_analytics_33 from Amplitude events
-  ts_server_export_amplitude_analytics_34:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_34
-    description: Column ts_server_export_amplitude_analytics_34 from Amplitude events
-  ts_server_export_amplitude_analytics_35:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_35
-    description: Column ts_server_export_amplitude_analytics_35 from Amplitude events
-  ts_server_export_amplitude_analytics_36:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_36
-    description: Column ts_server_export_amplitude_analytics_36 from Amplitude events
-  ts_server_export_amplitude_analytics_37:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_37
-    description: Column ts_server_export_amplitude_analytics_37 from Amplitude events
-  ts_server_export_amplitude_analytics_38:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_38
-    description: Column ts_server_export_amplitude_analytics_38 from Amplitude events
-  ts_server_export_amplitude_analytics_39:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_39
-    description: Column ts_server_export_amplitude_analytics_39 from Amplitude events
-  ts_server_export_amplitude_analytics_40:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_40
-    description: Column ts_server_export_amplitude_analytics_40 from Amplitude events
-  ts_server_export_amplitude_analytics_41:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_41
-    description: Column ts_server_export_amplitude_analytics_41 from Amplitude events
-  ts_server_export_amplitude_analytics_42:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_42
-    description: Column ts_server_export_amplitude_analytics_42 from Amplitude events
-  ts_server_export_amplitude_analytics_43:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_43
-    description: Column ts_server_export_amplitude_analytics_43 from Amplitude events
-  ts_server_export_amplitude_analytics_44:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_44
-    description: Column ts_server_export_amplitude_analytics_44 from Amplitude events
-  ts_server_export_amplitude_analytics_45:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_45
-    description: Column ts_server_export_amplitude_analytics_45 from Amplitude events
-  ts_server_export_amplitude_analytics_46:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_46
-    description: Column ts_server_export_amplitude_analytics_46 from Amplitude events
-  ts_server_export_amplitude_analytics_47:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_47
-    description: Column ts_server_export_amplitude_analytics_47 from Amplitude events
-  ts_server_export_amplitude_analytics_48:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_48
-    description: Column ts_server_export_amplitude_analytics_48 from Amplitude events
-  ts_server_export_amplitude_analytics_49:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_49
-    description: Column ts_server_export_amplitude_analytics_49 from Amplitude events
-  ts_server_export_amplitude_analytics_50:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_50
-    description: Column ts_server_export_amplitude_analytics_50 from Amplitude events
-  ts_server_export_amplitude_analytics_51:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_51
-    description: Column ts_server_export_amplitude_analytics_51 from Amplitude events
-  ts_server_export_amplitude_analytics_52:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_52
-    description: Column ts_server_export_amplitude_analytics_52 from Amplitude events
-  ts_server_export_amplitude_analytics_53:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_53
-    description: Column ts_server_export_amplitude_analytics_53 from Amplitude events
-  ts_server_export_amplitude_analytics_54:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_54
-    description: Column ts_server_export_amplitude_analytics_54 from Amplitude events
-  ts_server_export_amplitude_analytics_55:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_55
-    description: Column ts_server_export_amplitude_analytics_55 from Amplitude events
-  ts_server_export_amplitude_analytics_56:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_56
-    description: Column ts_server_export_amplitude_analytics_56 from Amplitude events
-  ts_server_export_amplitude_analytics_57:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_57
-    description: Column ts_server_export_amplitude_analytics_57 from Amplitude events
-  ts_server_export_amplitude_analytics_58:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_58
-    description: Column ts_server_export_amplitude_analytics_58 from Amplitude events
-  ts_server_export_amplitude_analytics_59:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_59
-    description: Column ts_server_export_amplitude_analytics_59 from Amplitude events
-  ts_server_export_amplitude_analytics_60:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_60
-    description: Column ts_server_export_amplitude_analytics_60 from Amplitude events
-  ts_server_export_amplitude_analytics_61:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_61
-    description: Column ts_server_export_amplitude_analytics_61 from Amplitude events
-  ts_server_export_amplitude_analytics_62:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_62
-    description: Column ts_server_export_amplitude_analytics_62 from Amplitude events
-  ts_server_export_amplitude_analytics_63:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_63
-    description: Column ts_server_export_amplitude_analytics_63 from Amplitude events
-  ts_server_export_amplitude_analytics_64:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_64
-    description: Column ts_server_export_amplitude_analytics_64 from Amplitude events
-  ts_server_export_amplitude_analytics_65:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_65
-    description: Column ts_server_export_amplitude_analytics_65 from Amplitude events
-  ts_server_export_amplitude_analytics_66:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_66
-    description: Column ts_server_export_amplitude_analytics_66 from Amplitude events
-  ts_server_export_amplitude_analytics_67:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_67
-    description: Column ts_server_export_amplitude_analytics_67 from Amplitude events
-  ts_server_export_amplitude_analytics_68:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_68
-    description: Column ts_server_export_amplitude_analytics_68 from Amplitude events
-  ts_server_export_amplitude_analytics_69:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_69
-    description: Column ts_server_export_amplitude_analytics_69 from Amplitude events
-  ts_server_export_amplitude_analytics_70:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_70
-    description: Column ts_server_export_amplitude_analytics_70 from Amplitude events
-  ts_server_export_amplitude_analytics_71:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_71
-    description: Column ts_server_export_amplitude_analytics_71 from Amplitude events
-  ts_server_export_amplitude_analytics_72:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_72
-    description: Column ts_server_export_amplitude_analytics_72 from Amplitude events
-  ts_server_export_amplitude_analytics_73:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_73
-    description: Column ts_server_export_amplitude_analytics_73 from Amplitude events
-  ts_server_export_amplitude_analytics_74:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_74
-    description: Column ts_server_export_amplitude_analytics_74 from Amplitude events
-  ts_server_export_amplitude_analytics_75:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_75
-    description: Column ts_server_export_amplitude_analytics_75 from Amplitude events
-  ts_server_export_amplitude_analytics_76:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_76
-    description: Column ts_server_export_amplitude_analytics_76 from Amplitude events
-  ts_server_export_amplitude_analytics_77:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_77
-    description: Column ts_server_export_amplitude_analytics_77 from Amplitude events
-  ts_server_export_amplitude_analytics_78:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_78
-    description: Column ts_server_export_amplitude_analytics_78 from Amplitude events
-  ts_server_export_amplitude_analytics_79:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_79
-    description: Column ts_server_export_amplitude_analytics_79 from Amplitude events
-  ts_server_export_amplitude_analytics_80:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_80
-    description: Column ts_server_export_amplitude_analytics_80 from Amplitude events
-  ts_server_export_amplitude_analytics_81:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_81
-    description: Column ts_server_export_amplitude_analytics_81 from Amplitude events
-  ts_server_export_amplitude_analytics_82:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_82
-    description: Column ts_server_export_amplitude_analytics_82 from Amplitude events
-  ts_server_export_amplitude_analytics_83:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_83
-    description: Column ts_server_export_amplitude_analytics_83 from Amplitude events
-  ts_server_export_amplitude_analytics_84:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_84
-    description: Column ts_server_export_amplitude_analytics_84 from Amplitude events
-  ts_server_export_amplitude_analytics_85:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_85
-    description: Column ts_server_export_amplitude_analytics_85 from Amplitude events
-  ts_server_export_amplitude_analytics_86:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_86
-    description: Column ts_server_export_amplitude_analytics_86 from Amplitude events
-  ts_server_export_amplitude_analytics_87:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_87
-    description: Column ts_server_export_amplitude_analytics_87 from Amplitude events
-  ts_server_export_amplitude_analytics_88:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_88
-    description: Column ts_server_export_amplitude_analytics_88 from Amplitude events
-  ts_server_export_amplitude_analytics_89:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_89
-    description: Column ts_server_export_amplitude_analytics_89 from Amplitude events
-  ts_server_export_amplitude_analytics_90:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_90
-    description: Column ts_server_export_amplitude_analytics_90 from Amplitude events
-  ts_server_export_amplitude_analytics_91:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_91
-    description: Column ts_server_export_amplitude_analytics_91 from Amplitude events
-  ts_server_export_amplitude_analytics_92:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_92
-    description: Column ts_server_export_amplitude_analytics_92 from Amplitude events
-  ts_server_export_amplitude_analytics_93:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_93
-    description: Column ts_server_export_amplitude_analytics_93 from Amplitude events
-  ts_server_export_amplitude_analytics_94:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_94
-    description: Column ts_server_export_amplitude_analytics_94 from Amplitude events
-  ts_server_export_amplitude_analytics_95:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_95
-    description: Column ts_server_export_amplitude_analytics_95 from Amplitude events
-  ts_server_export_amplitude_analytics_96:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_96
-    description: Column ts_server_export_amplitude_analytics_96 from Amplitude events
-  ts_server_export_amplitude_analytics_97:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_97
-    description: Column ts_server_export_amplitude_analytics_97 from Amplitude events
-  ts_server_export_amplitude_analytics_98:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_98
-    description: Column ts_server_export_amplitude_analytics_98 from Amplitude events
-  ts_server_export_amplitude_analytics_99:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_99
-    description: Column ts_server_export_amplitude_analytics_99 from Amplitude events
-  ts_server_export_amplitude_analytics_100:
-    lineage:
-      - datalake_amplitude_clean.events.ts_server_export_amplitude_analytics_100
-    description: Column ts_server_export_amplitude_analytics_100 from Amplitude events
+    - datalake_amplitude_clean.events.ts_server_received
+    description: Timestamp when Amplitude ingestion servers first received the event, in UTC.
+  ts_processed:
+    lineage:
+    - datalake_amplitude_clean.events.ts_processed
+    description: Timestamp when the event was processed in the ETL pipeline before landing in the clean layer.
   year:
     lineage:
-      - datalake_amplitude_clean.events.year
-    description: Column year from Amplitude events
+    - datalake_amplitude_clean.events.year
+    description: 'Table partition column (year). Derived from ts_event at clean ingestion. Required in WHERE clauses
+
+      for partition pruning — always combine with month and day to restrict scans to the smallest date
+
+      window needed.
+
+      '
   month:
     lineage:
-      - datalake_amplitude_clean.events.month
-    description: Column month from Amplitude events
+    - datalake_amplitude_clean.events.month
+    description: 'Table partition column (month, 1–12). Derived from ts_event at clean ingestion. Must be filtered
+
+      together with year and day to avoid full-table scans on this high-volume events subpartition.
+
+      '
   day:
     lineage:
-      - datalake_amplitude_clean.events.day
-    description: Column day from Amplitude events
+    - datalake_amplitude_clean.events.day
+    description: 'Table partition column (day, 1–31). Derived from ts_event at clean ingestion. Always filter with
+
+      year and month — last partition column in the table layout.
+
+      '
