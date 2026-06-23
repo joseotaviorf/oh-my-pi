@@ -192,3 +192,18 @@ columns:
     lineage:
       - datalake_big_agent_clean.partner_tier.ts_updated
     description: Timestamp when the partner tier assignment was last updated in Big Agent.
+  dt_load:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.ts_created
+    description: Load reference date derived from the partner tier assignment creation timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.ts_created
+    description: Partition day derived from ts_created.

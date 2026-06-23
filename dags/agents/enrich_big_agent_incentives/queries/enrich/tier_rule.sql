@@ -130,7 +130,11 @@ SELECT
     tq.qualifier_multiplier_ccv,
     tq.qualifier_multiplier_fl_sale,
     tq.qualifier_multiplier_tqc,
-    tier.ts_created
+    tier.ts_created,
+    DATE(tier.ts_created) AS dt_load,
+    YEAR(tier.ts_created) AS year,
+    MONTH(tier.ts_created) AS month,
+    DAY(tier.ts_created) AS day
 FROM
     tier
 LEFT JOIN

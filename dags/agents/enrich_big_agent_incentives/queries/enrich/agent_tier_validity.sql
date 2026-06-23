@@ -45,7 +45,11 @@ SELECT
     pt.dt_validity_started,
     pt.dt_validity_ended,
     pt.ts_created,
-    pt.ts_updated
+    pt.ts_updated,
+    DATE(pt.ts_created) AS dt_load,
+    YEAR(pt.ts_created) AS year,
+    MONTH(pt.ts_created) AS month,
+    DAY(pt.ts_created) AS day
   FROM
     datalake_big_agent_clean.partner_tier AS pt
   JOIN
