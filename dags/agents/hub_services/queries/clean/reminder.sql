@@ -36,7 +36,10 @@ SELECT
     ts_closed,
     year,
     month,
-    day
+    day,
+    op_cdc,
+    ts_cdc_transaction,
+    ts_database_transaction
 FROM
     deduped
 WHERE

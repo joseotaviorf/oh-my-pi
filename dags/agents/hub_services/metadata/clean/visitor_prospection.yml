@@ -71,6 +71,24 @@ columns:
     description: UTC timestamp of the last update to the prospection row in Hub Services.
     lineage:
       - datalake_hub_services_raw.visitor_prospection.updated_at
+  op_cdc:
+    description: CDC operation type captured by Debezium.
+    lineage:
+      - datalake_hub_services_raw.visitor_prospection.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC system captured this transaction (millisecond
+      precision).
+    lineage:
+      - datalake_hub_services_raw.visitor_prospection.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the source system.
+    lineage:
+      - datalake_hub_services_raw.visitor_prospection.ts_database_transaction
   year:
     description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
