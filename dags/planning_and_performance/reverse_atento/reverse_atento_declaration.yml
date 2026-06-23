@@ -24,6 +24,7 @@ workflow:
   tables_customization:
     backlog_metric: {}
     csat_front: {}
+    cases_perspective: {}
     demand_metric: {}
     fcr_metric: {}
     general_metric: {}

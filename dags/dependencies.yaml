@@ -4497,6 +4497,7 @@ bietlejuice.reverse_anonymization:
   - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation:first-run-of-day
 bietlejuice.reverse_atento:
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metric:first-run-of-day
+  - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-cases-perspective:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-csat-front:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-demand-metric:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-email:first-run-of-day
