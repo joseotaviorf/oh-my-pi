@@ -1,10 +1,37 @@
 database_name: datalake_jira_raw
 table_name: issues
-domain: "Data Ops & Governance"
+owner: luisa.ladeira@quintoandar.com.br
+domain: Data Ops & Governance
 columns:
   changelog:
     tags:
     - Confidential
+    description: JSON array of issue change history entries returned by the Jira API,
+      including field updates and authors.
+  expand:
+    description: Comma-separated list of Jira API expand parameters included in the
+      issue response payload.
   fields:
     tags:
     - Confidential
+    description: JSON object with issue field values (summary, status, assignee, sprint,
+      custom fields, and related attributes).
+  id:
+    description: Numeric internal identifier assigned to the issue by Jira.
+  key:
+    description: Human-readable issue key combining project prefix and sequence number
+      (for example DEI-1234).
+  self:
+    description: REST API URL endpoint that uniquely identifies this issue resource
+      in Jira.
+  year:
+    description: Year of the data load date, used for Hive partitioning — include
+      in filters for partition pruning.
+  month:
+    description: Month of the data load date, used for Hive partitioning — include
+      in filters for partition pruning.
+  day:
+    description: Day of the data load date, used for Hive partitioning — include in
+      filters for partition pruning.
+description: Raw ingest of Jira issue JSON payloads from the Jira REST API, loaded
+  daily by the jira DAG.

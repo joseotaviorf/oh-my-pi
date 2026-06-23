@@ -1,52 +1,57 @@
 ---
 database_name: datalake_jira
 table_name: issue_status_changes
-description: Status changes from the Issues in Jira
-domain: "Data Ops & Governance"
-owner: giuseppe.giovanelli@quintoandar.com.br
+description: >
+  Enriched history of Jira issue status transitions parsed from change_log JSON in
+  datalake_jira_clean.issues. Each row is one status change with queue names before and after,
+  the author, and time spent in the origin queue. Grain is one row per id_issue and id_change.
+domain: Data Ops & Governance
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id_issue:
     lineage:
       - datalake_jira_clean.issues.key
-    description: ""
+    description: Jira issue key identifying the ticket whose status transition is recorded.
   id_change:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Numeric identifier of the change-log history entry in Jira for this status update.
   id_author:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Jira accountId of the user who performed the status change.
   field:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Jira change-log field name; always status for rows in this table.
   field_type:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Jira field type metadata associated with the changed field in the change log.
   from_queue:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Human-readable status or queue name before the transition (fromString in change log).
   to_queue:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Human-readable status or queue name after the transition (toString in change log).
   author_email:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Email address of the Jira user who authored the status change.
   author_name:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Display name of the Jira user who authored the status change.
   minutes_in_origin_queue:
     lineage:
       - datalake_jira.issues.ts_created
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: >
+      Minutes the issue remained in from_queue before moving to to_queue, computed from the prior
+      status timestamp (or ts_created for the first transition) through ts_updated.
   ts_updated:
     lineage:
       - datalake_jira_clean.issues.change_log
-    description: ""
+    description: Timestamp when the status change was recorded in the Jira change log.

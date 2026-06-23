@@ -1,3 +1,44 @@
 database_name: datalake_jira_raw
 table_name: projects
-domain: "Data Ops & Governance"
+owner: luisa.ladeira@quintoandar.com.br
+domain: Data Ops & Governance
+description: Raw ingest layer for projects, loaded by the parent governance DAG before
+  clean transformation.
+columns:
+  avatar_urls:
+    description: JSON map of avatar image URLs for the project at different display
+      sizes.
+  id_entity:
+    description: UUID entity identifier used by Jira to reference the project across
+      systems.
+  expand:
+    description: Comma-separated list of Jira API expand parameters included in the
+      project response payload.
+  id:
+    description: Numeric internal identifier assigned to the project by Jira.
+  is_private:
+    description: Boolean flag indicating whether the project visibility is restricted
+      to authorized users only.
+  key:
+    description: Short uppercase project key used as prefix in issue keys (for example
+      DEI or DATA).
+  name:
+    description: Display name of the Jira project as shown in the UI.
+  project_type_key:
+    description: Jira project type classification key (for example software, business,
+      or service_desk).
+  properties:
+    description: JSON object with additional project configuration properties returned
+      by the Jira API.
+  self:
+    description: REST API URL endpoint that uniquely identifies this project resource
+      in Jira.
+  is_simplified:
+    description: Boolean flag indicating whether the project uses Jira next-gen simplified
+      workflow and board layout.
+  style:
+    description: Jira project layout style (for example classic or next-gen) that
+      determines board and workflow behavior.
+  uuid:
+    description: Globally unique identifier for the project, stable across Jira instances
+      and integrations.

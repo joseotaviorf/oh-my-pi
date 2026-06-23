@@ -1,58 +1,61 @@
 database_name: datalake_jira_clean
 table_name: projects
-description: Information about projects
-domain: "Data Ops & Governance"
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Full-refresh clean-layer snapshot of Jira projects extracted via the Jira REST API by the jira DAG
+  (daily 00:00 UTC). Grain is one row per project id. Supports project inventory and engineering
+  governance reporting.
 columns:
   avatar_urls:
     lineage:
       - datalake_jira_raw.projects.avatarurls
-    description: Avatar URLs
+    description: JSON map of avatar image URLs for the project at different display sizes.
   id_entity:
     lineage:
       - datalake_jira_raw.projects.entityid
-    description: Entity ID
+    description: UUID entity identifier used by Jira to reference the project across systems.
   expand:
     lineage:
       - datalake_jira_raw.projects.expand
-    description: List Expansion
+    description: Comma-separated list of Jira API expand parameters included in the project response payload.
   id:
     lineage:
       - datalake_jira_raw.projects.id
-    description: Project internal ID
+    description: Numeric internal identifier assigned to the project by Jira.
   is_private:
     lineage:
       - datalake_jira_raw.projects.isprivate
-    description: If it is private data
+    description: Boolean flag indicating whether the project visibility is restricted to authorized users only.
   key:
     lineage:
       - datalake_jira_raw.projects.key
-    description: Project Key
+    description: Short uppercase project key used as prefix in issue keys (for example DEI or DATA).
   name:
     lineage:
       - datalake_jira_raw.projects.name
-    description: Project name
+    description: Display name of the Jira project as shown in the UI.
   project_type_key:
     lineage:
       - datalake_jira_raw.projects.projecttypekey
-    description: Project type key
+    description: Jira project type classification key (for example software, business, or service_desk).
   properties:
     lineage:
       - datalake_jira_raw.projects.properties
-    description: Additional information
+    description: JSON object with additional project configuration properties returned by the Jira API.
   self:
     lineage:
       - datalake_jira_raw.projects.self
-    description: Project URLs
+    description: REST API URL endpoint that uniquely identifies this project resource in Jira.
   is_simplified:
     lineage:
       - datalake_jira_raw.projects.simplified
-    description: Is simplified
+    description: Boolean flag indicating whether the project uses Jira next-gen simplified workflow and board layout.
   style:
     lineage:
       - datalake_jira_raw.projects.style
-    description: Project style
+    description: Jira project layout style (for example classic or next-gen) that determines board and workflow behavior.
   uuid:
     lineage:
       - datalake_jira_raw.projects.uuid
-    description: Unique ID on any system
+    description: Globally unique identifier for the project, stable across Jira instances and integrations.

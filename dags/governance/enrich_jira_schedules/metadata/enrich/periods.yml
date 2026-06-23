@@ -2,7 +2,7 @@
 database_name: datalake_jira_schedules
 table_name: periods
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 description: >
   Enriched on-call periods from Jira Ops schedule timelines: base and final rotations are unioned,
   joined to schedule metadata and user accounts. One row per rotation period with responder identity;

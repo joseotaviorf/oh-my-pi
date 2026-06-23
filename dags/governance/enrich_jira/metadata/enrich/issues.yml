@@ -3,7 +3,7 @@ database_name: datalake_jira
 table_name: issues
 description: Detailed information from the Issues created in Jira
 domain: Data Ops & Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id_issue:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_jira_schedules
 table_name: data_engineer_on_call
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 description: >
   Subset of on-call periods for selected Data Engineering schedules: final timeline rows joined to base
   timeline on the same id_period to detect responder overrides and expose original versus effective assignees.

@@ -1,42 +1,45 @@
 database_name: datalake_jira_clean
 table_name: issues
-description: Its purpose is to store information related to cards
-domain: "Data Ops & Governance"
-owner: herivelto.junior@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Incremental clean-layer snapshot of Jira issues extracted via the Jira REST API by the jira DAG
+  (daily 00:00 UTC). Grain is one row per issue key per load date. Partitioned by year, month, day
+  — filter on ingestion date. Supports project lifecycle tracking and engineering metrics.
 columns:
   change_log:
     lineage:
       - datalake_jira_raw.issues.changelog
-    description: Indicates the change log
+    description: JSON array of issue change history entries returned by the Jira API, including field updates and authors.
   expand:
     lineage:
       - datalake_jira_raw.issues.expand
-    description: List Expansion
+    description: Comma-separated list of Jira API expand parameters included in the issue response payload.
   fields:
     lineage:
       - datalake_jira_raw.issues.fields
-    description: JSON containing card fields.
+    description: JSON object with issue field values (summary, status, assignee, sprint, custom fields, and related attributes).
   id:
     lineage:
       - datalake_jira_raw.issues.id
-    description: Card internal ID
+    description: Numeric internal identifier assigned to the issue by Jira.
   key:
     lineage:
       - datalake_jira_raw.issues.key
-    description: Card Key on Jira
+    description: Human-readable issue key combining project prefix and sequence number (for example DEI-1234).
   self:
     lineage:
       - datalake_jira_raw.issues.self
-    description: Shows the endpoint for this card
+    description: REST API URL endpoint that uniquely identifies this issue resource in Jira.
   year:
     lineage:
       - datalake_jira_raw.issues.year
-    description: Year created
+    description: Year of the data load date, used for Hive partitioning — include in filters for partition pruning.
   month:
     lineage:
       - datalake_jira_raw.issues.month
-    description: Month created
+    description: Month of the data load date, used for Hive partitioning — include in filters for partition pruning.
   day:
     lineage:
       - datalake_jira_raw.issues.day
-    description: Day created
+    description: Day of the data load date, used for Hive partitioning — include in filters for partition pruning.

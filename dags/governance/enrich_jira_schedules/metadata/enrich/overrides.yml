@@ -2,7 +2,7 @@
 database_name: datalake_jira_schedules
 table_name: overrides
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 description: >
   Enriched Jira Ops schedule overrides: rotations are exploded from each override row, deduplicated to the
   latest load per schedule/rotation/window, then keyed with a hash id_period. Responder profile comes from

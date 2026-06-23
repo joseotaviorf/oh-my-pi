@@ -1,199 +1,206 @@
 ---
 database_name: datalake_jira
 table_name: issues_itops
-description: this table contains the help desk tickets of the ITOps team
-domain: "Data Ops & Governance"
-owner: giuseppe.giovanelli@quintoandar.com.br
+description: >
+  Enriched snapshot of ITOps help-desk tickets from Jira project TI (non sub-task issues). Each row
+  is the latest version of a ticket with request metadata, SLA timers, service categories, and
+  resolution timestamps parsed from custom fields. Grain is one row per id_issue.
+domain: Data Ops & Governance
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_jira_clean.issues.id
-    description: primary key of the table
+    description: Internal Jira numeric issue id used as the table surrogate key.
   id_issue:
     lineage:
       - datalake_jira_clean.issues.key
-    description: Key of issue on Jira
+    description: Jira issue key for the ITOps ticket (TI project prefix and numeric id).
   request_type:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue request type
+    description: Jira Service Management request type name selected when the ticket was opened.
   summary:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue summary
+    description: Short title of the ITOps ticket as entered in Jira.
   issue_description:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue description
+    description: Full free-text description of the request or incident reported in Jira.
   category:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Service category
+    description: Jira issue type name classifying the ticket (for example Incident or Service request).
   current_status:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue current status
+    description: Current workflow status name of the ticket in Jira.
   reporter_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue reporter name
+    description: Display name of the Jira user who reported the ticket.
   reporter_email:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue reporter email
+    description: Email address of the Jira user who reported the ticket.
   creator_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue creator name
+    description: Display name of the Jira user who created the ticket record.
   creator_email:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue creator email
+    description: Email address of the Jira user who created the ticket record.
   departament:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Department of the requester
+    description: Department of the requester as captured in the ITOps custom field.
   service_location:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Not used anymore
+    description: Legacy service location field; no longer populated in current ITOps workflows.
   assignee_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Name of assignee to resolve the issue
+    description: Display name of the agent currently assigned to resolve the ticket.
   assignee_email:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Email of Assignee to resolve the issue
+    description: Email address of the agent currently assigned to resolve the ticket.
   support_level:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue support level
+    description: Support tier or level assigned to the ticket by the ITOps team.
   priority_defined_by_support:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: From the Lowest priority P3 to Highest P1
+    description: Priority label set by support (P1 highest through P3 lowest).
   qtd_comments:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Number of comments on the issue
+    description: Total number of comments on the Jira ticket at extraction time.
   satisfaction:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Satisfaction rate for the requester (1 to 5)
+    description: Requester satisfaction rating on a 1-to-5 scale when provided after resolution.
   sub_category:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Issue second category
+    description: Secondary service category refining the primary ticket classification.
   incident_type_old:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Incident type detail
+    description: Legacy incident type detail field retained for historical tickets.
   software_incident_old:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Not used anymore
+    description: Legacy software incident classification; no longer used in current workflows.
   incident_computer_os:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Computer's Operating System
+    description: Operating system of the affected computer reported in hardware incidents.
   software_access_old:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Not used anymore
+    description: Legacy software access field; superseded by access_software_name fields.
   software_category_old:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Not used anymore
+    description: Legacy software category field; no longer populated for new tickets.
   company:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Company of the requester
+    description: Company or legal entity associated with the requester.
   service_category:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Service category
+    description: Primary service category grouping the ticket within ITOps catalog.
   access_software_name_others:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Open field for software that is not in the approved list
+    description: Free-text software name when the requested tool is not in the approved list.
   access_software_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: list of approved software
+    description: Name of the approved software requested for access provisioning.
   access_approval_groups:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Name of the group which is responsible to approve the access request
+    description: Jira group responsible for approving the access request.
   resolution:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Type of reolution of the issue
+    description: Jira resolution name describing how the ticket was closed.
   queue:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Represents the tribe responsible for the queue
+    description: Tribe or team queue currently responsible for handling the ticket.
   incidents_activity:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Further details about Incidents
+    description: Additional detail text for incident-type tickets.
   services_activity:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Further details about Services requests
+    description: Additional detail text for service-request tickets.
   native_language:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Requester's language
+    description: Preferred language of the requester for support communication.
   sla_time_first_response_hours:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Remaining hours for the first contact with the reporter
+    description: Remaining SLA hours until first response to the reporter, from Jira SLA custom field.
   sla_hours:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Remaining Hours for resolution for the issue
+    description: Remaining SLA hours until ticket resolution, from the current SLA custom field.
   sla_hours_old:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Remaining Hours for resolution for the issue, the legacy field
+    description: Remaining resolution SLA hours from the legacy SLA custom field.
   sla_access_approval_hours:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Remaining hours to the approval of the access request (Manager and Owner)
+    description: Remaining SLA hours for manager and owner approval of an access request.
   sla_renewal_hours:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Remaining Hours for the replacement of the machine
+    description: Remaining SLA hours for machine replacement or renewal requests.
   slo_hours:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Remaining Hours for resolution for the issue, without pauses
+    description: Remaining SLO hours for resolution excluding paused SLA clock time.
   sla_target:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: category of SLA for the ticket
+    description: SLA target category assigned to the ticket for reporting and alerting.
+  is_reopened:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Boolean flag indicating whether the ticket was reopened after initial resolution.
   is_temporary_access:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Boolean indicating if the requested access is temporary
+    description: Boolean flag indicating whether the requested access is temporary rather than permanent.
   ts_first_response:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Timestamp of the issue first response
+    description: Timestamp of the first agent response to the reporter.
   ts_status_category_changed:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Timestamp of the issue status change
+    description: Timestamp when the Jira status category last changed (To Do, In Progress, Done).
   ts_created:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Timestamp of the issue creation
+    description: Timestamp when the ticket was created in Jira.
   ts_resolved:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Timestamp of the issue resolution
+    description: Timestamp when the ticket was marked resolved in Jira, if applicable.
   ts_updated:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Timestamp of the last issue update
+    description: Timestamp of the most recent update to the ticket in Jira.
