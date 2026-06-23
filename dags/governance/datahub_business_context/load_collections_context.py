@@ -835,6 +835,14 @@ mutation CreateDataProduct($input: CreateDataProductInput!) {
 }
 """
 
+_UPDATE_DATA_PRODUCT = """
+mutation UpdateDataProduct($urn: String!, $input: UpdateDataProductInput!) {
+  updateDataProduct(urn: $urn, input: $input) {
+    urn
+  }
+}
+"""
+
 _SET_DATA_PRODUCT_ASSETS = """
 mutation BatchSetDataProductAssets($input: BatchSetDataProductInput!) {
   batchSetDataProduct(input: $input)
@@ -1199,64 +1207,65 @@ def _duplicate_structured_property_message(errors: list[Any]) -> bool:
     return False
 
 
-def ensure_dp_golden_struct_property(qualified_name: str) -> None:
-    """Idempotent CreateStructuredProperty: URN type restricted to Query.
+def _ensure_structured_property(qname: str, inp: dict[str, Any], label: str) -> bool:
+    """Idempotent createStructuredProperty: skips via entityExists pre-check, returns True on success.
 
-    MULTIPLE cardinality — a Data Product can have several golden queries, all pinned to
-    the sidebar. (Idempotent: if the property already exists this create is a no-op, so the
-    cardinality here only takes effect on a fresh DataHub.)
+    Retains the error-based fallback for TOCTOU races where entityExists returns False
+    but createStructuredProperty still bounces with "already exists".
     """
-
-    inp: dict[str, Any] = {
-        "qualifiedName": qualified_name,
-        "id": qualified_name,
-        "displayName": "Golden query",
-        "description": (
-            "Canonical validated SQL for this Data Product, stored as Query entities "
-            "(navigable from the sidebar)."
-        ),
-        "valueType": STRUCTURED_PROPERTY_VALUE_TYPE_URN_POINTER,
-        "typeQualifier": {"allowedTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_QUERY]},
-        "cardinality": "MULTIPLE",
-        "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
-        "settings": {
-            "showInAssetSummary": True,
-            "hideInAssetSummaryWhenEmpty": True,
-            "showInSearchFilters": False,
-            "isHidden": False,
-            "showAsAssetBadge": False,
-            "showInColumnsTable": False,
-        },
-    }
+    if _entity_exists(structured_property_urn(qname)):
+        _ok(f"Structured property already defined ({qname})")
+        return True
     root = _graphql_root(_CREATE_STRUCTURED_PROPERTY, {"input": inp})
     if root is None:
-        _fail(
-            "createStructuredProperty (golden query)",
-            "HTTP/network failure calling GraphQL",
-        )
-        return
+        _fail(f"createStructuredProperty ({label})", "HTTP/network failure")
+        return False
     gql_errors = root.get("errors")
     if gql_errors:
         if _errors_indicate_already_exists(
             gql_errors
         ) or _duplicate_structured_property_message(gql_errors):
-            _ok(f"Structured property already defined ({qualified_name})")
-            return
-        _fail(
-            "createStructuredProperty (golden query)",
-            json.dumps(gql_errors),
-        )
-        return
+            _ok(f"Structured property already defined ({qname})")
+            return True
+        _fail(f"createStructuredProperty ({label})", json.dumps(gql_errors))
+        return False
     data = root.get("data") or {}
     created = data.get("createStructuredProperty")
     urn_resp = created.get("urn") if isinstance(created, dict) else None
     if urn_resp:
         _ok(f"Defined structured property {urn_resp}")
-    else:
-        _fail(
-            "createStructuredProperty (golden query)",
-            f"unexpected response: {data}",
-        )
+        return True
+    _fail(f"createStructuredProperty ({label})", f"unexpected response: {data}")
+    return False
+
+
+def ensure_dp_golden_struct_property(qualified_name: str) -> None:
+    """Idempotent CreateStructuredProperty: URN type restricted to Query, MULTIPLE cardinality."""
+    _ensure_structured_property(
+        qualified_name,
+        {
+            "qualifiedName": qualified_name,
+            "id": qualified_name,
+            "displayName": "Golden query",
+            "description": (
+                "Canonical validated SQL for this Data Product, stored as Query entities "
+                "(navigable from the sidebar)."
+            ),
+            "valueType": STRUCTURED_PROPERTY_VALUE_TYPE_URN_POINTER,
+            "typeQualifier": {"allowedTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_QUERY]},
+            "cardinality": "MULTIPLE",
+            "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
+            "settings": {
+                "showInAssetSummary": True,
+                "hideInAssetSummaryWhenEmpty": True,
+                "showInSearchFilters": False,
+                "isHidden": False,
+                "showAsAssetBadge": False,
+                "showInColumnsTable": False,
+            },
+        },
+        "golden query",
+    )
 
 
 def ensure_golden_query_structured_property_definition() -> None:
@@ -1432,8 +1441,18 @@ def _curated_data_product_asset_urns(cfg: dict[str, Any]) -> list[str]:
         raise SystemExit("`datasets` (non-empty list) is required")
     out = []
     for row in rows:
-        if isinstance(row, dict) and row.get("schema") and row.get("table"):
+        if not isinstance(row, dict):
+            continue
+        if row.get("urn"):
+            # Explicit URN for non-Databricks assets (e.g. Superset datasets)
+            out.append(str(row["urn"]))
+        elif row.get("schema") and row.get("table"):
             out.append(_urn(str(row["schema"]), str(row["table"])))
+        else:
+            print(
+                f"  ! skipping malformed dataset row (no 'urn' or 'schema'+'table'): {row}",
+                file=sys.stderr,
+            )
     return sorted(set(out))
 
 
@@ -1536,7 +1555,7 @@ def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]
 
 
 def curated_push_assets(cfg: dict[str, Any]) -> None:
-    print("\n[1/7] DataProduct assets (datasets only)...")
+    print("\n[1/10] DataProduct assets (datasets only)...")
     pid = str(cfg["data_product_id"])
     pname = cfg.get("product_display_name") or pid
     pdesc_raw = cfg.get("product_description")
@@ -1581,7 +1600,22 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     if create_dp.get("urn"):
         _ok(f"Created DataProduct ({dp_u})")
     elif _errors_indicate_already_exists(create_errors) or _data_product_exists(dp_u):
-        print("  -> DataProduct already exists — proceeding to asset linking")
+        print("  -> DataProduct already exists — updating description...")
+        upd = _graphql_root(
+            _UPDATE_DATA_PRODUCT,
+            {
+                "urn": dp_u,
+                "input": {
+                    "name": str(pname),
+                    "description": pdesc_raw.strip(),
+                },
+            },
+        )
+        updated_dp = (upd.get("data") or {}).get("updateDataProduct") if upd else None
+        if not updated_dp:
+            _fail("curated.updateDataProduct", repr(upd))
+        else:
+            _ok("Updated DataProduct description")
     else:
         _fail(
             "curated.createDataProduct",
@@ -1600,7 +1634,7 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
 
 
 def curated_push_documentation_link(cfg: dict[str, Any]) -> None:
-    print("\n[2/7] Documentation link...")
+    print("\n[2/10] Documentation link...")
     dl = cfg.get("documentation_link")
     if not isinstance(dl, dict) or not dl.get("url") or not dl.get("label"):
         print("  -> skipping documentation_link")
@@ -1638,7 +1672,7 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
     After terms are created / verified the function attaches them to the Data Product
     via ``batchAddTerms``.
     """
-    print("\n[3/7] Glossary terms...")
+    print("\n[3/10] Glossary terms...")
     gt_block = cfg.get("glossary_terms")
     if not isinstance(gt_block, dict) or not gt_block.get("terms"):
         print("  -> no glossary_terms block — skipping")
@@ -1755,7 +1789,7 @@ def _curated_extra_query_discovery_urls(cfg: dict[str, Any]) -> list[str]:
 
 
 def curated_purge_discovery_links(cfg: dict[str, Any]) -> None:
-    print("\n[4/7] Purge golden-query deep links...")
+    print("\n[4/10] Purge golden-query deep links...")
     gqs = _get_all_golden_queries(cfg)
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     ui_base = DATAHUB_UI_ORIGIN.rstrip("/")
@@ -1855,7 +1889,7 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
     SQL block cannot wipe the rest.
     """
     gqs = _get_all_golden_queries(cfg)
-    print(f"\n[5/7] Golden Query entities ({len(gqs)})...")
+    print(f"\n[5/10] Golden Query entities ({len(gqs)})...")
     if not gqs:
         print("  -> no golden queries in YAML — skipping")
         return []
@@ -1870,7 +1904,7 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
 def curated_push_sidebar_struct_props(
     cfg: dict[str, Any], query_urns: list[str]
 ) -> None:
-    print("\n[6/7] Sidebar structured property...")
+    print("\n[6/10] Sidebar structured property...")
     spec_sp = cfg.get("structured_property")
     if not isinstance(spec_sp, dict) or not spec_sp.get("qualified_name"):
         raise SystemExit("`structured_property.qualified_name` is required")
@@ -1937,7 +1971,7 @@ def curated_push_sidebar_struct_props(
 
 
 def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
-    print("\n[7/7] Re-affirm dataset-only memberships...")
+    print("\n[7/10] Re-affirm dataset-only memberships...")
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     urns_r = _filter_assignable_urns(
         _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
@@ -1963,14 +1997,288 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
     _ok(f"Pinned {len(urns_r)} datasets")
 
 
+# ---------------------------------------------------------------------------
+# Shared SP upsert helper (used by mutations 8, 9, 10)
+# ---------------------------------------------------------------------------
+
+
+def _upsert_sp_on_data_product(
+    dp_u: str,
+    sp_urn: str,
+    values: list[dict[str, Any]],
+    step_label: str,
+) -> bool:
+    """Prefetch all SPs on a data product, replace the target SP, and upsert the merged set."""
+    our_row: dict[str, Any] = {"structuredPropertyUrn": sp_urn, "values": values}
+    fetch = _post(_FETCH_DATA_PRODUCT_STRUCTURED_PROPERTIES, {"urn": dp_u})
+    if fetch is None:
+        _fail(step_label, "prefetch structured properties failed")
+        return False
+    dp_blob = fetch.get("dataProduct")
+    if dp_blob is None:
+        _fail(step_label, "dataProduct returned null")
+        return False
+    props = ((dp_blob.get("structuredProperties") or {}).get("properties")) or []
+    merged: list[dict[str, Any]] = []
+    for prop in props:
+        sp_blob = prop.get("structuredProperty") or {}
+        sp_u = sp_blob.get("urn")
+        if not sp_u or sp_u == sp_urn:
+            continue
+        converted = _structured_property_entry_to_value_inputs(prop)
+        if converted is None:
+            _fail(
+                step_label,
+                f"cannot round-trip structured property {sp_u} — aborting merge",
+            )
+            return False
+        merged.append({"structuredPropertyUrn": sp_u, "values": converted})
+    merged.append(our_row)
+    upl = _post(
+        _UPSERT_STRUCTURED_PROPERTIES,
+        {"input": {"assetUrn": dp_u, "structuredPropertyInputParams": merged}},
+    )
+    if upl is None:
+        _fail(step_label, "HTTP/network failure on upsert")
+        return False
+    return True
+
+
+# ---------------------------------------------------------------------------
+# Mutation 8 — Upstream data product relationships (structured property)
+# ---------------------------------------------------------------------------
+
+_UPSTREAM_SP_QNAME = "br.com.quintoandar.datahub.upstream_data_products"
+
+
+def _ensure_upstream_sp_definition() -> bool:
+    return _ensure_structured_property(
+        _UPSTREAM_SP_QNAME,
+        {
+            "qualifiedName": _UPSTREAM_SP_QNAME,
+            "id": _UPSTREAM_SP_QNAME,
+            "displayName": "Upstream data products",
+            "description": (
+                "Data products this metric entity draws its schema and component logic from. "
+                "Navigate to the upstream product for grain, tables, and join recipes."
+            ),
+            "valueType": STRUCTURED_PROPERTY_VALUE_TYPE_URN_POINTER,
+            "typeQualifier": {
+                "allowedTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT]
+            },
+            "cardinality": "MULTIPLE",
+            "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
+            "settings": {
+                "showInAssetSummary": True,
+                "hideInAssetSummaryWhenEmpty": True,
+                "showInSearchFilters": False,
+                "isHidden": False,
+                "showAsAssetBadge": False,
+                "showInColumnsTable": False,
+            },
+        },
+        "upstream_data_products",
+    )
+
+
+def curated_push_upstream_data_products(cfg: dict[str, Any]) -> None:
+    """Wire upstream data product URNs as a structured property on the metric data product."""
+    print("\n[8/10] Upstream data product relationships...")
+    related = cfg.get("related_data_products")
+    if not related or not isinstance(related, list):
+        print("  -> no related_data_products — skipping")
+        return
+
+    upstream_urns: list[str] = []
+    missing: list[str] = []
+    for pid in related:
+        u = _data_product_urn(str(pid).strip())
+        if _data_product_exists(u):
+            upstream_urns.append(u)
+        else:
+            missing.append(u)
+            print(
+                f"  ! upstream data product not found in DataHub: {u}", file=sys.stderr
+            )
+
+    if missing:
+        _fail(
+            "curated.upstream_data_products",
+            f"{len(missing)} upstream product(s) not found — aborting to avoid overwriting a "
+            f"complete stored list with a partial one: {missing}",
+        )
+        return
+    if not upstream_urns:
+        _fail(
+            "curated.upstream_data_products",
+            "none of the related_data_products exist in DataHub",
+        )
+        return
+
+    if not _ensure_upstream_sp_definition():
+        return
+
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+    upstream_sp_urn = structured_property_urn(_UPSTREAM_SP_QNAME)
+    if not _upsert_sp_on_data_product(
+        dp_u,
+        upstream_sp_urn,
+        [{"stringValue": u} for u in upstream_urns],
+        "curated.upstream_data_products",
+    ):
+        return
+    _ok(
+        f"Linked {len(upstream_urns)} upstream data product(s): {', '.join(upstream_urns)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Mutation 9 — Lifecycle stage (structured property)
+# ---------------------------------------------------------------------------
+
+_LIFECYCLE_SP_QNAME = "br.com.quintoandar.datahub.data_product.lifecycle_stage"
+_LIFECYCLE_SP_ALLOWED_VALUES = frozenset({"draft", "review", "prod", "deprecated"})
+_STRUCTURED_PROPERTY_VALUE_TYPE_STRING = "urn:li:dataType:datahub.string"
+
+
+def _ensure_lifecycle_sp_definition() -> bool:
+    return _ensure_structured_property(
+        _LIFECYCLE_SP_QNAME,
+        {
+            "qualifiedName": _LIFECYCLE_SP_QNAME,
+            "id": _LIFECYCLE_SP_QNAME,
+            "displayName": "Lifecycle Stage",
+            "description": (
+                "Maturity stage of this Data Product. "
+                "draft = under development; review = awaiting approval; "
+                "prod = live and discoverable; deprecated = soft-deleted, no longer maintained."
+            ),
+            "valueType": _STRUCTURED_PROPERTY_VALUE_TYPE_STRING,
+            "cardinality": "SINGLE",
+            "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
+            "settings": {
+                "showInAssetSummary": True,
+                "hideInAssetSummaryWhenEmpty": True,
+                "showInSearchFilters": True,
+                "isHidden": False,
+                "showAsAssetBadge": True,
+                "showInColumnsTable": False,
+            },
+        },
+        "lifecycle_stage",
+    )
+
+
+def curated_push_lifecycle_stage(cfg: dict[str, Any]) -> None:
+    """Upsert the lifecycle_stage structured property on the data product."""
+    print("\n[9/10] Lifecycle stage...")
+    stage = str(cfg.get("lifecycle_stage") or "").strip().lower()
+    if not stage:
+        print(
+            "  ! lifecycle_stage not set — add `lifecycle_stage: prod` (or draft/review/deprecated) to the YAML",
+            file=sys.stderr,
+        )
+        _fail(
+            "curated.lifecycle_stage",
+            "lifecycle_stage is required but missing from YAML",
+        )
+        return
+    if stage not in _LIFECYCLE_SP_ALLOWED_VALUES:
+        _fail(
+            "curated.lifecycle_stage",
+            f"invalid value {stage!r} — allowed: {sorted(_LIFECYCLE_SP_ALLOWED_VALUES)}",
+        )
+        return
+
+    if not _ensure_lifecycle_sp_definition():
+        return
+
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+    lifecycle_sp_urn = structured_property_urn(_LIFECYCLE_SP_QNAME)
+    if not _upsert_sp_on_data_product(
+        dp_u,
+        lifecycle_sp_urn,
+        [{"stringValue": stage}],
+        "curated.lifecycle_stage",
+    ):
+        return
+    _ok(f"Set lifecycle_stage = {stage!r}")
+
+
+# ---------------------------------------------------------------------------
+# Mutation 10 — Data product type (domain | metric)
+# ---------------------------------------------------------------------------
+
+_TYPE_SP_QNAME = "br.com.quintoandar.datahub.data_product.type"
+_TYPE_SP_ALLOWED_VALUES = frozenset({"domain", "metric"})
+_TYPE_SP_DEFAULT = "domain"
+
+
+def _ensure_type_sp_definition() -> bool:
+    return _ensure_structured_property(
+        _TYPE_SP_QNAME,
+        {
+            "qualifiedName": _TYPE_SP_QNAME,
+            "id": _TYPE_SP_QNAME,
+            "displayName": "Data Product Type",
+            "description": (
+                "Classification of this Data Product. "
+                "domain = business entity / schema reference; "
+                "metric = official calculated metric with a golden query."
+            ),
+            "valueType": _STRUCTURED_PROPERTY_VALUE_TYPE_STRING,
+            "cardinality": "SINGLE",
+            "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
+            "settings": {
+                "showInAssetSummary": True,
+                "hideInAssetSummaryWhenEmpty": True,
+                "showInSearchFilters": True,
+                "isHidden": False,
+                "showAsAssetBadge": True,
+                "showInColumnsTable": False,
+            },
+        },
+        "data_product.type",
+    )
+
+
+def curated_push_data_product_type(cfg: dict[str, Any]) -> None:
+    """Upsert the data_product.type structured property; defaults to 'domain' if not set."""
+    print("\n[10/10] Data product type...")
+    dp_type = str(cfg.get("data_product_type") or _TYPE_SP_DEFAULT).strip().lower()
+    if dp_type not in _TYPE_SP_ALLOWED_VALUES:
+        _fail(
+            "curated.data_product_type",
+            f"invalid value {dp_type!r} — allowed: {sorted(_TYPE_SP_ALLOWED_VALUES)}",
+        )
+        return
+
+    if not _ensure_type_sp_definition():
+        return
+
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+    type_sp_urn = structured_property_urn(_TYPE_SP_QNAME)
+    if not _upsert_sp_on_data_product(
+        dp_u,
+        type_sp_urn,
+        [{"stringValue": dp_type}],
+        "curated.data_product_type",
+    ):
+        return
+    _ok(f"Set data_product_type = {dp_type!r}")
+
+
 def run_data_product_curated_entity(spec: dict[str, Any]) -> None:
-    curated_push_assets(spec)  # [1/7]
-    curated_push_documentation_link(spec)  # [2/7]
-    curated_push_glossary_terms(spec)  # [3/7]
-    curated_purge_discovery_links(spec)  # [4/7]
-    query_urns = curated_push_all_golden_queries(spec)  # [5/7]
-    curated_push_sidebar_struct_props(spec, query_urns)  # [6/7]
-    curated_refresh_dataset_assets(spec)  # [7/7]
+    curated_push_assets(spec)  # [1/10]
+    curated_push_documentation_link(spec)  # [2/10]
+    curated_push_glossary_terms(spec)  # [3/10]
+    curated_purge_discovery_links(spec)  # [4/10]
+    query_urns = curated_push_all_golden_queries(spec)  # [5/10]
+    curated_push_sidebar_struct_props(spec, query_urns)  # [6/10]
+    curated_refresh_dataset_assets(spec)  # [7/10]
+    curated_push_upstream_data_products(spec)  # [8/10]
+    curated_push_lifecycle_stage(spec)  # [9/10]
+    curated_push_data_product_type(spec)  # [10/10]
 
 
 def run_full_curated_datahub_bundle(spec: dict[str, Any]) -> None:

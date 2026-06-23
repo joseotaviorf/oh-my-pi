@@ -51,10 +51,13 @@ if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
 from sync.constants import (  # noqa: E402
+    DATA_PRODUCT_TYPE_METRIC,
     DELIVERY_MODE_DIRECT,
     DELIVERY_MODE_GITOPS,
     LIFECYCLE_STAGE_DRAFT,
     LIFECYCLE_STAGE_PROD,
+    MD_OUTPUT_DIR,
+    MD_OUTPUT_DIR_METRICS,
     SYNC_STATE_FILENAME,
 )
 from sync.datahub_document_client import (  # noqa: E402
@@ -150,6 +153,14 @@ def _fill_derived_fields(
     return doc
 
 
+def _md_output_dir(data_product_type: str) -> str:
+    return (
+        MD_OUTPUT_DIR_METRICS
+        if data_product_type == DATA_PRODUCT_TYPE_METRIC
+        else MD_OUTPUT_DIR
+    )
+
+
 _OUTCOME_OK = "ok"
 _OUTCOME_SKIPPED = "skipped"
 _OUTCOME_FAILED = "failed"
@@ -197,6 +208,7 @@ def _process_document(
 
     # All pre-checks passed — this doc will produce output
     print(f"\n▶  {label}  ({doc.urn})")
+    print(f"  → data_product_type: {doc.data_product_type}")
 
     doc = _fill_derived_fields(doc, dry_run=dry_run)
 
@@ -242,6 +254,7 @@ def _process_document(
             md_content=md_text,
             document_title=doc.title,
             document_urn=doc.urn,
+            md_output_dir=_md_output_dir(doc.data_product_type),
         )
         print(f"  ✓ opened PR #{pr.pr_number}: {pr.pr_url}")
         state.mark_synced(
@@ -264,6 +277,7 @@ def _process_document(
             glossary_parent_node_urn=doc.glossary_parent_node_urn or None,
             primary_datasets=doc.primary_datasets or None,
             source_document_urn=doc.urn,
+            data_product_type=doc.data_product_type,
         )
         yaml_text = render_yaml(spec)
         with tempfile.TemporaryDirectory(prefix="tars-sync-") as tmp:

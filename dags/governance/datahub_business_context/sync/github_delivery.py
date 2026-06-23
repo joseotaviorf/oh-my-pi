@@ -130,6 +130,7 @@ def open_sync_pull_request(
     document_title: str,
     document_urn: str,
     is_edit: bool = False,
+    md_output_dir: str = MD_OUTPUT_DIR,
 ) -> PullRequestResult:
     """Create branch, commit MD file, and open (or update) a PR for engineering review.
 
@@ -141,12 +142,21 @@ def open_sync_pull_request(
     ``is_edit=True`` means a file already exists on master; the PR title is labelled
     ``[EDIT]`` so reviewers know they're looking at a diff, not a net-new entity.
 
-    Idempotent: if an open PR already exists on branch ``tars-entity-sync/{data_product_id}``,
-    the MD file is updated in-place on that branch and the existing PR is returned.
+    ``md_output_dir`` controls both the committed file path and the branch name prefix;
+    use ``MD_OUTPUT_DIR_METRICS`` for metric data products.
+
+    Idempotent: if an open PR already exists on the sync branch, the MD file is updated
+    in-place on that branch and the existing PR is returned.
     """
     entity_slug = data_product_id.replace("-", "_")
-    md_path = f"{MD_OUTPUT_DIR}/{entity_slug}.md"
-    branch = f"tars-entity-sync/{data_product_id}"
+    md_path = f"{md_output_dir}/{entity_slug}.md"
+    # Derive branch prefix from the last path component (business_entities → tars-entity-sync,
+    # metric_entities → tars-metrics-sync) so branches stay namespaced by kind.
+    _dir_suffix = md_output_dir.rsplit("/", 1)[-1]  # e.g. "business_entities"
+    _branch_prefix = (
+        "tars-metrics-sync" if "metric" in _dir_suffix else "tars-entity-sync"
+    )
+    branch = f"{_branch_prefix}/{data_product_id}"
 
     commit_msg = (
         f"feat(datahub): sync TARS entity '{document_title}' from Context Document"

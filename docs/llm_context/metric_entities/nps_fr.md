@@ -10,6 +10,10 @@
 
 - NPS
 
+## DataHub Catalog
+
+- **Upstream business entity data product**: `urn:li:dataProduct:nps`
+
 ## Glossary and Synonyms
 
 - **NPS FR**, **NPS True**, **NPS FR True**, **official NPS**, **weighted NPS** → this metric (journey-weighted average)

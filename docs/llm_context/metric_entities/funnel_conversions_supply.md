@@ -18,6 +18,10 @@ All conversions use **cohort logic**: a property is counted as converted when it
 
 - Supply
 
+## DataHub Catalog
+
+- **Upstream business entity data product**: `urn:li:dataProduct:supply`
+
 ## Glossary and Synonyms
 
 - **L2P**, **Lead to Prospect**, **conversão de lead para prospect** → Lead → Prospect conversion

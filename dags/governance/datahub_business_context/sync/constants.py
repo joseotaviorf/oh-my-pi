@@ -5,6 +5,12 @@ from __future__ import annotations
 TARS_ENTITY_TAG = "tars-entity"
 TARS_ENTITY_TAG_URN = "urn:li:tag:tars-entity"
 
+TARS_METRICS_TAG = "tars-metrics"
+TARS_METRICS_TAG_URN = "urn:li:tag:tars-metrics"
+
+DATA_PRODUCT_TYPE_DOMAIN = "domain"
+DATA_PRODUCT_TYPE_METRIC = "metric"
+
 STRUCTURED_PROP_DOMAIN_URN = "br.com.quintoandar.datahub.tars_entity.domain_urn"
 STRUCTURED_PROP_DATA_PRODUCT_ID = (
     "br.com.quintoandar.datahub.tars_entity.data_product_id"
@@ -23,6 +29,7 @@ STRUCTURED_PROP_SYNC_STATUS = "br.com.quintoandar.datahub.tars_entity.sync_statu
 GITHUB_REPO = "quintoandar/bi-etl-ejuice"
 GITHUB_DEFAULT_BRANCH = "master"
 MD_OUTPUT_DIR = "docs/llm_context/business_entities"
+MD_OUTPUT_DIR_METRICS = "docs/llm_context/metric_entities"
 YAML_OUTPUT_DIR = "dags/governance/datahub_business_context/datahub_entities"
 
 REQUIRED_MD_SECTIONS = (

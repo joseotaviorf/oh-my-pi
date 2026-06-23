@@ -25,10 +25,13 @@ product_description: |
 
 data_product_id: {entity_slug_kebab}
 domain_urn: urn:li:domain:{domain}
+lifecycle_stage: prod  # draft | review | prod | deprecated
+data_product_type: domain  # domain | metric
 
 structured_property:
-  qualified_name: br.com.quintoandar.datahub.{entity_slug_kebab}.golden_query
+  qualified_name: br.com.quintoandar.datahub.data_product.golden_query
   legacy_qualified_names_to_drop:
+    - br.com.quintoandar.datahub.{entity_slug_kebab}.golden_query
     - br.com.quintoandar.datahub.{entity_slug_kebab}.golden_query_url
 
 golden_queries:

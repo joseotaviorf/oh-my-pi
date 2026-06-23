@@ -14,6 +14,11 @@ The lifecycle has six stages:
 
 Not all leads follow every stage. Leads may be discarded at any step, reprocessed through recovery flows, or accelerated by operations. RENT and SALE flows are tracked separately under the same model via `nm_business_context`.
 
+## Related Metric Entities
+
+- FL (First Listings)
+- Supply Funnel Conversions
+
 ## Glossary and Synonyms
 
 - **Supply**, **captação**, **aquisição de proprietários** → the supply entity; use `dw_growth.obt_supply`

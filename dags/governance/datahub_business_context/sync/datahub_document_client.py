@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from sync.constants import (
+    DATA_PRODUCT_TYPE_DOMAIN,
+    DATA_PRODUCT_TYPE_METRIC,
     STRUCTURED_PROP_DATA_PRODUCT_ID,
     STRUCTURED_PROP_DOMAIN_URN,
     STRUCTURED_PROP_GLOSSARY_PARENT,
@@ -13,6 +15,7 @@ from sync.constants import (
     STRUCTURED_PROP_PRIMARY_DATASETS,
     STRUCTURED_PROP_SYNC_STATUS,
     TARS_ENTITY_TAG,
+    TARS_METRICS_TAG,
 )
 from sync.datahub_client import post as _dh_post
 
@@ -29,6 +32,7 @@ class TarsEntityDocument:
     golden_query_stable_urn: str = ""
     glossary_parent_node_urn: str = ""
     is_published: bool = False
+    data_product_type: str = DATA_PRODUCT_TYPE_DOMAIN
 
 
 _SEARCH_DOCUMENTS = """
@@ -154,18 +158,24 @@ def _parse_primary_datasets(raw: str) -> list[tuple[str, str]]:
     return pairs
 
 
-def _has_tars_entity_tag(entity: dict[str, Any]) -> bool:
+def _extract_product_type_from_tags(entity: dict[str, Any]) -> Optional[str]:
+    """Return DATA_PRODUCT_TYPE_DOMAIN/METRIC if a tars tag is present, else None."""
     tag_names = {
         (t.get("tag") or {}).get("name") or ""
         for t in ((entity.get("tags") or {}).get("tags") or [])
     }
-    return TARS_ENTITY_TAG in tag_names
+    if TARS_METRICS_TAG in tag_names:
+        return DATA_PRODUCT_TYPE_METRIC
+    if TARS_ENTITY_TAG in tag_names:
+        return DATA_PRODUCT_TYPE_DOMAIN
+    return None
 
 
 def _entity_to_document(entity: dict[str, Any]) -> Optional[TarsEntityDocument]:
     if not entity or not entity.get("urn"):
         return None
-    if not _has_tars_entity_tag(entity):
+    product_type = _extract_product_type_from_tags(entity)
+    if product_type is None:
         return None
     info = entity.get("info") or {}
     state = ((info.get("status") or {}).get("state") or "").upper()
@@ -189,6 +199,7 @@ def _entity_to_document(entity: dict[str, Any]) -> Optional[TarsEntityDocument]:
         golden_query_stable_urn=_string_prop(props, STRUCTURED_PROP_GOLDEN_QUERY_URN),
         glossary_parent_node_urn=_string_prop(props, STRUCTURED_PROP_GLOSSARY_PARENT),
         is_published=is_published,
+        data_product_type=product_type,
     )
 
 
@@ -331,12 +342,13 @@ def write_sync_status(
     return _upsert_document_structured_properties(doc_urn, updates)
 
 
-def search_tars_entity_documents(
+def _search_documents_by_tag(
+    tag: str,
     *,
     count: int = 50,
 ) -> list[TarsEntityDocument]:
-    """Search published Context Documents tagged ``tars-entity`` (paginated)."""
-    query_string = f"tags:{TARS_ENTITY_TAG}"
+    """Paginate all Context Documents tagged ``tag`` and return parsed documents."""
+    query_string = f"tags:{tag}"
     docs: list[TarsEntityDocument] = []
     start = 0
     total: Optional[int] = None
@@ -370,6 +382,25 @@ def search_tars_entity_documents(
         if len(results) < count or (total is not None and start >= total):
             break
 
+    return docs
+
+
+def search_tars_entity_documents(
+    *,
+    count: int = 50,
+) -> list[TarsEntityDocument]:
+    """Search Context Documents tagged ``tars-entity`` or ``tars-metrics`` (paginated).
+
+    Both tags are searched separately to avoid relying on DataHub OR-query syntax.
+    Results are deduplicated by URN.
+    """
+    docs: list[TarsEntityDocument] = []
+    seen_urns: set[str] = set()
+    for tag in (TARS_ENTITY_TAG, TARS_METRICS_TAG):
+        for doc in _search_documents_by_tag(tag, count=count):
+            if doc.urn not in seen_urns:
+                seen_urns.add(doc.urn)
+                docs.append(doc)
     return docs
 
 

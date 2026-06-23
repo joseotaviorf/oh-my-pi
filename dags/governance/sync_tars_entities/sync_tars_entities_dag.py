@@ -145,6 +145,7 @@ def audit_document(**context) -> dict[str, Any]:
 
     _doc_header_re = re.compile(r"^▶\s+(.+?)\s+\((urn:li:document:[^)]+)\)")
     _dp_id_re = re.compile(r"→ data_product_id (?:derived from title|is): (\S+)")
+    _dp_type_re = re.compile(r"→ data_product_type: (\S+)")
     _md_re = re.compile(r"✓ dry-run wrote (.+\.md)$")
 
     docs: list[dict[str, str]] = []
@@ -163,12 +164,21 @@ def audit_document(**context) -> dict[str, Any]:
             current["data_product_id"] = m.group(1).strip()
             continue
 
+        m = _dp_type_re.search(line)
+        if m:
+            current["data_product_type"] = m.group(1).strip()
+            continue
+
         m = _md_re.search(line)
         if m:
             current["_md_path"] = m.group(1).strip()
 
     if current.get("document_urn"):
         docs.append(current)
+
+    # Default missing types to "domain" for backward compatibility.
+    for d in docs:
+        d.setdefault("data_product_type", "domain")
 
     # Read MD content into XCom so downstream tasks don't depend on the local filesystem
     # (tasks may run on different workers that don't share /tmp or sync_output/).
@@ -228,7 +238,7 @@ def classify_entity(**context) -> dict[str, Any]:
     if pkg_dir not in sys.path:
         sys.path.insert(0, pkg_dir)
 
-    from sync.constants import MD_OUTPUT_DIR  # noqa: PLC0415
+    from sync.constants import MD_OUTPUT_DIR, MD_OUTPUT_DIR_METRICS  # noqa: PLC0415
     from sync.datahub_document_client import (  # noqa: PLC0415
         fetch_data_product,
         write_data_product_id,
@@ -249,7 +259,9 @@ def classify_entity(**context) -> dict[str, Any]:
         dp_id = doc["data_product_id"]
         product_id = dp_id.strip().lower().replace("_", "-")
         entity_slug = product_id.replace("-", "_")
-        md_path = f"{MD_OUTPUT_DIR}/{entity_slug}.md"
+        dp_type = doc.get("data_product_type", "domain")
+        md_dir = MD_OUTPUT_DIR_METRICS if dp_type == "metric" else MD_OUTPUT_DIR
+        md_path = f"{md_dir}/{entity_slug}.md"
         dp_urn = f"urn:li:dataProduct:{product_id}"
 
         try:
@@ -315,6 +327,7 @@ def open_pr(**context) -> None:
     if pkg_dir not in sys.path:
         sys.path.insert(0, pkg_dir)
 
+    from sync.constants import MD_OUTPUT_DIR, MD_OUTPUT_DIR_METRICS  # noqa: PLC0415
     from sync.datahub_document_client import write_sync_status  # noqa: PLC0415
     from sync.github_delivery import (  # noqa: PLC0415
         is_ip_allowlist_error,
@@ -335,8 +348,10 @@ def open_pr(**context) -> None:
             continue
 
         is_edit = doc.get("is_edit", False)
+        dp_type = doc.get("data_product_type", "domain")
+        md_output_dir = MD_OUTPUT_DIR_METRICS if dp_type == "metric" else MD_OUTPUT_DIR
         pr_label = "EDIT" if is_edit else "NEW"
-        print(f"\n[{pr_label}] Opening PR for '{title}' ({dp_id}) ...")
+        print(f"\n[{pr_label}] Opening PR for '{title}' ({dp_id}) [type={dp_type}] ...")
         try:
             pr = open_sync_pull_request(
                 data_product_id=dp_id,
@@ -344,6 +359,7 @@ def open_pr(**context) -> None:
                 document_title=title,
                 document_urn=doc_urn,
                 is_edit=is_edit,
+                md_output_dir=md_output_dir,
             )
             print(f"  ✅  PR #{pr.pr_number}: {pr.pr_url}")
             print(f"       branch : {pr.branch}")
@@ -382,8 +398,9 @@ with DAG(
     },
     description=(
         "Validate, classify (NEW/EDIT), and open a GitHub PR for published DataHub "
-        "Context Documents tagged tars-entity. Merging the PR triggers the existing "
-        "Woodpecker pipeline which publishes the Data Product to DataHub."
+        "Context Documents tagged tars-entity (domain data products) or tars-metrics "
+        "(metric data products). Merging the PR triggers Woodpecker, which publishes "
+        "the Data Product to DataHub."
     ),
     start_date=pendulum.datetime(2026, 6, 10, tz="America/Sao_Paulo"),
     schedule="@daily",
@@ -398,33 +415,48 @@ Three-task pipeline for ops-authored DataHub Context Documents.
 audit_document  →  classify_entity  →  open_pr  →  [human review]  →  merge  →  Woodpecker  →  DataHub
 ```
 
+### Supported document kinds
+
+| DataHub tag | Data Product type | MD output directory |
+|---|---|---|
+| `tars-entity` | `domain` | `docs/llm_context/business_entities/` |
+| `tars-metrics` | `metric` | `docs/llm_context/metric_entities/` |
+
+Both tags are audited in a single run. Each document's type is detected automatically
+from which tag is present.
+
 ### Task 1 — audit_document
 
 Runs `sync_tars_entities.py --dry-run --mode gitops` against all PUBLISHED documents
-tagged `tars-entity`. Validates required sections, table existence, SQL syntax, and
-slug collision. Writes generated `.datahub.yaml` and `.md` to `sync_output/` and
-passes file paths to Task 2 via XCom.
+tagged `tars-entity` or `tars-metrics`. Validates required sections, table existence,
+SQL syntax, and slug collision. Writes generated `.md` to `sync_output/` and passes
+file content to Task 2 via XCom (including `data_product_type` per doc).
 
 Fails (Task 2 skipped) if any document fails validation.
 
 ### Task 2 — classify_entity
 
 For each document from Task 1:
-- **GitHub check**: does `docs/llm_context/business_entities/<slug>.md` already
-  exist on master? Yes → `EDIT` (PR shows a diff). No → `NEW`.
+- **GitHub check**: does the MD file already exist on master?
+  - Domain: `docs/llm_context/business_entities/<slug>.md`
+  - Metric: `docs/llm_context/metric_entities/<slug>.md`
+  - Yes → `EDIT` (PR shows a diff). No → `NEW`.
 - **DataHub check**: does `urn:li:dataProduct:<slug>` already exist? If yes and
   the document's `data_product_id` structured property is not yet set, writes it
   back to the DataHub document sidebar so ops users see the linkage.
 
-Passes the enriched payload (`is_edit`, `existing_dp_urn` per doc) to Task 3.
+Passes the enriched payload (`is_edit`, `existing_dp_urn`, `data_product_type` per doc)
+to Task 3.
 
 ### Task 3 — open_pr
 
-Opens a GitHub PR to `master` labelled `[NEW]` or `[EDIT]` with only:
-- `docs/llm_context/business_entities/<slug>.md`
+Opens a GitHub PR to `master` labelled `[NEW]` or `[EDIT]` with the MD file committed
+to the correct directory based on document type:
+- Domain: `tars-entity-sync/<slug>` branch → `docs/llm_context/business_entities/<slug>.md`
+- Metric: `tars-metrics-sync/<slug>` branch → `docs/llm_context/metric_entities/<slug>.md`
 
-Branch: `tars-entity-sync/<slug>`. On merge, Woodpecker `sync-tars-entities` runs
-`sync_tars_entities.py --mode direct` and publishes the Data Product from in-memory YAML.
+On merge, Woodpecker `sync-tars-entities` runs `sync_tars_entities.py --mode direct`
+and publishes the Data Product (with the correct `data_product_type`) from in-memory YAML.
 
 ### CLI default vs this DAG
 
@@ -451,7 +483,7 @@ override `TARS_SYNC_MODE` on the worker.
             type="string",
             description=(
                 "Audit a single document by URN (e.g. urn:li:document:abc123). "
-                "Leave empty to scan all published tars-entity documents."
+                "Leave empty to scan all published tars-entity and tars-metrics documents."
             ),
         ),
         "force": Param(

@@ -44,6 +44,17 @@ find each entity). One bullet per related entity.
 
 - {Business Entity Name}
 
+## DataHub Catalog
+
+<!--
+URNs for the DataHub data products this metric links to. TARS uses these to
+call get_entities() and fetch schema, glossary, and golden queries from the catalog.
+Include this metric's own data product URN if one exists in DataHub.
+-->
+
+- **This metric's data product**: `urn:li:dataProduct:{metric-id}` <!-- remove if no metric data product exists yet -->
+- **Upstream business entity data product**: `urn:li:dataProduct:{entity-id}`
+
 ## Glossary and Synonyms
 
 <!-- Names and terms analysts/stakeholders use to ASK for this metric. TARS uses these to route. -->

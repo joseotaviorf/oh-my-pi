@@ -26,7 +26,9 @@
 #       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
 #       depends_on push-datahub-business-context fails on pull_request)
 #   sync-tars-entities — sync_tars_entities.py (direct mode) for DataHub Context Documents
-#                         tagged tars-entity (uses prod API key — same as push step)
+#                         tagged tars-entity (domain) or tars-metrics (metric).
+#                         Runs after push-datahub-business-context so the Data Product
+#                         already exists when the backlink is established.
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
 #
@@ -148,9 +150,11 @@ steps:
         path:
           include:
             - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/metric_entities/**"
             - "dags/governance/datahub_business_context/sync/**"
             - "dags/governance/datahub_business_context/sync_tars_entities.py"
           on_empty: false
+    depends_on: [push-datahub-business-context]
 
   push-context-documents:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest

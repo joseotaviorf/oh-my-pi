@@ -12,6 +12,11 @@ The metric supports segmentation by **supply source** (1P vs 3P) and by **busine
 
 - Supply
 
+## DataHub Catalog
+
+- **This metric's data product**: `urn:li:dataProduct:first-listings-1p`
+- **Upstream business entity data product**: `urn:li:dataProduct:supply`
+
 ## Glossary and Synonyms
 
 - **FL**, **First Listing**, **First Listings**, **novas publicações**, **anúncios publicados pela primeira vez**, **volume de FL** → total first listings (all channels)

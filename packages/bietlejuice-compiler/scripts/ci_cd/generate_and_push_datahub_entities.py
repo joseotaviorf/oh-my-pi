@@ -128,10 +128,35 @@ _PRODUCT_DISPLAY_NAME_LINE_RE = re.compile(
 
 _CI_YAML_DIR: Path | None = None
 
+_DATA_PRODUCT_TYPE_RE = re.compile(r"(?m)^data_product_type:.*$")
+_LIFECYCLE_STAGE_LINE_RE = re.compile(r"(?m)^lifecycle_stage:.*$")
+
 
 def md_path_to_data_product_id(md_path: Path) -> str:
     """``accounting_funnel.md`` → ``accounting-funnel``."""
     return md_path.stem.replace("_", "-")
+
+
+def _md_to_data_product_type(md_path: Path) -> str:
+    """Return 'metric' for metric_entities/, 'domain' for everything else."""
+    return "metric" if "metric_entities" in md_path.parts else "domain"
+
+
+def _inject_data_product_type(yaml_content: str, data_product_type: str) -> str:
+    """Replace existing data_product_type line, or insert it after lifecycle_stage.
+
+    Mirrors the surgical-replacement approach used by _inject_description so that
+    the LLM output (which copies 'domain' from the gold standard) is always
+    overridden with the correct value derived from the source directory.
+    """
+    line = f"data_product_type: {data_product_type}"
+    if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
+        return _DATA_PRODUCT_TYPE_RE.sub(line, yaml_content, count=1)
+    if _LIFECYCLE_STAGE_LINE_RE.search(yaml_content):
+        return _LIFECYCLE_STAGE_LINE_RE.sub(
+            lambda m: f"{m.group(0)}\n{line}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{line}\n"
 
 
 def _ci_yaml_dir() -> Path:
@@ -631,6 +656,9 @@ def main(argv: list[str] | None = None) -> int:
         yaml_content = _enforce_stable_urns(yaml_content, entity_slug)
         yaml_content = _inject_description(
             yaml_content, _extract_description_from_md(md_path)
+        )
+        yaml_content = _inject_data_product_type(
+            yaml_content, _md_to_data_product_type(md_path)
         )
 
         domain_err = _validate_domain_urn(
