@@ -1,0 +1,62 @@
+---
+database_name: datalake_ebdb_clean
+table_name: creci_validation
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+description: |
+  CRECI (Conselho Regional de Corretores de Imóveis) validation records for agents and
+  related legal entities in EBDB. Stores validation outcome, provider, reusable window,
+  and audit timestamps sourced from the CreciValidation application table.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.id
+    description: Surrogate primary key of the CRECI validation record in EBDB.
+  uuid_creci_validation:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.creci_validation_uuid
+    description: Business UUID that uniquely identifies the CRECI validation attempt.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.person_uuid
+    description: UUID of the person or legal entity subject to CRECI validation.
+  legal_entity_type:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.legal_entity_type
+    description: Type of legal entity validated (for example individual broker or company).
+  validation_input_hash:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.validation_input_hash
+    description: Hash of the input payload used for idempotent validation lookups.
+  version:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.version
+    description: Version counter or schema version associated with the validation record.
+  status:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.status
+    description: Current validation status returned by the CRECI validation workflow.
+  reason:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.reason
+    description: Human-readable or coded reason describing the validation result or failure.
+  provider:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.provider
+    description: External or internal provider that executed the CRECI validation.
+  ts_validated:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.validated_at
+    description: Timestamp when the CRECI validation was completed.
+  ts_reusable_until:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.reusable_until
+    description: Timestamp until which a successful validation result may be reused without re-check.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.created_at
+    description: Timestamp when the validation record was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.CreciValidation.updated_at
+    description: Timestamp when the validation record was last updated in EBDB.

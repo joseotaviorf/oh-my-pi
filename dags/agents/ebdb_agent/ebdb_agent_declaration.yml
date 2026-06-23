@@ -37,6 +37,8 @@ workflow:
       clean_table_name: client_portfolio
     ClientPortfolioMigration:
       clean_table_name: client_portfolio_migration
+    CreciValidation:
+      clean_table_name: creci_validation
     DadosAgente:
       clean_table_name: agent_data
     DadosAgente_AUD:
