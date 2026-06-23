@@ -3,7 +3,7 @@ database_name: datalake_jaiminho_clean
 table_name: campaigns
 description: This table consolidates campaigns comms data from Jaiminho.
 domain: Support and Services
-owner: conrado.fabri@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the campaign.
@@ -58,14 +58,14 @@ columns:
     lineage:
       - datalake_jaiminho_raw.campaigns.sentAt
   year:
-    description: Year extracted from the campaign update timestamp for partitioning.
+    description: Year extracted from the campaign update timestamp. Partition column — filter on this column to enable partition pruning.
     lineage:
       - datalake_jaiminho_raw.campaigns.updatedAt
   month:
-    description: Month extracted from the campaign update timestamp for partitioning.
+    description: Month extracted from the campaign update timestamp. Partition column — filter on this column to enable partition pruning.
     lineage:
       - datalake_jaiminho_raw.campaigns.updatedAt
   day:
-    description: Day extracted from the campaign update timestamp for partitioning.
+    description: Day extracted from the campaign update timestamp. Partition column — filter on this column to enable partition pruning.
     lineage:
       - datalake_jaiminho_raw.campaigns.updatedAt

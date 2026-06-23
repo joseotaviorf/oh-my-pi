@@ -1,8 +1,8 @@
 ---
 database_name: datalake_braze_events_clean
 table_name: events_indica_ai
-domain: Growth
-owner: isadora.gallerani@quintoandar.com.br
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
 columns:
   id:
@@ -14,18 +14,18 @@ columns:
     lineage:
       - datalake_braze_events_raw.events_indica_ai.event_info
   event_type:
-    description: Type of event that occured (complete).
+    description: Full event type name indicating the Braze event category (e.g., send, open, click, delivery, bounce).
     lineage:
       - datalake_braze_events_raw.events_indica_ai.event_type
   year:
-    description: Year of when the event occurred.
+    description: Year when the Braze event occurred. Partition column — filter on this column to enable partition pruning.
     lineage:
       - datalake_braze_events_raw.events_indica_ai.year
   month:
-    description: Month of when the event occurred.
+    description: Month when the Braze event occurred. Partition column — filter on this column to enable partition pruning.
     lineage:
       - datalake_braze_events_raw.events_indica_ai.month
   day:
-    description: Day of when the event occurred.
+    description: Day when the Braze event occurred. Partition column — filter on this column to enable partition pruning.
     lineage:
       - datalake_braze_events_raw.events_indica_ai.day

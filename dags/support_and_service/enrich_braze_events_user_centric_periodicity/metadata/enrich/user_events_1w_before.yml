@@ -4,7 +4,7 @@ table_name: user_events_1w_before
 description: Table with metrics regarding all the communications sent to a user on the week before the week start of data last update. 
   Here we can see the number of campaigns, canvas, emails,sms, webhooks, etc. sent to the user though Braze. 
 domain: Support and Services
-owner: conrado.fabri@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_user_braze:
     lineage:
@@ -14,7 +14,7 @@ columns:
   id_user:
     lineage:
       - datalake_braze_user_centric.user_events_daily.id_user
-    description: QuintoAndar's main user id.
+    description: QuintoAndar's main user identifier, linking this record to the user dimension.
   total_campaigns_sent_to:
     lineage:
       - datalake_braze_user_centric.user_events_daily.id_campaign

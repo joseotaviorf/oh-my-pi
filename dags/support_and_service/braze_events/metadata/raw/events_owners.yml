@@ -1,13 +1,16 @@
 database_name: datalake_braze_events_raw
 table_name: events_owners
-owner: isadora.gallerani@quintoandar.com.br
-domain: Growth
+description: Raw Braze events for the owners (proprietários/landlord) audience. One row per Braze event (dispatch, interaction) for owner users. Contains PII — access restricted.
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
 columns:
   id:
+    description: Unique identifier for the Braze event record (dispatch or user interaction).
     tags:
     - PII
     - Confidential
   event_info:
+    description: JSON payload with all metadata about the Braze event, including campaign and user context.
     tags:
     - PII
     - Confidential

@@ -3,7 +3,7 @@ database_name: datalake_jaiminho_clean
 table_name: events
 description: This table consolidates all records of communication events from Jaiminho DB.
 domain: Support and Services
-owner: conrado.fabri@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the communication event.

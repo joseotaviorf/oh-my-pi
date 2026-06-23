@@ -1,7 +1,7 @@
 ---
 database_name: datalake_braze_user_centric_periodicity
 table_name: user_events_same_week
-owner: leticia.lima@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 description: This table contains details about all events related to a user that happened during a week.
 columns:
@@ -44,19 +44,19 @@ columns:
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
   total_emails_delivered_to:
-    description: Volume of emails that this user received.
+    description: Number of email messages this user received (delivered) in the reference period.
     lineage:
       - datalake_braze_user_centric.user_events_daily.event_channel
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
   total_email_opens:
-    description: Volume of emails that this user opened.
+    description: Number of email messages this user opened in the reference period.
     lineage:
       - datalake_braze_user_centric.user_events_daily.event_channel
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
   total_email_clicks:
-    description: Volume of emails that this user clicked.
+    description: Number of email messages this user clicked through in the reference period.
     lineage:
       - datalake_braze_user_centric.user_events_daily.event_channel
       - datalake_braze_user_centric.user_events_daily.event_action
@@ -92,21 +92,21 @@ columns:
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
   total_sms_sent_to:
-    description: Volume of sms that were sent to this user.
+    description: Number of SMS messages sent to this user in the reference period.
     lineage:
       - datalake_braze_user_centric.user_events_daily.event_channel
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
   total_sms_delivered_to:
-    description: Volume of sms that this user received.
+    description: Number of SMS messages this user received (delivered) in the reference period.
     lineage:
       - datalake_braze_user_centric.user_events_daily.event_channel
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
   year:
-    description: Year of when the event occurred.
+    description: Year when the event occurred. Partition column — filter on this column to enable partition pruning.
   month:
-    description: Month of when the event occurred.
+    description: Month when the event occurred. Partition column — filter on this column to enable partition pruning.
   day:
-    description: Day of when the event occurred.
+    description: Day when the event occurred. Partition column — filter on this column to enable partition pruning.
 

@@ -3,7 +3,7 @@ database_name: datalake_jaiminho_clean
 table_name: user_contacts
 description: This table consolidates user contact records from Jaiminho.
 domain: Support and Services
-owner: gabriel.fonseca@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the user contact record.

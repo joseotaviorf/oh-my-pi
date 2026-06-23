@@ -1,7 +1,7 @@
 database_name: datalake_braze_details_clean
 table_name: campaign_details_indica_ai
-domain: Growth
-owner: isadora.gallerani@quintoandar.com.br
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 description: Table that consolidates IndicaAi campaign details from Braze.
 columns:
   id_campaign:
