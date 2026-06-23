@@ -1,16 +1,18 @@
 WITH
-current_people AS (
+current_people_ranked AS (
     SELECT
         id_person,
-        person_number
+        person_number,
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_effective_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.all_people
     WHERE
         dt_effective_ended >= DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_effective_ended DESC) = 1
 ),
-current_assignments AS (
+current_people AS (
+    SELECT id_person, person_number FROM current_people_ranked WHERE rn = 1
+),
+current_assignments_ranked AS (
     SELECT
         id_assignment,
         id_period_of_service,
@@ -19,16 +21,21 @@ current_assignments AS (
         legislation_code,
         assignment_type,
         assignment_status_type,
-        dt_projected_started
+        dt_projected_started,
+        ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.all_assignments
     WHERE
         assignment_type IN ('E', 'C', 'P')
         AND dt_effective_ended >= DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_ended DESC) = 1
 ),
-current_names AS (
+current_assignments AS (
+    SELECT
+        id_assignment, id_period_of_service, id_person, assignment_number,
+        legislation_code, assignment_type, assignment_status_type, dt_projected_started
+    FROM current_assignments_ranked WHERE rn = 1
+),
+current_names_ranked AS (
     SELECT
         id_person,
         documented_first_name,
@@ -36,38 +43,47 @@ current_names AS (
         documented_full_name,
         display_name,
         first_social_name,
-        last_social_name
+        last_social_name,
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_effective_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.person_name
     WHERE
         name_type = 'GLOBAL'
         AND dt_effective_ended >= DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_effective_ended DESC) = 1
 ),
-work_emails AS (
+current_names AS (
+    SELECT
+        id_person, documented_first_name, documented_last_name,
+        documented_full_name, display_name, first_social_name, last_social_name
+    FROM current_names_ranked WHERE rn = 1
+),
+work_emails_ranked AS (
     SELECT
         id_person,
-        email_address
+        email_address,
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.email_address
     WHERE
         email_type = 'W1'
         AND (dt_ended >= DATE('{load_end_date}') OR dt_ended IS NULL)
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) = 1
 ),
-personal_emails AS (
+work_emails AS (
+    SELECT id_person, email_address FROM work_emails_ranked WHERE rn = 1
+),
+personal_emails_ranked AS (
     SELECT
         id_person,
-        email_address
+        email_address,
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) AS rn
     FROM
         datalake_pin_core_clean.email_address
     WHERE
         email_type = 'H1'
         AND (dt_ended >= DATE('{load_end_date}') OR dt_ended IS NULL)
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) = 1
+),
+personal_emails AS (
+    SELECT id_person, email_address FROM personal_emails_ranked WHERE rn = 1
 ),
 test_users AS (
     SELECT
@@ -148,7 +164,7 @@ person_legacy_code AS (
         datalake_gsheets_people_clean.legacy_registration AS lr
             ON LOWER(TRIM(lr.work_email)) = LOWER(TRIM(we.email_address))
 ),
-latest_periods_of_service AS (
+latest_periods_of_service_ranked AS (
     SELECT
         id_period_of_service,
         id_person,
@@ -156,12 +172,7 @@ latest_periods_of_service AS (
         ts_updated,
         year,
         month,
-        day
-    FROM
-        datalake_pin_core_clean.periods_of_service
-    WHERE
-        dt_started IS NOT NULL
-    QUALIFY
+        day,
         ROW_NUMBER() OVER (
             PARTITION BY id_period_of_service
             ORDER BY
@@ -169,11 +180,23 @@ latest_periods_of_service AS (
                 year DESC,
                 month DESC,
                 day DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.periods_of_service
+    WHERE
+        dt_started IS NOT NULL
 ),
-transfer_continuation_periods AS (
+latest_periods_of_service AS (
+    SELECT id_period_of_service, id_person, dt_started, ts_updated, year, month, day
+    FROM latest_periods_of_service_ranked WHERE rn = 1
+),
+transfer_continuation_periods_ranked AS (
     SELECT
-        aa_next.id_period_of_service
+        aa_next.id_period_of_service,
+        ROW_NUMBER() OVER (
+            PARTITION BY aa_next.id_period_of_service
+            ORDER BY aa.dt_effective_started ASC
+        ) AS rn
     FROM
         datalake_pin_core_clean.all_assignments AS aa
     INNER JOIN
@@ -185,11 +208,9 @@ transfer_continuation_periods AS (
         AND aa_next.assignment_type IN ('E', 'C')
         AND aa.assignment_status_type = 'INACTIVE'
         AND aa.action_code = 'GLB_TRANSFER'
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY aa_next.id_period_of_service
-            ORDER BY aa.dt_effective_started ASC
-        ) = 1
+),
+transfer_continuation_periods AS (
+    SELECT id_period_of_service FROM transfer_continuation_periods_ranked WHERE rn = 1
 ),
 employment_periods AS (
     -- Periods of service with at least one employment assignment (E/C).
@@ -251,6 +272,53 @@ period_cycle_groups AS (
     FROM
         period_cycle_flags
 ),
+termination_assignments_ranked AS (
+    SELECT
+        aa.id_assignment,
+        aa.id_action_occurrence,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                aa.id_assignment
+            ORDER BY
+                aa.dt_effective_ended ASC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    WHERE
+        aa.is_primary
+        AND aa.assignment_type IN ('E', 'C')
+        AND aa.action_code IN (
+            'TERMINATION',
+            'RESIGNATION',
+            'DEATH',
+            'GLB_TRANSFER',
+            'EXPATRIADO'
+        )
+        AND aa.assignment_status_type = 'INACTIVE'
+),
+termination_assignments AS (
+    SELECT
+        id_assignment,
+        id_action_occurrence
+    FROM
+        termination_assignments_ranked
+    WHERE
+        rn = 1
+),
+termination_event_definitions AS (
+    SELECT
+        ta.id_assignment,
+        CONCAT(
+            CAST(ao.id_action AS STRING),
+            '-',
+            CAST(ao.id_action_reason AS STRING)
+        ) AS id_event_definition
+    FROM
+        termination_assignments AS ta
+    INNER JOIN
+        datalake_pin_core_clean.action_occurrence AS ao
+            ON ao.id_action_occurrence = ta.id_action_occurrence
+),
 period_continuous_employment_cycles AS (
     SELECT
         id_person,
@@ -299,6 +367,7 @@ SELECT
     LOWER(we.email_address) AS work_email,
     LOWER(pe.email_address) AS personal_email,
     tu.id_person IS NOT NULL AS is_user_test,
+    ca.assignment_type IN ('E', 'C') AND tu.id_person IS NULL AS is_valid_assignment,
     ca.assignment_status_type = 'ACTIVE' AS is_active,
     ROW_NUMBER() OVER (
         PARTITION BY
@@ -309,8 +378,17 @@ SELECT
     ca.dt_projected_started,
     pcec.dt_original_hired,
     pp.dt_started,
-    pp.dt_actual_termination,
-    pp.dt_notified_termination,
+    CASE
+        WHEN pp.dt_actual_termination >= DATE('4712-12-31')
+            THEN DATE('9999-12-31')
+        ELSE pp.dt_actual_termination
+    END AS dt_actual_termination,
+    CASE
+        WHEN pp.dt_notified_termination >= DATE('4712-12-31')
+            THEN DATE('9999-12-31')
+        ELSE pp.dt_notified_termination
+    END AS dt_notified_termination,
+    ted.id_event_definition AS id_termination_event_definition,
     NOW() AS ts_load
 FROM
     current_people AS cp
@@ -348,3 +426,6 @@ LEFT JOIN
     period_continuous_employment_cycles AS pcec
         ON pcec.id_person = ca.id_person
         AND pcec.id_period_of_service = ca.id_period_of_service
+LEFT JOIN
+    termination_event_definitions AS ted
+        ON ted.id_assignment = ca.id_assignment

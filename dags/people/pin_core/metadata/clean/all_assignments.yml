@@ -135,7 +135,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.system_person_type
   assignment_information_category:
-    description: Category of assignment information.
+    description: Extensible flexfield category code for storing additional assignment-specific attributes such as EEO or occupational classification data.
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.asg_information_category
   employee_category:
@@ -167,7 +167,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.record_creator
   seniority_basis:
-    description: Seniority.
+    description: Basis used to calculate the employee's seniority for tenure-related benefits and policies.
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.seniority_basis
   frequency:
@@ -196,7 +196,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.effective_sequence
   normal_hours:
-    description: Normal working hours.
+    description: Scheduled working hours per period (typically per week) for the assignment, used to determine part-time vs full-time status.
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.normal_hours
   target_plr:
@@ -305,6 +305,10 @@ columns:
     categories:
       'true': Working at home.
       'false': Not working at home.
+  is_active:
+    description: True when the assignment status type is ACTIVE.
+    lineage:
+    - datalake_pin_core_raw.per_all_assignments_m.assignment_status_type
   dt_effective_started:
     description: Start date of the period for which this row is effective.
     lineage:

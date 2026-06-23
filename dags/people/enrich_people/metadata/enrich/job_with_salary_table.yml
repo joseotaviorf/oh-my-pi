@@ -45,10 +45,6 @@ columns:
     description: Contribution level (e.g., Contribuidor Individual, Líder). Use to distinguish individual contributor vs leadership roles.
     lineage:
       - datalake_pin_core_clean.job.contribution_level
-  is_leadership_job:
-    description: Flag indicating whether the job is a leadership role, derived from contribution level.
-    lineage:
-      - datalake_pin_core_clean.job.contribution_level
   job_business_unit_group:
     description: Business unit from set identifiers.
     lineage:
@@ -146,7 +142,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.job.target_sop
   target_hiring_sop:
-    description: Hiring SOP target for the job.
+    description: Stock option (SOP) target granted at hiring for this job level, representing equity offered to new hires.
     lineage:
       - datalake_pin_core_clean.job.target_hiring_sop
   target_exceptional_bonus:
@@ -178,6 +174,14 @@ columns:
     description: Whether the job requires clock-in/clock-out.
     lineage:
       - datalake_pin_core_clean.job.is_time_clocking_required
+  is_leadership_job:
+    description: Flag indicating whether the job is a leadership role, derived from contribution level.
+    lineage:
+      - datalake_pin_core_clean.job.contribution_level
+  is_leadership_team_job:
+    description: Flag indicating whether the job is a leadership team (LT) position, derived from band being EXEC or >= 10.
+    lineage:
+      - datalake_pin_core_clean.grade_translation.name
   is_active:
     description: Whether the job is currently active in the system.
     lineage:

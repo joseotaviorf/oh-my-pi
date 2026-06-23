@@ -57,6 +57,7 @@ SELECT
   effective_latest_change = 'Y' AS is_effective_latest_change,
   rehire_recommendation = 'Y' AS is_recommended_for_rehire,
   work_at_home = 'Y' AS is_working_at_home,
+  assignment_status_type = 'ACTIVE' AS is_active,
   TO_DATE(effective_start_date) AS dt_effective_started,
   TO_DATE(effective_end_date) AS dt_effective_ended,
   TO_DATE(freeze_start_date) AS dt_freeze_started,

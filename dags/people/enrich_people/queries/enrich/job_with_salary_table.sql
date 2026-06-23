@@ -20,7 +20,7 @@ WITH salary_bases_history AS (
     WHERE
         dt_available_from <= CURRENT_DATE
 ),
-job_with_salary_table_base AS (
+job_with_salary_table_base_ranked AS (
     SELECT
         j.id_job,
         j.job_code,
@@ -33,6 +33,11 @@ job_with_salary_table_base AS (
             THEN TRUE
             ELSE FALSE
         END AS is_leadership_job,
+        CASE
+            WHEN gt.name = 'EXEC' OR TRY_CAST(gt.name AS INT) >= 10
+            THEN TRUE
+            ELSE FALSE
+        END AS is_leadership_team_job,
         si.set_name AS job_business_unit_group,
         glt.name AS salary_table,
         CASE
@@ -151,7 +156,45 @@ job_with_salary_table_base AS (
             COALESCE(r.dt_effective_ended, DATE('4712-12-31')),
             COALESCE(rv.dt_effective_ended, DATE('4712-12-31')),
             COALESCE(sb.dt_effective_ended, DATE('4712-12-31'))
-        ) AS dt_valid_to
+        ) AS dt_valid_to,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                j.id_job,
+                GREATEST(
+                    j.dt_effective_started,
+                    COALESCE(vg.dt_effective_started, j.dt_effective_started),
+                    COALESCE(gl.dt_effective_started, j.dt_effective_started),
+                    COALESCE(glt.dt_effective_started, j.dt_effective_started),
+                    COALESCE(gt.dt_effective_started, j.dt_effective_started),
+                    COALESCE(gt_ptb.dt_effective_started, j.dt_effective_started),
+                    COALESCE(r.dt_effective_started, j.dt_effective_started),
+                    COALESCE(rv.dt_effective_started, j.dt_effective_started),
+                    COALESCE(sb.dt_effective_started, j.dt_effective_started)
+                )
+            ORDER BY
+                jt.dt_effective_started DESC NULLS LAST,
+                jt.object_version_number DESC NULLS LAST,
+                jft.dt_effective_started DESC NULLS LAST,
+                jft.object_version_number DESC NULLS LAST,
+                gt.dt_effective_started DESC NULLS LAST,
+                gt.object_version_number DESC NULLS LAST,
+                gt_ptb.dt_effective_started DESC NULLS LAST,
+                gt_ptb.object_version_number DESC NULLS LAST,
+                glt.dt_effective_started DESC NULLS LAST,
+                glt.object_version_number DESC NULLS LAST,
+                gl.dt_effective_started DESC NULLS LAST,
+                si.ts_updated DESC NULLS LAST,
+                jl.dt_effective_started DESC NULLS LAST,
+                jl.object_version_number DESC NULLS LAST,
+                vg.dt_effective_started DESC NULLS LAST,
+                vg.object_version_number DESC NULLS LAST,
+                r.dt_effective_started DESC NULLS LAST,
+                r.object_version_number DESC NULLS LAST,
+                rv.dt_effective_started DESC NULLS LAST,
+                rv.object_version_number DESC NULLS LAST,
+                sb.dt_effective_started DESC NULLS LAST,
+                sb.object_version_number DESC NULLS LAST
+        ) AS rn
     FROM
         datalake_pin_core_clean.job AS j
     LEFT JOIN
@@ -274,45 +317,9 @@ job_with_salary_table_base AS (
             COALESCE(rv.dt_effective_ended, DATE('4712-12-31')),
             COALESCE(sb.dt_effective_ended, DATE('4712-12-31'))
         )
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                j.id_job,
-                GREATEST(
-                    j.dt_effective_started,
-                    COALESCE(vg.dt_effective_started, j.dt_effective_started),
-                    COALESCE(gl.dt_effective_started, j.dt_effective_started),
-                    COALESCE(glt.dt_effective_started, j.dt_effective_started),
-                    COALESCE(gt.dt_effective_started, j.dt_effective_started),
-                    COALESCE(gt_ptb.dt_effective_started, j.dt_effective_started),
-                    COALESCE(r.dt_effective_started, j.dt_effective_started),
-                    COALESCE(rv.dt_effective_started, j.dt_effective_started),
-                    COALESCE(sb.dt_effective_started, j.dt_effective_started)
-                )
-            ORDER BY
-                jt.dt_effective_started DESC NULLS LAST,
-                jt.object_version_number DESC NULLS LAST,
-                jft.dt_effective_started DESC NULLS LAST,
-                jft.object_version_number DESC NULLS LAST,
-                gt.dt_effective_started DESC NULLS LAST,
-                gt.object_version_number DESC NULLS LAST,
-                gt_ptb.dt_effective_started DESC NULLS LAST,
-                gt_ptb.object_version_number DESC NULLS LAST,
-                glt.dt_effective_started DESC NULLS LAST,
-                glt.object_version_number DESC NULLS LAST,
-                gl.dt_effective_started DESC NULLS LAST,
-                si.ts_updated DESC NULLS LAST,
-                jl.dt_effective_started DESC NULLS LAST,
-                jl.object_version_number DESC NULLS LAST,
-                vg.dt_effective_started DESC NULLS LAST,
-                vg.object_version_number DESC NULLS LAST,
-                r.dt_effective_started DESC NULLS LAST,
-                r.object_version_number DESC NULLS LAST,
-                rv.dt_effective_started DESC NULLS LAST,
-                rv.object_version_number DESC NULLS LAST,
-                sb.dt_effective_started DESC NULLS LAST,
-                sb.object_version_number DESC NULLS LAST
-        ) = 1
+),
+job_with_salary_table_base AS (
+    SELECT * FROM job_with_salary_table_base_ranked WHERE rn = 1
 ),
 job_with_salary_table_with_hash AS (
     SELECT
@@ -325,6 +332,7 @@ job_with_salary_table_with_hash AS (
             CAST(band AS STRING),
             CAST(career_track AS STRING),
             CAST(is_leadership_job AS STRING),
+            CAST(is_leadership_team_job AS STRING),
             CAST(job_business_unit_group AS STRING),
             CAST(salary_table AS STRING),
             CAST(country AS STRING),
@@ -386,6 +394,7 @@ job_with_salary_table_consolidated AS (
         band,
         career_track,
         is_leadership_job,
+        is_leadership_team_job,
         job_business_unit_group,
         salary_table,
         country,
@@ -423,6 +432,7 @@ job_with_salary_table_consolidated AS (
         band,
         career_track,
         is_leadership_job,
+        is_leadership_team_job,
         job_business_unit_group,
         salary_table,
         country,
@@ -457,6 +467,7 @@ SELECT
     band,
     career_track,
     is_leadership_job,
+    is_leadership_team_job,
     job_business_unit_group,
     salary_table,
     country,
