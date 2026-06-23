@@ -456,7 +456,7 @@ class DAGDeclarationValidator(Validator):
                         "name": {"type": "string", "required": True, "empty": False},
                         "pipeline_runner": {
                             "type": "string",
-                            "required": True,
+                            "required": False,
                             "empty": False,
                         },
                     },

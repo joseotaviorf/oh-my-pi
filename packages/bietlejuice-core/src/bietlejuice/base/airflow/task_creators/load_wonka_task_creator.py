@@ -1,5 +1,3 @@
-from typing import Union
-
 from airflow.models.baseoperator import BaseOperator
 
 from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
@@ -21,9 +19,8 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
     _PEX_PYTHON_INTERPRETER_PATH = "/home/hadoop/venv/bin/python"
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
-        parameters = [
-            self.dag_execution_context.workflow_args["wonka_config"]["pipeline_runner"]
-        ]
+        pipeline_package = self.dag_execution_context.dag_args["name"].replace("-", "_")
+        parameters = [pipeline_package]
         if getattr(self.dag_execution_context, "is_validation", False):
             target_db, target_table = table_attributes.get_validation_write_target()
             parameters.extend(
@@ -48,17 +45,3 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
             # Note: python_interpreter_path is ignored when running on Databricks
             python_interpreter_path=self._PEX_PYTHON_INTERPRETER_PATH,
         )
-
-    def create_task(
-        self, table_attributes: Union[TableAttributes, list]
-    ) -> BaseOperator:
-        """
-        Creates a task that runs a Wonka pipeline.
-
-        Since a Wonka pipeline can generate multiple tables (i.e. historical and latest),
-        we only need to run the task once.
-        """
-        if isinstance(table_attributes, list) and len(table_attributes) > 1:
-            table_attributes = table_attributes[0]
-
-        return super().create_task(table_attributes)

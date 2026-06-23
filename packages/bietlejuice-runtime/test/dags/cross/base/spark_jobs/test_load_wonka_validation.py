@@ -55,21 +55,19 @@ class TestApplyValidationEnv:
 
 
 class TestLoadWonkaMain:
+    @patch.object(load_wonka, "build_wonka_runner")
     @patch.object(load_wonka, "apply_validation_env")
-    @patch.object(load_wonka.importlib, "import_module")
     def test_validation_args_trigger_env_before_import(
-        self, mock_import_module, mock_apply_validation_env, monkeypatch
+        self, mock_apply_validation_env, mock_build_runner, monkeypatch
     ):
         monkeypatch.setenv("DATABRICKS_S3_BUCKET", "5a-datalake-prod")
 
         mock_runner = MagicMock()
-        mock_module = MagicMock()
-        mock_module.runner = mock_runner
-        mock_import_module.return_value = mock_module
+        mock_build_runner.return_value = mock_runner
 
         test_args = [
             "load_wonka.py",
-            "user_visits.user_visits_runner.runner",
+            "user_visits",
             "--target-database-name",
             "cluster_validation",
             "--target-table-name",
@@ -83,23 +81,23 @@ class TestLoadWonkaMain:
             "wonka___user_visits",
             "5a-datalake-prod",
         )
+        mock_build_runner.assert_called_once_with(pipeline_target="user_visits")
         mock_runner.execute.assert_called_once()
 
+    @patch.object(load_wonka, "build_wonka_runner")
     @patch.object(load_wonka, "apply_validation_env")
-    @patch.object(load_wonka.importlib, "import_module")
     def test_prod_run_skips_validation_env(
-        self, mock_import_module, mock_apply_validation_env
+        self, mock_apply_validation_env, mock_build_runner
     ):
         mock_runner = MagicMock()
-        mock_module = MagicMock()
-        mock_module.runner = mock_runner
-        mock_import_module.return_value = mock_module
+        mock_build_runner.return_value = mock_runner
 
-        test_args = ["load_wonka.py", "user_visits.user_visits_runner.runner"]
+        test_args = ["load_wonka.py", "user_visits"]
         with patch.object(sys, "argv", test_args):
             load_wonka.main()
 
         mock_apply_validation_env.assert_not_called()
+        mock_build_runner.assert_called_once_with(pipeline_target="user_visits")
         mock_runner.execute.assert_called_once()
 
     def test_validation_requires_databricks_bucket(self, monkeypatch):
@@ -107,7 +105,7 @@ class TestLoadWonkaMain:
 
         test_args = [
             "load_wonka.py",
-            "user_visits.user_visits_runner.runner",
+            "user_visits",
             "--target-database-name",
             "cluster_validation",
             "--target-table-name",
