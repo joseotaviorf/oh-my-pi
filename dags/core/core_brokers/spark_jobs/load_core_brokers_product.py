@@ -45,9 +45,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
         """Create the current-state brokers product model from clean layer."""
         config = self.get_brokers_product_config()
 
-        company_df = self._load_data(
-            spark, config["COMPANY_TABLE"], args, apply_date_filter=True
-        )
+        company_df = self._load_data(spark, config["COMPANY_TABLE"], args)
         company_product_df = self._load_data(
             spark, config["COMPANY_PRODUCT_TABLE"], args
         )

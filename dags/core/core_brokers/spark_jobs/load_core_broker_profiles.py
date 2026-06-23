@@ -24,7 +24,6 @@ class CoreBrokerProfilesSparkJob(CoreBrokersBaseSparkJob):
             spark,
             config["MEMBER_PROFILE_TABLE"],
             args,
-            apply_date_filter=True,
         )
         profile_df = spark.read.table(config["PROFILE_TABLE"])
         product_df = spark.read.table(config["PRODUCT_TABLE"])

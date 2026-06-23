@@ -100,7 +100,7 @@ class CoreBrokersBaseSparkJob(BaseCoreModelSparkJob):
         else:
             partitions = []
 
-        merge_on = self.get_config(merge_on_key, required=True)
+        merge_on = self.get_config(merge_on_key, required=False, default=None)
         when_matched_update_condition = self.get_config(
             update_condition_key, required=False, default=None
         )

@@ -10,6 +10,7 @@ Covers:
 """
 
 from datetime import datetime
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -352,3 +353,101 @@ class TestProcessCompanyDocument:
 
         # assert — the dated revision wins; NULL ts_updated is excluded
         assert out[1]["cnpj"] == "22222222000122"
+
+
+_COMPANY_SCHEMA = StructType(
+    [
+        StructField("id", LongType(), True),
+        StructField("ts_updated", TimestampType(), True),
+    ]
+)
+
+_COMPANY_VIEW = "test_company_for_load_data"
+
+
+def _register_company_table(spark_session, rows):
+    df = spark_session.createDataFrame(rows, schema=_COMPANY_SCHEMA)
+    df.createOrReplaceTempView(_COMPANY_VIEW)
+    return df
+
+
+class TestLoadData:
+    """Tests for ``CoreBrokersBaseSparkJob._load_data`` full vs incremental filtering."""
+
+    def test_full_load_returns_all_rows_without_date_filter(
+        self, spark_session, core_brokers_job
+    ):
+        # arrange
+        _register_company_table(
+            spark_session,
+            [
+                (1, datetime(2025, 1, 1, 0, 0, 0)),
+                (2, datetime(2026, 6, 1, 0, 0, 0)),
+            ],
+        )
+        args = SimpleNamespace(
+            load_start_date="2026-01-01",
+            load_end_date="2026-01-31",
+        )
+
+        # act — default full load does not apply date filter
+        result = core_brokers_job._load_data(spark_session, _COMPANY_VIEW, args)
+
+        # assert
+        assert result.count() == 2
+
+    def test_incremental_backfill_filters_when_apply_date_filter_and_dates_set(
+        self, spark_session, core_brokers_job
+    ):
+        # arrange
+        _register_company_table(
+            spark_session,
+            [
+                (1, datetime(2025, 12, 15, 0, 0, 0)),
+                (2, datetime(2026, 1, 15, 0, 0, 0)),
+                (3, datetime(2026, 2, 1, 0, 0, 0)),
+            ],
+        )
+        args = SimpleNamespace(
+            load_start_date="2026-01-01",
+            load_end_date="2026-01-31",
+        )
+
+        # act
+        result = core_brokers_job._load_data(
+            spark_session,
+            _COMPANY_VIEW,
+            args,
+            apply_date_filter=True,
+        )
+
+        # assert — only company 2 falls in the January window
+        ids = [row["id"] for row in result.collect()]
+        assert ids == [2]
+
+    def test_incremental_backfill_skips_filter_when_dates_empty(
+        self, spark_session, core_brokers_job
+    ):
+        # arrange
+        _register_company_table(
+            spark_session,
+            [
+                (1, datetime(2025, 1, 1, 0, 0, 0)),
+                (2, datetime(2026, 6, 1, 0, 0, 0)),
+            ],
+        )
+        args = SimpleNamespace(
+            load_start_date=None,
+            load_end_date=None,
+        )
+
+        # act
+        result = core_brokers_job._load_data(
+            spark_session,
+            _COMPANY_VIEW,
+            args,
+            apply_date_filter=True,
+        )
+
+        # assert
+        assert result.count() == 2

@@ -13,6 +13,3 @@ TIER_TABLE: "datalake_company_clean.tier"
 COMPANY_PRODUCT_TIER_TABLE: "datalake_company_clean.company_product_tier"
 MEMBER_PROFILE_TABLE: "datalake_company_clean.member_profile"
 PROFILE_TABLE: "datalake_company_clean.profile"
-merge_on: ["sk_broker"]
-merge_on_brokers_product: ["sk_broker_product"]
-merge_on_brokers_profile: ["sk_broker_profile"]

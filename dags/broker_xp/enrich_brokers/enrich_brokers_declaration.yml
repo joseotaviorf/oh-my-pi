@@ -8,16 +8,9 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_extraction_type: incremental
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_extraction_type: full
   tables_customization:
-    hubspot_brokers_history:
-      extraction_type: full
     broker_status_history:
-      merge_on: [id_status_change]
-      when_matched_update_condition: "source.ts_end IS DISTINCT FROM target.ts_end OR source.is_current != target.is_current"
       z_order_by: [sk_broker, product_name]
   inner_dependencies:
     broker_status_history:
