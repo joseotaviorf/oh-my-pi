@@ -1,49 +1,51 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: sale_demand_targets_retro_cohort
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Retrospective For Sale demand funnel targets by cohort week. Captures planned conversion volumes across visits, offers, and contracts for cohort-based performance analysis.
 columns:
   city_group:
-    description: City group.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.city_group
+    description: QuintoAndar city group associated with the retrospective cohort demand targets.
   hub_offer:
-    description: Informs which associated hub the offer came from.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.hub_offer
+    description: For Sale hub from which the offer or cohort demand target originated.
   weeks_conversion:
-    description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.weeks_conversion
+    description: Cohort week indicator representing elapsed weeks between funnel events (W0, W1, and so on).
   vb2vc:
-    description: Target volume of visits booked that converted into visits completed.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.vb2vc
+    description: Cohort target volume of visits booked that converted into visits completed.
   vc2os:
-    description: Target volume of visits completed that converted into offers submitted.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.vc2os
+    description: Cohort target volume of visits completed that converted into offers submitted.
   os2oa:
-    description: Target volume of offers submitted that converted into offers approved.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.os2oa
+    description: Cohort target volume of offers submitted that converted into offers approved.
   oa2ccv:
-    description: Target volume of offers approved that converted into contracts.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.oa2ccv
+    description: Cohort target volume of offers approved that converted into contracts signed.
   ccv_signed:
-    description: Target volume of contracts signed.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.ccv_signed
+    description: Cohort target volume of sale contracts (CCV) signed in the reference period.
   os2ccv:
-    description: Target volume of offers submitted that converted into contracts.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.os2ccv
+    description: Cohort target volume of offers submitted that converted directly into contracts signed.
   is_rede:
-    description: If it comes from rede.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.is_rede
+    description: Boolean flag indicating whether the cohort target row includes Rede channel demand.
   dt_week_started:
-    description: Week of the target.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro_cohort.week_start
+    description: Reference week start date identifying the retrospective cohort demand target period.

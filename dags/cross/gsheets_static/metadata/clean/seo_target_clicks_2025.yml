@@ -1,14 +1,15 @@
+---
 database_name: datalake_gsheets_clean
 table_name: seo_target_clicks_2025
-description: "Target clicks SEO non branded 2025"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
+description: Monthly non-branded SEO click targets for 2025. Static reference used by Growth to measure organic search performance against planned click volumes.
 columns:
   target_clicks:
-    description: "Target for SEO clicks for the year 2025 "
     lineage:
       - datalake_gsheets_raw.seo_target_clicks_2025.target_clicks
-
+    description: Planned volume of non-branded organic search clicks for the reference month in 2025.
   dt_created:
-    description: "Target date "
     lineage:
       - datalake_gsheets_raw.seo_target_clicks_2025.dt_created
+    description: Reference date identifying the month for which the SEO click target applies.

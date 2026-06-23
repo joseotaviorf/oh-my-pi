@@ -1,19 +1,27 @@
+---
 database_name: datalake_gsheets_clean
 table_name: seo_budget_target_clicks_2025
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
+description: SEO budget and click targets for 2025 by country, source, and period. Static reference used by Growth planning to track non-branded organic click goals.
 columns:
   pais:
     lineage:
       - datalake_gsheets_raw.seo_budget_target_clicks_2025.pais
+    description: Country code or name associated with the SEO budget and click target row.
   fuente:
     lineage:
       - datalake_gsheets_raw.seo_budget_target_clicks_2025.fuente
+    description: Data source or provider supplying the SEO budget and click target values.
   periodo:
     lineage:
       - datalake_gsheets_raw.seo_budget_target_clicks_2025.periodo
+    description: Reference period for the SEO target, typically formatted as year and month.
   variable:
     lineage:
       - datalake_gsheets_raw.seo_budget_target_clicks_2025.variable
+    description: Metric variable measured in the row, such as budget amount or click target volume.
   valor:
     lineage:
       - datalake_gsheets_raw.seo_budget_target_clicks_2025.valor
+    description: Numeric value corresponding to the SEO budget or click target variable in the period.

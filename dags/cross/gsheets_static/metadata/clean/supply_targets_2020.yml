@@ -1,49 +1,67 @@
+---
 database_name: datalake_gsheets_clean
 table_name: supply_targets_2020
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Growth supply funnel targets for 2020 by city group, channel, and time period. Captures planned volumes across prospects, qualifieds, opportunities, and first listings.
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.city_group
+    description: QuintoAndar city group associated with the 2020 supply target row.
   first_listings:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.first_listings
+    description: Planned target count of first listings published in the reference period.
   lead_context:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.lead_context
+    description: Business context or segment of the owner lead covered by the supply target.
   opportunities:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.opportunities
+    description: Planned target count of supply opportunities created in the reference period.
   prospects:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.prospects
+    description: Planned target count of owner prospects entering the supply funnel.
   qualifieds:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.qualifieds
+    description: Planned target count of owner leads qualified for listing in the supply funnel.
   supply_channel:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.supply_channel
+    description: Acquisition or processing channel associated with the supply target row.
   supply_origin:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.supply_origin
+    description: Marketing or operational origin of the supply lead for the target row.
   tier:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.tier
+    description: City tier classification used in Growth supply target planning.
   halfyear:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.halfyear
+    description: Half-year period label associated with the 2020 supply target.
   quarter:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.quarter
+    description: Calendar quarter associated with the 2020 supply target.
   dt_week_started:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.week_start
+    description: Week start date identifying the supply target planning period.
   month:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.month
+    description: Calendar month associated with the 2020 supply target.
   year:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.year
+    description: Calendar year associated with the 2020 supply target.
   dt_target:
     lineage:
       - datalake_gsheets_raw.supply_targets_2020.date
+    description: Reference date identifying the supply target period for the row.

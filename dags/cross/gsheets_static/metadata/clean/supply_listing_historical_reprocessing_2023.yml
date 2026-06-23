@@ -1,46 +1,63 @@
+---
 database_name: datalake_gsheets_clean
 table_name: supply_listing_historical_reprocessing_2023
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Historical supply listing leads reprocessed in 2023 mailings. Tracks lead and house identifiers, funnel milestone dates, and reprocessing channel metadata for Growth supply analytics.
 columns:
   id_lead:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.sk_lead
+    description: Surrogate key identifying the supply lead included in the 2023 reprocessing cohort.
   id_house:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.id_house
+    description: QuintoAndar house identifier associated with the reprocessed supply lead.
   base:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.base
+    description: Source base or cohort name from which the reprocessed lead was selected.
   base_type:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.tipo_de_base
+    description: Classification of the source base type used in the reprocessing campaign.
   dt_mailing:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.data_mailing
+    description: Date when the reprocessing mailing or outreach was sent to the lead.
   dt_prospect:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_prospect
+    description: Date when the lead reached prospect status in the supply funnel.
   dt_qualified:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_qualified
+    description: Date when the lead was qualified for listing in the supply funnel.
   dt_availalable_qualified:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_availalable_qualified
+    description: Date when the qualified lead had an available property ready for listing.
   dt_opportunity:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_opp
+    description: Date when a supply opportunity was created from the reprocessed lead.
   dt_first_listing:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_first_listing
+    description: Date when the first listing was published for the reprocessed lead.
   main_phone:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.telefone_principal
+    description: Primary phone number associated with the reprocessed supply lead.
   reprocessing_channel:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.canal_reprocessamento
+    description: Outreach channel used to reprocess the historical supply lead.
   reprocessing_version:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.versao_do_reprocessamento
+    description: Version label of the reprocessing campaign or workflow applied to the lead.
   sales_company:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.sales_company
+    description: Sales company or partner responsible for the reprocessed lead outreach.

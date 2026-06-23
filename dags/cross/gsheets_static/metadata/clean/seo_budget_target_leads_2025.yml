@@ -1,25 +1,27 @@
+---
 database_name: datalake_gsheets_clean
 table_name: seo_budget_target_leads_2025
-description: "Cleaned SEO budget and target leads data for 2025"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
+description: SEO budget and lead targets for 2025 by country, source, and period. Static reference used by Growth planning to track organic lead generation goals.
 columns:
   pais:
-    description: "Country of the record"
     lineage:
       - datalake_gsheets_raw.seo_budget_target_leads_2025.pais
+    description: Country code or name associated with the SEO budget and lead target row.
   fuente:
-    description: "Data source or provider"
     lineage:
       - datalake_gsheets_raw.seo_budget_target_leads_2025.fuente
+    description: Data source or provider supplying the SEO budget and lead target values.
   periodo:
-    description: "Time period of the record (e.g., YYYYMM)"
     lineage:
       - datalake_gsheets_raw.seo_budget_target_leads_2025.periodo
+    description: Reference period for the SEO target, typically formatted as year and month.
   variable:
-    description: "Variable measured (e.g., budget, leads)"
     lineage:
       - datalake_gsheets_raw.seo_budget_target_leads_2025.variable
+    description: Metric variable measured in the row, such as budget amount or lead target volume.
   valor:
-    description: "Value corresponding to the variable in the given period"
     lineage:
       - datalake_gsheets_raw.seo_budget_target_leads_2025.valor
+    description: Numeric value corresponding to the SEO budget or lead target variable in the period.

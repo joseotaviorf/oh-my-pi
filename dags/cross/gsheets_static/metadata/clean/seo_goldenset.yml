@@ -1,17 +1,19 @@
+---
 database_name: datalake_gsheets_clean
 table_name: seo_goldenset
-description: "Cleaned SEO golden set data"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
+description: Strategic SEO golden set of priority keywords and their effective date ranges. Static reference used by Growth to align content and campaign efforts with high-value search terms.
 columns:
   keyword:
-    description: "Strategic SEO keyword from the golden set used for high-priority search engine optimization campaigns and content targeting"
     lineage:
       - datalake_gsheets_raw.seo_goldenset.keyword
+    description: Strategic SEO keyword included in the golden set for high-priority optimization campaigns.
   dt_effective_start:
-    description: "Date when the keyword becomes active in the golden set or when it was added to the strategic SEO keyword portfolio"
     lineage:
       - datalake_gsheets_raw.seo_goldenset.dt_effective_start
+    description: Date when the keyword becomes active in the golden set or enters the strategic portfolio.
   dt_effective_end:
-    description: "Date when the keyword becomes inactive in the golden set or when it was removed from the strategic SEO keyword portfolio"
     lineage:
       - datalake_gsheets_raw.seo_goldenset.dt_effective_end
+    description: Date when the keyword is retired from the golden set or leaves the strategic portfolio.

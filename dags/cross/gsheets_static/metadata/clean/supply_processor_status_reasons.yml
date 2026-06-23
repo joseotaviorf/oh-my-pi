@@ -1,14 +1,19 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: supply_processor_status_reasons
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Reference mapping of supply processor status reason codes and types. Static lookup used by Growth and supply operations to interpret lead processing outcomes.
 columns:
-    id_reason:
-        lineage:
-            - datalake_gsheets_raw.supply_processor_status_reasons.id_reason
-    reason_name:
-        lineage:
-            - datalake_gsheets_raw.supply_processor_status_reasons.reason_name
-    reason_type:
-        lineage:
-            - datalake_gsheets_raw.supply_processor_status_reasons.reason_type
+  id_reason:
+    lineage:
+      - datalake_gsheets_raw.supply_processor_status_reasons.id_reason
+    description: Numeric identifier of the supply processor status reason code.
+  reason_name:
+    lineage:
+      - datalake_gsheets_raw.supply_processor_status_reasons.reason_name
+    description: Human-readable name describing the supply processor status reason.
+  reason_type:
+    lineage:
+      - datalake_gsheets_raw.supply_processor_status_reasons.reason_type
+    description: Category or type grouping for the supply processor status reason.
