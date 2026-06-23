@@ -4,3 +4,6 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_memory_cluster

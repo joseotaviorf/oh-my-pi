@@ -11,3 +11,11 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_cluster
+    custom_configurations:
+      core_nodes:
+        instance_count: 1
+      task_nodes:
+        instance_count: 2

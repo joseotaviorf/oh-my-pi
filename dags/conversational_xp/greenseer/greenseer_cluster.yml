@@ -6,3 +6,6 @@ cluster:
       availability: ON_DEMAND
     spark_conf:
       spark.driver.maxResultSize: '0'
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_cluster
