@@ -1,10 +1,15 @@
+---
 database_name: datalake_gsheets_clean
 table_name: metabase_collections_domains
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Mapping between Metabase collections and Data Ops governance domains. Supports documentation campaigns and domain ownership tracking for self-service analytics content.
 columns:
   domain:
     lineage:
       - datalake_gsheets_raw.metabase_collections_domains.domain
+    description: Governance domain label assigned to the Metabase collection in the sheet.
   dashboard_folder:
     lineage:
       - datalake_gsheets_raw.metabase_collections_domains.metabase_collection
+    description: Metabase collection name or path associated with the governance domain.

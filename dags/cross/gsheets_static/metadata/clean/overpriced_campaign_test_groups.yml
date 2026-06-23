@@ -1,41 +1,55 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: overpriced_campaign_test_groups
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: Test group assignments for the overpriced listing campaign experiment. Links houses and users to pricing calculator bounds and pre-campaign listing behavior for Fintech analysis.
 columns:
   id_house:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.sk_house
+    description: House identifier assigned to an overpriced campaign test group.
   id_user:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.sk_user
+    description: User identifier of the listing owner in the campaign experiment.
   email:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.email
+    description: Contact email of the listing owner participating in the test group.
   test_group:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.test_group
+    description: Numeric code identifying the experiment test group assignment.
   test_group_description:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.test_group_description
+    description: Human-readable label describing the experiment test group treatment.
   last_price_before_campaign:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.last_price_before_campaign
+    description: Last listed rent price observed before the overpriced campaign started.
   days_without_vb_before_campaign:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.days_without_vb_before_campaign
+    description: Count of days without a booked visit before the campaign intervention.
   min_price_calculator:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.p_10
+    description: Lower bound (P10) of the pricing calculator range before adjustments.
   max_price_calculator:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.p_90
+    description: Upper bound (P90) of the pricing calculator range before adjustments.
   min_price_calculator_adjusted:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.p_10_adjusted
+    description: Adjusted lower bound (P10) of the pricing calculator after campaign rules.
   max_price_calculator_adjusted:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.p_90_adjusted
+    description: Adjusted upper bound (P90) of the pricing calculator after campaign rules.
   overpriced_calculator_range:
     lineage:
       - datalake_gsheets_raw.overpriced_campaign_test_groups.over_calc_range
+    description: Label classifying how far the listing price sits above the calculator range.

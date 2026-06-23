@@ -1,53 +1,71 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: metrics_registration
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Registry of business metrics with maturity, calculation notes, and ownership metadata. Sourced from the metric attribution and registration Google Sheet used by Data Ops governance.
 columns:
   metric_name:
     lineage:
       - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.name
-  metric_acronym:
+    description: Official name of the registered business metric in the governance catalog.
+  meetric_acronym:
     lineage:
       - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.acronym
+    description: Short acronym used to identify the metric in dashboards and documentation.
   metric_description:
     lineage:
       - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.description
+    description: Business definition explaining what the metric measures and how it is interpreted.
   business_stage:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.business_stage
-  calculation:
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.businessStage
+    description: Funnel or business stage where the metric is primarily applied.
+  metric_calculation:
     lineage:
       - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.calculation
+    description: Narrative or formula describing how the metric value is calculated.
   company_line:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.company_line
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.companyLine
+    description: Company line or product area that owns the registered metric.
   has_datamart:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.has_datamart
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.hasDatamart
+    description: Boolean flag indicating whether a datamart table backs the metric.
   datamart_name:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.datamart_name
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.datamartName
+    description: Name of the datamart dataset implementing the metric when available.
   is_additive:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.is_additive
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.isAdditive
+    description: Boolean flag indicating whether the metric can be summed across dimensions.
   hierarchy_level:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.hierarchy_level
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.hierarchyLevel
+    description: Hierarchy tier of the metric within the governance taxonomy.
   link_to_metric:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.link_to_metric
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.linkToMetric
+    description: URL pointing to the canonical metric definition or dashboard.
   approved_by:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.approved_by
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.approvedBy
+    description: Email of the stakeholder who approved the metric registration entry.
   created_by:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.created_by
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.createdBy
+    description: Email of the person who created the metric registration record.
   observations:
     lineage:
       - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.observations
+    description: Free-text notes capturing caveats or implementation details for the metric.
   maturity_level:
     lineage:
-      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.maturity_level
+      - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.maturityLevel
+    description: Maturity classification assigned to the metric in the governance framework.
   ts_load:
     lineage:
       - datalake_gsheets_raw.atribuicao_de_maturidade_e_validacao_do_cadastro.ts_load
+    description: Timestamp when the metric registration row was loaded into the clean layer.

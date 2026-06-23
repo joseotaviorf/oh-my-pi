@@ -1,14 +1,19 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: monday_users
-domain: Cross
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Reference mapping of Monday.com user identifiers to names and emails. Used by Cross operations teams to reconcile Monday boards with internal user records.
 columns:
   id_monday:
     lineage:
-      - datalake_gsheets_raw.id_monday
+      - datalake_gsheets_raw.monday_users.id_monday
+    description: Numeric identifier of the user account in Monday.com.
   user_name:
     lineage:
-      - datalake_gsheets_raw.name
+      - datalake_gsheets_raw.monday_users.name
+    description: Display name of the Monday.com user as recorded in the reference sheet.
   user_email:
     lineage:
-      - datalake_gsheets_raw.email
+      - datalake_gsheets_raw.monday_users.email
+    description: Work email address associated with the Monday.com user account.

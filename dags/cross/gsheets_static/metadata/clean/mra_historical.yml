@@ -1,38 +1,51 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: mra_historical
-domain: Cross
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+description: Historical monthly rent anticipation (MRA) records by contract and owner. Static snapshot from Google Sheets used for legacy Fintech and Cross reconciliation of anticipation fees and rent values.
 columns:
   anticipation_cost:
     lineage:
       - datalake_gsheets_raw.mra_historical.anticipation_cost
+    description: Cost amount charged for the rent anticipation service in BRL.
   anticipation_fee:
     lineage:
       - datalake_gsheets_raw.mra_historical.anticipation_fee
+    description: Fee rate or amount applied to the anticipated rent transaction.
   anticipation_value:
     lineage:
       - datalake_gsheets_raw.mra_historical.anticipation_value
+    description: Total anticipated rent value transferred to the owner in BRL.
   id_contract:
     lineage:
       - datalake_gsheets_raw.mra_historical.id_contract
+    description: Rental contract identifier linked to the anticipation record.
   id_house:
     lineage:
       - datalake_gsheets_raw.mra_historical.id_house
+    description: House identifier associated with the anticipated rental contract.
   id_owner:
     lineage:
       - datalake_gsheets_raw.mra_historical.id_owner
+    description: Owner identifier receiving the rent anticipation payment.
   month:
     lineage:
       - datalake_gsheets_raw.mra_historical.month
+    description: Calendar month number of the anticipation accrual period.
   rent_net_value:
     lineage:
       - datalake_gsheets_raw.mra_historical.rent_net_value
+    description: Net rent value after deductions considered in the anticipation.
   rent_value:
     lineage:
       - datalake_gsheets_raw.mra_historical.rent_value
+    description: Gross contractual rent value before anticipation adjustments.
   status:
     lineage:
       - datalake_gsheets_raw.mra_historical.status
+    description: Processing status of the anticipation record in the historical sheet.
   year:
     lineage:
       - datalake_gsheets_raw.mra_historical.year
+    description: Calendar year of the anticipation accrual period.

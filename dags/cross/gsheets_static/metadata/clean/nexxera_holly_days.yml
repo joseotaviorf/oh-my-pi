@@ -1,11 +1,15 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: nexxera_holly_days
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: Brazilian banking holiday calendar from Nexxera used by Fintech payment operations. Maps each holiday date to the next business day for settlement scheduling.
 columns:
   holly_day:
     lineage:
       - datalake_gsheets_raw.nexxera_holly_days.holly_day
+    description: Calendar date recognized as a banking holiday in the Nexxera calendar.
   work_day:
     lineage:
       - datalake_gsheets_raw.nexxera_holly_days.work_day
+    description: Next business day used for payment processing after the holiday date.

@@ -1,56 +1,75 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: pld_suspicion_list
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: Registry of money laundering (PLD) suspicion cases tracked in Google Sheets. Documents risk classification, regulatory references, and diligence outcomes for For Rent compliance reviews.
 columns:
   id_suspicion:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.id
+    description: Unique identifier of the PLD suspicion record in the compliance sheet.
   name:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.nome_novo
+    description: Current standardized name of the suspicion category or subject.
   old_name:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.nome_antigo
+    description: Legacy name of the suspicion category before taxonomy standardization.
   money_laundering_risk:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.risco_de_pld
+    description: Assessed money laundering risk level for the suspicion case.
   suspicion_type:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.tipo_de_situacao
+    description: Type of suspicious situation reported in the PLD workflow.
   ref_jira:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.ref_jira
+    description: Jira ticket reference tracking investigation of the suspicion case.
   ref_siscoaf:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.ref_siscoaf
+    description: Siscoaf regulatory reference number associated with the report.
   newops:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.newops
+    description: New operations team label or status for the suspicion handling flow.
   legaut:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.legaut
+    description: Legacy automation or authorization flag recorded for the case.
   sorting:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.triagem
+    description: Triage stage or sorting label applied during initial PLD review.
   confection:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.confeccao
+    description: Case preparation or dossier confection status in the compliance process.
   diligence_risk:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.risk_diligencia
+    description: Risk rating assigned after enhanced due diligence on the suspicion.
   crn:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.crn
+    description: CRN regulatory reference field captured for the suspicion record.
   cri:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.cri
+    description: CRI regulatory reference field captured for the suspicion record.
   funded:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.financiado
+    description: Indicator of whether the transaction involved financed payment.
   prompt_payment:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.a_vista
+    description: Indicator of whether the transaction was settled with prompt cash payment.
   banks:
     lineage:
       - datalake_gsheets_raw.pld_suspicion_list.bancos
+    description: Banks involved in the transaction linked to the PLD suspicion case.

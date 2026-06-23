@@ -1,26 +1,35 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: marketing_affiliates_targets_replanning
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Replanned affiliate marketing targets by city group and vertical. Captures mid-cycle budget and prospect goals for Growth affiliate acquisition programs.
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.city_group
+    description: QuintoAndar city group covered by the replanned affiliate targets.
   mkt_origin:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.mkt_origin
+    description: Marketing origin taxonomy applied to the affiliate replanning slice.
   mkt_vertical:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.mkt_vertical
+    description: Business vertical dimension for affiliate marketing replanning.
   budget:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.budget
+    description: Replanned budget amount allocated to affiliate marketing in BRL.
   prospects_target:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.prospects_target
+    description: Replanned target count of affiliate prospects for the period.
   dt_week_started:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.week_start
+    description: Start date of the planning week for the replanned affiliate targets.
   dt_target:
     lineage:
       - datalake_gsheets_raw.marketing_affiliates_targets_replanning.date
+    description: Reference date identifying the affiliate replanning target period.

@@ -1,10 +1,15 @@
+---
 database_name: datalake_gsheets_clean
 table_name: looker_folders_domains
-domain: "Data Ops & Governance"
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: Mapping between Looker dashboard folders and Data Ops governance domains. Used to attribute BI content to business domains for documentation campaigns and access reviews.
 columns:
   domain:
     lineage:
       - datalake_gsheets_raw.looker_folders_domains.domain
+    description: Governance domain label assigned to the Looker folder in the reference sheet.
   dashboard_folder:
     lineage:
       - datalake_gsheets_raw.looker_folders_domains.looker_folder
+    description: Looker folder path or name linked to the governance domain entry.

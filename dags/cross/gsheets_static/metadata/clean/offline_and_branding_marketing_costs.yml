@@ -1,43 +1,59 @@
+---
 database_name: datalake_gsheets_clean
 table_name: offline_and_branding_marketing_costs
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Offline and branding marketing spend by channel, city group, and funnel side. Sourced from Google Sheets for Growth cost allocation and media mix reporting.
 columns:
   sk_date:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.sk_date
+    description: Surrogate date key identifying the cost accrual period in the sheet.
   business_context:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.business_context
+    description: Business line context (For Rent or For Sale) for the marketing cost row.
   city_group:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.city_group
+    description: QuintoAndar city group where the offline or branding spend was allocated.
   cost:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.cost
+    description: Marketing cost amount in BRL for the channel and period combination.
   funnel_side:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.funnel_side
+    description: Funnel side label (supply or demand) attributed to the marketing spend.
   mkt_category:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_category
+    description: High-level marketing category for offline and branding investments.
   mkt_channel:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_channel
+    description: Marketing channel classification for the reported cost entry.
   mkt_completion:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_completion
+    description: Completion or fulfillment label associated with the marketing activity.
   mkt_flow:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_flow
+    description: Marketing flow dimension describing the user journey targeted by spend.
   mkt_medium:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_medium
+    description: Marketing medium (for example offline, branding, or event) for the cost row.
   mkt_origin:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_origin
+    description: Marketing origin taxonomy applied when allocating offline spend.
   mkt_source:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_source
+    description: Specific marketing source identifier within the selected channel.
   utm_campaign:
     lineage:
       - datalake_gsheets_raw.offline_and_branding_marketing_costs.utm_campaign
+    description: UTM campaign name linked to the offline or branding cost when available.
