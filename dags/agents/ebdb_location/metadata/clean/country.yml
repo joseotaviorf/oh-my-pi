@@ -27,9 +27,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.country.created_at
-    description: Timestamp of created.
+    description: Timestamp when the country record was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.country.updated_at
-    description: Timestamp of updated.
-description: Clean layer table for country agent domain data.
+    description: Timestamp when the country record was last updated in EBDB.
+description: |
+  Countries supported by QuintoAndar operations in EBDB, with default locale and timezone settings
+  used for internationalization and scheduling across agent territories.

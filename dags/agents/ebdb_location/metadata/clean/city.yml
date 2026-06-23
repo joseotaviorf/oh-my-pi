@@ -23,9 +23,11 @@ columns:
   ts_updated:
     lineage:
     - datalake_ebdb_raw.municipio.atualizadoem
-    description: Timestamp of updated.
+    description: Timestamp when the municipality record was last updated in EBDB.
   ts_created:
     lineage:
     - datalake_ebdb_raw.municipio.criadoem
-    description: Timestamp of created.
-description: Clean layer table for city agent domain data.
+    description: Timestamp when the municipality record was first created in EBDB.
+description: |
+  Brazilian municipalities (municípios) referenced by EBDB location hierarchy, including SIAFI fiscal
+  codes and state (UF) association for agent region and territory configuration.

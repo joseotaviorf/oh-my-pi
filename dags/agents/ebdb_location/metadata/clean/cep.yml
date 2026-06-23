@@ -35,9 +35,11 @@ columns:
   ts_updated:
     lineage:
     - datalake_ebdb_raw.cep.atualizadoem
-    description: Timestamp of updated.
+    description: Timestamp when the postal code reference record was last updated in EBDB.
   ts_created:
     lineage:
     - datalake_ebdb_raw.cep.criadoem
-    description: Timestamp of created.
-description: Clean layer table for cep agent domain data.
+    description: Timestamp when the postal code reference record was first created in EBDB.
+description: |
+  Brazilian postal code (CEP) lookup reference from EBDB, mapping zip codes to street, neighborhood,
+  city, and state used for address validation and geocoding in agent territory management.

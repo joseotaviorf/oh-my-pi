@@ -11,11 +11,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.mapregiao.criadaem
-    description: Timestamp of created.
+    description: Timestamp when the map region node was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.mapregiao.atualizadoem
-    description: Timestamp of updated.
+    description: Timestamp when the map region node was last updated in EBDB.
   level:
     lineage:
     - datalake_ebdb_raw.mapregiao.nivel
@@ -40,4 +40,6 @@ columns:
     lineage:
     - datalake_ebdb_raw.mapregiao.cidadenome
     description: Value of city name in the source record.
-description: Clean layer table for map region agent domain data.
+description: |
+  Hierarchical map region tree from EBDB used for geographic navigation, linking macro regions,
+  cities, and nested levels for agent territory and listing coverage visualization.

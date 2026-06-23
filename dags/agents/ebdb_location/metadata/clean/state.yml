@@ -23,9 +23,11 @@ columns:
   ts_updated:
     lineage:
     - datalake_ebdb_raw.estado.atualizadoem
-    description: Timestamp of updated.
+    description: Timestamp when the state (UF) record was last updated in EBDB.
   ts_created:
     lineage:
     - datalake_ebdb_raw.estado.criadoem
-    description: Timestamp of created.
-description: Clean layer table for state agent domain data.
+    description: Timestamp when the state (UF) record was first created in EBDB.
+description: |
+  Brazilian states (UF) in the EBDB location hierarchy, linked to their parent country and used
+  as the administrative level above municipalities and operational regions.

@@ -67,9 +67,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.regionconfig.criadoEm
-    description: Timestamp of created.
+    description: Timestamp when the region configuration record was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.regionconfig.atualizadoEm
-    description: Timestamp of updated.
-description: Clean layer table for region config agent domain data.
+    description: Timestamp when the region configuration record was last updated in EBDB.
+description: |
+  Base configuration for an EBDB operational region, including price bounds, timezone, featured
+  listing settings, and feature toggles for search, visits, and house registration.

@@ -3,7 +3,9 @@ database_name: datalake_ebdb_clean
 table_name: region_parameters
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
-description: Table that contains the parameters for each region.
+description: |
+  Business-context-specific parameters for EBDB regions (rent vs sale), extending region_config with
+  per-context price bounds and feature toggles such as PFA, keys-with-agent, and talk-to-agent.
 columns:
   id:
     lineage:

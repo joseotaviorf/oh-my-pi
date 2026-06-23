@@ -39,9 +39,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.regiao.criadaem
-    description: Timestamp of created.
+    description: Timestamp when the operational region was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.regiao.atualizadoem
-    description: Timestamp of updated.
-description: Clean layer table for region agent domain data.
+    description: Timestamp when the operational region definition was last updated in EBDB.
+description: |
+  Operational geographic regions in EBDB that define agent territories and listing coverage areas,
+  organized in a parent-child hierarchy with centroid coordinates and URL slugs.

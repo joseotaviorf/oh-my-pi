@@ -11,11 +11,11 @@ columns:
   ts_updated:
     lineage:
     - datalake_ebdb_raw.local.atualizadoem
-    description: Timestamp of updated.
+    description: Timestamp when the local point-of-interest record was last updated in EBDB.
   ts_created:
     lineage:
     - datalake_ebdb_raw.local.criadoem
-    description: Timestamp of created.
+    description: Timestamp when the local point-of-interest record was first created in EBDB.
   lat:
     lineage:
     - datalake_ebdb_raw.local.lat
@@ -56,4 +56,6 @@ columns:
     lineage:
     - datalake_ebdb_raw.local.region_id
     description: Unique identifier for region.
-description: Clean layer table for local agent domain data.
+description: |
+  Named local points of interest (POIs) within EBDB regions, such as landmarks or meeting spots,
+  with coordinates and slugs used for agent routing and territory reference.
