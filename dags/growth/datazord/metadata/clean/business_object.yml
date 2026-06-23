@@ -1,11 +1,13 @@
 database_name: datalake_datazord_clean
 table_name: business_object
 domain: Growth
-description: Business object table from datazord containing business entity information, relationships, and context data
-owner: eduardo.soares@quintoandar.com.br
+description: |
+  Datazord business-object registry ingested from the Datazord CDF topic, mapping users, houses, contracts, and personas into CDP transactional entities. One row per business object with type, context, and lifecycle timestamps.
+
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_business_object:
-    description: Primary key identifier for the business object
+    description: Surrogate key for the Datazord business object row in the clean layer.
     lineage:
       - datalake_datazord_raw.business_object.surrogate_key
   id_user:
@@ -13,7 +15,7 @@ columns:
     lineage:
       - datalake_datazord_raw.business_object.id_user
   uuid_person:
-    description: Person UUID identifier
+    description: UUID person identifier linking the business object to the CDP person dimension.
     lineage:
       - datalake_datazord_raw.business_object.uuid_person
   id_house:
@@ -25,11 +27,11 @@ columns:
     lineage:
       - datalake_datazord_raw.business_object.id_contract
   id_object:
-    description: Object identifier
+    description: Source-system object identifier for the business entity referenced by this row.
     lineage:
       - datalake_datazord_raw.business_object.id_object
   business_type:
-    description: Type of business object
+    description: Datazord business-object type enum (e.g. house, contract, visit) used in CDP entity routing.
     lineage:
       - datalake_datazord_raw.business_object.business_type
   persona:
@@ -49,7 +51,7 @@ columns:
     lineage:
       - datalake_datazord_raw.business_object.properties
   business_context:
-    description: Context information for the business object
+    description: Rent or sale business context and journey metadata attached to the business object.
     lineage:
       - datalake_datazord_raw.business_object.business_context
   journey_step:
