@@ -1,6 +1,7 @@
 database_name: datalake_growth_entities_views
 table_name: house_draft
-description: >
+description: |
+  Enriched house draft entity view for the CDP transactional entities pipeline, exposing listing draft attributes from Atlas.
   Enriched view of HOUSE_DRAFT entities (self-service property registrations by owners).
   Consumed by enrich_transactional_entities consolidation.
 domain: Growth

@@ -9,6 +9,7 @@ description:
   from the last 3 months based on ts_updated.
   This filtering strategy ensures relevant, recent data while maintaining complete active entity coverage.
   The format is specifically designed for use by AI initiatives like our chatbots.
+  Z-ordered by id_user, id_house, and persona for CDP entity lookups.
 columns:
   sk_entity:
     lineage:

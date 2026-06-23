@@ -15,6 +15,7 @@ description: |
   partition pruning. Example: WHERE year = 2026 AND month = 6 AND day = 9.
   Combine with id_sync or id_sync_run when drilling into a specific integration or run
   to avoid scanning the full table.
+  Partitioned by year, month, and day — filter year, month, and day together in WHERE.
 columns:
   id_sync:
     description: |

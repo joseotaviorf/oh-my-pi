@@ -13,6 +13,7 @@ description: |
   full table scans. Example: WHERE year = 2026 AND month = 6 AND day = 9.
   When analyzing a specific audience, combine id_audience with partition predicates to
   restrict the scan further.
+  Partitioned by year, month, and day — filter year, month, and day together in WHERE.
 columns:
   id_audience:
     description: |

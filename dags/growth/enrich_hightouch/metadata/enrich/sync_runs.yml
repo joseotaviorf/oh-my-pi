@@ -13,6 +13,7 @@ description: |
   table scans. Example: WHERE year = 2026 AND month = 6 AND day = 9.
   Combine with id_sync when investigating a specific sync configuration to reduce scan cost.
   Use sync_changelog for row-level failure details per sync run.
+  Partitioned by year, month, and day — filter year, month, and day together in WHERE.
 columns:
   id_sync:
     description: |

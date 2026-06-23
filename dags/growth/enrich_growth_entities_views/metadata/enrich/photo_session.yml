@@ -1,6 +1,7 @@
 database_name: datalake_growth_entities_views
 table_name: photo_session
-description: >
+description: |
+  Enriched photo session entity view for CDP, tracking photographer assignments and session status for listings.
   Enriched view of PHOTO_SESSION entities with persona expansion (OWNER, AGENT_PHOTOGRAPHER).
   Consumed by enrich_transactional_entities consolidation.
 domain: Growth

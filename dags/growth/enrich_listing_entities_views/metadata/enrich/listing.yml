@@ -1,6 +1,7 @@
 database_name: datalake_listing_entities_views
 table_name: listing
-description: >
+description: |
+  Enriched listing entity view for CDP, joining listing lifecycle fields used in transactional entity resolution.
   Enriched view of LISTING entities across RENT and SALE business contexts.
   Consolidates house, owner, and contract information for property listings.
   Consumed by enrich_transactional_entities consolidation.
