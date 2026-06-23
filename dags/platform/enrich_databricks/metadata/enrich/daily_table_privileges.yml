@@ -1,63 +1,100 @@
 ---
 database_name: datalake_databricks
 table_name: daily_table_privileges
-description: Takes daily snapshots of the privileges associated with each table. Each row represents
-  read access granted to a user, service principal or group on a specific table, on a given day.
-  The table only captures direct group privileges, otherwise it would get too large. If you need indirect memberships (i.e., users
-  who are members of groups or subgroups), you can use the `daily_group_members` table to resolve
-  the full membership hierarchy.
+description: |
+  Daily snapshot of Unity Catalog table privileges in the QuintoAndar catalog, materialized from
+  system.information_schema.table_privileges and table owners from information_schema.tables. Each
+  row is one grantee (user email, group display name, or service principal application UUID) with
+  aggregated privilege types on a schema.table, including inheritance metadata. Direct group grants
+  only — use daily_group_members to expand indirect membership. Depends on daily_users, daily_groups,
+  and daily_service_principals for internal ID resolution. Part of the enrich_databricks DAG (daily,
+  first run of day). Partitioned by year, month, and day (derived from current_date because
+  information_schema reflects live catalog state). Always filter on year, month, and day in WHERE
+  clauses to enable partition pruning and avoid full table scans.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_user:
-    description: If the grantee is a user, this column contains the internal user ID.
+    description: |
+      Internal Databricks user ID when grantee_type is User, resolved by joining grantee email to
+      daily_users on the same snapshot partition. Null for group or service principal grantees.
     lineage:
       - datalake_databricks.daily_users.id_user
   id_group:
-    description: If the grantee is a group, this column contains the internal group ID.
+    description: |
+      Internal Databricks group ID when grantee_type is Group, resolved by joining grantee display
+      name to daily_groups on the same snapshot partition. Null for user or service principal grants.
     lineage:
       - datalake_databricks.daily_groups.id_group
   id_service_principal:
-    description: If the grantee is a service principal, this column contains the internal service principal ID.
+    description: |
+      Internal service principal ID when grantee_type is Service principal, resolved by joining
+      grantee application UUID to daily_service_principals on the same snapshot partition.
     lineage:
       - datalake_databricks.daily_service_principals.id_service_principal
   grantee:
-    description: If the grantee is a service principal, this column contains the service principal id. If the grantee is a user,
-      this column contains the email. If the grantee is a group, this column contains the group name.
+    description: |
+      Raw grantee identifier from Unity Catalog: user email, group display name, or service principal
+      application UUID depending on grantee_type. Matches system.information_schema.table_privileges
+      before internal ID enrichment.
     lineage:
       - system.information_schema.table_privileges.grantee
   privileges:
-    description: The privileges granted to the grantee. This column is an array of strings, each string is a privilege type. For example, ['SELECT', 'ALL_PRIVILEGES'].
+    description: |
+      Array of privilege type strings granted to the grantee on the table (e.g. SELECT,
+      MODIFY, ALL_PRIVILEGES), aggregated from information_schema with collect_set per grantee and
+      table. Table owners receive a synthetic ALL_PRIVILEGES entry from the tables union branch.
     lineage:
       - system.information_schema.table_privileges.privileges
   grantee_type:
-    description: Indicates whether the grantee is a user, group, or service principal.
+    description: |
+      Classification of the grantee principal inferred by matching grantee to daily_users, daily_groups,
+      or daily_service_principals on the snapshot date. Defaults to Service principal when no match.
     categories:
       User: A user account.
       Group: A group account.
       Service principal: A service principal account.
   grant_type:
-    description: Indicates whether the privilege is granted by grant or the table owner.
+    description: |
+      Distinguishes explicit GRANT statements from implicit table-owner privileges synthesized from
+      information_schema.tables.table_owner.
     categories:
       grant: The privilege is granted by a grant.
       table_owner: The privilege is granted by the table owner (the owner of the table has all privileges).
   table_schema:
-    description: Schema of the table on which the privilege is granted.
+    description: |
+      Unity Catalog schema name of the protected table within the configured catalog (quintoandar_{env}).
     lineage:
       - system.information_schema.table_privileges.table_schema
   table_name:
-    description: Name of the table on which the privilege is granted.
+    description: |
+      Unity Catalog table name on which privileges are granted, combined with table_schema for full
+      table qualification in access audits.
     lineage:
       - system.information_schema.table_privileges.table_name
   inherited_from:
-    description: Kind of object that the privilege is inherited from. For example, 'CATALOG', 'SCHEMA', 'NONE'.
+    description: |
+      Scope from which the privilege is inherited in Unity Catalog: CATALOG, SCHEMA, or NONE when
+      granted directly on the table without inheritance.
     lineage:
       - system.information_schema.table_privileges.inherited_from
   inherited_object:
-    description: Name of object that the privilege is inherited from. If the privilege is inherited from a catalog, this column contains the catalog name. If the privilege is inherited from a schema, this column contains the schema name. If the privilege is not inherited from any object, this column is null.
+    description: |
+      Name of the catalog or schema object propagating the privilege when inherited_from is CATALOG
+      or SCHEMA; null for direct table grants (inherited_from = NONE).
   year:
-    description: Year of the snapshot.
+    description: |
+      Table partition column (year). Set to the calendar year of current_date when privileges are
+      read from information_schema (live catalog snapshot). Required in WHERE clauses for partition
+      pruning — always combine with month and day to restrict scans to the smallest date window
+      needed. Queries without partition filters will scan the entire table.
   month:
-    description: Month of the snapshot.
+    description: |
+      Table partition column (month, 1–12). Set from current_date at privilege snapshot time. Must
+      be filtered together with year and day in every query to enable partition pruning; omitting
+      any partition column disables pruning and forces a full scan.
   day:
-    description: Day of the snapshot.
+    description: |
+      Table partition column (day, 1–31). Set from current_date at privilege snapshot time. Always
+      the last partition column — filter with year and month to narrow the scan to specific snapshot
+      days. Example: WHERE year = 2026 AND month = 6 AND day = 22.

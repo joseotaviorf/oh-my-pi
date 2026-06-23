@@ -6,7 +6,7 @@ WITH latest_snapshot AS (
         is_active_employee,
         MAKE_DATE(year, month, day) AS dt_created,
         MAKE_DATE(year, month, day) AS dt_updated,
-        NULL::DATE AS dt_deleted
+        CAST(NULL AS DATE) AS dt_deleted
     FROM
         datalake_databricks.daily_users
     WHERE
@@ -32,10 +32,24 @@ new_deletes AS (
         uu.dt_deleted IS NULL -- Not marked as deleted yet
         AND ls.id_user IS NULL -- But not in the latest snapshot
 )
-SELECT *
+SELECT
+    id_user,
+    email,
+    is_active_user,
+    is_active_employee,
+    dt_created,
+    dt_updated,
+    dt_deleted
 FROM
     latest_snapshot
 UNION ALL
-SELECT *
+SELECT
+    id_user,
+    email,
+    is_active_user,
+    is_active_employee,
+    dt_created,
+    dt_updated,
+    dt_deleted
 FROM
     new_deletes

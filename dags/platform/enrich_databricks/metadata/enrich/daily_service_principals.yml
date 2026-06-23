@@ -1,23 +1,50 @@
 ---
 database_name: datalake_databricks
 table_name: daily_service_principals
-description: Takes daily snapshots of service principals in the Databricks account.
+description: |
+  Daily snapshot of every service principal in the QuintoAndar Databricks account, loaded from the
+  Account SCIM service-principals API. One row per service principal per snapshot date with
+  application UUID used as Unity Catalog grantee identifier. Feeds unique_service_principals merge
+  logic and grantee resolution in daily_table_privileges. Part of the enrich_databricks DAG (daily).
+  Partitioned by year, month, and day (derived from current_date at snapshot capture). Always filter
+  on year, month, and day in WHERE clauses to enable partition pruning and avoid full table scans;
+  align partition filters with the snapshot date being analyzed.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_service_principal:
-    description: Unique identifier for the service principal on the Databricks account.
+    description: |
+      Internal Databricks service principal identifier from the SCIM API. Primary join key to
+      unique_service_principals and daily_table_privileges across snapshot dates.
   id_service_principal_external:
-    description: External identifier for the service principal on the Databricks account.
+    description: |
+      External identifier from the identity provider (SCIM external_id), linking the service
+      principal to corporate IAM or application registration records outside Databricks.
   display_name:
-    description: Display name of the service principal.
+    description: |
+      Human-readable service principal name in the Databricks account, used for discovery and
+      audit when tracing automated workloads to owning teams.
   application_id:
-    description: UUID application ID of the service principal, used as the grantee identifier in Unity Catalog table privileges.
+    description: |
+      UUID application identifier for the service principal in Azure AD / OAuth, matched against
+      system.information_schema.table_privileges.grantee when resolving machine identity grants.
   is_active:
-    description: Indicates whether the service principal is currently active in the Databricks account.
+    description: |
+      Whether the service principal is active in Databricks at snapshot time according to the SCIM
+      active flag. Inactive principals may retain historical privilege rows until removed.
   year:
-    description: Year of the snapshot.
+    description: |
+      Table partition column (year). Set to the calendar year of current_date when the snapshot Spark
+      job runs. Required in WHERE clauses for partition pruning — always combine with month and day
+      to restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
   month:
-    description: Month of the snapshot.
+    description: |
+      Table partition column (month, 1–12). Set from current_date at snapshot capture. Must be
+      filtered together with year and day in every query to enable partition pruning; omitting any
+      partition column disables pruning and forces a full scan.
   day:
-    description: Day of the snapshot.
+    description: |
+      Table partition column (day, 1–31). Set from current_date at snapshot capture. Always the last
+      partition column — filter with year and month to narrow the scan to specific snapshot days.
+      Example: WHERE year = 2026 AND month = 6 AND day = 22.

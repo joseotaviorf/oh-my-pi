@@ -1,51 +1,109 @@
 ---
 database_name: datalake_databricks
 table_name: unique_clusters
-description: Provides metrics about databricks Clusters using system tables. One row per cluster.
-domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Slowly-updated reference dimension of Databricks clusters in QuintoAndar workspaces, one row per
+  cluster_id from system.compute.clusters (latest change_time per cluster within the load window).
+  Captures configuration (node types, autoscale, pools, DBR, Photon, init scripts, tags) and parsed
+  Bietlejuice DAG name from cluster naming conventions. Merged incrementally on id_cluster when
+  ts_updated advances. Upstream of daily_clusters, enrich_databricks_job_runs, and usage-cost
+  pipelines. Part of the enrich_databricks DAG (daily). Not partitioned — filter on ts_updated or
+  join through daily_clusters for date-scoped analysis.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_cluster:
-    description: The unique identifier of the cluster.
+    description: |
+      Databricks cluster identifier from system.compute.clusters.cluster_id, primary merge key and
+      join target for Overwatch clusterstatefact and daily_clusters.
   id_organization:
-    description: The identifier of the organization associated with the cluster.
+    description: |
+      Databricks workspace ID (workspace_id in system tables) identifying which QuintoAndar
+      environment hosts the cluster (Forno, Prod, or legacy workspace IDs).
   id_driver_instance_pool:
-    description: The identifier of the driver instance pool associated with the cluster.
+    description: |
+      Instance pool ID attached to the cluster driver node, joinable to instance_pools for pool name
+      and node type defaults. Null when the driver uses on-demand instances.
   id_worker_instance_pool:
-    description: The identifier of the worker instance pool associated with the cluster.
+    description: |
+      Instance pool ID for worker nodes, joinable to instance_pools. Null when workers are not
+      pool-backed.
+  workspace_name:
+    description: |
+      Human-readable Databricks workspace label mapped from workspace_id (QuintoAndar, Forno, or Prod).
+    lineage:
+      - system.compute.clusters.workspace_id
   cluster_name:
-    description: The name of the cluster.
+    description: |
+      Cluster display name from system.compute.clusters, often encoding job or Bietlejuice DAG naming
+      patterns used to derive bietlejuice_dag_name.
   bietlejuice_dag_name:
-    description: The name of the Bietlejuice DAG associated with the cluster.
+    description: |
+      Parsed Bietlejuice Airflow DAG name extracted via regex from cluster_name when the name matches
+      bietlejuice.{dag}_scheduled or similar patterns; null for manually named or external clusters.
   cluster_type:
-    description: The type of the cluster.
+    description: |
+      Single Node when ResourceClass tag is SingleNode; otherwise Standard multi-node topology from
+      system.compute.clusters tags and worker configuration.
   spark_version:
-    description: The version of Spark used by the cluster.
+    description: |
+      Normalized Databricks Runtime version string with photon segment removed for comparability
+      across STANDARD and PHOTON engines.
   runtime_engine:
-    description: One of STANDARD or PHOTON.
+    description: |
+      STANDARD or PHOTON, inferred from whether dbr_version contains the photon marker. Affects DBU
+      pricing in downstream cost calculations.
   init_scripts:
-    description: The initialization scripts used by the cluster.
+    description: |
+      JSON array of cluster init script definitions (DBFS or workspace paths) executed during startup,
+      serialized from system.compute.clusters.init_scripts.
   custom_tags:
-    description: The custom tags associated with the cluster.
+    description: |
+      JSON map of cluster tags from system.compute.clusters.tags, including ResourceClass and custom
+      chargeback labels applied at cluster creation.
   driver_node_type:
-    description: The node type of the driver node.
+    description: |
+      EC2 instance type ID for the driver node from system.compute.clusters.driver_node_type.
   node_type:
-    description: The node type of the worker nodes.
+    description: |
+      EC2 instance type ID for worker nodes from system.compute.clusters.worker_node_type.
   aws_attributes:
-    description: The AWS attributes of the cluster.
+    description: |
+      Parsed map of AWS cluster attributes (availability, EBS, spot settings) from
+      system.compute.clusters.aws_attributes JSON.
   driver_instance_pool_name:
-    description: The name of the driver instance pool associated with the cluster.
+    description: |
+      Human-readable driver pool name joined from instance_pools on id_driver_instance_pool at load
+      time for reporting without repeated pool lookups.
   worker_instance_pool_name:
-    description: The name of the worker instance pool associated with the cluster.
+    description: |
+      Human-readable worker pool name joined from instance_pools on id_worker_instance_pool.
   num_workers:
-    description: The number of workers in the cluster.
+    description: |
+      Configured worker count from system.compute.clusters.worker_count at the latest cluster
+      revision, before autoscale min/max bounds.
   autoscale:
-    description: Autoscale configuration of the cluster.
+    description: |
+      JSON struct with min_workers and max_workers autoscale bounds from system.compute.clusters
+      min/max autoscale worker fields. Null for fixed-size clusters.
   auto_termination_minutes:
-    description: The number of minutes of inactivity before the cluster is automatically terminated.
+    description: |
+      Minutes of inactivity after which an all-purpose cluster auto-terminates, from
+      system.compute.clusters.auto_termination_minutes.
   is_elastic_disk_enabled:
-    description: Indicates whether elastic disk is enabled for the cluster.
+    description: |
+      Whether elastic disk is enabled on the cluster (enable_elastic_disk), allowing disk expansion
+      during execution without pre-sizing EBS.
   is_automated:
-    description: Indicates whether the cluster is automated.
+    description: |
+      True when cluster_source is JOB, indicating an ephemeral job cluster rather than an interactive
+      all-purpose cluster.
   ts_updated:
-    description: The timestamp of when the cluster was last updated.
+    description: |
+      Timestamp of the latest cluster configuration change (change_time) used as the merge watermark
+      when upserting into this dimension from system.compute.clusters.
+  ts_deleted:
+    description: |
+      Timestamp when the cluster was deleted in system.compute.clusters (delete_time). Null for active clusters.
+    lineage:
+      - system.compute.clusters.delete_time

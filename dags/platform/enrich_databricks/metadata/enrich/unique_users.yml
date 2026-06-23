@@ -1,32 +1,50 @@
 ---
 database_name: datalake_databricks
 table_name: unique_users
-description: Every row is a user that has ever existed in the Databricks account. This table is
-  updated incrementally based on daily snapshots from the daily_users table.
+description: |
+  Slowly-changing dimension of every Databricks account user ever observed in QuintoAndar snapshots,
+  merged incrementally from daily_users. One row per id_user with current email, active flags, and
+  soft-delete tracking when a user disappears from the latest daily snapshot. Used for longitudinal
+  identity governance, access reviews, and joining historical privilege analysis. Part of the
+  enrich_databricks DAG (daily). Not partitioned — use dt_updated or join daily_users with partition
+  filters for point-in-time snapshots.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_user:
-    description: Unique identifier for the user on the Databricks account.
+    description: |
+      Internal Databricks account user identifier, stable merge key from daily_users snapshots and
+      join target for daily_group_members and daily_table_privileges.
     lineage:
       - datalake_databricks.daily_users.id_user
   email:
-    description: Email of the user.
+    description: |
+      Current primary email for the user, updated from the latest daily_users snapshot when the
+      address or active status changes.
     lineage:
       - datalake_databricks.daily_users.email
   is_active_user:
-    description: Indicates whether the user is active.
+    description: |
+      Latest known Databricks account active flag from daily_users. Set false when a previously seen
+      user is absent from the current snapshot (soft delete path in unique_users.sql).
     lineage:
       - datalake_databricks.daily_users.is_active_user
   is_active_employee:
-    description: Indicates whether the user is an active QuintoAndar employee.
+    description: |
+      Latest known QuintoAndar employee status from org_chart enrichment in daily_users, indicating
+      whether the Databricks login maps to an ACTIVE org_chart assignment.
     lineage:
       - datalake_databricks.daily_users.is_active_employee
   dt_created:
-    description: Timestamp when the user was first seen in the Databricks account. The table was created 
-      on 2025-10-01, so any user created before that date will have that as their dt_created.
+    description: |
+      Date when the user first appeared in daily_users snapshots (make_date of first seen year, month,
+      day). Users predating table creation on 2025-10-01 retain that date as the earliest observable
+      first-seen value.
   dt_updated:
-    description: Timestamp when the user was last updated in the Databricks account.
+    description: |
+      Date of the most recent daily_users snapshot that changed email, active flags, or deletion
+      status for this user.
   dt_deleted:
-    description: If the user was deleted, this column contains the timestamp of deletion. If the
-      user is active, this column is NULL.
+    description: |
+      Date when the user was inferred deleted because they no longer appear in the current daily_users
+      snapshot while still active in this dimension. Null while the user remains in the latest snapshot.

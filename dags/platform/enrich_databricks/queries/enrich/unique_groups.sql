@@ -5,7 +5,7 @@ WITH latest_snapshot AS (
         display_name,
         MAKE_DATE(year, month, day) AS dt_created,
         MAKE_DATE(year, month, day) AS dt_updated,
-        NULL::DATE AS dt_deleted
+        CAST(NULL AS DATE) AS dt_deleted
     FROM
         datalake_databricks.daily_groups
     WHERE
@@ -28,10 +28,22 @@ new_deletes AS (
         ug.dt_deleted IS NULL -- Not marked as deleted yet
         AND ls.id_group IS NULL -- But not in the latest snapshot
 )
-SELECT *
+SELECT
+    id_group,
+    id_group_external,
+    display_name,
+    dt_created,
+    dt_updated,
+    dt_deleted
 FROM
     latest_snapshot
 UNION ALL
-SELECT *
+SELECT
+    id_group,
+    id_group_external,
+    display_name,
+    dt_created,
+    dt_updated,
+    dt_deleted
 FROM
     new_deletes

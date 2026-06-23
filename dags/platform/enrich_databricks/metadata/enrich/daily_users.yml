@@ -1,21 +1,46 @@
 ---
 database_name: datalake_databricks
 table_name: daily_users
-description: Takes daily snapshots of users in the Databricks account.
+description: |
+  Daily snapshot of every user in the QuintoAndar Databricks account, loaded from the Account SCIM
+  API and enriched with active-employee status from datalake_people_public.org_chart. One row per
+  user per snapshot date. Feeds the unique_users slowly-changing dimension and grantee resolution in
+  daily_table_privileges. Part of the enrich_databricks DAG (daily, first run of day). Partitioned by
+  year, month, and day (derived from current_date at snapshot capture, not the Airflow execution
+  date). Always filter on year, month, and day in WHERE clauses to enable partition pruning and
+  avoid full table scans; align partition filters with the snapshot date being analyzed.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_user:
-    description: Unique identifier for the user on the Databricks account.
+    description: |
+      Internal Databricks account user identifier from the SCIM API (AccountClient.users). Stable key
+      for joining to daily_group_members and unique_users across snapshot dates.
   email:
-    description: Email of the user.
+    description: |
+      Primary login email for the Databricks user, used as the grantee string in Unity Catalog
+      privileges when the grantee type is User.
   is_active_user:
-    description: Indicates whether the user is active.
+    description: |
+      Whether the user account is active in Databricks according to the SCIM active flag at snapshot
+      time. Inactive users may still appear until removed from the account.
   is_active_employee:
-    description: Indicates whether the user is an active QuintoAndar employee.
+    description: |
+      True when the user's email matches an ACTIVE assignment in datalake_people_public.org_chart,
+      distinguishing QuintoAndar employees from external or former collaborators on the workspace.
   year:
-    description: Year of the snapshot.
+    description: |
+      Table partition column (year). Set to the calendar year of current_date when the snapshot Spark
+      job runs. Required in WHERE clauses for partition pruning — always combine with month and day
+      to restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
   month:
-    description: Month of the snapshot.
+    description: |
+      Table partition column (month, 1–12). Set from current_date at snapshot capture. Must be
+      filtered together with year and day in every query to enable partition pruning; omitting any
+      partition column disables pruning and forces a full scan.
   day:
-    description: Day of the snapshot.
+    description: |
+      Table partition column (day, 1–31). Set from current_date at snapshot capture. Always the last
+      partition column — filter with year and month to narrow the scan to specific snapshot days.
+      Example: WHERE year = 2026 AND month = 6 AND day = 22.

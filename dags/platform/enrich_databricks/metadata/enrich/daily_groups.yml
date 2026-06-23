@@ -1,19 +1,42 @@
 ---
 database_name: datalake_databricks
 table_name: daily_groups
-description: Takes daily snapshots of groups in the Databricks account.
+description: |
+  Daily snapshot of every group in the QuintoAndar Databricks account, loaded from the Account SCIM
+  groups API. One row per group per snapshot date with internal and external identifiers and display
+  name. Feeds unique_groups merge logic and grantee resolution in daily_table_privileges when
+  privileges are granted to a group by display name. Part of the enrich_databricks DAG (daily).
+  Partitioned by year, month, and day (derived from current_date at snapshot capture). Always filter
+  on year, month, and day in WHERE clauses to enable partition pruning and avoid full table scans;
+  align partition filters with the snapshot date being analyzed.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_group:
-    description: Unique identifier for the group on the Databricks account.
+    description: |
+      Internal Databricks account group identifier from the SCIM API. Primary join key to
+      daily_group_members and unique_groups across snapshot dates.
   id_group_external:
-    description: External identifier for the group on the Databricks account.
+    description: |
+      External group identifier from the identity provider (SCIM external_id), used to correlate
+      Databricks groups with corporate directory or SSO group objects.
   display_name:
-    description: Display name of the group.
+    description: |
+      Human-readable group name in Databricks, matched against Unity Catalog grantee strings when
+      resolving group-based table privileges in daily_table_privileges.
   year:
-    description: Year of the snapshot.
+    description: |
+      Table partition column (year). Set to the calendar year of current_date when the snapshot Spark
+      job runs. Required in WHERE clauses for partition pruning — always combine with month and day
+      to restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
   month:
-    description: Month of the snapshot.
+    description: |
+      Table partition column (month, 1–12). Set from current_date at snapshot capture. Must be
+      filtered together with year and day in every query to enable partition pruning; omitting any
+      partition column disables pruning and forces a full scan.
   day:
-    description: Day of the snapshot.
+    description: |
+      Table partition column (day, 1–31). Set from current_date at snapshot capture. Always the last
+      partition column — filter with year and month to narrow the scan to specific snapshot days.
+      Example: WHERE year = 2026 AND month = 6 AND day = 22.

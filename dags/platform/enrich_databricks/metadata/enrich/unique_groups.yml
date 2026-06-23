@@ -1,28 +1,43 @@
 ---
 database_name: datalake_databricks
 table_name: unique_groups
-description: Every row is a group that has ever existed in the Databricks account. This table is
-  updated incrementally based on daily snapshots from the daily_groups table.
+description: |
+  Slowly-changing dimension of every Databricks account group ever observed in QuintoAndar snapshots,
+  merged incrementally from daily_groups. One row per id_group with external ID, display name, and
+  soft-delete tracking when a group disappears from the latest daily snapshot. Supports longitudinal
+  group governance and privilege audits when combined with daily_table_privileges and
+  daily_group_members. Part of the enrich_databricks DAG (daily). Not partitioned — use dt_updated
+  or join daily_groups with partition filters for point-in-time membership.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_group:
-    description: Unique identifier for the group on the Databricks account.
+    description: |
+      Internal Databricks group identifier, stable merge key from daily_groups and join target for
+      daily_group_members and privilege resolution.
     lineage:
       - datalake_databricks.daily_groups.id_group
   id_group_external:
-    description: External identifier for the group, typically corresponding to an identity provider's group ID.
+    description: |
+      External identity-provider group identifier from daily_groups, typically mapping to SSO or
+      corporate directory group objects outside Databricks.
     lineage:
       - datalake_databricks.daily_groups.id_group_external
   display_name:
-    description: Display name of the group.
+    description: |
+      Current group display name from the latest daily_groups snapshot, matched against Unity Catalog
+      grantee strings for group-based privileges.
     lineage:
       - datalake_databricks.daily_groups.display_name
   dt_created:
-    description: Timestamp when the group was first seen in the Databricks account. The table was created
-      on 2025-10-01, so any group created before that date will have that as their dt_created.
+    description: |
+      Date when the group first appeared in daily_groups snapshots. Groups predating table creation
+      on 2025-10-01 retain that date as the earliest observable first-seen value.
   dt_updated:
-    description: Timestamp when the group was last updated in the Databricks account.
+    description: |
+      Date of the most recent daily_groups snapshot that changed external ID, display name, or
+      deletion status for this group.
   dt_deleted:
-    description: If the group was deleted, this column contains the timestamp of deletion. If the
-      group is active, this column is NULL.
+    description: |
+      Date when the group was inferred deleted because it no longer appears in the current daily_groups
+      snapshot while still active in this dimension. Null while the group remains in the latest snapshot.

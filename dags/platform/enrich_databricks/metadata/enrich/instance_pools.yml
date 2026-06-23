@@ -1,37 +1,73 @@
 ---
 database_name: datalake_databricks
 table_name: instance_pools
-description: Lists all instance pools in the databricks workspace.
-domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Current inventory of Databricks instance pools across QuintoAndar workspaces (Forno, Prod, and
+  related IDs), loaded via the workspace Instance Pools API and unioned per workspace. One row per
+  pool per load with capacity, idle autoscaling, node type, AWS attributes, and tagging configuration.
+  Full refresh without partitioning; ts_load marks ingestion time. Joined from unique_clusters to
+  resolve driver and worker pool names for cluster cost and rightsizing analysis. Part of the
+  enrich_databricks DAG (daily), upstream of unique_clusters and daily_clusters.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_instance_pool:
-    description: Databricks instance pool id
+    description: |
+      Databricks instance pool identifier assigned by the workspace API, stable for joining to
+      unique_clusters driver_instance_pool_id and worker_instance_pool_id.
   id_node_type:
-    description: The identifier of the node type associated with the instance pool.
+    description: |
+      EC2 instance type configured for instances launched from this pool (node_type_id in the API),
+      determining vCPU, memory, and on-demand cost baseline for pooled workers.
   instance_pool_name:
-    description: Databricks instance pool name
+    description: |
+      Administrator-defined pool name in the Databricks workspace, surfaced in unique_clusters and
+      daily_clusters for human-readable cost attribution.
   aws_attributes:
-    description: AWS attributes of the instance pool
+    description: |
+      JSON map of AWS-specific pool settings from the API (availability zone, spot bid, EBS volume
+      options) governing how worker instances are provisioned in the cloud account.
   default_tags:
-    description: Default tags of the instance pool
+    description: |
+      Default cluster tags automatically applied to clusters using this pool, used for chargeback
+      and environment classification in AWS billing exports.
   disk_spec:
-    description: Details of the disk specification
+    description: |
+      Disk specification object from the API describing EBS volume type and size attached to pool
+      instances, relevant for shuffle-heavy workload sizing.
   idle_instance_autotermination_minutes:
-    description: The number of minutes after which an idle instance is terminated.
+    description: |
+      Minutes of idle time after which unused pool instances are terminated to control standing
+      capacity cost while preserving min_idle_instances warm capacity.
   state:
-    description: The state of the instance pool.
+    description: |
+      Lifecycle state of the instance pool in Databricks (e.g. ACTIVE or deleted), indicating
+      whether the pool accepts new cluster attachments.
   stats:
-    description: Metrics about the instance pool.
+    description: |
+      Runtime statistics object from the API summarizing current idle and active instance counts in
+      the pool at load time.
   custom_tags:
-    description: Custom tags of the instance pool
+    description: |
+      Administrator-supplied key-value tags on the pool beyond default_tags, used for team or
+      workload labeling in governance dashboards.
   max_capacity:
-    description: Maximum number of instances that can be created in the instance pool.
+    description: |
+      Upper bound on concurrent instances the pool may provision, capping burst parallelism for
+      workloads attached to the pool.
   min_idle_instances:
-    description: Minimum number of idle instances that should be maintained in the instance pool.
+    description: |
+      Minimum warm instances kept idle in the pool to reduce cluster startup latency for attached
+      jobs and all-purpose clusters.
   preloaded_spark_versions:
-    description: List of preloaded Spark versions in the instance pool.
+    description: |
+      List of Databricks Runtime versions preloaded on pool instances to shorten driver and worker
+      bootstrap time when clusters pin a matching DBR.
   is_elastic_disk_enabled:
-    description: Whether elastic disk is enabled for the instance pool.
+    description: |
+      Whether elastic disk expansion is enabled for pool instances, allowing automatic disk growth
+      during large shuffles without pre-provisioning maximum EBS size.
   ts_load:
-    description: Timestamp of when the row was loaded in the table.
+    description: |
+      Timestamp when this pool row was ingested into the datalake during the Spark full-refresh job,
+      distinguishing successive reloads of the same id_instance_pool.

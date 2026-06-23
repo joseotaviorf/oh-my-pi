@@ -1,79 +1,176 @@
 ---
 database_name: datalake_databricks
 table_name: daily_clusters
-description: Provides daily metrics about databricks Clusters using Overwatch data.
-domain: Data Ops & Governance 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Daily cluster utilization and cost metrics for the QuintoAndar Databricks workspaces, aggregated
+  from Overwatch clusterstatefact and enriched with pool names and Bietlejuice DAG attribution from
+  unique_clusters. One row per cluster per calendar day of activity (dt_cluster_run), rolling up DBU
+  and EC2 costs, uptime, worker utilization, startup latency between lifecycle states, and a flag for
+  the last cluster run of the day per DAG. Consumed by enrich_databricks_job_runs, usage-cost
+  pipelines, and platform rightsizing analysis. Part of the enrich_databricks DAG (daily). Partitioned
+  by dt_cluster_run (Overwatch state_start_date). Always filter on dt_cluster_run in WHERE clauses to
+  enable partition pruning and avoid full table scans; align partition filters with the cluster
+  activity date range being analyzed.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_cluster:
-    description: Databricks cluster id
+    description: |
+      Databricks cluster identifier from Overwatch clusterstatefact, matching system.compute.clusters
+      and unique_clusters.id_cluster. Primary grain key together with dt_cluster_run.
+    lineage:
+      - overwatch.clusterstatefact.cluster_id
   id_driver_instance_pool:
-    description: The identifier of the driver instance pool associated with the cluster.
+    description: |
+      Instance pool identifier for the cluster driver node, resolved from unique_clusters. Null when
+      the cluster does not use a driver pool.
     lineage:
       - datalake_databricks.unique_clusters.id_driver_instance_pool
   id_worker_instance_pool:
-    description: The identifier of the worker instance pool associated with the cluster.
+    description: |
+      Instance pool identifier for worker nodes, resolved from unique_clusters. Null when workers run
+      on on-demand instances without a pool.
     lineage:
       - datalake_databricks.unique_clusters.id_worker_instance_pool
   cluster_name:
-    description: Databricks cluster name
+    description: |
+      Human-readable cluster name from Overwatch at runtime, often encoding the Bietlejuice DAG or job
+      that launched the cluster (e.g. bietlejuice.{dag}_scheduled).
+    lineage:
+      - overwatch.clusterstatefact.cluster_name
   dag_name:
-    description: Dag name
+    description: |
+      Bietlejuice Airflow DAG name parsed from the cluster name in unique_clusters, linking cluster
+      spend and startup metrics back to the owning pipeline. Null for non-Bietlejuice clusters.
     lineage:
       - datalake_databricks.unique_clusters.bietlejuice_dag_name
   driver_instance_pool_name:
-    description: The name of the driver instance pool associated with the cluster.
+    description: |
+      Display name of the driver instance pool from unique_clusters, used for cost attribution when
+      clusters share standardized pool configurations.
     lineage:
       - datalake_databricks.unique_clusters.driver_instance_pool_name
   worker_instance_pool_name:
-    description: The name of the worker instance pool associated with the cluster.
+    description: |
+      Display name of the worker instance pool from unique_clusters, used alongside driver pool for
+      capacity and idle-time analysis.
     lineage:
       - datalake_databricks.unique_clusters.worker_instance_pool_name
   driver_node_type:
-    description: Driver's machine type, e.g. m5a.xlarge
+    description: |
+      EC2 instance type of the driver node for this cluster-day (e.g. m5a.xlarge), sourced from
+      Overwatch clusterstatefact driver_node_type_id.
+    lineage:
+      - overwatch.clusterstatefact.driver_node_type_id
   node_type:
-    description: Workers's machine type, e.g. m5a.xlarge
+    description: |
+      EC2 instance type of worker nodes for this cluster-day (e.g. m5a.xlarge), from Overwatch
+      clusterstatefact node_type_id.
+    lineage:
+      - overwatch.clusterstatefact.node_type_id
   sku:
-    description: Type of cluster (job cluster or all purpose) e.g automated, interactive, jobsLight, sqlCompute
+    description: |
+      Databricks SKU classifying cluster usage mode, such as automated (job), interactive (all-purpose),
+      jobsLight, or sqlCompute. Drives DBU pricing tier in downstream cost models.
+    lineage:
+      - overwatch.clusterstatefact.sku
   runtime_engine:
-    description: One of STANDARD or PHOTON. When PHOTON, pricing is adjusted when deriving the dbu_costs
+    description: |
+      Compute engine for DBU billing: STANDARD or PHOTON. PHOTON runs use adjusted DBU rates when
+      deriving total_dbu_cost in Overwatch exports.
+    lineage:
+      - overwatch.clusterstatefact.runtime_engine
   spark_version:
-    description: DBR version - scala version
+    description: |
+      Databricks Runtime (DBR) version string for the cluster, including Scala/Spark lineage, joined
+      from unique_clusters (photon suffix stripped for comparability).
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
   total_dbu_cost:
-    description: All dbu costs for Driver and Workers
+    description: |
+      Sum of DBU charges for driver and all workers on this cluster-day, aggregated from Overwatch
+      clusterstatefact total_dbu_cost across non-TERMINATING states.
+    lineage:
+      - overwatch.clusterstatefact.total_dbu_cost
   total_ec2_cost:
-    description: All compute costs for Driver and Workers
+    description: |
+      Sum of underlying EC2 compute charges (total_compute_cost in Overwatch) for driver and workers
+      on this cluster-day, excluding DBU markup.
+    lineage:
+      - overwatch.clusterstatefact.total_compute_cost
   total_cost:
-    description: Total cost from Compute and DBUs for all nodes (including Driver)
+    description: |
+      Combined DBU and EC2 cost for the cluster-day (total_dbu_cost + total_ec2_cost), the primary
+      spend metric for cluster-level chargeback and optimization.
+    lineage:
+      - overwatch.clusterstatefact.total_cost
   seconds_cluster_started_to_init_scripts_started:
-    description: Time in seconds from cluster creation to initialization scripts start
+    description: |
+      Elapsed seconds from cluster creation (STARTING/CREATING) to init script start, when init
+      scripts run immediately after startup. Null when init scripts were added mid-day or the cluster
+      started on a prior calendar day.
   seconds_init_scripts_started_to_init_scripts_finished:
-    description: Time in seconds from initialization scripts start to initialization scripts finish
+    description: |
+      Elapsed seconds from init script start to init script completion for the first init-script
+      cycle of the day. Null when the expected state sequence is broken by cross-day boundaries.
   seconds_init_scripts_finished_to_running_started:
-    description: Time in seconds from initialization scripts finish to the start of the "RUNNING" status
+    description: |
+      Elapsed seconds from init script completion to the RUNNING state, measuring post-init warmup
+      before Spark accepts work. Null when RUNNING does not follow init scripts in sequence.
   seconds_total_startup_time:
-    description: Total startup time in seconds of when the cluster first started. Notice that if the cluster started multiple times, this is still only from the first time.
+    description: |
+      End-to-end startup latency in seconds from cluster creation to RUNNING, using the first startup
+      of the day only (not subsequent restarts within the same calendar day).
   total_seconds_in_starting_state:
-    description: Total time in seconds the cluster spent in the "STARTING" state, including all times it started
+    description: |
+      Cumulative seconds spent in STARTING or CREATING states across all restarts on this cluster-day,
+      including partial intervals capped at end-of-day per Overwatch state timestamps.
   total_seconds_uptime:
-    description: Total time in seconds the cluster was up. Includes startup time.
+    description: |
+      Total seconds the cluster was in any non-TERMINATING state on this calendar day, including
+      startup time. Denominator for avg_target_num_workers.
   total_worker_instance_usage_seconds:
-    description: Total time in seconds the worker instances were up. If two workers were up for 10 minutes, this would be 20 minutes.
+    description: |
+      Worker capacity-seconds (uptime multiplied by target worker count) summed across the day. Two
+      workers up for ten minutes contribute twenty worker-minutes to this metric.
   avg_target_num_workers:
-    description: Average number of workers the cluster had (or was trying to provision).
+    description: |
+      Average target worker count weighted by uptime (total_worker_instance_usage_seconds divided by
+      total_seconds_uptime), reflecting autoscale intent during active periods.
   is_last_of_day_for_dag:
-    description: True if the cluster represents the last execution of the day for the dag
+    description: |
+      True when this cluster-day row is the latest cluster start for the same bietlejuice DAG on
+      dt_cluster_run, used to pick a representative run per DAG for daily cost rollups.
   ts_init_scripts_started:
-    description: Timestamp of when the initialization scripts started
+    description: |
+      Earliest timestamp on this cluster-day when init scripts began executing, from Overwatch
+      INIT_SCRIPTS_STARTED state transitions.
   ts_init_scripts_finished:
-    description: Timestamp of when the initialization scripts finished
+    description: |
+      Earliest timestamp on this cluster-day when init scripts completed, from Overwatch
+      INIT_SCRIPTS_FINISHED state transitions.
   ts_running_started:
-    description: Timestamp of when the cluster entered the "RUNNING" status
+    description: |
+      Earliest timestamp on this cluster-day when the cluster entered RUNNING and accepted Spark
+      workloads.
   ts_first_state_started:
-    description: Timestamp of when the cluster entered the first state in the day
+    description: |
+      Timestamp of the first recorded Overwatch state transition for the cluster on dt_cluster_run,
+      marking the beginning of measurable activity for the day.
   ts_cluster_started:
-    description: Timestamp of when the cluster started
+    description: |
+      Timestamp when the cluster first entered STARTING or CREATING on dt_cluster_run, anchor for
+      startup latency metrics.
   ts_cluster_ended:
-    description: Timestamp of when the cluster ended
+    description: |
+      Latest timestamp when any tracked state ended on dt_cluster_run, typically when the cluster
+      terminated or the calendar day boundary capped the last state interval.
   dt_cluster_run:
-    description: Date of when the cluster started, used for partitioning
+    description: |
+      Table partition column (calendar date). Derived from Overwatch clusterstatefact state_start_date
+      for the cluster activity being aggregated. Required in WHERE clauses for partition pruning —
+      always restrict to the smallest date window needed. Queries without dt_cluster_run filters will
+      scan the entire table. Example: WHERE dt_cluster_run BETWEEN DATE '2026-06-01' AND DATE
+      '2026-06-07'.
+    lineage:
+      - overwatch.clusterstatefact.state_start_date

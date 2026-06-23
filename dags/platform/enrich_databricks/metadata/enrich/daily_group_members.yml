@@ -1,22 +1,46 @@
 ---
 database_name: datalake_databricks
 table_name: daily_group_members
-description: Takes daily snapshots of the relationship between each user and the groups they belong to in the Databricks account.
+description: |
+  Daily snapshot of user-to-group membership edges in the QuintoAndar Databricks account, built by
+  expanding SCIM user records and their group memberships from the Account API. One row per user,
+  group, and directness type per snapshot date. Used with daily_groups to resolve indirect Unity
+  Catalog privileges through nested group membership. Part of the enrich_databricks DAG (daily, first
+  run of day). Partitioned by year, month, and day (derived from current_date at snapshot capture).
+  Always filter on year, month, and day in WHERE clauses to enable partition pruning and avoid full
+  table scans; align partition filters with the snapshot date being analyzed.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_user:
-    description: Unique identifier for the user on the Databricks account.
+    description: |
+      Internal Databricks user identifier for the member, from AccountClient.users. Join to
+      daily_users on id_user and matching year, month, day for user attributes at snapshot time.
   id_group:
-    description: Unique identifier for the group on the Databricks account.
+    description: |
+      Internal Databricks group identifier for the membership edge, from the user's SCIM groups list.
+      Join to daily_groups on id_group and matching year, month, day for group display names.
   directness:
-    description: Indicates whether the user is a direct member of the group or an indirect member (i.e., a member of a subgroup).
+    description: |
+      Whether membership is direct (user listed on the group) or indirect (user inherits membership
+      through a nested subgroup). Only direct edges are materialized from the API; indirect rows
+      represent SCIM-reported nested membership type.
     categories:
       direct: The user is a direct member of the group.
       indirect: The user is an indirect member of the group (i.e., a member of a subgroup).
   year:
-    description: Year of the snapshot.
+    description: |
+      Table partition column (year). Set to the calendar year of current_date when the snapshot Spark
+      job runs. Required in WHERE clauses for partition pruning — always combine with month and day
+      to restrict scans to the smallest date window needed. Queries without partition filters will
+      scan the entire table.
   month:
-    description: Month of the snapshot.
+    description: |
+      Table partition column (month, 1–12). Set from current_date at snapshot capture. Must be
+      filtered together with year and day in every query to enable partition pruning; omitting any
+      partition column disables pruning and forces a full scan.
   day:
-    description: Day of the snapshot.
+    description: |
+      Table partition column (day, 1–31). Set from current_date at snapshot capture. Always the last
+      partition column — filter with year and month to narrow the scan to specific snapshot days.
+      Example: WHERE year = 2026 AND month = 6 AND day = 22.

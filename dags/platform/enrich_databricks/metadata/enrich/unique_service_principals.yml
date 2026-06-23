@@ -1,35 +1,56 @@
 ---
 database_name: datalake_databricks
 table_name: unique_service_principals
-description: Every row is a service principal that has ever existed in the Databricks account. This table is
-  updated incrementally based on daily snapshots from the daily_service_principals table.
+description: |
+  Slowly-changing dimension of every Databricks service principal ever observed in QuintoAndar
+  snapshots, merged incrementally from daily_service_principals. One row per id_service_principal
+  with application UUID, display name, active flag, and soft-delete tracking when a principal
+  disappears from the latest daily snapshot. Used to attribute Unity Catalog machine grants and
+  audit non-human access over time. Part of the enrich_databricks DAG (daily). Not partitioned —
+  use dt_updated or join daily_service_principals with partition filters for point-in-time state.
 domain: Data Ops & Governance
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_service_principal:
-    description: Unique identifier for the service principal on the Databricks account.
+    description: |
+      Internal Databricks service principal identifier, stable merge key from daily_service_principals
+      and join target for daily_table_privileges machine grantee resolution.
     lineage:
       - datalake_databricks.daily_service_principals.id_service_principal
   id_service_principal_external:
-    description: External identifier for the service principal, typically corresponding to an identity provider's ID.
+    description: |
+      External identity-provider identifier from daily_service_principals, linking the principal to
+      corporate IAM or application registration records.
     lineage:
       - datalake_databricks.daily_service_principals.id_service_principal_external
   display_name:
-    description: Display name of the service principal.
+    description: |
+      Current service principal display name from the latest daily snapshot, used for human-readable
+      audit trails alongside application_id in privilege reports.
     lineage:
       - datalake_databricks.daily_service_principals.display_name
   application_id:
-    description: UUID application ID of the service principal, used as the grantee identifier in Unity Catalog table privileges.
+    description: |
+      OAuth application UUID for the service principal, matched against Unity Catalog grantee strings
+      in daily_table_privileges when grantee_type is Service principal.
     lineage:
       - datalake_databricks.daily_service_principals.application_id
   is_active:
-    description: Indicates whether the service principal is currently active in the Databricks account.
+    description: |
+      Latest known active flag from daily_service_principals. Set false when a previously seen
+      principal is absent from the current snapshot (soft delete path in unique_service_principals.sql).
     lineage:
       - datalake_databricks.daily_service_principals.is_active
   dt_created:
-    description: Date when the service principal was first seen in the Databricks account.
+    description: |
+      Date when the service principal first appeared in daily_service_principals snapshots (make_date
+      of first seen year, month, day).
   dt_updated:
-    description: Date when the service principal record was last updated.
+    description: |
+      Date of the most recent daily snapshot that changed display name, application_id, active status,
+      or deletion state for this service principal.
   dt_deleted:
-    description: If the service principal was deleted, this column contains the date of deletion. If the
-      service principal is active, this column is NULL.
+    description: |
+      Date when the service principal was inferred deleted because it no longer appears in the current
+      daily_service_principals snapshot while still active in this dimension. Null while the principal
+      remains in the latest snapshot.
