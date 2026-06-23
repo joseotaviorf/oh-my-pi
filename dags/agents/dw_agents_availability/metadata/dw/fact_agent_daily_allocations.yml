@@ -7,7 +7,7 @@ columns:
   sk_agent:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.sk_agent
-    description: sk of agent (agent id)
+    description: Surrogate key linking to dim_agent for the field agent whose daily availability is aggregated.
   sk_slot_date:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.sk_slot_date
@@ -27,7 +27,7 @@ columns:
   agent_business_context:
     lineage:
     - dw_agents_availability.fact_agent_hourly_allocations.agent_business_context
-    description: Business context of the agent
+    description: Operational business line (rent or sale) governing which listing types the agent serves in this slot.
   max_slots_allocation_available:
     lineage:
     - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available

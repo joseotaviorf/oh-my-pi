@@ -8,15 +8,15 @@ columns:
   sk_agent:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_agent
-    description: Id of the agent.
+    description: Surrogate key linking to dim_agent for the photographer whose hourly allocation is recorded.
   sk_slot_date:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date
-    description: Id of the date slot.
+    description: Surrogate date key (YYYYMMDD integer) for the calendar day of the photographer allocation slot.
   sk_slot_date_hour:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date_hour
-    description: Id of the hour slot.
+    description: Surrogate key combining calendar date and hour for the photographer hourly slot.
   sk_agent_region:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_agent_region

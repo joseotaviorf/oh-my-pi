@@ -7,11 +7,11 @@ columns:
   sk_agent:
     lineage:
       - dw_agents_availability.fact_photographer_hourly_allocations.sk_agent
-    description: Id of the agent.
+    description: Surrogate key linking to dim_agent for the photographer whose daily allocation is aggregated.
   sk_slot_date:
     lineage:
       - dw_agents_availability.fact_photographer_hourly_allocations.sk_slot_date
-    description: Id of the date slot.
+    description: Surrogate date key (YYYYMMDD integer) for the calendar day of the photographer allocation slot.
   sk_agent_region:
     lineage:
       - dw_agents_availability.fact_photographer_hourly_allocations.sk_agent_region

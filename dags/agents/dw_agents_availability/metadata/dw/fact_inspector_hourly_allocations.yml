@@ -8,7 +8,7 @@ columns:
   sk_agent:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_agent
-    description: Id of the agent.
+    description: Surrogate key linking to dim_agent for the inspection agent whose hourly allocation is recorded.
   sk_agent_region:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_agent_region
@@ -20,15 +20,15 @@ columns:
   sk_region:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_region
-    description: Id of the region.
+    description: Surrogate key linking to dim_region for the geographic area where the inspector is allocated.
   sk_slot_date:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date
-    description: Id of the date slot.
+    description: Surrogate date key (YYYYMMDD integer) for the calendar day of the allocation slot.
   sk_slot_date_hour:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date_hour
-    description: Id of the hour slot.
+    description: Surrogate key combining calendar date and hour for the hourly allocation slot.
   sk_work_contract:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_work_contract
@@ -36,7 +36,7 @@ columns:
   agent_type:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.agent_type
-    description: Type of the agent.
+    description: Inspection agent role classification (in-house vistoria or outsourced quarteirizada).
     categories:
       Vistoria: Agent responsible for the house inspection.
       VistoriaQuarteirizada: Outsourced agent responsible for the house inspection.

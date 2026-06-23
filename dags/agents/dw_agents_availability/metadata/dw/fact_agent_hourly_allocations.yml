@@ -7,7 +7,7 @@ columns:
   sk_agent:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_agent
-    description: sk of agent (agent id)
+    description: Surrogate key linking to dim_agent for the field agent whose hourly availability is recorded.
   sk_slot_date:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date
@@ -35,7 +35,7 @@ columns:
   agent_business_context:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.agent_business_context
-    description: Business context of the agent
+    description: Operational business line (rent or sale) governing which listing types the agent serves in this slot.
   is_allocation_available:
     lineage:
       - datalake_agenda_allocation.agenda_hourly_allocations.is_allocation_available

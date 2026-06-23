@@ -8,7 +8,7 @@ columns:
   sk_agent:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.sk_agent
-    description: Id of the agent.
+    description: Surrogate key linking to dim_agent for the inspection agent whose daily allocation is aggregated.
   sk_agent_region:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.sk_agent_region
@@ -20,11 +20,11 @@ columns:
   sk_region:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.sk_region
-    description: Id of the region.
+    description: Surrogate key linking to dim_region for the geographic area where the inspector is allocated.
   sk_slot_date:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.sk_slot_date
-    description: Id of the date slot.
+    description: Surrogate date key (YYYYMMDD integer) for the calendar day of the allocation slot.
   sk_work_contract:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.sk_work_contract
@@ -32,7 +32,7 @@ columns:
   agent_type:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.agent_type
-    description: Type of the agent.
+    description: Inspection agent role classification (in-house vistoria or outsourced quarteirizada).
     categories:
       Vistoria: Agent responsible for the house inspection.
       VistoriaQuarteirizada: Outsourced agent responsible for the house inspection.

@@ -31,7 +31,7 @@ columns:
   agent_code:
     lineage:
     - datalake_ebdb_clean.agent_data.code
-    description: Agent code identifier.
+    description: Human-readable agent code from EBDB agent_data used for internal identification and reporting.
   agent_profile:
     lineage:
     - datalake_ebdb_clean.agent_data.profile

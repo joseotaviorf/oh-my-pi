@@ -22,12 +22,14 @@ columns:
   contract_name:
     lineage:
       - datalake_ebdb_work_contract.work_contract.contract_name
-    description: Name of the contract.
+    description: Display name of the work contract template in EBDB (brackets removed for reporting consistency).
   rede_partner:
     lineage:
       - datalake_ebdb_work_contract.work_contract.3p_partner
     description: Name of the partner if this is a Rede contract. Otherwise, N/A.
   is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data.is_active
     description: Tells if the agent is active or not, as specified by Main's agent data.
   is_rede_contract:
     lineage:
