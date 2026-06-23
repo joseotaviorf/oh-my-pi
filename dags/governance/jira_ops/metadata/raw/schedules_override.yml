@@ -1,4 +1,27 @@
----
 database_name: datalake_jira_ops_raw
 table_name: schedules_override
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
+description: Raw ingest layer for schedules_override, loaded by the parent governance
+  DAG before clean transformation.
+columns:
+  schedule_id:
+    description: Schedule this override applies to.
+  alias:
+    description: Override identifier or alias returned by the API.
+  rotationIds:
+    description: List of rotations affected by the override.
+  responder:
+    description: Responder object returned by the API (id and type).
+  dt_load:
+    description: Load date of the ingestion into the data lake.
+  startDate:
+    description: Start of the override validity window.
+  endDate:
+    description: End of the override validity window.
+  year:
+    description: Partition year of the load date.
+  month:
+    description: Partition month of the load date.
+  day:
+    description: Partition day of the load date.

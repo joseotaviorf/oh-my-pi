@@ -4,7 +4,7 @@ description: >
   Jira Cloud user profiles from GET /rest/api/3/user (JIRA credentials), enriched with groups and
   application roles, loaded from distinct accountIds extracted in the responders_account layer.
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id_account:
     lineage:
@@ -21,7 +21,7 @@ columns:
   display_name:
     lineage:
       - datalake_jira_ops_raw.user_account.displayName
-    description: Display name of the Jira user.
+    description: Human-readable Jira profile name shown in issue activity, comments, and user pickers.
   locale:
     lineage:
       - datalake_jira_ops_raw.user_account.locale

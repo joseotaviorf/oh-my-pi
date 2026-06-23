@@ -4,7 +4,7 @@ description: >
   Schedule overrides (LIST_SCHEDULES_OVERRIDES) with time windows and per-period responder, linked to
   the parent schedule via id_schedule for coverage and on-call exception analysis.
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id_schedule:
     lineage:

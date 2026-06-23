@@ -1,4 +1,25 @@
----
 database_name: datalake_jira_ops_raw
 table_name: schedules_timeline
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
+description: Raw ingest layer for schedules_timeline, loaded by the parent governance
+  DAG before clean transformation.
+columns:
+  schedule_id:
+    description: Schedule identifier injected via feedback from the schedules table.
+  finalTimeline:
+    description: finalTimeline object from the API (rotations and consolidated periods).
+  baseTimeline:
+    description: baseTimeline object from the API for the requested window.
+  dt_load:
+    description: Load date of the ingestion into the data lake.
+  startDate:
+    description: Start of the timeline window when present on raw.
+  endDate:
+    description: End of the timeline window when present on raw.
+  year:
+    description: Partition year of the load date.
+  month:
+    description: Partition month of the load date.
+  day:
+    description: Partition day of the load date.

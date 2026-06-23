@@ -1,4 +1,28 @@
----
 database_name: datalake_jira_ops_raw
 table_name: alert_log
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
+description: Raw ingest layer for alert_log, loaded by the parent governance DAG before
+  clean transformation.
+columns:
+  alert_id:
+    description: Unique identifier for each alert entry in the log.
+  logType:
+    description: Type or category of the alert log (e.g., error, warning, info).
+  log:
+    description: Detailed message or content of the alert log.
+  owner:
+    description: User or system responsible for generating or owning the alert.
+  logTime:
+    description: Timestamp indicating when the alert log was generated.
+  dt_load:
+    description: Full ingestion date representing when the data was loaded.
+  year:
+    description: Year of the data load date, used for data partitioning in the storage
+      layer.
+  month:
+    description: Month of the data load date, used for data partitioning in the storage
+      layer.
+  day:
+    description: Day of the data load date, used for data partitioning in the storage
+      layer.

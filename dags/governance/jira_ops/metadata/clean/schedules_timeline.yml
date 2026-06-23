@@ -4,7 +4,7 @@ description: >
   On-call schedule timelines (GET_SCHEDULES_TIMELINE) with final and base windows per schedule, feeding
   responders_account and user account enrichment in the same DAG.
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id_schedule:
     lineage:

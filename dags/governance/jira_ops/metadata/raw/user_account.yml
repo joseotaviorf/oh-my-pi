@@ -1,11 +1,40 @@
----
 database_name: datalake_jira_ops_raw
 table_name: user_account
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
+description: Raw ingest of Jira Cloud user profiles from the Jira Ops API, loaded
+  by jira_ops DAG.
 columns:
+  accountId:
+    description: Atlassian accountId used for user API calls.
+  accountType:
+    description: Account type in Jira Cloud (e.g. atlassian, app).
   emailAddress:
     tags:
       - PII
+    description: User email address when returned by the API.
   displayName:
     tags:
       - PII
+    description: Human-readable Jira profile name shown in issue activity, comments,
+      and user pickers.
+  locale:
+    description: Locale and language preferences for the user profile.
+  timeZone:
+    description: Time zone associated with the user profile.
+  groups:
+    description: Jira groups the user belongs to (expanded payload).
+  applicationRoles:
+    description: Application roles returned by the user API expand parameter.
+  avatarUrls:
+    description: Avatar URLs for standard API sizes.
+  active:
+    description: Whether the Jira user account is active.
+  dt_load:
+    description: Load date of the ingestion into the data lake.
+  year:
+    description: Partition year of the load date.
+  month:
+    description: Partition month of the load date.
+  day:
+    description: Partition day of the load date.

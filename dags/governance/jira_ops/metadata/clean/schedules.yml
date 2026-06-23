@@ -4,7 +4,7 @@ description: >
   On-call schedules catalog from the Jira Ops API, feeding timelines, overrides, and the responder
   chain in the jira_ops DAG.
 domain: Data Ops & Governance
-owner: leonardo.soares@quintoandar.com.br
+owner: luisa.ladeira@quintoandar.com.br
 columns:
   id_schedule:
     lineage:

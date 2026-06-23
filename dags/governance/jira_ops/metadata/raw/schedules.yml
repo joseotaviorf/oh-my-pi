@@ -1,4 +1,29 @@
----
 database_name: datalake_jira_ops_raw
 table_name: schedules
+owner: luisa.ladeira@quintoandar.com.br
 domain: Data Ops & Governance
+description: Raw ingest layer for schedules, loaded by the parent governance DAG before
+  clean transformation.
+columns:
+  id:
+    description: Unique schedule identifier in Jira Service Management.
+  teamId:
+    description: Owning or associated team for the schedule.
+  name:
+    description: Human-readable on-call schedule name.
+  description:
+    description: Schedule description text when provided by the API.
+  timezone:
+    description: Reference time zone for the schedule.
+  rotations:
+    description: Rotation structure returned by the API (JSON/struct).
+  enabled:
+    description: Whether the schedule is enabled.
+  dt_load:
+    description: Load date of the ingestion into the data lake.
+  year:
+    description: Partition year of the load date.
+  month:
+    description: Partition month of the load date.
+  day:
+    description: Partition day of the load date.
