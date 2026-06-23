@@ -71,7 +71,7 @@ columns:
   template:
     description: Template identifier used for formatting the notification body.
     lineage:
-      - datalake_jaiminho_raw.user_notifications.payload:bodyTemplate
+      - datalake_jaiminho_raw.user_notifications.payload
       - datalake_jaiminho_raw.user_notifications.templateName
   template_meta_category:
     description: Category of the template at meta at the time the notification was sent. Only for whatsapp
@@ -80,11 +80,11 @@ columns:
   country_code:
     description: Country code where the notification was sent or targeted.
     lineage:
-      - datalake_jaiminho_raw.user_notifications.payload:country
+      - datalake_jaiminho_raw.user_notifications.payload
   metadata:
     description: Additional metadata extracted from the notification payload.
     lineage:
-      - datalake_jaiminho_raw.user_notifications.payload:metadata
+      - datalake_jaiminho_raw.user_notifications.payload
   cost_center:
     description: Cost center associated with the notification for billing or tracking purposes.
     lineage:

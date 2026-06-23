@@ -45,7 +45,7 @@ columns:
     description: Template identifier used for formatting the notification body.
     lineage:
       - datalake_jaiminho_raw.notifications.templateName
-      - datalake_jaiminho_raw.notifications.payload:bodyTemplate
+      - datalake_jaiminho_raw.notifications.payload
   error_code:
     description: Code of the error associated with the failure status.
     lineage:

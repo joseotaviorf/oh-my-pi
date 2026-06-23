@@ -9,7 +9,7 @@ SELECT
   tags,
   profile,
   scope,
-  COALESCE(templateName, payload:bodyTemplate) AS template,
+  COALESCE(templateName, GET_JSON_OBJECT(payload, '$.bodyTemplate')) AS template,
   errorCode AS error_code,
   errorInfo AS error_info,
   state,
