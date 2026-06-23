@@ -3,117 +3,123 @@ database_name: datalake_hub_services_clean
 table_name: reminder_aud
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Audit of reminders for agents in Hub Services
+description: >
+  Hibernate Envers audit history of agent reminders in Hub Services. Each row captures one revision of a
+  reminder entity and can be joined to rev_info for actor and timestamp context.
 columns:
   id:
+    description: Primary key of the reminder entity being audited.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.reminder_aud.id
   id_visitor:
+    description: Visitor linked to the reminder at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.visitor_id
-    description: Unique identifier for visitor.
+      - datalake_hub_services_raw.reminder_aud.visitor_id
   id_event:
+    description: Visitor event associated with the reminder at this revision, when present.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.event_id
-    description: Unique identifier for event.
+      - datalake_hub_services_raw.reminder_aud.event_id
   id_reminder_type:
+    description: Reminder type catalog id at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.reminder_type_id
-    description: Unique identifier for reminder type.
+      - datalake_hub_services_raw.reminder_aud.reminder_type_id
   status:
+    description: Reminder workflow status at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.status
-    description: Value of status in the source record.
+      - datalake_hub_services_raw.reminder_aud.status
   created_by:
+    description: Hub user id who created the reminder at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.created_by
-    description: Value of created by in the source record.
+      - datalake_hub_services_raw.reminder_aud.created_by
   closed_by:
+    description: Hub user id who closed the reminder at this revision, if closed.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.closed_by
-    description: Value of closed by in the source record.
+      - datalake_hub_services_raw.reminder_aud.closed_by
   creation_method:
+    description: Creation channel recorded at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.creation_method
-    description: Value of creation method in the source record.
+      - datalake_hub_services_raw.reminder_aud.creation_method
   version:
+    description: Optimistic locking version from the source row at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.reminder_aud.version
   rev:
+    description: Envers revision id; join to rev_info for commit metadata.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.rev
-    description: Value of rev in the source record.
+      - datalake_hub_services_raw.reminder_aud.rev
   rev_end:
+    description: Revision id that superseded this audit row, when the entity changed again.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.revend
-    description: Value of rev end in the source record.
+      - datalake_hub_services_raw.reminder_aud.revend
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
-    - datalake_hub_services_raw.reminder_aud.revtype
-    description: Value of rev type in the source record.
+      - datalake_hub_services_raw.reminder_aud.revtype
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   mod_id_visitor:
+    description: True when id_visitor changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.visitor_id_mod
-    description: Audit flag for changes to id visitor.
+      - datalake_hub_services_raw.reminder_aud.visitor_id_mod
   mod_id_event:
+    description: True when id_event changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.event_id_mod
-    description: Audit flag for changes to id event.
+      - datalake_hub_services_raw.reminder_aud.event_id_mod
   mod_id_reminder_type:
+    description: True when id_reminder_type changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.reminder_type_id_mod
-    description: Audit flag for changes to id reminder type.
+      - datalake_hub_services_raw.reminder_aud.reminder_type_id_mod
   mod_status:
+    description: True when status changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.status_mod
-    description: Audit flag for changes to status.
+      - datalake_hub_services_raw.reminder_aud.status_mod
   mod_created_by:
+    description: True when created_by changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.created_by_mod
-    description: Audit flag for changes to created by.
+      - datalake_hub_services_raw.reminder_aud.created_by_mod
   mod_closed_by:
+    description: True when closed_by changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.closed_by_mod
-    description: Audit flag for changes to closed by.
+      - datalake_hub_services_raw.reminder_aud.closed_by_mod
   mod_creation_method:
+    description: True when creation_method changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.creation_method_mod
-    description: Audit flag for changes to creation method.
+      - datalake_hub_services_raw.reminder_aud.creation_method_mod
   mod_ts_reminder:
+    description: True when ts_reminder changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.date_mod
-    description: Audit flag for changes to ts reminder.
+      - datalake_hub_services_raw.reminder_aud.date_mod
   mod_ts_closed:
+    description: True when ts_closed changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.closed_at_mod
-    description: Audit flag for changes to ts closed.
+      - datalake_hub_services_raw.reminder_aud.closed_at_mod
   ts_reminder:
+    description: Scheduled local date and time for the reminder at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.date
-    description: Timestamp of reminder.
+      - datalake_hub_services_raw.reminder_aud.date
   ts_created:
+    description: UTC timestamp when the reminder was first created in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.reminder_aud.created_at
   ts_updated:
+    description: UTC timestamp of the last update captured at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.reminder_aud.updated_at
   ts_closed:
+    description: UTC timestamp when the reminder was closed at this revision, if applicable.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.closed_at
-    description: Timestamp of closed.
+      - datalake_hub_services_raw.reminder_aud.closed_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.reminder_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.reminder_aud.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.reminder_aud.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.reminder_aud.day

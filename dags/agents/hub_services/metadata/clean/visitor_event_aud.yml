@@ -3,126 +3,131 @@ database_name: datalake_hub_services_clean
 table_name: visitor_event_aud
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Audit of every event associated with a visit in Hub Services, like visit scheduled, canceled, done, or waiting
-  confirmation.
+description: >
+  Hibernate Envers audit history of visitor lifecycle events in Hub Services. Each row is one revision of
+  an event (schedule, cancel, complete, etc.) and can be joined to rev_info for actor context.
 columns:
   id:
+    description: Primary key of the visitor event entity being audited.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.id
   id_visitor:
+    description: Visitor linked to the event at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.visitor_id
-    description: Unique identifier for visitor.
+      - datalake_hub_services_raw.visitor_event_aud.visitor_id
   id_house:
+    description: Listing house id tied to the event at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.house_id
-    description: Unique identifier for house.
+      - datalake_hub_services_raw.visitor_event_aud.house_id
   id_region:
+    description: Hub operating region at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.region_id
-    description: Unique identifier for region.
+      - datalake_hub_services_raw.visitor_event_aud.region_id
   id_user:
+    description: Hub agent or internal user attributed to the event at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.user_id
-    description: Unique identifier for user.
+      - datalake_hub_services_raw.visitor_event_aud.user_id
   id_idempotency:
+    description: Idempotency key for deduplicated event ingestion at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.idempotency_id
-    description: Unique identifier for idempotency.
+      - datalake_hub_services_raw.visitor_event_aud.idempotency_id
   domain_name:
+    description: Producer bounded context namespace at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.domain_name
-    description: Value of domain name in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.domain_name
   event_type:
+    description: High-level visitor event category at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.event_type
-    description: Value of event type in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.event_type
   event_code:
+    description: Stable machine code for the specific event variant at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.event_code
-    description: Value of event code in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.event_code
   metadata:
+    description: JSON payload with auxiliary attributes at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.metadata
-    description: Value of metadata in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.metadata
   version:
+    description: Optimistic locking version from the source row at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.version
   rev:
+    description: Envers revision id; join to rev_info for commit metadata.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.rev
-    description: Value of rev in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.revtype
-    description: Value of rev type in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.revtype
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
+    description: Revision id that superseded this audit row, when the entity changed again.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.revend
-    description: Value of rev end in the source record.
+      - datalake_hub_services_raw.visitor_event_aud.revend
   mod_id_visitor:
+    description: True when id_visitor changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.visitor_id_mod
-    description: Audit flag for changes to id visitor.
+      - datalake_hub_services_raw.visitor_event_aud.visitor_id_mod
   mod_id_house:
+    description: True when id_house changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.house_id_mod
-    description: Audit flag for changes to id house.
+      - datalake_hub_services_raw.visitor_event_aud.house_id_mod
   mod_id_region:
+    description: True when id_region changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.region_id_mod
-    description: Audit flag for changes to id region.
+      - datalake_hub_services_raw.visitor_event_aud.region_id_mod
   mod_id_user:
+    description: True when id_user changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.user_id_mod
-    description: Audit flag for changes to id user.
+      - datalake_hub_services_raw.visitor_event_aud.user_id_mod
   mod_id_idempotency:
+    description: True when id_idempotency changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.idempotency_id_mod
-    description: Audit flag for changes to id idempotency.
+      - datalake_hub_services_raw.visitor_event_aud.idempotency_id_mod
   mod_domain_name:
+    description: True when domain_name changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.domain_name_mod
-    description: Audit flag for changes to domain name.
+      - datalake_hub_services_raw.visitor_event_aud.domain_name_mod
   mod_event_type:
+    description: True when event_type changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.event_type_mod
-    description: Audit flag for changes to event type.
+      - datalake_hub_services_raw.visitor_event_aud.event_type_mod
   mod_event_code:
+    description: True when event_code changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.event_code_mod
-    description: Audit flag for changes to event code.
+      - datalake_hub_services_raw.visitor_event_aud.event_code_mod
   mod_metadata:
+    description: True when metadata changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.metadata_mod
-    description: Audit flag for changes to metadata.
+      - datalake_hub_services_raw.visitor_event_aud.metadata_mod
   mod_ts_event:
+    description: True when ts_event changed in this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.event_date_mod
-    description: Audit flag for changes to ts event.
+      - datalake_hub_services_raw.visitor_event_aud.event_date_mod
   ts_event:
+    description: UTC timestamp when the visitor event occurred at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.event_date
-    description: Timestamp of event.
+      - datalake_hub_services_raw.visitor_event_aud.event_date
   ts_created:
+    description: UTC timestamp when the event row was first created in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.visitor_event_aud.created_at
   ts_updated:
+    description: UTC timestamp of the last update captured at this revision.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.visitor_event_aud.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.visitor_event_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.visitor_event_aud.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.visitor_event_aud.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.visitor_event_aud.day

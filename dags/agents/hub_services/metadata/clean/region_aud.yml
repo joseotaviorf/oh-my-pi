@@ -16,7 +16,7 @@ columns:
   rev_type:
     lineage:
       - datalake_hub_services_raw.region_aud.revtype
-    description: Modification type.
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     categories:
       '0': Create
       '1': Update

@@ -3,41 +3,43 @@ database_name: datalake_hub_services_clean
 table_name: reminder_type
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Types of reminders.
+description: >
+  Catalog of reminder templates in Hub Services that agents use to classify follow-up tasks. One row per
+  reminder type id after deduplicating to the latest update from the Hubs Postgres CDC feed.
 columns:
   id:
+    description: Primary key of the reminder type in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder_type.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.reminder_type.id
   name:
+    description: Human-readable label shown to agents when selecting or viewing the reminder type.
     lineage:
-    - datalake_hub_services_raw.reminder_type.name
-    description: Value of name in the source record.
+      - datalake_hub_services_raw.reminder_type.name
   status:
+    description: Lifecycle flag indicating whether the reminder type is active in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder_type.status
-    description: Value of status in the source record.
+      - datalake_hub_services_raw.reminder_type.status
   version:
+    description: Optimistic locking version from the Hub Services source row.
     lineage:
-    - datalake_hub_services_raw.reminder_type.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.reminder_type.version
   ts_created:
+    description: UTC timestamp when the reminder type was created in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder_type.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.reminder_type.created_at
   ts_updated:
+    description: UTC timestamp of the last update to the reminder type in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder_type.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.reminder_type.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.reminder_type.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.reminder_type.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.reminder_type.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.reminder_type.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.reminder_type.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.reminder_type.day

@@ -3,61 +3,67 @@ database_name: datalake_hub_services_clean
 table_name: reminder_type_aud
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Audit of the types of reminders.
+description: >
+  Hibernate Envers audit history of reminder type catalog entries in Hub Services. Each row is one revision
+  of a reminder template and can be joined to rev_info for change context.
 columns:
   id:
+    description: Primary key of the reminder type entity being audited.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.id
   name:
+    description: Display name of the reminder type at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.name
-    description: Value of name in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.name
   status:
+    description: Active or inactive flag for the reminder type at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.status
-    description: Value of status in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.status
   version:
+    description: Optimistic locking version from the source row at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.version
   rev:
+    description: Envers revision id; join to rev_info for commit metadata.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.rev
-    description: Value of rev in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.rev
   rev_end:
+    description: Revision id that superseded this audit row, when the entity changed again.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.revend
-    description: Value of rev end in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.revend
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.revtype
-    description: Value of rev type in the source record.
+      - datalake_hub_services_raw.reminder_type_aud.revtype
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   mod_name:
+    description: True when name changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.name_mod
-    description: Audit flag for changes to name.
+      - datalake_hub_services_raw.reminder_type_aud.name_mod
   mod_status:
+    description: True when status changed in this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.status_mod
-    description: Audit flag for changes to status.
+      - datalake_hub_services_raw.reminder_type_aud.status_mod
   ts_created:
+    description: UTC timestamp when the reminder type was first created in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.reminder_type_aud.created_at
   ts_updated:
+    description: UTC timestamp of the last update captured at this revision.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.reminder_type_aud.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.reminder_type_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.reminder_type_aud.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.reminder_type_aud.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.reminder_type_aud.day

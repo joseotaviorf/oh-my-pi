@@ -3,81 +3,83 @@ database_name: datalake_hub_services_clean
 table_name: visitor_prospection
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Visitor prospection process in Hub Services.
+description: >
+  Denormalized prospection queue row in Hub Services combining visitor, assigned agent, reminder, and lead
+  priority fields used to sort agent worklists. One row per prospection id after keeping the latest update.
 columns:
   id:
+    description: Primary key of the visitor prospection record in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.visitor_prospection.id
   id_visitor:
+    description: Visitor being prospected in the agent queue.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.visitor_id
-    description: Unique identifier for visitor.
+      - datalake_hub_services_raw.visitor_prospection.visitor_id
   id_responsible:
+    description: Hub user id of the agent responsible for this prospection task.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.responsible_id
-    description: Unique identifier for responsible.
+      - datalake_hub_services_raw.visitor_prospection.responsible_id
   id_reminder:
+    description: Linked reminder id when the prospection row is tied to a scheduled follow-up.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_id
-    description: Unique identifier for reminder.
+      - datalake_hub_services_raw.visitor_prospection.reminder_id
   id_reminder_type:
+    description: Reminder type catalog id denormalized onto the prospection row.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_type_id
-    description: Unique identifier for reminder type.
+      - datalake_hub_services_raw.visitor_prospection.reminder_type_id
   priority_lead_status:
+    description: Lead status bucket used to prioritize the visitor in agent queues.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.priority_lead_status
-    description: Value of priority lead status in the source record.
+      - datalake_hub_services_raw.visitor_prospection.priority_lead_status
   priority_lead_type:
+    description: Lead type dimension used alongside status for queue ordering rules.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.priority_lead_type
-    description: Value of priority lead type in the source record.
+      - datalake_hub_services_raw.visitor_prospection.priority_lead_type
   reminder_type_name:
+    description: Display name of the linked reminder type copied for list rendering without joins.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_type_name
-    description: Value of reminder type name in the source record.
+      - datalake_hub_services_raw.visitor_prospection.reminder_type_name
   reminder_status:
+    description: Current status of the linked reminder on this prospection row.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_status
-    description: Value of reminder status in the source record.
+      - datalake_hub_services_raw.visitor_prospection.reminder_status
   reminder_creation_method:
+    description: How the linked reminder was created (manual, automated, import, etc.).
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_creation_method
-    description: Value of reminder creation method in the source record.
+      - datalake_hub_services_raw.visitor_prospection.reminder_creation_method
   reminder_event_type:
+    description: Visitor event type associated with the linked reminder, when applicable.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_event_type
-    description: Value of reminder event type in the source record.
+      - datalake_hub_services_raw.visitor_prospection.reminder_event_type
   sorting_order:
+    description: Numeric rank assigned by Hub Services to order this row in agent worklists.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.sorting_order
-    description: Value of sorting order in the source record.
+      - datalake_hub_services_raw.visitor_prospection.sorting_order
   version:
+    description: Optimistic locking version from the Hub Services source row.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.visitor_prospection.version
   ts_reminder:
+    description: Local date and time when the linked reminder should fire for the agent.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.reminder_date
-    description: Timestamp of reminder.
+      - datalake_hub_services_raw.visitor_prospection.reminder_date
   ts_created:
+    description: UTC timestamp when the prospection row was created in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.visitor_prospection.created_at
   ts_updated:
+    description: UTC timestamp of the last update to the prospection row in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.visitor_prospection.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.visitor_prospection.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.visitor_prospection.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.visitor_prospection.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.visitor_prospection.day

@@ -3,73 +3,76 @@ database_name: datalake_hub_services_clean
 table_name: visitor_event
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Every event associated with a visit in Hub Services, like visit scheduled, canceled, done, or waiting confirmation.
+description: >
+  Latest visitor lifecycle event emitted by Hub Services for demand-side visit workflows (for example
+  scheduled, canceled, completed, or awaiting confirmation). One row per event id after deduplicating to
+  the most recent update from raw.
 columns:
   id:
+    description: Primary key of the visitor event in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_event.id
-    description: Value of id in the source record.
+      - datalake_hub_services_raw.visitor_event.id
   id_visitor:
+    description: Visitor associated with the event in the Hub Services CRM.
     lineage:
-    - datalake_hub_services_raw.visitor_event.visitor_id
-    description: Unique identifier for visitor.
+      - datalake_hub_services_raw.visitor_event.visitor_id
   id_house:
+    description: Listing house id tied to the visit or intent captured by the event.
     lineage:
-    - datalake_hub_services_raw.visitor_event.house_id
-    description: Unique identifier for house.
+      - datalake_hub_services_raw.visitor_event.house_id
   id_region:
+    description: Hub operating region where the event was recorded.
     lineage:
-    - datalake_hub_services_raw.visitor_event.region_id
-    description: Unique identifier for region.
+      - datalake_hub_services_raw.visitor_event.region_id
   id_user:
+    description: Hub agent or internal user linked to the event when attribution is known.
     lineage:
-    - datalake_hub_services_raw.visitor_event.user_id
-    description: Unique identifier for user.
+      - datalake_hub_services_raw.visitor_event.user_id
   id_idempotency:
+    description: Idempotency key used by Hub Services to deduplicate retried event payloads.
     lineage:
-    - datalake_hub_services_raw.visitor_event.idempotency_id
-    description: Unique identifier for idempotency.
+      - datalake_hub_services_raw.visitor_event.idempotency_id
   domain_name:
+    description: Bounded context namespace of the event producer inside Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_event.domain_name
-    description: Value of domain name in the source record.
+      - datalake_hub_services_raw.visitor_event.domain_name
   event_type:
+    description: High-level category of the visitor event (schedule change, completion, cancellation, etc.).
     lineage:
-    - datalake_hub_services_raw.visitor_event.event_type
-    description: Value of event type in the source record.
+      - datalake_hub_services_raw.visitor_event.event_type
   event_code:
+    description: Stable machine code identifying the specific visitor event variant.
     lineage:
-    - datalake_hub_services_raw.visitor_event.event_code
-    description: Value of event code in the source record.
+      - datalake_hub_services_raw.visitor_event.event_code
   metadata:
+    description: JSON payload with auxiliary attributes not modeled as top-level columns.
     lineage:
-    - datalake_hub_services_raw.visitor_event.metadata
-    description: Value of metadata in the source record.
+      - datalake_hub_services_raw.visitor_event.metadata
   version:
+    description: Optimistic locking version from the Hub Services source row.
     lineage:
-    - datalake_hub_services_raw.visitor_event.version
-    description: Value of version in the source record.
+      - datalake_hub_services_raw.visitor_event.version
   ts_event:
+    description: UTC timestamp when the visitor event occurred in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_event.event_date
-    description: Timestamp of event.
+      - datalake_hub_services_raw.visitor_event.event_date
   ts_created:
+    description: UTC timestamp when the event row was inserted in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_event.created_at
-    description: Timestamp of created.
+      - datalake_hub_services_raw.visitor_event.created_at
   ts_updated:
+    description: UTC timestamp of the last mutation to the event row in Hub Services.
     lineage:
-    - datalake_hub_services_raw.visitor_event.updated_at
-    description: Timestamp of updated.
+      - datalake_hub_services_raw.visitor_event.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.visitor_event.year
-    description: Partition column (year) for the table load date.
+      - datalake_hub_services_raw.visitor_event.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.visitor_event.month
-    description: Partition column (month) for the table load date.
+      - datalake_hub_services_raw.visitor_event.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.visitor_event.day
-    description: Partition column (day) for the table load date.
+      - datalake_hub_services_raw.visitor_event.day

@@ -3,69 +3,71 @@ database_name: datalake_hub_services_clean
 table_name: reminder
 owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: Reminders for agents in Hub Services
+description: >
+  Latest agent reminder scheduled in Hub Services (Hubs Postgres), linked to a visitor and optionally to a
+  visitor event. One row per reminder id after keeping the most recent update from raw.
 columns:
   id:
-    description: Value of id in the source record.
+    description: Primary key of the reminder in the Hub Services application.
     lineage:
-    - datalake_hub_services_raw.reminder.id
+      - datalake_hub_services_raw.reminder.id
   id_visitor:
-    description: Unique identifier for visitor.
+    description: Visitor who should be contacted when the reminder fires.
     lineage:
-    - datalake_hub_services_raw.reminder.visitor_id
+      - datalake_hub_services_raw.reminder.visitor_id
   id_event:
-    description: Unique identifier for event.
+    description: Visitor event that contextualizes the reminder, when the task relates to a visit lifecycle step.
     lineage:
-    - datalake_hub_services_raw.reminder.event_id
+      - datalake_hub_services_raw.reminder.event_id
   id_reminder_type:
-    description: Unique identifier for reminder type.
+    description: Foreign key to the reminder type catalog that defines the task template.
     lineage:
-    - datalake_hub_services_raw.reminder.reminder_type_id
+      - datalake_hub_services_raw.reminder.reminder_type_id
   status:
-    description: Value of status in the source record.
+    description: Workflow status of the reminder in Hub Services (for example open, done, or canceled).
     lineage:
-    - datalake_hub_services_raw.reminder.status
+      - datalake_hub_services_raw.reminder.status
   created_by:
-    description: Value of created by in the source record.
+    description: Hub user id of the agent or staff member who created the reminder.
     lineage:
-    - datalake_hub_services_raw.reminder.created_by
+      - datalake_hub_services_raw.reminder.created_by
   closed_by:
-    description: Value of closed by in the source record.
+    description: Hub user id who closed the reminder when the follow-up was completed or dismissed.
     lineage:
-    - datalake_hub_services_raw.reminder.closed_by
+      - datalake_hub_services_raw.reminder.closed_by
   creation_method:
-    description: Value of creation method in the source record.
+    description: Channel or UI flow used to create the reminder (manual, automated rule, import, etc.).
     lineage:
-    - datalake_hub_services_raw.reminder.creation_method
+      - datalake_hub_services_raw.reminder.creation_method
   version:
-    description: Value of version in the source record.
+    description: Optimistic locking version from the Hub Services source row.
     lineage:
-    - datalake_hub_services_raw.reminder.version
+      - datalake_hub_services_raw.reminder.version
   ts_reminder:
-    description: Timestamp of reminder.
+    description: Local date and time when the agent should act on this reminder in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder.date
+      - datalake_hub_services_raw.reminder.date
   ts_created:
-    description: Timestamp of created.
+    description: UTC timestamp when the reminder row was inserted in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder.created_at
+      - datalake_hub_services_raw.reminder.created_at
   ts_updated:
-    description: Timestamp of updated.
+    description: UTC timestamp of the last mutation to the reminder in Hub Services.
     lineage:
-    - datalake_hub_services_raw.reminder.updated_at
+      - datalake_hub_services_raw.reminder.updated_at
   ts_closed:
-    description: Timestamp of closed.
+    description: UTC timestamp when the reminder was closed in Hub Services, if applicable.
     lineage:
-    - datalake_hub_services_raw.reminder.closed_at
+      - datalake_hub_services_raw.reminder.closed_at
   year:
-    description: Partition column (year) for the table load date.
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
-    - datalake_hub_services_raw.reminder.year
+      - datalake_hub_services_raw.reminder.year
   month:
-    description: Partition column (month) for the table load date.
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
-    - datalake_hub_services_raw.reminder.month
+      - datalake_hub_services_raw.reminder.month
   day:
-    description: Partition column (day) for the table load date.
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
-    - datalake_hub_services_raw.reminder.day
+      - datalake_hub_services_raw.reminder.day
