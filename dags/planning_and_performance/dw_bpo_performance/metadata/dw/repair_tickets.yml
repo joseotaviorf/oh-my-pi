@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: repair_tickets
-description: Table that contains the repair tickets data for bpo performance.
+description: Repair and maintenance support tickets for BPO performance reporting, including contestation tasks, taxonomy themes, and first-reply SLA metrics. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -55,7 +55,7 @@ columns:
   contestation_task_origin:
     lineage:
       - datalake_repairs.repair_tickets.contestation_task_origin
-    description: Origin of the contestation task.
+    description: Source system or workflow that originated the repair contestation task linked to the ticket.
   service_provider:
     lineage:
       - datalake_repairs.repair_tickets.service_provider
@@ -63,7 +63,7 @@ columns:
   theme:
     lineage:
       - datalake_repairs.repair_tickets.theme
-    description: Theme of the ticket.
+    description: Taxonomy theme classifying the repair ticket subject matter for BPO reporting.
   theme_detail:
     lineage:
       - datalake_repairs.repair_tickets.theme_detail
@@ -131,7 +131,7 @@ columns:
   minutes_first_reply_time_calendar:
     lineage:
       - datalake_repairs.repair_tickets.minutes_first_reply_time_calendar
-    description: Minutes of the first reply time calendar.
+    description: Calendar-time elapsed minutes from repair ticket creation until the first agent reply.
   entrance_date:
     lineage:
       - datalake_repairs.repair_tickets.entrance_date
@@ -257,4 +257,4 @@ columns:
   ts_load:
     lineage:
       - CURRENT_TIMESTAMP
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

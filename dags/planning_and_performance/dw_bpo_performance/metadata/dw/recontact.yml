@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: recontact
-description: Table that contains the Recontact data for bpo performance.
+description: Customer recontact events for BPO performance analysis, measuring repeat contacts within a defined window and handling time between consecutive interactions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -29,7 +29,7 @@ columns:
       - dw_customer_support.fact_tickets.ts_created
       - dw_customer_support.dim_department.team
       - dw_customer_support.fact_tickets.sk_user
-    description: Channel of the contact.
+    description: Support channel through which the recontact interaction occurred (e.g. email, chat, phone).
   team:
     lineage:
       - dw_customer_support.dim_department.team
@@ -70,7 +70,7 @@ columns:
       - dw_customer_support.fact_tickets.ts_created
       - dw_customer_support.dim_department.team
       - dw_customer_support.fact_tickets.sk_user
-    description: Email of the first contact.
+    description: Work email of the agent who handled the customer's initial contact before the recontact event.
   total_minutes_handling_time:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_handling_time
@@ -80,7 +80,7 @@ columns:
       - dw_customer_support.fact_customer_contats.ts_started
       - dw_customer_support.fact_customer_contats.sk_user
       - dw_customer_support.fact_customer_contacts.total_handling_time
-    description: Total handling time of the previous contact in minutes.
+    description: Total agent handling time in minutes for the customer's previous contact before the recontact occurred.
   total_minutes_queue_time:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_waiting_time
@@ -153,4 +153,4 @@ columns:
   ts_load:
     lineage:
       - CURRENT_TIMESTAMP
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

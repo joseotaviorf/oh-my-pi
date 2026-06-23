@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
-table_name: backlog_metric
-description: Table that contains the backlog metric for bpo performance.
+table_name: csat_front
+description: Front-office CSAT survey results linked to support tickets, capturing agent, team, and taxonomy context for BPO customer satisfaction analysis. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -11,7 +11,7 @@ columns:
   email:
     lineage:
       - dw_customer_support.dim_analyst.email
-    description: Email of the agent.
+    description: Work email of the front-office agent who handled the ticket associated with the CSAT response.
   organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
@@ -19,11 +19,11 @@ columns:
   team:
     lineage:
       - dw_customer_support.dim_department.team
-    description: Team of the agent.
+    description: Support team to which the front-office agent belongs at the time of the CSAT survey.
   channel:
     lineage:
       - dw_customer_support.fact_tickets.channel
-    description: Channel of the ticket.
+    description: Support channel through which the ticket linked to the CSAT response was opened.
   main_department:
     lineage:
       - dw_customer_support.dim_department.department
@@ -35,7 +35,7 @@ columns:
   step_tag:
     lineage:
       - dw_customer_support.dim_taxonomy.step_tag
-    description: Step tag of the ticket.
+    description: Taxonomy step tag classifying the customer journey stage at the time of the CSAT survey.
   motivation:
     lineage:
       - dw_customer_support.dim_taxonomy.motivation
@@ -87,4 +87,4 @@ columns:
   ts_load:
     lineage:
       - NOW()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

@@ -1,6 +1,6 @@
 database_name: dw_bpo_performance
 table_name: cases_perspective
-description: Table containing data from Zendesk and Salesforce for BPO submission.
+description: Unified case perspective combining Zendesk tickets and Salesforce cases for BPO submission, including SPOC and PP Multi classification flags. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
 owner: alef.vieira@quintoandar.com.br
 columns:
@@ -141,13 +141,13 @@ columns:
       - dw_offboarding.fact_terminations.is_spoc_contract
       - dw_offboarding.fact_terminations.ts_termination_request
       - dw_offboarding.fact_terminations.is_spoc_control_group
-    description: Spoc Classification
+    description: Boolean flag indicating whether the case belongs to the SPOC (Single Point of Contact) test group.
   is_pp_multi:
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history.is_pp_multi_active
       - datalake_pro_owners.daily_owner_houses_quantity_history.ongoing_houses
       - dw_bpo_performance.tickets_perspective.is_pp_multi
-    description: PP Multi Classification
+    description: Boolean flag indicating whether the case is associated with a PP Multi subscription contract.
   off_area:
     lineage:
       - datalake_salesforce_clean.cases.case_type
@@ -276,4 +276,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

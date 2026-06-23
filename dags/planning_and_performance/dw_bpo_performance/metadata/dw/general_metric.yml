@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: general_metric
-description: Table that contains the general metrics for bpo performance.
+description: Consolidated BPO performance metrics combining ticket handling times, CSAT scores, and agent productivity across support channels. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -19,7 +19,7 @@ columns:
   channel:
     lineage:
       - dw_customer_support.fact_tickets.channel
-    description: Channel of the ticket.
+    description: Support channel through which the ticket was opened (e.g. email, chat, phone).
   csat_score:
     lineage:
       - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
@@ -27,11 +27,11 @@ columns:
   status:
     lineage:
       - dw_customer_support.dim_ticket.status
-    description: Status of the ticket.
+    description: Current workflow status of the ticket (e.g. open, pending, solved).
   csat_type:
     lineage:
       - dw_customer_support.fact_ticket_csat.last_csat_score
-    description: Type of the CSAT score. 
+    description: Classification of the CSAT survey type applied to the ticket (e.g. resolution, agent). 
   csat_comment:
     lineage:
       - dw_customer_support.fact_ticket_csat.first_csat_comment
@@ -47,7 +47,7 @@ columns:
   area:
     lineage:
       - dw_customer_support.dim_department.area
-    description: Area of the ticket.
+    description: Business area within customer support that owns the ticket.
   department:
     lineage:
       - dw_customer_support.dim_department.department
@@ -87,7 +87,7 @@ columns:
   step_tag:
     lineage:
       - dw_customer_support.dim_taxonomy.step_tag
-    description: Step tag of the ticket.
+    description: Taxonomy step tag classifying the customer journey stage of the ticket.
   external_url:
     lineage:
       - dw_customer_support.fact_tickets.sk_ticket
@@ -99,11 +99,11 @@ columns:
   agent_full_name:
     lineage:
       - dw_customer_support.dim_analyst.full_name
-    description: Full name of the agent.
+    description: Full display name of the support agent assigned to the ticket.
   agent_email:
     lineage:
       - dw_customer_support.dim_analyst.email
-    description: Email of the agent.
+    description: Work email of the support agent assigned to the ticket.
   organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
@@ -155,15 +155,15 @@ columns:
   minutes_requester_wait_time_business:
     lineage:
       - dw_customer_support.fact_tickets.requester_wait_time_min_business
-    description: Minutes of requester wait time during business hours.
+    description: Business-hours wait time in minutes from ticket creation until the first agent reply.
   minutes_first_reply_time_business:
     lineage:
       - dw_customer_support.fact_tickets.reply_time_min_business
-    description: Minutes of first reply time during business hours.
+    description: Business-hours elapsed time in minutes until the first public agent reply on the ticket.
   minutes_full_resolution_time_business:
     lineage:
       - dw_customer_support.fact_tickets.full_resolution_time_min_business
-    description: Minutes of full resolution time during business hours.
+    description: Business-hours elapsed time in minutes from ticket creation until full resolution.
   is_pp_multi:
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history
@@ -183,4 +183,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

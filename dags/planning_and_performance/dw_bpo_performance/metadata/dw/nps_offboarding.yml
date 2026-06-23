@@ -1,13 +1,13 @@
 database_name: dw_bpo_performance
 table_name: nps_offboarding
-description: Table that contains the NPS Offboarding data for bpo performance.
+description: NPS Offboarding survey responses for BPO performance reporting, linking contract, customer, and SPOC agent data for post-termination satisfaction analysis. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns: 
   sk_nps_answer:
     lineage:
       - dw_customer_satisfaction.dim_nps_answer.sk_nps_answer
-    description: Key of the NPS answer.
+    description: Surrogate key identifying the NPS survey response for the offboarding campaign.
   ts_answered:
     lineage:
       - dw_customer_satisfaction.dim_nps_answer.ts_answered
@@ -23,7 +23,7 @@ columns:
   sk_contract:
     lineage:
       - dw_customer_satisfaction.fact_nps_dispatches.sk_contract
-    description: Key of the contract.
+    description: Surrogate key of the rental contract associated with the offboarding NPS response.
   tr_dt:
     lineage:
       - datalake_terminator.termination.termination_request
@@ -47,7 +47,7 @@ columns:
   customer_type:
     lineage:
       - dw_customer_satisfaction.dim_nps_campaign.customer_type
-    description: Type of customer.
+    description: Customer role in the contract context (e.g. tenant, owner) for the offboarding NPS survey.
   opted_out:
     lineage:
       - dw_rent.dim_contract.is_exit_inspection_opted_out
@@ -64,7 +64,7 @@ columns:
   rent:
     lineage:
       - dw_rent.dim_contract.rent
-    description: Rent of the contract.
+    description: Monthly rent value of the contract at the time of the offboarding NPS survey.
   high_value:
     lineage:
       - dw_rent.dim_contract.rent
@@ -72,7 +72,7 @@ columns:
   sk_user:
     lineage:
       - dw_customer_satisfaction.fact_nps_dispatches.sk_user
-    description: Key of the user.
+    description: Surrogate key of the user who submitted the offboarding NPS response.
   spoc_wave:
     lineage:
       - dw_offboarding.fact_terminations.spoc_wave
@@ -94,7 +94,7 @@ columns:
   spoc_agent_email:
     lineage:
       - dw_customer_support.dim_analyst.email
-    description: Email of the SPOC agent.
+    description: Work email of the Single Point of Contact agent assigned to the contract at offboarding.
   comment:
     lineage:
       - dw_customer_satisfaction.dim_nps_answer.comment
@@ -112,4 +112,4 @@ columns:
   ts_load:
     lineage:
       - NOW()
-    description: Timestamp of the data load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

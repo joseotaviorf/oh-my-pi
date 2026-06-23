@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: listing_quality_sla
-description: Table that contains the listing quality SLA metrics for bpo performance.
+description: Listing quality SLA compliance metrics for BPO performance, tracking photo job analysis turnaround against defined service level targets. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   id_listing_quality_sla:
     lineage:
@@ -72,4 +72,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

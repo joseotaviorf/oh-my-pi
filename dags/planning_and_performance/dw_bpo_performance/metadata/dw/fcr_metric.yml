@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: fcr_metric
-description: Table that contains infos to complement the fcr metric for bpo analysis.
+description: First Contact Resolution (FCR) complement data for BPO analysis, linking ticket recontact patterns to agent and taxonomy dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -73,4 +73,4 @@ columns:
   ts_load:
     lineage:
       - now()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

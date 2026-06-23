@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: email
-description: Table that contains the email metrics for bpo analysis.
+description: Email channel support metrics for BPO performance analysis, aggregating ticket volumes and handling times by agent, team, and channel. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -11,11 +11,11 @@ columns:
   agent_email:
     lineage:
       - dw_customer_support.dim_analyst.email
-    description: Email of the agent.
+    description: Work email of the support agent who handled the email channel ticket.
   team:
     lineage:
       - dw_customer_support.dim_department.team
-    description: Team of the agent.
+    description: Support team to which the agent belongs for email channel performance reporting.
   main_department:
     lineage:
       - datalake_customer_support.tickets.last_queue
@@ -36,7 +36,7 @@ columns:
   channel:
     lineage:
       - datalake_customer_support.tickets.channel
-    description: Channel of the ticket.
+    description: Support channel identifier, fixed to email for this metric table.
   has_retention_tags:
     lineage:
       - dw_customer_support.dim_ticket.tags
@@ -94,7 +94,7 @@ columns:
   ts_load:
     lineage:
       - NOW()
-    description: Timestamp of the data load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
   refined_direction:
     lineage:
       - dw_customer_support.fact_tickets.refined_direction

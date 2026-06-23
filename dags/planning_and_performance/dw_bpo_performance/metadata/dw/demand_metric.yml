@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: demand_metric
-description: Table that contains the backlog metric for bpo performance.
+description: Demand volume and handling metrics for BPO support tickets, tracking ticket status, agent workload, SLA exceed time, and department dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_task:
     lineage:
@@ -19,15 +19,15 @@ columns:
   channel:
     lineage:
       - 'email'
-    description: Channel of the ticket.
+    description: Support channel through which the demand ticket was opened (e.g. email, chat, phone).
   status:
     lineage:
       - dw_customer_support.dim_ticket.status
-    description: Status of the ticket.
+    description: Current workflow status of the demand ticket (e.g. open, pending, solved).
   agent_email:
     lineage:
       - dw_customer_support.dim_analyst.email
-    description: Email of the agent.
+    description: Work email of the support agent assigned to the demand ticket.
   organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
@@ -47,11 +47,11 @@ columns:
   team:
     lineage:
       - dw_customer_support.dim_department.team
-    description: Team of the ticket.
+    description: Support team responsible for handling the demand ticket.
   area:
     lineage:
       - dw_customer_support.dim_department.area
-    description: Area of the ticket.
+    description: Business area within customer support that owns the demand ticket.
   contact_motivation_tag:
     lineage:
       - dw_customer_support.dim_taxonomy.motivation
@@ -67,7 +67,7 @@ columns:
   step_tag:
     lineage:
       - dw_customer_support.dim_taxonomy.step_tag
-    description: Step tag of the ticket.
+    description: Taxonomy step tag classifying the customer journey stage of the demand ticket.
   tag:
     lineage:
       - dw_customer_support.dim_ticket.tags
@@ -80,7 +80,7 @@ columns:
     lineage:
       - dw_customer_support.fact_tickets.days_elapsed_business
       - dw_customer_support.fact_tickets.sla_target
-    description: Time spent solved with exceed SLA of the ticket.
+    description: Total handling time in minutes for tickets solved after exceeding the defined SLA target.
   days_worked:
     lineage:
       - dw_customer_support.fact_tickets.days_elapsed_business
@@ -88,7 +88,7 @@ columns:
   days_off:
     lineage:
       - dw_customer_support.fact_tickets.days_off
-    description: Days off of the ticket.
+    description: Number of non-business days excluded from SLA calculation for the demand ticket.
   leadtime_day:
     lineage:
       - dw_customer_support.fact_tickets.days_elapsed_business
@@ -142,4 +142,4 @@ columns:
   ts_load:
     lineage:
       - NOW()
-    description: Timestamp of the data load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

@@ -1,8 +1,8 @@
 database_name: dw_bpo_performance
 table_name: backlog_metric
-description: Table that contains the backlog metric for bpo performance.
+description: Daily backlog snapshot of open customer support tickets for BPO performance monitoring, including SLA compliance, agent assignment, and taxonomy dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
-owner: data-pp@quintoandar.com.br
+owner: alef.vieira@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -15,11 +15,11 @@ columns:
   channel:
     lineage:
       - dw_customer_support.fact_backlog_metrics_tasks.channel
-    description: Channel of the ticket.
+    description: Support channel through which the backlog ticket was opened (e.g. email, chat, phone).
   status:
     lineage:
       - dw_customer_support.fact_backlog_metrics_tasks.status
-    description: Status of the ticket.
+    description: Current workflow status of the backlog ticket (e.g. open, pending, solved).
   organization:
     lineage:
       - dw_customer_support.dim_analyst.organization
@@ -27,7 +27,7 @@ columns:
   agent_email:
     lineage:
       - dw_customer_support.dim_analyst.agent_email
-    description: Email of the agent.
+    description: Work email of the support agent assigned to the backlog ticket.
   department:
     lineage:
       - dw_customer_support.dim_department.department
@@ -55,11 +55,11 @@ columns:
   step_tag:
     lineage:
       - dw_customer_support.dim_taxonomy.step_tag
-    description: Step tag of the ticket.
+    description: Taxonomy step tag classifying the customer journey stage of the backlog ticket.
   team:
     lineage:
       - dw_customer_support.dim_department.team
-    description: Team of the ticket.
+    description: Support team responsible for handling the backlog ticket.
   journey_step:
     lineage:
       - dw_customer_support.dim_department.journey_step
@@ -67,7 +67,7 @@ columns:
   area:
     lineage:
       - dw_customer_support.dim_department.area
-    description: Area of the ticket.
+    description: Business area within customer support that owns the backlog ticket.
   sla_target:
     lineage:
       - dw_customer_support.fact_tickets.sla_target
@@ -129,4 +129,4 @@ columns:
   ts_load:
     lineage:
       - NOW()
-    description: Timestamp of the load.
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
