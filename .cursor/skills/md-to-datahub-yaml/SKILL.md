@@ -18,7 +18,7 @@ This skill reads a business entity Markdown file and produces a correctly-struct
 
 - Retrofitting: an existing `docs/llm_context/business_entities/{entity}.md` has no companion YAML yet.
 - Standalone invocation: a single entity's YAML needs updating after the Markdown changed.
-- Called from `create-entity-doc` Step 6 immediately after writing a new Markdown.
+- Called from `create-business-entity-doc` Step 6 immediately after writing a new Markdown.
 
 ---
 

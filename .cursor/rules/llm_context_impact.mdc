@@ -86,7 +86,7 @@ For each new table, map `dags/{domain}/` + the `domain:` field in the metadata Y
 
 Verdict per new table (choose one):
 - **Belongs in existing entity doc** — list path + sections to extend (`## Tables` row at minimum; add a Golden Query if it is a fact/metric table analysts will commonly query)
-- **No good fit, but analytically important** (`dw_*` fact, `dw_*` dimension without coverage, `metric_*`) — recommend creating a new entity doc via the `create-entity-doc` skill
+- **No good fit, but analytically important** (`dw_*` fact, `dw_*` dimension without coverage, `metric_*`) — recommend creating a new entity doc via the `create-business-entity-doc` skill
 - **Internal / not analyst-facing** (raw, clean, infra, pure plumbing) — state this explicitly; no coverage needed
 
 ### 3.3 Path B findings
@@ -132,7 +132,7 @@ After the report, ask whether to apply the updates. **Match the user's language*
 
 If yes:
 1. Edit each entity doc with scoped replacements using the line ranges from the report.
-2. Follow section conventions from `.cursor/skills/create-entity-doc/SKILL.md` (Trino SQL in Golden Queries, bullet-list in Glossary, no column duplication from metadata YAML).
+2. Follow section conventions from `.cursor/skills/create-business-entity-doc/SKILL.md` (Trino SQL in Golden Queries, bullet-list in Glossary, no column duplication from metadata YAML).
 3. Re-grep entity docs to confirm no stale references remain.
 4. Report what changed, file by file.
 
