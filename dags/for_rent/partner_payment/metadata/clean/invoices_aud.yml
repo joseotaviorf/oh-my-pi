@@ -44,14 +44,6 @@ columns:
     lineage:
       - datalake_partner_payment_raw.invoices_aud.invoice_receipt_number_mod
     description: Boolean flag indicating whether the invoice_receipt_number field was modified in this revision.
-  errors:
-    lineage:
-      - datalake_partner_payment_raw.invoices_aud.errors
-    description: The value of the errors array captured during this specific revision.
-  errors_mod:
-    lineage:
-      - datalake_partner_payment_raw.invoices_aud.errors_mod
-    description: Boolean flag indicating whether the errors field was modified in this revision.
   version:
     lineage:
       - datalake_partner_payment_raw.invoices_aud.version

@@ -8,8 +8,6 @@ SELECT
     status,
     invoice_receipt_number,
     invoice_receipt_number_mod,
-    errors,
-    errors_mod,
     version,
     status_mod,
     version_mod,

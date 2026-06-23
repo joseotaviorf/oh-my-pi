@@ -28,10 +28,6 @@ columns:
     lineage:
       - datalake_partner_payment_raw.invoices.invoice_receipt_number
     description: The receipt number returned by the payment provider after the invoice is processed. Null until the payment provider acknowledges the invoice.
-  errors:
-    lineage:
-      - datalake_partner_payment_raw.invoices.errors
-    description: Array containing error messages returned by the payment provider during invoice validation. Empty or null when the invoice was processed successfully.
   version:
     lineage:
       - datalake_partner_payment_raw.invoices.version

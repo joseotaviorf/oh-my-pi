@@ -4,7 +4,6 @@ SELECT
     blobvault_invoice_id AS uuid_blobvault_invoice,
     status,
     invoice_receipt_number,
-    errors,
     version,
     upload_date AS dt_upload,
     created_at AS ts_created,

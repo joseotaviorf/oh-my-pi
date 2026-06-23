@@ -8,7 +8,6 @@ SELECT
     total_amount,
     currency,
     payment_provider,
-    errors,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
