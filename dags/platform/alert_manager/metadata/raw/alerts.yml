@@ -1,3 +1,12 @@
+---
 database_name: datalake_alert_manager_raw
 table_name: alerts
 domain: Data Platform
+owner: gustavo.akashi@quintoandar.com.br
+description: |
+  Raw layer for AlertManager webhook payloads ingested from S3. Each row stores the full
+  JSON alert notification emitted by Prometheus monitoring rules across QuintoAndar
+  infrastructure (Databricks clusters, services, and other app labels). Serves as the
+  source for clean-layer tables such as alerts_databricks_cluster. Partitioned by year,
+  month, and day derived from the alert @timestamp. Filter on year, month, and day when
+  scanning historical alert batches.

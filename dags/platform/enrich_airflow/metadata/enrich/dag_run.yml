@@ -1,10 +1,14 @@
 ---
 database_name: datalake_airflow
 table_name: dag_run
-description: Stores information on all past and current DAG runs including whether they were successful, whether they were scheduled
-  or manually triggered, and detailed timing information. It combines information from Composer (our old Airflow instance) and Astro.
-domain: Data Life Cycle 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Unified history of Airflow DAG run executions from Astronomer (Astro) and Google Cloud
+  Composer (legacy). One row per run, unioned with ID offset (+1000000) on Astro rows to
+  avoid primary key collisions. Captures run state, trigger type, scheduling timestamps, and
+  data interval boundaries. Used by Data Life Cycle for SLA monitoring, failure analysis,
+  and orchestration health dashboards. Incrementally loaded by execution date window.
+domain: Data Life Cycle
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -37,7 +41,9 @@ columns:
     lineage:
       - datalake_composer_clean.dag_run.state
       - datalake_astro_clean.dag_run.state
-    description: State of the DAG run.
+    description: |
+      Terminal or in-progress execution state of the DAG run. SUCCESS and FAILED are
+      final outcomes; RUNNING and QUEUED indicate active or pending execution.
     categories:
       QUEUED: The run is queued and waiting to be run.
       RUNNING: The run is currently running.
@@ -46,7 +52,10 @@ columns:
   run_type:
     lineage:
       - datalake_astro_clean.dag_run.run_type
-    description: Type of the run.
+    description: |
+      Mechanism that created the DAG run. scheduled for cron-driven runs, manual for
+      UI/CLI triggers, backfill for historical replays, dataset_triggered for data-aware
+      scheduling (Astro only).
     categories:
       backfill: A backfill run.
       scheduled: A scheduled run.
@@ -64,7 +73,9 @@ columns:
   clear_number:
     lineage:
       - datalake_astro_clean.dag_run.clear_number
-    description: Number of clear runs.
+    description: |
+      Counter incremented each time the DAG run was cleared via the Airflow UI or API,
+      resetting downstream task states for re-execution (Astro only).
   had_external_trigger:
     lineage:
       - datalake_composer_clean.dag_run.had_external_trigger
@@ -105,4 +116,6 @@ columns:
     lineage:
       - datalake_composer_clean.dag_run.ts_ended
       - datalake_astro_clean.dag_run.ts_ended
-    description: Time the run was ended.
+    description: |
+      Wall-clock timestamp when the DAG run reached a terminal state (SUCCESS or FAILED).
+      Null while the run is still QUEUED or RUNNING.

@@ -1,31 +1,51 @@
 ---
 database_name: datalake_dag_inventory_clean
 table_name: dag
-owner: augusto.torres@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table contains information about the bi-etl-ejuice DAGs 
+description: |
+  Daily snapshot of bi-etl-ejuice DAG definitions discovered via Airflow DagBag at
+  ingestion time. One row per DAG per ingestion date, capturing the DAG identifier,
+  repository file path, and Databricks cluster configuration parsed from the DAG's
+  init-cluster task. Used by Data Ops and Governance for DAG inventory tracking,
+  cluster rightsizing analysis, and FAIR metadata coverage assessments. Partitioned
+  by year, month, and day (ingestion date). Always filter on year, month, and day
+  in WHERE clauses to enable partition pruning when querying historical snapshots.
 columns:
   dag:
-    description: Name of the DAG
+    description: |
+      Airflow DAG identifier (e.g. bietlejuice.enrich_airflow). Primary key together
+      with the ingestion partition columns.
     lineage:
       - datalake_dag_inventory_raw.dag.dag
   dag_location:
-    description: bi-etl-ejuice DAG path
+    description: |
+      Relative path to the DAG Python file within the bi-etl-ejuice repository
+      (e.g. dags/platform/enrich_airflow/enrich_airflow.py).
     lineage:
       - datalake_dag_inventory_raw.dag.dag_location
   cluster_configuration:
-    description: Configuration of the cluster
+    description: |
+      JSON-serialized Databricks cluster specification extracted from the DAG's
+      create-cluster or execute-job-cluster task, including node type, worker count,
+      and Spark runtime version.
     lineage:
       - datalake_dag_inventory_raw.dag.cluster_configuration
   year:
-    description: ingestion year  
+    description: |
+      Ingestion partition year (DAG bag scan date). Filter on year, month, and day
+      together to query a specific daily inventory snapshot.
     lineage:
       - datalake_dag_inventory_raw.dag.year
   month:
-    description: ingestion month 
+    description: |
+      Ingestion partition month (1–12). Combine with year and day predicates for
+      partition pruning on daily snapshots.
     lineage:
       - datalake_dag_inventory_raw.dag.month
   day:
-    description: ingestion day 
+    description: |
+      Ingestion partition day of month. Always include year and month filters alongside
+      day when querying historical DAG inventory records.
     lineage:
       - datalake_dag_inventory_raw.dag.day

@@ -1,49 +1,109 @@
+---
 database_name: datalake_alert_manager_clean
 table_name: alerts_databricks_cluster
 domain: Data Platform
+owner: gustavo.akashi@quintoandar.com.br
+description: |
+  Clean layer for Prometheus AlertManager notifications scoped to Databricks cluster monitoring
+  (app label databricks-clusters). One row per alert fingerprint with parsed severity metrics
+  extracted from the alert message body. Used by Data Platform to track cluster resource
+  alerts (CPU, memory, disk) tied to bi-etl-ejuice DAG cluster names, investigate firing
+  versus resolved incidents, and correlate alert volume with DAG execution windows.
+  Partitioned by year, month, and day derived from the alert timestamp (ts_alert). Always
+  filter on year, month, and day in WHERE clauses to enable partition pruning; align
+  partition predicates with the ts_alert date range being analyzed.
 columns:
   id:
+    description: |
+      Unique alert fingerprint from AlertManager. Stable identifier for a specific alert
+      instance across status transitions (firing to resolved).
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   dag_name:
+    description: |
+      Databricks cluster name associated with the alert, mapped from the cluster_name label.
+      Corresponds to the bi-etl-ejuice DAG cluster that triggered the monitoring rule.
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   cluster_component:
+    description: |
+      Cluster sub-component that raised the alert (e.g. driver, worker, executor), mapped
+      from the component label in the raw AlertManager payload.
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   message:
+    description: |
+      Human-readable alert message from commonAnnotations, describing the threshold breach
+      and observed metric value (e.g. CPU usage percentage above limit).
     lineage:
       - datalake_alert_manager_raw.alerts.commonAnnotations
   alert_channel:
+    description: |
+      Slack or notification channel configured for this alert rule, mapped from the
+      alarm_channel label (e.g. data-platform-alerts).
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   alert_name:
+    description: |
+      Prometheus alert rule name that fired (e.g. DatabricksClusterHighCpu), mapped from
+      the alertname label.
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   alert_qty:
+    description: |
+      Numeric metric value parsed from the alert message body via regex (e.g. 85.3 for
+      85.3% CPU utilization). Null when the message format does not contain a parseable
+      quantity.
     lineage:
       - datalake_alert_manager_raw.alerts.commonAnnotations
   alert_unit:
+    description: |
+      Unit suffix parsed from the alert message immediately after the numeric quantity
+      (e.g. %, GB, ms). Null when no unit is present in the message text.
     lineage:
       - datalake_alert_manager_raw.alerts.commonAnnotations
   ts_alert:
+    description: |
+      Timestamp when AlertManager recorded the notification event (@timestamp), used as
+      the primary time axis for alert volume and latency analysis.
     lineage:
       - datalake_alert_manager_raw.alerts.@timestamp
   ts_start:
+    description: |
+      Timestamp when the alert condition first became active (startsAt). Marks the beginning
+      of the incident window for duration and SLA calculations.
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   ts_end:
+    description: |
+      Timestamp when the alert condition cleared (endsAt). Null for alerts still firing
+      or when AlertManager has not yet received a resolution signal.
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
   status:
+    description: |
+      Current AlertManager status for this fingerprint. firing indicates an active incident;
+      resolved indicates the condition cleared.
     lineage:
       - datalake_alert_manager_raw.alerts.alerts
+    categories:
+      firing: Alert condition is currently active.
+      resolved: Alert condition has cleared.
   year:
+    description: |
+      Partition year derived from ts_alert. Filter on year, month, and day together to
+      enable partition pruning when querying alert history.
     lineage:
       - datalake_alert_manager_raw.alerts.year
   month:
+    description: |
+      Partition month (1–12) derived from ts_alert. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
     lineage:
       - datalake_alert_manager_raw.alerts.month
   day:
+    description: |
+      Partition day of month derived from ts_alert. Always include year and month filters
+      alongside day for efficient partition pruning.
     lineage:
       - datalake_alert_manager_raw.alerts.day

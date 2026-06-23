@@ -1,10 +1,15 @@
 ---
 database_name: datalake_airflow
 table_name: dag
-description: Stores information on all DAGs (Directed Acyclic Graphs) that have ever existed in the Airflow instance. This includes both
-  Composer (our old Airflow instance) and Astro (our new Airflow instance) DAGs.
-domain: Data Platform 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Unified catalog of Airflow DAG definitions spanning Astronomer (Astro, current) and Google
+  Cloud Composer (legacy) instances. Built via full outer join on the latest Astro snapshot
+  and historical Composer records, with source_provider indicating the authoritative origin.
+  One row per DAG id_dag. Used by Data Life Cycle for orchestration observability, stale-DAG
+  detection, and cross-platform migration tracking. Not partitioned; full table scans are
+  acceptable given the small row count.
+domain: Data Platform
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_dag:
     lineage:
@@ -42,7 +47,9 @@ columns:
     lineage:
       - datalake_composer_clean.dag.description
       - datalake_astro_clean.dag.description
-    description: Description of the DAG
+    description: |
+      Free-text description of the DAG's purpose as defined in the DAG file docstring or
+      Airflow metadata, surfaced in the Airflow UI.
   dataset_expression:
     lineage:
       - datalake_astro_clean.dag.dataset_expression
@@ -56,6 +63,9 @@ columns:
     lineage:
       - datalake_composer_clean.dag.last_pickled
       - datalake_astro_clean.dag.last_pickled
+    description: |
+      Timestamp when the DAG definition was last serialized (pickled) by the Airflow
+      scheduler, indicating the most recent code parse event.
   owners:
     lineage:
       - datalake_composer_clean.dag.owners
@@ -136,8 +146,12 @@ columns:
   ts_next_dagrun_data_interval_start:
     lineage:
       - datalake_astro_clean.dag.ts_next_dagrun_data_interval_start
-    description: Data interval start for the next dag run.
+    description: |
+      Lower bound of the data interval that the next scheduled DAG run will cover. Defines
+      the start of the logical processing window for upcoming execution.
   ts_next_dagrun_data_interval_end:
     lineage:
       - datalake_astro_clean.dag.ts_next_dagrun_data_interval_end
-    description: Data interval end for the next dag run.
+    description: |
+      Upper bound (exclusive) of the data interval that the next scheduled DAG run will
+      cover. Together with ts_next_dagrun_data_interval_start defines the processing window.

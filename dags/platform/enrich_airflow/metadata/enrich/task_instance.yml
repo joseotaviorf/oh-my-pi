@@ -1,9 +1,16 @@
 ---
 database_name: datalake_airflow
 table_name: task_instance
-description: Stores information on all Airflow task instances. It combines information from Composer (our old Airflow instance) and Astro.
-domain: Data Life Cycle 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Unified Airflow task instance executions from Astronomer (Astro) and Google Cloud Composer
+  (legacy). One row per (id_task, id_dag, id_run) attempt, unioned across providers with
+  Astro rows enriched via join to dag_run for ts_executed. Captures task state transitions,
+  operator details, retry counts, and execution timing. Used by Data Life Cycle for task-level
+  SLA tracking, failure root-cause analysis, and duration benchmarking. Partitioned by year,
+  month, and day derived from ts_updated. Always filter on year, month, and day in WHERE
+  clauses to enable partition pruning when querying task execution history.
+domain: Data Life Cycle
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_task:
     lineage:
@@ -23,7 +30,9 @@ columns:
   id_queued_by_job:
     lineage:
       - datalake_astro_clean.task_instance.id_queued_by_job
-    description: ID of the job that queued the task instance.
+    description: |
+      Airflow scheduler job ID that queued this task instance for execution on a worker
+      (Astro only). Links to the job table for scheduler diagnostics.
   id_process:
     lineage:
       - datalake_astro_clean.task_instance.id_process
@@ -35,14 +44,19 @@ columns:
   id_job:
     lineage:
       - datalake_astro_clean.task_instance.id_job
-    description: Job ID of the task instance.
+    description: |
+      Airflow internal job ID assigned when the task instance was scheduled for execution
+      on a worker node (Astro only).
   source_provider:
     description: Either "Astro" or "Composer", indicating where the task instance was created.
   task_state:
     lineage:
       - datalake_composer_clean.task_instance.task_state
       - datalake_astro_clean.task_instance.task_state
-    description: State of the task instance.
+    description: |
+      Current lifecycle state of the task instance within the Airflow execution engine.
+      Terminal states include success, failed, skipped, and upstream_failed; transient
+      states include queued, running, and up_for_retry.
     categories:
       removed: The task instance was removed from the DAG.
       scheduled: The task instance was scheduled to run.
@@ -79,7 +93,9 @@ columns:
   custom_operator_name:
     lineage:
       - datalake_astro_clean.task_instance.custom_operator_name
-    description: Custom name of the operator that the task instance executed.
+    description: |
+      User-defined alias for the operator class when the DAG author overrides the default
+      operator display name (Astro only).
   executor:
     lineage:
       - datalake_astro_clean.task_instance.executor
@@ -87,16 +103,22 @@ columns:
   task_display_name:
     lineage:
       - datalake_astro_clean.task_instance.task_display_name
-    description: Display name of the task.
+    description: |
+      Human-readable task label shown in the Airflow UI, which may differ from the internal
+      id_task identifier (Astro only).
   map_index:
     lineage:
       - datalake_astro_clean.task_instance.map_index
-    description: Map index of the task instance.
+    description: |
+      Index position when the task uses dynamic task mapping (mapped tasks). -1 indicates
+      a non-mapped (regular) task instance (Astro only).
   try_number:
     lineage:
       - datalake_composer_clean.task_instance.try_number
       - datalake_astro_clean.task_instance.try_number
-    description: Number of the try that the task instance is on.
+    description: |
+      Current attempt number for this task instance, starting at 1. Increments on each
+      retry after a failure or timeout.
   max_tries:
     lineage:
       - datalake_composer_clean.task_instance.max_tries
@@ -114,7 +136,9 @@ columns:
   priority_weight:
     lineage:
       - datalake_astro_clean.task_instance.priority_weight
-    description: Priority weight of the task instance.
+    description: |
+      Scheduler-assigned priority weight used to determine task execution order within a
+      pool when multiple tasks compete for worker slots (Astro only).
   ts_trigger_timeout:
     lineage:
       - datalake_astro_clean.task_instance.ts_trigger_timeout
@@ -123,8 +147,10 @@ columns:
     lineage:
       - datalake_composer_clean.task_instance.ts_executed
       - datalake_astro_clean.task_instance.ts_executed
-    description: Execution date or logical date of the DAG run associated with the task instance. Be aware that this is not necessarily the
-      same as the date the run was actually executed. For example, if the DAG is scheduled to
+    description: |
+      Logical execution date of the parent DAG run (data interval start). For daily DAGs
+      this is typically the previous calendar day, not the wall-clock run time. Sourced
+      from dag_run join for Astro rows and from task_instance for Composer rows.
   ts_queued:
     lineage:
       - datalake_astro_clean.task_instance.ts_queued
@@ -148,14 +174,20 @@ columns:
     lineage:
       - datalake_composer_clean.task_instance.year
       - datalake_astro_clean.task_instance.year
-    description: Year of the last update of the task instance.
+    description: |
+      Partition year derived from ts_updated. Filter on year, month, and day together to
+      enable partition pruning when querying task execution history.
   month:
     lineage:
       - datalake_composer_clean.task_instance.month
       - datalake_astro_clean.task_instance.month
-    description: Month of the last update of the task instance.
+    description: |
+      Partition month (1–12) derived from ts_updated. Combine with year and day predicates
+      in WHERE clauses to avoid full table scans.
   day:
     lineage:
       - datalake_composer_clean.task_instance.day
       - datalake_astro_clean.task_instance.day
-    description: Day of the last update of the task instance.
+    description: |
+      Partition day of month derived from ts_updated. Always include year and month filters
+      alongside day for efficient partition pruning.

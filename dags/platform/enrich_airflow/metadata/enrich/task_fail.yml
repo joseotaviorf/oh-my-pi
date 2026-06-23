@@ -1,9 +1,15 @@
 ---
 database_name: datalake_airflow
 table_name: task_fail
-description: Stores information on all failed task instances. It combines information from Composer (our old Airflow instance) and Astro.
-domain: Data Life Cycle 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Unified record of failed Airflow task instances from Astronomer (Astro) and Google Cloud
+  Composer (legacy). One row per failure event, deduplicated by id_fail with Astro IDs offset
+  by +1000000 to avoid collisions. Captures failure duration, start/end timestamps, and the
+  parent DAG run execution date. Used by Data Life Cycle for failure rate analysis, retry
+  pattern investigation, and incident correlation. Incrementally loaded by execution date
+  window; not partitioned at the enrich layer.
+domain: Data Life Cycle
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   id_fail:
     lineage:
