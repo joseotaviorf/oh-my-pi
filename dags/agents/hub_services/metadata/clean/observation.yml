@@ -1,34 +1,49 @@
+---
 database_name: datalake_hub_services_clean
 table_name: observation
+description: >
+  Latest snapshot of free-text observations agents record about a visitor in Hub Services. One row per
+  observation id after deduplicating on the most recent update from raw.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Surrogate primary key of the observation in Hub Services.
     lineage:
       - datalake_hub_services_raw.observation.id
   id_visitor:
+    description: Visitor the observation refers to in the Hub Services CRM.
     lineage:
       - datalake_hub_services_raw.observation.visitor_id
   id_creator:
+    description: Hub user id of the agent or staff member who authored the observation.
     lineage:
       - datalake_hub_services_raw.observation.creator_id
   version:
+    description: Optimistic locking version from the Hub Services source application.
     lineage:
       - datalake_hub_services_raw.observation.version
   value:
+    description: Observation body text captured for the visitor during hub operations.
     lineage:
       - datalake_hub_services_raw.observation.value
   ts_created:
+    description: UTC timestamp when the observation was created in Hub Services.
     lineage:
       - datalake_hub_services_raw.observation.created_at
   ts_updated:
+    description: UTC timestamp of the latest update to the observation in Hub Services.
     lineage:
       - datalake_hub_services_raw.observation.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.observation.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.observation.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.observation.day

@@ -1,70 +1,101 @@
+---
 database_name: datalake_hub_services_clean
 table_name: responsible_aud
+description: >
+  Hibernate Envers audit history of Hub Services lead-to-agent assignments, including routing and active
+  flags. Each row is one revision and joins to rev_info on rev.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Assignment surrogate key whose audited snapshot is stored in this revision row.
     lineage:
       - datalake_hub_services_raw.responsible_aud.id
   id_lead:
+    description: Lead identifier for the assignment at this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.lead_id
   id_responsible:
+    description: Hub user responsible for the lead at this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.responsible
   id_distributor:
+    description: Hub distributor user associated with the assignment at this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.distributor
   rev:
+    description: Envers revision id; join to rev_info for the user and timestamp of the change.
     lineage:
       - datalake_hub_services_raw.responsible_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
       - datalake_hub_services_raw.responsible_aud.revtype
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
+    description: Revision id that superseded this audit row, when the entity was updated again.
     lineage:
       - datalake_hub_services_raw.responsible_aud.revend
   version:
+    description: Optimistic locking version captured in this assignment audit revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.version
   is_active:
+    description: Active flag on the assignment at this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.active
   mod_id_lead:
+    description: Envers flag indicating whether id_lead changed in this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.lead_id_mod
   mod_is_active:
+    description: Envers flag indicating whether is_active changed in this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.active_mod
   mod_id_distributor:
+    description: Envers flag indicating whether id_distributor changed in this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.distributor_mod
   mod_id_responsible:
+    description: Envers flag indicating whether id_responsible changed in this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.responsible_mod
   mod_ts_assigned:
+    description: Envers flag indicating whether ts_assigned changed in this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.assigned_at_mod
   mod_ts_unassigned:
+    description: Envers flag indicating whether ts_unassigned changed in this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.unassigned_at_mod
   ts_assigned:
+    description: UTC timestamp when the agent became responsible, at this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.assigned_at
   ts_unassigned:
+    description: UTC timestamp when the agent was unassigned, at this revision.
     lineage:
       - datalake_hub_services_raw.responsible_aud.unassigned_at
   ts_created:
+    description: UTC timestamp when the assignment row was created in the source application.
     lineage:
       - datalake_hub_services_raw.responsible_aud.created_at
   ts_updated:
+    description: UTC timestamp when the assignment row was last updated in the source application.
     lineage:
       - datalake_hub_services_raw.responsible_aud.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.responsible_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.responsible_aud.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.responsible_aud.day

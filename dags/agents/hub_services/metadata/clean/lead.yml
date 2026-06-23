@@ -1,53 +1,73 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: lead
+description: >
+  Latest snapshot of sales or rental leads registered in Hub Services, linking a visitor intent to a house
+  and performance hub. One row per lead id after keeping the most recent update from raw.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Surrogate primary key of the lead in Hub Services.
     lineage:
       - datalake_hub_services_raw.lead.id
   id_house:
+    description: House identifier associated with the lead opportunity.
     lineage:
       - datalake_hub_services_raw.lead.house_id
   id_visitor:
+    description: Visitor identifier who originated or owns the lead in Hub Services.
     lineage:
       - datalake_hub_services_raw.lead.visitor_id
   id_business_unit:
+    description: Performance hub business unit handling this lead.
     lineage:
       - datalake_hub_services_raw.lead.business_unit_id
   version:
+    description: Optimistic locking version from the Hub Services source application.
     lineage:
       - datalake_hub_services_raw.lead.version
   message:
+    description: Free-text note or context captured with the lead at creation or update.
     lineage:
       - datalake_hub_services_raw.lead.message
   business_context:
+    description: Commercial line of the lead, such as rent or sale operations.
     lineage:
       - datalake_hub_services_raw.lead.business_context
   lead_type:
+    description: Hub Services classification of the lead source or funnel type.
     lineage:
       - datalake_hub_services_raw.lead.lead_type
   lead_status:
+    description: Current workflow status of the lead inside Hub Services.
     lineage:
       - datalake_hub_services_raw.lead.lead_status
   is_cancellation:
+    description: Flag indicating whether the lead represents a cancellation event.
     lineage:
       - datalake_hub_services_raw.lead.cancellation
   is_secretariat:
+    description: Flag indicating the lead was created or handled by secretariat staff.
     lineage:
       - datalake_hub_services_raw.lead.is_secretariat
   ts_created:
+    description: UTC timestamp when the lead was created in Hub Services.
     lineage:
       - datalake_hub_services_raw.lead.created_at
   ts_updated:
+    description: UTC timestamp of the latest update to the lead in Hub Services.
     lineage:
       - datalake_hub_services_raw.lead.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.lead.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.lead.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.lead.day

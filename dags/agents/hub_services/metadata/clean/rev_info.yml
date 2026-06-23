@@ -1,23 +1,33 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: rev_info
+description: >
+  Hibernate Envers revision metadata for Hub Services audit tables. Each row identifies who performed a
+  change and when, and joins to *_aud tables on the rev column.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Envers revision id referenced by audit tables such as lead_aud and member_profile_aud.
     lineage:
       - datalake_hub_services_raw.revinfo.id
   id_user:
+    description: Hub Services user id that performed the audited change for this revision.
     lineage:
       - datalake_hub_services_raw.revinfo.user_id
   ts_created:
+    description: UTC timestamp when the Envers revision was recorded in the source database.
     lineage:
       - datalake_hub_services_raw.revinfo.timestamp
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.revinfo.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.revinfo.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.revinfo.day

@@ -1,43 +1,61 @@
+---
 database_name: datalake_hub_services_clean
 table_name: responsible
+description: >
+  Latest assignment of hub agents to leads in Hub Services, including distributor routing and active flag.
+  One row per assignment id after keeping the most recent update from raw.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Surrogate primary key of the lead assignment row in Hub Services.
     lineage:
       - datalake_hub_services_raw.responsible.id
   id_lead:
+    description: Lead identifier receiving the agent assignment.
     lineage:
       - datalake_hub_services_raw.responsible.lead_id
   id_responsible:
+    description: Hub user id of the agent currently responsible for the lead.
     lineage:
       - datalake_hub_services_raw.responsible.responsible
   id_distributor:
+    description: Hub user id of the distributor who routed or owns the assignment workflow.
     lineage:
       - datalake_hub_services_raw.responsible.distributor
   version:
+    description: Optimistic locking version from the Hub Services source application.
     lineage:
       - datalake_hub_services_raw.responsible.version
   is_active:
+    description: Whether this responsible assignment is currently active for the lead.
     lineage:
       - datalake_hub_services_raw.responsible.active
   ts_assigned:
+    description: UTC timestamp when the agent became responsible for the lead.
     lineage:
       - datalake_hub_services_raw.responsible.assigned_at
   ts_unassigned:
+    description: UTC timestamp when the agent was removed from the lead, if applicable.
     lineage:
       - datalake_hub_services_raw.responsible.unassigned_at
   ts_created:
+    description: UTC timestamp when the assignment row was created in Hub Services.
     lineage:
       - datalake_hub_services_raw.responsible.created_at
   ts_updated:
+    description: UTC timestamp of the latest update to the assignment in Hub Services.
     lineage:
       - datalake_hub_services_raw.responsible.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.responsible.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.responsible.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.responsible.day

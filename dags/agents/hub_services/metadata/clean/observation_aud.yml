@@ -1,52 +1,77 @@
+---
 database_name: datalake_hub_services_clean
 table_name: observation_aud
+description: >
+  Hibernate Envers audit history of Hub Services visitor observations, including field-level change flags.
+  Each row is one revision of an observation and joins to rev_info on rev.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Observation surrogate key whose audited snapshot is stored in this revision row.
     lineage:
       - datalake_hub_services_raw.observation_aud.id
   id_visitor:
+    description: Visitor identifier referenced by the observation at this revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.visitor_id
   id_creator:
+    description: Hub user who authored the observation at this revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.creator_id
   rev:
+    description: Envers revision id; join to rev_info for the user and timestamp of the change.
     lineage:
       - datalake_hub_services_raw.observation_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
       - datalake_hub_services_raw.observation_aud.revtype
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
+    description: Revision id that superseded this audit row, when the entity was updated again.
     lineage:
       - datalake_hub_services_raw.observation_aud.revend
   version:
+    description: Optimistic locking version captured in this observation audit revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.version
   value:
+    description: Observation text content stored at this revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.value
   mod_value:
+    description: Envers flag indicating whether the observation text changed in this revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.value_mod
   mod_id_visitor:
+    description: Envers flag indicating whether id_visitor changed in this revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.visitor_id_mod
   mod_id_creator:
+    description: Envers flag indicating whether id_creator changed in this revision.
     lineage:
       - datalake_hub_services_raw.observation_aud.creator_id_mod
   ts_created:
+    description: UTC timestamp when the observation row was created in the source application.
     lineage:
       - datalake_hub_services_raw.observation_aud.created_at
   ts_updated:
+    description: UTC timestamp when the observation row was last updated in the source application.
     lineage:
       - datalake_hub_services_raw.observation_aud.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.observation_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.observation_aud.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.observation_aud.day

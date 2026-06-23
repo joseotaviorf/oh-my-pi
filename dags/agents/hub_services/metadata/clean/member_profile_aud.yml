@@ -1,71 +1,101 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: member_profile_aud
+description: >
+  Hibernate Envers audit history of hub member profiles, capturing role, hierarchy, and activation changes.
+  Each row is one revision and joins to rev_info on rev.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
+    description: Member profile surrogate key whose audited snapshot is stored in this revision row.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.id
   rev:
+    description: Envers revision id; join to rev_info for the user and timestamp of the change.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.rev
   rev_type:
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
     lineage:
       - datalake_hub_services_raw.member_profile_aud.revtype
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
   rev_end:
+    description: Revision id that superseded this audit row, when the entity was updated again.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.revend
   id_business_unit:
+    description: Performance hub business unit linked to the member profile at this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.business_unit_id
   id_user:
+    description: Hub Services user id associated with the member profile at this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.user_id
   version:
+    description: Optimistic locking version captured in this member profile audit revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.version
   id_parent_member_profile:
+    description: Parent member profile id defining hierarchy at this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.parent_member_profile_id
   profile:
+    description: Named profile or role label assigned to the hub member at this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.profile
   is_active:
+    description: Whether the member profile was active at this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.active
   mod_id_business_unit:
+    description: Envers flag indicating whether id_business_unit changed in this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.business_unit_id_mod
   mod_id_user:
+    description: Envers flag indicating whether id_user changed in this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.user_id_mod
   mod_profile:
+    description: Envers flag indicating whether profile changed in this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.profile_mod
   mod_active:
+    description: Envers flag indicating whether is_active changed in this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.active_mod
   mod_id_parent_member_profile:
+    description: Envers flag indicating whether id_parent_member_profile changed in this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.parent_member_profile_id_mod
   mod_dt_relationship_started:
+    description: Envers flag indicating whether dt_relationship_started changed in this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.relationship_start_date_mod
   dt_relationship_started:
+    description: Calendar date when the member relationship started at this revision.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.relationship_start_date
   ts_created:
+    description: UTC timestamp when the member profile row was created in the source application.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.created_at
   ts_updated:
+    description: UTC timestamp when the member profile row was last updated in the source application.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.updated_at
   year:
+    description: Year partition of the clean load; filter with month and day for partition pruning.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.year
   month:
+    description: Month partition of the clean load; combine with year and day when querying history.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.month
   day:
+    description: Day partition of the clean load; always constrain year, month, and day together.
     lineage:
       - datalake_hub_services_raw.member_profile_aud.day
