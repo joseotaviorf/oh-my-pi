@@ -13,8 +13,11 @@ description: >
   allowed duplicate companies with the same legacy cnpj, source companies are deduplicated to one
   id_company per effective CNPJ before joining core_brokers.brokers. Effective CNPJ is COALESCE(cnpj_unique,
   cnpj): cnpj_unique is the system-enforced unique identifier in HubSpot and is preferred when populated;
-  when cnpj_unique is still null the legacy cnpj is used and ties are broken by the most recently updated
-  company.
+  when cnpj_unique is still null the legacy cnpj is used. When more than one eligible company shares the
+  effective CNPJ, the canonical company is chosen deterministically by preferring the active Rede Sale
+  member (sale_lead_status = Membro), then a company with a non-null id_hubspot_owner, then a populated
+  cnpj_unique, then the most recently updated company, with id_company as the final tie-breaker. This
+  prevents a lost or owner-less duplicate company from masking the active broker's account manager.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:

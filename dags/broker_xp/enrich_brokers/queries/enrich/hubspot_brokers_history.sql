@@ -5,8 +5,11 @@ WITH brokers_members_ranked AS (
     ROW_NUMBER() OVER(
       PARTITION BY COALESCE(c.cnpj_unique, c.cnpj)
       ORDER BY
+        (c.sale_lead_status = 'Membro') DESC,
+        (c.id_hubspot_owner IS NOT NULL) DESC,
         (c.cnpj_unique IS NOT NULL) DESC,
-        c.ts_updated DESC
+        c.ts_updated DESC,
+        c.id_company DESC
     ) AS rn
   FROM
     datalake_hubspot.company AS c
