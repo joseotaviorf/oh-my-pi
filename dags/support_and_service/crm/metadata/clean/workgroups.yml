@@ -2,23 +2,37 @@
 database_name: datalake_crm_clean
 table_name: workgroups
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
+description: >
+  One row per CRM workgroup (team queue) configuration. Reference table mapping workgroup identifiers to their display titles, task type restrictions, and routing flags. Source system is datalake_crm_raw.workgroups.
 columns:
   id:
     lineage:
       - datalake_crm_raw.workgroups._id
+
+    description: Unique identifier for the CRM workgroup.
   flags:
     lineage:
       - datalake_crm_raw.workgroups.flags
+
+    description: JSON array of feature flags or configuration flags for this workgroup.
   task_types:
     lineage:
       - datalake_crm_raw.workgroups.tasktypes
+
+    description: Array of task type identifiers that this workgroup is authorized to handle.
   title:
     lineage:
       - datalake_crm_raw.workgroups.title
+
+    description: Human-readable display title for this CRM workgroup (team name).
   automatic_reassign:
     lineage:
       - datalake_crm_raw.workgroups.automaticreassign
+
+    description: Boolean flag indicating whether tasks in this workgroup are automatically reassigned if abandoned.
   version:
     lineage:
       - datalake_crm_raw.workgroups.__v
+
+    description: Version number of the workgroup configuration record.

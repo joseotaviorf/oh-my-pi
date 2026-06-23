@@ -2,4 +2,5 @@
 database_name: datalake_braze_analytics_raw
 table_name: campaign_analytics_owners
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
+description: Raw Braze campaign analytics for the owners (proprietários) audience. One row per campaign analytics snapshot. Source system is Braze.

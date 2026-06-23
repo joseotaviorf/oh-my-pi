@@ -2,20 +2,33 @@
 database_name: datalake_crm_clean
 table_name: task_titles
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
+description: >
+  Reference table mapping CRM task type identifiers to their human-readable titles,
+  slugs, and associated workgroup assignments. One row per task title definition.
+  Source system is datalake_crm_raw.
 columns:
   id:
     lineage:
       - datalake_crm_raw.tasktitles._id
+
+    description: Unique identifier for the task title record.
   workgroup_ids:
     lineage:
       - datalake_crm_raw.tasktitles.workgroupids
+
+    description: Array of workgroup identifiers associated with this task title.
   description:
     lineage:
       - datalake_crm_raw.tasktitles.description
+    description: Free-text description of the task title, providing context about the task type's purpose and scope.
   title:
     lineage:
       - datalake_crm_raw.tasktitles.title
+
+    description: Human-readable display title for this CRM task type.
   slug:
     lineage:
       - datalake_crm_raw.tasktitles.slug
+
+    description: URL-safe slug identifier for the task title, used in routing and API calls.

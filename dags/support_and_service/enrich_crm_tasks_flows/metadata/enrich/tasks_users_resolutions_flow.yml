@@ -1,9 +1,12 @@
 ---
 database_name: datalake_crm_tasks_flows
 table_name: tasks_users_resolutions_flow
-description: ""
+description: >
+  One row per CRM task enriched with user assignment and resolution flow metrics. Combines task
+  identity with assignee information and resolution timing, used for analyst performance
+  and SLA reporting. Source systems are datalake_crm and datalake_crm_tasks_resolution.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_action_date:
     lineage:
@@ -20,7 +23,7 @@ columns:
   id_contract:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_contract
-    description: Key of contract
+    description: Identifier of the rental contract associated with this task action.
   id_origin:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_origin
@@ -62,7 +65,7 @@ columns:
   id_workgroup:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_workgroup
-    description: ""
+    description: Identifier of the workgroup (team queue) this task action belongs to.
   action_type:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.action_type
@@ -76,7 +79,7 @@ columns:
   origin:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.origin
-    description: ""
+    description: Origin system or entity that triggered this task action (e.g., rent flow, contract).
   type_activity:
     lineage:
       - datalake_heimdall.activity.type
@@ -90,7 +93,7 @@ columns:
   type:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.type
-    description: ""
+    description: Task type classification indicating the category of support task (e.g., inspection, repair).
   task_user_type:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.action_type

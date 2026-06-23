@@ -2,110 +2,181 @@
 database_name: datalake_crm_clean
 table_name: tasks
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
+description: >
+  One row per CRM support task, capturing assignee, originating entity, property,
+  tenant, workgroup, and metadata. Used for SLA tracking, performance reporting,
+  and task lifecycle analysis. Source system is datalake_crm_raw.
 columns:
   id:
     lineage:
       - datalake_crm_raw.tasks._id
+
+    description: Unique identifier for the CRM task record.
   id_origin:
     lineage:
       - datalake_crm_raw.tasks.origemid
+
+    description: Identifier of the originating entity (e.g., contract, inspection) that triggered this task.
   id_assignee:
     lineage:
       - datalake_crm_raw.tasks.assigneeid
+
+    description: Identifier of the support agent assigned to handle this task.
   id_house:
     lineage:
       - datalake_crm_raw.tasks.imovelid
+
+    description: Identifier of the property associated with this task.
   id_opened_by:
     lineage:
       - datalake_crm_raw.tasks.openedbyid
+
+    description: Identifier of the user who opened or created this task.
   id_tenant:
     lineage:
       - datalake_crm_raw.tasks.inquilinoid
+
+    description: Identifier of the tenant (inquilino) associated with this task.
   id_negotiation:
     lineage:
       - datalake_crm_raw.tasks.negociacaoid
+
+    description: Identifier of the negotiation process linked to this task.
   id_manager:
     lineage:
       - datalake_crm_raw.tasks.gerenteid
+
+    description: Identifier of the manager responsible for this task.
   id_owner:
     lineage:
       - datalake_crm_raw.tasks.proprietarioid
+
+    description: Identifier of the landlord (proprietário) associated with this task.
   id_receiver:
     lineage:
       - datalake_crm_raw.tasks.destinatarioid
+
+    description: Identifier of the customer (receiver) who is the subject of this task.
   id_workgroup:
     lineage:
       - datalake_crm_raw.tasks.workgroupId
+
+    description: Identifier of the workgroup (team queue) this task is assigned to.
   version:
     lineage:
       - datalake_crm_raw.tasks.__v
+
+    description: Version number of the task record for incremental tracking.
   actions:
     lineage:
       - datalake_crm_raw.tasks.actions
+
+    description: JSON array of actions performed on this task.
   score:
     lineage:
       - datalake_crm_raw.tasks.score
+
+    description: Satisfaction or performance score for this task.
   score_factor:
     lineage:
       - datalake_crm_raw.tasks.scorefactor
+
+    description: Numeric factor used to weight or prioritize this task.
   receiver_name:
     lineage:
       - datalake_crm_raw.tasks.nomedestinatario
+
+    description: Display name of the customer (receiver) who is the subject of this task.
   task_comment:
     lineage:
       - datalake_crm_raw.tasks.comentario
+
+    description: Free-text comment added by the agent when completing or updating this task.
   origin:
     lineage:
       - datalake_crm_raw.tasks.origem
+
+    description: Origin system or channel that generated this task.
   type:
     lineage:
       - datalake_crm_raw.tasks.type
+
+    description: Classification type of this task (e.g., visit, inspection, payment).
   receiver_type:
     lineage:
       - datalake_crm_raw.tasks.tipodestinatario
+
+    description: Type of the receiver entity (e.g., tenant, landlord, guarantor).
   description:
     lineage:
       - datalake_crm_raw.tasks.descricao
+    description: Free-text description or notes added to this CRM task by the operator.
   phase:
     lineage:
       - datalake_crm_raw.tasks.fase
+
+    description: Current workflow phase of this task (e.g., open, in_progress, closed).
   start_date_object:
     lineage:
       - datalake_crm_raw.tasks.datainicio
+
+    description: Parsed date object for when work on this task started.
   origin_date_object:
     lineage:
       - datalake_crm_raw.tasks.origemdata
+
+    description: Parsed date object from the origin system when the triggering event occurred.
   completed_date_object:
     lineage:
       - datalake_crm_raw.tasks.realizadaem
+
+    description: Parsed date object for when this task was completed.
   silenced_until_date_object:
     lineage:
       - datalake_crm_raw.tasks.silenciadaate
+
+    description: Parsed date object until which this task is snoozed.
   created_date_object:
     lineage:
       - datalake_crm_raw.tasks.datacriacao
+
+    description: Parsed date object for when this task was created.
   visit_fup:
     lineage:
       - datalake_crm_raw.tasks.followupvisita
+
+    description: Follow-up flag for tasks related to property visits.
   unix_fup:
     lineage:
       - datalake_crm_raw.tasks.datafup
+
+    description: Unix timestamp for the next scheduled follow-up action on this task.
   analyst_started:
     lineage:
       - datalake_crm_raw.tasks.startedat
+
+    description: Timestamp when the assigned analyst began working on this task.
   tags:
     lineage:
       - datalake_crm_raw.tasks.tags
+
+    description: Array of classification tags applied to this task.
   metadata:
     lineage:
       - datalake_crm_raw.tasks.metadata
+
+    description: JSON object with additional context metadata extracted from the raw task payload.
   is_resolved:
     lineage:
       - datalake_crm_raw.tasks.resolvida
+
+    description: Boolean flag indicating whether this task has been resolved and closed.
   dt_visit:
     lineage:
       - datalake_crm_raw.tasks.datavisita
+
+    description: Date of the property visit associated with this task, if applicable.
   year:
     lineage:
       - datalake_crm_raw.tasks.year

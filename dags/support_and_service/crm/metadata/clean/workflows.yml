@@ -2,44 +2,72 @@
 database_name: datalake_crm_clean
 table_name: workflows
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
+description: >
+  One row per CRM workflow instance, tracking its state transitions, context, and
+  lifecycle timestamps from creation to completion. Links to workflow definition
+  templates and the flow it belongs to. Source system is datalake_crm_raw.
 columns:
   id:
     lineage:
       - datalake_crm_raw.workflows._id
+
+    description: Unique identifier for the workflow instance.
   id_workflow_definition:
     lineage:
       - datalake_crm_raw.workflows.workflowdefinitionid
+
+    description: Identifier of the workflow definition template this instance was created from.
   id_flow:
     lineage:
       - datalake_crm_raw.workflows.flowid
+
+    description: Identifier of the broader flow this workflow belongs to.
   workflow_definition_version:
     lineage:
       - datalake_crm_raw.workflows.workflowdefinitionversion
+
+    description: Version of the workflow definition used to create this instance.
   version:
     lineage:
       - datalake_crm_raw.workflows.__v
+
+    description: Version number of the workflow record for incremental tracking.
   states:
     lineage:
       - datalake_crm_raw.workflows.states
+
+    description: JSON array of all states this workflow has passed through.
   status:
     lineage:
       - datalake_crm_raw.workflows.status
+
+    description: Current status of the workflow (e.g., active, completed, cancelled).
   transitions:
     lineage:
       - datalake_crm_raw.workflows.transitions
+
+    description: JSON array of task transition events that occurred within this workflow.
   context:
     lineage:
       - datalake_crm_raw.workflows.context
+
+    description: JSON object with additional context metadata for this workflow instance.
   start_date_object:
     lineage:
       - datalake_crm_raw.workflows.starttime
+
+    description: Parsed date object for when this workflow started.
   updated_date_object:
     lineage:
       - datalake_crm_raw.workflows.updated
+
+    description: Parsed date object for the most recent update to this workflow.
   end_date_object:
     lineage:
       - datalake_crm_raw.workflows.endtime
+
+    description: Parsed date object for when this workflow was completed or closed.
   year:
     lineage:
       - datalake_crm_raw.workflows.year
