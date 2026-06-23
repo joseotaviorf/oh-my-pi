@@ -32,7 +32,6 @@ workflow:
       z_order_by: [ts_created]
     agent_tier_validity:
       merge_on: [id_agent_tier]
-      z_order_by: [ts_updated]
     brokerage_share_history:
       merge_on: [id_revision, id_contract]
       z_order_by: [id_contract, ts_revision]
