@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets
 table_name: rental_supply_targets
-owner: monica.faria@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: This table contains a historical merge of targets to supply metrics at the growth line.
 columns:
@@ -49,7 +49,7 @@ columns:
       - datalake_static_files.rental_supply_targets.supply_channel
       - datalake_gsheets_clean.supply_targets_2022.supply_channel
   supply_origin:
-    description: The origin or source of the supply.
+    description: Marketing or operational origin of the owner lead used in Growth supply target planning.
     lineage:
       - datalake_static_files.rental_supply_targets.supply_origin
       - datalake_gsheets_clean.supply_targets_2022.supply_origin

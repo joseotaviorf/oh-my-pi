@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets
 table_name: sale_supply_targets_cohort
-description: Table that consolidates sale supply cohort targets from gsheets.
+description: Enriched consolidation of For Sale supply cohort targets across annual spreadsheets (2024 and 2025). Captures week-over-week conversion volumes across the owner supply funnel.
 domain: For Sale
 owner: uilson.bonfim@quintoandar.com.br
 columns:
@@ -9,76 +9,76 @@ columns:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.avq2opp
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.avq2opp
-    description: "Available qualified to opportunity conversion rate"
+    description: Cohort target volume of available qualifieds that converted into supply opportunities.
   city_group:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.city_group
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.region
-    description: "City group or region"
+    description: QuintoAndar city group or region associated with the cohort supply target row.
   company_report_origin:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.company_report_origin
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.company_report_origin
-    description: "Company report origin"
+    description: Acquisition channel or conversion source used in company reporting for the cohort row.
   dt_week_started:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.dt_week_started
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.week_start
-    description: "Week start date"
+    description: Week start date identifying the cohort supply target planning period.
   fl:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.fl
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.fl
-    description: "First listings count"
+    description: Cohort target volume of first listings published in the reference period.
   lead_processing_operation:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.lead_processing_operation
-    description: "Lead processing operation"
+    description: Operation team or workflow that processed the owner listing lead for the cohort row.
   opp2fl:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.opp2fl
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.opp2fl
-    description: "Opportunities to first listings conversion rate"
+    description: Cohort target volume of opportunities that converted into first listings published.
   op2q:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.op2q
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.op2q
-    description: "Opportunities to qualified conversion rate"
+    description: Cohort target volume of owner prospects that converted into qualified leads.
   planning_cluster:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_cluster
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.planning_cluster
-    description: "Planning cluster"
+    description: Channel cluster used in cohort supply target planning for affiliates and medium channels.
   planning_conversion:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_conversion
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.planning_conversion
-    description: "Planning conversion"
+    description: Detailed conversion operation type distinguishing Inside Sales inbound, outbound, and expert flows.
   planning_operation:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_operation
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.planning_operation
-    description: "Planning operation"
+    description: High-level conversion operation type associated with the cohort supply target row.
   planning_taxonomy:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_taxonomy
-    description: "Planning taxonomy"
+    description: Planning taxonomy combining supply marketing origin and medium channel for the cohort row.
   q2avq:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.q2avq
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.q2avq
-    description: "Qualified to available qualified conversion rate"
+    description: Cohort target volume of qualified leads that converted into available qualifieds.
   q2opp:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.q2opp
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.q2opp
-    description: "Qualified to opportunity conversion rate"
+    description: Cohort target volume of qualified leads that converted into supply opportunities.
   supply_mkt_origin_detailed:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.supply_mkt_origin_detailed
-    description: "Supply market origin detailed"
+    description: Detailed marketing origin of the owner lead used in cohort supply target planning.
   weeks_conversion:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_cohort_2024.weeks_conversion
       - datalake_gsheets_clean.sale_supply_targets_cohort_2025.weeks_conversion
-    description: "Weeks conversion data"
+    description: Cohort week indicator representing elapsed weeks between funnel events (W0, W1, and so on).

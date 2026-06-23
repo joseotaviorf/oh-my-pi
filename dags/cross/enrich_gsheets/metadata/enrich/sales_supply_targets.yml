@@ -3,10 +3,10 @@ database_name: datalake_gsheets
 table_name: sales_supply_targets
 description: Table that consolidates the sales demand targets, with historical data and data from the present year.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   city_group:
-    description: City group.
+    description: QuintoAndar city group associated with the consolidated For Sale supply targets.
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.city_group
       - datalake_gsheets_clean.sale_supply_targets_retro.city_group
@@ -21,7 +21,7 @@ columns:
       - datalake_gsheets_clean.sale_supply_targets_2024.supply_mkt_origin_detailed
       - datalake_gsheets_clean.sale_supply_targets_retro.supply_mkt_origin_detailed
   planning_taxonomy:
-    description: What is the planning taxonomy.
+    description: Planning taxonomy combining supply marketing origin and medium channel for the target row.
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.planning_taxonomy
       - datalake_gsheets_clean.sale_supply_targets_retro.planning_taxonomy
@@ -68,15 +68,15 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.day
   quarter:
-    description: Quarter of target.
+    description: Calendar quarter derived from the target reference date in the consolidated supply table.
     lineage:
       - datalake_quintoandar.aux_date.quarter
   week_start:
-    description: Week of target.
+    description: Week start date derived from the target reference date for weekly supply planning.
     lineage:
       - datalake_quintoandar.aux_date.week_start
   dt_target:
-    description: Date of the target.
+    description: Reference date identifying the For Sale supply target period in the consolidated table.
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.dt_target
       - datalake_gsheets_clean.sale_supply_targets_retro.dt_target

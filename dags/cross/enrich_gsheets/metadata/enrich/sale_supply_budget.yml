@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets
 table_name: sale_supply_budget
-description: Table that consolidates sale supply budget from gsheets.
+description: Enriched consolidation of For Sale supply budget metrics across annual budget spreadsheets (2024 and 2025). Unifies owner lead funnel volumes for sale supply planning.
 domain: For Sale
 owner: uilson.bonfim@quintoandar.com.br
 columns:
@@ -9,66 +9,66 @@ columns:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.available_qualifieds
       - datalake_gsheets_clean.sale_supply_budget_2025.available_qualifieds
-    description: "Count of available qualified prospects"
+    description: Budgeted count of qualified owner leads with an available property to list.
   city_group:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.city_group
       - datalake_gsheets_clean.sale_supply_budget_2025.city_group
-    description: "City group"
+    description: QuintoAndar city group associated with the For Sale supply budget row.
   company_report_origin:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.company_report_origin
       - datalake_gsheets_clean.sale_supply_budget_2025.company_report_origin
-    description: "Company report origin"
+    description: Acquisition channel or conversion source used in company reporting for the budget row.
   dt_budget:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.dt_budget
       - datalake_gsheets_clean.sale_supply_budget_2025.date
-    description: "Budget date"
+    description: Reference date identifying the For Sale supply budget period.
   first_listings:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.first_listings
       - datalake_gsheets_clean.sale_supply_budget_2025.first_listings
-    description: "Count of first listings"
+    description: Budgeted count of first listings published from the For Sale supply funnel.
   lead_processing_operation:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.lead_processing_operation
-    description: "Lead processing operation"
+    description: Operation team or workflow that processed the owner listing lead for the budget row.
   opportunities:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.opportunities
       - datalake_gsheets_clean.sale_supply_budget_2025.opportunities
-    description: "Count of opportunities"
+    description: Budgeted count of supply opportunities created from qualified owner leads.
   planning_cluster:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.planning_cluster
       - datalake_gsheets_clean.sale_supply_budget_2025.planning_cluster
-    description: "Planning cluster"
+    description: Channel cluster used in For Sale supply budget planning for affiliates and medium channels.
   planning_conversion:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.planning_conversion
       - datalake_gsheets_clean.sale_supply_budget_2025.planning_conversion
-    description: "Planning conversion"
+    description: Detailed conversion operation type distinguishing Inside Sales inbound, outbound, and expert flows.
   planning_operation:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.planning_operation
       - datalake_gsheets_clean.sale_supply_budget_2025.planning_operation
-    description: "Planning operation"
+    description: High-level conversion operation type associated with the supply budget row.
   planning_taxonomy:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.planning_taxonomy
-    description: "Planning taxonomy"
+    description: Planning taxonomy combining supply marketing origin and medium channel for the budget row.
   prospects:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.prospects
       - datalake_gsheets_clean.sale_supply_budget_2025.prospects
-    description: "Count of prospects"
+    description: Budgeted count of owner prospects entering the For Sale supply funnel.
   qualifieds:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.qualifieds
       - datalake_gsheets_clean.sale_supply_budget_2025.qualifieds
-    description: "Count of qualified prospects"
+    description: Budgeted count of owner leads qualified for listing in the supply funnel.
   supply_mkt_origin_detailed:
     lineage:
       - datalake_gsheets_clean.sale_supply_budget_2024.supply_mkt_origin_detailed
-    description: "Supply market origin detailed"
+    description: Detailed marketing origin of the owner lead used in For Sale supply budget planning.

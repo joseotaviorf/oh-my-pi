@@ -1,127 +1,127 @@
 ---
 database_name: datalake_gsheets
 table_name: rental_demand_targets
-description: Table that consolidates rental demand targets from gsheets.
+description: Enriched consolidation of For Rent demand targets from historical gsheets and static files. Unifies funnel volumes and calendar dimensions for cross-year rental demand planning.
 domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   city_group:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.city_group
       - datalake_static_files.rental_demand_targets.city_group
-    description: "City group"
+    description: QuintoAndar city group associated with the rental demand target row.
   demand_channel:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.demand_channel
       - datalake_static_files.rental_demand_targets.demand_channel
-    description: "Demand channel"
+    description: Acquisition or engagement channel associated with the rental demand target.
   demand_channel_type:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.demand_channel_type
       - datalake_static_files.rental_demand_targets.demand_channel_type
-    description: "Demand channel type"
+    description: Channel type classification for the rental demand target planning row.
   funnel_origin:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.funnel_origin
       - datalake_static_files.rental_demand_targets.funnel_origin
-    description: "Funnel origin"
+    description: Funnel entry point or origin associated with the rental demand target.
   rental_administrator:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.rental_administrator
       - datalake_static_files.rental_demand_targets.rental_administrator
-    description: "Rental administrator"
+    description: Contract administrator responsible for listings covered by the demand target.
   evaluation_positive:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.evaluation_positive
       - datalake_static_files.rental_demand_targets.evaluation_positive
-    description: "Evaluation positive"
+    description: Target volume of positive tenant evaluations in the rental demand funnel.
   evaluation_started:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.evaluation_started
       - datalake_static_files.rental_demand_targets.evaluation_started
-    description: "Evaluation started"
+    description: Target volume of tenant evaluations started in the rental demand funnel.
   new_tenant_prospects:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.new_tenant_prospects
       - datalake_static_files.rental_demand_targets.new_tenant_prospects
-    description: "New tenant prospects"
+    description: Target volume of newly acquired tenant prospects entering the rental funnel.
   contracts_signed:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.contracts_signed
       - datalake_static_files.rental_demand_targets.contracts_signed
-    description: "Contracts signed"
+    description: Target volume of rental contracts signed in the demand funnel.
   credit_approved:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.credit_approved
       - datalake_static_files.rental_demand_targets.credit_approved
-    description: "Credits approved"
+    description: Target volume of tenant credit approvals in the rental demand funnel.
   doc_completed:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.doc_completed
       - datalake_static_files.rental_demand_targets.doc_completed
-    description: "Docs completed"
+    description: Target volume of completed tenant documentation packages in the funnel.
   doc_sent:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.doc_sent
       - datalake_static_files.rental_demand_targets.doc_sent
-    description: "Docs sent"
+    description: Target volume of tenant documentation packages sent in the rental funnel.
   offer_accepted:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.offer_accepted
       - datalake_static_files.rental_demand_targets.offer_accepted
-    description: "Offers accepted"
+    description: Target volume of rental offers accepted by stakeholders.
   offer_sent:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.offer_sent
       - datalake_static_files.rental_demand_targets.offer_sent
-    description: "Offers sent"
+    description: Target volume of rental offers sent to prospective tenants.
   visits_booked:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.visits_booked
       - datalake_static_files.rental_demand_targets.visits_booked
-    description: "Visits booked"
+    description: Target volume of property visits booked by prospective tenants.
   visits_completed:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.visits_completed
       - datalake_static_files.rental_demand_targets.visits_completed
-    description: "Visits completed"
+    description: Target volume of property visits completed by prospective tenants.
   tier:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.tier
       - datalake_static_files.rental_demand_targets.tier
-    description: "Tier"
+    description: City tier classification used in rental demand target planning.
   halfyear:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.halfyear
       - datalake_static_files.rental_demand_targets.halfyear
-    description: "Halfyear"
+    description: Half-year period label associated with the rental demand target.
   quarter:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.quarter
       - datalake_static_files.rental_demand_targets.quarter
-    description: "Quarter"
+    description: Calendar quarter associated with the rental demand target row.
   month:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.month
       - datalake_static_files.rental_demand_targets.month
-    description: "Month"
+    description: Calendar month associated with the rental demand target row.
   year:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.year
       - datalake_static_files.rental_demand_targets.year
-    description: "Year"
+    description: Calendar year associated with the rental demand target row.
   has_guarantee:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.has_guarantee
       - datalake_static_files.rental_demand_targets.has_guarantee
-    description: "Has guarantee"
+    description: Boolean flag indicating whether the demand target row includes guarantee product volume.
   dt_week_started:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.dt_week_started
       - datalake_static_files.rental_demand_targets.dt_week_started
-    description: "Date of the week start"
+    description: Week start date identifying the rental demand target planning period.
   dt_target:
     lineage:
       - datalake_gsheets_clean.demand_targets_2022.dt_target
       - datalake_static_files.rental_demand_targets.dt_target
-    description: "Date of the target"
+    description: Reference date identifying the rental demand target period for the row.

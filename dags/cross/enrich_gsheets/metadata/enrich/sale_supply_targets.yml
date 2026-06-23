@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets
 table_name: sale_supply_targets
-description: Table that consolidates sale supply targets from gsheets.
+description: Enriched consolidation of For Sale supply targets across annual target spreadsheets (2024 and 2025). Unifies owner lead funnel volumes for sale supply planning.
 domain: For Sale
 owner: uilson.bonfim@quintoandar.com.br
 columns:
@@ -9,66 +9,66 @@ columns:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.available_qualifieds
       - datalake_gsheets_clean.sale_supply_targets_2025.available_qualifieds
-    description: "Available qualifieds count"
+    description: Target count of qualified owner leads with an available property to list.
   city_group:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.city_group
       - datalake_gsheets_clean.sale_supply_targets_2025.city_group
-    description: "City group"
+    description: QuintoAndar city group associated with the For Sale supply target row.
   company_report_origin:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.company_report_origin
       - datalake_gsheets_clean.sale_supply_targets_2025.company_report_origin
-    description: "Company report origin"
+    description: Acquisition channel or conversion source used in company reporting for the target row.
   dt_target:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.dt_target
       - datalake_gsheets_clean.sale_supply_targets_2025.date
-    description: "Target date"
+    description: Reference date identifying the For Sale supply target period.
   first_listings:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.first_listings
       - datalake_gsheets_clean.sale_supply_targets_2025.first_listings
-    description: "First listings count"
+    description: Target count of first listings published from the For Sale supply funnel.
   lead_processing_operation:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.lead_processing_operation
-    description: "Lead processing operation"
+    description: Operation team or workflow that processed the owner listing lead for the target row.
   opportunities:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.opportunities
       - datalake_gsheets_clean.sale_supply_targets_2025.opportunities
-    description: "Opportunities count"
+    description: Target count of supply opportunities created from qualified owner leads.
   planning_cluster:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.planning_cluster
       - datalake_gsheets_clean.sale_supply_targets_2025.planning_cluster
-    description: "Planning cluster"
+    description: Channel cluster used in For Sale supply target planning for affiliates and medium channels.
   planning_conversion:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.planning_conversion
       - datalake_gsheets_clean.sale_supply_targets_2025.planning_conversion
-    description: "Planning conversion"
+    description: Detailed conversion operation type distinguishing Inside Sales inbound, outbound, and expert flows.
   planning_operation:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.planning_operation
       - datalake_gsheets_clean.sale_supply_targets_2025.planning_operation
-    description: "Planning operation"
+    description: High-level conversion operation type associated with the supply target row.
   planning_taxonomy:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.planning_taxonomy
-    description: "Planning taxonomy"
+    description: Planning taxonomy combining supply marketing origin and medium channel for the target row.
   prospects:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.prospects
       - datalake_gsheets_clean.sale_supply_targets_2025.prospects
-    description: "Prospects count"
+    description: Target count of owner prospects entering the For Sale supply funnel.
   qualifieds:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.qualifieds
       - datalake_gsheets_clean.sale_supply_targets_2025.qualifieds
-    description: "Qualified leads count"
+    description: Target count of owner leads qualified for listing in the supply funnel.
   supply_mkt_origin_detailed:
     lineage:
       - datalake_gsheets_clean.sale_supply_targets_2024.supply_mkt_origin_detailed
-    description: "Supply market origin detailed"
+    description: Detailed marketing origin of the owner lead used in For Sale supply target planning.

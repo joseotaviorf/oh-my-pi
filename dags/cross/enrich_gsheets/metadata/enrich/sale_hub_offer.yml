@@ -1,60 +1,80 @@
 ---
 database_name: datalake_gsheets
 table_name: sale_hub_offer
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Enriched For Sale offers from the hub central spreadsheet with normalized hub flow classification. Used to analyze offer funnel milestones and executive routing across hub locations.
 columns:
   id_offer:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.id_offer
+    description: Unique identifier of the For Sale offer in the hub central source system.
   id_client_cm:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.id_client_cm
+    description: Client identifier in the hub central CRM associated with the offer.
   id_buyer:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.id_user_5a
+    description: QuintoAndar buyer user identifier linked to the hub central offer.
   id_house_cm:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.id_house_cm
+    description: House identifier in the hub central system associated with the offer.
   id_house:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.id_house_5a
+    description: QuintoAndar house identifier linked to the hub central offer.
   status:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.status
+    description: Current lifecycle status of the For Sale offer in the hub central workflow.
   offer_model:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.offer_model
+    description: Commercial offer model classification applied to the hub central transaction.
   executive:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.executive
+    description: Executive accountable for managing the offer in the hub central process.
   executive_lead:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.executive_lead
+    description: Lead executive overseeing the offer team in the hub central workflow.
   sale_price_agreed:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.sale_price_agreed
+    description: Agreed sale price negotiated for the offer in the hub central record.
   agent:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.agent
+    description: Real estate agent associated with the offer in the hub central spreadsheet.
   ohc_offer_flow:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.offer_flow
+    description: Normalized hub offer flow category derived from the raw offer flow field (HUB or CENTRAL).
   ohc_offer_flow_detail:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.executive_lead
       - datalake_gsheets_clean.offers_hub_central.offer_flow
+    description: Detailed hub location or flow label derived from executive lead and offer flow rules.
   dt_offer_submitted:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.dt_offer_submitted
+    description: Date when the buyer submitted the offer in the hub central funnel.
   dt_offer_ended:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.dt_offer_ended
+    description: Date when the offer reached a terminal ended state in the hub central workflow.
   dt_offer_accepted:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.dt_offer_accepted
+    description: Date when the offer was accepted by stakeholders in the hub central process.
   dt_offer_dismissed:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.dt_offer_dismissed
+    description: Date when the offer was dismissed or rejected in the hub central workflow.
   dt_sale_agreement_signed:
     lineage:
       - datalake_gsheets_clean.offers_hub_central.dt_sale_agreement_signed
+    description: Date when the sale agreement (CCV) was signed for the hub central offer.
