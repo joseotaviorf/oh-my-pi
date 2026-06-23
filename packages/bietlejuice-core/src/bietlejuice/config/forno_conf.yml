@@ -1986,9 +1986,11 @@ emr_consolidation_base: &emr_consolidation_anchor
         instance_count: 0
     # Aligned with Databricks consolidation tiers (gen7 m7g/r7g/c7g ↔ gen6 m6g/r6g/c6g).
     # Forno multi-worker: 1 CORE (ON_DEMAND); optional TASK (SPOT) per preset. Single-node: master-only.
+    # Shared single-node executor caps; per-tier anchors below set instance-aware memory/cores.
 emr_spark_single_node: &emr_spark_single_node
-    spark.dynamicAllocation.maxExecutors: "4"
-    spark.executor.instances: "2"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
 
 emr_spark_xs_general: &emr_spark_xs_general
     spark.yarn.am.memory: 1g
@@ -2125,6 +2127,98 @@ emr_spark_xl_memory: &emr_spark_xl_memory
     spark.executor.memoryOverhead: 8g
     spark.executor.cores: "4"
 
+
+##### EMR single-node spark conf (tier + base + instance-aware executor sizing) #####
+
+emr_spark_xs_general_single_node: &emr_spark_xs_general_single_node
+    <<: [*emr_spark_xs_general, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 3g
+    spark.executor.memoryOverhead: 1g
+    spark.executor.cores: "1"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_s_general_single_node: &emr_spark_s_general_single_node
+    <<: [*emr_spark_s_general, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 3g
+    spark.executor.memoryOverhead: 1g
+    spark.executor.cores: "1"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_m_general_single_node: &emr_spark_m_general_single_node
+    <<: [*emr_spark_m_general, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 8g
+    spark.executor.memoryOverhead: 2g
+    spark.executor.cores: "2"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_l_general_single_node: &emr_spark_l_general_single_node
+    <<: [*emr_spark_l_general, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 16g
+    spark.executor.memoryOverhead: 4g
+    spark.executor.cores: "4"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_xl_general_single_node: &emr_spark_xl_general_single_node
+    <<: [*emr_spark_xl_general, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 48g
+    spark.executor.memoryOverhead: 4g
+    spark.executor.cores: "4"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_xs_memory_single_node: &emr_spark_xs_memory_single_node
+    <<: [*emr_spark_xs_memory, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 8g
+    spark.executor.memoryOverhead: 2g
+    spark.executor.cores: "2"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_s_memory_single_node: &emr_spark_s_memory_single_node
+    <<: [*emr_spark_s_memory, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 8g
+    spark.executor.memoryOverhead: 2g
+    spark.executor.cores: "2"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_m_memory_single_node: &emr_spark_m_memory_single_node
+    <<: [*emr_spark_m_memory, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 16g
+    spark.executor.memoryOverhead: 4g
+    spark.executor.cores: "2"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_l_memory_single_node: &emr_spark_l_memory_single_node
+    <<: [*emr_spark_l_memory, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 32g
+    spark.executor.memoryOverhead: 4g
+    spark.executor.cores: "4"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
+
+emr_spark_xl_memory_single_node: &emr_spark_xl_memory_single_node
+    <<: [*emr_spark_xl_memory, *emr_cluster_spark_conf_anchor]
+    spark.executor.memory: 64g
+    spark.executor.memoryOverhead: 8g
+    spark.executor.cores: "4"
+    spark.dynamicAllocation.minExecutors: "1"
+    spark.dynamicAllocation.maxExecutors: "1"
+    spark.executor.instances: "1"
 emr_7_12_med_general_cluster:
     <<: *emr_cluster_anchor
 
@@ -2474,9 +2568,7 @@ emr_7_12_consolidation_xs_general_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_xs_general, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_xs_general_single_node
 
 emr_7_12_consolidation_s_general_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2484,9 +2576,7 @@ emr_7_12_consolidation_s_general_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_s_general, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_s_general_single_node
 
 emr_7_12_consolidation_m_general_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2494,9 +2584,7 @@ emr_7_12_consolidation_m_general_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_m_general, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_m_general_single_node
 
 emr_7_12_consolidation_l_general_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2504,9 +2592,7 @@ emr_7_12_consolidation_l_general_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_l_general, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_l_general_single_node
 
 emr_7_12_consolidation_xl_general_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2514,9 +2600,7 @@ emr_7_12_consolidation_xl_general_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_xl_general, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_xl_general_single_node
 
 ##### EMR Memory (r7g — consolidation family) #####
 
@@ -2573,9 +2657,7 @@ emr_7_12_consolidation_xs_memory_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_xs_memory, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_xs_memory_single_node
 
 emr_7_12_consolidation_s_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2583,9 +2665,7 @@ emr_7_12_consolidation_s_memory_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_s_memory, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_s_memory_single_node
 
 emr_7_12_consolidation_m_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2593,9 +2673,7 @@ emr_7_12_consolidation_m_memory_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_m_memory, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_m_memory_single_node
 
 emr_7_12_consolidation_l_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2603,9 +2681,7 @@ emr_7_12_consolidation_l_memory_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_l_memory, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_l_memory_single_node
 
 emr_7_12_consolidation_xl_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
@@ -2613,9 +2689,7 @@ emr_7_12_consolidation_xl_memory_single_node_cluster:
     core_nodes:
         instance_count: 0
     spark_conf:
-        <<: [*emr_spark_xl_memory, *emr_cluster_spark_conf_anchor]
-        spark.dynamicAllocation.maxExecutors: "4"
-        spark.executor.instances: "2"
+        <<: *emr_spark_xl_memory_single_node
 ##### Consolidation Cluster Presets #####
 # Naming: consolidation_{size}_{family}_cluster
 # Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32

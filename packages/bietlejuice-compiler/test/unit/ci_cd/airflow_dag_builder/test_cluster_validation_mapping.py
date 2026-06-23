@@ -1279,3 +1279,27 @@ class TestEmrConsolidationMasterMemorySizing:
             + _parse_memory_gib(spark_conf["spark.yarn.am.memory"])
         )
         assert used_gib <= instance_ram * 0.7
+
+    @pytest.mark.parametrize(
+        "emr_preset",
+        [
+            p
+            for p in _emr_consolidation_preset_names()
+            if p.endswith("_single_node_cluster")
+        ],
+    )
+    def test_single_node_total_memory_within_instance_budget(self, emr_preset):
+        emr = ConfigurationService().get_config(emr_preset)
+        spark_conf = emr["spark_conf"]
+        master_type = emr["master_node_type_id"]
+        instance_ram = _INSTANCE_RAM_GIB[master_type]
+        used_gib = (
+            _parse_memory_gib(spark_conf["spark.driver.memory"])
+            + _parse_memory_gib(spark_conf["spark.driver.memoryOverhead"])
+            + _parse_memory_gib(spark_conf["spark.yarn.am.memory"])
+            + _parse_memory_gib(spark_conf["spark.executor.memory"])
+            + _parse_memory_gib(spark_conf["spark.executor.memoryOverhead"])
+        )
+        assert used_gib <= instance_ram * 0.875
+        assert spark_conf["spark.dynamicAllocation.maxExecutors"] == "1"
+        assert spark_conf["spark.executor.instances"] == "1"
