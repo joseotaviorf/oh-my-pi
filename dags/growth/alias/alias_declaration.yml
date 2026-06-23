@@ -1,0 +1,66 @@
+dag:
+  name: alias
+  owner: Data Growth
+  schedule_interval: 0 0,8,12 * * *
+  schedule_start_date: 2024, 1, 1
+  documentation:
+    dag_purpose: |
+      CDC pipeline for the Alias microservice (For Brokers / classifieds partner platform).
+      Captures broker onboarding, CRM integrations, lead management, listing fingerprint sync,
+      AI WhatsApp agents, and inventory ingestion runs from PostgreSQL
+      (alias.db.core-prd.habitat.zone / alias.public).
+
+      Source repo: backend-services/applications/alias
+      Database documentation: dags/growth/alias/alias.md
+
+      DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer
+      SCHEDULE: 3x daily (00:00, 08:00, 12:00 UTC) to cover business-hour and end-of-day coverage.
+
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: alias
+  database_type: postgres
+  source_database: alias
+  source_schema: public
+  lineage_product_database_name: alias
+  dbutils_secret_key: ALIAS_DB
+  tables_customization:
+    brokers:
+      clean_z_order_by: [uuid_company]
+    crm_integrations:
+      clean_z_order_by: [uuid_company]
+      table_privileges:
+        data-platform-engineers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    leads:
+      clean_z_order_by: [uuid_company, uuid_lead]
+      table_privileges:
+        data-platform-engineers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    lead_sessions:
+      clean_z_order_by: [uuid_lead, ts_updated]
+    lead_resolutions:
+      clean_z_order_by: [uuid_lead_session]
+    lead_engagements:
+      clean_z_order_by: [uuid_lead_session, origin]
+    listing_fingerprint:
+      raw_primary_keys: [company_uuid, listing_original_id]
+      clean_primary_keys: [uuid_company, id_listing_original]
+      clean_z_order_by: [uuid_company, status]
+    ai_agents:
+      clean_z_order_by: [uuid_company]
+      table_privileges:
+        data-platform-engineers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    inventory_ingestions:
+      clean_z_order_by: [uuid_company, ts_started]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

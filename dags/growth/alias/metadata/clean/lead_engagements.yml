@@ -1,0 +1,73 @@
+---
+database_name: datalake_alias_clean
+table_name: lead_engagements
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Inbound lead touchpoints linked to sessions on Alias (PostgreSQL source: alias.public.lead_engagements).
+  An engagement represents the moment a lead reached Alias through a specific channel: classified-portal
+  webhook (ImovelWeb, Zap/GrupoZap), CRM webhook (Univen), or first WhatsApp message to the brokerage.
+  Multiple engagements per session are allowed — e.g. the same lead arrives from ImovelWeb and then
+  from Zap within the same active session. The id_origin_lead field (origin_lead_id in source) is the
+  external lead ID from the origin portal or CRM — used by Univen for deduplication: only the
+  id_origin_lead of the first engagement is forwarded to the CRM on resolution, avoiding duplicate
+  records. The id_property field (origin_property_id in source) is the property ID referenced in the
+  origin portal at intake time (raw VARCHAR, not normalized — different from Alias's id_synthetic_house).
+  Partitioned by year/month/day from ts_created.
+columns:
+  uuid_lead_engagement:
+    description: |
+      Primary key — unique engagement event identifier.
+    lineage:
+      - datalake_alias_raw.lead_engagements.uuid
+  uuid_lead_session:
+    description: |
+      Foreign key to lead_sessions.uuid_lead_session — session that groups this engagement.
+    lineage:
+      - datalake_alias_raw.lead_engagements.lead_session_uuid
+  uuid_company:
+    description: |
+      Foreign key to brokers.uuid_company — broker receiving the engagement (denormalized for queries).
+    lineage:
+      - datalake_alias_raw.lead_engagements.company_uuid
+  id_property:
+    description: |
+      Listing or property reference from the origin platform at engagement time. Nullable.
+    lineage:
+      - datalake_alias_raw.lead_engagements.origin_property_id
+  id_origin_lead:
+    description: |
+      External lead identifier from the originating CRM or portal (e.g. ImovelWeb lead ID). Nullable.
+    lineage:
+      - datalake_alias_raw.lead_engagements.origin_lead_id
+  origin:
+    description: |
+      Channel or source label for the engagement (free-text VARCHAR). Common values include WhatsApp,
+      UNIVEN, IMOVELWEB, ZAP, OTHER — not enforced as a database enum.
+    lineage:
+      - datalake_alias_raw.lead_engagements.origin
+  message:
+    description: |
+      Initial message body from the lead at engagement time. Nullable for silent portal submissions.
+    lineage:
+      - datalake_alias_raw.lead_engagements.message
+  ts_created:
+    description: |
+      Timestamp when the engagement occurred. Basis for partition columns (immutable event time).
+    lineage:
+      - datalake_alias_raw.lead_engagements.created_at
+  year:
+    description: |
+      Partition column (year) from ts_created. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_engagements.created_at
+  month:
+    description: |
+      Partition column (month) from ts_created. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_engagements.created_at
+  day:
+    description: |
+      Partition column (day) from ts_created. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_engagements.created_at

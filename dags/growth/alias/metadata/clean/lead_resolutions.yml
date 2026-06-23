@@ -1,0 +1,88 @@
+---
+database_name: datalake_alias_clean
+table_name: lead_resolutions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Qualification outcomes recorded during or at the end of a session on Alias (PostgreSQL source:
+  alias.public.lead_resolutions). One record per qualification event — multiple per session are allowed.
+  Types: VISIT_INTENTION (lead wants to schedule a property visit — hot lead qualified by the AI, with
+  property, date, and intent in metadata), ESCALATION (conversation must be handed off to a human
+  broker — AI could not resolve, stores the user's question in metadata), and INACTIVE (lead went cold —
+  session expired without a prior resolution, generated automatically by the expiration reminder). Each
+  resolution asynchronously triggers a CRM export (post_lead_url), with sent_to_crm_at set on success.
+  The metadata (JSONB) field holds AI-extracted signals: temperature, intent, budget, preferred visit
+  date, user question — structure varies by type. Used for qualification-rate analytics, CRM sync
+  auditing, and AI performance metrics. Partitioned by year/month/day from ts_updated.
+columns:
+  uuid_lead_resolution:
+    description: |
+      Primary key — unique resolution record identifier.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.uuid
+  uuid_lead_session:
+    description: |
+      Foreign key to lead_sessions.uuid_lead_session — the session this resolution closes or records.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.lead_session_uuid
+  id_property:
+    description: |
+      Synthetic house ID (listing_fingerprint.id_synthetic_house) associated with the resolution.
+      Nullable when not property-specific.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.property_id
+  type:
+    description: |
+      Business resolution category assigned when the session outcome is determined.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.type
+    categories:
+      VISIT_INTENTION: Lead expressed interest in scheduling a property visit.
+      ESCALATION: Conversation escalated to human broker or support.
+      INACTIVE: Lead marked inactive or discarded without visit intent.
+  summary:
+    description: |
+      Text summary of the resolution, often duplicated from metadata for CRM payloads.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.summary
+  metadata:
+    description: |
+      JSON document with structured resolution context (intent, temperature, budget, user question, etc.).
+      Always non-null in source; empty object when no extra fields captured.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.metadata
+  ts_resolved:
+    description: |
+      Timestamp when the resolution was recorded (business event time).
+    lineage:
+      - datalake_alias_raw.lead_resolutions.resolved_at
+  ts_sent_to_crm:
+    description: |
+      Timestamp when the resolution was successfully posted to the broker CRM. Null if not yet sent.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.sent_to_crm_at
+  ts_created:
+    description: |
+      Timestamp when the resolution row was inserted.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.created_at
+  ts_updated:
+    description: |
+      Timestamp of the last update. Basis for partition columns.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.updated_at
+  year:
+    description: |
+      Partition column (year) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.updated_at
+  month:
+    description: |
+      Partition column (month) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.updated_at
+  day:
+    description: |
+      Partition column (day) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_resolutions.updated_at

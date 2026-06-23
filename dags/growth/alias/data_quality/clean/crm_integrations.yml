@@ -1,0 +1,82 @@
+---
+table_name: datalake_alias_clean.crm_integrations
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  uuid_crm_integration:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  uuid_company:
+    is_complete:
+      severity_level: Error
+  platform:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - UNIVEN
+        - UNIVEN_PRO
+        - KENLO
+        - UNIVERSAL
+        - VISTA
+      severity_level: Error
+  xml_inventory_url:
+    is_complete:
+      severity_level: Error
+  post_lead_url:
+    is_complete:
+      severity_level: Error
+  crm_api_token:
+    is_complete:
+      severity_level: Error
+  is_active:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_alias_clean.crm_integrations
+         WHERE year != YEAR(CAST(ts_updated AS TIMESTAMP))
+            OR month != MONTH(CAST(ts_updated AS TIMESTAMP))
+            OR day != DAY(CAST(ts_updated AS TIMESTAMP))
+        ) = 0
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 31
+      severity_level: Error

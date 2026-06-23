@@ -1,0 +1,71 @@
+---
+database_name: datalake_alias_clean
+table_name: leads
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Buyer/renter contacts per brokerage on Alias (PostgreSQL source: alias.public.leads). Grain: one
+  record per (uuid_company, phone) — the same person can be a lead at multiple brokerages, but each
+  company+phone pair is unique. Leads arrive via classified-portal webhooks (ImovelWeb, Zap/GrupoZap)
+  or directly through the brokerage's WhatsApp number. Alias deduplicates by phone: if the same lead
+  arrives twice from the same portal, the existing record is reused and a new session is opened.
+  Stores PII (phone, name, email) — access restricted on the clean table. The ts_last_session_activity
+  field is updated on every inbound message in the active session and drives admin list ordering.
+  Parent of lead_sessions. Partitioned by year/month/day from ts_updated.
+columns:
+  uuid_lead:
+    description: |
+      Primary key — unique lead identifier within Alias.
+    lineage:
+      - datalake_alias_raw.leads.uuid
+  uuid_company:
+    description: |
+      Foreign key to brokers.uuid_company — the broker company that owns this lead contact.
+    lineage:
+      - datalake_alias_raw.leads.company_uuid
+  phone:
+    description: |
+      Lead phone number (E.164 or local format as stored by Alias). Part of unique key with uuid_company.
+      Personal data — access restricted on clean table.
+    lineage:
+      - datalake_alias_raw.leads.phone
+  name:
+    description: |
+      Lead display name captured from portal forms or inferred during WhatsApp onboarding.
+    lineage:
+      - datalake_alias_raw.leads.name
+  email:
+    description: |
+      Lead email address. Required in source schema; may be placeholder when unknown.
+    lineage:
+      - datalake_alias_raw.leads.email
+  ts_last_session_activity:
+    description: |
+      Timestamp of the most recent lead session activity for this contact. Used for admin list ordering.
+    lineage:
+      - datalake_alias_raw.leads.last_session_activity_at
+  ts_created:
+    description: |
+      Timestamp when the lead was first registered in Alias.
+    lineage:
+      - datalake_alias_raw.leads.created_at
+  ts_updated:
+    description: |
+      Timestamp of the last update to the lead row. Basis for partition columns.
+    lineage:
+      - datalake_alias_raw.leads.updated_at
+  year:
+    description: |
+      Partition column (year) from ts_updated. Required in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.leads.updated_at
+  month:
+    description: |
+      Partition column (month) from ts_updated. Required in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.leads.updated_at
+  day:
+    description: |
+      Partition column (day) from ts_updated. Required in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.leads.updated_at

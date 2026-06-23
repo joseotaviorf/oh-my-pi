@@ -1,0 +1,129 @@
+---
+database_name: datalake_alias_clean
+table_name: ai_agents
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  WhatsApp AI agent configuration per brokerage on Alias (PostgreSQL source: alias.public.ai_agents).
+  One row per company — not the language model itself, but the WhatsApp channel identity that routes
+  traffic to Copilot (chat orchestrator). uuid_ai_agent is used as senderId in Copilot Kafka events to
+  identify which brokerage owns each conversation. Setup involves: (1) configure Meta WABA
+  (meta_waba_id, meta_business_portfolio_id) in the UI; (2) provision a dedicated Twilio sub-account
+  (id_twilio_account, id_twilio_api_key); (3) acquire a BR phone number (phone_number); (4) register
+  a WhatsApp sender with Meta via Twilio (id_twilio_sender); (5) OTP verification → phone_verified_at
+  set. Agent readiness requires a Twilio sender ONLINE plus at least one COMPLETED inventory_ingestion
+  (so there are listings available during conversations). is_carousel_enabled activates property carousel
+  cards in WhatsApp conversations. Twilio credentials are encrypted in OLTP and have restricted access
+  on the clean layer. _plain columns are legacy plaintext fallbacks. Used for AI channel adoption
+  analytics and operational monitoring. Partitioned by year/month/day from ts_updated.
+columns:
+  uuid_ai_agent:
+    description: |
+      Primary key — unique AI agent configuration identifier.
+    lineage:
+      - datalake_alias_raw.ai_agents.uuid
+  uuid_company:
+    description: |
+      Foreign key to brokers.uuid_company — broker owning this AI agent configuration.
+    lineage:
+      - datalake_alias_raw.ai_agents.company_uuid
+  id_meta_business_portfolio:
+    description: |
+      Meta Business Portfolio ID for WhatsApp Business API integration. Nullable until configured.
+    lineage:
+      - datalake_alias_raw.ai_agents.meta_business_portfolio_id
+  id_meta_waba:
+    description: |
+      Meta WhatsApp Business Account ID. Nullable until WABA is linked.
+    lineage:
+      - datalake_alias_raw.ai_agents.meta_waba_id
+  id_twilio_sender:
+    description: |
+      Twilio Messaging sender SID for the WhatsApp channel. Sensitive — restricted access.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_sender_sid
+  id_twilio_account:
+    description: |
+      Twilio account SID for WhatsApp messaging. Sensitive — restricted access in clean layer.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_account_sid
+  id_twilio_api_key:
+    description: |
+      Twilio API key SID for subaccount authentication. Nullable. Sensitive — restricted access.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_api_key
+  id_twilio_messaging_service:
+    description: |
+      Twilio Messaging Service SID bundling senders for this broker. Nullable.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_messaging_service_sid
+  phone_number:
+    description: |
+      Twilio WhatsApp-enabled phone number (E.164). Unique when set. PII — restricted access in clean layer.
+    lineage:
+      - datalake_alias_raw.ai_agents.phone_number
+  display_name:
+    description: |
+      Display name shown to end users in WhatsApp conversations. Nullable.
+    lineage:
+      - datalake_alias_raw.ai_agents.display_name
+  agent_name:
+    description: |
+      Internal agent persona name used by Copilot prompts. Nullable.
+    lineage:
+      - datalake_alias_raw.ai_agents.agent_name
+  twilio_auth_token:
+    description: |
+      Twilio auth token for API calls (encrypted at rest in OLTP). Sensitive — restricted access.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_auth_token
+  twilio_api_secret:
+    description: |
+      Twilio API key secret (encrypted at rest in OLTP). Sensitive — restricted access.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_api_secret
+  twilio_auth_token_plain:
+    description: |
+      Legacy plaintext Twilio auth token fallback column. Nullable; prefer encrypted twilio_auth_token.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_auth_token_plain
+  twilio_api_secret_plain:
+    description: |
+      Legacy plaintext Twilio API secret fallback. Nullable; prefer encrypted twilio_api_secret.
+    lineage:
+      - datalake_alias_raw.ai_agents.twilio_api_secret_plain
+  is_carousel_enabled:
+    description: |
+      Whether property carousel UI is enabled in WhatsApp conversations for this broker.
+    lineage:
+      - datalake_alias_raw.ai_agents.is_carousel_enabled
+  ts_phone_verified:
+    description: |
+      Timestamp when the WhatsApp phone number was verified with Twilio/Meta. Null until verified.
+    lineage:
+      - datalake_alias_raw.ai_agents.phone_verified_at
+  ts_created:
+    description: |
+      Timestamp when the AI agent configuration was created.
+    lineage:
+      - datalake_alias_raw.ai_agents.created_at
+  ts_updated:
+    description: |
+      Timestamp of the last configuration update. Basis for partition columns.
+    lineage:
+      - datalake_alias_raw.ai_agents.updated_at
+  year:
+    description: |
+      Partition column (year) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.ai_agents.updated_at
+  month:
+    description: |
+      Partition column (month) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.ai_agents.updated_at
+  day:
+    description: |
+      Partition column (day) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.ai_agents.updated_at

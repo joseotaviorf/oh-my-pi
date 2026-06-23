@@ -1,0 +1,25 @@
+SELECT
+    uuid AS uuid_ai_agent,
+    company_uuid AS uuid_company,
+    meta_business_portfolio_id AS id_meta_business_portfolio,
+    meta_waba_id AS id_meta_waba,
+    twilio_sender_sid AS id_twilio_sender,
+    twilio_account_sid AS id_twilio_account,
+    twilio_api_key AS id_twilio_api_key,
+    twilio_messaging_service_sid AS id_twilio_messaging_service,
+    phone_number,
+    display_name,
+    agent_name,
+    twilio_auth_token,
+    twilio_api_secret,
+    twilio_auth_token_plain,
+    twilio_api_secret_plain,
+    is_carousel_enabled,
+    CAST(phone_verified_at AS TIMESTAMP) AS ts_phone_verified,
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
+    YEAR(CAST(updated_at AS TIMESTAMP)) AS year,
+    MONTH(CAST(updated_at AS TIMESTAMP)) AS month,
+    DAY(CAST(updated_at AS TIMESTAMP)) AS day
+FROM
+    datalake_alias_raw.ai_agents

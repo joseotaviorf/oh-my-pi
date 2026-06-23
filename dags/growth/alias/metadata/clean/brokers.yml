@@ -1,0 +1,61 @@
+---
+database_name: datalake_alias_clean
+table_name: brokers
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Partner brokerage companies registered on the Alias platform (PostgreSQL source: alias.public.brokers).
+  Alias is QuintoAndar's B2B product that provides a WhatsApp AI agent for real-estate brokerages:
+  qualifies leads, answers questions about the property portfolio, and forwards outcomes to the
+  partner's CRM. Each brokerage is identified by uuid_company (UUID from QuintoAndar's Company
+  service). On registration, a shell ai_agent is automatically created to allow WhatsApp configuration
+  by backoffice without an extra step. Root entity of the domain model: all configuration (CRM, agent,
+  inventory) and all lead traffic depend on uuid_company. company_name and logo_url are used on the
+  WhatsApp profile and white-label classified surfaces. Used in partner onboarding and ecosystem
+  growth analytics. Partitioned by year/month/day from ts_updated.
+columns:
+  uuid_company:
+    description: |
+      Primary key — UUID of the broker company in the Company service. Referenced by all child
+      Alias entities (leads, CRM, listings, agents).
+    lineage:
+      - datalake_alias_raw.brokers.company_uuid
+  company_name:
+    description: |
+      Legal or trade name of the broker company as shown in Alias admin and partner-facing surfaces.
+    lineage:
+      - datalake_alias_raw.brokers.company_name
+  logo_url:
+    description: |
+      URL of the broker logo asset (S3/CloudFront). Nullable when the broker has not uploaded branding.
+    lineage:
+      - datalake_alias_raw.brokers.logo_url
+  ts_created:
+    description: |
+      Timestamp when the broker record was first created in Alias (created_at in source, UTC).
+    lineage:
+      - datalake_alias_raw.brokers.created_at
+  ts_updated:
+    description: |
+      Timestamp of the last update to the broker record. Basis for CDC incremental loads and partition
+      derivation (year, month, day).
+    lineage:
+      - datalake_alias_raw.brokers.updated_at
+  year:
+    description: |
+      Table partition column (year). Derived from ts_updated at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day.
+    lineage:
+      - datalake_alias_raw.brokers.updated_at
+  month:
+    description: |
+      Table partition column (month). Derived from ts_updated at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with year and day.
+    lineage:
+      - datalake_alias_raw.brokers.updated_at
+  day:
+    description: |
+      Table partition column (day). Derived from ts_updated at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with year and month.
+    lineage:
+      - datalake_alias_raw.brokers.updated_at

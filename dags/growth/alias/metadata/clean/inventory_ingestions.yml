@@ -1,0 +1,94 @@
+---
+database_name: datalake_alias_clean
+table_name: inventory_ingestions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Inventory sync job executions per brokerage on Alias (PostgreSQL source:
+  alias.public.inventory_ingestions). One row per run per company. The job reads the brokerage's XML
+  feed (crm_integrations.xml_inventory_url), publishes per-listing events to Kafka
+  (alias.listing.ingest.event), and each listing is processed: hash diff, enrichment (Vespucio geocoding,
+  Text2Filter), publication to Listing Gate / OpenSearch. Counters track the outcome: quantity_created
+  (new listings), quantity_updated (hash changed), quantity_skipped (unchanged), quantity_failed (errors),
+  quantity_unpublished (removed from feed). On COMPLETED, triggers the CRM ready gate — a notification
+  to the partner CRM that Alias inventory is indexed and ready to receive leads. TIMED_OUT means the run
+  exceeded the TTL without receiving the BATCH_END event (auto-recovery mechanism). The first completed
+  ingestion also unlocks the AI agent (prerequisite for ONLINE status). Used for onboarding SLA
+  monitoring, feed failure diagnosis, and portfolio growth metrics. Partitioned by year/month/day from
+  ts_started; z-order by uuid_company and ts_started.
+columns:
+  uuid_inventory_ingestion:
+    description: |
+      Primary key — unique ingestion run identifier.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.uuid
+  uuid_company:
+    description: |
+      Foreign key to brokers.uuid_company — broker whose feed was ingested in this run.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.company_uuid
+  status:
+    description: |
+      Terminal or in-progress state of the ingestion job.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.status
+    categories:
+      IN_PROGRESS: Ingestion currently running.
+      COMPLETED: Ingestion finished successfully.
+      FAILED: Ingestion aborted due to unrecoverable error.
+      TIMED_OUT: Ingestion exceeded allowed duration and was stopped.
+  quantity_created:
+    description: |
+      Count of new listing fingerprints created during this run.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.created
+  quantity_updated:
+    description: |
+      Count of existing listings updated (hash change detected) during this run.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.updated
+  quantity_failed:
+    description: |
+      Count of listings that failed processing during this run.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.failed
+  quantity_skipped:
+    description: |
+      Count of listings skipped (unchanged hash or filtered out) during this run.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.skipped
+  quantity_unpublished:
+    description: |
+      Count of listings soft-unpublished (stale or removed from feed) during this run.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.unpublished
+  failure_reason:
+    description: |
+      Free-text summary of failure cause when status is FAILED or TIMED_OUT. Nullable on success.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.failure_reason
+  ts_started:
+    description: |
+      Timestamp when the ingestion job started. Basis for partition columns.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.started_at
+  ts_completed:
+    description: |
+      Timestamp when the ingestion job completed. Null while IN_PROGRESS.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.completed_at
+  year:
+    description: |
+      Partition column (year) from ts_started. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.started_at
+  month:
+    description: |
+      Partition column (month) from ts_started. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.started_at
+  day:
+    description: |
+      Partition column (day) from ts_started. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.inventory_ingestions.started_at

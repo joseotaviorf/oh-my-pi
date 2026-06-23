@@ -1,0 +1,91 @@
+---
+database_name: datalake_alias_clean
+table_name: lead_sessions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Lead conversation threads on Alias (PostgreSQL source: alias.public.lead_sessions). A session groups
+  all engagements (inbound touchpoints) and resolutions (AI qualifications) for a lead during a given
+  activity period. Lifecycle: OPEN (intake received, chat not yet started) → IN_PROGRESS (conversation
+  active in Copilot, uuid_chat_session set) → CLOSED (closed by the expiration reminder). At most one
+  OPEN or IN_PROGRESS session per lead at a time. uuid_chat_session is the key to retrieve message
+  history from Copilot (chat orchestrator) — Alias does not store message bodies. uuid_expiration_reminder
+  references the job in the reminder service that closes the session when inactive for too long; if the
+  session closes without any resolution, the system automatically creates an INACTIVE resolution. Used
+  for conversion funnel analytics and AI agent performance reporting. Partitioned by year/month/day from
+  ts_updated; z-order by uuid_lead and ts_updated.
+columns:
+  uuid_lead_session:
+    description: |
+      Primary key — unique session identifier in Alias.
+    lineage:
+      - datalake_alias_raw.lead_sessions.uuid
+  uuid_lead:
+    description: |
+      Foreign key to leads.uuid_lead — the contact participating in this session.
+    lineage:
+      - datalake_alias_raw.lead_sessions.lead_uuid
+  uuid_expiration_reminder:
+    description: |
+      Reminder service job UUID for session expiration nudges. Null when no reminder scheduled.
+    lineage:
+      - datalake_alias_raw.lead_sessions.expiration_reminder_id
+  uuid_chat_session:
+    description: |
+      External chat orchestrator session UUID (Copilot). Null until chat is started.
+    lineage:
+      - datalake_alias_raw.lead_sessions.chat_session_id
+  status:
+    description: |
+      Current lifecycle state of the conversation session.
+    lineage:
+      - datalake_alias_raw.lead_sessions.status
+    categories:
+      OPEN: Session created; no active chat orchestrator session yet.
+      IN_PROGRESS: Chat session linked and conversation in progress.
+      CLOSED: Session finished (resolved or abandoned).
+  summary:
+    description: |
+      AI-generated or agent-provided summary of the conversation outcome. Nullable.
+    lineage:
+      - datalake_alias_raw.lead_sessions.summary
+  ts_closed:
+    description: |
+      Timestamp when the session was closed. Null for open or in-progress sessions.
+    lineage:
+      - datalake_alias_raw.lead_sessions.closed_at
+  ts_chat_started:
+    description: |
+      Timestamp when the chat orchestrator session was linked to this lead session.
+    lineage:
+      - datalake_alias_raw.lead_sessions.chat_started_at
+  ts_last_message_received:
+    description: |
+      Timestamp of the last inbound message received in this session (WhatsApp or portal).
+    lineage:
+      - datalake_alias_raw.lead_sessions.last_message_received_at
+  ts_created:
+    description: |
+      Timestamp when the session record was created.
+    lineage:
+      - datalake_alias_raw.lead_sessions.created_at
+  ts_updated:
+    description: |
+      Timestamp of the last session update. Basis for partition columns.
+    lineage:
+      - datalake_alias_raw.lead_sessions.updated_at
+  year:
+    description: |
+      Partition column (year) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_sessions.updated_at
+  month:
+    description: |
+      Partition column (month) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_sessions.updated_at
+  day:
+    description: |
+      Partition column (day) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.lead_sessions.updated_at

@@ -1,0 +1,103 @@
+---
+database_name: datalake_alias_clean
+table_name: crm_integrations
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  CRM and XML feed integration configuration per brokerage on Alias (PostgreSQL source:
+  alias.public.crm_integrations). One integration per company (1:1 with brokers). Serves three critical
+  functions: (1) inventory ingestion — xml_inventory_url is the brokerage's VR_SYNC feed, read by the
+  inventory_ingestions job to index listings in OpenSearch; (2) lead forwarding — post_lead_url receives
+  portal leads and post_direct_lead_url (nullable) receives direct WhatsApp leads; (3) ready gate — on
+  completing the first ingestion, Alias notifies the CRM (Univen requires this before it starts sending
+  leads). Platforms: UNIVEN and UNIVEN_PRO require OAuth setup and an active ready gate; KENLO and VISTA
+  have dedicated adapters; UNIVERSAL is the generic adapter (ready gate is a no-op). Deactivation
+  (is_active=false) suspends ingestion and forwarding without deleting the record. crm_api_token is
+  encrypted in OLTP — access restricted on the clean layer. Partitioned by year/month/day from ts_updated.
+columns:
+  uuid_crm_integration:
+    description: |
+      Primary key — unique identifier of the CRM integration record in Alias.
+    lineage:
+      - datalake_alias_raw.crm_integrations.uuid
+  uuid_company:
+    description: |
+      Foreign key to brokers.uuid_company. Unique — each broker has at most one CRM integration row.
+    lineage:
+      - datalake_alias_raw.crm_integrations.company_uuid
+  id_crm_broker_account:
+    description: |
+      Broker account identifier in the external CRM system. Nullable when not required by the platform.
+    lineage:
+      - datalake_alias_raw.crm_integrations.crm_broker_account_id
+  platform:
+    description: |
+      CRM integration vendor/platform type. Determines payload mapping and API client used for lead post.
+    lineage:
+      - datalake_alias_raw.crm_integrations.platform
+    categories:
+      UNIVEN: Univen CRM integration.
+      UNIVEN_PRO: Univen Pro variant integration.
+      KENLO: Kenlo CRM integration.
+      UNIVERSAL: Universal/generic CRM adapter.
+      VISTA: Vista CRM integration.
+  xml_inventory_url:
+    description: |
+      URL of the XML/feed endpoint used to pull the broker's property inventory for ingestion runs.
+    lineage:
+      - datalake_alias_raw.crm_integrations.xml_inventory_url
+  post_lead_url:
+    description: |
+      CRM endpoint URL for posting portal-originated leads (non-direct WhatsApp flow).
+    lineage:
+      - datalake_alias_raw.crm_integrations.post_lead_url
+  post_direct_lead_url:
+    description: |
+      CRM endpoint URL for direct WhatsApp leads. Nullable; falls back to post_lead_url when blank.
+    lineage:
+      - datalake_alias_raw.crm_integrations.post_direct_lead_url
+  crm_api_token:
+    description: |
+      Encrypted API token for authenticating outbound CRM calls. Sensitive — restricted table privileges.
+    lineage:
+      - datalake_alias_raw.crm_integrations.crm_api_token
+  is_active:
+    description: |
+      Whether the integration is currently active and eligible for lead forwarding and inventory sync.
+    lineage:
+      - datalake_alias_raw.crm_integrations.active
+  ts_deactivated:
+    description: |
+      Timestamp when the integration was deactivated. Null while is_active is true.
+    lineage:
+      - datalake_alias_raw.crm_integrations.deactivated_at
+  ts_ready_gate_sent:
+    description: |
+      Timestamp when the CRM ready-gate notification was successfully sent after integration setup.
+    lineage:
+      - datalake_alias_raw.crm_integrations.ready_gate_sent_at
+  ts_created:
+    description: |
+      Timestamp when the integration record was created in Alias.
+    lineage:
+      - datalake_alias_raw.crm_integrations.created_at
+  ts_updated:
+    description: |
+      Timestamp of the last update. Basis for partition columns year, month, day.
+    lineage:
+      - datalake_alias_raw.crm_integrations.updated_at
+  year:
+    description: |
+      Partition column (year) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.crm_integrations.updated_at
+  month:
+    description: |
+      Partition column (month) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.crm_integrations.updated_at
+  day:
+    description: |
+      Partition column (day) from ts_updated. Filter in WHERE for partition pruning.
+    lineage:
+      - datalake_alias_raw.crm_integrations.updated_at
