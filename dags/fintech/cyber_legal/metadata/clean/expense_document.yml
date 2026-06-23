@@ -1,0 +1,19 @@
+---
+database_name: datalake_cyber_legal_clean
+table_name: expense_document
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Associative table, contains the id mapping between documents and the expenses of each case."
+columns:
+  id_case:
+    description: "Legal case number - Primary key identifying the judicial process"
+    lineage:
+      - datalake_cyber_legal_raw.tb_desp_doc.DDCASENO
+  id_expense:
+    description: "Sequential expense identifier within the procedural stage"
+    lineage:
+      - datalake_cyber_legal_raw.tb_desp_doc.DDDEXID
+  id_document:
+    description: "Identifier of the document associated with the expense, referencing the document registered for the legal case."
+    lineage:
+      - datalake_cyber_legal_raw.tb_desp_doc.DDDOID
