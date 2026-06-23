@@ -130,7 +130,7 @@ def create_load_table_task(
         ),
         task_id=f"load_core_support_journey_{table_stem}",
         job_parameters=base_parameters,
-        execution_timeout_hours=1,
+        execution_timeout_hours=2,
     )
 
 
