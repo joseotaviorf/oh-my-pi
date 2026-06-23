@@ -58,14 +58,24 @@ def list_table_specs_from_dir(tables_dir: Path) -> List[Tuple[str, Dict[str, Any
 def get_daily_target_logical_date(
     logical_date: datetime, execution_hour: int
 ) -> datetime:
+    """
+    Map this hourly DAG's ``logical_date`` to the daily upstream run's ``logical_date``.
+
+    The upstream lands ``d-1``'s data at ``execution_hour`` UTC, so its logical_date
+    sits at that hour. We point at the latest upstream run that has already completed:
+
+        2026-06-23 03:00:00 -> 2026-06-22 03:00:00   (at/after the cutoff -> d-1)
+        2026-06-23 02:00:00 -> 2026-06-21 03:00:00   (in the 00:00..cutoff gap -> d-2)
+    """
     target = logical_date.replace(
         hour=execution_hour, minute=0, second=0, microsecond=0
     )
 
-    if logical_date < target:
-        target = target - timedelta(days=1)
+    # In the gap between midnight and ``execution_hour`` the d-1 upstream run has
+    # not landed yet, so fall back one extra day.
+    days_back = 2 if logical_date.hour < execution_hour else 1
 
-    return target
+    return target - timedelta(days=days_back)
 
 
 BASE_PARAMETERS = {

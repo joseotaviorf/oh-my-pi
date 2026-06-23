@@ -38,12 +38,18 @@ class TestGetDailyTargetLogicalDate:
     @pytest.mark.parametrize(
         "logical_date,execution_hour,expected",
         [
-            (datetime(2026, 5, 27, 5, 30), 6, datetime(2026, 5, 26, 6, 0, 0)),
-            (datetime(2026, 5, 27, 7, 0), 6, datetime(2026, 5, 27, 6, 0, 0)),
-            (datetime(2026, 5, 27, 6, 0), 6, datetime(2026, 5, 27, 6, 0, 0)),
+            # At/after the cutoff -> latest completed upstream run is d-1.
+            (datetime(2026, 5, 27, 7, 0), 6, datetime(2026, 5, 26, 6, 0, 0)),
+            (datetime(2026, 5, 27, 6, 0), 6, datetime(2026, 5, 26, 6, 0, 0)),
+            # In the 00:00..cutoff gap the d-1 run has not landed yet -> fall back to d-2.
+            (datetime(2026, 5, 27, 5, 30), 6, datetime(2026, 5, 25, 6, 0, 0)),
+            (datetime(2026, 5, 27, 0, 0), 6, datetime(2026, 5, 25, 6, 0, 0)),
+            # Docstring examples (execution_hour=3).
+            (datetime(2026, 6, 23, 3, 0), 3, datetime(2026, 6, 22, 3, 0, 0)),
+            (datetime(2026, 6, 23, 2, 0), 3, datetime(2026, 6, 21, 3, 0, 0)),
         ],
     )
-    def test_aligns_to_previous_day_when_before_execution_hour(
+    def test_points_to_latest_completed_upstream_run(
         self, logical_date, execution_hour, expected, core_support_journey_module
     ):
         result = core_support_journey_module.get_daily_target_logical_date(

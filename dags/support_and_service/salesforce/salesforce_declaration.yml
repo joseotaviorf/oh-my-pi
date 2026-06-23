@@ -2,7 +2,7 @@ dag:
   name: salesforce
   owner: Data SS
   schedule_start_date: 2025, 02, 10
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 0 * * *
   documentation:
     dag_purpose: |
       DAG for ingesting data from the Sales Force tool, this DAG uses the Sales Force API to query data from operations performed in the tool.
@@ -100,4 +100,3 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
-

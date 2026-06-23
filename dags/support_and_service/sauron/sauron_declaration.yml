@@ -21,4 +21,3 @@ workflow:
       clean_z_order_by: [ts_created, ts_updated, id]
     CallEvents:
       clean_table_name: call_events
-
