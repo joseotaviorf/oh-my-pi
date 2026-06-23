@@ -4,87 +4,87 @@ columns:
   id_amplitude:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   ts_client_event:
     lineage:
     - datalake_amplitude_clean.events.ts_client_event
-    description: Column ts_client_event from Amplitude events
+    description: Timestamp when the event was recorded on the client device, in UTC.
   device_carrier:
     lineage:
     - datalake_amplitude_clean.events.device_carrier
-    description: Column device_carrier from Amplitude events
+    description: Mobile network carrier name reported by the device when available.
   device_family:
     lineage:
     - datalake_amplitude_clean.events.device_family
-    description: Column device_family from Amplitude events
+    description: Device family grouping from Amplitude device detection (for example iPhone or Android).
   id_device:
     lineage:
     - datalake_amplitude_clean.events.id_device
-    description: Column id_device from Amplitude events
+    description: Amplitude-generated device identifier used to stitch sessions on the same physical device.
   device_manufacturer:
     lineage:
     - datalake_amplitude_clean.events.device_manufacturer
-    description: Column device_manufacturer from Amplitude events
+    description: Device manufacturer name reported by the operating system.
   device_model:
     lineage:
     - datalake_amplitude_clean.events.device_model
-    description: Column device_model from Amplitude events
+    description: Specific device model string reported by the operating system.
   device_type:
     lineage:
     - datalake_amplitude_clean.events.device_type
-    description: Column device_type from Amplitude events
+    description: Coarse device category from Amplitude (for example mobile, tablet, or desktop).
   id_event:
     lineage:
     - datalake_amplitude_clean.events.id_event
-    description: Column id_event from Amplitude events
+    description: Amplitude insert identifier for the ingested row within the export batch.
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   event_properties:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Column event_properties from Amplitude events
+    description: JSON object with custom event attributes sent by the application at track time.
   is_attribution_event:
     lineage:
     - datalake_amplitude_clean.events.is_attribution_event
-    description: Column is_attribution_event from Amplitude events
+    description: Flag indicating whether Amplitude classified this event as part of an attribution window.
   os_name:
     lineage:
     - datalake_amplitude_clean.events.os_name
-    description: Column os_name from Amplitude events
+    description: Operating system name reported by the client SDK (for example iOS or Android).
   os_version:
     lineage:
     - datalake_amplitude_clean.events.os_version
-    description: Column os_version from Amplitude events
+    description: Operating system version string reported by the client SDK.
   platform:
     lineage:
     - datalake_amplitude_clean.events.platform
-    description: Column platform from Amplitude events
+    description: Amplitude platform label for the originating client (for example iOS, Android, or Web).
   id_session:
     lineage:
     - datalake_amplitude_clean.events.id_session
-    description: Column id_session from Amplitude events
+    description: Amplitude session identifier grouping events within the same user session window.
   ts_user_created:
     lineage:
     - datalake_amplitude_clean.events.ts_user_created
-    description: Column ts_user_created from Amplitude events
+    description: Timestamp when the Amplitude user profile was first created, in UTC.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
-    description: Column id_user from Amplitude events
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
   user_properties:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column user_properties from Amplitude events
+    description: JSON object with persistent user-level attributes set by the application or Amplitude.
   uuid:
     lineage:
     - datalake_amplitude_clean.events.uuid
-    description: Column uuid from Amplitude events
+    description: Universally unique identifier for the ingested event row in the Amplitude export.
   ts_processed:
     lineage:
     - datalake_amplitude_clean.events.ts_processed
-    description: Column ts_processed from Amplitude events
+    description: Timestamp when the event was processed in the ETL pipeline before landing in the clean layer.
   year:
     lineage:
     - datalake_amplitude_clean.events.year
@@ -100,63 +100,63 @@ columns:
   up_gclid:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_gclid from Amplitude events
+    description: Analytics attribute 'up gclid' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_utm_source:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_utm_source from Amplitude events
+    description: UTM source campaign parameter extracted from user_properties ($.utm_source).
   up_utm_medium:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_utm_medium from Amplitude events
+    description: UTM medium campaign parameter extracted from user_properties ($.utm_medium).
   up_utm_campaign:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_utm_campaign from Amplitude events
+    description: UTM campaign name extracted from user_properties ($.utm_campaign).
   up_utm_content:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_utm_content from Amplitude events
+    description: UTM content variant extracted from user_properties ($.utm_content).
   up_utm_term:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_utm_term from Amplitude events
+    description: UTM search term extracted from user_properties ($.utm_term).
   up_platform:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_platform from Amplitude events
+    description: Analytics attribute 'up platform' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_adjust_network:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_adjust_network from Amplitude events
+    description: Analytics attribute 'up adjust network' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_adjust_campaign:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_adjust_campaign from Amplitude events
+    description: Analytics attribute 'up adjust campaign' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_appsflyer_appsflyer_id:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_appsflyer_appsflyer_id from Amplitude events
+    description: Analytics attribute 'up appsflyer appsflyer id' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_appsflyer_campaign:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_appsflyer_campaign from Amplitude events
+    description: Analytics attribute 'up appsflyer campaign' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_appsflyer_installed_at:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_appsflyer_installed_at from Amplitude events
+    description: Analytics attribute 'up appsflyer installed at' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_appsflyer_media_source:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_appsflyer_media_source from Amplitude events
+    description: Analytics attribute 'up appsflyer media source' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_appsflyer_network_name:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_appsflyer_network_name from Amplitude events
+    description: Analytics attribute 'up appsflyer network name' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   up_entrance_uri:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: Column up_entrance_uri from Amplitude events
+    description: Entry URI or deep link path extracted from user_properties ($.entrance_uri) for attribution.
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
 description: This table contains login_confirmation_viewed events from app 170698.
