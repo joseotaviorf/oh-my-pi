@@ -1,9 +1,12 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: databricks_contract_details
-description: Table based on a gsheet that aims to store databricks contract information.
+description: |
+  Clean layer for Databricks contract pricing sourced from the platform Google Sheet
+  (gsheets_platform DAG). One row per cluster compute type and contract validity window.
+  Used by enrich_databricks_pricing and analytical cost models to translate DBUs into dollars.
 domain: Data Life Cycle
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   cluster_compute_type:
     description: Descriptive information that indicates whether the cluster is all-purpose, for example.

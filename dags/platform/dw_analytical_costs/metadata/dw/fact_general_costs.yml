@@ -2,10 +2,12 @@
 database_name: dw_analytical_costs
 table_name: fact_general_costs
 description: |
-  Transactional fact table that aims to store general processing cost information in Databricks.
-  Each row in the table must have a unique cost business key.
+  Unified cost fact combining bietlejuice DAG, ad-hoc execution, and scheduled job spend
+  from the three upstream analytical cost facts. Each row is one cost event identified by
+  sk_snapshot; used for cross-context cost reporting and rightsizing analysis in
+  dw_analytical_costs.
 domain: Data Life Cycle
-owner: data-platform-team@quintoandar.com.br
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   sk_snapshot:
     description: Execution record identification key, based on id_cluster/id_dag/id_job and execution time.

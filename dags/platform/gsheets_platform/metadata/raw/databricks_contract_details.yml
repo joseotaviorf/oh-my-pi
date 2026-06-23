@@ -1,8 +1,14 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: databricks_contract_details
+description: |
+  Raw ingest of Databricks contract pricing rows from the platform team's Google Sheet.
+  One row per SKU and contract period; loaded daily by gsheets_platform for downstream
+  clean-layer normalization. Not partitioned.
 domain: Data Life Cycle
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   dbu_price:
+    description: Contracted DBU unit price in USD for the SKU row; tagged Confidential.
     tags:
       - Confidential

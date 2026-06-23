@@ -1,9 +1,13 @@
 ---
 database_name: datalake_emr_validation_test
 table_name: emr_validation
-description: Smoke-test table to validate the EMR Spark runtime and init script. Contains a snapshot of active Airflow DAGs.
+description: |
+  Smoke-test table written by the enrich_emr_validation_test DAG to validate EMR Spark runtime
+  and init scripts. Each run snapshots active Airflow DAG metadata (id, owners, schedule,
+  pause state) with ts_validated marking the validation execution time. Not partitioned;
+  full scans are acceptable given the small row count.
 domain: Data Life Cycle
-owner: data-platform-team@quintoandar.com.br
+owner: mario.abreu@quintoandar.com.br
 columns:
   id_dag:
     lineage:

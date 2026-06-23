@@ -1,10 +1,13 @@
 ---
 database_name: dw_analytical_costs
 table_name: fact_job_costs
-description: Daily snapshot fact table with the aim of gathering the main cost information generated in Databricks by scheduled jobs. 
-  Each row in this table represents a unique combination of date and job key.
-domain: Data Life Cycle 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Daily snapshot fact table aggregating Databricks DBU and dollar costs per scheduled job.
+  Each row represents one job on one execution date (grain: sk_snapshot = job + date).
+  Sourced from datalake_databricks_usage_costs.usage_costs; consumed by fact_general_costs
+  and cost observability dashboards in the dw_analytical_costs schema.
+domain: Data Life Cycle
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   sk_snapshot:
     description: Unique snapshot identification key.

@@ -1,434 +1,760 @@
 database_name: datalake_ebdb_test_clean
 table_name: house_aud
 domain: Data Platform
+owner: mario.abreu@quintoandar.com.br
+description: |
+  Smoke-test clean layer audit trail for EBDB Imovel (house) changes, loaded by the ebdb_test
+  CDC pipeline. Each row captures a revision with modification flags and field values, matching
+  production house_aud semantics. Used by Data Platform for CDC replication validation only.
 columns:
   rev:
+    description: |
+      Revision number for the audit record. Unique identifier for each change transaction in the audit system.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.rev
   rev_type:
+    description: |
+      Type of revision operation (INSERT, UPDATE, DELETE). Indicates the nature of the change that triggered this audit record.
+    categories:
+      '0': 'Insertion operation.'
+      '1': 'Update operation.'
+      '2': 'Deletion operation.'
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.revtype
   mod_rent:
+    description: |
+      Modification flag indicating whether the rent field was changed in this revision. Used for tracking rental price changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.aluguel_mod
   mod_condo:
+    description: |
+      Modification flag indicating whether the condominium fee was changed in this revision. Used for tracking cost changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.condominio_mod
   mod_iptu:
+    description: |
+      Modification flag indicating whether the IPTU tax value was changed in this revision. Used for tracking tax cost changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.iptu_mod
   mod_guarantees:
+    description: |
+      Modification flag indicating whether the guarantees information was changed in this revision. Used for tracking rental guarantee changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.garantias_mod
   mod_floor:
+    description: |
+      Modification flag indicating whether the floor number was changed in this revision. Used for tracking location corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.andar_mod
   mod_total_area:
+    description: |
+      Modification flag indicating whether the total area was changed in this revision. Used for tracking house specification changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.areatotal_mod
   mod_neighborhood:
+    description: |
+      Modification flag indicating whether the neighborhood was changed in this revision. Used for tracking location corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.bairro_mod
   mod_zipcode:
+    description: |
+      Modification flag indicating whether the zipcode was changed in this revision. Used for tracking address corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.cep_mod
   mod_city:
+    description: |
+      Modification flag indicating whether the city was changed in this revision. Used for tracking location corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.cidade_mod
   mod_complement:
+    description: |
+      Modification flag indicating whether the address complement was changed in this revision. Used for tracking address detail changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.complemento_mod
   mod_house_description:
+    description: |
+      Modification flag indicating whether the house description was changed in this revision. Used for tracking listing content changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.descricaoimovel_mod
   mod_has_elevator:
+    description: |
+      Modification flag indicating whether the elevator information was changed in this revision. Used for tracking amenity changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.elevador_mod
   mod_address:
+    description: |
+      Modification flag indicating whether the street address was changed in this revision. Used for tracking address corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.endereco_mod
   mod_is_furnished:
+    description: |
+      Modification flag indicating whether the furnished status was changed in this revision. Used for tracking listing feature changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.mobiliado_mod
   mod_number:
+    description: |
+      Modification flag indicating whether the street number was changed in this revision. Used for tracking address corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numero_mod
   mod_bathrooms:
+    description: |
+      Modification flag indicating whether the number of bathrooms was changed in this revision. Used for tracking house specification changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numerobanheiros_mod
   mod_bedrooms:
+    description: |
+      Modification flag indicating whether the number of bedrooms was changed in this revision. Used for tracking house specification changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numeroquartos_mod
   mod_suites:
+    description: |
+      Modification flag indicating whether the number of suites was changed in this revision. Used for tracking house specification changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numerosuites_mod
   mod_parking_slots:
+    description: |
+      Modification flag indicating whether the number of parking slots was changed in this revision. Used for tracking amenity changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numerovagas_mod
   mod_type:
+    description: |
+      Modification flag indicating whether the house type was changed in this revision. Used for tracking classification changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipo_mod
   mod_doorman_type:
+    description: |
+      Modification flag indicating whether the doorman type was changed in this revision. Used for tracking security feature changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipoporteiro_mod
   mod_parking_slot_type:
+    description: |
+      Modification flag indicating whether the parking slot type was changed in this revision. Used for tracking parking feature changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipovagas_mod
   mod_amenities_info:
+    description: |
+      Modification flag indicating whether the amenities information was changed in this revision. Used for tracking feature updates.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.amenidadesinfos_mod
   mod_state:
+    description: |
+      Modification flag indicating whether the state information was changed in this revision. Used for tracking location corrections.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.estado_mod
   mod_features_info:
+    description: |
+      Modification flag indicating whether the features information was changed in this revision. Used for tracking house feature updates.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.instalacoesinfos_mod
   mod_status:
+    description: |
+      Modification flag indicating whether the listing status was changed in this revision. Used for tracking status transitions.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.status_mod
   mod_ts_recapture:
+    description: |
+      Modification flag indicating whether the recapture timestamp was changed in this revision. Used for tracking business development changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.recaptadoem_mod
   mod_is_visit_information_confirmed:
+    description: |
+      Modification flag indicating whether the visit information confirmation status was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.confirmadoinformacoesvisita_mod
   mod_dt_first_publication:
+    description: |
+      Modification flag indicating whether the first publication date was changed in this revision. Used for tracking publication history changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.firstpublication_mod
   mod_accounts:
+    description: |
+      Modification flag indicating whether the accounts information was changed in this revision. Used for tracking financial data changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.contas_mod
   mod_home_owners_insurance_value:
+    description: |
+      Modification flag indicating whether the homeowner's insurance value was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.homeownersinsurancevalue_mod
   mod_admin_info:
+    description: |
+      Modification flag indicating whether the admin information was changed in this revision. Used for tracking administrative updates.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.infosadmin_mod
   mod_internal_admin_info:
+    description: |
+      Modification flag indicating whether the internal admin information was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.infosadmininterna_mod
   mod_suspension_reason:
+    description: |
+      Modification flag indicating whether the suspension reason was changed in this revision. Used for tracking suspension changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.suspensionreason_mod
   mod_land_area:
+    description: |
+      Modification flag indicating whether the land area was changed in this revision. Used for tracking house specification changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.areaterreno_mod
   mod_dt_vacant_on:
+    description: |
+      Modification flag indicating whether the vacant date was changed in this revision. Used for tracking availability changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.vacanton_mod
   mod_parking_slots_description:
+    description: |
+      Modification flag indicating whether the parking slots description was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.parkingslots_mod
   mod_access_type:
+    description: |
+      Modification flag indicating whether the access type was changed in this revision. Used for tracking access feature changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.accesstype_mod
   mod_unpublished_reason:
+    description: |
+      Modification flag indicating whether the unpublished reason was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.unpublishedreason_mod
   mod_iptu_details:
+    description: |
+      Modification flag indicating whether the IPTU details were changed in this revision. Used for tracking tax information changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.iptudetails_mod
   mod_user:
+    description: |
+      Modification flag indicating whether the user information was changed in this revision. Used for tracking ownership changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.usuario_mod
   mod_penalization_score:
+    description: |
+      Modification flag indicating whether the penalization score was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.penalizationscore_mod
   mod_ts_last_publication:
+    description: |
+      Modification flag indicating whether the last publication timestamp was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.ultimapublicacao_mod
   mod_is_verified:
+    description: |
+      Modification flag indicating whether the verification status was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.verificado_mod
   mod_predicted_price:
+    description: |
+      Modification flag indicating whether the predicted price was changed in this revision. Used for tracking pricing model updates.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.predictedprice_mod
   mod_sale_price:
+    description: |
+      Modification flag indicating whether the sale price was changed in this revision. Used for tracking pricing changes.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.saleprice_mod
   mod_is_for_rent:
+    description: |
+      Modification flag indicating whether the for rent status was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.forrent_mod
   mod_is_for_sale:
+    description: |
+      Modification flag indicating whether the for sale status was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.forsale_mod
   mod_listing_highlight_priority:
+    description: |
+      Modification flag indicating whether the listing highlight priority was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.prioridadedestaqueclassificado_mod
   mod_announced_by:
+    description: |
+      Modification flag indicating whether the announced by information was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.announcedby_mod
   id_house:
+    description: Unique identifier of the house record in EBDB database.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.id
   rent:
+    description: |
+      Monthly rental price in Brazilian Reais (BRL) for rental properties. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.aluguel
   floor:
+    description: |
+      Floor level where the house is located within the building. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.andar
   building_floors:
+    description: |
+      Total number of floors in the building where the house is located. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.andarespredio
   houses_per_floor:
+    description: |
+      Number of apartment units per floor in the building. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.aptosporandar
   total_area:
+    description: |
+      Total built area of the house in square meters. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.areatotal
   neighborhood:
+    description: |
+      Neighborhood name where the house is located. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.bairro
   zipcode:
+    description: |
+      Brazilian postal code (CEP) for the house address. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.cep
   city:
+    description: |
+      City name where the house is located. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.cidade
   complement:
+    description: |
+      Additional address information such as apartment number, block, or building name. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.complemento
   condo:
+    description: |
+      Monthly condominium fee in Brazilian Reais (BRL). Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.condominio
   dt_built:
+    description: |
+      Construction completion date of the house, but it is not standardized in date format. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.dataconstrucao
   dt_moving_in:
+    description: |
+      Date when the house becomes available for occupancy. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.dataparamudar
   house_description:
+    description: |
+      Detailed text description of the house including special features and amenities. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.descricaoimovel
   has_elevator:
+    description: |
+      Boolean flag indicating whether the building has an elevator. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.elevador
   address:
+    description: |
+      Street address of the house including street name. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.endereco
   iptu:
+    description: |
+      Annual house tax (IPTU) value in Brazilian Reais. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.iptu
   lat:
+    description: |
+      Geographic latitude coordinate of the house location. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.lat
   lng:
+    description: |
+      Geographic longitude coordinate of the house location. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.lng
   is_furnished:
+    description: |
+      Boolean flag indicating whether the house comes furnished. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.mobiliado
   number:
+    description: |
+      Street number of the house address. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numero
   bathrooms:
+    description: |
+      Total number of bathrooms in the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numerobanheiros
   bedrooms:
+    description: |
+      Total number of bedrooms in the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numeroquartos
   suites:
+    description: |
+      Number of master bedrooms with private bathrooms (suites). Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numerosuites
   parking_slots:
+    description: |
+      Number of parking spaces included with the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.numerovagas
   status:
+    description: |
+      Current listing status of the house. Historical value at the time of this audit record.
+    categories:
+      aguardando_publicacao: 'House is waiting to be published.'
+      alugado: 'House was rented.'
+      despublicado: 'House is unpublished.'
+      edicao: 'House is under editing.'
+      edicaoSemUsuario: 'No user editing.'
+      edicaoUsuarioNaoConfirmado: 'Unconfirmed user editing.'
+      excluido: 'House was excluded.'
+      publicado: 'House is published.'
+      suspenso: 'House is suspended.'
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.status
   type:
+    description: Property type classification. Historical value at the time of this audit record.
+    categories:
+      Apartamento: "Apartment unit in a residential building."
+      CasaCondominio: "House within a gated condominium complex."
+      Casa: "Standalone house property."
+      StudioOuKitchenette: "Studio or kitchenette unit with integrated kitchen."
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipo
   doorman_type:
+    description: |
+      Type of doorman service available in the building. Historical value at the time of this audit record.
+    categories:
+      horas24: '24 hours doorman.'
+      NaoHaPorteiro: 'No doorman.'
+      Diurno: 'Daytime doorman.'
+      Noturno: 'Night time doorman.'
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipoporteiro
   parking_slot_type:
+    description: |
+      Type of parking spaces available. Historical value at the time of this audit record.
+    categories:
+      NaoCobertas: 'Uncovered parking slot.'
+      Cobertas: 'Covered parking slot.'
+      Ambos: 'Both.'
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipovagas
   is_verified:
+    description: |
+      Boolean flag indicating whether the house has been verified by QuintoAndar team. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.verificado
   id_state:
+    description: |
+      Unique identifier for the Brazilian state where the house is located. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.estado_id
   id_user:
+    description: |
+      Unique identifier of the user related to the house in the QuintoAndar system. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.usuario_id
   promotion_code:
+    description: |
+      Promotional discount code applicable to the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.codigopromocao
   is_quote_insurance_needed:
+    description: |
+      Boolean flag indicating whether house insurance quotation is required. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.cotarseguro
   total_value:
+    description: |
+      Total monthly cost including rent, condominium, and other fees. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.valortotal
   dt_first_publication:
+    description: |
+      Timestamp when the house was first published on the platform. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.firstpublication
   insurance_value:
+    description: |
+      House insurance value in Brazilian Reais. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.valorseguro
   lead_description:
+    description: |
+      Description of the lead source or how the house came to be listed. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.descricaolead
   listing_highlight_priority:
+    description: |
+      Priority level for highlighting the house listing. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.prioridadedestaqueclassificado
   condo_management_information:
+    description: |
+      Information about the condominium management company. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.dadosadministradoracondominio
   references:
+    description: |
+      Additional reference points or landmarks near the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.referencias
   has_manual_coordinates:
+    description: |
+      Boolean flag indicating whether geographic coordinates were manually entered. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.coordenadasmanuais
   is_follow_up_owner_upload_photos:
+    description: |
+      Boolean flag indicating whether follow-up is needed for owner to upload photos. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.followupproprietariosubirfotos
   lead_collision_type:
+    description: |
+      Type of lead collision or conflict identified for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipocolisaolead
   ts_agent_lead_payment_calculated:
+    description: |
+      Timestamp when agent lead payment was calculated. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.calculopagamentoleadcorretor
   admin_info:
+    description: |
+      Administrative information and notes about the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.infosadmin
   internal_admin_info:
+    description: |
+      Internal administrative information not visible to public. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.infosadmininterna
   has_service_bathroom:
+    description: |
+      Boolean flag indicating whether the house has a service bathroom. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.possuibanheiroservico
   has_service_bedroom:
+    description: |
+      Boolean flag indicating whether the house has a service bedroom (maid's room). Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.possuiquartoservico
   default_neighborhood:
+    description: |
+      Standardized neighborhood name used for consistency in location references. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.bairropadrao
   id_sales_force:
+    description: |
+      Unique identifier linking the house to Salesforce CRM records. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.salesforceid
   condo_type:
+    description: |
+      Classification of condominium type. Historical value at the time of this audit record.
+    categories:
+      NaoExiste: 'There is no condominium price to be applied.'
+      IncluidoNoAluguel: 'Condo price included in the rent.'
+      NaoInformado: 'Condo price not informed.'
+      Normal: 'Normal (not in rent).'
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipocondominio
   iptu_type:
+    description: |
+      Classification of IPTU tax calculation method. Historical value at the time of this audit record.
+    categories:
+      NaoExiste: 'There is no IPTU price to be applied.'
+      IncluidoNoAluguel: 'IPTU price included in the rent.'
+      NaoInformado: 'IPTU price not informed.'
+      Normal: 'Normal (not in rent).'
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.tipoiptu
   dt_availability_end:
+    description: |
+      Date until when the house will remain available. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.disponivelate
   code_cartographic:
+    description: |
+      Official cartographic code for the house location. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.codcartografico
   code_water_consumer:
+    description: |
+      Water utility consumer code for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.codconsumidoragua
   code_power_consumer:
+    description: |
+      Electric utility consumer code for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.codconsumidorenergia
   code_taxpayer:
+    description: |
+      Tax contributor code for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.codcontribuinte
   registration:
+    description: |
+      Official registration of the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.matricula
   id_region:
+    description: |
+      Unique identifier for the geographic region where the house is located. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.regiao_id
   title:
+    description: |
+      House listing title or headline. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.titulo
   ts_suspension_end:
+    description: |
+      Timestamp when the house suspension period ends. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.suspensoate
   id_external:
+    description: |
+      External system identifier for house integration. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.externalid
   is_in_negotiation:
+    description: |
+      Boolean flag indicating whether the house is currently in negotiation. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.emnegociacao
   is_in_external_negotiation:
+    description: |
+      Boolean flag indicating whether the house is in negotiation with external parties. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.emnegociacaoexterna
   ts_external_negotiation_start:
+    description: |
+      Timestamp when external negotiation began. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.entrouemnegociacaoexterna
   cardiff_rejection_reason:
+    description: |
+      Reason for Cardiff system rejection if applicable. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.motivorecusacardiff
   ts_recapture:
+    description: |
+      Timestamp when the house was recaptured or re-acquired. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.recaptadoem
   is_photographer_job_pending:
+    description: |
+      Boolean flag indicating whether there is a pending photographer job for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.jobfotografopendente
   has_requested_professional_photos:
+    description: |
+      Boolean flag indicating whether professional photos have been requested. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.requisitoufotosprofissionais
   lat_bkp:
+    description: |
+      Backup latitude coordinate for the house location. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.latbkp
   lng_bkp:
+    description: |
+      Backup longitude coordinate for the house location. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.lngbkp
   ts_last_confirmation_availability:
+    description: |
+      Timestamp of the last availability confirmation. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.lastconfirmationavailability
   registry:
+    description: |
+      Name of the public registry office (cartório) where the house is registered. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.cartorio
   penalization_score:
+    description: |
+      Penalization score for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.penalizationscore
   is_receive_default_contract_copy_needed:
+    description: |
+      Boolean flag indicating whether owner needs to receive default contract copy. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.recebercopiacontratopadrao
   rank_score:
+    description: Ranking score for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.rankscore
   ts_last_publication:
+    description: |
+      Timestamp of the last time the house was published. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.ultimapublicacao
   is_visit_information_confirmed:
+    description: |
+      Boolean flag indicating whether visit information has been confirmed. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.confirmadoinformacoesvisita
   home_owners_insurance_value:
+    description: |
+      Value of homeowner's insurance for the house. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.homeownersinsurancevalue
   suspension_reason:
+    description: |
+      Reason why the house listing was suspended. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.suspensionreason
   land_area:
+    description: |
+      Total land area of the house in square meters. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.areaterreno
   dt_vacant_on:
+    description: |
+      Date when the house will become vacant. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.vacanton
   id_announced_by:
+    description: |
+      Unique identifier of the entity that announced the house listing. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.announcedby_id
   unpublished_reason:
+    description: |
+      Reason why the house listing was unpublished. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.unpublishedreason
   predicted_price:
+    description: |
+      Predicted market value of the house in Brazilian Reais. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.predictedprice
   sale_price:
+    description: |
+      House sale price in Brazilian Reais (BRL). Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.saleprice
   is_for_rent:
+    description: |
+      Boolean flag indicating whether the house is available for rental. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.forrent
   is_for_sale:
+    description: |
+      Boolean flag indicating whether the house is available for sale. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.forsale
   id_user_registrant:
+    description: |
+      Unique identifier of the user who originally registered the house. Uses COALESCE to prioritize original registrant over current registrant. Historical value at the time of this audit record.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.originalusuarioquecadastrou_id
       - datalake_ebdb_test_raw.imovel_aud.usuarioquecadastrou_id
   mod_user_registrant:
+    description: |
+      Modification flag indicating whether the user registrant information was changed in this revision.
     lineage:
       - datalake_ebdb_test_raw.imovel_aud.usuarioquecadastrou_mod

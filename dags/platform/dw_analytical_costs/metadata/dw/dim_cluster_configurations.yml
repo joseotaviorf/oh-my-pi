@@ -1,10 +1,12 @@
 ---
 database_name: dw_analytical_costs
 table_name: dim_cluster_configurations
-description: Dimensional table of combinations that aims to gather descriptive information about the configuration of the clusters. 
-  Each row in this table generates a unique combination of settings.
-domain: Data Life Cycle 
-owner: data-platform-team@quintoandar.com.br
+description: |
+  Slowly changing dimension of Databricks cluster configuration combinations (compute type,
+  execution context, Spark version, runtime engine). One row per sk_cluster_config; referenced
+  by all analytical cost facts to describe how workloads were executed.
+domain: Data Life Cycle
+owner: gustavo.akashi@quintoandar.com.br
 columns:
   sk_cluster_config:
     description: Unique identification key for a combination.

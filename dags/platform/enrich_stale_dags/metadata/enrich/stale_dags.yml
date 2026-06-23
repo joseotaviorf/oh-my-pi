@@ -1,10 +1,11 @@
 ---
 database_name: enrich_stale_dags
 table_name: stale_dags
-description: >
-  Active, unpaused Airflow DAGs with no successful run in the last month,
-  or whose DAG file has not been modified in 1+ months. Used as a periodic
-  tech-debt signal for the stale DAG detector (DPLT-860).
+description: |
+  Active, unpaused Airflow DAGs with no successful run in the last month, or whose DAG file
+  has not been modified in 1+ months. Used as a periodic tech-debt signal for the stale DAG
+  detector (DPLT-860). One row per stale id_dag from datalake_astro_clean. Not partitioned;
+  full table refresh on each weekly run.
 domain: Data Life Cycle
 owner: aurelio.nogueira@quintoandar.com.br
 columns:
