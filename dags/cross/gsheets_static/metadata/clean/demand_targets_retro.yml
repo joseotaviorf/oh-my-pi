@@ -1,61 +1,63 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_retro
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: Retrospective rental demand funnel targets by city group and business slice. Used by For Rent analytics to compare actual funnel performance against historical planning baselines.
 columns:
   city_group:
-    description: City group.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.city_group
+    description: QuintoAndar city group associated with the retrospective demand targets.
   dt_target:
-    description: Date of the target.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.date
+    description: Reference date identifying the retrospective target planning period.
   business_type:
-    description: Business type of the listing related to the event (ASP, CIQ, B2B or Core).
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.business_type
+    description: Business line of the listing (ASP, CIQ, B2B, or Core) for the target row.
   rent_flow_origin:
-    description: Origin (first touchpoint) of the rent flow related to the event.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.rent_flow_origin
+    description: First-touch origin of the rental flow linked to the retrospective targets.
   rental_administrator:
-    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.rental_administrator
+    description: Contract administrator responsible for listings in the target slice.
   visits_booked:
-    description: Target volume of visits booked.
     lineage:
-      - datalake_gsheets_raw.demand_targets_retro.visits_booked  
+      - datalake_gsheets_raw.demand_targets_retro.visits_booked
+    description: Retrospective target count of property visits booked by tenants.
   visits_completed:
-    description: Target volume of visits completed.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.visits_completed
+    description: Retrospective target count of property visits completed by tenants.
   offers_submitted:
-    description: Target volume of offers submitted.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.offers_submitted
+    description: Retrospective target count of rental offers submitted in the funnel.
   offers_accepted:
-    description: Target volume of offers accepted.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.offers_accepted
+    description: Retrospective target count of rental offers accepted by stakeholders.
   evaluation_started:
-    description: Target volume of evaluations started.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.evaluation_started
+    description: Retrospective target count of tenant credit evaluations started.
   evaluation_positive:
-    description: Target volume of evaluations positive.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.evaluation_positive
+    description: Retrospective target count of evaluations with a positive outcome.
   documentation_sent:
-    description: Target volume of documentations sent.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.documentation_sent
+    description: Retrospective target count of documentation packages sent to tenants.
   credit_approved:
-    description: Target volume of credit analysis approved.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.credit_approved
+    description: Retrospective target count of tenants approved in credit analysis.
   contracts_signed:
-    description: Target volume of contracts signed.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro.contracts_signed
+    description: Retrospective target count of rental contracts signed in the period.

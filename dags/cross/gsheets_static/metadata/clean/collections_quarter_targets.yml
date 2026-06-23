@@ -1,86 +1,87 @@
+---
 database_name: datalake_gsheets_clean
 table_name: collections_quarter_targets
-description: Quarter targets for collections and evictions
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: Quarterly collections and evictions KPI targets maintained in Google Sheets. Used by Fintech collections leadership to track resolution rates, cushion effectiveness, and overdue rent anomaly goals by reference date.
 columns:
   active_flow:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.active_flow
-    description: "Active Flow Target"
+    description: Target value for active collections flow volume in the reference quarter.
   active_stock:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.active_stock
-    description: "Active Stock Target"
+    description: Target stock of active collection cases expected at quarter end.
   fpd:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.FPD
-    description: "FPD Target"
+    description: First-payment default rate target for newly originated rental contracts.
   property_owners:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.property_owners
-    description: "Property Owners Target"
+    description: Target count or share of property owners engaged in collections outcomes.
   ended_1_to_90:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.ended_1_to_90
-    description: "Ended 1-90 Target"
+    description: Target volume of cases ended with delay between 1 and 90 days overdue.
   ended_91_to_360:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.ended_91_to_360
-    description: "Ended 91-360 Target"
+    description: Target volume of cases ended with delay between 91 and 360 days overdue.
   ended_greater_360:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.ended_greater_360
-    description: "Ended Greater 360 Target"
+    description: Target volume of cases ended with more than 360 days of overdue rent.
   detractor_index:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.detractor_index
-    description: "Detractor Index Target"
+    description: Target detractor index for collections-related customer experience surveys.
   active_cushion_effectiveness:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.active_cushion_effectiveness
-    description: "Active Cushion Effectiveness Target"
+    description: Target effectiveness rate of cushion actions on active overdue contracts.
   ended_cushion_effectiveness:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.ended_cushion_effectiveness
-    description: "Ended Cushion Effectiveness Target"
+    description: Target effectiveness rate of cushion actions on ended collection cases.
   resolution_rate_120d:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_120d
-    description: "Resolution Rate 120D Target"
+    description: Target resolution rate for collection cases within 120 days of delinquency.
   resolution_rate_120_to_240d:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_120_to_240d
-    description: "Resolution Rate 120-240D Target"
+    description: Target resolution rate for cases resolved between 120 and 240 days overdue.
   resolution_rate_greater_240d:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_greater_240d
-    description: "Resolution Rate Greater 240D Target"
+    description: Target resolution rate for cases resolved after more than 240 days overdue.
   resolution_rate_240d_to_360d:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_240d_to_360d
-    description: "Resolution Rate 240-360D Target"
+    description: Target resolution rate for cases resolved between 240 and 360 days overdue.
   resolution_rate_greater_360d:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_greater_360d
-    description: "Resolution Rate Greater 360D Target"
+    description: Target resolution rate for cases resolved after more than 360 days overdue.
   resolution_rate_mob3:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_mob3
-    description: "Resolution Rate MOB3 Target"
+    description: Target resolution rate measured at three months on book (MOB3) for new cases.
   process_efficiency:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.process_efficiency
-    description: "Process Efficiency Target"
+    description: Target operational efficiency of the collections process in the quarter.
   average_overdue_rent_anomalies_greater_120:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.average_overdue_rent_anomalies_greater_120
-    description: "Average Overdue Rent Anomalies Greater 120 Target"
+    description: Target average overdue rent amount for anomalies beyond 120 days delinquent.
   dt_reference:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.dt_reference
-    description: "Date Reference"
+    description: Calendar date that identifies the quarter or month the targets refer to.
   ts_load:
     lineage:
       - datalake_gsheets_raw.collections_quarter_targets.ts_load
-    description: "Timestamp Load"
+    description: Timestamp when the quarterly targets row was loaded into the clean layer.

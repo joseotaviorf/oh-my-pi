@@ -1,59 +1,79 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_replanning
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: Replanned rental demand targets and budgets by city group and marketing slice. Captures mid-cycle adjustments to funnel KPI targets maintained in Google Sheets for For Rent leadership.
 columns:
   budget:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.budget
+    description: Budget amount allocated to the replanned demand initiative in BRL.
   city_group:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.city_group
+    description: QuintoAndar city group covered by the replanning target row.
   contracts_signed_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.contracts_signed_target
+    description: Replanned target count of rental contracts signed in the period.
   credit_approved_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.credit_approved_target
+    description: Replanned target count of tenants approved in credit analysis.
   doc_completed_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.doc_completed_target
+    description: Replanned target count of completed documentation packages.
   doc_sent_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.doc_sent_target
+    description: Replanned target count of documentation packages sent to applicants.
   first_offer_sent_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.first_offer_sent_target
+    description: Replanned target count of first offers sent in the rental funnel.
   mkt_channel:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.mkt_channel
+    description: Marketing channel dimension used in the replanning exercise.
   mkt_medium:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.mkt_medium
+    description: Marketing medium dimension paired with the replanning channel.
   mkt_source:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.mkt_source
+    description: Marketing source identifier within the replanning channel slice.
   new_rent_flows_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.new_rent_flows_target
+    description: Replanned target count of new rental flows started in the period.
   new_tenant_prospects_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.new_tenant_prospects_target
+    description: Replanned target volume of new tenant prospects in the funnel.
   offer_accepted_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.offer_accepted_target
+    description: Replanned target count of rental offers accepted by stakeholders.
   offer_sent_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.offer_sent_target
+    description: Replanned target count of rental offers submitted in the period.
   visits_booked_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.visits_booked_target
+    description: Replanned target count of property visits booked by prospects.
   visits_completed_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.visits_completed_target
+    description: Replanned target count of property visits completed by prospects.
   dt_week_started:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.week_start
+    description: Start date of the planning week covered by the replanning targets.
   dt_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.date
+    description: Reference date identifying the replanning target period.

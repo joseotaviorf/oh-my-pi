@@ -1,25 +1,35 @@
+---
 database_name: datalake_gsheets_clean
 table_name: costs_allocation_relative_indexes
+owner: gabriel.salla@quintoandar.com
 domain: Cross
+description: Relative cost allocation indexes by marketing origin and funnel step, sourced from Google Sheets. Supports Cross finance and growth teams when distributing shared acquisition costs across For Rent and For Sale.
 columns:
   cost_definition:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.cost_definition
+    description: Business label describing the cost line being allocated across channels.
   cost_funnel:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.cost_funnel
+    description: Funnel stage to which the relative allocation index applies.
   cost_type:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.cost_type
+    description: Classification of the cost (for example media, operations, or overhead).
   mkt_origin:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.mkt_origin
+    description: Marketing origin dimension used to split the relative allocation weight.
   relative_value_fr_fs:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.relative_value_fr_fs
+    description: Relative index weight applied when allocating costs between For Rent and For Sale.
   dt_month_started:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.month_start
+    description: First day of the month when the allocation index becomes effective.
   dt_month_ended:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.month_end
+    description: Last day of the month when the allocation index remains valid.

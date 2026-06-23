@@ -1,57 +1,59 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_retro_cohort
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: Cohort-based retrospective rental demand conversion targets by week and funnel step. Tracks planned conversion volumes between visits, offers, credit, and contracts for For Rent planning.
 columns:
   dt_week_started:
-    description: Week of the target.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.week_start
+    description: Start date of the cohort week used in retrospective conversion targets.
   city_group:
-    description: City group.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.city_group
+    description: QuintoAndar city group associated with the cohort conversion targets.
   rental_administrator:
-    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.rental_administrator
+    description: Contract administrator type for listings in the cohort target slice.
   business_type:
-    description: Business type of the listing related to the event (ASP, CIQ, B2B or Core).
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.business_type
+    description: Business line of the listing (ASP, CIQ, B2B, or Core) in the cohort row.
   rent_flow_origin:
-    description: Origin (first touchpoint) of the rent flow related to the event.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.rent_flow_origin
+    description: First-touch origin of the rental flow for the cohort conversion targets.
   weeks_conversion:
-    description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.weeks_conversion
+    description: Cohort lag label (W0, W1, etc.) measuring weeks between funnel events.
   vb2vc:
-    description: Target volume of visits booked that converted into visits completed.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.vb2vc
+    description: Target volume converting from visits booked to visits completed in the cohort.
   vc2os:
-    description: Target volume of visits completed that converted into offers submitted.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.vc2os
+    description: Target volume converting from visits completed to offers submitted.
   os2oa:
-    description: Target volume of offers submitted that converted into offers approved.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.os2oa
+    description: Target volume converting from offers submitted to offers accepted.
   oa2ca:
-    description: Target volume of offers approved that converted into credit analysis approved.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.oa2ca
+    description: Target volume converting from offers accepted to credit analysis approved.
   ca2cs:
-    description: Target volume of credit analysis approved that converted into contracts signed.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.ca2cs
+    description: Target volume converting from credit approved to contracts signed.
   cs:
-    description: Target volume of contratcs signed.
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.cs
-  vb2os: 
-    description: Target volume of visits booked that converted into offers submitted.
+    description: Target count of contracts signed at the cohort conversion step.
+  vb2os:
     lineage:
       - datalake_gsheets_raw.demand_targets_retro_cohort.vb2os
+    description: Target volume converting directly from visits booked to offers submitted.

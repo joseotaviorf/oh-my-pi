@@ -1,77 +1,103 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_2019
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: Historical 2019 rental demand funnel targets by city group, channel, and calendar period. Sourced from Google Sheets for For Rent planning and retrospective performance analysis.
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.city_group
+    description: QuintoAndar city group aggregation used in demand target planning.
   demand_channel:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.demand_channel
+    description: Marketing or product channel attributed to the demand target row.
   demand_channel_type:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.demand_channel_type
+    description: Subclassification of the demand channel for reporting granularity.
   funnel_origin:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.funnel_origin
+    description: First-touch origin label associated with the tenant demand funnel.
   rental_administrator:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.rental_administrator
+    description: Contract administrator type (QuintoAndar, third party, or brokerage only).
   evaluation_positive:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.evaluation_positive
+    description: Target count of tenant evaluations with a positive outcome in the period.
   evaluation_started:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.evaluation_started
+    description: Target count of tenant credit evaluations started in the funnel.
   new_tenant_prospects:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.new_tenant_prospects
+    description: Target volume of new tenant prospects entering the rental funnel.
   contracts_signed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.contracts_signed
+    description: Target count of rental contracts signed within the planning slice.
   credit_approved:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.credit_approved
+    description: Target count of tenants approved in credit analysis during the period.
   doc_completed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.doc_completed
+    description: Target count of documentation packages completed by applicants.
   doc_sent:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.doc_sent
+    description: Target count of documentation packages sent to applicants for review.
   guarantee:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.guarantee
+    description: Target volume segmented by rental guarantee product or requirement.
   offer_accepted:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.offer_accepted
+    description: Target count of rental offers accepted by owners or tenants.
   offer_sent:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.offer_sent
+    description: Target count of rental offers submitted in the demand funnel.
   visits_booked:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.visits_booked
+    description: Target count of property visits scheduled by prospective tenants.
   visits_completed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.visits_completed
+    description: Target count of property visits completed by prospective tenants.
   tier:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.tier
+    description: City tier classification applied when setting demand targets.
   halfyear:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.halfyear
+    description: Half-year period number associated with the demand target row.
   quarter:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.quarter
+    description: Calendar quarter number associated with the demand target row.
   month:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.month
+    description: Calendar month number associated with the demand target row.
   year:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.year
+    description: Calendar year associated with the demand target row.
   dt_week_started:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.week_start
+    description: Start date of the planning week to which the target values apply.
   dt_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.date
+    description: Reference date identifying the demand target planning period.

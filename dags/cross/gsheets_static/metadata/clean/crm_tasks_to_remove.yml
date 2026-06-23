@@ -1,8 +1,11 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: crm_tasks_to_remove
-domain: Support and Services 
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
+description: Reference list of CRM task identifiers flagged for removal from operational workflows. Maintained in Google Sheets by Support and Services to drive bulk cleanup in CRM integrations.
 columns:
   id_task:
     lineage:
       - datalake_gsheets_raw.crm_tasks_to_remove.id_task
+    description: Unique identifier of the CRM task scheduled for deletion or archival.
