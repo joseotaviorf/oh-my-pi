@@ -22,7 +22,7 @@ columns:
   rev_end:
     lineage:
       - datalake_big_agent_raw.listing_aud.revend
-    description: End revision.
+    description: Envers revision that closed this audit interval; null while still current.
   id_house:
     lineage:
       - datalake_big_agent_raw.listing_aud.house_id
@@ -30,11 +30,11 @@ columns:
   business_context:
     lineage:
       - datalake_big_agent_raw.listing_aud.business_context
-    description: Listing business context.
+    description: Demand-side context (SALE or RENT) stored on the listing in this audit revision.
   status:
     lineage:
       - datalake_big_agent_raw.listing_aud.status
-    description: Listing status.
+    description: Publication lifecycle status of the listing captured in this audit revision.
   mod_id_house:
     lineage:
       - datalake_big_agent_raw.listing_aud.house_id_mod

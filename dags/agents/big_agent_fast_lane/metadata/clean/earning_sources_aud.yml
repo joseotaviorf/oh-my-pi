@@ -30,7 +30,7 @@ columns:
   uuid_earning_source:
     lineage:
       - datalake_big_agent_raw.earning_sources_aud.earning_source_uuid
-    description: UUID of the earning source.
+    description: Business UUID that identifies the earning source transaction in Big Agent.
   uuid_external_cart:
     lineage:
       - datalake_big_agent_raw.earning_sources_aud.external_cart_uuid

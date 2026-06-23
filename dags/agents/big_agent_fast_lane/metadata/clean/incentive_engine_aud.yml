@@ -22,7 +22,7 @@ columns:
   rev_end:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.revend
-    description: End revision.
+    description: Envers revision that closed this audit interval; null while still current.
   id_external_condition:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.external_condition_id
@@ -30,15 +30,15 @@ columns:
   external_condition_type:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.external_condition_type
-    description: External condition type.
+    description: Discriminator for the external rule entity linked to this incentive engine revision.
   incentive_system:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.incentive_system
-    description: Incentive system.
+    description: Incentive program code governed by this engine configuration in the revision.
   status:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.status
-    description: Record status.
+    description: Lifecycle status of the incentive engine row captured in this audit revision.
   mod_id_external_condition:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.external_condition_id_mod

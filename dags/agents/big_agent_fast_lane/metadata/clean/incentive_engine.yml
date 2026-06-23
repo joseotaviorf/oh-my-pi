@@ -18,7 +18,7 @@ columns:
   external_condition_type:
     lineage:
       - datalake_big_agent_raw.incentive_engine.external_condition_type
-    description: External condition type.
+    description: Discriminator for the external rule entity linked to this incentive engine row.
   incentive_system:
     lineage:
       - datalake_big_agent_raw.incentive_engine.incentive_system
@@ -26,7 +26,7 @@ columns:
   status:
     lineage:
       - datalake_big_agent_raw.incentive_engine.status
-    description: Record status.
+    description: Lifecycle status of the incentive engine configuration (active, inactive, etc.).
   ts_validity_started:
     lineage:
       - datalake_big_agent_raw.incentive_engine.validity_start_at

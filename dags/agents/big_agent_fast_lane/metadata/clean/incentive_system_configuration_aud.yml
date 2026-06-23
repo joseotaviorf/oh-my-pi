@@ -22,19 +22,19 @@ columns:
   rev_end:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.revend
-    description: End revision.
+    description: Envers revision that closed this audit interval; null while still current.
   incentive_system:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.incentive_system
-    description: Incentive system.
+    description: Incentive program code configured in this audit revision.
   performance_evaluation_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.performance_evaluation_period
-    description: Performance evaluation period.
+    description: Rolling window length used to evaluate partner performance in this revision.
   tier_validity_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.tier_validity_period
-    description: Tier validity period.
+    description: Duration a partner tier assignment remains valid in this audit revision.
   mod_incentive_system:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.incentive_system_mod

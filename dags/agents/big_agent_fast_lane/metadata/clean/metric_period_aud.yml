@@ -34,7 +34,7 @@ columns:
   status:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.status
-    description: Status of the metric period.
+    description: Processing state of the metric period (open, closed, invalidated, etc.).
   mod_metric:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.metric_mod

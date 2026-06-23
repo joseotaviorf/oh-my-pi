@@ -10,7 +10,7 @@ columns:
   id:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.id
-    description: Log identifier.
+    description: Surrogate primary key of a remuneration change event logged in Big Agent.
   id_earning:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.earning_id
@@ -22,19 +22,19 @@ columns:
   external_author_type:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.external_author_type
-    description: External author type.
+    description: Entity type of the external actor who applied the remuneration change.
   old_value:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.old_value
-    description: Previous value.
+    description: Remuneration amount or configuration before the logged adjustment.
   new_value:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.new_value
-    description: New value.
+    description: Remuneration amount or configuration after the logged adjustment.
   reason:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.reason
-    description: Change reason.
+    description: Business justification recorded for the remuneration change.
   ts_created:
     lineage:
       - datalake_big_agent_raw.earning_remuneration_log.created_at

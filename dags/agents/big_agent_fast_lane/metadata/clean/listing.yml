@@ -9,7 +9,7 @@ columns:
   id:
     lineage:
       - datalake_big_agent_raw.listing.id
-    description: Listing identifier.
+    description: Primary key of the property listing mirrored from Big Agent.
   id_house:
     lineage:
       - datalake_big_agent_raw.listing.house_id
@@ -17,11 +17,11 @@ columns:
   business_context:
     lineage:
       - datalake_big_agent_raw.listing.business_context
-    description: Listing business context.
+    description: Demand-side context (SALE or RENT) for the listing in Big Agent.
   status:
     lineage:
       - datalake_big_agent_raw.listing.status
-    description: Listing status.
+    description: Publication lifecycle status of the listing (published, unpublished, etc.).
   ts_created:
     lineage:
       - datalake_big_agent_raw.listing.created_at

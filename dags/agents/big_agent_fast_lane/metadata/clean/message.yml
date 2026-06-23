@@ -9,19 +9,19 @@ columns:
   id:
     lineage:
       - datalake_big_agent_raw.message.id
-    description: Message identifier.
+    description: Primary key of the outbox message row in Big Agent.
   id_incremental:
     lineage:
       - datalake_big_agent_raw.message.incremental_id
-    description: Incremental identifier.
+    description: Monotonic sequence id used by the message broker for ordering deliveries.
   destination:
     lineage:
       - datalake_big_agent_raw.message.destination
-    description: Message destination.
+    description: Target queue or topic name where the message payload is published.
   headers:
     lineage:
       - datalake_big_agent_raw.message.headers
-    description: Message headers.
+    description: JSON metadata headers attached to the outbound message envelope.
   payload:
     lineage:
       - datalake_big_agent_raw.message.payload

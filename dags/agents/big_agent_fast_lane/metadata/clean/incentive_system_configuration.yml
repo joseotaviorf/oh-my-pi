@@ -18,11 +18,11 @@ columns:
   performance_evaluation_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.performance_evaluation_period
-    description: Performance evaluation period.
+    description: Rolling window length used to evaluate partner performance metrics for tiering.
   tier_validity_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.tier_validity_period
-    description: Tier validity period.
+    description: Duration a partner tier assignment remains valid before reassessment.
   ts_classification_started:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.classification_start_at
