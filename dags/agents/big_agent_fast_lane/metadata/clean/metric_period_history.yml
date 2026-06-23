@@ -22,15 +22,15 @@ columns:
   metric_link_file:
     lineage:
       - datalake_big_agent_raw.metric_period_history.metric_link_file
-    description: Metric file link.
+    description: URL or storage path to the exported metric dataset for this period run.
   query_link_file:
     lineage:
       - datalake_big_agent_raw.metric_period_history.query_link_file
-    description: Query file link.
+    description: URL or storage path to the SQL query artifact used to compute the metric.
   status:
     lineage:
       - datalake_big_agent_raw.metric_period_history.status
-    description: History status.
+    description: Processing state of the metric period history entry (pending, completed, failed).
   ts_created:
     lineage:
       - datalake_big_agent_raw.metric_period_history.created_at

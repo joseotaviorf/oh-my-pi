@@ -34,7 +34,7 @@ columns:
   status:
     lineage:
       - datalake_big_agent_raw.partner_classification_aud.status
-    description: Partner classification status.
+    description: Current tier or eligibility status captured in this audit revision.
   mod_id_partner_external:
     lineage:
       - datalake_big_agent_raw.partner_classification_aud.partner_external_id_mod

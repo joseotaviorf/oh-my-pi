@@ -22,7 +22,7 @@ columns:
   rev_end:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule_aud.revend
-    description: End revision.
+    description: Envers revision that closed this audit interval; null while still current.
   id_partner_classification:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule_aud.partner_classification_id
@@ -34,11 +34,11 @@ columns:
   incentive_system:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule_aud.incentive_system
-    description: Incentive system.
+    description: Incentive program code scheduled in this audit revision.
   status:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule_aud.status
-    description: Schedule status.
+    description: Execution state of the classification schedule in this audit revision.
   mod_id_partner_classification:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule_aud.partner_classification_id_mod

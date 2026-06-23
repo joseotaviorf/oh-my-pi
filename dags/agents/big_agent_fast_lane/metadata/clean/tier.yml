@@ -26,7 +26,7 @@ columns:
   name:
     lineage:
       - datalake_big_agent_raw.tier.name
-    description: Tier name.
+    description: Display label of the commercial tier within the incentive program.
   priority:
     lineage:
       - datalake_big_agent_raw.tier.priority

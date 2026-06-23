@@ -22,11 +22,11 @@ columns:
   rev_end:
     lineage:
       - datalake_big_agent_raw.new_points_rule_aud.revend
-    description: End revision.
+    description: Envers revision that closed this audit interval; null while still current.
   id_score_rule:
     lineage:
       - datalake_big_agent_raw.new_points_rule_aud.score_rule_id
-    description: Score rule identifier.
+    description: Score rule id linked to this points accrual configuration in the revision.
   operation:
     lineage:
       - datalake_big_agent_raw.new_points_rule_aud.operation
@@ -34,11 +34,11 @@ columns:
   trigger:
     lineage:
       - datalake_big_agent_raw.new_points_rule_aud.trigger
-    description: Rule trigger.
+    description: Business event or condition that fires this points rule in the revision.
   points:
     lineage:
       - datalake_big_agent_raw.new_points_rule_aud.points
-    description: Points awarded.
+    description: Points awarded when the trigger fires, as stored in this audit revision.
   max_points:
     lineage:
       - datalake_big_agent_raw.new_points_rule_aud.max_points

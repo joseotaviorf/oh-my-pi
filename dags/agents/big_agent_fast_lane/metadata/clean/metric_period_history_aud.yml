@@ -22,7 +22,7 @@ columns:
   rev_end:
     lineage:
       - datalake_big_agent_raw.metric_period_history_aud.revend
-    description: End revision.
+    description: Envers revision that closed this audit interval; null while still current.
   id_metric_period:
     lineage:
       - datalake_big_agent_raw.metric_period_history_aud.metric_period_id
@@ -34,15 +34,15 @@ columns:
   metric_link_file:
     lineage:
       - datalake_big_agent_raw.metric_period_history_aud.metric_link_file
-    description: Metric file link.
+    description: URL or storage path to the exported metric dataset in this audit revision.
   query_link_file:
     lineage:
       - datalake_big_agent_raw.metric_period_history_aud.query_link_file
-    description: Query file link.
+    description: URL or storage path to the SQL query artifact in this audit revision.
   status:
     lineage:
       - datalake_big_agent_raw.metric_period_history_aud.status
-    description: History status.
+    description: Processing state of the metric period history entry in this audit revision.
   mod_id_metric_period:
     lineage:
       - datalake_big_agent_raw.metric_period_history_aud.metric_period_id_mod

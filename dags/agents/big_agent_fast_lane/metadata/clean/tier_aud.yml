@@ -38,11 +38,11 @@ columns:
   name:
     lineage:
       - datalake_big_agent_raw.tier_aud.name
-    description: Tier name.
+    description: Display label of the commercial tier in this audit revision.
   priority:
     lineage:
       - datalake_big_agent_raw.tier_aud.priority
-    description: Tier priority.
+    description: Numeric rank used to break ties when multiple tiers match a partner score.
   mod_id_incentive_engine:
     lineage:
       - datalake_big_agent_raw.tier_aud.incentive_engine_id_mod

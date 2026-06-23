@@ -10,7 +10,7 @@ columns:
   id:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule.id
-    description: Schedule identifier.
+    description: Primary key of the scheduled partner classification job in Big Agent.
   id_partner_classification:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule.partner_classification_id
@@ -22,11 +22,11 @@ columns:
   incentive_system:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule.incentive_system
-    description: Incentive system.
+    description: Incentive program code whose classification run is scheduled.
   status:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule.status
-    description: Schedule status.
+    description: Execution state of the classification schedule (pending, done, cancelled).
   ts_scheduled_to:
     lineage:
       - datalake_big_agent_raw.partner_classification_schedule.scheduled_to

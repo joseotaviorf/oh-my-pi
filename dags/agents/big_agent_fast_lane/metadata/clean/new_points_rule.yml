@@ -10,7 +10,7 @@ columns:
   id:
     lineage:
       - datalake_big_agent_raw.new_points_rule.id
-    description: Points rule identifier.
+    description: Primary key of the points accrual rule in Big Agent.
   id_score_rule:
     lineage:
       - datalake_big_agent_raw.new_points_rule.score_rule_id
@@ -22,7 +22,7 @@ columns:
   trigger:
     lineage:
       - datalake_big_agent_raw.new_points_rule.trigger
-    description: Points rule trigger.
+    description: Business event or condition that fires this points accrual rule.
   points:
     lineage:
       - datalake_big_agent_raw.new_points_rule.points

@@ -22,7 +22,7 @@ columns:
   status:
     lineage:
       - datalake_big_agent_raw.partner_classification.status
-    description: Partner classification status.
+    description: Current tier or eligibility status assigned to the partner in Big Agent.
   ts_created:
     lineage:
       - datalake_big_agent_raw.partner_classification.created_at
