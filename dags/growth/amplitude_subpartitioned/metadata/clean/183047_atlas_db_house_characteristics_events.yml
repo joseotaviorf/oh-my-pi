@@ -1,14 +1,14 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_atlas_db_house_characteristics_events
 owner: alexandre.gimenez@quintoandar.com.br
-domain: Growth
+domain: Atlas DB
 description:
   This table contains Amplitude events for tracking the requests to vespucio from fss and calculators.
 columns:
   id_amplitude:
     lineage:
       - datalake_amplitude_clean.events.id_amplitude
-    description: Amplitude identifier.
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   id_app:
     lineage:
       - datalake_amplitude_clean.events.id_app
@@ -56,11 +56,11 @@ columns:
   event_type:
     lineage:
       - datalake_amplitude_clean.events.event_type
-    description: type of the event.
+    description: Product event name tracked in Amplitude (for example offer_submitted or offer_canceled_new).
   event_properties:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Properties of the event.
+    description: JSON object with custom event attributes sent by the application at track time.
   operation_customer_edition:
     lineage:
       - datalake_amplitude_clean.events.event_properties
@@ -96,7 +96,7 @@ columns:
   match_type:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Type of the match.
+    description: Analytics attribute 'match type' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   business_context:
     lineage:
       - datalake_amplitude_clean.events.event_properties
@@ -104,11 +104,11 @@ columns:
   lead_id:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Lead identifier.
+    description: Analytics attribute 'lead id' materialized in this subpartition for product funnel reporting and Growth enrich pipelines.
   ip_address:
     lineage:
       - datalake_amplitude_clean.events.ip_address
-    description: Users IP Address.
+    description: Client IP address at event time, used for geolocation inference by Amplitude.
   os_name:
     lineage:
       - datalake_amplitude_clean.events.os_name
@@ -116,7 +116,7 @@ columns:
   os_version:
     lineage:
       - datalake_amplitude_clean.events.os_version
-    description: Users OS version.
+    description: Operating system version string reported by the client SDK.
   platform:
     lineage:
       - datalake_amplitude_clean.events.platform
@@ -124,7 +124,7 @@ columns:
   library:
     lineage:
       - datalake_amplitude_clean.events.library
-    description: Amplitude library.
+    description: Amplitude SDK library name and version used to send the event.
   region:
     lineage:
       - datalake_amplitude_clean.events.region
@@ -132,7 +132,7 @@ columns:
   start_version:
     lineage:
       - datalake_amplitude_clean.events.start_version
-    description: Amplitude start version.
+    description: Application version installed when the user first opened the application.
   user_properties:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -144,15 +144,15 @@ columns:
   uuid:
     lineage:
       - datalake_amplitude_clean.events.uuid
-    description: Event uuid.
+    description: Universally unique identifier for the ingested event row in the Amplitude export.
   version_name:
     lineage:
       - datalake_amplitude_clean.events.version_name
-    description: Version name.
+    description: Current application version name active when the event was triggered.
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
-    description: Timestamp of the event
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   ts_server_received:
     lineage:
       - datalake_amplitude_clean.events.ts_server_received
