@@ -41,6 +41,7 @@ chatbot_sessions_ranked AS (
       WHEN m.channel = 'WHATSAPP_CLAUDIA_CHAT' THEN 'claudia'
       WHEN m.channel = 'WHATSAPP_ALIAS_CHAT' THEN 'alias'
       WHEN m.channel = 'WHATSAPP_DOMINIC_CHAT' THEN 'dominic'
+      WHEN m.channel = 'WHATSAPP_SAMIA_CHAT' THEN 'samia'
       WHEN m.channel LIKE '%ISAIAS%' THEN 'isaias'
       ELSE 'unknown'
     END AS bot,

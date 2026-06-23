@@ -17,13 +17,14 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 ## Glossary and Synonyms
 
 - **Sessão de chatbot**, **conversa**, **atendimento bot** → `chatbot session` (`datalake_chatbot.sessions`)
-- **Host**, **bot**, **agente** → the AI persona handling the session (`sessions.bot`): sonia, wall-e, isaias, matthew, concierge, copilot, vandinha, old bot. There could be an overlap of concepts here as 'agente' can sometimes refer to a host, like wall-e, but can also refer to an specific AI Agent/sub-agent called within a host, e.g. `HumanEscalationAgent`.
+- **Host**, **bot**, **agente** → the AI persona handling the session (`sessions.bot`): sonia, wall-e, isaias, matthew, concierge, copilot, vandinha, samia, old bot. There could be an overlap of concepts here as 'agente' can sometimes refer to a host, like wall-e, but can also refer to an specific AI Agent/sub-agent called within a host, e.g. `HumanEscalationAgent`.
 - **Sonia** → rent-focused WhatsApp bot. Filter: `sessions.bot = 'sonia'`
 - **Wall-E** → support bot (in-app and WhatsApp). Filter: `sessions.bot = 'wall-e'`
 - **Isaias** → landlord lead qualification bot. Filter: `sessions.bot = 'isaias'`. Funnel flags in `isaias_conversational_flow`
 - **Matthew** → collections-related WhatsApp bot. Filter: `sessions.bot = 'matthew'`
 - **Concierge** → demand/search concierge bot. Filter: `sessions.bot = 'concierge'`
 - **Vandinha** → for-sale transaction EOP bot. Filter: `sessions.bot = 'vandinha'`
+- **Samia** → repair mediation WhatsApp bot. Filter: `sessions.bot = 'samia'`
 - **Old bot** → legacy Greenseer sessions. Filter: `sessions.bot = 'old bot'`. No  `id_langfuse_session`.
 - **Escalação**, **transbordo**, **escalation** → escalation to human analyst (`sessions.is_escalated = true`). **Transbordo** is somewhat of an old name, curent business terminology revolves around **escalation**.
 - **Bypass** → pre-bot action that routes the user to a queue before AI engagement (`bypass.bypass`)
