@@ -1,0 +1,257 @@
+database_name: datalake_big_agent
+table_name: tier_rule
+description: |
+  Enriched Big Agent tier configuration with classifier and qualifier score rules expanded
+  per incentive operation. One row per tier updated within the load window.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_tier:
+    lineage:
+      - datalake_big_agent_clean.tier.id
+    description: Primary identifier of the tier in Big Agent.
+  id_business_unit:
+    lineage:
+      - datalake_big_agent_clean.incentive_engine.id_external_condition
+      - datalake_big_agent_clean.incentive_engine.external_condition_type
+    description: Hub business unit identifier when the linked incentive engine external condition type is HUB; otherwise null.
+  incentive_engine_external_condition_type:
+    lineage:
+      - datalake_big_agent_clean.incentive_engine.external_condition_type
+    description: External condition type of the incentive engine that scopes this tier (for example HUB).
+  incentive_system:
+    lineage:
+      - datalake_big_agent_clean.incentive_engine.incentive_system
+    description: Incentive system label from the linked incentive engine (for example DEMAND_CONVERSION_FS).
+  tier_name:
+    lineage:
+      - datalake_big_agent_clean.tier.name
+    description: Display name of the tier in the Big Agent incentive configuration.
+  tier_priority:
+    lineage:
+      - datalake_big_agent_clean.tier.priority
+    description: Priority order used when multiple tiers match the same agent score context; lower values rank higher.
+  classifier_min_score:
+    lineage:
+      - datalake_big_agent_clean.score_rule.min_score
+      - datalake_big_agent_clean.tier.id_classifier_score_rule
+    description: Minimum agent score required to match the classifier score rule, with zero-score sentinel values normalized to 0.
+  classifier_resume:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.operation
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.tier.id_classifier_score_rule
+    description: |
+      Array of structs summarizing each classifier points rule with operation, max points, min trigger, and multiplier; null when no classifier rules exist.
+      When exists more than one possible to compose the classifier minimum score, the list will contain all possible combinations.
+  qualifier_min_score:
+    lineage:
+      - datalake_big_agent_clean.score_rule.min_score
+      - datalake_big_agent_clean.tier.id_qualifier_score_rule
+    description: Minimum agent score required to match the qualifier score rule, with zero-score sentinel values normalized to 0.
+  qualifier_resume:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.operation
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.tier.id_qualifier_score_rule
+    description: |
+      Array of structs summarizing each qualifier points rule with operation, max points, min trigger, and multiplier; null when no qualifier rules exist.
+      When exists more than one possible to compose the qualifier minimum score, the list will contain all possible combinations.
+  classifier_max_points_cs:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the CS operation on the classifier score rule linked to this tier.
+  classifier_max_points_fl_rent:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the FL_FR (first listing rent) operation on the classifier score rule.
+  classifier_max_points_ccv:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the CCV operation on the classifier score rule linked to this tier.
+  classifier_max_points_fl_sale:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the FL_FS (first listing sale) operation on the classifier score rule.
+  classifier_max_points_tqc:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the TQC operation on the classifier score rule linked to this tier.
+  classifier_min_points_cs:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the CS operation on the classifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  classifier_min_points_fl_rent:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the first listing rent operation on the classifier score rule.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  classifier_min_points_ccv:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the CCV operation on the classifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  classifier_min_points_sale:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the first listing sale operation on the classifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  classifier_min_points_tqc:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the TQC operation on the classifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  classifier_multiplier_cs:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the CS operation on the classifier score rule linked to this tier.
+      So this column computes how many points will be applied to the agent score for unitary event of the CS operation.
+  classifier_multiplier_fl_rent:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the first listing rent operation on the classifier score rule.
+      So this column computes how many points will be applied to the agent score for unitary event of the FL_FR operation.
+  classifier_multiplier_ccv:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the CCV operation on the classifier score rule linked to this tier.
+      So this column computes how many points will be applied to the agent score for unitary event of the CCV operation.
+  classifier_multiplier_fl_sale:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the first listing sale operation on the classifier score rule.
+      So this column computes how many points will be applied to the agent score for unitary event of the FL_FS operation.
+  classifier_multiplier_tqc:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the TQC operation on the classifier score rule linked to this tier.
+      So this column computes how many points will be applied to the agent score for unitary event of the TQC operation.
+  qualifier_max_points_cs:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the CS operation on the qualifier score rule linked to this tier.
+  qualifier_max_points_fl_rent:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the first listing rent operation on the qualifier score rule.
+  qualifier_max_points_ccv:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the CCV operation on the qualifier score rule linked to this tier.
+  qualifier_max_points_fl_sale:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the first listing sale operation on the qualifier score rule.
+  qualifier_max_points_tqc:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.max_points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: Maximum points for the TQC operation on the qualifier score rule linked to this tier.
+  qualifier_min_points_cs:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the CS operation on the qualifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  qualifier_min_points_fl_rent:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the first listing rent operation on the qualifier score rule.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  qualifier_min_points_ccv:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the CCV operation on the qualifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  qualifier_min_points_sale:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the first listing sale operation on the qualifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  qualifier_min_points_tqc:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.trigger
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Minimum trigger points for the TQC operation on the qualifier score rule linked to this tier.
+      The points will be computed if the agent score is greater than or equal to the minimum trigger points.
+  qualifier_multiplier_cs:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the CS operation on the qualifier score rule linked to this tier.
+      So this column computes how many points will be applied to the agent score for unitary event of the CS operation.
+  qualifier_multiplier_fl_rent:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the first listing rent operation on the qualifier score rule.
+      So this column computes how many points will be applied to the agent score for unitary event of the FL_FR operation.
+  qualifier_multiplier_ccv:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the CCV operation on the qualifier score rule linked to this tier.
+      So this column computes how many points will be applied to the agent score for unitary event of the CCV operation.
+  qualifier_multiplier_fl_sale:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the first listing sale operation on the qualifier score rule.
+      So this column computes how many points will be applied to the agent score for unitary event of the FL_FS operation.
+  qualifier_multiplier_tqc:
+    lineage:
+      - datalake_big_agent_clean.new_points_rule.points
+      - datalake_big_agent_clean.new_points_rule.operation
+    description: |
+      Points multiplier applied to the TQC operation on the qualifier score rule linked to this tier.
+      So this column computes how many points will be applied to the agent score for unitary event of the TQC operation.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.tier.ts_created
+    description: Timestamp of the tier creation.

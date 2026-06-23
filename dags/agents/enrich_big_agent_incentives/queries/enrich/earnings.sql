@@ -21,14 +21,15 @@ WITH new_earnings_filtered AS (
     WHERE
         DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
-SELECT 
+SELECT
     ne.id AS id_earning,
     ne.id_earning_source,
     ne.id_revenue_share,
     IF(es.external_domain_type = 'RENT_CONTRACT', es.id_external_domain, NULL) AS id_contract,
     IF(es.external_domain_type = 'SALES_FLOW', es.id_external_domain, NULL) AS id_sales_flow,
     IF(ne.author_role <> "SYSTEM", ne.id_author, NULL) AS id_author,
-    es.uuid_external_cart AS uuid_cart,
+    c.id AS id_cart,
+    tr.id_business_unit,
     IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
     IF(ne.external_receiver_type = "AGENT", ne.id_external_receiver, NULL) AS uuid_person,
     CASE
@@ -39,23 +40,48 @@ SELECT
     ne.incentive_system,
     ne.calculated_from,
     ne.currency,
+    ne.external_receiver_type,
     ne.status AS earning_status,
     ne.reason AS earning_status_reason,
+    ei.reason AS invalidation_reason,
     es.status AS earning_source_status,
     es.failure_reason AS earning_source_status_reason,
+    rs.relation_type AS revenue_share_relation_type,
+    rs.type AS revenue_share_type,
     ROUND(es.base_amount, 2) AS base_amount,
     ROUND(es.revenue_share_total_amount, 2) AS revenue_share_total_amount,
     ROUND(ne.revenue_amount, 2) AS revenue_amount,
     ROUND(ne.revenue_percentage, 2) AS revenue_percentage,
+    tr.incentive_engine_external_condition_type,
+    tr.tier_name,
+    tr.tier_priority,
+    tr.classifier_min_score,
+    tr.classifier_resume,
+    tr.qualifier_min_score,
+    tr.qualifier_resume,
     ne.author_role = "SYSTEM" AS is_authored_by_system,
     ne.ts_created,
+    ei.ts_invalidated,
     ne.ts_updated,
     DATE(ne.ts_created) AS dt_load,
     YEAR(ne.ts_created) AS year,
     MONTH(ne.ts_created) AS month,
     DAY(ne.ts_created) AS day
-FROM 
+FROM
     new_earnings_filtered AS ne
-JOIN 
-    datalake_big_agent_clean.earning_sources AS es 
+JOIN
+    datalake_big_agent_clean.earning_sources AS es
         ON es.id = ne.id_earning_source
+LEFT JOIN
+    datalake_cart_system_clean.cart AS c
+        ON c.uuid_cart = es.uuid_external_cart
+LEFT JOIN
+    datalake_big_agent_clean.earning_invalidations AS ei
+        ON ei.id_earning = ne.id
+LEFT JOIN
+    datalake_big_agent_clean.revenue_share AS rs
+        ON rs.id = ne.id_revenue_share
+LEFT JOIN
+    datalake_big_agent.tier_rule AS tr
+        ON tr.id_tier = rs.id_relation
+        AND rs.relation_type = 'TIER'

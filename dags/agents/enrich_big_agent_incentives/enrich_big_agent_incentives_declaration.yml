@@ -3,7 +3,7 @@ dag:
   name: enrich_big_agent_incentives
   schedule_start_date: 2020, 7, 1
   owner: Data Agents
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates enriched tables for Big Agent Incentives Engine System and Earnings processing.
 workflow:
@@ -15,6 +15,11 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    agent_tier_validity:
+      - tier_rule
+    earnings:
+      - tier_rule
   tables_customization:
     earning_author:
       merge_on: [id_earning, id_author]
@@ -22,6 +27,12 @@ workflow:
     earnings:
       merge_on: [id_earning, id_earning_source]
       z_order_by: [id_earning_source, id_earning]
+    tier_rule:
+      merge_on: [id_tier]
+      z_order_by: [ts_created]
+    agent_tier_validity:
+      merge_on: [id_agent_tier]
+      z_order_by: [ts_updated]
     brokerage_share_history:
       merge_on: [id_revision, id_contract]
       z_order_by: [id_contract, ts_revision]
