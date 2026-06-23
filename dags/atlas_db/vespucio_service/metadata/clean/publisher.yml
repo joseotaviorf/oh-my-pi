@@ -5,7 +5,7 @@ description:
   Table that store the publisher status from Vespucio Service Application.
   It is an append only table.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -22,7 +22,7 @@ columns:
   listing_status:
     lineage:
       - datalake_vespucio_service_raw.publisher.listing_status
-    description: "The listing status of the publisher."
+    description: "Current publication status of the listing in the Vespucio Service (e.g. active, paused, removed), indicating whether the listing is visible to buyers or renters on partner portals."
   ts_created:
     lineage:
       - datalake_vespucio_service_raw.publisher.created_at

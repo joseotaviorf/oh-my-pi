@@ -1,7 +1,7 @@
 ---
 database_name: datalake_union_cdc_clean
 table_name: house_2
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 domain: Atlas DB
 description: |
   This table contains supplementary property information from UnionDB (imovel2 table), providing additional

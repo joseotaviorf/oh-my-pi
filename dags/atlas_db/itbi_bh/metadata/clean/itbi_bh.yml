@@ -5,8 +5,9 @@ description:
   Table extracted from the Belo Horizonte City Hall website.It has all the records of
   transactions that were subject to the ITBI tax (Imposto de Transmissão de Bens Imóveis).
   The ingestion of ITBI BH data occurs on the 15th and 30th of each month.
+  Partitioned by year and month — always filter on both columns for partition pruning.
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   address:
     lineage:

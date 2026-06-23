@@ -6,9 +6,10 @@ description:
   original auto-completed values with customer-edited values. The table includes metrics such as
   absolute differences and percentage differences between original and edited values for various
   house characteristics (area, condo, bedrooms, parking lots, etc.). This data helps identify
-  patterns in user corrections and assess the accuracy of auto-complete predictions."
+  patterns in user corrections and assess the accuracy of auto-complete predictions.
+  Partitioned by year, month, and day — always filter on these columns for partition pruning."
 domain: Atlas DB
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_amplitude:
     lineage:

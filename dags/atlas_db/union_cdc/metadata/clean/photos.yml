@@ -1,7 +1,7 @@
 ---
 database_name: datalake_union_cdc_clean
 table_name: photos
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 domain: Atlas DB
 description: |
   This table contains property photo metadata from UnionDB, storing information about images associated
@@ -56,7 +56,7 @@ columns:
   dt_paratime:
     description: Date and time when the photo was taken or uploaded.
     lineage:
-      - datalake_union_cdc_raw.fotos.dt_paratime
+      - datalake_union_cdc_raw.fotos.paratime
   codigo_importacao:
     description: Import code associated with the photo.
     lineage:

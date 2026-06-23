@@ -1,11 +1,12 @@
 ---
 database_name: datalake_clustering_image_model_clean
 table_name: clustering_image
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 domain: Atlas DB
 description: |
   Table with information on the data science image clustering model results for houses similarity by images.
   This model use Atlas DB database to generate the results of the clustering algorithm.
+  Partitioned by year, month, and day — always filter on these columns for partition pruning.
 columns:
   id_condo:
     description: |

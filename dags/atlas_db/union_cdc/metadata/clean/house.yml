@@ -1,7 +1,7 @@
 ---
 database_name: datalake_union_cdc_clean
 table_name: house
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 domain: Atlas DB
 description: |
   This table contains comprehensive property listings data from UnionDB, a real estate management system.
@@ -375,7 +375,7 @@ columns:
   det_celeiro:
     description: Indicator whether the property has barn/granary.
     lineage:
-      - datalake_union_cdc_raw.imovel.det_CasaCaseiro
+      - datalake_union_cdc_raw.imovel.det_celeiro
   det_cerca:
     description: Indicator whether the property has fence/enclosure.
     lineage:

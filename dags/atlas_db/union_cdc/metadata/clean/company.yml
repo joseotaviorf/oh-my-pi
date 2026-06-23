@@ -1,7 +1,7 @@
 ---
 database_name: datalake_union_cdc_clean
 table_name: company
-owner: data-atlas-db@quintoandar.com.br
+owner: gabriel.mota@quintoandar.com.br
 domain: Atlas DB
 description: |
   This table contains real estate company and broker information from UnionDB, including both real estate
@@ -16,7 +16,7 @@ columns:
   id_onboarding:
     description: Foreign key referencing onboarding process or stage.
     lineage:
-      - datalake_union_cdc_raw.empresa.fkonboarding
+      - datalake_union_cdc_raw.empresa.fkonbording
   nome:
     description: Company or broker name.
     lineage:
@@ -66,11 +66,11 @@ columns:
     lineage:
       - datalake_union_cdc_raw.empresa.dddfax
   fax:
-    description: Company fax number.
+    description: Fax number of the company as stored in the Union CDC source (may be null for companies without a fax line).
     lineage:
       - datalake_union_cdc_raw.empresa.fax
   email:
-    description: Company email address.
+    description: Primary contact email address of the company as stored in the Union CDC raw source.
     lineage:
       - datalake_union_cdc_raw.empresa.email
   site:
@@ -382,7 +382,7 @@ columns:
     lineage:
       - datalake_union_cdc_raw.empresa.redemorar_user
   redemorar_password:
-    description: RedeMorar FTP password.
+    description: FTP access password used by the company to connect to the RedeMorar listing syndication service.
     lineage:
       - datalake_union_cdc_raw.empresa.redemorar_password
   eptvanuncios:
@@ -712,7 +712,7 @@ columns:
   hostEmailMarketing:
     description: Email marketing platform host/server.
     lineage:
-      - datalake_union_cdc_raw.empresa.pkemhostEmailMarketingpresa
+      - datalake_union_cdc_raw.empresa.hostEmailMarketing
   loginEmailMarketing:
     description: Email marketing platform login username.
     lineage:
