@@ -1,8 +1,11 @@
 database_name: datalake_customer_support
 table_name: tickes
-description: Test table for tickets data
+description: >
+  One row per enriched customer support ticket, combining CRM task attributes with
+  support channel, status, and SLA metadata. Central enrichment table for support
+  operations analytics. Source systems are CRM and support platform.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ticket:
     lineage:

@@ -1,9 +1,12 @@
 ---
 database_name: datalake_survicate
 table_name: salesforce_surveys
-description: Responses to Salesforce surveys
+description: >
+  One row per Survicate survey response linked to a Salesforce case. Enriches
+  survey feedback with the corresponding Salesforce case identifier for CRM analytics.
+  Source system is Survicate.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_survey:
     lineage:

@@ -1,9 +1,12 @@
 ---
 database_name: datalake_survicate
 table_name: keys_surveys
-description: Responses to key service forms
+description: >
+  One row per key delivery service survey response enriched from Survicate. Captures
+  respondent satisfaction scores and comments about the key handover service.
+  Source system is Survicate.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_answer:
     lineage:
@@ -47,7 +50,7 @@ columns:
       to the journey, for example: onboarding, offboarding. Or we can refer to the
       related microservice, for example: lockbox."
   survey_source:
-    description: Data source
+    description: Origin system or channel through which this keys-handover survey response was collected (e.g., Survicate web widget, email link).
   satisfaction_rating:
     lineage:
       - datalake_survicate.response_content.answer_content

@@ -1,9 +1,12 @@
 ---
 database_name: datalake_survicate
 table_name: photo_surveys
-description: Answers to photo service forms
+description: >
+  One row per photo service survey response enriched from Survicate. Captures
+  respondent answers about the property photography service quality.
+  Source system is Survicate.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_response:
     lineage:
@@ -39,7 +42,7 @@ columns:
       to the journey, for example: onboarding, offboarding. Or we can refer to the
       related microservice, for example: lockbox."
   survey_source:
-    description: Data source
+    description: Origin system or channel through which this photo-review survey response was collected (e.g., Survicate web widget, email link).
   improvement_tags:
     lineage:
       - datalake_survicate.response_content.answer_content

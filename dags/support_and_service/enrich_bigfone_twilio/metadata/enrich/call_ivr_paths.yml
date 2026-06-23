@@ -1,37 +1,40 @@
 database_name: datalake_bigfone_twilio
 table_name: call_ivr_paths
-description: "Table with tasks related to Twilio IVR"
+description: >
+  One row per Twilio IVR call task, enriched with BigFone event data. Captures the
+  IVR path a customer followed during an inbound call, including task and call
+  identifiers from Twilio. Source systems are BigFone and Twilio.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_bigfone_events.events.id
-    description: ID of the event
+    description: Primary key uniquely identifying this IVR path event record in the enriched Bigfone/Twilio call dataset.
   id_event:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: ID of the event
+    description: Identifier of the originating telephony event in the Bigfone/Twilio system that generated this IVR path record.
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: ID of the call
+    description: Identifier of the parent phone call session within which this IVR navigation step occurred.
   id_task:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: ID of the task
+    description: Identifier of the Twilio Flex task created when this IVR interaction was routed to an agent queue.
   step_name:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: IVR step name
+    description: Label of the IVR menu node reached during this navigation step (e.g., main_menu, tenant_support, agent_transfer).
   event_type:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Type of event
+    description: Classification of this IVR event (e.g., gather, say, redirect, enqueue) indicating the action performed at this step.
   digits:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Digits pressed
+    description: DTMF digits entered by the caller when responding to a menu prompt at this IVR navigation step.
   ts_created:
     lineage:
       - datalake_bigfone_events.events.metadata

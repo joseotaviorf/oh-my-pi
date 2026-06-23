@@ -1,8 +1,11 @@
 database_name: datalake_terminator_clean
 table_name: contract
-description: table with contract information.
+description: >
+  One row per rental contract in the Terminator system. Captures contract identity,
+  financial terms, responsibility assignments, and effective dates used in the
+  contract termination workflow. Source system is the Terminator service.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

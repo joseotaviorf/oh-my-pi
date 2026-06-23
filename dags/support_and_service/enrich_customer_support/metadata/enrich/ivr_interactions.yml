@@ -1,17 +1,20 @@
 database_name: datalake_customer_support
 table_name: ivr_interactions
-description: Table with all IVR interactions
+description: >
+  One row per IVR (Interactive Voice Response) customer interaction, enriched with
+  Twilio call and task identifiers. Used to track and analyse inbound voice interactions
+  in the customer support channel. Source system is Twilio.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_task:
     lineage:
       - datalake_bigfone_clean.event.id_task
-    description: Task ID from Twilio
+    description: Twilio Flex task identifier linking this IVR interaction to the corresponding customer service work item.
   id_call:
     lineage:
       - datalake_bigfone_clean.event.id_call
-    description: Call ID from Twilio
+    description: Twilio call session identifier uniquely referencing the phone call that triggered this IVR interaction record.
   from_phone_number:
     lineage:
       - datalake_bigfone_clean.event.from_phone_number
@@ -20,11 +23,35 @@ columns:
     lineage:
       - datalake_bigfone_clean.event.to_phone_number
     description: Phone number the call was made to
-  ivr_steps:
+  step_name:
     lineage:
       - datalake_bigfone_clean.event.ivr_steps
-    description: IVR steps, like key presses
-  ts_created:
+    description: Name of the IVR menu step the customer reached during this interaction (e.g., main_menu, agent_transfer), extracted from the IVR steps map.
+  type:
+    lineage:
+      - datalake_bigfone_clean.event.ivr_steps
+    description: Type of action performed at this IVR step (e.g., gather, say, redirect), derived from the IVR steps event map.
+  value:
+    lineage:
+      - datalake_bigfone_clean.event.ivr_steps
+    description: DTMF digits or response value entered by the caller at this IVR step, extracted from the IVR steps map.
+  ts_event:
+    lineage:
+      - datalake_bigfone_clean.event.ivr_steps
+    description: Timestamp of the specific IVR step event, extracted from the millisecond epoch value in the IVR steps map.
+  ts_ivr_started:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Timestamp of when the reservation was created
+    description: Timestamp when the IVR session started, computed as the earliest event timestamp for this task.
+  year:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created
+    description: Year extracted from the IVR session start timestamp. Partition column.
+  month:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created
+    description: Month extracted from the IVR session start timestamp. Partition column.
+  day:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created
+    description: Day extracted from the IVR session start timestamp. Partition column.
