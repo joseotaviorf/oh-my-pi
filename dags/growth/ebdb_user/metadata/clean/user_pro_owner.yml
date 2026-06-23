@@ -4,26 +4,27 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.userproowner.id
-    description: Unique table's id.
+    - datalake_ebdb_raw.userproowner.id
+    description: UserProOwner record primary key from EBDB.
   id_user:
     lineage:
-      - datalake_ebdb_raw.userproowner.user_id
-    description: User ID that joined the PP Multi program.
+    - datalake_ebdb_raw.userproowner.user_id
+    description: EBDB user (Usuario.id) enrolled in the PP Multi (Pro Owner) program.
   id_account_manager:
     lineage:
-      - datalake_ebdb_raw.userproowner.account_manager_id
-    description: Account manager ID that supports the PP Multi customer.
+    - datalake_ebdb_raw.userproowner.account_manager_id
+    description: EBDB user identifier of the account manager assigned to this Pro Owner.
   is_active:
     lineage:
-      - datalake_ebdb_raw.userproowner.active
-    description: Boolean flag indicating if the customer is active on PP Multi program.
+    - datalake_ebdb_raw.userproowner.active
+    description: Flag indicating whether the landlord is currently active in the PP Multi program.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.userproowner.created_at
-    description: Timestamp when the user was registered.
+    - datalake_ebdb_raw.userproowner.created_at
+    description: Timestamp when the Pro Owner enrollment was created in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.userproowner.updated_at
-    description: Timestamp when the user was updated.
-      
+    - datalake_ebdb_raw.userproowner.updated_at
+    description: Timestamp when the Pro Owner enrollment was last updated in EBDB.
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean layer for PP Multi (Pro Owner) program enrollments from EBDB `UserProOwner`. One row per landlord enrolled in the multi-property owner program, including assigned account manager and active status.

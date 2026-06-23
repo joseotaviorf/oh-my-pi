@@ -1,44 +1,42 @@
 database_name: datalake_ebdb_clean
 table_name: user_merge
-description: >
-  Clean layer for EBDB user account merge events, linking loser and winner accounts
-  and their person UUIDs when accounts are consolidated.
+description: Clean layer for EBDB user account merge events (`UserMerge`). Records consolidation of duplicate accounts by linking the loser (merged-away) and winner (surviving) account IDs and their person UUIDs, plus merge processing status and retry count.
 domain: Growth
-owner: data-growth@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.usermerge.id
-    description: Primary identifier of the user merge record in EBDB.
+    - datalake_ebdb_raw.usermerge.id
+    description: UserMerge record primary key from EBDB.
   id_loser_account:
     lineage:
-      - datalake_ebdb_raw.usermerge.loseraccountid
-    description: Account identifier of the user account merged away (loser).
+    - datalake_ebdb_raw.usermerge.loseraccountid
+    description: EBDB user ID of the account merged away (loser).
   id_winner_account:
     lineage:
-      - datalake_ebdb_raw.usermerge.winneraccountid
-    description: Account identifier of the surviving user account (winner).
+    - datalake_ebdb_raw.usermerge.winneraccountid
+    description: EBDB user ID of the surviving account after consolidation (winner).
   uuid_winner_person:
     lineage:
-      - datalake_ebdb_raw.usermerge.winnerpersonuuid
+    - datalake_ebdb_raw.usermerge.winnerpersonuuid
     description: Person UUID of the winning account after the merge.
   uuid_loser_person:
     lineage:
-      - datalake_ebdb_raw.usermerge.loserpersonuuid
+    - datalake_ebdb_raw.usermerge.loserpersonuuid
     description: Person UUID of the losing account before the merge.
   status:
     lineage:
-      - datalake_ebdb_raw.usermerge.status
-    description: Processing status of the merge operation in EBDB.
+    - datalake_ebdb_raw.usermerge.status
+    description: Processing status of the merge operation (e.g. pending, completed, failed).
   failure_count:
     lineage:
-      - datalake_ebdb_raw.usermerge.failurecount
-    description: Number of failed attempts while applying the merge.
+    - datalake_ebdb_raw.usermerge.failurecount
+    description: Number of failed attempts while applying the account merge.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.usermerge.criadoem
+    - datalake_ebdb_raw.usermerge.criadoem
     description: Timestamp when the merge record was created in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.usermerge.atualizadoem
+    - datalake_ebdb_raw.usermerge.atualizadoem
     description: Timestamp when the merge record was last updated in EBDB.

@@ -3,83 +3,113 @@ database_name: datalake_ebdb_user
 table_name: agent_data
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
-description: |
-  Enrich layer for QuintoAndar field agent profiles sourced from EBDB Main `DadosAgente`
+description: 'Enrich layer for QuintoAndar field agent profiles sourced from EBDB Main `DadosAgente`
+
   (clean: datalake_ebdb_clean.agent_data). One row per agent, enriched with country_code from the
+
   linked user record, business-context flags (For Rent / For Sale), and persona indicators
+
   (real estate agent with CRECI, photographer). Aggregates agent_data_business_contexts_served to
+
   derive is_sale_agent and is_rent_agent; agents without explicit business context default to RENT.
+
   Used by Growth and the Agents domain for agent roster, licensing, and operational segmentation.
+
   Depends on enrich user (inner dependency). Part of the enrich_ebdb_user DAG. Partitioned by
+
   country_code — always filter on country_code in WHERE clauses to enable partition pruning and
+
   avoid full table scans; combine with id when querying a specific agent for best performance.
+
+  '
 columns:
   id:
-    description: |
-      Agent data identifier from EBDB DadosAgente. Primary key of this table; joins to
+    description: 'Agent data identifier from EBDB DadosAgente. Primary key of this table; joins to
+
       datalake_ebdb_clean.user.id_agent for the linked user profile.
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.id
+    - datalake_ebdb_clean.agent_data.id
   id_city:
-    description: |
-      EBDB city identifier where the agent operates (cidade_id in DadosAgente).
+    description: 'EBDB city identifier where the agent operates (cidade_id in DadosAgente).
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.id_city
+    - datalake_ebdb_clean.agent_data.id_city
   country_code:
-    description: |
-      Table partition column. ISO country code of the agent's linked user (e.g. BR, MX), sourced
-      from datalake_ebdb_user.user.country_code. Defaults to 'Undefined' when no user link exists.
+    description: 'Table partition column. ISO country code of the agent''s linked user (e.g. BR, MX), sourced
+
+      from datalake_ebdb_user.user.country_code. Defaults to ''Undefined'' when no user link exists.
+
       Required in WHERE clauses for partition pruning — never query without filtering on country_code.
+
+      '
     lineage:
-      - datalake_ebdb_user.user.country_code
+    - datalake_ebdb_user.user.country_code
   creci_number:
-    description: |
-      CRECI registration number of the agent (Conselho Regional de Corretores de Imóveis).
+    description: 'CRECI registration number of the agent (Conselho Regional de Corretores de Imóveis).
+
       Empty string when the agent is not a licensed real estate broker.
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.creci_number
+    - datalake_ebdb_clean.agent_data.creci_number
   profile:
-    description: |
-      Agent mobility profile from EBDB (perfil in DadosAgente), indicating transportation method
+    description: 'Agent mobility profile from EBDB (perfil in DadosAgente), indicating transportation method
+
       or operational profile for field visits.
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.profile
+    - datalake_ebdb_clean.agent_data.profile
   is_active:
-    description: |
-      Flag indicating whether the agent record is active in EBDB (ativo in DadosAgente).
+    description: 'Flag indicating whether the agent record is active in EBDB (ativo in DadosAgente).
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.is_active
+    - datalake_ebdb_clean.agent_data.is_active
   is_realstate_agent:
-    description: |
-      Flag indicating whether the agent holds a CRECI license. Built as MAX over rows where
+    description: 'Flag indicating whether the agent holds a CRECI license. Built as MAX over rows where
+
       creci_number is not null and not empty within the agent group.
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.creci_number
+    - datalake_ebdb_clean.agent_data.creci_number
   is_photographer:
-    description: |
-      Flag indicating whether the linked EBDB user is classified as a photographer persona.
+    description: 'Flag indicating whether the linked EBDB user is classified as a photographer persona.
+
       Sourced from the enrich user table (id_photographer_data IS NOT NULL on the linked user).
+
+      '
     lineage:
-      - datalake_ebdb_user.user.is_photographer
+    - datalake_ebdb_user.user.is_photographer
   is_sale_agent:
-    description: |
-      Flag indicating whether the agent serves the For Sale business context. Built as MAX over
-      agent_data_business_contexts_served where business_context = 'SALE'.
+    description: 'Flag indicating whether the agent serves the For Sale business context. Built as MAX over
+
+      agent_data_business_contexts_served where business_context = ''SALE''.
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data_business_contexts_served.business_context
+    - datalake_ebdb_clean.agent_data_business_contexts_served.business_context
   is_rent_agent:
-    description: |
-      Flag indicating whether the agent serves the For Rent business context. Built as MAX over
+    description: 'Flag indicating whether the agent serves the For Rent business context. Built as MAX over
+
       business_contexts_served; agents with no explicit context default to RENT per enrich logic.
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data_business_contexts_served.business_context
+    - datalake_ebdb_clean.agent_data_business_contexts_served.business_context
   ts_created:
-    description: |
-      Timestamp when the agent record was created in EBDB (criadoem in DadosAgente).
+    description: 'Timestamp when the agent record was created in EBDB (criadoem in DadosAgente).
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.ts_created
+    - datalake_ebdb_clean.agent_data.ts_created
   ts_updated:
-    description: |
-      Timestamp when the agent record was last updated in EBDB (atualizadoem in DadosAgente).
+    description: 'Timestamp when the agent record was last updated in EBDB (atualizadoem in DadosAgente).
+
+      '
     lineage:
-      - datalake_ebdb_clean.agent_data.ts_updated
+    - datalake_ebdb_clean.agent_data.ts_updated

@@ -4,40 +4,55 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.device.id
+    - datalake_ebdb_raw.device.id
+    description: Device record primary key from EBDB Device.
   arn:
     lineage:
-      - datalake_ebdb_raw.device.arn
+    - datalake_ebdb_raw.device.arn
+    description: AWS SNS ARN for the registered device, used to route push notifications.
   mobile_app:
     lineage:
-      - datalake_ebdb_raw.device.mobileapp
+    - datalake_ebdb_raw.device.mobileapp
+    description: EBDB mobile application identifier (e.g. Inquilinos tenant app).
   id_user:
     lineage:
-      - datalake_ebdb_raw.device.usuario_id
+    - datalake_ebdb_raw.device.usuario_id
+    description: EBDB user (Usuario.id) who owns this device registration.
   token:
     lineage:
-      - datalake_ebdb_raw.device.token
+    - datalake_ebdb_raw.device.token
+    description: Device push notification token. Treat as sensitive.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.device.atualizadoem
+    - datalake_ebdb_raw.device.atualizadoem
+    description: Timestamp when the device record was last updated in EBDB.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.device.criadoem
+    - datalake_ebdb_raw.device.criadoem
+    description: Timestamp when the device was first registered in EBDB.
   arn_endpoint:
     lineage:
-      - datalake_ebdb_raw.device.endpointarn
+    - datalake_ebdb_raw.device.endpointarn
+    description: AWS SNS platform endpoint ARN derived from the device token.
   mobile_platform:
     lineage:
-      - datalake_ebdb_raw.device.mobileplatform
+    - datalake_ebdb_raw.device.mobileplatform
+    description: Mobile OS platform (e.g. iOS, Android) of the registered device.
   app_version:
     lineage:
-      - datalake_ebdb_raw.device.appversion
+    - datalake_ebdb_raw.device.appversion
+    description: Installed mobile app version at registration or last update.
   environment:
     lineage:
-      - datalake_ebdb_raw.device.environment
+    - datalake_ebdb_raw.device.environment
+    description: Deployment environment for the device registration (e.g. prod, staging).
   pwa_public_key:
     lineage:
-      - datalake_ebdb_raw.device.pwapublickey
+    - datalake_ebdb_raw.device.pwapublickey
+    description: Public key for Progressive Web App push subscription, when applicable.
   pwa_auth:
     lineage:
-      - datalake_ebdb_raw.device.pwaauth
+    - datalake_ebdb_raw.device.pwaauth
+    description: PWA push authentication secret. Treat as sensitive.
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean layer for mobile app and PWA device registrations sourced from EBDB Main `Device`. One row per registered device; stores push notification tokens, SNS ARN endpoints, and app/platform metadata. Used to detect tenant app installation (has_tenant_app in enrich user) and to route mobile push campaigns.

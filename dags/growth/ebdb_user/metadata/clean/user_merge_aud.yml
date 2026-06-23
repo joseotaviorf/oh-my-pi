@@ -4,28 +4,39 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.id
+    - datalake_ebdb_raw.usermerge_aud.id
+    description: UserMerge record identifier for this audit row.
   id_loser_account:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.loseraccountid
+    - datalake_ebdb_raw.usermerge_aud.loseraccountid
+    description: Loser account user ID at the time of this revision.
   id_winner_account:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.winneraccountid
+    - datalake_ebdb_raw.usermerge_aud.winneraccountid
+    description: Winner account user ID at the time of this revision.
   rev:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.rev
+    - datalake_ebdb_raw.usermerge_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_ebdb_clean.user_revision_entity.id; join on rev to retrieve who performed the change, when, and why.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.revtype
+    - datalake_ebdb_raw.usermerge_aud.revtype
+    description: 'Hibernate Envers operation type for this audit row: 0=insert, 1=update, 2=delete.'
   failure_count:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.failurecount
+    - datalake_ebdb_raw.usermerge_aud.failurecount
+    description: Merge failure count value captured in this audit revision.
   mod_failure_count:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.failurecount_mod
+    - datalake_ebdb_raw.usermerge_aud.failurecount_mod
+    description: Audit flag indicating whether the merge failure count changed in this revision (Hibernate Envers _mod column).
   status:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.status
+    - datalake_ebdb_raw.usermerge_aud.status
+    description: Merge processing status value captured in this audit revision.
   mod_status:
     lineage:
-      - datalake_ebdb_raw.usermerge_aud.status_mod
+    - datalake_ebdb_raw.usermerge_aud.status_mod
+    description: Audit flag indicating whether the merge processing status changed in this revision (Hibernate Envers _mod column).
+owner: isadora.gallerani@quintoandar.com.br
+description: Hibernate Envers audit history for EBDB `UserMerge` account consolidation events. Tracks changes to merge status and failure_count across processing retries. Join rev to user_revision_entity to audit who triggered merge state transitions.

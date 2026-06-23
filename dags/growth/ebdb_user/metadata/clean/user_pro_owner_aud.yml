@@ -4,26 +4,35 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.id
+    - datalake_ebdb_raw.userproowner_aud.id
+    description: UserProOwner record identifier for this audit row.
   id_user:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.user_id
+    - datalake_ebdb_raw.userproowner_aud.user_id
+    description: EBDB user enrolled in PP Multi at the time of this revision.
   id_account_manager:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.account_manager_id
+    - datalake_ebdb_raw.userproowner_aud.account_manager_id
+    description: Account manager user ID value captured in this audit revision.
   rev:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.REV
+    - datalake_ebdb_raw.userproowner_aud.REV
+    description: Hibernate Envers revision identifier. Foreign key to datalake_ebdb_clean.user_revision_entity.id; join on rev to retrieve who performed the change, when, and why.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.REVTYPE
+    - datalake_ebdb_raw.userproowner_aud.REVTYPE
+    description: 'Hibernate Envers operation type for this audit row: 0=insert, 1=update, 2=delete.'
   is_active:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.active
+    - datalake_ebdb_raw.userproowner_aud.active
+    description: PP Multi active status value captured in this audit revision.
   mod_id_account_manager:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.account_manager_id_MOD
+    - datalake_ebdb_raw.userproowner_aud.account_manager_id_MOD
+    description: Audit flag indicating whether the assigned account manager changed in this revision (Hibernate Envers _mod column).
   mod_is_active:
     lineage:
-      - datalake_ebdb_raw.userproowner_aud.active_MOD
-      
+    - datalake_ebdb_raw.userproowner_aud.active_MOD
+    description: Audit flag indicating whether the PP Multi active status changed in this revision (Hibernate Envers _mod column).
+owner: isadora.gallerani@quintoandar.com.br
+description: Hibernate Envers audit history for EBDB `UserProOwner` (PP Multi enrollments). One row per revision capturing changes to account manager assignment or active status. Join rev to user_revision_entity for change attribution.

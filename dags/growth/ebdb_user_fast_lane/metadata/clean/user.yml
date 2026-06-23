@@ -2,275 +2,273 @@ database_name: datalake_ebdb_clean
 table_name: user
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
-description: |-
-  User profile table sourced from EBDB `Usuario` (Main's database)
-  This dataset includes personally identifiable information (PII) and sensitive authentication/banking fields.
+description: Clean layer for EBDB Main user profiles sourced from `Usuario`. One row per QuintoAndar platform user with contact, document, address, banking, and persona foreign keys (agent, photographer, sales rep, affiliate). Contains PII and sensitive authentication fields. Ingested via ebdb_user_fast_lane for low-latency updates; feeds enrich_ebdb_user and downstream DW models (dim_user).
 columns:
   id:
     description: Unique identifier for the user record. Primary key.
     lineage:
-      - datalake_ebdb_raw.usuario.id
+    - datalake_ebdb_raw.usuario.id
   id_country:
     description: Identifier of the user's country.
     lineage:
-      - datalake_ebdb_raw.usuario.country_id
+    - datalake_ebdb_raw.usuario.country_id
   uuid_person:
     description: Person UUID associated with the user.
     lineage:
-      - datalake_ebdb_raw.usuario.personuuid
+    - datalake_ebdb_raw.usuario.personuuid
   is_active:
     description: Flag indicating whether the user is active.
     lineage:
-      - datalake_ebdb_raw.usuario.active
+    - datalake_ebdb_raw.usuario.active
   neighborhood:
     description: User address neighborhood (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.bairro
+    - datalake_ebdb_raw.usuario.bairro
   zip_code:
     description: User address ZIP / postal code (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.cep
+    - datalake_ebdb_raw.usuario.cep
   city:
     description: User address city (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.cidade
+    - datalake_ebdb_raw.usuario.cidade
   complement:
     description: Address complement (e.g. apartment/suite) (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.complemento
+    - datalake_ebdb_raw.usuario.complemento
   cpf:
     description: Brazilian taxpayer registry number (CPF) for the user (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.cpf
+    - datalake_ebdb_raw.usuario.cpf
   dt_birth:
     description: User birth date (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.datanascimento
+    - datalake_ebdb_raw.usuario.datanascimento
   email:
     description: Primary email address for the user (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.email
+    - datalake_ebdb_raw.usuario.email
   alternative_email:
     description: Alternative email address for the user (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.emailalternativo
+    - datalake_ebdb_raw.usuario.emailalternativo
   address:
     description: Street address (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.endereco
+    - datalake_ebdb_raw.usuario.endereco
   id_facebook:
     description: Facebook account identifier, when available (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.facebookid
+    - datalake_ebdb_raw.usuario.facebookid
   photo:
     description: User photo reference (e.g. URL/path), when available (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.foto
+    - datalake_ebdb_raw.usuario.foto
   id_linkedin:
     description: LinkedIn account identifier, when available (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.linkedinid
+    - datalake_ebdb_raw.usuario.linkedinid
   name:
     description: User full name (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.nome
+    - datalake_ebdb_raw.usuario.nome
   number:
     description: Address number (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.numero
+    - datalake_ebdb_raw.usuario.numero
   password:
     description: User password (typically a hashed/encoded credential). Treat as sensitive; do not expose.
     lineage:
-      - datalake_ebdb_raw.usuario.password
+    - datalake_ebdb_raw.usuario.password
   gender:
     description: User gender (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.sexo
+    - datalake_ebdb_raw.usuario.sexo
   business_phone:
     description: User business phone number (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.telefonecomercial
+    - datalake_ebdb_raw.usuario.telefonecomercial
   main_phone:
     description: User main phone number (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.telefoneprincipal
+    - datalake_ebdb_raw.usuario.telefoneprincipal
   secondary_phone:
     description: User secondary phone number (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.telefonesecundario
+    - datalake_ebdb_raw.usuario.telefonesecundario
   id_state:
     description: Identifier of the user's state.
     lineage:
-      - datalake_ebdb_raw.usuario.estado_id
+    - datalake_ebdb_raw.usuario.estado_id
   login_count:
     description: Total number of logins recorded for the user.
     lineage:
-      - datalake_ebdb_raw.usuario.contadorlogin
+    - datalake_ebdb_raw.usuario.contadorlogin
   ts_created:
     description: Timestamp when the user record was created.
     lineage:
-      - datalake_ebdb_raw.usuario.criadoem
+    - datalake_ebdb_raw.usuario.criadoem
   do_not_ask_phone:
     description: Flag indicating the user opted out of being asked for a phone number.
     lineage:
-      - datalake_ebdb_raw.usuario.naomeperguntetelefone
+    - datalake_ebdb_raw.usuario.naomeperguntetelefone
   is_blocked:
     description: Flag indicating whether the user is blocked.
     lineage:
-      - datalake_ebdb_raw.usuario.bloqueado
+    - datalake_ebdb_raw.usuario.bloqueado
   rg:
     description: Brazilian identity document number (RG) (PII, confidential).
     lineage:
-      - datalake_ebdb_raw.usuario.rg
+    - datalake_ebdb_raw.usuario.rg
   ts_rg_created:
     description: Timestamp/date of RG issuance.
     lineage:
-      - datalake_ebdb_raw.usuario.dataexpedicaorg
+    - datalake_ebdb_raw.usuario.dataexpedicaorg
   detail_lead_guided_search:
     description: Additional details for guided search leads associated with the user.
     lineage:
-      - datalake_ebdb_raw.usuario.detalhesleadbuscaguiada
+    - datalake_ebdb_raw.usuario.detalhesleadbuscaguiada
   has_received_guided_search:
     description: Flag indicating whether the user has received guided search.
     lineage:
-      - datalake_ebdb_raw.usuario.recebeubuscaguiada
+    - datalake_ebdb_raw.usuario.recebeubuscaguiada
   id_agent:
     description: Identifier of the agent data associated with the user.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosagente_id
+    - datalake_ebdb_raw.usuario.dadosagente_id
   id_agent_rep:
     description: Identifier of the agent representative data associated with the user.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosagente_id
+    - datalake_ebdb_raw.usuario.dadosagente_id
   has_accepted_sms:
     description: Flag indicating whether the user accepted SMS communications.
     lineage:
-      - datalake_ebdb_raw.usuario.aceitasms
+    - datalake_ebdb_raw.usuario.aceitasms
   hash_login_bypass:
     description: Hash/token used to bypass normal login flow. Treat as sensitive.
     lineage:
-      - datalake_ebdb_raw.usuario.hashloginbypass
+    - datalake_ebdb_raw.usuario.hashloginbypass
   contact_preference:
     description: User contact preference (channel), when available.
     lineage:
-      - datalake_ebdb_raw.usuario.preferenciacontato
+    - datalake_ebdb_raw.usuario.preferenciacontato
   desire_contact:
     description: Flag indicating whether the user prefers to be contacted.
     lineage:
-      - datalake_ebdb_raw.usuario.preferecontato
+    - datalake_ebdb_raw.usuario.preferecontato
   ts_click_anuncie:
     description: Timestamp when the user clicked on "anuncie" (advertise) CTA.
     lineage:
-      - datalake_ebdb_raw.usuario.dataclickanuncie
+    - datalake_ebdb_raw.usuario.dataclickanuncie
   bank_agency:
     description: Bank agency/branch number.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_agencia
+    - datalake_ebdb_raw.usuario.dadosbancarios_agencia
   bank_account:
-    description: Bank account number.
+    description: Bank account number for the user's registered payout account.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_contacorrente
+    - datalake_ebdb_raw.usuario.dadosbancarios_contacorrente
   bank_cpf_cnpj:
     description: CPF/CNPJ for the bank account holder.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_cpfoucnpj
+    - datalake_ebdb_raw.usuario.dadosbancarios_cpfoucnpj
   bank_name:
     description: Bank account holder name (may refer to another holder).
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_nome
+    - datalake_ebdb_raw.usuario.dadosbancarios_nome
   bank_another_holder:
     description: Indicates whether the bank account has another holder.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_outrotitular
+    - datalake_ebdb_raw.usuario.dadosbancarios_outrotitular
   bank_account_type:
     description: Bank account type (e.g. checking/savings), when available.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_tipoconta
+    - datalake_ebdb_raw.usuario.dadosbancarios_tipoconta
   do_not_send_search_monthly_notice:
     description: Flag indicating whether the user opted out from receiving monthly search notices.
     lineage:
-      - datalake_ebdb_raw.usuario.naoenviaravisomensalprocura
+    - datalake_ebdb_raw.usuario.naoenviaravisomensalprocura
   sms_activation_code:
     description: SMS activation code. Treat as sensitive.
     lineage:
-      - datalake_ebdb_raw.usuario.codativacaosms
+    - datalake_ebdb_raw.usuario.codativacaosms
   ts_sms_code_created:
     description: Timestamp when the SMS activation code was generated.
     lineage:
-      - datalake_ebdb_raw.usuario.datageracaocodsms
+    - datalake_ebdb_raw.usuario.datageracaocodsms
   admin_type:
     description: Administrative type/role of the user, when applicable.
     lineage:
-      - datalake_ebdb_raw.usuario.tipoadmin
+    - datalake_ebdb_raw.usuario.tipoadmin
   ts_updated:
     description: Timestamp when the user record was last updated.
     lineage:
-      - datalake_ebdb_raw.usuario.atualizadoem
+    - datalake_ebdb_raw.usuario.atualizadoem
   ts_last_update_opportunity:
     description: Timestamp of the last opportunity update for this user, when available.
     lineage:
-      - datalake_ebdb_raw.usuario.lastupdateoportunidade
+    - datalake_ebdb_raw.usuario.lastupdateoportunidade
   id_bank:
     description: Bank identifier associated with the user's bank data.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosbancarios_banco_id
+    - datalake_ebdb_raw.usuario.dadosbancarios_banco_id
   ts_noticed_cardiff_conditions:
     description: Timestamp when the user was notified about Cardiff conditions.
     lineage:
-      - datalake_ebdb_raw.usuario.avisadocondicoescardiffem
+    - datalake_ebdb_raw.usuario.avisadocondicoescardiffem
   ts_collector_email_sent:
     description: Timestamp when an email was sent by the collector/capturer.
     lineage:
-      - datalake_ebdb_raw.usuario.captadoraenviouemailem
+    - datalake_ebdb_raw.usuario.captadoraenviouemailem
   ts_app_ecardiff_sent:
     description: Timestamp when an app e-Cardiff message was sent.
     lineage:
-      - datalake_ebdb_raw.usuario.enviadoappecardiffem
+    - datalake_ebdb_raw.usuario.enviadoappecardiffem
   id_google:
     description: Google account identifier, when available.
     lineage:
-      - datalake_ebdb_raw.usuario.googleid
+    - datalake_ebdb_raw.usuario.googleid
   id_account_kit:
     description: Account Kit identifier, when available.
     lineage:
-      - datalake_ebdb_raw.usuario.accountkitid
+    - datalake_ebdb_raw.usuario.accountkitid
   id_photographer_data:
     description: Identifier for photographer-related user data, when applicable.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosfotografo_id
+    - datalake_ebdb_raw.usuario.dadosfotografo_id
   id_sales_rep:
     description: Identifier for sales representative-related user data, when applicable.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosvendedor_id
+    - datalake_ebdb_raw.usuario.dadosvendedor_id
   id_affiliates:
     description: Identifier for affiliate-related user data, when applicable.
     lineage:
-      - datalake_ebdb_raw.usuario.dadosafiliado_id
+    - datalake_ebdb_raw.usuario.dadosafiliado_id
   id_account:
     description: Identifier for the associated current account entity.
     lineage:
-      - datalake_ebdb_raw.usuario.contacorrente_id
+    - datalake_ebdb_raw.usuario.contacorrente_id
   old_phone:
     description: Previous phone number value (historical).
     lineage:
-      - datalake_ebdb_raw.usuario.oldphone
+    - datalake_ebdb_raw.usuario.oldphone
   id_user_crm_data:
     description: Identifier for CRM-related user data, when applicable.
     lineage:
-      - datalake_ebdb_raw.usuario.usercrmdata_id
+    - datalake_ebdb_raw.usuario.usercrmdata_id
   ts_login_renewal:
     description: Timestamp of login renewal, when available.
     lineage:
-      - datalake_ebdb_raw.usuario.loginrenewal
+    - datalake_ebdb_raw.usuario.loginrenewal
   id_keycloak_user:
     description: Keycloak user identifier, when available.
     lineage:
-      - datalake_ebdb_raw.usuario.keycloakuserid
+    - datalake_ebdb_raw.usuario.keycloakuserid
   ts_last_logged:
     description: Timestamp of the user's last login.
     lineage:
-      - datalake_ebdb_raw.usuario.lastloggedat
+    - datalake_ebdb_raw.usuario.lastloggedat
   is_instant_login:
     description: Flag indicating whether the user uses instant login.
     lineage:
-      - datalake_ebdb_raw.usuario.instantlogin
+    - datalake_ebdb_raw.usuario.instantlogin

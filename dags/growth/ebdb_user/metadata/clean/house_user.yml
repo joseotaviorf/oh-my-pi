@@ -4,7 +4,11 @@ domain: Growth
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_raw.houseuser.house_id
+    - datalake_ebdb_raw.houseuser.house_id
+    description: EBDB house identifier (Imovel.id) linked to the supplemental user info.
   id_user_info:
     lineage:
-      - datalake_ebdb_raw.houseuser.userinfo_id
+    - datalake_ebdb_raw.houseuser.userinfo_id
+    description: Foreign key to datalake_ebdb_clean.user_info for the linked profile.
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean junction table from EBDB `HouseUser`, linking houses (Imovel) to supplemental user profile records in `UserInfo`. Supports co-owner and alternate contact scenarios where listing contact data differs from the primary Usuario profile.

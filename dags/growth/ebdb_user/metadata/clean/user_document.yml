@@ -4,19 +4,27 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.userdocument.id
+    - datalake_ebdb_raw.userdocument.id
+    description: UserDocument record primary key from EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.userdocument.atualizadoem
+    - datalake_ebdb_raw.userdocument.atualizadoem
+    description: Timestamp when the document record was last updated in EBDB.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.userdocument.criadoem
+    - datalake_ebdb_raw.userdocument.criadoem
+    description: Timestamp when the document record was created in EBDB.
   id_user:
     lineage:
-      - datalake_ebdb_raw.userdocument.usuario_id
+    - datalake_ebdb_raw.userdocument.usuario_id
+    description: EBDB user (Usuario.id) to whom this document belongs.
   document_type:
     lineage:
-      - datalake_ebdb_raw.userdocument.documenttype
+    - datalake_ebdb_raw.userdocument.documenttype
+    description: Type of identity document (e.g. RG, CNH, proof of address) as classified in EBDB.
   document_value:
     lineage:
-      - datalake_ebdb_raw.userdocument.documentvalue
+    - datalake_ebdb_raw.userdocument.documentvalue
+    description: Document number or reference value (PII, confidential).
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean layer for additional identity documents attached to EBDB users, sourced from `UserDocument`. Supports KYC and verification workflows beyond the primary CPF/RG stored on Usuario. Contains PII — document values are confidential.

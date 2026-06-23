@@ -4,19 +4,27 @@ domain: Growth
 columns:
   id_sales_rep:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor_aud.id
+    - datalake_ebdb_raw.dadosvendedor_aud.id
+    description: Sales rep data record identifier (DadosVendedor.id) for this audit row.
   id_user:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor_aud.usuario_id
+    - datalake_ebdb_raw.dadosvendedor_aud.usuario_id
+    description: EBDB user identifier linked to the sales rep at the time of this revision.
   rev:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor_aud.rev
+    - datalake_ebdb_raw.dadosvendedor_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_ebdb_clean.user_revision_entity.id; join on rev to retrieve who performed the change, when, and why.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor_aud.revtype
+    - datalake_ebdb_raw.dadosvendedor_aud.revtype
+    description: 'Hibernate Envers operation type for this audit row: 0=insert, 1=update, 2=delete.'
   is_active:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor_aud.ativo
+    - datalake_ebdb_raw.dadosvendedor_aud.ativo
+    description: Sales rep active status value captured in this audit revision.
   ts_contract_started:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor_aud.iniciocontrato
+    - datalake_ebdb_raw.dadosvendedor_aud.iniciocontrato
+    description: Contract start timestamp value captured in this audit revision.
+owner: isadora.gallerani@quintoandar.com.br
+description: Hibernate Envers audit history for EBDB `DadosVendedor` (sales_rep). One row per field-level change to a sales rep profile. Join rev to user_revision_entity to trace who updated rep activation status or contract dates.

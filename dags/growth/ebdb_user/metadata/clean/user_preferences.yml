@@ -4,19 +4,27 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.userpreferences.id
+    - datalake_ebdb_raw.userpreferences.id
+    description: UserPreferences record primary key from EBDB.
   id_user:
     lineage:
-      - datalake_ebdb_raw.userpreferences.usuario_id
+    - datalake_ebdb_raw.userpreferences.usuario_id
+    description: EBDB user (Usuario.id) whose communication preferences are stored.
   is_receiving_sms:
     lineage:
-      - datalake_ebdb_raw.userpreferences.receivessms
+    - datalake_ebdb_raw.userpreferences.receivessms
+    description: Flag indicating whether the user opted in to receive SMS messages.
   is_receiving_whatsapp:
     lineage:
-      - datalake_ebdb_raw.userpreferences.receiveswhatsapp
+    - datalake_ebdb_raw.userpreferences.receiveswhatsapp
+    description: Flag indicating whether the user opted in to receive WhatsApp messages.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.userpreferences.criadoem
+    - datalake_ebdb_raw.userpreferences.criadoem
+    description: Timestamp when the preferences record was created in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.userpreferences.atualizadoem
+    - datalake_ebdb_raw.userpreferences.atualizadoem
+    description: Timestamp when the preferences record was last updated in EBDB.
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean communication channel opt-in preferences from EBDB `UserPreferences`. Tracks SMS and WhatsApp consent separately from the legacy aceitasms flag on Usuario, enabling granular marketing compliance reporting.

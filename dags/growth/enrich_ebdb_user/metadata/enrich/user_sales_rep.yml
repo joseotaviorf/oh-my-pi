@@ -3,69 +3,94 @@ database_name: datalake_ebdb_user
 table_name: user_sales_rep
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
-description: |
-  Enrich layer listing sales representative users from EBDB Main (`Usuario` + `DadosVendedor`).
+description: 'Enrich layer listing sales representative users from EBDB Main (`Usuario` + `DadosVendedor`).
+
   One row per sales rep user, filtered to QuintoAndar internal reps (email @quintoandar.com.br with
+
   id_sales_rep set) or outsourced BPO partners (Actionline, Atento, Algar, AEC, Olos) identified
+
   by corporate email domains. Used by Growth to track sales rep roster, outsourcing company,
+
   activation status, and contract start dates for property sales assistance workflows. Sources:
+
   datalake_ebdb_clean.user, datalake_ebdb_clean.sales_rep, datalake_ebdb_country.user. Part of the
+
   enrich_ebdb_user DAG. Partitioned by country_code — always filter on country_code in WHERE clauses
+
   to enable partition pruning and avoid full table scans.
+
+  '
 columns:
   id_user_sales_rep:
-    description: |
-      EBDB user identifier of the sales representative. Primary key of this table; maps to
-      datalake_ebdb_clean.user.id for the rep's user profile.
+    description: 'EBDB user identifier of the sales representative. Primary key of this table; maps to
+
+      datalake_ebdb_clean.user.id for the rep''s user profile.
+
+      '
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
   country_code:
-    description: |
-      Table partition column. ISO country code where the sales rep operates (e.g. BR, MX), sourced
+    description: 'Table partition column. ISO country code where the sales rep operates (e.g. BR, MX), sourced
+
       from datalake_ebdb_country.user. Required in WHERE clauses for partition pruning — never query
+
       without filtering on country_code.
+
+      '
     lineage:
-      - datalake_ebdb_country.user.country_code
+    - datalake_ebdb_country.user.country_code
   name:
-    description: |
-      Full name of the sales representative as registered in EBDB Usuario (PII).
+    description: 'Full name of the sales representative as registered in EBDB Usuario (PII).
+
+      '
     lineage:
-      - datalake_ebdb_clean.user.name
+    - datalake_ebdb_clean.user.name
   email:
-    description: |
-      Corporate email of the sales representative. Used to classify the outsourcing company
+    description: 'Corporate email of the sales representative. Used to classify the outsourcing company
+
       (sales_company) and to filter eligible sales reps in this table (PII).
+
+      '
     lineage:
-      - datalake_ebdb_clean.user.email
+    - datalake_ebdb_clean.user.email
   phone_number:
-    description: |
-      Main phone number of the sales representative from EBDB Usuario (PII).
+    description: 'Main phone number of the sales representative from EBDB Usuario (PII).
+
+      '
     lineage:
-      - datalake_ebdb_clean.user.main_phone
+    - datalake_ebdb_clean.user.main_phone
   admin_type:
-    description: |
-      Administrative profile type of the user in EBDB, when applicable (tipoadmin in source).
+    description: 'Administrative profile type of the user in EBDB, when applicable (tipoadmin in source).
+
+      '
     lineage:
-      - datalake_ebdb_clean.user.admin_type
+    - datalake_ebdb_clean.user.admin_type
   sales_company:
-    description: |
-      Outsourcing company or employer of the sales rep. Built by mapping email domain and id_sales_rep
+    description: 'Outsourcing company or employer of the sales rep. Built by mapping email domain and id_sales_rep
+
       to QUINTO_ANDAR (internal), ACTION_LINE, ATENTO, ALGAR, AEC, or OLOS based on corporate email
+
       patterns defined in the enrich SQL.
+
+      '
     lineage:
-      - datalake_ebdb_clean.user.email
-      - datalake_ebdb_clean.user.id_sales_rep
+    - datalake_ebdb_clean.user.email
+    - datalake_ebdb_clean.user.id_sales_rep
   is_sales_rep_active:
-    description: |
-      Flag indicating whether the sales rep is currently active. Built as COALESCE of
+    description: 'Flag indicating whether the sales rep is currently active. Built as COALESCE of
+
       sales_rep.is_active and user.is_active, preferring the sales_rep record when available.
+
+      '
     lineage:
-      - datalake_ebdb_clean.sales_rep.is_active
-      - datalake_ebdb_clean.user.is_active
+    - datalake_ebdb_clean.sales_rep.is_active
+    - datalake_ebdb_clean.user.is_active
   dt_sales_rep_started:
-    description: |
-      Date when the user started as a sales representative. Built as the contract start date from
+    description: 'Date when the user started as a sales representative. Built as the contract start date from
+
       DadosVendedor when available, otherwise falling back to the user creation date.
+
+      '
     lineage:
-      - datalake_ebdb_clean.sales_rep.ts_contract_started
-      - datalake_ebdb_clean.user.ts_created
+    - datalake_ebdb_clean.sales_rep.ts_contract_started
+    - datalake_ebdb_clean.user.ts_created

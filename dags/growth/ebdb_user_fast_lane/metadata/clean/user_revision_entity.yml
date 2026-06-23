@@ -1,39 +1,30 @@
 database_name: datalake_ebdb_clean
 table_name: user_revision_entity
-description: It stores revision information for all audited tables. Each record represents a single revision/transaction,
-  capturing who made the change, when it occurred, and why. This table serves as the central spine for the audit system,
-  with all _AUD tables referencing it through their rev field.
+description: It stores revision information for all audited tables. Each record represents a single revision/transaction, capturing who made the change, when it occurred, and why. This table serves as the central spine for the audit system, with all _AUD tables referencing it through their rev field.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.usuariorevisionentity.id
-    description: Unique identifier for the revision. This is the primary key and is referenced by the rev field in all audit tables (_AUD).
-      Auto-incremented value that ensures each revision has a unique identifier across all audited entities.
+    - datalake_ebdb_raw.usuariorevisionentity.id
+    description: Unique identifier for the revision. This is the primary key and is referenced by the rev field in all audit tables (_AUD). Auto-incremented value that ensures each revision has a unique identifier across all audited entities.
   ts_revision:
     lineage:
-      - datalake_ebdb_raw.usuariorevisionentity.timestamp
-    description: Timestamp (Unix timestamp in milliseconds) indicating when the revision was created. This field has a correction applied
-      to handle an incorrect product migration where some timestamps came as date format (e.g., 20220801123000 for 2022-08-01 12:30:00).
-      The transformation converts high timestamp values to proper Unix format.
+    - datalake_ebdb_raw.usuariorevisionentity.timestamp
+    description: Timestamp (Unix timestamp in milliseconds) indicating when the revision was created. This field has a correction applied to handle an incorrect product migration where some timestamps came as date format (e.g., 20220801123000 for 2022-08-01 12:30:00). The transformation converts high timestamp values to proper Unix format.
   id_user:
     lineage:
-      - datalake_ebdb_raw.usuariorevisionentity.usuario_id
-    description: Foreign key reference to the user who made the change. This field can be NULL when the change was made by an automatic
-      process or system operation rather than a specific user action.
+    - datalake_ebdb_raw.usuariorevisionentity.usuario_id
+    description: Foreign key reference to the user who made the change. This field can be NULL when the change was made by an automatic process or system operation rather than a specific user action.
   id_principal:
     lineage:
-      - datalake_ebdb_raw.usuariorevisionentity.principalId
-    description: Foreign key reference to the principal who made the change. This field can be NULL when the change was made by an automatic
-      process or system operation rather than a specific user action.
+    - datalake_ebdb_raw.usuariorevisionentity.principalId
+    description: Foreign key reference to the principal who made the change. This field can be NULL when the change was made by an automatic process or system operation rather than a specific user action.
   principal_type:
     lineage:
-      - datalake_ebdb_raw.usuariorevisionentity.principalType
+    - datalake_ebdb_raw.usuariorevisionentity.principalType
     description: Type of principal who made the change. This field can be NULL when the change was made by an automatic
   reason:
     lineage:
-      - datalake_ebdb_raw.usuariorevisionentity.motivo
-    description: Textual description or reason for the change/revision. Often contains prefixed codes indicating the type of action,
-      such as "[ED OPT-OUT]" for opt-out edits, "[SYSTEM]" for automatic system changes, or other action identifiers that provide
-      context for why the revision occurred.
+    - datalake_ebdb_raw.usuariorevisionentity.motivo
+    description: Textual description or reason for the change/revision. Often contains prefixed codes indicating the type of action, such as "[ED OPT-OUT]" for opt-out edits, "[SYSTEM]" for automatic system changes, or other action identifiers that provide context for why the revision occurred.

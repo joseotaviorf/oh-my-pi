@@ -2,114 +2,151 @@
 database_name: datalake_ebdb_user
 table_name: affiliate_data
 domain: Growth
-owner: isadora.gallerani@quintoandar.com.br
-description: |
-  Enrich layer for EBDB Main affiliate partner profiles sourced from `DadosAfiliado`
+owner: gabriel.salla@quintoandar.com
+description: 'Enrich layer for EBDB Main affiliate partner profiles sourced from `DadosAfiliado`
+
   (clean: datalake_ebdb_clean.affiliate_data). One row per affiliate record, enriched with
+
   country_code from the linked EBDB user, doorman join details, and the earliest operation start
+
   timestamp from audit history. Classifies affiliate type (including Doorman and Agent combinations)
+
   and flags doorman affiliates. Used by Growth and downstream DW models (`dim_user`, `dim_user_affiliate`,
+
   `dim_agent`). Part of the enrich_ebdb_user DAG. Partitioned by country_code — always filter on
+
   country_code in WHERE clauses to enable partition pruning and avoid full table scans.
+
+  '
 columns:
   id:
-    description: |
-      Affiliate data identifier from EBDB DadosAfiliado. Primary key of this table; joins to
+    description: 'Affiliate data identifier from EBDB DadosAfiliado. Primary key of this table; joins to
+
       datalake_ebdb_clean.user.id_affiliates for the linked user profile.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.id
+    - datalake_ebdb_clean.affiliate_data.id
   id_indicated_by:
-    description: |
-      Identifier of the affiliate or user who referred this affiliate partner, when applicable.
+    description: 'Identifier of the affiliate or user who referred this affiliate partner, when applicable.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.id_indicated_by
+    - datalake_ebdb_clean.affiliate_data.id_indicated_by
   id_doorman_affiliate_data:
-    description: |
-      Foreign key to doorman affiliate data (DadosAfiliadoPorteiro) when this affiliate is also
+    description: 'Foreign key to doorman affiliate data (DadosAfiliadoPorteiro) when this affiliate is also
+
       registered as a building doorman. Null for non-doorman affiliates.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
+    - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
   country_code:
-    description: |
-      Table partition column. ISO country code of the affiliate's linked user (e.g. BR, MX), sourced
-      from datalake_ebdb_country.user. Defaults to 'Undefined' when no user mapping exists. Required
+    description: 'Table partition column. ISO country code of the affiliate''s linked user (e.g. BR, MX), sourced
+
+      from datalake_ebdb_country.user. Defaults to ''Undefined'' when no user mapping exists. Required
+
       in WHERE clauses for partition pruning — never query without filtering on country_code.
+
+      '
     lineage:
-      - datalake_ebdb_country.user.country_code
+    - datalake_ebdb_country.user.country_code
   is_active:
-    description: |
-      Flag indicating whether the affiliate record is active in EBDB (ativo in DadosAfiliado).
+    description: 'Flag indicating whether the affiliate record is active in EBDB (ativo in DadosAfiliado).
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.is_active
+    - datalake_ebdb_clean.affiliate_data.is_active
   is_doorman_affiliate:
-    description: |
-      Flag indicating whether the affiliate is registered as a doorman partner. Built as
+    description: 'Flag indicating whether the affiliate is registered as a doorman partner. Built as
+
       id_doorman_affiliate_data IS NOT NULL on the affiliate record.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
+    - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
   origin:
-    description: |
-      Acquisition or registration origin of the affiliate partner as recorded in EBDB DadosAfiliado.
+    description: 'Acquisition or registration origin of the affiliate partner as recorded in EBDB DadosAfiliado.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.origin
+    - datalake_ebdb_clean.affiliate_data.origin
   affiliate_type:
-    description: |
-      Affiliate persona classification. Built by combining EBDB affiliate_type with the linked user's
-      agent status: 'Doorman & Agent' when both apply, 'Agent' when id_agent is set, otherwise the
+    description: 'Affiliate persona classification. Built by combining EBDB affiliate_type with the linked user''s
+
+      agent status: ''Doorman & Agent'' when both apply, ''Agent'' when id_agent is set, otherwise the
+
       original affiliate_type from DadosAfiliado.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.affiliate_type
-      - datalake_ebdb_user.user.id_agent
+    - datalake_ebdb_clean.affiliate_data.affiliate_type
+    - datalake_ebdb_user.user.id_agent
   payment_preference:
-    description: |
-      Preferred payment method or payout configuration for the affiliate as recorded in EBDB.
+    description: 'Preferred payment method or payout configuration for the affiliate as recorded in EBDB.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.payment_preference
+    - datalake_ebdb_clean.affiliate_data.payment_preference
   creci_number:
-    description: |
-      CRECI registration number when the affiliate is also a licensed real estate broker
+    description: 'CRECI registration number when the affiliate is also a licensed real estate broker
+
       (Conselho Regional de Corretores de Imóveis).
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.creci_number
+    - datalake_ebdb_clean.affiliate_data.creci_number
   work_city:
-    description: |
-      City where the affiliate operates. Built as COALESCE of operation_city from DadosAfiliado and
+    description: 'City where the affiliate operates. Built as COALESCE of operation_city from DadosAfiliado and
+
       work_city from doorman affiliate data when the doorman record is linked.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.operation_city
-      - datalake_ebdb_clean.doorman_affiliate_data.work_city
+    - datalake_ebdb_clean.affiliate_data.operation_city
+    - datalake_ebdb_clean.doorman_affiliate_data.work_city
   last_week_balance_communication:
-    description: |
-      Last weekly balance communication identifier or reference sent to the affiliate, as recorded
+    description: 'Last weekly balance communication identifier or reference sent to the affiliate, as recorded
+
       in EBDB DadosAfiliado.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.last_week_balance_communication
+    - datalake_ebdb_clean.affiliate_data.last_week_balance_communication
   ts_doorman_joined:
-    description: |
-      Timestamp when the affiliate joined as a doorman partner. Sourced from doorman affiliate data
+    description: 'Timestamp when the affiliate joined as a doorman partner. Sourced from doorman affiliate data
+
       (ts_joined); null when the affiliate is not a doorman.
+
+      '
     lineage:
-      - datalake_ebdb_clean.doorman_affiliate_data.ts_joined
+    - datalake_ebdb_clean.doorman_affiliate_data.ts_joined
   ts_first_operation_start:
-    description: |
-      Earliest operation start timestamp for this affiliate. Built as COALESCE of the first non-null
+    description: 'Earliest operation start timestamp for this affiliate. Built as COALESCE of the first non-null
+
       ts_operation_start from affiliate_data_aud history and the current ts_operation_start on the
+
       affiliate record.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data_aud.ts_operation_start
-      - datalake_ebdb_clean.affiliate_data.ts_operation_start
+    - datalake_ebdb_clean.affiliate_data_aud.ts_operation_start
+    - datalake_ebdb_clean.affiliate_data.ts_operation_start
   ts_operation_start:
-    description: |
-      Current operation start timestamp for the affiliate as recorded in EBDB DadosAfiliado.
+    description: 'Current operation start timestamp for the affiliate as recorded in EBDB DadosAfiliado.
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.ts_operation_start
+    - datalake_ebdb_clean.affiliate_data.ts_operation_start
   ts_created:
-    description: |
-      Timestamp when the affiliate record was created in EBDB (criadoem in DadosAfiliado).
+    description: 'Timestamp when the affiliate record was created in EBDB (criadoem in DadosAfiliado).
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.ts_created
+    - datalake_ebdb_clean.affiliate_data.ts_created
   ts_updated:
-    description: |
-      Timestamp when the affiliate record was last updated in EBDB (atualizadoem in DadosAfiliado).
+    description: 'Timestamp when the affiliate record was last updated in EBDB (atualizadoem in DadosAfiliado).
+
+      '
     lineage:
-      - datalake_ebdb_clean.affiliate_data.ts_updated
+    - datalake_ebdb_clean.affiliate_data.ts_updated

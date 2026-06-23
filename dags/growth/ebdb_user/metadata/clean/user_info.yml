@@ -4,58 +4,79 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.userinfo.id
+    - datalake_ebdb_raw.userinfo.id
+    description: UserInfo record primary key from EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.userinfo.atualizadoem
+    - datalake_ebdb_raw.userinfo.atualizadoem
+    description: Timestamp when the UserInfo record was last updated in EBDB.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.userinfo.criadoem
+    - datalake_ebdb_raw.userinfo.criadoem
+    description: Timestamp when the UserInfo record was created in EBDB.
   id_user:
     lineage:
-      - datalake_ebdb_raw.userinfo.user_id
+    - datalake_ebdb_raw.userinfo.user_id
+    description: EBDB user (Usuario.id) that this supplemental profile belongs to.
   name:
     lineage:
-      - datalake_ebdb_raw.userinfo.name
+    - datalake_ebdb_raw.userinfo.name
+    description: Full name on the supplemental profile (PII, confidential).
   email:
     lineage:
-      - datalake_ebdb_raw.userinfo.email
+    - datalake_ebdb_raw.userinfo.email
+    description: Email address on the supplemental profile (PII, confidential).
   phone_number:
     lineage:
-      - datalake_ebdb_raw.userinfo.phone
+    - datalake_ebdb_raw.userinfo.phone
+    description: Phone number on the supplemental profile (PII, confidential).
   cpf:
     lineage:
-      - datalake_ebdb_raw.userinfo.cpf
+    - datalake_ebdb_raw.userinfo.cpf
+    description: Brazilian CPF on the supplemental profile (PII, confidential).
   rg:
     lineage:
-      - datalake_ebdb_raw.userinfo.rg
+    - datalake_ebdb_raw.userinfo.rg
+    description: Brazilian RG identity document on the supplemental profile (PII, confidential).
   cnpj:
     lineage:
-      - datalake_ebdb_raw.userinfo.cnpj
+    - datalake_ebdb_raw.userinfo.cnpj
+    description: Brazilian CNPJ corporate registry on the supplemental profile (PII, confidential).
   person_type:
     lineage:
-      - datalake_ebdb_raw.userinfo.persontype
+    - datalake_ebdb_raw.userinfo.persontype
+    description: Person type classification (individual vs corporate) on the supplemental profile.
   address:
     lineage:
-      - datalake_ebdb_raw.userinfo.address
+    - datalake_ebdb_raw.userinfo.address
+    description: Street address on the supplemental profile (PII, confidential).
   number:
     lineage:
-      - datalake_ebdb_raw.userinfo.number
+    - datalake_ebdb_raw.userinfo.number
+    description: Street number on the supplemental profile (PII, confidential).
   complement:
     lineage:
-      - datalake_ebdb_raw.userinfo.complement
+    - datalake_ebdb_raw.userinfo.complement
+    description: Address complement on the supplemental profile (PII, confidential).
   zip_code:
     lineage:
-      - datalake_ebdb_raw.userinfo.zipcode
+    - datalake_ebdb_raw.userinfo.zipcode
+    description: Postal code (CEP) on the supplemental profile (PII, confidential).
   neighborhood:
     lineage:
-      - datalake_ebdb_raw.userinfo.neighborhood
+    - datalake_ebdb_raw.userinfo.neighborhood
+    description: Neighborhood (bairro) on the supplemental profile (PII, confidential).
   city:
     lineage:
-      - datalake_ebdb_raw.userinfo.city
+    - datalake_ebdb_raw.userinfo.city
+    description: City on the supplemental profile (PII, confidential).
   id_state:
     lineage:
-      - datalake_ebdb_raw.userinfo.state_id
+    - datalake_ebdb_raw.userinfo.state_id
+    description: EBDB state identifier for the supplemental profile address.
   letter_of_attorney_file_name:
     lineage:
-      - datalake_ebdb_raw.userinfo.letterofattorneyfilename
+    - datalake_ebdb_raw.userinfo.letterofattorneyfilename
+    description: Filename of the uploaded power-of-attorney document for this profile.
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean supplemental user profile records from EBDB `UserInfo`. Stores contact, document, and address details that may extend or differ from the main `Usuario` profile. Linked to houses via house_user for alternate listing contacts.

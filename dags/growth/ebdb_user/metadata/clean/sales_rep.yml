@@ -4,22 +4,31 @@ domain: Growth
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.id
+    - datalake_ebdb_raw.dadosvendedor.id
+    description: Sales rep data record primary key from EBDB DadosVendedor.
   ts_contract_started:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.iniciocontrato
+    - datalake_ebdb_raw.dadosvendedor.iniciocontrato
+    description: Timestamp when the sales rep employment or outsourcing contract started.
   id_user:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.usuario_id
+    - datalake_ebdb_raw.dadosvendedor.usuario_id
+    description: EBDB user identifier (Usuario.id) linked to this sales rep profile.
   id_manager:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.gerente_id
+    - datalake_ebdb_raw.dadosvendedor.gerente_id
+    description: EBDB user identifier of the sales rep's direct manager.
   is_active:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.ativo
+    - datalake_ebdb_raw.dadosvendedor.ativo
+    description: Flag indicating whether the sales rep record is active in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.atualizadoem
+    - datalake_ebdb_raw.dadosvendedor.atualizadoem
+    description: Timestamp when the sales rep record was last updated in EBDB.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.dadosvendedor.criadoem
+    - datalake_ebdb_raw.dadosvendedor.criadoem
+    description: Timestamp when the sales rep record was created in EBDB.
+owner: isadora.gallerani@quintoandar.com.br
+description: Clean layer for property sales representative profiles from EBDB `DadosVendedor`. One row per sales rep data record, linking the rep to their EBDB user account, manager, and contract start date. Feeds enrich user_sales_rep for internal QuintoAndar reps and outsourced BPO partner identification.

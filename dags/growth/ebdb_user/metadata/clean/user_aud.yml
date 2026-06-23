@@ -4,244 +4,335 @@ domain: Growth
 columns:
   id_user:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.id
+    - datalake_ebdb_raw.usuario_aud.id
+    description: EBDB user identifier (Usuario.id) whose profile changed in this revision.
   uuid_person:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.personUUID
+    - datalake_ebdb_raw.usuario_aud.personUUID
+    description: Person UUID of the user at the time of this revision.
   id_country:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.country_id
+    - datalake_ebdb_raw.usuario_aud.country_id
+    description: Country identifier (country_id) of the user at the time of this revision.
   rev:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.rev
+    - datalake_ebdb_raw.usuario_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_ebdb_clean.user_revision_entity.id; join on rev to retrieve who performed the change, when, and why.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.revtype
+    - datalake_ebdb_raw.usuario_aud.revtype
+    description: 'Hibernate Envers operation type for this audit row: 0=insert, 1=update, 2=delete.'
   neighborhood:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.bairro
+    - datalake_ebdb_raw.usuario_aud.bairro
+    description: User address neighborhood (bairro) value in this revision (PII).
   mod_neighborhood:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.bairro_mod
+    - datalake_ebdb_raw.usuario_aud.bairro_mod
+    description: Audit flag indicating whether neighborhood changed in this revision (Hibernate Envers _mod column).
   zip_code:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.cep
+    - datalake_ebdb_raw.usuario_aud.cep
+    description: Postal code (CEP) value in this revision (PII).
   mod_zip_code:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.cep_mod
+    - datalake_ebdb_raw.usuario_aud.cep_mod
+    description: Audit flag indicating whether postal code changed in this revision (Hibernate Envers _mod column).
   city:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.cidade
+    - datalake_ebdb_raw.usuario_aud.cidade
+    description: City value in this revision (PII).
   mod_city:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.cidade_mod
+    - datalake_ebdb_raw.usuario_aud.cidade_mod
+    description: Audit flag indicating whether city changed in this revision (Hibernate Envers _mod column).
   complement:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.complemento
+    - datalake_ebdb_raw.usuario_aud.complemento
+    description: Address complement value in this revision (PII).
   mod_complement:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.complemento_mod
+    - datalake_ebdb_raw.usuario_aud.complemento_mod
+    description: Audit flag indicating whether address complement changed in this revision (Hibernate Envers _mod column).
   cpf:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.cpf
+    - datalake_ebdb_raw.usuario_aud.cpf
+    description: CPF/CNPJ document number value in this revision (PII, confidential).
   mod_cpf:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.cpf_mod
+    - datalake_ebdb_raw.usuario_aud.cpf_mod
+    description: Audit flag indicating whether CPF/CNPJ document number changed in this revision (Hibernate Envers _mod column).
   dt_birth:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.datanascimento
+    - datalake_ebdb_raw.usuario_aud.datanascimento
+    description: User birth date value in this revision (PII, confidential).
   mod_dt_birth:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.datanascimento_mod
+    - datalake_ebdb_raw.usuario_aud.datanascimento_mod
+    description: Audit flag indicating whether birth date changed in this revision (Hibernate Envers _mod column).
   email:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.email
+    - datalake_ebdb_raw.usuario_aud.email
+    description: Primary email address value in this revision (PII, confidential).
   mod_email:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.email_mod
+    - datalake_ebdb_raw.usuario_aud.email_mod
+    description: Audit flag indicating whether primary email changed in this revision (Hibernate Envers _mod column).
   alternative_email:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.emailalternativo
+    - datalake_ebdb_raw.usuario_aud.emailalternativo
+    description: Secondary email address value in this revision (PII, confidential).
   mod_alternative_email:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.emailalternativo_mod
+    - datalake_ebdb_raw.usuario_aud.emailalternativo_mod
+    description: Audit flag indicating whether alternative email changed in this revision (Hibernate Envers _mod column).
   address:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.endereco
+    - datalake_ebdb_raw.usuario_aud.endereco
+    description: Street address value in this revision (PII, confidential).
   mod_address:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.endereco_mod
+    - datalake_ebdb_raw.usuario_aud.endereco_mod
+    description: Audit flag indicating whether street address changed in this revision (Hibernate Envers _mod column).
   id_facebook:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.facebookid
+    - datalake_ebdb_raw.usuario_aud.facebookid
+    description: Facebook account identifier value in this revision.
   mod_id_facebook:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.facebookid_mod
+    - datalake_ebdb_raw.usuario_aud.facebookid_mod
+    description: Audit flag indicating whether Facebook account identifier changed in this revision (Hibernate Envers _mod column).
   photo:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.foto
+    - datalake_ebdb_raw.usuario_aud.foto
+    description: Profile photo URL or reference value in this revision.
   mod_photo:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.foto_mod
+    - datalake_ebdb_raw.usuario_aud.foto_mod
+    description: Audit flag indicating whether profile photo changed in this revision (Hibernate Envers _mod column).
   name:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.nome
+    - datalake_ebdb_raw.usuario_aud.nome
+    description: Full name value in this revision (PII, confidential).
   mod_name:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.nome_mod
+    - datalake_ebdb_raw.usuario_aud.nome_mod
+    description: Audit flag indicating whether full name changed in this revision (Hibernate Envers _mod column).
   number:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.numero
+    - datalake_ebdb_raw.usuario_aud.numero
+    description: Address street number value in this revision (PII).
   mod_number:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.numero_mod
+    - datalake_ebdb_raw.usuario_aud.numero_mod
+    description: Audit flag indicating whether address street number changed in this revision (Hibernate Envers _mod column).
   password:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.password
+    - datalake_ebdb_raw.usuario_aud.password
+    description: Hashed password value in this revision. Treat as highly sensitive.
   mod_password:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.password_mod
+    - datalake_ebdb_raw.usuario_aud.password_mod
+    description: Audit flag indicating whether password hash changed in this revision (Hibernate Envers _mod column).
   gender:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.sexo
+    - datalake_ebdb_raw.usuario_aud.sexo
+    description: Gender value in this revision (PII, confidential).
   mod_gender:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.sexo_mod
+    - datalake_ebdb_raw.usuario_aud.sexo_mod
+    description: Audit flag indicating whether gender changed in this revision (Hibernate Envers _mod column).
   business_phone:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.telefonecomercial
+    - datalake_ebdb_raw.usuario_aud.telefonecomercial
+    description: Business phone number value in this revision (PII).
   mod_business_phone:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.telefonecomercial_mod
+    - datalake_ebdb_raw.usuario_aud.telefonecomercial_mod
+    description: Audit flag indicating whether business phone changed in this revision (Hibernate Envers _mod column).
   main_phone:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.telefoneprincipal
+    - datalake_ebdb_raw.usuario_aud.telefoneprincipal
+    description: Primary phone number value in this revision (PII, confidential).
   mod_main_phone:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.telefoneprincipal_mod
+    - datalake_ebdb_raw.usuario_aud.telefoneprincipal_mod
+    description: Audit flag indicating whether primary phone changed in this revision (Hibernate Envers _mod column).
   secondary_phone:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.telefonesecundario
+    - datalake_ebdb_raw.usuario_aud.telefonesecundario
+    description: Secondary phone number value in this revision (PII).
   mod_secondary_phone:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.telefonesecundario_mod
+    - datalake_ebdb_raw.usuario_aud.telefonesecundario_mod
+    description: Audit flag indicating whether secondary phone changed in this revision (Hibernate Envers _mod column).
   id_state:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.estado_id
+    - datalake_ebdb_raw.usuario_aud.estado_id
+    description: EBDB state identifier (estado_id) for the user address in this revision.
   mod_state:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.estado_mod
+    - datalake_ebdb_raw.usuario_aud.estado_mod
+    description: Audit flag indicating whether state identifier changed in this revision (Hibernate Envers _mod column).
   is_blocked:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.bloqueado
+    - datalake_ebdb_raw.usuario_aud.bloqueado
+    description: Account blocked flag value in this revision.
   mod_is_blocked:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.bloqueado_mod
+    - datalake_ebdb_raw.usuario_aud.bloqueado_mod
+    description: Audit flag indicating whether blocked status changed in this revision (Hibernate Envers _mod column).
+  id_agent:
+    lineage:
+    - datalake_ebdb_raw.usuario_aud.dadosagente_id
+    description: Foreign key to agent data (DadosAgente) in this revision.
+  mod_agent:
+    lineage:
+    - datalake_ebdb_raw.usuario_aud.dadosagente_mod
+    description: Audit flag indicating whether agent data association changed in this revision (Hibernate Envers _mod column).
   id_agent_rep:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosagente_id
+    - datalake_ebdb_raw.usuario_aud.dadosagente_id
+    description: Foreign key to agent representative data in this revision.
   mod_agent_rep:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosagente_mod
+    - datalake_ebdb_raw.usuario_aud.dadosagente_mod
+    description: Audit flag indicating whether agent representative association changed in this revision (Hibernate Envers _mod column).
   has_accepted_sms:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.aceitasms
+    - datalake_ebdb_raw.usuario_aud.aceitasms
+    description: SMS marketing opt-in flag value in this revision.
   mod_has_accepted_sms:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.aceitasms_mod
+    - datalake_ebdb_raw.usuario_aud.aceitasms_mod
+    description: Audit flag indicating whether SMS opt-in changed in this revision (Hibernate Envers _mod column).
   desire_contact:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.preferecontato
+    - datalake_ebdb_raw.usuario_aud.preferecontato
+    description: User contact preference flag value in this revision.
   mod_desire_contact:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.preferecontato_mod
+    - datalake_ebdb_raw.usuario_aud.preferecontato_mod
+    description: Audit flag indicating whether contact preference changed in this revision (Hibernate Envers _mod column).
   bank_agency:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_agencia
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_agencia
+    description: Bank agency/branch number in this revision.
   bank_account:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_contacorrente
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_contacorrente
+    description: Bank account number in this revision.
   bank_cpf_cnpj:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_cpfoucnpj
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_cpfoucnpj
+    description: CPF or CNPJ of the bank account holder in this revision.
   bank_name:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_nome
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_nome
+    description: Bank account holder name in this revision.
   bank_another_holder:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_outrotitular
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_outrotitular
+    description: Flag indicating a different bank account holder in this revision.
   bank_account_type:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_tipoconta
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_tipoconta
+    description: Bank account type (e.g. checking, savings) in this revision.
   admin_type:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.tipoadmin
+    - datalake_ebdb_raw.usuario_aud.tipoadmin
+    description: Administrative profile type (tipoadmin) in this revision.
   mod_admin_type:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.tipoadmin_mod
+    - datalake_ebdb_raw.usuario_aud.tipoadmin_mod
+    description: Audit flag indicating whether administrative profile type changed in this revision (Hibernate Envers _mod column).
   id_bank:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosbancarios_banco_id
+    - datalake_ebdb_raw.usuario_aud.dadosbancarios_banco_id
+    description: Bank identifier for the user's registered bank account in this revision.
   ts_noticed_cardiff_conditions:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.avisadocondicoescardiffem
+    - datalake_ebdb_raw.usuario_aud.avisadocondicoescardiffem
+    description: Timestamp when the user was notified about Cardiff conditions.
   mod_ts_noticed_cardiff_conditions:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.avisadocondicoescardiffem_mod
+    - datalake_ebdb_raw.usuario_aud.avisadocondicoescardiffem_mod
+    description: Audit flag indicating whether Cardiff conditions notification timestamp changed in this revision (Hibernate Envers _mod column).
   ts_collector_email_sent:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.captadoraenviouemailem
+    - datalake_ebdb_raw.usuario_aud.captadoraenviouemailem
+    description: Timestamp when the listing collector sent an email to the user.
   mod_ts_collector_email_sent:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.captadoraenviouemailem_mod
+    - datalake_ebdb_raw.usuario_aud.captadoraenviouemailem_mod
+    description: Audit flag indicating whether collector email sent timestamp changed in this revision (Hibernate Envers _mod column).
   mod_ts_app_ecardiff_sent:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.enviadoappecardiffem_mod
+    - datalake_ebdb_raw.usuario_aud.enviadoappecardiffem_mod
+    description: Audit flag indicating whether app e-Cardiff sent timestamp changed in this revision (Hibernate Envers _mod column).
   id_google:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.googleid
+    - datalake_ebdb_raw.usuario_aud.googleid
+    description: Google account identifier value in this revision.
   mod_id_google:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.googleid_mod
+    - datalake_ebdb_raw.usuario_aud.googleid_mod
+    description: Audit flag indicating whether Google account identifier changed in this revision (Hibernate Envers _mod column).
   mod_id_country:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.country_id_MOD
+    - datalake_ebdb_raw.usuario_aud.country_id_MOD
+    description: Audit flag indicating whether country identifier changed in this revision (Hibernate Envers _mod column).
   id_account_kit:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.accountkitid
+    - datalake_ebdb_raw.usuario_aud.accountkitid
+    description: Facebook Account Kit identifier value in this revision.
   mod_id_account_kit:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.accountkitid_mod
+    - datalake_ebdb_raw.usuario_aud.accountkitid_mod
+    description: Audit flag indicating whether Account Kit identifier changed in this revision (Hibernate Envers _mod column).
   id_sales_rep:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosvendedor_id
+    - datalake_ebdb_raw.usuario_aud.dadosvendedor_id
+    description: Foreign key to sales rep data (DadosVendedor) in this revision.
   mod_sales_rep:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosvendedor_mod
+    - datalake_ebdb_raw.usuario_aud.dadosvendedor_mod
+    description: Audit flag indicating whether sales rep association changed in this revision (Hibernate Envers _mod column).
   id_affiliates:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosafiliado_id
+    - datalake_ebdb_raw.usuario_aud.dadosafiliado_id
+    description: Foreign key to affiliate data (DadosAfiliado) in this revision.
   mod_affiliates:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.dadosafiliado_mod
+    - datalake_ebdb_raw.usuario_aud.dadosafiliado_mod
+    description: Audit flag indicating whether affiliate association changed in this revision (Hibernate Envers _mod column).
   id_account:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.contacorrente_id
+    - datalake_ebdb_raw.usuario_aud.contacorrente_id
+    description: Foreign key to current account (conta corrente) in this revision.
   mod_account:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.contacorrente_mod
+    - datalake_ebdb_raw.usuario_aud.contacorrente_mod
+    description: Audit flag indicating whether current account association changed in this revision (Hibernate Envers _mod column).
   ts_login_renewal:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.loginrenewal
+    - datalake_ebdb_raw.usuario_aud.loginrenewal
+    description: Login renewal timestamp value in this revision.
   mod_ts_login_renewal:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.loginrenewal_mod
+    - datalake_ebdb_raw.usuario_aud.loginrenewal_mod
+    description: Audit flag indicating whether login renewal timestamp changed in this revision (Hibernate Envers _mod column).
   is_instant_login:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.instantlogin
+    - datalake_ebdb_raw.usuario_aud.instantlogin
+    description: Instant login flag value in this revision.
   mod_is_instant_login:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.instantlogin_mod
+    - datalake_ebdb_raw.usuario_aud.instantlogin_mod
+    description: Audit flag indicating whether instant login flag changed in this revision (Hibernate Envers _mod column).
   mod_uuid_person:
     lineage:
-      - datalake_ebdb_raw.usuario_aud.personUUID_MOD
+    - datalake_ebdb_raw.usuario_aud.personUUID_MOD
+    description: Audit flag indicating whether person UUID changed in this revision (Hibernate Envers _mod column).
+owner: isadora.gallerani@quintoandar.com.br
+description: Hibernate Envers audit history for EBDB `Usuario` (user profile changes). One row per revision capturing before/after values and mod_* flags for every audited field, including PII (contact, documents, address, banking), persona foreign keys (agent, sales rep, affiliate), and authentication data. Join rev to user_revision_entity.id to resolve the acting user, timestamp, and change reason. Used by Growth and downstream enrich models to trace profile and compliance changes.

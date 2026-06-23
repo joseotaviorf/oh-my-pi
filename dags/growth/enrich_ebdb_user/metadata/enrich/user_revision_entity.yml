@@ -3,51 +3,73 @@ database_name: datalake_ebdb_user
 table_name: user_revision_entity
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
-description: |
-  Enrich layer for EBDB audit revision records sourced from Main's `UsuarioRevisionEntity` table
+description: 'Enrich layer for EBDB audit revision records sourced from Main''s `UsuarioRevisionEntity` table
+
   (clean: datalake_ebdb_clean.user_revision_entity). One row per revision transaction.
+
   Each revision captures who changed a record, when, and why; all `_AUD` tables (e.g. proposal_aud, contract_aud)
+
   reference this table via their `rev` column (join: user_revision_entity.id = {entity}_aud.rev).
+
   This enrich pass-through adds country_code from datalake_ebdb_country.user and normalizes ts_revision
+
   from Unix milliseconds to a proper timestamp.
+
   Used by Growth and downstream enrich tables to trace audit history. Part of the enrich_ebdb_user DAG.
+
   Partitioned by country_code — always filter on country_code in WHERE clauses to enable partition pruning
+
   and avoid full table scans.
+
   Use case example: understand who (id_user) updated a contract status (revision from ebdb.contract_aud),
+
   when (ts_revision) it happened, and why (reason).
+
+  '
 columns:
   id:
-    description: |
-      Unique revision identifier and primary key. Auto-incremented in EBDB; referenced as `rev` in all
+    description: 'Unique revision identifier and primary key. Auto-incremented in EBDB; referenced as `rev` in all
+
       audit (_AUD) tables. Use to join audit rows to revision metadata (user, timestamp, reason).
+
+      '
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.id
+    - datalake_ebdb_clean.user_revision_entity.id
   id_user:
-    description: |
-      EBDB user identifier of the person who performed the change. Might be null when the revision was created
+    description: 'EBDB user identifier of the person who performed the change. Might be null when the revision was created
+
       by an automatic system process rather than a human user action.
+
+      '
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.id_user
+    - datalake_ebdb_clean.user_revision_entity.id_user
   country_code:
-    description: |
-      Table partition column. ISO country code of the user who made the revision (e.g. BR, MX),
-      sourced from datalake_ebdb_country.user. Defaults to 'Undefined' when no country mapping exists.
+    description: 'Table partition column. ISO country code of the user who made the revision (e.g. BR, MX),
+
+      sourced from datalake_ebdb_country.user. Defaults to ''Undefined'' when no country mapping exists.
+
       Required in WHERE clauses for partition pruning — avoid querying without filtering on country_code.
+
+      '
     lineage:
-      - datalake_ebdb_country.user.country_code
+    - datalake_ebdb_country.user.country_code
     categories:
       Undefined: '#N/A'
-      BR: 'User is from Brazil'
-      MX: 'User is from Mexico'
+      BR: User is from Brazil
+      MX: User is from Mexico
   reason:
-    description: |
-      Textual reason or action code for the revision as recorded in EBDB. Often contains prefixed
+    description: 'Textual reason or action code for the revision as recorded in EBDB. Often contains prefixed
+
       tags such as [ED OPT-OUT], [SYSTEM], or other identifiers explaining why the change occurred.
+
+      '
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.reason
+    - datalake_ebdb_clean.user_revision_entity.reason
   ts_revision:
-    description: |
-      Timestamp when the revision was created. Built by converting the EBDB Unix millisecond timestamp
+    description: 'Timestamp when the revision was created. Built by converting the EBDB Unix millisecond timestamp
+
       (ts_revision in clean) to a proper TIMESTAMP, preserving sub-second precision via DATEADD.
+
+      '
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_ebdb_clean.user_revision_entity.ts_revision
