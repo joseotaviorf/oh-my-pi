@@ -5,11 +5,12 @@ description:
   This table consolidates all tenant prospects (users in the ForRent demand funnel) from QuintoAndar, in a historical view.
   We don't group any user in active periods as a rent flow "never dies", so this table will consolidate the first and last
   event of the tenant prospect on the ForRent demand funnel.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the tenant prospect.
+    description: QuintoAndar user identifier for the tenant prospect persona before first lease signing.
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
   uuid_person:

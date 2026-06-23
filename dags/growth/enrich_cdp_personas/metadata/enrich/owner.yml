@@ -11,11 +11,12 @@ description:
   a while, stopped being an owner (e.g. stopped listing with us) and later listed with us again.
   Prioritizes house-based ownership records, supplementing with contract-based records when users 
   are only present in Contract Person table.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the owner.
+    description: QuintoAndar user identifier for the property owner persona with active and historical ownership periods.
       It may not be unique, as a user may be owner in our platform in different periods.
     lineage:
       - datalake_ebdb_clean.house_aud.id_user

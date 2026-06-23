@@ -9,11 +9,12 @@ description:
   a while, stopped being an owner/tenant and later came back to the platform. It does not apply for tenant prospect and 
   buyer prospect, as this concept does not exist in the demand funnel. Also, not applicable for CIQs, as the historical
   data is not reliable.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the persona.
+    description: QuintoAndar user identifier for the consolidated persona row; may repeat across non-overlapping active periods for owners and tenants.
       It may not be unique, as an user may be owner/tenant in our platform in different periods.
     lineage:
       - datalake_cdp_personas.agent_broker.id_user
@@ -36,7 +37,7 @@ columns:
       - datalake_cdp_personas.tenant_prospect.uuid_person
       - datalake_cdp_personas.owner.uuid_person
   persona:
-    description: The persona type. 
+    description: CDP persona classification for the user (broker, tenant, owner, prospect, etc.) defining marketing and analytics segmentation.
     categories:
       AGENT_BROKER: User is a broker agent who attends visits to properties and help clients during the rent/sale journey.
       AGENT_INSPECTOR: User is an agent inspector.

@@ -4,11 +4,12 @@ table_name: partner_ciq
 description:
   This table consolidates all CIQs (supply partners) from QuintoAndar, in a historical view.
   We don't group any user in active/unactive periods as the historical data is not reliable.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the CIQ.
+    description: QuintoAndar user identifier for the partner CIQ persona row in the CDP partner program.
     lineage:
       - datalake_ebdb_clean.partner_agent.id_user
   uuid_person:

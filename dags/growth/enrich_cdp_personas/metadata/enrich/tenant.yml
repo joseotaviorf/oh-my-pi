@@ -8,11 +8,12 @@ description:
   the contract that started earlier, and the end timestamp related to the contract that finished later.
   If an user appears more than once, it indicates that this user was active in a ForRent contract for
   a while, stopped being a tenant (e.g. went through a contract termination) and later rented with us again.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the tenant.
+    description: QuintoAndar user identifier for the active tenant persona with historical lease periods.
       It may not be unique, as an user may be tenant in our platform in different periods.
     lineage:
       - datalake_ebdb_clean.contract_aud.id_user

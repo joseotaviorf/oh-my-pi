@@ -14,7 +14,7 @@ WITH base AS (
         AND sk_event_type <> 6 -- SALE_AGREEMENT_SIGNED
     GROUP BY 1, 2
 ),
-latest_event AS (
+latest_event_ranked AS (
     SELECT
         id_buyer AS id_user,
         CASE
@@ -22,7 +22,8 @@ latest_event AS (
             WHEN sk_event_type IN (3, 4, 8) THEN 'OFFER'
             WHEN sk_event_type = 5 THEN 'CLOSING'
             ELSE NULL
-        END AS journey_step
+        END AS journey_step,
+        ROW_NUMBER() OVER(PARTITION BY sde.id_buyer ORDER BY sde.ts_event DESC) AS rn
     FROM
         datalake_sale_demand_events.sale_demand_events AS sde
     JOIN
@@ -31,18 +32,18 @@ latest_event AS (
     WHERE
         b.ts_last_event = sde.ts_event
         AND sde.sk_event_type <> 6
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY sde.id_buyer ORDER BY sde.ts_event DESC) = 1
 )
 SELECT
     b.id_user,
     b.uuid_person,
-    le.journey_step,
+    ler.journey_step,
     TRUE AS is_active,
     b.ts_first_event,
-    b.ts_last_event
+    b.ts_last_event,
+    NOW() AS ts_load
 FROM
     base AS b
 JOIN
-    latest_event AS le
-        ON b.id_user = le.id_user
+    latest_event_ranked AS ler
+        ON b.id_user = ler.id_user
+        AND ler.rn = 1

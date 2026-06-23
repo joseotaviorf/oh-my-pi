@@ -3,11 +3,12 @@ database_name: datalake_cdp_personas
 table_name: agent_inspector
 description:
   This table consolidates all inspector agents from QuintoAndar in a historical view.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the inspector agent.
+    description: QuintoAndar user identifier for the inspector agent persona row in the CDP historical view.
     lineage:
       - datalake_ebdb_clean.user.id
   uuid_person:

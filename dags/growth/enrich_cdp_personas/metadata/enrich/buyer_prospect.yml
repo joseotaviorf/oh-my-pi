@@ -5,11 +5,12 @@ description:
   This table consolidates all buyer prospects (users in the ForSale demand funnel) from QuintoAndar, in a historical view.
   We don't group any user in active periods as this concept doesn't exist in our product, so this table will consolidate the
   first and last event of the buyer prospect on the ForSale demand funnel.
+  Z-ordered by id_user for query pruning on user-scoped lookups.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the buyer prospect.
+    description: QuintoAndar user identifier for the buyer prospect persona in the classified demand funnel.
     lineage:
       - datalake_sale_demand_events.sale_demand_events.id_buyer
   uuid_person:
