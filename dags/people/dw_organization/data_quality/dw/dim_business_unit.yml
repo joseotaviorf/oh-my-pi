@@ -27,6 +27,16 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  consolidated_business_units_with_required_cnpj_have_cnpj:
+    custom:
+      # QuintoAndar SP, MG, SC, and ATTA consolidated labels must have legal-entity CNPJ.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_organization.dim_business_unit
+         WHERE consolidated_business_unit_name IN ('QuintoAndar SP', 'QuintoAndar MG', 'QuintoAndar SC', 'ATTA')
+           AND cnpj IS NULL
+        ) = 0
+      severity_level: Error
   ts_load:
     has_null_count:
       less_than_or_equal_to: 1

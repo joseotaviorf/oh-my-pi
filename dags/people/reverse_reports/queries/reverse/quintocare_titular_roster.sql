@@ -1,12 +1,7 @@
 SELECT
     bu.consolidated_business_unit_name AS empresa,
     es.name AS nome,
-    CASE
-        WHEN bu.consolidated_business_unit_name = 'QuintoAndar MG' THEN '16.788.643/0021-25'
-        WHEN bu.consolidated_business_unit_name = 'QuintoAndar SC' THEN '16.788.643/0022-06'
-        WHEN bu.consolidated_business_unit_name = 'QuintoAndar SP' THEN '16.788.643/0001-81'
-        ELSE NULL
-    END AS cnpj,
+    bu.cnpj,
     es.gender_identity AS identidade_genero,
     es.marital_status AS estado_civil,
     es.dt_birth AS dt_nascimento,
