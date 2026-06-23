@@ -21,7 +21,7 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.event_properties.source
   business_context:
-    description: Business context which the entry model change was performed.
+    description: Indicates whether the tracked action relates to Rent, Sale, or another QuintoAndar product line parsed from the analytics payload.
     lineage:
       - datalake_amplitude_clean.events.event_properties.business_context
   ts_event:
