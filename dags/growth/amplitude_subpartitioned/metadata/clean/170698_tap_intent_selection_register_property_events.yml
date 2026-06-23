@@ -4,56 +4,65 @@ columns:
   id_amplitude:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    description: Primary Amplitude event identifier assigned by the analytics SDK for deduplication and event tracing.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
-    description: Column id_user from Amplitude events
+    description: Amplitude user identifier for cross-event identity stitching across sessions and devices.
   id_event:
     lineage:
     - datalake_amplitude_clean.events.id_event
-    description: Column id_event from Amplitude events
+    description: Amplitude insert identifier for the ingested row within the export batch.
   id_session:
     lineage:
     - datalake_amplitude_clean.events.id_session
-    description: Column id_session from Amplitude events
+    description: Amplitude session identifier grouping events within the same user session window.
   uuid:
     lineage:
     - datalake_amplitude_clean.events.uuid
-    description: Column uuid from Amplitude events
+    description: Universally unique identifier for the ingested event row in the Amplitude export.
   ab_beakman_onboarding_owner_flow_v2:
     lineage:
-    - datalake_amplitude_clean.events.user_properties
-    description: Column ab_beakman_onboarding_owner_flow_v2 from Amplitude events
+    - datalake_amplitude_clean.events.ab_beakman_onboarding_owner_flow_v2
+    description: Analytics field 'ab_beakman_onboarding_owner_flow_v2' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    description: Canonical event timestamp used for analytics, typically client event time in UTC.
   ts_client_event:
     lineage:
     - datalake_amplitude_clean.events.ts_client_event
-    description: Column ts_client_event from Amplitude events
+    description: Timestamp when the event was recorded on the client device, in UTC.
   ts_client_uploaded:
     lineage:
     - datalake_amplitude_clean.events.ts_client_uploaded
-    description: Column ts_client_uploaded from Amplitude events
-  ts_processed:
-    lineage:
-    - datalake_amplitude_clean.events.ts_processed
-    description: Column ts_processed from Amplitude events
+    description: Timestamp when the mobile or web client uploaded the event batch to Amplitude servers.
   year:
     lineage:
     - datalake_amplitude_clean.events.year
-    description: Column year from Amplitude events
+    description: 'Table partition column (year). Derived from ts_event at clean ingestion. Required in WHERE clauses
+
+      for partition pruning — always combine with month and day to restrict scans to the smallest date
+
+      window needed.
+
+      '
   month:
     lineage:
     - datalake_amplitude_clean.events.month
-    description: Column month from Amplitude events
+    description: 'Table partition column (month, 1–12). Derived from ts_event at clean ingestion. Must be filtered
+
+      together with year and day to avoid full-table scans on this high-volume events subpartition.
+
+      '
   day:
     lineage:
     - datalake_amplitude_clean.events.day
-    description: Column day from Amplitude events
+    description: 'Table partition column (day, 1–31). Derived from ts_event at clean ingestion. Always filter with
+
+      year and month — last partition column in the table layout.
+
+      '
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
-description: This table contains tap_intent_selection_register_property events from app 170698. It tracks
-  user interactions and includes relevant metadata and user properties.
+description: This table contains tap_intent_selection_register_property events from app 170698. It tracks user interactions and includes relevant metadata and user properties.

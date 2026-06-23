@@ -1,5 +1,8 @@
 database_name: datalake_amplitude_clean
 table_name: 170698_visit_hoursalert_confirmed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: This table contains visit_hoursalert_confirmed events from app 170698. It tracks user interactions and includes relevant metadata and user properties.
 columns:
   id_amplitude:
     lineage:
@@ -231,6 +234,3 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Analytics field 'ep_alert_slot_to' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
-owner: guilherme.rocha@quintoandar.com.br
-domain: For Sale
-description: This table contains visit_hoursalert_confirmed events from app 170698. It tracks user interactions and includes relevant metadata and user properties.
