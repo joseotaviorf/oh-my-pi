@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.id_user
   id_house:
-    description: Identifier of the property for which the copy button was clicked during indication.
+    description: QuintoAndar listing identifier parsed from the JSON analytics payload for property joins.
     lineage:
       - datalake_amplitude_clean.events.event_properties.house_id
   ts_event:

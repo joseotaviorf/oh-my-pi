@@ -22,11 +22,11 @@ columns:
   visit_status:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Status of the visit at the time the success page was viewed
+    description: Scheduling outcome label captured alongside the success screen for funnel reporting.
   business_context:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Business context of the visit when the success page was viewed
+    description: Indicates whether the tracked action relates to Rent, Sale, or another QuintoAndar product line parsed from the analytics payload.
   current_page:
     lineage:
       - datalake_amplitude_clean.events.event_properties

@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.id_user
   origin:
-    description: Origin from which the agent accessed the property indication page.
+    description: Acquisition channel or referral source label materialized from the analytics payload.
     lineage:
       - datalake_amplitude_clean.events.event_properties.origin
   ts_event:
