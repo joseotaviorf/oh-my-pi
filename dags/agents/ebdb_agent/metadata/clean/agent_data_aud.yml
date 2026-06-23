@@ -27,7 +27,7 @@ columns:
   uuid_company:
     lineage:
     - datalake_ebdb_raw.dadosagente_aud.companyuuid
-    description: UUID for company.
+    description: Company UUID in the internal Company service linked to the agent's brokerage affiliation.
   mod_uuid_company:
     lineage:
     - datalake_ebdb_raw.dadosagente_aud.companyuuid_mod
@@ -108,4 +108,6 @@ columns:
     lineage:
     - datalake_ebdb_raw.dadosagente_aud.opted_for_online_support_mod
     description: Flag indicating whether the record has opted for online support mod.
-description: Clean layer table for agent data aud agent domain data.
+description: |
+  Hibernate Envers audit trail for changes to agent profile records (DadosAgente), capturing revision
+  metadata and field-level modification flags for affiliation, credentials, and operational settings.

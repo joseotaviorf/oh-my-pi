@@ -24,7 +24,7 @@ columns:
   program:
     lineage:
       - datalake_ebdb_raw.dadosagente_programs_aud.program
-    description: Program name
+    description: Incentive or loyalty program code the agent is enrolled in or evaluated against (e.g. Big Agent tier).
   is_eligible:
     lineage:
       - datalake_ebdb_raw.dadosagente_programs_aud.elegible

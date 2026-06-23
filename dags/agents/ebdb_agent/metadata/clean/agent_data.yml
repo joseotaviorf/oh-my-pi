@@ -31,7 +31,7 @@ columns:
   uuid_company:
     lineage:
     - datalake_ebdb_raw.dadosagente.companyuuid
-    description: UUID for company.
+    description: Company UUID in the internal Company service linked to the agent's brokerage affiliation.
   code:
     lineage:
     - datalake_ebdb_raw.dadosagente.code
@@ -79,9 +79,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.dadosagente.criadoem
-    description: Timestamp of created.
+    description: Timestamp when the agent profile record was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.dadosagente.atualizadoem
-    description: Timestamp of updated.
-description: Clean layer table for agent data agent domain data.
+    description: Timestamp when the agent profile record was last modified in EBDB.
+description: |
+  Extended profile and operational attributes for QuintoAndar field agents (DadosAgente), including
+  CRECI, agency affiliation, work contract, preferred region, and feature toggles for scheduling and leads.

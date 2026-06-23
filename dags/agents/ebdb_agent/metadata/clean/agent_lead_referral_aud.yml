@@ -3,7 +3,9 @@ database_name: datalake_ebdb_clean
 table_name: agent_lead_referral_aud
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
-description: Agent Lead Referral AUD table.
+description: |
+  Hibernate Envers audit trail for Traz Quem Compra (TQC) buyer referral invites, recording each revision
+  of agent-to-lead referral records with field-level change flags.
 columns:
   id:
     lineage:
@@ -76,4 +78,4 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.createdAt
-    description: Timestamp of created.
+    description: Timestamp when this audit revision of the referral record was captured in EBDB.

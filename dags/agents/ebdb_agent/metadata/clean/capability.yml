@@ -16,11 +16,11 @@ columns:
   type:
     lineage:
       - datalake_ebdb_raw.capability.type
-    description: Capability type.
+    description: Capability category granted to the agent (e.g. visit management, photography, inspection).
   status:
     lineage:
       - datalake_ebdb_raw.capability.status
-    description: Capability status.
+    description: Operational status of the capability for the agent (active, suspended, or revoked).
   ts_created:
     lineage:
       - datalake_ebdb_raw.capability.created_at

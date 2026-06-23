@@ -22,11 +22,11 @@ columns:
     lineage:
     - datalake_ebdb_raw.agentleadreferral.name
   status:
-    description: Invite status.
+    description: Lifecycle status of the buyer referral invite (pending, accepted, expired, or cancelled).
     lineage:
     - datalake_ebdb_raw.agentleadreferral.status
   phone:
-    description: Lead phone
+    description: Mobile phone number provided by the invited buyer for referral validation and outreach.
     lineage:
     - datalake_ebdb_raw.agentleadreferral.phone
   code:

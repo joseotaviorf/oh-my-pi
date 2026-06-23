@@ -43,9 +43,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.preferredfixedagent_aud.criadoem
-    description: Timestamp of created.
+    description: Timestamp when the preferred fixed agent assignment was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.preferredfixedagent_aud.atualizadoem
-    description: Timestamp of updated.
-description: Clean layer table for preferred fixed agent aud agent domain data.
+    description: Timestamp when the preferred fixed agent assignment was last modified in EBDB.
+description: |
+  Hibernate Envers audit trail for Preferred Fixed Agent (PFA) assignments, capturing revision history
+  and field-level change flags for region, business context, and enablement status.

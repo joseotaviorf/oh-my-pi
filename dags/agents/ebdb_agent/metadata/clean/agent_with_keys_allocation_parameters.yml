@@ -39,9 +39,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.agentwithkeysallocationparameters.created_at
-    description: Timestamp of created.
+    description: Timestamp when the keys-with-agent allocation parameters were first recorded for this agent.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.agentwithkeysallocationparameters.updated_at
-    description: Timestamp of updated.
-description: Clean layer table for agent with keys allocation parameters agent domain data.
+    description: Timestamp when the allocation parameters were last recalculated or updated in EBDB.
+description: |
+  Allocation parameters for agents participating in the keys-with-agent program, including portfolio
+  size, capacity, average ticket, and geographic centroid used for matching houses to agents.

@@ -35,9 +35,11 @@ columns:
   ts_created:
     lineage:
     - datalake_ebdb_raw.preferredfixedagent.criadoem
-    description: Timestamp of created.
+    description: Timestamp when the preferred fixed agent assignment was first created in EBDB.
   ts_updated:
     lineage:
     - datalake_ebdb_raw.preferredfixedagent.atualizadoem
-    description: Timestamp of updated.
-description: Clean layer table for preferred fixed agent agent domain data.
+    description: Timestamp when the preferred fixed agent assignment was last modified in EBDB.
+description: |
+  Preferred Fixed Agent (PFA) assignments linking an agent to a region and business context (rent or sale),
+  indicating whether the agent is enabled as the default consultant for listings in that area.

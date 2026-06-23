@@ -24,11 +24,11 @@ columns:
   partnership_representative_type:
     lineage:
       - datalake_ebdb_raw.agent.partnership_representative_type
-    description: Type of the partnership representative.
+    description: Classification of the external representative linked to the agent's partnership (e.g. broker network role).
   affiliation_type:
     lineage:
       - datalake_ebdb_raw.agent.affiliation_type
-    description: Agent affiliation type.
+    description: How the agent is affiliated with QuintoAndar (employee, partner broker, or autonomous consultant).
   status:
     lineage:
       - datalake_ebdb_raw.agent.status
