@@ -1,25 +1,28 @@
 ---
 database_name: datalake_emlio
 table_name: billboard
-owner: 'ralph.filho@quintoandar.com.br'
+owner: michelly.silva@quintoandar.com.br
 domain: MLOps
-description: House maps containing house id and weight of the billboard service.
+description: |
+  House maps containing house id and weight of the billboard service.
   The purpose is to track and monitor data drifts.
+  Partitioned by id_service, service_version, year, month, and day — always filter
+  on these columns for partition pruning.
 columns:
   id_service:
-    description: ID of the service ('billboard'). 
+    description: Identifier of the EMLIO AI service that produced the billboard inference log (always 'billboard').
     lineage:
     - datalake_emlio_clean.emlio_logs.id_service
   service_version:
-    description: Version of the billboard service.
+    description: Version string of the billboard ranking model deployed when the inference was logged.
     lineage:
     - datalake_emlio_clean.emlio_logs.service_version
   id_house:
-    description: ID of the house.
+    description: QuintoAndar house identifier extracted from the billboard house_maps payload in the inference input.
     lineage:
     - datalake_emlio_clean.emlio_logs.inputs
   weight:
-    description: Calculated weight of the house.
+    description: The weight assigned to the house by the billboard model, indicating its ranking relative importance.
     lineage:
     - datalake_emlio_clean.emlio_logs.inputs
   year:

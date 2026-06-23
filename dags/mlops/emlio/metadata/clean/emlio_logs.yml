@@ -3,7 +3,10 @@ database_name: datalake_emlio_clean
 table_name: emlio_logs
 owner: lucas.cardozo@quintoandar.com.br
 domain: MLOps
-description: 'Logs of inputs and outputs from Machine Learning models'
+description: |
+  Logs of inputs and outputs from Machine Learning models ingested via EMLIO.
+  Clean layer partitioned by id_service, year, month, and day — always filter
+  on these columns for partition pruning.
 columns:
   uuid:
     lineage:
@@ -11,7 +14,7 @@ columns:
     description: 'Unique identifier for the log record'
   id_service:
     lineage:
-      - datalake_emlio_raw.emlio_logs.id_service
+      - datalake_emlio_raw.emlio_logs.service_id
     description: 'AI service unique identifier (e.g., model name, LLM provider)'
   service_version:
     lineage:
@@ -27,7 +30,7 @@ columns:
     description: 'Type of the AI service (MODEL or SERVICE)'
   ts_log:
     lineage:
-      - datalake_emlio_raw.emlio_logs.ts_log
+      - datalake_emlio_raw.emlio_logs.log_timestamp
     description: 'Timestamp of the log record'
   inputs:
     lineage:
@@ -39,7 +42,7 @@ columns:
     description: 'Outputs of the AI service'
   service_keys:
     lineage:
-      - datalake_emlio_raw.emlio_logs.service_keys
+      - datalake_emlio_raw.emlio_logs.keys
     description: 'Identifiers of the logged data'
   deployment_info:
     lineage:

@@ -1,10 +1,12 @@
 ---
 database_name: datalake_emlio
 table_name: casio
-owner: 'ralph.filho@quintoandar.com.br'
+owner: michelly.silva@quintoandar.com.br
 domain: MLOps
 description: Inputs of the casio model. Casio is a model for house price prediction.
   The purpose is to track and monitor data drifts.
+  Partitioned by id_service, service_version, year, month, and day — always filter
+  on these columns for partition pruning.
 columns:
   year:
     description: Year of the log.
@@ -19,7 +21,7 @@ columns:
     lineage:
     - datalake_emlio_clean.emlio_logs.day
   id_service:
-    description: ID of the service ('casio').
+    description: Identifier of the EMLIO AI service that produced the Casio price prediction log (always 'casio').
     lineage:
     - datalake_emlio_clean.emlio_logs.id_service
   service_version:
@@ -2986,3 +2988,67 @@ columns:
     description: Casio's default field.
     lineage:
     - datalake_emlio_clean.inputs
+  house_id:
+    description: House identifier from the Casio prediction request keys payload.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_keys
+  prediction_id:
+    description: Unique identifier of the Casio price prediction request.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_keys
+  x_original_requester:
+    description: HTTP header value indicating the original client that initiated the Casio prediction request.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_keys
+  x_request_via:
+    description: HTTP header value indicating the intermediate service that forwarded the Casio request.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_keys
+  x_model_request_metadata:
+    description: JSON metadata attached to the Casio model request for traceability and debugging.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_keys
+  request_method:
+    description: HTTP method used to invoke the Casio price prediction endpoint.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_keys
+  quantile_10:
+    description: Predicted rent price at the 10th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_20:
+    description: Predicted rent price at the 20th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_30:
+    description: Predicted rent price at the 30th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_40:
+    description: Predicted rent price at the 40th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_50:
+    description: Predicted rent price at the 50th percentile (median) returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_60:
+    description: Predicted rent price at the 60th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_70:
+    description: Predicted rent price at the 70th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_80:
+    description: Predicted rent price at the 80th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  quantile_90:
+    description: Predicted rent price at the 90th percentile returned by the Casio model.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs
+  certainty:
+    description: Model confidence score for the Casio price prediction, indicating prediction reliability.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.outputs

@@ -1,18 +1,20 @@
 ---
 database_name: datalake_emlio
 table_name: emma_watson
-owner: "ralph.filho@quintoandar.com.br"
+owner: michelly.silva@quintoandar.com.br
 domain: MLOps
 description:
   Data extracted from user chats that are processed by emma watson service.
   The purpose is to track and monitor data drifts and serve as input for metrics computations.
+  Partitioned by id_service, service_version, year, month, and day — always filter
+  on these columns for partition pruning.
 columns:
   id_service:
-    description: ID of the service ('emma_watson').
+    description: Identifier of the EMLIO AI service that processed the user chat (always 'emma_watson').
     lineage:
       - datalake_emlio_clean.emlio_logs.id_service
   service_version:
-    description: Version of the emma watson service.
+    description: Version string of the Emma Watson LLM pipeline deployed when the chat inference was logged.
     lineage:
       - datalake_emlio_clean.emlio_logs.service_version
   prompt:

@@ -1,32 +1,47 @@
 ---
 database_name: datalake_batch_inference_clean
 table_name: batch_inference
+owner: gervasio.santos@quintoandar.com
 domain: MLOps
+description: |
+  Batch ML inference results produced by Data Products team models, including input
+  payloads, prediction outputs, and run metadata for offline scoring jobs.
+  Partitioned by year, month, day, model_name, and model_version — always filter
+  on these columns for partition pruning.
 columns:
   model_name:
     lineage:
       - datalake_batch_inference_raw.batch_inference.model_name
-  model_service:
+    description: Name of the ML model that produced the batch inference result.
+  model_version:
     lineage:
-      - datalake_batch_inference_raw.batch_inference.model_service
+      - datalake_batch_inference_raw.batch_inference.model_version
+    description: Version identifier of the ML model used in the batch inference run.
   input_data:
     lineage:
       - datalake_batch_inference_raw.batch_inference.input_data
+    description: JSON payload with the feature values fed into the model for prediction.
   output_data:
     lineage:
       - datalake_batch_inference_raw.batch_inference.output_data
+    description: JSON payload with the model prediction output for the given input.
   metadata:
     lineage:
       - datalake_batch_inference_raw.batch_inference.metadata
+    description: Additional run metadata such as execution context, parameters, or diagnostics.
   ts_inference:
     lineage:
       - datalake_batch_inference_raw.batch_inference.timestamp
+    description: Timestamp when the batch inference was executed and the result was recorded.
   year:
     lineage:
       - datalake_batch_inference_raw.batch_inference.year
+    description: Year of the inference run. It is a partition column.
   month:
     lineage:
       - datalake_batch_inference_raw.batch_inference.month
+    description: Month of the inference run. It is a partition column.
   day:
     lineage:
       - datalake_batch_inference_raw.batch_inference.day
+    description: Day of the inference run. It is a partition column.

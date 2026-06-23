@@ -1,10 +1,12 @@
 ---
 database_name: datalake_emlio
 table_name: citadel
-owner: 'ralph.filho@quintoandar.com.br'
+owner: michelly.silva@quintoandar.com.br
 domain: MLOps
 description: Inputs of the citadel model. Citadel is a model to classify user chats.
   The purpose is to track and monitor data drifts.
+  Partitioned by id_service, service_version, year, month, and day — always filter
+  on these columns for partition pruning.
 columns:
   service_version:
     description: Citadel's default field.
@@ -26,267 +28,267 @@ columns:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.last_hsm_type:
+  last_hsm_type:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.last_hsm_ts_diff:
+  last_hsm_ts_diff:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.last_taxonomies:
+  last_taxonomies:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.last_taxonomies_ts_diff:
+  last_taxonomies_ts_diff:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.agent_is_active:
+  agent_is_active:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_house_status_rented__sum:
+  owner_house_status_rented__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_house_status_edition__sum:
+  owner_house_status_edition__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_house_status_published__sum:
+  owner_house_status_published__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_house_status_suspended__sum:
+  owner_house_status_suspended__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_rent_flow_contract_sent__sum_over_4_weeks_rolling_windows:
+  owner_rent_flow_contract_sent__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_rent_flow_documentations__sum_over_4_weeks_rolling_windows:
+  owner_rent_flow_documentations__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_rent_flow_closed_deals__sum_over_4_weeks_rolling_windows:
+  owner_rent_flow_closed_deals__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_rent_flow_negotiations__sum_over_4_weeks_rolling_windows:
+  owner_rent_flow_negotiations__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_rent_flow_prospects__sum_over_4_weeks_rolling_windows:
+  owner_rent_flow_prospects__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_offer_status_negotiation__sum_over_4_weeks_rolling_windows:
+  owner_offer_status_negotiation__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_offer_status_approved__sum_over_4_weeks_rolling_windows:
+  owner_offer_status_approved__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_offer_status_rejected__sum_over_4_weeks_rolling_windows:
+  owner_offer_status_rejected__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_proposal_new__sum_over_4_weeks_rolling_windows:
+  owner_proposal_new__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_proposal_analysis__sum_over_4_weeks_rolling_windows:
+  owner_proposal_analysis__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_proposal_approved__sum_over_4_weeks_rolling_windows:
+  owner_proposal_approved__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_proposal_rejected__sum_over_4_weeks_rolling_windows:
+  owner_proposal_rejected__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_documentation_under_analysis__sum_over_4_weeks_rolling_windows:
+  owner_documentation_under_analysis__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_documentation_approved__sum_over_4_weeks_rolling_windows:
+  owner_documentation_approved__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_documentation_not_sent__sum_over_4_weeks_rolling_windows:
+  owner_documentation_not_sent__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_active__sum:
+  owner_contract_active__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_pre_signature__sum:
+  owner_contract_pre_signature__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_finalized__sum:
+  owner_contract_finalized__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_canceled__sum:
+  owner_contract_canceled__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_draft__sum:
+  owner_contract_draft__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_closing_signed__sum:
+  owner_contract_closing_signed__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_closing_sent__sum:
+  owner_contract_closing_sent__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_inspection_status_commented__sum_over_4_weeks_rolling_windows:
+  owner_inspection_status_commented__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.owner_contract_signed__count_over_40_days_rolling_windows:
+  owner_contract_signed__count_over_40_days_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_rent_flow_documentations__sum_over_4_weeks_rolling_windows:
+  tenant_rent_flow_documentations__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_rent_flow_closed_deals__sum_over_4_weeks_rolling_windows:
+  tenant_rent_flow_closed_deals__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_rent_flow_negotiations__sum_over_4_weeks_rolling_windows:
+  tenant_rent_flow_negotiations__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_canceled__sum:
+  tenant_contract_canceled__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_finalized__sum:
+  tenant_contract_finalized__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_active__sum:
+  tenant_contract_active__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_pre_signature__sum:
+  tenant_contract_pre_signature__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_draft__sum:
+  tenant_contract_draft__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_closing_signed__sum:
+  tenant_contract_closing_signed__sum:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_offer_status_negotiation__sum_over_4_weeks_rolling_windows:
+  tenant_offer_status_negotiation__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_offer_status_approved__sum_over_4_weeks_rolling_windows:
+  tenant_offer_status_approved__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_offer_status_rejected__sum_over_4_weeks_rolling_windows:
+  tenant_offer_status_rejected__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_offer_rejection_reason_rented_for_another_tenant_5a__sum_over_4_weeks_rolling_windows:
+  tenant_offer_rejection_reason_rented_for_another_tenant_5a__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_offer_rejection_reason_tenant_does_not_agree_with_conditions__sum_over_4_weeks_rolling_windows:
+  tenant_offer_rejection_reason_tenant_does_not_agree_with_conditions__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_new__sum_over_4_weeks_rolling_windows:
+  tenant_proposal_new__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_under_analysis__sum_over_4_weeks_rolling_windows:
+  tenant_proposal_under_analysis__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_approved__sum_over_4_weeks_rolling_windows:
+  tenant_proposal_approved__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_rejected__sum_over_4_weeks_rolling_windows:
+  tenant_proposal_rejected__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_documentation_under_analysis__sum_over_4_weeks_rolling_windows:
+  tenant_documentation_under_analysis__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_documentation_approved__sum_over_4_weeks_rolling_windows:
+  tenant_documentation_approved__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_documentation_refused__sum_over_4_weeks_rolling_windows:
+  tenant_documentation_refused__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_documentation_not_sent__sum_over_4_weeks_rolling_windows:
+  tenant_documentation_not_sent__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_documentation_resend__sum_over_4_weeks_rolling_windows:
+  tenant_documentation_resend__sum_over_4_weeks_rolling_windows:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_log_diff_ts_proposal_expired_at:
+  tenant_log_diff_ts_proposal_expired_at:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_log_diff_ts_proposal_status_change:
+  tenant_log_diff_ts_proposal_status_change:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_log_diff_ts_contract_started:
+  tenant_log_diff_ts_contract_started:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_log_diff_ts_contract_status_change:
+  tenant_log_diff_ts_contract_status_change:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_status:
+  tenant_proposal_status:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_tenant_documentation_status:
+  tenant_proposal_tenant_documentation_status:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_proposal_rejection_reason:
+  tenant_proposal_rejection_reason:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_status:
+  tenant_contract_status:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.tenant_contract_previous_status:
+  tenant_contract_previous_status:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features
-  s_inputs.model_features.initial_text:
+  initial_text:
     description: Citadel's default field.
     lineage:
     - datalake_emlio_clean.inputs.model_features

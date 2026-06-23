@@ -1,10 +1,10 @@
 ---
 database_name: datalake_emlio
-table_name: casio
-owner: 'ralph.filho@quintoandar.com.br'
+table_name: pclick
+owner: michelly.silva@quintoandar.com.br
 domain: MLOps
-description: Inputs of the casio model. Casio is a model for house price prediction.
-  The purpose is to track and monitor data drifts.
+description: Inputs of the P-click model used to score listing click probability.
+  The purpose is to track and monitor data drifts. Partitioned by id_service, service_version, year, month, and day — always filter on these columns for partition pruning.
 columns:
   service_version:
     description: P-click's default field.
@@ -179,10 +179,6 @@ columns:
     lineage:
     - datalake_emlio_clean.inputs
   user__listing_page_viewed_rent_per_month__avg_over_15_events_row_windows:
-    description: P-click's default field.
-    lineage:
-    - datalake_emlio_clean.inputs
-  user__amplitude_device_model:
     description: P-click's default field.
     lineage:
     - datalake_emlio_clean.inputs
@@ -386,3 +382,19 @@ columns:
     description: P-click's default field.
     lineage:
     - datalake_emlio_clean.inputs
+  house__listing_age:
+    description: Age of the house listing in days at the time of the P-click inference event.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.inputs
+  house__rent_ts_last_publication:
+    description: Timestamp of the most recent rent publication for the house in the P-click request context.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.inputs
+  house__sale_ts_last_publication:
+    description: Timestamp of the most recent sale publication for the house in the P-click request context.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.inputs
+  searched_house__street_match:
+    description: Boolean flag indicating whether the searched house street matched the listing in the P-click event.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.inputs
