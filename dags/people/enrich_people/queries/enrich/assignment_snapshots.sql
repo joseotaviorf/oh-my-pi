@@ -1,135 +1,34 @@
 WITH
--- Base assignments from identifier_mapping (termination dates from assignment_termination when available)
-assignments_base AS (
+assignments_with_series_end AS (
     SELECT
         im.id_assignment,
         im.id_person,
         im.person_number,
         im.assignment_number,
-        COALESCE(im.dt_started, at.dt_hired) AS dt_started,
-        COALESCE(im.dt_actual_termination, at.dt_terminated) AS dt_actual_termination,
-        COALESCE(im.dt_notified_termination, at.dt_notified) AS dt_notified
+        im.dt_started,
+        im.dt_actual_termination AS dt_terminated,
+        im.dt_notified_termination,
+        LEAST(COALESCE(im.dt_actual_termination, CURRENT_DATE()), CURRENT_DATE()) AS dt_series_end
     FROM
         datalake_people.identifier_mapping AS im
-    LEFT JOIN
-        datalake_people.assignment_termination AS at
-            ON at.id_assignment = im.id_assignment
     WHERE
-        NOT im.is_user_test
-        AND im.assignment_type IN ('E', 'C')
-),
--- Assignment context: current org/job, termination events, managers, first hire
-current_assignments_ranked AS (
-    SELECT
-        id_assignment,
-        id_organization,
-        id_business_unit,
-        id_job,
-        career_track,
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                id_assignment
-            ORDER BY
-                dt_effective_ended DESC
-        ) AS rn
-    FROM
-        datalake_pin_core_clean.all_assignments
-    WHERE
-        assignment_type IN ('E', 'C')
-),
-current_assignments AS (
-    SELECT
-        id_assignment,
-        id_organization,
-        id_business_unit,
-        id_job,
-        career_track
-    FROM
-        current_assignments_ranked
-    WHERE
-        rn = 1
-),
-termination_assignments_ranked AS (
-    SELECT
-        aa.id_assignment,
-        aa.id_action_occurrence,
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                aa.id_assignment
-            ORDER BY
-                aa.dt_effective_ended ASC
-        ) AS rn
-    FROM
-        datalake_pin_core_clean.all_assignments AS aa
-    WHERE
-        aa.is_primary
-        AND aa.assignment_type IN ('E', 'C')
-        AND aa.action_code IN (
-            'TERMINATION',
-            'RESIGNATION',
-            'DEATH',
-            'GLB_TRANSFER',
-            'EXPATRIADO'
-        )
-        AND aa.assignment_status_type = 'INACTIVE'
-),
-termination_assignments AS (
-    SELECT
-        id_assignment,
-        id_action_occurrence
-    FROM
-        termination_assignments_ranked
-    WHERE
-        rn = 1
-),
-termination_event_definitions AS (
-    SELECT
-        ta.id_assignment,
-        CONCAT(
-            CAST(ao.id_action AS STRING),
-            '-',
-            CAST(ao.id_action_reason AS STRING)
-        ) AS id_event_definition
-    FROM
-        termination_assignments AS ta
-    INNER JOIN
-        datalake_pin_core_clean.action_occurrence AS ao
-            ON ao.id_action_occurrence = ta.id_action_occurrence
-),
-first_hire_per_person AS (
-    SELECT
-        ps.id_person,
-        MIN(ps.dt_started) AS dt_original_hire
-    FROM
-        datalake_pin_core_clean.periods_of_service AS ps
-    GROUP BY
-        ps.id_person
+        im.is_valid_assignment
+        AND im.dt_started IS NOT NULL
+        AND im.dt_started <= CURRENT_DATE()
 ),
 assignments_with_dates AS (
     SELECT
-        ab.id_assignment,
-        ab.id_person,
-        ab.person_number,
-        ab.assignment_number,
-        ab.dt_started,
-        ab.dt_actual_termination,
-        ab.dt_notified,
-        SEQUENCE(
-            ab.dt_started,
-            LEAST(
-                CASE
-                    WHEN NULLIF(ab.dt_actual_termination, DATE('4712-12-31')) IS NOT NULL
-                        THEN LAST_DAY(ab.dt_actual_termination)
-                    ELSE CURRENT_DATE()
-                END,
-                CURRENT_DATE()
-            )
-        ) AS dt_reference_array
+        aws.id_assignment,
+        aws.id_person,
+        aws.person_number,
+        aws.assignment_number,
+        aws.dt_started,
+        aws.dt_terminated,
+        aws.dt_notified_termination,
+        aws.dt_series_end,
+        SEQUENCE(aws.dt_started, aws.dt_series_end) AS dt_reference_array
     FROM
-        assignments_base AS ab
-    WHERE
-        ab.dt_started IS NOT NULL
-        AND ab.dt_started <= CURRENT_DATE()
+        assignments_with_series_end AS aws
 ),
 assignments_daily AS (
     SELECT
@@ -138,8 +37,9 @@ assignments_daily AS (
         awd.person_number,
         awd.assignment_number,
         awd.dt_started,
-        awd.dt_actual_termination,
-        awd.dt_notified,
+        awd.dt_terminated,
+        awd.dt_notified_termination,
+        awd.dt_series_end,
         dt_reference,
         (
             dt_reference < awd.dt_started
@@ -198,10 +98,7 @@ hierarchy_with_direct_manager AS (
         datalake_people.management_hierarchy AS mh
             ON mh.assignment_number = ad.assignment_number
             AND ad.dt_reference >= mh.dt_valid_from
-            AND ad.dt_reference <= COALESCE(
-                NULLIF(mh.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND ad.dt_reference <= mh.dt_valid_to
     WHERE
         NOT ad.is_future_hire
 ),
@@ -314,9 +211,9 @@ assignment_snapshots_ranked AS (
     SELECT
         ad.id_assignment,
         ad.id_person,
-        ca.id_organization,
-        ca.id_business_unit,
-        ca.id_job,
+        all_assign.id_organization,
+        all_assign.id_business_unit,
+        all_assign.id_job,
         MD5(
             CONCAT_WS(
                 '|',
@@ -328,13 +225,10 @@ assignment_snapshots_ranked AS (
         cv.sk_compensation AS sk_compensation_version,
         jwst.country AS business_unit_country,
         mh.sk_hierarchy_version,
-        ted.id_event_definition AS sk_termination_event_definition,
+        im.id_termination_event_definition AS sk_termination_event_definition,
         DATE_FORMAT(ad.dt_started, 'yyyyMMdd') AS sk_hired_date,
         DATE_FORMAT(
-            COALESCE(
-                NULLIF(ad.dt_actual_termination, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            ),
+            COALESCE(ad.dt_terminated, DATE('9999-12-31')),
             'yyyyMMdd'
         ) AS sk_terminated_date,
         DATE_FORMAT(ad.dt_reference, 'yyyyMMdd') AS sk_reference_date,
@@ -344,32 +238,29 @@ assignment_snapshots_ranked AS (
         mh.hierarchy_level,
         mh.hierarchy_depth,
         CASE
-            WHEN all_assign.assignment_status_type = 'ACTIVE'
+            WHEN all_assign.is_active
                 THEN 'Active'
             ELSE 'Terminated'
         END AS employment_status,
         CASE
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) IS NULL THEN CAST(NULL AS STRING)
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 3  THEN '< 3 months'
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 12 THEN '3-11 months'
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 36 THEN '1-2 years'
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 60 THEN '3-4 years'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) IS NULL THEN CAST(NULL AS STRING)
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 3  THEN '< 3 months'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 12 THEN '3-11 months'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 36 THEN '1-2 years'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 60 THEN '3-4 years'
             ELSE '5+ years'
         END AS tenure_range,
-        DATEDIFF(ad.dt_reference, fh.dt_original_hire) AS days_tenure_in_company,
-        FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) AS months_tenure_in_company,
+        DATEDIFF(ad.dt_reference, im.dt_original_hired) AS days_tenure_in_company,
+        FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) AS months_tenure_in_company,
         DATEDIFF(ad.dt_reference, ad.dt_started) AS days_tenure_in_assignment,
         COALESCE(drc.count_direct_report, 0) AS count_direct_report,
         COALESCE(irc.count_indirect_report, 0) AS count_indirect_report,
         COALESCE(drc.count_direct_report, 0) + COALESCE(irc.count_indirect_report, 0) AS count_total_report,
         (
-            ca.career_track = 'L'
+            COALESCE(jwst.is_leadership_job, FALSE)
             OR COALESCE(drc.count_direct_report, 0) > 0
         ) AS is_manager,
-        COALESCE(
-            jwst.band = 'EXEC' OR TRY_CAST(jwst.band AS INT) >= 10,
-            FALSE
-        ) AS is_member_lt,
+        COALESCE(jwst.is_leadership_team_job, FALSE) AS is_leadership_team_member,
         COALESCE(
             mh.sk_hierarchy_version IS NOT NULL
             AND (
@@ -378,43 +269,27 @@ assignment_snapshots_ranked AS (
             )
             AND TRY_CAST(jwst.band AS INT) >= 14,
             FALSE
-        ) AS is_member_et,
-        IF(all_assign.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
-        IF(
-            ad.dt_actual_termination IS NOT NULL
-            AND ad.dt_actual_termination <> DATE('4712-12-31'),
-            TRUE,
-            FALSE
-        ) AS is_terminated,
+        ) AS is_executive_team_member,
+        all_assign.is_active,
         pei.id_person IS NOT NULL AS has_emergency_contact,
-        fh.dt_original_hire IS NOT NULL
-            AND fh.dt_original_hire < ad.dt_started AS is_internal_transfer,
+        im.dt_original_hired IS NOT NULL
+            AND im.dt_original_hired < ad.dt_started AS is_internal_transfer,
         ad.is_future_hire,
         COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
-        COALESCE(LOWER(TRIM(lo.is_layoff)) = 'sim', FALSE) AS is_reorganization_termination,
+        lo.id_employee IS NOT NULL AS is_reorganization_termination,
         (
             LAST_DAY(ad.dt_reference) = ad.dt_reference
             OR ad.dt_reference = CURRENT_DATE()
+            OR ad.dt_reference = ad.dt_series_end
         ) AS is_monthly_snapshot,
-        ad.dt_reference = LEAST(
-            COALESCE(
-                NULLIF(ad.dt_actual_termination, DATE('4712-12-31')),
-                CURRENT_DATE()
-            ),
-            CURRENT_DATE()
-        ) AS is_current,
-        fh.dt_original_hire,
+        ad.dt_reference = ad.dt_series_end AS is_current,
+        im.dt_original_hired AS dt_original_hire,
         ad.dt_started AS dt_hired,
-        COALESCE(
-            NULLIF(ad.dt_actual_termination, DATE('4712-12-31')),
-            DATE('9999-12-31')
-        ) AS dt_terminated,
-        COALESCE(
-            NULLIF(ad.dt_notified, DATE('4712-12-31')),
-            DATE('9999-12-31')
-        ) AS dt_notified,
+        COALESCE(ad.dt_terminated, DATE('9999-12-31')) AS dt_terminated,
+        COALESCE(ad.dt_notified_termination, DATE('9999-12-31')) AS dt_notified_termination,
         ad.dt_reference AS dt_reference,
-        CURRENT_TIMESTAMP() AS ts_load,
+        LAST_DAY(ad.dt_reference) AS dt_month_reference,
+        NOW() AS ts_load,
         ROW_NUMBER() OVER (
             PARTITION BY
                 ad.id_assignment,
@@ -429,31 +304,23 @@ assignment_snapshots_ranked AS (
     FROM
         assignments_daily AS ad
     INNER JOIN
-        current_assignments AS ca
-            ON ca.id_assignment = ad.id_assignment
-    LEFT JOIN
-        termination_event_definitions AS ted
-            ON ted.id_assignment = ad.id_assignment
-    LEFT JOIN
-        first_hire_per_person AS fh
-            ON fh.id_person = ad.id_person
+        datalake_people.identifier_mapping AS im
+            ON im.id_assignment = ad.id_assignment
     LEFT JOIN
         datalake_people.management_hierarchy AS mh
             ON mh.assignment_number = ad.assignment_number
             AND ad.dt_reference >= mh.dt_valid_from
-            AND ad.dt_reference <= COALESCE(
-                NULLIF(mh.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND ad.dt_reference <= mh.dt_valid_to
     LEFT JOIN
         datalake_pin_core_clean.all_assignments AS all_assign
             ON all_assign.id_assignment = ad.id_assignment
             AND all_assign.assignment_type IN ('E', 'C')
             AND ad.dt_reference >= all_assign.dt_effective_started
-            AND ad.dt_reference <= COALESCE(
-                NULLIF(all_assign.dt_effective_ended, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND ad.dt_reference <= CASE
+                WHEN all_assign.dt_effective_ended >= DATE('4712-12-31')
+                    THEN DATE('9999-12-31')
+                ELSE COALESCE(all_assign.dt_effective_ended, DATE('9999-12-31'))
+            END
     LEFT JOIN
         direct_report_counts AS drc
             ON drc.manager_assignment_number = ad.assignment_number
@@ -464,29 +331,24 @@ assignment_snapshots_ranked AS (
             AND irc.dt_reference = ad.dt_reference
     LEFT JOIN
         datalake_people.job_with_salary_table AS jwst
-            ON jwst.id_job = ca.id_job
+            ON jwst.id_job = all_assign.id_job
             AND ad.dt_reference >= jwst.dt_valid_from
-            AND ad.dt_reference <= COALESCE(
-                NULLIF(jwst.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND ad.dt_reference <= COALESCE(jwst.dt_valid_to, DATE('9999-12-31'))
     LEFT JOIN
         datalake_people.cost_center_history AS cc
-            ON cc.id_organization = ca.id_organization
+            ON cc.id_organization = all_assign.id_organization
             AND ad.dt_reference >= cc.dt_valid_from
-            AND ad.dt_reference <= COALESCE(
-                NULLIF(cc.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND ad.dt_reference <= cc.dt_valid_to
     LEFT JOIN
         datalake_pin_core_clean.people_extra_info AS pei
             ON pei.id_person = ad.id_person
             AND pei.information_type = 'Contatos de Emergência'
             AND ad.dt_reference >= pei.dt_effective_started
-            AND ad.dt_reference <= COALESCE(
-                NULLIF(pei.dt_effective_ended, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND ad.dt_reference <= CASE
+                WHEN pei.dt_effective_ended >= DATE('4712-12-31')
+                    THEN DATE('9999-12-31')
+                ELSE COALESCE(pei.dt_effective_ended, DATE('9999-12-31'))
+            END
     LEFT JOIN
         primary_assignment_per_person_day AS pap
             ON pap.id_person = ad.id_person
@@ -529,10 +391,9 @@ SELECT
     count_indirect_report,
     count_total_report,
     is_manager,
-    is_member_lt,
-    is_member_et,
+    is_leadership_team_member,
+    is_executive_team_member,
     is_active,
-    is_terminated,
     has_emergency_contact,
     is_internal_transfer,
     is_future_hire,
@@ -543,8 +404,9 @@ SELECT
     dt_original_hire,
     dt_hired,
     dt_terminated,
-    dt_notified,
+    dt_notified_termination,
     dt_reference,
+    dt_month_reference,
     ts_load
 FROM
     assignment_snapshots_ranked

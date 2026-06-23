@@ -14,7 +14,7 @@ SELECT
     LOWER(es.address_state) AS estado,
     LOWER(es.address_city) AS cidade,
     CASE
-        WHEN es.is_member_lt IS TRUE THEN 1
+        WHEN es.is_leadership_team_member IS TRUE THEN 1
         ELSE 0
     END AS fl_lt,
     es.dt_hired AS dt_inicio,
@@ -29,7 +29,7 @@ LEFT JOIN
     dw_organization.dim_business_unit AS bu
         ON bu.sk_business_unit = es.sk_business_unit
 WHERE
-    es.dt_reference = CURRENT_DATE()
+    es.is_current = TRUE
     AND es.is_primary_assignment_for_snapshot = TRUE
     AND LOWER(es.status) = 'active'
     AND CAST(es.band AS INT) >= 10

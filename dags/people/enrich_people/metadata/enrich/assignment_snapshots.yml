@@ -3,9 +3,15 @@ table_name: assignment_snapshots
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Work assignments as of each calendar day: identifiers, manager and hierarchy context, tenure metrics, report counts, LT/ET and manager flags, lifecycle dates, and surrogate keys for job, cost center, and management hierarchy effective on that date.
-  dt_original_hire is the earliest observed assignment start per person and is meant for company-level tenure only, not as the legal hire date of a specific assignment.
-  Enrich snapshot table: one row per id_assignment and dt_reference (assignment state on that calendar day, not an SCD dimension). Only assignment types E and C are included (not pending-worker type P); use is_future_hire where pre-start rows must be excluded for dt_reference.
+  Daily snapshot of all active and historical employment assignments. Grain: one row per id_assignment × dt_reference (each calendar day from hire to termination or today, whichever is earlier). Only assignment types E (employee) and C (contingent) are included.
+
+  Data modeling patterns:
+  - Current state: filter is_current = TRUE to get the latest available row per assignment — active assignments use today's date; terminated ones use the termination date. Exactly one row per assignment is flagged.
+  - Monthly analysis: filter is_monthly_snapshot = TRUE and join/group by dt_month_reference (last calendar day of the reference month). Gives one row per assignment per closed month, plus a partial snapshot for the current in-progress month.
+  - Historical point-in-time: filter by a specific dt_reference value to reconstruct the workforce as it stood on any past calendar day.
+
+  All job, org, and hierarchy attributes are time-valid: they reflect the state on dt_reference, not the current value. dt_original_hire is the earliest hire date within the current continuous employment cycle and is intended for tenure calculations only.
+
 columns:
   id_assignment:
     description: Unique identifier for the work assignment.
@@ -142,11 +148,11 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.ass_attribute14
       - datalake_people.management_hierarchy.assignment_number_l0
-  is_member_lt:
+  is_leadership_team_member:
     description: True when the employee is in the Leadership Team (band 10+ or EXEC). Used for DE&I analytics.
     lineage:
       - datalake_people.job_with_salary_table.band
-  is_member_et:
+  is_executive_team_member:
     description: True when the employee is in the Executive Team (L0 or L1 in hierarchy and band 14+).
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l0
@@ -156,10 +162,6 @@ columns:
     description: True when the employee is currently active in this assignment.
     lineage:
       - datalake_pin_core_clean.all_assignments.assignment_status_type
-  is_terminated:
-    description: True when the assignment has ended.
-    lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   has_emergency_contact:
     description: True when the employee has at least one emergency contact on file for this date.
     lineage:
@@ -199,12 +201,16 @@ columns:
     description: Date the assignment ended. Shows 9999-12-31 when still active.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
-  dt_notified:
+  dt_notified_termination:
     description: Date when the termination was notified. Shows 9999-12-31 when still active.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_notified_termination
   dt_reference:
     description: Snapshot date.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_month_reference:
+    description: Last calendar day of the snapshot month (LAST_DAY of dt_reference). Use when joining or grouping monthly snapshots.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
   ts_load:

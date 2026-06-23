@@ -5,14 +5,12 @@ SELECT
     LOWER(es.work_email) AS email,
     es.band AS banda,
     CASE
-        WHEN es.is_member_lt IS TRUE THEN 1
+        WHEN es.is_leadership_team_member IS TRUE THEN 1
         ELSE 0
     END AS flag_LT,
     es.dt_hired AS dt_inicio,
     CASE
-        -- Legacy base_comms: 7-day new-hire window measured from D-1 (snapshot batch date).
-        -- DATE_SUB(dt_reference, 1) then 7 days back equals DATE_SUB(CURRENT_DATE(), 8) here.
-        WHEN es.dt_hired > DATE_SUB(DATE_SUB(es.dt_reference, 1), 7) THEN 1
+        WHEN es.dt_hired > DATE_SUB(CURRENT_DATE(), 8) THEN 1
         ELSE 0
     END AS `fl_new_hire (ult 7 dias)`,
     es.manager_name AS gestor,
@@ -57,7 +55,7 @@ LEFT JOIN
     dw_organization.dim_business_unit AS bu
         ON bu.sk_business_unit = es.sk_business_unit
 WHERE
-    es.dt_reference = CURRENT_DATE()
+    es.is_current = TRUE
     AND es.is_primary_assignment_for_snapshot = TRUE
     AND LOWER(es.status) = 'active'
 ORDER BY

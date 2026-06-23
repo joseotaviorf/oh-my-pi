@@ -872,23 +872,17 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_manager
 
-  is_member_lt:
-    description: Snapshot attribute for is_member_lt on the employee_snapshots wide metric table.
+  is_leadership_team_member:
+    description: Snapshot attribute for is_leadership_team_member on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_member_lt
+      - dw_employee_details.fact_assignment_snapshots.is_leadership_team_member
 
-  is_member_et:
-    description: Snapshot attribute for is_member_et on the employee_snapshots wide metric table.
+  is_executive_team_member:
+    description: Snapshot attribute for is_executive_team_member on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_member_et
-
-  is_terminated:
-    description: Snapshot attribute for is_terminated on the employee_snapshots wide metric table.
-    dimension: True
-    lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_terminated
+      - dw_employee_details.fact_assignment_snapshots.is_executive_team_member
 
   has_emergency_contact:
     description: Snapshot attribute for has_emergency_contact on the employee_snapshots wide metric table.
@@ -921,10 +915,10 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.is_current
 
   dt_reference:
-    description: Snapshot attribute for dt_reference on the employee_snapshots wide metric table.
+    description: Last calendar day of the snapshot month. Active employees show the month-end of today's month; terminated employees show the month-end of their termination month.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.dt_reference
+      - dw_employee_details.fact_assignment_snapshots.dt_month_reference
 
   dt_birth:
     description: Snapshot attribute for dt_birth on the employee_snapshots wide metric table.
@@ -950,11 +944,11 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_original_hire
 
-  dt_notified:
-    description: Snapshot attribute for dt_notified on the employee_snapshots wide metric table.
+  dt_notified_termination:
+    description: Snapshot attribute for dt_notified_termination on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.dt_notified
+      - dw_employee_details.fact_assignment_snapshots.dt_notified_termination
 
   dt_last_raise:
     description: Snapshot attribute for dt_last_raise on the employee_snapshots wide metric table.

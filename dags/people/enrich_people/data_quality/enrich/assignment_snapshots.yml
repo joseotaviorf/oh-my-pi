@@ -11,16 +11,6 @@ column_level_validations:
   id_assignment:
     is_complete:
       severity_level: Error
-    custom:
-      # Grain uniqueness: one row per (id_assignment, dt_reference)
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-          SELECT id_assignment, dt_reference
-          FROM datalake_people.assignment_snapshots
-          GROUP BY id_assignment, dt_reference
-          HAVING COUNT(*) > 1
-        )) = 0
-      severity_level: Error
   dt_reference:
     is_complete:
       severity_level: Error
@@ -33,9 +23,24 @@ column_level_validations:
   dt_hired:
     is_complete:
       severity_level: Error
-  count_direct_report:
+  ts_load:
+    is_complete:
+      severity_level: Warning
+  grain_uniqueness_per_assignment_per_day:
     custom:
-      # Top-of-hierarchy reports (L0 / no manager) must equal total employees per dt_reference (excluding is_future_hire).
+      # Grain: one row per (id_assignment, dt_reference). Duplicates indicate a broken dedup in the final ROW_NUMBER step.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_assignment, dt_reference
+          FROM datalake_people.assignment_snapshots
+          GROUP BY id_assignment, dt_reference
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  ceo_total_report_count_matches_assignment_count:
+    custom:
+      # Top-of-hierarchy assignments (L0 / no manager) must report as many people as there are active assignments per dt_reference.
+      # A mismatch signals that report counts are under-counted or that hierarchy rows are missing.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT dt_reference
@@ -57,9 +62,10 @@ column_level_validations:
             )
         )) = 0
       severity_level: Error
-  is_current:
+  one_current_snapshot_per_assignment:
     custom:
-      # Exactly one current snapshot per assignment_number (latest day for active; termination date for terminated).
+      # Every assignment_number must have exactly one is_current row — the latest day for active assignments,
+      # the termination date for terminated ones. More or fewer signals a broken series-end or dedup logic.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT assignment_number
@@ -68,6 +74,17 @@ column_level_validations:
           HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) != 1
         )) = 0
       severity_level: Error
-  ts_load:
-    is_complete:
-      severity_level: Warning
+  terminated_monthly_snapshot_in_termination_month:
+    custom:
+      # For terminated assignments, the is_current row (the termination day) must fall within the
+      # same calendar month as dt_terminated. A mismatch means dt_month_reference is misaligned
+      # with the actual termination month, breaking monthly headcount snapshots.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT assignment_number
+          FROM datalake_people.assignment_snapshots
+          WHERE is_current = TRUE
+            AND dt_terminated < DATE('9999-12-31')
+            AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
+        )) = 0
+      severity_level: Error

@@ -111,14 +111,14 @@ columns:
     description: Total number of reports (direct + indirect) under this assignment. Zero when no reports exist.
     lineage:
       - datalake_people.assignment_snapshots.count_total_report
-  is_member_lt:
+  is_leadership_team_member:
     description: True when the employee is in the Leadership Team (band 10+ or EXEC). Used for DE&I analytics.
     lineage:
-      - datalake_people.assignment_snapshots.is_member_lt
-  is_member_et:
+      - datalake_people.assignment_snapshots.is_leadership_team_member
+  is_executive_team_member:
     description: True when the employee is in the Executive Team (L0 or L1 in hierarchy and band 14+).
     lineage:
-      - datalake_people.assignment_snapshots.is_member_et
+      - datalake_people.assignment_snapshots.is_executive_team_member
   is_manager:
     description: True when the employee has leadership career track or has at least one direct report.
     lineage:
@@ -127,10 +127,6 @@ columns:
     description: True when the employee is currently active in this assignment.
     lineage:
       - datalake_people.assignment_snapshots.is_active
-  is_terminated:
-    description: True when the assignment has ended (employee left or was transferred out).
-    lineage:
-      - datalake_people.assignment_snapshots.is_terminated
   has_emergency_contact:
     description: True when the employee has at least one emergency contact on file.
     lineage:
@@ -167,13 +163,17 @@ columns:
     description: Date the assignment ended. Shows 9999-12-31 when still active (no end date yet).
     lineage:
       - datalake_people.assignment_snapshots.dt_terminated
-  dt_notified:
+  dt_notified_termination:
     description: Date when the termination was notified to HR. Shows 9999-12-31 when still active.
     lineage:
-      - datalake_people.assignment_snapshots.dt_notified
+      - datalake_people.assignment_snapshots.dt_notified_termination
   dt_reference:
     description: Snapshot date. Each row represents the employee's status on this date. Use for headcount by date.
     lineage:
       - datalake_people.assignment_snapshots.dt_reference
+  dt_month_reference:
+    description: Last calendar day of the snapshot month (LAST_DAY of dt_reference). Use when joining or grouping monthly snapshots — active employees show the month-end of today's month; terminated employees show the month-end of their termination month.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_month_reference
   ts_load:
     description: When the record was loaded. For technical use only.

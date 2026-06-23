@@ -142,9 +142,8 @@ SELECT
     -- Workforce metrics
     fact.days_tenure_in_company,
     fact.is_manager,
-    fact.is_member_lt,
-    fact.is_active,
-    fact.is_terminated
+    fact.is_leadership_team_member,
+    fact.is_active
 FROM
     dw_employee_details.fact_assignment_snapshots AS fact
 INNER JOIN
@@ -188,7 +187,7 @@ INNER JOIN
     ON fact.sk_hierarchy_version = hier.sk_hierarchy_version
 WHERE
     fact.is_current = TRUE
-    AND fact.is_terminated = TRUE
+    AND NOT fact.is_active
     AND YEAR(fact.dt_terminated) = 2026
     AND evt.reason_name = '<voluntary_reason_label>'
     AND (
