@@ -4,37 +4,55 @@ domain: Growth
 columns:
   business:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.business
+    - datalake_gsheets_raw.forecast_supply_daily.business
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   year_month:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.year_month
+    - datalake_gsheets_raw.forecast_supply_daily.year_month
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   region:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.region
+    - datalake_gsheets_raw.forecast_supply_daily.region
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_conversion:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.planning_conversion
+    - datalake_gsheets_raw.forecast_supply_daily.planning_conversion
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_operation:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.planning_operation
+    - datalake_gsheets_raw.forecast_supply_daily.planning_operation
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_cluster_adj:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.planning_cluster_adj
+    - datalake_gsheets_raw.forecast_supply_daily.planning_cluster_adj
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   company_report_origin:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.company_report_origin
+    - datalake_gsheets_raw.forecast_supply_daily.company_report_origin
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   prospects:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.p
+    - datalake_gsheets_raw.forecast_supply_daily.p
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.q
+    - datalake_gsheets_raw.forecast_supply_daily.q
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   available_qualifieds:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.aq
+    - datalake_gsheets_raw.forecast_supply_daily.aq
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   opportunities:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.o
+    - datalake_gsheets_raw.forecast_supply_daily.o
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   first_listings:
     lineage:
-      - datalake_gsheets_raw.forecast_supply_daily.fl
+    - datalake_gsheets_raw.forecast_supply_daily.fl
+    description: Attribute sourced from the `forecast_supply_daily` reference sheet and consumed by Growth analytics pipelines.
+  date:
+    lineage:
+    - datalake_gsheets_raw.forecast_supply_daily.date
+    description: Calendar date of the daily supply forecast row in the planning sheet.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `forecast_supply_daily` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

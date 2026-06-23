@@ -1,80 +1,78 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: marketing_name_convention_shared_costs
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table extracted from Gsheets where Growth teams define Manual Costs specifing using a name convention share rule. This table is used when there is a share rule that can be applied to share costs between city groups. 
+description: Table extracted from Gsheets where Growth teams define Manual Costs specifing using a name convention share rule. This table is used when there is a share rule that can be applied to share costs between city groups.
 columns:
   id_rule:
     description: Id rule used to share cost between cities
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.rule_id
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.rule_id
   side:
     description: Side/squad intern team owner of that campaing cost
-    categories: 
-      demand: '' 
+    categories:
+      demand: ''
       supply: ''
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.side
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.side
   account_name:
     description: Account name of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.account_name
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.account_name
   campaign_name:
     description: Campagin name of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.campaign_name
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.campaign_name
   ad_group_name:
     description: Ad group name of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.ad_group_name
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.ad_group_name
   utm_term:
     description: utm_term of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.utm_term
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.utm_term
   utm_content:
     description: utm_content of Marketing Ads Platform where cost should be attributed
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.utm_content
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.utm_content
   mkt_business:
     description: Business context of cost allocation
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_business
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_business
   mkt_origin:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_origin
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_origin
   mkt_channel:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_channel
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_channel
   mkt_medium:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_medium
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_medium
   mkt_source:
     description: Level of Growth Taxonomy
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_source
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.mkt_source
   cost:
     description: Manual cost attributed for each segmentation
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost
   cost_share_mobile:
     description: Cost share for mobile platforms
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost_share_mobile
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost_share_mobile
   cost_share_desktop:
     description: Cost share for desktop platforms
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost_share_desktop
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost_share_desktop
   cost_share_other:
     description: Cost share for other platforms
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost_share_other
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.cost_share_other
   dt_cost:
     description: Date segmentation
     lineage:
-      - datalake_gsheets_raw.marketing_name_convention_shared_costs.dt
-  ts_load: 
-    description: Timestamp of loaded data
+    - datalake_gsheets_raw.marketing_name_convention_shared_costs.dt

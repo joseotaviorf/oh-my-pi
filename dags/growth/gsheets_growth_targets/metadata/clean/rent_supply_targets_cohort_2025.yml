@@ -4,40 +4,55 @@ domain: Growth
 columns:
   avq2opp:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.avq2opp
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.avq2opp
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.city_group
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.city_group
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   company_report_origin:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.company_report_origin
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.company_report_origin
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   fl:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.fl
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.fl
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   op2q:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.op2q
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.op2q
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   opp2fl:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.opp2fl
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.opp2fl
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   planning_cluster:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.planning_cluster
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.planning_cluster
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   planning_conversion:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.planning_conversion
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.planning_conversion
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   planning_operation:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.planning_operation
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.planning_operation
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   q2avq:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.q2avq
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.q2avq
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   q2opp:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.q2opp
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.q2opp
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   week_start:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.week_start
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.week_start
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
   weeks_conversion:
     lineage:
-      - datalake_gsheets_raw.rent_supply_targets_cohort_2025.weeks_conversion
+    - datalake_gsheets_raw.rent_supply_targets_cohort_2025.weeks_conversion
+    description: Attribute sourced from the `rent_supply_targets_cohort_2025` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rent_supply_targets_cohort_2025` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

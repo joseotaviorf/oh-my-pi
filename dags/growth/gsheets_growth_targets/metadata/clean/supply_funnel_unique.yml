@@ -1,120 +1,146 @@
 database_name: datalake_gsheets_clean
 table_name: supply_funnel_unique
-description: "Supply Funnel Unique For Rent and For Sale"
+description: Supply Funnel Unique For Rent and For Sale
 domain: Growth
-owner: gustavo.geiger@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   city_group:
-    description: |
-      Grouping of cities for planning and analysis purposes
+    description: 'Grouping of cities for planning and analysis purposes
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.city_group
+    - datalake_gsheets_raw.supply_funnel_unique.city_group
   planning_conversion:
-    description: |
-      Planning metric for conversion rates in the supply funnel.
+    description: 'Planning metric for conversion rates in the supply funnel.
+
       It can be, for example, IS, CIQ, CaptaAí, FSS, etc.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.planning_conversion
+    - datalake_gsheets_raw.supply_funnel_unique.planning_conversion
   planning_operation:
-    description: |
-      Operational planning category or segment.
+    description: 'Operational planning category or segment.
+
       It can be, for example, Outbound, CIQ, CaptaAí, Inbound, etc.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.planning_operation
+    - datalake_gsheets_raw.supply_funnel_unique.planning_operation
   planning_cluster:
-    description: |
-      Planning cluster classification for strategic grouping.
+    description: 'Planning cluster classification for strategic grouping.
+
       It can be, for example, Backend, CIQ, CaptaAí, PP Multi, etc.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.planning_cluster
+    - datalake_gsheets_raw.supply_funnel_unique.planning_cluster
   company_report_origin:
-    description: |
-      Source or origin of the company report data.
+    description: 'Source or origin of the company report data.
+
       It can be, for example, Backend, CIQ, CaptaAí, PP Multi, etc.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.company_report_origin
+    - datalake_gsheets_raw.supply_funnel_unique.company_report_origin
   prospects_fr:
-    description: |
-      Metric related to prospects in the For Rent (FR) funnel.
+    description: 'Metric related to prospects in the For Rent (FR) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.prospects_fr
+    - datalake_gsheets_raw.supply_funnel_unique.prospects_fr
   qualifieds_fr:
-    description: |
-      Metric related to qualified prospects in the For Rent (FR) funnel.
+    description: 'Metric related to qualified prospects in the For Rent (FR) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.qualifieds_fr
+    - datalake_gsheets_raw.supply_funnel_unique.qualifieds_fr
   available_qualifieds_fr:
-    description: |
-      Metric related to available qualified prospects in the For Rent (FR) funnel.
+    description: 'Metric related to available qualified prospects in the For Rent (FR) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.available_qualifieds_fr
+    - datalake_gsheets_raw.supply_funnel_unique.available_qualifieds_fr
   opportunities_fr:
-    description: |
-      Metric related to opportunities in the For Rent (FR) funnel.
+    description: 'Metric related to opportunities in the For Rent (FR) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.opportunities_fr
+    - datalake_gsheets_raw.supply_funnel_unique.opportunities_fr
   first_listings_fr:
-    description: |
-      Metric related to first listings created in the For Rent (FR) funnel.
+    description: 'Metric related to first listings created in the For Rent (FR) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.first_listings_fr
+    - datalake_gsheets_raw.supply_funnel_unique.first_listings_fr
   prospects_fs:
-    description: |
-      Metric related to prospects in the For Sale (FS) funnel.
+    description: 'Metric related to prospects in the For Sale (FS) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.prospects_fs
+    - datalake_gsheets_raw.supply_funnel_unique.prospects_fs
   qualifieds_fs:
-    description: |
-      Metric related to qualified prospects in the For Sale (FS) funnel.
+    description: 'Metric related to qualified prospects in the For Sale (FS) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.qualifieds_fs
+    - datalake_gsheets_raw.supply_funnel_unique.qualifieds_fs
   available_qualifieds_fs:
-    description: |
-      Metric related to available qualified prospects in the For Sale (FS) funnel.
+    description: 'Metric related to available qualified prospects in the For Sale (FS) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.available_qualifieds_fs
+    - datalake_gsheets_raw.supply_funnel_unique.available_qualifieds_fs
   opportunities_fs:
-    description: |
-      Metric related to opportunities in the For Sale (FS) funnel.
+    description: 'Metric related to opportunities in the For Sale (FS) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.opportunities_fs
+    - datalake_gsheets_raw.supply_funnel_unique.opportunities_fs
   first_listings_fs:
-    description: |
-      Metric related to first listings created in the For Sale (FS) funnel.
+    description: 'Metric related to first listings created in the For Sale (FS) funnel.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.first_listings_fs
+    - datalake_gsheets_raw.supply_funnel_unique.first_listings_fs
   volume_prospects_unique:
-    description: |
-      Metric related to unique volume of prospects across both For Rent and For Sale funnels.
+    description: 'Metric related to unique volume of prospects across both For Rent and For Sale funnels.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.volume_prospects_unique
+    - datalake_gsheets_raw.supply_funnel_unique.volume_prospects_unique
   volume_qualifieds_unique:
-    description: |
-      Metric related to unique volume of qualified prospects across both funnels.
+    description: 'Metric related to unique volume of qualified prospects across both funnels.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.volume_qualifieds_unique
+    - datalake_gsheets_raw.supply_funnel_unique.volume_qualifieds_unique
   volume_available_qualifieds_unique:
-    description: |
-      Metric related to unique volume of available qualified prospects across both funnels.
+    description: 'Metric related to unique volume of available qualified prospects across both funnels.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.volume_available_qualifieds_unique
+    - datalake_gsheets_raw.supply_funnel_unique.volume_available_qualifieds_unique
   volume_opportunities_unique:
-    description: |
-      Metric related to unique volume of opportunities across both funnels.
+    description: 'Metric related to unique volume of opportunities across both funnels.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.volume_opportunities_unique
+    - datalake_gsheets_raw.supply_funnel_unique.volume_opportunities_unique
   volume_first_listings_unique:
-    description: |
-      Metric related to unique volume of first listings across both funnels.
+    description: 'Metric related to unique volume of first listings across both funnels.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.volume_first_listings_unique
+    - datalake_gsheets_raw.supply_funnel_unique.volume_first_listings_unique
   year_month_date:
-    description: |
-      Year and month date dimension for temporal analysis.
+    description: 'Year and month date dimension for temporal analysis.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.year_month
+    - datalake_gsheets_raw.supply_funnel_unique.year_month
   date:
-    description: |
-      Full date field for detailed temporal tracking.
+    description: 'Full date field for detailed temporal tracking.
+
+      '
     lineage:
-      - datalake_gsheets_raw.supply_funnel_unique.date
+    - datalake_gsheets_raw.supply_funnel_unique.date

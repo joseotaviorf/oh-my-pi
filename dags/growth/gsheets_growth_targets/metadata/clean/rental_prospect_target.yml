@@ -4,31 +4,43 @@ domain: Growth
 columns:
   behavior_type:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.behavior_type
+    - datalake_gsheets_raw.rental_prospect_target.behavior_type
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   campaign_strategy_intent:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.campaign_strategy_intent
+    - datalake_gsheets_raw.rental_prospect_target.campaign_strategy_intent
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.city_group
+    - datalake_gsheets_raw.rental_prospect_target.city_group
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   date:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.date
+    - datalake_gsheets_raw.rental_prospect_target.date
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   funnel_side:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.funnel_side
+    - datalake_gsheets_raw.rental_prospect_target.funnel_side
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   medium:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.medium
+    - datalake_gsheets_raw.rental_prospect_target.medium
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   ntp:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.ntp
+    - datalake_gsheets_raw.rental_prospect_target.ntp
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   operation_channel:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.operation_channel
+    - datalake_gsheets_raw.rental_prospect_target.operation_channel
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   referral_type:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.referral_type
+    - datalake_gsheets_raw.rental_prospect_target.referral_type
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
   rtp:
     lineage:
-      - datalake_gsheets_raw.rental_prospect_target.rtp
+    - datalake_gsheets_raw.rental_prospect_target.rtp
+    description: Attribute sourced from the `rental_prospect_target` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rental_prospect_target` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,25 +4,35 @@ domain: Growth
 columns:
   behavior_type:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.behavior_type
+    - datalake_gsheets_raw.rental_tof_monthly_target.behavior_type
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   campaign_strategy_intent:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.campaign_strategy_intent
+    - datalake_gsheets_raw.rental_tof_monthly_target.campaign_strategy_intent
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.city_group
+    - datalake_gsheets_raw.rental_tof_monthly_target.city_group
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   month_start:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.month_start
+    - datalake_gsheets_raw.rental_tof_monthly_target.month_start
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   funnel_side:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.funnel_side
+    - datalake_gsheets_raw.rental_tof_monthly_target.funnel_side
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   medium:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.medium
+    - datalake_gsheets_raw.rental_tof_monthly_target.medium
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   tof_events:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.tof_events
+    - datalake_gsheets_raw.rental_tof_monthly_target.tof_events
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
   tof_users:
     lineage:
-      - datalake_gsheets_raw.rental_tof_monthly_target.tof_users
+    - datalake_gsheets_raw.rental_tof_monthly_target.tof_users
+    description: Attribute sourced from the `rental_tof_monthly_target` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rental_tof_monthly_target` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

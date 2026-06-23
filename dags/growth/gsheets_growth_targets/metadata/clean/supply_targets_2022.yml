@@ -5,52 +5,71 @@ domain: Growth
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.city_group
+    - datalake_gsheets_raw.supply_targets_2022.city_group
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   first_listings:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.first_listings
+    - datalake_gsheets_raw.supply_targets_2022.first_listings
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   lead_context:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.lead_context
+    - datalake_gsheets_raw.supply_targets_2022.lead_context
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   opportunities:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.opportunities
+    - datalake_gsheets_raw.supply_targets_2022.opportunities
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   prospects:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.prospects
+    - datalake_gsheets_raw.supply_targets_2022.prospects
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.qualifieds
+    - datalake_gsheets_raw.supply_targets_2022.qualifieds
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   available_qualifieds:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.available_qualifieds
+    - datalake_gsheets_raw.supply_targets_2022.available_qualifieds
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   supply_channel:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.supply_channel
+    - datalake_gsheets_raw.supply_targets_2022.supply_channel
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   supply_origin:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.supply_origin
+    - datalake_gsheets_raw.supply_targets_2022.supply_origin
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   canal_planning:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.canal_planning
+    - datalake_gsheets_raw.supply_targets_2022.canal_planning
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   tier:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.tier
+    - datalake_gsheets_raw.supply_targets_2022.tier
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.halfyear
+    - datalake_gsheets_raw.supply_targets_2022.halfyear
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   quarter:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.quarter
+    - datalake_gsheets_raw.supply_targets_2022.quarter
+    description: Attribute sourced from the `supply_targets_2022` reference sheet and consumed by Growth analytics pipelines.
   month:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.month
+    - datalake_gsheets_raw.supply_targets_2022.month
+    description: Hive partition column (month) for incremental reads; combine with business date filters when querying historical snapshots.
   year:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.year
+    - datalake_gsheets_raw.supply_targets_2022.year
+    description: Hive partition column (year) for incremental reads; combine with business date filters when querying historical snapshots.
   dt_week_started:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.week_start
+    - datalake_gsheets_raw.supply_targets_2022.week_start
+    description: Calendar date associated with the metric, target, or event represented in this row.
   dt_target:
     lineage:
-      - datalake_gsheets_raw.supply_targets_2022.date
+    - datalake_gsheets_raw.supply_targets_2022.date
+    description: Calendar date associated with the metric, target, or event represented in this row.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `supply_targets_2022` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

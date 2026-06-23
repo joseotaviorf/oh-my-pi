@@ -4,62 +4,64 @@ table_name: supply_targets_2024
 domain: Growth
 columns:
   dt_target:
-    description: Date of the target.
+    description: Calendar date associated with the metric, target, or event represented in this row.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.date
+    - datalake_gsheets_raw.supply_targets_2024.date
   city_group:
-    description: City group.
+    description: Attribute sourced from the `supply_targets_2024` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.city_group
+    - datalake_gsheets_raw.supply_targets_2024.city_group
   lead_processing_operation:
     description: Operation that processed the listing lead.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.lead_processing_operation
+    - datalake_gsheets_raw.supply_targets_2024.lead_processing_operation
   supply_mkt_origin_detailed:
     description: Market origin of the lead.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.supply_mkt_origin_detailed
+    - datalake_gsheets_raw.supply_targets_2024.supply_mkt_origin_detailed
   planning_taxonomy:
     description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.planning_taxonomy
+    - datalake_gsheets_raw.supply_targets_2024.planning_taxonomy
   rental_administrator:
     description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.rental_administrator
+    - datalake_gsheets_raw.supply_targets_2024.rental_administrator
   planning_conversion:
     description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.planning_conversion
+    - datalake_gsheets_raw.supply_targets_2024.planning_conversion
   planning_operation:
     description: Identifies the conversion operation type.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.planning_operation
+    - datalake_gsheets_raw.supply_targets_2024.planning_operation
   planning_cluster:
     description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.planning_cluster
+    - datalake_gsheets_raw.supply_targets_2024.planning_cluster
   company_report_origin:
     description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.company_report_origin
+    - datalake_gsheets_raw.supply_targets_2024.company_report_origin
   first_listings:
     description: Target volume of first listings.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.first_listings
+    - datalake_gsheets_raw.supply_targets_2024.first_listings
   opportunities:
     description: Target volume of opportunities.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.opportunities
+    - datalake_gsheets_raw.supply_targets_2024.opportunities
   prospects:
     description: Target volume of prospects.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.prospects
+    - datalake_gsheets_raw.supply_targets_2024.prospects
   qualifieds:
     description: Target volume of qualifieds.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.qualifieds
+    - datalake_gsheets_raw.supply_targets_2024.qualifieds
   available_qualifieds:
     description: Target volume of available qualifieds.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024.available_qualifieds
+    - datalake_gsheets_raw.supply_targets_2024.available_qualifieds
+owner: gabriel.salla@quintoandar.com
+description: Reference table `supply_targets_2024` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

@@ -4,34 +4,47 @@ domain: Growth
 columns:
   available_qualifieds:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.available_qualifieds
+    - datalake_gsheets_raw.rent_supply_budget_2025.available_qualifieds
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.city_group
+    - datalake_gsheets_raw.rent_supply_budget_2025.city_group
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   company_report_origin:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.company_report_origin
+    - datalake_gsheets_raw.rent_supply_budget_2025.company_report_origin
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   date:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.date
+    - datalake_gsheets_raw.rent_supply_budget_2025.date
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   first_listings:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.first_listings
+    - datalake_gsheets_raw.rent_supply_budget_2025.first_listings
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   opportunities:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.opportunities
+    - datalake_gsheets_raw.rent_supply_budget_2025.opportunities
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   planning_cluster:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.planning_cluster
+    - datalake_gsheets_raw.rent_supply_budget_2025.planning_cluster
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   planning_conversion:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.planning_conversion
+    - datalake_gsheets_raw.rent_supply_budget_2025.planning_conversion
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   planning_operation:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.planning_operation
+    - datalake_gsheets_raw.rent_supply_budget_2025.planning_operation
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   prospects:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.prospects
+    - datalake_gsheets_raw.rent_supply_budget_2025.prospects
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.rent_supply_budget_2025.qualifieds
+    - datalake_gsheets_raw.rent_supply_budget_2025.qualifieds
+    description: Attribute sourced from the `rent_supply_budget_2025` reference sheet and consumed by Growth analytics pipelines.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `rent_supply_budget_2025` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

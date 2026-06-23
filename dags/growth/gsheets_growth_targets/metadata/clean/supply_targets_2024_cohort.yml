@@ -4,70 +4,72 @@ table_name: supply_targets_2024_cohort
 domain: Growth
 columns:
   dt_week_started:
-    description: Week of the target.
+    description: Calendar date associated with the metric, target, or event represented in this row.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.week_start
+    - datalake_gsheets_raw.supply_targets_2024_cohort.week_start
   city_group:
-    description: City group.
+    description: Attribute sourced from the `supply_targets_2024_cohort` reference sheet and consumed by Growth analytics pipelines.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.city_group
+    - datalake_gsheets_raw.supply_targets_2024_cohort.city_group
   lead_processing_operation:
     description: Operation that processed the listing lead.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.lead_processing_operation
+    - datalake_gsheets_raw.supply_targets_2024_cohort.lead_processing_operation
   supply_mkt_origin_detailed:
     description: Market origin of the listing lead.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.supply_mkt_origin_detailed
+    - datalake_gsheets_raw.supply_targets_2024_cohort.supply_mkt_origin_detailed
   planning_taxonomy:
     description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.planning_taxonomy
+    - datalake_gsheets_raw.supply_targets_2024_cohort.planning_taxonomy
   rental_administrator:
     description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.rental_administrator
+    - datalake_gsheets_raw.supply_targets_2024_cohort.rental_administrator
   planning_conversion:
     description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.planning_conversion
+    - datalake_gsheets_raw.supply_targets_2024_cohort.planning_conversion
   planning_operation:
     description: Identifies the conversion operation type.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.planning_operation
+    - datalake_gsheets_raw.supply_targets_2024_cohort.planning_operation
   planning_cluster:
     description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.planning_cluster
+    - datalake_gsheets_raw.supply_targets_2024_cohort.planning_cluster
   company_report_origin:
     description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.company_report_origin
+    - datalake_gsheets_raw.supply_targets_2024_cohort.company_report_origin
   weeks_conversion:
     description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.weeks_conversion
+    - datalake_gsheets_raw.supply_targets_2024_cohort.weeks_conversion
   op2q:
     description: Target volume of owner prospects that converted into a qualified in the cohort.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.op2q
+    - datalake_gsheets_raw.supply_targets_2024_cohort.op2q
   q2opp:
     description: Target volume of qualifieds that converted into an opportunity in the cohort.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.q2opp
+    - datalake_gsheets_raw.supply_targets_2024_cohort.q2opp
   opp2fl:
     description: Target volume of opportunities that converted into a first listing in the cohort.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.opp2fl
+    - datalake_gsheets_raw.supply_targets_2024_cohort.opp2fl
   q2avq:
     description: Target volume of qualifieds that converted into an available qualified in the cohort.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.q2avq
+    - datalake_gsheets_raw.supply_targets_2024_cohort.q2avq
   avq2opp:
     description: Target volume of available qualifieds that converted into an opportunity in the cohort.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.avq2opp
+    - datalake_gsheets_raw.supply_targets_2024_cohort.avq2opp
   fl:
     description: Target volume of first listings.
     lineage:
-      - datalake_gsheets_raw.supply_targets_2024_cohort.fl
+    - datalake_gsheets_raw.supply_targets_2024_cohort.fl
+owner: gabriel.salla@quintoandar.com
+description: Reference table `supply_targets_2024_cohort` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.

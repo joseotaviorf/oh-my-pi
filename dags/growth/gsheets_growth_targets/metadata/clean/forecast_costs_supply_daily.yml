@@ -4,52 +4,71 @@ domain: Growth
 columns:
   business_context:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.business
+    - datalake_gsheets_raw.forecast_costs_supply_daily.business
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   date:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.date
+    - datalake_gsheets_raw.forecast_costs_supply_daily.date
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   year_month:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.year_month
+    - datalake_gsheets_raw.forecast_costs_supply_daily.year_month
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   city_group:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.region
+    - datalake_gsheets_raw.forecast_costs_supply_daily.region
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_conversion:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_conversion
+    - datalake_gsheets_raw.forecast_costs_supply_daily.planning_conversion
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_operation:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_operation
+    - datalake_gsheets_raw.forecast_costs_supply_daily.planning_operation
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_cluster_adj:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_cluster_adj
+    - datalake_gsheets_raw.forecast_costs_supply_daily.planning_cluster_adj
+    description: Segmentation label or cluster bucket assigned for planning and performance tracking.
   funnel_side:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.funnel_side
+    - datalake_gsheets_raw.forecast_costs_supply_daily.funnel_side
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   campaign_strategy_intent:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.campaign_strategy_intent
+    - datalake_gsheets_raw.forecast_costs_supply_daily.campaign_strategy_intent
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   behavior_type:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.behavior_type
+    - datalake_gsheets_raw.forecast_costs_supply_daily.behavior_type
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   medium:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.medium
+    - datalake_gsheets_raw.forecast_costs_supply_daily.medium
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   company_report_origin:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.company_report_origin
+    - datalake_gsheets_raw.forecast_costs_supply_daily.company_report_origin
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   supply_medium:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.supply_medium
+    - datalake_gsheets_raw.forecast_costs_supply_daily.supply_medium
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_mkt_level1:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level1
+    - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level1
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_mkt_level2:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level2
+    - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level2
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   planning_mkt_level3:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level3
+    - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level3
+    description: Attribute sourced from the `forecast_costs_supply_daily` reference sheet and consumed by Growth analytics pipelines.
   cost:
     lineage:
-      - datalake_gsheets_raw.forecast_costs_supply_daily.cost
+    - datalake_gsheets_raw.forecast_costs_supply_daily.cost
+    description: Monetary cost or allocation amount from the marketing or operations reference sheet.
+owner: gabriel.salla@quintoandar.com
+description: Reference table `forecast_costs_supply_daily` produced by the cleaned Google Sheets reference layer; maintained by Growth teams for planning, attribution, or operational reporting.
