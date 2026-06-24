@@ -38,7 +38,7 @@ base AS (
     WHERE
         NOT ei.is_user_test
         AND ei.assignment_type IN ('C', 'E')
-        AND aei.dt_effective_ended = DATE('4712-12-31')
+        AND aei.dt_effective_ended = DATE('9999-12-31')
         AND aei.information_type LIKE 'Saldo de F%'
 )
 SELECT

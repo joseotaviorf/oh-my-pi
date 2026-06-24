@@ -117,11 +117,8 @@ pl_periods AS (
       pl.legal_sex,
       pl.neurodiversity,
       pl.disability_answer,
-      DATE(pl.dt_effective_started) AS dt_period_start,
-      COALESCE(
-        NULLIF(DATE(pl.dt_effective_ended), DATE('4712-12-31')),
-        DATE('9999-12-31')
-      ) AS dt_period_end
+      pl.dt_effective_started AS dt_period_start,
+      pl.dt_effective_ended AS dt_period_end
     FROM
       datalake_pin_core_clean.people_legislative AS pl
     INNER JOIN
@@ -345,11 +342,8 @@ with_medical_disability_record AS (
           d.id_person = n.id_person
           AND d.legislation_code = n.legislation_code
           AND COALESCE(UPPER(d.status), '') = 'A'
-          AND DATE(d.dt_effective_started) <= n.dt_period_end
-          AND COALESCE(
-            NULLIF(DATE(d.dt_effective_ended), DATE('4712-12-31')),
-            DATE('9999-12-31')
-          ) >= n.dt_period_start
+          AND d.dt_effective_started <= n.dt_period_end
+          AND d.dt_effective_ended >= n.dt_period_start
       ) AS has_medical_disability_record
     FROM
       normalized AS n

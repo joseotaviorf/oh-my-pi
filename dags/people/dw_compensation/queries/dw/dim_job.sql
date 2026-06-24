@@ -43,10 +43,7 @@ SELECT
     is_active,
     is_current,
     dt_valid_from,
-    COALESCE(
-        NULLIF(dt_valid_to, DATE('4712-12-31')),
-        DATE('9999-12-31')
-    ) AS dt_valid_to,
+    COALESCE(dt_valid_to, DATE('9999-12-31')) AS dt_valid_to,
     NOW() AS ts_load
 FROM
     datalake_people.job_with_salary_table

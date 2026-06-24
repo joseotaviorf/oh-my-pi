@@ -56,26 +56,17 @@ fact_assignment_snapshots_ranked AS (
         dw_employee_details.dim_contact AS ct
             ON ct.person_number = asn.person_number
             AND asn.dt_reference >= ct.dt_valid_from
-            AND asn.dt_reference <= COALESCE(
-                NULLIF(ct.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND asn.dt_reference <= ct.dt_valid_to
     LEFT JOIN
         dw_employee_details.dim_documentation AS doc
             ON doc.person_number = asn.person_number
             AND asn.dt_reference >= doc.dt_valid_from
-            AND asn.dt_reference <= COALESCE(
-                NULLIF(doc.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND asn.dt_reference <= doc.dt_valid_to
     LEFT JOIN
         dw_employee_details.dim_emergency_contact AS ec
             ON ec.person_number = asn.person_number
             AND asn.dt_reference >= ec.dt_valid_from
-            AND ec.dt_reference <= COALESCE(
-                NULLIF(ec.dt_valid_to, DATE('4712-12-31')),
-                DATE('9999-12-31')
-            )
+            AND asn.dt_reference <= ec.dt_valid_to
 )
 SELECT
     sk_cost_center_version,

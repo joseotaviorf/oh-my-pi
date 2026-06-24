@@ -36,10 +36,7 @@ SELECT
     mh.email_l9,
     mh.is_current,
     mh.dt_valid_from,
-    COALESCE(
-        NULLIF(mh.dt_valid_to, DATE('4712-12-31')),
-        DATE('9999-12-31')
-    ) AS dt_valid_to,
+    mh.dt_valid_to,
     mh.ts_load
 FROM
     datalake_people.management_hierarchy AS mh

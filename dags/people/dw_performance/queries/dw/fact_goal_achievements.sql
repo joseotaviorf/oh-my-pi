@@ -80,7 +80,7 @@ goal_base AS (
   INNER JOIN
     datalake_pin_core_clean.all_people AS ap
       ON ap.id_person = g.id_person
-        AND ap.dt_effective_ended >= DATE('4712-12-31')
+        AND ap.dt_effective_ended >= DATE('9999-12-31')
   WHERE
     gc.category IN ('kpi', 'project')
 ),

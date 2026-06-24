@@ -12,36 +12,46 @@ subordinates AS (
   GROUP BY
     mh.id_manager_period_of_service
 ),
-current_salaries AS (
-  SELECT 
+current_salaries_ranked AS (
+  SELECT
     s.id_assignment,
     s.currency_code,
-    s.salary_amount
-  FROM 
+    s.salary_amount,
+    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) AS rn
+  FROM
     datalake_pin_compensation_clean.salary AS s
-  WHERE 
+  WHERE
     s.dt_started <= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) = 1
 ),
-valid_salary_adjustments AS (
-  SELECT 
+current_salaries AS (
+  SELECT
+    id_assignment,
+    currency_code,
+    salary_amount
+  FROM
+    current_salaries_ranked
+  WHERE
+    rn = 1
+),
+valid_salary_adjustments_ranked AS (
+  SELECT
     s.id_assignment,
     s.adjustment_amount,
     s.adjustment_percent,
     s.dt_started,
-    art.action_reason AS last_salary_increase_type
-  FROM 
+    art.action_reason AS last_salary_increase_type,
+    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_started DESC) AS rn
+  FROM
     datalake_pin_compensation_clean.salary AS s
   INNER JOIN
     datalake_pin_core_clean.action_base AS ab
       ON ab.id_action = s.id_action
-      AND ab.dt_ended = DATE('4712-12-31')
+      AND ab.dt_ended = DATE('9999-12-31')
   LEFT JOIN
     datalake_pin_core_clean.action_reason_translation AS art
       ON art.id_action_reason = s.id_action_reason
       AND art.language = 'PTB'
-  WHERE 
+  WHERE
     s.dt_started <= DATE('{load_start_date}')
     AND ab.action_code IN ('CHANGE_SALARY', 'PROMOTION', 'GLB_TRANSFER')
     AND (
@@ -49,21 +59,35 @@ valid_salary_adjustments AS (
       OR (s.adjustment_percent IS NOT NULL AND s.adjustment_percent <> 0)
     )
     AND art.action_reason IN ('Mérito', 'Promoção', 'Recrutamento Interno')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_started DESC) = 1
 ),
-current_assignments AS (
-  SELECT 
-    id_period_of_service, 
+valid_salary_adjustments AS (
+  SELECT
+    id_assignment,
+    adjustment_amount,
+    adjustment_percent,
+    dt_started,
+    last_salary_increase_type
+  FROM
+    valid_salary_adjustments_ranked
+  WHERE
+    rn = 1
+),
+current_assignments_ranked AS (
+  SELECT
+    id_period_of_service,
     id_job,
     id_organization,
     id_business_unit,
-    legislation_code, 
+    legislation_code,
     assignment_status_type,
     dt_projected_started,
     target_plr,
-    career_track
-  FROM 
+    career_track,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_period_of_service
+      ORDER BY dt_effective_ended ASC
+    ) AS rn
+  FROM
     datalake_pin_core_clean.all_assignments
   WHERE
     (
@@ -77,18 +101,30 @@ current_assignments AS (
       )
     )
     AND dt_effective_ended >= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY id_period_of_service 
-      ORDER BY dt_effective_ended ASC
-    ) = 1
 ),
-managers AS (
+current_assignments AS (
+  SELECT
+    id_period_of_service,
+    id_job,
+    id_organization,
+    id_business_unit,
+    legislation_code,
+    assignment_status_type,
+    career_track,
+    target_plr,
+    dt_projected_started
+  FROM
+    current_assignments_ranked
+  WHERE
+    rn = 1
+),
+managers_ranked AS (
   SELECT
     ma.id_manager_period_of_service,
     ma.id_assignment,
     ma.id_manager,
-    COALESCE(ed_manager.assignment_status_type = 'ACTIVE', FALSE) AS has_active_manager
+    COALESCE(ed_manager.assignment_status_type = 'ACTIVE', FALSE) AS has_active_manager,
+    ROW_NUMBER() OVER (PARTITION BY ma.id_assignment ORDER BY ma.dt_effective_started DESC) AS rn
   FROM
     datalake_pin.managers_history AS ma
   LEFT JOIN
@@ -96,8 +132,17 @@ managers AS (
       ON ed_manager.id_period_of_service = ma.id_manager_period_of_service
   WHERE
     ma.dt_effective_started <= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ma.id_assignment ORDER BY ma.dt_effective_started DESC) = 1
+),
+managers AS (
+  SELECT
+    id_manager_period_of_service,
+    id_assignment,
+    id_manager,
+    has_active_manager
+  FROM
+    managers_ranked
+  WHERE
+    rn = 1
 )
 SELECT
   im.id_period_of_service AS sk_assignment,
@@ -121,7 +166,7 @@ SELECT
     ORDER BY
       CASE WHEN ed.assignment_type = 'P' THEN 1 ELSE 0 END ASC,
       ps.dt_started DESC NULLS LAST,
-      NULLIF(ps.dt_actual_termination, DATE('4712-12-31')) DESC NULLS FIRST
+      ps.dt_actual_termination DESC NULLS FIRST
   ) = 1 AS is_last_valid_work_relationship,
   IF(ed.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
   IF(ed.assignment_type = 'P', TRUE, FALSE) AS is_pending_worker,

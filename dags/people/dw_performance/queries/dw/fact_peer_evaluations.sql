@@ -5,7 +5,7 @@ WITH current_people AS (
     FROM
         datalake_pin_core_clean.all_people
     WHERE
-        dt_effective_ended >= DATE('4712-12-31')
+        dt_effective_ended >= DATE('9999-12-31')
 ),
 peer_ratings AS (
     SELECT

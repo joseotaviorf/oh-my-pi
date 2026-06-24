@@ -43,5 +43,5 @@ LEFT JOIN
     AND ei.id_period_of_service = v.id_period_of_service
 WHERE
   ei.assignment_type IN ('C', 'E')
-  AND aei.dt_effective_ended = DATE('4712-12-31')
+  AND aei.dt_effective_ended = DATE('9999-12-31')
   AND aei.information_type = 'Saldo de Férias'
