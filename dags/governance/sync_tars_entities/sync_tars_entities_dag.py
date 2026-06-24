@@ -403,7 +403,7 @@ with DAG(
         "the Data Product to DataHub."
     ),
     start_date=pendulum.datetime(2026, 6, 10, tz="America/Sao_Paulo"),
-    schedule="@daily",
+    schedule="*/5 * * * *",
     catchup=False,
     tags=["governance", "datahub", "tars"],
     doc_md="""
