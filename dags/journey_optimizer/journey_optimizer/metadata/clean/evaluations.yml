@@ -7,7 +7,7 @@ description: >
   Column names follow lake naming conventions (id_*, ts_* prefixes).
   Primary key: id_evaluation (ULID, varchar 26).
 domain: Journey Optimizer
-owner: vinicius.valves@quintoandar.com.br
+owner: vinicius.valves@quintoandar.com
 columns:
   id_evaluation:
     description: Primary key. ULID (varchar 26) uniquely identifying this policy evaluation run.

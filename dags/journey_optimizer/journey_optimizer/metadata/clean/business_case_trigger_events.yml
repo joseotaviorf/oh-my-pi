@@ -6,7 +6,7 @@ description: >
   Column names follow lake naming conventions (id_*, ts_* prefixes).
   Primary key: id_trigger_binding.
 domain: Journey Optimizer
-owner: vinicius.valves@quintoandar.com.br
+owner: vinicius.valves@quintoandar.com
 columns:
   id_trigger_binding:
     description: Primary key. UUID uniquely identifying this (business_case, trigger_event_code) binding.

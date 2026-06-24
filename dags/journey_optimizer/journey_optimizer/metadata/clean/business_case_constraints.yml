@@ -6,7 +6,7 @@ description: >
   Column names follow lake naming conventions (id_*, ts_* prefixes).
   Primary key: id_constraint.
 domain: Journey Optimizer
-owner: vinicius.valves@quintoandar.com.br
+owner: vinicius.valves@quintoandar.com
 columns:
   id_constraint:
     description: Primary key. UUID uniquely identifying this constraint rule.
