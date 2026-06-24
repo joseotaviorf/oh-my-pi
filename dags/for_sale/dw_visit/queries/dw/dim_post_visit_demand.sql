@@ -1,6 +1,7 @@
 SELECT
     id_visit AS sk_visit,
     channel,
+    reason,
     agent_rating,
     agent_rating_comment,
     house_rating,

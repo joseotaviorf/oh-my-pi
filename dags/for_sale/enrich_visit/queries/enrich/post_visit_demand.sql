@@ -310,6 +310,7 @@ visit_status_by_demand AS (
             id_visit,
             visit_code,
             channel,
+            reason,
             CASE
                 WHEN event_type IN ('ANSWER_VISIT_DONE', 'ANSWER_DONE') THEN TRUE
                 WHEN event_type IN ('ANSWER_VISIT_UNSUCCESSFUL', 'ANSWER_UNSUCCESSFUL') THEN FALSE
@@ -332,6 +333,7 @@ visit_status_by_demand AS (
         id_visit,
         visit_code,
         channel,
+        reason,
         is_visit_completed_by_demand,
         is_visit_canceled_by_demand,
         ts_created
@@ -380,6 +382,7 @@ SELECT
     vsbd.id_visit,
     vsbd.visit_code,
     vsbd.channel,
+    vsbd.reason,
     ha.agent_rating,
     ha.agent_rating_comment,
     ha.house_rating,

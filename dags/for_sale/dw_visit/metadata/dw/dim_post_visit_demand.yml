@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_visit.post_visit_demand.channel
     description: Channel of visit finalization by demand.
+  reason:
+    lineage:
+      - datalake_visit.post_visit_demand.reason
+    description: Reason of visit finalization by demand.
   agent_rating:
     lineage:
       - datalake_visit.post_visit_demand.agent_rating

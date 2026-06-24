@@ -23,6 +23,10 @@ columns:
     lineage:
       - datalake_visit.visit_status_events.channel
     description: Channel of visit finalization by demand.
+  reason:
+    lineage:
+      - datalake_visit.visit_status_events.reason
+    description: Reason of visit finalization by demand.
   agent_rating:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected
