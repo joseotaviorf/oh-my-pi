@@ -1,7 +1,7 @@
 ---
-database_name: datalake_cyber_clean
+database_name: datalake_cyber_bureau_clean
 table_name: bureau_policy_bureau
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Table that contains data about the negativation/rehabilitation queues and indicates in which Bureau (e.g., SERASA or CYB - Internal Bureau)
@@ -19,3 +19,5 @@ columns:
     description: "Bureau ID where the negativation/rehabilitation will be sent (e.g., SERASA or CYB)"
     lineage:
       - datalake_cyber_bureau_raw.tb_politica_mnr_bureau.CD_BUREAU
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.

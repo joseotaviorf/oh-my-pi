@@ -1,29 +1,34 @@
----
-database_name: datalake_cyber_clean
+database_name: datalake_cyber_bureau_clean
 table_name: bureau_process
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: |
-  Internal table of CyberFinancial that contains the processes related to CyberBureau.
-  This table stores the different types of bureau processes that can be executed in the system.
+description: 'Internal table of CyberFinancial that contains the processes related
+  to CyberBureau.
+
+  This table stores the different types of bureau processes that can be executed in
+  the system.
+
+  '
 columns:
   process_code:
-    description: "Bureau process code"
+    description: Code identifying the bureau process type in CyberEngine configuration.
     lineage:
-      - datalake_cyber_bureau_raw.tb_processo_bureau.CODIGO
+    - datalake_cyber_bureau_raw.tb_processo_bureau.CODIGO
   process_name:
-    description: "Name of the bureau process"
+    description: Human-readable label of the bureau process configured in CyberEngine.
     lineage:
-      - datalake_cyber_bureau_raw.tb_processo_bureau.NOME
+    - datalake_cyber_bureau_raw.tb_processo_bureau.NOME
   process_description:
-    description: "Detailed description of the bureau process"
+    description: Detailed description of the bureau process
     lineage:
-      - datalake_cyber_bureau_raw.tb_processo_bureau.DESCRICAO
+    - datalake_cyber_bureau_raw.tb_processo_bureau.DESCRICAO
   process_order:
-    description: "Execution order of the process"
+    description: Execution order of the process
     lineage:
-      - datalake_cyber_bureau_raw.tb_processo_bureau.ORDEM
+    - datalake_cyber_bureau_raw.tb_processo_bureau.ORDEM
   is_active:
-    description: "Flag indicating if the process is currently active"
+    description: Flag indicating if the process is currently active
     lineage:
-      - datalake_cyber_bureau_raw.tb_processo_bureau.ATIVO
+    - datalake_cyber_bureau_raw.tb_processo_bureau.ATIVO
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.

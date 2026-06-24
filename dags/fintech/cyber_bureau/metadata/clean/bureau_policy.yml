@@ -1,7 +1,7 @@
 ---
-database_name: datalake_cyber_clean
+database_name: datalake_cyber_bureau_clean
 table_name: bureau_policy
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Stores data about the negativation/rehabilitation queues and their validity.
@@ -27,3 +27,5 @@ columns:
     description: "Debtor client type (1 for debtor, 0 for co-obligor)"
     lineage:
       - datalake_cyber_bureau_raw.tb_politica_mnr.TP_CLI_DEVEDOR
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.

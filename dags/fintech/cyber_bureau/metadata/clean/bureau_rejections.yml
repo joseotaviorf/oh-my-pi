@@ -1,57 +1,61 @@
----
-database_name: datalake_cyber_clean
+database_name: datalake_cyber_bureau_clean
 table_name: bureau_rejections
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: |
-  Stores information about contracts that were rejected by the bureau.
-  Contains the rejection code and the rejected record. Rejected records are stored for later treatment by the BackOffice area.
+description: 'Stores information about contracts that were rejected by the bureau.
+
+  Contains the rejection code and the rejected record. Rejected records are stored
+  for later treatment by the BackOffice area.
+
+  '
 columns:
   ts_billing_cycle:
-    description: "Billing cycle date"
+    description: Timestamp marking the billing cycle of the rejected bureau submission.
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.DT_CICLO_COBRANCA
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.DT_CICLO_COBRANCA
   cpf_cnpj:
-    description: "Client CPF/CNPJ"
+    description: Tax identifier (CPF or CNPJ) tied to the rejected bureau record.
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_CPFCNPJ_CLI
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_CPFCNPJ_CLI
   person_type:
-    description: "Person type: Physical Person or Legal Entity"
+    description: 'Person type: Physical Person or Legal Entity'
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.TP_PESSOA_CLI
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.TP_PESSOA_CLI
   remittance_number:
-    description: "Remittance number associated with the rejection"
+    description: Remittance number associated with the rejection
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.NR_REMESSA
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.NR_REMESSA
   id_bureau:
-    description: "Bureau ID that rejected the record"
+    description: Bureau ID that rejected the record
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_BUREAU
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_BUREAU
   id_company:
-    description: "Company ID"
+    description: Identifier of the company associated with the rejected bureau submission.
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_EMPRESA
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_EMPRESA
   contract_group:
-    description: "Contract group: 1 for QuintoAndar, 2 for QuintoCred"
+    description: 'Contract group: 1 for QuintoAndar, 2 for QuintoCred'
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_GRUPO
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_GRUPO
   creditor:
-    description: "Creditor name: QuintoAndar or QuintoCred"
+    description: 'Creditor name: QuintoAndar or QuintoCred'
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_GRUPO
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_GRUPO
   id_contract:
-    description: "Contract number that was rejected"
+    description: Contract number that was rejected
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_CONTRATO
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_CONTRATO
   contract_bureau_code:
-    description: "Contract code as registered in the bureau"
+    description: Contract code as registered in the bureau
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_CTR_BUREAU
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_CTR_BUREAU
   reason_code:
-    description: "Rejection reason code from the bureau"
+    description: Rejection reason code from the bureau
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_MOTIVO
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.CD_MOTIVO
   detail_line:
-    description: "The full detail line that was rejected by the bureau"
+    description: The full detail line that was rejected by the bureau
     lineage:
-      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.LN_DETALHE
+    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.LN_DETALHE
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.
