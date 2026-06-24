@@ -199,7 +199,7 @@ columns:
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.range_position
   rate_default_amount:
-    description: Default amount for the salary rate.
+    description: Reference salary amount defined for the associated pay rate, used as the baseline for salary range calculations alongside rate_min_amount, rate_mid_amount, and rate_max_amount.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.rate_default_amount
   rate_factor:
@@ -234,6 +234,10 @@ columns:
     description: Boolean flag indicating if the employee works from home.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.work_at_home
+  dt_salary_proposal:
+    description: Date when the salary proposal was submitted in Oracle HCM, stored as a generic date attribute (attribute_date15).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.attribute_date15
   dt_started:
     description: The start date for which this salary record is effective.
     lineage:

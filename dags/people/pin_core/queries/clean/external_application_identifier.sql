@@ -9,7 +9,7 @@ SELECT
     created_by,
     last_updated_by AS updated_by,
     TO_DATE(date_from) AS dt_started,
-    TO_DATE(date_to) AS dt_ended,
+    COALESCE(NULLIF(TO_DATE(date_to), DATE('4712-12-31')), DATE('9999-12-31')) AS dt_ended,
     TO_TIMESTAMP(creation_date) AS ts_created,
     TO_TIMESTAMP(last_update_date) AS ts_updated,
     NOW() AS ts_load,
