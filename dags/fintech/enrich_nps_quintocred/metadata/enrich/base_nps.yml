@@ -1,0 +1,269 @@
+database_name: datalake_nps_quintocred
+table_name: base_nps
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: Monthly broker-level snapshot for QuintoCred NPS eligibility, one row per
+  real-estate broker for the current reference month. Aggregates proposal-to-contract
+  funnel metrics, rolling three- and six-month production windows, and months-on-books
+  from Velo propose history. Consumed by the Fintech NPS squad to select broker partners
+  for satisfaction surveys.
+columns:
+  id_broker:
+    description: QuintoCred broker identifier used as the grain of the NPS eligibility
+      snapshot.
+    lineage:
+    - datalake_velo.broker.id_broker
+  contracts:
+    description: Count of distinct active rental-guarantee contracts linked to the broker
+      at the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.dt_contract_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.dt_contract_started
+    - datalake_velo.propose_legacy.dt_ended
+  p_generated_at_month:
+    description: Proposals created by the broker in the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  p2c_at_month:
+    description: Proposals converted to contracts in the reference month (proposal-to-contract).
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  drop_p2c_at_month:
+    description: Proposals created in the reference month that did not convert to a contract.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_beginning_and_ending_at_month:
+    description: Contracts that both started and ended within the same reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.dt_ended
+  contracts_beginning_at_month:
+    description: Contracts that started in the reference month and remained open beyond
+      it.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.dt_ended
+  contracts_ending_at_month:
+    description: Contracts that ended in the reference month without starting in the
+      same month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.dt_ended
+  proposes_gen_at_M_1:
+    description: Proposals created one month before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  proposes_gen_at_M_2:
+    description: Proposals created two months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  proposes_gen_at_M_3:
+    description: Proposals created three months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  proposes_gen_at_M_4:
+    description: Proposals created four months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  proposes_gen_at_M_5:
+    description: Proposals created five months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  proposes_gen_at_M_6:
+    description: Proposals created six months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_1:
+    description: Contracts started one month before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_2:
+    description: Contracts started two months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_3:
+    description: Contracts started three months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_4:
+    description: Contracts started four months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_5:
+    description: Contracts started five months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_6:
+    description: Contracts started six months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  sum_proposes_gen_w3:
+    description: Total proposals created in the trailing three-month window before the
+      reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  sum_proposes_gen_w6:
+    description: Total proposals created in the trailing six-month window before the
+      reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  sum_contracts_gen_w3:
+    description: Total contracts started in the trailing three-month window before the
+      reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  sum_contracts_gen_w6:
+    description: Total contracts started in the trailing six-month window before the
+      reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  avg_proposes_gen_w3:
+    description: Average monthly proposals created over the trailing three-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  avg_proposes_gen_w6:
+    description: Average monthly proposals created over the trailing six-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+  avg_contracts_gen_w3:
+    description: Average monthly contracts started over the trailing three-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  avg_contracts_gen_w6:
+    description: Average monthly contracts started over the trailing six-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.ts_propose_started
+  mob_imob:
+    description: Months on books of the broker since the first proposal, measured at the
+      reference month.
+    lineage:
+    - dw_public.dim_date.month_start
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.ts_propose_started
+  dt_imob_activation:
+    description: Date of the broker's first proposal in Velo, used as the activation
+      anchor for months-on-books.
+    lineage:
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.ts_propose_started
+  dt_reference:
+    description: First day of the current month used as the reference period for all
+      rolling metrics.
+    lineage:
+    - dw_public.dim_date.month_start

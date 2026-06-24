@@ -1,0 +1,324 @@
+database_name: datalake_nps_quintocred
+table_name: base_nps_direct_billing
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: Monthly broker-level snapshot for QuintoCred NPS eligibility restricted to
+  direct-billing proposals, one row per real-estate broker for the current reference
+  month. Mirrors base_nps metrics but counts only proposes flagged with is_direct_billing.
+  Used by the Fintech NPS squad to survey broker partners on the direct-billing funnel.
+columns:
+  id_broker:
+    description: QuintoCred broker identifier used as the grain of the direct-billing
+      NPS eligibility snapshot.
+    lineage:
+    - datalake_velo.broker.id_broker
+  contracts:
+    description: Count of distinct active direct-billing contracts linked to the broker
+      at the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.dt_contract_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.dt_contract_started
+    - datalake_velo.propose_legacy.dt_ended
+  p_generated_at_month:
+    description: Direct-billing proposals created by the broker in the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  p2c_at_month:
+    description: Direct-billing proposals converted to contracts in the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  drop_p2c_at_month:
+    description: Direct-billing proposals created in the reference month that did not
+      convert to a contract.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_beginning_and_ending_at_month:
+    description: Direct-billing contracts that both started and ended within the same
+      reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.dt_ended
+  contracts_beginning_at_month:
+    description: Direct-billing contracts that started in the reference month and remained
+      open beyond it.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.dt_ended
+  contracts_ending_at_month:
+    description: Direct-billing contracts that ended in the reference month without starting
+      in the same month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.dt_ended
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.dt_ended
+  proposes_gen_at_M_1:
+    description: Direct-billing proposals created one month before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  proposes_gen_at_M_2:
+    description: Direct-billing proposals created two months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  proposes_gen_at_M_3:
+    description: Direct-billing proposals created three months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  proposes_gen_at_M_4:
+    description: Direct-billing proposals created four months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  proposes_gen_at_M_5:
+    description: Direct-billing proposals created five months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  proposes_gen_at_M_6:
+    description: Direct-billing proposals created six months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  contracts_gen_at_M_1:
+    description: Direct-billing contracts started one month before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_2:
+    description: Direct-billing contracts started two months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_3:
+    description: Direct-billing contracts started three months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_4:
+    description: Direct-billing contracts started four months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_5:
+    description: Direct-billing contracts started five months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  contracts_gen_at_M_6:
+    description: Direct-billing contracts started six months before the reference month.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  sum_proposes_gen_w3:
+    description: Total direct-billing proposals created in the trailing three-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  sum_proposes_gen_w6:
+    description: Total direct-billing proposals created in the trailing six-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  sum_contracts_gen_w3:
+    description: Total direct-billing contracts started in the trailing three-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  sum_contracts_gen_w6:
+    description: Total direct-billing contracts started in the trailing six-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  avg_proposes_gen_w3:
+    description: Average monthly direct-billing proposals over the trailing three-month
+      window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  avg_proposes_gen_w6:
+    description: Average monthly direct-billing proposals over the trailing six-month
+      window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.ts_propose_started
+    - datalake_velo.propose_legacy.is_direct_billing
+  avg_contracts_gen_w3:
+    description: Average monthly direct-billing contracts started over the trailing
+      three-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  avg_contracts_gen_w6:
+    description: Average monthly direct-billing contracts started over the trailing
+      six-month window.
+    lineage:
+    - datalake_velo.propose.id_propose
+    - datalake_velo.propose.is_contract
+    - datalake_velo.propose.is_direct_billing
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.id_propose
+    - datalake_velo.propose_legacy.is_contract
+    - datalake_velo.propose_legacy.is_direct_billing
+    - datalake_velo.propose_legacy.ts_propose_started
+  mob_imob:
+    description: Months on books of the broker since the first direct-billing proposal,
+      measured at the reference month.
+    lineage:
+    - dw_public.dim_date.month_start
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.ts_propose_started
+  dt_imob_activation:
+    description: Date of the broker's first direct-billing proposal in Velo, used as the
+      activation anchor for months-on-books.
+    lineage:
+    - datalake_velo.propose.ts_propose_started
+    - datalake_velo.propose_legacy.ts_propose_started
+  dt_reference:
+    description: First day of the current month used as the reference period for all
+      rolling metrics.
+    lineage:
+    - dw_public.dim_date.month_start

@@ -1,0 +1,50 @@
+database_name: datalake_nps_quintocred
+table_name: broker_contact_info
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: Contact directory for QuintoCred NPS outreach, one row per broker and Velo
+  agent (realtor) pair with active proposals. Joins Velo broker and user records with
+  company-member phone numbers from the rental guarantee platform. Consumed to dispatch
+  satisfaction surveys to the correct broker representative.
+columns:
+  id_broker:
+    description: QuintoCred broker identifier linked to the Velo proposal portfolio.
+    lineage:
+    - datalake_velo.broker.id_broker
+  id_realtor:
+    description: UUID of the Velo agent (corretor) associated with the broker's proposals.
+    lineage:
+    - datalake_velo.user.uuid_user
+  broker_name:
+    description: Legal corporate name of the QuintoCred broker company.
+    lineage:
+    - datalake_velo.broker.broker_name
+  broker_comercial_name:
+    description: Trade name of the QuintoCred broker company used in commercial communications.
+    lineage:
+    - datalake_velo.broker.broker_comercial_name
+  document:
+    description: Broker CNPJ tax identifier used to validate the legal entity in NPS
+      campaigns.
+    lineage:
+    - datalake_velo.broker.cnpj
+  realtor:
+    description: Full name of the Velo agent who represents the broker in proposal workflows.
+    lineage:
+    - datalake_velo.user.name
+  email:
+    description: Email address of the Velo agent used as a primary NPS contact channel.
+    lineage:
+    - datalake_velo.user.email
+  phone:
+    description: Phone number of the company member linked to the Velo agent, resolved
+      from person contact info with category PHONE.
+    lineage:
+    - datalake_person_clean.contact_info.contact_info
+    - datalake_rental_guarantee_platform_clean.company.uuid_company
+    - datalake_company_clean.member_profile.uuid_person
+  profile:
+    description: Velo platform role assigned to the agent, indicating permissions and
+      access level.
+    lineage:
+    - datalake_velo.user.user_role
