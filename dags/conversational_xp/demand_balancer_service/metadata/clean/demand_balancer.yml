@@ -1,5 +1,5 @@
 ---
-database_name: datalake_search
+database_name: datalake_demand_balancer_service_clean
 table_name: demand_balancer
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP

@@ -4637,6 +4637,7 @@ bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_superset:load-enrich-slices:first-run-of-day
   - bietlejuice.enrich_superset:load-enrich-tables:first-run-of-day
 bietlejuice.reverse_demand_classifieds_ranking:
+  - bietlejuice.demand_balancer_service:load-clean-demand-balancer:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
 bietlejuice.reverse_demand_classifieds_ranking_access:

@@ -10,6 +10,16 @@ DAG:
       deadline: 2026-06-30
       created_by: gabriel.firmino@quintoandar.com.br
       approved_by: lucas.bguerra@quintoandar.com.br
+    bietlejuice.demand_balancer_service:
+      reason: "Pipeline owned by Data Science/MLOps teams."
+      deadline: Never
+      created_by: isadora.gallerani@quintoandar.com.br
+      approved_by: william.angelo@quintoandar.com.br
+    bietlejuice.reverse_demand_classifieds_ranking:
+      reason: "Reverse pipeline owned by Data Science/MLOps teams."
+      deadline: Never
+      created_by: isadora.gallerani@quintoandar.com.br
+      approved_by: william.angelo@quintoandar.com.br
   contains:
     bietlejuice.gsheets_:
       reason: "GSheets are used to store the manual operations data for the datalake, so they are not Data Engineering on call responsibility."
