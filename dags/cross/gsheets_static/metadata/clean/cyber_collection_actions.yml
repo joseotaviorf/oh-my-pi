@@ -1,5 +1,4 @@
----
-database_name: datalake_gsheets_static_clean
+database_name: datalake_gsheets_clean
 table_name: cyber_collection_actions
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
