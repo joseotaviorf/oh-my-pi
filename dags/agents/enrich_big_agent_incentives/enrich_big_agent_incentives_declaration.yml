@@ -29,7 +29,7 @@ workflow:
       z_order_by: [id_earning_source, id_earning]
     tier_rule:
       merge_on: [id_tier]
-      z_order_by: [ts_created]
+      z_order_by: [id_tier, id_business_unit]
     agent_tier_validity:
       merge_on: [id_agent_tier]
     brokerage_share_history:
