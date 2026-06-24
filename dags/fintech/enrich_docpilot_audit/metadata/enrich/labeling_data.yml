@@ -1,91 +1,96 @@
-database_name: datalake_docpilot
-table_name: audit_labeling_data
-description: This table contains Docpilot data to audit team label.
+database_name: datalake_docpilot_audit
+table_name: labeling_data
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-owner: leticia.mendes@quintoandar.com.br
+description: Weekly stratified sample of manual Sorting Hat credit analyses prepared
+  for DocPilot audit labeling, one row per rental proposal and proponent with up to
+  ten income document file names. Applies proportional sampling by analyst and analysis
+  type, guarantees at least one rejection per analyst, and joins DocX identity and
+  income documents for the Fintech documentation quality audit squad.
 columns:
   id_proposal:
+    description: Rental proposal identifier selected in the credit audit sample and
+      matched to DocX income documents.
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis_version
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Proposal ID.
+    - datalake_sorting_hat_clean.credit_analysis_version.id_proposal
+    - datalake_docx_clean.document.reference_properties
   name:
+    description: Applicant full name extracted from the identity document JSON attributes
+      in DocX.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Name of the applicant.
+    - datalake_docx_clean.document.attributes
   type:
+    description: Sorting Hat credit analysis type associated with the sampled decision.
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis_version
-    description: Type of the credit analysis.
+    - datalake_sorting_hat_clean.credit_analysis_version.type
   ts_credit_analysis_updated:
+    description: Timestamp of the latest credit analysis version included in the audit
+      sample.
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis_version
-    description: Timestamp of the last update of the credit analysis.
+    - datalake_sorting_hat_clean.credit_analysis_version.ts_updated
   result:
+    description: Credit analysis outcome from Sorting Hat, excluding auto-advisory states
+      in the sampling filter.
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis_version
-    description: Result of the credit analysis.
+    - datalake_sorting_hat_clean.credit_analysis_version.result
   reason:
+    description: Analyst-provided or system reason code explaining the credit analysis
+      result.
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis_version
-    description: Reason of the credit analysis.
+    - datalake_sorting_hat_clean.credit_analysis_version.reason
   analyst:
+    description: Manual analyst name captured from the Sorting Hat checklist item input
+      source on the current checklist.
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis_version
-      - datalake_sorting_hat_clean.checklist
-      - datalake_sorting_hat_clean.checklist_group
-      - datalake_sorting_hat_clean.checklist_item
-    description: Analyst responsible for the credit analysis.
+    - datalake_sorting_hat_clean.checklist_item.input_source_name
+    - datalake_sorting_hat_clean.analysis_request.id_external
   document_1:
+    description: First income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: First document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_2:
+    description: Second income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Second document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_3:
+    description: Third income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Third document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_4:
+    description: Fourth income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Fourth document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_5:
+    description: Fifth income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference 
-    description: Fifth document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_6:
+    description: Sixth income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Sixth document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_7:
+    description: Seventh income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Seventh document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_8:
+    description: Eighth income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Eighth document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_9:
+    description: Ninth income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Ninth document of the applicant.
+    - datalake_docx_clean.document.attributes
   document_10:
+    description: Tenth income document file name from bank statements or payslips JSON
+      attached to the proposal folder.
     lineage:
-      - datalake_docx_clean.document
-      - datalake_docx_clean.folder_reference
-    description: Tenth document of the applicant.
-  
+    - datalake_docx_clean.document.attributes
