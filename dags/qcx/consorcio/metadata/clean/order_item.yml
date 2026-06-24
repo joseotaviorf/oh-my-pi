@@ -1,7 +1,7 @@
 ---
 database_name: datalake_consorcio_clean
 table_name: order_item
-owner: cadu.procha@quintoandar.com.br
+owner: carlos.procha@quintoandar.com.br
 domain: QCX
 description: This table contains individual items within consortium orders.
 columns:
@@ -16,7 +16,7 @@ columns:
   id_order:
     lineage:
     - datalake_consorcio_raw.order_item.order_id
-    description: FK from order table.
+    description: Foreign key referencing the parent consorcio order this item belongs to.
   id_external_segment:
     lineage:
     - datalake_consorcio_raw.order_item.external_segment_id
@@ -24,7 +24,7 @@ columns:
   name:
     lineage:
     - datalake_consorcio_raw.order_item.name
-    description: Name of order item.
+    description: Name of the consorcio product item selected within this order, identifying the specific consortium group or plan.
   id_external_product:
     lineage:
     - datalake_consorcio_raw.order_item.external_product_id
@@ -44,7 +44,7 @@ columns:
   reserve_fund_fee:
     lineage:
     - datalake_consorcio_raw.order_item.reserve_fund_fee
-    description: Reserve fund fee percentage of order item.
+    description: Percentage charged as a reserve fund to cover potential defaults or consortium group expenses, expressed as a decimal.
   installment_value:
     lineage:
     - datalake_consorcio_raw.order_item.installment_value

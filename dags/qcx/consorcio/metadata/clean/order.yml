@@ -1,9 +1,9 @@
 ---
 database_name: datalake_consorcio_clean
 table_name: order
-owner: cadu.procha@quintoandar.com.br
+owner: carlos.procha@quintoandar.com.br
 domain: QCX
-description: This table contains consorcio order information.
+description: Each row represents a consorcio purchase order linking a lead and a member (consorciado) to a specific product. Tracks checkout URL and order status from initiation to completion.
 columns:
   id:
     lineage:
@@ -16,7 +16,7 @@ columns:
   id_lead:
     lineage:
     - datalake_consorcio_raw.order.lead_id
-    description: FK from lead table.
+    description: Foreign key referencing the lead that originated this consorcio order.
   id_consorciado:
     lineage:
     - datalake_consorcio_raw.order.consorciado_id

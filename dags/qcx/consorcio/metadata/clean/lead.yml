@@ -1,7 +1,7 @@
 ---
 database_name: datalake_consorcio_clean
 table_name: lead
-owner: cadu.procha@quintoandar.com.br
+owner: carlos.procha@quintoandar.com.br
 domain: QCX
 description: This table contains lead information from consorcio prospects.
 columns:
@@ -16,15 +16,15 @@ columns:
   name:
     lineage:
       - datalake_consorcio_raw.lead.name
-    description: Name of lead prospect.
+    description: Full name of the consorcio prospect as provided during lead registration.
   phone:
     lineage:
       - datalake_consorcio_raw.lead.phone
-    description: Phone number of lead.
+    description: Contact phone number provided by the consorcio lead during registration.
   email:
     lineage:
       - datalake_consorcio_raw.lead.email
-    description: Email address of lead.
+    description: Email address of the consorcio prospect, used for lead contact and communications.
   metadata:
     lineage:
       - datalake_consorcio_raw.lead.metadata
@@ -32,7 +32,7 @@ columns:
   source:
     lineage:
       - datalake_consorcio_raw.lead.source
-    description: Source origin of lead.
+    description: Acquisition channel or source that originated this consorcio lead (e.g. organic, paid, referral).
   uuid_person:
     lineage:
       - datalake_consorcio_raw.lead.person_uuid

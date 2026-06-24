@@ -1,7 +1,7 @@
 ---
 database_name: datalake_consorcio_clean
 table_name: product
-owner: cadu.procha@quintoandar.com.br
+owner: carlos.procha@quintoandar.com.br
 domain: QCX
 description: This table contains consorcio product information and configurations.
 columns:
@@ -20,7 +20,7 @@ columns:
   name:
     lineage:
     - datalake_consorcio_raw.product.name
-    description: Name of consorcio product.
+    description: Commercial name of the consorcio product offered, identifying the consortium group and plan type.
   id_external_product:
     lineage:
     - datalake_consorcio_raw.product.external_product_id
@@ -57,10 +57,10 @@ columns:
     lineage:
     - datalake_consorcio_raw.product.deadline_term
     description: Deadline term in months for product.
-  active:
+  is_active:
     lineage:
     - datalake_consorcio_raw.product.active
-    description: Flag indicating if product is active.
+    description: Flag indicating whether this consorcio product is currently available for sale.
   ts_created:
     lineage:
     - datalake_consorcio_raw.product.created_at

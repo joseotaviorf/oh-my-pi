@@ -1,7 +1,7 @@
 ---
 database_name: datalake_consorcio_clean
 table_name: consorciado
-owner: cadu.procha@quintoandar.com.br
+owner: carlos.procha@quintoandar.com.br
 domain: QCX
 description: This table contains consorcio member information.
 columns:
