@@ -1,5 +1,5 @@
 ---
-database_name: datalake_search
+database_name: datalake_concierge_propensity_model_service_clean
 table_name: concierge_propensity_scores
 owner: francisco.cristovao@quintoandar.com
 domain: Conversational XP
