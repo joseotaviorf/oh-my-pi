@@ -4,7 +4,16 @@ dag:
   schedule_interval: 0 21,8,12 * * *
   owner: Data Broker XP
   documentation:
-    dag_purpose: This DAG imports the tables from Signup, a service responsible for orchestrating all signup flows in QuintoAndar.
+    dag_purpose: |
+      CDC pipeline for the Signup microservice (user registration orchestration audit trail).
+      Captures enrollment, disenrollment, and registration-completeness history from PostgreSQL
+      (signup.db.core-prd.habitat.zone / signup.public).
+
+      Source repo: backend-services/applications/signup
+      Database documentation: dags/broker_xp/signup/signup.md
+
+      DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer
+      SCHEDULE: 3× daily (08:00, 12:00, 21:00 UTC).
 workflow:
   type: cdc
   layer: raw

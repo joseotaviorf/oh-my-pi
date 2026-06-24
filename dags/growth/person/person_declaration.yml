@@ -7,6 +7,9 @@ dag:
     dag_purpose: |
       This DAG imports the tables from Person, a core identity management microservice that centralizes natural person data across QuintoAndar's ecosystem.
 
+      Source repo: backend-services/applications/person
+      Database documentation: dags/growth/person/person.md
+
       **Service Overview:**
       The Person service acts as the single source of truth for person/user identity and data, handling:
       - Person registration and profile management

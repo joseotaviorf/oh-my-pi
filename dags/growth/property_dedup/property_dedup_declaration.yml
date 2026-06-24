@@ -9,6 +9,12 @@ dag:
       Debezium and Kafka Connect are provisioned outside this repository; this DAG reads landing data
       from the S3 sink and materializes transactional, raw Delta, and clean tables.
       Core tables: similar_property (candidate duplicate), duplicity_output (rules-engine outcome).
+
+      Source repo: backend-services/applications/property-dedup
+      Database documentation: dags/growth/property_dedup/property_dedup.md
+
+      DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer
+      SCHEDULE: Daily (00:00 UTC).
 workflow:
   type: cdc
   layer: raw

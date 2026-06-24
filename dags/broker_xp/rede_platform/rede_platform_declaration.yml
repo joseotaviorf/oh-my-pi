@@ -4,8 +4,16 @@ dag:
   schedule_interval: 0 21,8,12 * * *
   owner: Data Broker XP
   documentation:
-    dag_purpose: >-
-      Imports Rede Platform Postgres via CDC into the data lake: 3P buyer–company relations (Demand) and broker lifecycle data.
+    dag_purpose: |
+      CDC pipeline for the Rede Platform microservice (Mão Dupla demand, broker accreditation, deaccreditation).
+      Captures buyer–company relations, accreditation prospects, and deaccreditation orchestration from PostgreSQL
+      (rede-platform.db.core-prd.habitat.zone / rede_platform.public).
+
+      Source repo: backend-services/applications/rede-platform
+      Database documentation: dags/broker_xp/rede_platform/rede_platform.md
+
+      DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer
+      SCHEDULE: 3× daily (08:00, 12:00, 21:00 UTC).
 workflow:
   type: cdc
   layer: raw

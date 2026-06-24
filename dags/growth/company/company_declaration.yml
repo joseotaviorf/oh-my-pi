@@ -6,6 +6,9 @@ dag:
     dag_purpose: |
       This DAG imports critical tables from the Company microservice, which centralizes legal entity data for QuintoAndar's partner ecosystem.
 
+      Source repo: backend-services/applications/company
+      Database documentation: dags/growth/company/company.md
+
       BUSINESS CONTEXT:
       The Company service manages QuintoAndar's paradigm shift to support broker partners (For Brokers initiative), where QuintoAndar
       itself becomes one entity among many companies in the platform. This CDC pipeline captures real-time changes from the production

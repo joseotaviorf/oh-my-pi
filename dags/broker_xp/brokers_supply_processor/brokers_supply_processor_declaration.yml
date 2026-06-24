@@ -4,22 +4,17 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Broker XP
   documentation:
-    dag_purpose: >
-      Imports tables from brokers-supply-processor service, QuintoAndar's platform for processing
-      third-party (3P) real estate leads from external partner agencies. Supports QuintoAndar's
-      expansion into a partnership ecosystem by processing, filtering, and qualifying partner-submitted
-      property leads for both SALE and RENT contexts.
+    dag_purpose: |
+      CDC pipeline for the Brokers Supply Processor microservice (3P partner lead ingestion).
+      Captures property leads, business-context processing status, deduplication locks, merge events,
+      and Hibernate Envers audit history from PostgreSQL
+      (brokers-supply-processor.db.core-prd.habitat.zone / brokers_supply_processor.public).
 
-      KEY TABLES: lead_3p (core property lead data), business_context_detail (lead status tracking),
-      lead_in_flight (concurrency control for duplicate lead processing),
-      file (bulk import management) and audit tables (*_aud) for
-      complete change history and compliance.
+      Source repo: backend-services/applications/brokers-supply-processor
+      Database documentation: dags/broker_xp/brokers_supply_processor/brokers_supply_processor.md
 
-      PIPELINE: Daily CDC from PostgreSQL with 24-hour latency. Handles medium to high volume data
-      depending on partner activity. Includes comprehensive audit trail for compliance and troubleshooting.
-
-      USE CASES: Partner performance analysis, lead conversion funnel optimization, market intelligence,
-      operational monitoring, and data quality management across the 3P Partners ecosystem.
+      DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer
+      SCHEDULE: Daily (00:00 UTC), ~24h CDC latency.
 workflow:
   type: cdc
   layer: raw

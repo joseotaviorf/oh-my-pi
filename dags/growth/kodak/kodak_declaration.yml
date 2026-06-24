@@ -6,7 +6,10 @@ dag:
   documentation:
     dag_purpose: |
       This DAG imports raw data from Kodak, QuintoAndar's centralized media management microservice responsible for storing and analyzing all media formats (photos, videos, 360° images/photospheres).
-      
+
+      Source repo: backend-services/applications/kodak
+      Database documentation: dags/growth/kodak/kodak.md
+
       **Kodak Service Overview:**
       Kodak is QuintoAndar's core media storage and AI-powered analysis platform that handles:
       - Photo, video, and photosphere (360° images) storage in S3
