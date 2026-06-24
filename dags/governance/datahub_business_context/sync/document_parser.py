@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from sync.constants import DATA_PRODUCT_TYPE_DOMAIN, DATA_PRODUCT_TYPE_METRIC
+
 
 @dataclass
 class GoldenQuery:
@@ -36,8 +38,19 @@ _MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()+\-#.!|])")
 
 _SECTION_RE = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 _H3_RE = re.compile(r"^###\s+(.+)$", re.MULTILINE)
-# Allow unclosed code fences (DataHub editor sometimes drops the closing ```)
-_SQL_BLOCK_RE = re.compile(r"```sql\s*\n(.*?)(?:```|$)", re.IGNORECASE | re.DOTALL)
+# DataHub's rich-text editor mangles fenced SQL blocks in two ways the naive
+# ```sql\n...``` pattern misses:
+#   1. It stores the block inline on a single line — ```sql SELECT ... — with no
+#      newline after the language tag (so requiring \s*\n drops the whole block).
+#   2. It splits the closing fence with spaces (``` becomes ` ``) and sometimes
+#      omits it entirely.
+# Match permissively: \b after the tag avoids ```sqlite; \s* (not \s*\n) accepts
+# both inline and multi-line blocks; the close is any run of backticks, optionally
+# space-separated, or end-of-section for unclosed fences.
+_SQL_BLOCK_RE = re.compile(
+    r"```sql\b\s*(.*?)\s*(?:`(?:\s*`)+|$)",
+    re.IGNORECASE | re.DOTALL,
+)
 _TABLE_REF_RE = re.compile(r"`([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)`")
 _FROM_JOIN_RE = re.compile(
     r"(?:FROM|JOIN)\s+([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)",
@@ -129,7 +142,12 @@ def _parse_datasets(section_text: str) -> list[tuple[str, str]]:
 
 
 def _clean_sql(sql: str) -> str:
-    """Remove blank lines that DataHub's editor inserts between every SQL line."""
+    """Normalize SQL extracted from DataHub's editor.
+
+    Removes blank lines the editor inserts between every SQL line and trims any
+    stray backtick fence remnants left over when it mangles the closing ```.
+    """
+    sql = sql.strip().strip("`").strip()
     lines = [ln for ln in sql.splitlines() if ln.strip()]
     return "\n".join(lines)
 
@@ -234,15 +252,32 @@ def parse_entity_markdown(
     )
 
 
-def validate_parsed_document(parsed: ParsedEntityDocument) -> list[str]:
-    """Return list of validation errors (empty = valid)."""
+def validate_parsed_document(
+    parsed: ParsedEntityDocument,
+    *,
+    data_product_type: str = DATA_PRODUCT_TYPE_DOMAIN,
+) -> list[str]:
+    """Return list of validation errors (empty = valid).
+
+    Required sections differ by data product type (see the authoring templates in
+    ``docs/llm_context/{business,metric}_entities/_TEMPLATE.md``):
+
+    - Domain entities (``business_entities``) route by table and teach a canonical
+      query, so they require both a ``## Tables`` / ``## Where to query what``
+      section and a ``## Golden Query`` section.
+    - Metric entities (``metric_entities``) are deliberately thin on schema and
+      link to their business entity instead — they have no ``## Tables`` section,
+      and the official ``## Calculation`` / ``## Canonical Filter`` are the source
+      of truth — so neither datasets nor a golden query are required.
+    """
+    is_metric = data_product_type == DATA_PRODUCT_TYPE_METRIC
     errors: list[str] = []
     if not parsed.title or parsed.title == "Untitled Entity":
         errors.append("Missing H1 title")
     if not parsed.overview.strip():
         errors.append("Missing ## Overview section")
-    if not parsed.datasets:
+    if not is_metric and not parsed.datasets:
         errors.append("No schema.table references found in ## Tables section")
-    if not parsed.golden_queries:
+    if not is_metric and not parsed.golden_queries:
         errors.append("Missing ## Golden Queries with at least one SQL block")
     return errors

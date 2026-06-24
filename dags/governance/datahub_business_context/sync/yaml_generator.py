@@ -70,16 +70,18 @@ def build_datahub_yaml(
     """Build a ``kind: data_product_curated_entity`` spec dict."""
     product_id = _kebab_case(data_product_id)
     entity_slug = _entity_slug(product_id)
-    datasets = primary_datasets or parsed.datasets
+    # Metric docs have no ## Tables section (they link to the business entity), so
+    # parsed.datasets is often empty — fall back to the golden query's FROM/JOIN
+    # tables so the loader still gets a non-empty datasets list.
+    golden_subjects: list[tuple[str, str]] = []
+    if parsed.golden_queries:
+        golden_subjects = extract_subjects_from_sql(parsed.golden_queries[0].sql)
+    datasets = primary_datasets or parsed.datasets or golden_subjects
     md_output_dir = (
         MD_OUTPUT_DIR_METRICS
         if data_product_type == DATA_PRODUCT_TYPE_METRIC
         else MD_OUTPUT_DIR
     )
-
-    golden = parsed.golden_queries[0]
-    stable_urn = golden_query_stable_urn or f"urn:li:query:{uuid.uuid4()}"
-    subjects = extract_subjects_from_sql(golden.sql) or datasets[:3]
 
     spec: dict[str, Any] = {
         "spec_version": 1,
@@ -99,17 +101,6 @@ def build_datahub_yaml(
                 f"br.com.quintoandar.datahub.{product_id}.golden_query_url",
             ],
         },
-        "golden_query": {
-            "stable_urn": stable_urn,
-            "name": golden.name,
-            "description": textwrap.dedent(
-                f"""\
-                {golden.description}
-                Source: {md_output_dir}/{entity_slug}.md"""
-            ).strip(),
-            "subjects": [{"schema": s, "table": t} for s, t in subjects],
-            "sql": golden.sql,
-        },
         "datasets": [{"schema": s, "table": t} for s, t in datasets],
         "documentation_link": {
             "label": f"Business entity documentation ({entity_slug}.md)",
@@ -119,6 +110,24 @@ def build_datahub_yaml(
             ),
         },
     }
+
+    # Golden query is optional (metric data products may have none). The loader
+    # skips the golden-query step when the key is absent.
+    if parsed.golden_queries:
+        golden = parsed.golden_queries[0]
+        stable_urn = golden_query_stable_urn or f"urn:li:query:{uuid.uuid4()}"
+        subjects = golden_subjects or datasets[:3]
+        spec["golden_query"] = {
+            "stable_urn": stable_urn,
+            "name": golden.name,
+            "description": textwrap.dedent(
+                f"""\
+                {golden.description}
+                Source: {md_output_dir}/{entity_slug}.md"""
+            ).strip(),
+            "subjects": [{"schema": s, "table": t} for s, t in subjects],
+            "sql": golden.sql,
+        }
 
     if parsed.glossary_terms:
         spec["glossary_terms"] = {

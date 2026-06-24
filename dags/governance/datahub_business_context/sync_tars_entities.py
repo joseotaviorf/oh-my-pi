@@ -197,7 +197,11 @@ def _process_document(
         return _OUTCOME_OK
 
     parsed = parse_entity_markdown(doc.content, fallback_title=doc.title)
-    parse_errors = validate_parsed_document(parsed)
+    # Required sections differ by type — metric docs are thin on schema and don't
+    # require a ## Tables section or a golden query (see validate_parsed_document).
+    parse_errors = validate_parsed_document(
+        parsed, data_product_type=doc.data_product_type
+    )
     if parse_errors:
         print(f"\n⏭  {label}  ({doc.urn})")
         print("  → document is still being authored — skipping until complete:")

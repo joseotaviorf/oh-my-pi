@@ -78,6 +78,54 @@ def test_validate_parsed_document_fails_without_golden_query():
     assert any("Golden Queries" in e for e in errors)
 
 
+# DataHub's rich-text editor stores fenced SQL inline on one line (no newline
+# after ```sql), backslash-escapes the backticks, and splits the closing fence
+# with a space (``` -> ` ``). This is exactly how a published document reaches
+# the audit task, so the parser must still find the golden query.
+DATAHUB_INLINE_MD = (
+    "# Testing NPS 2\n\n"
+    "## Overview\n\nNPS overview for For Rent.\n\n"
+    "## Tables\n\nUse `dw_customer_satisfaction.fact_nps_dispatches`.\n\n"
+    "## Golden Query\n\n"
+    "\\`\\``sql WITH j AS ( SELECT 1 AS x "
+    "FROM dw_customer_satisfaction.fact_nps_dispatches ) "
+    "SELECT * FROM j ORDER BY x` \\`\\`\n\n"
+    "## Dos and Don'ts\n\nDo things.\n"
+)
+
+
+def test_parse_inline_datahub_fence_extracts_golden_query():
+    parsed = parse_entity_markdown(DATAHUB_INLINE_MD, fallback_title="Testing NPS 2")
+    assert len(parsed.golden_queries) == 1
+    sql = parsed.golden_queries[0].sql
+    assert sql.startswith("WITH j AS")
+    assert "```" not in sql and "`" not in sql  # no fence remnants leak into the SQL
+    assert validate_parsed_document(parsed) == []
+
+
+def test_metric_document_skips_tables_and_golden_query_checks():
+    # Metric docs are thin on schema: no ## Tables section and no golden query
+    # required (calculation + canonical filter are the source of truth).
+    metric_md = (
+        "# NPS FR\n\n"
+        "## Overview\n\nOfficial weighted NPS for For Rent.\n\n"
+        "## Calculation\n\nWeighted sum of journey components.\n\n"
+        "### Canonical Filter\n\n```sql\nbusiness_context = 'forRent'\n```\n"
+    )
+    parsed = parse_entity_markdown(metric_md)
+    assert validate_parsed_document(parsed, data_product_type="metric") == []
+
+
+def test_domain_document_still_requires_tables_and_golden_query():
+    # Same thin content fails for a domain entity, which must route by table and
+    # teach a canonical query.
+    metric_md = "# NPS FR\n\n## Overview\n\nNPS overview.\n"
+    parsed = parse_entity_markdown(metric_md)
+    errors = validate_parsed_document(parsed, data_product_type="domain")
+    assert any("Golden Queries" in e for e in errors)
+    assert any("schema.table" in e for e in errors)
+
+
 def test_extract_subjects_from_sql():
     sql = """
     SELECT a.x
