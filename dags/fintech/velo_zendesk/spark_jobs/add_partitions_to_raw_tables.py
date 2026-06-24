@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 import boto3
 from pyspark.sql.functions import lit
+from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -77,20 +78,32 @@ if __name__ == "__main__":
             f"msg=No files found for dt={execution_date}. Skipping."
         )
     else:
-        df = spark.read.json(partition_location).withColumn(
-            "dt", lit(execution_date).cast("date")
+        full_table_name = f"{database_name}.{table_name.lower()}"
+
+        # Enforce the existing table schema on read. Inferring the schema from a
+        # single day of JSON is unstable for nested structs (e.g. attachments)
+        # and makes the Delta write fail with "Failed to merge fields". The
+        # partition column dt is excluded here and re-added below.
+        table_schema = spark.table(full_table_name).schema
+        read_schema = StructType(
+            [field for field in table_schema.fields if field.name != "dt"]
+        )
+
+        df = (
+            spark.read.schema(read_schema)
+            .json(partition_location)
+            .withColumn("dt", lit(execution_date).cast("date"))
         )
 
         (
             df.write.format("delta")
             .mode("overwrite")
             .option("replaceWhere", f"dt = '{execution_date}'")
-            .option("mergeSchema", "true")
             .partitionBy("dt")
-            .saveAsTable(f"{database_name}.{table_name.lower()}")
+            .saveAsTable(full_table_name)
         )
 
         logger.info(
-            f"m={JOB_NAME}, table={database_name}.{table_name.lower()}, "
+            f"m={JOB_NAME}, table={full_table_name}, "
             f"dt={execution_date}, msg=Loaded partition into Delta raw table."
         )
