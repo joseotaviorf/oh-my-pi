@@ -1,4 +1,4 @@
-database_name: dw_credit_analysis
+database_name: dw_credit
 table_name: fact_early_credit
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
