@@ -432,3 +432,50 @@ class TestWriteValidationConfigsPrune:
         )
         text = cluster_path.read_text(encoding="utf-8")
         assert "validation:" in text
+
+
+class TestWriteValidationConfigsWonka:
+    def test_skips_write_when_prod_yml_missing(self, tmp_path):
+        rec = _Rec(
+            dag_id="quintoml.wonka.house_main",
+            cohort="collapse_to_single",
+            confidence="high",
+            actions="collapse_to_single",
+            current_preset="wonka_cluster",
+            recommended_preset="consolidation_s_memory_cluster",
+            rec_driver_node_type="r7g.8xlarge",
+            rec_worker_count=0,
+        )
+        quintoml_root = tmp_path
+        prod_path = (
+            quintoml_root / "jobs" / "wonka" / "house-main" / "configs" / "prod.yml"
+        )
+        out_yaml = tmp_path / "out.yml"
+
+        count = write_validation_configs(
+            [rec],
+            out_yaml,
+            dags_root=tmp_path / "dags",
+            quintoml_root=quintoml_root,
+            write_cluster_files=True,
+        )
+
+        assert count == 1
+        assert not prod_path.exists()
+        assert out_yaml.exists()
+
+    def test_none_quintoml_root_uses_default_for_wonka_paths(self, tmp_path):
+        rec = _Rec(
+            dag_id="quintoml.wonka.house_main",
+            cohort="no_change",
+            confidence="high",
+            actions="no_change",
+            current_preset="wonka_cluster",
+        )
+        write_validation_configs(
+            [rec],
+            tmp_path / "out.yml",
+            dags_root=tmp_path / "dags",
+            quintoml_root=None,
+            write_cluster_files=False,
+        )

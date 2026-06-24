@@ -58,6 +58,8 @@ Useful flags:
 | `--retarget-scope` | `bounded` | `bounded`: retarget only DAGs with an actionable change; `fleet`: retarget all Gen-6 DAGs |
 | `--include-validation-runs` | off | Union `__validation` runs into ARM metrics using **latest-generation-era** selection (see below) |
 | `--validation-config-filter` | `same-latest` | With `--include-validation-runs`: `same-latest` keeps validation rows matching the latest cluster shape (NVMe-normalized); `all` unions every validation run on the metrics generation |
+| `--dag-id-prefix` | `bietlejuice.%` | SQL LIKE prefix for dag-id scope (repeatable). Add `quintoml.wonka.%` for Wonka feature sets |
+| `--quintoml-root` | `~/Work/quintoml` | QuintoML repo root when writing Wonka `validation:` blocks with `--write-cluster-files` |
 
 Set `TRINO_HOST` to point at a non-prod Trino endpoint without changing the command line:
 
@@ -226,6 +228,21 @@ Review carefully:
 - `actions`: decision trace. Look for `reduce_driver`, `reduce_worker_type`, `reduce_worker_count`, `worker_count_blocked_sla`, `disable_photon`, and `drop_nvme`.
 - `protect_oom_risk`: handle before cost-saving waves; expect `m6g→r6g` at the same tier, not a same-family size-up.
 - `medium-x86`: recommendation derived from AMD (x86) history via `--use-amd-history`. Same cohorts as ARM (`collapse_to_single`, `right_size_multi`, `keep_multi_*`, etc.); lower confidence because telemetry is pre-Graviton. Wall times in the report are observed (uncorrected); SLA/collapse math applies a 26.5% ARM speedup factor (`AMD_WALL_CORRECTION = 0.735`) before sizing.
+
+### Wonka (`quintoml.wonka.*`)
+
+Most Wonka prod configs are still x86 (`r5a`/`c5a`). Until ARM prod telemetry exists, run with both prefixes and AMD history:
+
+```bash
+uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+  python scripts/recommend_cluster_specs.py \
+  --trino --list \
+  --dag-id-prefix 'bietlejuice.%' \
+  --dag-id-prefix 'quintoml.wonka.%' \
+  --use-amd-history
+```
+
+Rightsizing `--write-cluster-files` upserts `validation:` into QuintoML `jobs/wonka/*/configs/prod.yml` when `--quintoml-root` is set. Autoscale-heavy Wonka DAGs may classify as `autoscale_review` until autoscale-aware sizing lands; Phase 1 arch-migration blocks preserve autoscale via `generate_wonka_validation_blocks.py`.
 
 Do not promote directly from the report. Every change needs a validation DAG run.
 

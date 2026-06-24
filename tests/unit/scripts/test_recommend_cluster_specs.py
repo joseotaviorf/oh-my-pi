@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -26,8 +27,10 @@ from scripts.recommend_cluster_specs import (  # noqa: E402
     _apply_amd_wall_correction,
     _current_cost_basis,
     build_amd_recommendation,
+    build_dag_id_like_filter,
     build_recommendation,
     build_sql,
+    build_validation_dag_id_like_filter,
     build_validation_outcomes,
     build_validation_sql,
     classify,
@@ -40,6 +43,7 @@ from scripts.recommend_cluster_specs import (  # noqa: E402
     recommend_preset,
     size_single_node,
     write_validation_cluster_file,
+    write_validation_configs,
 )
 
 
@@ -1569,6 +1573,67 @@ class TestSqlAndRowMapping:
                 include_validation_runs=True,
                 validation_config_filter="bogus",
             )
+
+    def test_dag_id_prefix_filters_include_wonka(self):
+        sql = build_sql(
+            days=90,
+            min_days=3,
+            min_runs=3,
+            dag_id_prefixes=("bietlejuice.%", "quintoml.wonka.%"),
+        )
+        assert "bietlejuice.%" in sql
+        assert "quintoml.wonka.%" in sql
+        val_sql = build_validation_sql(
+            90,
+            2,
+            dag_id_prefixes=("bietlejuice.%", "quintoml.wonka.%"),
+        )
+        assert "quintoml.wonka.%__validation" in val_sql
+
+    def test_build_dag_id_like_filter_helpers(self):
+        assert "LIKE 'bietlejuice.%'" in build_dag_id_like_filter("airflow_dag_id")
+        multi = build_dag_id_like_filter(
+            "airflow_dag_id", ("bietlejuice.%", "quintoml.wonka.%")
+        )
+        assert " OR " in multi
+        val_multi = build_validation_dag_id_like_filter(
+            "airflow_dag_id", ("bietlejuice.%", "quintoml.wonka.%")
+        )
+        assert "quintoml.wonka.%__validation" in val_multi
+
+
+class TestWonkaRecommenderPathSetup:
+    def test_wonka_config_paths_module_imports_via_compiler_path(self):
+        if "scripts" in sys.modules and not hasattr(sys.modules["scripts"], "ci_cd"):
+            del sys.modules["scripts"]
+        mod = rcs._wonka_config_paths_module()
+        assert mod.WONKA_DAG_ID_PREFIX == "quintoml.wonka."
+        assert mod.DEFAULT_QUINTOML_ROOT.name == "quintoml"
+
+    def test_resolve_quintoml_root_from_wonka_prefix(self):
+        resolved = rcs._resolve_quintoml_root(None, ("quintoml.wonka.%",), [])
+        assert resolved == rcs._wonka_config_paths_module().DEFAULT_QUINTOML_ROOT
+
+    def test_resolve_quintoml_root_from_wonka_recommendations(self):
+        rec = MagicMock()
+        rec.dag_id = "quintoml.wonka.house_main"
+        resolved = rcs._resolve_quintoml_root(None, ("bietlejuice.%",), [rec])
+        assert resolved == rcs._wonka_config_paths_module().DEFAULT_QUINTOML_ROOT
+
+    def test_resolve_quintoml_root_returns_none_for_bietlejuice_only(self):
+        rec = MagicMock()
+        rec.dag_id = "bietlejuice.dw_agent"
+        assert rcs._resolve_quintoml_root(None, ("bietlejuice.%",), [rec]) is None
+
+    def test_write_validation_configs_omits_quintoml_root_when_none(self, tmp_path):
+        rec = MagicMock()
+        rec.dag_id = "bietlejuice.dw_agent"
+        mock_module = MagicMock()
+        mock_module.write_validation_configs.return_value = 0
+        with patch.object(rcs, "_rightsizing_validation_module", return_value=mock_module):
+            write_validation_configs([rec], tmp_path / "out.yml", quintoml_root=None)
+        call_kwargs = mock_module.write_validation_configs.call_args.kwargs
+        assert "quintoml_root" not in call_kwargs
 
     def test_row_to_metrics_parses_validation_mix_fields(self):
         metrics = rcs._row_to_metrics(

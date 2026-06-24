@@ -24,6 +24,11 @@ from .cluster_validation_mapping import (
     is_emr_prod_cluster_args,
 )
 from .cluster_yaml_format import dump_cluster_yaml
+from .wonka_config_paths import (
+    DEFAULT_QUINTOML_ROOT,
+    WONKA_DAG_ID_PREFIX,
+    dag_id_to_wonka_prod_path,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
 DEFAULT_DAGS_ROOT = REPO_ROOT / "dags"
@@ -93,6 +98,49 @@ def find_dag_cluster_path(
     return matches[0] if len(matches) == 1 else None
 
 
+def dag_id_to_config_path(
+    dag_id: str,
+    *,
+    dags_root: Path = DEFAULT_DAGS_ROOT,
+    quintoml_root: Path = DEFAULT_QUINTOML_ROOT,
+) -> Path | None:
+    """Resolve cluster config path for bietlejuice or quintoml.wonka dag ids."""
+    wonka_path = dag_id_to_wonka_prod_path(dag_id, quintoml_root)
+    if wonka_path is not None:
+        return wonka_path
+    dag_name = dag_id.removeprefix("bietlejuice.")
+    return find_dag_cluster_path(dag_name, dags_root)
+
+
+def _dag_name_from_dag_id(dag_id: str) -> str:
+    if dag_id.startswith(WONKA_DAG_ID_PREFIX):
+        return dag_id.removeprefix(WONKA_DAG_ID_PREFIX)
+    return dag_id.removeprefix("bietlejuice.")
+
+
+def _is_wonka_dag_id(dag_id: str) -> bool:
+    return dag_id.startswith(WONKA_DAG_ID_PREFIX)
+
+
+def load_wonka_prod_cluster_args(
+    dag_id: str, quintoml_root: Path = DEFAULT_QUINTOML_ROOT
+) -> tuple[dict | None, dict | None, Path | None]:
+    """Load prod cluster args and full declaration from QuintoML prod.yml."""
+    prod_path = dag_id_to_wonka_prod_path(dag_id, quintoml_root)
+    if prod_path is None or not prod_path.exists():
+        return None, None, prod_path
+    try:
+        doc = yaml.safe_load(prod_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        LOGGER.warning("Failed to parse YAML %s: %s", prod_path, exc)
+        return None, None, prod_path
+    if not isinstance(doc, dict):
+        return None, None, prod_path
+    cluster = doc.get("cluster")
+    cluster_args = cluster if isinstance(cluster, dict) else None
+    return cluster_args, doc, prod_path
+
+
 def find_dag_folder(dag_name: str, dags_root: Path = DEFAULT_DAGS_ROOT) -> Path | None:
     """Find the DAG folder containing {dag_name}_declaration.yml."""
     target = f"{dag_name}_declaration.yml"
@@ -135,8 +183,19 @@ def load_prod_cluster_args(dag_name: str, dags_root: Path) -> dict | None:
     return None
 
 
-def get_current_cluster_type(dag_name: str, dags_root: Path) -> str | None:
-    """Read prod cluster.type from *_cluster.yml, falling back to declaration."""
+def get_current_cluster_type(
+    dag_name: str,
+    dags_root: Path,
+    *,
+    dag_id: str | None = None,
+    quintoml_root: Path = DEFAULT_QUINTOML_ROOT,
+) -> str | None:
+    """Read prod cluster.type from cluster config or Wonka prod.yml."""
+    if dag_id and _is_wonka_dag_id(dag_id):
+        cluster_args, _, _ = load_wonka_prod_cluster_args(dag_id, quintoml_root)
+        if cluster_args:
+            return cluster_args.get("type")
+        return None
     cluster_path = find_dag_cluster_path(dag_name, dags_root)
     if cluster_path and cluster_path.exists():
         try:
@@ -181,6 +240,7 @@ def generate_validation_config(
     databricks_conn_id: str = "databricks_new",
     *,
     dags_root: Path = DEFAULT_DAGS_ROOT,
+    quintoml_root: Path = DEFAULT_QUINTOML_ROOT,
 ) -> dict | None:
     """Return a minimal validation block dict, or None when not actionable."""
     if rec.cohort not in _ACTIONABLE_COHORTS or not rec.recommended_preset:
@@ -195,16 +255,31 @@ def generate_validation_config(
         if not accepted_actions.intersection(rec.actions.split("|")):
             return None
 
-    dag_name = rec.dag_id.removeprefix("bietlejuice.")
-    prod_type = get_current_cluster_type(dag_name, dags_root) or rec.current_preset
+    dag_name = _dag_name_from_dag_id(rec.dag_id)
+    is_wonka = _is_wonka_dag_id(rec.dag_id)
+    prod_type = (
+        get_current_cluster_type(
+            dag_name,
+            dags_root,
+            dag_id=rec.dag_id,
+            quintoml_root=quintoml_root,
+        )
+        or rec.current_preset
+    )
 
-    prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)
+    if is_wonka:
+        prod_cluster_args, declaration, _ = load_wonka_prod_cluster_args(
+            rec.dag_id, quintoml_root
+        )
+        declaration = declaration or {}
+    else:
+        prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)
+        declaration = load_declaration(dag_name, dags_root) or {}
+
     if not prod_cluster_args:
         prod_cluster_args = {"type": prod_type or rec.current_preset or "unknown"}
     if is_emr_prod_cluster_args(prod_cluster_args):
         return None
-
-    declaration = load_declaration(dag_name, dags_root) or {}
 
     spec = build_rightsizing_validation_cluster_spec(
         prod_cluster_args=prod_cluster_args,
@@ -392,53 +467,78 @@ def write_validation_configs(
     dags_root: Path = DEFAULT_DAGS_ROOT,
     write_cluster_files: bool = False,
     databricks_conn_id: str = "databricks_new",
+    quintoml_root: Path | None = None,
 ) -> int:
-    """Write validation_configs.yml and optionally update *_cluster.yml files."""
+    """Write validation_configs.yml and optionally update cluster config files."""
+    from .wonka_validation_config import (  # noqa: PLC0415
+        remove_validation_from_wonka_prod_yml,
+        wonka_validation_is_noop,
+        write_validation_to_wonka_prod_yml,
+    )
+
+    quintoml_root = quintoml_root or DEFAULT_QUINTOML_ROOT
+
     entries: list[dict] = []
     for rec in recs:
-        dag_name = rec.dag_id.removeprefix("bietlejuice.")
-        prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)
+        dag_name = _dag_name_from_dag_id(rec.dag_id)
+        is_wonka = _is_wonka_dag_id(rec.dag_id)
+        if is_wonka:
+            prod_cluster_args, _, config_path = load_wonka_prod_cluster_args(
+                rec.dag_id, quintoml_root
+            )
+        else:
+            prod_cluster_args = load_prod_cluster_args(dag_name, dags_root)
+            config_path = find_dag_cluster_path(dag_name, dags_root)
+
         if prod_cluster_args and is_emr_prod_cluster_args(prod_cluster_args):
-            if write_cluster_files:
-                cluster_path = find_dag_cluster_path(dag_name, dags_root)
-                if cluster_path is None:
-                    folder = find_dag_folder(dag_name, dags_root)
-                    if folder:
-                        cluster_path = folder / f"{dag_name}_cluster.yml"
-                if cluster_path is not None:
-                    remove_validation_from_cluster_file(cluster_path)
+            if write_cluster_files and config_path is not None:
+                if is_wonka:
+                    remove_validation_from_wonka_prod_yml(config_path)
+                else:
+                    remove_validation_from_cluster_file(config_path)
             continue
 
-        cfg = generate_validation_config(rec, databricks_conn_id, dags_root=dags_root)
+        cfg = generate_validation_config(
+            rec,
+            databricks_conn_id,
+            dags_root=dags_root,
+            quintoml_root=quintoml_root,
+        )
         if not cfg:
-            if write_cluster_files:
-                cluster_path = find_dag_cluster_path(dag_name, dags_root)
-                if cluster_path is None:
-                    folder = find_dag_folder(dag_name, dags_root)
-                    if folder:
-                        cluster_path = folder / f"{dag_name}_cluster.yml"
-                if (
-                    cluster_path is not None
-                    and cluster_path.exists()
-                    and _cluster_file_validation_is_noop(cluster_path)
-                ):
-                    remove_validation_from_cluster_file(cluster_path)
+            if write_cluster_files and config_path is not None and config_path.exists():
+                if is_wonka:
+                    if wonka_validation_is_noop(config_path):
+                        remove_validation_from_wonka_prod_yml(config_path)
+                elif _cluster_file_validation_is_noop(config_path):
+                    remove_validation_from_cluster_file(config_path)
             continue
         entries.append(cfg)
 
         if write_cluster_files:
-            cluster_path = find_dag_cluster_path(dag_name, dags_root)
-            if cluster_path is None:
-                folder = find_dag_folder(dag_name, dags_root)
-                if folder:
-                    cluster_path = folder / f"{dag_name}_cluster.yml"
-            if cluster_path is None:
+            if config_path is None:
+                if is_wonka:
+                    config_path = dag_id_to_wonka_prod_path(rec.dag_id, quintoml_root)
+                else:
+                    folder = find_dag_folder(dag_name, dags_root)
+                    if folder:
+                        config_path = folder / f"{dag_name}_cluster.yml"
+            if config_path is None:
                 LOGGER.warning("cannot locate cluster file for %s", rec.dag_id)
                 continue
-            current_type = get_current_cluster_type(dag_name, dags_root)
-            write_validation_cluster_file(
-                cluster_path, cfg, current_type, databricks_conn_id
-            )
+            if is_wonka:
+                if not config_path.exists():
+                    LOGGER.warning(
+                        "Wonka prod.yml not found at %s; skipping write for %s",
+                        config_path,
+                        rec.dag_id,
+                    )
+                    continue
+                write_validation_to_wonka_prod_yml(config_path, cfg["validation"])
+            else:
+                current_type = get_current_cluster_type(dag_name, dags_root)
+                write_validation_cluster_file(
+                    config_path, cfg, current_type, databricks_conn_id
+                )
 
     out_yaml.parent.mkdir(parents=True, exist_ok=True)
     out_yaml.write_text(
