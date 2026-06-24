@@ -1,0 +1,75 @@
+---
+database_name: datalake_sales_flow_raw
+table_name: tic_aud
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Raw CDC audit table from Sales Flow postgres with Hibernate Envers history for TIC
+  (Termo de Intermediação Compartilhada) records. Captures every revision of the tic entity,
+  including document reference changes and status transitions as partners create, confirm, and
+  upload TIC documents through CDI or Vendas. Join rev with revinfo to resolve revision timestamps.
+columns:
+  id:
+    description: Entity identifier of the audited TIC record (matches tic.id in the source database).
+  rev:
+    description: |
+      Envers revision identifier for this audit row. Join with revinfo.id to obtain the revision
+      timestamp and author of the change.
+  revtype:
+    description: Hibernate Envers revision type code (0=create, 1=update, 2=delete).
+  revend:
+    description: |
+      Revision identifier of the audit entry that superseded this row, closing its validity window
+      in the Envers history chain.
+  sales_flow_id:
+    description: Sales flow foreign key value at this revision, linking the TIC to its 3P offer context.
+  sales_flow_id_mod:
+    description: Envers flag indicating whether sales_flow_id changed in this revision.
+  signed_document_reference:
+    description: BlobVault objectId for the signed TIC PDF as stored in this revision.
+  signed_document_reference_mod:
+    description: Envers flag indicating whether signed_document_reference changed in this revision.
+  unsigned_document_reference:
+    description: BlobVault objectId for the unsigned TIC PDF as stored in this revision.
+  unsigned_document_reference_mod:
+    description: Envers flag indicating whether unsigned_document_reference changed in this revision.
+  status:
+    description: |
+      TIC lifecycle status at this revision (e.g. CREATED after document confirmation,
+      SIGNED after final upload with CCV).
+  status_mod:
+    description: Envers flag indicating whether status changed in this revision.
+  template_version:
+    description: Contract-filler template version number at this revision.
+  template_version_mod:
+    description: Envers flag indicating whether template_version changed in this revision.
+  created_at:
+    description: Entity created_at value preserved in this audit revision.
+  updated_at:
+    description: Entity updated_at value preserved in this audit revision.
+  signed_document_origin:
+    description: |
+      Upload channel for the signed document at this revision (CDI for Central da Imobiliária,
+      VENDAS for the legacy expert upload flow).
+  signed_document_origin_mod:
+    description: Envers flag indicating whether signed_document_origin changed in this revision.
+  updated_at_mod:
+    description: Envers flag indicating whether updated_at changed in this revision.
+  op_cdc:
+    description: CDC operation type captured by Debezium (insert, update, or delete).
+  ts_cdc_transaction:
+    description: Timestamp when the change was captured by the CDC pipeline.
+  ts_database_transaction:
+    description: Timestamp of the database transaction in the source system.
+  cdc_transaction_id:
+    description: Source database transaction identifier for the CDC event.
+  cdc_binlog_position:
+    description: Postgres logical sequence number (LSN) for the CDC event.
+  year:
+    description: Year partition derived from the CDC ingestion timestamp.
+  month:
+    description: Month partition derived from the CDC ingestion timestamp.
+  day:
+    description: Day partition derived from the CDC ingestion timestamp.
+  hour:
+    description: Hour partition derived from the CDC ingestion timestamp.

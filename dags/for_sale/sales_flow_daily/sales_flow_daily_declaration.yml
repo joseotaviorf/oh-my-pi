@@ -20,3 +20,11 @@ workflow:
       clean_table_name: ai_legal_analysis_lego_contract_execution_change_log
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
+    tic:
+      clean_table_name: tic
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    tic_aud:
+      clean_table_name: tic_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
