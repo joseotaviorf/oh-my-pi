@@ -1,0 +1,120 @@
+database_name: datalake_meetcall_clean
+table_name: logs
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Clean-layer collection occurrence log from the MeetCall BPO dialer platform,
+  one row per customer contact attempt (id_occurrence). Sourced from raw acoescobranca
+  exports and merged incrementally by occurrence start time. Used by Fintech collections
+  squads to monitor operator actions, contact outcomes, channel mix, and satisfaction
+  survey results across outsourced recovery operations.
+columns:
+  id_occurrence:
+    description: Primary key of the collection occurrence in MeetCall; deduplicated on
+      merge using the occurrence start timestamp.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.id_ocorrencia
+  id_operator_cyber:
+    description: Operator login identifier in the Cyber collections system linked to
+      the occurrence.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.id_operador_cyber
+  id_operator:
+    description: MeetCall-assigned operator login (assessoria) who handled the contact.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.id_operador_assessoria
+  id_contract:
+    description: QuintoAndar contract identifier associated with the delinquent account
+      contacted in the occurrence.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.id_contrato
+  phone_contacted:
+    description: Phone number dialed or messaged during the collection attempt.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.telefone_acionado
+  email_contacted:
+    description: Email address used when the occurrence was handled through an email
+      channel.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.email_acionado
+  assessment_tag:
+    description: Assessment-team disposition tag (tabulação) applied to classify the
+      interaction outcome.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.tabulacao_assessoria
+  action:
+    description: Operator action recorded for the occurrence, such as call attempt or
+      follow-up step.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.acao
+  result:
+    description: Outcome code returned by the operator workflow after the contact attempt.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.resultado
+  complement:
+    description: Free-text notes or additional context entered by the operator about
+      the occurrence.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.complemento
+  survey_sent:
+    description: Flag indicating whether a post-contact satisfaction survey was sent
+      to the customer.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.envio_pesquisa
+  survey_score:
+    description: Numeric satisfaction score provided by the customer when a survey
+      was completed.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.nota_pesquisa
+  channel:
+    description: Communication channel used in the attempt, for example voice, SMS, or
+      email.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.canal
+  contact_type:
+    description: Contact modality classification defined by MeetCall for the occurrence.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.tipo_contato
+  triggered:
+    description: Whether the contact was system-triggered (acionamento) rather than
+      manually initiated by the operator.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.acionamento
+  alo:
+    description: Boolean indicator that the call reached a live answer (alo) during
+      the voice attempt.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.alo
+  cpc:
+    description: Contact-per-contact (CPC) indicator marking that the right party was
+      reached in the attempt.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.cpc
+  talk_time:
+    description: Spoken call duration in seconds when a voice connection was established.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.tempo_falado
+  ts_occurrence_start:
+    description: Timestamp when the operator started handling the occurrence in MeetCall.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.data_hora_ocorrencia_inicio
+  ts_occurrence_end:
+    description: Timestamp when the operator finished handling the occurrence in MeetCall.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.data_hora_ocorrencia_fim
+  year:
+    description: Partition year derived from the occurrence event date in the source
+      export.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.year
+  month:
+    description: Partition month derived from the occurrence event date in the source
+      export.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.month
+  day:
+    description: Partition day derived from the occurrence event date in the source
+      export.
+    lineage:
+    - datalake_meetcall_raw.acoescobranca.day
+  ts_load:
+    description: Pipeline load timestamp set at clean-layer execution time (NOW()).
