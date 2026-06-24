@@ -1,125 +1,157 @@
----
 database_name: datalake_nexxera_clean
-table_name: acquirer_traier
+table_name: acquirer_trailer
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Table containing all acquirer trailers data from nexxera files (id_registration = 98). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+description: 'Table containing all acquirer trailers data from nexxera files (id_registration
+  = 98). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1'
 columns:
   id_registration:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_1
-      - datalake_nexxera_raw.financial.col_1
-      - datalake_nexxera_raw.inadvance.col_1
-      - datalake_nexxera_raw.sales.col_1
-      - datalake_nexxera_raw.transaction.col_1
+    - datalake_nexxera_raw.adjustments.col_1
+    - datalake_nexxera_raw.financial.col_1
+    - datalake_nexxera_raw.inadvance.col_1
+    - datalake_nexxera_raw.sales.col_1
+    - datalake_nexxera_raw.transaction.col_1
+    description: CNAB registration type code (98) identifying acquirer trailer records.
   group_name:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_2
-      - datalake_nexxera_raw.financial.col_2
-      - datalake_nexxera_raw.inadvance.col_2
-      - datalake_nexxera_raw.sales.col_2
-      - datalake_nexxera_raw.transaction.col_2
+    - datalake_nexxera_raw.adjustments.col_2
+    - datalake_nexxera_raw.financial.col_2
+    - datalake_nexxera_raw.inadvance.col_2
+    - datalake_nexxera_raw.sales.col_2
+    - datalake_nexxera_raw.transaction.col_2
+    description: Merchant group name reported in the Nexxera acquirer trailer file.
   group_cnpj:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_3
-      - datalake_nexxera_raw.financial.col_3
-      - datalake_nexxera_raw.inadvance.col_3
-      - datalake_nexxera_raw.sales.col_3
-      - datalake_nexxera_raw.transaction.col_3
+    - datalake_nexxera_raw.adjustments.col_3
+    - datalake_nexxera_raw.financial.col_3
+    - datalake_nexxera_raw.inadvance.col_3
+    - datalake_nexxera_raw.sales.col_3
+    - datalake_nexxera_raw.transaction.col_3
+    description: CNPJ tax identifier of the merchant group in the trailer record.
   acquirer_name:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_4
-      - datalake_nexxera_raw.financial.col_4
-      - datalake_nexxera_raw.inadvance.col_4
-      - datalake_nexxera_raw.sales.col_4
-      - datalake_nexxera_raw.transaction.col_4
+    - datalake_nexxera_raw.adjustments.col_4
+    - datalake_nexxera_raw.financial.col_4
+    - datalake_nexxera_raw.inadvance.col_4
+    - datalake_nexxera_raw.sales.col_4
+    - datalake_nexxera_raw.transaction.col_4
+    description: Name of the card acquirer reported in the Nexxera trailer segment.
   sale_installments_net_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_5
-      - datalake_nexxera_raw.financial.col_5
-      - datalake_nexxera_raw.inadvance.col_5
-      - datalake_nexxera_raw.sales.col_5
-      - datalake_nexxera_raw.transaction.col_5
+    - datalake_nexxera_raw.adjustments.col_5
+    - datalake_nexxera_raw.financial.col_5
+    - datalake_nexxera_raw.inadvance.col_5
+    - datalake_nexxera_raw.sales.col_5
+    - datalake_nexxera_raw.transaction.col_5
+    description: Net value of card sale installments summarized in the acquirer trailer.
   summary_anticipated_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_6
-      - datalake_nexxera_raw.financial.col_6
-      - datalake_nexxera_raw.inadvance.col_6
-      - datalake_nexxera_raw.sales.col_6
-      - datalake_nexxera_raw.transaction.col_6
+    - datalake_nexxera_raw.adjustments.col_6
+    - datalake_nexxera_raw.financial.col_6
+    - datalake_nexxera_raw.inadvance.col_6
+    - datalake_nexxera_raw.sales.col_6
+    - datalake_nexxera_raw.transaction.col_6
+    description: Total anticipated settlement value in the acquirer trailer summary.
   credit_adjustments_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_7
-      - datalake_nexxera_raw.financial.col_7
-      - datalake_nexxera_raw.inadvance.col_7
-      - datalake_nexxera_raw.sales.col_7
-      - datalake_nexxera_raw.transaction.col_7
+    - datalake_nexxera_raw.adjustments.col_7
+    - datalake_nexxera_raw.financial.col_7
+    - datalake_nexxera_raw.inadvance.col_7
+    - datalake_nexxera_raw.sales.col_7
+    - datalake_nexxera_raw.transaction.col_7
+    description: Sum of credit adjustments applied in the acquirer trailer.
   debit_adjustments_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_8
-      - datalake_nexxera_raw.financial.col_8
-      - datalake_nexxera_raw.inadvance.col_8
-      - datalake_nexxera_raw.sales.col_8
-      - datalake_nexxera_raw.transaction.col_8
+    - datalake_nexxera_raw.adjustments.col_8
+    - datalake_nexxera_raw.financial.col_8
+    - datalake_nexxera_raw.inadvance.col_8
+    - datalake_nexxera_raw.sales.col_8
+    - datalake_nexxera_raw.transaction.col_8
+    description: Sum of debit adjustments applied in the acquirer trailer.
   compensated_adjustments_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_9
-      - datalake_nexxera_raw.financial.col_9
-      - datalake_nexxera_raw.inadvance.col_9
-      - datalake_nexxera_raw.sales.col_9
-      - datalake_nexxera_raw.transaction.col_9
+    - datalake_nexxera_raw.adjustments.col_9
+    - datalake_nexxera_raw.financial.col_9
+    - datalake_nexxera_raw.inadvance.col_9
+    - datalake_nexxera_raw.sales.col_9
+    - datalake_nexxera_raw.transaction.col_9
+    description: Compensated adjustment value netted in the Nexxera acquirer trailer.
   legacy_summary_installments_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_10
-      - datalake_nexxera_raw.financial.col_10
-      - datalake_nexxera_raw.inadvance.col_10
-      - datalake_nexxera_raw.sales.col_10
-      - datalake_nexxera_raw.transaction.col_10
-  sale_installments_value:
+    - datalake_nexxera_raw.adjustments.col_10
+    - datalake_nexxera_raw.financial.col_10
+    - datalake_nexxera_raw.inadvance.col_10
+    - datalake_nexxera_raw.sales.col_10
+    - datalake_nexxera_raw.transaction.col_10
+    description: Legacy summarized installment value carried in the trailer file.
+  source_file:
+    description: Nexxera source file type (adjustments, financial, inadvance, sales,
+      or transaction).
+  total_sale_installments:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_11
-      - datalake_nexxera_raw.financial.col_11
-      - datalake_nexxera_raw.inadvance.col_11
-      - datalake_nexxera_raw.sales.col_11
-      - datalake_nexxera_raw.transaction.col_11
-  sale_statements_amount:
+    - datalake_nexxera_raw.adjustments.col_11
+    - datalake_nexxera_raw.financial.col_11
+    - datalake_nexxera_raw.inadvance.col_11
+    - datalake_nexxera_raw.sales.col_11
+    - datalake_nexxera_raw.transaction.col_11
+    description: Total count of sale installments reported in the trailer.
+  total_sale_statements:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_12
-      - datalake_nexxera_raw.financial.col_12
-      - datalake_nexxera_raw.inadvance.col_12
-      - datalake_nexxera_raw.sales.col_12
-      - datalake_nexxera_raw.transaction.col_12
-  sale_summary_amount:
+    - datalake_nexxera_raw.adjustments.col_12
+    - datalake_nexxera_raw.financial.col_12
+    - datalake_nexxera_raw.inadvance.col_12
+    - datalake_nexxera_raw.sales.col_12
+    - datalake_nexxera_raw.transaction.col_12
+    description: Total count of sale statements reported in the trailer.
+  total_sale_summary:
     lineage:
-      - datalake_nexxera_raw.adjustments.col_13
-      - datalake_nexxera_raw.financial.col_13
-      - datalake_nexxera_raw.inadvance.col_13
-      - datalake_nexxera_raw.sales.col_13
-      - datalake_nexxera_raw.transaction.col_13
+    - datalake_nexxera_raw.adjustments.col_13
+    - datalake_nexxera_raw.financial.col_13
+    - datalake_nexxera_raw.inadvance.col_13
+    - datalake_nexxera_raw.sales.col_13
+    - datalake_nexxera_raw.transaction.col_13
+    description: Total count of sale summary records reported in the trailer.
   year:
     lineage:
-      - datalake_nexxera_raw.adjustments.year
-      - datalake_nexxera_raw.financial.year
-      - datalake_nexxera_raw.inadvance.year
-      - datalake_nexxera_raw.sales.year
-      - datalake_nexxera_raw.transaction.year
+    - datalake_nexxera_raw.adjustments.year
+    - datalake_nexxera_raw.financial.year
+    - datalake_nexxera_raw.inadvance.year
+    - datalake_nexxera_raw.sales.year
+    - datalake_nexxera_raw.transaction.year
+    description: Column year on acquirer_trailer.
   month:
     lineage:
-      - datalake_nexxera_raw.adjustments.month
-      - datalake_nexxera_raw.financial.month
-      - datalake_nexxera_raw.inadvance.month
-      - datalake_nexxera_raw.sales.month
-      - datalake_nexxera_raw.transaction.month
+    - datalake_nexxera_raw.adjustments.month
+    - datalake_nexxera_raw.financial.month
+    - datalake_nexxera_raw.inadvance.month
+    - datalake_nexxera_raw.sales.month
+    - datalake_nexxera_raw.transaction.month
+    description: Column month on acquirer_trailer.
   day:
     lineage:
-      - datalake_nexxera_raw.adjustments.day
-      - datalake_nexxera_raw.financial.day
-      - datalake_nexxera_raw.inadvance.day
-      - datalake_nexxera_raw.sales.day
-      - datalake_nexxera_raw.transaction.day
+    - datalake_nexxera_raw.adjustments.day
+    - datalake_nexxera_raw.financial.day
+    - datalake_nexxera_raw.inadvance.day
+    - datalake_nexxera_raw.sales.day
+    - datalake_nexxera_raw.transaction.day
+    description: Column day on acquirer_trailer.
   ts_ingested:
     lineage:
-      - datalake_nexxera_raw.adjustments.ts_ingested
-      - datalake_nexxera_raw.financial.ts_ingested
-      - datalake_nexxera_raw.inadvance.ts_ingested
-      - datalake_nexxera_raw.sales.ts_ingested
-      - datalake_nexxera_raw.transaction.ts_ingested
+    - datalake_nexxera_raw.adjustments.year
+    - datalake_nexxera_raw.adjustments.month
+    - datalake_nexxera_raw.adjustments.day
+    - datalake_nexxera_raw.financial.year
+    - datalake_nexxera_raw.financial.month
+    - datalake_nexxera_raw.financial.day
+    - datalake_nexxera_raw.inadvance.year
+    - datalake_nexxera_raw.inadvance.month
+    - datalake_nexxera_raw.inadvance.day
+    - datalake_nexxera_raw.sales.year
+    - datalake_nexxera_raw.sales.month
+    - datalake_nexxera_raw.sales.day
+    - datalake_nexxera_raw.transaction.year
+    - datalake_nexxera_raw.transaction.month
+    - datalake_nexxera_raw.transaction.day
+    description: Timestamp when the acquirer trailer row was ingested from Nexxera
+      files.
