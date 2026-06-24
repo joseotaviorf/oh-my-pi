@@ -285,8 +285,8 @@ assignment_snapshots_ranked AS (
         ad.dt_reference = ad.dt_series_end AS is_current,
         im.dt_original_hired AS dt_original_hire,
         ad.dt_started AS dt_hired,
-        COALESCE(ad.dt_terminated, DATE('9999-12-31')) AS dt_terminated,
-        COALESCE(ad.dt_notified_termination, DATE('9999-12-31')) AS dt_notified_termination,
+        ad.dt_terminated,
+        ad.dt_notified_termination,
         ad.dt_reference AS dt_reference,
         LAST_DAY(ad.dt_reference) AS dt_month_reference,
         NOW() AS ts_load,
@@ -316,11 +316,7 @@ assignment_snapshots_ranked AS (
             ON all_assign.id_assignment = ad.id_assignment
             AND all_assign.assignment_type IN ('E', 'C')
             AND ad.dt_reference >= all_assign.dt_effective_started
-            AND ad.dt_reference <= CASE
-                WHEN all_assign.dt_effective_ended >= DATE('4712-12-31')
-                    THEN DATE('9999-12-31')
-                ELSE COALESCE(all_assign.dt_effective_ended, DATE('9999-12-31'))
-            END
+            AND ad.dt_reference <= all_assign.dt_effective_ended
     LEFT JOIN
         direct_report_counts AS drc
             ON drc.manager_assignment_number = ad.assignment_number
@@ -344,11 +340,7 @@ assignment_snapshots_ranked AS (
             ON pei.id_person = ad.id_person
             AND pei.information_type = 'Contatos de Emergência'
             AND ad.dt_reference >= pei.dt_effective_started
-            AND ad.dt_reference <= CASE
-                WHEN pei.dt_effective_ended >= DATE('4712-12-31')
-                    THEN DATE('9999-12-31')
-                ELSE COALESCE(pei.dt_effective_ended, DATE('9999-12-31'))
-            END
+            AND ad.dt_reference <= pei.dt_effective_ended
     LEFT JOIN
         primary_assignment_per_person_day AS pap
             ON pap.id_person = ad.id_person

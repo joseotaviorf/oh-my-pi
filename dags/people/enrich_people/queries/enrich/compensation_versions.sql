@@ -67,7 +67,7 @@
  *     salary_plr_periods              — rebuild contiguous sub-periods from boundaries
  *     salary_with_plr_target          — attach multiplier and amount PLR via independent joins
  *     salary_enriched                 — attach event_definition; null adjustments on split rows
- *     salary_consolidation_base       — normalise NULL dt_ended to 4712-12-31
+ *     salary_consolidation_base       — normalise NULL dt_ended to 9999-12-31
  *     salary_consolidation_groups     — detect consecutive identical salary records (gaps-and-islands)
  *     salary_consolidated             — collapse identical consecutive records into one row
  *     salary_with_reference           — add dt_reference = LEAST(CURRENT_DATE, dt_valid_to)
@@ -111,22 +111,30 @@ WITH salary_with_person AS (
         AND (sal.dt_ended IS NULL OR sal.dt_started <= sal.dt_ended)
         AND im.assignment_number NOT LIKE 'P%'
 ),
-assignment_identifier_mapping AS (
+assignment_identifier_mapping_ranked AS (
     -- Stable mapping from id_assignment to id_continuous_employment_cycle.
-    -- QUALIFY picks the earliest dt_started in case an assignment appears in multiple
+    -- Picks the earliest dt_started in case an assignment appears in multiple
     -- identifier_mapping rows (edge case from partial loads).
+    SELECT
+        id_assignment,
+        id_continuous_employment_cycle,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_assignment
+            ORDER BY dt_started ASC
+        ) AS rn
+    FROM
+        datalake_people.identifier_mapping
+),
+assignment_identifier_mapping AS (
     SELECT
         id_assignment,
         id_continuous_employment_cycle
     FROM
-        datalake_people.identifier_mapping
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_assignment
-            ORDER BY dt_started ASC
-        ) = 1
+        assignment_identifier_mapping_ranked
+    WHERE
+        rn = 1
 ),
-assignment_history_base AS (
+assignment_history_base_ranked AS (
     -- Deduplicated assignment history: one row per (assignment, effective date range),
     -- keeping the highest effective_sequence / object_version_number to resolve Oracle
     -- correction rows that share the same date range.
@@ -136,16 +144,7 @@ assignment_history_base AS (
         aa.id_job,
         aa.dt_effective_started,
         aa.dt_effective_ended,
-        im.id_continuous_employment_cycle
-    FROM
-        datalake_pin_core_clean.all_assignments AS aa
-    LEFT JOIN
-        assignment_identifier_mapping AS im
-            ON aa.id_assignment = im.id_assignment
-    WHERE
-        aa.id_job IS NOT NULL
-        AND aa.assignment_number NOT LIKE 'P%'
-    QUALIFY
+        im.id_continuous_employment_cycle,
         ROW_NUMBER() OVER (
             PARTITION BY
                 aa.id_assignment,
@@ -154,7 +153,28 @@ assignment_history_base AS (
             ORDER BY
                 aa.effective_sequence DESC,
                 aa.object_version_number DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    LEFT JOIN
+        assignment_identifier_mapping AS im
+            ON aa.id_assignment = im.id_assignment
+    WHERE
+        aa.id_job IS NOT NULL
+        AND aa.assignment_number NOT LIKE 'P%'
+),
+assignment_history_base AS (
+    SELECT
+        id_person,
+        id_assignment,
+        id_job,
+        dt_effective_started,
+        dt_effective_ended,
+        id_continuous_employment_cycle
+    FROM
+        assignment_history_base_ranked
+    WHERE
+        rn = 1
 ),
 assignment_job_groups AS (
     -- Detect job changes within a single assignment using gaps-and-islands.
@@ -225,7 +245,7 @@ job_with_salary_table_effective AS (
         target_hiring_sop,
         target_exceptional_bonus,
         dt_valid_from,
-        COALESCE(dt_valid_to, DATE('4712-12-31')) AS dt_valid_to
+        COALESCE(dt_valid_to, DATE('9999-12-31')) AS dt_valid_to
     FROM
         datalake_people.job_with_salary_table
     WHERE
@@ -384,7 +404,7 @@ person_plr_base AS (
         CAST(eev.screen_entry_value AS DECIMAL(18, 4)) AS plr_value,
         GREATEST(ee.dt_effective_started, eev.dt_effective_started) AS dt_valid_from,
         CASE
-            WHEN LEAST(ee.dt_effective_ended, eev.dt_effective_ended) >= DATE('4712-12-31')
+            WHEN LEAST(ee.dt_effective_ended, eev.dt_effective_ended) >= DATE('9999-12-31')
             THEN DATE('9999-12-31')
             ELSE LEAST(ee.dt_effective_ended, eev.dt_effective_ended)
         END AS dt_valid_to,
@@ -509,7 +529,7 @@ salary_with_assignment_job AS (
             WHEN assignment_history.id_job IS NULL
             THEN sal.dt_ended
             ELSE LEAST(
-                COALESCE(sal.dt_ended, DATE('4712-12-31')),
+                sal.dt_ended,
                 assignment_history.dt_effective_ended
             )
         END AS dt_ended
@@ -518,7 +538,7 @@ salary_with_assignment_job AS (
     LEFT JOIN
         assignment_history AS assignment_history
             ON assignment_history.id_assignment = sal.id_assignment
-            AND assignment_history.dt_effective_started <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND assignment_history.dt_effective_started <= sal.dt_ended
             AND assignment_history.dt_effective_ended > sal.dt_started
 ),
 salary_with_job_version AS (
@@ -556,7 +576,7 @@ salary_with_job_version AS (
         CASE
             WHEN jst.sk_job_version IS NULL
             THEN sal.dt_ended
-            ELSE LEAST(COALESCE(sal.dt_ended, DATE('4712-12-31')), jst.dt_valid_to)
+            ELSE LEAST(sal.dt_ended, jst.dt_valid_to)
         END AS dt_ended,
         jst.sk_job_version,
         jst.target_rvv,
@@ -568,7 +588,7 @@ salary_with_job_version AS (
     LEFT JOIN
         job_with_salary_table_effective AS jst
             ON sal.id_job = jst.id_job
-            AND jst.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND jst.dt_valid_from <= sal.dt_ended
             AND jst.dt_valid_to >= sal.dt_started
 ),
 salary_plr_boundary_salary_starts AS (
@@ -592,7 +612,7 @@ salary_plr_boundary_multiplier_starts AS (
         person_plr_multiplier AS plr_mult
             ON sal.id_person = plr_mult.id_person
             AND plr_mult.dt_valid_from > sal.dt_started
-            AND plr_mult.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND plr_mult.dt_valid_from <= sal.dt_ended
 ),
 salary_plr_boundary_multiplier_ends AS (
     SELECT
@@ -606,7 +626,7 @@ salary_plr_boundary_multiplier_ends AS (
         person_plr_multiplier AS plr_mult
             ON sal.id_person = plr_mult.id_person
             AND plr_mult.dt_valid_to >= sal.dt_started
-            AND plr_mult.dt_valid_to < COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND plr_mult.dt_valid_to < sal.dt_ended
 ),
 salary_plr_boundary_amount_starts AS (
     SELECT
@@ -620,7 +640,7 @@ salary_plr_boundary_amount_starts AS (
         person_plr_amount AS plr_amt
             ON sal.id_person = plr_amt.id_person
             AND plr_amt.dt_valid_from > sal.dt_started
-            AND plr_amt.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND plr_amt.dt_valid_from <= sal.dt_ended
 ),
 salary_plr_boundary_amount_ends AS (
     SELECT
@@ -634,7 +654,7 @@ salary_plr_boundary_amount_ends AS (
         person_plr_amount AS plr_amt
             ON sal.id_person = plr_amt.id_person
             AND plr_amt.dt_valid_to >= sal.dt_started
-            AND plr_amt.dt_valid_to < COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND plr_amt.dt_valid_to < sal.dt_ended
 ),
 salary_plr_boundary_union AS (
     SELECT
@@ -706,7 +726,7 @@ salary_plr_periods AS (
                 ),
                 -1
             ),
-            COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            sal.dt_ended
         ) AS dt_ended
     FROM
         salary_plr_period_boundaries AS b
@@ -746,7 +766,7 @@ salary_with_plr_target AS (
         sal.sk_job_version,
         per.dt_started,
         CASE
-            WHEN per.dt_ended >= DATE('4712-12-31')
+            WHEN per.dt_ended >= DATE('9999-12-31')
             THEN NULL
             ELSE per.dt_ended
         END AS dt_ended,
@@ -828,7 +848,7 @@ salary_enriched AS (
             AND sal.id_action_reason = ed.id_reason
 ),
 salary_consolidation_base AS (
-    -- Normalise NULL dt_ended to 4712-12-31 (Oracle open-ended sentinel) so that
+    -- Normalise NULL dt_ended to 9999-12-31 (People open-ended sentinel) so that
     -- the gaps-and-islands in salary_consolidation_groups can compare dates uniformly.
     SELECT
         id_salary,
@@ -849,7 +869,7 @@ salary_consolidation_base AS (
         range_position AS range_percentile,
         is_salary_approved,
         dt_started,
-        COALESCE(dt_ended, DATE('4712-12-31')) AS dt_ended_normalized,
+        COALESCE(dt_ended, DATE('9999-12-31')) AS dt_ended_normalized,
         id_event_definition,
         action_code,
         reason_code,
@@ -1027,14 +1047,14 @@ salary_consolidated AS (
 ),
 salary_with_reference AS (
     -- dt_reference is the effective date used to measure tenure for each row.
-    -- For open records (dt_ended_normalized = 4712-12-31) it is CURRENT_DATE.
+    -- For open records (dt_ended_normalized = 9999-12-31) it is CURRENT_DATE.
     -- For closed historical records it is the last day of validity (dt_valid_to),
     -- so tenure reflects the employee's state at the end of that salary period.
     SELECT
         sal.*,
         LEAST(
             CURRENT_DATE,
-            COALESCE(NULLIF(sal.dt_ended_normalized, DATE('4712-12-31')), CURRENT_DATE)
+            COALESCE(NULLIF(sal.dt_ended_normalized, DATE('9999-12-31')), CURRENT_DATE)
         ) AS dt_reference
     FROM
         salary_consolidated AS sal
@@ -1088,13 +1108,13 @@ SELECT
     -- SCD Type 2 validity window: one row per consolidated compensation period.
     sal.dt_started AS dt_valid_from,
     CASE
-        WHEN sal.dt_ended_normalized >= DATE('4712-12-31')
+        WHEN sal.dt_ended_normalized >= DATE('9999-12-31')
         THEN DATE('9999-12-31')
         ELSE sal.dt_ended_normalized
     END AS dt_valid_to,
     CASE
         WHEN sal.dt_started <= CURRENT_DATE
-            AND (sal.dt_ended_normalized >= DATE('4712-12-31') OR sal.dt_ended_normalized > CURRENT_DATE)
+            AND (sal.dt_ended_normalized >= DATE('9999-12-31') OR sal.dt_ended_normalized > CURRENT_DATE)
         THEN TRUE
         ELSE FALSE
     END AS is_current,

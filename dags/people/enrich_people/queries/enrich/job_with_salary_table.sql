@@ -13,7 +13,7 @@ WITH salary_bases_history AS (
                 PARTITION BY id_salary_basis
                 ORDER BY object_version_number
             ),
-            DATE('4712-12-31')
+            DATE('9999-12-31')
         ) AS dt_effective_ended
     FROM
         datalake_pin_compensation_clean.salary_bases
@@ -148,14 +148,14 @@ job_with_salary_table_base_ranked AS (
         ) AS dt_valid_from,
         LEAST(
             j.dt_effective_ended,
-            COALESCE(vg.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(gl.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(glt.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(gt.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(gt_ptb.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(r.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(rv.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(sb.dt_effective_ended, DATE('4712-12-31'))
+            COALESCE(vg.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(gl.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(glt.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(gt.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(gt_ptb.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(r.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(rv.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(sb.dt_effective_ended, DATE('9999-12-31'))
         ) AS dt_valid_to,
         ROW_NUMBER() OVER (
             PARTITION BY
@@ -216,7 +216,7 @@ job_with_salary_table_base_ranked AS (
     LEFT JOIN
         datalake_pin_core_clean.valid_grades AS vg
             ON vg.id_job = j.id_job
-            AND j.dt_effective_started < COALESCE(vg.dt_effective_ended, DATE('4712-12-31'))
+            AND j.dt_effective_started < COALESCE(vg.dt_effective_ended, DATE('9999-12-31'))
             AND j.dt_effective_ended > vg.dt_effective_started
     LEFT JOIN
         datalake_pin_core_clean.grade_translation AS gt
@@ -308,14 +308,14 @@ job_with_salary_table_base_ranked AS (
             COALESCE(sb.dt_effective_started, j.dt_effective_started)
         ) < LEAST(
             j.dt_effective_ended,
-            COALESCE(vg.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(gl.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(glt.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(gt.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(gt_ptb.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(r.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(rv.dt_effective_ended, DATE('4712-12-31')),
-            COALESCE(sb.dt_effective_ended, DATE('4712-12-31'))
+            COALESCE(vg.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(gl.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(glt.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(gt.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(gt_ptb.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(r.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(rv.dt_effective_ended, DATE('9999-12-31')),
+            COALESCE(sb.dt_effective_ended, DATE('9999-12-31'))
         )
 ),
 job_with_salary_table_base AS (
@@ -420,7 +420,7 @@ job_with_salary_table_consolidated AS (
         has_clock_in,
         is_active,
         MIN(dt_valid_from) AS dt_valid_from,
-        NULLIF(MAX(dt_valid_to), DATE('4712-12-31')) AS dt_valid_to,
+        MAX(dt_valid_to) AS dt_valid_to,
         NOW() AS ts_load
     FROM
         job_with_salary_table_groups

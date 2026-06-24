@@ -29,13 +29,10 @@ core_periods_raw AS (
             COALESCE(a.dt_effective_started, o.dt_effective_started),
             COALESCE(c.dt_valid_from, o.dt_effective_started)
         ) AS dt_valid_from,
-        NULLIF(
-            LEAST(
-                COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
-                COALESCE(a.dt_effective_ended, DATE '4712-12-31'),
-                COALESCE(c.dt_valid_to, DATE '4712-12-31')
-            ),
-            DATE '4712-12-31'
+        LEAST(
+            COALESCE(o.dt_effective_ended, DATE '9999-12-31'),
+            COALESCE(a.dt_effective_ended, DATE '9999-12-31'),
+            COALESCE(c.dt_valid_to, DATE '9999-12-31')
         ) AS dt_valid_to,
         o.ts_created,
         ROW_NUMBER() OVER (
@@ -63,8 +60,8 @@ core_periods_raw AS (
         datalake_people.codex_log AS c
             ON a.cost_center_code = c.cost_center_code
             AND c.dt_valid_from <= LEAST(
-                COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
-                COALESCE(a.dt_effective_ended, DATE '4712-12-31')
+                COALESCE(o.dt_effective_ended, DATE '9999-12-31'),
+                COALESCE(a.dt_effective_ended, DATE '9999-12-31')
             )
             AND (
                 c.dt_valid_to IS NULL
@@ -81,9 +78,9 @@ core_periods_raw AS (
             COALESCE(a.dt_effective_started, o.dt_effective_started),
             COALESCE(c.dt_valid_from, o.dt_effective_started)
         ) <= LEAST(
-            COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
-            COALESCE(a.dt_effective_ended, DATE '4712-12-31'),
-            COALESCE(c.dt_valid_to, DATE '4712-12-31')
+            COALESCE(o.dt_effective_ended, DATE '9999-12-31'),
+            COALESCE(a.dt_effective_ended, DATE '9999-12-31'),
+            COALESCE(c.dt_valid_to, DATE '9999-12-31')
         )
 ),
 core_periods AS (

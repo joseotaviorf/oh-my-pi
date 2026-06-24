@@ -10,7 +10,7 @@ WITH base AS (
         updated_by,
         is_active,
         dt_effective_started AS dt_valid_from,
-        COALESCE(dt_effective_ended, DATE('4712-12-31')) AS dt_valid_to,
+        dt_effective_ended AS dt_valid_to,
         ts_created,
         ts_updated
     FROM
@@ -169,7 +169,7 @@ SELECT
         ELSE FALSE
     END AS is_current,
     dt_valid_from,
-    NULLIF(dt_valid_to, DATE('4712-12-31')) AS dt_valid_to,
+    dt_valid_to,
     ts_created,
     ts_updated,
     ts_load

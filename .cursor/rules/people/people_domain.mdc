@@ -467,9 +467,16 @@ The clean table name should clearly indicate its content while remaining traceab
 
 ### Oracle Date 4712-12-31 — No End Date
 
-In Oracle HCM, `4712-12-31` means "no end date expected" (indefinite). In the **DW layer**, normalize both NULL and `4712-12-31` to **`9999-12-31`** for "no end date" columns (e.g., `dt_valid_to`, `dt_terminated`, `dt_notified`). Use `COALESCE(NULLIF(col, DATE('4712-12-31')), DATE('9999-12-31'))` when reading from source.
+In Oracle HCM, `4712-12-31` means "no end date expected" (indefinite). The **`pin_core` clean layer** is the single place where this sentinel is normalized to the People standard `9999-12-31`.
 
-When **filtering** source tables (clean/enrich) that still contain `4712-12-31`, keep the filter on the source value (e.g., `dt_effective_ended = DATE('4712-12-31')`).
+**Clean layer (pin_core) — two patterns:**
+
+| Column semantic | Oracle sends | Clean layer output | Pattern |
+|---|---|---|---|
+| Period-end / validity (`dt_effective_ended`, `dt_ended`) | `4712-12-31` | `9999-12-31` | `COALESCE(NULLIF(TO_DATE(col), DATE('4712-12-31')), DATE('9999-12-31'))` |
+| Event date (`dt_actual_termination`, `dt_notified_termination`) | `NULL` (no sentinel) | `NULL` | no conversion needed |
+
+**Enrich and DW layers** read clean tables and operate on `9999-12-31` as the open-ended sentinel. Filters and comparisons on period-end columns use `= DATE('9999-12-31')` or `>= DATE('9999-12-31')`.
 
 ### Deprecation — Avoid
 

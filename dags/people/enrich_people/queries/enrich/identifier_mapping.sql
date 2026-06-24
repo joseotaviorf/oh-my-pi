@@ -378,16 +378,8 @@ SELECT
     ca.dt_projected_started,
     pcec.dt_original_hired,
     pp.dt_started,
-    CASE
-        WHEN pp.dt_actual_termination >= DATE('4712-12-31')
-            THEN DATE('9999-12-31')
-        ELSE pp.dt_actual_termination
-    END AS dt_actual_termination,
-    CASE
-        WHEN pp.dt_notified_termination >= DATE('4712-12-31')
-            THEN DATE('9999-12-31')
-        ELSE pp.dt_notified_termination
-    END AS dt_notified_termination,
+    pp.dt_actual_termination,
+    pp.dt_notified_termination,
     ted.id_event_definition AS id_termination_event_definition,
     NOW() AS ts_load
 FROM

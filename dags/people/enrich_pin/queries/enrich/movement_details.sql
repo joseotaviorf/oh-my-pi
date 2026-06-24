@@ -23,7 +23,7 @@ FROM
 LEFT JOIN
   datalake_pin_core_clean.grade AS g
     ON g.id_grade = aa.id_grade
-    AND g.dt_effective_ended = DATE('4712-12-31')
+    AND g.dt_effective_ended = DATE('9999-12-31')
 LEFT JOIN
   datalake_hr_system_clean.organizations AS occ
     ON occ.id_organization = aa.id_organization
