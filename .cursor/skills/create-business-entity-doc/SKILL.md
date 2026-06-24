@@ -35,6 +35,36 @@ Before writing, explore the actual data model. Launch parallel explore subagents
 6. **Look for gotchas** — type mismatches requiring CAST, dedup needs (ROW_NUMBER), mandatory filters (status exclusions), or grain changes on JOINs.
 7. **Validate columns via database MCP** (if available) — use `describe_table` to confirm column names and types for the main DW tables. This catches renames or additions not yet reflected in SQL files.
 
+### Variant — pipeline / operational health entities
+
+Use this path when the entity documents **pipeline observability** (volume, latency, CDC
+gaps, connector health) rather than a Kimball business concept. Example:
+`salesforce_sst_pipeline.md` (`datalake_sst_metrics`).
+
+1. **Research sources** — read `dags/{domain}/{dag}/metadata/**/*.yml` and the DAG
+   declaration; validate table/column names with Trino via the **`fair-metadata`** skill
+   (not only DW SQL under `queries/dw/`).
+2. **Tables section** — document observability schemas (e.g. `datalake_sst_metrics.*`);
+   state grain (`partition_date` + `partition_hour`), mandatory filters
+   (`environment = 'prod'`), and column-name inconsistencies across tables (e.g. `env`
+   vs `environment`).
+3. **Failure signals** — a missing hourly partition is ambiguous: it may mean pipeline
+   down **or** a scheduled daily flow. Document disambiguation columns (e.g.
+   `event_type = 'RECOVERY'` in `events_type_volume`) in Overview, Glossary, and
+   **Critical rules**.
+4. **Domain architecture section** — when ingestion has a distinct operational model,
+   add a dedicated `## {Source} Pipeline` section (e.g. Appflow flow mapping, status
+   values, recovery flow behavior, Appflow-specific Dos and Don'ts).
+5. **Golden Queries** — prioritize incident investigation: broken connectors, latency
+   spikes, CDC gaps, schema drift. Cross-check columns against metadata YAML before
+   committing SQL blocks.
+6. **Catalog caveats** — if a table is in DataHub metadata but not yet queryable in
+   Trino, note it under **DataHub catalog** open items; remove stale Trino warnings once
+   validated.
+7. **Draft files** — write the canonical doc only under
+   `docs/llm_context/business_entities/{entity_name}.md`. Do not leave working drafts at
+   the repo root.
+
 ---
 
 ## Step 3 — Write the entity file
@@ -190,6 +220,9 @@ Before presenting to the user, verify:
 - [ ] Related entity docs updated with cross-references (if applicable)
 - [ ] Critical rules section present when CAST, Dedup, or mandatory filters apply
 - [ ] No information that doesn't fill a gap — if something is redundant, remove it
+- [ ] (Pipeline entities) Ambiguous failure signals documented with disambiguation columns
+- [ ] (Pipeline entities) Architecture / connector section present when ingestion model is non-trivial
+- [ ] Canonical file lives under `docs/llm_context/business_entities/` (no repo-root drafts)
 
 ---
 
