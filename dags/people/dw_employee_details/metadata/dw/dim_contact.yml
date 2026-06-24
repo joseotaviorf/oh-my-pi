@@ -18,19 +18,19 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.person_number
   personal_email:
-    description: Personal email of the employee at this version.
+    description: Non-work email address registered in HCM for the employee.
     lineage:
       - datalake_pin_core_clean.email_address.email_address
   phone_country_code:
-    description: Country code of the employee phone at this version.
+    description: International dialing prefix for the employee phone.
     lineage:
       - datalake_pin_core_clean.phone.country_code_number
   phone_area_code:
-    description: Area code of the employee phone at this version.
+    description: Regional area code for the employee phone.
     lineage:
       - datalake_pin_core_clean.phone.area_code
   phone_number:
-    description: Phone number of the employee at this version.
+    description: Local subscriber number for the employee phone.
     lineage:
       - datalake_pin_core_clean.phone.phone_number
   full_phone_number:
@@ -43,41 +43,47 @@ columns:
     description: GitHub username or profile link of the employee.
     lineage:
       - datalake_pin_core_clean.people_legislative.github_username
-  address_street:
-    description: Street name of the employee address.
+  address_street_type:
+    description: Street type of the mailing address (e.g. rua, avenida).
     lineage:
+      - datalake_pin_core_clean.address.street_type
+  address_street:
+    description: Street line combining street type and logradouro, aligned with legacy employee contact exports.
+    lineage:
+      - datalake_pin_core_clean.address.street_type
       - datalake_pin_core_clean.address.street
   address_number:
-    description: Address number.
+    description: Street number of the employee mailing address.
     lineage:
       - datalake_pin_core_clean.address.number
   address_complement:
-    description: Address complement.
+    description: Apartment, block, or other complement for the mailing address.
     lineage:
       - datalake_pin_core_clean.address.complement
   address_district:
-    description: Address district or neighborhood.
+    description: District or neighborhood of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.neighborhood
   address_zip_code:
-    description: Postal code of the address.
+    description: Postal code of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.postal_code
   address_city:
-    description: City of the address.
+    description: Municipality or city of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.town_or_city
   address_state:
-    description: State of the address.
+    description: State or region of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.state
   address_country:
-    description: Country code of the address.
+    description: Country code of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.country_code
   full_address:
-    description: Complete address unifying street, number, complement, district, zip, city, state and country.
+    description: Complete mailing address unifying street line, number, complement, district, zip, city, state and country.
     lineage:
+      - datalake_pin_core_clean.address.street_type
       - datalake_pin_core_clean.address.street
       - datalake_pin_core_clean.address.number
       - datalake_pin_core_clean.address.complement
