@@ -1,48 +1,65 @@
----
-database_name: datalake_gsheets_fintech_clean
+database_name: datalake_gsheets_clean
 table_name: for_sale_casa_mineira_invoice_control
-owner: ae-finance-fintech@quintoandar.com.br
+owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:
   id_offer:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.offer
+    description: For Sale offer identifier linked to the Casa Mineira invoice control
+      row.
   id_internal:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.id_interno
+    description: Internal control identifier for the Casa Mineira invoice spreadsheet
+      row.
   id_client_sap:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.codigo_cliente
+    description: SAP customer code associated with the Casa Mineira invoice record.
   id_house:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.id_imovel
+    description: House identifier tied to the Casa Mineira For Sale invoice control
+      entry.
   rps_number:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.numero_rps
+    description: RPS number issued for the Casa Mineira service invoice batch.
   invoice_number:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.n_da_nfse
+    description: NFSe invoice number recorded in the Casa Mineira control sheet.
   invoice_key:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.chave_da_nfenfse
+    description: Electronic invoice access key for the Casa Mineira NFSe record.
   batch_number:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.n_do_lote
+    description: Batch number grouping Casa Mineira invoices in the control sheet.
   client_name:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.nome
+    description: Customer name billed on the Casa Mineira For Sale invoice row.
   amount:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.valor_nfse
+    description: Invoice amount in Brazilian reais on the Casa Mineira control row.
   status:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.status
+    description: Processing status of the Casa Mineira invoice in the control sheet.
   dt_due:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.data_do_documento
+    description: Due date of the Casa Mineira invoice recorded in the control sheet.
   dt_created:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.data_de_criacao
+    description: Creation date of the Casa Mineira invoice entry in the control sheet.
   ts_load:
     lineage:
     - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.ts_load
+    description: Timestamp when the Casa Mineira invoice control row was ingested.
+description: Google Sheets control panel tracking Casa Mineira For Sale invoice issuance.

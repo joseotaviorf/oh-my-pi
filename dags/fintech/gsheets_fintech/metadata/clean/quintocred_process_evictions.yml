@@ -1,363 +1,501 @@
----
-database_name: datalake_gsheets_fintech_clean
+database_name: datalake_gsheets_clean
 table_name: quintocred_process_evictions
-owner: ae-finance-fintech@quintoandar.com.br
+owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:
   id_process:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.processo_id
+    description: Legal process identifier for the QuintoCred eviction case.
   id_broker:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.id_imob
+    description: Broker identifier linked to the QuintoCred eviction process row.
   id_opposing_party:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.parte_contraria_id
+    description: Opposing party identifier in the QuintoCred eviction lawsuit.
   id_status:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.id_status
+    description: Status code of the QuintoCred eviction process in the sheet.
   cpf_cnpj:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.cpf_cnpj
+    description: Tax identifier of the opposing party in the eviction process.
   contract_number:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.numero_do_contrato
+    description: Rental contract number tied to the QuintoCred eviction process.
   process_number:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.numero_do_processo
+    description: Court process number assigned to the QuintoCred eviction case.
   name_opposing_party:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.parte_contraria_nome
+    description: Name of the opposing party in the QuintoCred eviction lawsuit.
   party_process:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.processo_parte
+    description: Party role description in the QuintoCred eviction court process.
   status:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.status
+    description: Current workflow status of the QuintoCred eviction process.
   action_type:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.acao
+    description: Legal action type filed in the QuintoCred eviction process.
   process_class_type:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.processo_classificacao
+    description: Court class type of the QuintoCred eviction legal process.
   process_justice_type:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.processo_tipo_de_justica
+    description: Justice system type handling the QuintoCred eviction case.
   external_office_responsible:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.escritorio_externo_responsavel
+    description: External law office responsible for the eviction case.
   process_fase:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.fase
+    description: Procedural phase of the QuintoCred eviction court process.
   team:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.time
+    description: Internal team accountable for the QuintoCred eviction process follow-up.
   state:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.estado
+    description: Brazilian state jurisdiction of the QuintoCred eviction lawsuit.
   process_motive:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.motivo
+    description: Documented motive initiating the QuintoCred eviction process.
   broker_name:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.nome_imob
+    description: Broker legal name linked to the QuintoCred eviction process.
   broker_commercial_name:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.nome_comercial_imob
+    description: Broker trade name linked to the QuintoCred eviction process.
   size_pauta:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.volume_pauta
+    description: Court docket size metric tracked for the QuintoCred eviction process
+      row.
   size_progress:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.volume_andamento
+    description: Procedural progress size metric on the QuintoCred eviction process
+      sheet.
   status_lead_time:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.lead_time_status
+    description: Lead time status indicator for the QuintoCred eviction legal process.
   promise_volume:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.vol_promessa
+    description: Promised settlement volume recorded on the QuintoCred eviction process
+      row.
   promise_per_month_volume:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.vol_promessa_mes
+    description: Monthly promised volume metric on the QuintoCred eviction process
+      sheet.
   active_contracts:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.contratos_ativos
+    description: Count of active contracts linked to the QuintoCred eviction process
+      row.
   contacts_per_month:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.vol_contato_pos_mes
+    description: Monthly contact attempts tracked on the QuintoCred eviction process
+      sheet.
   finalization_batch:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.lt_finalizacao
+    description: Batch identifier for finalization stage of the QuintoCred eviction
+      process.
   has_progress:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.existe_andamento
+    description: Whether procedural progress exists on the QuintoCred eviction process
+      row.
   has_pauta:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.existe_pauta
+    description: Whether a court docket (pauta) exists for the QuintoCred eviction
+      process.
   is_dismissal:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.exoneracao
+    description: Whether the QuintoCred eviction process ended in dismissal.
   is_archived:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.arquivamento
+    description: Whether the QuintoCred eviction process row is archived in the sheet.
   has_analysis:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.em_analise
+    description: Whether legal analysis was completed for the QuintoCred eviction
+      process.
   is_finished:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.finalizado
+    description: Whether the QuintoCred eviction legal process is finished.
   is_suspended:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.suspenso
+    description: Whether the QuintoCred eviction legal process is currently suspended.
   has_broker_return:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.ag_retorno_imob
+    description: Whether the broker returned required documents for the eviction process.
   has_written_distribution:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distrib_escrit
+    description: Whether written distribution was completed in the eviction process.
   lt_finalization:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.lt_finalizacao
+    description: Lead time to finalization measured for the QuintoCred eviction process.
   lt_inventory_remove:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.lt_estoque_retirar
+    description: Lead time to inventory removal tracked on the eviction process row.
   exoneration:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.exoneracao
+    description: Exoneration milestone status on the QuintoCred eviction process spreadsheet.
   record_x_ag_exoneration:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.registro_x_ag_exoner
+    description: Lead time from case registration to agency exoneration in the legal
+      funnel.
   under_analysis:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.em_analise
+    description: Flag indicating the eviction case is under internal legal analysis.
   ag_return_imob:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.ag_retorno_imob
+    description: Flag for agency return milestone back to the broker on the eviction
+      case.
   record_x_seized_advisory:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.registro_x_tombado_assessoria
+    description: Lead time from registration to seized advisory inventory milestone.
   registration_written:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.tombamento_escr
+    description: Flag for written registration (tombamento) completed on the eviction
+      case.
   pre_registration:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.pre_tombamento
+    description: Flag for pre-registration stage before formal eviction inventory
+      filing.
   registration_written_x_distributed:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.tomb_escr_x_distribuido
+    description: Lead time from written registration to court distribution milestone.
   suspended_x_distributed_written:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.suspenso_x_distrib_escrit
+    description: Lead time from suspension to distributed written filing milestone.
   record_x_distributed_written:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.registro_x_distrib_escrit
+    description: Lead time from registration to distributed written filing milestone.
   preliminary_ind:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.liminar_ind
+    description: Flag for preliminary injunction granted in favor of the plaintiff.
   preliminary_def:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.liminar_def
+    description: Flag for preliminary injunction granted in favor of the defendant.
   positive_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_positiva
+    description: Flag for successful positive court citation of the opposing party.
   negative_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_negativa
+    description: Flag for negative court citation attempt on the opposing party.
   negative_notification_abandonment:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_neg_abandono
+    description: Flag for negative citation due to abandonment of service.
   mandate_exp_imission:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_exp_imissao
+    description: Flag for expeditious mandate of imission of possession issued.
   mandate_exp_coercive:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_exp_coercitivo
+    description: Flag for coercive expeditious mandate issued in the eviction case.
   lt_record_x_finalization:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.lt_registro_x_finalizacao
+    description: Lead time measured from registration to case finalization.
   distributed_x_preliminary_Ind:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distribuido_x_limin_Ind
+    description: Lead time from distribution to preliminary injunction (plaintiff)
+      stage.
   distributed_x_preliminary_def:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distribuido_x_limin_def
+    description: Lead time from distribution to preliminary injunction (defendant)
+      stage.
   preliminary_Ind_x_preliminary_def:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.limin_ind_x_limin_def
+    description: Lead time between plaintiff and defendant preliminary injunction
+      stages.
   preliminary_x_mandate:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.liminar_x_mandado
+    description: Lead time from preliminary injunction to mandate issuance.
   preliminary_def_x_positive_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.limin_def_x_citacao_pos
+    description: Lead time from defendant injunction to positive citation.
   mandate_x_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_x_citacao
+    description: Lead time from mandate issuance to court citation milestone.
   negative_notification_x_positive_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_neg_x_citacao_pos
+    description: Lead time from negative to positive citation attempts.
   negative_notification_x_finalization:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_neg_x_finalizacao
+    description: Lead time from negative citation to case finalization.
   positive_notification_x_finalization:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_pos_x_finalizacao
+    description: Lead time from positive citation to case finalization.
   mandate_imission_x_finalization:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_imissao_x_finalizacao
+    description: Lead time from imission mandate to case finalization.
   mandate_coercive_x_finalization:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_coercitivo_x_finalizacao
+    description: Lead time from coercive mandate to case finalization.
   current_value:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.valor_atual
+    description: Current monetary value outstanding on the QuintoCred eviction case.
   original_value:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.valor_original
+    description: Original monetary value registered when the eviction case opened.
   paid_value:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.valor_pago
+    description: Total amount already paid against the eviction case balance.
   pending_value:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.valor_pendente
+    description: Remaining pending monetary value on the eviction case.
   package_value:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.valor_pacote
+    description: Negotiated package settlement value tracked on the eviction case.
   lt_debt_x_registration:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.lt_divida_x_tombamento
+    description: Lead time from debt recognition to eviction inventory registration.
   current_debt_target:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.divida_vigente_target
+    description: Target outstanding debt value used in eviction portfolio planning.
   arbitral_distribution:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distrib_arbitral
+    description: Flag for arbitral court distribution milestone on the eviction case.
   arbitral_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.cit_n_arbitral
+    description: Flag for arbitral citation notification served in the case.
   arbitral_sentence:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.sentenca_arbitral
+    description: Flag for arbitral sentence issued in the eviction legal process.
   arbitral_cs_record:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.registro_cs_arbitral
+    description: Flag for arbitral central registry record created for the case.
   arbitral_notification_decision:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.decisao_intimacao_arbitral
+    description: Flag for court decision on arbitral citation notification.
   arbitral_cs_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.intimacao_cs_arbitral
+    description: Flag for central registry notification in the arbitral track.
   arbitral_cs_objection:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.impugnacao_cs_arbitral
+    description: Flag for objection filed against arbitral central registry action.
   record_x_arbitral_distribution:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.registro_x_distr_arbitral
+    description: Lead time from registration to arbitral distribution milestone.
   arbitral_distribution_x_arbitral_sentence:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distr_arbitral_x_sentenca_arbitral
+    description: Lead time from arbitral distribution to arbitral sentence.
   arbitral_sentence_x_distributed_office:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.sentenca_arbitral_x_distr_escritorio
+    description: Lead time from arbitral sentence to law office distribution.
   distributed_office_x_mandate:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distr_escritorio_x_mandado
+    description: Lead time from law office distribution to mandate issuance.
   distributed_office_x_notification_decision:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distr_escritorio_x_decisao_intimacao
+    description: Lead time from office distribution to notification decision.
   iaf_portfolio:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.carteira_iaf
+    description: IAF portfolio bucket assigned to the QuintoCred eviction case.
   current_legacy_office:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.escritorio_legado_atual
+    description: Legacy external law office currently responsible for the case.
   dt_exoneration:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.exoneracao_data
+    description: Date when exoneration was recorded on the eviction case.
   dt_ag_return_imob:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.ag_retorno_imob_data
+    description: Date when agency return to broker was recorded on the case.
   dt_registration_written:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.tombamento_escr_data
+    description: Date when written registration was completed on the case.
   dt_pre_registration:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.pre_tombamento_data
+    description: Date when pre-registration was recorded on the eviction case.
   dt_preliminary_ind:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.liminar_ind_data
+    description: Date when plaintiff preliminary injunction was granted.
   dt_preliminary_def:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.liminar_def_data
+    description: Date when defendant preliminary injunction was granted.
   dt_mandate_exp:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_exp_data
+    description: Date when an expeditious mandate was issued on the case.
   dt_positive_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_positiva_data
+    description: Date when positive court citation was confirmed.
   dt_negative_notification_abandonment:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_negativa_abandono_data
+    description: Date when negative citation abandonment was recorded.
   dt_mandate_exp_imission:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_exp_imissao_data
+    description: Date when imission expeditious mandate was issued.
   dt_mandate_exp_coercive:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.mandado_exp_coercitivo_data
+    description: Date when coercive expeditious mandate was issued.
   dt_arbitral_distribution:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distrib_arbitral_data
+    description: Date when arbitral distribution occurred on the case.
   dt_arbitral_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.cit_n_arbitral_data
+    description: Date when arbitral citation notification was served.
   dt_arbitral_sentence:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.sentenca_arbitral_data
+    description: Date when the arbitral sentence was issued.
   dt_arbitral_cs_record:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.registro_cs_arbitral_data
+    description: Date when arbitral central registry record was created.
   dt_arbitral_notification_decision:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.decisao_intimacao_arbitral_data
+    description: Date of court decision on arbitral citation notification.
   dt_arbitral_cs_notification:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.intimacao_cs_arbitral_data
+    description: Date when arbitral central registry notification was served.
   dt_arbitral_cs_objection:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.impugnacao_cs_arbitral_data
+    description: Date when arbitral central registry objection was filed.
   dt_adjusted_record:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.data_registro_ajustada
+    description: Adjusted registration date used for eviction portfolio reporting.
   dt_reanalisys_allowed:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.apto_reanalise_data
+    description: Date when the case became eligible for legal re-analysis.
   dt_suspended:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.suspenso_data
+    description: Date when the eviction legal process was suspended.
   dt_status:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.data_status
+    description: Reference date of the current status on the eviction tracking row.
   dt_broker_return:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.ag_retorno_imob_data
+    description: Date when broker return documentation was received.
   dt_analysis:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.em_analise_data
+    description: Date when the case entered under-analysis legal review.
   dt_dismissal:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.exoneracao_data
+    description: Date when the eviction case was dismissed or exonerated.
   dt_finalized:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.finalizado_data
+    description: Date when the eviction legal process was finalized.
   dt_negative_citation:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.citacao_neg_data
+    description: Date when negative court citation was attempted.
   dt_register:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.data_registrado
+    description: Date when the eviction case was registered in the legal tracker.
   dt_distribution:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.distribuicao
+    description: Date when the case was distributed to the responsible court.
   ts_load:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.ts_load
+    description: Timestamp when the eviction process spreadsheet row was ingested
+      into the lake.
+description: Google Sheets registry of QuintoCred legal eviction processes and court
+  milestones.

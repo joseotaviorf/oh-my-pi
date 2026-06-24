@@ -1,72 +1,100 @@
----
-database_name: datalake_gsheets_fintech_clean
+database_name: datalake_gsheets_clean
 table_name: for_sale_closing_assistance
-owner: ae-finance-fintech@quintoandar.com.br
+owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:
   id_ticket:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.id_do_ticket
+    description: Zendesk ticket identifier for the For Sale closing assistance case.
   id_offer:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_offer_proposta
+    description: For Sale offer identifier associated with the closing assistance
+      ticket.
   id_ticket_signal_return:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_ticket_de_devolucao_do_sinal
+    description: Return signal ticket identifier linked to the closing assistance
+      case.
   aditive_reason:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_aditivo
+    description: Reason recorded when an addendum was required in closing assistance.
   cancellation_reason:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_distrato
+    description: Documented reason for canceling the For Sale closing assistance case.
   payment_model:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_modelo_de_pagamento
+    description: Payment model agreed for the For Sale closing assistance deal.
   assigned_name:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.nome_do_atribuido
+    description: Analyst name assigned to handle the closing assistance ticket.
   request_category:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_solicitacao
+    description: Category of the closing assistance request in the control sheet.
   hub_name:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_hub_
+    description: Sales hub name responsible for the closing assistance case.
   request_type:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_tipo_de_solicitacao
+    description: Type of closing assistance request opened in the control sheet.
   sale_price:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.apoio_valor_do_imovel
+    description: Agreed sale price captured on the closing assistance spreadsheet
+      row.
   request_status:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_status_da_solicitacao
+    description: Current status of the closing assistance request in the sheet.
   brokerage_amount:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_valor_da_corretagem_padrao_r_0000000
+    description: Brokerage fee amount recorded for the closing assistance deal.
   downpayment_amount:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_valor_do_sinal
+    description: Down payment amount recorded on the closing assistance case.
   cancellation_fine:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_multa
+    description: Cancellation fine amount applied on the closing assistance deal.
   has_downpayment_reversal:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_devolucao_do_sinal
+    description: Whether a down payment reversal occurred on the closing case.
   is_offer_canceled:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_offer_cancelada
+    description: Whether the underlying For Sale offer was canceled in the case.
   has_brokerage_charge:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_cobranca_corretagem
+    description: Whether brokerage charges apply to the closing assistance deal.
   dt_created:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_inicio_carimbo_de_datahora
+    description: Creation date of the closing assistance row in the control sheet.
   dt_deadline:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.data_para_retorno_carimbo_de_datahora
+    description: Deadline date tracked for resolving the closing assistance case.
   dt_approved:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ca_fim_carimbo_de_datahora
+    description: Date when the For Sale closing assistance request was approved in
+      the sheet.
   ts_load:
     lineage:
     - datalake_gsheets_raw.for_sale_closing_assistance.ts_load
+    description: Timestamp when the closing assistance spreadsheet row was ingested
+      into the lake.
+description: Google Sheets tracker for For Sale closing assistance tickets and brokerage
+  operations.

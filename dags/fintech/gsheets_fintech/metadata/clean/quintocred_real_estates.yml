@@ -1,33 +1,48 @@
----
-database_name: datalake_gsheets_fintech_clean
+database_name: datalake_gsheets_clean
 table_name: quintocred_real_estates
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_broker:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.sk_broker
+    - datalake_gsheets_raw.quintocred_real_estates.sk_broker
+    description: Surrogate key identifying the QuintoCred broker in the real estates
+      sheet.
   id_pipedrive:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.id_pipedrive
+    - datalake_gsheets_raw.quintocred_real_estates.id_pipedrive
+    description: Pipedrive CRM identifier of the QuintoCred real estate partner.
   broker_name:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.broker_name
+    - datalake_gsheets_raw.quintocred_real_estates.broker_name
+    description: Legal name of the QuintoCred partner real estate agency.
   cnpj:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.cnpj
+    - datalake_gsheets_raw.quintocred_real_estates.cnpj
+    description: CNPJ tax identifier of the QuintoCred partner real estate agency.
   potential_segmentation:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.potential_segmentation
+    - datalake_gsheets_raw.quintocred_real_estates.potential_segmentation
+    description: Potential revenue segmentation assigned to the real estate partner.
   credit_segmentation:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.credit_segmentation
+    - datalake_gsheets_raw.quintocred_real_estates.credit_segmentation
+    description: Credit risk segmentation assigned to the real estate partner.
   status_imob:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.status_imob
+    - datalake_gsheets_raw.quintocred_real_estates.status_imob
+    description: Real estate agency status in the QuintoCred partner program.
   status:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.status
+    - datalake_gsheets_raw.quintocred_real_estates.status
+    description: Overall partnership status of the QuintoCred real estate agency row.
   executivo:
     lineage:
-      - datalake_gsheets_raw.quintocred_real_estates.executivo
+    - datalake_gsheets_raw.quintocred_real_estates.executivo
+    description: Account executive responsible for the QuintoCred real estate partner.
+  hunter:
+    description: Hunter owner assigned to the QuintoCred real estate lead.
+    lineage:
+    - datalake_gsheets_raw.quintocred_real_estates.hunter
+description: Google Sheets directory of QuintoCred partner real estate agencies and
+  segmentation.

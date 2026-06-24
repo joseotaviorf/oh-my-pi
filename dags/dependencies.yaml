@@ -1990,6 +1990,7 @@ bietlejuice.enrich_collections_quintoandar:
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose-person:first-run-of-day
   - bietlejuice.enrich_velo:load-enrich-propose:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-quintocred-process-evictions:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-aud:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info:first-run-of-day
@@ -3170,6 +3171,7 @@ bietlejuice.enrich_nps_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose-legacy:first-run-of-day
   - bietlejuice.enrich_velo:load-enrich-propose:first-run-of-day
   - bietlejuice.enrich_velo:load-enrich-user:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-quintocred-real-estates:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-person:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-company-executive:first-run-of-day

@@ -1,60 +1,89 @@
----
-database_name: datalake_gsheets_fintech_clean
+database_name: datalake_gsheets_clean
 table_name: for_sale_platform_invoice_control
-owner: ae-finance-fintech@quintoandar.com.br
+owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:
   id_offer:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.offer
+    description: For Sale offer identifier linked to the For Sale platform invoice
+      control row.
   invoice_key:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.chave
+    description: Electronic invoice access key for the For Sale platform NFSe record.
   id_internal:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.id_interno
+    description: Internal control identifier for the For Sale platform invoice spreadsheet
+      row.
   id_client_sap:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.contrapartida
+    description: SAP customer code associated with the For Sale platform invoice record.
   id_house:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.id_imovel
+    description: House identifier tied to the For Sale platform For Sale invoice control
+      entry.
   id_account:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.conta
+    description: SAP account identifier associated with the platform invoice control
+      row.
   cost_center_code:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.cc
+    description: SAP cost center code charged on the platform invoice control row.
   rps_number:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.rps
+    description: RPS number issued for the For Sale platform service invoice batch.
   invoice_number:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.nf
+    description: NFSe invoice number recorded in the For Sale platform control sheet.
   transaction_number:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.no_transacao
+    description: SAP transaction number linked to the platform invoice control entry.
   client_name:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.nome_conta_contrap
+    description: Customer name billed on the For Sale platform For Sale invoice row.
   description:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.descricao
+    description: Free-text description of the platform invoice charge in the control
+      sheet.
   comments:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.observacoes
+    description: Analyst comments captured on the platform invoice control spreadsheet
+      row.
   amount:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.valor
+    description: Invoice amount in Brazilian reais on the For Sale platform control
+      row.
   accumulated_amount:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.saldo_acumulado
+    description: Accumulated billed amount tracked on the platform invoice control
+      row.
   dt_due:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.vencimento
+    description: Due date of the For Sale platform invoice recorded in the control
+      sheet.
   dt_created:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.data
+    description: Creation date of the For Sale platform invoice entry in the control
+      sheet.
   ts_load:
     lineage:
     - datalake_gsheets_raw.for_sale_platform_invoice_control.ts_load
+    description: Timestamp when the For Sale platform invoice control row was ingested.
+description: Google Sheets control panel tracking For Sale platform invoice issuance
+  and SAP posting.
