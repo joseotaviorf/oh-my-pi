@@ -7,7 +7,9 @@ from bietlejuice.base.sst.core.appflow.marker import (
     ACTIVE_STATUS,
     appflow_has_completed_hour,
     extract_flow_name,
+    format_metric_payload,
     get_latest_appflow_run,
+    save_appflow_metrics,
 )
 from bietlejuice.base.sst.core.observability.metrics import save_volume_metric
 from bietlejuice.base.sst.core.observability.sensors import (
@@ -21,6 +23,7 @@ from bietlejuice.base.sst.core.utils.common import (
     retrieve_spark_session,
     validate_and_write,
 )
+from bietlejuice.base.sst.core.utils.time import standard_now
 from bietlejuice.base.sst.core.utils.transforms import apply_schema_remaps
 from bietlejuice.base.sst.domains.salesforce.raw.io import read_sf_cdc_json
 from bietlejuice.base.sst.domains.salesforce.raw.transform import (
@@ -132,6 +135,7 @@ def salesforce_raw_pipeline(cfg):
             "last_execution_status": None,
             "last_execution_timestamp": None,
             "last_execution_message": str(exc),
+            "request_time": standard_now(),
         }
 
     appflow_completed_hour = appflow_has_completed_hour(
@@ -147,6 +151,28 @@ def salesforce_raw_pipeline(cfg):
     should_run_recovery = (
         appflow_status["flow_status"] != ACTIVE_STATUS and not appflow_completed_hour
     )
+
+    metric_payload = format_metric_payload(
+        flow_name=flow_name,
+        appflow_payload=appflow_status,
+        completed_hour=appflow_completed_hour,
+        run_recovery=should_run_recovery,
+    )
+
+    logger.info(
+        f"m=salesforce_raw_pipeline, msg=Saving Appflow Metrics {metric_payload}"
+    )
+
+    save_appflow_metrics(
+        spark=spark,
+        partition_date=cfg.partition_date,
+        partition_hour=cfg.partition_hour,
+        job_name=job_name,
+        payload=metric_payload,
+        bucket=cfg.bucket,
+        sync_hive=True,
+    )
+
     if should_run_recovery:
         last_execution_ts = appflow_status.get("last_execution_timestamp")
         last_execution_ts_str = (

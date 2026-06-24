@@ -30,7 +30,7 @@ from typing import Optional, Union
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.sst.core.utils.time import build_hour_window
+from bietlejuice.base.sst.core.utils.time import build_hour_window, standard_now
 
 logger = QuintoAndarLogger("sst.core.appflow.marker")
 
@@ -139,10 +139,12 @@ def appflow_has_completed_hour(
 def get_latest_appflow_run(flow_name: str, region_name: str = DEFAULT_REGION) -> dict:
     client = boto3.client("appflow", region_name=region_name)
 
+    request_time = standard_now()
     response = client.describe_flow(flowName=flow_name)
     last_run = response.get("lastRunExecutionDetails", {})
 
     return {
+        "request_time": request_time,
         "flow_status": response.get("flowStatus", ""),
         "last_execution_status": last_run.get("mostRecentExecutionStatus"),
         "last_execution_timestamp": last_run.get("mostRecentExecutionTime").astimezone(
@@ -150,6 +152,85 @@ def get_latest_appflow_run(flow_name: str, region_name: str = DEFAULT_REGION) ->
         ),
         "last_execution_message": last_run.get("mostRecentExecutionMessage"),
     }
+
+
+def format_metric_payload(flow_name, appflow_payload, completed_hour, run_recovery):
+    last_execution_ts = appflow_payload.get("last_execution_timestamp")
+    last_execution_ts_str = (
+        last_execution_ts.strftime("%Y-%m-%d %H:%M:%S")
+        if last_execution_ts is not None
+        else None
+    )
+
+    return {
+        "name": flow_name,
+        "status": appflow_payload.get("flow_status"),
+        "request_time": appflow_payload.get("request_time"),
+        "last_execution_status": appflow_payload.get("last_execution_status"),
+        "last_execution_timestamp": last_execution_ts_str,
+        "last_execution_message": appflow_payload.get("last_execution_message"),
+        "has_completed_hour": completed_hour,
+        "run_recovery": run_recovery,
+    }
+
+
+def save_appflow_metrics(
+    spark,
+    partition_date,
+    partition_hour,
+    job_name,
+    payload,
+    bucket,
+    sync_hive=True,
+):
+    from pyspark.sql.types import StringType, StructField, StructType
+
+    from bietlejuice.base.sst.core.utils.common import validate_and_write
+
+    rows = {
+        **payload,
+        "partition_date": partition_date,
+        "partition_hour": partition_hour,
+        "job_name": job_name,
+    }
+
+    fields = [
+        ("name", False),
+        ("request_time", False),
+        ("status", False),
+        ("last_execution_status", True),
+        ("last_execution_timestamp", True),
+        ("last_execution_message", True),
+        ("run_recovery", True),
+        ("partition_date", False),
+        ("partition_hour", True),
+        ("job_name", False),
+    ]
+
+    schema = StructType(
+        [
+            StructField(name, StringType(), nullable=nullable)
+            for name, nullable in fields
+        ]
+    )
+
+    full_table_name = "datalake_sst_metrics.appflow_status"
+    table_location = f"s3a://{bucket}/sst_metrics/appflow_status"
+    df = spark.createDataFrame([rows], schema=schema).withColumn(
+        "write_timestamp", standard_now(is_col=True)
+    )
+    validate_and_write(
+        spark=spark,
+        df=df,
+        target_table=full_table_name,
+        table_location=table_location,
+        partition_filter=None,
+        partition_cols=None,
+        overwrite_schema=False,
+        append=True,
+        sync_hive=sync_hive,
+        sync_secondary_catalog=True,
+    )
 
 
 def save_status_marker_as_table(
@@ -193,7 +274,7 @@ def save_status_marker_as_table(
     )
 
     full_table_name = "datalake_sst_metrics.appflow_status"
-    table_location = f"s3a://{bucket}/sst_metrics/appflow_status"
+    table_location = f"s3a://{bucket}/sst_metrics/appflow_status_marker"
 
     row = {
         **payload,
