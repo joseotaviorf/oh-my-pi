@@ -44,11 +44,11 @@ columns:
   id_stage_history:
     lineage:
       - datalake_hubspot_clean.ticket.properties_with_history
-    description: History of the the stage ID.
+    description: Surrogate key referencing the HubSpot pipeline stage history row active when the record was captured.
   id_pipeline_history:
     lineage:
       - datalake_hubspot_clean.ticket.properties_with_history
-    description: History of the the pipeline ID.
+    description: Surrogate key referencing the HubSpot pipeline history dimension for pipeline context.
   content:
     lineage:
       - datalake_hubspot_clean.ticket.properties
@@ -62,8 +62,8 @@ columns:
       - datalake_hubspot_clean.ticket.properties
     description: Onboarding type of the company. Not used often.
     categories:
-      'Ao Vivo': Live
-      'Digital': Remote
+      'Ao Vivo': In-person onboarding session conducted with the partner on site or at an event.
+      'Digital': Remote onboarding session delivered through digital channels without in-person attendance.
   field_sales:
     lineage:
       - datalake_hubspot_clean.ticket.properties

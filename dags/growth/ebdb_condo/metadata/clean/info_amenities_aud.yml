@@ -32,3 +32,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.amenidades_id
     description: 'Historical foreign key to the amenity that this relationship audit event refers to. Identifies which specific amenity (air conditioning, pool, etc.) was being assigned or modified for the property.'
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo_aud.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo_aud.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo_aud.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

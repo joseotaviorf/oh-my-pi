@@ -36,3 +36,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.amenidades.criadoem
     description: 'Timestamp when the amenity record was first created in the system. Used for audit trail purposes and understanding the evolution of the amenity catalog over time.'
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.amenidades.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.amenidades.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.amenidades.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

@@ -58,13 +58,13 @@ columns:
       - datalake_hubspot.company.member_category
     description: Category of the member. To be removed June 7th, replaced by sale_member_category and rent_member_category.
     categories:
-      Prata: 'Silver'
-      Ouro: 'Gold'
-      Diamante: 'Diamond'
+      Prata: Silver tier for Rede partners with baseline listing volume and standard operational support.
+      Ouro: Gold tier for Rede partners with expanded benefits and priority operational support.
+      Diamante: Diamond tier for top-performing Rede partners with premium benefits and dedicated support.
   sale_lead_status:
     lineage:
       - datalake_hubspot.company.sale_lead_status
-    description: Status of the company sale lead in HubSpot.
+    description: Current sale-pipeline membership label for the company in HubSpot Rede onboarding workflows (prospect, member, churned).
   is_flagged_as_leadgen:
     lineage:
       - datalake_hubspot.company.is_flagged_as_leadgen

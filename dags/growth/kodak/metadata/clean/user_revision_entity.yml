@@ -17,3 +17,20 @@ columns:
     lineage:
       - datalake_kodak_raw.userrevisionentity.timestamp
     description: 'Timestamp when the database transaction/revision occurred. Provides precise timing for all data changes and enables temporal queries to reconstruct system state at any point in time.'
+  op_cdc:
+    lineage:
+      - datalake_kodak_raw.userrevisionentity.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_kodak_raw.userrevisionentity.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_kodak_raw.userrevisionentity.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

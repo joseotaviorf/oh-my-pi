@@ -49,3 +49,20 @@ columns:
     description: The day partition of the record.
     lineage:
       - datalake_rede_platform_raw.broker_deaccreditation_process.day
+  op_cdc:
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

@@ -24,30 +24,30 @@ columns:
   id_user_updated_by:
     lineage:
       - datalake_hubspot.contact.lead_status_history
-    description: User ID of the user who updated the contact's status.
+    description: Internal QuintoAndar user identifier of the analyst who last changed contact status during enrichment.
   source_type:
     lineage:
       - datalake_hubspot.contact.lead_status_history
     description: The source where the status change was made.
-    categories: 
-      API: ''
-      CRM_UI: ''
-      EXTENSION: ''
-      MOBILE_IOS: ''
-      'null': ''
+    categories:
+      API: Status change triggered through a HubSpot REST API call or external integration.
+      CRM_UI: Status change made manually by a user in the HubSpot CRM web interface.
+      EXTENSION: Status change submitted from a HubSpot browser extension or sidebar tool.
+      MOBILE_IOS: Status change submitted from the HubSpot mobile application on iOS.
+      'null': Source channel was not recorded in HubSpot for this status change event.
   days_in_status:
     description:  Number of days the contact has been in the current status.
   lead_status:
     lineage:
       - datalake_hubspot.contact.lead_status_history
-    description: The current status of the contact.
-    categories: 
-      CONNECTED: ''
-      IN_PROGRESS: ''
-      NEW: ''
-      OPEN: ''
-      OPEN_DEAL: ''
-      UNQUALIFIED: ''
+    description: Operational lead disposition in HubSpot sales workflow (open, qualified, unqualified, etc.).
+    categories:
+      CONNECTED: Sales rep successfully reached the contact and established two-way communication.
+      IN_PROGRESS: Contact is actively being worked by sales with ongoing outreach attempts.
+      NEW: Contact was recently created and has not yet been contacted by the sales team.
+      OPEN: Contact is open for qualification with no active deal associated in HubSpot yet.
+      OPEN_DEAL: Contact has an associated open deal progressing in the HubSpot sales pipeline.
+      UNQUALIFIED: Contact was reviewed and marked as not fit for the current sales funnel.
   ts_status_started: 
     lineage:
       - datalake_hubspot.contact.lead_status_history

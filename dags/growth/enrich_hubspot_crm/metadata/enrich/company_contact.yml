@@ -25,18 +25,18 @@ columns:
       - datalake_hubspot.contact.id_contact
     description: Unique identifier of the contact in HubSpot.
   company_association_type:
-    description: What the company is to the contact.
+    description: HubSpot label describing how the linked company ranks among all companies tied to this contact (primary account versus secondary affiliation).
     categories:
       MAIN_COMPANY: 'The contact''s main company'
       SECONDARY_COMPANY: 'The contact''s secondary company'
   contact_association_type:
-    description: What the contact is to the company.
+    description: HubSpot label describing the contact role inside the company relationship (primary decision-maker versus supporting stakeholder).
     categories:
       DECIDING_CONTACT: 'The contact is the deciding contact for the company. This is preferrably the owner/CEO,
         then a partner/director, then a manager. If there is more than one, the first created is chosen.'
       NON_DECIDING_CONTACT: 'The contact is not the deciding contact for the company'
   occupation:
-    description: The contact''s occupation in the company.
+    description: Job title or professional role reported for the contact inside the linked company organization.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.

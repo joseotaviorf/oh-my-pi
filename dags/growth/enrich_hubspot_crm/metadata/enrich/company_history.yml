@@ -103,7 +103,7 @@ columns:
   life_cycle_stage:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: >
+    description: HubSpot lifecycle stage bucket (subscriber, lead, MQL, SQL, etc.) summarizing funnel maturity.
       HubSpot lifecycle stage for the company record (for example lead or customer), indicating CRM funnel
       maturity independently of Rede Sale or Rent membership status.
   mkt_campain:
@@ -156,15 +156,15 @@ columns:
       - datalake_hubspot_clean.company.properties
     description: Type of the member, as in ForSale or ForRent.
     categories:
-      B2B Sales: ForSale
+      'B2B Sales': For Sale broker partnership focused on property sales through the Rede B2B program.
   member_category:
     lineage:
       - datalake_hubspot_clean.company.properties
     description: Category of the member. To be removed June 7th, replaced by sale_member_category and rent_member_category.
     categories:
-      Prata: 'Silver'
-      Ouro: 'Gold'
-      Diamante: 'Diamond'
+      Prata: Silver tier for Rede partners with baseline listing volume and standard operational support.
+      Ouro: Gold tier for Rede partners with expanded benefits and priority operational support.
+      Diamante: Diamond tier for top-performing Rede partners with premium benefits and dedicated support.
   sale_member_category:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -172,9 +172,9 @@ columns:
       Current Rede Sale partner tier in HubSpot (Prata, Ouro, Diamante), used by Operations to segment
       sale-side broker benefits and performance programs.
     categories:
-      Prata: 'Silver'
-      Ouro: 'Gold'
-      Diamante: 'Diamond'
+      Prata: Silver tier for Rede Sale partners with baseline sale-side benefits and support.
+      Ouro: Gold tier for Rede Sale partners with expanded sale-side benefits and priority support.
+      Diamante: Diamond tier for top Rede Sale partners with premium sale-side benefits and dedicated support.
   rent_member_category:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -182,9 +182,9 @@ columns:
       Current Rede Rent partner tier in HubSpot (Prata, Ouro, Diamante), used to segment rent-side broker
       benefits and performance programs.
     categories:
-      Prata: 'Silver'
-      Ouro: 'Gold'
-      Diamante: 'Diamond'
+      Prata: Silver tier for Rede Rent partners with baseline rent-side benefits and support.
+      Ouro: Gold tier for Rede Rent partners with expanded rent-side benefits and priority support.
+      Diamante: Diamond tier for top Rede Rent partners with premium rent-side benefits and dedicated support.
   company_cluster:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -227,7 +227,7 @@ columns:
   first_conversion_event_name:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Name of the first form sent to all contacts associated to this company.
+    description: Marketing form or landing-page event that first converted this contact in HubSpot analytics attribution.
   hs_analytics_first_touch_converting_campaign:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -287,11 +287,11 @@ columns:
   lead_status:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Status of the company lead in HubSpot. To be removed June 7th, replaced by sale_lead_status and rent_lead_status.
+    description: Operational lead disposition in HubSpot sales workflow (open, qualified, unqualified, etc.).
   sale_lead_status:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: >
+    description: Current sale-pipeline membership label for the company in HubSpot Rede onboarding workflows (prospect, member, churned).
       Rede Sale lead or membership status from HubSpot hs_lead_status on this daily snapshot (for example
       Membro or Parceiro), before archived or merged normalization applied in the company snapshot table.
   rent_lead_status:
@@ -303,7 +303,7 @@ columns:
   lead_status_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
-    description: History of the company lead status in HubSpot. To be removed June 7th, replaced by sale_lead_status and rent_lead_status.
+    description: Serialized history of prior lead_status values for auditing funnel movement over time.
   sale_lead_status_history:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history

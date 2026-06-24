@@ -44,11 +44,11 @@ columns:
   id_stage_history:
     lineage:
       - datalake_hubspot_clean.deal.properties_with_history
-    description: History of the the stage ID.
+    description: Surrogate key referencing the HubSpot pipeline stage history row active when the record was captured.
   id_pipeline_history:
     lineage:
       - datalake_hubspot_clean.deal.properties_with_history
-    description: History of the the pipeline ID.
+    description: Surrogate key referencing the HubSpot pipeline history dimension for pipeline context.
   deal_name:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -66,9 +66,9 @@ columns:
       - datalake_hubspot_clean.deal.properties
     description: Partnership model of the deal. Comes from the field modelo_da_parceria.
     categories:
-      'Supply + Demanda': Supply + Demand
-      'Supply': Supply
-      'Demanda': Demand
+      'Supply + Demanda': Combined supply-and-demand partnership covering both listing acquisition and buyer demand.
+      'Supply': Supply-only partnership focused on bringing partner listings into the QuintoAndar marketplace.
+      'Demanda': Demand-only partnership focused on generating buyer demand for partner listings.
   unqualification_reason:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -92,7 +92,7 @@ columns:
     categories:
       '3P': 'Rede QuintoAndar'
       'Garantia': 'Rental Guarantee'
-      'Atta': 'Atta'
+      'Atta': Atta product-line partnership tracked separately from core Rede 3P onboarding deals.
       '3P - For Rent': 'Rede QuintoAndar - For Rent'
   soft_opening_priority:
     lineage:
@@ -245,7 +245,7 @@ columns:
   consorcio_id_lead:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: id of the lead for the consorcio pipeline
+    description: External lead identifier from the consorcio partner integration linked to this HubSpot deal.
   consorcio_id_device:
     lineage:
       - datalake_hubspot_clean.deal.properties

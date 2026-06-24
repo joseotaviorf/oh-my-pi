@@ -32,3 +32,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.contatocondominio.condominio_id
     description: 'Foreign key reference to the condominium that this contact information belongs to. Links to the condo table, establishing which building or complex this contact serves for communication purposes.'
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

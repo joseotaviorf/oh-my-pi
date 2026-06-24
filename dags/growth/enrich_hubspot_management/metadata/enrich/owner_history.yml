@@ -31,11 +31,11 @@ columns:
   first_name:
     lineage:
       - datalake_hubspot_clean.owner.first_name
-    description: First name of the owner.
+    description: Given name of the contact as registered in HubSpot CRM for personalization and deduplication.
   last_name:
     lineage:
       - datalake_hubspot_clean.owner.last_name
-    description: Last name of the HubSpot owner (sales representative).
+    description: Family name of the contact as registered in HubSpot CRM for personalization and deduplication.
   teams:
     lineage:
       - datalake_hubspot_clean.owner.teams

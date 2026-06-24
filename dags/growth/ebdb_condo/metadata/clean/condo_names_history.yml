@@ -28,3 +28,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.condonameshistory.atualizadoEm
     description: 'Timestamp of the most recent update to this name history record. Used for maintaining data integrity and tracking any corrections or modifications to historical name information.'
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

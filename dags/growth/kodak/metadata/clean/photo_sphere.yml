@@ -38,3 +38,20 @@ columns:
     description: 'Sequential position or order number of the photosphere within a property virtual tour. Used for organizing the navigation flow and ensuring logical progression through property spaces in virtual tour experiences.'
     lineage:
       - datalake_kodak_raw.photosphere.position
+  op_cdc:
+    lineage:
+      - datalake_kodak_raw.photosphere.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_kodak_raw.photosphere.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_kodak_raw.photosphere.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

@@ -127,3 +127,20 @@ columns:
       Partition column (day) from ts_updated. Filter in WHERE for partition pruning.
     lineage:
       - datalake_alias_raw.ai_agents.updated_at
+  op_cdc:
+    lineage:
+      - datalake_alias_raw.ai_agents.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_alias_raw.ai_agents.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_alias_raw.ai_agents.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

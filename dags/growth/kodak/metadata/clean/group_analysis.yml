@@ -18,3 +18,20 @@ columns:
     lineage:
       - datalake_kodak_raw.group_analysis.result
     description: 'Complete raw JSON response from AI providers containing unprocessed property-level analysis results. Includes all metrics, scores, classifications, and metadata returned by the AI service before parsing into structured database fields. Used for reprocessing, algorithm updates, and debugging analysis workflows.'
+  op_cdc:
+    lineage:
+      - datalake_kodak_raw.group_analysis.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_kodak_raw.group_analysis.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_kodak_raw.group_analysis.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

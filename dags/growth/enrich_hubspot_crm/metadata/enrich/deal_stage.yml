@@ -32,7 +32,7 @@ columns:
   id_user_updated_by:
     lineage:
       - datalake_hubspot.deal.id_stage_history
-    description: 'User ID of the person who moved the deal to this stage. Critical for sales team performance analysis and stage change attribution.'
+    description: Internal QuintoAndar user identifier of the analyst who last changed contact status during enrichment.
   source_type:
     lineage:
       - datalake_hubspot.deal.id_stage_history

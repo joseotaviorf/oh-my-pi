@@ -47,11 +47,11 @@ columns:
   id_stage_history:
     lineage:
       - datalake_hubspot.ticket_history.id_stage_history
-    description: History of the the stage ID.
+    description: Surrogate key referencing the HubSpot pipeline stage history row active when the record was captured.
   id_pipeline_history:
     lineage:
       - datalake_hubspot.ticket_history.id_pipeline_history
-    description: History of the the pipeline ID.
+    description: Surrogate key referencing the HubSpot pipeline history dimension for pipeline context.
   content:
     lineage:
       - datalake_hubspot.ticket_history.content

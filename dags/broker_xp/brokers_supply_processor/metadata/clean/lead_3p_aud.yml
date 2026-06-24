@@ -386,3 +386,20 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p_aud.day
     description: 'Partition column: Day extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'
+  op_cdc:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

@@ -24,19 +24,19 @@ columns:
   id_user_updated_by:
     lineage:
       - datalake_hubspot.company.lead_status_history
-    description: Unique identifier of the user who updated the lead status in HubSpot.
+    description: Internal QuintoAndar user identifier of the analyst who last changed contact status during enrichment.
   source_type:
     lineage:
       - datalake_hubspot.company.lead_status_history
     description: Source type of the update.
     categories:
-      API: ''
-      AUTOMATION_PLATFORM: ''
-      BATCH_UPDATE: ''
-      CRM_UI_BULK_ACTION: ''
-      CRM_UI: ''
-      IMPORT: ''
-      MOBILE_IOS: ''
+      API: Status change triggered through a HubSpot REST API call or external integration.
+      AUTOMATION_PLATFORM: Status change applied automatically by a HubSpot workflow, sequence, or automation rule.
+      BATCH_UPDATE: Status change from a bulk CRM update affecting multiple company records at once.
+      CRM_UI_BULK_ACTION: Status change from a mass-edit action performed in the HubSpot CRM web interface.
+      CRM_UI: Status change made manually by a user in the HubSpot CRM web interface.
+      IMPORT: Status change loaded through a HubSpot data import or spreadsheet upload.
+      MOBILE_IOS: Status change submitted from the HubSpot mobile application on iOS.
   business_context:
     description: The business context of the lead status change.
     categories:
@@ -45,7 +45,7 @@ columns:
   lead_status:
     lineage:
       - datalake_hubspot.company.lead_status_history
-    description: The new lead status in HubSpot.
+    description: Operational lead disposition in HubSpot sales workflow (open, qualified, unqualified, etc.).
   days_in_status:
     lineage:
       - datalake_hubspot.company.

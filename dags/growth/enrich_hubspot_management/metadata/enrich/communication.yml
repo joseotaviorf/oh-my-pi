@@ -23,19 +23,19 @@ columns:
   ids_associated_tickets:
     lineage:
       - datalake_hubspot.communication_history.ids_associated_tickets
-    description: List of ids of associated tickets.
+    description: Collection of HubSpot ticket IDs linked to this engagement for customer-support context joins.
   ids_associated_contacts:
     lineage:
       - datalake_hubspot.communication_history.ids_associated_contacts
-    description: List of ids of associated contacts.
+    description: Collection of HubSpot contact IDs linked to this engagement for stakeholder coverage analysis.
   ids_associated_companies:
     lineage:
       - datalake_hubspot.communication_history.ids_associated_companies
-    description: List of ids of associated companies.
+    description: Collection of HubSpot company IDs linked to this engagement for account-based reporting.
   ids_associated_deals:
     lineage:
       - datalake_hubspot.communication_history.ids_associated_deals
-    description: List of ids of associated deals.
+    description: Collection of HubSpot deal IDs linked to this engagement for revenue attribution and funnel analytics.
   communication_channel_type:
     lineage:
       - datalake_hubspot.communication_history.communication_channel_type

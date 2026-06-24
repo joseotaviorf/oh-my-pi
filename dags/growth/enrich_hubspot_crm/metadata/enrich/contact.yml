@@ -73,15 +73,15 @@ columns:
   first_conversion_event_name:
     lineage:
     - datalake_hubspot.contact_history.first_conversion_event_name
-    description: Name of the first conversion event for the contact.
+    description: Marketing form or landing-page event that first converted this contact in HubSpot analytics attribution.
   field_of_business:
     lineage:
     - datalake_hubspot.contact_history.field_of_business
-    description: Field of business of the contact.
+    description: Declared industry or business vertical segment captured on the HubSpot contact profile for segmentation.
   occupation:
     lineage:
     - datalake_hubspot.contact_history.occupation
-    description: Occupation of the contact.
+    description: Job title or professional role reported for the contact inside the linked company organization.
   address:
     lineage:
     - datalake_hubspot.contact_history.address
@@ -105,7 +105,7 @@ columns:
   hs_email_domain:
     lineage:
     - datalake_hubspot.contact_history.hs_email_domain
-    description: Domain of the email of the contact.
+    description: Internet domain extracted from the contact primary email used for firmographic matching and deliverability checks.
   hs_whatsapp_phone_number:
     lineage:  
     - datalake_hubspot.contact_history.hs_whatsapp_phone_number
@@ -113,7 +113,7 @@ columns:
   mobile_phone:
     lineage:
     - datalake_hubspot.contact_history.mobile_phone
-    description: Mobile phone of the contact.
+    description: Mobile telephone number stored on the HubSpot contact for sales outreach and messaging integrations.
   phone:
     lineage:
     - datalake_hubspot.contact_history.phone
@@ -125,27 +125,27 @@ columns:
   first_name:
     lineage:
     - datalake_hubspot.contact_history.first_name
-    description: First name of the contact.
+    description: Given name of the contact as registered in HubSpot CRM for personalization and deduplication.
   last_name:
     lineage:
     - datalake_hubspot.contact_history.last_name
-    description: Last name of the contact.
+    description: Family name of the contact as registered in HubSpot CRM for personalization and deduplication.
   hs_marketable_status:
     lineage:
     - datalake_hubspot.contact_history.hs_marketable_status
-    description: Marketable status of the contact.
+    description: HubSpot consent flag indicating whether the contact may receive marketing communications under policy.
   life_cycle_stage:
     lineage:
     - datalake_hubspot.contact_history.life_cycle_stage
-    description: Life cycle stage of the contact.
+    description: HubSpot lifecycle stage bucket (subscriber, lead, MQL, SQL, etc.) summarizing funnel maturity.
   lead_origin_restricted_use:
     lineage:
     - datalake_hubspot.contact_history.lead_origin_restricted_use
-    description: Lead origin of the contact (restricted field).
+    description: Internal-only lead acquisition channel code restricted to governance-approved growth reporting.
   recent_conversion_event_name:
     lineage:
     - datalake_hubspot.contact_history.recent_conversion_event_name
-    description: Name of the most recent conversion event for the contact.
+    description: Most recent marketing conversion event attributed to this contact in HubSpot analytics.
   nps_responsible:
     lineage: 
       - datalake_hubspot.contact_history.nps_responsible
@@ -153,11 +153,11 @@ columns:
   lead_status:
     lineage:
     - datalake_hubspot.contact_history.lead_status
-    description: Lead status of the contact.
+    description: Operational lead disposition in HubSpot sales workflow (open, qualified, unqualified, etc.).
   lead_status_history:
     lineage:
     - datalake_hubspot.contact_history.lead_status_history
-    description: Lead status history of the contact.
+    description: Serialized history of prior lead_status values for auditing funnel movement over time.
   num_conversion_events:
     lineage:
     - datalake_hubspot.contact_history.num_conversion_events

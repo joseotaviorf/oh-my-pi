@@ -32,7 +32,7 @@ columns:
   id_user_updated_by:
     lineage:
       - datalake_hubspot.ticket.id_stage_history
-    description: 'User ID of the support agent who moved the ticket to this stage. Critical for support team performance analysis and case management attribution.'
+    description: Internal QuintoAndar user identifier of the analyst who last changed contact status during enrichment.
   source_type:
     lineage:
       - datalake_hubspot.ticket.id_stage_history
