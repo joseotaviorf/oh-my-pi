@@ -1,6 +1,8 @@
 database_name: dw_listing
 table_name: dim_price_predicted
-description: Dimensional table that consolidates all the information about the prices predicted by the calculator to a house listing.
+description: >
+  Dimensional table with calculator prediction attributes per revision (sk_price_predicted).
+  Sourced from datalake_ebdb_pricing.listing_prediction_changes.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:

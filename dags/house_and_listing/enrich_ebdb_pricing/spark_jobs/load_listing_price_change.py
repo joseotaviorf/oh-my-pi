@@ -21,9 +21,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 TABLE_HOUSE_AUD = "datalake_ebdb_clean.house_aud"
 TABLE_USER_REVISION = "datalake_ebdb_user.user_revision_entity"
 TABLE_LISTING_BUSINESS_CONTEXT = "datalake_ebdb_clean.listing_business_context"
-TABLE_HOUSE_LISTING = "datalake_ebdb_listing.house_listing"
-TABLE_BUSINESS_CONTEXT_HISTORY = "datalake_ebdb_listing.business_context_history"
-TABLE_SALE_LISTING_STATUS = "datalake_sale_listings.sale_listing_status"
 
 
 def _get_candidates(start_date, end_date) -> DataFrame:
@@ -133,142 +130,26 @@ def _build_price_interval(
     )
 
 
-def _build_rent_listing_versions() -> DataFrame:
+def _prepare_price_changes(price_interval_df: DataFrame, price_col: str) -> DataFrame:
     """
-    Finds distinct (house, listing, version window) triples for RENT listings via a
-    range join, then marks which is the earliest version per house.
+    Maps audit price intervals to the schema expected by _build_variation.
+
+    ts_price_started / ts_price_ended come from _build_price_interval (LEAD over the
+    house audit price-change sequence). lag_price is the previous price in that same
+    sequence. Listing version windows are not applied.
     """
-    hl = spark.table(TABLE_HOUSE_LISTING)
-    bch = spark.table(TABLE_BUSINESS_CONTEXT_HISTORY)
-
-    join_cond = (
-        (F.col("hl.id_house") == F.col("bch.id_house"))
-        & (F.col("hl.ts_listing_version_start") <= F.col("bch.ts_state_started"))
-        & (
-            F.coalesce(F.col("bch.ts_state_ended"), F.current_timestamp())
-            <= F.coalesce(F.col("hl.ts_listing_version_end"), F.current_timestamp())
-        )
-    )
-
-    versions = (
-        hl.filter(F.col("id_house_listing").isNotNull())
-        .alias("hl")
-        .join(bch.filter(F.col("business_context") == "RENT").alias("bch"), join_cond)
-        .select(
-            F.col("hl.id_house"),
-            F.col("hl.id_house_listing"),
-            F.col("hl.ts_listing_version_start"),
-            F.col("hl.ts_listing_version_end"),
-        )
-        .distinct()
-    )
-
-    house_window = Window.partitionBy("id_house").orderBy(
-        F.asc("ts_listing_version_start")
-    )
-
-    return versions.withColumn(
-        "is_first_version",
-        F.row_number().over(house_window) == 1,
-    )
-
-
-def _build_sale_listing_versions() -> DataFrame:
-    """
-    For each sale listing, derives the full lifecycle:
-    - ts_listing_version_start: earliest ts_status_started (MIN over the listing)
-    - ts_listing_version_end: ts_status_ended of the latest status row, i.e. the row
-      with the maximum COALESCE(ts_status_ended, CURRENT_TIMESTAMP) — NULL when the
-      listing is still active.
-    """
-    sale_status = spark.table(TABLE_SALE_LISTING_STATUS)
-
-    listing_window = Window.partitionBy("id_sale_listing")
-    latest_end_window = (
-        Window.partitionBy("id_sale_listing")
-        .orderBy(F.desc(F.coalesce(F.col("ts_status_ended"), F.current_timestamp())))
-        .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
-    )
-    house_window = Window.partitionBy("id_house").orderBy(
-        F.asc("ts_listing_version_start")
-    )
-
-    return (
-        sale_status.filter(F.col("id_sale_listing").isNotNull())
-        .withColumn(
-            "ts_listing_version_start", F.min("ts_status_started").over(listing_window)
-        )
-        .withColumn(
-            "ts_listing_version_end", F.first("ts_status_ended").over(latest_end_window)
-        )
-        .select(
-            F.col("id_house"),
-            F.col("id_sale_listing").alias("id_house_listing"),
-            F.col("ts_listing_version_start"),
-            F.col("ts_listing_version_end"),
-        )
-        .distinct()
-        .withColumn("is_first_version", F.row_number().over(house_window) == 1)
-    )
-
-
-def _build_price_changes_listing(
-    price_interval_df: DataFrame,
-    listing_versions_df: DataFrame,
-    price_col: str,
-) -> DataFrame:
-    """
-    Joins price intervals to their corresponding listing version window using the logic
-    of first-version back-fill vs standard overlap check, then computes lag_price for
-    the joined result.
-
-    price_col: name of the price column in price_interval_df ('rent_price' or 'sale_price').
-    """
-    pi = price_interval_df.alias("pi")
-    lv = listing_versions_df.alias("lv")
-
-    ts_price_ended_coalesced = F.coalesce(
-        F.col("pi.ts_price_ended"), F.current_timestamp()
-    )
-    ts_version_end_coalesced = F.coalesce(
-        F.col("lv.ts_listing_version_end"), F.current_timestamp()
-    )
-
-    join_cond = (F.col("lv.id_house") == F.col("pi.id_house")) & F.when(
-        F.col("lv.is_first_version")
-        & (F.col("pi.ts_price_started") < F.col("lv.ts_listing_version_start")),
-        (F.col("lv.ts_listing_version_start") >= F.col("pi.ts_price_started"))
-        & (F.col("lv.ts_listing_version_start") <= ts_price_ended_coalesced),
-    ).otherwise(
-        (F.col("pi.ts_price_started") >= F.col("lv.ts_listing_version_start"))
-        & (F.col("pi.ts_price_started") < ts_version_end_coalesced),
-    )
-
-    joined = pi.join(lv, join_cond).select(
-        F.col("pi.id_house"),
-        F.col("lv.id_house_listing"),
-        F.col("pi.id_user_revision"),
-        F.col("pi.id_revision"),
-        F.col("pi.business_context"),
-        F.col("pi.change_reason"),
-        F.col(f"pi.{price_col}").alias("price"),
-        F.col("pi.ts_price_started"),
-    )
-
     house_ts_window = Window.partitionBy("id_house").orderBy(
         "ts_price_started", "id_revision"
     )
 
-    # ts_price_ended is recomputed here (post-JOIN) so it only references events
-    # that survived the listing-version filter. Computing it from the pre-JOIN
-    # LEAD in _build_price_interval would let it point to audit events excluded
-    # by the JOIN, producing a non-null ts_price_ended for the last effective price.
-    return joined.withColumn(
-        "lag_price", F.lag("price").over(house_ts_window)
-    ).withColumn("ts_price_ended", F.lead("ts_price_started").over(house_ts_window))
+    return (
+        price_interval_df.withColumn("price", F.col(price_col))
+        .withColumn("lag_price", F.lag("price").over(house_ts_window))
+        .drop(price_col)
+    )
 
 
-def _build_variation(listing_df: DataFrame) -> DataFrame:
+def _build_variation(price_changes_df: DataFrame) -> DataFrame:
     """
     Replicate the rent/sale_price_changes_variation CTEs and the final SELECT
     transformations (rounding, change_number, days_with_pricing_scheme).
@@ -296,7 +177,7 @@ def _build_variation(listing_df: DataFrame) -> DataFrame:
     )
 
     return (
-        listing_df.withColumn("previous_price", F.col("lag_price"))
+        price_changes_df.withColumn("previous_price", F.col("lag_price"))
         .withColumn("is_first_price", F.col("lag_price").isNull())
         .withColumn(
             "change_type",
@@ -354,19 +235,18 @@ def _build_result(house_aud_df: DataFrame) -> DataFrame:
     house_aud_df must already be persisted by the caller, as it is consumed twice
     (once per business context).
     """
-    rent_listing = _build_price_changes_listing(
-        _build_price_interval(house_aud_df, "RENT", "rent_price"),
-        _build_rent_listing_versions(),
-        "rent_price",
+    rent_final = _build_variation(
+        _prepare_price_changes(
+            _build_price_interval(house_aud_df, "RENT", "rent_price"),
+            "rent_price",
+        )
     )
-    sale_listing = _build_price_changes_listing(
-        _build_price_interval(house_aud_df, "SALE", "sale_price"),
-        _build_sale_listing_versions(),
-        "sale_price",
+    sale_final = _build_variation(
+        _prepare_price_changes(
+            _build_price_interval(house_aud_df, "SALE", "sale_price"),
+            "sale_price",
+        )
     )
-
-    rent_final = _build_variation(rent_listing)
-    sale_final = _build_variation(sale_listing)
 
     return (
         rent_final.unionAll(sale_final)
@@ -384,7 +264,6 @@ def _build_result(house_aud_df: DataFrame) -> DataFrame:
         .select(
             "id_price_change",
             "id_house",
-            "id_house_listing",
             "id_user_revision",
             "id_revision",
             "business_context",

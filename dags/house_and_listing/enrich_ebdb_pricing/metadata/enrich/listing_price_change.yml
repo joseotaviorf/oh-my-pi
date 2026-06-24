@@ -1,8 +1,7 @@
 ---
 database_name: datalake_ebdb_pricing
 table_name: listing_price_change
-description: Enrich table that handles sale and rental listing price change information and enriches it with some comparison columns and pricing scheme information.
-  If the price change occurred before versioning, it will be associated with the first version of the listing. Each row represents a price exchange for the listing.
+description: Enrich table of rental and sale price changes derived from house audit history per business context (RENT or SALE). Each row is a distinct rent or sale_price revision for the house; metrics and validity windows are computed from the audit sequence, not from listing version lifecycles.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -17,14 +16,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
     description: Foreign key referring to the house ID.
-  id_house_listing:
-    lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
-      - datalake_sale_listings.sale_listing_status.id_sale_listing
-    description: Foreign key of the listing. The last 3 numbers indicate the version of the listing when the price started.
   id_user_revision:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.id_user
+      - datalake_ebdb_user.user_revision_entity.id_user
     description: Foreign key referring to the author who made the price change.
   id_revision:
     lineage:
@@ -41,37 +35,35 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price
       - datalake_ebdb_clean.house_aud.rent
-    description: Published rental or sale price for a listing in a given time period.
+    description: Rental or sale price recorded in house audit for the row validity period.
   previous_price:
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price
       - datalake_ebdb_clean.house_aud.rent
     description: Price previous to the price of the referenced row.
   last_price_variation:
-    description: Percent difference between the published price for the row and the previous published price for the house within the same business context (RENT or SALE), across all listing versions.
+    description: Percent difference between the price in the row and the previous audit price change for the house within the same business context (RENT or SALE).
   first_price_variation:
-    description: Percent difference between the published price for the row and the first published price ever recorded for the house within the same business context (RENT or SALE), across all listing versions.
+    description: Percent difference between the price in the row and the first audit price change ever recorded for the house within the same business context (RENT or SALE).
   change_type:
-    description: Describes the type of price change.
+    description: Describes the type of price change relative to the previous audit price.
     categories:
-      First price: First price of the listing.
-      Price increase: Price of the listing went up.
-      Price decrease: Price of the listing went down.
+      FIRST_PRICE: First audit price change for the house in the business context.
+      PRICE_INCREASE: Price went up relative to the previous audit price change.
+      PRICE_DECREASE: Price went down relative to the previous audit price change.
   change_number:
-    description: Sequential number of the price change for the house within a given business context (RENT or SALE), across all listing versions.
+    description: Sequential number of the audit price change for the house within a given business context (RENT or SALE).
   days_with_pricing_scheme:
-    description: Count how many days the house stayed at that publication price within a given business context (RENT or SALE). If it is the most recent price, it counts up to D-1.
+    description: Count of days the house remained at that audit price within a business context (RENT or SALE). If it is the most recent change, counts up to D-1.
   is_first_price:
-    description: Boolean that tells if the price is the first publication price ever recorded for the house within a given business context (RENT or SALE), across all listing versions.
+    description: Boolean indicating whether the row is the first audit price change for the house within the business context (RENT or SALE).
   is_last_price:
-    description: Boolean that tells if the price is the most recent publication price of the house within a given business context (RENT or SALE), across all listing versions.
+    description: Boolean indicating whether the row is the most recent audit price change for the house within the business context (RENT or SALE).
   is_last_price_of_day:
-    description: Boolean that tells if the price is the house's most recent publication price of the day within a given business context (RENT or SALE), across all listing versions.
+    description: Boolean indicating whether the row is the house most recent audit price change of the day within the business context (RENT or SALE).
   ts_price_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_sale_listings.sale_listing_status.ts_status_started
-      - datalake_ebdb_listing.house_listing.ts_listing_version_start
     description: Timestamp of the beginning of the price scheme observed in that row.
   ts_price_ended:
     lineage:

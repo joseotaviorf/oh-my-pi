@@ -1,12 +1,10 @@
 database_name: dw_listing
 table_name: dim_pricing
 description: >
-  Dimensional table with descriptive attributes of each listing price change.
-  One row per price change (sk_pricing), regardless of listing version (id_house_listing).
-  Flags (is_last_price, is_last_price_of_day) and change_number are maintained at the
-  house-and-business-context level (sk_house + business_context), so a new price change
-  on any listing version of the same house updates the flags of all prior price changes
-  for that house in that context.
+  Dimensional table with descriptive attributes of each house audit price change.
+  One row per price change (sk_pricing). Flags (is_last_price, is_last_price_of_day) and
+  change_number are maintained at the (sk_house, business_context) level, so a new price
+  change updates the flags of all prior price changes for that house in that context.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -15,7 +13,7 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_price_change
   price:
-    description: Published rental or sale price for the listing during the validity window of this price change.
+    description: Rental or sale price recorded in house audit during the validity window of this price change.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.price
   previous_price:
@@ -38,8 +36,8 @@ columns:
       - datalake_ebdb_pricing.listing_price_change.first_price_variation
   change_number:
     description: >
-      Sequential counter of price changes for the same (sk_house, business_context),
-      starting at 1 and incrementing across all listing versions.
+      Sequential counter of audit price changes for the same (sk_house, business_context),
+      starting at 1.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.change_number
   change_type:
@@ -51,7 +49,7 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_price_change.change_type
   business_context:
-    description: Listing business context under which the price change occurred.
+    description: Business context (RENT or SALE) under which the audit price change occurred.
     categories:
       RENT: For rent.
       SALE: For sale.
@@ -59,14 +57,13 @@ columns:
       - datalake_ebdb_pricing.listing_price_change.business_context
   is_last_price:
     description: >
-      TRUE if this is the most recent price change for the (sk_house, business_context) pair,
-      regardless of listing version (id_house_listing).
+      TRUE if this is the most recent price change for the (sk_house, business_context) pair.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.is_last_price
   is_last_price_of_day:
     description: >
       TRUE if this is the most recent price change on its calendar day for the
-      (sk_house, business_context) pair, regardless of listing version (id_house_listing).
+      (sk_house, business_context) pair.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.is_last_price_of_day
   ts_load:

@@ -14,34 +14,27 @@ columns:
   sk_price_predicted:
     description: >
       Key referring to the earliest calculator prediction whose validity window overlaps
-      the price change period, scoped to the same (sk_house, sk_house_listing, business_context).
+      the price change period, scoped to the same (sk_house, business_context).
       Defaults to -1 if no matching prediction exists.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
   sk_price_suggested:
     description: >
       Key referring to the most recent price suggestion active at the moment the price change
-      started, scoped to (sk_house, business_context) regardless of listing version.
-      Defaults to -1 if no matching suggestion exists.
+      started, scoped to (sk_house, business_context). Defaults to -1 if no matching suggestion exists.
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
   sk_house:
-    description: Key referring to the house. Consistent across all listing versions.
+    description: Key referring to the house.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_house
-  sk_house_listing:
-    description: >
-      Key referring to the listing version that was active when this price change occurred.
-      The last 3 digits indicate the listing version.
-    lineage:
-      - datalake_ebdb_pricing.listing_price_change.id_house_listing
   sk_user:
     description: Key referring to the user who authored the price change. Defaults to -1 if unknown.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_user_revision
   days_with_pricing_scheme:
     description: >
-      Number of days the listing remained at this price. For the current active price
+      Number of days the house remained at this audit price. For the current active price
       (ts_price_ended IS NULL), this counts up to D-1.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.days_with_pricing_scheme
@@ -52,8 +45,7 @@ columns:
   ts_price_ended:
     description: >
       Timestamp of when this price was superseded by the next price change for the same
-      (sk_house, business_context), regardless of listing version (id_house_listing).
-      NULL if this is the currently active price.
+      (sk_house, business_context). NULL if this is the currently active price.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.ts_price_ended
   ts_load:

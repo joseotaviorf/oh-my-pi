@@ -1,8 +1,10 @@
 ---
 database_name: datalake_ebdb_pricing
 table_name: listing_prediction_changes
-description: Enrich table that handles sale and rental calculator listing predicted price change information.
-  If the predicted price change occurred before versioning, it will be associated with the first version of the listing. Each row represents a price exchange for the listing.
+description: >
+  Enrich table of rental and sale calculator prediction revisions from house_predicted_price_aud,
+  per (id_house, business_context). Each row is one audit revision with calculator percentiles;
+  validity windows and last-prediction flags are derived from the audit sequence, not listing versions.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -12,18 +14,15 @@ columns:
       - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
   id_house:
     lineage:
-      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.house_predicted_price_aud.id_house
     description: Foreign key referring to the house ID.
-  id_house_listing:
-    lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
-      - datalake_sale_listings.sale_listing_status.id_sale_listing
-    description: Foreign key of the listing. The last 3 numbers indicate the version of the listing when the prediction started.
   id_revision:
     lineage:
-      - datalake_ebdb_clean.house_aud.rev
-    description: Foreign key reffering to the revision entity of the price change.
+      - datalake_ebdb_clean.house_predicted_price_aud.rev
+    description: Foreign key referring to the revision entity of the prediction change.
   business_context:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.business_context
     description: Business context in which the price change occurred.
     categories:
       RENT: For rent.
@@ -74,14 +73,12 @@ columns:
       LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
       NONE: If the prediction has no certainty at all.
   is_last_prediction:
-    description: Boolean indicating whether is the last prediction made by the calculator for the house.
+    description: Boolean indicating whether this is the most recent prediction for the house within the business context (RENT or SALE).
   is_last_prediction_of_day:
-    description: Boolean indicating whether is the last prediction of the day made by the calculator.
+    description: Boolean indicating whether this is the most recent prediction of the day for the house within the business context (RENT or SALE).
   ts_calculator_result_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_sale_listings.sale_listing_status.ts_status_started
-      - datalake_ebdb_listing.house_listing.ts_listing_version_start
     description: Timestamp of the beginning of the calculator price result observed in that row.
   ts_calculator_result_ended:
     lineage:

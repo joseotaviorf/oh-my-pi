@@ -24,13 +24,13 @@ def get_affected_price_changes(spark, start_date, end_date):
     Filtering only by ts_price_started would miss price changes whose
     is_last_price or is_last_price_of_day flags were updated in the source
     because a newer price change was created for the same house in the date
-    range. The flags are maintained at the id_house level in the source: a new
-    price change — even from a different id_house_listing — flips is_last_price
-    to false for every prior price change of that house.
+    range. The flags are maintained at the (id_house, business_context) level in the
+    source: a new price change flips is_last_price to false for every prior price change
+    in that context.
 
     Strategy: find every (id_house, business_context) that had a new price
     change in the range, then reprocess ALL historical price changes for those
-    houses across all listing versions.
+    houses.
     """
     price_changes = spark.table(SOURCE_TABLE)
 

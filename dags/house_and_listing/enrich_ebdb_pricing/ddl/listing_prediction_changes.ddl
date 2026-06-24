@@ -3,7 +3,6 @@
 CREATE TABLE datalake_ebdb_pricing.listing_prediction_changes (
     id_prediction_change BIGINT GENERATED ALWAYS AS IDENTITY,
     id_house BIGINT,
-    id_house_listing BIGINT,
     id_revision INT,
     business_context STRING,
     calculator_min_price INT,

@@ -29,14 +29,13 @@ def get_affected_price_changes(spark, start_date, end_date):
 
     1. New price changes (ts_price_started in range):
        a new price change updates ts_price_ended of the immediately preceding
-       price change in the source — which may belong to a different
-       id_house_listing. To ensure that preceding record is reprocessed, we
-       use (id_house, business_context) as the join key, fetching the full
-       history across all listing versions.
+       price change in the source. To ensure that preceding record is reprocessed,
+       we use (id_house, business_context) as the join key, fetching the full
+       history for that house and context.
 
     2. New predictions (ts_calculator_result_started in range):
-       predictions are scoped to a specific listing version, so we use the
-       narrower (id_house, id_house_listing, business_context) key here.
+       predictions are joined by (id_house, business_context), fetching all
+       price changes for that house and context.
 
     3. New suggestions (ts_suggestion_started in range):
        the suggestion join key is (id_house, business_context), so ALL price
@@ -44,8 +43,8 @@ def get_affected_price_changes(spark, start_date, end_date):
     """
     price_changes = spark.table(PRICE_CHANGE_TABLE)
 
-    # New price changes: use house-level key so that ts_price_ended updates in
-    # prior listing versions are correctly reprocessed.
+    # New price changes: use (id_house, business_context) so that ts_price_ended updates on
+    # prior rows in the same context are correctly reprocessed.
     affected_houses_from_price = (
         price_changes.filter(
             F.to_date(F.col("ts_price_started")).between(start_date, end_date)
@@ -54,19 +53,19 @@ def get_affected_price_changes(spark, start_date, end_date):
         .distinct()
     )
 
-    # New predictions: scoped to listing version.
-    affected_listing_versions_from_prediction = (
+    # New predictions: house-level key.
+    affected_houses_from_prediction = (
         spark.table(PREDICTION_CHANGES_TABLE)
         .filter(
             F.to_date(F.col("ts_calculator_result_started")).between(
                 start_date, end_date
             )
         )
-        .select("id_house", "id_house_listing", "business_context")
+        .select("id_house", "business_context")
         .distinct()
     )
 
-    # New suggestions: house-level key (no id_house_listing in suggestion join).
+    # New suggestions: house-level key.
     affected_houses_from_suggestion = (
         spark.table(SUGGESTION_CHANGES_TABLE)
         .filter(F.to_date(F.col("ts_suggestion_started")).between(start_date, end_date))
@@ -81,8 +80,8 @@ def get_affected_price_changes(spark, start_date, end_date):
         .select("id_price_change")
         .unionByName(
             price_changes.join(
-                F.broadcast(affected_listing_versions_from_prediction),
-                ["id_house", "id_house_listing", "business_context"],
+                F.broadcast(affected_houses_from_prediction),
+                ["id_house", "business_context"],
             ).select("id_price_change")
         )
         .unionByName(
@@ -114,7 +113,6 @@ def build_fact_price_changes(spark, pri_df):
 
     prediction_join_cond = (
         (F.col("pre.id_house") == F.col("pri.id_house"))
-        & (F.col("pre.id_house_listing") == F.col("pri.id_house_listing"))
         & (F.col("pre.business_context") == F.col("pri.business_context"))
         & (F.col("pre.ts_calculator_result_started") >= F.col("pri.ts_price_started"))
         & (
@@ -138,7 +136,6 @@ def build_fact_price_changes(spark, pri_df):
                 "sk_price_predicted"
             ),
             F.col("pri.id_house").alias("sk_house"),
-            F.col("pri.id_house_listing").alias("sk_house_listing"),
             F.coalesce(F.col("pri.id_user_revision"), F.lit(-1)).alias("sk_user"),
             F.col("pri.days_with_pricing_scheme"),
             F.col("pri.business_context"),
@@ -176,7 +173,6 @@ def build_fact_price_changes(spark, pri_df):
                 "sk_price_suggested"
             ),
             F.col("p.sk_house"),
-            F.col("p.sk_house_listing"),
             F.col("p.sk_user"),
             F.col("p.days_with_pricing_scheme"),
             F.col("p.ts_price_started"),
@@ -229,7 +225,6 @@ if __name__ == "__main__":
             .select(
                 "id_price_change",
                 "id_house",
-                "id_house_listing",
                 "id_user_revision",
                 "days_with_pricing_scheme",
                 "business_context",
