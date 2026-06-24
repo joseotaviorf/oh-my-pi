@@ -1,57 +1,75 @@
----
-database_name: datalake_velo_clean
+database_name: datalake_rental_guarantee_platform_clean
 table_name: clientes_person_legacy
 domain: Fintech
-owner: data-ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.id
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.id
+    description: Primary key of the legacy Velo record ingested from raw FiancaVelo
+      tables.
   id_user_insert:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.userinsert
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.userinsert
+    description: User identifier that originally inserted the legacy Velo record.
   id_user_update:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.userupdate
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.userupdate
+    description: User identifier that last updated the legacy Velo record.
   name:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.name
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.name
+    description: Full name of the legacy Velo rental guarantee client person.
   document:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.document
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.document
+    description: Government identification document number of the legacy client person.
   email:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.email
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.email
+    description: Email address of the legacy Velo rental guarantee client person.
   mother:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.mother
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.mother
+    description: Mother name captured for the legacy Velo client person record.
   phone:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.phone
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.phone
+    description: Phone number of the legacy Velo rental guarantee client person.
   rental:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.rental
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.rental
+    description: Rental reference text associated with the legacy client person.
   is_foreigner:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.estrangeiro
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.estrangeiro
+    description: Whether the legacy client person is flagged as a foreign national.
   is_active:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.active
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.active
+    description: Boolean flag indicating whether the legacy Velo record remains active.
   dt_birth:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.birth
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.birth
+    description: Birth date of the legacy Velo rental guarantee client person.
   ts_inserted:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.dateinsert
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.dateinsert
+    description: Timestamp when the legacy Velo record was first inserted in source.
   ts_updated:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.dateupdate
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.dateupdate
+    description: Timestamp when the legacy Velo record was last updated in source.
   year:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.year
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.year
+    description: Column year on clientes_person_legacy.
   month:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.month
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.month
+    description: Column month on clientes_person_legacy.
   day:
     lineage:
-      - datalake_velo_raw.clientes_person_legacy.day
+    - datalake_rental_guarantee_platform_raw.clientes_person_legacy.day
+    description: Column day on clientes_person_legacy.
+description: Legacy Velo client person records migrated from FiancaVelo raw ingestion.

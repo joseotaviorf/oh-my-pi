@@ -1,63 +1,84 @@
----
-database_name: datalake_velo_clean
+database_name: datalake_rental_guarantee_platform_clean
 table_name: fiancavelo_fianca_legacy
 domain: Fintech
-owner: data-ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.id
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.id
+    description: Primary key of the legacy Velo record ingested from raw FiancaVelo
+      tables.
   id_realtor:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.realtor
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.realtor
+    description: Identifier of the realtor associated with the legacy guarantee record.
   id_realestate:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.realestate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.realestate
+    description: Identifier of the real estate agency in the legacy guarantee record.
   id_responsible:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.responsible
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.responsible
+    description: Identifier of the user responsible for the legacy guarantee record.
   id_type:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.type
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.type
+    description: Type code classifying the legacy Velo guarantee record.
   id_status:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.status
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.status
+    description: Status code of the legacy Velo guarantee record in source.
   id_external:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.externalref
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.externalref
+    description: External system identifier linked to the legacy Velo guarantee record.
   id_propose:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.propose
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.propose
+    description: Foreign key referencing the legacy Velo rental guarantee proposal.
   id_validity:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.validity
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.validity
+    description: Validity period identifier for the legacy guarantee contract.
   id_user_insert:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.userinsert
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.userinsert
+    description: User identifier that originally inserted the legacy Velo record.
   id_user_update:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.userupdate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.userupdate
+    description: User identifier that last updated the legacy Velo record.
   is_active:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.active
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.active
+    description: Boolean flag indicating whether the legacy Velo record remains active.
   dt_begin:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.begin
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.begin
+    description: Start date of the legacy Velo guarantee validity window.
   dt_ended:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.end
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.end
+    description: End date of the legacy Velo guarantee validity window.
   ts_inserted:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.dateinsert
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.dateinsert
+    description: Timestamp when the legacy Velo record was first inserted in source.
   ts_updated:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.dateupdate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.dateupdate
+    description: Timestamp when the legacy Velo record was last updated in source.
   year:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.year
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.year
+    description: Column year on fiancavelo_fianca_legacy.
   month:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.month
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.month
+    description: Column month on fiancavelo_fianca_legacy.
   day:
     lineage:
-      - datalake_velo_raw.fiancavelo_fianca_legacy.day
+    - datalake_rental_guarantee_platform_raw.fiancavelo_fianca_legacy.day
+    description: Column day on fiancavelo_fianca_legacy.
+description: Legacy Velo guarantee (fianca) contracts migrated from FiancaVelo raw
+  tables.

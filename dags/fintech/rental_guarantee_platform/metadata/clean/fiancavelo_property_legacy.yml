@@ -1,63 +1,84 @@
----
-database_name: datalake_velo_clean
+database_name: datalake_rental_guarantee_platform_clean
 table_name: fiancavelo_property_legacy
 domain: Fintech
-owner: data-ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.id
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.id
+    description: Primary key of the legacy Velo record ingested from raw FiancaVelo
+      tables.
   id_property_type:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.propertytype
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.propertytype
+    description: Type code describing the legacy Velo property category.
   id_user_insert:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.userinsert
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.userinsert
+    description: User identifier that originally inserted the legacy Velo record.
   id_user_update:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.userupdate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.userupdate
+    description: User identifier that last updated the legacy Velo record.
   neighborhood:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.neighborhood
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.neighborhood
+    description: Neighborhood of the legacy Velo guarantee property address.
   street:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.street
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.street
+    description: Street name of the legacy Velo guarantee property address.
   number:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.number
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.number
+    description: Street number of the legacy Velo guarantee property address.
   complement:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.complement
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.complement
+    description: Address complement of the legacy Velo guarantee property.
   zipcode:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.zipcode
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.zipcode
+    description: Postal code of the legacy Velo guarantee property address.
   city:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.city
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.city
+    description: City of the legacy Velo guarantee property address.
   state:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.state
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.state
+    description: State of the legacy Velo guarantee property address.
   country:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.country
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.country
+    description: Country of the legacy Velo guarantee property address.
   geolocation:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.geolocation
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.geolocation
+    description: Geolocation coordinates of the legacy Velo guarantee property.
   is_active:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.active
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.active
+    description: Boolean flag indicating whether the legacy Velo record remains active.
   ts_inserted:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.dateinsert
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.dateinsert
+    description: Timestamp when the legacy Velo record was first inserted in source.
   ts_updated:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.dateupdate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.dateupdate
+    description: Timestamp when the legacy Velo record was last updated in source.
   year:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.year
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.year
+    description: Column year on fiancavelo_property_legacy.
   month:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.month
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.month
+    description: Column month on fiancavelo_property_legacy.
   day:
     lineage:
-      - datalake_velo_raw.fiancavelo_property_legacy.day
+    - datalake_rental_guarantee_platform_raw.fiancavelo_property_legacy.day
+    description: Column day on fiancavelo_property_legacy.
+description: Legacy Velo property addresses migrated from FiancaVelo raw property
+  tables.

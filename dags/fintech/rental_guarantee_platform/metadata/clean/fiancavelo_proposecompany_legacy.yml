@@ -1,39 +1,51 @@
----
-database_name: datalake_velo_clean
+database_name: datalake_rental_guarantee_platform_clean
 table_name: fiancavelo_proposecompany_legacy
 domain: Fintech
-owner: data-ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.id
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.id
+    description: Primary key of the legacy Velo record ingested from raw FiancaVelo
+      tables.
   id_user_insert:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.userinsert
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.userinsert
+    description: User identifier that originally inserted the legacy Velo record.
   id_user_update:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.userupdate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.userupdate
+    description: User identifier that last updated the legacy Velo record.
   id_propose:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.propose
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.propose
+    description: Foreign key referencing the legacy Velo rental guarantee proposal.
   id_company:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.company
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.company
+    description: Foreign key referencing the legacy Velo broker company on the proposal.
   is_active:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.active
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.active
+    description: Boolean flag indicating whether the legacy Velo record remains active.
   ts_inserted:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.dateinsert
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.dateinsert
+    description: Timestamp when the legacy Velo record was first inserted in source.
   ts_updated:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.dateupdate
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.dateupdate
+    description: Timestamp when the legacy Velo record was last updated in source.
   year:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.year
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.year
+    description: Column year on fiancavelo_proposecompany_legacy.
   month:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.month
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.month
+    description: Column month on fiancavelo_proposecompany_legacy.
   day:
     lineage:
-      - datalake_velo_raw.fiancavelo_proposecompany_legacy.day
+    - datalake_rental_guarantee_platform_raw.fiancavelo_proposecompany_legacy.day
+    description: Column day on fiancavelo_proposecompany_legacy.
+description: Legacy Velo proposal-to-company links migrated from FiancaVelo raw ingestion.
