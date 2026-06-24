@@ -53,6 +53,16 @@ workflow:
         - "1lf1CIn8GRvHOnNm0imZ8z01w_NXtjv16zbPqD5GP8-k"
         - "base - PIN"
 
+    # --- P&T headcount (FP&A / P&T leadership) ---
+    # Use context: Weekly P&T headcount base (active + terminated) with termination date,
+    # scoped by L1 manager (CTO + CPO). Consumed by FP&A and P&T leadership (Paulo Golgher / Rafael Castro).
+    # Business Owner: fabiano.ribeiro@quintoandar.com.br
+    # Governance: docs/pnt_headcount_termination_roster.md
+    pnt_headcount_termination_roster:
+      extra_spark_job_arguments:
+        - "1rhyzy3ANxm_lw9Wmq9tOPdFnLhpoFuAT3QY2CWOcPmc"
+        - "_base"
+
     # --- FP&A / CODEX → PIN ---
     organization_codex_pin_sync:
       column_mapping_mode: name

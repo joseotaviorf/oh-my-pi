@@ -1,0 +1,61 @@
+# `pnt_headcount_termination_roster` — reverse export governance
+
+| Field | Value |
+| --- | --- |
+| **Metastore table** | `reverse_reports.pnt_headcount_termination_roster` |
+| **Business owner** | Fabiano Ribeiro (P&T) |
+| **Technical owner** | People Data |
+| **Domain** | People |
+| **One-line summary** | P&T headcount roster (active + terminated) with termination date, scoped to the P&T org by L1 manager (CTO + CPO). |
+| **Business purpose** | Weekly P&T headcount base reused by FP&A and P&T leadership (Paulo Golgher / Rafael Castro) for org analyses. Mirrors the `public_information` column set and adds `dt_desligamento` so terminations are visible. Created for DBP-1544, where the requester noted the termination date had been dropped from the weekly HC sheet. |
+| **Business consumer** | P&T leadership (Paulo Golgher / Rafael Castro) and FP&A. |
+| **Operational source of truth** | DW 2.0 (`dw_employee_details`, `dw_organization`, `dw_compensation`). No external spreadsheet owner — all data sourced from the lake. |
+| **Delivery channel** | Google Sheets tab **_base** in workbook `1rhyzy3ANxm_lw9Wmq9tOPdFnLhpoFuAT3QY2CWOcPmc`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
+| **Contract notes** | Legacy Portuguese column names preserved from `public_information` for sheet compatibility. **P&T scope** = `dim_management_hierarchy.name_l1 IN ('paulo braz golgher', 'rafael dantas de castro')` (CTO + CPO), the org source of truth — preferred over cost-center `vertical` because the L1 chain also captures P&T people sitting in `ops`/`corp`/null verticals (e.g. credit analytics); the filter is pushed into the `pnt_management_hierarchy` CTE (INNER JOIN) before the fact joins. **No active filter**: terminated employees are kept so `dt_desligamento` is meaningful. Both `dt_desligamento` and `status` are gated on `dt_terminated <= CURRENT_DATE()`: a termination on or before today shows the date with `status = 'desligado'`; active employees and not-yet-effective future terminations show an empty `dt_desligamento` and stay `status = 'ativo'` until the date arrives. Future hires (`dt_hired > CURRENT_DATE()`) and external emails (`@ext.`) are excluded. |
+
+### Column inventory
+
+| Column (sheet / Delta name) | Description | Lake source |
+| --- | --- | --- |
+| matricula | Employee person number (natural HR identifier). | `dw_employee_details.dim_employee.person_number` |
+| empresa | Legal entity / business unit display name with standard remapping (e.g. Classifieds umbrella, Benvi México). | `dw_organization.dim_business_unit.consolidated_business_unit_name` |
+| nome | Employee full name, lowercased. | `dw_employee_details.dim_employee.name` |
+| email | Employee work email, lowercased. | `dw_employee_details.dim_employee.work_email` |
+| status | `'desligado'` when `dt_terminated <= CURRENT_DATE()` (today or past); otherwise `'ativo'` (active employees and not-yet-effective future terminations). | Derived from `fact_assignment_snapshots.dt_terminated` |
+| gestor | Direct manager full name, lowercased. | `dw_employee_details.dim_employee.name` (joined via `dim_management_hierarchy.manager_assignment_number`) |
+| cargo | Job title, lowercased. | `dw_compensation.dim_job.job_name` |
+| numero_centro_de_custo | Cost centre code, lowercased. | `dw_organization.dim_cost_center.cost_center_code` |
+| centro_de_custo | Formatted cost centre label: `<code> - <name_after_prefix>`, all lowercased. | `dw_organization.dim_cost_center` (cost_center_code + cost_center_name) |
+| l1_cc | Cost centre L1 owner name, lowercased; NULL when not set. | `dw_organization.dim_cost_center.owner_l1_name` |
+| l2_cc | Cost centre L2 owner name, lowercased; NULL when not set. | `dw_organization.dim_cost_center.owner_l2_name` |
+| l3_cc | Cost centre L3 owner name, lowercased; NULL when not set. | `dw_organization.dim_cost_center.owner_l3_name` |
+| vertical | CODEX vertical classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.vertical` |
+| structure | CODEX structure classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.structure` |
+| team | CODEX team classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.team` |
+| business | CODEX business classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.business` |
+| product | CODEX product classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.product` |
+| brand | CODEX brand classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.brand` |
+| chapter | CODEX chapter classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.chapter` |
+| line | CODEX line classification, lowercased; NULL when not set. | `dw_organization.dim_cost_center.line` |
+| hrbp | HRBP work email for the employee's cost centre, lowercased; NULL when not assigned. | `dw_organization.dim_cost_center.hrbp_work_email` |
+| pais | Country inferred from business unit name (argentina / mexico / portugal / brasil); falls back to job country. | `dw_organization.dim_business_unit.business_unit_name` + `dw_compensation.dim_job.country` (CASE) |
+| residencia_uf | Employee home state (address), lowercased. | `dw_employee_details.dim_contact.address_state` |
+| residencia_cidade | Employee home city (address), lowercased. | `dw_employee_details.dim_contact.address_city` |
+| l0_gestor | Hierarchy level 0 (top) manager name, lowercased; defaults to `'gabriel braga vieira'` when absent. | `dw_employee_details.dim_management_hierarchy.name_l0` |
+| l1_gestor | Hierarchy level 1 manager name, lowercased (P&T scope: CTO / CPO). | `dw_employee_details.dim_management_hierarchy.name_l1` |
+| l2_gestor | Hierarchy level 2 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l2` |
+| l3_gestor | Hierarchy level 3 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l3` |
+| l4_gestor | Hierarchy level 4 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l4` |
+| l5_gestor | Hierarchy level 5 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l5` |
+| l6_gestor | Hierarchy level 6 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l6` |
+| l7_gestor | Hierarchy level 7 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l7` |
+| l8_gestor | Hierarchy level 8 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l8` |
+| idade_empresa | Employee tenure in the company in full months. | `dw_employee_details.fact_assignment_snapshots.months_tenure_in_company` |
+| fl_lider | 1 if the employee is a manager; 0 otherwise. | `dw_employee_details.fact_assignment_snapshots.is_manager` |
+| dt_inicio | Date when the current work relationship started. | `dw_employee_details.fact_assignment_snapshots.dt_hired` |
+| dt_desligamento | Termination date when it is on or before today; NULL (empty) for active employees and not-yet-effective future terminations. | `dw_employee_details.fact_assignment_snapshots.dt_terminated` |
+| dt_last_update | Date when the snapshot was last loaded, in Brazil/São Paulo timezone. | `dw_employee_details.fact_assignment_snapshots.ts_load` |
+| dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_hired` (MIN per person_number) |
+| year | Partition year (from `{load_start_date}`). Not exported to the sheet. | — |
+| month | Partition month (from `{load_start_date}`). Not exported to the sheet. | — |
+| day | Partition day (from `{load_start_date}`). Not exported to the sheet. | — |
