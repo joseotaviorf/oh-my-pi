@@ -1,4 +1,4 @@
-database_name: datalake_tars_clean
+database_name: datalake_tars_logs_clean
 table_name: logs
 description: |
   Parsed TARS chatbot answer log. One row per answer (answer_id).
