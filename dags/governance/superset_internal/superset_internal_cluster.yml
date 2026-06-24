@@ -10,3 +10,6 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     driver_node_type_id: m7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_general_cluster

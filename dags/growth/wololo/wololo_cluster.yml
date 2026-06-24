@@ -8,3 +8,12 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_general_cluster
+    custom_configurations:
+      master_node_type_id: r7g.xlarge
+      spark_conf:
+        spark.driver.memory: 12g
+        spark.driver.memoryOverhead: 4g
+        spark.yarn.am.memory: 4g

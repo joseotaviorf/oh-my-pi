@@ -147,7 +147,16 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
             key: value for key, value in prod_custom.items() if key != "num_workers"
         }
     if prod_custom or validation_custom:
-        merged["custom_configurations"] = {**prod_custom, **validation_custom}
+        merged_custom = {**prod_custom, **validation_custom}
+        # Deep-merge spark_conf: validation settings override prod, but prod keys
+        # not present in validation are preserved (e.g. spark.sql.session.timeZone).
+        prod_spark_conf = prod_custom.get("spark_conf")
+        validation_spark_conf = validation_custom.get("spark_conf")
+        if isinstance(prod_spark_conf, dict) and isinstance(
+            validation_spark_conf, dict
+        ):
+            merged_custom["spark_conf"] = {**prod_spark_conf, **validation_spark_conf}
+        merged["custom_configurations"] = merged_custom
     else:
         merged.pop("custom_configurations", None)
     return merged

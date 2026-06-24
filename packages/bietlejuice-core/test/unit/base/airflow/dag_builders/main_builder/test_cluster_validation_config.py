@@ -307,6 +307,36 @@ class TestMergeValidationClusterArgs:
             "task_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 2},
         }
 
+    def test_deep_merges_spark_conf_for_databricks_to_emr_validation(self):
+        prod = {
+            "type": "consolidation_s_general_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 3,
+                "spark_conf": {
+                    "spark.sql.session.timeZone": "America/Sao_Paulo",
+                    "spark.sql.shuffle.partitions": "200",
+                },
+            },
+        }
+        validation = {
+            "type": "emr_7_12_consolidation_s_general_cluster",
+            "custom_configurations": {
+                "master_node_type_id": "r7g.xlarge",
+                "spark_conf": {
+                    "spark.driver.memory": "8g",
+                    "spark.driver.memoryOverhead": "2g",
+                },
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"]["spark_conf"] == {
+            "spark.sql.session.timeZone": "America/Sao_Paulo",
+            "spark.sql.shuffle.partitions": "200",
+            "spark.driver.memory": "8g",
+            "spark.driver.memoryOverhead": "2g",
+        }
+
     def test_strips_prod_num_workers_for_single_node_validation(self):
         prod = {
             "type": "consolidation_l_memory_cluster",
