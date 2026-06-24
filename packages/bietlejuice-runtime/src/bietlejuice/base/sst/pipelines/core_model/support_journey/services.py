@@ -77,6 +77,8 @@ _VERSIONING_EVENT_TS_COL = "ts_task_updated"
 _TIMESTAMP_COLS = [
     "ts_task_created",
     "ts_task_updated",
+    "_effective_timestamp",
+    "_expired_timestamp",
 ]
 
 
@@ -630,24 +632,29 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             )
             return
 
+        bigfone_events_ts_filter = self.build_ts_filter(
+            self.cfg.partition_date,
+            delta_hours=-24,
+            col="ts_cdc_transaction",
+        )
+        qm_tasks_ts_filter = self.build_ts_filter(
+            self.cfg.partition_date,
+            delta_hours=-24,
+            col="ts_updated",
+        )
+
         bigfone_events_df = spark.table(sources["bigfone_event"]["table_name"]).where(
-            self.build_ts_filter(
-                self.cfg.partition_date,
-                delta_hours=-24,
-                col="ts_cdc_transaction",
-            )
+            bigfone_events_ts_filter
         )
         qm_tasks_df = spark.table(sources["qm_task"]["table_name"]).where(
-            self.build_ts_filter(
-                self.cfg.partition_date, delta_hours=-24, col="ts_updated"
-            )
+            qm_tasks_ts_filter
         )
 
         if bigfone_events_df.isEmpty() and qm_tasks_df.isEmpty():
             raise ValueError(
                 "No service event rows found in "
-                f"{sources['bigfone_event']['table_name']} or "
-                f"{sources['qm_task']['table_name']} for partition "
+                f"{sources['bigfone_event']['table_name']} ON filter {bigfone_events_ts_filter} "
+                f"{sources['qm_task']['table_name']} ON filter {qm_tasks_ts_filter} "
                 f"partition_date={self.cfg.partition_date}"
             )
 

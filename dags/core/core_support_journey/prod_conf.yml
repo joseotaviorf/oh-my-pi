@@ -10,7 +10,7 @@ datalake_bucket: "5a-datalake-prod"
 dependencies:
   bietlejuice.salesforce:
     is_daily: true
-    execution_hour: 6
+    execution_hour: 3
     tasks:
       - load-clean-record-types
       - load-clean-case-milestones
@@ -37,9 +37,10 @@ dependencies:
       - load-clean-session
   bietlejuice.support_session_service:
     is_daily: true
-    execution_hour: 6
+    execution_hour: 3
     tasks:
       - load-clean-support-session
+
 
 cluster:
   type: emr_7_12_small_general_2xlarge_single_node_cluster

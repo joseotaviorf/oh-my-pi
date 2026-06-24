@@ -161,7 +161,7 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
                 "id_event",
                 F.sha2(
                     F.concat_ws(
-                        "_",
+                        "&",
                         F.col("id_record"),
                         F.col("transaction_key"),
                         F.col("commit_number"),
@@ -172,7 +172,7 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
             .withColumn(
                 "id_event_type",
                 F.concat_ws(
-                    "_",
+                    "&",
                     F.lit("id_record"),
                     F.lit("transaction_key"),
                     F.lit("commit_number"),
