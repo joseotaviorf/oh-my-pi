@@ -1,154 +1,207 @@
+---
 database_name: datalake_gsheets_clean
 table_name: projreparos_espelhamento_dl
+owner: gustavo.brunelli@quintoandar.com.br
 domain: Cross
+description: Proj Reparos repair resolution cases mirrored from the operational spreadsheet. Tracks partner execution, reimbursement outcomes, lead times, and customer impact for Cross repair program analytics.
 columns:
   analista_responsavel:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.analista_responsavel
+    description: Name of the analyst responsible for managing the repair resolution case.
   cidade:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.cidade
+    description: City where the repair service was performed or coordinated.
   cliente_contestou_qualidade_servico:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.cliente_contestou_qualidade_servico
+    description: Indicator of whether the customer disputed the quality of the repair service.
   complexidade_reparos:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.complexidade_reparos
+    description: Complexity classification assigned to the repair scope for the case.
   conseguimos_confirmar_com_pp_forma_de_resolucao:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.conseguimos_confirmar_com_pp_forma_de_resolucao
+    description: Whether the resolution method was confirmed with the property owner (PP).
   conseguimos_orcar_reembolso:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.conseguimos_orcar_reembolso
+    description: Whether a reimbursement quote was successfully obtained for the case.
   contrato:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.contrato
+    description: Rental contract identifier associated with the repair resolution case.
   fim_do_servico:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.fim_do_servico
+    description: Date when the repair service execution was completed.
   forma_de_resolucao:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.forma_de_resolucao
+    description: Resolution method chosen to close the repair case (reimbursement, partner fix, etc.).
   ha_reparos_negados_por_qualidade:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.ha_reparos_negados_por_qualidade
+    description: Indicator of whether any repair items were denied due to quality standards.
   impacto_cliente:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.impacto_cliente
+    description: Customer impact severity classification for the repair outcome.
   incluimos_outros_reparos_apos_negociacao:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.incluimos_outros_reparos_apos_negociacao
+    description: Whether additional repair items were added after negotiation with stakeholders.
   leadtime_execucao_parceiros:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_execucao_parceiros
+    description: Elapsed days for partner execution of the repair after assignment.
   leadtime_final:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_final
+    description: Total elapsed days from case opening to final resolution.
   leadtime_iniciado_preferencia:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_iniciado_preferencia
+    description: Days between case start and initiation of the owner preference workflow.
   leadtime_orcamento_parceiros:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_orcamento_parceiros
+    description: Days taken for partners to return a repair or reimbursement quote.
   leadtime_preferencia_concluido:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_preferencia_concluido
+    description: Days to complete the owner preference step in the resolution flow.
   leadtime_tarefa_iniciado:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_tarefa_iniciado
+    description: Days from case creation until the repair task was formally started.
   leadtime_total:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.leadtime_total
+    description: End-to-end lead time for the repair case across all workflow stages.
   observacao_parceiro:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.observacao_parceiro
+    description: Free-text notes recorded by the repair partner about the service.
   observacao_valor_reparo:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.observacao_valor_reparo
+    description: Notes explaining the quoted or final repair value for the case.
   pp_contestou_reparos_negados:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.pp_contestou_reparos_negados
+    description: Whether the property owner contested repairs that were denied for quality.
   parceiro:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.parceiro
+    description: Name of the external repair partner executing the service.
   perc_valor_recuperado:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.perc_valor_recuperado
+    description: Percentage of the repair value successfully recovered from the partner or owner.
   resultado:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.resultado
+    description: Final outcome label summarizing how the repair case was closed.
   retorno_de_garantia:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.retorno_de_garantia
+    description: Guarantee return status or amount associated with the repair resolution.
   ticket_pp:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.ticket_pp
+    description: Support ticket identifier for the property owner side of the case.
   ticket_paceiro:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.ticket_paceiro
+    description: Support ticket identifier for the repair partner side of the case.
   valor_final_reembolsado:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.valor_final_reembolsado
+    description: Final reimbursement amount paid to the owner in BRL.
   valor_final_servico:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.valor_final_servico
+    description: Final invoiced amount for the repair service in BRL.
   valor_orcado_para_reembolso:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.valor_orcado_para_reembolso
+    description: Quoted reimbursement amount before final approval in BRL.
   valor_recuperado:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.valor_recuperado
+    description: Total monetary value recovered from partners or guarantees in BRL.
   aux_month:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.aux_month
+    description: Auxiliary month label used for reporting aggregation in the spreadsheet.
   nome_da_semana:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.nome_da_semana
+    description: Week name label associated with the case in the project calendar.
   semana:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.semana
+    description: Week number within the project timeline for the repair case.
   semana_projeto:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.semana_projeto
+    description: Project week index used to track repair program milestones.
   is_b2b:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.is_b2b
+    description: Boolean flag indicating whether the contract is a B2B portfolio case.
   is_tratativa_chaves_itens_acesso:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.is_tratativa_chaves_itens_acesso
+    description: Whether the case required handling keys or access items for entry.
   is_tratativa_contas_consumo:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.is_tratativa_contas_consumo
+    description: Whether utility bill settlement was part of the repair negotiation.
   data_1_contato_pp:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_1_contato_pp
+    description: Date of the first contact attempt with the property owner.
   data_abertura_tarefa:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_abertura_tarefa
+    description: Date when the repair task was opened in the operations system.
   data_acionamento_parceiro:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_acionamento_parceiro
+    description: Date when the external repair partner was engaged for the case.
   data_aprovacao_servico:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_aprovacao_servico
+    description: Date when the repair service quote was approved by stakeholders.
   data_cobranca_inicial:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_cobranca_inicial
+    description: Date when the initial charge or reimbursement request was issued.
   data_definicao_forma_de_resolucao:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_definicao_forma_de_resolucao
+    description: Date when the resolution method was formally defined for the case.
   data_final_resolucao:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_final_resolucao
+    description: Date when the repair case reached its final resolution state.
   data_finalizacao_reparo:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_finalizacao_reparo
+    description: Date when the physical repair work was completed on site.
   data_finalizacao_servico:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_finalizacao_servico
+    description: Date when the repair service was closed in the partner workflow.
   data_finalizacao_ticket:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_finalizacao_ticket
+    description: Date when the support ticket was closed for the repair case.
   data_recebimento_orcamento:
     lineage:
       - datalake_gsheets_raw.espelhamento_dl.data_recebimento_orcamento
+    description: Date when the repair or reimbursement quote was received from the partner.

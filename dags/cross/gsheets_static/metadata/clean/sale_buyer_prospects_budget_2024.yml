@@ -1,31 +1,31 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: sale_buyer_prospects_budget_2024
-owner: gustavo.alencar@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: Transformed table created from a Google Sheets file in order to input sale buyer prospects budgets into datalake
+description: 2024 budget targets for For Sale buyer prospects by city group and hub. Sourced from Google Sheets for Growth planning of new and recovered buyer acquisition.
 columns:
   city_group:
-    description: City group
     lineage:
       - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.city_group
+    description: QuintoAndar city group where the buyer prospect budget applies.
   hub_offer:
-    description: Hub associated to the buyer prospect
     lineage:
       - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.hub_offer
+    description: For Sale hub associated with the buyer prospect budget slice.
   is_rede:
-    description: Identifies if the buyer prospect comes from 1P or 3P supply (Rede)
     lineage:
-      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.is_rede  
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.is_rede
+    description: Boolean flag indicating whether prospects originate from the Rede third-party channel.
   new_buyer_prospect:
-    description: Budget volume of new buyer prospects
     lineage:
       - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.new_buyer_prospect
+    description: Budgeted volume of newly acquired buyer prospects in the period.
   recovered_buyer_prospect:
-    description: Budget volume of recovered buyer prospects
     lineage:
       - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.recovered_buyer_prospect
+    description: Budgeted volume of re-engaged buyer prospects returning to the funnel.
   dt_budget:
-    description: Date of the budget
     lineage:
       - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.date
+    description: Reference date identifying the buyer prospect budget planning period.

@@ -1,49 +1,51 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: sale_demand_targets_retro
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Retrospective For Sale demand funnel targets by city group and hub. Captures planned volumes across visits, offers, and contracts for historical performance analysis.
 columns:
   city_group:
-    description: City group.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.city_group
+    description: QuintoAndar city group associated with the retrospective demand targets.
   hub_offer:
-    description: Informs which associated hub the offer came from.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.hub_offer
+    description: For Sale hub from which the offer or demand target originated.
   visits_booked:
-    description: Target volume of visits booked.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.visits_booked
+    description: Retrospective target count of property visits booked by buyers.
   visits_completed:
-    description: Target volume of visits completed.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.visits_completed
+    description: Retrospective target count of property visits completed by buyers.
   offers_submitted:
-    description: Target volume of offers submitted.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.offers_submitted
+    description: Retrospective target count of purchase offers submitted in the funnel.
   offers_accepted:
-    description: Target volume of offers accepted.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.offers_accepted
+    description: Retrospective target count of purchase offers accepted by stakeholders.
   ccv_signed:
-    description: Target volume of contracts signed.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.ccv_signed
+    description: Retrospective target count of sale contracts (CCV) signed in the period.
   new_buyer_prospect:
-    description: Target volume of new buyers prospects.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.new_buyer_prospect
+    description: Retrospective target count of newly acquired buyer prospects.
   recovered_buyer_prospect:
-    description: Target volume of recovered buyers prospect.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.recovered_buyer_prospect
+    description: Retrospective target count of re-engaged buyer prospects in the funnel.
   is_rede:
-    description: If it comes from rede.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.is_rede
+    description: Boolean flag indicating whether the target row includes Rede channel demand.
   dt_target:
-    description: Date of the target.
     lineage:
       - datalake_gsheets_raw.sale_demand_targets_retro.date
+    description: Reference date identifying the retrospective demand target period.

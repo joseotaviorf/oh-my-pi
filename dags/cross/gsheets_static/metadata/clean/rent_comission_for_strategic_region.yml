@@ -1,29 +1,29 @@
+---
 database_name: datalake_gsheets_clean
 table_name: rent_comission_for_strategic_region
-description:
-  Strategic region mapping for Rent. Identifies whether a region (city/neighborhood) is considered strategic.
-domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
+domain: Agents
+description: Strategic region mapping for For Rent agent commission rules. Identifies city and neighbourhood combinations classified as strategic for rental broker incentives.
 columns:
   id_region:
     lineage:
       - datalake_gsheets_raw.rent_comission_for_strategic_region.id
-    description: Region ID.
+    description: Numeric identifier of the city-neighbourhood region in the strategic mapping.
   city_name:
     lineage:
       - datalake_gsheets_raw.rent_comission_for_strategic_region.city_name
-    description: City name.
+    description: Municipality name of the region evaluated for strategic commission status.
   neighborhood_name:
     lineage:
       - datalake_gsheets_raw.rent_comission_for_strategic_region.neighborhood_name
-    description: Neighborhood name.
+    description: Neighbourhood name within the city included in the strategic region list.
   concat_city_neighborhood:
     lineage:
       - datalake_gsheets_raw.rent_comission_for_strategic_region.concat_city_neighborhood
-    description: Concatenated city and neighborhood names.
+    description: Concatenated city and neighbourhood label used as a lookup key.
   is_strategic_region:
     lineage:
       - datalake_gsheets_raw.rent_comission_for_strategic_region.strategic_region
-    description: Whether the region is strategic.
+    description: Boolean flag indicating whether the region qualifies for strategic commission rates.
   ts_load:
-    description: Date when the table data was updated.
+    description: Timestamp when the strategic region mapping row was loaded into the clean layer.

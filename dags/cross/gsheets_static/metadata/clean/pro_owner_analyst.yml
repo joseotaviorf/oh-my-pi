@@ -1,43 +1,59 @@
+---
 database_name: datalake_gsheets_clean
 table_name: pro_owner_analyst
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
+description: Mapping of Pro Owner program analysts across communication platforms and cluster assignments. Used by For Rent operations to route owner support tickets to the correct analyst team.
 columns:
   id_cluster:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.id_clusterizacao_
+    description: Cluster identifier grouping Pro Owner analysts by region or portfolio.
   id_metabase:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.id_metabase_
+    description: Metabase user identifier linked to the Pro Owner analyst account.
   id_sirena:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.id_sirena_
+    description: Sirena platform identifier assigned to the Pro Owner analyst.
   id_twilio:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.id_twilio_
+    description: Twilio agent identifier used for Pro Owner voice or messaging routing.
   email:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.email_
+    description: Work email address of the Pro Owner program analyst.
   twilio_name:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.nomes_twillio
+    description: Display name of the analyst as registered in the Twilio platform.
   sirena_name:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.nomes_sirena
+    description: Display name of the analyst as registered in the Sirena platform.
   metabase_name:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.nome_metabase_
+    description: Display name of the analyst as registered in Metabase.
   cluster:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.clusterizacao
+    description: Cluster label describing the analyst portfolio assignment.
   type:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.tipo_
+    description: Analyst type classification within the Pro Owner support model.
   team:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.time_
+    description: Operations team name to which the Pro Owner analyst belongs.
   tl:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.tl_
+    description: Team lead responsible for the Pro Owner analyst squad.
   fh_team:
     lineage:
       - datalake_gsheets_raw.de_para_analistas_proowner.time_fh
+    description: FH operations team associated with the analyst for escalations.

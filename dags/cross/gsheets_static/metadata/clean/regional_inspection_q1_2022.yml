@@ -1,17 +1,23 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: regional_inspection_q1_2022
-domain: Cross
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
+description: Regional inspection zone assignments by neighbourhood for Q1 and Q2 2022. Static reference used by Cross operations to map inspection coverage areas.
 columns:
   id:
     lineage:
       - datalake_gsheets_raw.regional_inspection_q1_2022.id
+    description: Sequential identifier of the neighbourhood inspection mapping row.
   neighbourhood:
     lineage:
       - datalake_gsheets_raw.regional_inspection_q1_2022.neighbourhood
+    description: Neighbourhood name covered by the regional inspection assignment.
   regional_inspection_q1_2022:
     lineage:
       - datalake_gsheets_raw.regional_inspection_q1_2022.regional_inspection_q1_2022
+    description: Regional inspection team or zone assigned for the first quarter of 2022.
   regional_inspection_q2_2022:
     lineage:
       - datalake_gsheets_raw.regional_inspection_q1_2022.regional_inspection_q2_2022
+    description: Regional inspection team or zone assigned for the second quarter of 2022.

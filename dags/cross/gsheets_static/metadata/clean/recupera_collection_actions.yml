@@ -1,33 +1,49 @@
 ---
 database_name: datalake_gsheets_static_clean
 table_name: recupera_collection_actions
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Table to map the collections/occurrence as cpc, alo, esforco and promisse
+description: Mapping of Recupera collections actions, results, and complements to effort, contact, and promise indicators. Used by Fintech collections analytics to standardize outbound action taxonomy.
 columns:
-  occurrence:
-    description: ""
+  action_code:
     lineage:
-      - datalake_gsheets_raw.cyber_collection_actions.occurrence
-  id_occurrence:
-    description: ""
+      - datalake_gsheets_raw.recupera_collection_actions.action_code
+    description: Numeric or alphanumeric code identifying the collections action in Recupera.
+  action:
     lineage:
-      - datalake_gsheets_raw.cyber_collection_actions.id_occurrence
+      - datalake_gsheets_raw.recupera_collection_actions.action
+    description: Human-readable label of the collections action performed by the agent.
+  result_code:
+    lineage:
+      - datalake_gsheets_raw.recupera_collection_actions.result_code
+    description: Code representing the outcome returned after the collections action.
+  result:
+    lineage:
+      - datalake_gsheets_raw.recupera_collection_actions.result
+    description: Description of the result associated with the collections action attempt.
+  complement_code:
+    lineage:
+      - datalake_gsheets_raw.recupera_collection_actions.complement_code
+    description: Secondary code refining the action result with additional context.
+  complement:
+    lineage:
+      - datalake_gsheets_raw.recupera_collection_actions.complement
+    description: Text complement explaining nuances of the action result combination.
   esforco:
-    description: ""
     lineage:
-      - datalake_gsheets_raw.cyber_collection_actions.esforco
+      - datalake_gsheets_raw.recupera_collection_actions.esforco
+    description: Effort level attributed to the action for collections productivity metrics.
   alo:
-    description: ""
     lineage:
-      - datalake_gsheets_raw.cyber_collection_actions.alo
+      - datalake_gsheets_raw.recupera_collection_actions.alo
+    description: Indicator of whether the action counts as a live contact (alo) attempt.
   cpc:
-    description: ""
     lineage:
-      - datalake_gsheets_raw.cyber_collection_actions.cpc
+      - datalake_gsheets_raw.recupera_collection_actions.cpc
+    description: Indicator of whether the action achieved contact with the correct party (CPC).
   promessa:
-    description: ""
     lineage:
-      - datalake_gsheets_raw.cyber_collection_actions.promessa
+      - datalake_gsheets_raw.recupera_collection_actions.promessa
+    description: Indicator of whether the debtor made a payment promise during the action.
   ts_load:
-    description: ""
+    description: Timestamp when the action mapping row was loaded into the clean layer.

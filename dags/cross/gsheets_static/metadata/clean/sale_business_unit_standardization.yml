@@ -1,23 +1,33 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: sale_business_unit_standardization
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Standardization mapping between For Sale business unit identifiers and hub names across Teams, Work Contract, and BUR systems. Used to align regional reporting labels.
 columns:
-    id_business_unit_teams:
-        lineage:
-            - datalake_gsheets_raw.sale_business_unit_standardization.id_business_unit_teams
-    hub_name_teams:
-        lineage:
-            - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_teams
-    hub_name_wc:
-        lineage:
-            - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_wc
-    hub_name_bur:
-        lineage:
-            - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_bur
-    is_work_contract:
-        lineage:
-            - datalake_gsheets_raw.sale_business_unit_standardization.is_work_contract
-    is_business_unit_region:
-        lineage:
-            - datalake_gsheets_raw.sale_business_unit_standardization.is_business_unit_region
+  id_business_unit_teams:
+    lineage:
+      - datalake_gsheets_raw.sale_business_unit_standardization.id_business_unit_teams
+    description: Business unit identifier as defined in the Microsoft Teams org structure.
+  hub_name_teams:
+    lineage:
+      - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_teams
+    description: Hub name label associated with the business unit in Teams.
+  hub_name_wc:
+    lineage:
+      - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_wc
+    description: Hub name label used in the Work Contract operational system.
+  hub_name_bur:
+    lineage:
+      - datalake_gsheets_raw.sale_business_unit_standardization.hub_name_bur
+    description: Hub name label used in the BUR regional management system.
+  is_work_contract:
+    lineage:
+      - datalake_gsheets_raw.sale_business_unit_standardization.is_work_contract
+    description: Boolean flag indicating whether the mapping applies to Work Contract hubs.
+  is_business_unit_region:
+    lineage:
+      - datalake_gsheets_raw.sale_business_unit_standardization.is_business_unit_region
+    description: Boolean flag indicating whether the row represents a regional business unit.
+  ts_load:
+    description: Timestamp when the business unit mapping row was loaded into the clean layer.
