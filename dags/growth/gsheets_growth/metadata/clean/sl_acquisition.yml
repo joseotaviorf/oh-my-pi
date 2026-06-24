@@ -1,0 +1,55 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sl_acquisition
+domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Soft-lead acquisition attendance records manually tracked in a Google Sheets workbook and ingested by gsheets_growth. Each row represents one customer contact handled by a Growth operations analyst, including channel, team, and outcome. Used by Growth analytics to monitor SL acquisition operations and analyst productivity.
+columns:
+  status:
+    description: Outcome or current state of the soft-lead acquisition attendance (e.g. completed, in progress, no answer).
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.status
+  analyst_name:
+    description: Name of the analyst who handled the soft-lead acquisition attendance.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.analista
+  phone_5a:
+    description: QuintoAndar phone number used to reach the customer during the attendance.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.telefone_5A
+  customer_phone:
+    description: Customer phone number contacted during the soft-lead acquisition attendance.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.telefone_cliente
+  channel:
+    description: Communication channel used for the attendance (e.g. phone, WhatsApp).
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.canal
+  analyst_email:
+    description: Email address of the analyst responsible for the attendance.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.email_analista
+  type:
+    description: Classification or category of the soft-lead acquisition attendance record.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.tipo
+  team:
+    description: Operations team responsible for the analyst who conducted the attendance.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.equipe
+  dt_attended_week_started:
+    description: Week start date of the soft-lead acquisition attendance period, as recorded in the source spreadsheet.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.week_atendimento
+  dt_attended_month_started:
+    description: Month start date of the soft-lead acquisition attendance period, as recorded in the source spreadsheet.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.month_atendimento
+  dt_attended:
+    description: Calendar date when the soft-lead acquisition attendance was attributed to the analyst.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.dt_atendimento
+  ts_attended:
+    description: Timestamp when the soft-lead acquisition attendance was recorded or attributed.
+    lineage:
+      - datalake_gsheets_raw.sl_acquisition.ts_atendimento

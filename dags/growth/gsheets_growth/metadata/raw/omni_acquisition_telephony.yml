@@ -1,0 +1,4 @@
+---
+database_name: datalake_gsheets_raw
+table_name: omni_acquisition_telephony
+domain: Growth

@@ -1,0 +1,111 @@
+---
+database_name: datalake_gsheets_clean
+table_name: omni_acquisition_telephony
+domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Omni telephony call records exported to Google Sheets and ingested by gsheets_growth. Each row represents one phone interaction in the acquisition funnel, including trunk, extension, disposition, and analyst attribution. Used by Growth analytics to monitor omni telephony acquisition operations and call-center performance.
+columns:
+  user_name:
+    description: Omni platform user who handled or is associated with the telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.usuario
+  profile:
+    description: User profile or role configured in Omni for the agent who handled the call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.perfil
+  type:
+    description: Call type classification reported by Omni for the telephony record.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.tipo
+  channel:
+    description: Communication channel associated with the telephony call in the acquisition context.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.canal
+  status:
+    description: Current or final status of the telephony call in Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.status
+  status_1:
+    description: Secondary status or sub-state of the telephony call as reported by Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.status_1
+  team:
+    description: Operations team responsible for handling the telephony call in Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.equipe
+  extension:
+    description: Agent extension number used to handle the telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.ramal
+  contact_phone:
+    description: Customer phone number associated with the telephony call in the Omni export.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.numero_contato
+  contact_name:
+    description: Customer or contact name as recorded in the Omni telephony export.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.contato
+  protocol:
+    description: Omni protocol or ticket identifier for the telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.protocolo
+  tabulation:
+    description: Primary disposition or tabulation code assigned when the call was closed.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.tabulacao
+  sub_tabulation:
+    description: Secondary disposition or sub-tabulation code assigned to the telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.subtabulacao
+  tabulation_note:
+    description: Free-text observation about the tabulation or disposition applied to the call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.observacao_tabulacao
+  trunk_did:
+    description: Trunk or DID number used to route the telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.troncodid
+  hangup:
+    description: Hangup cause or party that ended the telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.hangup
+  cost_center:
+    description: Cost center associated with the telephony handling team or operation.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.centro_de_custos
+  analyst_name:
+    description: Name of the Growth analyst attributed to the acquisition telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.analista
+  phone_5a:
+    description: QuintoAndar phone number used during the acquisition telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.telefone_5a
+  customer_phone:
+    description: Customer phone number used for the acquisition telephony call attribution.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.telefone_cliente
+  analyst_email:
+    description: Email address of the analyst attributed to the acquisition telephony call.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.email_analista
+  call_time:
+    description: Time of day when the telephony call occurred, as exported from Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.hora
+  duration:
+    description: Total duration of the telephony call as reported by Omni, in its original time format.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.duracao
+  dt_contact:
+    description: Calendar date when the Omni telephony call occurred.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.data
+  dt_attended:
+    description: Calendar date when the acquisition telephony call was attributed to the analyst.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.data_atendimento
+  ts_attended:
+    description: Timestamp when the acquisition telephony call was recorded or attributed.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_telephony.data_hora

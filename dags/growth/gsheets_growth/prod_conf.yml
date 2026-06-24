@@ -376,3 +376,21 @@ sheets_info:
     sheet_name: voucherify_users
     clean_table_name: voucherify_users
     sheet_context: growth
+
+  omni_acquisition_contact:
+    sheet_id: 1X-kptKIzrRaf_8LVYF0fIlz82SAGqTgFA6zECBOPyrM
+    sheet_name: omni_atendimentos
+    clean_table_name: omni_acquisition_contact
+    sheet_context: growth
+
+  omni_acquisition_telephony:
+    sheet_id: 1X-kptKIzrRaf_8LVYF0fIlz82SAGqTgFA6zECBOPyrM
+    sheet_name: omni_telefonia
+    clean_table_name: omni_acquisition_telephony
+    sheet_context: growth
+
+  sl_acquisition:
+    sheet_id: 1X-kptKIzrRaf_8LVYF0fIlz82SAGqTgFA6zECBOPyrM
+    sheet_name: upload_databricks
+    clean_table_name: sl_acquisition
+    sheet_context: growth

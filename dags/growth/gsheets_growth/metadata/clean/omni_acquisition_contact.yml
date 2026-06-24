@@ -1,0 +1,151 @@
+---
+database_name: datalake_gsheets_clean
+table_name: omni_acquisition_contact
+domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Omni contact-center attendance records exported to Google Sheets and ingested by gsheets_growth. Each row represents one customer interaction in the acquisition funnel, including channel, disposition, handling times, and analyst attribution. Used by Growth analytics to monitor omni acquisition operations and contact-center performance.
+columns:
+  user_name:
+    description: Omni platform user who handled or is associated with the contact interaction.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.usuario
+  profile:
+    description: User profile or role configured in Omni for the agent who handled the contact.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.perfil
+  type:
+    description: Interaction type classification reported by Omni for the contact record.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tipo
+  channel:
+    description: Communication channel used for the contact (e.g. phone, WhatsApp, chat).
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.canal
+  channel_1:
+    description: Secondary or sub-channel classification reported by Omni for the contact record.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.canal_1
+  channel_type:
+    description: Detailed channel subtype reported by Omni for the contact interaction.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tipo_do_canal
+  instance:
+    description: Omni instance or tenant identifier associated with the contact record.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.instancia
+  contact_name:
+    description: Customer or contact name as recorded in the Omni attendance export.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.contato
+  contact_phone:
+    description: Customer phone number associated with the contact in the Omni export.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.numero_do_contato
+  status:
+    description: Current or final status of the contact interaction in Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.status
+  status_1:
+    description: Secondary status or sub-state of the contact interaction as reported by Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.status_1
+  template:
+    description: Message or attendance template applied during the Omni interaction, when applicable.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.template
+  tabulation:
+    description: Disposition or tabulation code assigned to the contact when the interaction was closed.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tabulacao
+  comment:
+    description: Free-text comment left by the analyst about the contact interaction.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.comentario
+  protocol:
+    description: Omni protocol or ticket identifier for the contact interaction.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.protocolo
+  tags:
+    description: Labels or tags attached to the contact record in Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.etiquetas
+  team:
+    description: Operations team responsible for handling the contact in Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.equipe
+  cost_center:
+    description: Cost center associated with the contact handling team or operation.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.centro_de_custos
+  analyst_name:
+    description: Name of the Growth analyst attributed to the acquisition contact.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.analista
+  phone_5a:
+    description: QuintoAndar phone number used during the acquisition contact.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.telefone_5a
+  customer_phone:
+    description: Customer phone number used for the acquisition contact attribution.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.telefone_cliente
+  analyst_email:
+    description: Email address of the analyst attributed to the acquisition contact.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.email_analista
+  attendance_time:
+    description: Time of day when the contact occurred, as exported from Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.hora
+  satisfaction_score:
+    description: Customer satisfaction score collected for the contact interaction, when available.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.satisfacao
+  duration:
+    description: Total handling duration of the contact as reported by Omni, in its original time format.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.duracao
+  wait_time:
+    description: Customer wait time before the contact was answered, in its original time format.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tempo_de_espera
+  parked_time:
+    description: Time the contact remained parked or on hold during handling, in its original time format.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tempo_estacionado
+  good_words_count:
+    description: Count of positive words detected in the contact conversation, as reported by Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.qtd_palavras_boas
+  bad_words_count:
+    description: Count of negative words detected in the contact conversation, as reported by Omni.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.qtd_palavras_ruins
+  duration_minutes:
+    description: Total handling duration of the contact converted to minutes.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.duracao_minutos
+  wait_time_minutes:
+    description: Customer wait time before the contact was answered, converted to minutes.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tempo_de_espera_minutos
+  parked_time_minutes:
+    description: Time the contact remained parked or on hold, converted to minutes.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.tempo_estacionado_minutos
+  month_year:
+    description: Month-year reference period associated with the contact, as recorded in the source spreadsheet.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.monthyear
+  dt_contact:
+    description: Calendar date when the Omni contact interaction occurred.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.data
+  dt_attended:
+    description: Calendar date when the acquisition contact was attributed to the analyst.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.data_atendimento
+  ts_attended:
+    description: Timestamp when the acquisition contact was recorded or attributed.
+    lineage:
+      - datalake_gsheets_raw.omni_acquisition_contact.data_hora
