@@ -65,9 +65,24 @@ if __name__ == "__main__":
     # Priority: Command line arg > Environment variable
     host = args.host or os.environ.get("TRINO_HOST")
     
-    # For OAuth2, user can often be a placeholder or extracted from token
-    # If not provided, we use a generic placeholder or environment user
-    user = args.user or os.environ.get("TRINO_USER") or "quinto-agent"
+    # For OAuth2, user must match the SSO identity (not quinto-agent unless impersonation is granted).
+    if args.external_auth:
+        user = args.user or os.environ.get("TRINO_USER")
+        if not user:
+            print(
+                json.dumps(
+                    {
+                        "status": "error",
+                        "message": (
+                            "With --external-auth, set TRINO_USER or pass --user to your "
+                            "@quintoandar.com email. Personal SSO cannot impersonate quinto-agent."
+                        ),
+                    }
+                )
+            )
+            sys.exit(1)
+    else:
+        user = args.user or os.environ.get("TRINO_USER") or "quinto-agent"
     
     if not host:
         print(json.dumps({"status": "error", "message": "Trino host not provided. Please set TRINO_HOST environment variable or use --host."}))

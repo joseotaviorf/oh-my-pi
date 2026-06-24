@@ -78,7 +78,6 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any
@@ -90,7 +89,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DAGS_ROOT = REPO_ROOT / "dags"
 EXECUTE_TRINO = (
-    REPO_ROOT / "plugins" / "tars" / "skills" / "tars" / "scripts" / "execute_trino.py"
+    REPO_ROOT / ".cursor" / "skills" / "trino" / "scripts" / "execute_trino.py"
 )
 _DEFAULT_TRINO_HOST = "trino.apps.data-prd.habitat.zone"
 logger = logging.getLogger(__name__)
@@ -4470,27 +4469,45 @@ def write_validation_outcomes(
             writer.writerow(asdict(outcome))
 
 
-def fetch_validation_rows(
+def resolve_trino_host(cli_host: str | None = None) -> str:
+    """Resolve Trino host from TRINO_HOST env var, CLI flag, or prod default."""
+    return os.environ.get("TRINO_HOST") or cli_host or _DEFAULT_TRINO_HOST
+
+
+def resolve_trino_user(cli_user: str | None = None) -> str:
+    """Resolve Trino user for SSO (must match OAuth identity, not quinto-agent)."""
+    user = (cli_user or os.environ.get("TRINO_USER") or "").strip()
+    if user:
+        return user
+    raise RuntimeError(
+        "Set TRINO_USER or pass --trino-user to your QuintoAndar email before --trino runs "
+        "(e.g. export TRINO_USER='you@quintoandar.com'). "
+        "Personal SSO cannot impersonate the default quinto-agent service user."
+    )
+
+
+def _run_trino_query(
     sql: str,
     trino_host: str | None = None,
+    trino_user: str | None = None,
+    execute_trino_path: Path = EXECUTE_TRINO,
 ) -> list[dict[str, Any]]:
-    """Run validation SQL and return raw row dicts."""
+    """Run SQL via execute_trino.py and return row dicts from JSON stdout."""
     host = resolve_trino_host(trino_host)
-    with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp:
-        csv_path = tmp.name
-
     cmd = [
-        sys.executable,
-        str(EXECUTE_TRINO),
+        "uv",
+        "run",
+        "--script",
+        str(execute_trino_path),
         "--host",
         host,
+        "--user",
+        resolve_trino_user(trino_user),
         "--catalog",
         "delta",
         "--external-auth",
         "--query",
         sql,
-        "--csv-output",
-        csv_path,
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
@@ -4503,26 +4520,29 @@ def fetch_validation_rows(
     if out.get("status") != "success":
         raise RuntimeError(f"Trino query failed: {out.get('message', out)}")
 
-    rows: list[dict[str, Any]] = []
-    with open(csv_path, newline="", encoding="utf-8") as fh:
-        reader = csv.DictReader(fh)
-        rows.extend(reader)
-    return rows
+    columns = out.get("columns") or []
+    data = out.get("data") or []
+    return [dict(zip(columns, row, strict=False)) for row in data]
 
 
-def resolve_trino_host(cli_host: str | None = None) -> str:
-    """Resolve Trino host from TRINO_HOST env var, CLI flag, or prod default."""
-    return os.environ.get("TRINO_HOST") or cli_host or _DEFAULT_TRINO_HOST
+def fetch_validation_rows(
+    sql: str,
+    trino_host: str | None = None,
+    trino_user: str | None = None,
+) -> list[dict[str, Any]]:
+    """Run validation SQL and return raw row dicts."""
+    return _run_trino_query(sql, trino_host, trino_user)
 
 
 def fetch_amd_candidates(
     metrics: list[DagMetrics],
     sql: str,
     trino_host: str | None = None,
+    trino_user: str | None = None,
 ) -> list[DagMetrics]:
     """Query AMD-era metrics and return DAGs not in the ARM pool."""
     arm_dag_ids = {m.dag_id for m in metrics}
-    amd_rows = fetch_from_trino(sql, resolve_trino_host(trino_host))
+    amd_rows = fetch_from_trino(sql, resolve_trino_host(trino_host), trino_user=trino_user)
     return [m for m in amd_rows if m.dag_id not in arm_dag_ids]
 
 
@@ -4663,38 +4683,20 @@ def _row_to_metrics(row: dict[str, Any]) -> DagMetrics:
 def fetch_from_trino(
     sql: str,
     trino_host: str | None = None,
+    trino_user: str | None = None,
     execute_trino_path: Path = EXECUTE_TRINO,
 ) -> list[DagMetrics]:
     """Run SQL via execute_trino.py and return parsed DagMetrics rows."""
-    host = resolve_trino_host(trino_host)
-    with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp:
-        csv_path = tmp.name
-
-    cmd = [
-        sys.executable,
-        str(execute_trino_path),
-        "--host",
-        host,
-        "--catalog",
-        "delta",
-        "--external-auth",
-        "--query",
-        sql,
-        "--csv-output",
-        csv_path,
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"execute_trino.py failed (exit {result.returncode}):\n"
-            f"stdout: {result.stdout[:500]}\nstderr: {result.stderr[:500]}"
-        )
-
-    out = json.loads(result.stdout)
-    if out.get("status") != "success":
-        raise RuntimeError(f"Trino query failed: {out.get('message', out)}")
-
-    return load_from_csv(csv_path)
+    rows: list[DagMetrics] = []
+    for row in _run_trino_query(sql, trino_host, trino_user, execute_trino_path):
+        try:
+            metrics = _row_to_metrics(row)
+            if _is_validation_dag(metrics.dag_id):
+                continue
+            rows.append(metrics)
+        except (KeyError, ValueError) as exc:
+            print(f"WARNING: skipping malformed row {row}: {exc}", file=sys.stderr)
+    return rows
 
 
 def load_from_csv(path: str | Path) -> list[DagMetrics]:
@@ -5091,6 +5093,14 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--trino-user",
+        default=None,
+        help=(
+            "Trino user for SSO (your @quintoandar.com email). "
+            "Defaults to TRINO_USER env var when set."
+        ),
+    )
+    parser.add_argument(
         "--list",
         action="store_true",
         help="Print DAG IDs and their cohorts, then exit (no files written)",
@@ -5263,6 +5273,7 @@ def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     _configure_target_generations(args)
     trino_host = resolve_trino_host(args.trino_host)
+    trino_user = args.trino_user or os.environ.get("TRINO_USER")
     dag_id_prefixes = normalize_dag_id_prefixes(args.dag_id_prefix)
 
     if not args.trino and not args.metrics_csv:
@@ -5282,20 +5293,32 @@ def main(argv: list[str] | None = None) -> int:
             recent_era_min_runs=args.recent_era_min_runs,
             dag_id_prefixes=dag_id_prefixes,
         )
-        print(f"Querying Trino ({trino_host}) …", file=sys.stderr)
+        print(f"Querying Trino ({trino_host}) as {resolve_trino_user(trino_user)} …", file=sys.stderr)
         if args.include_validation_runs:
             print(
                 "Metrics mode: latest-generation era "
                 f"(validation filter={args.validation_config_filter})",
                 file=sys.stderr,
             )
-        metrics = fetch_from_trino(sql, trino_host)
+        metrics = fetch_from_trino(sql, trino_host, trino_user=trino_user)
     else:
         metrics = load_from_csv(args.metrics_csv)
 
     if not metrics:
-        print("No metrics rows loaded. Check data source.", file=sys.stderr)
-        return 1
+        if getattr(args, "use_amd_history", False) and args.trino:
+            print(
+                "No ARM-eligible DAG rows (expected for x86-only scopes such as "
+                "quintoml.wonka.*); continuing with --use-amd-history …",
+                file=sys.stderr,
+            )
+        else:
+            print("No metrics rows loaded. Check data source.", file=sys.stderr)
+            if args.trino:
+                print(
+                    "Hint: for x86-only DAGs (e.g. quintoml.wonka.*), add --use-amd-history.",
+                    file=sys.stderr,
+                )
+            return 1
 
     print(f"Loaded {len(metrics)} DAG rows.", file=sys.stderr)
 
@@ -5321,7 +5344,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.days, dag_id_prefixes=dag_id_prefixes
             )
             print("Querying fleet DBU rates …", file=sys.stderr)
-            fleet_rows = fetch_validation_rows(fleet_sql, trino_host)
+            fleet_rows = fetch_validation_rows(fleet_sql, trino_host, trino_user)
             _FLEET_DBU_RATE.update(fleet_dbu_rate_from_rows(fleet_rows))
             print(
                 f"Loaded {len(_FLEET_DBU_RATE)} fleet DBU rates.",
@@ -5358,7 +5381,7 @@ def main(argv: list[str] | None = None) -> int:
             args.amd_min_runs,
             dag_id_prefixes=dag_id_prefixes,
         )
-        amd_pool = fetch_amd_candidates(metrics, amd_sql, trino_host)
+        amd_pool = fetch_amd_candidates(metrics, amd_sql, trino_host, trino_user)
         amd_recs = [
             build_amd_recommendation(
                 m,
@@ -5380,6 +5403,10 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         recs.extend(amd_recs)
+
+    if not recs:
+        print("No recommendations produced. Check dag-id prefix and Trino data.", file=sys.stderr)
+        return 1
 
     if args.list:
         _print_cohort_summary(recs)
@@ -5419,7 +5446,7 @@ def main(argv: list[str] | None = None) -> int:
             dag_id_prefixes=dag_id_prefixes,
         )
         print("Querying validation run outcomes …", file=sys.stderr)
-        val_rows = fetch_validation_rows(val_sql, trino_host)
+        val_rows = fetch_validation_rows(val_sql, trino_host, trino_user)
         outcomes = build_validation_outcomes(recs, val_rows)
         val_csv = Path(args.validation_outcomes)
         write_validation_outcomes(outcomes, val_csv)
