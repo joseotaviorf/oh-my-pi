@@ -1,7 +1,7 @@
 ---
-database_name: datalake_search
+database_name: datalake_search_metrics_service_clean
 table_name: search_experiments
-owner: joao.fidalgo@quintoandar.com.br
+owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: "This table contains A/B experiment results and statistical analysis for search functionality, including conversion rates, confidence intervals, and significance testing."
 

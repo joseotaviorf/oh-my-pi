@@ -1,5 +1,5 @@
 ---
-database_name: datalake_search
+database_name: datalake_search_metrics_service_clean
 table_name: search_contamination
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
@@ -10,7 +10,7 @@ columns:
     description: "Name of the A/B experiment being tracked"
     lineage:
       - datalake_search.search_contamination.business_context
-  execution_date:
+  date:
     description: "Date when the contamination analysis was executed"
     lineage:
       - datalake_search.search_contamination.date

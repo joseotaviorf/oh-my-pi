@@ -1,7 +1,7 @@
 ---
-database_name: datalake_search
+database_name: datalake_search_metrics_service_clean
 table_name: search_metrics
-owner: joao.fidalgo@quintoandar.com.br
+owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: "This table contains search performance metrics aggregated by various dimensions for monitoring and analysis of search functionality."
 
