@@ -1,61 +1,115 @@
----
 database_name: datalake_cyber
-table_name: debt
-owner: bianca.martins@quintoandar.com.br
+table_name: debt_negotiated
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Debts/invoices that were negotiated. Table granularity - invoices
+description: Enriched Cyber debt negotiation snapshot, one row per negotiated invoice
+  reconciling bill attributes with historical agreements and campaign offers. Combines
+  invoice settlement status, pause windows, and fee breakdowns for Fintech collections
+  analytics on renegotiated tenant debt.
 columns:
-  id_debtor:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.historical_agreements.id_client
-  id_contract:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.historical_agreements.id_contract_external
-  id_contract_external:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.historical_agreements.id_contract_external
   id_invoice:
-    description: ""
+    description: Cyber invoice identifier reconciled across bill, historical agreement,
+      and campaign contract sources.
     lineage:
-      - datalake_cyber_clean.historical_agreements.id_invoice
+    - datalake_cyber_clean.bill.id_invoice
+    - datalake_cyber_clean.campaign_contracts.id_invoice
+    - datalake_cyber_clean.historical_agreements.id_invoice
+  id_contract_cyber:
+    description: Cyber-internal contract identifier tied to the negotiated invoice.
+    lineage:
+    - datalake_cyber_clean.bill.id_contract
+    - datalake_cyber_clean.campaign_contracts.id_contract
+    - datalake_cyber_clean.historical_agreements.id_contract
+  id_contract:
+    description: QuintoAndar external contract identifier resolved from Cyber contracts
+      or parsed from the Cyber contract key.
+    lineage:
+    - datalake_cyber_clean.bill.id_contract
+    - datalake_cyber_clean.campaign_contracts.id_contract
+    - datalake_cyber_clean.contracts.id_contract_external
+    - datalake_cyber_clean.historical_agreements.id_contract
+  id_debtor:
+    description: Normalized debtor client identifier from Cyber agreement or contract
+      records.
+    lineage:
+    - datalake_cyber_clean.campaign_contracts.id_client
+    - datalake_cyber_clean.contracts.id_client
+    - datalake_cyber_clean.historical_agreements.id_client
   creditor:
-    description: ""
+    description: Creditor entity responsible for the negotiated invoice receivable.
     lineage:
-      - datalake_cyber_clean.historical_agreements.contract_group
+    - datalake_cyber_clean.bill.creditor
+    - datalake_cyber_clean.campaign_contracts.creditor
+    - datalake_cyber_clean.historical_agreements.creditor
   our_number:
-    description: ""
+    description: Bank our-number (nosso número) assigned to the invoice boleto.
     lineage:
-      - datalake_cyber_clean.historical_agreements.our_number
+    - datalake_cyber_clean.bill.our_number
   purpose:
-    description: ""
+    description: Invoice purpose classification from Cyber bill ingestion.
     lineage:
-      - datalake_cyber_clean.historical_agreements.purpose
+    - datalake_cyber_clean.bill.purpose
   payment_status:
-    description: ""
+    description: Retsuko payment settlement status of the negotiated invoice.
     lineage:
-      - datalake_cyber_clean.historical_agreements.retsuko_status
+    - datalake_cyber_clean.bill.retsuko_status
+  invoice_status:
+    description: Operational invoice status in the Cyber collections workflow.
+    lineage:
+    - datalake_cyber_clean.bill.invoice_status
+  pause_reason:
+    description: Reason code explaining a temporary pause on debt collection or negotiation.
+    lineage:
+    - datalake_cyber_clean.bill.pause_reason
+  is_tenant_first_invoice:
+    description: Whether this is the tenant's first billed invoice on the rental contract.
+    lineage:
+    - datalake_cyber_clean.bill.is_tenant_first_invoice
+  has_previously_negotiated:
+    description: Whether the contract had prior debt negotiations before this invoice.
+    lineage:
+    - datalake_cyber_clean.bill.has_previously_negotiated
+  accrual_year_month:
+    description: Accrual year-month period assigned to the negotiated invoice.
+    lineage:
+    - datalake_cyber_clean.bill.accrual_year_month
   due_amount:
-    description: ""
+    description: Principal due amount on the invoice, preferring negotiated agreement
+      values when present.
     lineage:
-      - datalake_cyber_clean.historical_agreements.due_amount
+    - datalake_cyber_clean.bill.due_amount
+    - datalake_cyber_clean.campaign_contracts.invoice_main_amount
+    - datalake_cyber_clean.historical_agreements.invoice_due_amount
   interest_fee_amount:
-    description: ""
+    description: Interest fee amount on the negotiated debt, coalesced from bill and
+      agreement sources.
     lineage:
-      - datalake_cyber_clean.historical_agreements.interest_amount
+    - datalake_cyber_clean.bill.interest_amount
+    - datalake_cyber_clean.campaign_contracts.invoice_interest_amount
+    - datalake_cyber_clean.historical_agreements.invoice_interest_amount
   fine_fee_amount:
-    description: ""
+    description: Fine fee amount on the negotiated debt, coalesced from bill and agreement
+      sources.
     lineage:
-      - datalake_cyber_clean.historical_agreements.fine_amount
+    - datalake_cyber_clean.bill.fine_amount
+    - datalake_cyber_clean.campaign_contracts.invoice_fine_amount
+    - datalake_cyber_clean.historical_agreements.invoice_fine_amount
   debt_amount:
-    description: ""
+    description: Total invoice main amount from the bill record used as the negotiated
+      debt baseline.
     lineage:
-      - datalake_cyber_clean.historical_agreements.main_amount
+    - datalake_cyber_clean.bill.main_amount
+  ts_creation:
+    description: Timestamp when the Cyber invoice record was originally created.
+    lineage:
+    - datalake_cyber_clean.bill.ts_creation
   dt_invoice_due:
-    description: ""
+    description: Calendar due date of the negotiated invoice.
     lineage:
-      - datalake_cyber_clean.historical_agreements.ts_due
+    - datalake_cyber_clean.bill.ts_due
+  ts_limit_pause:
+    description: Deadline until which the negotiation pause remains valid.
+    lineage:
+    - datalake_cyber_clean.bill.ts_limit_pause
   ts_load:
-    description: ""
+    description: Pipeline load timestamp set at enrich-layer execution time (NOW()).

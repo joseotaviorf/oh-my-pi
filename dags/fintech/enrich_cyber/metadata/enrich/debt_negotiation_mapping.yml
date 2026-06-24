@@ -1,0 +1,36 @@
+database_name: datalake_cyber
+table_name: debt_negotiation_mapping
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Negotiation key mapping for Cyber debt programs, one row per invoice linked
+  to its Cyber contract, QuintoAndar contract, and originating agreement or campaign
+  offer. Bridges historical agreements and campaign contracts so downstream models
+  can join negotiated invoices to the correct negotiation identifier.
+columns:
+  id_invoice:
+    description: Cyber invoice identifier shared across bill, historical agreement,
+      and campaign contract records.
+    lineage:
+    - datalake_cyber_clean.historical_agreements.id_invoice
+    - datalake_cyber_clean.campaign_contracts.id_invoice
+  id_contract_cyber:
+    description: Cyber-internal contract identifier resolved from bill, agreement, or
+      campaign sources.
+    lineage:
+    - datalake_cyber_clean.bill.id_contract
+    - datalake_cyber_clean.historical_agreements.id_contract
+    - datalake_cyber_clean.campaign_contracts.id_contract
+  id_contract:
+    description: QuintoAndar external contract identifier from Cyber contracts or
+      parsed from the Cyber contract key.
+    lineage:
+    - datalake_cyber_clean.contracts.id_contract_external
+    - datalake_cyber_clean.bill.id_contract
+    - datalake_cyber_clean.historical_agreements.id_contract
+    - datalake_cyber_clean.campaign_contracts.id_contract
+  id_negotiation:
+    description: Negotiation program identifier, cast from the historical agreement
+      id or the campaign offer id when no agreement exists.
+    lineage:
+    - datalake_cyber_clean.historical_agreements.id_agreement
+    - datalake_cyber_clean.campaign_contracts.id_offer
