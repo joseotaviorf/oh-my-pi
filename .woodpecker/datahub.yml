@@ -1,21 +1,23 @@
 # DataHub governance pipeline — independent of the main code release.
 #
+# Scope: triggers ONLY on entity Markdown changes and processes ONLY the MD files
+# added/edited in the triggering PR/push — never a full catalog re-sync. Editing one
+# entity's MD uploads/updates just that one Data Product.
+#
 # Path filters: pull_request = full PR diff; push = files in the pushed commit range.
 # Workflow triggers on pull_request or push to master / hotfix/* only.
 #
 # Triggers on changes to:
-#   • docs/llm_context/business_entities/**  (Markdown entity docs — versioned source)
-#   • dags/governance/datahub_business_context/load_collections_context.py  (loader logic)
-#   • dags/governance/datahub_business_context/datahub_domain_catalog.py  (domain catalog)
-#   • dags/governance/datahub_business_context/push_all_entities.py  (deprecated push wrapper)
-#   • dags/governance/datahub_business_context/smoke_test_datahub.py  (smoke test)
-#   • dags/governance/datahub_business_context/reference/**  (LLM reference YAMLs)
-#   • dags/governance/datahub_business_context/context_documents/**  (guide + template MDs)
-#   • dags/governance/datahub_business_context/push_context_documents.py  (doc push script)
-#   • dags/governance/datahub_business_context/sync/**  (TARS entity sync modules)
-#   • dags/governance/datahub_business_context/sync_tars_entities.py  (sync orchestrator)
-#   • packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
-#   • .woodpecker/datahub.yml
+#   • docs/llm_context/business_entities/**  (business entity Markdown — versioned source)
+#   • docs/llm_context/metric_entities/**    (metric entity Markdown — versioned source)
+#
+# Loader/generator/reference changes no longer auto-republish every product. When a change
+# to the generation logic must propagate to all products, run a deliberate full re-sync:
+#   uv run python packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py --all
+# (The push step still auto-detects changed MDs via git diff; --resync-if-loader-changed is
+#  intentionally NOT used so a loader edit never fans out to all 36 products.)
+#
+# The sync-tars-entities and push-context-documents steps keep their own path filters below.
 #
 # Steps:
 #   get-credentials-prod — Vault OPENAI_API_KEY for LiteLLM (push only)
@@ -66,17 +68,13 @@ steps:
     when:
       - event: push
         branch: [master, hotfix/*]
+        # Scope: fire ONLY when entity Markdown sources change. Loader/generator/reference
+        # edits no longer auto-trigger a run (they would process zero changed MDs anyway);
+        # use `generate_and_push_datahub_entities.py --all` for a deliberate full re-sync.
         path: &datahub_path
           include:
             - "docs/llm_context/business_entities/**"
             - "docs/llm_context/metric_entities/**"
-            - "dags/governance/datahub_business_context/load_collections_context.py"
-            - "dags/governance/datahub_business_context/datahub_domain_catalog.py"
-            - "dags/governance/datahub_business_context/push_all_entities.py"
-            - "dags/governance/datahub_business_context/smoke_test_datahub.py"
-            - "dags/governance/datahub_business_context/reference/**"
-            - "packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py"
-            - ".woodpecker/datahub.yml"
           on_empty: false
 
   push-datahub-business-context:
@@ -89,7 +87,11 @@ steps:
         from_secret: datahub_api_key_prod
     commands:
       - eval $(cat ./my-secrets)
-      - uv run python packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py --resync-if-loader-changed
+      # Process ONLY the entity MDs added/edited in this push (auto-detected via git diff) —
+      # never a full catalog re-sync. Editing one MD uploads/updates just that Data Product.
+      # For a deliberate full re-sync (e.g. after a generator/loader change), run the script
+      # with --all as a one-off, outside this path-scoped pipeline.
+      - uv run python packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
     when:
       - event: push
         branch: [master, hotfix/*]
