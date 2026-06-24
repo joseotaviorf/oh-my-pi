@@ -422,6 +422,8 @@ bietlejuice.core_region:
     - bietlejuice.ebdb_location:load-clean-region-business-contexts-served
     - bietlejuice.ebdb_location:load-clean-region-config
     - bietlejuice.ebdb_location:load-clean-state
+    - bietlejuice.core_region_history:load-core-business-unit-history:first-run-of-day
+    - bietlejuice.core_region_history:load-core-business-unit-region-history:first-run-of-day
   remove:
     - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
     - bietlejuice.ebdb_location:load-clean-region:first-run-of-day

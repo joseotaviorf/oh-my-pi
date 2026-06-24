@@ -7,12 +7,17 @@ columns:
     type: string
     required: true
 
-  # Region identifier (composite grain)
+  # Junction identifier (transactional business_unit_region.id)
+  id_business_unit_region:
+    type: bigint
+    required: true
+
+  # Region identifier (denormalized FK)
   id_region:
     type: bigint
     required: true
 
-  # Business unit (Hub) identifier (composite grain)
+  # Business unit (Hub) identifier (denormalized FK)
   id_business_unit:
     type: bigint
     required: true
@@ -51,6 +56,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 10
-max_columns: 10
+min_columns: 11
+max_columns: 11
 strict: true

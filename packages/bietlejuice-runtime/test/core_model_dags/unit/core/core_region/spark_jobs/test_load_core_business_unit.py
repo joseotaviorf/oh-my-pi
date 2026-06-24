@@ -2,15 +2,17 @@
 
 Covers both output tables built from the narrow history tables via CurrentStateBuilder:
   - business_unit             (grain id_business_unit)
-  - business_unit_region      (grain id_region + id_business_unit)
+  - business_unit_region      (grain id_business_unit_region)
 
 Key behaviours asserted:
   - one row per grain (current state),
   - attributes pivoted to their latest value,
   - ts_created = the *latest* ev_ts_created value (current state, not earliest),
   - ts_updated = MAX(ts_transaction),
-  - (0,0)/null-key sentinel filtered out for business_unit_region,
-  - surrogate key equals the history sha256 basis.
+  - null/zero junction and FK keys filtered out for business_unit_region,
+  - denormalized id_region/id_business_unit joined from latest history row,
+  - one row per (id_region, id_business_unit) keeping highest id_business_unit_region,
+  - surrogate key equals the history sha256 basis for the winning junction id.
 """
 
 import hashlib
@@ -51,6 +53,7 @@ EXPECTED_BU_COLUMNS = {
 
 EXPECTED_BUR_COLUMNS = {
     "sk_core_business_unit_region",
+    "id_business_unit_region",
     "id_region",
     "id_business_unit",
     "business_context",
@@ -166,6 +169,7 @@ def bu_history_df(spark_session):
 def bur_history_df(spark_session):
     schema = StructType(
         [
+            StructField("id_business_unit_region", StringType(), True),
             StructField("id_region", StringType(), True),
             StructField("id_business_unit", StringType(), True),
             StructField("event_name", StringType(), True),
@@ -174,11 +178,26 @@ def bur_history_df(spark_session):
         ]
     )
     data = [
-        # pair (10, 20) — context flips SALE->RENT; ts_created has an OLD value then a
+        # junction 100 — context flips SALE->RENT; ts_created has an OLD value then a
         # NEWER value at a LATER ts_transaction (current state must take the latest).
-        ("10", "20", "ev_business_context", "SALE", datetime(2024, 3, 1, 8, 0, 0)),
-        ("10", "20", "ev_business_context", "RENT", datetime(2024, 3, 5, 10, 0, 0)),
         (
+            "100",
+            "10",
+            "20",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "100",
+            "10",
+            "20",
+            "ev_business_context",
+            "RENT",
+            datetime(2024, 3, 5, 10, 0, 0),
+        ),
+        (
+            "100",
             "10",
             "20",
             "ev_ts_created",
@@ -186,28 +205,138 @@ def bur_history_df(spark_session):
             datetime(2024, 3, 1, 8, 0, 0),
         ),
         (
+            "100",
             "10",
             "20",
             "ev_ts_created",
             "2025-06-02 00:00:00.000",
             datetime(2024, 3, 20, 11, 0, 0),
         ),
-        # pair (11, 21) — single association
-        ("11", "21", "ev_business_context", "SALE", datetime(2024, 4, 1, 8, 0, 0)),
+        # junction 101 — single association
         (
+            "101",
+            "11",
+            "21",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 4, 1, 8, 0, 0),
+        ),
+        (
+            "101",
             "11",
             "21",
             "ev_ts_created",
             "2024-04-01 08:00:00.000",
             datetime(2024, 4, 1, 8, 0, 0),
         ),
-        # (0,0) sentinel — must be filtered out
+        # (0,0) sentinel junction — must be filtered out
         (
+            "999",
             "0",
             "0",
             "ev_ts_created",
             "1970-01-01 00:00:00.000",
             datetime(2024, 1, 1, 0, 0, 0),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def bur_history_reassociation_df(spark_session):
+    """Two junction ids for the same (region, business_unit) pair."""
+    schema = StructType(
+        [
+            StructField("id_business_unit_region", StringType(), True),
+            StructField("id_region", StringType(), True),
+            StructField("id_business_unit", StringType(), True),
+            StructField("event_name", StringType(), True),
+            StructField("value", StringType(), True),
+            StructField("ts_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "100",
+            "10",
+            "20",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "100",
+            "10",
+            "20",
+            "ev_ts_created",
+            "2024-03-01 08:00:00.000",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "102",
+            "10",
+            "20",
+            "ev_business_context",
+            "RENT",
+            datetime(2024, 6, 1, 9, 0, 0),
+        ),
+        (
+            "102",
+            "10",
+            "20",
+            "ev_ts_created",
+            "2024-06-01 09:00:00.000",
+            datetime(2024, 6, 1, 9, 0, 0),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def bur_history_stale_sibling_df(spark_session):
+    """Stale low junction id vs live high id for the same pair (prod-like pattern)."""
+    schema = StructType(
+        [
+            StructField("id_business_unit_region", StringType(), True),
+            StructField("id_region", StringType(), True),
+            StructField("id_business_unit", StringType(), True),
+            StructField("event_name", StringType(), True),
+            StructField("value", StringType(), True),
+            StructField("ts_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "3277",
+            "2",
+            "138",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 1, 1, 8, 0, 0),
+        ),
+        (
+            "3277",
+            "2",
+            "138",
+            "ev_ts_created",
+            "2024-01-01 08:00:00.000",
+            datetime(2024, 1, 1, 8, 0, 0),
+        ),
+        (
+            "7214",
+            "2",
+            "138",
+            "ev_business_context",
+            "RENT",
+            datetime(2024, 6, 15, 10, 0, 0),
+        ),
+        (
+            "7214",
+            "2",
+            "138",
+            "ev_ts_created",
+            "2024-06-15 10:00:00.000",
+            datetime(2024, 6, 15, 10, 0, 0),
         ),
     ]
     return spark_session.createDataFrame(data, schema)
@@ -271,7 +400,7 @@ class TestBusinessUnit:
 
 
 class TestBusinessUnitRegion:
-    def _run(self, spark_session, bur_history_df):
+    def _run(self, spark_session, history_df):
         job = CoreBusinessUnitSparkJob()
         args = _make_args("business_unit_region")
         with (
@@ -280,44 +409,67 @@ class TestBusinessUnitRegion:
                 "get_config",
                 side_effect=_config_side_effect(CONFIG_MAP_BUR),
             ),
-            patch.object(spark_session, "table", return_value=bur_history_df),
+            patch.object(spark_session, "table", return_value=history_df),
         ):
             return job.create_core_model(spark_session, args)
 
     def test_column_names_match_schema(self, spark_session, bur_history_df):
         result = self._run(spark_session, bur_history_df)
         assert set(result.columns) == EXPECTED_BUR_COLUMNS
-        assert len(result.columns) == 10
+        assert len(result.columns) == 11
 
     def test_zero_key_sentinel_is_filtered(self, spark_session, bur_history_df):
         result = self._run(spark_session, bur_history_df)
-        keys = {(r["id_region"], r["id_business_unit"]) for r in result.collect()}
-        assert (0, 0) not in keys
-        assert keys == {(10, 20), (11, 21)}
+        junction_ids = {r["id_business_unit_region"] for r in result.collect()}
+        assert 999 not in junction_ids
+        assert 0 not in junction_ids
+        assert junction_ids == {100, 101}
 
     def test_ts_created_is_latest_not_earliest(self, spark_session, bur_history_df):
-        """The pair (10,20) has two ev_ts_created values; current state takes the later one."""
+        """Junction 100 has two ev_ts_created values; current state takes the later one."""
         result = self._run(spark_session, bur_history_df)
-        pair = next(
-            r
-            for r in result.collect()
-            if r["id_region"] == 10 and r["id_business_unit"] == 20
-        )
-        assert pair["ts_business_unit_region_created"] == datetime(2025, 6, 2, 0, 0, 0)
-        assert pair["business_context"] == "RENT"
-        assert pair["ts_business_unit_region_updated"] == datetime(
-            2024, 3, 20, 11, 0, 0
-        )
+        row = next(r for r in result.collect() if r["id_business_unit_region"] == 100)
+        assert row["ts_business_unit_region_created"] == datetime(2025, 6, 2, 0, 0, 0)
+        assert row["business_context"] == "RENT"
+        assert row["id_region"] == 10
+        assert row["id_business_unit"] == 20
+        assert row["ts_business_unit_region_updated"] == datetime(2024, 3, 20, 11, 0, 0)
 
     def test_surrogate_key_matches_history_basis(self, spark_session, bur_history_df):
         result = self._run(spark_session, bur_history_df)
-        pair = next(
-            r
-            for r in result.collect()
-            if r["id_region"] == 10 and r["id_business_unit"] == 20
+        row = next(r for r in result.collect() if r["id_business_unit_region"] == 100)
+        assert row["sk_core_business_unit_region"] == _sha256_sk(
+            "BUSINESS_UNIT_REGION", "100"
         )
-        assert pair["sk_core_business_unit_region"] == _sha256_sk(
-            "BUSINESS_UNIT_REGION", "10", "20"
+
+    def test_same_pair_keeps_highest_junction_id(
+        self, spark_session, bur_history_reassociation_df
+    ):
+        result = self._run(spark_session, bur_history_reassociation_df)
+        rows = result.collect()
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["id_business_unit_region"] == 102
+        assert row["id_region"] == 10
+        assert row["id_business_unit"] == 20
+        assert row["business_context"] == "RENT"
+        assert row["sk_core_business_unit_region"] == _sha256_sk(
+            "BUSINESS_UNIT_REGION", "102"
+        )
+
+    def test_stale_sibling_junction_dropped_for_pair(
+        self, spark_session, bur_history_stale_sibling_df
+    ):
+        result = self._run(spark_session, bur_history_stale_sibling_df)
+        rows = result.collect()
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["id_business_unit_region"] == 7214
+        assert row["id_region"] == 2
+        assert row["id_business_unit"] == 138
+        assert row["business_context"] == "RENT"
+        assert row["sk_core_business_unit_region"] == _sha256_sk(
+            "BUSINESS_UNIT_REGION", "7214"
         )
 
 

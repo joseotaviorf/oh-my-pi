@@ -5,7 +5,6 @@ DAG:
     - bietlejuice.consorcio
     - bietlejuice.conversation_explorer
     - bietlejuice.copilot_judge_metrics
-    - bietlejuice.core_region_history
     - bietlejuice.core_support_journey
     - bietlejuice.cyber_bureau
     - bietlejuice.demand_balancer_service

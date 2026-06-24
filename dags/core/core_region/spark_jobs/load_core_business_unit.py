@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql.window import Window
 
 from bietlejuice.base.core_models.helpers.current_state_builder import (
     CurrentStateBuilder,
@@ -48,13 +49,22 @@ _TABLE_SPECS: Dict[str, Dict[str, Any]] = {
     },
     "business_unit_region": {
         "history_table_config_key": "BUSINESS_UNIT_REGION_HISTORY_TABLE",
-        "grain": ["id_region", "id_business_unit"],
+        "grain": ["id_business_unit_region"],
         "entity_type": "BUSINESS_UNIT_REGION",
         "sk_col": "sk_core_business_unit_region",
         "ts_updated_col": "ts_business_unit_region_updated",
         "filter_zero_keys": True,
+        "filter_key_columns": [
+            "id_business_unit_region",
+            "id_region",
+            "id_business_unit",
+        ],
+        "denormalized_fk_columns": ["id_region", "id_business_unit"],
+        "pair_dedup_key_columns": ["id_region", "id_business_unit"],
+        "pair_dedup_junction_col": "id_business_unit_region",
         "output_columns": [
             "sk_core_business_unit_region",
+            "id_business_unit_region",
             "id_region",
             "id_business_unit",
             "business_context",
@@ -73,14 +83,19 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
     """Current-state core models for the Hub Services business_unit domain.
 
     Writes ``core_region.business_unit`` and ``core_region.business_unit_region`` as
-    current-state mirrors of the clean tables, reconstructed from the narrow history
-    tables ``core_region.business_unit_history`` / ``business_unit_region_history``.
+    current-state tables reconstructed from the narrow history tables
+    ``core_region.business_unit_history`` / ``business_unit_region_history``.
 
     Attributes and ``ts_created`` are pivoted by ``CurrentStateBuilder`` (latest value
-    per ``(grain, event_name)`` by ``ts_transaction`` — the current state, verified to
-    match clean). ``ts_updated`` is derived as ``MAX(ts_transaction)`` per grain (CDC
-    commit time, not the source ``updated_at``). For ``business_unit_region`` the ``(0,0)``
-    / null-key sentinel rows are filtered out before building.
+    per ``(grain, event_name)`` by ``ts_transaction``). ``ts_updated`` is derived as
+    ``MAX(ts_transaction)`` per grain (CDC commit time, not the source ``updated_at``).
+
+    For ``business_unit_region`` the pipeline builds junction-level current state from
+    history, then keeps one row per ``(id_region, id_business_unit)`` by selecting the
+    highest ``id_business_unit_region`` (matches clean when stale CDC junction rows
+    remain live). ``id_business_unit_region`` and ``sk_core_*`` reflect that winning
+    junction id (same role as clean ``id``). Merge is on the region–hub pair so
+    re-association replaces the pair row when the winning junction id changes.
     """
 
     def __init__(self):
@@ -107,7 +122,8 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
 
         history_df = spark.table(history_table)
         if spec["filter_zero_keys"]:
-            history_df = self._filter_valid_keys(history_df, grain)
+            key_cols = spec.get("filter_key_columns", grain)
+            history_df = self._filter_valid_keys(history_df, key_cols)
 
         # Full rebuild: no load-window filter so every grain is reconstructed from the
         # complete history each run. CurrentStateBuilder pivots attributes + ts_created
@@ -124,15 +140,32 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
         )
         result = current_df.join(ts_updated_df, grain, "left")
 
-        # Surrogate key on the (string) history grain so it matches the history table's
-        # sk basis (sha256 of entity_type || grain), then cast the grain to bigint to
-        # align with clean / core_region.region.
+        denormalized_fk_columns = spec.get("denormalized_fk_columns")
+        if denormalized_fk_columns:
+            result = self._attach_denormalized_fks(
+                result, history_df, grain[0], denormalized_fk_columns
+            )
+
+        pair_dedup_keys = spec.get("pair_dedup_key_columns")
+        if pair_dedup_keys:
+            junction_col = spec["pair_dedup_junction_col"]
+            result = self._dedupe_latest_junction_per_pair(
+                result,
+                pair_dedup_keys,
+                junction_col,
+                ts_updated_col,
+            )
+
+        # Surrogate key on the winning junction id (sha256 of entity_type || grain).
         result = SurrogateKeysHelper.generate_surrogate_key(
             result, spec["entity_type"], id_column=grain
         ).withColumnRenamed("surrogate_key", spec["sk_col"])
 
-        for grain_col in grain:
-            result = result.withColumn(grain_col, F.col(grain_col).cast("long"))
+        bigint_cols = list(
+            dict.fromkeys(grain + spec.get("denormalized_fk_columns", []))
+        )
+        for col_name in bigint_cols:
+            result = result.withColumn(col_name, F.col(col_name).cast("long"))
 
         result = (
             result.withColumn("ts_load", F.current_timestamp())
@@ -164,6 +197,51 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
                 col_condition if condition is None else (condition & col_condition)
             )
         return df.filter(condition)
+
+    @staticmethod
+    def _attach_denormalized_fks(
+        current_df: DataFrame,
+        history_df: DataFrame,
+        grain_col: str,
+        fk_columns: List[str],
+    ) -> DataFrame:
+        """Join denormalized FK columns from the latest history row per junction grain."""
+        select_cols = [grain_col] + fk_columns + ["ts_transaction"]
+        fk_source = history_df.select(
+            *[F.col(c) for c in select_cols if c in history_df.columns]
+        )
+        order_by = [F.col("ts_transaction").desc()]
+        window = Window.partitionBy(grain_col).orderBy(*order_by)
+        fk_lookup = (
+            fk_source.withColumn("_rn", F.row_number().over(window))
+            .filter(F.col("_rn") == 1)
+            .drop("_rn", "ts_transaction")
+        )
+        return current_df.join(fk_lookup, grain_col, "left")
+
+    @staticmethod
+    def _dedupe_latest_junction_per_pair(
+        df: DataFrame,
+        pair_key_columns: List[str],
+        junction_col: str,
+        ts_updated_col: str,
+    ) -> DataFrame:
+        """Keep one junction row per region–hub pair (matches clean live association).
+
+        When CDC retains multiple junction ids for the same pair after re-association,
+        clean keeps the newest junction id; empirically that is the highest
+        ``id_business_unit_region``. ``ts_business_unit_region_updated`` breaks ties.
+        """
+        order_by = [
+            F.col(junction_col).cast("long").desc(),
+            F.col(ts_updated_col).desc(),
+        ]
+        window = Window.partitionBy(*pair_key_columns).orderBy(*order_by)
+        return (
+            df.withColumn("_pair_rn", F.row_number().over(window))
+            .filter(F.col("_pair_rn") == 1)
+            .drop("_pair_rn")
+        )
 
     def run_pipeline(
         self, dataframe: DataFrame, args: Any, spark: SparkSession

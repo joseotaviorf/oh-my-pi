@@ -1,4 +1,18 @@
 ---
+# core_region.business_unit_region
+#
+# Clean parity checks (grain / attributes / ts_created vs datalake_hub_services_clean)
+# are intentionally omitted for now. Investigation showed clean can diverge from
+# transactional CDC and aud (e.g. hub_services clean lag, stale rows, pair-level
+# dedup vs junction grain). CS BUR is built from core_region.business_unit_region_history
+# at junction id, then deduped to one row per (id_region, id_business_unit) by highest
+# id_business_unit_region. Validating against clean would raise non-actionable warnings until
+# clean ingestion is aligned.
+#
+# Aud liveness filtering (e.g. restricting current state to junction ids present in
+# business_unit_region_aud) is also intentionally not applied in load_core_business_unit.
+# Tombstone awareness belongs in a follow-up once history backfill and junction-grain
+# CS are stable in prod.
 table_name: core_region.business_unit_region
 alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
 
@@ -13,87 +27,35 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
+  id_business_unit_region:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
   id_region:
     is_complete:
       severity_level: Error
   id_business_unit:
     is_complete:
       severity_level: Error
+  # Pair grain guard: CS BUR dedupes to one live row per (id_region, id_business_unit); duplicate
+  # pairs mean pair dedup or merge logic regressed (e.g. multiple junction ids surfaced as separate rows).
+  unique_pair_region_business_unit:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_region, id_business_unit FROM core_region.business_unit_region
+          GROUP BY id_region, id_business_unit HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
   ts_business_unit_region_updated:
     is_complete:
       severity_level: Error
-  # Sentinel guard: the (0,0)/null-key junk rows must not leak into the current state.
+  # Sentinel guard: null/zero junction and FK keys must not leak into the current state.
   no_zero_or_null_keys_business_unit_region:
     custom:
       constraint: |-
         (SELECT COUNT(*) FROM core_region.business_unit_region
-         WHERE id_region IS NULL OR id_business_unit IS NULL
-            OR id_region = 0 OR id_business_unit = 0) = 0
+         WHERE id_business_unit_region IS NULL OR id_region IS NULL OR id_business_unit IS NULL
+            OR id_business_unit_region = 0 OR id_region = 0 OR id_business_unit = 0) = 0
       severity_level: Error
-  # Grain-set parity vs clean deduped to one live row per (id_region, id_business_unit),
-  # excluding the (0,0) sentinel on both sides. Expect 0 one-sided rows.
-  matching_grain_business_unit_region_core_and_clean:
-    custom:
-      constraint: |-
-        (SELECT COUNT(*) FROM (
-           SELECT core.id_region AS core_r, cl.id_region AS clean_r
-           FROM core_region.business_unit_region core
-           FULL OUTER JOIN (
-             SELECT id_region, id_business_unit FROM (
-               SELECT id_region, id_business_unit,
-                 ROW_NUMBER() OVER (
-                   PARTITION BY id_region, id_business_unit ORDER BY ts_updated DESC
-                 ) AS rn
-               FROM datalake_hub_services_clean.business_unit_region
-               WHERE id_region <> 0 AND id_business_unit <> 0
-             ) d WHERE d.rn = 1
-           ) cl
-             ON core.id_region = cl.id_region
-            AND core.id_business_unit = cl.id_business_unit
-           WHERE core.id_region IS NULL OR cl.id_region IS NULL
-        )) = 0
-      severity_level: Warning
-  # Attribute parity vs clean (null-safe) on the live association. Expect 0 mismatches.
-  matching_attributes_business_unit_region_core_and_clean:
-    custom:
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM core_region.business_unit_region core
-         JOIN (
-           SELECT id_region, id_business_unit, business_context FROM (
-             SELECT id_region, id_business_unit, business_context,
-               ROW_NUMBER() OVER (
-                 PARTITION BY id_region, id_business_unit ORDER BY ts_updated DESC
-               ) AS rn
-             FROM datalake_hub_services_clean.business_unit_region
-             WHERE id_region <> 0 AND id_business_unit <> 0
-           ) d WHERE d.rn = 1
-         ) cl
-           ON core.id_region = cl.id_region
-          AND core.id_business_unit = cl.id_business_unit
-         WHERE NOT (core.business_context <=> cl.business_context)) = 0
-      severity_level: Warning
-  # ts_created parity vs clean live association at second granularity (absorbs the
-  # millisecond/microsecond rendering difference). Verified 604/604 on multi-event pairs.
-  matching_ts_created_second_business_unit_region_core_and_clean:
-    custom:
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM core_region.business_unit_region core
-         JOIN (
-           SELECT id_region, id_business_unit, ts_created FROM (
-             SELECT id_region, id_business_unit, ts_created,
-               ROW_NUMBER() OVER (
-                 PARTITION BY id_region, id_business_unit ORDER BY ts_updated DESC
-               ) AS rn
-             FROM datalake_hub_services_clean.business_unit_region
-             WHERE id_region <> 0 AND id_business_unit <> 0
-           ) d WHERE d.rn = 1
-         ) cl
-           ON core.id_region = cl.id_region
-          AND core.id_business_unit = cl.id_business_unit
-         WHERE NOT (
-           DATE_TRUNC('SECOND', core.ts_business_unit_region_created)
-             <=> DATE_TRUNC('SECOND', cl.ts_created)
-         )) = 0
-      severity_level: Warning

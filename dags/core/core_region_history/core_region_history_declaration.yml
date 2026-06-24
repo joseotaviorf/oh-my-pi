@@ -23,6 +23,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
     business_unit_region_history:
+      load_spark_job: load_core_region_history
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"
@@ -37,6 +38,7 @@ workflow:
       table_properties:
         "delta.enableChangeDataFeed": "true"
     business_unit_history:
+      load_spark_job: load_core_region_history
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"

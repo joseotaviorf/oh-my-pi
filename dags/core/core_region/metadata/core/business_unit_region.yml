@@ -3,35 +3,42 @@ table_name: business_unit_region
 domain: Data Platform
 owner: gustavo.alencar@quintoandar.com.br
 description: >
-  Current-state Core Model for the hub-region association (which regions a hub/business_unit
-  serves and with which business context). One row per (id_region, id_business_unit) pair holding
-  the latest business_context, reconstructed from the narrow history table
-  core_region.business_unit_region_history via CurrentStateBuilder. It mirrors
-  datalake_hub_services_clean.business_unit_region (one live row per pair) and drops the source
-  junction id, version, and the (0,0) sentinel rows. Used to resolve hub coverage by region and
-  to join hubs to regions in the region domain.
+  Current-state Core Model for the hub-region junction association (which regions a hub/business_unit
+  serves and with which business context). One row per live (id_region, id_business_unit) pair,
+  holding the latest business_context reconstructed from core_region.business_unit_region_history via
+  CurrentStateBuilder. When CDC retains multiple junction ids for the same pair, the row with the
+  highest id_business_unit_region is kept (matches clean). id_business_unit_region and sk_core_* use
+  that winning junction id (same role as clean id). Clean parity is not enforced in data quality for
+  now. Drops the source version and the (0,0) sentinel rows. No aud liveness filter is applied in
+  the Spark job. Delta merge keys are id_region and id_business_unit. Used to resolve hub coverage
+  by region and to join hubs to regions in the region domain.
 columns:
   sk_core_business_unit_region:
     lineage:
-      - core_region.business_unit_region_history.id_region
-      - core_region.business_unit_region_history.id_business_unit
-    description: Surrogate key for the region-hub pair (SHA256 of entity type and the composite
-      id_region||id_business_unit). Always unique; shares the same hash basis as the history table.
+      - core_region.business_unit_region_history.id_business_unit_region
+    description: Surrogate key for the junction record (SHA256 of entity type and id_business_unit_region).
+      Always unique; shares the same hash basis as the history table.
+  id_business_unit_region:
+    lineage:
+      - core_region.business_unit_region_history.id_business_unit_region
+    description: Junction identifier for the winning live association for the pair. When multiple
+      junction ids exist in CDC for the same (id_region, id_business_unit), the highest id is kept
+      (matches datalake_hub_services_clean.business_unit_region.id).
   id_region:
     lineage:
       - core_region.business_unit_region_history.id_region
-    description: Region identifier of the association. Part of the composite natural grain; joins to
+    description: Region identifier denormalized from the latest history row for the junction. Joins to
       core_region.region.id_region.
   id_business_unit:
     lineage:
       - core_region.business_unit_region_history.id_business_unit
-    description: Business unit (Hub) identifier of the association. Part of the composite natural grain;
-      joins to core_region.business_unit.id_business_unit.
+    description: Business unit (Hub) identifier denormalized from the latest history row for the junction.
+      Joins to core_region.business_unit.id_business_unit.
   business_context:
     lineage:
       - core_region.business_unit_region_history.value
     description: Current business context served by the hub in this region (SALE or RENT), the latest
-      ev_business_context value from history for the pair.
+      ev_business_context value from history for the junction.
     categories:
       SALE: Association serves the for-sale context.
       RENT: Association serves the for-rent context.
@@ -39,13 +46,13 @@ columns:
     lineage:
       - core_region.business_unit_region_history.value
     description: Association creation timestamp. Mirrors the source's current created_at for the live
-      association (the latest ev_ts_created value), matching clean; reflects the live source value
+      junction (the latest ev_ts_created value), matching clean; reflects the live source value
       rather than the earliest-ever creation, as the source has been observed to bulk-reset created_at.
   ts_business_unit_region_updated:
     lineage:
       - core_region.business_unit_region_history.ts_transaction
     description: Association last-update timestamp, derived as the maximum CDC database transaction time
-      across the pair's history events. This is the change-data-capture commit time, not the source
+      across the junction's history events. This is the change-data-capture commit time, not the source
       updated_at column.
   ts_load:
     description: Timestamp when this Core Model row was last loaded; set to current_timestamp()

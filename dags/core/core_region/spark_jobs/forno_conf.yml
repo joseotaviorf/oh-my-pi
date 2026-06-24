@@ -34,7 +34,9 @@ business_unit_event_configs:
 
 BUSINESS_UNIT_REGION_HISTORY_TABLE: "core_region.business_unit_region_history"
 business_unit_region_merge_on: ["id_region", "id_business_unit"]
-business_unit_region_when_matched_update_condition: "source.ts_business_unit_region_updated > target.ts_business_unit_region_updated"
+business_unit_region_when_matched_update_condition: >-
+  source.ts_business_unit_region_updated > target.ts_business_unit_region_updated
+  OR source.id_business_unit_region > target.id_business_unit_region
 business_unit_region_event_configs:
   - target_col: business_context
     target_type: string
