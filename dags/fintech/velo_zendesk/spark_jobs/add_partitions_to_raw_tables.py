@@ -2,13 +2,12 @@ import logging
 from argparse import ArgumentParser
 
 import boto3
-from pyspark.sql.functions import lit
-from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.validation.spark_args import add_validation_target_args
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.storage_services import S3Service
 
 SOURCE = "velo_zendesk"
@@ -41,69 +40,43 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
+    next_execution_date = args.next_execution_date
     table_name = args.table_name
+    partition_cols = [{"dt": execution_date}, {"dt": next_execution_date}]
 
+    logger.info(
+        f"""
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
+            execution_date={execution_date}, msg=Starting spark job...
+        """
+    )
+
+    spark_client = SparkClient()
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
+    metastore_service = SparkMetastoreService(spark_client)
+    s3_service = S3Service(boto3.resource("s3"))
+
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
     is_validation_run = (
         args.target_database_name is not None and args.target_table_name is not None
     )
 
-    logger.info(
-        f"m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, "
-        f"execution_date={execution_date}, table_name={table_name}, msg=Starting spark job..."
-    )
-
-    spark_client = SparkClient()
-    spark = spark_client.conn
-    s3_service = S3Service(boto3.resource("s3"))
-
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
-    database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
-
-    # Stitch lands the daily JSONL under the per-table sub-path; we read only the
-    # execution date partition and merge it into the Delta raw table.
-    stitch_base = database_location.replace(
-        SOURCE, f"{TABLE_DB_MAPPING[table_name]}/{table_name}"
-    )
-    partition_location = f"{stitch_base}dt={execution_date}"
-
-    if is_validation_run:
-        logger.info(
-            f"m={JOB_NAME}, msg=Skipping write in validation mode "
-            "(Stitch source data remains on prod S3 paths)."
+    # Stitch loads data to prod S3; this job only registers metastore partitions.
+    for level in partition_cols:
+        partition_location = database_location.replace(
+            SOURCE, f"{TABLE_DB_MAPPING[table_name]}/{table_name}"
         )
-    elif not s3_service.list_objects(partition_location):
-        logger.info(
-            f"m={JOB_NAME}, partition_location={partition_location}, "
-            f"msg=No files found for dt={execution_date}. Skipping."
-        )
-    else:
-        full_table_name = f"{database_name}.{table_name.lower()}"
+        for column, value in level.items():
+            partition_location += "".join(f"{column}={value}")
 
-        # Enforce the existing table schema on read. Inferring the schema from a
-        # single day of JSON is unstable for nested structs (e.g. attachments)
-        # and makes the Delta write fail with "Failed to merge fields". The
-        # partition column dt is excluded here and re-added below.
-        table_schema = spark.table(full_table_name).schema
-        read_schema = StructType(
-            [field for field in table_schema.fields if field.name != "dt"]
-        )
-
-        df = (
-            spark.read.schema(read_schema)
-            .json(partition_location)
-            .withColumn("dt", lit(execution_date).cast("date"))
-        )
-
-        (
-            df.write.format("delta")
-            .mode("overwrite")
-            .option("replaceWhere", f"dt = '{execution_date}'")
-            .partitionBy("dt")
-            .saveAsTable(full_table_name)
-        )
-
-        logger.info(
-            f"m={JOB_NAME}, table={full_table_name}, "
-            f"dt={execution_date}, msg=Loaded partition into Delta raw table."
-        )
+        if s3_service.list_objects(partition_location):
+            if is_validation_run:
+                logger.info(
+                    f"m={JOB_NAME}, msg=Skipping metastore partition registration in "
+                    "validation mode (Stitch data remains on prod S3 paths)"
+                )
+            else:
+                metastore_service.add_partitions(
+                    database_name, table_name.lower(), partition_cols
+                )
