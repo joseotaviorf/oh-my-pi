@@ -1,30 +1,33 @@
 ---
 database_name: dw_datamarts
 table_name: house_media
-owner: gustavo.miller@quintoandar.com.br
-domain: Rede
-description: Every row in this datamart corresponds to a house that has at least one video or 360 photo.
+owner: helder.rodrigues@quintoandar.com
+domain: For Sale
+description: |
+  Datamart summarizing Kodak video and 360 photo sphere coverage per QuintoAndar house.
+  One row per house that has at least one video or 360 photo asset, with counts and last revision timestamps.
+  Consumed by Atlas DB media-quality dashboards and Rede listing completeness analytics.
 columns:
   id_house:
     lineage:
       - datalake_kodak_clean.video.id_external_domain
       - datalake_kodak_clean.photo_sphere.id_external_domain
-    description: House id
+    description: QuintoAndar house identifier for listings with Kodak video or 360 photo sphere assets.
   number_of_videos:
-    description: Number of videos for this house
+    description: Count of house-scoped marketing videos in Kodak that have a non-null source reference.
   number_of_360_photos:
-    description: Number of 360 photos for this house
+    description: Count of 360-degree photo sphere assets linked to the house in Kodak with a stored path.
   description_360_photos:
     lineage:
       - datalake_kodak_clean.photo_sphere.metadata
-    description: Description of the 360 photos for this house, in the format of an array. For example, [quarto,sale,sala]
+    description: Array string of slugified room labels extracted from 360 photo metadata (for example quarto, sala).
   ts_video_last_updated:
     lineage:
       - datalake_kodak_clean.user_revision_entity.ts_revised
-    description: Timestamp of the last video update for this house
+    description: Latest user-revision timestamp among video audit rows associated with this house.
   ts_360_photos_last_updated:
     lineage:
       - datalake_kodak_clean.user_revision_entity.ts_revised
-    description: Timestamp of the last 360 photo update for this house
+    description: Latest user-revision timestamp among photo sphere audit rows associated with this house.
   ts_load:
-    description: Timestamp when the data was loaded into the datamart
+    description: ETL timestamp when this datamart snapshot row was materialized in the warehouse.

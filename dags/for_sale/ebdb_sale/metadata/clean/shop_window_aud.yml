@@ -1,64 +1,86 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: shop_window_aud
-domain: Rede
-description: Audit of shop window created by an agent from Rede QuintoAndar.
-owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com
+description: |
+  Hibernate Envers audit history of Rede QuintoAndar agent shop windows in EBDB.
+  Each row captures one revision of a shop window entity, including Envers modification flags
+  for changed attributes. Used to reconstruct how agent showcases evolved over time.
 columns:
   id_shop_window:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.id
+    description: Business identifier of the shop window entity under audit (same as clean shop_window).
   id_shop_window_creator:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shopwindowcreatorid
+    description: Creator user identifier stored on this audit revision of the shop window.
   id_agents_prospect:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.agentsProspect_id
+    description: Agents prospect foreign key as recorded on this audit revision.
   id_external:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.externalid
+    description: External partner identifier as recorded on this audit revision.
   shop_window_name:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.name
+    description: Shop window display name as recorded on this audit revision.
   shop_window_creator_user_type:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shopwindowcreatorusertype
+    description: Creator user-type code as recorded on this audit revision.
   short_url:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shorturl
+    description: Shortened public URL as recorded on this audit revision.
   cover_image_uri:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.coverimageuri
+    description: Cover image storage URI as recorded on this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.rev
+    description: Envers revision number linking this row to the global revision metadata table.
   rev_type:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.revtype
+    description: Envers change type for this revision (insert, update, or delete).
   is_active:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.isactive
+    description: Active flag value as recorded on this audit revision.
   mod_id_shop_window_creator:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shopwindowcreatorid_mod
+    description: Envers dirty flag indicating whether id_shop_window_creator changed in this revision.
   mod_id_agents_prospect:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.agentsProspect_id_MOD
+    description: Envers dirty flag indicating whether id_agents_prospect changed in this revision.
   mod_id_external:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.externalid_mod
+    description: Envers dirty flag indicating whether id_external changed in this revision.
   mod_shop_window_name:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.name_mod
+    description: Envers dirty flag indicating whether shop_window_name changed in this revision.
   mod_shop_window_creator_user_type:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shopwindowcreatorusertype_mod
+    description: Envers dirty flag indicating whether shop_window_creator_user_type changed in this revision.
   mod_short_url:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.shorturl_mod
+    description: Envers dirty flag indicating whether short_url changed in this revision.
   mod_cover_image_uri:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.coverimageuri_mod
+    description: Envers dirty flag indicating whether cover_image_uri changed in this revision.
   mod_is_active:
     lineage:
       - datalake_ebdb_raw.shopwindow_aud.isactive_mod
+    description: Envers dirty flag indicating whether is_active changed in this revision.

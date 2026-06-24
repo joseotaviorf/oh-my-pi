@@ -1,40 +1,54 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: shop_window
-domain: Rede
-description: Shop window created by an agent from Rede QuintoAndar.
-owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com
+description: |
+  Clean-layer shop windows created by Rede QuintoAndar agents to showcase curated sale listings.
+  Each row represents one agent-owned property showcase with branding, cover media, and a shareable short link.
+  Consumed by Atlas DB and Rede analytics to track agent merchandising activity.
 columns:
   id_shop_window:
     lineage:
       - datalake_ebdb_raw.shopwindow.id
+    description: Primary key of the shop window record in EBDB; uniquely identifies one agent showcase.
   id_shop_window_creator:
     lineage:
       - datalake_ebdb_raw.shopwindow.shopwindowcreatorid
+    description: Identifier of the Rede agent or internal user who created and owns this shop window.
   id_agents_prospect:
     lineage:
       - datalake_ebdb_raw.shopwindow.agentsProspect_id
+    description: Foreign key to the agents prospect profile associated with the shop window creator.
   id_external:
     lineage:
       - datalake_ebdb_raw.shopwindow.externalid
+    description: Partner or external-system identifier used to correlate this shop window outside EBDB.
   shop_window_name:
     lineage:
       - datalake_ebdb_raw.shopwindow.name
+    description: Human-readable title displayed to buyers when browsing the agent shop window.
   shop_window_creator_user_type:
     lineage:
       - datalake_ebdb_raw.shopwindow.shopwindowcreatorusertype
+    description: EBDB user-type code describing the creator role (for example Rede agent versus internal staff).
   short_url:
     lineage:
       - datalake_ebdb_raw.shopwindow.shorturl
+    description: Public shortened URL shared with clients to open the shop window listing collection.
   cover_image_uri:
     lineage:
       - datalake_ebdb_raw.shopwindow.coverimageuri
+    description: Storage URI of the hero cover image rendered on the shop window landing page.
   is_active:
     lineage:
       - datalake_ebdb_raw.shopwindow.isactive
+    description: Boolean flag indicating whether the shop window is published and visible to end users.
   ts_created:
     lineage:
       - datalake_ebdb_raw.shopwindow.criadoem
+    description: Timestamp when the shop window was first created in the EBDB source system.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.shopwindow.atualizadoem
+    description: Timestamp of the most recent update to shop window attributes in EBDB.
