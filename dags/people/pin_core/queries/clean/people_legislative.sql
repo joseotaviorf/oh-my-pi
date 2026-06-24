@@ -84,7 +84,10 @@ SELECT
   TO_DATE(per_information_date1) AS dt_ctps_issued,
   TO_DATE(marital_status_date) AS dt_marital_status,
   TO_DATE(effective_start_date) AS dt_effective_started,
-  TO_DATE(effective_end_date) AS dt_effective_ended,
+  COALESCE(
+    NULLIF(TO_DATE(effective_end_date), DATE('4712-12-31')),
+    DATE('9999-12-31')
+  ) AS dt_effective_ended,
   TO_TIMESTAMP(creation_date) AS ts_created,
   TO_TIMESTAMP(last_update_date) AS ts_updated,
   NOW() AS ts_load,

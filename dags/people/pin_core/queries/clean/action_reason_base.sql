@@ -6,7 +6,10 @@ SELECT
     last_updated_by AS updated_by,
     CAST(object_version_number AS INT) AS object_version_number,
     TO_DATE(start_date) AS dt_started,
-    TO_DATE(end_date) AS dt_ended,
+    COALESCE(
+        NULLIF(TO_DATE(end_date), DATE('4712-12-31')),
+        DATE('9999-12-31')
+    ) AS dt_ended,
     TO_TIMESTAMP(creation_date) AS ts_created,
     TO_TIMESTAMP(last_update_date) AS ts_updated,
     NOW() AS ts_load,

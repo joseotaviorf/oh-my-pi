@@ -10,7 +10,10 @@ SELECT
   grade_type,
   CAST(object_version_number AS INT) AS object_version_number,
   IF(active_status = 'A', TRUE, FALSE) AS is_active,
-  TO_DATE(effective_end_date) AS dt_effective_ended,
+  COALESCE(
+    NULLIF(TO_DATE(effective_end_date), DATE('4712-12-31')),
+    DATE('9999-12-31')
+  ) AS dt_effective_ended,
   TO_DATE(effective_start_date) AS dt_effective_started,
   TO_TIMESTAMP(creation_date) AS ts_created,
   TO_TIMESTAMP(last_update_date) AS ts_updated,

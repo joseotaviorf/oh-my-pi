@@ -13,7 +13,10 @@ SELECT
     CAST(object_version_number AS INT) AS object_version_number,
     effective_latest_change = 'Y' AS is_effective_latest_change,
     TO_DATE(effective_start_date) AS dt_effective_started,
-    TO_DATE(effective_end_date) AS dt_effective_ended,
+    COALESCE(
+        NULLIF(TO_DATE(effective_end_date), DATE('4712-12-31')),
+        DATE('9999-12-31')
+    ) AS dt_effective_ended,
     TO_DATE(aei_information_date1) AS dt_period_started,
     TO_DATE(aei_information_date2) AS dt_period_ended,
     TO_TIMESTAMP(creation_date) AS ts_created,

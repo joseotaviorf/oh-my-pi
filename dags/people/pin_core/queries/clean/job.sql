@@ -25,7 +25,10 @@ SELECT
   CAST(attribute_number4 AS FLOAT) AS target_hiring_sop,
   CAST(attribute_number5 AS FLOAT) AS target_bonus_tech_usd,
   CAST(attribute8 AS FLOAT) AS target_plr_salary_multiplier,
-  TO_DATE(effective_end_date) AS dt_effective_ended,
+  COALESCE(
+    NULLIF(TO_DATE(effective_end_date), DATE('4712-12-31')),
+    DATE('9999-12-31')
+  ) AS dt_effective_ended,
   TO_DATE(effective_start_date) AS dt_effective_started,
   TO_TIMESTAMP(creation_date) AS ts_created,
   TO_TIMESTAMP(last_update_date) AS ts_updated,
