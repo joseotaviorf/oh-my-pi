@@ -177,6 +177,110 @@ class TestPromoteValidationClusterFile:
         assert prv.promote_validation_cluster_file(cluster_path) is None
 
 
+class TestPromoteWonkaValidationProdYml:
+    def test_promote_keeps_wonka_cluster_type(self, tmp_path: Path):
+        prod_yml = tmp_path / "prod.yml"
+        prod_yml.write_text(
+            """\
+cluster:
+  type: wonka_cluster
+  custom_configurations:
+    node_type_id: r5a.8xlarge
+    driver_node_type_id: c5a.4xlarge
+    num_workers: 2
+
+validation:
+  cluster:
+    type: consolidation_memory
+    custom_configurations:
+      node_type_id: r7g.8xlarge
+      driver_node_type_id: c7g.4xlarge
+      num_workers: 2
+""",
+            encoding="utf-8",
+        )
+        previous = prv.promote_validation_config_file(prod_yml, source="wonka")
+        assert previous is not None
+        assert previous["type"] == "wonka_cluster"
+
+        doc = yaml.safe_load(prod_yml.read_text(encoding="utf-8"))
+        assert "validation" not in doc
+        assert doc["cluster"]["type"] == "wonka_cluster"
+        custom = doc["cluster"]["custom_configurations"]
+        assert custom["node_type_id"] == "r7g.8xlarge"
+        assert custom["driver_node_type_id"] == "c7g.4xlarge"
+
+    def test_reject_removes_validation_without_mutating_prod(self, tmp_path: Path):
+        prod_yml = tmp_path / "prod.yml"
+        prod_yml.write_text(
+            """\
+cluster:
+  type: wonka_cluster
+  custom_configurations:
+    node_type_id: r5a.8xlarge
+
+validation:
+  cluster:
+    type: consolidation_memory
+    custom_configurations:
+      node_type_id: r7g.8xlarge
+""",
+            encoding="utf-8",
+        )
+        changed = prv.remove_validation_config_file(prod_yml, source="wonka")
+        assert changed is True
+        doc = yaml.safe_load(prod_yml.read_text(encoding="utf-8"))
+        assert "validation" not in doc
+        assert doc["cluster"]["custom_configurations"]["node_type_id"] == "r5a.8xlarge"
+
+
+class TestApplyPromotionsWonka:
+    def test_resolve_quintoml_root_returns_none_for_bietlejuice_only(self):
+        assert prv._resolve_quintoml_root(None, ["bietlejuice.test_dag"]) is None
+
+    def test_resolve_quintoml_root_defaults_for_wonka_dags(self):
+        resolved = prv._resolve_quintoml_root(None, ["quintoml.wonka.house_main"])
+        assert resolved is not None
+
+    def test_apply_promotions_bietlejuice_only_without_quintoml_root(
+        self, tmp_path, monkeypatch
+    ):
+        def _unexpected_wonka_import():
+            raise AssertionError("wonka paths must not load for bietlejuice-only runs")
+
+        monkeypatch.setattr(
+            prv, "_wonka_config_paths_module", _unexpected_wonka_import
+        )
+        rows = [_row(prod_airflow_dag_id="bietlejuice.test_dag")]
+        ledger_path = tmp_path / "ledger.json"
+
+        decisions, _ = prv.apply_promotions(
+            rows,
+            quintoml_root=None,
+            ledger_path=ledger_path,
+            dry_run=True,
+        )
+
+        assert len(decisions) == 1
+        assert decisions[0].dag_id == "bietlejuice.test_dag"
+
+    def test_apply_promotions_skips_missing_wonka_prod_yml(self, tmp_path):
+        quintoml_root = tmp_path / "quintoml"
+        quintoml_root.mkdir()
+        rows = [_row(prod_airflow_dag_id="quintoml.wonka.house_main")]
+        ledger_path = tmp_path / "ledger.json"
+
+        decisions, _ = prv.apply_promotions(
+            rows,
+            quintoml_root=quintoml_root,
+            ledger_path=ledger_path,
+            dry_run=False,
+        )
+
+        assert len(decisions) == 1
+        assert "cluster config not found" in decisions[0].reason
+
+
 class TestWatchPromotions:
     def test_flags_cost_regression_with_revert_spec(self, tmp_path):
         ledger_path = tmp_path / "ledger.json"

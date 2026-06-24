@@ -82,6 +82,29 @@ def _rightsizing_validation_module():
     return rvc
 
 
+def _wonka_config_paths_module():
+    """Load wonka_config_paths after compiler scripts are on sys.path."""
+    _ensure_bietlejuice_import_path()
+    scripts_mod = sys.modules.get("scripts")
+    if scripts_mod is not None and not hasattr(scripts_mod, "ci_cd"):
+        del sys.modules["scripts"]
+    from scripts.ci_cd.airflow_dag_builder import wonka_config_paths  # noqa: PLC0415
+
+    return wonka_config_paths
+
+
+def _resolve_quintoml_root(
+    explicit: Path | None,
+    dag_ids: list[str],
+) -> Path | None:
+    """Resolve QuintoML root for Wonka promotion when needed."""
+    if explicit is not None:
+        return explicit
+    if any(dag_id.startswith("quintoml.wonka.") for dag_id in dag_ids):
+        return _wonka_config_paths_module().DEFAULT_QUINTOML_ROOT
+    return None
+
+
 def _f(value: Any) -> float | None:
     if value is None:
         return None
@@ -529,6 +552,59 @@ def remove_validation_cluster_file(cluster_path: Path) -> bool:
     return rvc.remove_validation_from_cluster_file(cluster_path)
 
 
+def _wonka_validation_module():
+    _ensure_bietlejuice_import_path()
+    scripts_mod = sys.modules.get("scripts")
+    if scripts_mod is not None and not hasattr(scripts_mod, "ci_cd"):
+        del sys.modules["scripts"]
+    from scripts.ci_cd.airflow_dag_builder import (  # noqa: PLC0415
+        wonka_validation_config as wvc,
+    )
+
+    return wvc
+
+
+def resolve_config_path(
+    dag_id: str,
+    *,
+    dags_root: Path,
+    quintoml_root: Path | None,
+) -> tuple[Path | None, str]:
+    """Return (config_path, source) where source is bietlejuice or wonka."""
+    rvc = _rightsizing_validation_module()
+    if dag_id.startswith("quintoml.wonka."):
+        effective_root = quintoml_root
+        if effective_root is None:
+            effective_root = _wonka_config_paths_module().DEFAULT_QUINTOML_ROOT
+        config_path = rvc.dag_id_to_config_path(
+            dag_id,
+            dags_root=dags_root,
+            quintoml_root=effective_root,
+        )
+        return config_path, "wonka"
+    dag_name = dag_id.removeprefix("bietlejuice.")
+    config_path = rvc.find_dag_cluster_path(dag_name, dags_root)
+    return config_path, "bietlejuice"
+
+
+def promote_validation_config_file(
+    config_path: Path,
+    *,
+    source: str,
+) -> dict[str, Any] | None:
+    if source == "wonka":
+        wvc = _wonka_validation_module()
+        return wvc.promote_wonka_validation_to_prod(config_path)
+    return promote_validation_cluster_file(config_path)
+
+
+def remove_validation_config_file(config_path: Path, *, source: str) -> bool:
+    if source == "wonka":
+        wvc = _wonka_validation_module()
+        return wvc.remove_validation_from_wonka_prod_yml(config_path)
+    return remove_validation_cluster_file(config_path)
+
+
 def load_ledger(path: Path) -> list[PromotionLedgerEntry]:
     if not path.exists():
         return []
@@ -557,11 +633,12 @@ def apply_promotions(
     rows: list[dict[str, Any]],
     *,
     dags_root: Path = DEFAULT_DAGS_ROOT,
+    quintoml_root: Path | None = None,
     ledger_path: Path = DEFAULT_LEDGER_PATH,
     dry_run: bool = False,
 ) -> tuple[list[PromotionDecision], list[PromotionLedgerEntry]]:
-    rvc = _rightsizing_validation_module()
     dag_ids = sorted(latest_row_per_dag(rows))
+    quintoml_root = _resolve_quintoml_root(quintoml_root, dag_ids)
     decisions: list[PromotionDecision] = []
     ledger = load_ledger(ledger_path)
 
@@ -575,14 +652,17 @@ def apply_promotions(
             continue
         decisions.append(decision)
 
-        dag_name = dag_id.removeprefix("bietlejuice.")
-        cluster_path = rvc.find_dag_cluster_path(dag_name, dags_root)
-        if cluster_path is None:
+        config_path, source = resolve_config_path(
+            dag_id,
+            dags_root=dags_root,
+            quintoml_root=quintoml_root,
+        )
+        if config_path is None or not config_path.exists():
             decision = PromotionDecision(
                 dag_id=dag_id,
                 action=decision.action,
                 outcome=decision.outcome,
-                reason=f"{decision.reason}; cluster file not found",
+                reason=f"{decision.reason}; cluster config not found",
             )
             decisions[-1] = decision
             continue
@@ -591,13 +671,15 @@ def apply_promotions(
             continue
 
         if decision.action == "promote":
-            previous_cluster = promote_validation_cluster_file(cluster_path)
+            previous_cluster = promote_validation_config_file(
+                config_path, source=source
+            )
             if previous_cluster is None:
                 decision = PromotionDecision(
                     dag_id=dag_id,
                     action="extend",
                     outcome="extend",
-                    reason="cluster file has no validation block to promote",
+                    reason="config file has no validation block to promote",
                 )
                 decisions[-1] = decision
                 continue
@@ -615,7 +697,7 @@ def apply_promotions(
                 )
             )
         elif decision.action == "reject":
-            remove_validation_cluster_file(cluster_path)
+            remove_validation_config_file(config_path, source=source)
 
     if not dry_run:
         save_ledger(ledger_path, ledger)
@@ -747,6 +829,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Root of the dags/ tree (default: repo dags/)",
     )
     parser.add_argument(
+        "--quintoml-root",
+        type=Path,
+        default=None,
+        help="QuintoML repo root for Wonka prod.yml promotion (default ~/Work/quintoml)",
+    )
+    parser.add_argument(
         "--report-out",
         type=Path,
         help="Write markdown promotion report to this path",
@@ -782,6 +870,7 @@ def main(argv: list[str] | None = None) -> int:
     decisions, _ledger = apply_promotions(
         rows,
         dags_root=args.dags_root,
+        quintoml_root=args.quintoml_root,
         ledger_path=args.ledger,
         dry_run=args.dry_run,
     )
