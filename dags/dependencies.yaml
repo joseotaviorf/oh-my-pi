@@ -4397,6 +4397,7 @@ bietlejuice.enrich_zscaler:
 bietlejuice.metric_fintech__collections_segmentation:
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
+  - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-invoice-wallet-timeline:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-segmentation-distribution:first-run-of-day
 bietlejuice.metric_fintech__velo:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker:first-run-of-day
