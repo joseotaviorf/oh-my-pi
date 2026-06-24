@@ -57,3 +57,15 @@ def resolve_order_by_cols(
 
 def format_order_by_clause(order_by_cols: List[str]) -> str:
     return _format_order_by_clause(order_by_cols)
+
+
+def is_cdc_clean_workflow(
+    domain: str,
+    dag_name: str,
+    layer: str,
+    repo_root: Optional[Path] = None,
+) -> bool:
+    if layer != "clean":
+        return False
+    declaration = load_declaration(domain, dag_name, repo_root)
+    return declaration.get("workflow", {}).get("type") == "cdc"

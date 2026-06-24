@@ -8,10 +8,28 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
+from declaration import is_cdc_clean_workflow
 from input_validation import (
     validate_git_ref,
     validate_iso_date,
     validate_resource_name,
+)
+
+# Mirrors load_cdc_clean runtime injection and lineage CDC_CLEAN_INJECTED_COLUMNS.
+CDC_CLEAN_COLUMNS = ("op_cdc", "ts_cdc_transaction", "ts_database_transaction")
+
+NON_COMPARABLE_COLUMNS = frozenset(
+    {
+        "ts_load",
+        "op_cdc",
+        "ts_cdc_transaction",
+        "ts_database_transaction",
+    }
+)
+
+_FROM_SCHEMA_TABLE_RE = re.compile(
+    r"(FROM\s+`?\w+\`?\.`?\w+`?)",
+    re.IGNORECASE,
 )
 
 
@@ -49,6 +67,16 @@ def pin_sql(
         flags=re.IGNORECASE,
     )
     return pinned
+
+
+def apply_cdc_clean_injection(
+    query: str,
+    columns: tuple[str, ...] = CDC_CLEAN_COLUMNS,
+) -> str:
+    """Mirror ``load_cdc_clean.insert_columns_into_query`` for migration validate."""
+    split_values_in_from = _FROM_SCHEMA_TABLE_RE.split(query)
+    split_values_in_from[-3] += "".join(f",{column}\n" for column in columns)
+    return "".join(split_values_in_from)
 
 
 def sql_hash(sql: str) -> str:
@@ -108,8 +136,11 @@ def load_pinned_sql(
         root = repo_root or Path.cwd()
         sql_path = root / "dags" / domain / dag_name / "queries" / layer / f"{table_name}.sql"
         sql = read_sql_from_disk(sql_path)
-    return pin_sql(sql, load_start_date, load_end_date)
+    pinned = pin_sql(sql, load_start_date, load_end_date)
+    if is_cdc_clean_workflow(domain, dag_name, layer, repo_root):
+        pinned = apply_cdc_clean_injection(pinned)
+    return pinned
 
 
 def detect_non_comparable_cols(schema_cols: list[str]) -> list[str]:
-    return [name for name in schema_cols if name.lower() == "ts_load"]
+    return [name for name in schema_cols if name.lower() in NON_COMPARABLE_COLUMNS]

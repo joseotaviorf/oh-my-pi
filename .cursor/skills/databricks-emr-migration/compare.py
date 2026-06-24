@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from baseline import format_table_label
 from models import EmrTableResult, SchemaEntry, TableBaseline, ValidationResult
 from profile import compare_checksums, compare_null_counts
+from sql_utils import NON_COMPARABLE_COLUMNS
 
 # ISO-8601 timestamps from Databricks JSON (…Z) vs EMR PySpark (microseconds, no Z).
 _ISO_TIMESTAMP_RE = re.compile(
@@ -39,6 +40,14 @@ def _types_compatible(baseline_type: str, emr_type: str) -> Tuple[bool, bool]:
     if emr in allowed:
         return True, True
     return False, False
+
+
+def schema_for_compare(
+    schema: List[SchemaEntry],
+    excluded: Set[str],
+) -> List[SchemaEntry]:
+    """Drop non-comparable columns (ts_load, CDC cols) from schema parity checks."""
+    return [(name, typ) for name, typ in schema if name not in excluded]
 
 
 def compare_schema(
@@ -357,7 +366,10 @@ def compare_results(
         )
         return result
 
-    schema_ok, schema_issues, schema_warn = compare_schema(baseline.schema, emr_result.schema)
+    excluded_cols = set(baseline.non_comparable_cols) | NON_COMPARABLE_COLUMNS
+    baseline_schema = schema_for_compare(baseline.schema, excluded_cols)
+    emr_schema = schema_for_compare(emr_result.schema, excluded_cols)
+    schema_ok, schema_issues, schema_warn = compare_schema(baseline_schema, emr_schema)
     result.schema_match = schema_ok
     result.schema_issues = schema_issues
 

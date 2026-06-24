@@ -5,7 +5,13 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL_DIR))
 
-from compare import compare_count, compare_results, compare_sample, compare_schema
+from compare import (
+    compare_count,
+    compare_results,
+    compare_sample,
+    compare_schema,
+    schema_for_compare,
+)
 from models import EmrTableResult, TableBaseline
 
 
@@ -302,6 +308,63 @@ class CompareTests(unittest.TestCase):
         )
         self.assertTrue(ok)
         self.assertFalse(warn)
+        self.assertEqual(diffs, [])
+
+    def test_schema_for_compare_strips_excluded_from_both_sides(self) -> None:
+        excluded = {"op_cdc", "ts_cdc_transaction", "ts_database_transaction"}
+        baseline = schema_for_compare(
+            [("id", "bigint"), ("op_cdc", "string")],
+            excluded,
+        )
+        emr = schema_for_compare(
+            [("id", "bigint"), ("op_cdc", "string"), ("ts_cdc_transaction", "timestamp")],
+            excluded,
+        )
+        self.assertEqual(baseline, [("id", "bigint")])
+        self.assertEqual(emr, [("id", "bigint")])
+
+    def test_compare_results_pass_when_emr_has_extra_cdc_columns(self) -> None:
+        baseline = TableBaseline(
+            dag="kodak",
+            table="watermark_removal",
+            layer="clean",
+            load_start_date="2026-06-23",
+            schema=[("id", "bigint"), ("id_image_inspection", "bigint")],
+            count=100,
+            sample_rows=0,
+            sample=[],
+            order_by_cols=["id"],
+            time_pinned_functions=[],
+            non_comparable_cols=[
+                "op_cdc",
+                "ts_cdc_transaction",
+                "ts_database_transaction",
+            ],
+        )
+        result = compare_results(
+            baseline,
+            EmrTableResult(
+                schema=[
+                    ("id", "bigint"),
+                    ("id_image_inspection", "bigint"),
+                    ("op_cdc", "string"),
+                    ("ts_cdc_transaction", "timestamp"),
+                    ("ts_database_transaction", "timestamp"),
+                ],
+                count=100,
+                sample=[],
+            ),
+        )
+        self.assertEqual(result.status, "PASS")
+        self.assertTrue(result.schema_match)
+
+    def test_sample_ignores_cdc_columns(self) -> None:
+        ok, diffs, _ = compare_sample(
+            [{"id": 1, "op_cdc": "c", "ts_cdc_transaction": "a"}],
+            [{"id": 1, "op_cdc": "u", "ts_cdc_transaction": "b"}],
+            ["op_cdc", "ts_cdc_transaction", "ts_database_transaction"],
+        )
+        self.assertTrue(ok)
         self.assertEqual(diffs, [])
 
 

@@ -24,7 +24,9 @@ _INTEGER_TYPES = frozenset(
 )
 _DECIMAL_RE = re.compile(r"^decimal\s*\(", re.IGNORECASE)
 _TIMESTAMP_TYPES = frozenset({"timestamp", "timestamp_ntz", "date"})
-_CHECKSUM_SKIP_DEFAULT = frozenset({"ts_load"})
+_CHECKSUM_SKIP_DEFAULT = frozenset(
+    {"ts_load", "op_cdc", "ts_cdc_transaction", "ts_database_transaction"}
+)
 
 
 def create_migration_validate_spark_session(app_name: str = "MigrationValidateJob") -> SparkSession:
