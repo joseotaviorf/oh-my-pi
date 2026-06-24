@@ -1,43 +1,43 @@
----
-database_name: datalake_olos_dialer_clean
+database_name: datalake_olos_dialer_test_clean
 table_name: login_raw_data
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about login raw data in the olos dialer system.
+description: Raw agent login and logout events captured from the OLOS dialer platform.
 columns:
   id_login_raw_data:
     description: Unique identifier of the login raw data.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.loginrawdataid
+    - datalake_olos_dialer_raw.loginrawdata.loginrawdataid
   id_agent:
     description: Unique identifier of the agent.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.agentid
+    - datalake_olos_dialer_raw.loginrawdata.agentid
   id_campaign:
     description: Unique identifier of the campaign.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.campaignid
+    - datalake_olos_dialer_raw.loginrawdata.campaignid
   insert_time:
-    description: Timestamp when the Olos Dialer event row was inserted in the source export.
+    description: Timestamp when the Olos Dialer event row was inserted in the source
+      export.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.inserttime
+    - datalake_olos_dialer_raw.loginrawdata.inserttime
   ts_login_started:
     description: Timestamp when the record was login started.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.startlogin
+    - datalake_olos_dialer_raw.loginrawdata.startlogin
   ts_login_ended:
     description: Timestamp when the record was login ended.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.endlogin
+    - datalake_olos_dialer_raw.loginrawdata.endlogin
   year:
     description: Partition column for the year of the record.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.year
+    - datalake_olos_dialer_raw.loginrawdata.year
   month:
     description: Partition column for the month of the record.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.month
+    - datalake_olos_dialer_raw.loginrawdata.month
   day:
     description: Partition column for the day of the record.
     lineage:
-      - datalake_olos_dialer_raw.loginrawdata.day
+    - datalake_olos_dialer_raw.loginrawdata.day

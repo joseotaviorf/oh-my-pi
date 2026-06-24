@@ -1,27 +1,26 @@
----
-database_name: datalake_olos_dialer_clean
+database_name: datalake_olos_dialer_test_clean
 table_name: info_agent_status
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info agent status in the olos dialer system.
+description: Lookup dimension of agent status codes configured in the OLOS dialer.
 columns:
   id_disposition:
     description: Unique identifier of the disposition.
     lineage:
-      - datalake_olos_dialer_raw.info_agentstatus.agentstatusid
+    - datalake_olos_dialer_raw.info_agentstatus.agentstatusid
   description:
     description: Textual description of the info agent status.
     lineage:
-      - datalake_olos_dialer_raw.info_agentstatus.description
+    - datalake_olos_dialer_raw.info_agentstatus.description
   year:
     description: Partition column for the year of the record.
     lineage:
-      - datalake_olos_dialer_raw.info_agentstatus.year
+    - datalake_olos_dialer_raw.info_agentstatus.year
   month:
     description: Partition column for the month of the record.
     lineage:
-      - datalake_olos_dialer_raw.info_agentstatus.month
+    - datalake_olos_dialer_raw.info_agentstatus.month
   day:
     description: Partition column for the day of the record.
     lineage:
-      - datalake_olos_dialer_raw.info_agentstatus.day
+    - datalake_olos_dialer_raw.info_agentstatus.day

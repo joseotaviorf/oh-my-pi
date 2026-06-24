@@ -1,5 +1,5 @@
 ---
-database_name: datalake_olos_dialer_clean
+database_name: datalake_olos_dialer_test_clean
 table_name: campaign
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth

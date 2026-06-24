@@ -1,27 +1,26 @@
----
-database_name: datalake_olos_dialer_clean
+database_name: datalake_olos_dialer_test_clean
 table_name: info_reason_type
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Contains information about info reason type in the olos dialer system.
+description: Lookup dimension of reason type codes attached to OLOS dialer events.
 columns:
   id_reason_type:
     description: Unique identifier of the reason type.
     lineage:
-      - datalake_olos_dialer_raw.info_reasontype.reasontypeid
+    - datalake_olos_dialer_raw.info_reasontype.reasontypeid
   description:
     description: Textual description of the info reason type.
     lineage:
-      - datalake_olos_dialer_raw.info_reasontype.description
+    - datalake_olos_dialer_raw.info_reasontype.description
   year:
     description: Partition column for the year of the record.
     lineage:
-      - datalake_olos_dialer_raw.info_reasontype.year
+    - datalake_olos_dialer_raw.info_reasontype.year
   month:
     description: Partition column for the month of the record.
     lineage:
-      - datalake_olos_dialer_raw.info_reasontype.month
+    - datalake_olos_dialer_raw.info_reasontype.month
   day:
     description: Partition column for the day of the record.
     lineage:
-      - datalake_olos_dialer_raw.info_reasontype.day
+    - datalake_olos_dialer_raw.info_reasontype.day
