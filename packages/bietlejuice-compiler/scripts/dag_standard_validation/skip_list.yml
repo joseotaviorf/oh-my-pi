@@ -63,6 +63,7 @@ dags_not_using_builder:
   - governance/datahub_business_context/datahub_curated_urns.py
   - governance/datahub_business_context/datahub_domain_catalog.py
   - governance/datahub_business_context/load_collections_context.py
+  - governance/datahub_business_context/reassign_data_product_datasets.py
   - governance/datahub_business_context/push_all_entities.py
   - governance/datahub_business_context/smoke_test_datahub.py
   - governance/datahub_business_context/push_context_documents.py

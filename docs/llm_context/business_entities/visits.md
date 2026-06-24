@@ -44,7 +44,7 @@ Before answering any visit question, decide which lens applies:
 | Detailed visit attributes (source, cancel reason, context) | `dw_visit.dim_visit` |
 | Confirmation details and lifecycle timestamps per schedule | `dw_visit.dim_visit_schedule` |
 | Post-visit evaluations (feedback from demand) | `dw_visit.dim_post_visit_demand` |
-| Property entrance and key management data | `dw_visit.fact_house_entrance` |
+| Property entrance and key management data | `dw_visit.dim_entrance_type` |
 
 ### The `dw_visit` building blocks
 

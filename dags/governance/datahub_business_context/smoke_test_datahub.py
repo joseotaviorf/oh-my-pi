@@ -100,6 +100,14 @@ _MIN_GOLDEN_QUERIES = 1
 _MIN_ASSETS = 1
 
 
+def _is_metric_entity(md_path: Path) -> bool:
+    """Metric Data Products live under ``metric_entities/``. They are calculations over
+    tables owned by domain products and own no base assets of their own, so the
+    zero-linked-assets bar does not apply to them (they surface sources via golden-query
+    subjects instead)."""
+    return "metric_entities" in md_path.parts
+
+
 def _datahub_graphql_post(
     graphql_url: str,
     token: Optional[str],
@@ -372,7 +380,12 @@ def main() -> None:
             )
         if gq_count < _MIN_GOLDEN_QUERIES:
             issues.append(f"{gq_count} golden queries < {_MIN_GOLDEN_QUERIES}")
-        if ns.deep and asset_count is not None and asset_count < _MIN_ASSETS:
+        if (
+            ns.deep
+            and asset_count is not None
+            and asset_count < _MIN_ASSETS
+            and not _is_metric_entity(md_path)
+        ):
             issues.append(f"{asset_count} assets < {_MIN_ASSETS}")
 
         detail = f"desc={len(desc.strip())}c gq={gq_count}" + (

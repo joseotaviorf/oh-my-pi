@@ -38,7 +38,7 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 |-------------|----------------|
 | Session-level data (bot, channel, status, escalation, queues) | `datalake_chatbot.sessions` (`s`) — one row per session, merge key `id_sauron_session`. Legacy (old bot) rows have `id_langfuse_session` as NULL. |
 | Message-level data (text, role, timing, conversation type) | `datalake_chatbot.messages` (`m`) — one row per message, merge key `id_message`. Excludes SPOC sessions. |
-| LLM evaluation scores | `datalake_chatbot.evals` (`e`) — one row per Langfuse session. `evals` is a MAP column; use `element_at()` in Trino or UNNEST. |
+| LLM evaluation scores | `datalake_chatbot.evals` (`e`, owned by the **evals** data product — see `business_entities/evals.md`) — one row per Langfuse session. `evals` is a MAP column; use `element_at()` in Trino or UNNEST. |
 | Pre-bot bypass | `datalake_chatbot.bypass` (`b`) — one row per bypass per session. Includes `inside_sales_bypass` from observations. |
 | Isaias lead qualification funnel | `datalake_chatbot.isaias_conversational_flow` (`icf`) — one row per Langfuse session with boolean flags for each qualification step. |
 | Raw LLM traces (latency, model, input/output) | `datalake_langfuse_clean.traces` (`t`) — one row per trace. JOIN to sessions via `t.id_session = s.id_langfuse_session`. |

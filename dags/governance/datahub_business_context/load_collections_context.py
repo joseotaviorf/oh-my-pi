@@ -39,9 +39,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -232,6 +234,43 @@ def _graphql_errors_retryable(errors: list) -> bool:
     return False
 
 
+_ALLOWED_REQUEST_SCHEMES = frozenset({"https", "http"})
+# Destination allow-list (SSRF guard). This tool must only ever reach DataHub, which lives
+# under the internal ``habitat.zone`` domain across environments; localhost covers local
+# runs. The host of the configured DATAHUB_GRAPHQL_URL is always permitted as well, so a
+# domain change never silently breaks the loader.
+_ALLOWED_REQUEST_HOSTS = frozenset({"localhost", "127.0.0.1"})
+_ALLOWED_REQUEST_HOST_SUFFIXES = (".habitat.zone",)
+
+
+def _host_is_allowed(host: str) -> bool:
+    if host in _ALLOWED_REQUEST_HOSTS:
+        return True
+    if any(host.endswith(suffix) for suffix in _ALLOWED_REQUEST_HOST_SUFFIXES):
+        return True
+    configured = (urllib.parse.urlparse(GRAPHQL_URL).hostname or "").lower()
+    return bool(configured) and host == configured
+
+
+def _assert_safe_url(url: str) -> str:
+    """Validate a request URL before it reaches urllib (SSRF guard, CWE-918).
+
+    Enforces an ``http(s)`` scheme, a non-empty host, and that the host is in the DataHub
+    allow-list — so a malformed or unexpected value can never be turned into a request to
+    an arbitrary target (file://, an internal metadata endpoint, an attacker host, …).
+    Returns the URL unchanged when valid; raises ValueError otherwise.
+    """
+    parsed = urllib.parse.urlparse(url)
+    host = (parsed.hostname or "").lower()
+    if parsed.scheme not in _ALLOWED_REQUEST_SCHEMES or not host:
+        raise ValueError(f"Refusing request to unsafe or non-HTTP(S) URL: {url!r}")
+    if not _host_is_allowed(host):
+        raise ValueError(
+            f"Refusing request to host {host!r} — not in the DataHub allow-list"
+        )
+    return url
+
+
 def _graphql_call_with_retry(
     query: str,
     variables: dict[str, Any],
@@ -241,10 +280,11 @@ def _graphql_call_with_retry(
     """POST GraphQL with retries on transient HTTP or GraphQL failures."""
     last_root: Optional[dict[str, Any]] = None
     last_diag = ""
+    safe_url = _assert_safe_url(GRAPHQL_URL)
 
     for attempt in range(1, _GRAPHQL_MAX_ATTEMPTS + 1):
         root, diag = datahub_graphql_post(
-            GRAPHQL_URL,
+            safe_url,
             TOKEN,
             query,
             variables,
@@ -552,11 +592,14 @@ def _query_exists(urn: str) -> bool:
 def _gms_ingest_proposal(proposal: dict[str, Any]) -> tuple[bool, str]:
     """POST a MetadataChangeProposal wrapper to GMS REST ingest."""
     base = _gms_base_url_from_graphql(GRAPHQL_URL)
-    url = f"{base.rstrip('/')}/aspects?action=ingestProposal"
+    url = _assert_safe_url(f"{base.rstrip('/')}/aspects?action=ingestProposal")
     payload = json.dumps(proposal).encode("utf-8")
+    # Build the Request from the validated URL + static headers only. The request body
+    # (the MD-derived proposal) is passed as urlopen's separate ``data`` argument rather
+    # than embedded in the Request, so the value used as the request target is provably
+    # the allow-listed URL and never the payload (avoids conflating body with URL).
     req = urllib.request.Request(
         url,
-        data=payload,
         method="POST",
         headers={
             "Accept": "application/json",
@@ -566,7 +609,7 @@ def _gms_ingest_proposal(proposal: dict[str, Any]) -> tuple[bool, str]:
     if TOKEN:
         req.add_header("Authorization", f"Bearer {TOKEN}")
     try:
-        with urllib.request.urlopen(req, timeout=60.0) as resp:
+        with urllib.request.urlopen(req, data=payload, timeout=60.0) as resp:
             status = int(getattr(resp, "status", None) or resp.getcode())
             if 200 <= status < 300:
                 return True, "ok"
@@ -1447,23 +1490,80 @@ def _get_all_golden_queries(cfg: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-def _golden_query_subject_urns(gq: dict[str, Any]) -> list[str]:
+# FROM / JOIN ``schema.table`` references in a SQL statement. Only dotted (qualified)
+# references match, so bare CTE aliases (``FROM actual_vol``) are naturally excluded.
+_SQL_TABLE_REF_RE = re.compile(
+    r"\b(?:FROM|JOIN)\s+([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)",
+    re.IGNORECASE,
+)
+
+
+def _table_refs_in_sql(sql: str) -> list[tuple[str, str]]:
+    """Distinct ``(schema, table)`` pairs referenced in a query's FROM/JOIN clauses,
+    in first-seen order. CTE aliases (unqualified names) are not matched."""
+    seen: set[tuple[str, str]] = set()
+    out: list[tuple[str, str]] = []
+    for schema, table in _SQL_TABLE_REF_RE.findall(sql or ""):
+        key = (schema.lower(), table.lower())
+        if key not in seen:
+            seen.add(key)
+            out.append((schema, table))
+    return out
+
+
+def _subject_urns_from_sql(sql: str) -> list[str]:
+    """Fallback subject resolution: derive dataset URNs from the query SQL's FROM/JOIN
+    refs. Used when the YAML omits usable ``subjects`` — common for large multi-CTE
+    golden queries where the generator fails to populate the field."""
+    urns: list[str] = []
+    for schema, table in _table_refs_in_sql(sql):
+        resolved = _resolve_urn(schema, table)
+        if resolved and resolved not in urns:
+            urns.append(resolved)
+    return urns
+
+
+def _golden_query_subject_urns(
+    gq: dict[str, Any], fallback_subject_urns: Optional[list[str]] = None
+) -> list[str]:
     """Dataset URNs for one golden query's ``subjects`` (list of {schema, table}).
 
-    Returns an empty list when ``subjects`` is absent or malformed — the caller
-    (``_curated_push_one_golden_query``) treats an empty list as a per-query failure
-    and logs it via ``_fail`` without aborting the whole product run.
+    Resolution order, stopping at the first that yields a DataHub-registered table:
+      1. explicit ``subjects`` in the YAML;
+      2. ``schema.table`` refs parsed from the query's own SQL (FROM/JOIN);
+      3. ``fallback_subject_urns`` — a product-wide pool (the product's datasets plus
+         tables seen across all its golden-query SQL). This rescues queries written as a
+         final ``SELECT ... FROM <cte>`` over a shared base CTE (common in metric docs),
+         whose own SQL references no real table.
+
+    Returns an empty list only when none of the three yields anything — the caller
+    (``_curated_push_one_golden_query``) then logs it without aborting the product run.
     """
     raw_subj = gq.get("subjects") or []
     rows = raw_subj if isinstance(raw_subj, list) else []
-    urns = []
+    urns: list[str] = []
     for row in rows:
         if isinstance(row, dict) and row.get("schema") and row.get("table"):
             resolved = _resolve_urn(str(row["schema"]), str(row["table"]))
-            if resolved:
+            if resolved and resolved not in urns:
                 urns.append(resolved)
+    name = gq.get("name") or "<unnamed>"
     if not urns:
-        name = gq.get("name") or "<unnamed>"
+        # YAML subjects missing/unresolvable — recover them from the SQL itself.
+        urns = _subject_urns_from_sql(str(gq.get("sql") or ""))
+        if urns:
+            print(
+                f"  -> golden query {name!r}: derived {len(urns)} subject(s) from SQL "
+                f"(YAML subjects were missing/unresolvable)"
+            )
+    if not urns and fallback_subject_urns:
+        # SQL only touches shared CTEs — fall back to the product-wide subject pool.
+        urns = list(fallback_subject_urns)
+        print(
+            f"  -> golden query {name!r}: using {len(urns)} product-level subject(s) "
+            f"(query SQL referenced only CTEs)"
+        )
+    if not urns:
         print(
             f"  ! golden query {name!r} has no valid `subjects` — skipping",
             file=sys.stderr,
@@ -1471,9 +1571,21 @@ def _golden_query_subject_urns(gq: dict[str, Any]) -> list[str]:
     return urns
 
 
+def _is_metric_product(cfg: dict[str, Any]) -> bool:
+    """A metric Data Product (``data_product_type: metric``) is a calculation over tables
+    owned by domain products — it owns no base tables of its own and surfaces its sources
+    through golden-query subjects, not exclusive dataset ownership."""
+    return str(cfg.get("data_product_type") or "").strip().lower() == "metric"
+
+
 def _curated_data_product_asset_urns(cfg: dict[str, Any]) -> list[str]:
     rows = cfg.get("datasets") or []
     if not isinstance(rows, list) or not rows:
+        # Metric products legitimately own no datasets — return an empty list and let the
+        # caller create the Data Product without asset links. Domain products must declare
+        # the tables they own, so an empty list there is still a hard error.
+        if _is_metric_product(cfg):
+            return []
         raise SystemExit("`datasets` (non-empty list) is required")
     out = []
     for row in rows:
@@ -1603,26 +1715,13 @@ def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]
     return assignable
 
 
-def curated_push_assets(cfg: dict[str, Any]) -> None:
-    print("\n[1/10] DataProduct assets (datasets only)...")
-    pid = str(cfg["data_product_id"])
-    pname = cfg.get("product_display_name") or pid
-    pdesc_raw = cfg.get("product_description")
-    dom = cfg.get("domain_urn") or _FALLBACK_DOMAIN_URN
-    if not isinstance(pdesc_raw, str) or not pdesc_raw.strip():
-        raise SystemExit("product_description (non-empty string) is required")
+def _create_or_update_data_product(
+    pid: str, pname: Any, pdesc_raw: str, dom: Any, dp_u: str
+) -> bool:
+    """Create the Data Product, or update its description when it already exists.
 
-    dp_u = _data_product_urn(pid)
-    urns = _filter_assignable_urns(
-        _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
-    )
-    if not urns:
-        _fail(
-            "curated.batchSetDataProduct",
-            "no datasets from YAML are registered in DataHub",
-        )
-        return
-
+    Returns True when the product exists afterward (created or updated); False on a hard
+    failure (already recorded via ``_fail``)."""
     create_root = _graphql_root(
         _CREATE_DATA_PRODUCT,
         {
@@ -1638,7 +1737,7 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     )
     if create_root is None:
         _fail("curated.createDataProduct", "HTTP failure")
-        return
+        return False
 
     create_errors = create_root.get("errors") or []
     create_data = create_root.get("data") or {}
@@ -1648,7 +1747,8 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     )
     if create_dp.get("urn"):
         _ok(f"Created DataProduct ({dp_u})")
-    elif _errors_indicate_already_exists(create_errors) or _data_product_exists(dp_u):
+        return True
+    if _errors_indicate_already_exists(create_errors) or _data_product_exists(dp_u):
         print("  -> DataProduct already exists — updating description...")
         upd = _graphql_root(
             _UPDATE_DATA_PRODUCT,
@@ -1663,13 +1763,43 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
         updated_dp = (upd.get("data") or {}).get("updateDataProduct") if upd else None
         if not updated_dp:
             _fail("curated.updateDataProduct", repr(upd))
-        else:
-            _ok("Updated DataProduct description")
-    else:
+            return False
+        _ok("Updated DataProduct description")
+        return True
+    _fail(
+        "curated.createDataProduct",
+        json.dumps(create_errors or create_root, default=str),
+    )
+    return False
+
+
+def curated_push_assets(cfg: dict[str, Any]) -> None:
+    print("\n[1/10] DataProduct assets (datasets only)...")
+    pid = str(cfg["data_product_id"])
+    pname = cfg.get("product_display_name") or pid
+    pdesc_raw = cfg.get("product_description")
+    dom = cfg.get("domain_urn") or _FALLBACK_DOMAIN_URN
+    if not isinstance(pdesc_raw, str) or not pdesc_raw.strip():
+        raise SystemExit("product_description (non-empty string) is required")
+
+    dp_u = _data_product_urn(pid)
+    urns = _filter_assignable_urns(
+        _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
+    )
+    if not urns and not _is_metric_product(cfg):
         _fail(
-            "curated.createDataProduct",
-            json.dumps(create_errors or create_root, default=str),
+            "curated.batchSetDataProduct",
+            "no datasets from YAML are registered in DataHub",
         )
+        return
+
+    if not _create_or_update_data_product(pid, pname, pdesc_raw, dom, dp_u):
+        return
+
+    if not urns:
+        # Metric product — owns no base tables; its sources are surfaced via golden-query
+        # subjects ([5/10]) rather than exclusive dataset links. Nothing to link here.
+        print("  -> metric product: no owned datasets to link (expected).")
         return
 
     ln = _post(
@@ -1872,7 +2002,9 @@ def curated_purge_discovery_links(cfg: dict[str, Any]) -> None:
             _ok("Removed golden-query Summary URL (if present)")
 
 
-def _curated_push_one_golden_query(gq: dict[str, Any]) -> Optional[str]:
+def _curated_push_one_golden_query(
+    gq: dict[str, Any], fallback_subject_urns: Optional[list[str]] = None
+) -> Optional[str]:
     """Create/upsert one golden Query entity. Returns its URN, or None on failure.
 
     Prefers a stable-URN REST upsert (idempotent); falls back to GraphQL ``createQuery``.
@@ -1887,7 +2019,7 @@ def _curated_push_one_golden_query(gq: dict[str, Any]) -> Optional[str]:
         _ok(f"Query already exists at {stable_urn}")
         return stable_urn
 
-    subj = _golden_query_subject_urns(gq)
+    subj = _golden_query_subject_urns(gq, fallback_subject_urns)
     if not subj:
         _fail(f"curated.goldenQuery [{name}]", "no valid subjects — new query skipped")
         return None
@@ -1930,6 +2062,27 @@ def _curated_push_one_golden_query(gq: dict[str, Any]) -> Optional[str]:
     return None
 
 
+def _product_subject_pool(cfg: dict[str, Any], gqs: list[dict[str, Any]]) -> list[str]:
+    """Product-wide subject fallback: the product's own resolved datasets, plus every real
+    table referenced across all its golden-query SQL. Used for golden queries whose own SQL
+    references only a shared CTE (e.g. metric docs with a base-CTE + swapped final SELECT).
+    """
+    pool: list[str] = []
+    try:
+        for u in _curated_data_product_asset_urns(cfg):
+            if u not in pool:
+                pool.append(u)
+    except SystemExit:
+        # Non-metric product with no `datasets` would raise here; the pool simply falls
+        # back to whatever the golden-query SQL references.
+        pass
+    for gq in gqs:
+        for u in _subject_urns_from_sql(str(gq.get("sql") or "")):
+            if u not in pool:
+                pool.append(u)
+    return pool
+
+
 def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
     """Create every golden query and return the URNs that landed (for the sidebar).
 
@@ -1942,9 +2095,10 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
     if not gqs:
         print("  -> no golden queries in YAML — skipping")
         return []
+    fallback_pool = _product_subject_pool(cfg, gqs)
     urns: list[str] = []
     for gq in gqs:
-        urn = _curated_push_one_golden_query(gq)
+        urn = _curated_push_one_golden_query(gq, fallback_pool)
         if urn and urn not in urns:
             urns.append(urn)
     return urns
@@ -2026,6 +2180,9 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
         _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
     )
     if not urns_r:
+        if _is_metric_product(cfg):
+            print("  -> metric product: no owned datasets to re-affirm (expected).")
+            return
         _fail(
             "curated.datasets.refresh",
             "no datasets from YAML are registered in DataHub",

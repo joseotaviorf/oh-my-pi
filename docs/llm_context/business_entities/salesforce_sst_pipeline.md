@@ -167,29 +167,7 @@ LEFT JOIN datalake_sst_metrics.cdc_pipeline_missing_events m
 
 ## Golden Queries
 
-### Query 1 — Last columns added to a given table
-
-Returns the most recent hour where new columns were detected in `source_table`.
-
-sql
-
-```sql
-SELECT
-  source_table,
-  partition_date,
-  partition_hour,
-  new_cols,
-  new_cols_count
-FROM datalake_sst_metrics.table_metadata
-WHERE source_table = 'datalake_salesforce_clean.events_case'   -- replace with target table
-  AND new_cols_count > 0
-  AND environment = 'prod'
-ORDER BY partition_date DESC, CAST(partition_hour AS INTEGER) DESC
-LIMIT 10
-
-```
-
-### Query 2 — Tables currently experiencing delay (latest hour)
+### Query 1 — Tables currently experiencing delay (latest hour)
 
 Returns all tables with above-average latency in the most recent available partition.
 
@@ -217,7 +195,7 @@ LIMIT 50
 
 ```
 
-### Query 3 — Pipeline stability: volume anomalies in the last 24 hours
+### Query 2 — Pipeline stability: volume anomalies in the last 24 hours
 
 Surfaces tables with z-score outside ±2 in the last day (24h window).
 
@@ -243,7 +221,7 @@ LIMIT 50
 
 ```
 
-### Query 4 — CDC gaps: tables with missing events in the last 7 days
+### Query 3 — CDC gaps: tables with missing events in the last 7 days
 
 sql
 
