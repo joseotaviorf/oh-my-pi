@@ -3,6 +3,8 @@ bietlejuice.alias_classifieds:
   - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.concierge_propensity_model_service:
+  - quintoml.concierge.concierge_propensity_model_batch.inference:first-run-of-day
 bietlejuice.conversation_explorer:
   - quintoml.chatbot.wall_e_session_categoriser.inference:first-run-of-day
 bietlejuice.core_aux_listing:

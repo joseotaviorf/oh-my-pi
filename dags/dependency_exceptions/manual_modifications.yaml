@@ -1359,6 +1359,9 @@ bietlejuice.dw_pipeline:
 bietlejuice.conversation_explorer:
   add:
     - quintoml.chatbot.wall_e_session_categoriser.inference:first-run-of-day
+bietlejuice.concierge_propensity_model_service:
+  add:
+    - quintoml.concierge.concierge_propensity_model_batch.inference:first-run-of-day
 bietlejuice.demand_balancer_service:
   add:
     - quintoml.search.maestro.inference:first-run-of-day

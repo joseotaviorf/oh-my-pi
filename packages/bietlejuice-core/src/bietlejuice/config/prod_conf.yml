@@ -40,6 +40,7 @@ dags_out_of_pattern:
         "enrich_table_dependency_tree",
         "enrich_vespucio_pipeline",
         "quintoml.chatbot.wall_e_session_categoriser.inference",
+        "quintoml.concierge.concierge_propensity_model_batch.inference",
         "quintoml.copilot.text2filter_evals.inference",
         "quintoml.post_contract.wall_e_offboarding_categoriser.inference",
         "quintoml.recs.house_user_embeddings.inference",
