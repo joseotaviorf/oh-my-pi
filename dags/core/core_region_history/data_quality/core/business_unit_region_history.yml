@@ -8,6 +8,9 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
+  id_business_unit_region:
+    is_complete:
+      severity_level: Error
   id_region:
     is_complete:
       severity_level: Error

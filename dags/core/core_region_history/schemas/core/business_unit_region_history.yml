@@ -2,13 +2,16 @@ columns:
   id_event:
     type: string
     required: true
+  id_business_unit_region:
+    type: string
+    required: true
+  sk_core_business_unit_region:
+    type: string
+    required: true
   id_region:
     type: string
     required: true
   id_business_unit:
-    type: string
-    required: true
-  sk_core_business_unit_region:
     type: string
     required: true
   event_name:
@@ -41,6 +44,6 @@ columns:
   day:
     type: int
     required: true
-min_columns: 14
-max_columns: 14
+min_columns: 15
+max_columns: 15
 strict: true

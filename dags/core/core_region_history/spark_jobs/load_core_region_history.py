@@ -15,10 +15,25 @@ from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
 
 JOB_NAME = "region_history"
 
-_COMPOSITE_KEY_COL = "_business_unit_region_pk"
-_COMPOSITE_ID_SPLIT_PATTERN = r"\|\|"
-
 _SUPPORTED_TABLES = {"business_unit_region_history", "business_unit_history"}
+
+_BUR_OUTPUT_COLUMNS = [
+    "id_event",
+    "id_business_unit_region",
+    "sk_core_business_unit_region",
+    "id_region",
+    "id_business_unit",
+    "event_name",
+    "event_type",
+    "value",
+    "payload",
+    "ts_transaction",
+    "event_origin",
+    "ts_load",
+    "year",
+    "month",
+    "day",
+]
 
 
 class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
@@ -28,11 +43,10 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
     ``core_region.business_unit_history`` from
     ``datalake_hub_services_transactional.*``.
 
-    ``business_unit_region_history`` uses a composite entity key
-    (``id_region||id_business_unit``) to track changes to region-hub
-    associations, producing 14 columns: the standard 13-column base with
-    ``id_business_unit_region`` replaced by the split ``id_region`` and
-    ``id_business_unit`` columns. Surrogate key: ``sk_core_business_unit_region``.
+    ``business_unit_region_history`` uses the transactional junction ``id`` as the
+    entity key (``id_business_unit_region``), producing 15 columns: the standard
+    13-column base plus denormalized ``id_region`` and ``id_business_unit`` for
+    pipeline joins. Surrogate key: ``sk_core_business_unit_region``.
 
     ``business_unit_history`` uses the simple ``id`` PK of the
     ``business_unit`` table, tracking 6 hub attribute columns in the standard
@@ -43,7 +57,7 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
     def __init__(self):
         super().__init__(JOB_NAME)
 
-    def create_core_model(self, spark: SparkSession, args) -> DataFrame:
+    def create_core_model(self, spark: SparkSession, args: Any) -> DataFrame:
         if args.table_name not in _SUPPORTED_TABLES:
             raise ValueError(
                 f"Unsupported table_name={args.table_name!r} for core_region_history"
@@ -75,31 +89,25 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
         event_configs: List[Dict[str, Any]],
         transactional_table: str,
     ) -> DataFrame:
-        """Build business_unit_region_history using composite region-hub key.
+        """Build business_unit_region_history using transactional junction ``id``.
 
-        The transactional table exposes FK columns as ``business_unit_id`` and
-        ``region_id``. These are renamed to core conventions before building the
-        composite entity key ``id_region||id_business_unit`` passed to
-        ``HistoryBuilder`` as a single-column id.
+        Entity grain is the junction row (``id`` → ``id_business_unit_region``),
+        aligned with clean/aud. ``id_region`` and ``id_business_unit`` are
+        denormalized onto every event row for joins.
         """
         if "id_business_unit" not in df.columns and "business_unit_id" in df.columns:
             df = df.withColumnRenamed("business_unit_id", "id_business_unit")
         if "id_region" not in df.columns and "region_id" in df.columns:
             df = df.withColumnRenamed("region_id", "id_region")
 
-        df = df.withColumn(
-            _COMPOSITE_KEY_COL,
-            F.concat_ws(
-                "||",
-                F.col("id_region").cast("string"),
-                F.col("id_business_unit").cast("string"),
-            ),
-        )
+        df = self._filter_valid_junction_keys(df)
+
+        fk_lookup = self._build_bur_fk_lookup(df)
 
         result = HistoryBuilder.build_history_for_columns(
             df,
             entity_name="business_unit_region",
-            id_col=_COMPOSITE_KEY_COL,
+            id_col="id",
             ts_col="ts_database_transaction",
             op_col="op_cdc",
             event_configs=event_configs,
@@ -108,31 +116,57 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         result = self._filter_value_filled(result)
-        return self._reshape_bur_history_output(result)
 
-    def _reshape_bur_history_output(self, df: DataFrame) -> DataFrame:
-        """Split composite id_business_unit_region → id_region + id_business_unit."""
-        parts = F.split(F.col("id_business_unit_region"), _COMPOSITE_ID_SPLIT_PATTERN)
-        return (
-            df.withColumn("id_region", parts.getItem(0))
-            .withColumn("id_business_unit", parts.getItem(1))
-            .drop("id_business_unit_region")
-            .select(
-                "id_event",
-                "id_region",
-                "id_business_unit",
-                "sk_core_business_unit_region",
-                "event_name",
-                "event_type",
-                "value",
-                "payload",
-                "ts_transaction",
-                "event_origin",
-                "ts_load",
-                "year",
-                "month",
-                "day",
+        result = result.join(
+            fk_lookup,
+            on=["id_business_unit_region", "ts_transaction"],
+            how="left",
+        )
+
+        return result.select(*_BUR_OUTPUT_COLUMNS)
+
+    @staticmethod
+    def _build_bur_fk_lookup(df: DataFrame) -> DataFrame:
+        """One denormalized FK row per junction id and transaction timestamp.
+
+        Uses the same CDC canonicalization as ``HistoryBuilder`` so a left join
+        cannot duplicate history rows when several raw CDC rows share
+        ``(id, ts_database_transaction)`` with conflicting FK columns.
+        """
+        tie_breaker_columns = HistoryBuilder._resolve_tie_breaker_columns(df, None)
+        lookup_cols = list(
+            dict.fromkeys(
+                ["id", "ts_database_transaction", "id_region", "id_business_unit"]
+                + tie_breaker_columns
             )
+        )
+        fk_source = df.select(*[F.col(c) for c in lookup_cols])
+        fk_canonical = HistoryBuilder._canonicalize_to_one_row_per_timestamp(
+            fk_source,
+            id_col="id",
+            ts_col="ts_database_transaction",
+            tie_breaker_columns=tie_breaker_columns,
+        )
+        return fk_canonical.select(
+            F.col("id").cast("string").alias("id_business_unit_region"),
+            F.col("ts_database_transaction").alias("ts_transaction"),
+            F.col("id_region").cast("string").alias("id_region"),
+            F.col("id_business_unit").cast("string").alias("id_business_unit"),
+        )
+
+    @staticmethod
+    def _filter_valid_junction_keys(df: DataFrame) -> DataFrame:
+        """Drop sentinel/null junction rows (e.g. region_id=0, business_unit_id=0)."""
+        id_col = F.col("id").cast("string")
+        region_col = F.col("id_region").cast("string")
+        bu_col = F.col("id_business_unit").cast("string")
+        return df.filter(
+            id_col.isNotNull()
+            & (id_col != "0")
+            & region_col.isNotNull()
+            & (region_col != "0")
+            & bu_col.isNotNull()
+            & (bu_col != "0")
         )
 
     def _build_business_unit_history(

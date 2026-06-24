@@ -5,12 +5,12 @@ dag:
   documentation:
     dag_purpose: |
       Creates narrow field-level history core tables for the Hub Services region domain:
-      business_unit_region_history tracks changes to hub-region associations from
+      business_unit_region_history tracks changes to hub-region junction records from
       datalake_hub_services_transactional.business_unit_region, and business_unit_history
       tracks changes to hub attributes from datalake_hub_services_transactional.business_unit.
-      Fixed schema: 14 columns for business_unit_region_history (composite region-hub key
-      split into id_region + id_business_unit), 13 columns for business_unit_history
-      (standard event log with id_business_unit).
+      Fixed schema: 15 columns for business_unit_region_history (junction id grain as
+      id_business_unit_region, plus denormalized id_region and id_business_unit), 13 columns
+      for business_unit_history (standard event log with id_business_unit).
 workflow:
   type: core_model
   layer: core

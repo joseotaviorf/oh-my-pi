@@ -2,7 +2,7 @@
 Unit tests for CoreRegionHistorySparkJob.
 
 Covers both output tables:
-  - business_unit_region_history (14 cols, composite entity key)
+  - business_unit_region_history (15 cols, junction id entity key)
   - business_unit_history        (13 cols, simple id PK)
 """
 
@@ -20,9 +20,10 @@ _MODULE = "dags.core.core_region_history.spark_jobs.load_core_region_history"
 
 EXPECTED_BUR_COLUMNS = {
     "id_event",
+    "id_business_unit_region",
+    "sk_core_business_unit_region",
     "id_region",
     "id_business_unit",
-    "sk_core_business_unit_region",
     "event_name",
     "event_type",
     "value",
@@ -66,7 +67,7 @@ def _make_args(table_name, start="2024-01-01", end="2025-01-01"):
 
 
 class TestBURHistorySchema:
-    def test_returns_14_columns(
+    def test_returns_15_columns(
         self,
         spark_session,
         transactional_bur_df,
@@ -81,7 +82,7 @@ class TestBURHistorySchema:
         ):
             result = job.create_core_model(spark_session, args)
 
-        assert len(result.columns) == 14
+        assert len(result.columns) == 15
 
     def test_column_names_match_expected_schema(
         self,
@@ -102,12 +103,12 @@ class TestBURHistorySchema:
 
 
 # ---------------------------------------------------------------------------
-# business_unit_region_history — composite key
+# business_unit_region_history — junction key
 # ---------------------------------------------------------------------------
 
 
-class TestBURHistoryCompositeKey:
-    def test_composite_key_split_produces_correct_id_region_and_id_business_unit(
+class TestBURHistoryJunctionKey:
+    def test_junction_id_is_transactional_id(
         self,
         spark_session,
         transactional_bur_df,
@@ -124,6 +125,7 @@ class TestBURHistoryCompositeKey:
 
         rows = result.collect()
         for row in rows:
+            assert row["id_business_unit_region"] == "100"
             assert row["id_region"] == "10"
             assert row["id_business_unit"] == "20"
 
@@ -197,13 +199,13 @@ class TestBURHistoryEvents:
         event_names = {r["event_name"] for r in result.collect()}
         assert "ev_business_context" in event_names
 
-    def test_created_at_emits_single_ev_ts_created(
+    def test_created_at_emits_single_ev_ts_created_per_junction(
         self,
         spark_session,
         transactional_bur_df,
         mock_configuration_bur,
     ):
-        """created_at is immutable, so exactly one ev_ts_created per region-hub pair."""
+        """created_at is immutable, so exactly one ev_ts_created per junction id."""
         job = CoreRegionHistorySparkJob()
         args = _make_args("business_unit_region_history")
 
@@ -326,6 +328,100 @@ class TestBURHistoryFilterValues:
             "Rows with null business_context should be filtered out by _filter_value_filled"
         )
         assert event_names == ["ev_ts_created"]
+
+
+# ---------------------------------------------------------------------------
+# business_unit_region_history — re-association
+# ---------------------------------------------------------------------------
+
+
+class TestBURHistoryReassociation:
+    def test_same_pair_different_junction_ids_emit_separate_ev_ts_created(
+        self,
+        spark_session,
+        transactional_bur_reassociation_df,
+        mock_configuration_bur,
+    ):
+        job = CoreRegionHistorySparkJob()
+        args = _make_args("business_unit_region_history")
+
+        with patch(
+            f"{_MODULE}.HistoricalHelper.load_transactional_data",
+            return_value=transactional_bur_reassociation_df,
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        ts_created_rows = [
+            r for r in result.collect() if r["event_name"] == "ev_ts_created"
+        ]
+        assert len(ts_created_rows) == 2
+        junction_ids = {r["id_business_unit_region"] for r in ts_created_rows}
+        assert junction_ids == {"100", "101"}
+        for row in ts_created_rows:
+            assert row["id_region"] == "10"
+            assert row["id_business_unit"] == "20"
+
+
+# ---------------------------------------------------------------------------
+# business_unit_region_history — sentinel filter
+# ---------------------------------------------------------------------------
+
+
+class TestBURHistorySentinelFilter:
+    def test_zero_key_junction_rows_are_excluded(
+        self,
+        spark_session,
+        transactional_bur_with_zero_key_df,
+        mock_configuration_bur,
+    ):
+        job = CoreRegionHistorySparkJob()
+        args = _make_args("business_unit_region_history")
+
+        with patch(
+            f"{_MODULE}.HistoricalHelper.load_transactional_data",
+            return_value=transactional_bur_with_zero_key_df,
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        junction_ids = {r["id_business_unit_region"] for r in result.collect()}
+        assert junction_ids == {"100"}
+
+
+# ---------------------------------------------------------------------------
+# business_unit_region_history — FK lookup canonicalization
+# ---------------------------------------------------------------------------
+
+
+class TestBURHistoryFkCanonicalization:
+    def test_conflicting_fk_at_same_ts_does_not_duplicate_id_event(
+        self,
+        spark_session,
+        transactional_bur_snapshot_duplicate_fk_df,
+        mock_configuration_bur,
+    ):
+        job = CoreRegionHistorySparkJob()
+        args = _make_args("business_unit_region_history")
+
+        with patch(
+            f"{_MODULE}.HistoricalHelper.load_transactional_data",
+            return_value=transactional_bur_snapshot_duplicate_fk_df,
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        rows = result.collect()
+        id_events = [r["id_event"] for r in rows]
+
+        assert len(rows) == len(set(id_events)), (
+            "FK join must not duplicate history rows at the same (junction, ts)"
+        )
+        assert len(rows) == 2
+        assert {r["event_name"] for r in rows} == {
+            "ev_business_context",
+            "ev_ts_created",
+        }
+        for row in rows:
+            assert row["id_region"] == "10"
+            assert row["id_business_unit"] == "20"
 
 
 # ---------------------------------------------------------------------------

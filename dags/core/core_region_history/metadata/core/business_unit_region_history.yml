@@ -4,33 +4,35 @@ domain: Data Platform
 owner: gustavo.alencar@quintoandar.com.br
 description: >
   Narrow field-level history for the business_unit_region entity from Debezium CDC.
-  Each row represents a single field-level change in a region-business_unit (hub) association
+  Each row represents a single field-level change on a hub-region junction record
   from datalake_hub_services_transactional.business_unit_region. The entity grain is
-  the region-business_ unit (hub) pair (composite id_region||id_business_unit); association
-  lifecycle events (INSERT/DELETE) and business_context changes are all captured.
-  14-column schema: the standard 13-column base with the composite entity id replaced by
-  the split id_region and id_business_unit columns.
+  the junction id (id_business_unit_region, sourced from transactional id); re-associations
+  of the same (id_region, id_business_unit) pair create separate entity timelines.
+  id_region and id_business_unit are denormalized on every row for pipeline joins.
+  15-column schema: standard 13-column event log plus denormalized FK columns.
 columns:
   id_event:
     lineage:
-      - datalake_hub_services_transactional.business_unit_region.region_id
-      - datalake_hub_services_transactional.business_unit_region.business_unit_id
+      - datalake_hub_services_transactional.business_unit_region.id
       - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
-    description: SHA256 hash of composite id (id_region||id_business_unit), event_name, and
-      ts_transaction. Used as the idempotent merge key.
+    description: SHA256 hash of id_business_unit_region, event_name, and ts_transaction.
+      Used as the idempotent merge key.
+  id_business_unit_region:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.id
+    description: Junction record identifier (transactional PK). Entity grain for this history table.
+  sk_core_business_unit_region:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.id
+    description: Surrogate key for the junction record, derived from id_business_unit_region.
   id_region:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.region_id
-    description: Region identifier (string) from transactional region_id. Primary entity for this region core model.
+    description: Region identifier denormalized from transactional region_id for joins.
   id_business_unit:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_unit_id
-    description: Hub (business unit) identifier (string) from transactional business_unit_id.
-  sk_core_business_unit_region:
-    lineage:
-      - datalake_hub_services_transactional.business_unit_region.region_id
-      - datalake_hub_services_transactional.business_unit_region.business_unit_id
-    description: Surrogate key for the region-hub pair, derived from the composite id_region||id_business_unit.
+    description: Hub (business unit) identifier denormalized from transactional business_unit_id for joins.
   event_name:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_context
@@ -38,7 +40,7 @@ columns:
     description: Resolved event name for the changed field.
     categories:
       ev_business_context: Change in business_context (SALE or RENT), including association creation and deletion.
-      ev_ts_created: Initial value of created_at (association creation timestamp). Immutable, so emitted once per region-hub pair.
+      ev_ts_created: Initial value of created_at (association creation timestamp). Immutable per junction record.
   event_type:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.op_cdc

@@ -193,6 +193,128 @@ def transactional_bur_null_context_df(spark_session):
 
 
 @pytest.fixture
+def transactional_bur_reassociation_df(spark_session):
+    """Two junction ids for the same (region, business_unit) pair — re-association."""
+    schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("business_unit_id", StringType(), True),
+            StructField("region_id", StringType(), True),
+            StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("op_cdc", StringType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
+            StructField("ts_cdc_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "100",
+            "20",
+            "10",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+            "c",
+            datetime(2024, 3, 1, 8, 0, 0),
+            datetime(2024, 3, 1, 8, 0, 1),
+        ),
+        (
+            "101",
+            "20",
+            "10",
+            "RENT",
+            datetime(2024, 6, 1, 9, 0, 0),
+            "c",
+            datetime(2024, 6, 1, 9, 0, 0),
+            datetime(2024, 6, 1, 9, 0, 1),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def transactional_bur_with_zero_key_df(spark_session):
+    """Valid junction plus sentinel (0,0) row — only valid junction should emit events."""
+    schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("business_unit_id", StringType(), True),
+            StructField("region_id", StringType(), True),
+            StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("op_cdc", StringType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
+            StructField("ts_cdc_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "100",
+            "20",
+            "10",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+            "c",
+            datetime(2024, 3, 1, 8, 0, 0),
+            datetime(2024, 3, 1, 8, 0, 1),
+        ),
+        (
+            "999",
+            "0",
+            "0",
+            "SALE",
+            datetime(1970, 1, 1, 0, 0, 0),
+            "c",
+            datetime(2024, 3, 2, 8, 0, 0),
+            datetime(2024, 3, 2, 8, 0, 1),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def transactional_bur_snapshot_duplicate_fk_df(spark_session):
+    """Snapshot batch: two CDC rows share junction id and ts with conflicting FKs."""
+    schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("business_unit_id", StringType(), True),
+            StructField("region_id", StringType(), True),
+            StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("op_cdc", StringType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
+            StructField("ts_cdc_transaction", TimestampType(), True),
+        ]
+    )
+    snapshot_ts = datetime(2024, 3, 1, 8, 0, 0)
+    created_at = datetime(2024, 3, 1, 8, 0, 0)
+    data = [
+        (
+            "100",
+            "20",
+            "99",
+            "SALE",
+            created_at,
+            "r",
+            snapshot_ts,
+            datetime(2024, 3, 1, 8, 0, 1),
+        ),
+        (
+            "100",
+            "20",
+            "10",
+            "SALE",
+            created_at,
+            "r",
+            snapshot_ts,
+            datetime(2024, 3, 1, 8, 0, 2),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
 def transactional_bu_df(spark_session):
     """CDC rows for business_unit: INSERT then UPDATE where only hub_name changes."""
     schema = StructType(
