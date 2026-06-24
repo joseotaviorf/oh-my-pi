@@ -37,7 +37,7 @@ WITH validation_runs_raw AS (
     WHERE MAKE_DATE(year, month, day) >= DATE('{load_start_date}')
       AND ts_started >= TO_TIMESTAMP('{load_start_date}')
       AND ts_started < TO_TIMESTAMP('{load_end_date}') + INTERVAL 1 DAY
-      AND id_dag LIKE 'bietlejuice.%'
+      AND (id_dag LIKE 'bietlejuice.%' OR id_dag LIKE 'quintoml.wonka.%')
       AND REGEXP_LIKE(id_dag, '__validation$')
       AND state IN ('success', 'failed')
       AND run_type = 'manual'
@@ -99,7 +99,7 @@ prod_astro AS (
             )                                                                        AS dedup_rn
         FROM datalake_astro_clean.dag_run
         WHERE MAKE_DATE(year, month, day) >= DATE_SUB(DATE('{load_start_date}'), 16)
-          AND id_dag LIKE 'bietlejuice.%'
+          AND (id_dag LIKE 'bietlejuice.%' OR id_dag LIKE 'quintoml.wonka.%')
           AND NOT REGEXP_LIKE(id_dag, '__validation$')
           AND state = 'success'
           AND ts_ended IS NOT NULL
@@ -243,7 +243,7 @@ fd_runs AS (
     FROM dw_databricks_health.fact_databricks_dag_run
     WHERE dt_dag_run_started >= DATE_SUB(DATE('{load_start_date}'), 16)
       AND dt_dag_run_started <= DATE('{load_end_date}')
-      AND airflow_dag_id LIKE 'bietlejuice.%'
+      AND (airflow_dag_id LIKE 'bietlejuice.%' OR airflow_dag_id LIKE 'quintoml.wonka.%')
       AND is_job_on_interactive = FALSE
       AND COALESCE(total_cost_usd, 0) > 0
 ),

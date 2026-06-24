@@ -246,9 +246,22 @@ Wonka feature sets (QuintoML `jobs/wonka/*/configs/prod.yml`) can opt in to clus
 - Skips `optimize_delta_tables` and `load_cdf_to_datazord` (no prod Kafka CDF traffic).
 - Redirects pipeline output via `load_wonka.py` env injection and `WonkaRunner` writer remapping to `cluster_validation.wonka___<feature_set>` (and `__latest` tables).
 
-Pilot DAGs: `quintoml.wonka.user_visits__validation`, `quintoml.wonka.house_main__validation`.
+Pilot DAGs (reference fixtures): `quintoml.wonka.user_visits__validation`, `quintoml.wonka.house_main__validation`.
 
-Fleet auto-generation for Wonka DAGs remains deferred (see Phase 6 in the wiring plan).
+Generate 1:1 Gen7 validation blocks for the full Wonka fleet (arch migration, not rightsizing):
+
+```bash
+ENVIRONMENT=prod uv run python scripts/generate_wonka_validation_blocks.py --dry-run
+ENVIRONMENT=prod uv run python scripts/generate_wonka_validation_blocks.py --write --quintoml-root ~/Work/quintoml
+```
+
+Trigger Wonka validation DAGs on prod Airflow:
+
+```bash
+uv run python scripts/trigger_cluster_validation_dags.py \
+  --lines wonka \
+  --quintoml-root ~/Work/quintoml
+```
 
 ## Exclusions
 

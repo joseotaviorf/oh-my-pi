@@ -32,6 +32,7 @@ from scripts.cluster_validation_conf_exceptions import (  # noqa: E402
     resolve_validation_conf_for_dag,
 )
 from scripts.cluster_validation_dag_discovery import (  # noqa: E402
+    DEFAULT_QUINTOML_ROOT,
     ValidationDag,
     discover_validation_dags,
     filter_validation_dags,
@@ -279,6 +280,15 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--dags-root",
         type=Path,
         default=Path(__file__).resolve().parents[1] / "dags",
+    )
+    parser.add_argument(
+        "--quintoml-root",
+        type=Path,
+        default=None,
+        help=(
+            "QuintoML repo root for Wonka validation discovery "
+            "(default: ~/Work/quintoml when set)"
+        ),
     )
     parser.add_argument(
         "--from-prod-run",
@@ -1411,8 +1421,12 @@ def _exit_code(outcomes: list[RunOutcome]) -> int:
 
 
 async def async_main(args: argparse.Namespace) -> int:
+    quintoml_root = args.quintoml_root
+    if quintoml_root is None and DEFAULT_QUINTOML_ROOT.is_dir():
+        quintoml_root = DEFAULT_QUINTOML_ROOT
+
     selected = filter_validation_dags(
-        discover_validation_dags(args.dags_root),
+        discover_validation_dags(args.dags_root, quintoml_root=quintoml_root),
         lines=args.lines,
         exclude_lines=args.exclude_lines,
         dag_names=args.dags,

@@ -1,6 +1,23 @@
-# Wonka cluster validation — Forno pilot runbook
+# Wonka cluster validation — pilot runbook
 
 Manual verification checklist after merging bi-etl-ejuice and QuintoML worktree branches.
+
+## Generate validation blocks (QuintoML)
+
+1:1 Gen7 topology mapping (same worker counts; Graviton instance types):
+
+```bash
+ENVIRONMENT=prod uv run python scripts/generate_wonka_validation_blocks.py --dry-run
+ENVIRONMENT=prod uv run python scripts/generate_wonka_validation_blocks.py --write --quintoml-root ~/Work/quintoml
+```
+
+## Trigger validation DAGs (prod Airflow)
+
+```bash
+uv run python scripts/trigger_cluster_validation_dags.py \
+  --lines wonka \
+  --quintoml-root ~/Work/quintoml
+```
 
 ## Prerequisites
 
