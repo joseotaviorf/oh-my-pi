@@ -36,3 +36,12 @@ def test_prod_branch_still_creates_optimize_and_cdf():
     prod_branch = source[validation_block_start:]
     assert "optimize_delta_tables_task" in prod_branch
     assert "load_cdf_to_datazord_task" in prod_branch
+
+
+def test_validation_merges_wonka_runtime_overlay():
+    source = _wonka_workflow_source()
+
+    assert "_wonka_runtime_overlay" in source
+    assert "_WONKA_RUNTIME_TOP_LEVEL_KEYS" in source
+    assert "install_pex_generic.sh" in source
+    assert "runtime_overlay = self._wonka_runtime_overlay" in source

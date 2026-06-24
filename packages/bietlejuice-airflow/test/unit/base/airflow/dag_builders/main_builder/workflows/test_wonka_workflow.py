@@ -174,6 +174,78 @@ class TestWonkaWorkflowClusterPresetSelection:
         assert workflow.cluster_args["spark_version"] == "16.4.x-scala2.12"
 
 
+class TestWonkaWorkflowValidationRuntimeOverlay:
+    @pytest.fixture
+    def config_presets(self):
+        return {
+            "consolidation_s_memory": {
+                "spark_version": "16.4.x-scala2.12",
+                "node_type_id": "m5d.xlarge",
+                "init_scripts": [
+                    {
+                        "s3": {"destination": "s3://artifacts/configure_spark.sh"},
+                        "args": [],
+                    }
+                ],
+                "spark_env_vars": {"SPARK_RUNTIME": "consolidation"},
+            },
+            "wonka_cluster": {
+                "spark_version": "16.4.x-scala2.12",
+                "databricks_conn_id": "databricks_new",
+                "init_scripts": [
+                    {
+                        "s3": {"destination": "s3://artifacts/install_pex_generic.sh"},
+                        "args": ["s3://wonka/pex"],
+                    },
+                    {
+                        "s3": {"destination": "s3://artifacts/vault.sh"},
+                        "args": [],
+                    },
+                ],
+                "spark_env_vars": {
+                    "SPARK_RUNTIME": "databricks",
+                    "WONKA_RUNTIME": "1",
+                },
+                "custom_configurations": {
+                    "spark_conf": {"spark.wonka": "true"},
+                },
+            },
+        }
+
+    def _validation_workflow(self, cluster_args, config_presets):
+        dag_args = {"name": "test-wonka", "owner": "MLOps"}
+        workflow_args = {"type": "wonka", "wonka_config": {"name": "test_wonka"}}
+        config_service = Mock()
+        config_service.get_config = Mock(side_effect=lambda key: config_presets[key])
+        with patch(
+            "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow.ConfigurationService",
+            return_value=config_service,
+        ):
+            return WonkaWorkflow(
+                dag_args,
+                workflow_args,
+                cluster_args,
+                None,
+                is_validation=True,
+            )
+
+    def test_runtime_overlay_wins_over_consolidation_preset(self, config_presets):
+        workflow = self._validation_workflow(
+            {"type": "consolidation_s_memory"},
+            config_presets,
+        )
+        cluster_args = workflow.cluster_args
+
+        assert cluster_args["node_type_id"] == "m5d.xlarge"
+        assert (
+            cluster_args["init_scripts"]
+            == config_presets["wonka_cluster"]["init_scripts"]
+        )
+        assert cluster_args["spark_env_vars"]["SPARK_RUNTIME"] == "databricks"
+        assert cluster_args["spark_env_vars"]["WONKA_RUNTIME"] == "1"
+        assert cluster_args["spark_conf"] == {"spark.wonka": "true"}
+
+
 class TestWonkaWorkflowEmrBootstrapArgInjection:
     @pytest.fixture
     def workflow(self):

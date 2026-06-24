@@ -35,6 +35,7 @@ PHASE2_WORKFLOWS = {
     "qube_measure",
     "qube_dimension",
     "qube_metric",
+    "wonka",
 }
 
 SKIP_CLUSTER_PREFIXES = ("emr_",)

@@ -41,6 +41,7 @@ PHASE2_WORKFLOWS = frozenset(
         "qube_measure",
         "qube_dimension",
         "qube_metric",
+        "wonka",
     }
 )
 SKIP_CLUSTER_PREFIXES = ("emr_",)

@@ -31,6 +31,29 @@ class WonkaWorkflow(BaseWorkflow):
     _WONKA_CUSTOM_SCHEMA = "wonka"
     _WONKA_DEFAULT_CLUSTER_CONFIG_KEY = "wonka_cluster"
     _INSTALL_PEX_GENERIC_SCRIPT = "install_pex_generic.sh"
+    _TOPOLOGY_CLUSTER_KEYS = frozenset(
+        {
+            "node_type_id",
+            "driver_node_type_id",
+            "master_node_type_id",
+            "num_workers",
+            "autoscale",
+            "spark_version",
+            "runtime_engine",
+            "instance_pool_id",
+            "driver_instance_pool_id",
+        }
+    )
+    _WONKA_RUNTIME_TOP_LEVEL_KEYS = frozenset(
+        {
+            "access_control_list",
+            "custom_libraries",
+            "databricks_conn_id",
+            "init_scripts",
+            "spark_env_vars",
+            "aws_attributes",
+        }
+    )
 
     def __init__(
         self, dag_args, workflow_args, cluster_args, dataset_dependencies, **kwargs
@@ -49,15 +72,24 @@ class WonkaWorkflow(BaseWorkflow):
         else:
             self.dag_id = wonka_dag_id
 
-        # Merge the Wonka cluster preset (from declaration `type`, default `wonka_cluster`)
+        # Merge the cluster preset (wonka_cluster for prod, consolidation_* for validation)
         # with the DAG declaration `cluster:` block into `self.cluster_args`.
-        wonka_cluster_config_key = self.cluster_args.get(
+        cluster_config_key = self.cluster_args.get(
             "type", self._WONKA_DEFAULT_CLUSTER_CONFIG_KEY
         )
-        wonka_cluster_preset = self.config_service.get_config(wonka_cluster_config_key)
+        cluster_preset = self.config_service.get_config(cluster_config_key)
         self.cluster_args = self._get_deep_updated_dict(
-            wonka_cluster_preset, self.cluster_args
+            cluster_preset, self.cluster_args
         )
+
+        if self.is_validation:
+            wonka_cluster_preset = self.config_service.get_config(
+                self._WONKA_DEFAULT_CLUSTER_CONFIG_KEY
+            )
+            runtime_overlay = self._wonka_runtime_overlay(wonka_cluster_preset)
+            self.cluster_args = self._get_deep_updated_dict(
+                self.cluster_args, runtime_overlay
+            )
 
         # Merge custom_configurations.spark_conf into top-level spark_conf so the
         # Databricks Jobs API receives all spark configs (it only uses top-level spark_conf).
@@ -68,6 +100,23 @@ class WonkaWorkflow(BaseWorkflow):
             self.cluster_args = self._get_deep_updated_dict(
                 self.cluster_args, {"spark_conf": custom_spark_conf}
             )
+
+    @classmethod
+    def _wonka_runtime_overlay(cls, wonka_cluster_preset: dict) -> dict:
+        """Non-topology wonka_cluster fields for validation on consolidation presets."""
+        overlay: dict = {}
+        for key in cls._WONKA_RUNTIME_TOP_LEVEL_KEYS:
+            if key in wonka_cluster_preset:
+                overlay[key] = copy.deepcopy(wonka_cluster_preset[key])
+        custom_configurations = wonka_cluster_preset.get("custom_configurations") or {}
+        runtime_custom = {
+            key: copy.deepcopy(value)
+            for key, value in custom_configurations.items()
+            if key not in cls._TOPOLOGY_CLUSTER_KEYS
+        }
+        if runtime_custom:
+            overlay["custom_configurations"] = runtime_custom
+        return overlay
 
     def build_dag(self):
         dag = super().dag_instance()
