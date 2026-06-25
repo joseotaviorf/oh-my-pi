@@ -105,7 +105,7 @@ class TestCheckDuplicates:
 
 
 class TestIsValidValue:
-    def test_contains_must_end_with_underscore_or_hyphen(self, validator_factory):
+    def test_contains_must_end_with_valid_separator(self, validator_factory):
         # Arrange
         validator = validator_factory(
             {
@@ -115,7 +115,7 @@ class TestIsValidValue:
             }
         )
 
-        # Act
+        # Act — "bietlejuice.a" ends with "a", not a valid separator ("_", "-", ".")
         dag_valid = validator._is_valid_value("DAG", "contains", "bietlejuice.a")
         task_valid = validator._is_valid_value("Task", "contains", "optimize-")
 
@@ -135,6 +135,17 @@ class TestIsValidValue:
         # Assert
         assert dag_valid is True
         assert task_valid is True
+        assert validator.errors == []
+
+    def test_accepts_dot_suffix_for_external_system_prefix(self, validator_factory):
+        # Arrange
+        validator = validator_factory({"DAG": {}, "Task": {}, "DAGOwner": {}})
+
+        # Act
+        result = validator._is_valid_value("DAG", "contains", "quintoml.")
+
+        # Assert
+        assert result is True
         assert validator.errors == []
 
 
@@ -202,6 +213,56 @@ class TestDagNamePatterns:
         assert any(
             "prefix" in error and "not found" in error for error in validator.errors
         )
+
+    def test_contains_skips_existence_check_for_external_prefix(
+        self, validator_factory
+    ):
+        # DAGs from other systems (e.g. quintoml.*) are not tracked in dags/;
+        # the validator must accept them without erroring on missing dag names.
+        # Arrange
+        validator = validator_factory(
+            {"DAG": {}, "Task": {}, "DAGOwner": {}},
+            dag_names=set(),
+        )
+
+        # Act
+        is_valid = validator._check_dag_name_pattern("contains", "quintoml.")
+
+        # Assert
+        assert is_valid is True
+        assert validator.errors == []
+
+    def test_contains_rejects_bare_bietlejuice_prefix(self, validator_factory):
+        # "bietlejuice." strips to "" — startswith("") is True for every name,
+        # so the existence check would pass trivially without matching any real prefix.
+        # Arrange
+        validator = validator_factory(
+            {"DAG": {}, "Task": {}, "DAGOwner": {}},
+            dag_names={"some_dag"},
+        )
+
+        # Act
+        is_valid = validator._check_dag_name_pattern("contains", "bietlejuice.")
+
+        # Assert
+        assert is_valid is False
+        assert any("empty prefix" in error for error in validator.errors)
+
+    def test_contains_still_requires_existing_prefix_for_bietlejuice_dags(
+        self, validator_factory
+    ):
+        # Arrange
+        validator = validator_factory(
+            {"DAG": {}, "Task": {}, "DAGOwner": {}},
+            dag_names=set(),
+        )
+
+        # Act
+        is_valid = validator._check_dag_name_pattern("contains", "bietlejuice.qube_")
+
+        # Assert
+        assert is_valid is False
+        assert any("not found in dags/" in error for error in validator.errors)
 
     def test_dag_name_from_dag_id_strips_prefix(self, validator_factory):
         # Arrange

@@ -126,7 +126,18 @@ class JiraOpsRoutineMuteListValidator:
         return False
 
     def _check_dag_name_pattern(self, operation: str, dag_name: str) -> bool:
+        raw_dag_name = dag_name
         dag_name = self._dag_name_from_dag_id(dag_name)
+
+        if not raw_dag_name.startswith(self.dag_id_prefix):
+            return True
+
+        if operation == "contains" and not dag_name:
+            self.errors.append(
+                f"DAG[contains]: {raw_dag_name!r} resolves to an empty prefix after "
+                f"stripping {self.dag_id_prefix!r}; use a more specific prefix."
+            )
+            return False
 
         if operation == "equals" and dag_name not in self.dag_names:
             self.errors.append(

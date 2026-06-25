@@ -21,7 +21,7 @@ DAG:
     - bietlejuice.enrich_crawler_loft
     - bietlejuice.enrich_crawler_olx
     - bietlejuice.enrich_demand_consolidated_targets
-    - bietlejuice.enrich_expected_contribution_margin
+
     - bietlejuice.enrich_find_health_metrics
     - bietlejuice.enrich_google_search_console_classified
     - bietlejuice.enrich_growth_automatic_daily_costs
@@ -53,6 +53,7 @@ DAG:
     - bietlejuice.gsheets_
     - bietlejuice.idactum_
     - bietlejuice.dw_datamarts_
+    - quintoml.
 
 Task:
   equals:
@@ -80,6 +81,7 @@ DAGOwner:
     - Data Governance
     - Data Life Cycle
     - Data People
+    - MLOps
     - Ops POC
     - Tech Platform Cyber Security
     - Tech Platform Dev Foundation

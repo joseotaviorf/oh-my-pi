@@ -54,6 +54,11 @@ DAGOwner:
       deadline: Never
       created_by: isabella.araujo@quintoandar.com.br
       approved_by: pedro.prates@quintoandar.com.br
+    MLOps:
+      reason: "MLOps pipelines are fully owned by the MLOps squad; DE on-call engineers have no context, access, or accountability over this domain."
+      deadline: Never
+      created_by: isadora.gallerani@quintoandar.com.br
+      approved_by: isadora.gallerani@quintoandar.com.br
     Ops POC:
       reason: "TODO: document why alerts for this DAGOwner are muted."
       deadline: Never

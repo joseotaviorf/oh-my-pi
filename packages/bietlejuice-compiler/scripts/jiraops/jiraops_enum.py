@@ -27,7 +27,7 @@ class JiraOpsEnum(enum.Enum):
 
     DAG_ID_PREFIX = "bietlejuice."
 
-    CONTAINS_SUFFIXES = ("_", "-")
+    CONTAINS_SUFFIXES = ("_", "-", ".")
     ALLOWED_OPERATIONS = frozenset({"equals", "contains"})
     REQUIRED_EXCEPTION_FIELDS = frozenset(
         {"reason", "deadline", "created_by", "approved_by"}
