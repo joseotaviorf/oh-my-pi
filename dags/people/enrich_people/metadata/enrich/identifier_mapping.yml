@@ -114,7 +114,9 @@ columns:
       - datalake_pin_core_clean.all_assignments.assignment_type
       - datalake_pin_core_clean.external_application_identifier.type_external_identifier
   is_active:
-    description: Boolean flag indicating if the assignment is currently active (TRUE) or not (FALSE).
+    description: True when the employee is active, False when inactive.
+  is_active_pin:
+    description: Raw active status from Oracle HCM. On the termination date itself, Oracle still records TRUE; it only flips to FALSE the following day.
     lineage:
       - datalake_pin_core_clean.all_assignments.assignment_status_type
   is_person_latest_assignment:

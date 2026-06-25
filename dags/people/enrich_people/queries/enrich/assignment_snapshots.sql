@@ -238,9 +238,9 @@ assignment_snapshots_ranked AS (
         mh.hierarchy_level,
         mh.hierarchy_depth,
         CASE
-            WHEN all_assign.is_active
-                THEN 'Active'
-            ELSE 'Terminated'
+            WHEN ad.dt_terminated IS NOT NULL
+                AND ad.dt_reference >= ad.dt_terminated THEN 'Terminated'
+            ELSE 'Active'
         END AS employment_status,
         CASE
             WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) IS NULL THEN CAST(NULL AS STRING)
@@ -270,7 +270,11 @@ assignment_snapshots_ranked AS (
             AND TRY_CAST(jwst.band AS INT) >= 14,
             FALSE
         ) AS is_executive_team_member,
-        all_assign.is_active,
+        CASE
+            WHEN ad.dt_terminated IS NOT NULL
+                AND ad.dt_reference >= ad.dt_terminated THEN FALSE
+            ELSE TRUE
+        END AS is_active,
         pei.id_person IS NOT NULL AS has_emergency_contact,
         im.dt_original_hired IS NOT NULL
             AND im.dt_original_hired < ad.dt_started AS is_internal_transfer,

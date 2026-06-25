@@ -74,9 +74,9 @@ column_level_validations:
           HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) != 1
         )) = 0
       severity_level: Error
-  terminated_monthly_snapshot_in_termination_month:
+  termination_month_consistency:
     custom:
-      # For terminated assignments, the is_current row (the termination day) must fall within the
+      # For terminated assignments, the is_current row (the termination date) must fall within the
       # same calendar month as dt_terminated. A mismatch means dt_month_reference is misaligned
       # with the actual termination month, breaking monthly headcount snapshots.
       constraint: |-
@@ -88,3 +88,15 @@ column_level_validations:
             AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
         )) = 0
       severity_level: Error
+  status_termination_date_consistency:
+    custom:
+      # Every employee whose termination date is in the past must have is_active = FALSE on their is_current row.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.assignment_snapshots
+         WHERE is_current = TRUE
+           AND is_active = TRUE
+           AND dt_terminated IS NOT NULL
+           AND dt_terminated < CURRENT_DATE()
+        ) = 0
+      severity_level: Warning

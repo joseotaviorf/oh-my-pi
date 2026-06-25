@@ -368,7 +368,12 @@ SELECT
     LOWER(pe.email_address) AS personal_email,
     tu.id_person IS NOT NULL AS is_user_test,
     ca.assignment_type IN ('E', 'C') AND tu.id_person IS NULL AS is_valid_assignment,
-    ca.assignment_status_type = 'ACTIVE' AS is_active,
+    ca.assignment_status_type = 'ACTIVE' AS is_active_pin,
+    CASE
+        WHEN pp.dt_actual_termination IS NOT NULL
+            AND CURRENT_DATE() >= pp.dt_actual_termination THEN FALSE
+        ELSE TRUE
+    END AS is_active,
     ROW_NUMBER() OVER (
         PARTITION BY
             ca.id_person

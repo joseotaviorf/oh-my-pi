@@ -5,7 +5,7 @@ alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
     greater_than: 0
-    severity_level: Warning
+    severity_level: Error
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: 0
@@ -15,72 +15,14 @@ table_level_validations:
 column_level_validations:
   id_assignment:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
   id_period_of_service:
     is_unique:
-      severity_level: Warning
+      severity_level: Error
     is_complete:
-      severity_level: Warning
+      severity_level: Error
   id_continuous_employment_cycle:
-    # Continuous employment cycle is an employment (E/C) concept: pension / pre-hire (P)
-    # rows intentionally have NULL cycle (see enrich SQL `employment_periods` CTE).
-    # Ensure active employment rows are non-null, deterministic assignment mapping,
-    # and transfer-chain consistency.
-    custom:
-      constraint: |-
-        (
-          (SELECT COUNT(*)
-           FROM datalake_people.identifier_mapping
-           WHERE is_active = TRUE
-             AND assignment_type IN ('E', 'C')
-             AND id_continuous_employment_cycle IS NULL
-          ) = 0
-          AND
-          (SELECT COUNT(*)
-           FROM (
-             SELECT id_assignment
-             FROM datalake_people.identifier_mapping
-             GROUP BY id_assignment
-             HAVING COUNT(DISTINCT id_continuous_employment_cycle) > 1
-           ) assignment_violations
-          ) = 0
-          AND
-           (WITH transfer_links AS (
-             SELECT
-               aa.id_period_of_service AS previous_id_period_of_service,
-               aa_next.id_period_of_service AS next_id_period_of_service
-             FROM datalake_pin_core_clean.all_assignments AS aa
-             INNER JOIN datalake_pin_core_clean.all_assignments AS aa_next
-               ON aa_next.id_person = aa.id_person
-              AND aa_next.assignment_sequence = aa.assignment_sequence + 1
-             WHERE aa.assignment_type IN ('E', 'C')
-               AND aa_next.assignment_type IN ('E', 'C')
-               AND aa.assignment_status_type = 'INACTIVE'
-               AND aa.action_code = 'GLB_TRANSFER'
-             QUALIFY ROW_NUMBER() OVER (
-               PARTITION BY aa_next.id_period_of_service
-               ORDER BY aa.dt_effective_started ASC
-             ) = 1
-           ),
-           period_cycles AS (
-             SELECT
-               id_period_of_service,
-               id_continuous_employment_cycle
-             FROM datalake_people.identifier_mapping
-             QUALIFY ROW_NUMBER() OVER (
-               PARTITION BY id_period_of_service
-               ORDER BY dt_started ASC NULLS LAST, id_assignment ASC
-             ) = 1
-           )
-           SELECT COUNT(*)
-           FROM transfer_links AS tl
-           INNER JOIN period_cycles AS pc_prev
-             ON pc_prev.id_period_of_service = tl.previous_id_period_of_service
-           INNER JOIN period_cycles AS pc_next
-             ON pc_next.id_period_of_service = tl.next_id_period_of_service
-           WHERE pc_prev.id_continuous_employment_cycle <> pc_next.id_continuous_employment_cycle
-          ) = 0
-        )
+    is_complete:
       severity_level: Warning
   id_person:
     is_complete:
@@ -125,13 +67,95 @@ column_level_validations:
   is_user_test:
     is_complete:
       severity_level: Warning
+  is_active_pin:
+    is_complete:
+      severity_level: Warning
   is_active:
     is_complete:
       severity_level: Warning
   dt_original_hired:
-    # Non-null for employment rows (E/C). Pension / pre-hire (P) rows have no
-    # continuous employment cycle and therefore no dt_original_hired.
+    is_complete:
+      severity_level: Warning
+  dt_started:
+    is_complete:
+      severity_level: Warning
+  dt_actual_termination:
+    is_complete:
+      severity_level: Warning
+  dt_notified_termination:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning
+
+  employment_cycle_consistency:
     custom:
+      # E/C rows in the source system must always have an employment cycle assigned. P rows are exempt.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE is_active_pin = TRUE
+           AND assignment_type IN ('E', 'C')
+           AND id_continuous_employment_cycle IS NULL
+        ) = 0
+      severity_level: Warning
+  employment_cycle_uniqueness:
+    custom:
+      # An assignment must belong to exactly one continuous employment cycle — no splits or double-counts.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_assignment
+           FROM datalake_people.identifier_mapping
+           GROUP BY id_assignment
+           HAVING COUNT(DISTINCT id_continuous_employment_cycle) > 1
+         ) violations
+        ) = 0
+      severity_level: Warning
+  employment_cycle_transfer_consistency:
+    custom:
+      # After a GLB_TRANSFER, the previous and next period-of-service must belong to the same cycle.
+      constraint: |-
+        (WITH transfer_links AS (
+           SELECT
+             aa.id_period_of_service AS previous_id_period_of_service,
+             aa_next.id_period_of_service AS next_id_period_of_service
+           FROM datalake_pin_core_clean.all_assignments AS aa
+           INNER JOIN datalake_pin_core_clean.all_assignments AS aa_next
+             ON aa_next.id_person = aa.id_person
+            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+           WHERE aa.assignment_type IN ('E', 'C')
+             AND aa_next.assignment_type IN ('E', 'C')
+             AND aa.assignment_status_type = 'INACTIVE'
+             AND aa.action_code = 'GLB_TRANSFER'
+           QUALIFY ROW_NUMBER() OVER (
+             PARTITION BY aa_next.id_period_of_service
+             ORDER BY aa.dt_effective_started ASC
+           ) = 1
+         ),
+         period_cycles AS (
+           SELECT
+             id_period_of_service,
+             id_continuous_employment_cycle
+           FROM datalake_people.identifier_mapping
+           QUALIFY ROW_NUMBER() OVER (
+             PARTITION BY id_period_of_service
+             ORDER BY dt_started ASC NULLS LAST, id_assignment ASC
+           ) = 1
+         )
+         SELECT COUNT(*)
+         FROM transfer_links AS tl
+         INNER JOIN period_cycles AS pc_prev
+           ON pc_prev.id_period_of_service = tl.previous_id_period_of_service
+         INNER JOIN period_cycles AS pc_next
+           ON pc_next.id_period_of_service = tl.next_id_period_of_service
+         WHERE pc_prev.id_continuous_employment_cycle <> pc_next.id_continuous_employment_cycle
+        ) = 0
+      severity_level: Warning
+  hire_date_completeness:
+    custom:
+      # E/C rows must always carry a hire date. P (pension/pre-hire) rows are exempt.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.identifier_mapping
@@ -139,29 +163,25 @@ column_level_validations:
            AND dt_original_hired IS NULL
         ) = 0
       severity_level: Warning
-  dt_started:
-    is_complete:
-      severity_level: Warning
-  dt_actual_termination:
+  pin_termination_status_consistency:
     custom:
+      # Oracle must have flipped is_active_pin to FALSE for any termination date before today.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE is_active_pin = TRUE
+           AND dt_actual_termination IS NOT NULL
+           AND dt_actual_termination < CURRENT_DATE
+        ) = 0
+      severity_level: Warning
+  status_termination_date_consistency:
+    custom:
+      # Every employee whose termination date is in the past must have is_active = FALSE (date-derived).
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.identifier_mapping
          WHERE is_active = TRUE
-            AND dt_actual_termination IS NOT NULL
-            AND dt_actual_termination < CURRENT_DATE
+           AND dt_actual_termination IS NOT NULL
+           AND dt_actual_termination < CURRENT_DATE
         ) = 0
-      severity_level: Warning
-  dt_notified_termination:
-    custom:
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_people.identifier_mapping
-         WHERE is_active = TRUE
-            AND dt_notified_termination IS NOT NULL
-            AND dt_notified_termination < CURRENT_DATE
-        ) = 0
-      severity_level: Warning
-  ts_load:
-    is_complete:
       severity_level: Warning

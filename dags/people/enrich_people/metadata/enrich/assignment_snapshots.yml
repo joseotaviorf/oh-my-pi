@@ -159,9 +159,7 @@ columns:
       - datalake_people.management_hierarchy.assignment_number_l1
       - datalake_people.job_with_salary_table.band
   is_active:
-    description: True when the employee is currently active in this assignment.
-    lineage:
-      - datalake_pin_core_clean.all_assignments.assignment_status_type
+    description: True when the employee is active, False when inactive.
   has_emergency_contact:
     description: True when the employee has at least one emergency contact on file for this date.
     lineage:
