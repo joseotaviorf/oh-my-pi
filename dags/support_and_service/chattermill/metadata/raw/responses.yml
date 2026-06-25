@@ -1,12 +1,18 @@
 database_name: datalake_chattermill_raw
 table_name: responses
+description:
+  Raw landing copy of responses as extracted from the upstream source system
+  before type normalization and deduplication in the clean layer.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   tags:
     tags:
     - PII
     - Confidential
+    description: List of labels attached to the record for filtering and automation rules.
   user_attributes:
     tags:
     - PII
     - Confidential
+    description: Business value representing user attributes on the responses raw dataset.

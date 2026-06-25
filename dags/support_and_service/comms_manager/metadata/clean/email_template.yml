@@ -2,7 +2,7 @@
 database_name: datalake_comms_manager_clean
 table_name: email_template
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: >
   Clean layer mirror of email templates managed by Comms Manager. Each row represents an email template with
   subject, provider configuration, sample data and user-profile targeting, used to power transactional and

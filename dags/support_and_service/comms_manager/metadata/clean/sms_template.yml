@@ -2,7 +2,7 @@
 database_name: datalake_comms_manager_clean
 table_name: sms_template
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: >
   Clean layer mirror of SMS templates managed by Comms Manager. Each row represents an SMS template with
   content, language, category and metadata, used to power transactional and marketing SMS messages sent

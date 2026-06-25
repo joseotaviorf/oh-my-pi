@@ -2,7 +2,7 @@
 database_name: datalake_comms_manager_clean
 table_name: whatsapp_template
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: >
   Clean layer mirror of WhatsApp templates managed by Comms Manager. Each row represents a WhatsApp template
   with content, language, Meta-specific category, approval status and rejection reason, used to power messages

@@ -2,7 +2,7 @@
 database_name: datalake_comms_manager_clean
 table_name: central_template
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: >
   Clean layer mirror of central communication templates managed by Comms Manager. Each row represents a reusable
   template used across multiple channels with title, content, language, category and metadata. Sourced from the
