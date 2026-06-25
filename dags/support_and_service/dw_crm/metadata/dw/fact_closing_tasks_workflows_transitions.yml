@@ -6,7 +6,7 @@ description:
   group transitions. A workflow can have many transitions, but a transition have only
   one workflow. In this table each line is a transition
 domain: Support and Services
-owner: marcus.pinto@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_transition:
     lineage:
