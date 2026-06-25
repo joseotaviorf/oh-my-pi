@@ -141,5 +141,5 @@ LEFT JOIN
         AND CURRENT_DATE() >= dis.dt_valid_from
         AND CURRENT_DATE() <= dis.dt_valid_to
 WHERE
-    es.dt_reference = CURRENT_DATE()
+    es.is_current = TRUE
     AND es.is_primary_assignment_for_snapshot = TRUE

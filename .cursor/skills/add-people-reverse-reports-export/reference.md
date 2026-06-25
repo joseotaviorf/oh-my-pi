@@ -79,6 +79,24 @@ Mirror key facts in `reverse_reports_declaration.yml` comments when helpful.
 
 ---
 
+## Filtering `metric_people.employee_snapshots`
+
+`employee_snapshots` is a **monthly snapshot** table. `dt_month_reference` holds the month-end reference date.
+
+**When exporting the current state of employees** (latest snapshot, one row per active assignment), use:
+
+```sql
+WHERE
+    es.is_current = TRUE
+    AND es.is_primary_assignment_for_snapshot = TRUE
+```
+
+`is_current = TRUE` always resolves to the latest available snapshot regardless of when the DAG runs. Reports querying historical snapshots or specific time ranges use their own predicates on `dt_month_reference` instead.
+
+> `dt_month_reference = CURRENT_DATE()` returns rows only on the exact calendar day that matches the month-end reference date. Use `is_current` to get the current snapshot reliably.
+
+---
+
 ## Implementation checklist
 
 1. **SQL** — `queries/reverse/{table_name}.sql` → `reverse_reports.{table_name}` with partition columns.

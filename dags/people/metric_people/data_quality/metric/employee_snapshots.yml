@@ -15,13 +15,13 @@ column_level_validations:
       # Employee-day grain uniqueness after collapse from assignment-level snapshots.
       constraint: |-
         (SELECT COUNT(*) FROM (
-          SELECT sk_employee, dt_reference
+          SELECT sk_employee, dt_month_reference
           FROM metric_people.employee_snapshots
-          GROUP BY sk_employee, dt_reference
+          GROUP BY sk_employee, dt_month_reference
           HAVING COUNT(*) > 1
         )) = 0
       severity_level: Error
-  dt_reference:
+  dt_month_reference:
     is_complete:
       severity_level: Error
   person_number:

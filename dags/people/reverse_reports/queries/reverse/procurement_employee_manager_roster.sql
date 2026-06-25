@@ -5,7 +5,7 @@ WITH
         FROM
             metric_people.employee_snapshots AS es
         WHERE
-            es.dt_reference = CURRENT_DATE()
+            es.is_current = TRUE
             AND es.is_primary_assignment_for_snapshot = TRUE
     ),
     manager_profile AS (

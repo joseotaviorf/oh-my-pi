@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       People metric-layer tables sourced only from People DW models (dw_*). First
       delivery: employee_snapshots — one row per employee (sk_employee) and
-      snapshot date (dt_reference), derived from dw_employee_details.fact_assignment_snapshots
+      snapshot date (dt_month_reference), derived from dw_employee_details.fact_assignment_snapshots
       using a DW-only tie-break when multiple assignments overlap a person-day.
 workflow:
   type: query_delta

@@ -272,7 +272,7 @@ SELECT
     fas.is_monthly_snapshot,
     fas.is_primary_assignment_for_snapshot,
     fas.is_current,
-    fas.dt_month_reference AS dt_reference,
+    fas.dt_month_reference,
     emp.dt_birth,
     fas.dt_hired,
     fas.dt_terminated,

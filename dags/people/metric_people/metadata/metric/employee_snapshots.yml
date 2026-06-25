@@ -6,7 +6,7 @@ domain: People
 description: |
   Wide assignment-day snapshot from DW 2.0 only. Monthly primary-assignment rows derived from
   dw_employee_details.fact_assignment_snapshots (month-end or current date; one assignment per
-  sk_employee and dt_reference via DW tie-break). Enriches with employee, contact, documentation,
+  sk_employee and dt_month_reference via DW tie-break). Enriches with employee, contact, documentation,
   demographics, disability, job, organization, hierarchy, compensation, and access-list rollups.
 columns:
   sk_cost_center_version:
@@ -914,7 +914,7 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_current
 
-  dt_reference:
+  dt_month_reference:
     description: Last calendar day of the snapshot month. Active employees show the month-end of today's month; terminated employees show the month-end of their termination month.
     dimension: True
     lineage:

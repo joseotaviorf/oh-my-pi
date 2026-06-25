@@ -57,5 +57,5 @@ LEFT JOIN
         ON mh.assignment_number = es.assignment_number
         AND mh.is_current = TRUE
 WHERE
-    es.dt_reference = CURRENT_DATE()
+    es.is_current = TRUE
     AND es.is_primary_assignment_for_snapshot = TRUE
