@@ -1,4 +1,0 @@
----
-raw_partition_cols: [year, month, day]
-s3_source_bucket: 5a-discador-olos
-s3_folder: db/QuintoAndar/ExportFiles/S3

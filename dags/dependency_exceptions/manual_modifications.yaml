@@ -642,20 +642,6 @@ bietlejuice.enrich_offer:
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-attempts-raw-data:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-campaign-customer:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-campaign:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-customer:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-disposition:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-info-campaign-type:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-mailing:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-reprocessing-mailing:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-users:first-run-of-day
-bietlejuice.enrich_supply_conversion:
-  remove:
-    - bietlejuice.olos_dialer_test:load-clean-attempts-raw-data:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-campaign:first-run-of-day
-    - bietlejuice.olos_dialer_test:load-clean-users:first-run-of-day
 bietlejuice.enrich_open_external_data:
   override: []
 bietlejuice.enrich_open_external_data_addresses:
