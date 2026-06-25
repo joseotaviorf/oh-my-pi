@@ -4,36 +4,8 @@ description:
   Fact table whose objective is to consolidate the relationship rules between answers <> category.
   The granularity of this table is a concatenation between response id and category id.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
-  sk_answer_category:
-    lineage:
-      - datalake_chattermill.responses.id_response_tag
-    description: The model's primary key comes from a concatenation between the response id and the category id.
-  sk_answer_classification:
-    lineage:
-      - datalake_chattermill.responses.id
-    description: Key that identifies the classification linked to the answer.
-  sk_answer:
-    lineage:
-      - datalake_chattermill.responses.id_response
-    description: Key that identifies the sent response.
-  sk_category:
-    lineage:
-      - datalake_chattermill.responses.id_tag_theme
-    description: Key that indicates the category in which the answer is related.
-  sk_answer_classification_created_date:
-    lineage:
-      - datalake_chattermill.responses.ts_created
-    description: Date key that indicates when the classification was created.
-  sk_answer_classification_updated_date:
-    lineage:
-      - datalake_chattermill.responses.ts_updated
-    description: Date key that indicates when the classification was updated.
-  sentiment:
-    lineage:
-      - datalake_chattermill.responses.tag_sentiment
-    description: Information received through the chattermill API indicates a feeling of satisfaction/dissatisfaction with the service.
   score:
     lineage:
       - datalake_chattermill.responses.score
@@ -48,3 +20,12 @@ columns:
     description: Standardized commentary in English.
   ts_load:
     description: Date of the last load of this base, in timestamp format.
+  tag_sentiment:
+    lineage: []
+    description: Business value representing tag sentiment on the fact_answer_category dw dataset.
+  coalesce:
+    lineage: []
+    description: Business value representing coalesce on the fact_answer_category dw dataset.
+  date_format:
+    lineage: []
+    description: Business value representing date format on the fact_answer_category dw dataset.

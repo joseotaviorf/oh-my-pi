@@ -4,7 +4,7 @@ description:
   Dim table that contains the flow of each transition. Each transition
   involves two tasks (start and end), except for the last one. Each line is a transition
 domain: Support and Services
-owner: marcus.pinto@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_transition:
     lineage:

@@ -6,7 +6,7 @@ description:
   goes to task B, then C and goes on. The workflow shows all task originated from
   the same event. Each line is a workflow
 domain: Support and Services
-owner: marcus.pinto@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_workflow:
     lineage:

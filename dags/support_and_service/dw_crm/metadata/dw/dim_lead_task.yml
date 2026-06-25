@@ -4,7 +4,7 @@ description:
   Information about task to convert leads on CRM. Each line is a task of
   an Inside Sales analyst
 domain: Support and Services
-owner: marcus.pinto@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_task:
     lineage:
@@ -44,7 +44,7 @@ columns:
   subject:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
-    description: Subject of the task
+    description: Human-readable subject line describing the CRM task purpose for agents and reporting.
   titles:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles

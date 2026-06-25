@@ -2,7 +2,7 @@ database_name: dw_crm
 table_name: dim_credit_task
 description: Information about CRM tasks from Credit workgroups. Each line is a CRM task.
 domain: Support and Services
-owner: cassio.bastos@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_task:
     lineage:
@@ -43,7 +43,7 @@ columns:
   subject:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
-    description: The subject of the task
+    description: Human-readable subject line describing the CRM task purpose for agents and reporting.
   titles:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
@@ -91,7 +91,5 @@ columns:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
     description: Timestamp of expiration of a task snooze event (UTC).
-  ts_analyst_started:
-    description: Timestamp of the moment analyst check for credit info on CRM interface
   ts_load:
     description: Timestamp of data load event (UTC timezone)
