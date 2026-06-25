@@ -15,3 +15,6 @@ workflow:
     lego_analysis_results:
       run_optimize: false
       run_vacuum: true
+    lego_backtest_results:
+      run_optimize: false
+      run_vacuum: true

@@ -1,0 +1,55 @@
+---
+database_name: datalake_legalops_clean
+table_name: lego_backtest_results
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: >
+  Clean table with LegoContract backtest assessment results sourced from the unified benchmark backtest
+  (unified_benchmark.week_20260302). Each row represents one validation assessment for a sales flow within
+  a completed backtest run, enabling benchmark comparison of LegoContract validation outcomes against
+  expected results for For Sale legal-ops quality monitoring.
+columns:
+  id_backtest:
+    description: Identifier of the backtest configuration used for benchmark evaluation (e.g. unified_benchmark.week_20260302).
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.backtest_id
+  id_run_backtest:
+    description: Identifier of a single execution run of the backtest. Uniquely identifies one backtest batch within id_backtest. A single backtest_id can have N runs in the same day.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.backtest_run_id
+  id_sales_flow:
+    description: Foreign key to the sales flow associated with this backtest assessment. Joins with id_sales_flow from datalake_sales_flow_clean tables.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.sales_flow_id
+  validation_id:
+    description: Rule identifier of the validation evaluated in the backtest (e.g. B01, SL01, HA12, H05).
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.validation_id
+  assessment_target:
+    description: Target field or document attribute assessed by the validation rule (e.g. house_address_number, seller_is_house_holder).
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.assessment_target
+  validation_status:
+    description: Overall status of the validation rule in the backtest run, indicating whether the rule passed or failed at the validation level.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.validation_status
+  assessment_status:
+    description: Status of the individual assessment returned by LegoContract in the backtest (e.g. MATCH, CHECK_PASS, CHECK_WARNING, DIFFERENT).
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.assessment_status
+  assessment_consolidated_status:
+    description: Final consolidated status of the assessment in the backtest, indicating ACTION_NEEDED, OK, or UNAVAILABLE. It does not curate the status with manual annotations.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.assessment_consolidated_status
+  backtest_concordance:
+    description: Concordance label comparing the backtest assessment outcome against the benchmark expected result. It uses the manual annotations to curate the status. It handles LINT status as CONCORDANT and WRITE as UNAVAILABLE. Use this column to have a proper curated agreement hate.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.backtest_concordance
+  ts_analysis_start:
+    description: Timestamp when the contract analysis referenced by the backtest assessment started processing in LegoContract.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.contract_created_at
+  ts_analysis_end:
+    description: Timestamp when the contract analysis referenced by the backtest assessment finished processing in LegoContract.
+    lineage:
+      - datalake_legalops_raw.lego_backtest_results.contract_updated_at
