@@ -21,6 +21,10 @@ columns:
     description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_ticket
+  sk_support_session:
+    description: Surrogate key for the front (or front-with-back-case) support session that triggered the satisfaction response, sourced from Chat FUP. For Support Session Service sessions this is the public_id (UUID); for legacy Sauron sessions it is the numeric session id. Defaults to '-1' when no support session is associated (non-Chat FUP sources).
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_support_session
   sk_case:
     description: Salesforce case unique identifier for the satisfaction response.
     lineage:

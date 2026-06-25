@@ -5,6 +5,8 @@ column_level_validations:
   sk_answer:
     is_unique:
       severity_level: Error
+    is_complete:
+      severity_level: Error
   sk_survey:
     is_complete:
       severity_level: Error

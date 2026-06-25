@@ -3,6 +3,7 @@ SELECT
     sa.id_survey AS sk_survey,
     COALESCE(sa.id_contract, -1) AS sk_contract,
     COALESCE(sa.id_ticket, -1) AS sk_ticket,
+    COALESCE(CAST(sa.id_support_session AS STRING), '-1') AS sk_support_session,
     COALESCE(sa.id_case, -1) AS sk_case,
     COALESCE(sa.id_account, -1) AS sk_account,
     COALESCE(sa.id_origin, -1) AS sk_origin,
