@@ -281,6 +281,8 @@ Detailed demand-side funnel (Visit → Offer → CCV), sub-stages, bridges, reas
 
 ## Listings — Visibility and Demand on 3P Supply
 
+For house grain, listing lifecycle, and RENT vs SALE schema routing, see [`business_entities/house_and_listing.md`](house_and_listing.md).
+
 The Marketplace's supply lifecycle does not end at "listing published". Once a 3P listing is on the main system, three orthogonal warehouse views describe how the listing performs from there:
 
 1. **Listing version and status timeline** — what the listing is and how its publication state evolves over time.

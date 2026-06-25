@@ -317,10 +317,11 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 - `obt_supply.sk_region = dw_region.dim_region.sk_region`
 - Geographic breakdown (city, neighborhood) of supply funnel
 
-### Listing / Property (N:1)
+### House / Listing (N:1)
 
-- `obt_supply.sk_house` links to `datalake_ebdb_listing.house`
-- Populated from QUALIFIED stage onward; value is `-1` before that
+- `obt_supply.sk_house` links to the house entity; populated from QUALIFIED stage onward (`-1` before that)
+- For house grain, listing versions, publication status, and first-listing filters, see [`business_entities/house_and_listing.md`](house_and_listing.md)
+- For price changes during or after acquisition, see [`business_entities/pricing.md`](pricing.md)
 
 ## Dos and Don'ts
 
@@ -599,7 +600,7 @@ Two paths connect sessions to supply events:
 ```sql
 -- Set {start_year} and {start_month} to integer values from your analysis start date. Keep the window short.
 WITH full_process_sessions AS (
-    SELECT 
+    SELECT
         t.id_session,
         COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE) AS is_full_process
     FROM datalake_langfuse_clean.observations o
@@ -612,16 +613,16 @@ WITH full_process_sessions AS (
     GROUP BY 1
 ),
 last_session_retrieved AS (
-    SELECT 
+    SELECT
         id_lead_retrieved,
-        MAX(id_sauron_session) AS last_session 
+        MAX(id_sauron_session) AS last_session
     FROM datalake_chatbot.isaias_conversational_flow icf
-    LEFT JOIN datalake_copilot_service_clean.session s 
+    LEFT JOIN datalake_copilot_service_clean.session s
         ON s.id_external = icf.id_langfuse_session
     GROUP BY 1
 ),
 conversion_time AS (
-    SELECT 
+    SELECT
         id_lead_ebdb,
         business_context,
         MIN(ts_event_adjusted) AS ts_event_adjusted
@@ -630,7 +631,7 @@ conversion_time AS (
     GROUP BY 1, 2
 ),
 base_sessions AS (
-    SELECT 
+    SELECT
         s.id AS id_sauron_session,
         CAST(s.id AS VARCHAR) AS id_sauron_session_varchar,
         s.source_environment,
@@ -640,9 +641,9 @@ base_sessions AS (
         JSON_EXTRACT_SCALAR(s.metadata, '$.extra_params.referral_source_type') AS referral_source_type
     FROM datalake_sauron_clean.session s
     WHERE s.source_environment IN (
-        'isaias_inbound', 'isaias_inbound_main', 'isaias_inbound_c2wa_acq_1', 'isaias_inbound_c2wa_acq_2', 
-        'isaias_inbound_c2wa_retarg_1', 'isaias_inbound_c2wa_retarg_2', 'isaias_inbound_owner_landing', 
-        'isaias_home', 'isaias_opr', 'isaias_calculadora', 'isaias_inbound_c2wa_camp_3', 
+        'isaias_inbound', 'isaias_inbound_main', 'isaias_inbound_c2wa_acq_1', 'isaias_inbound_c2wa_acq_2',
+        'isaias_inbound_c2wa_retarg_1', 'isaias_inbound_c2wa_retarg_2', 'isaias_inbound_owner_landing',
+        'isaias_home', 'isaias_opr', 'isaias_calculadora', 'isaias_inbound_c2wa_camp_3',
         'isaias_inbound_c2wa_camp_1', 'isaias_inbound_c2wa_camp_2', 'isaias_inbound_c2wa_camp_4'
     )
     AND s.year >= {start_year}
@@ -652,7 +653,7 @@ obt_session_filtered AS (
            company_report_origin, planning_cluster, sk_lead, sk_supply, nm_business_context,
            sk_chat_session, cd_funnel_step, tp_origin_acquisition, tp_origin_conversion, planning_operation
     FROM dw_growth.obt_supply
-    WHERE sk_chat_session IS NOT NULL AND CAST(sk_chat_session AS VARCHAR) != '-1' 
+    WHERE sk_chat_session IS NOT NULL AND CAST(sk_chat_session AS VARCHAR) != '-1'
 ),
 obt_lead_filtered AS (
     SELECT date, city_group, cd_discard_reason, discard_funnel_step, operation_channel,
@@ -663,8 +664,8 @@ obt_lead_filtered AS (
 ),
 unified_supply_events AS (
     -- Session path: lead was created in the Isaias session (linked via sk_chat_session)
-    SELECT 
-        'session' AS source_path, 
+    SELECT
+        'session' AS source_path,
         CAST(o.sk_chat_session AS VARCHAR) AS join_session_id,
         o.date, o.city_group, o.cd_discard_reason, o.discard_funnel_step, o.operation_channel,
         o.company_report_origin, o.planning_cluster, o.sk_lead, o.sk_supply, o.nm_business_context,
@@ -674,7 +675,7 @@ unified_supply_events AS (
     LEFT JOIN conversion_time ct ON ct.id_lead_ebdb = o.sk_lead AND ct.business_context = o.nm_business_context
     UNION ALL
     -- Lead path: lead was retrieved by Isaias in this session (linked via ICF)
-    SELECT 
+    SELECT
         'lead' AS source_path,
         cs_u.id_sauron_session AS join_session_id,
         o2.date, o2.city_group, o2.cd_discard_reason, o2.discard_funnel_step, o2.operation_channel,
@@ -682,14 +683,14 @@ unified_supply_events AS (
         o2.cd_funnel_step, o2.tp_origin_acquisition, o2.tp_origin_conversion, o2.planning_operation,
         ct2.ts_event_adjusted
     FROM obt_lead_filtered o2
-    JOIN datalake_chatbot.isaias_conversational_flow icf_u 
+    JOIN datalake_chatbot.isaias_conversational_flow icf_u
         ON icf_u.id_lead_retrieved = CAST(o2.sk_lead AS VARCHAR)
-    JOIN datalake_copilot_service_clean.session cs_u 
+    JOIN datalake_copilot_service_clean.session cs_u
         ON cs_u.id_external = icf_u.id_langfuse_session
     LEFT JOIN conversion_time ct2 ON ct2.id_lead_ebdb = o2.sk_lead AND ct2.business_context = o2.nm_business_context
 ),
 fct_session_supply_base AS (
-    SELECT 
+    SELECT
         bs.id_sauron_session,
         bs.ts_created_session,
         bs.source_environment,
@@ -711,32 +712,32 @@ fct_session_supply_base AS (
         u.operation_channel,
         u.company_report_origin,
         u.planning_cluster,
-        CASE 
+        CASE
             WHEN u.sk_lead IS NULL THEN 'no_lead'
             WHEN u.source_path = 'session' THEN 'created_in_session'
             WHEN u.source_path = 'lead' THEN 'retrieved_lead'
         END AS lead_acquisition_type,
-        CASE 
+        CASE
             WHEN u.source_path = 'session' AND lsr.last_session IS NULL THEN TRUE
             WHEN lsr.last_session = bs.id_sauron_session_varchar THEN TRUE
-            ELSE FALSE 
+            ELSE FALSE
         END AS is_valid_attribution,
-        CASE 
-            WHEN u.ts_event_adjusted <= bs.ts_created_session + INTERVAL '24' HOUR THEN TRUE 
-            ELSE FALSE 
+        CASE
+            WHEN u.ts_event_adjusted <= bs.ts_created_session + INTERVAL '24' HOUR THEN TRUE
+            ELSE FALSE
         END AS is_converted_within_24h
     FROM base_sessions bs
-    LEFT JOIN datalake_copilot_service_clean.session cs 
+    LEFT JOIN datalake_copilot_service_clean.session cs
         ON cs.id_sauron_session = bs.id_sauron_session_varchar
-    LEFT JOIN full_process_sessions fps 
+    LEFT JOIN full_process_sessions fps
         ON fps.id_session = cs.id_external
-    LEFT JOIN unified_supply_events u 
+    LEFT JOIN unified_supply_events u
         ON u.join_session_id = bs.id_sauron_session_varchar
-    LEFT JOIN last_session_retrieved lsr  
+    LEFT JOIN last_session_retrieved lsr
         ON lsr.id_lead_retrieved = CAST(u.sk_lead AS VARCHAR)
 )
 -- inicio_sessao: one deduplicated row per session (denominator)
-SELECT 
+SELECT
     DATE(ts_created_session) AS data_referencia,
     'inicio_sessao'          AS tipo_evento,
     id_sauron_session, ts_created_session, source_environment, department, source,
@@ -764,7 +765,7 @@ GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 UNION ALL
 
 -- conversao: one row per session × supply event (numerator)
-SELECT 
+SELECT
     date                     AS data_referencia,
     'conversao'              AS tipo_evento,
     id_sauron_session, ts_created_session, source_environment, department, source,

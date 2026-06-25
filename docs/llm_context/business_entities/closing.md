@@ -83,6 +83,7 @@ Not all closings reach signature. Some are cancelled before any signature (`OWNE
 
 - `fc.sk_contract = dc.sk_contract`, then `fc.sk_house` for the house and `fc.sk_house_listing` for the listing
 - Use this JOIN whenever the question references a property (e.g., "houses with multiple contracts", "houses already rented")
+- For house grain, listing version grain, and Early Demand flags see [`business_entities/house_and_listing.md`](house_and_listing.md)
 
 ### Signatories (1:N — one contract has multiple signatories)
 
