@@ -1,69 +1,94 @@
 database_name: datalake_crm_tasks_flows
 table_name: tasks_actions_resolutions_flow
+description:
+  One row per tasks actions resolutions flow in the internal CRM task platform
+  used by support analysts to manage customer journeys and operational
+  workflows.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_task:
     lineage:
       - datalake_crm.tasks.id
+    description: Operational task identifier from the CRM platform linking events to a single work item.
   id_workgroup:
     lineage:
       - datalake_crm.tasks.id_workgroup
+    description: CRM platform identifier for the workgroup associated with this task.
   score_factor:
     lineage:
       - datalake_crm.tasks.score_factor
+    description: CRM task attribute describing score factor for support workflow tracking.
   version:
     lineage:
       - datalake_crm.tasks.version
+    description: CRM task attribute describing version for support workflow tracking.
   origin: 
     lineage:
       - datalake_crm.tasks.origin
+    description: Channel or product surface that initiated the IVR closed-history request.
   type:
     lineage:
       - datalake_crm.tasks.type
+    description: Classification type assigned by the source platform for routing or reporting.
   description:
     lineage:
       - datalake_crm.tasks.description
+    description: Free-text body describing the customer issue, task context, or field help text.
   subject:
     lineage:
       - datalake_crm.tasks.subject
+    description: Human-readable subject line describing the CRM task purpose for agents and reporting.
   titles:
     lineage:
       - datalake_crm.tasks.subject
       - datalake_crm.workgroups.title
+    description: JSON array of task title identifiers associated with the CRM task in MongoDB.
   workgroups:
     lineage:
       - datalake_crm.tasks.id_workgroup
       - datalake_crm.workgroups.id
+    description: JSON array of workgroup identifiers routing the CRM task to analyst teams.
   hours_task_started_to_completed:
     lineage:
       - datalake_crm.tasks.ts_start
       - datalake_crm.tasks.ts_completed
       - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+    description: CRM task attribute describing hours task started to completed for support workflow tracking.
   is_resolved:
     lineage:
       - datalake_crm.tasks.is_resolved
+    description: Indicates whether resolved applies to this record.
   is_task_auto_completed:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_user_action
+    description: Indicates whether task auto completed applies to this record.
   ts_started:
     lineage:
       - datalake_crm.tasks.ts_start
+    description: Timestamp when the telephony call started according to the provider event stream.
   ts_completed:
     lineage:
       - datalake_crm.tasks.ts_completed
       - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+    description: Timestamp when completed occurred according to the source system.
   ts_silenced_until:
     lineage:
       - datalake_crm.tasks.ts_silenced_until
+    description: Timestamp when silenced until occurred according to the source system.
   ts_partition:
     lineage:
       - datalake_crm.tasks.ts_completed
+    description: Timestamp when partition occurred according to the source system.
   year:
     lineage:
       - datalake_crm.tasks.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_crm.tasks.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_crm.tasks.day
+    description: Day partition derived from the source event timestamp for incremental loading.

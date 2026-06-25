@@ -2,7 +2,7 @@ database_name: datalake_crm
 table_name: tasks_actions
 description: Data about the actions performed within a given task
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

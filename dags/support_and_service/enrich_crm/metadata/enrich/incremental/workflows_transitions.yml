@@ -1,75 +1,104 @@
 database_name: datalake_crm
 table_name: workflows_transitions
+description:
+  One row per workflows transitions in the internal CRM task platform used by
+  support analysts to manage customer journeys and operational workflows.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_transition:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM platform identifier for the transition associated with this task.
   id_workflow:
     lineage:
       - datalake_crm_clean.workflows.id
+    description: CRM platform identifier for the workflow associated with this task.
   id_task_from:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM platform identifier for the task from associated with this task.
   id_task_to:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM platform identifier for the task to associated with this task.
   status:
     lineage:
       - datalake_crm_clean.workflows.status
+    description: Current lifecycle status of the ticket, task, or workflow step.
   assignment_method:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing assignment method for support workflow tracking.
   definition_task_from:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing definition task from for support workflow tracking.
   definition_task_to:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing definition task to for support workflow tracking.
   context:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing context for support workflow tracking.
   release_minuta:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing release minuta for support workflow tracking.
   owner_pendency:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing owner pendency for support workflow tracking.
   tenant_pendency:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing tenant pendency for support workflow tracking.
   reject_proposal:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing reject proposal for support workflow tracking.
   owner_contact_channel:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing owner contact channel for support workflow tracking.
   frontend_contact_channel:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing frontend contact channel for support workflow tracking.
   tenant_contact_channel:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: CRM task attribute describing tenant contact channel for support workflow tracking.
   is_end_of_workflow:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: Indicates whether end of workflow applies to this record.
   ts_workflow_started:
     lineage:
       - datalake_crm_clean.workflows.start_date_object
+    description: Timestamp when workflow started occurred according to the source system.
   ts_workflow_updated:
     lineage:
       - datalake_crm_clean.workflows.updated_date_object
+    description: Timestamp when workflow updated occurred according to the source system.
   ts_workflow_ended:
     lineage:
       - datalake_crm_clean.workflows.end_date_object
+    description: Timestamp when workflow ended occurred according to the source system.
   ts_transitioned:
     lineage:
       - datalake_crm_clean.workflows.transitions
+    description: Timestamp when transitioned occurred according to the source system.
   year:
     lineage:
       - datalake_crm_clean.workflows.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_crm_clean.workflows.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_crm_clean.workflows.day
+    description: Day partition derived from the source event timestamp for incremental loading.
