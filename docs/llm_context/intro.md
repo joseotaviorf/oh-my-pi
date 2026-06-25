@@ -79,6 +79,7 @@ Each **metric entity** file follows a different, leaner structure focused on the
 - `business_entities/contact.md` — Voice and chat contacts with support agents — Front Office interactions (BigFone, Twilio, Sauron) before ticket creation (contato / ligação / reserva / tarefa)
 - `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
+- `business_entities/employee_details.md` — People DW employee identity, contacts, hierarchy, and daily assignment snapshots (colaborador / headcount / quadro)
 - `business_entities/fs-transact.md` — FS Transact — For Sale transaction funnel: EoF (OS → CCV → Closed Deal) and EoP (CCV → CRI → key delivery), 1P scope, Buyer Prospect, lead times by payment track, LegoContract contract analysis and assessment performance metrics, TIC (Termo de Intermediação Compartilhada) lifecycle for 3P partner offers (CLOSING_3P / TSC / CQA) (funil de transação de venda / CCV / Closed Deal / EoP / análise de contratos / LegoContract / assessments / TIC / imobiliárias parceiras / Salesforce CDC event tables: `datalake_salesforce_clean.events_pendency` (Solicitações CRN), `datalake_salesforce_clean.events_received_document` (Solicitações de documentos), `datalake_salesforce_clean.events_incident` (Incidentes Legal Ops), `datalake_salesforce_clean.events_case_legal_ops` (Casos Legal Ops / due diligence).)
 - `business_entities/evals.md` — Online LLM-as-a-judge evaluation scores of the Domi Platform AI agents (evals / avaliações / online evals)
 - `business_entities/inspection.md` — Property inspections (vistorias)
@@ -86,7 +87,8 @@ Each **metric entity** file follows a different, leaner structure focused on the
 - `business_entities/losses.md` — Accounting write-offs and provisioning (perdas / PDD)
 - `business_entities/matthew.md` — Collections AI agent for tenants with open balances (agente Matthew / cobrança IA)
 - `business_entities/nps.md` — Net Promoter Score campaigns via Tracksale (NPS)
-- `business_entities/org_chart.md` — Public active workforce org chart (`datalake_people_public.org_chart`): manager, job, cost center, Codex taxonomy, P&T teams (organograma / quadro ativo). In `@tars`, the only runnable People table; other People schemas — contact People Data team.
+- `business_entities/organization.md` — People DW org reference: cost centers, business units, and jobs (centro de custo / time / BU)
+- `business_entities/org_chart.md` — Public active workforce org chart (`datalake_people_public.org_chart`): manager, job, cost center, Codex taxonomy, P&T teams (organograma / quadro ativo)
 - `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/recovery_collections_fr_tenants.md` — Overdue debt recovery rate analytics for For-Rent tenants (recuperação / cobrança FR / wallet / recovery rate)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
