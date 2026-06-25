@@ -66,7 +66,7 @@ personal_email_ranked AS (
             ON cv.id_person = ea.id_person
             AND ea.email_type = 'H1'
             AND ea.dt_started <= cv.dt_effective_started
-            AND (ea.dt_ended >= cv.dt_effective_started OR ea.dt_ended IS NULL)
+            AND (ea.dt_ended >= cv.dt_effective_started OR ea.dt_ended = DATE('9999-12-31'))
 ),
 personal_email_at_version AS (
     SELECT
@@ -98,7 +98,7 @@ phone_ranked AS (
         datalake_pin_core_clean.phone AS p
             ON cv.id_primary_phone = p.id_phone
             AND p.dt_started <= cv.dt_effective_started
-            AND (p.dt_ended >= cv.dt_effective_started OR p.dt_ended IS NULL)
+            AND (p.dt_ended >= cv.dt_effective_started OR p.dt_ended = DATE('9999-12-31'))
 ),
 phone_at_version AS (
     SELECT
@@ -131,7 +131,7 @@ github_ranked AS (
             ON cv.id_person = pl.id_person
             AND pl.legislation_code = 'BR'
             AND pl.dt_effective_started <= cv.dt_effective_started
-            AND (pl.dt_effective_ended >= cv.dt_effective_started OR pl.dt_effective_ended IS NULL)
+            AND (pl.dt_effective_ended >= cv.dt_effective_started OR pl.dt_effective_ended = DATE('9999-12-31'))
 ),
 github_at_version AS (
     SELECT
@@ -171,7 +171,7 @@ address_ranked AS (
             AND a.dt_effective_started <= cv.dt_address_referenced
             AND (
                 a.dt_effective_ended >= cv.dt_address_referenced
-                OR a.dt_effective_ended IS NULL
+                OR a.dt_effective_ended = DATE('9999-12-31')
             )
 ),
 address_at_version AS (

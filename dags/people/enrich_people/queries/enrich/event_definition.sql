@@ -20,8 +20,7 @@ current_action_base_ranked AS (
             ORDER BY
                 CASE
                     WHEN
-                        ab.dt_ended IS NULL
-                        OR ab.dt_ended >= DATE('9999-12-31')
+                        ab.dt_ended >= DATE('9999-12-31')
                         OR ab.dt_ended > CURRENT_DATE()
                     THEN 1
                     ELSE 0
@@ -57,8 +56,7 @@ current_action_reason_base_ranked AS (
             ORDER BY
                 CASE
                     WHEN
-                        arb.dt_ended IS NULL
-                        OR arb.dt_ended >= DATE('9999-12-31')
+                        arb.dt_ended >= DATE('9999-12-31')
                         OR arb.dt_ended > CURRENT_DATE()
                     THEN 1
                     ELSE 0
@@ -100,13 +98,11 @@ deduplicated AS (
         CASE
             WHEN GREATEST(ab.dt_started, arb.dt_started) <= CURRENT_DATE()
                 AND (
-                    ab.dt_ended IS NULL
-                    OR ab.dt_ended >= DATE('9999-12-31')
+                    ab.dt_ended >= DATE('9999-12-31')
                     OR ab.dt_ended > CURRENT_DATE()
                 )
                 AND (
-                    arb.dt_ended IS NULL
-                    OR arb.dt_ended >= DATE('9999-12-31')
+                    arb.dt_ended >= DATE('9999-12-31')
                     OR arb.dt_ended > CURRENT_DATE()
                 )
             THEN TRUE
@@ -114,9 +110,9 @@ deduplicated AS (
         END AS is_current,
         GREATEST(ab.dt_started, arb.dt_started) AS dt_valid_from,
         CASE
-            WHEN ab.dt_ended IS NULL OR ab.dt_ended >= DATE('9999-12-31')
+            WHEN ab.dt_ended >= DATE('9999-12-31')
             THEN arb.dt_ended
-            WHEN arb.dt_ended IS NULL OR arb.dt_ended >= DATE('9999-12-31')
+            WHEN arb.dt_ended >= DATE('9999-12-31')
             THEN ab.dt_ended
             ELSE LEAST(ab.dt_ended, arb.dt_ended)
         END AS dt_valid_to,

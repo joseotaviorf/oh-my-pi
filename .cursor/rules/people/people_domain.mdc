@@ -467,9 +467,9 @@ The clean table name should clearly indicate its content while remaining traceab
 
 ### Oracle Date 4712-12-31 — No End Date
 
-In Oracle HCM, `4712-12-31` means "no end date expected" (indefinite). The **`pin_core` clean layer** is the single place where this sentinel is normalized to the People standard `9999-12-31`.
+In Oracle HCM, `4712-12-31` means "no end date expected" (indefinite). The **`pin_*_clean` layer** is the single place where this sentinel is normalized to the People standard `9999-12-31`.
 
-**Clean layer (pin_core) — two patterns:**
+**Clean layer (pin_*) — two patterns:**
 
 | Column semantic | Oracle sends | Clean layer output | Pattern |
 |---|---|---|---|
@@ -477,6 +477,26 @@ In Oracle HCM, `4712-12-31` means "no end date expected" (indefinite). The **`pi
 | Event date (`dt_actual_termination`, `dt_notified_termination`) | `NULL` (no sentinel) | `NULL` | no conversion needed |
 
 **Enrich and DW layers** read clean tables and operate on `9999-12-31` as the open-ended sentinel. Filters and comparisons on period-end columns use `= DATE('9999-12-31')` or `>= DATE('9999-12-31')`.
+
+**Hard rule — never use `IS NULL` on period-end columns from `pin_*_clean`:**
+
+`dt_effective_ended` and `dt_ended` are **never NULL** in any `pin_*_clean` table (confirmed for `pin_core`, `pin_compensation`, `pin_absence`, `pin_talent`). Using `IS NULL` as a filter or fallback on these columns is always incorrect:
+
+- **`AND dt_ended IS NULL`** — sole condition, never matches → filter is completely broken (e.g. `test_users` CTE in `identifier_mapping.sql`).
+- **`OR dt_ended IS NULL`** — fallback that is unreachable; misleading and a maintenance hazard.
+
+Always use the sentinel explicitly:
+
+```sql
+-- Checking for open-ended / active records
+WHERE dt_ended = DATE('9999-12-31')
+
+-- Fallback in an OR — correct form
+OR dt_ended = DATE('9999-12-31')
+
+-- Range filter that includes open-ended records
+WHERE dt_effective_ended >= some_date   -- 9999-12-31 always satisfies this; no IS NULL needed
+```
 
 ### Deprecation — Avoid
 

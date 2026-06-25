@@ -108,7 +108,7 @@ WITH salary_with_person AS (
     WHERE
         sal.is_salary_approved = TRUE
         AND sal.dt_started <= CURRENT_DATE
-        AND (sal.dt_ended IS NULL OR sal.dt_started <= sal.dt_ended)
+        AND (sal.dt_ended = DATE('9999-12-31') OR sal.dt_started <= sal.dt_ended)
         AND im.assignment_number NOT LIKE 'P%'
 ),
 assignment_identifier_mapping_ranked AS (

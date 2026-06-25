@@ -66,7 +66,7 @@ work_emails_ranked AS (
         datalake_pin_core_clean.email_address
     WHERE
         email_type = 'W1'
-        AND (dt_ended >= DATE('{load_end_date}') OR dt_ended IS NULL)
+        AND (dt_ended >= DATE('{load_end_date}') OR dt_ended = DATE('9999-12-31'))
 ),
 work_emails AS (
     SELECT id_person, email_address FROM work_emails_ranked WHERE rn = 1
@@ -80,7 +80,7 @@ personal_emails_ranked AS (
         datalake_pin_core_clean.email_address
     WHERE
         email_type = 'H1'
-        AND (dt_ended >= DATE('{load_end_date}') OR dt_ended IS NULL)
+        AND (dt_ended >= DATE('{load_end_date}') OR dt_ended = DATE('9999-12-31'))
 ),
 personal_emails AS (
     SELECT id_person, email_address FROM personal_emails_ranked WHERE rn = 1
@@ -92,7 +92,7 @@ test_users AS (
         datalake_pin_core_clean.external_application_identifier
     WHERE
         type_external_identifier = 'ID_ONDA1'
-        AND dt_ended IS NULL
+        AND dt_ended = DATE('9999-12-31')
 ),
 person_tmf_ranked AS (
     SELECT
@@ -106,7 +106,7 @@ person_tmf_ranked AS (
         datalake_pin_core_clean.external_application_identifier
     WHERE
         type_external_identifier = 'ID_MATRICULA'
-        AND (dt_ended IS NULL OR dt_ended >= DATE('{load_end_date}'))
+        AND (dt_ended = DATE('9999-12-31') OR dt_ended >= DATE('{load_end_date}'))
         AND TRIM(CAST(number_external_identifier AS STRING)) <> ''
 ),
 person_tmf AS (
@@ -130,7 +130,7 @@ person_salu_ranked AS (
         datalake_pin_core_clean.external_application_identifier
     WHERE
         type_external_identifier = 'ID_SALU'
-        AND (dt_ended IS NULL OR dt_ended >= DATE('{load_end_date}'))
+        AND (dt_ended = DATE('9999-12-31') OR dt_ended >= DATE('{load_end_date}'))
         AND TRIM(CAST(number_external_identifier AS STRING)) <> ''
 ),
 person_salu AS (

@@ -1,28 +1,45 @@
 WITH
-employees AS (
+employees_ranked AS (
     SELECT
         im.id_person,
         im.person_number,
         im.name,
         im.work_email,
-        im.employee_tmf_code
-    FROM
-        datalake_people.identifier_mapping AS im
-    WHERE
-        NOT im.is_user_test
-        AND im.assignment_type IN ('C', 'E')
-    QUALIFY
+        im.employee_tmf_code,
         ROW_NUMBER() OVER (
             PARTITION BY
                 im.id_person
             ORDER BY
                 im.assignment_number
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_people.identifier_mapping AS im
+    WHERE
+        NOT im.is_user_test
+        AND im.assignment_type IN ('C', 'E')
 ),
-current_education AS (
+employees AS (
+    SELECT
+        id_person,
+        person_number,
+        name,
+        work_email,
+        employee_tmf_code
+    FROM
+        employees_ranked
+    WHERE
+        rn = 1
+),
+current_education_ranked AS (
     SELECT
         pl.id_person,
-        flv.meaning AS highest_education_level
+        flv.meaning AS highest_education_level,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                pl.id_person
+            ORDER BY
+                pl.dt_effective_started DESC
+        ) AS rn
     FROM
         datalake_pin_core_clean.people_legislative AS pl
     LEFT JOIN
@@ -33,16 +50,18 @@ current_education AS (
     WHERE
         pl.legislation_code = 'BR'
         AND (
-            pl.dt_effective_ended IS NULL
+            pl.dt_effective_ended = DATE('9999-12-31')
             OR pl.dt_effective_ended >= CURRENT_DATE()
         )
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                pl.id_person
-            ORDER BY
-                pl.dt_effective_started DESC
-        ) = 1
+),
+current_education AS (
+    SELECT
+        id_person,
+        highest_education_level
+    FROM
+        current_education_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     emp.id_person AS sk_employee,

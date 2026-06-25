@@ -53,7 +53,7 @@ core_periods_raw AS (
             AND a.cost_center_code IS NOT NULL
             AND o.dt_effective_started <= a.dt_effective_ended
             AND (
-                a.dt_effective_ended IS NULL
+                a.dt_effective_ended = DATE('9999-12-31')
                 OR a.dt_effective_ended >= o.dt_effective_started
             )
     LEFT JOIN

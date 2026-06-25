@@ -130,7 +130,7 @@ legal_names AS (
             AND pn.dt_effective_started <= pr.dt_valid_from
             AND (
                 pn.dt_effective_ended >= pr.dt_valid_from
-                OR pn.dt_effective_ended IS NULL
+                OR pn.dt_effective_ended = DATE('9999-12-31')
             )
 ),
 legislative_info AS (
@@ -159,7 +159,7 @@ legislative_info AS (
             AND pl.dt_effective_started <= pr.dt_valid_from
             AND (
                 pl.dt_effective_ended >= pr.dt_valid_from
-                OR pl.dt_effective_ended IS NULL
+                OR pl.dt_effective_ended = DATE('9999-12-31')
             )
 ),
 national_ids AS (
