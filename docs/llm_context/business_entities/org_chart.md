@@ -10,13 +10,15 @@
 
 **SLA:** D-1 with the `enrich_people_public` DAG. Grain: **one row per active `assignment_number`**.
 
-**Out of scope:** employment history, terminated employees, compensation, performance, and SCD2 validity windows — use `employee_details.md` (`dw_employee_details`) or `datalake_people.identifier_mapping` instead.
+**Out of scope:** employment history, terminated employees, compensation, performance, and SCD2 validity windows — use `employee_details.md` (`dw_employee_details`) or `datalake_people.identifier_mapping` instead. In `@tars`, those tables are not available — contact the **People Data team**.
 
-## TARS pilot scope (restricted audience)
+## TARS — People domain entry point
 
-**Status:** pilot — validate in Trino before broader publication. Access is limited to users who already have People analytical authorization.
+**Access:** Public — `datalake_people_public` is available to all analysts in Trino (`delta` catalog). No People DW authorization required.
 
-**Trino catalog:** `delta` — table `datalake_people_public.org_chart`.
+**TARS coverage:** `datalake_people_public.org_chart` is the **only** People table available in `@tars` sessions. Other People schemas exist in the lake/DW but are not registered in Trino — do not query or suggest them here.
+
+**Routing rule:** For any People / HR / workforce question in `@tars`, answer from org_chart when possible. If the question requires data org_chart does not carry, explain the limitation and direct the user to the **People Data team** for new data-access or TARS coverage requests.
 
 | Table | What it contains |
 |-------|------------------|
@@ -52,13 +54,13 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 | Manager and employee contact for active workforce | `datalake_people_public.org_chart` — `work_email`, `manager_name`, `manager_email` |
 | Codex / financial taxonomy per active employee | `datalake_people_public.org_chart` — `business`, `product`, `vertical`, `directorate`, `subdirectorate` |
 | Product & Technology squad structure | `datalake_people_public.org_chart` — `line`, `chapter`, `product_and_tech_team_*` (NULL outside P&T) |
-| Historical headcount or terminated employees | `dw_employee_details.fact_assignment_snapshots` — see `employee_details.md` |
-| Full employment history (all statuses) | `datalake_people.identifier_mapping` |
+| Historical headcount or terminated employees | `dw_employee_details.fact_assignment_snapshots` — see `employee_details.md` (not queryable in `@tars`; contact People Data team) |
+| Full employment history (all statuses) | `datalake_people.identifier_mapping` (not queryable in `@tars`; contact People Data team) |
 
 **Critical rules:**
 - Table contains **only active** employees — do not add `is_active = TRUE` or `assignment_status_type = 'ACTIVE'` unless joining from another table.
-- For terminated or historical analysis, use `employee_details.md` or `identifier_mapping`; this table will not return offboarded workers.
-- `assignment_number` is unique — one row per person-assignment; use it as the join key to other People enrich tables.
+- For terminated or historical analysis, use `employee_details.md` or `identifier_mapping`; org_chart will not return offboarded workers. In `@tars`, those tables are not available — contact People Data team.
+- `assignment_number` is unique — one row per person-assignment. Outside `@tars`, use it as the join key to other People enrich tables.
 - P&T columns (`line`, `chapter`, teams) are populated only for employees matched in the GSheets team-formation source; expect NULL elsewhere.
 - **DataHub CI:** concrete table name only — `datalake_people_public.org_chart`.
 
@@ -72,6 +74,8 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 - **New hires (recent)** — filter `dt_hired` for a rolling window
 
 ## Relationships with Other Entities
+
+> **In `@tars`:** The tables below are **platform context only** — not queryable in Trino. For lake/DW access outside TARS, see the linked entity files.
 
 ### Employee Details (subset — current active only)
 
@@ -90,13 +94,19 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 
 ## Dos and Don'ts
 
-**Do:**
+**Do (outside `@tars`):**
 - Use `datalake_people_public.org_chart` for quick questions about **who works where today** among active employees.
 - Join on `assignment_number` when linking to other People enrich tables.
 - Use `manager_email` or `manager_name` for direct-manager lookups.
 - Fall back to `employee_details.md` when the question mentions termination, historical dates, or monthly snapshots.
 
+**In `@tars` only:**
+- Use `datalake_people_public.org_chart` as the **only** People table — public and Trino-accessible.
+- If the question needs data org_chart does not carry, explain the gap and refer the user to **People Data team**.
+
 **Don't:**
+- Query or suggest SQL against other People schemas in `@tars` — they are not available in Trino.
+- Substitute org_chart when the question requires terminated workers, historical snapshots, or attributes org_chart lacks — use `employee_details.md` outside `@tars`; in `@tars`, explain the gap and refer the user to **People Data team**.
 - Filter `is_active = TRUE` or `assignment_status_type = 'ACTIVE'` — the table is already scoped to active assignments.
 - Use this table for terminated-employee analysis or month-end headcount history — rows disappear after offboarding.
 - Confuse `manager_name` (direct manager) with cost-center owners (`owner_l1_name` in `dw_organization.dim_cost_center`).

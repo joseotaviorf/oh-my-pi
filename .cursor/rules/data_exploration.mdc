@@ -81,6 +81,20 @@ Always prefer the highest available layer:
 2. Need deeper granularity or a column not in DW? → Check Enrich tables in the entity file.
 3. Still not found? → Proceed with best judgment based on available schema and context.
 
+### People domain — `@tars` table priority (overrides the layer priority above)
+
+In **`@tars` sessions only**: when the question is about **People / HR / workforce / organogram** (synonyms in `business_entities/org_chart.md`), **do not** apply the default DW-first rule above. Read `business_entities/org_chart.md` first.
+
+**TARS availability:** The only People table available in `@tars` today is `datalake_people_public.org_chart`. All other People schemas (`dw_employee_details`, `dw_organization`, `datalake_people`, `dw_compensation`, etc.) are **not registered in Trino** and must **not** be queried or suggested as runnable SQL in TARS sessions.
+
+| Priority | Table / schema | When to use |
+|---|---|---|
+| **Only** | `datalake_people_public.org_chart` | Any People question answerable from the **current active workforce**: name, manager, job, cost center, Codex taxonomy, P&T teams, hire date. Public — all analysts have Trino access. |
+
+**Decision tree (People):**
+1. Can the question be answered from the **current active workforce** using org_chart columns? → Query `datalake_people_public.org_chart`.
+2. Does it require terminated workers, point-in-time history, compensation, performance, SCD2 validity, L0–L9 management chain, or any attribute not on org_chart? → **Do not** attempt other People tables. Explain what org_chart cannot provide and direct the user to the **People Data team** for new data-access or TARS coverage requests.
+
 ---
 
 ## Common SQL Patterns
@@ -130,7 +144,7 @@ When answering user questions about data:
 
 1. **Find context** — follow `docs/llm_context/intro.md` (DataHub first, then business/metric entity files as needed) to identify the relevant entity and map the user's terms via its Synonyms.
 2. **Review entity rules** — check Dos and Don'ts for mandatory patterns before producing any SQL
-3. **Pick the right table** — follow the layer priority above and the entity's Tables section
+3. **Pick the right table** — follow the layer priority above and the entity's Tables section; for People / HR questions in `@tars`, apply the People domain exception below instead of the layer priority above
 4. **Write Trino SQL** — all queries must use Trino syntax; convert Databricks constructs automatically
 5. **Delegate execution to the Trino skill** — after the SQL is final, hand it off to `.cursor/skills/trino/SKILL.md`. That skill is the single source of truth for script invocation, LIMIT safeguard, result persistence, and error handling. Follow the render rules from "Mandatory Execution" above for case (i) vs case (ii).
 6. **Explain your reasoning** — briefly describe assumptions, table choices, and any caveats

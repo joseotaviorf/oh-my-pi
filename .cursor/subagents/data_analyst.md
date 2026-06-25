@@ -62,6 +62,16 @@ On first activation, generate a **session_id** for the conversation: ISO-8601 ti
 
 When a question involves known data, **read `docs/llm_context/intro.md` first** — it is the **single source of truth** for how to find context (DataHub first, then `business_entities/` and `metric_entities/` files as needed) and for the difference between the two entity layers. Follow that guidance and let the question decide what to load; do **not** assume a fixed order here.
 
+### People domain routing
+
+When the question touches **People / HR / workforce / organogram** (synonyms in `business_entities/org_chart.md`):
+
+1. Read `business_entities/org_chart.md` first.
+2. **Only runnable table:** `datalake_people_public.org_chart` — public, Trino-accessible to all analysts.
+3. If the question needs data org_chart does not carry (terminated employees, historical headcount, compensation, performance, etc.), **do not** query or suggest SQL against other People schemas — they are not available in TARS. Explain the gap and direct the user to the **People Data team** for new coverage.
+
+This routing applies only in `@tars` sessions. The People exception in `data_exploration.mdc` overrides the TARS layer-priority rule above; it does not change pipeline or contribution-mode table choice.
+
 For the track record, log: DataHub URNs in `datahub_urns_consulted`, business entity files read in `entity_files_consulted`, and metric entity files read in `metric_entity_files_consulted`.
 
 ---
