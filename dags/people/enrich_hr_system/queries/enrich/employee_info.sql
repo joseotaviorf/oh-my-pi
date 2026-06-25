@@ -63,6 +63,6 @@ INNER JOIN
   datalake_pin_core_clean.person_name AS an
     ON p.id_person = an.id_person
     AND an.name_type = 'GLOBAL'
-    AND an.dt_effective_ended = '4712-12-31' 
+    AND an.dt_effective_ended = DATE('9999-12-31')
 WHERE 
   NOT im.is_user_test
