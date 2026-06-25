@@ -48,7 +48,24 @@ invoice AS (
       ON DATE(i.ts_paid) = dd.date
 ),
 
-  sap_entity AS (
+sap_entity_ranked AS (
+  SELECT
+    id_finance_entity,
+    id_sap_gateway_feature,
+    version,
+    event,
+    status,
+    failed_status,
+    failed_reason,
+    ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY id_sap_gateway_feature DESC, ts_updated DESC) AS rn
+  FROM
+    datalake_retsuko_clean.sap_entity
+  WHERE
+    id_finance_entity IS NOT NULL
+    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
+),
+
+sap_entity AS (
   SELECT
     id_finance_entity,
     id_sap_gateway_feature,
@@ -58,11 +75,9 @@ invoice AS (
     failed_status,
     failed_reason
   FROM
-    datalake_retsuko_clean.sap_entity
+    sap_entity_ranked
   WHERE
-    id_finance_entity IS NOT NULL
-    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY id_sap_gateway_feature DESC, ts_updated DESC) = 1
+    rn = 1
 ),
 
 retsuko_entry AS (
@@ -104,7 +119,7 @@ retsuko_entry AS (
     AND DATE(e.ts_created) >= '2025-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
-    AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
+    -- AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
 ),
 
 retsuko_invoice AS (
@@ -151,7 +166,7 @@ retsuko_invoice AS (
     )
     AND ct.country_code = 'BR'
     AND DATE(i.ts_paid) >= '2025-01-01'
-    AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
+    -- AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
     HAVING
       SUM(amount) != 0
@@ -163,15 +178,16 @@ retsuko_final AS (
   SELECT * FROM retsuko_invoice
 ),
 
-sap_gateway AS (
+sap_gateway_ranked AS (
   SELECT
     f.id_finance_entity,
     s.id_feature,
     s.hash,
-    s.status as sync_sap_job_status,
-    w.status as sap_send_status,
-    w.webhook_status as sap_processed_status,
-    w.errors AS webhook_error
+    s.status AS sync_sap_job_status,
+    w.status AS sap_send_status,
+    w.webhook_status AS sap_processed_status,
+    w.errors AS webhook_error,
+    ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) AS rn
   FROM
     datalake_sap_gateway_clean.feature f
   LEFT JOIN
@@ -184,7 +200,21 @@ sap_gateway AS (
     s.erp_solution IN ('S4')
     AND s.type = 'LCM'
     AND s.status NOT IN ('ignore', 'ignored')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) = 1
+),
+
+sap_gateway AS (
+  SELECT
+    id_finance_entity,
+    id_feature,
+    hash,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM
+    sap_gateway_ranked
+  WHERE
+    rn = 1
 ),
 
 sap_ledger AS (
