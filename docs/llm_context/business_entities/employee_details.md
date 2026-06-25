@@ -146,32 +146,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 
 ## Golden Queries
 
-### Query 1 — Active headcount (current state)
-
-```sql
-SELECT
-    COUNT(DISTINCT fact.person_number) AS active_headcount
-FROM dw_employee_details.fact_assignment_snapshots AS fact
-WHERE fact.is_current = TRUE
-  AND fact.is_active = TRUE
-  AND fact.is_primary_assignment_for_snapshot = TRUE
-```
-
-### Query 2 — Headcount at month-end (historical)
-
-Monthly snapshot pattern (*base fotografias*). Replace the date with the target month-end `dt_reference`.
-
-```sql
-SELECT
-    COUNT(DISTINCT fact.person_number) AS headcount
-FROM dw_employee_details.fact_assignment_snapshots AS fact
-WHERE fact.dt_reference = DATE '2025-12-31'
-  AND fact.is_monthly_snapshot = TRUE
-  AND fact.is_active = TRUE
-  AND fact.is_primary_assignment_for_snapshot = TRUE
-```
-
-### Query 3 — Wide current workforce (in-schema attributes, TARS pilot)
+### Query 1 — Wide current workforce (TARS pilot)
 
 Identity, hierarchy, and termination context for active employees. Uses only tables in the TARS pilot (no contact/documentation dimensions).
 
@@ -202,60 +177,6 @@ LEFT JOIN dw_employee_details.dim_event_definition AS evt
 WHERE fact.is_current = TRUE
   AND fact.is_active = TRUE
   AND fact.is_primary_assignment_for_snapshot = TRUE
-```
-
-### Query 4 — Current workforce with org context
-
-```sql
-SELECT
-    emp.name,
-    emp.work_email,
-    hier.name_l1 AS vp_name,
-    hier.name_l2 AS director_name,
-    hier.name_l3 AS manager_name,
-    cc.cost_center_name,
-    cc.vertical,
-    bu.business_unit_name,
-    fact.days_tenure_in_company,
-    fact.is_manager
-FROM dw_employee_details.fact_assignment_snapshots AS fact
-INNER JOIN dw_employee_details.dim_employee AS emp
-    ON fact.sk_employee = emp.sk_employee
-LEFT JOIN dw_employee_details.dim_management_hierarchy AS hier
-    ON fact.sk_hierarchy_version = hier.sk_hierarchy_version
-LEFT JOIN dw_organization.dim_cost_center AS cc
-    ON fact.sk_cost_center_version = cc.sk_cost_center_version
-LEFT JOIN dw_organization.dim_business_unit AS bu
-    ON fact.sk_business_unit = bu.sk_business_unit
-WHERE fact.is_current = TRUE
-  AND fact.is_active = TRUE
-  AND fact.is_primary_assignment_for_snapshot = TRUE
-```
-
-### Query 5 — Voluntary terminations by manager chain
-
-Check `dim_event_definition` for the exact `reason_name` before running in production.
-
-```sql
-SELECT
-    DATE_TRUNC('month', fact.dt_terminated) AS termination_month,
-    COUNT(DISTINCT fact.person_number) AS voluntary_terminations
-FROM dw_employee_details.fact_assignment_snapshots AS fact
-INNER JOIN dw_employee_details.dim_event_definition AS evt
-    ON fact.sk_termination_event_definition = evt.sk_event_definition
-INNER JOIN dw_employee_details.dim_management_hierarchy AS hier
-    ON fact.sk_hierarchy_version = hier.sk_hierarchy_version
-WHERE fact.is_terminated = TRUE
-  AND YEAR(fact.dt_terminated) = 2026
-  AND evt.reason_name = '<voluntary_reason_label>'
-  AND (
-      LOWER(hier.name_l1) LIKE LOWER('%<manager_name>%')
-      OR LOWER(hier.name_l2) LIKE LOWER('%<manager_name>%')
-      OR LOWER(hier.name_l3) LIKE LOWER('%<manager_name>%')
-      OR LOWER(hier.name_l4) LIKE LOWER('%<manager_name>%')
-  )
-GROUP BY 1
-ORDER BY 1
 ```
 
 ## DataHub catalog

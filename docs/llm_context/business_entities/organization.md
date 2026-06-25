@@ -130,44 +130,6 @@ WHERE cc.vertical = 'Tech'
 ORDER BY cc.cost_center_name
 ```
 
-### Query 2 — Headcount by business unit (current)
-
-```sql
-SELECT
-    bu.business_unit_name,
-    COUNT(DISTINCT fact.person_number) AS active_headcount
-FROM dw_employee_details.fact_assignment_snapshots AS fact
-INNER JOIN dw_organization.dim_business_unit AS bu
-    ON fact.sk_business_unit = bu.sk_business_unit
-WHERE fact.is_current = TRUE
-  AND fact.is_active = TRUE
-  AND fact.is_primary_assignment_for_snapshot = TRUE
-GROUP BY 1
-ORDER BY 2 DESC
-```
-
-### Query 3 — Employees with current cost center attributes
-
-```sql
-SELECT
-    fact.sk_employee,
-    fact.person_number,
-    cc.cost_center_name,
-    cc.vertical,
-    cc.headcount_type,
-    cc.hrbp_name,
-    cc.owner_l1_name,
-    bu.business_unit_name
-FROM dw_employee_details.fact_assignment_snapshots AS fact
-LEFT JOIN dw_organization.dim_cost_center AS cc
-    ON fact.sk_cost_center_version = cc.sk_cost_center_version
-LEFT JOIN dw_organization.dim_business_unit AS bu
-    ON fact.sk_business_unit = bu.sk_business_unit
-WHERE fact.is_current = TRUE
-  AND fact.is_active = TRUE
-  AND fact.is_primary_assignment_for_snapshot = TRUE
-```
-
 ## DataHub catalog
 
 - **Data Product:** [urn:li:dataProduct:organization](https://datahub.apps.data-prd.habitat.zone/dataProducts/urn%3Ali%3AdataProduct%3Aorganization)
