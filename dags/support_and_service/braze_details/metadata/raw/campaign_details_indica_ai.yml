@@ -4,3 +4,4 @@ table_name: campaign_details_indica_ai
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Braze campaign configuration details for the IndicaAi audience. One row per campaign. Source system is Braze.
+columns: {}

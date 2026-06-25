@@ -4,3 +4,4 @@ table_name: canvas_analytics_owners
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Braze canvas analytics for the owners (proprietários) audience. One row per canvas analytics snapshot. Source system is Braze.
+columns: {}
