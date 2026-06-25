@@ -4,14 +4,14 @@ description:
   Base responsible for processing event data from the Bigfone microservice intended for calls to Twilio,
   with the call ID and event ID as the main key.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Key that identifies the event.
     lineage:
       - datalake_bigfone_clean.event.id
   event:
-    description: Event name.
+    description: Business value representing event on the events enrich dataset.
     lineage:
       - datalake_bigfone_clean.event.event
   id_call:
@@ -19,11 +19,11 @@ columns:
     lineage:
       - datalake_bigfone_clean.event.metadata
   metadata:
-    description: Metadata of the event.
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
     lineage:
       - datalake_bigfone_clean.event.metadata
   provider:
-    description: Provider of the event.
+    description: Telephony provider or integration source that originated the call record.
     lineage:
       - datalake_bigfone_clean.event.provider
   ts_created:

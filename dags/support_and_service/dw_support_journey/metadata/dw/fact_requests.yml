@@ -3,7 +3,7 @@ database_name: dw_support_journey
 table_name: fact_requests
 description: Fact table with the support request (Salesforce case) events of the support journey, one row per case event version sourced from the core support journey model.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_event:
     description: Surrogate key uniquely identifying a case event version (grain of the table). System-generated upstream as a hash of id_record, transaction_key and commit_number, so it is unique per event.

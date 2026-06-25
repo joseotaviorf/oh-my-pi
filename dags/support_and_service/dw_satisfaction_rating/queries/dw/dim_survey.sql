@@ -55,11 +55,29 @@ pet_surveys AS (
     AND DATE('{load_end_date}')
 ) 
 SELECT 
-  * 
+  sk_survey,
+  service_type,
+  service_context,
+  source_name,
+  survey_name,
+  ts_first_submitted,
+  ts_load,
+  year,
+  month,
+  day 
 FROM 
   previous_surveys 
 UNION ALL 
 SELECT 
-  * 
+  sk_survey,
+  service_type,
+  service_context,
+  source_name,
+  survey_name,
+  ts_first_submitted,
+  ts_load,
+  year,
+  month,
+  day 
 FROM 
   pet_surveys

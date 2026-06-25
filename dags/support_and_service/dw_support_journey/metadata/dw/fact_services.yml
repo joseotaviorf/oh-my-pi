@@ -3,7 +3,7 @@ database_name: dw_support_journey
 table_name: fact_services
 description: Fact table with human customer service events (chat and call) of the support journey, one row per service event sourced from the core support journey services model. Each event represents an interaction handled in a session, carrying outcome, timing and routing attributes used for service-level and productivity analysis.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_event:
     description: Surrogate key uniquely identifying a service event (grain of the table). Built directly from id_event of the core services model, so it is unique per event.

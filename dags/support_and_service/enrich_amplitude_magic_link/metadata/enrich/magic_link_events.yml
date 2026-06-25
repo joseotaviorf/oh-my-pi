@@ -5,7 +5,7 @@ description:
   Enrichment table with the aim of unifying information about magic link
   events and assigned analysts. Each row in this table represents an event.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_amplitude:
     description: Event identification key within the amplitude.
@@ -64,7 +64,7 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.user_properties
   country_code:
-    description: Region code.
+    description: Standardized code for country code used in taxonomy and SLA segmentation.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   agent_email:

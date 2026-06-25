@@ -2,12 +2,12 @@ database_name: datalake_app_installed
 table_name: events
 description: Table containing the a series of Amplitude events for every id_user
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_user:
     lineage:
       - datalake_amplitude_clean.events.id_user
-    description: ID of the user
+    description: QuintoAndar user identifier associated with the IVR interaction or scheduled call.
   app_version:
     lineage:
       - datalake_amplitude_clean.events.version_name
