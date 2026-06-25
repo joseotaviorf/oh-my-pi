@@ -1,6 +1,7 @@
 SELECT
     id,
     ticket_id AS id_ticket,
+    session_id AS id_support_session,
     attendant_name,
     attendant_email,
     customer_email,
