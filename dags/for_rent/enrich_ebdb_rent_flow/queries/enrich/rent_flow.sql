@@ -1,45 +1,34 @@
 WITH lbc_first_publication AS (
+    WITH lbc_first_publication_ranked AS (
+        SELECT
+            h.id AS id_house,
+            COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS ts_first_publication,
+            ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) AS rn
+        FROM
+            datalake_ebdb_clean.house AS h
+        LEFT JOIN
+            datalake_ebdb_clean.listing_business_context AS lbc
+                ON lbc.id_house = h.id
+    )
     SELECT
-        h.id AS id_house,
-        COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS ts_first_publication
+        id_house,
+        ts_first_publication
     FROM
-        datalake_ebdb_clean.house AS h
-    LEFT JOIN
-        datalake_ebdb_clean.listing_business_context AS lbc
-            ON lbc.id_house = h.id
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) = 1
-),
-visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
-    SELECT
-        id_visit,
-        id_schedule,
-        CASE
-            WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
-            WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
-            WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
-        END AS visit_fup,
-        ts_created AS ts_visit_fup
-    FROM
-        datalake_ebdb_clean.visit_status_log
+        lbc_first_publication_ranked
     WHERE
-        ts_created::DATE >= '2025-01-01'
-        AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
+        rn = 1
 ),
 rent_flow_offer_and_pre_proposal AS (
     WITH pre_proposal_with_visits AS (
         SELECT
             pp.id AS id_pp,
-            booking.id AS id_booking,
-            unix_timestamp(pp.ts_created) - unix_timestamp(booking.ts_created) AS creation_diff
+            vs.id_schedule AS id_booking,
+            unix_timestamp(pp.ts_created) - unix_timestamp(vs.ts_schedule_created) AS creation_diff
         FROM datalake_ebdb_clean.pre_proposal pp
-        JOIN datalake_ebdb_clean.booking
-            ON booking.id_visitor = pp.id_user
-            AND booking.id_house = pp.id_house
+        JOIN datalake_visit.visit_schedules AS vs
+            ON vs.id_visitor = pp.id_user
+            AND vs.id_house = pp.id_house
         WHERE pp.last_edition_updated > 0
-            AND booking.type = 'Visita'
     ),
     pre_proposal_creation_diff AS (
         SELECT
@@ -59,15 +48,6 @@ rent_flow_offer_and_pre_proposal AS (
         JOIN pre_proposal_creation_diff pp_diff
             ON pp_diff.id_pp = pp.id_pp
             AND pp_diff.min_diff = pp.creation_diff
-    ),
-    agent_absent AS (
-        SELECT DISTINCT
-            id_booking,
-            absence_reason = 'Absent' AS was_agent_absent
-        FROM
-            datalake_ebdb_clean.visitor
-        WHERE type='Agent'
-            AND absence_reason = 'Absent'
     ),
     rent_flow_pre_proposal_full AS (
         SELECT
@@ -95,8 +75,6 @@ rent_flow_offer_and_pre_proposal AS (
             AND booking.type = 'Visita'
         LEFT JOIN datalake_ebdb_clean.user
             ON user.id = rf.id_client
-        LEFT JOIN datalake_ebdb_clean.visit
-            ON visit.id = booking.id_visit
         LEFT JOIN datalake_ebdb_clean.user user_agent
             ON user_agent.id_agent = booking.id_agent
         LEFT JOIN datalake_ebdb_clean.pre_proposal prep
@@ -113,8 +91,6 @@ rent_flow_offer_and_pre_proposal AS (
             ON contract.id_proposal = COALESCE(proposal_bk.id, proposal_pp.id)
         LEFT JOIN datalake_ebdb_clean.portability
             ON portability.id_flow = rf.id
-        LEFT JOIN agent_absent
-            ON agent_absent.id_booking = booking.id
         WHERE ((prep_bk.id_pp = prep.id) IS NULL
             OR prep_bk.id_pp = prep.id)
             AND portability.id IS NULL
@@ -170,22 +146,8 @@ rent_flow_offer_and_pre_proposal AS (
             booking.id AS id_booking,
             booking.ts_created AS dt_booking_created,
             booking.dt_booking AS dt_visit,
-            COALESCE(
-                COALESCE(booking.visit_fup, fup_vsl.visit_fup) IN ('VaiNegociar',
-                                      'NaoGostou',
-                                      'VisitouSozinho',
-                                      'Talvez'),
-                FALSE
-            ) AS is_visit_completed,
-            IF(
-                COALESCE(booking.visit_fup, fup_vsl.visit_fup) IS NULL,
-                FALSE,
-                IF(
-                    agent_absent.was_agent_absent,
-                    FALSE,
-                    TRUE
-                )
-            ) AS is_visit_performed,
+            vs.is_completed AS is_visit_completed,
+            IF(v.has_fup_collected AND v.has_unsuccessful_agent_not_attended = FALSE, TRUE, FALSE) AS is_visit_performed,
             house.id_user AS id_owner,
             user_agent.id AS id_user_agent,
             rf.id_client,
@@ -216,8 +178,10 @@ rent_flow_offer_and_pre_proposal AS (
         LEFT JOIN datalake_ebdb_clean.booking
             ON rf.id = booking.id_rent_flow
             AND booking.type = 'Visita'
-        LEFT JOIN visit_fup_vsl AS fup_vsl
-            ON booking.id = fup_vsl.id_schedule
+        LEFT JOIN datalake_visit.visit_schedules AS vs
+            ON vs.id_schedule = booking.id
+        LEFT JOIN datalake_visit.visits AS v
+            ON v.id_visit = vs.id_visit
         LEFT JOIN datalake_ebdb_clean.user
             ON user.id = rf.id_client
         LEFT JOIN datalake_ebdb_clean.visit
@@ -237,8 +201,6 @@ rent_flow_offer_and_pre_proposal AS (
             ON contract.id_proposal = COALESCE(proposal_bk.id, proposal_off.id)
         LEFT JOIN datalake_ebdb_clean.portability
             ON portability.id_flow = rf.id
-        LEFT JOIN agent_absent
-            ON agent_absent.id_booking = booking.id
         WHERE ((offer_bk.id_offer = offer.id) IS NULL
             OR offer_bk.id_offer = offer.id)
             AND portability.id IS NULL

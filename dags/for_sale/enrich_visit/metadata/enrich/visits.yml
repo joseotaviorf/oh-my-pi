@@ -185,7 +185,7 @@ columns:
     description: Role of user who cancelled the visit. Data since 2024-11.
   unsuccessful_reason:
     lineage:
-      - datalake_visit.post_visit_agent_unified.reason
+      - datalake_visit.post_visit_agent_unified.unsuccessful_reason
     description: Reason of visit unsuccessful. Data since 2016.
   visit_model:
     description: Visit model of the visit. Data since 2015.
@@ -246,6 +246,10 @@ columns:
     lineage:
       - datalake_visit.visit_status_events.channel
     description: Role of user who is related to the first visit confirmation. Data since 2024-11.
+  visit_finalization_agent_channel:
+    lineage:
+      - datalake_visit.post_visit_agent_unified.channel
+    description: Channel of the visit finalization by agent. Data since 2026-06.
   first_tenant_living_answer:
     lineage:
       - datalake_visit.visit_status_events.event_type
@@ -339,18 +343,18 @@ columns:
     lineage:
       - datalake_visit.visit_cancellation_unified.is_cancelled_by_expiration
     description: True if the visit was cancelled due to expired time. Data since 2015.
-  has_unsuccessful_demand_attended:
+  has_unsuccessful_demand_not_attended:
     lineage:
-      - datalake_visit.post_visit_agent_unified.has_demand_attended
-    description: True if demand (visitor) attended the visit. Data since 2016.
-  has_unsuccessful_agent_attended:
+      - datalake_visit.post_visit_agent_unified.has_unsuccessful_demand_not_attended
+    description: True if demand (visitor) did not attend the unsuccessful visit. Data since 2016.
+  has_unsuccessful_agent_not_attended:
     lineage:
-      - datalake_visit.post_visit_agent_unified.has_agent_attended
-    description: True if agent attended the visit. Data since 2016.
-  has_unsuccessful_supply_attended:
+      - datalake_visit.post_visit_agent_unified.has_unsuccessful_agent_not_attended
+    description: True if agent did not attend the unsuccessful visit. Data since 2016.
+  has_unsuccessful_supply_not_attended:
     lineage:
-      - datalake_visit.post_visit_agent_unified.has_supply_attended
-    description: True if supply (owner) attended the visit. Data since 2021-04.
+      - datalake_visit.post_visit_agent_unified.has_unsuccessful_supply_not_attended
+    description: True if supply (owner) did not attend the unsuccessful visit. Data since 2021-04.
   is_visit_same_day_first_schedule:
     lineage:
       - datalake_ebdb_clean.visit.ts_created
@@ -362,6 +366,18 @@ columns:
       - datalake_ebdb_clean.visit.ts_visit
       - datalake_visit.visit_status_events.ts_visit_rescheduled
     description: True if the visit was scheduled on the same day as the last schedule. Data since 2015.
+  is_completed_visit_contested_by_demand:
+    lineage:
+      - datalake_visit.visit_status_events.reason
+    description: True if the visit was completed by demand and the reason is wrong visit done status. Data since 2024-11.
+  is_canceled_visit_contested_by_demand:
+    lineage:
+      - datalake_visit.visit_status_events.reason
+    description: True if the visit was canceled by demand and the reason is wrong cancellation reason. Data since 2024-11.
+  is_visit_contested_by_demand:
+    lineage:
+      - datalake_visit.visit_status_events.reason
+    description: True if the visit was contested by demand. Data since 2024-11.
   dt_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit

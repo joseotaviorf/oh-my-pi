@@ -1,30 +1,29 @@
 database_name: datalake_tqc_referral
-table_name: sales_event_flow
+table_name: sale_events_flow
 description: This table groups the funnel events of a lead with a valid TQC indication. Grouping done from id_sale_flow, starting from the first VB
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_visit:
     lineage:
-      - datalake_ebdb_clean.booking.id_visit
-    description: Key of visit.
+      - datalake_ebdb_visit.visit.id_visit
+    description: Primary key of the sale visit in the TQC funnel.
   id_house:
     lineage:
-      - datalake_ebdb_clean.booking.id_house
+      - datalake_ebdb_visit.visit.id_house
     description: Key of property/house.
   id_buyer:
     lineage:
-      - datalake_ebdb_clean.booking.id_visitor
-    description: Id of the buyer.
+      - datalake_ebdb_visit.visit.id_visitor
+    description: User identifier of the buyer (visitor) tied to the sale visit or offer.
   id_agent:
     lineage:
-      - datalake_ebdb_clean.booking.id_agent
-    description: Id of the agent.
+      - datalake_ebdb_user.user.id_agent
+    description: Agent user identifier associated with the visit or offer.
   id_sales_flow:
     lineage:
-      - datalake_ebdb_clean.booking.id_visitor
-      - datalake_ebdb_clean.booking.id_house
-      - datalake_sale_offer.sale_offer.id_sale_flow
+      - datalake_ebdb_visit.visit.id_visitor
+      - datalake_ebdb_visit.visit.id_house
     description: Key of sale flow (id_visitor + id_house).
   id_referral_flow:
     lineage:
@@ -36,20 +35,18 @@ columns:
     description: Offer unique identifier.
   first_visit_creation_origin:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.id_user
-      - datalake_ebdb_clean.booking.id_visitor
+      - datalake_visit.visits.id_user_visit_request
+      - datalake_visit.visits.id_visitor
       - datalake_hub_services.secretariat_hierarchy.id_user_5a
-      - datalake_ebdb_clean.booking.id_visit
-      - datalake_ebdb_clean.booking.ts_created
-      - datalake_ebdb_clean.visit_status_log.id_author_user
+      - datalake_visit.visits.id_visit
+      - datalake_visit.visits.ts_created
     description: Identifies the type of user who created the sale visit.
   visit_creation_origin:
     lineage:
-      - datalake_ebdb_clean.booking_status_change.id_user
-      - datalake_ebdb_clean.booking.id_visitor
+      - datalake_visit.visits.id_user_visit_request
+      - datalake_visit.visits.id_visitor
       - datalake_hub_services.secretariat_hierarchy.id_user_5a
-      - datalake_ebdb_clean.booking.id_visit
-      - datalake_ebdb_clean.visit_status_log.id_author_user
+      - datalake_visit.visits.id_visit
     description: Identifies the type of user who created the sale booking.
   visit_code:
     lineage:
@@ -57,9 +54,7 @@ columns:
     description: Unique string code with 8 characters generated for each visit.
   visit_status:
     lineage:
-      - datalake_ebdb_clean.booking.visit_fup
-      - datalake_ebdb_clean.booking.status
-      - datalake_ebdb_clean.visit_status_log.event_type
+      - datalake_visit.visits.computed_status
     description: Gives the booking status, for exemple to show if the visit is canceled
       or not
   tqc_flow:
@@ -68,9 +63,7 @@ columns:
     description: Indicates the stream where a referral was made. Whether it was old ('Old') or new ('New')
   is_visit_completed:
     lineage:
-      - datalake_ebdb_clean.booking.status
-      - datalake_ebdb_clean.booking.visit_fup
-      - datalake_ebdb_clean.visit_status_log.event_type
+      - datalake_visit.visits.computed_status
     description: Boolean flag indicating if the visit was completed (visit_status = 'Realizado').
   id_tqc_flow:
     lineage:
@@ -86,24 +79,22 @@ columns:
     description: Timestamp at which the indication was registered.
   ts_visit_scheduled_for:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
-      - datalake_ebdb_clean.country.default_timezone
+      - datalake_visit.visits.ts_visit
     description: Timestamp at which the visit was scheduled on UTC.
   ts_first_visit_created:
     lineage:
-      - datalake_ebdb_clean.booking.ts_created
+      - datalake_visit.visits.ts_created
       - datalake_ebdb_clean.country.default_timezone
-      - datalake_booking.booking.id_visit
+      - datalake_visit.visits.id_visit
     description: Datetime of first visit creation on local timezone, based on the country of the booking.
   ts_visit_created:
     lineage:
-      - datalake_ebdb_clean.booking.ts_created
+      - datalake_visit.visits.ts_created
       - datalake_ebdb_clean.country.default_timezone
     description: Datetime of visit creation on local timezone, based on the country of the booking.
   ts_visit_updated:
     lineage:
-      - datalake_ebdb_clean.booking.ts_updated
+      - datalake_visit.visits.ts_updated
     description: Datetime of the visit updating.
   ts_offer_submitted:
     lineage:

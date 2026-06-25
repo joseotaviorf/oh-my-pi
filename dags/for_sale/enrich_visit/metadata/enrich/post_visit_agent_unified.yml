@@ -1,7 +1,7 @@
 database_name: datalake_visit
 table_name: post_visit_agent_unified
 description: The post visit details is collected through an agent's follow up.
-  This model contains the post visit by agent from current model (fup agent models). We will soon have this information in the new modeling and this model will unify them.
+  This model contains the post visit by agent from current model (fup agent models) and the new model (visit_status_events).
   Each row is an unique visit.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
@@ -9,17 +9,19 @@ columns:
   id_visit:
     lineage:
       - datalake_ebdb_clean.booking.id_visit
+      - datalake_visit.visit_status_events.id_visit
     description: Primary key of this table. The unsuccessful information is at visit granularity.
   id_schedule:
     lineage:
       - datalake_ebdb_clean.booking.id
+      - datalake_visit.visit_status_events.id_schedule
     description: ID of schedule (booking).
-  reason:
+  unsuccessful_reason:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
       - datalake_visit.visit_status_events.event_type
       - datalake_visit.visit_status_events.reason
-    description: Reason of visit finalization by agent.
+    description: Reason of unsuccessful visit finalization by agent.
   event_type:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
@@ -29,22 +31,25 @@ columns:
       VISIT_DONE: The visit was done by agent.
       VISIT_UNSUCCESSFUL: The visit was unsuccessful by agent.
       ERROR: Not mapped case.
-  has_demand_attended:
+  channel:
+    lineage:
+      - datalake_visit.visit_status_events.channel
+    description: Channel of the unsuccessful visit finalization by agent.
+  has_unsuccessful_demand_not_attended:
     lineage:
       - datalake_ebdb_clean.visitor.has_attended
-    description: True if demand (visitor) attended the visit.
-  has_agent_attended:
+      - datalake_visit.visit_status_events.reason
+    description: True if demand (visitor) did not attend the unsuccessful visit.
+  has_unsuccessful_agent_not_attended:
     lineage:
       - datalake_ebdb_clean.visitor.has_attended
-    description: True if agent attended the visit.
-  has_tenant_living_attended:
+      - datalake_visit.visit_status_events.reason
+    description: True if agent did not attend the unsuccessful visit.
+  has_unsuccessful_supply_not_attended:
     lineage:
       - datalake_ebdb_clean.visitor.has_attended
-    description: True if tenant living attended the visit.
-  has_supply_attended:
-    lineage:
-      - datalake_ebdb_clean.visitor.has_attended
-    description: True if supply (owner) attended the visit.
+      - datalake_visit.visit_status_events.reason
+    description: True if supply (owner) did not attend the unsuccessful visit.
   ts_post_visit_agent:
     lineage:
       - datalake_ebdb_clean.booking.ts_visit_fup

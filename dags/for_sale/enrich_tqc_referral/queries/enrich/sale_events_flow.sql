@@ -1,143 +1,49 @@
-WITH
-first_booking_author AS (
-  WITH old_source AS (
-    SELECT DISTINCT
-      bsc.id_booking,
-      FIRST_VALUE(id_user) OVER (PARTITION BY bsc.id_booking ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_user_creation
-    FROM
-      datalake_ebdb_clean.booking_status_change AS bsc
-    WHERE
-      ts_created::date < '2025-01-01'
-  ),
-  new_source AS (
-    SELECT
-      id_schedule as id_booking,
-      MIN_BY(id_author_user, id_visit_status_log) as id_user_creation
-    FROM
-      datalake_ebdb_clean.visit_status_log
-    WHERE
-      ts_created::date >= '2025-01-01'
-      AND event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
-    GROUP BY 1
-  )
+WITH sale_visit_flows AS (
   SELECT
-    id_booking,
-    id_user_creation
-  FROM
-    old_source
-  UNION ALL
-  SELECT
-    id_booking,
-    id_user_creation
-  FROM
-    new_source
-),
-visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
-  SELECT
-    id_visit,
-    id_schedule,
+    v.id_visit,
+    v.id_house,
+    v.id_visitor AS id_buyer,
+    uv.id_agent,
+    v.id_agent AS id_user_sale_agent,
+    CONCAT(v.id_visitor, '_', v.id_house) AS id_sale_flow,
     CASE
-      WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
-      WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
-      WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
-    END AS visit_fup,
-    ts_created AS ts_visit_fup
-  FROM
-    datalake_ebdb_clean.visit_status_log
-  WHERE
-    ts_created::DATE >= '2025-01-01'
-    AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
-),
-base_booking AS (
-SELECT
-    b.id_visit,
-    b.id_house,
-    b.id_visitor AS id_buyer,
-    b.id_agent,
-    ua.id AS id_user_sale_agent,
-    IF(b.business_context = 'SALE',
-        CONCAT(b.id_visitor, '_', b.id_house),
-        NULL
-      ) AS id_sale_flow,
-    IF( b.business_context = 'SALE',
-        (
-          CASE
-            WHEN fba.id_user_creation = ua.id THEN 'Agent'
-            WHEN fba.id_user_creation = b.id_visitor THEN 'Buyer'
-            WHEN fba.id_user_creation = su.id_user_5a THEN 'Secretaria'
-            WHEN u.email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
-            ELSE 'Other'
-          END
-        ),
-        NULL
-      ) AS user_sale_booking_creator,
-    FROM_UTC_TIMESTAMP(b.ts_created, COALESCE(ct.default_timezone, 'UTC')) AS ts_created_local_tz,
-    visit.code AS visit_code,
-    CASE
-      WHEN b.status = 'Realizado' AND COALESCE(b.visit_fup, fup_vsl.visit_fup) IN ('EntradaNaoAutorizada','NaoCompareceu')
-        THEN 'Cancelado'
-      ELSE b.status
-    END AS visit_status,
+      WHEN v.visit_request_channel IN ('AGENT_PWA', 'AGENT_NATIVE') THEN 'Agent'
+      WHEN v.visit_request_channel IN ('TENANT_PWA', 'TENANT_NATIVE') THEN 'Buyer'
+      WHEN su.id_user_5a IS NOT NULL THEN 'Secretaria'
+      WHEN u.email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
+      ELSE 'Other'
+    END AS visit_creation_origin,
+    visit_creation_origin AS first_visit_creation_origin,
+    COALESCE(FROM_UTC_TIMESTAMP(v.ts_visit_rescheduled, COALESCE(ct.default_timezone, 'UTC')), FROM_UTC_TIMESTAMP(v.ts_created, COALESCE(ct.default_timezone, 'UTC'))) AS ts_visit_created,
+    FROM_UTC_TIMESTAMP(v.ts_created, COALESCE(ct.default_timezone, 'UTC')) AS ts_first_visit_created,
+    v.code AS visit_code,
+    v.computed_status AS visit_status,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
-    CAST(b.dt_booking AS TIMESTAMP)
-          + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
-          + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES
-        AS ts_booking_local_tz,
-    b.ts_updated
+    v.ts_visit AS ts_visit_scheduled_for,
+    FROM_UTC_TIMESTAMP(v.ts_visit, COALESCE(ct.default_timezone, 'UTC')) as ts_booking_local_tz,
+    v.ts_updated AS ts_visit_updated
   FROM
-    datalake_ebdb_clean.booking AS b
+    datalake_visit.visits AS v
   LEFT JOIN
-    visit_fup_vsl AS fup_vsl
-      ON b.id = fup_vsl.id_schedule
-  LEFT JOIN
-    first_booking_author AS fba
-      ON fba.id_booking = b.id
-  LEFT JOIN
-    datalake_ebdb_clean.visit
-      ON b.id_visit = visit.id
-  LEFT JOIN
-    datalake_ebdb_clean.user AS ua
-      ON ua.id_agent = b.id_agent
+    datalake_ebdb_user.user AS uv
+      ON uv.id = v.id_agent
   LEFT JOIN
     datalake_hub_services.secretariat_hierarchy AS su
-      ON su.id_user_5a = fba.id_user_creation
+      ON su.id_user_5a = v.id_user_visit_request
   LEFT JOIN
     datalake_ebdb_user.user AS u
-      ON u.id = fba.id_user_creation
+      ON u.id = v.id_user_visit_request
   LEFT JOIN
     datalake_ebdb_listing.house AS hl
-      ON b.id_house = hl.id
+      ON v.id_house = hl.id
   LEFT JOIN
     datalake_ebdb_clean.country AS ct
       ON ct.code = hl.country_code
   WHERE
-    b.type = 'Visita'
-    AND b.business_context = 'SALE'
+    v.business_context = 'SALE'
 ),
-sale_visit_flows AS (
-SELECT
-  id_visit,
-  id_house,
-  id_buyer,
-  id_agent,
-  id_user_sale_agent,
-  id_sale_flow,
-  FIRST_VALUE(user_sale_booking_creator) OVER(PARTITION BY id_visit ORDER BY ts_created_local_tz) AS first_visit_creation_origin,
-  user_sale_booking_creator AS visit_creation_origin,
-  ts_created_local_tz AS ts_visit_created,
-  visit_code,
-  visit_status,
-  TO_UTC_TIMESTAMP(ts_booking_local_tz, default_timezone) AS ts_visit_scheduled_for,
-  FIRST_VALUE(ts_created_local_tz) OVER(PARTITION BY id_visit ORDER BY ts_created_local_tz) AS ts_first_visit_created,
-  ts_updated AS ts_visit_updated
-FROM
-  base_booking
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_updated DESC) = 1
-)
-SELECT
+sale_events_flow_ranked AS (
+  SELECT
     svf.id_visit,
     svf.id_house,
     svf.id_buyer,
@@ -171,7 +77,20 @@ SELECT
     so.ts_offer_submitted,
     so.ts_offer_accepted AS ts_offer_accepted,
     so.ts_sale_agreement_created AS ts_sale_agreement_created,
-    so.ts_sale_agreement_signed AS ts_sale_agreement_signed
+    so.ts_sale_agreement_signed AS ts_sale_agreement_signed,
+    ROW_NUMBER() OVER(
+      PARTITION BY COALESCE(svf.id_visit, so.id_offer), tqc.id_referral_flow
+      ORDER BY
+        CASE
+          WHEN tqc.tqc_flow = 'Old'
+            THEN 1
+          WHEN tqc.tqc_flow = 'New'
+            THEN 2
+          ELSE NULL
+        END DESC,
+        svf.ts_visit_created,
+        so.ts_offer_submitted
+    ) AS rn
   FROM
     sale_visit_flows AS svf
   FULL OUTER JOIN
@@ -179,10 +98,38 @@ SELECT
       ON svf.id_sale_flow = CONCAT(so.id_buyer, '_', so.id_house)
   LEFT JOIN
     datalake_tqc_referral.unified_lead_referral_flow AS tqc
-      ON CONCAT(COALESCE(svf.id_agent,svf.id_user_sale_agent,so.id_agent,so.id_user_agent),'_',COALESCE(svf.id_buyer, so.id_buyer)) = tqc.id_referral_flow
-    AND (tqc.status = 'TRUE' OR tqc.status = 'CONFIRMED')
-    AND DATE(COALESCE(svf.ts_first_visit_created, so.ts_offer_submitted)) >= DATE(DATE_ADD(tqc.ts_created,-7))
+      ON CONCAT(COALESCE(svf.id_agent, svf.id_user_sale_agent, so.id_agent, so.id_user_agent), '_', COALESCE(svf.id_buyer, so.id_buyer)) = tqc.id_referral_flow
+      AND (tqc.status = 'TRUE' OR tqc.status = 'CONFIRMED')
+      AND DATE(COALESCE(svf.ts_first_visit_created, so.ts_offer_submitted)) >= DATE(DATE_ADD(tqc.ts_created, -7))
   WHERE
     tqc.id_referral_flow IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY COALESCE(svf.id_visit,so.id_offer), id_referral_flow ORDER BY id_tqc_flow DESC, svf.ts_visit_created, so.ts_offer_submitted) = 1
+)
+SELECT
+  id_visit,
+  id_house,
+  id_buyer,
+  id_agent,
+  id_sales_flow,
+  id_referral_flow,
+  id_offer,
+  first_visit_creation_origin,
+  visit_creation_origin,
+  visit_code,
+  visit_status,
+  tqc_flow,
+  id_tqc_flow,
+  is_visit_completed,
+  is_tqc,
+  ts_tqc_referral,
+  ts_visit_scheduled_for,
+  ts_first_visit_created,
+  ts_visit_created,
+  ts_visit_updated,
+  ts_offer_submitted,
+  ts_offer_accepted,
+  ts_sale_agreement_created,
+  ts_sale_agreement_signed
+FROM
+  sale_events_flow_ranked
+WHERE
+  rn = 1

@@ -69,28 +69,8 @@ rent_flow_house_listing AS (
     rf.id_client,
     rf.id_user_agent AS id_agent,
     h.id_region,
-    CASE
-      WHEN bk.type = 'Visita'
-        AND (bk.ts_created IS NOT NULL OR (bk.dt_booking IS NOT NULL AND bk.is_visit_completed = TRUE AND bk.visit_fup IN ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez'))) THEN rf.id_booking
-      ELSE NULL
-      /** Conditions to accept a booking:
-        -    Booking type must be Visit, always
-        -    Booking creation date not null (which indicates VB event)
-        -    Booking date not null + visit completed + some visit fups (which indicates VC event)
-        -    Other bookings not following these rules shouldn't be present at any time
-      **/
-    END AS id_booking,
-    CASE
-      WHEN bk.type = 'Visita'
-        AND (bk.ts_created IS NOT NULL OR (bk.dt_booking IS NOT NULL AND bk.is_visit_completed = TRUE AND bk.visit_fup IN ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez'))) THEN bk.id_visit
-      ELSE NULL
-      /** Same conditions to accept a booking:
-        -    Booking type must be Visit, always
-        -    Booking creation date not null (which indicates VB event)
-        -    Booking date not null + visit completed + some visit fups (which indicates VC event)
-        -    Other bookings not following these rules shouldn't be present at any time
-      **/
-    END AS id_visit,
+    IF(vs.is_completed, vs.id_schedule, NULL) AS id_booking,
+    IF(vs.is_completed, vs.id_visit, NULL) AS id_visit,
     CASE
       WHEN rf.id_offer_context REGEXP '[0-1]{{2}}$' THEN NULL
       WHEN off.ts_first_sent IS NOT NULL OR (off.status IN ('Aprovada', 'ACCEPTED') AND off.ts_analyzed IS NOT NULL) THEN rf.id_offer_context
@@ -148,8 +128,8 @@ rent_flow_house_listing AS (
     datalake_ebdb_listing.listing_business_context AS lbc
       ON lbc.id_house = h.id
   LEFT JOIN
-    datalake_booking.booking AS bk
-      ON bk.id = rf.id_booking
+    datalake_visit.visit_schedules AS vs
+      ON vs.id_schedule = rf.id_booking
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id_offer_context = rf.id_offer_context
@@ -163,9 +143,9 @@ rent_flow_house_listing AS (
         that we have on the fact_listing_rent_flows, we decided to add another filter considering the business context as null
     **/
     AND (
-      COALESCE(bk.visit_intent, '') <> 'SALE'
+      vs.business_context <> 'SALE'
       OR (
-        bk.visit_intent = 'SALE'
+        vs.business_context = 'SALE'
         AND rf.id_contract IS NOT NULL
       )
     )
@@ -240,6 +220,9 @@ rent_demand_events AS (
   FROM
     datalake_booking.booking AS bk
   JOIN
+    datalake_visit.visit_schedules AS vs
+      ON vs.id_schedule = bk.id
+  JOIN
     rent_flow_house_listing AS rf
       ON rf.id_booking = bk.id
   LEFT JOIN
@@ -248,13 +231,7 @@ rent_demand_events AS (
       AND DATE(bk.ts_booking_utc) >= DATE(hbh.ts_started)
       AND DATE(bk.ts_booking_utc) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
-    bk.type = 'Visita'
-    AND bk.is_visit_completed = TRUE
-    AND bk.visit_fup IN ('VaiNegociar',
-          'NaoGostou',
-          'VisitouSozinho',
-          'Talvez')
-    AND bk.dt_booking IS NOT NULL
+    vs.is_completed
   UNION ALL
   SELECT --offer_submitted
     off.id_offer_context AS id_event,
@@ -830,14 +807,23 @@ termination_period AS (
     As this is an issue to be investigated and if directly used here would duplicate our events, we decided to use the most
     recent contract.
   **/
+  WITH termination_period_ranked AS (
+    SELECT
+      id_house_listing,
+      dt_previous_termination,
+      dt_previous_contract_termination,
+      ROW_NUMBER() OVER(PARTITION BY id_house_listing ORDER BY ts_contract_created DESC) AS rn
+    FROM
+      datalake_listing_contracts.listing_contracts
+  )
   SELECT
     id_house_listing,
     dt_previous_termination,
     dt_previous_contract_termination
   FROM
-    datalake_listing_contracts.listing_contracts
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_house_listing ORDER BY ts_contract_created DESC) = 1
+    termination_period_ranked
+  WHERE
+    rn = 1
 )
 SELECT DISTINCT
   /** As a rent flow may have N times the same booking/proposal/offer appearing related to different demand steps

@@ -7,3 +7,6 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
+  ts_post_visit_agent:
+    is_complete:
+      severity_level: Error

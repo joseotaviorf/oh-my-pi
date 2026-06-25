@@ -34,14 +34,15 @@ WITH
                 MIN_BY(vse.event_type, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS first_supply_answer,
                 MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS first_supply_answer_channel,
                 MIN_BY(vse.event_type, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer,
-                MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel
+                MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel,
+                MAX_BY(vse.reason, vse.ts_created) FILTER (WHERE vse.event_type IN ('VISIT_CONTESTED')) AS reason_visit_contested
             FROM
                 datalake_visit.visit_status_events AS vse
             JOIN
                 datalake_ebdb_clean.visit AS v
                     ON vse.id_visit = v.id
             WHERE
-                v.ts_created::DATE >= '2024-11-01'
+                DATE(v.ts_created) >= '2024-11-01'
             GROUP BY 1
         ),
         bsc AS (
@@ -56,7 +57,7 @@ WITH
                 MIN(bsc.ts_created) FILTER (WHERE bsc.reason = 'AGENT_SCHEDULE_REALIZED') AS ts_visit_registered,
                 MIN(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_visit_first_confirmed,
                 MAX(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_visit_last_confirmed,
-                IF(MIN(fup.id_visit) IS NULL AND MIN(vcu.id_visit) IS NULL AND DATEDIFF(DAY, MIN(v.ts_visit), NOW()) >= 3, DATEADD(DAY, 2, MIN(v.ts_visit)), NULL) AS ts_visit_stalled,
+                IF(MIN(fup.id_visit) IS NULL AND MIN(vcu.id_visit) IS NULL AND DATEDIFF(NOW(), MIN(v.ts_visit)) >= 3, DATEADD(DAY, 2, MIN(v.ts_visit)), NULL) AS ts_visit_stalled,
                 MIN(bsc.ts_created) AS ts_first_event,
                 MAX(bsc.ts_created) AS ts_last_event
             FROM
@@ -75,7 +76,7 @@ WITH
                     ON vcu.id_visit = v.id
             WHERE
                 b.type = 'Visita'
-                AND v.ts_created::DATE < '2024-11-01'
+                AND DATE(v.ts_created) < '2024-11-01'
             GROUP BY 1
         )
         SELECT
@@ -111,7 +112,8 @@ WITH
             first_supply_answer,
             first_supply_answer_channel,
             first_tenant_living_answer,
-            first_tenant_living_answer_channel
+            first_tenant_living_answer_channel,
+            reason_visit_contested
         FROM
             vsl
         UNION ALL
@@ -148,7 +150,8 @@ WITH
             NULL AS first_supply_answer,
             NULL AS first_supply_answer_channel,
             NULL AS first_tenant_living_answer,
-            NULL AS first_tenant_living_answer_channel
+            NULL AS first_tenant_living_answer_channel,
+            NULL AS reason_visit_contested
         FROM
             bsc
     ),
@@ -173,7 +176,7 @@ WITH
             datalake_ebdb_clean.visit AS v
                 ON v.id = b.id_visit
         WHERE
-            v.ts_created::DATE < '2024-11-01'
+            DATE(v.ts_created) < '2024-11-01'
             AND b.type = 'Visita'
         GROUP BY 1
     )
@@ -207,13 +210,13 @@ SELECT
     vbm.has_3p_access_control,
     visit.status,
     CASE
-        WHEN visit.ts_created::DATE >= '2024-11-01' THEN visit.computed_status
-        WHEN visit.ts_created::DATE < '2024-11-01' AND pva.event_type = 'VISIT_DONE' THEN 'DONE'
-        WHEN visit.ts_created::DATE < '2024-11-01' AND pva.event_type = 'VISIT_UNSUCCESSFUL' THEN 'UNSUCCESSFUL'
-        WHEN visit.ts_created::DATE < '2024-11-01' AND visit_cancellation.id_visit IS NOT NULL THEN 'CANCELED'
-        WHEN visit.ts_created::DATE < '2024-11-01' AND visit_log.ts_visit_stalled IS NOT NULL THEN 'STALLED'
-        WHEN visit.ts_created::DATE < '2024-11-01' AND lbs.last_status = 'AguardandoConfirmacao' THEN 'REQUESTED'
-        WHEN visit.ts_created::DATE < '2024-11-01' AND lbs.last_status = 'Marcado' THEN 'CONFIRMED'
+        WHEN DATE(visit.ts_created) >= '2024-11-01' THEN visit.computed_status
+        WHEN DATE(visit.ts_created) < '2024-11-01' AND pva.event_type = 'VISIT_DONE' THEN 'DONE'
+        WHEN DATE(visit.ts_created) < '2024-11-01' AND pva.event_type = 'VISIT_UNSUCCESSFUL' THEN 'UNSUCCESSFUL'
+        WHEN DATE(visit.ts_created) < '2024-11-01' AND visit_cancellation.id_visit IS NOT NULL THEN 'CANCELED'
+        WHEN DATE(visit.ts_created) < '2024-11-01' AND visit_log.ts_visit_stalled IS NOT NULL THEN 'STALLED'
+        WHEN DATE(visit.ts_created) < '2024-11-01' AND lbs.last_status = 'AguardandoConfirmacao' THEN 'REQUESTED'
+        WHEN DATE(visit.ts_created) < '2024-11-01' AND lbs.last_status = 'Marcado' THEN 'CONFIRMED'
     END AS computed_status_unified,
     computed_status_unified AS computed_status,
     visit.behavior,
@@ -240,7 +243,7 @@ SELECT
     visit_cancellation.channel AS cancellation_channel,
     visit_cancellation.type AS cancellation_type,
     visit_cancellation.author_user_role AS cancellation_author_role,
-    IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.reason, NULL) AS unsuccessful_reason,
+    pva.unsuccessful_reason,
     CASE
         WHEN visit_log.ts_visit_registered IS NOT NULL THEN 'REGISTERED'
         WHEN visit_log.ts_visit_fitted IS NOT NULL THEN 'FITTED'
@@ -262,14 +265,15 @@ SELECT
     visit_log.first_tenant_living_answer_channel,
     visit_log.visit_first_confirmed_channel,
     visit_log.visit_first_confirmed_user_role,
+    pva.channel AS visit_finalization_agent_channel,
     CASE
       WHEN visit_log.nbr_reschedule IS NULL THEN 0
       ELSE visit_log.nbr_reschedule
     END AS nbr_reschedule,
     vbh.nbr_agent,
-    DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_last_event) AS journey_days,
-    DATEDIFF(HOUR, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS hours_waiting_for_answers,
-    DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS days_waiting_for_answers,
+    DATEDIFF(visit_log.ts_last_event, visit_log.ts_first_event) AS journey_days,
+    TIMESTAMPDIFF(HOUR, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS hours_waiting_for_answers,
+    DATEDIFF(visit_log.ts_visit_supply_answer, visit_log.ts_first_event) AS days_waiting_for_answers,
     CASE
         WHEN vbh.nbr_agent > 1 THEN TRUE
         ELSE FALSE
@@ -293,11 +297,14 @@ SELECT
     IF(visit_log.ts_visit_tenant_answer IS NOT NULL, TRUE, NULL) AS has_tenant_answered,
     IF(visit_log.ts_visit_tenant_confirmed IS NOT NULL, TRUE, NULL) AS has_tenant_confirmed,
     visit_cancellation.is_cancelled_by_expiration,
-    IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_demand_attended, NULL) AS has_unsuccessful_demand_attended,
-    IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_agent_attended, NULL) AS has_unsuccessful_agent_attended,
-    IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_supply_attended, NULL) AS has_unsuccessful_supply_attended,
-    visit.ts_created::DATE = visit.ts_visit::DATE AS is_visit_same_day_first_schedule,
-    COALESCE(visit_log.ts_visit_rescheduled::DATE, visit.ts_created::DATE) = visit.ts_visit::DATE AS is_visit_same_day_last_schedule,
+    pva.has_unsuccessful_demand_not_attended,
+    pva.has_unsuccessful_agent_not_attended,
+    pva.has_unsuccessful_supply_not_attended,
+    DATE(visit.ts_created) = DATE(visit.ts_visit) AS is_visit_same_day_first_schedule,
+    COALESCE(DATE(visit_log.ts_visit_rescheduled), DATE(visit.ts_created)) = DATE(visit.ts_visit) AS is_visit_same_day_last_schedule,
+    IF(visit_log.reason_visit_contested = 'WRONG_VISIT_DONE_STATUS', TRUE, FALSE) AS is_completed_visit_contested_by_demand,
+    IF(visit_log.reason_visit_contested = 'WRONG_CANCELLATION_REASON', TRUE, FALSE) AS is_canceled_visit_contested_by_demand,
+    IF(visit_log.reason_visit_contested IS NOT NULL, TRUE, FALSE) AS is_visit_contested_by_demand,
     visit.dt_visit,
     TO_UTC_TIMESTAMP(
         (

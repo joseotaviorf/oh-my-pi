@@ -14,16 +14,25 @@ WITH available_hours AS (
     datalake_sale_available_booking_hours.weekly_available_booking_hours
 ),
 key_location_by_day AS (
+  WITH key_location_by_day_ranked AS (
+    SELECT
+      id_house,
+      key_location,
+      ts_entrance_started AS ts_key_location_started,
+      LAG(key_location) OVER (PARTITION BY id_house ORDER BY ts_entrance_started) AS prev_key_location
+    FROM
+      datalake_ebdb_listing.house_entrance_history
+    WHERE
+      is_last_status_of_day
+  )
   SELECT
     id_house,
     key_location,
-    ts_entrance_started AS ts_key_location_started
+    ts_key_location_started
   FROM
-    datalake_ebdb_listing.house_entrance_history
+    key_location_by_day_ranked
   WHERE
-    is_last_status_of_day
-  QUALIFY
-    LAG(key_location) OVER (PARTITION BY id_house ORDER BY ts_entrance_started) IS DISTINCT FROM key_location
+    prev_key_location IS DISTINCT FROM key_location
 ),
 key_location AS (
   SELECT
@@ -69,26 +78,37 @@ visits_unauthorized_entry AS (
     datalake_visit.visits AS v
   WHERE
     v.business_context = 'SALE'
-    AND v.unsuccessful_reason = 'EntradaNaoAutorizada'
+    AND v.unsuccessful_reason = 'ACCESS_TO_HOUSE_NOT_AUTHORIZED'
   GROUP BY
     1, 2
 ),
 suspected_unavailability_listings_aux AS (
+  WITH suspected_unavailability_listings_ranked AS (
+    SELECT
+      l_aud.id_house,
+      DATE(r.ts_revision) AS date,
+      r.ts_revision,
+      LAST(r.ts_revision) OVER (PARTITION BY l_aud.id_house, DATE(r.ts_revision)) AS last_ts_revision,
+      l_aud.is_confirmed AS aud_is_confirmed,
+      l.is_confirmed AS listing_is_confirmed
+    FROM
+      datalake_ebdb_clean.suspected_unavailability_listings_aud AS l_aud
+    INNER JOIN
+      datalake_ebdb_clean.suspected_unavailability_listings AS l
+        ON l_aud.id_house = l.id_house
+    INNER JOIN
+      datalake_ebdb_user.user_revision_entity AS r
+        ON l_aud.rev = r.id
+  )
   SELECT
-    l_aud.id_house,
-    DATE(r.ts_revision) AS date
+    id_house,
+    date
   FROM
-    datalake_ebdb_clean.suspected_unavailability_listings_aud AS l_aud
-  INNER JOIN
-    datalake_ebdb_clean.suspected_unavailability_listings AS l
-      ON l_aud.id_house = l.id_house
-  INNER JOIN
-    datalake_ebdb_user.user_revision_entity AS r
-      ON l_aud.rev = r.id
-  QUALIFY
-    LAST(r.ts_revision) OVER (PARTITION BY l_aud.id_house, DATE(r.ts_revision)) = r.ts_revision
-    AND l_aud.is_confirmed IS FALSE
-    AND l.is_confirmed IS FALSE
+    suspected_unavailability_listings_ranked
+  WHERE
+    last_ts_revision = ts_revision
+    AND aud_is_confirmed IS FALSE
+    AND listing_is_confirmed IS FALSE
 ),
 suspected_unavailability_listings AS (
   SELECT
@@ -115,34 +135,54 @@ rent_contracts AS (
     AND is_canceled IS FALSE
 ),
 status_change_by_day AS (
-  SELECT
-    lbc.id_house,
-    h.id_region,
-    lbc.status,
-    ure.ts_revision
-  FROM
-    datalake_ebdb_clean.listing_business_context_aud AS lbc
-  JOIN
-    datalake_ebdb_user.user_revision_entity AS ure
-      ON lbc.rev = ure.id
-  JOIN
-    datalake_ebdb_clean.house AS h
-      ON lbc.id_house = h.id
-  WHERE
-    lbc.business_context = 'SALE'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY lbc.id_house, DATE(ure.ts_revision) ORDER BY ure.ts_revision DESC) = 1
-),
-status_changes_aux AS (
+  WITH status_change_by_day_ranked AS (
+    SELECT
+      lbc.id_house,
+      h.id_region,
+      lbc.status,
+      ure.ts_revision,
+      ROW_NUMBER() OVER (PARTITION BY lbc.id_house, DATE(ure.ts_revision) ORDER BY ure.ts_revision DESC) AS rn
+    FROM
+      datalake_ebdb_clean.listing_business_context_aud AS lbc
+    JOIN
+      datalake_ebdb_user.user_revision_entity AS ure
+        ON lbc.rev = ure.id
+    JOIN
+      datalake_ebdb_clean.house AS h
+        ON lbc.id_house = h.id
+    WHERE
+      lbc.business_context = 'SALE'
+  )
   SELECT
     id_house,
     id_region,
     status,
     ts_revision
   FROM
-    status_change_by_day
-  QUALIFY
-    LAG(status) OVER (PARTITION BY id_house ORDER BY ts_revision) IS DISTINCT FROM status
+    status_change_by_day_ranked
+  WHERE
+    rn = 1
+),
+status_changes_aux AS (
+  WITH status_changes_aux_ranked AS (
+    SELECT
+      id_house,
+      id_region,
+      status,
+      ts_revision,
+      LAG(status) OVER (PARTITION BY id_house ORDER BY ts_revision) AS prev_status
+    FROM
+      status_change_by_day
+  )
+  SELECT
+    id_house,
+    id_region,
+    status,
+    ts_revision
+  FROM
+    status_changes_aux_ranked
+  WHERE
+    prev_status IS DISTINCT FROM status
 ),
 status_changes AS (
   SELECT
@@ -355,6 +395,27 @@ create_tiers AS (
     score
 ),
 grouping_tiers AS (
+  WITH grouping_tiers_ranked AS (
+    SELECT
+      id_house,
+      id_region,
+      status,
+      availability_score,
+      key_location_score,
+      week_available_hours_score,
+      cancel_by_owner_score,
+      has_active_rental_contract_score,
+      cancel_by_unauthorized_entry_score,
+      suspicious_listing_contact_score,
+      tier,
+      tier_disclaimer,
+      tier_drill_down,
+      ts_tier_started,
+      MIN(IF(status = 'PUBLISHED', ts_tier_started, NULL)) OVER (PARTITION BY id_house) AS min_published_ts_tier_started,
+      LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started) AS prev_tier
+    FROM
+      create_tiers
+  )
   SELECT
     id_house,
     id_region,
@@ -371,10 +432,10 @@ grouping_tiers AS (
     tier_drill_down,
     ts_tier_started
   FROM
-    create_tiers
-  QUALIFY
-    ts_tier_started = MIN(IF(status = 'PUBLISHED', ts_tier_started, NULL)) OVER (PARTITION BY id_house)
-    OR tier != LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started)
+    grouping_tiers_ranked
+  WHERE
+    ts_tier_started = min_published_ts_tier_started
+    OR tier != prev_tier
 ),
 tier_status AS (
   SELECT
