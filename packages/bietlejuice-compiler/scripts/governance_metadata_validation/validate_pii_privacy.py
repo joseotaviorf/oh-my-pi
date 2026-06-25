@@ -20,6 +20,9 @@ from scripts.ci_cd.domain_cli import (
     domain_arg_type,
     repo_relative_file_arg_type,
 )
+from scripts.governance_metadata_validation.lineage_privacy_validator import (
+    validate_lineage_privacy_for_files,
+)
 from scripts.governance_metadata_validation.pii_privacy_checks import (
     REPO_ROOT,
     catalog_classification_for,
@@ -30,6 +33,13 @@ from scripts.governance_metadata_validation.pii_privacy_checks import (
     load_pii_catalog,
     validate_controls_against_privacy_index,
     validate_metadata_privacy,
+)
+from scripts.governance_metadata_validation.pii_privacy_report import (
+    format_tier_note,
+    print_no_files_in_scope,
+    print_report,
+    print_scope_header,
+    relative_repo_path,
 )
 from scripts.services.git_service import GitService
 from scripts.services.metadata_file_service import MetadataFileService
@@ -77,6 +87,19 @@ def parse_args():
     )
 
 
+def branch_from_ref(branch: str) -> str:
+    if not branch:
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+        ).strip()
+    return branch_name_arg_type(branch)
+
+
+def diff_from_branch(branch: str) -> str:
+    branch = branch_from_ref(branch)
+    return "HEAD~1" if branch == "master" else "origin/master"
+
+
 def get_metadata_file_paths(mode, input_value, domain=None):
     files = []
     if mode == "file":
@@ -85,13 +108,7 @@ def get_metadata_file_paths(mode, input_value, domain=None):
         files = metadata_file_service.list_metadata_files()
     else:
         git_service = GitService()
-        branch = input_value
-        if not branch:
-            branch = subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
-            ).strip()
-        branch = branch_name_arg_type(branch)
-        from_branch = "HEAD~1" if branch == "master" else "origin/master"
+        from_branch = diff_from_branch(input_value)
         files = [
             (file_path, status)
             for file_path, status in git_service.get_modified_files_from_diff(
@@ -120,17 +137,40 @@ def _controls_changed_in_diff(from_branch: str, to_branch: str) -> bool:
     )
 
 
+def controls_changed_for_branch(branch: str) -> bool:
+    from_branch = diff_from_branch(branch)
+    return _controls_changed_in_diff(from_branch, "HEAD")
+
+
 def main():
     mode, input_value, verbose, domain = parse_args()
+    branch_label = branch_from_ref(input_value) if mode == "branch" else None
     skip_list = _load_skip_list()
     catalog = load_pii_catalog()
     catalog_types = set(catalog.get("types", {}).keys())
     controls = load_anonymization_controls()
     metadata_files = get_metadata_file_paths(mode, input_value, domain=domain)
+    run_controls_check = mode == "all_files"
+    if mode == "branch":
+        run_controls_check = controls_changed_for_branch(input_value)
+
+    if not metadata_files and not run_controls_check:
+        print_no_files_in_scope(domain=domain)
+        return
+
+    print_scope_header(
+        branch=branch_label,
+        domain=domain,
+        file_count=len(metadata_files),
+    )
+
     errors: list = []
+    warnings: list = []
     passed = []
     skipped = []
     tier_notes: list = []
+    all_metadata_paths = list_all_metadata_paths()
+    lineage_check_paths: list[Path] = []
 
     for file_path, _status in metadata_files:
         if remove_prefix(file_path) in skip_list:
@@ -140,9 +180,16 @@ def main():
             metadata = yaml.safe_load(handle) or {}
         file_errors = validate_metadata_privacy(metadata, catalog_types)
         if file_errors:
-            errors.extend(f"{file_path}: {err}" for err in file_errors)
+            errors.extend(
+                f"{relative_repo_path(file_path)}: {err}" for err in file_errors
+            )
         else:
             passed.append(file_path)
+        if metadata.get("privacy") or any(
+            isinstance(col, dict) and col.get("privacy")
+            for col in (metadata.get("columns") or {}).values()
+        ):
+            lineage_check_paths.append(REPO_ROOT / file_path)
         if verbose:
             for id_entity, _col, privacy in iter_privacy_entities_from_metadata(
                 metadata
@@ -151,39 +198,33 @@ def main():
                 if pii_type:
                     tier = catalog_classification_for(pii_type, catalog)
                     tier_notes.append(
-                        f"{file_path} {id_entity}: piiType={pii_type} "
-                        f"catalog.classification={tier}"
+                        format_tier_note(file_path, id_entity, pii_type, tier)
                     )
 
-    run_controls_check = mode == "all_files"
-    if mode == "branch":
-        branch = (
-            input_value
-            or subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
-            ).strip()
-        )
-        from_branch = (
-            "HEAD~1" if branch_name_arg_type(branch) == "master" else "origin/master"
-        )
-        run_controls_check = _controls_changed_in_diff(from_branch, "HEAD")
-
     if controls and run_controls_check:
-        privacy_index = index_customer_privacy_entities(list_all_metadata_paths())
+        privacy_index = index_customer_privacy_entities(all_metadata_paths)
         errors.extend(validate_controls_against_privacy_index(controls, privacy_index))
 
-    if verbose:
-        print(f"passed={len(passed)} skipped={len(skipped)}")
-        if tier_notes:
-            print("Derived catalog tiers (informational):")
-            for note in tier_notes:
-                print(f"  {note}")
+    if lineage_check_paths:
+        lineage_errors, lineage_warnings = validate_lineage_privacy_for_files(
+            lineage_check_paths, all_metadata_paths
+        )
+        if mode == "branch":
+            errors.extend(lineage_errors)
+        else:
+            warnings.extend(lineage_errors)
+        warnings.extend(lineage_warnings)
+
+    print_report(
+        passed=passed,
+        skipped=skipped,
+        warnings=warnings,
+        errors=errors,
+        tier_notes=tier_notes,
+        verbose=verbose,
+    )
     if errors:
-        print("PII privacy validation errors:")
-        for err in errors:
-            print(f"  - {err}")
         raise SystemExit(1)
-    print("Result: PII privacy validation passed.")
 
 
 if __name__ == "__main__":

@@ -202,13 +202,11 @@ steps:
       path:
         include:
           - "dags/**/*.yml"
-          # Keep: a controls-only PR (rae.yml) must still run the RAE cross-check.
+          - "governance/pii_catalog/**"
           - "governance/pii_anonymization_controls/**"
           # Keep: validator-only PRs must re-run the check (same as metadata-content / lineage).
           - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
-          # NOTE: governance/pii_catalog/** is intentionally NOT a trigger — in
-          # branch mode a catalog-only change validates no metadata. Re-add when
-          # Phase 2 wires a full-scan to detect orphaned piiType slugs.
+          # Post-backfill gate may add full-scan for orphaned piiType slugs.
           - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]

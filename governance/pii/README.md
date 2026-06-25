@@ -1,18 +1,76 @@
-# PII governance (phase 1)
+# PII governance
 
 Normative types: [`../pii_catalog/pii_catalog.yml`](../pii_catalog/pii_catalog.yml) (version in file — short slugs such as `cpf`, `rg`, `cnh`; `classification` is `personal`, `sensitive`, or `highly_personal`).
 
-Declare PII per column in `dags/**/metadata/**/*.yml`:
+## Roadmap
+
+| Phase | Scope |
+|-------|--------|
+| **1** | Catalog, Yamale `columns.*.privacy`, `validate-pii-privacy`, RAE controls |
+| **2** | Optional table-level `privacy.dataSubjectType`, lineage propagation checks, governance-domain pilot backfill |
+| **3** | Metadata backfill PRs (YAML only), lineage-first local tooling |
+| **Post-backfill** | Table `privacy.dataSubjectType` required in Yamale + CI hard fail |
+
+## Declare PII (Phase 2 contract)
+
+**Titular (who the data is about)** — optional until post-backfill gate; preferred format when classifying:
 
 ```yaml
 privacy:
-  piiType: cpf                  # slug from pii_catalog.yml
-  dataSubjectType: [customer]   # customer | employee | partner
+  dataSubjectType:
+    - employee
+    # add more lines when needed: - customer  - partner
 ```
 
-- No `privacy` section → not declared as PII (CI passes).
-- `customer` → masked in authX after metadata is on `master` (unless RAE in [`../pii_anonymization_controls/`](../pii_anonymization_controls/)).
+**Type of personal data** — per column (or `jsonPaths`):
+
+```yaml
+columns:
+  work_email:
+    lineage:
+      - datalake_pin_core_clean.person.work_email
+    description: "Corporate email."
+    privacy:
+      piiType: corporate_email
+```
+
+- Table `privacy.dataSubjectType` is **optional** during Phase 2/3 backfill.
+- List **includes `customer`** → customer PII masked in authX after metadata is on `master` (unless RAE in [`../pii_anonymization_controls/`](../pii_anonymization_controls/)).
 - Production masking is configured in authX, not in this repo.
+
+### Lineage-first classification
+
+1. Classify **upstream** tables/columns first (raw → clean → enrich → dw).
+2. For downstream columns, use `lineage` to inherit `piiType` from the source column.
+3. Propagate **table** `dataSubjectType` from upstream datasets when the whole table is the same titular.
+4. Use **column-level** `dataSubjectType` only as an override (e.g. mixed titular in one dataset).
+
+### Legacy (Phase 1) column format
+
+Still supported during migration:
+
+```yaml
+privacy:
+  piiType: cpf
+  dataSubjectType:
+    - customer
+```
+
+Prefer moving `dataSubjectType` to the table `privacy` block when backfilling.
+
+### JSON columns (`jsonPaths`)
+
+```yaml
+privacy:
+  dataSubjectType:
+    - customer
+columns:
+  person_payload:
+    privacy:
+      jsonPaths:
+        - path: $.holder.cpf
+          piiType: cpf
+```
 
 ## CI
 
@@ -21,7 +79,12 @@ make validate-pii-privacy CI_COMMIT_BRANCH=<branch>
 make validate-metadata-files-content CI_COMMIT_BRANCH=<branch>
 ```
 
-Classification backfill is done locally; follow-up PRs contain **only** updated DAG metadata YAML.
+Both run on **metadata files changed in the PR** (not the whole repo). Positive validation only: no `privacy` section → CI passes.
+
+- **Branch / PR:** schema + lineage privacy mismatches on changed metadata files → **errors**.
+- **All files (`-a`):** lineage issues → **warnings** (informational).
+
+Classification backfill is done locally under `governance/pii/local/` (not committed); follow-up PRs contain **only** updated DAG metadata YAML.
 
 ## Where this lives (and what it is)
 

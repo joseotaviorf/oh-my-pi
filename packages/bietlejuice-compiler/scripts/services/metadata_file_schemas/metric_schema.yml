@@ -4,6 +4,7 @@ table_name: str(min=1, max=280)
 owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*')
 domain: regex('Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|Growth|International|Journey Optimizer|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|Conversational XP|DS Pricing|Atlas DB|Broker XP|House and Listing')
 description: str()
+privacy: include("table_privacy_schema", required=False)
 columns: map(include("column_with_dimension"), include("column_with_metric"), key=str(min=1, max=280))
 ---
 column_with_dimension:

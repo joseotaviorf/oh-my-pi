@@ -1,4 +1,10 @@
-# Yamale type for the columns.*.privacy section (YAML key remains `privacy:`).
+# PII privacy Yamale types (YAML key `privacy:` on table and columns).
+
+# Table-level titular (optional until post-backfill gate).
+table_privacy_schema:
+  dataSubjectType: list(str(min=1, max=64), min=1)
+---
+# Column-level PII (piiType; dataSubjectType optional when set on table).
 privacy_schema:
   piiType: str(min=1, max=64, required=False)
   dataSubjectType: list(str(min=1, max=64), min=1, required=False)
@@ -7,4 +13,4 @@ privacy_schema:
 privacy_json_path:
   path: str(min=1, max=512)
   piiType: str(min=1, max=64)
-  dataSubjectType: list(str(min=1, max=64), min=1)
+  dataSubjectType: list(str(min=1, max=64), min=1, required=False)
