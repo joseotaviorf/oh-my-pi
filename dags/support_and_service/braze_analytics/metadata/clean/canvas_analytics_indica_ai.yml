@@ -2,7 +2,7 @@
 database_name: datalake_braze_analytics_clean
 table_name: canvas_analytics_indica_ai
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: Daily series of various stats for a canvas over time for the IndicaAi app group. Data includes how many messages were sent, opened, clicked, or converted by messaging channel.
 columns:
   id_canvas:

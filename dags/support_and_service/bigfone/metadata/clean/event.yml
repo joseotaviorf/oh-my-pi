@@ -3,7 +3,7 @@ table_name: event
 description: Clean version of the Bigfone telephony events ingested from Twilio
   TaskRouter, with one row per event in the lifecycle of a call-handling task.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier of the Bigfone event row, inherited from the
@@ -176,3 +176,16 @@ columns:
     description: Day component of the event date, used as a partition column.
     lineage:
       - datalake_bigfone_raw.event.day
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row in the source database.
+    lineage:
+      - datalake_bigfone_raw.event.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the upstream operational system.
+    lineage:
+      - datalake_bigfone_raw.event.ts_database_transaction

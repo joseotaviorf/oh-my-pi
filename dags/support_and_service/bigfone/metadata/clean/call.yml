@@ -43,3 +43,20 @@ columns:
     lineage:
       - datalake_bigfone_raw.call.end_time
     description: Timestamp when the call ended or was disconnected.
+  op_cdc:
+    lineage:
+      - datalake_bigfone_raw.call.op_cdc
+    description: CDC operation type captured by Debezium for this row in the source database.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_bigfone_raw.call.ts_cdc_transaction
+    description: Timestamp when the CDC pipeline captured this transaction with millisecond precision.
+  ts_database_transaction:
+    lineage:
+      - datalake_bigfone_raw.call.ts_database_transaction
+    description: Timestamp of the original database transaction in the upstream operational system.

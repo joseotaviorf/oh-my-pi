@@ -2,7 +2,7 @@
 database_name: datalake_braze_analytics_clean
 table_name: campaign_analytics_tenants
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: Daily series of various stats for a campaign over time. Data includes how many messages were sent, opened, clicked, or converted by messaging channel.
 columns:
   id_campaign:
@@ -30,7 +30,7 @@ columns:
     lineage:
       - datalake_braze_analytics_raw.campaign_analytics_tenants.conversions3_by_send_time
   conversions:
-    description: Number of Conversions.
+    description: Business value representing conversions on the campaign_analytics_tenants clean dataset.
     lineage:
       - datalake_braze_analytics_raw.campaign_analytics_tenants.conversions
   conversions1:
