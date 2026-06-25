@@ -95,6 +95,10 @@ DBP uses a standard sequence; exact transition IDs vary by issue type/workflow �
 
 Add subsections or tables for **custom field IDs**, **components**, **labels**, **priority names**, **board/JQL filters**, or **parent epic keys** once confirmed — only facts that stay true across tickets until config changes.
 
+### Codifying delivery learnings
+
+When a DBP delivery surfaces a **reusable** pattern (SCD edge case, naming, metadata style, EMR SQL idiom), capture it in **`.cursor/rules/people/people_domain.mdc`** and, if agents need a playbook entry point, **`.cursor/skills/people/people-dw-patterns/SKILL.md`**. Keep ticket-specific repro data out of rules (no person numbers, addresses, or PII). Prefer a focused docs-only PR or a final commit on the same epic — not blocking the functional merge unless the team asks.
+
 ---
 
 ## When a Jira/API call is still required
@@ -110,5 +114,6 @@ Read **this reference** before Jira/MCP steps in any of these (each skill lives 
 | Skill `name` | Role |
 |----------------|------|
 | **`people-jira-branch-setup`** | Jira + Git: branch from `origin/master` / `origin/HEAD` — **procedural** steps in the skill; **`.cursor/temp/`** layout → **`people/people_domain.mdc`** (**Delivery artifact folder**); policies and naming → **this file**. |
+| **`people-dw-patterns`** | Playbook for People DW SQL/metadata patterns; canonical text in **`people_domain.mdc`**. |
 
 Other People skills added later under **`.cursor/skills/people/*/`** should still read **this reference** before Jira/MCP steps.

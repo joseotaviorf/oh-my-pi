@@ -45,6 +45,10 @@ Use this skill when starting **non–local-only** work on `bi-etl-ejuice`. If **
 
 - After **`{KEY}/{slug}`** is the current branch, create **`.cursor/temp/{KEY}/{slug}/`** if missing (mirror rule in **`people_domain.mdc`**).
 
+### 5. After merge (optional)
+
+- If the delivery introduced a **durable** DW/SQL/metadata pattern, propose or open a small follow-up to **`people_domain.mdc`** / **`people-dw-patterns`** skill — see **Codifying delivery learnings** in **`dbp-jira-reference.md`**.
+
 ## Commit messages
 
 Use **English**, imperative mood, and the format in the **always-applied Cursor rules** for this repository.

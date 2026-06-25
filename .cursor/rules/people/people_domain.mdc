@@ -1,5 +1,5 @@
 ---
-description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, reverse export PII (no dim_person guard), Confluence People Data space identifiers for Atlassian MCP (cloudId, numeric spaceId, hub pageIds), reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
+description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, independent source SCD temporal resolution, EMR-safe SQL (no QUALIFY), business-first DW/metric metadata (PIN not Oracle HCM; no Oracle table names in descriptions), reverse export PII (no dim_person guard), Confluence People Data space identifiers for Atlassian MCP (cloudId, numeric spaceId, hub pageIds), reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
 globs: dags/people/**/*
 alwaysApply: false
 ---
@@ -21,6 +21,7 @@ Optional agent skills that complement this rule file (invoke by each skill’s Y
 | **`review-pr`** | `.cursor/skills/review-pr/SKILL.md` | Full local CI-style checks before merge (style, declarations, metadata pairs, etc.). |
 | **`sync-dw-documentation`** | `.cursor/skills/people/sync-dw-documentation/SKILL.md` | Authoring or refreshing **People DW** business Markdown under `dags/people/dw_*/docs/` from **`REFERENCE_TEMPLATE.md`** (SQL + `metadata/dw` synergy). |
 | **`publish-confluence-markdown`** | `.cursor/skills/people/publish-confluence-markdown/SKILL.md` | Syncing `dags/people/**/docs/dw_*.md` to Confluence via Atlassian MCP (**draft-first**, title hygiene, **`people_domain.mdc`** IDs). |
+| **`people-dw-patterns`** | `.cursor/skills/people/people-dw-patterns/SKILL.md` | Editing **People DW / metric** SQL and metadata: independent source SCDs, EMR-safe dedup (no `QUALIFY`), business-first metadata (PIN, no Oracle names in descriptions). |
 
 For **`workflow.type: api_ingestion`** under **`dags/people/`**, follow **`docs/api_ingestion/user_guide.md`** (and **`contributing.md`** for code changes) plus the **New DAGs in People** / **Mandatory Declaration** sections in this file (bucket, `*_people_cluster`, ACL, `credentials_scope`, etc.).
 
@@ -79,7 +80,7 @@ Repo-wide `sql_conventions.mdc` requires reverse DAGs that export personal data 
 
 | Topic | People domain |
 |-------|----------------|
-| **Identity model** | Workforce records come from **Oracle HCM Cloud**, ingested via **`pin_*` DAGs** (`dw_employee_details`, `metric_people.employee_snapshots`, etc.). **PIN** is the internal name for that ingestion stack — not a separate employee population. |
+| **Identity model** | Workforce records come from **PIN** (**Person Information** — QuintoAndar's name for Oracle HCM Cloud), ingested via **`pin_*` DAGs** (`dw_employee_details`, `metric_people.employee_snapshots`, etc.). PIN is the internal product name, not a separate employee population. |
 | **`dw_public.dim_person`** | Platform **customer/user** identity (`id_user`, `uuid_person`). It does **not** contain Oracle HCM workforce records and is **not** joinable to HR snapshots on `sk_person` or `id_user`. |
 | **Reverse exports** | GSheets/API exports of employee PII (name, CPF, email) are **intentional** for internal consumers (Benefits, HR, InfoSec). Do **not** add `dim_person` joins or `has_right_to_be_forgotten` guards unless a future People-specific erasure source is defined. |
 | **PR review** | Automated reviewers (e.g. Kody) may flag this — dismiss as out of scope for People; cite this section. |
@@ -347,6 +348,37 @@ When building SCD Type 2 dimensions, **merge consecutive periods** with identica
 
 **Bad**: Multiple version records for the same attribute values across consecutive periods.
 
+### Temporal attribute resolution (independent source SCDs)
+
+A DW dimension may version on one **grain** (e.g. `all_people.dt_effective_started`) while an attribute is sourced from a `pin_*` clean table with **its own** effective dating.
+
+| Dimension version | Attribute join reference |
+|-------------------|--------------------------|
+| **Historical** (`is_current = false`) | As-of that version's `dt_valid_from` |
+| **Current** (`is_current = true`) | As-of **`CURRENT_DATE`** |
+
+**Why:** PIN can update the attribute SCD without a new row on the dimension grain. Joining the attribute only at `dt_valid_from` leaves the **current** dimension version stale.
+
+**Implementation:**
+
+- Add an internal reference date in a CTE (name with **`dt_*`**, e.g. `dt_attribute_referenced`).
+- When version CTEs already filter `dt_effective_started <= CURRENT_DATE`, the active version per person is often **`MAX(dt_effective_started)`** — prefer that over a heavier `LEAD` pattern when sufficient.
+- Document **behavior** in a SQL `--` comment at the top of the query file; do not put step-by-step join logic in metadata `description`.
+
+**Known follow-up:** `is_current` can still be true for more than one row per person when several grain versions share the same `dt_effective_started`. Fix in a dedicated ticket — do not paper over in unrelated PRs.
+
+---
+
+## DW Layer — SQL (dual-runtime / EMR)
+
+All SQL under `dags/people/**` must run on **Databricks DBR 16.4** and **EMR Spark 3.5** (see `emr_compatibility.mdc` and **`databricks-emr-sql-lint`** skill).
+
+| Avoid | Prefer |
+|-------|--------|
+| `QUALIFY` | Ranked CTE with `ROW_NUMBER() … AS rn`, then `WHERE rn = 1` (or join with `AND alias.rn = 1`) |
+
+Apply when deduplicating in DW/enrich/clean People queries — same pattern as `dim_documentation.sql`.
+
 ---
 
 ## DW Layer — Fact Tables — Date Columns
@@ -409,9 +441,9 @@ When the source does not distinguish requested period vs actual period, use a **
 
 ## Source Systems
 
-### pin_ DAGs — Oracle HCM
+### pin_ DAGs — PIN (Person Information)
 
-DAGs whose names start with `pin_` (e.g. `pin_core`) are based on Oracle database tables and views from HCM (Human Capital Management). **Extracts:** `pin_*` DAGs. **Key Tables:** `per_all_people_f`, `per_all_assignments_m`. **Effective dating** (`effective_start_date` AND `effective_end_date`) is the core logic.
+**PIN** = **Person Information** — the workforce HR system QuintoAndar uses internally (Oracle HCM Cloud in the vendor layer). DAGs named `pin_*` (e.g. `pin_core`) ingest PIN tables and views. **Extracts:** `pin_*` DAGs. **Key source tables (engineering/SQL only — never in DW/metric metadata descriptions):** `per_all_people_f`, `per_all_assignments_m`. **Effective dating** (`effective_start_date` AND `effective_end_date`) is the core logic.
 
 **Reference:** https://docs.oracle.com/en/cloud/saas/human-resources/oedmh/hcm-tables-and-views.html
 
@@ -566,6 +598,41 @@ Governance metadata (`metadata/{layer}/{table}.yml`) must clearly document **bus
 - **Column descriptions**: Clarify business meaning, valid values, and usage (e.g., "use display_name for communications; legal_name for compliance only")
 - **Lineage**: Keep lineage accurate, but descriptions should focus on what the data represents for the business
 - **Column order**: Column order in metadata must match the SQL query order (helps consumers and lineage validation)
+
+### People DW and metric metadata — business audience (FAIR F2-02)
+
+**Scope:** `metadata/dw/` and `metadata/metric/` under `dags/people/` (and People-facing columns in `metric_people`).
+
+**Audience:** HR, People Analytics, Benefits, and other **business** consumers — not engineers tracing SQL. Descriptions are read in DataHub/catalog UIs; **`lineage`** carries technical provenance.
+
+| Rule | Detail |
+|------|--------|
+| **Business language only** | Grain, SCD behavior, what the column means for decisions, valid values, how to join at a **business** level |
+| **No implementation detail** | No join algorithms, effective-dating mechanics, CTE/window logic, or dedup rules in YAML — put those in SQL `--` comments |
+| **Never Oracle table/view names** | Do **not** cite `per_*`, `PER_*`, or any Oracle object name in table or column `description` |
+| **Prefer PIN over Oracle HCM** | If the source system must be named in prose, say **PIN** (Person Information), not "Oracle HCM", "Oracle", or vendor table prefixes |
+| **Lineage vs description** | `lineage` uses lake identifiers (`datalake_pin_core_clean.*`) for governance; descriptions stay vendor-agnostic |
+
+When a file is in the PR diff, `make validate-fair-metadata` enforces substantive descriptions. Balance business readability with CI:
+
+| Do | Avoid |
+|----|--------|
+| One-line business meaning per column | Repeating "at this version" on every column |
+| PIN or domain terms in table `description` when source context helps | Oracle/HCM table or view names anywhere in `description` |
+| SQL `--` comments for temporal join / dedup mechanics | Implementation walkthroughs in YAML `description` |
+| Distinct phrasing (e.g. "International dialing prefix…") | `boilerplate_or_name_echo` — description that only restates the column name |
+
+Touch only columns you change when possible; expanding descriptions on unrelated columns triggers FAIR on the whole file.
+
+```yaml
+# Good — metric/dw column (business)
+personal_email:
+  description: Non-work email address registered in PIN for the employee.
+
+# Bad — Oracle name or engineering detail in description
+personal_email:
+  description: Email from per_email_addresses where email_type = H1, joined at dt_effective_started.
+```
 
 ### Column Descriptions — Single-Line Only
 
