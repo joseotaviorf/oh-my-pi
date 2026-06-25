@@ -29,6 +29,9 @@ from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.services.metastore_services.hive_metastore_service import (
     HiveMetastoreService,
 )
+from bietlejuice.services.metastore_services.hive_sync_partition_utils import (
+    should_skip_emr_hive_partition_sync,
+)
 
 JOB_NAME = "sync_metadata"
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -213,7 +216,13 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
     )
 
     schema = StructType([StructField("table_name", StringType(), True)])
-    spark_table_names = list(tables_partition_values.keys())
+    spark_table_names = []
+    for table in tables_partition_values:
+        if should_skip_emr_hive_partition_sync(
+            spark_ms.spark_database_name, table, spark=spark
+        ):
+            continue
+        spark_table_names.append(table)
     df = spark.createDataFrame([(name,) for name in spark_table_names], schema=schema)
     df.foreach(
         lambda row: func(row.table_name, tables_partition_values[row.table_name])

@@ -8,6 +8,9 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers.databricks_consumer import DatabricksConsumer
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.hive_sync_partition_utils import (
+    should_skip_emr_hive_partition_sync,
+)
 
 logger = QuintoAndarLogger("SparkMetastoreHelper")
 
@@ -209,9 +212,15 @@ class SparkMetastoreHelper:
 
             spark_ms_table_partition_values = []
             if get_partition_values and spark_ms_table_partition_keys:
-                spark_ms_table_partition_values = (
-                    self.get_spark_metastore_table_partition_values(table_name)
-                )
+                spark_session = self.spark_metastore_service.client.conn
+                if should_skip_emr_hive_partition_sync(
+                    self.spark_database_name, table_name, spark=spark_session
+                ):
+                    spark_ms_table_partition_values = []
+                else:
+                    spark_ms_table_partition_values = (
+                        self.get_spark_metastore_table_partition_values(table_name)
+                    )
 
             tables_spark_metadata[table_name] = dict()
             tables_spark_metadata[table_name]["name"] = table_name

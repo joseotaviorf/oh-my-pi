@@ -20,6 +20,8 @@ _private_modules = [
     "inmetro.validators",
     # edwiges is Nexus-only; cannot be installed locally
     "edwiges",
+    # optional DB driver; not always installed in the runtime test venv
+    "psycopg2",
 ]
 
 for _mod in _private_modules:
