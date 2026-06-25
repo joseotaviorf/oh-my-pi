@@ -121,7 +121,7 @@ workflow:
       merge_on: [id_case, id_expense]
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "[EXDTUPD]"
         - True
         - "[]"
     cardacct:
