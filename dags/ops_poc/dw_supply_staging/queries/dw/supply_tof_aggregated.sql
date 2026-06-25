@@ -51,7 +51,7 @@ cohort_events AS (
     FROM
         dw_growth.obt_supply
     WHERE
-        cd_funnel_step IN ('qualified','opportunity','first_listing')
+        cd_funnel_step IN ('qualified', 'av_qualified', 'opportunity', 'first_listing')
 ),
 
 campaign_name_historic_dictionary AS (
@@ -195,25 +195,56 @@ actual_vol AS (
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity', obt.sk_supply, NULL))) as act_opportunities
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'first_listing', obt.sk_supply, NULL))) as act_first_listings
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', qualifieds.sk_supply, NULL))) as qty_p2q_cohort
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=7, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_d7
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=14, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_d14
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=28, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_d28
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', qualifieds.date) = date_trunc('WEEK', obt.date), qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 1, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w1
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 2, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w2
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 3, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w3
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) = 4, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w4
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', qualifieds.date)) >= 5, qualifieds.sk_supply, NULL))) as qty_p2q_cohort_w5plus
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', opportunities.sk_supply, NULL))) as qty_p2o_cohort
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=7, opportunities.sk_supply, NULL))) as qty_p2o_cohort_d7
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=14, opportunities.sk_supply, NULL))) as qty_p2o_cohort_d14
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=28, opportunities.sk_supply, NULL))) as qty_p2o_cohort_d28
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', opportunities.date) = date_trunc('WEEK', obt.date), opportunities.sk_supply, NULL))) as qty_p2o_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 1, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w1
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 2, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w2
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 3, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w3
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 4, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w4
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) >= 5, opportunities.sk_supply, NULL))) as qty_p2o_cohort_w5plus
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect', first_listings.sk_supply, NULL))) as qty_p2l_cohort
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=7, qualifieds.sk_supply, NULL))) as    qty_p2q_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=7, opportunities.sk_supply, NULL))) as    qty_p2o_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=7, first_listings.sk_supply, NULL))) as    qty_p2l_cohort_d7
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=14, qualifieds.sk_supply, NULL))) as     qty_p2q_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=14, opportunities.sk_supply, NULL))) as     qty_p2o_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=14, first_listings.sk_supply, NULL)))  as   qty_p2l_cohort_d14
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(qualifieds.date, obt.date)<=28, qualifieds.sk_supply, NULL))) as     qty_p2q_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(opportunities.date, obt.date)<=28, opportunities.sk_supply, NULL))) as     qty_p2o_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and datediff(first_listings.date, obt.date)<=28, first_listings.sk_supply, NULL)))  as   qty_p2l_cohort_d28
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', qualifieds.date) = date_trunc('WEEK', obt.date), qualifieds.   sk_supply, NULL))) as qty_p2q_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', opportunities.date) = date_trunc('WEEK', obt.date),    opportunities.sk_supply, NULL))) as qty_p2o_cohort_w0
-        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', first_listings.date) = date_trunc('WEEK', obt.date),     first_listings.sk_supply, NULL))) as qty_p2l_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and date_trunc('WEEK', first_listings.date) = date_trunc('WEEK', obt.date), first_listings.sk_supply, NULL))) as qty_p2l_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 1, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w1
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 2, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w2
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 3, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w3
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 4, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w4
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'prospect' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) >= 5, first_listings.sk_supply, NULL))) as qty_p2l_cohort_w5plus
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified', av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and date_trunc('WEEK', av_qualifieds.date) = date_trunc('WEEK', obt.date), av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 1, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w1
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 2, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w2
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 3, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w3
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) = 4, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w4
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', av_qualifieds.date)) >= 5, av_qualifieds.sk_supply, NULL))) as qty_q2avq_cohort_w5plus
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified', opportunities.sk_supply, NULL))) as qty_avq2o_cohort
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and date_trunc('WEEK', opportunities.date) = date_trunc('WEEK', obt.date), opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 1, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w1
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 2, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w2
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 3, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w3
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) = 4, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w4
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'av_qualified' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', opportunities.date)) >= 5, opportunities.sk_supply, NULL))) as qty_avq2o_cohort_w5plus
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity', first_listings.sk_supply, NULL))) as qty_o2l_cohort
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and datediff(first_listings.date, obt.date)<=7, first_listings.sk_supply, NULL)))  as   qty_o2l_cohort_d7
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and datediff(first_listings.date, obt.date)<=14, first_listings.sk_supply,   NULL)))   as qty_o2l_cohort_d14
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and datediff(first_listings.date, obt.date)<=28, first_listings.sk_supply,   NULL)))   as qty_o2l_cohort_d28
         ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and date_trunc('WEEK', first_listings.date) = date_trunc('WEEK', obt.date),    first_listings.sk_supply, NULL))) as qty_o2l_cohort_w0
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 1, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w1
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 2, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w2
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 3, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w3
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) = 4, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w4
+        ,COUNT(DISTINCT (IF(obt.cd_funnel_step = 'opportunity' and TIMESTAMPDIFF(WEEK, date_trunc('WEEK', obt.date), date_trunc('WEEK', first_listings.date)) >= 5, first_listings.sk_supply, NULL))) as qty_o2l_cohort_w5plus
         ,NULL AS lastyear_leads
         ,NULL AS lastyear_prospects
         ,NULL AS lastyear_opportunities
@@ -244,6 +275,11 @@ actual_vol AS (
         ON obt.sk_supply = opportunities.sk_supply
         AND obt.nm_business_context = opportunities.nm_business_context
         AND opportunities.cd_funnel_step = 'opportunity'
+    LEFT JOIN
+      cohort_events av_qualifieds
+        ON obt.sk_supply = av_qualifieds.sk_supply
+        AND obt.nm_business_context = av_qualifieds.nm_business_context
+        AND av_qualifieds.cd_funnel_step = 'av_qualified'
     LEFT JOIN
       cohort_events first_listings
         ON obt.sk_supply = first_listings.sk_supply
@@ -324,25 +360,56 @@ bup AS (
         ,NULL AS act_opportunities
         ,NULL AS act_first_listings
         ,NULL AS qty_p2q_cohort
-        ,NULL AS qty_p2o_cohort
-        ,NULL AS qty_p2l_cohort
         ,NULL AS qty_p2q_cohort_d7
-        ,NULL AS qty_p2o_cohort_d7
-        ,NULL AS qty_p2l_cohort_d7
         ,NULL AS qty_p2q_cohort_d14
-        ,NULL AS qty_p2o_cohort_d14
-        ,NULL AS qty_p2l_cohort_d14
         ,NULL AS qty_p2q_cohort_d28
-        ,NULL AS qty_p2o_cohort_d28
-        ,NULL AS qty_p2l_cohort_d28
         ,NULL AS qty_p2q_cohort_w0
+        ,NULL AS qty_p2q_cohort_w1
+        ,NULL AS qty_p2q_cohort_w2
+        ,NULL AS qty_p2q_cohort_w3
+        ,NULL AS qty_p2q_cohort_w4
+        ,NULL AS qty_p2q_cohort_w5plus
+        ,NULL AS qty_p2o_cohort
+        ,NULL AS qty_p2o_cohort_d7
+        ,NULL AS qty_p2o_cohort_d14
+        ,NULL AS qty_p2o_cohort_d28
         ,NULL AS qty_p2o_cohort_w0
+        ,NULL AS qty_p2o_cohort_w1
+        ,NULL AS qty_p2o_cohort_w2
+        ,NULL AS qty_p2o_cohort_w3
+        ,NULL AS qty_p2o_cohort_w4
+        ,NULL AS qty_p2o_cohort_w5plus
+        ,NULL AS qty_p2l_cohort
         ,NULL AS qty_p2l_cohort_w0
+        ,NULL AS qty_p2l_cohort_w1
+        ,NULL AS qty_p2l_cohort_w2
+        ,NULL AS qty_p2l_cohort_w3
+        ,NULL AS qty_p2l_cohort_w4
+        ,NULL AS qty_p2l_cohort_w5plus
+        ,NULL AS qty_q2avq_cohort
+        ,NULL AS qty_q2avq_cohort_w0
+        ,NULL AS qty_q2avq_cohort_w1
+        ,NULL AS qty_q2avq_cohort_w2
+        ,NULL AS qty_q2avq_cohort_w3
+        ,NULL AS qty_q2avq_cohort_w4
+        ,NULL AS qty_q2avq_cohort_w5plus
+        ,NULL AS qty_avq2o_cohort
+        ,NULL AS qty_avq2o_cohort_w0
+        ,NULL AS qty_avq2o_cohort_w1
+        ,NULL AS qty_avq2o_cohort_w2
+        ,NULL AS qty_avq2o_cohort_w3
+        ,NULL AS qty_avq2o_cohort_w4
+        ,NULL AS qty_avq2o_cohort_w5plus
         ,NULL AS qty_o2l_cohort
         ,NULL AS qty_o2l_cohort_d7
         ,NULL AS qty_o2l_cohort_d14
         ,NULL AS qty_o2l_cohort_d28
         ,NULL AS qty_o2l_cohort_w0
+        ,NULL AS qty_o2l_cohort_w1
+        ,NULL AS qty_o2l_cohort_w2
+        ,NULL AS qty_o2l_cohort_w3
+        ,NULL AS qty_o2l_cohort_w4
+        ,NULL AS qty_o2l_cohort_w5plus
         ,NULL AS lastyear_leads
         ,NULL AS lastyear_prospects
         ,NULL AS lastyear_opportunities
@@ -413,25 +480,56 @@ okr AS (
         ,NULL AS act_opportunities
         ,NULL AS act_first_listings
         ,NULL AS qty_p2q_cohort
-        ,NULL AS qty_p2o_cohort
-        ,NULL AS qty_p2l_cohort
         ,NULL AS qty_p2q_cohort_d7
-        ,NULL AS qty_p2o_cohort_d7
-        ,NULL AS qty_p2l_cohort_d7
         ,NULL AS qty_p2q_cohort_d14
-        ,NULL AS qty_p2o_cohort_d14
-        ,NULL AS qty_p2l_cohort_d14
         ,NULL AS qty_p2q_cohort_d28
-        ,NULL AS qty_p2o_cohort_d28
-        ,NULL AS qty_p2l_cohort_d28
         ,NULL AS qty_p2q_cohort_w0
+        ,NULL AS qty_p2q_cohort_w1
+        ,NULL AS qty_p2q_cohort_w2
+        ,NULL AS qty_p2q_cohort_w3
+        ,NULL AS qty_p2q_cohort_w4
+        ,NULL AS qty_p2q_cohort_w5plus
+        ,NULL AS qty_p2o_cohort
+        ,NULL AS qty_p2o_cohort_d7
+        ,NULL AS qty_p2o_cohort_d14
+        ,NULL AS qty_p2o_cohort_d28
         ,NULL AS qty_p2o_cohort_w0
+        ,NULL AS qty_p2o_cohort_w1
+        ,NULL AS qty_p2o_cohort_w2
+        ,NULL AS qty_p2o_cohort_w3
+        ,NULL AS qty_p2o_cohort_w4
+        ,NULL AS qty_p2o_cohort_w5plus
+        ,NULL AS qty_p2l_cohort
         ,NULL AS qty_p2l_cohort_w0
+        ,NULL AS qty_p2l_cohort_w1
+        ,NULL AS qty_p2l_cohort_w2
+        ,NULL AS qty_p2l_cohort_w3
+        ,NULL AS qty_p2l_cohort_w4
+        ,NULL AS qty_p2l_cohort_w5plus
+        ,NULL AS qty_q2avq_cohort
+        ,NULL AS qty_q2avq_cohort_w0
+        ,NULL AS qty_q2avq_cohort_w1
+        ,NULL AS qty_q2avq_cohort_w2
+        ,NULL AS qty_q2avq_cohort_w3
+        ,NULL AS qty_q2avq_cohort_w4
+        ,NULL AS qty_q2avq_cohort_w5plus
+        ,NULL AS qty_avq2o_cohort
+        ,NULL AS qty_avq2o_cohort_w0
+        ,NULL AS qty_avq2o_cohort_w1
+        ,NULL AS qty_avq2o_cohort_w2
+        ,NULL AS qty_avq2o_cohort_w3
+        ,NULL AS qty_avq2o_cohort_w4
+        ,NULL AS qty_avq2o_cohort_w5plus
         ,NULL AS qty_o2l_cohort
         ,NULL AS qty_o2l_cohort_d7
         ,NULL AS qty_o2l_cohort_d14
         ,NULL AS qty_o2l_cohort_d28
         ,NULL AS qty_o2l_cohort_w0
+        ,NULL AS qty_o2l_cohort_w1
+        ,NULL AS qty_o2l_cohort_w2
+        ,NULL AS qty_o2l_cohort_w3
+        ,NULL AS qty_o2l_cohort_w4
+        ,NULL AS qty_o2l_cohort_w5plus
         ,NULL AS lastyear_leads
         ,NULL AS lastyear_prospects
         ,NULL AS lastyear_opportunities
@@ -496,25 +594,56 @@ tgt_unique as (
         ,NULL AS act_opportunities
         ,NULL AS act_first_listings
         ,NULL AS qty_p2q_cohort
-        ,NULL AS qty_p2o_cohort
-        ,NULL AS qty_p2l_cohort
         ,NULL AS qty_p2q_cohort_d7
-        ,NULL AS qty_p2o_cohort_d7
-        ,NULL AS qty_p2l_cohort_d7
         ,NULL AS qty_p2q_cohort_d14
-        ,NULL AS qty_p2o_cohort_d14
-        ,NULL AS qty_p2l_cohort_d14
         ,NULL AS qty_p2q_cohort_d28
-        ,NULL AS qty_p2o_cohort_d28
-        ,NULL AS qty_p2l_cohort_d28
         ,NULL AS qty_p2q_cohort_w0
+        ,NULL AS qty_p2q_cohort_w1
+        ,NULL AS qty_p2q_cohort_w2
+        ,NULL AS qty_p2q_cohort_w3
+        ,NULL AS qty_p2q_cohort_w4
+        ,NULL AS qty_p2q_cohort_w5plus
+        ,NULL AS qty_p2o_cohort
+        ,NULL AS qty_p2o_cohort_d7
+        ,NULL AS qty_p2o_cohort_d14
+        ,NULL AS qty_p2o_cohort_d28
         ,NULL AS qty_p2o_cohort_w0
+        ,NULL AS qty_p2o_cohort_w1
+        ,NULL AS qty_p2o_cohort_w2
+        ,NULL AS qty_p2o_cohort_w3
+        ,NULL AS qty_p2o_cohort_w4
+        ,NULL AS qty_p2o_cohort_w5plus
+        ,NULL AS qty_p2l_cohort
         ,NULL AS qty_p2l_cohort_w0
+        ,NULL AS qty_p2l_cohort_w1
+        ,NULL AS qty_p2l_cohort_w2
+        ,NULL AS qty_p2l_cohort_w3
+        ,NULL AS qty_p2l_cohort_w4
+        ,NULL AS qty_p2l_cohort_w5plus
+        ,NULL AS qty_q2avq_cohort
+        ,NULL AS qty_q2avq_cohort_w0
+        ,NULL AS qty_q2avq_cohort_w1
+        ,NULL AS qty_q2avq_cohort_w2
+        ,NULL AS qty_q2avq_cohort_w3
+        ,NULL AS qty_q2avq_cohort_w4
+        ,NULL AS qty_q2avq_cohort_w5plus
+        ,NULL AS qty_avq2o_cohort
+        ,NULL AS qty_avq2o_cohort_w0
+        ,NULL AS qty_avq2o_cohort_w1
+        ,NULL AS qty_avq2o_cohort_w2
+        ,NULL AS qty_avq2o_cohort_w3
+        ,NULL AS qty_avq2o_cohort_w4
+        ,NULL AS qty_avq2o_cohort_w5plus
         ,NULL AS qty_o2l_cohort
         ,NULL AS qty_o2l_cohort_d7
         ,NULL AS qty_o2l_cohort_d14
         ,NULL AS qty_o2l_cohort_d28
         ,NULL AS qty_o2l_cohort_w0
+        ,NULL AS qty_o2l_cohort_w1
+        ,NULL AS qty_o2l_cohort_w2
+        ,NULL AS qty_o2l_cohort_w3
+        ,NULL AS qty_o2l_cohort_w4
+        ,NULL AS qty_o2l_cohort_w5plus
         ,NULL AS lastyear_leads
         ,NULL AS lastyear_prospects
         ,NULL AS lastyear_opportunities
@@ -575,25 +704,56 @@ tgt_mkt_costs AS (
         NULL AS act_opportunities,
         NULL AS act_first_listings,
         NULL AS qty_p2q_cohort,
-        NULL AS qty_p2o_cohort,
-        NULL AS qty_p2l_cohort,
         NULL AS qty_p2q_cohort_d7,
-        NULL AS qty_p2o_cohort_d7,
-        NULL AS qty_p2l_cohort_d7,
         NULL AS qty_p2q_cohort_d14,
-        NULL AS qty_p2o_cohort_d14,
-        NULL AS qty_p2l_cohort_d14,
         NULL AS qty_p2q_cohort_d28,
-        NULL AS qty_p2o_cohort_d28,
-        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2q_cohort_w0,
+        NULL AS qty_p2q_cohort_w1,
+        NULL AS qty_p2q_cohort_w2,
+        NULL AS qty_p2q_cohort_w3,
+        NULL AS qty_p2q_cohort_w4,
+        NULL AS qty_p2q_cohort_w5plus,
+        NULL AS qty_p2o_cohort,
+        NULL AS qty_p2o_cohort_d7,
+        NULL AS qty_p2o_cohort_d14,
+        NULL AS qty_p2o_cohort_d28,
         NULL AS qty_p2o_cohort_w0,
+        NULL AS qty_p2o_cohort_w1,
+        NULL AS qty_p2o_cohort_w2,
+        NULL AS qty_p2o_cohort_w3,
+        NULL AS qty_p2o_cohort_w4,
+        NULL AS qty_p2o_cohort_w5plus,
+        NULL AS qty_p2l_cohort,
         NULL AS qty_p2l_cohort_w0,
+        NULL AS qty_p2l_cohort_w1,
+        NULL AS qty_p2l_cohort_w2,
+        NULL AS qty_p2l_cohort_w3,
+        NULL AS qty_p2l_cohort_w4,
+        NULL AS qty_p2l_cohort_w5plus,
+        NULL AS qty_q2avq_cohort,
+        NULL AS qty_q2avq_cohort_w0,
+        NULL AS qty_q2avq_cohort_w1,
+        NULL AS qty_q2avq_cohort_w2,
+        NULL AS qty_q2avq_cohort_w3,
+        NULL AS qty_q2avq_cohort_w4,
+        NULL AS qty_q2avq_cohort_w5plus,
+        NULL AS qty_avq2o_cohort,
+        NULL AS qty_avq2o_cohort_w0,
+        NULL AS qty_avq2o_cohort_w1,
+        NULL AS qty_avq2o_cohort_w2,
+        NULL AS qty_avq2o_cohort_w3,
+        NULL AS qty_avq2o_cohort_w4,
+        NULL AS qty_avq2o_cohort_w5plus,
         NULL AS qty_o2l_cohort,
         NULL AS qty_o2l_cohort_d7,
         NULL AS qty_o2l_cohort_d14,
         NULL AS qty_o2l_cohort_d28,
         NULL AS qty_o2l_cohort_w0,
+        NULL AS qty_o2l_cohort_w1,
+        NULL AS qty_o2l_cohort_w2,
+        NULL AS qty_o2l_cohort_w3,
+        NULL AS qty_o2l_cohort_w4,
+        NULL AS qty_o2l_cohort_w5plus,
         NULL AS lastyear_leads,
         NULL AS lastyear_prospects,
         NULL AS lastyear_opportunities,
@@ -656,25 +816,56 @@ UNION ALL
         NULL AS act_opportunities,
         NULL AS act_first_listings,
         NULL AS qty_p2q_cohort,
-        NULL AS qty_p2o_cohort,
-        NULL AS qty_p2l_cohort,
         NULL AS qty_p2q_cohort_d7,
-        NULL AS qty_p2o_cohort_d7,
-        NULL AS qty_p2l_cohort_d7,
         NULL AS qty_p2q_cohort_d14,
-        NULL AS qty_p2o_cohort_d14,
-        NULL AS qty_p2l_cohort_d14,
         NULL AS qty_p2q_cohort_d28,
-        NULL AS qty_p2o_cohort_d28,
-        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2q_cohort_w0,
+        NULL AS qty_p2q_cohort_w1,
+        NULL AS qty_p2q_cohort_w2,
+        NULL AS qty_p2q_cohort_w3,
+        NULL AS qty_p2q_cohort_w4,
+        NULL AS qty_p2q_cohort_w5plus,
+        NULL AS qty_p2o_cohort,
+        NULL AS qty_p2o_cohort_d7,
+        NULL AS qty_p2o_cohort_d14,
+        NULL AS qty_p2o_cohort_d28,
         NULL AS qty_p2o_cohort_w0,
+        NULL AS qty_p2o_cohort_w1,
+        NULL AS qty_p2o_cohort_w2,
+        NULL AS qty_p2o_cohort_w3,
+        NULL AS qty_p2o_cohort_w4,
+        NULL AS qty_p2o_cohort_w5plus,
+        NULL AS qty_p2l_cohort,
         NULL AS qty_p2l_cohort_w0,
+        NULL AS qty_p2l_cohort_w1,
+        NULL AS qty_p2l_cohort_w2,
+        NULL AS qty_p2l_cohort_w3,
+        NULL AS qty_p2l_cohort_w4,
+        NULL AS qty_p2l_cohort_w5plus,
+        NULL AS qty_q2avq_cohort,
+        NULL AS qty_q2avq_cohort_w0,
+        NULL AS qty_q2avq_cohort_w1,
+        NULL AS qty_q2avq_cohort_w2,
+        NULL AS qty_q2avq_cohort_w3,
+        NULL AS qty_q2avq_cohort_w4,
+        NULL AS qty_q2avq_cohort_w5plus,
+        NULL AS qty_avq2o_cohort,
+        NULL AS qty_avq2o_cohort_w0,
+        NULL AS qty_avq2o_cohort_w1,
+        NULL AS qty_avq2o_cohort_w2,
+        NULL AS qty_avq2o_cohort_w3,
+        NULL AS qty_avq2o_cohort_w4,
+        NULL AS qty_avq2o_cohort_w5plus,
         NULL AS qty_o2l_cohort,
         NULL AS qty_o2l_cohort_d7,
         NULL AS qty_o2l_cohort_d14,
         NULL AS qty_o2l_cohort_d28,
         NULL AS qty_o2l_cohort_w0,
+        NULL AS qty_o2l_cohort_w1,
+        NULL AS qty_o2l_cohort_w2,
+        NULL AS qty_o2l_cohort_w3,
+        NULL AS qty_o2l_cohort_w4,
+        NULL AS qty_o2l_cohort_w5plus,
         NULL AS lastyear_leads,
         NULL AS lastyear_prospects,
         NULL AS lastyear_opportunities,
@@ -735,25 +926,56 @@ act_costs AS (
         NULL AS act_opportunities,
         NULL AS act_first_listings,
         NULL AS qty_p2q_cohort,
-        NULL AS qty_p2o_cohort,
-        NULL AS qty_p2l_cohort,
         NULL AS qty_p2q_cohort_d7,
-        NULL AS qty_p2o_cohort_d7,
-        NULL AS qty_p2l_cohort_d7,
         NULL AS qty_p2q_cohort_d14,
-        NULL AS qty_p2o_cohort_d14,
-        NULL AS qty_p2l_cohort_d14,
         NULL AS qty_p2q_cohort_d28,
-        NULL AS qty_p2o_cohort_d28,
-        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2q_cohort_w0,
+        NULL AS qty_p2q_cohort_w1,
+        NULL AS qty_p2q_cohort_w2,
+        NULL AS qty_p2q_cohort_w3,
+        NULL AS qty_p2q_cohort_w4,
+        NULL AS qty_p2q_cohort_w5plus,
+        NULL AS qty_p2o_cohort,
+        NULL AS qty_p2o_cohort_d7,
+        NULL AS qty_p2o_cohort_d14,
+        NULL AS qty_p2o_cohort_d28,
         NULL AS qty_p2o_cohort_w0,
+        NULL AS qty_p2o_cohort_w1,
+        NULL AS qty_p2o_cohort_w2,
+        NULL AS qty_p2o_cohort_w3,
+        NULL AS qty_p2o_cohort_w4,
+        NULL AS qty_p2o_cohort_w5plus,
+        NULL AS qty_p2l_cohort,
         NULL AS qty_p2l_cohort_w0,
+        NULL AS qty_p2l_cohort_w1,
+        NULL AS qty_p2l_cohort_w2,
+        NULL AS qty_p2l_cohort_w3,
+        NULL AS qty_p2l_cohort_w4,
+        NULL AS qty_p2l_cohort_w5plus,
+        NULL AS qty_q2avq_cohort,
+        NULL AS qty_q2avq_cohort_w0,
+        NULL AS qty_q2avq_cohort_w1,
+        NULL AS qty_q2avq_cohort_w2,
+        NULL AS qty_q2avq_cohort_w3,
+        NULL AS qty_q2avq_cohort_w4,
+        NULL AS qty_q2avq_cohort_w5plus,
+        NULL AS qty_avq2o_cohort,
+        NULL AS qty_avq2o_cohort_w0,
+        NULL AS qty_avq2o_cohort_w1,
+        NULL AS qty_avq2o_cohort_w2,
+        NULL AS qty_avq2o_cohort_w3,
+        NULL AS qty_avq2o_cohort_w4,
+        NULL AS qty_avq2o_cohort_w5plus,
         NULL AS qty_o2l_cohort,
         NULL AS qty_o2l_cohort_d7,
         NULL AS qty_o2l_cohort_d14,
         NULL AS qty_o2l_cohort_d28,
         NULL AS qty_o2l_cohort_w0,
+        NULL AS qty_o2l_cohort_w1,
+        NULL AS qty_o2l_cohort_w2,
+        NULL AS qty_o2l_cohort_w3,
+        NULL AS qty_o2l_cohort_w4,
+        NULL AS qty_o2l_cohort_w5plus,
         NULL AS lastyear_leads,
         NULL AS lastyear_prospects,
         NULL AS lastyear_opportunities,
@@ -823,25 +1045,56 @@ act_last_year as (
         NULL AS act_opportunities,
         NULL AS act_first_listings,
         NULL AS qty_p2q_cohort,
-        NULL AS qty_p2o_cohort,
-        NULL AS qty_p2l_cohort,
         NULL AS qty_p2q_cohort_d7,
-        NULL AS qty_p2o_cohort_d7,
-        NULL AS qty_p2l_cohort_d7,
         NULL AS qty_p2q_cohort_d14,
-        NULL AS qty_p2o_cohort_d14,
-        NULL AS qty_p2l_cohort_d14,
         NULL AS qty_p2q_cohort_d28,
-        NULL AS qty_p2o_cohort_d28,
-        NULL AS qty_p2l_cohort_d28,
         NULL AS qty_p2q_cohort_w0,
+        NULL AS qty_p2q_cohort_w1,
+        NULL AS qty_p2q_cohort_w2,
+        NULL AS qty_p2q_cohort_w3,
+        NULL AS qty_p2q_cohort_w4,
+        NULL AS qty_p2q_cohort_w5plus,
+        NULL AS qty_p2o_cohort,
+        NULL AS qty_p2o_cohort_d7,
+        NULL AS qty_p2o_cohort_d14,
+        NULL AS qty_p2o_cohort_d28,
         NULL AS qty_p2o_cohort_w0,
+        NULL AS qty_p2o_cohort_w1,
+        NULL AS qty_p2o_cohort_w2,
+        NULL AS qty_p2o_cohort_w3,
+        NULL AS qty_p2o_cohort_w4,
+        NULL AS qty_p2o_cohort_w5plus,
+        NULL AS qty_p2l_cohort,
         NULL AS qty_p2l_cohort_w0,
+        NULL AS qty_p2l_cohort_w1,
+        NULL AS qty_p2l_cohort_w2,
+        NULL AS qty_p2l_cohort_w3,
+        NULL AS qty_p2l_cohort_w4,
+        NULL AS qty_p2l_cohort_w5plus,
+        NULL AS qty_q2avq_cohort,
+        NULL AS qty_q2avq_cohort_w0,
+        NULL AS qty_q2avq_cohort_w1,
+        NULL AS qty_q2avq_cohort_w2,
+        NULL AS qty_q2avq_cohort_w3,
+        NULL AS qty_q2avq_cohort_w4,
+        NULL AS qty_q2avq_cohort_w5plus,
+        NULL AS qty_avq2o_cohort,
+        NULL AS qty_avq2o_cohort_w0,
+        NULL AS qty_avq2o_cohort_w1,
+        NULL AS qty_avq2o_cohort_w2,
+        NULL AS qty_avq2o_cohort_w3,
+        NULL AS qty_avq2o_cohort_w4,
+        NULL AS qty_avq2o_cohort_w5plus,
         NULL AS qty_o2l_cohort,
         NULL AS qty_o2l_cohort_d7,
         NULL AS qty_o2l_cohort_d14,
         NULL AS qty_o2l_cohort_d28,
         NULL AS qty_o2l_cohort_w0,
+        NULL AS qty_o2l_cohort_w1,
+        NULL AS qty_o2l_cohort_w2,
+        NULL AS qty_o2l_cohort_w3,
+        NULL AS qty_o2l_cohort_w4,
+        NULL AS qty_o2l_cohort_w5plus,
         act_leads as lastyear_leads,
         act_prospects as lastyear_prospects,
         act_opportunities as lastyear_opportunities,
@@ -915,25 +1168,56 @@ SELECT
     m.act_opportunities,
     m.act_first_listings,
     m.qty_p2q_cohort,
-    m.qty_p2o_cohort,
-    m.qty_p2l_cohort,
     m.qty_p2q_cohort_d7,
-    m.qty_p2o_cohort_d7,
-    m.qty_p2l_cohort_d7,
     m.qty_p2q_cohort_d14,
-    m.qty_p2o_cohort_d14,
-    m.qty_p2l_cohort_d14,
     m.qty_p2q_cohort_d28,
-    m.qty_p2o_cohort_d28,
-    m.qty_p2l_cohort_d28,
     m.qty_p2q_cohort_w0,
+    m.qty_p2q_cohort_w1,
+    m.qty_p2q_cohort_w2,
+    m.qty_p2q_cohort_w3,
+    m.qty_p2q_cohort_w4,
+    m.qty_p2q_cohort_w5plus,
+    m.qty_p2o_cohort,
+    m.qty_p2o_cohort_d7,
+    m.qty_p2o_cohort_d14,
+    m.qty_p2o_cohort_d28,
     m.qty_p2o_cohort_w0,
+    m.qty_p2o_cohort_w1,
+    m.qty_p2o_cohort_w2,
+    m.qty_p2o_cohort_w3,
+    m.qty_p2o_cohort_w4,
+    m.qty_p2o_cohort_w5plus,
+    m.qty_p2l_cohort,
     m.qty_p2l_cohort_w0,
+    m.qty_p2l_cohort_w1,
+    m.qty_p2l_cohort_w2,
+    m.qty_p2l_cohort_w3,
+    m.qty_p2l_cohort_w4,
+    m.qty_p2l_cohort_w5plus,
+    m.qty_q2avq_cohort,
+    m.qty_q2avq_cohort_w0,
+    m.qty_q2avq_cohort_w1,
+    m.qty_q2avq_cohort_w2,
+    m.qty_q2avq_cohort_w3,
+    m.qty_q2avq_cohort_w4,
+    m.qty_q2avq_cohort_w5plus,
+    m.qty_avq2o_cohort,
+    m.qty_avq2o_cohort_w0,
+    m.qty_avq2o_cohort_w1,
+    m.qty_avq2o_cohort_w2,
+    m.qty_avq2o_cohort_w3,
+    m.qty_avq2o_cohort_w4,
+    m.qty_avq2o_cohort_w5plus,
     m.qty_o2l_cohort,
     m.qty_o2l_cohort_d7,
     m.qty_o2l_cohort_d14,
     m.qty_o2l_cohort_d28,
     m.qty_o2l_cohort_w0,
+    m.qty_o2l_cohort_w1,
+    m.qty_o2l_cohort_w2,
+    m.qty_o2l_cohort_w3,
+    m.qty_o2l_cohort_w4,
+    m.qty_o2l_cohort_w5plus,
     m.lastyear_leads,
     m.lastyear_prospects,
     m.lastyear_opportunities,
