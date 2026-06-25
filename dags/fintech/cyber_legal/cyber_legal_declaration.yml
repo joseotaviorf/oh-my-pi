@@ -115,8 +115,11 @@ workflow:
         - "[]"
     caexpns:
       clean_table_name: case_expense
-      extraction_type: full
-      partitions: []
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
+      merge_on: [id_case, id_expense]
+      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "[]"
         - True
