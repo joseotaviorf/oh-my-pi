@@ -8,19 +8,92 @@ WITH inspection AS (
 ),
 appointment AS (
     SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.appointment
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
+        id_inspection,
+        id_appointment
+    FROM (
+        SELECT
+            id_inspection,
+            id_appointment,
+            ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) AS rn
+        FROM
+            datalake_inspection_services_clean.appointment
+    ) AS ranked
+    WHERE
+        rn = 1
 ),
 assessment AS (
     SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.assessment
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
+        id_inspection,
+        id_assessment,
+        ts_created
+    FROM (
+        SELECT
+            id_inspection,
+            id_assessment,
+            ts_created,
+            ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) AS rn
+        FROM
+            datalake_inspection_services_clean.assessment
+    ) AS ranked
+    WHERE
+        rn = 1
+),
+item_aud AS (
+    SELECT
+        id_item,
+        id_item_group,
+        is_active,
+        status,
+        comment,
+        id_type,
+        is_present
+    FROM (
+        SELECT
+            id_item,
+            id_item_group,
+            is_active,
+            status,
+            comment,
+            id_type,
+            is_present,
+            ROW_NUMBER() OVER (PARTITION BY id_item ORDER BY ts_updated DESC) AS rn
+        FROM
+            datalake_inspection_services_clean.item_aud
+        WHERE
+            is_active IS NULL
+    ) AS ranked
+    WHERE
+        rn = 1
+),
+item_group_aud AS (
+    SELECT
+        id_item_group,
+        id_room,
+        is_active_status,
+        is_active_inferior_quality,
+        status,
+        name,
+        id_type,
+        ts_updated
+    FROM (
+        SELECT
+            id_item_group,
+            id_room,
+            is_active_status,
+            is_active_inferior_quality,
+            status,
+            name,
+            id_type,
+            ts_updated,
+            ROW_NUMBER() OVER (PARTITION BY id_item_group ORDER BY ts_updated DESC) AS rn
+        FROM
+            datalake_inspection_services_clean.item_group_aud
+        WHERE
+            is_active_status IS NULL
+            AND is_active_inferior_quality IS NULL
+    ) AS ranked
+    WHERE
+        rn = 1
 )
 SELECT DISTINCT
     MD5(
@@ -72,13 +145,11 @@ LEFT JOIN
     datalake_inspection_services_clean.room AS ra
       ON ass.id_assessment = ra.id_assessment
 LEFT JOIN
-    datalake_inspection_services_clean.item_group_aud AS ig
-      ON ra.id_room = ig.id_room
-      AND ig.is_active_status IS NULL AND ig.is_active_inferior_quality IS NULL
+    item_group_aud AS ig
+        ON ra.id_room = ig.id_room
 LEFT JOIN
-    datalake_inspection_services_clean.item_aud AS it
-      ON ig.id_item_group = it.id_item_group
-      AND it.is_active IS NULL
+    item_aud AS it
+        ON ig.id_item_group = it.id_item_group
 LEFT JOIN
     datalake_inspection_services_clean.item_issue_aud AS ii
       ON it.id_item = ii.id_item
