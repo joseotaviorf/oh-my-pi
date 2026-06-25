@@ -3,7 +3,7 @@ database_name: dw_satisfaction_rating
 table_name: dim_answer
 description: This table contains information about satisfaction responses. Its granularity is given by the sk_answer column.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_answer:
     description: Unique identifier of the satisfaction response.
@@ -28,7 +28,7 @@ columns:
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.score_description
   secondary_score_description:
-    description: Secondary satisfaction score description.
+    description: Business value representing secondary score description on the dim_answer dw dataset.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.secondary_score_description
   custom_attributes:

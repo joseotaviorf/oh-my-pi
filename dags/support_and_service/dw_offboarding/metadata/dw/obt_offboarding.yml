@@ -13,7 +13,7 @@ description: |
   (termination, inspection, mediation, discounts) in a single place, instead of
   joining multiple terminator or inspection service tables.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_contract:
     description: Contract identification key.

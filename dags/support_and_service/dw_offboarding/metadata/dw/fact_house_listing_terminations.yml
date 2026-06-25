@@ -3,7 +3,7 @@ database_name: dw_offboarding
 table_name: fact_house_listing_terminations
 description: This table aims to facilitate the retention track of the listings that were/are in the termination step.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_termination:
     lineage:
@@ -72,9 +72,9 @@ columns:
   days_termination_request_to_relisting_declined:
     description: Days between termination request date and date when
   days_termination_to_publication:
-    description: Days between termination and publication
+    description: Business value representing days termination to publication on the fact_house_listing_terminations dw dataset.
   days_termination_to_contract_signed:
-    description: Days between termination and contract signed
+    description: Business value representing days termination to contract signed on the fact_house_listing_terminations dw dataset.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_offboarding.
   year:

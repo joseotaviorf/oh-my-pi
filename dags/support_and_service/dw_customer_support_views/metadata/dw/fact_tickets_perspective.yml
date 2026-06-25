@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: fact_tickets_perspective
 description: Enriched table of support data from tickets perspective.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -89,7 +89,7 @@ columns:
   ticket_type:
     lineage:
       - dw_customer_support.dim_ticket.type
-    description: Type of the ticket.
+    description: Business value representing ticket type on the fact_tickets_perspective dw dataset.
   first_department:
     lineage:
       - dw_customer_support.dim_ticket.department
@@ -124,10 +124,6 @@ columns:
     lineage:
       - dw_customer_support.dim_analyst.agent_manager
     description: Manager of the first agent associated with the ticket.
-  first_analyst_organization:
-    lineage: 
-      - dw_customer_support.dim_analyst.agent_organization
-    description: Organization of the first agent associated with the ticket.
   last_agent_email:
     lineage:
       - dw_customer_support.dim_analyst.email
@@ -172,7 +168,7 @@ columns:
   ticket_origin:
     lineage:
       - dw_customer_support.fact_tickets.ticket_origin
-    description: Origin of the ticket.
+    description: Business value representing ticket origin on the fact_tickets_perspective dw dataset.
   total_talk_time:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_talk_time
@@ -222,3 +218,6 @@ columns:
     lineage:
       - dw_customer_support.fact_tickets.ts_last_move_to_final_group
     description: Timestamp of the last move to the final group of the ticket, in UTC timezone.
+  first_agent_organization:
+    lineage: []
+    description: Business value representing first agent organization on the fact_tickets_perspective dw dataset.
