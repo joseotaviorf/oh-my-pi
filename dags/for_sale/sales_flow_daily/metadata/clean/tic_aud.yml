@@ -82,10 +82,11 @@ columns:
   signed_document_origin:
     description: |
       Upload channel for the signed document at this revision. CDI for Central da Imobiliária;
-      VENDAS for the legacy QuintoAndar expert upload in Vendas.
+      VENDAS when uploaded via the Vendas backoffice — covers both the legacy QuintoAndar expert
+      flow and cases where the real estate agency requested the upload through support channels.
     categories:
       CDI: Document uploaded by the partner through Central da Imobiliária.
-      VENDAS: Document uploaded manually by a QuintoAndar expert through Vendas.
+      VENDAS: Document uploaded via Vendas backoffice — either by a QuintoAndar expert in the legacy flow, or on behalf of a real estate agency that requested upload through support channels.
     lineage:
       - datalake_sales_flow_raw.tic_aud.signed_document_origin
   mod_signed_document_origin:
