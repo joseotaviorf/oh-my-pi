@@ -20,6 +20,10 @@ Tickets are split into two operational categories:
 - **Front Office** — real-time interactions (calls and chats handled via Twilio). At the end of every Front Office interaction, a ticket is generated in Zendesk.
 - **Back Office** — demands requiring longer analysis time (repairs, payments, operational processes). Handled asynchronously via Zendesk tickets.
 
+## Related Metric Entities
+
+- Journey PC
+
 ## Synonyms
 
 - **Chamado**, **solicitação**, **demanda** → `ticket`

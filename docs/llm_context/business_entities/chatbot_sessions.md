@@ -14,6 +14,10 @@ The lifecycle typically includes:
 
 Not all sessions follow every step. Some are bypassed entirely (pre-bot routing), some are resolved fully by the AI, and legacy sessions (Greenseer) lack Langfuse observability. There should be a very low and neglectible number of legacy sessions (`bot = 'old bot'`).
 
+## Related Metric Entities
+
+- Journey PC
+
 ## Glossary and Synonyms
 
 - **Sessão de chatbot**, **conversa**, **atendimento bot** → `chatbot session` (`datalake_chatbot.sessions`)

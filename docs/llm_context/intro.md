@@ -112,6 +112,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/funnel_conversions_supply.md` — Supply Funnel Conversions: cohort-based conversion rates between all stages of the supply acquisition funnel (L2P, P2Q, Q2O, O2L) plus non-adjacent transitions (P2O, P2L, Lead to Listing). Supports both RENT and SALE verticals with week-0 velocity variants. Builds on `business_entities/supply.md`.
 
+- `metric_entities/journey_pc.md` — Journey PC (post-contract journey mix): share of For Rent client slots (contract × role) in each support-interaction category — % Seamless / % Digital / % Human Support clients — by month, journey stage (onboarding/ongoing; offboarding excluded) and IQ/PP, plus interaction-volume metrics (% clientes seamless/digital/human sup. / tamanho do universo por etapa). Population counterpart to the NPS Seamless family in `metric_entities/nps_fr.md`. Builds on `business_entities/ticket.md` and `business_entities/chatbot_sessions.md`.
+
 ## Company-Wide Glossary
 
 These abbreviations appear across multiple entities and data domains. In column names, they map to specific prefixes:
