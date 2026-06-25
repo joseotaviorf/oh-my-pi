@@ -202,6 +202,7 @@ WITH base_outbound_notifications AS (
   JOIN datalake_person_clean.contact_info ci
     ON ci.id_person = cr.id_person
   WHERE ci.category = 'PHONE'
+  AND priority = 'PRIMARY'
   AND ci.contact_info IN (SELECT DISTINCT user_phone FROM in_outbound_users)
 )
 
