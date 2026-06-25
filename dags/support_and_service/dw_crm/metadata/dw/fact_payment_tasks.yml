@@ -4,7 +4,7 @@ description:
   Information about CRM tasks from Payment workgroups. Each line is an
   action from a CRM task.
 domain: Support and Services
-owner: ana.maia@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_task:
     lineage:

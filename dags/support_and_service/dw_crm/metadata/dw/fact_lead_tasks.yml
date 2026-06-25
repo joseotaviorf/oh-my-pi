@@ -4,7 +4,7 @@ description:
   Fact table that contains the flow of each task to treat the lead, in
   order to convert it. Each line is a task flow
 domain: Support and Services
-owner: marcus.pinto@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_created_date:
     lineage:

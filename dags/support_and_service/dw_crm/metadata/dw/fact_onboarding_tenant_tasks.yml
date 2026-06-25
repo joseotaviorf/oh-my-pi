@@ -4,12 +4,12 @@ description:
   Fact table that contains events data, flags and its related foreign keys
   on each Tenant's Onborading task grouped by task action
 domain: Support and Services
-owner: nathalia.paula@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_task:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
-    description: Key of task in CRM
+    description: Data warehouse surrogate key for the CRM task entity used in support journey analytics.
   sk_receiver:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_receiver

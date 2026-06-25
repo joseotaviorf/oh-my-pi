@@ -3,7 +3,7 @@ table_name: dim_nps_answer
 description: Table with context information about NPS answers (feedback provided by
   customers in dispatches). Each line is an answer.
 domain: Support and Services
-owner: ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_nps_answer:
     lineage:
@@ -40,3 +40,9 @@ columns:
     description: Timestamp in which the customer answered the survey.
   ts_load:
     description: Timestamp in which data was loaded into database.
+  nps_answer:
+    lineage: []
+    description: Numeric Net Promoter Score response value submitted by the customer in the survey.
+  id_campaign:
+    lineage: []
+    description: Survey campaign identifier grouping NPS dispatches and responses by program.

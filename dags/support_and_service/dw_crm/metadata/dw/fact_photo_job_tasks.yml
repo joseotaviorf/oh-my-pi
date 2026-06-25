@@ -4,7 +4,7 @@ description:
   Fact table that contains data and foreign keys related to "agendarjobdefotografo"
   and "fupfoto" task event
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_action_date:
     lineage:
@@ -47,7 +47,7 @@ columns:
   sk_task:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
-    description: Key of task in CRM
+    description: Data warehouse surrogate key for the CRM task entity used in support journey analytics.
   sk_task_action_end_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
@@ -113,17 +113,5 @@ columns:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
     description: Integer type data that indicates the day in which we had the action task in the crm.
-  sk_task_user_end_date:
-    description: Key of action event on the task ended
-  sk_task_user_start_date:
-    description: Key of task action start event
-  task_user_resolve_hours:
-    description:
-      Hours that the task action takes to be resolved, or the difference
-      hours between action started and ended
   ts_load:
     description: Timestamp of data load event (UTC timezone)
-  ts_task_user_end:
-    description: Timestamp of action event on the task happened
-  ts_task_user_start:
-    description: Key of action event on the task started
