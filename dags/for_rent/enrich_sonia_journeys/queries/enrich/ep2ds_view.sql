@@ -178,4 +178,4 @@ SELECT
   DATE_FORMAT(ef.ts_evaluation_positive, '%Y-%m-%d %T') AS ts_evaluation_positive,
   DATE_FORMAT(ef.ts_documentation_sent, '%Y-%m-%d %T') AS ts_documentation_sent
 FROM
-  enriched_flows AS ef;
+  enriched_flows AS ef
