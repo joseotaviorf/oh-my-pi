@@ -2,6 +2,7 @@ WITH chat_fup_surveys AS (
     SELECT
         MD5(CONCAT(r.id_rating, r.year, r.month, r.day)) AS id_answer,
         NULL AS id_ticket,
+        NULL AS id_support_session,
         r.id_user AS id_respondent,
         NULL AS respondent_email,
         'customer support' AS service_type,
@@ -26,6 +27,7 @@ WITH chat_fup_surveys AS (
     SELECT DISTINCT
         sa.id AS id_answer,
         cc.id_ticket,
+        cc.id_support_session,
         NULL AS id_respondent,
         cc.customer_email AS respondent_email,
         "customer support" AS service_type,
@@ -62,6 +64,7 @@ SELECT DISTINCT
     MD5(cfs.source_name) AS id_survey,
     CAST(tfm.id_contract AS BIGINT) AS id_contract,
     cfs.id_ticket,
+    cfs.id_support_session,
     cfs.id_respondent AS id_respondent,
     cfs.respondent_email AS respondent_email,
     cfs.service_type,

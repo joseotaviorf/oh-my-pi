@@ -37,6 +37,10 @@ columns:
       - datalake_satisfaction_rating.bigfone_surveys.id_ticket
       - datalake_satisfaction_rating.survicate_surveys.id_ticket
       - datalake_satisfaction_rating.chat_fup_surveys.id_ticket
+  id_support_session:
+    description: Identifier of the front (or front-with-back-case) support session that triggered the satisfaction response, carried from the Chat FUP attendance. For Support Session Service sessions this is the public_id (UUID); for legacy Sauron sessions it is the numeric session id. Only populated for Chat FUP-originated responses; NULL for all other sources.
+    lineage:
+      - datalake_satisfaction_rating.chat_fup_surveys.id_support_session
   id_case:
     description: Salesforce case unique identifier.
     lineage:
@@ -159,7 +163,7 @@ columns:
       - datalake_satisfaction_rating.chat_fup_surveys.secondary_satisfaction_score
       - datalake_satisfaction_rating.survicate_surveys.secondary_satisfaction_score
   secondary_score_description:
-    description: Secondary satisfaction score description.
+    description: Text label identifying what the secondary satisfaction score measures (for example 'resolution survey' for Chat FUP follow-ups or 'house satisfaction' for inspection CSAT). NULL when the source form has only a single satisfaction question.
     lineage:
       - datalake_satisfaction_rating.gsheets_surveys.secondary_score_description
       - datalake_satisfaction_rating.bigfone_surveys.secondary_score_description

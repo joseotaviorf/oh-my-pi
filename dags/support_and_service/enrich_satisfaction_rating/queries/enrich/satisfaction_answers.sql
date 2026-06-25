@@ -4,6 +4,7 @@ WITH union_surveys_answers AS (
         ssg.id_survey,
         ssg.id_contract,
         NULL AS id_ticket,
+        NULL AS id_support_session,
         NULL AS id_case,
         NULL AS id_account,
         NULL AS id_origin,
@@ -38,6 +39,7 @@ WITH union_surveys_answers AS (
         MD5(ssz.source_name) AS id_survey,
         ssz.id_contract,
         ssz.id_ticket,
+        NULL AS id_support_session,
         NULL AS id_case,
         NULL AS id_account, 
         NULL AS id_origin,
@@ -72,6 +74,7 @@ WITH union_surveys_answers AS (
         MD5(ssb.source_name) AS id_survey,
         ssb.id_contract,
         ssb.id_ticket,
+        NULL AS id_support_session,
         NULL AS id_case,
         NULL AS id_account, 
         NULL AS id_origin,
@@ -106,6 +109,7 @@ WITH union_surveys_answers AS (
         COALESCE(sscf.id_survey, MD5(sscf.source_name)) AS id_survey,
         sscf.id_contract,
         sscf.id_ticket,
+        sscf.id_support_session,
         NULL AS id_case,
         NULL AS id_account,
         NULL AS id_origin,
@@ -140,6 +144,7 @@ WITH union_surveys_answers AS (
         sss.id_survey,
         sss.id_contract,
         sss.id_ticket,
+        NULL AS id_support_session,
         sss.id_case,
         sss.id_account,
         sss.id_origin,
@@ -167,22 +172,32 @@ WITH union_surveys_answers AS (
     WHERE
         MAKE_DATE(sss.year, sss.month, sss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
-users AS (
+users_ranked AS (
     SELECT
         u.id AS id_user,
-        LOWER(u.email) AS email
+        LOWER(u.email) AS email,
+        u.ts_updated,
+        FIRST(u.ts_updated) OVER(PARTITION BY LOWER(u.email) ORDER BY u.ts_updated DESC) AS ts_last_updated
     FROM
         datalake_ebdb_user.user AS u
     WHERE
         DATE(u.ts_updated) <= DATE('{load_end_date}')
-    QUALIFY
-        u.ts_updated = FIRST(u.ts_updated) OVER(PARTITION BY LOWER(u.email) ORDER BY u.ts_updated DESC)
+),
+users AS (
+    SELECT
+        ur.id_user,
+        ur.email
+    FROM
+        users_ranked AS ur
+    WHERE
+        ur.ts_updated = ur.ts_last_updated
 )
 SELECT DISTINCT
     usa.id_answer,
     usa.id_survey,
     usa.id_contract,
     usa.id_ticket,
+    usa.id_support_session,
     usa.id_case,
     usa.id_account,
     usa.id_origin,

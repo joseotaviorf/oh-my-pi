@@ -23,6 +23,10 @@ columns:
     description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
     lineage:
       - datalake_chat_fup_clean.chats_chat.id_ticket
+  id_support_session:
+    description: Identifier of the support session that triggered this satisfaction response, carried over from the Chat FUP attendance (chats_chat.session_id). For Support Session Service sessions this is the public_id (UUID); for legacy Sauron sessions it is the numeric session id. NULL when the response comes from the rating source.
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.id_support_session
   id_respondent:
     description: Identifier of the person who answered the form.
     lineage:
@@ -60,7 +64,7 @@ columns:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.is_solved
   secondary_score_description:
-    description: Secondary satisfaction score description.
+    description: Human-readable label of the optional secondary rating prompt shown after the main CSAT question. Set to 'resolution survey' when the follow-up asks whether the customer's issue was resolved; NULL for rating-only responses.
   custom_attributes:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:
