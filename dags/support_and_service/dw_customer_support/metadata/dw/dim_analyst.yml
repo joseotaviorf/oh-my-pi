@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: dim_analyst
 description: Dimension containing agents attributes. Values obtained from Zendesk base.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_analyst:
     description: Unique agent identifier.
@@ -10,10 +10,6 @@ columns:
     lineage:
       - datalake_ebdb_user.user.user.id
     description: Unique user identifier.
-  person_uuid:
-    lineage:
-      - datalake_ebdb_user.user.user.person_uuid
-    description: Unique agent identifier.
   sk_agent_twilio:
     lineage:
       - datalake_support_users.analysts.id_agent_twilio
@@ -21,15 +17,15 @@ columns:
   full_name:
     lineage:
       - datalake_support_users.analysts.name
-    description: Agent name.
+    description: Human-readable full name used in dashboards and operational reports.
   email:
     lineage:
       - datalake_support_users.analysts.email
-    description: Agent email.
+    description: Email address associated with the user or contact on this record.
   phone:
     lineage:
       - datalake_support_users.analysts.phone
-    description: Agent phone.
+    description: Phone number associated with the user or contact on this record.
   agent_organization:
     lineage:
       - datalake_support_users.analysts.organization
@@ -37,10 +33,13 @@ columns:
   agent_manager:
     lineage:
       - datalake_gsheets_clean.agents_control.manager
-    description: Analyst Manager.
+    description: Business value representing agent manager on the dim_analyst dw dataset.
   dt_agent_start:
     lineage:
       - datalake_support_users.analysts.ts_created
     description: Date agent start working for QuintoAndar.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_customer_support.
+  uuid_person:
+    description: UUID identifier for person in the upstream application.
+    lineage: []

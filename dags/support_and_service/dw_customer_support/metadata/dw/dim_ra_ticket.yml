@@ -6,7 +6,7 @@ description:
   response and interaction.
 
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_ra_ticket:
     lineage:
@@ -35,23 +35,23 @@ columns:
   customer_cpf:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
-    description: Customer CPF.
+    description: Business value representing customer cpf on the dim_ra_ticket dw dataset.
   customer_city:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
-    description: Customer city
+    description: Business value representing customer city on the dim_ra_ticket dw dataset.
   customer_state:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
-    description: Customer state
+    description: Business value representing customer state on the dim_ra_ticket dw dataset.
   customer_email:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
-    description: Customer email address.
+    description: Business value representing customer email on the dim_ra_ticket dw dataset.
   customer_phone_numbers:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
-    description: Customer phone numbers.
+    description: Business value representing customer phone numbers on the dim_ra_ticket dw dataset.
   customer_tags:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
@@ -59,11 +59,11 @@ columns:
   moderation_status:
     lineage:
       - datalake_reclameaqui_clean.tickets.moderation
-    description: The status from the moderation data.
+    description: Business value representing moderation status on the dim_ra_ticket dw dataset.
   moderation_reason:
     lineage:
       - datalake_reclameaqui_clean.tickets.moderation
-    description: The reason from the moderation data.
+    description: Business value representing moderation reason on the dim_ra_ticket dw dataset.
   total_moderations:
     lineage:
       - datalake_reclameaqui_clean.tickets.ticket_moderations_count

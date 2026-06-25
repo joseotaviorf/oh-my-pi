@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: dim_taxonomy
 description: Dimension containing taxonomy information.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_taxonomy:
     lineage:
@@ -41,15 +41,15 @@ columns:
   theme:
     lineage:
       - datalake_customer_support.tickets.contact_theme_tag
-    description: Theme.
+    description: Business value representing theme on the dim_taxonomy dw dataset.
   theme_detail:
     lineage:
       - datalake_customer_support.tickets.contact_theme_detail_tag
-    description: Detailed theme.
+    description: Business value representing theme detail on the dim_taxonomy dw dataset.
   journey:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.journey
-    description: Journey of the ticket.
+    description: Business value representing journey on the dim_taxonomy dw dataset.
   sub_journey:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.sub_journey

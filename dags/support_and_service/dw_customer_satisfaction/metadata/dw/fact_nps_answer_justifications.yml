@@ -4,7 +4,7 @@ description: Table with detailed justifications from NPS answers, which are pred
   reasons for some campaigns. Each line is a justification, either from main or second
   level.
 domain: Support and Services
-owner: ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_nps_answer:
     lineage:

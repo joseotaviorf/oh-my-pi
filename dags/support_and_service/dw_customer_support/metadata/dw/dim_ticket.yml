@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: dim_ticket
 description: Dimension table that contains data on tickets created in Zendesk Support
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
@@ -112,3 +112,6 @@ columns:
     description: ts_updated in UTC-3 timezone
   ts_load:
     description: Timestamp of data load from database source (UTC timezone)
+  sk_taxonomy:
+    lineage: []
+    description: Data warehouse surrogate key for taxonomy used in support reporting joins.

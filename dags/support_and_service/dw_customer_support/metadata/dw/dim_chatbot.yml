@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: dim_chatbot
 description: Dimension containing chatbot attributes. Values obtained from Greenseer base.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_session:
     lineage:
