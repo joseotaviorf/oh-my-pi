@@ -2,32 +2,32 @@ database_name: datalake_bigfone_twilio
 table_name: call_ivr_events
 description: Contains all Twilio IVR events related to customer support via call
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_bigfone_events.events.id
-    description: Event ID
+    description: Primary surrogate identifier for the entity row in this support and service dataset.
   id_event:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Event ID from Twilio
+    description: Unique event identifier assigned by the telephony platform for this lifecycle record.
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Twilio call ID
+    description: Telephony provider call identifier linking multiple events to the same phone conversation.
   id_call_teravoz:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Teravoz call ID
+    description: Legacy Teravoz call identifier retained for historical telephony reconciliation.
   id_task:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Twilio task ID
+    description: Operational task identifier from the CRM platform linking events to a single work item.
   id_channel:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Twilio channel ID
+    description: Communication channel identifier used to route the message or call in the platform.
   from_number:
     lineage:
       - datalake_bigfone_events.events.metadata
@@ -43,7 +43,7 @@ columns:
   event_type:
     lineage:
       - datalake_bigfone_events.events.event
-    description: Type of event
+    description: Lifecycle event label emitted by the telephony provider for this call-handling step.
   task_cancelation_reason:
     lineage:
       - datalake_bigfone_events.events.metadata
@@ -51,7 +51,7 @@ columns:
   steps:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: steps
+    description: Ordered sequence of IVR menu steps navigated by the caller before agent routing.
   metadata:
     lineage:
       - datalake_bigfone_events.events.metadata
@@ -59,7 +59,7 @@ columns:
   task_priority:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Priority of the task
+    description: Numeric priority assigned to the TaskRouter task when competing for agent capacity.
   csat_1:
     lineage:
       - datalake_bigfone_events.events.metadata

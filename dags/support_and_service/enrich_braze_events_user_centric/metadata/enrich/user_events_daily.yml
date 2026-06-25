@@ -1,7 +1,7 @@
 ---
 database_name: datalake_braze_user_centric
 table_name: user_events_daily
-owner: data-ss@quintoandar.com
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 description: This table aggregates daily events for owners, tenants, and affiliates in a user-centric manner. Provides a comprehensive view of user interactions via different channels and actions.
 
@@ -35,7 +35,7 @@ columns:
       - datalake_braze.events_affiliates.id_campaign
 
   event_type:
-    description: Type of the event
+    description: Lifecycle event label emitted by the telephony provider for this call-handling step.
     lineage:
       - datalake_braze.events_owners.event_type
       - datalake_braze.events_tenants.event_type
@@ -68,7 +68,7 @@ columns:
       - datalake_braze.events_affiliates.id_event
 
   dt_event:
-    description: Date of the event
+    description: Calendar date associated with event in the business process.
     lineage:
       - datalake_braze.events_owners.ts_event
       - datalake_braze.events_tenants.ts_event

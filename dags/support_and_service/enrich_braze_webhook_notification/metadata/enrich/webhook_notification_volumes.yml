@@ -1,7 +1,7 @@
 ---
 database_name: datalake_braze_webhook_notification
 table_name: webhook_notification_volumes
-owner: data-ss@quintoandar.com
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 description: Table with the volume of communications sent through webhook to affiliates, tenants and owners.
 columns:
@@ -16,11 +16,11 @@ columns:
       - datalake_braze_details_clean.canvas_details_indica_ai.canvas_name
       - datalake_braze_details_clean.canvas_details_tenants.canvas_name
       - datalake_braze_details_clean.canvas_details_owners.canvas_name
-    description: Canvas name.
+    description: Human-readable canvas name used in dashboards and operational reports.
   variant_name:
     lineage:
       - datalake_braze_details_clean.canvas_details_indica_ai.variants
-    description: Variant name.
+    description: Human-readable variant name used in dashboards and operational reports.
   step_name:
     lineage:
       - datalake_braze_details_clean.canvas_details_indica_ai.steps
@@ -34,9 +34,9 @@ columns:
   rule_status:
     lineage:
       - datalake_braze_details_clean.canvas_details_indica_ai.steps
-    description: Status of the rule.
+    description: Business value representing rule status on the webhook_notification_volumes enrich dataset.
   notification_count:
-    description: Count of notifications.
+    description: Business value representing notification count on the webhook_notification_volumes enrich dataset.
   dt_webhook_sent:
     lineage:
       - datalake_braze_dispatches_user.affiliates_events.ts_webhook_sent

@@ -2,12 +2,12 @@ database_name: datalake_bigfone_twilio
 table_name: inbound_call_locations
 description: "Table with inbound calls and their origin location"
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: ID of the all
+    description: Telephony provider call identifier linking multiple events to the same phone conversation.
   from_city:
     lineage:
       - datalake_bigfone_events.events.metadata

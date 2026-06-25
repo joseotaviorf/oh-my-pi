@@ -2,7 +2,7 @@ database_name: datalake_bigfone_twilio
 table_name: call_flex_events
 description: Enrichment table that aims to consolidate information from call flex service. The main source of the table is Twillio's call service base, and each line represents a service event.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -59,7 +59,7 @@ columns:
   customer_phone:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Customer phone number.
+    description: Phone number of the customer participating in the telephony interaction.
   agent_email:
     lineage:
       - datalake_bigfone_events.events.metadata
@@ -71,11 +71,11 @@ columns:
   task_queue_name:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Task queue name.
+    description: Human-readable name of the Twilio TaskRouter queue that routed the service task.
   event_type:
     lineage:
       - datalake_bigfone_events.events.event
-    description: Event type name.
+    description: Lifecycle event label emitted by the telephony provider for this call-handling step.
   direction:
     lineage:
       - datalake_bigfone_events.events.metadata
@@ -87,7 +87,7 @@ columns:
   reason:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Reason for event.
+    description: Business reason code explaining why the telephony event or task transition occurred.
   comment:
     lineage:
       - datalake_bigfone_events.events.metadata
@@ -99,15 +99,15 @@ columns:
   task_priority:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Task priority level.
+    description: Numeric priority assigned to the TaskRouter task when competing for agent capacity.
   scheduling_source:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Scheduling source.
+    description: Origin system or workflow that created the scheduled callback request.
   seconds_waiting_time:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description: Waiting time in seconds.
+    description: Elapsed waiting time in seconds before the customer was connected to an agent.
   is_scheduled:
     lineage:
       - datalake_bigfone_events.events.metadata
