@@ -11,11 +11,11 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.house_listing_relation_aud.id_house
-    description: House id (main)
+    description: EBDB property identifier for the listing tied to the Preferred Property Agent; grain is one PPA assignment period per house and business context.
   id_listing_business_context:
     lineage:
       - datalake_ebdb_clean.house_listing_relation_aud.id_listing_business_context
-    description: Listing business context id
+    description: Surrogate key of the rent or sale listing business context row scoped to the house; determines whether the PPA relation applies to RENT or SALE.
   id_user_related_agent:
     lineage:
       - datalake_ebdb_user.user.id

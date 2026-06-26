@@ -8,7 +8,7 @@ columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id
-    description: ID of the agent.
+    description: EBDB agent entity key (dadosagente.id) for the agent whose activation, suspension, or contract change is being audited.
   id_work_contract:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
@@ -36,19 +36,19 @@ columns:
   work_contract_name:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
-    description: Name of the work contract.
+    description: Label of the work contract assigned after this revision, joined from work_contract; used to interpret SUSPENDED (contract id 6) versus regular contract moves.
   previous_work_contract_name:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
-    description: Previous work contract name.
+    description: Label of the work contract active immediately before this revision, joined via id_previous_work_contract; contrasts with work_contract_name to classify ALTERED_CONTRACT versus suspension events.
   agent_name:
     lineage:
       - datalake_ebdb_clean.user.name
-    description: Name of the agent.
+    description: Full legal name of the affected agent at revision time, joined from EBDB user via id_agent for operational reporting without extra joins.
   agent_type:
     lineage:
       - datalake_ebdb_clean.agent_data_types.types
-    description: Type of the agent.
+    description: Comma-separated operational profiles accredited to the agent (Visita, Vistoria, SessaoFotos, and others) from agent_data_types at the time of the change.
   user_change_name:
     lineage:
       - datalake_ebdb_clean.user.name

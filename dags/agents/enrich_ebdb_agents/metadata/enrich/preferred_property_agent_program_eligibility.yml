@@ -20,7 +20,7 @@ columns:
   program:
     lineage:
       - datalake_ebdb_clean.agent_data_programs_aud.program
-    description: program name
+    description: Agent program identifier audited in agent_data_programs_aud; this table retains PREFERRED_PROPERTY_AGENT rows only, indicating PPA supply-bringing eligibility.
   is_eligible:
     lineage:
       - datalake_ebdb_clean.agent_data_programs_aud.is_eligible

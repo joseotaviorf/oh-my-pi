@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.id
   id_previous_work_contract:
-    description: ID of the agent's previous work contract.
+    description: Foreign key to the work contract (EBDB workcontract) that governed the agent immediately before this revision, populated via LAG when employment terms change.
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
   id_work_contract:
@@ -23,11 +23,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
   id_current_work_contract:
-    description: ID of the agent's current work contract.
+    description: Foreign key to the agent's most recent work contract as of the latest agent_data_aud revision, denormalized onto each historical change row for comparison.
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
   previous_work_contract_name:
-    description: Name of the agent's previous work contract
+    description: Human-readable label of the employment contract type the agent held right before this change (for example CIQ or suspended), sourced from work_contract via LAG.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   work_contract_name:
@@ -35,7 +35,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   current_work_contract_name:
-    description: Name of the agent's current work contract.
+    description: Human-readable label of the agent's latest work contract across all revisions, denormalized for quick comparison with the contract active at each historical event.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   ts_work_contract_started:

@@ -7,16 +7,16 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.house.id
-    description: Id of the house.
+    description: EBDB property identifier for listings registered by an autonomous partner agent in non-sale rent context; one row per qualifying house.
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
-    description: Id of the listing.
+    description: Listing surrogate key from house_listing for the property when a published listing exists; null when the house has no listing record yet.
   id_partner_agent:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_user
-    description: Id of the partner agent.
+    description: Platform user id of the autonomous partner agent linked through partner_agent for the property registrant; maps to EBDB user.id.
   id_partner:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_partner
-    description: Id of the partner.
+    description: EBDB partner organization id tying the autonomous agent to their brokerage firm (partner.id), excluding internal test partner 257.

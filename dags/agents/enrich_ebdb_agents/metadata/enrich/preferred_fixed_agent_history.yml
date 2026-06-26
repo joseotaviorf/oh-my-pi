@@ -30,7 +30,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
   id_user_agent:
-    description: User ID of the preferred agent.
+    description: Platform user key (EBDB user.id) of the preferred fixed agent, resolved from preferred_fixed_agent.id_agent_data; use for joins to dim_user and visit facts.
     lineage:
       - datalake_ebdb_user.user.id
   business_context:

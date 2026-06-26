@@ -16,7 +16,7 @@ columns:
   agent_type:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.agent_type
-    description: Type of the agent.
+    description: Operational profile or brokerage role of the agent during the validity window; drives default business_context when none is recorded in audit history.
     categories:
       CheckUpLar: ''
       SessaoFotos: ''
@@ -26,7 +26,7 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_clean.agent_data_business_contexts_served_aud.business_context
-    description: Business context served
+    description: Commercial vertical the agent served in the period (RENT, SALE, or REDE), derived from agent_data_business_contexts_served audit with fallbacks for CORRETOR agents.
     categories:
       RENT: For Rent business context
       SALE: For Sale business context

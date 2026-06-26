@@ -17,7 +17,7 @@ columns:
   rev_type:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type
-    description: Revision type
+    description: Envers audit opcode for this agent-region row; 0 when the region was added to the agent service area, 2 when it was removed.
     categories:
       "0" : Create (means that the region was added to the agent area of activity)
       "2" : Delete (means that the region was removed of the agent area of activity)
