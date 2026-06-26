@@ -163,9 +163,8 @@ SELECT
     evt.reason_name AS termination_reason,
     fact.days_tenure_in_company,
     fact.is_manager,
-    fact.is_member_lt,
+    fact.is_leadership_team_member,
     fact.is_active,
-    fact.is_terminated,
     fact.dt_terminated
 FROM dw_employee_details.fact_assignment_snapshots AS fact
 INNER JOIN dw_employee_details.dim_employee AS emp
