@@ -28,4 +28,5 @@ workflow:
     tickets_contract: {}
     fcr_metric: {}
     cases_perspective: {}
+    backlog_metrics_salesforce: {}
 

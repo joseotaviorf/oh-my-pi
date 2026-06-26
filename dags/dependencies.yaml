@@ -4490,6 +4490,7 @@ bietlejuice.offboarding_categorization:
   - quintoml.post_contract.wall_e_offboarding_categoriser.inference:first-run-of-day
 bietlejuice.reverse_aec:
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metric:first-run-of-day
+  - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metrics-salesforce:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-cases-perspective:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
