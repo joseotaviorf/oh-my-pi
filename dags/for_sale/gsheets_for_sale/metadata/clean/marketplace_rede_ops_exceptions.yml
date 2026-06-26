@@ -1,0 +1,50 @@
+---
+database_name: datalake_gsheets_clean
+table_name: marketplace_rede_ops_exceptions
+owner: tamara.gimenez@quintoandar.com.br
+domain: For Sale
+description: >-
+  Reference table for marketplace offers that followed a legacy exception flow before migration
+  to the standard system. One row per offer, consolidating financial brokerage splits and
+  operational dates used by For Sale and Rede teams for audit and invoice issuance analysis.
+columns:
+  id_offer:
+    description: Unique identifier of the sale offer in the marketplace exception registry. Joins with datalake_sale_offer.core_sale_offer.id_offer.
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.id_offer
+  payment_model:
+    description: >-
+      Operational payment model classifying the offer side as Supply (QuintoAndar) or Demand
+      (Instant Partner).
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.payment_model
+  sale_price_agreed:
+    description: Final negotiated sale price for the offer, in Brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.sale_price_agreed
+  brokerage_fee:
+    description: Total brokerage fee percentage applied to the agreed sale price.
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.brokerage_fee
+  brokerage_amount:
+    description: Total brokerage amount calculated from the agreed sale price, in Brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.brokerage_amount
+  brokerage_quinto_andar_ciq_amount:
+    description: >-
+      Portion of the brokerage amount allocated to QuintoAndar and CIQ combined, in Brazilian
+      Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.brokerage_quinto_andar_ciq_amount
+  brokerage_quinto_andar_amount:
+    description: Portion of the brokerage amount allocated to QuintoAndar only, in Brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.brokerage_quinto_andar_amount
+  dt_signed_ccv:
+    description: Date when the purchase and sale contract (CCV) was signed.
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.dt_signed_ccv
+  dt_legal_analysis_marketplace:
+    description: Date that triggers invoice issuance for the marketplace legal analysis step.
+    lineage:
+      - datalake_gsheets_raw.marketplace_rede_ops_exceptions.dt_legal_analysis_marketplace

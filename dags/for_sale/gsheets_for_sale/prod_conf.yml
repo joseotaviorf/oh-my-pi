@@ -376,3 +376,10 @@ sheets_info:
     clean_table_name: sale_performance_crn_historical
     sheet_context: for_sale
     preload_time_in_seconds: 30
+
+  marketplace_rede_ops_exceptions:
+    sheet_id: 1kK5hC4lmtToXj7s8toeuTkdqYGAnBT4KvVOeYbh9Cew
+    sheet_name: data
+    clean_table_name: marketplace_rede_ops_exceptions
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
