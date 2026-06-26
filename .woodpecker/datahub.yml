@@ -29,8 +29,10 @@
 #       depends_on push-datahub-business-context fails on pull_request)
 #   sync-tars-entities — sync_tars_entities.py (direct mode) for DataHub Context Documents
 #                         tagged tars-entity (domain) or tars-metrics (metric).
-#                         Runs after push-datahub-business-context so the Data Product
-#                         already exists when the backlink is established.
+#                         No depends_on: its path filter includes sync/** (code changes),
+#                         which would omit push-datahub-business-context from the pipeline
+#                         and cause "depends on unknown step". Data Products already exist
+#                         in DataHub so strict ordering is not required.
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
 #
@@ -156,7 +158,6 @@ steps:
             - "dags/governance/datahub_business_context/sync/**"
             - "dags/governance/datahub_business_context/sync_tars_entities.py"
           on_empty: false
-    depends_on: [push-datahub-business-context]
 
   push-context-documents:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
