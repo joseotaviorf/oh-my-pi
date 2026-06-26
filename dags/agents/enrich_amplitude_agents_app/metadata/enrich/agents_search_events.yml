@@ -156,7 +156,7 @@ columns:
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
-    description: Event datetime.
+    description: Wall-clock timestamp when Amplitude recorded the property search interaction on the device.
   year:
     lineage:
       - datalake_amplitude_clean.events.year

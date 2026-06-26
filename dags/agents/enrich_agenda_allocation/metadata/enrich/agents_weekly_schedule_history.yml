@@ -14,7 +14,7 @@ columns:
   agent_type:
     lineage:
       - datalake_ebdb_clean.agent_data_types.types
-    description: Agent type
+    description: Operational role of the agent for this schedule row, such as Visita, Vistoria, or SessaoFotos, sourced from EBDB agent_data_types.
     categories:
       Vistoria: Inspection
       Visita: Visit
@@ -39,7 +39,7 @@ columns:
       - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_17_and_18_available
       - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_18_and_19_available
       - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_19_and_20_available
-    description: Slot number (8:00 = 0, 08:15 = 1, 08:30 = 2...)
+    description: Zero-based index of the 15-minute interval within the weekday schedule, where 0 maps to 08:00 and each step adds 15 minutes.
   is_available_slot:
     lineage:
       - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_08_and_09_available
@@ -58,7 +58,7 @@ columns:
   ts_slot:
     lineage:
       - datalake_agenda_allocation.slots_base_time.ts_slot
-    description: Timestamp of the slot
+    description: Effective date-time when this weekly schedule version applies to the slot, joined from slots_base_time between revision timestamps.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.agent_weekly_hours_aud.ts_updated

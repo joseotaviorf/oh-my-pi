@@ -8,7 +8,7 @@ columns:
   id_agent:
     lineage:
       - datalake_agenda_allocation.agents_weekly_schedule_history.id_agent
-    description: ID of the agent.
+    description: QuintoAndar field agent identifier (EBDB dados_agente_id) whose 15-minute availability slot is represented in this row.
   agent_type:
     lineage:
       - datalake_agenda_allocation.agents_weekly_schedule_history.agent_type
@@ -93,7 +93,7 @@ columns:
   ts_slot:
     lineage:
       - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
-    description: Timestamp of the slot.
+    description: Calendar date and time marking the 15-minute booking window this row describes, starting at 08:00 with slot 0.
   year:
     lineage:
       - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot

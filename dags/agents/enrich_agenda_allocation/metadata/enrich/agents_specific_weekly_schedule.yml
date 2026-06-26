@@ -25,7 +25,7 @@ columns:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
-    description: Slot number (8:00 = 0, 08:15 = 1, 08:30 = 2...)
+    description: Zero-based index of the 15-minute interval within the agent day, where 0 maps to 08:00 and each step adds 15 minutes.
   is_available_slot:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_08_and_09
@@ -60,7 +60,7 @@ columns:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
-    description: Timestamp of the slot
+    description: Concrete date-time of the exception slot, derived from dt_agent_specific_hour plus the 15-minute offset implied by slot_number.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.ts_updated

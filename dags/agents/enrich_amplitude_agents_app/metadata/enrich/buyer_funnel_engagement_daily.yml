@@ -50,13 +50,13 @@ columns:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
       - datalake_amplitude_agents_app.agents_search_events.search_type
-    description: Sale search page viewed events triggered from deeplink.
+    description: Count of for-sale search or results screen impressions that arrived via an external deeplink entry point.
   total_sale_events_search_page_viewed_copilot:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
       - datalake_amplitude_agents_app.agents_search_events.search_type
-    description: Sale search page viewed events triggered from copilot.
+    description: Count of for-sale search or results screen impressions initiated through the copilot assistant entry path.
   total_sale_events_search_subscription:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
@@ -66,7 +66,7 @@ columns:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
-    description: Sale events where a listing page was viewed.
+    description: Daily count of listing detail page impressions where the user was browsing properties marked as for-sale.
   total_sale_events_listing_page_viewed_from_search:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
@@ -78,7 +78,7 @@ columns:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
       - datalake_amplitude_agents_app.agents_search_events.lpv_origin
-    description: Sale listing page viewed events originated from deeplink.
+    description: Count of for-sale listing detail impressions opened directly from a marketing or share deeplink rather than in-app navigation.
   total_sale_events_listing_page_viewed_from_house:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
@@ -113,7 +113,7 @@ columns:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
-    description: Sale events where a listing section was expanded.
+    description: How many times the user expanded an accordion section on a for-sale listing detail page during the day.
   total_sale_events_listing_section_expanded_condo:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
@@ -125,13 +125,13 @@ columns:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
       - datalake_amplitude_agents_app.agents_search_events.listing_section
-    description: Sale listing section expanded events for values and taxes.
+    description: Accordion expansions on the values-and-taxes block of a for-sale listing detail page.
   total_sale_events_listing_section_expanded_neighborhood:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context
       - datalake_amplitude_agents_app.agents_search_events.event_type
       - datalake_amplitude_agents_app.agents_search_events.listing_section
-    description: Sale listing section expanded events for neighborhood information.
+    description: Accordion expansions on the neighborhood information block of a for-sale listing detail page.
   total_sale_events_listing_tts_form:
     lineage:
       - datalake_amplitude_agents_app.agents_search_events.business_context

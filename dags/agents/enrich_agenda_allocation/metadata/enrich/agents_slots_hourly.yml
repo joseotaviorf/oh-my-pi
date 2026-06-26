@@ -6,7 +6,7 @@ domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
-    description: ID of the agent.
+    description: QuintoAndar field agent identifier (EBDB dados_agente_id) whose hourly allocation counts are aggregated in this row.
     lineage:
       - datalake_agenda_allocation.agents_slots.id_agent
   agent_type:
@@ -19,10 +19,16 @@ columns:
       - datalake_agenda_allocation.agents_slots.day_of_week
   allocated_slots:
     description: Number of allocated slots for the hour.
+    lineage:
+      - datalake_agenda_allocation.agents_slots.last_change_reason
+      - datalake_agenda_allocation.agents_slots.is_available_slot_24h
   specific_allocated_slots:
     description: Number of specific allocated slots for the hour.
+    lineage:
+      - datalake_agenda_allocation.agents_slots.last_change_reason
+      - datalake_agenda_allocation.agents_slots.is_available_specific_slot
   ts_slot_hour:
-    description: Timestamp of the slot.
+    description: Hour-level timestamp (start of hour) used to roll up 15-minute slot allocations for the agent on that weekday.
     lineage:
       - datalake_agenda_allocation.agents_slots.ts_slot
   year:

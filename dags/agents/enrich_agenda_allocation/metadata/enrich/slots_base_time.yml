@@ -9,6 +9,6 @@ columns:
   day_of_week:
     description: Day of week (starting on mondays)
   slot_number:
-    description: Slot number (8:00 = 0, 08:15 = 1, 08:30 = 2...)
+    description: Sequential 15-minute index within the business day, counting from 08:00 (0) in 15-minute steps up to 21:00.
   ts_slot:
-    description: Timestamp of the slot
+    description: Absolute timestamp for each generated 15-minute interval from 07:00 through 21:00, starting 2019-01-01 through two months ahead.
