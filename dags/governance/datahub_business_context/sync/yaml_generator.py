@@ -22,6 +22,11 @@ from sync.document_parser import (
     extract_subjects_from_sql,
 )
 
+# Stable URN namespace — same as generate_and_push_datahub_entities.py so the TARS
+# sync and CI flows produce the same deterministic URN for index-0 when a data_product_id
+# is known (position 1+ URNs are always derived from data_product_id + index).
+_URN_NAMESPACE = uuid.UUID("5f4dcc3b-5aa7-4b63-e02b-eea7b56af02c")
+
 
 def _kebab_case(slug: str) -> str:
     return slug.strip().lower().replace("_", "-")
@@ -55,6 +60,19 @@ def _glossary_parent_node(domain_urn: str, override: Optional[str]) -> str:
     return "urn:li:glossaryNode:fintech"
 
 
+def _gq_stable_urn(product_id: str, index: int, base_urn: Optional[str] = None) -> str:
+    """Deterministic per-query URN.
+
+    Index 0 uses ``base_urn`` when provided (stored stable URN from the TARS document),
+    falling back to uuid5(product_id) so it remains stable even when the stored URN is
+    absent. Index 1+ always derive from product_id + index via uuid5.
+    """
+    if index == 0 and base_urn:
+        return base_urn
+    key = product_id if index == 0 else f"{product_id}:{index}"
+    return f"urn:li:query:{uuid.uuid5(_URN_NAMESPACE, key)}"
+
+
 def build_datahub_yaml(
     parsed: ParsedEntityDocument,
     *,
@@ -71,12 +89,14 @@ def build_datahub_yaml(
     product_id = _kebab_case(data_product_id)
     entity_slug = _entity_slug(product_id)
     # Metric docs have no ## Tables section (they link to the business entity), so
-    # parsed.datasets is often empty — fall back to the golden query's FROM/JOIN
+    # parsed.datasets is often empty — fall back to the golden queries' FROM/JOIN
     # tables so the loader still gets a non-empty datasets list.
-    golden_subjects: list[tuple[str, str]] = []
-    if parsed.golden_queries:
-        golden_subjects = extract_subjects_from_sql(parsed.golden_queries[0].sql)
-    datasets = primary_datasets or parsed.datasets or golden_subjects
+    all_gq_subjects: list[tuple[str, str]] = []
+    for gq in parsed.golden_queries:
+        for pair in extract_subjects_from_sql(gq.sql):
+            if pair not in all_gq_subjects:
+                all_gq_subjects.append(pair)
+    datasets = primary_datasets or parsed.datasets or all_gq_subjects
     md_output_dir = (
         MD_OUTPUT_DIR_METRICS
         if data_product_type == DATA_PRODUCT_TYPE_METRIC
@@ -111,23 +131,30 @@ def build_datahub_yaml(
         },
     }
 
-    # Golden query is optional (metric data products may have none). The loader
-    # skips the golden-query step when the key is absent.
+    # Golden queries are optional (metric data products may have none). The loader
+    # skips the golden-query step when the key is absent. Emit plural golden_queries:
+    # list so ALL queries are pushed; the legacy singular golden_query: key is only used
+    # when there is exactly one query and backward-compat is needed.
     if parsed.golden_queries:
-        golden = parsed.golden_queries[0]
-        stable_urn = golden_query_stable_urn or f"urn:li:query:{uuid.uuid4()}"
-        subjects = golden_subjects or datasets[:3]
-        spec["golden_query"] = {
-            "stable_urn": stable_urn,
-            "name": golden.name,
-            "description": textwrap.dedent(
-                f"""\
-                {golden.description}
-                Source: {md_output_dir}/{entity_slug}.md"""
-            ).strip(),
-            "subjects": [{"schema": s, "table": t} for s, t in subjects],
-            "sql": golden.sql,
-        }
+        gq_list = []
+        for i, gq in enumerate(parsed.golden_queries):
+            gq_subjects = extract_subjects_from_sql(gq.sql) or datasets[:3]
+            gq_list.append(
+                {
+                    "stable_urn": _gq_stable_urn(
+                        product_id, i, golden_query_stable_urn
+                    ),
+                    "name": gq.name,
+                    "description": textwrap.dedent(
+                        f"""\
+                    {gq.description}
+                    Source: {md_output_dir}/{entity_slug}.md"""
+                    ).strip(),
+                    "subjects": [{"schema": s, "table": t} for s, t in gq_subjects],
+                    "sql": gq.sql,
+                }
+            )
+        spec["golden_queries"] = gq_list
 
     if parsed.glossary_terms:
         spec["glossary_terms"] = {

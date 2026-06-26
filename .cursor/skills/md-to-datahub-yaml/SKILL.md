@@ -200,7 +200,7 @@ structured_property:
   legacy_qualified_names_to_drop:
     - br.com.quintoandar.datahub.{slug}.golden_query_url
 golden_queries:
-  - stable_urn: "TBD"          # CI assigns the deterministic URN
+  - stable_urn: "TBD"
     name: "Query 1 — ..."
     description: >-
       ...

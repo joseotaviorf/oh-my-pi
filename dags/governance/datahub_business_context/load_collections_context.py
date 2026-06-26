@@ -1617,6 +1617,29 @@ def _curated_data_product_asset_urns(cfg: dict[str, Any]) -> list[str]:
     return sorted(set(out))
 
 
+def _curated_pending_dataset_names(cfg: dict[str, Any]) -> list[str]:
+    """Return ``schema.table`` strings from cfg['datasets'] that couldn't be resolved.
+
+    Relies on the ``_URN_CACHE`` already populated by a prior call to
+    ``_curated_data_product_asset_urns`` within the same run, so no extra
+    DataHub probes are made.
+    """
+    rows = cfg.get("datasets") or []
+    if not isinstance(rows, list):
+        return []
+    pending = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        if row.get("urn"):
+            continue  # explicit URN — assumed to exist
+        schema = str(row.get("schema") or "").strip()
+        table = str(row.get("table") or "").strip()
+        if schema and table and _resolve_urn(schema, table) is None:
+            pending.append(f"{schema}.{table}")
+    return pending
+
+
 def _filter_registered_dataset_urns(urns: list[str]) -> list[str]:
     """Keep only dataset URNs that exist in DataHub (batchSet fails on unknown URNs)."""
     registered: list[str] = []
@@ -1783,23 +1806,47 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
         raise SystemExit("product_description (non-empty string) is required")
 
     dp_u = _data_product_urn(pid)
+    # Resolve datasets. _curated_data_product_asset_urns populates _URN_CACHE so
+    # the subsequent _curated_pending_dataset_names call needs no extra API probes.
     urns = _filter_assignable_urns(
         _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
     )
-    if not urns and not _is_metric_product(cfg):
+    pending = _curated_pending_dataset_names(cfg)
+
+    if not urns and not pending and not _is_metric_product(cfg):
         _fail(
             "curated.batchSetDataProduct",
             "no datasets from YAML are registered in DataHub",
         )
         return
 
+    # Tables that don't exist in DataHub yet can't be linked — append their names to the
+    # description so the product is still useful while ingestion catches up.
+    if pending:
+        note = (
+            "\n\n---\n\n**Tables not yet available in DataHub** "
+            "(will be linked automatically once ingested):\n"
+            + "\n".join(f"- `{t}`" for t in sorted(pending))
+        )
+        pdesc_raw = pdesc_raw.rstrip() + note
+        print(
+            f"  -> {len(pending)} dataset(s) not yet in DataHub — "
+            "noting them in the product description.",
+            file=sys.stderr,
+        )
+
     if not _create_or_update_data_product(pid, pname, pdesc_raw, dom, dp_u):
         return
 
     if not urns:
-        # Metric product — owns no base tables; its sources are surfaced via golden-query
-        # subjects ([5/10]) rather than exclusive dataset links. Nothing to link here.
-        print("  -> metric product: no owned datasets to link (expected).")
+        if _is_metric_product(cfg):
+            # Metric product — owns no base tables; sources surface via golden-query subjects.
+            print("  -> metric product: no owned datasets to link (expected).")
+        else:
+            print(
+                f"  -> 0 datasets linked; {len(pending)} pending DataHub ingestion "
+                "(will auto-link on next push once tables are registered)."
+            )
         return
 
     ln = _post(
@@ -1809,7 +1856,10 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     if ln is None:
         _fail("curated.batchSetDataProduct", "mutation failed")
         return
-    _ok(f"Linked {len(urns)} datasets")
+    _ok(
+        f"Linked {len(urns)} datasets"
+        + (f" ({len(pending)} pending)" if pending else "")
+    )
 
 
 def curated_push_documentation_link(cfg: dict[str, Any]) -> None:
@@ -2183,9 +2233,12 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
         if _is_metric_product(cfg):
             print("  -> metric product: no owned datasets to re-affirm (expected).")
             return
-        _fail(
-            "curated.datasets.refresh",
-            "no datasets from YAML are registered in DataHub",
+        # Tables may not yet be ingested into DataHub (handled gracefully in step [1/10]).
+        # Log a warning but do not fail — the description already notes the pending tables.
+        print(
+            "  ⚠ no DataHub-registered datasets to re-affirm — tables may still be "
+            "pending ingestion (noted in product description).",
+            file=sys.stderr,
         )
         return
     ref = _post(

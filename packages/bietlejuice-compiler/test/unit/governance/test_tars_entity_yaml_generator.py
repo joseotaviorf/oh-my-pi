@@ -50,7 +50,7 @@ def test_build_datahub_yaml_structure():
     assert spec["kind"] == "data_product_curated_entity"
     assert spec["data_product_id"] == "payments"
     assert spec["domain_urn"] == "urn:li:domain:fintech"
-    assert spec["golden_query"]["stable_urn"].startswith("urn:li:query:")
+    assert spec["golden_queries"][0]["stable_urn"].startswith("urn:li:query:")
     assert spec["datasets"][0]["schema"] == "dw_payments_platform"
     assert spec["datasets"][0]["table"] == "fact_payment"
     rendered = render_yaml(spec)

@@ -380,11 +380,15 @@ def main() -> None:
             )
         if gq_count < _MIN_GOLDEN_QUERIES:
             issues.append(f"{gq_count} golden queries < {_MIN_GOLDEN_QUERIES}")
+        # Skip the zero-assets check when the loader noted that tables are pending
+        # DataHub ingestion (the description contains the sentinel text).
+        has_pending_tables = "Tables not yet available in DataHub" in desc
         if (
             ns.deep
             and asset_count is not None
             and asset_count < _MIN_ASSETS
             and not _is_metric_entity(md_path)
+            and not has_pending_tables
         ):
             issues.append(f"{asset_count} assets < {_MIN_ASSETS}")
 

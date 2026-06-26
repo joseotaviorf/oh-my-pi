@@ -97,8 +97,10 @@ _QUERY_URN_RE = re.compile(
 )
 # Allows an optional ``- `` list marker so it matches both the singular
 # (``  stable_urn: …``) and the plural-list (``  - stable_urn: …``) YAML forms.
+# The optional trailing ``(?:#[^\n]*)?`` absorbs YAML inline comments like
+# ``  - stable_urn: "TBD"  # CI assigns the URN`` that the template emits.
 _STABLE_URN_LINE_RE = re.compile(
-    r"^(\s*(?:-\s+)?stable_urn:\s*)(?:urn:li:query:[^\s]+|\S+)\s*$",
+    r"^(\s*(?:-\s+)?stable_urn:\s*)(?:urn:li:query:[^\s]+|\S+)\s*(?:#[^\n]*)?$",
     re.MULTILINE,
 )
 
