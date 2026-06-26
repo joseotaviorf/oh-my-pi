@@ -7,7 +7,7 @@ columns:
   id:
     lineage:
       - datalake_big_agent_clean.enrollment.id
-    description: Enrollment ID
+    description: Surrogate primary key of the agent enrollment record in Big Agent.
   id_agent:
     lineage:
       - datalake_big_agent_clean.enrollment.id_agent

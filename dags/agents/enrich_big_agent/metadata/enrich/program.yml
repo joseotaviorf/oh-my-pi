@@ -5,19 +5,19 @@ domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
-    description: ID of the program.
+    description: Surrogate primary key of the Big Agent incentive program definition.
     lineage:
       - datalake_big_agent_clean.program.id
   name:
-    description: Name of the program.
+    description: Display name of the Big Agent program tier (e.g. ASP, CIQ Full, CIQ Manager).
     lineage:
       - datalake_big_agent_clean.program.name
   code:
-    description: Code of the program.
+    description: Short machine-readable program code used in enrollment and commission rules.
     lineage:
       - datalake_big_agent_clean.program.code
   details:
-    description: Details of the program.
+    description: JSON payload with optional program configuration metadata from the Big Agent source.
     lineage:
       - datalake_big_agent_clean.program.details
   ts_created:

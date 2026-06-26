@@ -13,7 +13,7 @@ columns:
   id_external_invoice:
     lineage:
       - datalake_big_agent_clean.installment.id_external_invoice
-    description: ID of the invoice.
+    description: Foreign key to the parent external invoice that this installment settles or corrects.
   id_earning:
     lineage:
       - datalake_big_agent_clean.installment.id_earning
@@ -25,7 +25,7 @@ columns:
   type:
     lineage:
       - datalake_big_agent_clean.installment.type
-    description: Type of the installment.
+    description: Installment direction indicating a payout to the consultant (CORRECTION) or a clawback (PAYMENT).
     categories:
       CORRECTION: Means that it is a positive amount that will be transferred to the CIQ. Normal installments will be of this type.
       PAYMENT: Means that the amount in the installment should be subtracted from the CIQ.
@@ -42,7 +42,7 @@ columns:
   status:
     lineage:
       - datalake_big_agent_clean.installment.status
-    description: Status of the installment.
+    description: Processing lifecycle status of the installment in the Robin Hood payout pipeline.
     categories:
       CANCELED: The installment is canceled.
       DISPATCHED: The installment was dispatched.

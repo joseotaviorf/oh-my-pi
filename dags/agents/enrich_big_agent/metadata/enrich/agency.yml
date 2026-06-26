@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_big_agent_clean.agency.id_house
   id_enrollment:
-    description: ID of the enrollment.
+    description: Enrollment version identifier linking the house-consultant association to Big Agent agency_aud history.
     lineage:
       - datalake_big_agent_clean.agency.id_enrollment
   dt_since:

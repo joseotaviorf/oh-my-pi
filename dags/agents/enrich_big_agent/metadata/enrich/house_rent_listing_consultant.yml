@@ -11,7 +11,7 @@ columns:
   id_house:
     lineage:
     - datalake_ebdb_listing.house_listing.id_house
-    description: id from the house
+    description: EBDB house identifier for the property linked to this rent listing consultant assignment.
   id_enrollment:
     lineage:
     - datalake_big_agent.house_consultant_history.id_enrollment
@@ -27,7 +27,7 @@ columns:
   consultant_type:
     lineage:
     - datalake_big_agent.house_consultant_history.consultant_type
-    description: type of the CIQ, calculated inside the select of the query
+    description: Big Agent program tier of the consultant assigned when the rent listing version was active.
     categories:
       ASP: House has an ASP manager assigned(similar to CIQ Manager)
       CIQ_FULL: House is fully managed by the CIQ
@@ -36,7 +36,7 @@ columns:
   first_consultant_type:
     lineage:
     - datalake_big_agent.house_consultant_history.consultant_type
-    description: first consultant type of the house
+    description: Program tier of the first consultant ever assigned to this house before the listing version window.
     categories:
       ASP: House has an ASP manager assigned(similar to CIQ Manager)
       CIQ_FULL: House is fully managed by the CIQ

@@ -19,7 +19,7 @@ columns:
   id_house:
     lineage:
     - datalake_big_agent.house.details
-    description: id from the house
+    description: EBDB house identifier for the property linked to this consultant assignment history.
   id_partner:
     lineage:
     - datalake_ebdb_clean.partner_agent.id_partner
@@ -35,7 +35,7 @@ columns:
   consultant_type:
     lineage:
     - datalake_big_agent.program.name
-    description: type of the CIQ
+    description: Big Agent program tier of the consultant responsible for the house during this revision.
     categories:
       ASP: House has an ASP manager assigned(similar to CIQ Manager)
       CIQ_FULL: House is fully managed by the CIQ

@@ -16,11 +16,11 @@ columns:
   id_partner:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_partner
-    description: Partner ID
+    description: EBDB partner company identifier for the agent
   consultant_type:
     lineage:
       - datalake_big_agent_clean.program.name
-    description: Program enrolled
+    description: Program assigned to the consultant (ASP, CIQ_FULL, CIQ_MANAGER, PRO_ACQUIRER os null).
     categories:
       ASP: Owner advisor, it works a lot like CIQ Manager
       CIQ_FULL: Agent fully responsible for the property, publication and management

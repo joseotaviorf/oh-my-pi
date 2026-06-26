@@ -9,11 +9,11 @@ columns:
   id:
     lineage:
       - datalake_big_agent_clean.external_invoice.id
-    description: ID of the table. 
+    description: Surrogate primary key of the deduplicated external invoice row in Big Agent enrich layer.
   id_earning:
     lineage:
       - datalake_big_agent_clean.external_invoice.id_earning
-    description: ID of the earning.
+    description: Foreign key to the Big Agent earning record that generated this invoice.
   id_external:
     lineage:
       - datalake_big_agent_clean.external_invoice.id_external
@@ -30,7 +30,7 @@ columns:
   purpose:
     lineage:
       - datalake_big_agent_clean.external_invoice.purpose
-    description: The purpose of the invoice.
+    description: Business reason for issuing the invoice (commission payout, correction, or incentive settlement).
   dt_due:
     lineage:
       - datalake_big_agent_clean.external_invoice.dt_due
