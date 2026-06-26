@@ -34,20 +34,69 @@ _AIRFLOW_EMR_CREATE_CLUSTER_DEFERRABLE = "airflow_emr_create_cluster_deferrable"
 
 _DEFAULT_EMR_TASK_RETRIES = 3
 
-_EMR_EXTRA_SPARK_SUBMIT_ARGS = [
-    "--conf",
-    "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension",
-    "--conf",
-    "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog",
-    "--conf",
-    "spark.hadoop.fs.s3a.acl.default=BucketOwnerFullControl",
-    "--conf",
-    "spark.hadoop.fs.s3a.canned.acl=BucketOwnerFullControl",
-    "--conf",
-    "spark.yarn.appMasterEnv.SPARK_RUNTIME=emr",
-    "--conf",
-    "spark.driverEnv.SPARK_RUNTIME=emr",
-]
+_DELTA_SPARK_SQL_EXTENSIONS = "io.delta.sql.DeltaSparkSessionExtension"
+
+# Cluster spark_conf keys forwarded to spark-submit when set on the merged cluster.
+_EMR_STEP_SPARK_CONF_KEYS = (
+    "spark.kryo.registrator",
+    "spark.serializer",
+)
+
+
+def _merge_spark_sql_extensions(*extension_lists: Optional[str]) -> str:
+    """Join comma-separated extension class names without duplicates."""
+    merged: List[str] = []
+    for extension_list in extension_lists:
+        if not extension_list:
+            continue
+        for extension in extension_list.split(","):
+            extension = extension.strip()
+            if extension and extension not in merged:
+                merged.append(extension)
+    return ",".join(merged)
+
+
+def _effective_cluster_spark_conf(
+    cluster_configuration: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Top-level spark_conf plus custom_configurations.spark_conf overlay."""
+    spark_conf = dict(cluster_configuration.get("spark_conf") or {})
+    custom_configurations = cluster_configuration.get("custom_configurations") or {}
+    custom_spark_conf = custom_configurations.get("spark_conf")
+    if isinstance(custom_spark_conf, dict):
+        spark_conf = {**spark_conf, **custom_spark_conf}
+    return spark_conf
+
+
+def _build_emr_extra_spark_submit_args(
+    cluster_configuration: Dict[str, Any],
+) -> List[str]:
+    """Delta defaults plus optional cluster spark_conf (e.g. additional SQL session extensions)."""
+    spark_conf = _effective_cluster_spark_conf(cluster_configuration)
+    cluster_extensions = spark_conf.get("spark.sql.extensions")
+    merged_extensions = _merge_spark_sql_extensions(
+        _DELTA_SPARK_SQL_EXTENSIONS,
+        cluster_extensions,
+    )
+    args: List[str] = [
+        "--conf",
+        f"spark.sql.extensions={merged_extensions}",
+        "--conf",
+        "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog",
+        "--conf",
+        "spark.hadoop.fs.s3a.acl.default=BucketOwnerFullControl",
+        "--conf",
+        "spark.hadoop.fs.s3a.canned.acl=BucketOwnerFullControl",
+        "--conf",
+        "spark.yarn.appMasterEnv.SPARK_RUNTIME=emr",
+        "--conf",
+        "spark.driverEnv.SPARK_RUNTIME=emr",
+    ]
+    for key in _EMR_STEP_SPARK_CONF_KEYS:
+        value = spark_conf.get(key)
+        if value is not None:
+            args.extend(["--conf", f"{key}={value}"])
+    return args
 
 
 class JobClusterEngine(ABC):
@@ -360,7 +409,9 @@ class EmrJobClusterEngine(JobClusterEngine):
             deploy_mode=str(
                 self._merged_cluster_configuration.get("emr_deploy_mode", "client")
             ),
-            extra_spark_args=list(_EMR_EXTRA_SPARK_SUBMIT_ARGS)
+            extra_spark_args=_build_emr_extra_spark_submit_args(
+                self._merged_cluster_configuration
+            )
             + self._python_interpreter_spark_args(python_interpreter_path)
             + [
                 "--conf",

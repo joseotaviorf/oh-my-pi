@@ -207,6 +207,77 @@ class TestEmrJobClusterEngineRetries:
         kwargs = mock_submit.call_args.kwargs
         assert kwargs["retries"] == 1
 
+    def test_submit_steps_merges_cluster_spark_sql_extensions(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        merged = {
+            **self._MERGED,
+            "spark_conf": {
+                "spark.sql.extensions": (
+                    "org.apache.sedona.viz.sql.SedonaVizExtensions,"
+                    "org.apache.sedona.sql.SedonaSqlExtensions"
+                ),
+                "spark.kryo.registrator": "org.apache.sedona.core.serde.SedonaKryoRegistrator",
+                "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
+            },
+        }
+        engine = EmrJobClusterEngine(emr_ctx, merged, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-polygon_region",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert (
+            "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension,"
+            "org.apache.sedona.viz.sql.SedonaVizExtensions,"
+            "org.apache.sedona.sql.SedonaSqlExtensions"
+        ) in flat
+        assert (
+            "spark.kryo.registrator=org.apache.sedona.core.serde.SedonaKryoRegistrator"
+            in flat
+        )
+        assert "spark.serializer=org.apache.spark.serializer.KryoSerializer" in flat
+
+    def test_submit_steps_does_not_inject_kryo_without_explicit_spark_conf(
+        self, emr_ctx
+    ):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        merged = {
+            **self._MERGED,
+            "spark_conf": {
+                "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
+                "spark.sql.extensions": (
+                    "org.apache.sedona.viz.sql.SedonaVizExtensions,"
+                    "org.apache.sedona.sql.SedonaSqlExtensions"
+                ),
+            },
+        }
+        engine = EmrJobClusterEngine(emr_ctx, merged, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-polygon_region",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert (
+            "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension,"
+            "org.apache.sedona.viz.sql.SedonaVizExtensions,"
+            "org.apache.sedona.sql.SedonaSqlExtensions"
+        ) in flat
+        assert "spark.kryo.registrator" not in flat
+
     def test_submit_steps_includes_s3a_bucket_owner_full_control_acl(self, emr_ctx):
         mock_submit = MagicMock()
         fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
