@@ -159,3 +159,37 @@ workflow:
       extra_spark_job_arguments:
         - "19JbdaddwOmC5cTdTWDLSSqFj4Vygehmeq7fDjPhMtp4"
         - "Base"
+
+    # --- reports_dw.py notebook migration (DBP-1333) ---
+    # Former notebook view: base_de_para
+    cost_center_mapping_pin:
+      extra_spark_job_arguments:
+        - "1oJG4O_D8Dadz0UthfMJGWAstj-tlQSpdh4vAq3U_xfE"
+        - "new_de_para_pin"
+    # Former notebook view: foto_atual_pin — People Insights / Classifieds PIN sync
+    pin_current_employee_snapshot:
+      extra_spark_job_arguments:
+        - "1UJu1xFgPjBtHIIeJTq28kmc4AFNYQv4nvkUIfP5i-A0"
+        - "foto_atual_pin"
+    # Former notebook view: centro_de_custo_pin — People Insights / Classifieds PIN sync
+    pin_cost_center_roster:
+      extra_spark_job_arguments:
+        - "1UJu1xFgPjBtHIIeJTq28kmc4AFNYQv4nvkUIfP5i-A0"
+        - "centro_de_custo_pin"
+    # Former notebook view: leiturinha_titular
+    leiturinha_holder_roster:
+      extra_spark_job_arguments:
+        - "1QgICpSG4yJa1-zyvnSyTi0S8GPHf6Xg0hg0rgzg5v3Q"
+        - "leiturinha_titular"
+    # Former notebook view: wd_sistemas — DP destination
+    pin_systems_employee_roster:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1il9Cl7fuyXQ7AKrso-AQVN0A4LDEE1-vtgcv-rqSEDU"
+        - "base_pin"
+    # Former notebook view: wd_sistemas — Performance / Navent shared workbook
+    pin_systems_employee_roster_shared:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1PEy7dd54tor157fVI_UK7J3t4SLIDKtgk92x6dHJbmg"
+        - "base_pin"

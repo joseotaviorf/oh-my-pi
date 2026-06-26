@@ -83,7 +83,7 @@ Mirror key facts in `reverse_reports_declaration.yml` comments when helpful.
 
 `employee_snapshots` is a **monthly snapshot** table. `dt_month_reference` holds the month-end reference date.
 
-**When exporting the current state of employees** (latest snapshot, one row per active assignment), use:
+**When exporting the current state of employees** (latest snapshot, one row per primary assignment), use:
 
 ```sql
 WHERE
@@ -119,9 +119,23 @@ WHERE
 
 User replies **validation OK** plus at least one of:
 
-- Tier 1–3 outputs from **Databricks** (row counts, `only_in_legacy` / `only_in_migrated`, EXCEPT counts)
-- Signed-off expected diffs with reasons
-- Description of Databricks notebook run (user pastes numbers)
+- Tier 1–3 outputs from **Databricks** (row counts, `only_in_legacy` / `only_in_migrated`, EXCEPT counts) — **prefer Databricks CLI** per [`people_domain.mdc`](../../rules/people/people_domain.mdc) and [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) when present
+- Signed-off expected diffs with reasons (document in PR + playbook)
+- Agent-run batch report: `.cursor/temp/{JIRA_KEY}/{branch}/validation/validation_report.md`
+
+### Tier 2 — columns to exclude from EXCEPT diffs
+
+Do **not** treat mismatches on **load-time stamps** as migration failures:
+
+| Column / pattern | Reason |
+| --- | --- |
+| Raw **`ts_load`** | Pipeline load time; legacy `dw_employee` vs DW 2.0 / `employee_snapshots` **always** differ. |
+| **`NOW()`**, **`CURRENT_TIMESTAMP()`**, or columns derived only from them | Run-time load stamp; differs every execution and across sources. |
+| Date columns **based on load `ts_load`** | e.g. `dt_last_update`, `data_extracao` via `CAST(ts_load AS DATE)` or `FROM_UTC_TIMESTAMP(ts_load, …)` — still load metadata, not a business event. |
+
+**In scope for Tier 2 — business dates:** all other exported date columns (`dt_birth`, `dt_hired`, `dt_inicio`, `dt_nascimento`, `dt_terminated`, `dt_desligamento`, SK-derived hire/termination dates, validity dates, etc.).
+
+All other exported business columns (non-date) remain in scope for Tier 2 unless the user signs off a documented waiver in the PR.
 
 ### Local Forno (before PR)
 

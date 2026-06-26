@@ -31,6 +31,20 @@ Technical rules live in [reference.md](reference.md). Apply them when generating
 
 **Shortcuts:** If the first message already picks a flow **and** includes material (DBP key, SQL/notebook, sheet URL, business description), acknowledge both, skip Flow selection and duplicate intake AskQuestions, and jump to the next missing step.
 
+### Migration notebook inference
+
+When the user selects **migrate** and supplies a notebook (`.ipynb`, workspace URL, or exported path) — or explicitly says tabs/sheets are correct for a migration — **do not** re-ask per-tab sheet URL, tab name, legacy SQL, or service-account ACL unless they dispute a value. Treat `table_to_gsheets` / `send_data_to_sheet` calls as production contract:
+
+| Infer from notebook | Use for |
+| --- | --- |
+| `sheet_url` / `sheet_id`, `sheet_tab` | Declaration `extra_spark_job_arguments` |
+| SQL in the cell above each export | Legacy logic + column contract |
+| `force_int_to_str=True` | Note in remap / declaration if needed |
+| Row counts in cell output | Tier-1 validation baseline |
+| Multiple writes of the same `table_name` | Flag dual-sheet cutover (one `tables_customization` entry per destination) |
+
+**Default for migrations:** legacy headers **Sim** (step 8); remap `dw_employee.*` → domain `dw_*` / `metric_people.employee_snapshots` per [reference.md](reference.md). **Batch** steps 5–9: present one consolidated table for all tabs, then governance — still **one governance question per turn**. **Still ask** (never invent): business owner, technical owner, operational consumer, why Sheets when not in Jira/notebook.
+
 ---
 
 ## Flow selection
@@ -107,9 +121,11 @@ Inspect the notebook and list tabs (cell titles, `table_to_gsheets` / `send_data
 
 Ask: **"Este notebook grava na(s) aba(s): {list}. Migrar todas agora ou só algumas?"**
 
-### 5–9. Per tab
+### 5–9. Per tab (or batched when notebook is complete)
 
-Repeat for each tab before the shared remap step:
+If a **migration notebook** is attached and the user has **not** disputed sheet targets, apply [Migration notebook inference](#migration-notebook-inference) — skip steps 5, 8 (default Sim), and 9; present one consolidated delivery table for all tabs before governance.
+
+Otherwise repeat for each tab before the shared remap step:
 
 - **5.** **"Qual a URL da planilha de produção (ou `sheet_id`) e o nome exato da aba `{tab}`?"** (+ Editor for `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`)
 - **6.** Business purpose — skip if intake already described it; otherwise **"Qual processo de negócio a aba `{tab}` sustenta? Quem usa e com que frequência?"**
@@ -248,13 +264,41 @@ Ask: **"Implementação concluída. Gerar SQL de validação ou ir direto para o
 
 ## Shared — Validation
 
-**Runtime:** People DW / reverse tables are **not fully available in Trino**. Run all Tier 1–3 validation SQL on **Databricks** (SQL editor, notebook, or MCP `execute_sql`). **Do not** use Trino or the `@tars` / `trino` skill for these diffs.
+**Runtime:** People DW / reverse tables are **not fully available in Trino**. Run all Tier 1–3 validation SQL on **Databricks** prod (`quintoandar_prod`). **Do not** use Trino or the `@tars` / `trino` skill for these diffs.
 
-**"Qual `load_start_date` / data de referência usar nas queries de diff?"**
+### Databricks CLI (agents)
 
-Save under `.cursor/temp/{JIRA_KEY}/{branch-slug}/validation/`. See [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) when present.
+Use the **People domain Databricks CLI runbook** ([`people_domain.mdc`](../../rules/people/people_domain.mdc) — *Ad-hoc SQL and pre-merge DQ validation*):
 
-**"Rode as queries no Databricks e cole os resultados Tier 1–3, depois responda validation OK."**
+1. List People test clusters; pick one in **RUNNING** state.
+2. `env -u DATABRICKS_TOKEN -u DATABRICKS_HOST -u DATABRICKS_USERNAME databricks … -p PROD`
+3. Commands API: `contexts/create` → `commands/execute` → poll `commands/status`.
+4. Always prefix: `USE CATALOG quintoandar_prod;`
+
+Save artifacts under `.cursor/temp/{JIRA_KEY}/{branch-slug}/validation/`:
+
+- `databricks_sql_runner.py` — ad-hoc single query
+- `run_{migration}_validation.py` — batch Tier 1–3 (see [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) when present)
+
+**`metric_people.employee_snapshots` current-state filter:** use `es.is_current = TRUE AND es.is_primary_assignment_for_snapshot = TRUE`. Do **not** use `dt_reference = CURRENT_DATE()` (month-end column; returns 0 rows most days) or `MAX(dt_reference)` as a snapshot picker — see [reference.md](reference.md#filtering-metric_peopleemployee_snapshots).
+
+### Columns excluded from Tier 2 (do not validate)
+
+**Load-time stamps** — omit from Tier 2 `EXCEPT` compare lists:
+
+| Pattern | Examples |
+| --- | --- |
+| Raw **`ts_load`** | `fact_*.ts_load`, `employee_snapshots.ts_load` |
+| **`NOW()`**, **`CURRENT_TIMESTAMP()`**, or columns derived only from them | `NOW() AS ts_load`, `CURRENT_TIMESTAMP() AS dt_extracted` |
+| Date columns **sourced from load `ts_load`** | `CAST(ts_load AS DATE) AS dt_last_update`, `CAST(FROM_UTC_TIMESTAMP(es.ts_load, …) AS DATE) AS data_extracao` |
+
+These record **when the pipeline loaded the row**, not a business event. Legacy (`dw_employee`) and DW 2.0 (`metric_people`, `dw_*`) load times **always** diverge after remap — expected, not a migration defect.
+
+**Business date columns stay in Tier 2** — validate mismatches on dates that represent domain facts, e.g. `dt_birth`, `dt_hired`, `dt_inicio`, `dt_nascimento`, `dt_terminated`, `dt_desligamento`, SK-as-date for hire/termination (`sk_hired_date` → `dt_inicio`), validity windows (`dt_valid_from` / `dt_valid_to`), and similar.
+
+- Tier 1 row counts and all non–load-time columns still require validation.
+
+**"Rode as queries no Databricks e cole os resultados Tier 1–3, depois responda validation OK."** — agents should run the CLI themselves when possible, not only ask the user to paste.
 
 ---
 
