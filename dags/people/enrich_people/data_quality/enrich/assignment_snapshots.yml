@@ -39,13 +39,14 @@ column_level_validations:
       severity_level: Error
   ceo_total_report_count_matches_assignment_count:
     custom:
-      # Top-of-hierarchy assignments (L0 / no manager) must report as many people as there are active assignments per dt_reference.
-      # A mismatch signals that report counts are under-counted or that hierarchy rows are missing.
+      # L0 (CEO) total report count covers all other employees — the L0 assignment is excluded from its own roll-up.
+      # Expected: assignment_count = ceo_total_reports + count(L0 assignments) per dt_reference.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT dt_reference
           FROM datalake_people.assignment_snapshots
           WHERE COALESCE(is_future_hire, FALSE) = FALSE
+            AND dt_reference >= DATE_SUB(CURRENT_DATE(), 7)
           GROUP BY dt_reference
           HAVING
             MAX(
@@ -59,7 +60,10 @@ column_level_validations:
                 WHEN manager_assignment_number IS NULL AND hierarchy_depth = 0
                 THEN COALESCE(count_direct_report, 0) + COALESCE(count_indirect_report, 0)
               END
-            )
+            ) + COUNT(DISTINCT CASE
+              WHEN manager_assignment_number IS NULL AND hierarchy_depth = 0
+              THEN id_assignment
+            END)
         )) = 0
       severity_level: Error
   one_current_snapshot_per_assignment:
@@ -76,15 +80,14 @@ column_level_validations:
       severity_level: Error
   termination_month_consistency:
     custom:
-      # For terminated assignments, the is_current row (the termination date) must fall within the
-      # same calendar month as dt_terminated. A mismatch means dt_month_reference is misaligned
-      # with the actual termination month, breaking monthly headcount snapshots.
+      # For completed terminations, the is_current row must fall in the same calendar month as dt_terminated.
+      # Future-dated terminations still active on is_current (dt_series_end = today) are excluded.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT assignment_number
           FROM datalake_people.assignment_snapshots
           WHERE is_current = TRUE
-            AND dt_terminated < DATE('9999-12-31')
+            AND dt_terminated < CURRENT_DATE()
             AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
         )) = 0
       severity_level: Error

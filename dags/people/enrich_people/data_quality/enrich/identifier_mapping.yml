@@ -8,7 +8,8 @@ table_level_validations:
     severity_level: Error
   has_size_variation:
     variation_type: percentage
-    greater_than_or_equal_to: 0
+    # Allows intentional shrink when excluding P-type rows (~2.6k rows, ~19% of prior baseline).
+    greater_than_or_equal_to: -25
     less_than_or_equal_to: 10
     severity_level: Warning
 
@@ -39,7 +40,7 @@ column_level_validations:
     is_complete:
       severity_level: Warning
     is_contained_in:
-      values: ['E', 'C', 'P']
+      values: ['E', 'C']
       severity_level: Warning
   assignment_status_type:
     is_complete:
@@ -79,19 +80,14 @@ column_level_validations:
   dt_started:
     is_complete:
       severity_level: Warning
-  dt_actual_termination:
-    is_complete:
-      severity_level: Warning
-  dt_notified_termination:
-    is_complete:
-      severity_level: Warning
+  # dt_actual_termination / dt_notified_termination: null while active; covered by pin_termination_status_consistency.
   ts_load:
     is_complete:
       severity_level: Warning
 
   employment_cycle_consistency:
     custom:
-      # E/C rows in the source system must always have an employment cycle assigned. P rows are exempt.
+      # Active employment rows must always have an employment cycle assigned.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.identifier_mapping
@@ -155,12 +151,11 @@ column_level_validations:
       severity_level: Warning
   hire_date_completeness:
     custom:
-      # E/C rows must always carry a hire date. P (pension/pre-hire) rows are exempt.
+      # Every row must carry a hire date for its continuous employment cycle.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.identifier_mapping
-         WHERE assignment_type IN ('E', 'C')
-           AND dt_original_hired IS NULL
+         WHERE dt_original_hired IS NULL
         ) = 0
       severity_level: Warning
   pin_termination_status_consistency:

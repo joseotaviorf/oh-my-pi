@@ -3,9 +3,9 @@ table_name: identifier_mapping
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Consolidated table that maps all identifiers for an employee (person, assignment, registration) in a single location. It serves as a crosswalk table to unify data from different HR systems and HCM tables.
+  Consolidated crosswalk for employment assignments (types E and C only; pension / pre-hire P excluded) mapping person, assignment, and registration identifiers across HR systems.
   Business rule for employment continuity:
-  - GLB_TRANSFER continuation (same person and assignment_sequence + 1) keeps the same employment cycle only when both assignments are type E or C (Pending P is excluded).
+  - GLB_TRANSFER continuation (same person and assignment_sequence + 1) keeps the same employment cycle when both assignments are type E or C.
   - Non-transfer rehiring starts a new employment cycle.
   - dt_original_hired is the earliest dt_started inside the current employment cycle.
   This means dt_original_hired is a cycle-based company tenure date.
@@ -23,7 +23,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.id_period_of_service
   id_continuous_employment_cycle:
-    description: Stable identifier of the person's current continuous employment cycle. Computed only for employment periods (assignments of type E or C); pension / pre-hire (P) rows have NULL cycle. GLB_TRANSFER between assignment types E or C only keeps the same cycle id; non-transfer rehiring starts a new cycle id.
+    description: Stable identifier of the person's current continuous employment cycle. GLB_TRANSFER between E or C assignments keeps the same cycle id; non-transfer rehiring starts a new cycle id.
     lineage:
       - datalake_pin_core_clean.periods_of_service.id_period_of_service
       - datalake_pin_core_clean.periods_of_service.id_person
@@ -66,7 +66,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.person_number
   assignment_type:
-    description: Type of assignment (E for Employee, C for Contingent, P for Pending).
+    description: Type of employment assignment. E for employee, C for contingent worker. Pension and pre-hire (P) assignments are excluded from this table.
     lineage:
       - datalake_pin_core_clean.all_assignments.assignment_type
   assignment_status_type:
@@ -109,7 +109,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.external_application_identifier.id_person
   is_valid_assignment:
-    description: True when the assignment is a real employment or contractor assignment (not pending nor a test user). Used to filter assignments eligible for snapshots and reporting.
+    description: True when the assignment is eligible for snapshots and reporting (employment or contractor assignment, not a test user).
     lineage:
       - datalake_pin_core_clean.all_assignments.assignment_type
       - datalake_pin_core_clean.external_application_identifier.type_external_identifier

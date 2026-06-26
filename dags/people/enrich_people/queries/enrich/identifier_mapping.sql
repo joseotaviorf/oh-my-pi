@@ -26,7 +26,7 @@ current_assignments_ranked AS (
     FROM
         datalake_pin_core_clean.all_assignments
     WHERE
-        assignment_type IN ('E', 'C', 'P')
+        assignment_type IN ('E', 'C')
         AND dt_effective_ended >= DATE('{load_end_date}')
 ),
 current_assignments AS (

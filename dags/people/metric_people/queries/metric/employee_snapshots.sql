@@ -1,3 +1,26 @@
+WITH
+primary_monthly_snapshots_ranked AS (
+    SELECT
+        fas.sk_employee,
+        fas.dt_month_reference,
+        fas.dt_reference,
+        fas.assignment_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                fas.sk_employee,
+                fas.dt_month_reference
+            ORDER BY
+                fas.dt_reference DESC,
+                fas.is_active DESC,
+                fas.assignment_number DESC
+        ) AS employee_month_rn
+    FROM
+        dw_employee_details.fact_assignment_snapshots AS fas
+    WHERE
+        fas.is_monthly_snapshot = TRUE
+        AND fas.is_primary_assignment_for_snapshot = TRUE
+        AND fas.sk_employee <> '-1'
+)
 SELECT
     fas.sk_cost_center_version,
     fas.sk_job_version,
@@ -281,7 +304,13 @@ SELECT
     fc.dt_valid_from AS dt_last_raise,
     fas.ts_load
 FROM
+    primary_monthly_snapshots_ranked AS pms
+INNER JOIN
     dw_employee_details.fact_assignment_snapshots AS fas
+        ON fas.sk_employee = pms.sk_employee
+        AND fas.dt_month_reference = pms.dt_month_reference
+        AND fas.dt_reference = pms.dt_reference
+        AND fas.assignment_number = pms.assignment_number
 LEFT JOIN
     dw_employee_details.dim_employee AS emp
         ON emp.sk_employee = fas.sk_employee
@@ -329,6 +358,4 @@ LEFT JOIN
     dw_compensation.dim_event_definition AS ev_raise
         ON ev_raise.sk_event_definition = fc.sk_event_definition
 WHERE
-    fas.is_monthly_snapshot = TRUE
-    AND fas.is_primary_assignment_for_snapshot = TRUE
-    AND fas.sk_employee <> '-1'
+    pms.employee_month_rn = 1
