@@ -31,3 +31,14 @@ validation:
       task_nodes:
         instance_count: 2
       master_node_type_id: m7g.xlarge
+      init_scripts:
+      - s3:
+          destination: '{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh'
+        args:
+        - '{{ var.value.artifacts_bucket }}'
+      - s3:
+          destination: '{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh'
+        args:
+        - '{{ var.value.artifacts_bucket }}'
+        - '{{ var.value.databricks_s3_bucket }}'
+        - '{{ dag.dag_id }}'
