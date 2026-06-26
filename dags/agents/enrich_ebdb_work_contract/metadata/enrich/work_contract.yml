@@ -6,11 +6,11 @@ domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
-    description: ID of the work contract.
+    description: EBDB work contract primary key identifying the partner accreditation agreement record.
     lineage:
       - datalake_ebdb_clean.work_contract.id
   id_company_hubspot:
-    description: ID of the company hubspot.
+    description: HubSpot company identifier matched to the work contract via 3P tag parsing or company SK trade-name linkage.
     lineage:
       - datalake_hubspot_clean.company.id_company
       - datalake_company.company_sks.id_hubspot
@@ -20,15 +20,15 @@ columns:
     lineage:
       - datalake_gsheets_clean.sale_business_unit_standardization.id_business_unit_teams
   hub_name_teams:
-    description: Name of the hub team.
+    description: Standardized hub team label from sale business unit mapping when the contract name matches a known hub work-contract name.
     lineage:
       - datalake_gsheets_clean.sale_business_unit_standardization.hub_name_teams
   contract_name:
-    description: Name of the work contract.
+    description: Legal or operational contract title from EBDB work_contract, often embedding 3P partner tags in brackets.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   3p_partner:
-    description: Name of 3p partner.
+    description: Extracted third-party brokerage partner name parsed from the [3P-*] tag in the contract name or HubSpot company tag.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
       - datalake_hubspot_clean.company.properties

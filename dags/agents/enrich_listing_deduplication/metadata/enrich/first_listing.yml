@@ -27,9 +27,11 @@ columns:
   status:
     lineage:
       - datalake_ebdb_listing.listing_business_context.status
-    description: The status of the listing. 
+    description: Current listing publication state from listing_business_context (for example PUBLISHED or UNPUBLISHED) for the CIQ-attached house and business context.
   has_first_listing:
     description: Indicates that this property has already had its first publication made.
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
   ts_first_listing:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing

@@ -5,7 +5,7 @@ description: >
   Combines Big Agent calculated earnings (demand conversion/acquisition and supply CIQ)
   with Nazaré revenue-share participants, aggregated per partition date.
 domain: Agents
-owner: anne.macedo@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:
@@ -27,7 +27,7 @@ columns:
     lineage:
       - datalake_big_agent.earnings.uuid_person
       - datalake_nazare_clean.agent.uuid_external_person
-    description: Person UUID of the agent receiving the revenue share.
+    description: Universal person UUID of the agent receiving revenue share, sourced from Big Agent earnings or Nazaré external person mapping.
   business_context:
     lineage:
       - datalake_hub_services.member_profile.business_context

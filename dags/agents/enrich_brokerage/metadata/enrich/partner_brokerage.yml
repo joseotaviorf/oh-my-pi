@@ -20,15 +20,15 @@ columns:
   name:
     lineage:
       - datalake_nazare_clean.agent.name
-    description: Agent name
+    description: Full name of the Nazaré agent participating in the offer brokerage revenue share.
   email:
     lineage:
       - datalake_nazare_clean.agent.email
-    description: Agent email
+    description: Contact email of the Nazaré agent linked to the offer-agent relationship.
   agent_role:
     lineage:
       - datalake_nazare_clean.offer_agent.agent_role
-    description: Agent role
+    description: Participant role on the offer in Nazaré (for example demand-side broker or CIQ supply agent) determining revenue-share treatment.
   partner_brokerage_fee:
     lineage:
       - datalake_nazare_clean.revenue_share_by_participant.json_output

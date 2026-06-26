@@ -127,7 +127,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.prospect_agent.status
       - datalake_ebdb_clean.prospect_agent.ts_created
-    description: True when the prospect is the last prospect person converted.
+    description: When a person has multiple prospect onboarding journeys, TRUE on the converted record with the latest ts_created for that uuid_person; FALSE on non-converted rows and on older converted records for the same person.
   ts_creci_validation_approved:
     lineage:
       - datalake_agent_accreditation.qualification_step.ts_changed

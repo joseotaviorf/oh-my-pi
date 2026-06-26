@@ -45,11 +45,11 @@ columns:
   contract_template_name:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_template.name
-    description: Name of the contract template.
+    description: Human-readable title of the EBDB accreditation contract template governing the agent partnership agreement.
   contract_template_description:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_template.description
-    description: Description of the contract template.
+    description: Long-form description text stored on the accreditation contract template explaining its purpose and scope.
   contract_process_status:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.status
