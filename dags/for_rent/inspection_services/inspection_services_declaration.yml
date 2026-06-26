@@ -189,6 +189,10 @@ workflow:
       clean_table_name: repair_request_media
       clean_primary_keys: [id_repair_request_media]
       raw_primary_keys: [id]
+    repair_request_mediation:
+      clean_table_name: repair_request_mediation
+      clean_primary_keys: [id_repair_request_mediation]
+      raw_primary_keys: [id]
     repair_request_aud:
       clean_table_name: repair_request_aud
       clean_primary_keys: [id_repair_request, rev]

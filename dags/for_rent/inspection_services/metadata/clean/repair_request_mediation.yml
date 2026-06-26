@@ -1,0 +1,91 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: repair_request_mediation
+description: >
+  Negotiation outcome for repair billing linked to an inspection, containing discount amounts,
+  tenant payment terms, counter-offer values, and acceptance status agreed during the mediation
+  process. One mediation record exists per inspection. Consumed by the For Rent domain to track
+  the financial settlement of repair requests between tenants and owners.
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
+columns:
+  id_repair_request_mediation:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.id
+    description: Unique internal identifier for the repair request mediation record.
+  id_inspection:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.inspection_id
+    description: Identifier of the inspection associated with this mediation.
+  uuid:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.uuid
+    description: Public UUID identifier for the repair request mediation.
+  applied_discount_amount:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.applied_discount_amount
+    description: Total discount amount applied during the negotiation for this mediation; NULL if no discount was applied.
+  applied_discount_currency:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.applied_discount_currency
+    description: Currency of the applied_discount_amount (e.g. BRL); NULL when no discount was applied.
+  tenant_payment_amount:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.tenant_payment_amount
+    description: Final payment amount agreed for the tenant in the mediation outcome; NULL if not yet settled.
+  tenant_payment_currency:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.tenant_payment_currency
+    description: Currency of the tenant_payment_amount (e.g. BRL); NULL when tenant_payment_amount is NULL.
+  mediation_discount_limit_amount:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.mediation_discount_limit_amount
+    description: Maximum discount amount allowed for this mediation, set as a ceiling for the negotiation.
+  mediation_discount_limit_currency:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.mediation_discount_limit_currency
+    description: Currency of the mediation_discount_limit_amount (e.g. BRL); NULL when no limit is set.
+  negotiation_summary:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.negotiation_summary
+    description: Free-text summary describing the negotiation that took place during the mediation process.
+  tenant_counter_offer_amount:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.tenant_counter_offer_amount
+    description: Counter-offer amount proposed by the tenant during mediation conclusion; NULL if no counter-offer was made.
+  tenant_counter_offer_currency:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.tenant_counter_offer_currency
+    description: Currency of the tenant_counter_offer_amount (e.g. BRL); NULL when tenant_counter_offer_amount is NULL.
+  is_tenant_agreed:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.tenant_agreed
+    description: Whether the tenant accepted the final proposal of the mediation; NULL if mediation has not concluded.
+  is_completed:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.completed
+    description: Whether the mediation process has been concluded, either by agreement or by reaching a final status.
+  ts_completed:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.completed_at
+    description: Timestamp when the mediation was concluded; NULL if the mediation is still in progress.
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.created_at
+    description: Timestamp when the mediation record was first created.
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.updated_at
+    description: Timestamp of the last update to the mediation record.
+  year:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_mediation.day
+    description: Day of update date.
