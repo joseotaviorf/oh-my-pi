@@ -60,15 +60,15 @@ WITH old_source AS (
                 WHEN COALESCE(b.visit_fup, vsl.visit_fup) IN ('EntradaNaoAutorizada', 'NaoCompareceu', 'ImovelAlugado') THEN 'VISIT_UNSUCCESSFUL'
             END AS event_type,
             CASE
-                WHEN b.visit_fup = 'EntradaNaoAutorizada' THEN 'ACCESS_TO_HOUSE_NOT_AUTHORIZED'
-                WHEN b.visit_fup = 'NaoCompareceu' AND show_demand.has_attended = FALSE THEN 'DEMAND_DID_NOT_ATTEND_VISIT'
-                WHEN b.visit_fup = 'NaoCompareceu' AND show_agent.has_attended = FALSE THEN 'AGENT_DID_NOT_ATTEND_VISIT'
-                WHEN b.visit_fup = 'NaoCompareceu' AND show_supply.has_attended = FALSE THEN 'SUPPLY_DID_NOT_ATTEND_VISIT'
-                WHEN b.visit_fup = 'ImovelAlugado' AND v.business_context = 'RENT' THEN 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT'
-                WHEN b.visit_fup = 'ImovelAlugado' AND v.business_context = 'SALE' THEN 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'EntradaNaoAutorizada' THEN 'ACCESS_TO_HOUSE_NOT_AUTHORIZED'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'NaoCompareceu' AND show_demand.has_attended = FALSE THEN 'DEMAND_DID_NOT_ATTEND_VISIT'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'NaoCompareceu' AND show_agent.has_attended = FALSE THEN 'AGENT_DID_NOT_ATTEND_VISIT'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'NaoCompareceu' AND show_supply.has_attended = FALSE THEN 'SUPPLY_DID_NOT_ATTEND_VISIT'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'ImovelAlugado' AND v.business_context = 'RENT' THEN 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT'
+                WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'ImovelAlugado' AND v.business_context = 'SALE' THEN 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE'
                 ELSE NULL
             END AS unsuccessful_reason_migrated,
-            IF(event_type = 'VISIT_UNSUCCESSFUL', COALESCE(unsuccessful_reason_migrated, vsl.visit_fup), NULL) AS unsuccessful_reason,
+            IF(event_type = 'VISIT_UNSUCCESSFUL', unsuccessful_reason_migrated, NULL) AS unsuccessful_reason,
             IF(event_type = 'VISIT_UNSUCCESSFUL' AND show_demand.has_attended = FALSE, TRUE, FALSE) AS has_unsuccessful_demand_not_attended,
             IF(event_type = 'VISIT_UNSUCCESSFUL' AND show_agent.has_attended = FALSE, TRUE, FALSE) AS has_unsuccessful_agent_not_attended,
             IF(event_type = 'VISIT_UNSUCCESSFUL' AND show_supply.has_attended = FALSE, TRUE, FALSE) AS has_unsuccessful_supply_not_attended,

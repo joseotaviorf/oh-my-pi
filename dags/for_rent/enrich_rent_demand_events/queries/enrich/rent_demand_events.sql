@@ -69,8 +69,8 @@ rent_flow_house_listing AS (
     rf.id_client,
     rf.id_user_agent AS id_agent,
     h.id_region,
-    IF(vs.is_completed, vs.id_schedule, NULL) AS id_booking,
-    IF(vs.is_completed, vs.id_visit, NULL) AS id_visit,
+    vs.id_schedule AS id_booking,
+    vs.id_visit,
     CASE
       WHEN rf.id_offer_context REGEXP '[0-1]{{2}}$' THEN NULL
       WHEN off.ts_first_sent IS NOT NULL OR (off.status IN ('Aprovada', 'ACCEPTED') AND off.ts_analyzed IS NOT NULL) THEN rf.id_offer_context
