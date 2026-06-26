@@ -12,6 +12,7 @@
 #   *wheel_package_path        — wheel build / publish chain
 #   *dag_bundle_sync_path       — DAG-bag delivery chain
 #   *core_init_scripts_path     — init_script.sh + emr_init_script.sh
+#   *sedona_init_script_path    — sedona/sedona-init.sh (Sedona JAR bootstrap)
 #   *wonka_init_scripts_path    — wonka/*.sh bootstrap scripts
 #   *dag_artifact_*_path        — per-artifact DAG package uploads
 #   *sst_pipelines_path         — SST pipeline upload
@@ -192,6 +193,23 @@ steps:
         include:
           - "packages/bietlejuice-compiler/scripts/init_script.sh"
           - "packages/bietlejuice-compiler/scripts/emr_init_script.sh"
+        on_empty: false
+
+  export-sedona-init-script-to-s3-prod:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: packages/bietlejuice-compiler/scripts/sedona/sedona-init.sh
+      target: sedona/
+      strip_prefix: packages/bietlejuice-compiler/scripts/sedona/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+      path: &sedona_init_script_path
+        include:
+          - "packages/bietlejuice-compiler/scripts/sedona/sedona-init.sh"
         on_empty: false
 
   export-wonka-init-scripts-to-s3-prod:
@@ -414,6 +432,20 @@ steps:
       event: push
       branch: forno
       path: *core_init_scripts_path
+
+  export-sedona-init-script-to-s3-forno:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: packages/bietlejuice-compiler/scripts/sedona/sedona-init.sh
+      target: sedona/
+      strip_prefix: packages/bietlejuice-compiler/scripts/sedona/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: push
+      branch: forno
+      path: *sedona_init_script_path
 
   export-wonka-init-scripts-to-s3-forno:
     image: plugins/s3:1.4.0

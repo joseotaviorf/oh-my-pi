@@ -428,6 +428,9 @@ upload-local-init-scripts:
 	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/configure_spark.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/configure_spark.sh \
 		--acl bucket-owner-full-control
+	@aws s3 cp $(COMPILER_SCRIPTS)/sedona/sedona-init.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/sedona/sedona-init.sh \
+		--acl bucket-owner-full-control
 
 .PHONY: upload-forno-release
 ## Full local Forno release: builds wheel and uploads all artifacts to Forno S3 (mirrors release.yml forno steps).
