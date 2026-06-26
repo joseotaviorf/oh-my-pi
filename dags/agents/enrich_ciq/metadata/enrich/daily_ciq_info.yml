@@ -5,18 +5,24 @@ description: |
   The table described provides daily information about the CIQ status and its information related to the demand context (Visit Broker), 
   with 1 record per day for each CIQ.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_partner:
-    description: Id partner of CIQ.
+    description: >
+      CIQ partner id from ciq_users for the daily snapshot grain of one row per
+      partner per reference date across supply and demand accreditation context.
     lineage:
       - datalake_ebdb_agents.ciq_users.id_partner
   id_user:
-    description: Id user of CIQ.
+    description: >
+      User id of the CIQ on the reference date, taken from the latest applicable
+      status version in ciq_users for that calendar day.
     lineage:
       - datalake_ebdb_agents.ciq_users.id_user
   id_agent:
-    description: Id agent of CIQ.
+    description: >
+      Visit-broker agent id when the CIQ is also registered as an agent in ebdb;
+      coalesced to -1 when the partner has no agent registration on that day.
     lineage:
       - datalake_ebdb_user.user.id_agent
   id_work_contract:

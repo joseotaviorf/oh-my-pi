@@ -4,7 +4,7 @@ table_name: ciq_supply_events_tracking
 description: Table contains records about supply events related to the CIQ context. 
   Each record corresponds to a step within the supply funnel and its corresponding information.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_supply:
     description: Primary key that identifies each supply flow events (Lead to FL).
@@ -94,6 +94,8 @@ columns:
       - datalake_supply_flows.supply_events_tracking.id_user_affiliate
       - datalake_supply_flows.supply_events_tracking.funnel_event_type
   ts_event:
-    description: Timestamp of the event.
+    description: >
+      Adjusted timestamp when the supply funnel step was recorded, mapped from
+      supply_events_tracking.ts_event_adjusted for acquisition and conversion events.
     lineage:
       - datalake_supply_flows.supply_events_tracking.ts_event

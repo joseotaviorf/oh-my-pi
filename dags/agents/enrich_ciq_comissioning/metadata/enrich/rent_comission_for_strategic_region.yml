@@ -4,16 +4,20 @@ table_name: rent_comission_for_strategic_region
 description: Enriched table containing information about regions (neighborhoods), 
   indicating whether or not they are strategic in a given month, in the For rent context.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
-    description: Id of house listing.
+    description: >
+      Rent house listing id used to attribute the property to a neighborhood and
+      publication month for strategic-region CIQ commission eligibility rules.
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
-    description: Id of the region.
+    description: >
+      Geographic region id of the house neighborhood from ebdb listing, used to
+      match the monthly strategic-region classification loaded from GSheets.
   city_name:
     lineage:
       - datalake_ebdb_listing.house.region_city_name

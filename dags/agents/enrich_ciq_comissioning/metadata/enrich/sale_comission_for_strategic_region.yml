@@ -4,16 +4,20 @@ table_name: sale_comission_for_strategic_region
 description: Enriched table containing information about regions (neighborhoods), 
   indicating whether or not they are strategic in a given month, in the For Sale context.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:
       - datalake_sale_listings.sale_listing.id_sale_listing
-    description: Id of sale listing.
+    description: >
+      Sale listing id for the house in SALE business context, filtered to the
+      canonical listing suffix used for strategic-region commission attribution.
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
-    description: Id of the region.
+    description: >
+      Geographic region id of the property neighborhood from ebdb house, joined
+      to the monthly strategic-region lookup from the sale commission GSheet.
   city_name:
     lineage:
       - datalake_ebdb_listing.house.city

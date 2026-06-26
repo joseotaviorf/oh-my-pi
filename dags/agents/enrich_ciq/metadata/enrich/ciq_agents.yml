@@ -2,20 +2,26 @@ database_name: datalake_ebdb_agents
 table_name: ciq_agents
 description: Each line represents a CIQ that is also present in the demand context, whether as a real estate agent or photographer, also detailing whether it belongs to rent or sale.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_partner:
     lineage:
       - datalake_ebdb_agents.ciq_users.id_partner
-    description: Partner ID (Main)
+    description: >
+      Main partner identifier for the CIQ autonomous-agent enrollment; links to
+      ciq_users and Portfolio Manager partner records for supply and demand context.
   id_user:
     lineage:
       - datalake_ebdb_agents.ciq_users.id_user
-    description: User ID (Main)
+    description: >
+      QuintoAndar user id tied to the CIQ partner account in Main, used to join
+      demand-side agent_data for visit broker, photographer, and sale/rent flags.
   id_agent:
     lineage:
       - datalake_ebdb_user.user.id_agent
-    description: Agent ID (Main)
+    description: >
+      Agent registration id in ebdb when the CIQ also operates in the demand
+      context as visit broker, photographer, or licensed real estate agent.
   name:
     lineage:
       - datalake_ebdb_agents.ciq_users.name
@@ -23,7 +29,9 @@ columns:
   email:
     lineage:
       - datalake_ebdb_agents.ciq_users.email
-    description: Email of user.
+    description: >
+      Contact email of the CIQ from ciq_users, used to identify the partner in
+      Portfolio Manager and downstream agent accreditation joins.
   is_active:
     lineage:
       - datalake_ebdb_user.agent_data.is_active

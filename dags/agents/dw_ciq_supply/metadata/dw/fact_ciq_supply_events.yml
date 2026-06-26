@@ -3,7 +3,7 @@ table_name: fact_ciq_supply_events
 description: Fact table that contains records about supply events related to the CIQ context. 
   Each record corresponds to a step within the supply funnel and its corresponding information.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   sk_ciq_supply_event:
     description: Unique primary key that identifies each supply event.
@@ -62,7 +62,9 @@ columns:
       - datalake_ciq.ciq_supply_events_tracking.application
       - datalake_ciq.ciq_supply_events_tracking.ops_agent
   ts_event:
-    description: Timestamp of the event.
+    description: >
+      Wall-clock time when the supply funnel step occurred, propagated from
+      ciq_supply_events_tracking as the adjusted event timestamp for the grain.
     lineage:
       - datalake_ciq.ciq_supply_events_tracking.ts_event
   ts_load:

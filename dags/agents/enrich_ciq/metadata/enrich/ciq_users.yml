@@ -4,16 +4,20 @@ description: >
   Each row represents a CIQ partner-user status version: active or inactive transitions and user
   changes on Main, with SCD-style validity windows.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_partner:
     lineage:
       - datalake_ebdb_clean.partner.id
-    description: Partner ID (Main)
+    description: >
+      Partner id of the autonomous agent (CIQ) in Main; one partner may have
+      multiple user linkage rows tracked with SCD validity windows.
   id_user:
     lineage:
       - datalake_ebdb_clean.partner_agent_aud.id_user
-    description: User ID (Main)
+    description: >
+      User id associated with the partner in partner_agent_aud, representing
+      the QuintoAndar account linked to the CIQ for each status version.
   uuid_company:
     lineage:
       - datalake_ebdb_clean.partner.uuid_company
@@ -21,7 +25,9 @@ columns:
   uuid_person:
     lineage:
       - datalake_person_clean.person.uuid_person
-    description: Person UUID of CIQ.
+    description: >
+      Person-service UUID for the CIQ user when available, used to enrich name
+      and email from datalake_person_clean alongside the Main partner record.
   name:
     lineage:
       - datalake_ebdb_clean.partner.name
@@ -33,7 +39,9 @@ columns:
       - datalake_person_clean.contact_info.priority
       - datalake_person_clean.contact_info.category
       - datalake_person_clean.contact_info.contact_info
-    description: Email of user.
+    description: >
+      CIQ contact email resolved from partner record or person contact_info
+      (primary then secondary), excluding internal @quintoandar.com.br addresses.
   status:
     lineage:
       - datalake_ebdb_clean.partner_agent_aud.status

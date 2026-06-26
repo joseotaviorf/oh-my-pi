@@ -4,10 +4,12 @@ table_name: ciq_portfolio
 description: 
   Each record brings information about a given CIQ about which cluster it belongs to and which portfolio it belongs to.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_partner:
-    description: Id partner of CIQ.
+    description: >
+      CIQ partner id from the portfolio control spreadsheet, identifying which
+      autonomous agent the cluster and portfolio allocation row refers to.
     lineage:
       - datalake_gsheets_clean.ciq_portfolio.id_partner
   portfolio_user_name:
@@ -15,7 +17,9 @@ columns:
     lineage:
       - datalake_gsheets_clean.ciq_portfolio.portfolio_user_name
   cluster_name:
-    description: Cluster of CIQ.
+    description: >
+      Operational cluster label assigned to the CIQ in the carteira_ciq sheet,
+      grouping partners for portfolio management and performance tracking.
     lineage:
       - datalake_gsheets_clean.ciq_portfolio.cluster_name
   is_last_status: 
