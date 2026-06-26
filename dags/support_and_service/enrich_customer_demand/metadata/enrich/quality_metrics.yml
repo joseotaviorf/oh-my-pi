@@ -6,7 +6,7 @@ description:
   focus on the CSAT metric. It provides insights into both answered resolution and
   customer satisfaction rating.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_agent:
     lineage:

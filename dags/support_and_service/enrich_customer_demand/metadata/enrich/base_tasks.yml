@@ -10,7 +10,7 @@ description:
   "orçamentação realizada" tag, or from the "Midias Ops [POS] [BACK]" department that
   have either the "escalar back video" tag or the "escalar ouvidoria hard cases" tag.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_task:
     lineage:
@@ -79,7 +79,7 @@ columns:
       - datalake_customer_support.email.agent_email
     description: Email of the agent assigned to the stask
   origin:
-    description: The task origin.
+    description: Channel or product surface that initiated the IVR closed-history request.
     categories:
       crm: For CRM tasks.
       email: For Zendesk E-mail Tickets.

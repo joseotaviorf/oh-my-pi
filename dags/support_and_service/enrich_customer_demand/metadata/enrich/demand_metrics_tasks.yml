@@ -8,7 +8,7 @@ description:
   number of days a task remained open, but instead provides the current status of
   each task.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_task:
     lineage:
@@ -70,7 +70,7 @@ columns:
   origin:
     lineage:
       - datalake_customer_demand.base_tasks.origin
-    description: The task origin.
+    description: Channel or product surface that initiated the IVR closed-history request.
     categories:
       crm: For CRM tasks.
       email: For Zendesk E-mail Tickets.

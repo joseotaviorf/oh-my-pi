@@ -6,7 +6,7 @@ description: >
   channel context, and response/inactivity metrics. Used for support operational analysis and
   routing quality reporting.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_channel:
     lineage:

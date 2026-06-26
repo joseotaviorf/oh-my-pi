@@ -2,7 +2,7 @@ database_name: datalake_crm_tasks_transitions
 table_name: tasks_transitions
 description: Data from case transitions between CRM tasks
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_transition:
     description: Unique identifier of the transition
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_crm.tasks.type
   status:
-    description: Transition status
+    description: Current lifecycle status of the ticket, task, or workflow step.
     lineage:
       - datalake_crm.workflows_transitions.status
   conclusion_option:

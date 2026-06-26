@@ -5,7 +5,7 @@ description: >
   One row per call reservation, with one additional row per unanswered task. Grain is id_call + id_reservation. Used for support operational analysis,
   SLA monitoring, BPO performance tracking, and call routing quality reporting.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_call:
     lineage:
