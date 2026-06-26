@@ -110,6 +110,14 @@ workflow:
       extra_spark_job_arguments:
         - "1il9Cl7fuyXQ7AKrso-AQVN0A4LDEE1-vtgcv-rqSEDU"
         - "base"
+    # --- access_list.py notebook migration (time bank) ---
+    # Former notebook view: access_list_dp
+    # Business Owner: mariana.reberte@quintoandar.com.br (DP)
+    # Governance: docs/access_list_dp.md
+    access_list_dp:
+      extra_spark_job_arguments:
+        - "1_R9bEBjOFQnVMjQgUNjyeZtvbyvy7ZSqtU59c_jddLc"
+        - "access_list"
     procurement_employee_manager_roster:
       extra_spark_job_arguments:
         - "1WNIqQi1uRYoBKxrGFLsJ0HGsLSVCvxNJpYl36eQcjQE"
