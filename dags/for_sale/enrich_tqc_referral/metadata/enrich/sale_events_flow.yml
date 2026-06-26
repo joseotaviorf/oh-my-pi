@@ -64,7 +64,7 @@ columns:
   is_visit_completed:
     lineage:
       - datalake_visit.visits.computed_status
-    description: Boolean flag indicating if the visit was completed (visit_status = 'Realizado').
+    description: Boolean flag indicating if the visit was completed (visit_status = 'DONE').
   id_tqc_flow:
     lineage:
       - datalake_tqc_referral.unified_lead_referral_flow.tqc_flow

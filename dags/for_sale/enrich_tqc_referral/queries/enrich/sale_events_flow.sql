@@ -63,7 +63,7 @@ sale_events_flow_ranked AS (
         THEN 2
       ELSE NULL
     END AS id_tqc_flow,
-    svf.visit_status = 'Realizado' AS is_visit_completed,
+    svf.visit_status = 'DONE' AS is_visit_completed,
     CASE
       WHEN tqc.id_user_lead IS NOT NULL
         THEN TRUE
