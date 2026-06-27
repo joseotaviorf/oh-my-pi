@@ -128,8 +128,11 @@ rent_flow_house_listing AS (
     datalake_ebdb_listing.listing_business_context AS lbc
       ON lbc.id_house = h.id
   LEFT JOIN
+    datalake_booking.booking AS bk
+      ON bk.id = rf.id_booking
+  LEFT JOIN
     datalake_visit.visit_schedules AS vs
-      ON vs.id_schedule = rf.id_booking
+      ON vs.id_schedule = bk.id
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id_offer_context = rf.id_offer_context
@@ -143,9 +146,9 @@ rent_flow_house_listing AS (
         that we have on the fact_listing_rent_flows, we decided to add another filter considering the business context as null
     **/
     AND (
-      vs.business_context <> 'SALE'
+      COALESCE(bk.visit_intent, '') <> 'SALE'
       OR (
-        vs.business_context = 'SALE'
+        bk.visit_intent = 'SALE'
         AND rf.id_contract IS NOT NULL
       )
     )
