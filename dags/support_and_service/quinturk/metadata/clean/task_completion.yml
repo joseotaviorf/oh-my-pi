@@ -93,6 +93,11 @@ columns:
     lineage:
       - datalake_quinturk_raw.task_completion.op_cdc
     description: CDC operation type for this record (e.g., insert, update, delete) indicating the change that triggered ingestion.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
   ts_cdc_transaction:
     lineage:
       - datalake_quinturk_raw.task_completion.ts_cdc_transaction

@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: case_feed
 description: Clean table for ingesting case feed data from the Sales Force tool. Contains feed items and activities associated with cases including comments, likes, and posts.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_case_feed:
     lineage:
@@ -31,11 +31,11 @@ columns:
   feed_type:
     lineage:
       - datalake_salesforce_raw.case_feed.Type
-    description: Type of feed item.
+    description: Business value representing feed type on the case_feed clean dataset.
   title:
     lineage:
       - datalake_salesforce_raw.case_feed.Title
-    description: Title of the feed item.
+    description: Business value representing title on the case_feed clean dataset.
   body:
     lineage:
       - datalake_salesforce_raw.case_feed.Body

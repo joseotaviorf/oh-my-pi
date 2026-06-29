@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: case_member
 description: Clean table for ingesting case member data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_case_member:
     lineage:
@@ -35,11 +35,11 @@ columns:
   case_member_name:
     lineage:
       - datalake_salesforce_raw.case_member.Name
-    description: Name of the case member.
+    description: Human-readable case member name used in dashboards and operational reports.
   case_member_type:
     lineage:
       - datalake_salesforce_raw.case_member.Type__c
-    description: Type of case member.
+    description: Business value representing case member type on the case_member clean dataset.
   is_deleted:
     lineage:
       - datalake_salesforce_raw.case_member.IsDeleted
@@ -73,4 +73,4 @@ columns:
       - datalake_salesforce_raw.case_member.day
     description: Day of the case member record.
   ts_load:
-    description: Timestamp of the load.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

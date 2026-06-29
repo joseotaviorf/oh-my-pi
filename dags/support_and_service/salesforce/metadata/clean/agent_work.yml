@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: agent_work
 description: Clean table for ingesting agent work data from the Sales Force tool. Contains information about work items assigned to agents including routing, capacity, and timing metrics.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_agent_work:
     lineage:
