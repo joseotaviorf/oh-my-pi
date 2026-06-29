@@ -3,7 +3,7 @@ database_name: datalake_survicate
 table_name: response_content
 description: Content of the response submitted in the survey
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_response:
     description: A unique, unchangeable identifier for the response.
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_survicate_clean.survey_responses.answer
   question_type:
-    description: The question's type.
+    description: Business value representing question type on the response_content enrich dataset.
     categories:
       button_close: ""
       button_next: ""
