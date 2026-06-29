@@ -3,7 +3,7 @@ database_name: datalake_notifyme_clean
 table_name: user_campaign_preferences
 description: This table consolidates user campaign preferences data from NotifyMe. Tracks user preferences for specific campaigns.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the user campaign preference record.
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_notifyme_raw.user_campaign_preferences.user_id
   campaign_name:
-    description: Name of the campaign for which the user has preferences.
+    description: Marketing or operational campaign label associated with the notification preference.
     lineage:
       - datalake_notifyme_raw.user_campaign_preferences.campaign_name
   ts_created:

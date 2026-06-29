@@ -3,7 +3,7 @@ database_name: datalake_notifyme_clean
 table_name: alerts_processing_scheduler
 description: This table consolidates alerts processing scheduler data from NotifyMe. Tracks when campaigns were last processed.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the processing scheduler record.

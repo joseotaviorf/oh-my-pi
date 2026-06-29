@@ -3,7 +3,7 @@ database_name: datalake_notifyme_clean
 table_name: subscriptions
 description: This table consolidates subscriptions data from NotifyMe. Tracks user subscription preferences for different communication channels.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the subscription record.

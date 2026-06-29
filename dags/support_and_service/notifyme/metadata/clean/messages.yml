@@ -3,7 +3,7 @@ database_name: datalake_notifyme_clean
 table_name: messages
 description: This table consolidates messages data from NotifyMe. Messages represent actual notifications sent to users.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the message.

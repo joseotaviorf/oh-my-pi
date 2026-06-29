@@ -3,7 +3,7 @@ database_name: datalake_notifyme_clean
 table_name: rev_info
 description: This table consolidates revision information data from NotifyMe. Tracks database revision history for audit purposes.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   rev:
     description: Unique revision identifier.

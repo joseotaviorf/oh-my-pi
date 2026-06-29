@@ -3,14 +3,14 @@ database_name: datalake_notifyme_clean
 table_name: users
 description: This table consolidates users data from NotifyMe. Contains user information for notification purposes.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the user.
     lineage:
       - datalake_notifyme_raw.users.id
   name:
-    description: Name of the user.
+    description: Display name of the entity as registered in the upstream operational application.
     lineage:
       - datalake_notifyme_raw.users.name
   email:
