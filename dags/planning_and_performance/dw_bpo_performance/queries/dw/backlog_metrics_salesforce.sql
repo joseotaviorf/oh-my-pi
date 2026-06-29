@@ -120,7 +120,7 @@ status_historico AS (
         COALESCE(
             LEAD(status) OVER (
                 PARTITION BY CAST(case_number AS INT)
-                ORDER BY FROM_ISO8601_TIMESTAMP(last_modified_date) ASC
+                ORDER BY CAST(last_modified_date AS TIMESTAMP) ASC
             ),
             status
         ) AS proximo_status
