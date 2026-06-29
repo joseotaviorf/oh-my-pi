@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: users
 description: Clean table for ingesting users data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_user_salesforce:
     lineage:
@@ -43,11 +43,11 @@ columns:
   last_name:
     lineage:
       - datalake_salesforce_raw.users.LastName
-    description: Last name of the user.
+    description: Human-readable last name used in dashboards and operational reports.
   first_name:
     lineage:
       - datalake_salesforce_raw.users.FirstName
-    description: First name of the user.
+    description: Human-readable first name used in dashboards and operational reports.
   middle_name:
     lineage:
       - datalake_salesforce_raw.users.MiddleName
@@ -199,7 +199,7 @@ columns:
   user_type:
     lineage:
       - datalake_salesforce_raw.users.UserType
-    description: Type of user license.
+    description: Business value representing user type on the users clean dataset.
   start_day:
     lineage:
       - datalake_salesforce_raw.users.StartDay
@@ -277,4 +277,4 @@ columns:
       - datalake_salesforce_raw.users.day
     description: Day of the user record.
   ts_load:
-    description: Timestamp of the load.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

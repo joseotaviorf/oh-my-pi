@@ -4,7 +4,7 @@ description: |
   Clean table with voice call events from Sauron, capturing call lifecycle
   events such as CALL_ENDED and CALL_OVERFLOWN within customer support.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

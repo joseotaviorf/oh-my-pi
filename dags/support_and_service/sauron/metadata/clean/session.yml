@@ -4,7 +4,7 @@ description: |
   Clean table with session records from Sauron, QuintoAndar's internal
   human interaction orchestration service that manages customer support sessions.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

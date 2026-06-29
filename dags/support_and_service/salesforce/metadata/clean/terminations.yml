@@ -3,7 +3,7 @@ database_name: datalake_salesforce_clean
 table_name: terminations
 description: Clean table for ingesting termination data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_termination:
     lineage:
@@ -153,14 +153,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.TerminationWithPenalty__c
     description: Specifies if the termination incurs a penalty.
-  ts_tr_termination_created:
-    lineage:
-      - datalake_salesforce_raw.terminations.TRTerminationCreatedDate__c
-    description: Timestamp when the termination record was created.
-  ts_vacancy:
-    lineage:
-      - datalake_salesforce_raw.terminations.VacancyDate__c
-    description: Timestamp indicating the vacancy date.
   ts_created:
     lineage:
       - datalake_salesforce_raw.terminations.CreatedDate
@@ -189,3 +181,63 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.day
     description: Day of the termination record.
+  tenant_answered_budget_approval_review:
+    lineage: []
+    description: Business value representing tenant answered budget approval review on the terminations clean dataset.
+  contract:
+    lineage: []
+    description: Business value representing contract on the terminations clean dataset.
+  tenant_agreed_budget_approval_review:
+    lineage: []
+    description: Business value representing tenant agreed budget approval review on the terminations clean dataset.
+  ts_last_referenced:
+    lineage: []
+    description: Timestamp when last referenced occurred according to the source system.
+  description_agreement_and_improvements:
+    lineage: []
+    description: Business value representing description agreement and improvements on the terminations clean dataset.
+  dt_tr_termination_created:
+    lineage: []
+    description: Calendar date associated with tr termination created in the business process.
+  ts_last_activity:
+    lineage: []
+    description: Timestamp when last activity occurred according to the source system.
+  owner_answered_budget_approval_review:
+    lineage: []
+    description: Business value representing owner answered budget approval review on the terminations clean dataset.
+  tenant_condominium_payer:
+    lineage: []
+    description: Business value representing tenant condominium payer on the terminations clean dataset.
+  is_valid_letter:
+    lineage: []
+    description: Indicates whether valid letter applies to this record.
+  feed_item_comment:
+    lineage: []
+    description: Business value representing feed item comment on the terminations clean dataset.
+  dt_vacancy:
+    lineage: []
+    description: Calendar date associated with vacancy in the business process.
+  case:
+    lineage: []
+    description: Business value representing case on the terminations clean dataset.
+  has_budget_approval:
+    lineage: []
+    description: Boolean flag indicating whether has budget approval applies to this support service record.
+  relisting_enable:
+    lineage: []
+    description: Business value representing relisting enable on the terminations clean dataset.
+  ts_last_viewed:
+    lineage: []
+    description: Timestamp when last viewed occurred according to the source system.
+  owner_agreed_budget_approval_review:
+    lineage: []
+    description: Business value representing owner agreed budget approval review on the terminations clean dataset.
+  is_deleted:
+    lineage: []
+    description: Indicates whether deleted applies to this record.
+  repairs_detected_internally:
+    lineage: []
+    description: Business value representing repairs detected internally on the terminations clean dataset.
+  repairs_detected_by_owner:
+    lineage: []
+    description: Business value representing repairs detected by owner on the terminations clean dataset.

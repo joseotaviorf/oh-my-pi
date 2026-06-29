@@ -3,13 +3,13 @@ database_name: datalake_support_session_service_clean
 table_name: support_session
 description: This table stores detailed information about support sessions.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_support_session_service_raw.support_session.id
     description: |
-      Session identifier.
+      Primary surrogate identifier for the entity row in this support and service dataset.
   public_id:
     lineage:
       - datalake_support_session_service_raw.support_session.public_id
@@ -19,7 +19,7 @@ columns:
     lineage:
       - datalake_support_session_service_raw.support_session.status
     description: |
-      Session status.
+      Current lifecycle status of the ticket, task, or workflow step.
     categories:
       active: 'Active'
       expired: 'Expired'
@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_support_session_service_raw.support_session.user_phone
     description: |
-      User phone
+      Customer phone number involved in the IVR flow or scheduled callback task.
   context:
     description: |
       Campo n usado por call
@@ -122,3 +122,6 @@ columns:
     lineage:
     - datalake_support_session_service_raw.support_session.day
     description: day when the record was created or updated. It's a partition.
+  ts_first_message:
+    lineage: []
+    description: Timestamp when first message occurred according to the source system.

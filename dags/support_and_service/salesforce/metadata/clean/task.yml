@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: task
 description: Clean table for ingesting task data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_task:
     lineage:
@@ -32,10 +32,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.ContractId
     description: Contract identification key related to the task.
-  id_feed_item:
-    lineage:
-      - datalake_salesforce_raw.task.FeedItemId
-    description: Feed item identification key associated with the task.
   id_source_task:
     lineage:
       - datalake_salesforce_raw.task.SourceTask__c
@@ -51,7 +47,7 @@ columns:
   subject:
     lineage:
       - datalake_salesforce_raw.task.Subject
-    description: Subject of the task.
+    description: Human-readable subject line describing the CRM task purpose for agents and reporting.
   status:
     lineage:
       - datalake_salesforce_raw.task.Status
@@ -63,11 +59,11 @@ columns:
   type:
     lineage:
       - datalake_salesforce_raw.task.Type
-    description: Type of task.
+    description: Classification type assigned by the source platform for routing or reporting.
   call_duration_in_seconds:
     lineage:
       - datalake_salesforce_raw.task.CallDurationInSeconds
-    description: Duration of call in seconds.
+    description: Business value representing call duration in seconds on the task clean dataset.
   call_type:
     lineage:
       - datalake_salesforce_raw.task.CallType
@@ -83,7 +79,7 @@ columns:
   task_subtype:
     lineage:
       - datalake_salesforce_raw.task.TaskSubtype
-    description: Subtype of the task.
+    description: Business value representing task subtype on the task clean dataset.
   recurrence_type:
     lineage:
       - datalake_salesforce_raw.task.RecurrenceType
@@ -99,7 +95,7 @@ columns:
   recurrence_day_of_month:
     lineage:
       - datalake_salesforce_raw.task.RecurrenceDayOfMonth
-    description: Day of the month for recurrence.
+    description: Business value representing recurrence day of month on the task clean dataset.
   recurrence_instance:
     lineage:
       - datalake_salesforce_raw.task.RecurrenceInstance
@@ -107,15 +103,15 @@ columns:
   recurrence_month_of_year:
     lineage:
       - datalake_salesforce_raw.task.RecurrenceMonthOfYear
-    description: Month of the year for recurrence.
+    description: Business value representing recurrence month of year on the task clean dataset.
   recurrence_regenerated_type:
     lineage:
       - datalake_salesforce_raw.task.RecurrenceRegeneratedType
-    description: Type of regenerated recurrence.
+    description: Business value representing recurrence regenerated type on the task clean dataset.
   task_name:
     lineage:
       - datalake_salesforce_raw.task.TaskName
-    description: Name of the task.
+    description: Human-readable task name used in dashboards and operational reports.
   task_interaction_type:
     lineage:
       - datalake_salesforce_raw.task.TaskInteractionType
@@ -139,7 +135,7 @@ columns:
   experiment_group:
     lineage:
       - datalake_salesforce_raw.task.ExperimentGroup
-    description: Experiment group of the task.
+    description: Business value representing experiment group on the task clean dataset.
   unlisting_reason:
     lineage:
       - datalake_salesforce_raw.task.UnlistingReason
@@ -240,3 +236,93 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.SystemModstamp
     description: System modification timestamp.
+  id_fs_offer:
+    lineage: []
+    description: Identifier for the fs offer referenced by this record.
+  ts_return_date_customer:
+    lineage: []
+    description: Timestamp when return date customer occurred according to the source system.
+  fs_seller:
+    lineage: []
+    description: Business value representing fs seller on the task clean dataset.
+  id_last_modified_by:
+    lineage: []
+    description: Identifier for the last modified by referenced by this record.
+  ts_last_modified:
+    lineage: []
+    description: Timestamp when last modified occurred according to the source system.
+  month:
+    lineage: []
+    description: Month partition for incremental loading and partition pruning.
+  is_fs_keys_received:
+    lineage: []
+    description: Indicates whether fs keys received applies to this record.
+  has_paid_via_ted:
+    lineage: []
+    description: Boolean flag indicating whether has paid via ted applies to this support service record.
+  ts_created:
+    lineage: []
+    description: Timestamp when the record was first created in the upstream source system.
+  day:
+    lineage: []
+    description: Day partition for incremental loading and partition pruning.
+  sla:
+    lineage: []
+    description: Business value representing sla on the task clean dataset.
+  id_call:
+    lineage: []
+    description: Telephony provider call identifier linking multiple events to the same phone conversation.
+  task_management:
+    lineage: []
+    description: Business value representing task management on the task clean dataset.
+  scheduling_management:
+    lineage: []
+    description: Business value representing scheduling management on the task clean dataset.
+  fs_reason_delay:
+    lineage: []
+    description: Business value representing fs reason delay on the task clean dataset.
+  ts_scheduling:
+    lineage: []
+    description: Timestamp when scheduling occurred according to the source system.
+  year:
+    lineage: []
+    description: Year partition for incremental loading and partition pruning.
+  is_question_resolved:
+    lineage: []
+    description: Indicates whether question resolved applies to this record.
+  ts_task_due_date_formula:
+    lineage: []
+    description: Timestamp when task due date formula occurred according to the source system.
+  cognito_link:
+    lineage: []
+    description: Business value representing cognito link on the task clean dataset.
+  source_task:
+    lineage: []
+    description: Business value representing source task on the task clean dataset.
+  source:
+    lineage: []
+    description: Business value representing source on the task clean dataset.
+  id_entity:
+    lineage: []
+    description: Identifier for the entity referenced by this record.
+  has_disagreement:
+    lineage: []
+    description: Boolean flag indicating whether has disagreement applies to this support service record.
+  ts_key_delivery:
+    lineage: []
+    description: Timestamp when key delivery occurred according to the source system.
+  has_got_response:
+    lineage: []
+    description: Boolean flag indicating whether has got response applies to this support service record.
+  id_fs_purchase_sale_contract:
+    lineage: []
+    description: Identifier for the fs purchase sale contract referenced by this record.
+  id_record_type:
+    lineage: []
+    description: Identifier for the record type referenced by this record.
+  ts_task_created:
+    lineage: []
+    description: Timestamp when task created occurred according to the source system.
+  task_action:
+    lineage: []
+    description: Business value representing task action on the task clean dataset.

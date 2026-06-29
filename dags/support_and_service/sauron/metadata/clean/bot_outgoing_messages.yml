@@ -4,7 +4,7 @@ description: |
   Clean table with outbound bot messages sent through Sauron in response
   to user interactions within a support session.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
