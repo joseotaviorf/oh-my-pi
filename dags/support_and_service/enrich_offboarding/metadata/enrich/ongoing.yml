@@ -1,83 +1,113 @@
 ---
 database_name: datalake_offboarding
 table_name: ongoing
+description:
+  Enriched ongoing dataset combining upstream clean sources with business
+  rules for support journey analytics and SLA monitoring.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id:
     lineage:
       - datalake_offboarding.contract_termination.id_termination
+    description: Primary surrogate identifier for the entity row in this support and service dataset.
   id_contract:
     lineage:
       - datalake_offboarding.contract_termination.id_contract
+    description: Identifier for the contract referenced by this record.
   id_house:
     lineage:
       - datalake_offboarding.contract_termination.id_house
+    description: Identifier for the house referenced by this record.
   id_exit_inspection:
     lineage:
       - datalake_offboarding.contract_termination.id_exit_inspection
+    description: Identifier for the exit inspection referenced by this record.
   category:
     lineage:
       - datalake_offboarding.contract_termination.category
+    description: Business value representing category on the ongoing enrich dataset.
   status:
     lineage:
       - datalake_offboarding.contract_termination.status
+    description: Current lifecycle status of the ticket, task, or workflow step.
   workflow_current_step:
     lineage:
       - datalake_offboarding.contract_termination.workflow_current_step
+    description: Business value representing workflow current step on the ongoing enrich dataset.
   reason:
     lineage:
       - datalake_offboarding.contract_termination.reason
+    description: Business reason code explaining why the telephony event or task transition occurred.
   repair_resolution:
     lineage:
       - datalake_offboarding.contract_termination.repair_resolution
+    description: Business value representing repair resolution on the ongoing enrich dataset.
   repair_cost:
     lineage:
       - datalake_offboarding.contract_termination.repair_cost
+    description: Business value representing repair cost on the ongoing enrich dataset.
   contract_status:
     lineage:
       - datalake_offboarding.contract_termination.contract_status
+    description: Business value representing contract status on the ongoing enrich dataset.
   b2b_type:
     lineage:
       - datalake_offboarding.contract_termination.b2b_type
+    description: Business value representing b2b type on the ongoing enrich dataset.
   has_repairs:
     lineage:
       - datalake_offboarding.contract_termination.has_repairs
+    description: Boolean flag indicating whether has repairs applies to this support service record.
   is_repair_tenant_duty:
     lineage:
       - datalake_offboarding.contract_termination.is_repair_tenant_duty
+    description: Indicates whether repair tenant duty applies to this record.
   is_workflow:
     lineage:
       - datalake_offboarding.contract_termination.is_workflow
+    description: Indicates whether workflow applies to this record.
   is_b2b:
     lineage:
       - datalake_offboarding.contract_termination.is_b2b
+    description: Indicates whether b2b applies to this record.
   is_contract_b2b:
     lineage:
       - datalake_offboarding.contract_termination.is_contract_b2b
+    description: Indicates whether contract b2b applies to this record.
   is_exit_inspection_opted_out:
     lineage:
       - datalake_offboarding.contract_termination.is_exit_inspection_opted_out
+    description: Indicates whether exit inspection opted out applies to this record.
   dt_contract_started:
     lineage:
       - datalake_offboarding.contract_termination.dt_contract_started
+    description: Calendar date associated with contract started in the business process.
   dt_contract_entrance:
     lineage:
       - datalake_offboarding.contract_termination.dt_contract_entrance
+    description: Calendar date associated with contract entrance in the business process.
   dt_last_inspection_synched:
     lineage:
       - datalake_offboarding.contract_termination.dt_last_inspection_synched
+    description: Calendar date associated with last inspection synched in the business process.
   dt_termination:
     lineage:
       - datalake_offboarding.contract_termination.dt_termination
+    description: Calendar date associated with termination in the business process.
   ts_created_inspection:
     lineage:
       - datalake_inspections.inspection_booking.ts_created
+    description: Timestamp when created inspection occurred according to the source system.
   ts_termination_request:
     lineage:
       - datalake_offboarding.contract_termination.ts_created
+    description: Timestamp when termination request occurred according to the source system.
   ts_termination_finished:
     lineage:
       - datalake_offboarding.contract_termination.ts_termination_finished
+    description: Timestamp when termination finished occurred according to the source system.
   ts_analyst_annulment_input:
     lineage:
       - datalake_offboarding.contract_termination.ts_analyst_annulment_input
+    description: Timestamp when analyst annulment input occurred according to the source system.

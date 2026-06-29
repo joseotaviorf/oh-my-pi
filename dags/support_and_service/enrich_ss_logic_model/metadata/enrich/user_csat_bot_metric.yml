@@ -5,7 +5,7 @@ description:
   This table retrieves the csat bot metrics by user. It is a snapshot ingestion, so in
   this case, only csat answered until the snapshot date are being considered.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
@@ -22,7 +22,7 @@ columns:
   total_bot_csat_detractor:
     description: The volume of bot csat answered equal to 1 or 2.
   last_bot_csat_answered_score:
-    description: The last bot csat answered score.
+    description: Most recent chatbot CSAT score submitted by the user before the snapshot date.
   avg_bot_csat_score_within_three_months:
     description: The average of bot csat scores within the last 3 months.
   total_bot_csat_detractor_within_three_months:
