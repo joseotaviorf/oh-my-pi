@@ -193,6 +193,10 @@ workflow:
       clean_table_name: repair_request_mediation
       clean_primary_keys: [id_repair_request_mediation]
       raw_primary_keys: [id]
+    repair_request_mediation_discount:
+      clean_table_name: repair_request_mediation_discount
+      clean_primary_keys: [id_repair_request_mediation_discount]
+      raw_primary_keys: [id]
     repair_request_aud:
       clean_table_name: repair_request_aud
       clean_primary_keys: [id_repair_request, rev]
