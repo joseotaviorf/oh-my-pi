@@ -3,7 +3,7 @@ database_name: datalake_notifyme_clean
 table_name: alerts
 description: This table consolidates alerts data from NotifyMe. Alerts represent notification rules and conditions for users.
 domain: Support and Services
-owner: data-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the alert.
