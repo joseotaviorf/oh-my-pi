@@ -1,0 +1,32 @@
+database_name: datalake_gsheets_clean
+table_name: manual_kpis_polygon
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
+description: |
+  Monthly manual OKR and product KPI targets for Polygon support operations,
+  sourced from a Google Sheets tracker and used in support performance dashboards.
+columns:
+  dt_month:
+    lineage:
+      - datalake_gsheets_raw.manual_kpis_polygon.date_month
+    description: First calendar day of the month the KPI target applies to.
+  uc_okr_fr_operations:
+    lineage:
+      - datalake_gsheets_raw.manual_kpis_polygon.uc_okr_fr_operations
+    description: Target share for the For Rent operations OKR tracked by UC Polygon.
+  seamless_journey:
+    lineage:
+      - datalake_gsheets_raw.manual_kpis_polygon.seamless_journey
+    description: Monthly target for the seamless customer journey KPI.
+  rent_app_share_post_contract:
+    lineage:
+      - datalake_gsheets_raw.manual_kpis_polygon.rent_app_share_of_postcontract
+    description: Target app adoption share among all post-contract users.
+  rent_app_share_post_contract_landlord:
+    lineage:
+      - datalake_gsheets_raw.manual_kpis_polygon.rent_app_share_of_postcontract_landlord
+    description: Target app adoption share among landlord post-contract users.
+  rent_app_share_post_contract_tenant:
+    lineage:
+      - datalake_gsheets_raw.manual_kpis_polygon.rent_app_share_of_postcontract_tenant
+    description: Target app adoption share among tenant post-contract users.

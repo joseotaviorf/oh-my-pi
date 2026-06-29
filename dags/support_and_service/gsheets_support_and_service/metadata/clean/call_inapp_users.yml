@@ -1,16 +1,22 @@
-database_name: datalake_gsheets_raw
+database_name: datalake_gsheets_clean
 table_name: call_inapp_users
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_experiment:
     lineage:
-      - datalake_gsheets_raw.call_inapp_users.id_experiment
+    - datalake_gsheets_raw.call_inapp_users.id_experiment
+    description: Experiment identifier for the in-app call user enrollment sheet.
   id_user:
     lineage:
-      - datalake_gsheets_raw.call_inapp_users.id_user
+    - datalake_gsheets_raw.call_inapp_users.id_user
+    description: User identifier enrolled in the in-app call experiment cohort.
   main_phone_number:
     lineage:
-      - datalake_gsheets_raw.call_inapp_users.telefone_principal
+    - datalake_gsheets_raw.call_inapp_users.telefone_principal
+    description: Primary phone number used for the in-app call experiment user.
   dt_included:
     lineage:
-      - datalake_gsheets_raw.call_inapp_users.dt_inclusao
+    - datalake_gsheets_raw.call_inapp_users.dt_inclusao
+    description: Date when the user was included in the in-app call experiment cohort.
+description: Google Sheets list of users enrolled in the in-app call experiment cohort.
