@@ -19,7 +19,7 @@ codex_current AS (
   WHERE
     is_current = true
 ),
-pin_current AS (
+pin_current_ranked AS (
   SELECT
     a.cost_center_code,
     o.name AS pin_organization_name,
@@ -35,7 +35,15 @@ pin_current AS (
     a.headcount_type AS pin_headcount_type,
     a.name_owner_l1 AS pin_name_owner_l1,
     a.name_owner_l2 AS pin_name_owner_l2,
-    a.name_owner_l3 AS pin_name_owner_l3
+    a.name_owner_l3 AS pin_name_owner_l3,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        TRIM(a.cost_center_code)
+      ORDER BY
+        a.ts_updated DESC NULLS LAST,
+        o.ts_updated DESC NULLS LAST,
+        o.id_organization
+    ) AS rn
   FROM
     datalake_pin_core_clean.all_organization_units AS a
   INNER JOIN
@@ -44,19 +52,32 @@ pin_current AS (
       AND o.classification_code = 'DEPARTMENT'
   WHERE
     a.cost_center_code IS NOT NULL
-    AND CURRENT_DATE >= a.dt_effective_started
-    AND CURRENT_DATE <= a.dt_effective_ended
-    AND CURRENT_DATE >= o.dt_effective_started
-    AND CURRENT_DATE <= o.dt_effective_ended
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY
-        TRIM(a.cost_center_code)
-      ORDER BY
-        a.ts_updated DESC NULLS LAST,
-        o.ts_updated DESC NULLS LAST,
-        o.id_organization
-    ) = 1
+    AND DATE('{load_start_date}') >= a.dt_effective_started
+    AND DATE('{load_start_date}') <= a.dt_effective_ended
+    AND DATE('{load_start_date}') >= o.dt_effective_started
+    AND DATE('{load_start_date}') <= o.dt_effective_ended
+),
+pin_current AS (
+  SELECT
+    cost_center_code,
+    pin_organization_name,
+    pin_organization_status,
+    pin_business,
+    pin_product,
+    pin_brand,
+    pin_vertical,
+    pin_structure,
+    pin_team,
+    pin_chapter,
+    pin_line,
+    pin_headcount_type,
+    pin_name_owner_l1,
+    pin_name_owner_l2,
+    pin_name_owner_l3
+  FROM
+    pin_current_ranked
+  WHERE
+    rn = 1
 )
 SELECT
   c.cost_center_code AS cost_center_code,

@@ -12,7 +12,7 @@ manager_ranked AS (
   FROM
     datalake_pin.managers_history
   WHERE
-    dt_effective_started <= DATE(CURRENT_DATE)
+    dt_effective_started <= DATE('{load_start_date}')
 ),
 assignment_ranked AS (
   SELECT
@@ -63,7 +63,7 @@ assignment_ranked AS (
     datalake_hr_system_clean.job_families AS job_family
       ON job_family.id_job_family = job.id_job_family
   WHERE
-    assignment_movement.dt_effective_started < DATE(CURRENT_DATE)
+    assignment_movement.dt_effective_started <= DATE('{load_start_date}')
     AND assignment_movement.assignment_type IN ('E', 'C')
 )
 SELECT
@@ -100,7 +100,7 @@ SELECT
   IF(assignment.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
   employee.dt_started AS dt_hired,
   CASE
-    WHEN employee.dt_actual_termination < CURRENT_DATE THEN employee.dt_actual_termination
+    WHEN employee.dt_actual_termination <= DATE('{load_start_date}') THEN employee.dt_actual_termination
     ELSE NULL
   END AS dt_terminated,
   NOW() AS ts_load

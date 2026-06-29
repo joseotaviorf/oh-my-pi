@@ -15,6 +15,9 @@ workflow:
   bucket_config_name: people_bucket
   custom_schema: demographics
   has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
     people-analytics: ["ALL PRIVILEGES"]

@@ -17,7 +17,7 @@ WITH base AS (
         datalake_pin_core_clean.hr_organization
     WHERE
         classification_code = 'FUN_BUSINESS_UNIT'
-        AND dt_effective_started <= CURRENT_DATE
+        AND dt_effective_started <= DATE('{load_start_date}')
 ),
 with_prev_dt_valid_to AS (
     SELECT
@@ -157,10 +157,10 @@ SELECT
     version_order,
     is_active,
     CASE
-        WHEN dt_valid_from <= CURRENT_DATE
+        WHEN dt_valid_from <= DATE('{load_start_date}')
             AND version_order = MAX(
                 CASE
-                    WHEN dt_valid_from <= CURRENT_DATE THEN version_order
+                    WHEN dt_valid_from <= DATE('{load_start_date}') THEN version_order
                 END
             ) OVER (
                 PARTITION BY id_organization

@@ -4,14 +4,18 @@ WITH date_range AS (
     FROM
         dw_public.dim_date
     WHERE
-        date >= DATE_ADD(CURRENT_DATE, -730)
-        AND date <= CURRENT_DATE
+        date >= DATE_ADD(DATE('{load_start_date}'), -730)
+        AND date <= DATE('{load_start_date}')
 ),
-active_assignments AS (
+active_assignments_ranked AS (
     SELECT
         dt_ref.dt_reference,
         assign.id_job,
-        assign.id_person
+        assign.id_person,
+        ROW_NUMBER() OVER (
+            PARTITION BY dt_ref.dt_reference, assign.id_person
+            ORDER BY assign.dt_effective_started DESC
+        ) AS rn
     FROM
         date_range AS dt_ref
     CROSS JOIN
@@ -21,11 +25,16 @@ active_assignments AS (
         AND assign.assignment_type IN ('E', 'C')
         AND assign.dt_effective_started <= dt_ref.dt_reference
         AND assign.dt_effective_ended >= dt_ref.dt_reference
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY dt_ref.dt_reference, assign.id_person
-            ORDER BY assign.dt_effective_started DESC
-        ) = 1
+),
+active_assignments AS (
+    SELECT
+        dt_reference,
+        id_job,
+        id_person
+    FROM
+        active_assignments_ranked
+    WHERE
+        rn = 1
 ),
 active_headcount_per_job AS (
     SELECT
@@ -91,7 +100,7 @@ frequencies_plr AS (
         dim_job.band,
         dim_job.target_plr
 ),
-most_frequent_plr AS (
+most_frequent_plr_ranked AS (
     SELECT
         dt_reference,
         salary_table,
@@ -100,14 +109,28 @@ most_frequent_plr AS (
         headcount_frequency,
         job_frequency,
         SUM(headcount_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_headcount,
-        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs
-    FROM
-        frequencies_plr
-    QUALIFY
+        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs,
         ROW_NUMBER() OVER (
             PARTITION BY dt_reference, salary_table, band
             ORDER BY headcount_frequency DESC, job_frequency DESC
-        ) = 1
+        ) AS rn
+    FROM
+        frequencies_plr
+),
+most_frequent_plr AS (
+    SELECT
+        dt_reference,
+        salary_table,
+        band,
+        target_plr,
+        headcount_frequency,
+        job_frequency,
+        total_headcount,
+        total_jobs
+    FROM
+        most_frequent_plr_ranked
+    WHERE
+        rn = 1
 ),
 frequencies_plr_multiplier AS (
     SELECT
@@ -131,7 +154,7 @@ frequencies_plr_multiplier AS (
         dim_job.band,
         dim_job.target_plr_salary_multiplier
 ),
-most_frequent_plr_multiplier AS (
+most_frequent_plr_multiplier_ranked AS (
     SELECT
         dt_reference,
         salary_table,
@@ -140,14 +163,28 @@ most_frequent_plr_multiplier AS (
         headcount_frequency,
         job_frequency,
         SUM(headcount_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_headcount,
-        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs
-    FROM
-        frequencies_plr_multiplier
-    QUALIFY
+        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs,
         ROW_NUMBER() OVER (
             PARTITION BY dt_reference, salary_table, band
             ORDER BY headcount_frequency DESC, job_frequency DESC
-        ) = 1
+        ) AS rn
+    FROM
+        frequencies_plr_multiplier
+),
+most_frequent_plr_multiplier AS (
+    SELECT
+        dt_reference,
+        salary_table,
+        band,
+        target_plr_salary_multiplier,
+        headcount_frequency,
+        job_frequency,
+        total_headcount,
+        total_jobs
+    FROM
+        most_frequent_plr_multiplier_ranked
+    WHERE
+        rn = 1
 ),
 frequencies_rvv AS (
     SELECT
@@ -171,7 +208,7 @@ frequencies_rvv AS (
         dim_job.band,
         dim_job.target_rvv
 ),
-most_frequent_rvv AS (
+most_frequent_rvv_ranked AS (
     SELECT
         dt_reference,
         salary_table,
@@ -180,14 +217,28 @@ most_frequent_rvv AS (
         headcount_frequency,
         job_frequency,
         SUM(headcount_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_headcount,
-        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs
-    FROM
-        frequencies_rvv
-    QUALIFY
+        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs,
         ROW_NUMBER() OVER (
             PARTITION BY dt_reference, salary_table, band
             ORDER BY headcount_frequency DESC, job_frequency DESC
-        ) = 1
+        ) AS rn
+    FROM
+        frequencies_rvv
+),
+most_frequent_rvv AS (
+    SELECT
+        dt_reference,
+        salary_table,
+        band,
+        target_rvv,
+        headcount_frequency,
+        job_frequency,
+        total_headcount,
+        total_jobs
+    FROM
+        most_frequent_rvv_ranked
+    WHERE
+        rn = 1
 ),
 frequencies_sop AS (
     SELECT
@@ -211,7 +262,7 @@ frequencies_sop AS (
         dim_job.band,
         dim_job.target_sop
 ),
-most_frequent_sop AS (
+most_frequent_sop_ranked AS (
     SELECT
         dt_reference,
         salary_table,
@@ -220,14 +271,28 @@ most_frequent_sop AS (
         headcount_frequency,
         job_frequency,
         SUM(headcount_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_headcount,
-        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs
-    FROM
-        frequencies_sop
-    QUALIFY
+        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs,
         ROW_NUMBER() OVER (
             PARTITION BY dt_reference, salary_table, band
             ORDER BY headcount_frequency DESC, job_frequency DESC
-        ) = 1
+        ) AS rn
+    FROM
+        frequencies_sop
+),
+most_frequent_sop AS (
+    SELECT
+        dt_reference,
+        salary_table,
+        band,
+        target_sop,
+        headcount_frequency,
+        job_frequency,
+        total_headcount,
+        total_jobs
+    FROM
+        most_frequent_sop_ranked
+    WHERE
+        rn = 1
 ),
 frequencies_hiring_sop AS (
     SELECT
@@ -251,7 +316,7 @@ frequencies_hiring_sop AS (
         dim_job.band,
         dim_job.target_hiring_sop
 ),
-most_frequent_hiring_sop AS (
+most_frequent_hiring_sop_ranked AS (
     SELECT
         dt_reference,
         salary_table,
@@ -260,14 +325,28 @@ most_frequent_hiring_sop AS (
         headcount_frequency,
         job_frequency,
         SUM(headcount_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_headcount,
-        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs
-    FROM
-        frequencies_hiring_sop
-    QUALIFY
+        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs,
         ROW_NUMBER() OVER (
             PARTITION BY dt_reference, salary_table, band
             ORDER BY headcount_frequency DESC, job_frequency DESC
-        ) = 1
+        ) AS rn
+    FROM
+        frequencies_hiring_sop
+),
+most_frequent_hiring_sop AS (
+    SELECT
+        dt_reference,
+        salary_table,
+        band,
+        target_hiring_sop,
+        headcount_frequency,
+        job_frequency,
+        total_headcount,
+        total_jobs
+    FROM
+        most_frequent_hiring_sop_ranked
+    WHERE
+        rn = 1
 ),
 frequencies_exceptional_bonus AS (
     SELECT
@@ -291,7 +370,7 @@ frequencies_exceptional_bonus AS (
         dim_job.band,
         dim_job.target_exceptional_bonus
 ),
-most_frequent_exceptional_bonus AS (
+most_frequent_exceptional_bonus_ranked AS (
     SELECT
         dt_reference,
         salary_table,
@@ -300,14 +379,28 @@ most_frequent_exceptional_bonus AS (
         headcount_frequency,
         job_frequency,
         SUM(headcount_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_headcount,
-        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs
-    FROM
-        frequencies_exceptional_bonus
-    QUALIFY
+        SUM(job_frequency) OVER (PARTITION BY dt_reference, salary_table, band) AS total_jobs,
         ROW_NUMBER() OVER (
             PARTITION BY dt_reference, salary_table, band
             ORDER BY headcount_frequency DESC, job_frequency DESC
-        ) = 1
+        ) AS rn
+    FROM
+        frequencies_exceptional_bonus
+),
+most_frequent_exceptional_bonus AS (
+    SELECT
+        dt_reference,
+        salary_table,
+        band,
+        target_exceptional_bonus,
+        headcount_frequency,
+        job_frequency,
+        total_headcount,
+        total_jobs
+    FROM
+        most_frequent_exceptional_bonus_ranked
+    WHERE
+        rn = 1
 ),
 totals AS (
     SELECT
@@ -363,7 +456,7 @@ SELECT
     ) AS has_job_exceptions,
     -- Priority 4: Boolean type
     CASE
-        WHEN base.dt_reference = CURRENT_DATE THEN TRUE
+        WHEN base.dt_reference = DATE('{load_start_date}') THEN TRUE
         ELSE FALSE
     END AS is_current,
     -- Priority 5: Date type

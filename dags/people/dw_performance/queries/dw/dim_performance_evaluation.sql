@@ -55,8 +55,8 @@ SELECT
   numeric_impact,
   numeric_leadership,
   (
-    dt_valid_from <= CURRENT_DATE
-    AND dt_valid_to >= CURRENT_DATE
+    dt_valid_from <= DATE('{load_start_date}')
+    AND dt_valid_to >= DATE('{load_start_date}')
   ) AS is_current,
   dt_valid_from,
   dt_valid_to,

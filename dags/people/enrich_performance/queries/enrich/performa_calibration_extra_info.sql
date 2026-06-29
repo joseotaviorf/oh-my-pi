@@ -1,24 +1,50 @@
-WITH pei_latest AS (
-  SELECT *
-  FROM
-    datalake_pin_core_clean.people_extra_info
-  WHERE
-    information_type = 'Notas Talent'
-    AND information_category = 'Notas Talent'
-  QUALIFY
+WITH pei_latest_ranked AS (
+  SELECT
+    id_person_extra_info,
+    id_person,
+    id_meeting,
+    id_rating_impact,
+    id_rating_behavior,
+    id_rating_leadership,
+    dt_evaluation,
     ROW_NUMBER() OVER (
       PARTITION BY
         id_person_extra_info
       ORDER BY
         dt_effective_started DESC
-    ) = 1
+    ) AS rn
+  FROM
+    datalake_pin_core_clean.people_extra_info
+  WHERE
+    information_type = 'Notas Talent'
+    AND information_category = 'Notas Talent'
 ),
-rating_value AS (
+pei_latest AS (
+  SELECT
+    id_person_extra_info,
+    id_person,
+    id_meeting,
+    id_rating_impact,
+    id_rating_behavior,
+    id_rating_leadership,
+    dt_evaluation
+  FROM
+    pei_latest_ranked
+  WHERE
+    rn = 1
+),
+rating_value_ranked AS (
   SELECT
     r.id_rating_level,
     r.rating_description,
     b.numeric_rating,
-    r.ts_updated
+    r.ts_updated,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        b.id_rating_level
+      ORDER BY
+        b.dt_started DESC
+    ) AS rn
   FROM
     datalake_pin_talent_clean.rating_level_translation r
   LEFT JOIN
@@ -26,14 +52,18 @@ rating_value AS (
       ON (b.id_rating_level = r.id_rating_level)
   WHERE
     r.language = 'US'
-    AND b.dt_started < CURRENT_DATE()
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY
-        b.id_rating_level
-      ORDER BY
-        b.dt_started DESC
-    ) = 1
+    AND b.dt_started <= DATE('{load_start_date}')
+),
+rating_value AS (
+  SELECT
+    id_rating_level,
+    rating_description,
+    numeric_rating,
+    ts_updated
+  FROM
+    rating_value_ranked
+  WHERE
+    rn = 1
 ),
 meeting_year AS (
   SELECT
@@ -92,7 +122,7 @@ LEFT JOIN
 WHERE 1=1
   AND aa.assignment_status_type = 'INACTIVE'
   AND aa.is_primary
-  AND CURRENT_DATE() BETWEEN TO_DATE(aa.dt_effective_started) AND TO_DATE(aa.dt_effective_ended)
+  AND DATE('{load_start_date}') BETWEEN TO_DATE(aa.dt_effective_started) AND TO_DATE(aa.dt_effective_ended)
   AND dtl.id_dashboard_template IN (300000008237707, 300000145965905)
   AND ci.rating_description IS NOT NULL
   AND cb.rating_description IS NOT NULL

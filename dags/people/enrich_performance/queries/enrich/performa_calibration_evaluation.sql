@@ -1,9 +1,15 @@
-WITH rating_value AS (
+WITH rating_value_ranked AS (
   SELECT
     r.id_rating_level,
     r.rating_description,
     b.numeric_rating,
-    r.ts_updated
+    r.ts_updated,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        b.id_rating_level
+      ORDER BY
+        b.dt_started DESC
+    ) AS rn
   FROM
     datalake_pin_talent_clean.rating_level_translation r
   LEFT JOIN
@@ -11,14 +17,18 @@ WITH rating_value AS (
       ON (b.id_rating_level = r.id_rating_level)
   WHERE
     r.language = 'US'
-    AND b.dt_started < CURRENT_DATE()
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY
-        b.id_rating_level
-      ORDER BY
-        b.dt_started DESC
-    ) = 1
+    AND b.dt_started <= DATE('{load_start_date}')
+),
+rating_value AS (
+  SELECT
+    id_rating_level,
+    rating_description,
+    numeric_rating,
+    ts_updated
+  FROM
+    rating_value_ranked
+  WHERE
+    rn = 1
 ),
 meeting_year AS (
   SELECT

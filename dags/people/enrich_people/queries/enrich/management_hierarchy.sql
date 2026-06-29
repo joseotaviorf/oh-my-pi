@@ -36,7 +36,7 @@ filtered_managers_history AS (
         ON id_map_mgr.id_assignment = supervisor.id_manager_assignment
     WHERE
         supervisor.manager_type = 'LINE_MANAGER'
-        AND supervisor.dt_effective_started <= CURRENT_DATE
+        AND supervisor.dt_effective_started <= DATE('{load_start_date}')
         AND NOT supervisor.id_manager_assignment IS NULL
         AND NOT id_map_emp.is_user_test
         AND id_map_emp.assignment_type IN ('C', 'E')
@@ -451,12 +451,18 @@ ceo_history_start AS (
     SELECT MIN(dt_from) AS first_ceo_dt
     FROM ceo_history
 ),
-hierarchy_filtered AS (
+hierarchy_filtered_ranked AS (
     SELECT
         hr.assignment_number,
         hr.manager_struct_path,
         hr.dt_valid_from,
-        hr.dt_valid_to
+        hr.dt_valid_to,
+        ROW_NUMBER() OVER (
+            PARTITION BY hr.assignment_number,
+                hr.dt_valid_from,
+                hr.dt_valid_to
+            ORDER BY SIZE(hr.manager_struct_path) DESC
+        ) AS rn
     FROM
         hierarchy_reordered AS hr
     LEFT JOIN
@@ -472,13 +478,17 @@ hierarchy_filtered AS (
             ceo.assignment_number IS NOT NULL
             OR COALESCE(hr.dt_valid_to, DATE('9999-12-31')) < cs.first_ceo_dt
         )
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY hr.assignment_number,
-                hr.dt_valid_from,
-                hr.dt_valid_to
-            ORDER BY SIZE(hr.manager_struct_path) DESC
-        ) = 1
+),
+hierarchy_filtered AS (
+    SELECT
+        assignment_number,
+        manager_struct_path,
+        dt_valid_from,
+        dt_valid_to
+    FROM
+        hierarchy_filtered_ranked
+    WHERE
+        rn = 1
 ),
 hierarchy_with_sig AS (
     SELECT
@@ -580,22 +590,32 @@ hierarchy_open_ended AS (
                 DATE_FORMAT(dt_valid_to, 'yyyy-MM-dd')
             )
         ) AS sk_hierarchy_version,
-        CURRENT_DATE BETWEEN dt_valid_from AND dt_valid_to AS is_current
+        DATE('{load_start_date}') BETWEEN dt_valid_from AND dt_valid_to AS is_current
     FROM
         hierarchy_tail_resolved
+),
+assignment_lookup_ranked AS (
+    SELECT
+        assignment_number,
+        person_number,
+        name,
+        work_email AS email,
+        ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY assignment_number) AS rn
+    FROM
+        datalake_people.identifier_mapping
+    WHERE
+        NOT is_user_test
 ),
 assignment_lookup AS (
     SELECT
         assignment_number,
         person_number,
         name,
-        work_email AS email
+        email
     FROM
-        datalake_people.identifier_mapping
+        assignment_lookup_ranked
     WHERE
-        NOT is_user_test
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY assignment_number) = 1
+        rn = 1
 )
 SELECT
     hv.sk_hierarchy_version,

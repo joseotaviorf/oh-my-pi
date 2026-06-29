@@ -20,7 +20,7 @@ absence_entries_ranked AS (
     FROM
         datalake_pin_absence_clean.person_entry AS pe
     WHERE
-        MAKE_DATE(pe.year, pe.month, pe.day) <= CURRENT_DATE()
+        MAKE_DATE(pe.year, pe.month, pe.day) <= DATE('{load_start_date}')
 ),
 absence_entries AS (
     SELECT
@@ -110,7 +110,7 @@ SELECT
     b.absence_status_code <> 'ORA_WITHDRAWN' AS is_valid,
     b.approval_status_code = 'APPROVED'
         AND b.absence_status_code <> 'ORA_WITHDRAWN'
-        AND b.dt_started <= CURRENT_DATE() AS is_effective,
+        AND b.dt_started <= DATE('{load_start_date}') AS is_effective,
     CASE
         WHEN b.advance_13th_salary IN ('S', 'Y') THEN TRUE
         WHEN b.advance_13th_salary = 'N' THEN FALSE

@@ -587,8 +587,8 @@ SELECT
     ANY_VALUE(has_medical_disability_record) AS has_medical_disability_record,
     ANY_VALUE(is_underrepresented_group) AS is_underrepresented_group,
     (
-      MIN(dt_period_start) <= CURRENT_DATE
-      AND MAX(dt_period_end) >= CURRENT_DATE
+      MIN(dt_period_start) <= DATE('{load_start_date}')
+      AND MAX(dt_period_end) >= DATE('{load_start_date}')
     ) AS is_current,
     MIN(dt_period_start) AS dt_valid_from,
     MAX(dt_period_end) AS dt_valid_to,

@@ -414,7 +414,7 @@ grouped_versions AS (
 with_future_flag AS (
     SELECT
         *,
-        dt_valid_from > CURRENT_DATE AS is_future_version
+        dt_valid_from > DATE('{load_start_date}') AS is_future_version
     FROM
         grouped_versions
 )

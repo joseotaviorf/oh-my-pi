@@ -51,7 +51,7 @@ current_education_ranked AS (
         pl.legislation_code = 'BR'
         AND (
             pl.dt_effective_ended = DATE('9999-12-31')
-            OR pl.dt_effective_ended >= CURRENT_DATE()
+            OR pl.dt_effective_ended >= DATE('{load_start_date}')
         )
 ),
 current_education AS (

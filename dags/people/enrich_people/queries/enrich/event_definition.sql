@@ -21,7 +21,7 @@ current_action_base_ranked AS (
                 CASE
                     WHEN
                         ab.dt_ended >= DATE('9999-12-31')
-                        OR ab.dt_ended > CURRENT_DATE()
+                        OR ab.dt_ended > DATE('{load_start_date}')
                     THEN 1
                     ELSE 0
                 END DESC,
@@ -57,7 +57,7 @@ current_action_reason_base_ranked AS (
                 CASE
                     WHEN
                         arb.dt_ended >= DATE('9999-12-31')
-                        OR arb.dt_ended > CURRENT_DATE()
+                        OR arb.dt_ended > DATE('{load_start_date}')
                     THEN 1
                     ELSE 0
                 END DESC,
@@ -96,14 +96,14 @@ deduplicated AS (
         art_ptb.action_reason AS reason_name_ptb,
         at_ptb.description AS action_description_ptb,
         CASE
-            WHEN GREATEST(ab.dt_started, arb.dt_started) <= CURRENT_DATE()
+            WHEN GREATEST(ab.dt_started, arb.dt_started) <= DATE('{load_start_date}')
                 AND (
                     ab.dt_ended >= DATE('9999-12-31')
-                    OR ab.dt_ended > CURRENT_DATE()
+                    OR ab.dt_ended > DATE('{load_start_date}')
                 )
                 AND (
                     arb.dt_ended >= DATE('9999-12-31')
-                    OR arb.dt_ended > CURRENT_DATE()
+                    OR arb.dt_ended > DATE('{load_start_date}')
                 )
             THEN TRUE
             ELSE FALSE

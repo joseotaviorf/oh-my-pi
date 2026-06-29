@@ -107,7 +107,7 @@ WITH salary_with_person AS (
             ON sal.id_assignment = im.id_assignment
     WHERE
         sal.is_salary_approved = TRUE
-        AND sal.dt_started <= CURRENT_DATE
+        AND sal.dt_started <= DATE('{load_start_date}')
         AND (sal.dt_ended = DATE('9999-12-31') OR sal.dt_started <= sal.dt_ended)
         AND im.assignment_number NOT LIKE 'P%'
 ),
@@ -249,7 +249,7 @@ job_with_salary_table_effective AS (
     FROM
         datalake_people.job_with_salary_table
     WHERE
-        dt_valid_from <= CURRENT_DATE
+        dt_valid_from <= DATE('{load_start_date}')
 ),
 assignment_history_with_band AS (
     -- Enrich assignment history with the band from job_with_salary_table (SCD2).
@@ -1053,8 +1053,8 @@ salary_with_reference AS (
     SELECT
         sal.*,
         LEAST(
-            CURRENT_DATE,
-            COALESCE(NULLIF(sal.dt_ended_normalized, DATE('9999-12-31')), CURRENT_DATE)
+            DATE('{load_start_date}'),
+            COALESCE(NULLIF(sal.dt_ended_normalized, DATE('9999-12-31')), DATE('{load_start_date}'))
         ) AS dt_reference
     FROM
         salary_consolidated AS sal
@@ -1113,8 +1113,8 @@ SELECT
         ELSE sal.dt_ended_normalized
     END AS dt_valid_to,
     CASE
-        WHEN sal.dt_started <= CURRENT_DATE
-            AND (sal.dt_ended_normalized >= DATE('9999-12-31') OR sal.dt_ended_normalized > CURRENT_DATE)
+        WHEN sal.dt_started <= DATE('{load_start_date}')
+            AND (sal.dt_ended_normalized >= DATE('9999-12-31') OR sal.dt_ended_normalized > DATE('{load_start_date}'))
         THEN TRUE
         ELSE FALSE
     END AS is_current,

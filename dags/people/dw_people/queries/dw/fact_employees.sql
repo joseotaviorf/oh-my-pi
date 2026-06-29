@@ -6,7 +6,7 @@ SELECT
     COALESCE(asn.sk_hierarchy_version, '-1') AS sk_manager_hierarchy,
     asn.sk_hired_date,
     CASE
-        WHEN asn.dt_terminated < CURRENT_DATE() THEN asn.sk_terminated_date
+        WHEN asn.dt_terminated <= DATE('{load_start_date}') THEN asn.sk_terminated_date
         ELSE NULL
     END AS sk_terminated_date,
     asn.sk_reference_date,
@@ -16,7 +16,7 @@ SELECT
     asn.is_current,
     asn.dt_hired,
     CASE
-        WHEN asn.dt_terminated < CURRENT_DATE() THEN asn.dt_terminated
+        WHEN asn.dt_terminated <= DATE('{load_start_date}') THEN asn.dt_terminated
         ELSE NULL
     END AS dt_terminated,
     asn.dt_reference,

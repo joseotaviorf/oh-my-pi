@@ -69,7 +69,7 @@ deduplicated AS (
         COALESCE(ec.dt_effective_ended_normalized, DATE '9999-12-31') AS dt_valid_to,
         (
             ec.dt_effective_ended_normalized = DATE '9999-12-31'
-            OR ec.dt_effective_ended_normalized > CURRENT_DATE()
+            OR ec.dt_effective_ended_normalized > DATE('{load_start_date}')
         ) AS is_current,
         CURRENT_TIMESTAMP() AS ts_load,
         ROW_NUMBER() OVER (

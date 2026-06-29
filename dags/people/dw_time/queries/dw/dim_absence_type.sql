@@ -17,7 +17,7 @@ INNER JOIN
         ON b.id_absence_type = tl.id_absence_type
 WHERE
     tl.language = 'US'
-    AND b.dt_effective_started <= CURRENT_DATE()
-    AND b.dt_effective_ended >= CURRENT_DATE()
-    AND tl.dt_effective_started <= CURRENT_DATE()
-    AND tl.dt_effective_ended >= CURRENT_DATE()
+    AND b.dt_effective_started <= DATE('{load_end_date}')
+    AND b.dt_effective_ended >= DATE('{load_end_date}')
+    AND tl.dt_effective_started <= DATE('{load_end_date}')
+    AND tl.dt_effective_ended >= DATE('{load_end_date}')

@@ -48,6 +48,6 @@ SELECT
 FROM
     datalake_people.job_with_salary_table
 WHERE
-    dt_valid_from <= CURRENT_DATE
+    dt_valid_from <= DATE('{load_start_date}')
 ORDER BY
     sk_job_version

@@ -8,13 +8,13 @@ assignments_with_series_end AS (
         im.dt_started,
         im.dt_actual_termination AS dt_terminated,
         im.dt_notified_termination,
-        LEAST(COALESCE(im.dt_actual_termination, CURRENT_DATE()), CURRENT_DATE()) AS dt_series_end
+        LEAST(COALESCE(im.dt_actual_termination, DATE('{load_start_date}')), DATE('{load_start_date}')) AS dt_series_end
     FROM
         datalake_people.identifier_mapping AS im
     WHERE
         im.is_valid_assignment
         AND im.dt_started IS NOT NULL
-        AND im.dt_started <= CURRENT_DATE()
+        AND im.dt_started <= DATE('{load_start_date}')
 ),
 assignments_with_dates AS (
     SELECT
@@ -283,7 +283,7 @@ assignment_snapshots_ranked AS (
         lo.id_employee IS NOT NULL AS is_reorganization_termination,
         (
             LAST_DAY(ad.dt_reference) = ad.dt_reference
-            OR ad.dt_reference = CURRENT_DATE()
+            OR ad.dt_reference = DATE('{load_start_date}')
             OR ad.dt_reference = ad.dt_series_end
         ) AS is_monthly_snapshot,
         ad.dt_reference = ad.dt_series_end AS is_current,

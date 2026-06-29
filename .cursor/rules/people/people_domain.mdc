@@ -657,3 +657,20 @@ columns:
 Columns calculated in the query (e.g., `CURRENT_TIMESTAMP()`, `NOW()`, `CASE` expressions with no source reference, hash-based surrogate keys such as `MD5(CONCAT_WS(...))`) must **not** have a `lineage` block. The value is not derived from a specific source column.
 
 The metadata is the primary documentation for data consumers; it must be self-explanatory without reading the SQL.
+
+---
+
+## Date Reference Convention
+
+People enrich and DW pipeline SQL must use **`DATE('{load_start_date}')`** (not `CURRENT_DATE` or `CURRENT_DATE()`) for all **business-logic date filters**: SCD current-version resolution (`is_current`, `dt_valid_from` / `dt_valid_to` bounds), series generation end dates, active-employee / active-company gates, and batch or period filters tied to the load window.
+
+| Context | Use |
+|---|---|
+| Business-logic filters (SCD, activity gates, series bounds) | `DATE('{load_start_date}')` |
+| Upper bound when load end equals execution day (e.g. absence-type SCD) | `DATE('{load_end_date}')` |
+| Age brackets and other **live** calculations (e.g. generation from `dt_of_birth`) | Keep `CURRENT_DATE` — intentional point-in-time math |
+| Comments documenting behavior | May mention `CURRENT_DATE` conceptually; do not change filter SQL in comments-only blocks |
+
+DAG declarations must expose `load_start_date` and `load_end_date` via `workflow.extra_query_template_params` when queries reference those placeholders.
+
+**Ad-hoc / SQL testing:** substitute `DATE('{load_start_date}')` with `DATE_ADD(CURRENT_DATE(), -1)` so interactive runs match scheduler D-1 behavior. See `.cursor/skills/local/sql-testing/SKILL.md`.

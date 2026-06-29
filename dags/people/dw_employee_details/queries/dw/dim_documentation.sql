@@ -91,7 +91,7 @@ person_periods AS (
         valid_employees AS emp
             ON acd.id_person = emp.id_person
     WHERE
-        acd.change_date <= CURRENT_DATE
+        acd.change_date <= DATE('{load_start_date}')
 ),
 person_numbers AS (
     SELECT
@@ -451,8 +451,8 @@ SELECT
     mp.dt_valid_from,
     mp.dt_valid_to,
     (
-        mp.dt_valid_from <= CURRENT_DATE
-        AND mp.dt_valid_to >= CURRENT_DATE
+        mp.dt_valid_from <= DATE('{load_start_date}')
+        AND mp.dt_valid_to >= DATE('{load_start_date}')
     ) AS is_current,
     NOW() AS ts_load
 FROM

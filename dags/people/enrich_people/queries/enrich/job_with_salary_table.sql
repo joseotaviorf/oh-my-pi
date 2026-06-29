@@ -18,7 +18,7 @@ WITH salary_bases_history AS (
     FROM
         datalake_pin_compensation_clean.salary_bases
     WHERE
-        dt_available_from <= CURRENT_DATE
+        dt_available_from <= DATE('{load_start_date}')
 ),
 job_with_salary_table_base_ranked AS (
     SELECT
@@ -263,38 +263,38 @@ job_with_salary_table_base_ranked AS (
             AND j.dt_effective_started < sb.dt_effective_ended
             AND j.dt_effective_ended > sb.dt_effective_started
     WHERE
-        j.dt_effective_started <= CURRENT_DATE
+        j.dt_effective_started <= DATE('{load_start_date}')
         AND (
             vg.dt_effective_started IS NULL
-            OR vg.dt_effective_started <= CURRENT_DATE
+            OR vg.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             gl.dt_effective_started IS NULL
-            OR gl.dt_effective_started <= CURRENT_DATE
+            OR gl.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             glt.dt_effective_started IS NULL
-            OR glt.dt_effective_started <= CURRENT_DATE
+            OR glt.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             gt.dt_effective_started IS NULL
-            OR gt.dt_effective_started <= CURRENT_DATE
+            OR gt.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             gt_ptb.dt_effective_started IS NULL
-            OR gt_ptb.dt_effective_started <= CURRENT_DATE
+            OR gt_ptb.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             r.dt_effective_started IS NULL
-            OR r.dt_effective_started <= CURRENT_DATE
+            OR r.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             rv.dt_effective_started IS NULL
-            OR rv.dt_effective_started <= CURRENT_DATE
+            OR rv.dt_effective_started <= DATE('{load_start_date}')
         )
         AND (
             sb.dt_effective_started IS NULL
-            OR sb.dt_effective_started <= CURRENT_DATE
+            OR sb.dt_effective_started <= DATE('{load_start_date}')
         )
         AND GREATEST(
             j.dt_effective_started,
@@ -493,10 +493,10 @@ SELECT
     has_clock_in,
     is_active,
     CASE
-        WHEN CURRENT_DATE >= dt_valid_from
+        WHEN DATE('{load_start_date}') >= dt_valid_from
             AND (
                 dt_valid_to IS NULL
-                OR CURRENT_DATE < dt_valid_to
+                OR DATE('{load_start_date}') < dt_valid_to
             )
         THEN TRUE
         ELSE FALSE
