@@ -4,7 +4,7 @@ table_name: kpis_targets
 description: Enrich, which unifies the monitoring data of S&S indicators,
   has 2 gsheets as its source and its granularity is the monitoring date.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   metric_name:
     lineage:

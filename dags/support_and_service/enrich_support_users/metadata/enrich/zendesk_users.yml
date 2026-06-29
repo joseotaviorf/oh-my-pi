@@ -1,8 +1,8 @@
 database_name: datalake_support_users
 table_name: zendesk_users
-description: Contains data from all Zendesk users
+description: Enriched zendesk users dataset combining upstream clean sources with business rules for support journey analytics and SLA monitoring.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_user_main:
     lineage:
@@ -11,7 +11,7 @@ columns:
   id_user_zendesk:
     lineage:
       - datalake_zendesk_clean.users.id_user
-    description: ID of the user, from Zendesk
+    description: Identifier for the user zendesk referenced by this record.
   id_organization:
     lineage:
       - datalake_zendesk_clean.organizations.id
@@ -27,15 +27,15 @@ columns:
   email:
     lineage:
       - datalake_zendesk_clean.users.email
-    description: User email
+    description: Email address associated with the user or contact on this record.
   name:
     lineage:
       - datalake_zendesk_clean.users.name
-    description: User name
+    description: Display name of the entity as registered in the upstream operational application.
   role:
     lineage:
       - datalake_zendesk_clean.users.role
-    description: User role
+    description: Zendesk role of the user (agent, admin, end-user).
   organization:
     lineage:
       - datalake_zendesk_clean.organizations.name
@@ -51,7 +51,7 @@ columns:
   time_zone:
     lineage:
       - datalake_zendesk_clean.users.time_zone
-    description: User time zone
+    description: Time zone configured for the Zendesk user account.
   is_active:
     lineage:
       - datalake_zendesk_clean.users.is_active
@@ -72,3 +72,15 @@ columns:
     lineage:
       - datalake_zendesk_clean.users.ts_updated
     description: Timestamp of user update
+  tags:
+    lineage: []
+    description: List of labels attached to the record for filtering and automation rules.
+  url:
+    lineage: []
+    description: Canonical URL of the support ticket or resource in the external ticketing platform.
+  alias:
+    lineage: []
+    description: Alternative display name configured for the Zendesk user profile.
+  is_shared_phone_number:
+    lineage: []
+    description: Indicates whether shared phone number applies to this record.

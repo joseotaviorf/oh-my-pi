@@ -5,7 +5,7 @@ description:
   This table retrieves the csat human metrics by user. It is a snapshot ingestion, so in
   this case, only csat answered until the snapshot date are being considered.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
@@ -16,7 +16,7 @@ columns:
       The user ID that has answered the satisfaction survey. It does not consider null
       id users or satisfaction surveys with null answers.
   last_human_csat_answered_score:
-    description: The last human csat answered score.
+    description: Business value representing last human csat answered score on the user_csat_human_metric enrich dataset.
   total_human_csat_answered:
     description: The volume of human csat answered by the user.
   total_human_csat_promoter:

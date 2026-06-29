@@ -5,18 +5,18 @@ description:
   This table consolidates the key metrics of S&S for each user, encompassing all
   personas they assume.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
   id_user:
     lineage:
       - datalake_user.persona_type .id_user
-    description: The user id.
+    description: QuintoAndar user identifier associated with the IVR interaction or scheduled call.
   id_country:
     lineage:
       - datalake_user.persona_type.id_country
-    description: The user country id.
+    description: Identifier for the country referenced by this record.
   id_personal_number:
     lineage:
       - datalake_user.persona_type.cpf
@@ -30,15 +30,15 @@ columns:
   main_phone:
     lineage:
       - datalake_user.persona_type.main_phone
-    description: The user main_phone.
+    description: Business value representing main phone on the user_ss_metrics enrich dataset.
   name:
     lineage:
       - datalake_user.persona_type.name
-    description: The user full_name.
+    description: Display name of the entity as registered in the upstream operational application.
   email:
     lineage:
       - datalake_user.persona_type.email
-    description: The user email.
+    description: Email address associated with the user or contact on this record.
   tenant_journey_step:
     lineage:
       - datalake_user.persona_type.tenant_journey_step
@@ -94,11 +94,11 @@ columns:
   last_bot_csat_answered_score:
     lineage:
       - datalake_ss_logic_model.user_csat_bot_metric.last_bot_csat_answered_score
-    description: The last bot csat answered score.
+    description: Business value representing last bot csat answered score on the user_ss_metrics enrich dataset.
   last_human_csat_answered_score:
     lineage:
       - datalake_ss_logic_model.user_csat_human_metric.last_human_csat_answered_score
-    description: The last human csat answered score.
+    description: Business value representing last human csat answered score on the user_ss_metrics enrich dataset.
   bot_csat_detractor_percentage_within_three_months:
     lineage:
       - datalake_ss_logic_model.user_csat_bot_metric.bot_csat_detractor_percentage_within_three_months
@@ -369,7 +369,7 @@ columns:
   dt_user_birth:
     lineage:
       - datalake_user.persona_type.dt_birth
-    description: The user birth date.
+    description: Calendar date associated with user birth in the business process.
   ts_user_updated:
     lineage:
       - datalake_user.persona_type.ts_user_updated
