@@ -414,7 +414,6 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-dim-rent-flow-type:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-rent-flows:first-run-of-day
@@ -728,7 +727,7 @@ bietlejuice.dw_eval_model_seamless:
 bietlejuice.dw_evictions:
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-logs-juridical:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-alerts:first-run-of-day
@@ -757,7 +756,6 @@ bietlejuice.dw_fintech_snapshot_recon:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
@@ -4552,8 +4550,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-house-listing-terminations:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
@@ -4639,8 +4635,8 @@ bietlejuice.reverse_demand_classifieds_ranking_access:
   - bietlejuice.reverse_demand_classifieds_ranking:load-reverse-house-classified-ranking-score:first-run-of-day
 bietlejuice.reverse_demand_score:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-house-listing-terminations:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
@@ -4816,7 +4812,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day

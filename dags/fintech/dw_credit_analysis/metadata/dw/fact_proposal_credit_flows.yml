@@ -261,7 +261,7 @@ columns:
     description: "True if the sk_client has not visited the sk_house before sending the proposal."
   is_early_demand:
     lineage:
-      - dw_public.dim_house_listing.ts_early_demand_started
+      - dw_rent.dim_house_listing.ts_early_demand_started
     description: "True if the sk_house has an early demand."
   is_resend_request:
     lineage:
@@ -307,7 +307,7 @@ columns:
   dt_offer_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
-    description: "Date when offer was approved."
+    description: "Calendar date when the tenant rental offer was approved in the rent flow, parsed from sk_offer_approved_date."
   dt_tenant_doc_complete_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_tenant_doc_complete_date
@@ -315,27 +315,27 @@ columns:
   dt_credit_evaluation_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-    description: "Date when the credit evaluation was approved."
+    description: "Calendar date when the automated credit evaluation returned an approved outcome for the proposal."
   dt_credit_analysis_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_credit_analysis_approved_date
-    description: "Date when the credit analysis was approved."
+    description: "Calendar date when credit analysis marked the proposal as approved, parsed from sk_credit_analysis_approved_date."
   dt_guarantee_accepted_date:
     lineage:
       - datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
-    description: "Date when the guarantee was accepted."
+    description: "Calendar date when the tenant accepted the rental guarantee terms in the credit analysis flow."
   dt_guarantee_paid_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_guarantee_paid_date
-    description: "Date when the guarantee was paid."
+    description: "Calendar date when the rental guarantee payment was confirmed, parsed from sk_guarantee_paid_date."
   dt_contract_created_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_created_date
-    description: "Date when the contract was created."
+    description: "Calendar date when the rental contract record was first created in the rent flow."
   dt_contract_signed_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
-    description: "Date when the contract was signed."
+    description: "Calendar date when all parties signed the rental contract, parsed from sk_contract_signed_date."
   dt_reference:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date

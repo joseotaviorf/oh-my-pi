@@ -37,7 +37,7 @@ ppm_ongoing_rentals AS (
     FROM dw_rent.dim_contract dc
     JOIN dw_public.dim_date dd 
         ON dd.date BETWEEN COALESCE(dc.dt_start, dc.dt_entrance) AND COALESCE(dc.dt_annulment, '{load_start_date}' - INTERVAL '1' DAY)
-    LEFT JOIN dw_public.fact_house_listings fhl 
+    LEFT JOIN dw_rent.fact_house_listings fhl 
         ON fhl.sk_contract = dc.sk_contract
     JOIN actual_pps ppmh
         ON ppmh.sk_owner = fhl.sk_owner
@@ -589,7 +589,7 @@ rent_flow_offer AS (
     fhl.flg_visit_completed
   from
     dw_rent.fact_listing_rent_flows fhl
-    LEFT JOIN dw_public.dim_house_listing AS hl ON hl.sk_house_listing = fhl.sk_house_listing
+    LEFT JOIN dw_rent.dim_house_listing AS hl ON hl.sk_house_listing = fhl.sk_house_listing
     INNER JOIN dw_public.dim_date dd2 ON dd2.sk_date = fhl.sk_offer_submitted_date
     LEFT JOIN offboarding t2 ON t2.id_house = hl.id_house
     AND dd2.date >= t2.ts_created
@@ -609,7 +609,7 @@ rent_flow_vb AS (
     fhl.flg_visit_completed
   from
     dw_rent.fact_listing_rent_flows fhl
-    LEFT JOIN dw_public.dim_house_listing AS hl ON hl.sk_house_listing = fhl.sk_house_listing
+    LEFT JOIN dw_rent.dim_house_listing AS hl ON hl.sk_house_listing = fhl.sk_house_listing
     INNER JOIN dw_public.dim_date dd2 ON dd2.sk_date = fhl.sk_visit_date
     LEFT JOIN offboarding t2 ON t2.id_house = hl.id_house
     AND dd2.date >= t2.ts_created
@@ -638,7 +638,7 @@ rent_flow_vc AS (
     ) AS vc_occupied_property
   from
     dw_rent.fact_listing_rent_flows fhl
-    LEFT JOIN dw_public.dim_house_listing AS hl ON hl.sk_house_listing = fhl.sk_house_listing
+    LEFT JOIN dw_rent.dim_house_listing AS hl ON hl.sk_house_listing = fhl.sk_house_listing
     INNER JOIN dw_public.dim_date dd2 ON dd2.sk_date = fhl.sk_visit_date
     LEFT JOIN offboarding t2 ON t2.id_house = hl.id_house
     AND dd2.date >= t2.ts_created
@@ -708,8 +708,8 @@ contrato_anterior AS (
         t.ts_termination_finished DESC
     ) AS rk
   from
-    dw_public.dim_house_listing AS dhl
-    LEFT JOIN dw_public.dim_house_listing AS rl ON rl.sk_house_listing = dhl.sk_house_listing - 1
+    dw_rent.dim_house_listing AS dhl
+    LEFT JOIN dw_rent.dim_house_listing AS rl ON rl.sk_house_listing = dhl.sk_house_listing - 1
     LEFT JOIN dw_rent.fact_listing_rent_flows AS fhl ON rl.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN dw_rent.dim_contract AS dc ON fhl.sk_contract = dc.sk_contract
     LEFT JOIN datalake_offboarding.contract_termination t ON t.id_contract = dc.sk_contract
@@ -767,8 +767,8 @@ contrato_anterior_new_relisting AS (
         t.ts_termination_finished DESC
     ) AS rk
   from
-    dw_public.dim_house_listing AS dhl
-    LEFT JOIN dw_public.dim_house_listing AS rl ON rl.sk_house_listing = dhl.sk_house_listing - 1
+    dw_rent.dim_house_listing AS dhl
+    LEFT JOIN dw_rent.dim_house_listing AS rl ON rl.sk_house_listing = dhl.sk_house_listing - 1
     LEFT JOIN dw_rent.fact_listing_rent_flows AS fhl ON rl.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN dw_rent.dim_contract AS dc ON fhl.sk_contract = dc.sk_contract
     LEFT JOIN datalake_offboarding.contract_termination t ON t.id_contract = dc.sk_contract
@@ -824,8 +824,8 @@ inquilinos_em_contrato AS (
   FROM
     dw_rent.fact_contract_people fcp
     LEFT JOIN dw_rent.dim_contract dc ON dc.sk_contract = fcp.sk_contract
-    LEFT JOIN dw_public.fact_house_listings fhl ON fhl.sk_contract = dc.sk_contract
-    LEFT JOIN dw_public.dim_house_listing dhl ON dhl.sk_house_listing = fhl.sk_house_listing
+    LEFT JOIN dw_rent.fact_house_listings fhl ON fhl.sk_contract = dc.sk_contract
+    LEFT JOIN dw_rent.dim_house_listing dhl ON dhl.sk_house_listing = fhl.sk_house_listing
   WHERE
     fcp.contract_role in (
       'tenant'
@@ -995,9 +995,9 @@ CASE
     ON dc.sk_contract = disp.sk_contract 
   LEFT JOIN dw_offboarding.fact_terminations AS dt
       ON dt.sk_contract = disp.sk_contract
-  LEFT JOIN dw_public.fact_house_listings AS fhl 
+  LEFT JOIN dw_rent.fact_house_listings AS fhl 
     ON fhl.sk_contract = dc.sk_contract
-  LEFT JOIN dw_public.dim_house_listing AS dhl 
+  LEFT JOIN dw_rent.dim_house_listing AS dhl 
     ON dhl.sk_house_listing = fhl.sk_house_listing
   Left join contrato_anterior ca 
     ON ca.sk_house_listing = dhl.sk_house_listing

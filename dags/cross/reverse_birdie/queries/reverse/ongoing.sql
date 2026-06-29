@@ -39,7 +39,7 @@ ppm_ongoing_rentals AS (
           COALESCE(dc.dt_start, dc.dt_entrance)
         AND
           COALESCE(dc.dt_annulment, CURRENT_DATE - INTERVAL '1' DAY)
-      LEFT JOIN dw_public.fact_house_listings fhl
+      LEFT JOIN dw_rent.fact_house_listings fhl
         ON fhl.sk_contract = dc.sk_contract
       JOIN actual_pps ppmh
         ON ppmh.sk_owner = fhl.sk_owner
@@ -403,7 +403,7 @@ lrf AS (
   SELECT DISTINCT
     sk_house_listing/1000 AS id_house,
     sk_owner
-  FROM dw_public.fact_house_listings
+  FROM dw_rent.fact_house_listings
   WHERE sk_owner > 0
   UNION
   SELECT DISTINCT
@@ -431,7 +431,7 @@ num_houses AS (
         sk_house_listing/1000 AS id_house,
         fhl.sk_contract,
         c.status
-      FROM dw_public.fact_house_listings AS fhl
+      FROM dw_rent.fact_house_listings AS fhl
       LEFT JOIN (
         SELECT DISTINCT sk_contract, status
         FROM dw_rent.dim_contract
@@ -518,9 +518,9 @@ listings AS (
   FROM dw_rent.dim_contract AS dc
   LEFT JOIN dw_rent.fact_listing_rent_flows AS fhl
     ON fhl.sk_contract = dc.sk_contract
-  LEFT JOIN dw_public.dim_house_listing AS hl
+  LEFT JOIN dw_rent.dim_house_listing AS hl
     ON hl.sk_house_listing = fhl.sk_house_listing
-  LEFT JOIN dw_public.dim_house_listing AS rl
+  LEFT JOIN dw_rent.dim_house_listing AS rl
     ON rl.sk_house_listing = hl.sk_house_listing + 1
   WHERE
     dc.status = 'Finalizado'
@@ -566,7 +566,7 @@ bd_relisting AS (
       fhl.sk_offer_approved_date,
       fhl.sk_offer_submitted_date
     FROM dw_rent.fact_listing_rent_flows AS fhl
-    LEFT JOIN dw_public.dim_house_listing AS hl
+    LEFT JOIN dw_rent.dim_house_listing AS hl
       ON hl.sk_house_listing = fhl.sk_house_listing
   ) AS fhl
     ON fhl.sk_house_listing = l.sk_relisting
@@ -696,8 +696,15 @@ joined AS (
   FROM tabela_final AS tf
   WHERE DATE(tf.data_resposta_nps) >= DATE('2024-01-01')
   ORDER BY tf.data_resposta_nps ASC
+),
+jd_ranked AS (
+  SELECT
+    jd.*,
+    ROW_NUMBER() OVER(PARTITION BY jd.sk_contract, jd.customer_type ORDER BY jd.data_resposta_nps ASC) AS rn
+  FROM joined jd
+  WHERE
+    DATE(jd.data_resposta_nps) >= DATE('{load_start_date}')
 )
-
 SELECT
   jd.sk_nps_answer  AS feedback_id,
   jd.sk_user  AS author_id,
@@ -740,7 +747,7 @@ SELECT
   month(jd.data_resposta_nps) AS month,
   day(jd.data_resposta_nps) AS day,
   NOW() AS ts_load
-FROM joined jd
+FROM
+  jd_ranked AS jd
 WHERE
-  DATE(jd.data_resposta_nps) >= DATE('{load_start_date}')
-QUALIFY ROW_NUMBER() OVER(PARTITION BY jd.sk_contract, jd.customer_type ORDER BY jd.data_resposta_nps ASC) = 1
+  jd.rn = 1

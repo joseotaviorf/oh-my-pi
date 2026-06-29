@@ -34,7 +34,7 @@ ppm_ongoing_rentals AS (
     JOIN dw_public.dim_date dd 
         ON dd.date BETWEEN COALESCE(dc.dt_start, dc.dt_entrance)
         AND COALESCE(dc.dt_annulment, DATE('{load_start_date}') - INTERVAL '1' DAY)
-    LEFT JOIN dw_public.fact_house_listings fhl 
+    LEFT JOIN dw_rent.fact_house_listings fhl 
         ON fhl.sk_contract = dc.sk_contract
     JOIN actual_pps ppmh
         ON ppmh.sk_owner = fhl.sk_owner
@@ -87,11 +87,11 @@ ppm_ongoing_rentals AS (
         AND dt.status NOT IN ('CANCELED')
       LEFT JOIN datalake_terminator_clean.termination_workflow w
         ON w.id_termination = t.id
-      LEFT JOIN dw_public.fact_house_listings fhl
+      LEFT JOIN dw_rent.fact_house_listings fhl
         ON t.id_contract = fhl.sk_contract
       LEFT JOIN dw_public.dim_region dr
         ON fhl.sk_region = dr.sk_region
-      LEFT JOIN dw_public.dim_house_listing dhl
+      LEFT JOIN dw_rent.dim_house_listing dhl
         ON fhl.sk_house_listing = dhl.sk_house_listing
       LEFT JOIN dw_rent.dim_contract dc
         ON dc.sk_contract = t.id_contract
@@ -235,9 +235,9 @@ listings AS (
     dw_rent.dim_contract dc
       LEFT JOIN dw_rent.fact_listing_rent_flows AS fhl
         ON fhl.sk_contract = dc.sk_contract
-      LEFT JOIN dw_public.dim_house_listing AS hl
+      LEFT JOIN dw_rent.dim_house_listing AS hl
         ON hl.sk_house_listing = fhl.sk_house_listing
-      LEFT JOIN dw_public.dim_house_listing AS rl
+      LEFT JOIN dw_rent.dim_house_listing AS rl
         ON rl.sk_house_listing = hl.sk_house_listing + 1
   WHERE
     dc.status = 'Finalizado'
@@ -279,7 +279,7 @@ bd_relisting AS (
     listings l
       LEFT JOIN dw_rent.fact_listing_rent_flows fhl
         ON fhl.sk_house_listing = l.sk_relisting
-      LEFT JOIN dw_public.dim_house_listing hl
+      LEFT JOIN dw_rent.dim_house_listing hl
         ON hl.sk_house_listing = fhl.sk_house_listing
       LEFT JOIN dw_rent.dim_contract dc
         ON dc.sk_contract = fhl.sk_contract
@@ -301,6 +301,27 @@ bd_relisting AS (
     1,
     2
 ),
+repair_termination_ranked AS (
+  SELECT
+    sk_contract,
+    sk_termination,
+    sk_house,
+    ts_termination_finished,
+    total_tentant_repair_ar,
+    repairs_added_by_owner_review,
+    repairs_exempted_by_owner_review,
+    total_tentant_repair_review,
+    repairs_exempted_ac,
+    repairs_absorbed_ac,
+    total_tentant_repair_ac,
+    CASE
+      WHEN repairs_absorbed_ac + total_tentant_repair_ac > 0 THEN TRUE
+      WHEN repairs_absorbed_ac + total_tentant_repair_ac <= 0 THEN FALSE
+    END AS com_ou_sem_reparos,
+    ROW_NUMBER() OVER (PARTITION BY sk_contract ORDER BY sk_termination_date DESC) AS rn
+  FROM
+    dw_offboarding.fact_terminations
+),
 repair_termination AS (
   SELECT
     sk_contract,
@@ -314,16 +335,13 @@ repair_termination AS (
     repairs_exempted_ac,
     repairs_absorbed_ac,
     total_tentant_repair_ac,
-    CASE
-      WHEN repairs_absorbed_ac + total_tentant_repair_ac > 0 THEN TRUE
-      WHEN repairs_absorbed_ac + total_tentant_repair_ac <= 0 THEN FALSE
-    END AS com_ou_sem_reparos
+    com_ou_sem_reparos
   FROM
-    dw_offboarding.fact_terminations
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY sk_contract ORDER BY sk_termination_date DESC) = 1
+    repair_termination_ranked
+  WHERE
+    rn = 1
 ),
-bd_intermediacao AS (
+bd_intermediacao_ranked AS (
   SELECT
     ft.sk_ticket,
     ft.sk_contract,
@@ -373,7 +391,8 @@ bd_intermediacao AS (
     CAST(
       GET_JSON_OBJECT(dimt.custom_fields, '$["Qualidade do laudo"]') AS STRING
     ) AS contest_quality,
-    CAST(GET_JSON_OBJECT(dimt.custom_fields, '$["Tipo de Cliente"]') AS STRING) AS customer_type
+    CAST(GET_JSON_OBJECT(dimt.custom_fields, '$["Tipo de Cliente"]') AS STRING) AS customer_type,
+    ROW_NUMBER() OVER (PARTITION BY ft.sk_contract ORDER BY ft.ts_created ASC) AS rn
   FROM
     dw_customer_support.fact_tickets ft
       LEFT JOIN dw_customer_support.dim_analyst agt
@@ -388,10 +407,28 @@ bd_intermediacao AS (
       'demanda_pos_saida'
     )
     AND dimt.tags NOT LIKE '%closed_by_merge%'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ft.sk_contract ORDER BY ft.ts_created ASC) = 1
 ),
-bd_tkt_escalado AS (
+bd_intermediacao AS (
+  SELECT
+    sk_ticket,
+    sk_contract,
+    email,
+    parceira,
+    group_name,
+    ts_created,
+    ts_solved,
+    repair_resolution,
+    first_bud_price,
+    final_reimbursement_pp_value,
+    final_reimbursement_value_iq_pay,
+    contest_quality,
+    customer_type
+  FROM
+    bd_intermediacao_ranked
+  WHERE
+    rn = 1
+),
+bd_tkt_escalado_ranked AS (
   SELECT
     ft.sk_ticket,
     ft.sk_user,
@@ -416,7 +453,8 @@ bd_tkt_escalado AS (
     dt.theme_detail,
     dt.motivation,
     dt.step_tag,
-    dt.sub_journey
+    dt.sub_journey,
+    ROW_NUMBER() OVER (PARTITION BY ft.sk_user ORDER BY ft.ts_created DESC) AS rn
   FROM
     dw_customer_support.fact_tickets ft
       LEFT JOIN dw_customer_support.dim_taxonomy dt
@@ -436,8 +474,33 @@ bd_tkt_escalado AS (
     AND ft.ts_created >= DATE((nps.data_inicio_contrato) - INTERVAL '30' day)
     AND ft.ts_created BETWEEN DATE((nps.ts_answered) - INTERVAL '90' day) AND DATE(nps.ts_answered)
     AND ft.sk_user <> -1
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ft.sk_user ORDER BY ft.ts_created DESC) = 1
+),
+bd_tkt_escalado AS (
+  SELECT
+    sk_ticket,
+    sk_user,
+    sk_contract,
+    channel,
+    department,
+    ts_created,
+    ts_closed,
+    ts_solved,
+    email,
+    parceira,
+    first_csat_score,
+    first_csat_comment,
+    ts_first_responde,
+    customer_type,
+    request_type,
+    theme,
+    theme_detail,
+    motivation,
+    step_tag,
+    sub_journey
+  FROM
+    bd_tkt_escalado_ranked
+  WHERE
+    rn = 1
 ),
 bd_front_off AS (
   SELECT
@@ -577,11 +640,28 @@ bd_front_off AS (
   GROUP BY
     1
 ),
-status AS (
-  SELECT DISTINCT
-    fhls.*
+status_ranked AS (
+  SELECT
+    fhls.country_code,
+    fhls.is_last_status_of_day,
+    fhls.revision_reason,
+    fhls.sk_first_publication_date,
+    fhls.sk_house_listing,
+    fhls.sk_region,
+    fhls.sk_company_supply,
+    fhls.sk_status_end_date,
+    fhls.sk_status_start_date,
+    fhls.status_change_reason,
+    fhls.status_history,
+    fhls.ts_load,
+    fhls.ts_status_end,
+    fhls.ts_status_start,
+    ROW_NUMBER() OVER (
+      PARTITION BY fhls.sk_house_listing / 1000
+      ORDER BY fhls.ts_status_start DESC
+    ) AS rn
   FROM
-    dw_offboarding.fact_house_listing_terminations as tr
+    dw_offboarding.fact_house_listing_terminations AS tr
       LEFT JOIN dw_public.dim_date AS dd
         ON tr.sk_next_house_listing_publication_date = dd.sk_date
       RIGHT JOIN dw_rent.fact_house_listing_status fhls
@@ -593,9 +673,27 @@ status AS (
       OR fhls.ts_status_start <> fhls.ts_status_end
     )
     AND fhls.is_last_status_of_day = TRUE
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY fhls.sk_house_listing / 1000 ORDER BY fhls.ts_status_start DESC)
-    = 1
+),
+status AS (
+  SELECT
+    country_code,
+    is_last_status_of_day,
+    revision_reason,
+    sk_first_publication_date,
+    sk_house_listing,
+    sk_region,
+    sk_company_supply,
+    sk_status_end_date,
+    sk_status_start_date,
+    status_change_reason,
+    status_history,
+    ts_load,
+    ts_status_end,
+    ts_status_start
+  FROM
+    status_ranked
+  WHERE
+    rn = 1
 ),
 status_ended_rental AS (
   SELECT DISTINCT

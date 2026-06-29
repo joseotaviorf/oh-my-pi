@@ -37,7 +37,7 @@ WITH
       brazil_houses br
         ON fl.sk_region = br.sk_region --- added to filter only BR business (excluding mexico)
     LEFT JOIN 
-      dw_public.dim_house_listing dhl 
+      dw_rent.dim_house_listing dhl 
         ON dhl.id_house = dl.sk_house
     WHERE
       date_diff (CURRENT_DATE, DATE(dl.ts_last_depublication)) = 20

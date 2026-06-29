@@ -5,7 +5,7 @@ region AS (
         g.short_region_name AS region,
         g.city_name AS city
     FROM dw_rent.fact_listing_rent_flows d
-    LEFT JOIN dw_public.dim_house_listing f
+    LEFT JOIN dw_rent.dim_house_listing f
         ON f.sk_house_listing = d.sk_house_listing
     LEFT JOIN dw_public.dim_region g
         ON g.sk_region = d.sk_region
@@ -52,7 +52,7 @@ overdue AS (
         o.sk_contract,
         o.dt_reference,
         o.delay_contamined_range,
-        DATEDIFF(DAY,MIN(o.dt_invoice_due_adjust), o.dt_reference) AS delay_days,
+        DATEDIFF(o.dt_reference, MIN(o.dt_invoice_due_adjust)) AS delay_days,
         SUM(o.due_amount) AS open_amount,
         COUNT(o.id_invoice) AS invoices,
         COUNT(CASE WHEN o.invoice_type = 'monthly' THEN o.id_invoice END) AS monthly_invoices,

@@ -1,6 +1,6 @@
 WITH listing_base AS (
   SELECT
-    dhl.ts_listing_version_start::DATE AS listing_start_dt,
+    CAST(dhl.ts_listing_version_start AS DATE) AS listing_start_dt,
     dhl.listing_category_start AS listing_category_start,
     dr.city_group,
     dr.city_name,
@@ -13,9 +13,9 @@ WITH listing_base AS (
     dhl.id_house,
     COALESCE(dhl.rent, dhl.house_rent) AS rent
   FROM
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
   LEFT JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
       ON fhl.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -24,7 +24,7 @@ WITH listing_base AS (
     (dr.country_code = 'BR' OR dr.country_code IS NULL)
     AND (dhl.version > 0)
     AND (dhl.status IN ('publicado', 'PUBLISHED'))
-    AND (dhl.ts_listing_version_start::DATE >= '2023-10-01'::DATE)
+    AND (CAST(dhl.ts_listing_version_start AS DATE) >= DATE '2023-10-01')
 ),
 days_published AS (
   SELECT
@@ -66,34 +66,34 @@ days_published AS (
       END
     ) AS days_pub_1
   FROM
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
   LEFT JOIN
     datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
       ON (hldi.id_house_listing = dhl.sk_house_listing)
-      AND (hldi.dt_day BETWEEN dhl.ts_listing_version_start::DATE AND COALESCE(dhl.ts_listing_version_END::DATE, CURRENT_DATE::DATE))
+      AND (hldi.dt_day BETWEEN CAST(dhl.ts_listing_version_start AS DATE) AND COALESCE(CAST(dhl.ts_listing_version_END AS DATE), CAST(CURRENT_DATE AS DATE)))
   WHERE (dhl.version > 0)
     AND (dhl.ts_listing_version_start >= date '2023-10-01')
   GROUP BY 1, 2
 ),
 lpv_amplitude AS (
   SELECT
-    ts_client_event::DATE AS dt_event,
+    CAST(ts_client_event AS DATE) AS dt_event,
     CASE
       WHEN ep_house_id LIKE '%.%' THEN NULL
-      ELSE ep_house_id::BIGINT
+      ELSE CAST(ep_house_id AS BIGINT)
     END AS id_house,
     COUNT(1) AS lpv
   FROM
     datalake_amplitude_clean.170698_listing_page_viewed_events
   WHERE
     (year >= 2023)
-    AND (ts_client_event::DATE >= '2023-10-01'::DATE)
+    AND (CAST(ts_client_event AS DATE) >= DATE '2023-10-01')
     AND (LOWER(business_context) = 'rent')
   GROUP BY 1, 2
 ),
 lpv AS (
   SELECT
-    dhl.ts_publication::DATE AS dt_publication,
+    CAST(dhl.ts_publication AS DATE) AS dt_publication,
     dhl.sk_house_listing,
     p.days_pub_21,
     p.days_pub_14,
@@ -101,33 +101,33 @@ lpv AS (
     p.days_pub_3,
     p.days_pub_1,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -21, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_21d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -21, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_21 = 0 THEN 1 ELSE p.days_pub_21 END)::DOUBLE AS avg_lpv_days_pub_21d,
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -21, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/CAST((CASE WHEN p.days_pub_21 = 0 THEN 1 ELSE p.days_pub_21 END) AS DOUBLE) AS avg_lpv_days_pub_21d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -14, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_14d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -14, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_14 = 0 THEN 1 ELSE p.days_pub_14 END)::DOUBLE AS avg_lpv_days_pub_14d,
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -14, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/CAST((CASE WHEN p.days_pub_14 = 0 THEN 1 ELSE p.days_pub_14 END) AS DOUBLE) AS avg_lpv_days_pub_14d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -7, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_7d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -7, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_7 = 0 THEN 1 ELSE p.days_pub_7 END)::DOUBLE AS avg_lpv_days_pub_7d,
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -7, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/CAST((CASE WHEN p.days_pub_7 = 0 THEN 1 ELSE p.days_pub_7 END) AS DOUBLE) AS avg_lpv_days_pub_7d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_3d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_3 = 0 THEN 1 ELSE p.days_pub_3 END)::DOUBLE AS avg_lpv_days_pub_3d,
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/CAST((CASE WHEN p.days_pub_3 = 0 THEN 1 ELSE p.days_pub_3 END) AS DOUBLE) AS avg_lpv_days_pub_3d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_1d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_1 = 0 THEN 1 ELSE p.days_pub_1 END)::DOUBLE AS avg_lpv_days_pub_1d
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/CAST((CASE WHEN p.days_pub_1 = 0 THEN 1 ELSE p.days_pub_1 END) AS DOUBLE) AS avg_lpv_days_pub_1d
   FROM
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
   LEFT JOIN
     lpv_amplitude
     ON (lpv_amplitude.id_house = dhl.id_house)
-      AND (lpv_amplitude.dt_event::DATE BETWEEN dhl.ts_listing_version_start::DATE AND COALESCE(dhl.ts_listing_version_end::DATE, CURRENT_DATE))
+      AND (CAST(lpv_amplitude.dt_event AS DATE) BETWEEN CAST(dhl.ts_listing_version_start AS DATE) AND COALESCE(CAST(dhl.ts_listing_version_end AS DATE), CURRENT_DATE))
   LEFT JOIN
     days_published AS p
       ON (p.sk_house_listing = dhl.sk_house_listing)
   WHERE
     (dhl.version > 0)
-    AND (dhl.ts_listing_version_start::DATE >= '2023-10-01'::DATE)
+    AND (CAST(dhl.ts_listing_version_start AS DATE) >= DATE '2023-10-01')
   GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
 booking_availability_hours AS (
   SELECT
     id_house,
-    dt_available_started::DATE AS start_date,
+    CAST(dt_available_started AS DATE) AS start_date,
     day_of_week,
     DATE_ADD(DAY, -1,
       COALESCE(
@@ -154,7 +154,7 @@ scores AS (
   SELECT
     hdi.dt_day,
     dhl.sk_house_listing,
-    dhl.ts_publication::DATE AS dt_published,
+    CAST(dhl.ts_publication AS DATE) AS dt_published,
     hdi.listing_category,
     dr.city_name,
     hdi.rent,
@@ -186,7 +186,7 @@ scores AS (
   FROM
     datalake_rental_historical_follow_up.house_listings_daily_info AS hdi
   JOIN
-    dw_public.dim_house_listing dhl
+    dw_rent.dim_house_listing dhl
       ON dhl.sk_house_listing = hdi.id_house_listing
   JOIN
     dw_public.dim_region dr

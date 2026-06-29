@@ -3,7 +3,7 @@ WITH
     SELECT
       id_house
     FROM
-      dw_public.dim_house_listing
+      dw_rent.dim_house_listing
     WHERE
       country_code = 'BR'
     GROUP BY
