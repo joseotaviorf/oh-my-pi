@@ -6,7 +6,8 @@ description: 'Every row of this table is a snapshot of one sale ongoing listing 
   Important:
   if you add up the metrics from this table such as visit booked or visit completed, they might not be equal to the total that actually happened. This
   is because some events happen when the listing is unpublished, so the rows will not appear in this table. To see all ForSale demand events, please use
-  the table dw_sale.fact_sale_demand_event.'
+  the table dw_sale.fact_sale_demand_event. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition
+  pruning and avoid full table scans.'
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -36,7 +37,8 @@ columns:
     lineage:
       - datalake_company.company_sks.sk_company
   sk_broker:
-    description: Surrogate key of the 3P broker partner for the supply-side company of the house. Joinable with dw_brokers.dim_broker. Returns -1 when the house is not associated with a 3P broker (i.e. 1P listings or companies without active 3P products).
+    description: Surrogate key of the 3P broker partner for the supply-side company of the house. Joinable with dw_brokers.dim_broker.
+      Returns -1 when the house is not associated with a 3P broker (i.e. 1P listings or companies without active 3P products).
     lineage:
       - core_brokers.brokers.sk_broker
   sk_sale_price_segment:
@@ -88,15 +90,18 @@ columns:
   qt_sale_agreements_signed:
     description: Amount of sale agreements signed in that day.
   year:
-    description: Year of the snapshot.
+    description: Year of the snapshot. Always filter on this partition column in WHERE clauses to enable
+      partition pruning when scanning the table.
     lineage:
       - dw_public.dim_date.year
   month:
-    description: Month of the snapshot.
+    description: Month of the snapshot. Always filter on this partition column in WHERE clauses to enable
+      partition pruning when scanning the table.
     lineage:
       - dw_public.dim_date.month
   day:
-    description: Day of the snapshot.
+    description: Day of the snapshot. Always filter on this partition column in WHERE clauses to enable
+      partition pruning when scanning the table.
     lineage:
       - dw_public.dim_date.day
   ts_load:

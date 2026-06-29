@@ -1,14 +1,16 @@
 database_name: dw_rent
 table_name: fact_house_listing_status
 description: Fact table that contains each status that the listing had. Each line
-  is a listing and its status in a certain time period
+  is a listing and its status in a certain time period.
+  Partitioned by country_code. Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house_listing_status.country_code
-    description: Two-letter ISO country code for the market where this listing operates.
+    description: Two-letter ISO country code for the market where this listing operates. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.

@@ -3,6 +3,7 @@ table_name: fact_house_listing_daily_available_hours
 description: Daily available hours of house listings whose latest status of the day is published. Each row is a listing
   related to a house on a specific date and the most recent available hours for that date. The sk_house_listing is not
   unique in this table, but the sk_house_listing_date is unique. This column is the concatenation of sk_house_listing + sk_date.
+  Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -35,7 +36,8 @@ columns:
     lineage:
       - datalake_booking.house_available_hours.day_hours_available
       - dw_public.dim_date.is_brz_business_day
-    description: Number of available hours for a house listing on work/business days in a specific week. Only includes days (up to D-1) when the listing is published.
+    description: Number of available hours for a house listing on work/business days in a specific week.
+      Only includes days (up to D-1) when the listing is published.
   week_day:
     lineage:
       - dw_public.dim_date.week_day
@@ -46,11 +48,14 @@ columns:
     lineage:
       - dw_public.dim_date.year
     description: Year associated with the referenced date. Also, it's a partition of this table.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
     lineage:
       - dw_public.dim_date.month
     description: Month associated with the referenced date. Also, it's a partition of this table.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
     lineage:
       - dw_public.dim_date.day
     description: Day associated with the referenced date. Also, it's a partition of this table.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.

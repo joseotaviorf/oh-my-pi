@@ -6,6 +6,8 @@ description:
   related to a house in a specific date with it's information about the agents, contract, account manager (PP Multi).
   The sk_house_listing is not unique in this table, but the sk_house_listing_day is unique. This column is the
   concatenation of sk_house_listing + sk_day.
+  Partitioned by country_code, year, month, day. Always filter on country_code, year, month, day in WHERE clauses to
+  enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -150,7 +152,8 @@ columns:
   country_code:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.country_code
-    description: Two-letter ISO country code indicating the country where the listing is active.
+    description: Two-letter ISO country code indicating the country where the listing is active. Partition key for
+      multi-country isolation; always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico
@@ -159,13 +162,16 @@ columns:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.year
     description: Year of the reference date. Also it's a partition.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.month
     description: Month of the reference date. Also it's a partition.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.day
     description: Day of the reference date. Also it's a partition.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   ts_load:
     description: Timestamp of when the table was updated.

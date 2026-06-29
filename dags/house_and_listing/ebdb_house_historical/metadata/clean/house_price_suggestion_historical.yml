@@ -2,14 +2,17 @@ database_name: datalake_ebdb_clean
 table_name: house_price_suggestion_historical
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: >
+description:
   Tracks changes in price suggestion fields from HousePriceSuggestion table.
   Each row represents a change, identified by composite key (id, id_cdc_transaction).
+  Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses
+  to enable partition pruning and avoid full table scans.
 columns:
   id:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.id
-    description: 'Primary key of HousePriceSuggestion source table. NOT unique here — one row per change. Part of composite key: (id, id_cdc_transaction).'
+    description: 'Primary key of HousePriceSuggestion source table. NOT unique here — one row per change.
+      Part of composite key: (id, id_cdc_transaction).'
   id_house:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.house_id
@@ -17,11 +20,13 @@ columns:
   id_prediction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.prediction_id
-    description: 'UUID of the prediction that generated this suggestion. Changes with each update, so the same id may have different id_prediction values over time.'
+    description: 'UUID of the prediction that generated this suggestion. Changes with each update, so the same id may have
+      different id_prediction values over time.'
   id_cdc_transaction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.cdc_transaction_id
-    description: 'Unique identifier of the CDC transaction and required to distinguish multiple changes captured at the same ts_cdc_transaction. Part of the composite key: (id, id_cdc_transaction).'
+    description: 'Unique identifier of the CDC transaction and required to distinguish multiple changes captured at the
+      same ts_cdc_transaction. Part of the composite key: (id, id_cdc_transaction).'
   deal_objective_lower_anchor:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.deal_objective_lower_anchor
@@ -61,7 +66,8 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.business_context
-    description: 'Business context for which the price was suggested. Each (id_house, business_context) has a distinct id in HousePriceSuggestion.'
+    description: 'Business context for which the price was suggested. Each (id_house, business_context) has a distinct
+      id in HousePriceSuggestion.'
     categories:
       RENT: Rental property context.
       SALE: Sale property context.
@@ -84,7 +90,8 @@ columns:
   ts_cdc_transaction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.ts_cdc_transaction
-    description: 'Timestamp when the CDC system captured this transaction. Multiple changes may occur at the same timestamp (millisecond precision), requiring id_cdc_transaction to distinguish them.'
+    description: 'Timestamp when the CDC system captured this transaction. Multiple changes may occur at the same timestamp
+      (millisecond precision), requiring id_cdc_transaction to distinguish them.'
   ts_database_transaction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.ts_database_transaction
@@ -92,12 +99,15 @@ columns:
   year:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.year
-    description: 'Year of the CDC transaction (partition column).'
+    description: 'Year of the CDC transaction (partition column). Always filter on this partition column in WHERE clauses
+      to enable partition pruning when scanning the table.'
   month:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.month
-    description: 'Month of the CDC transaction (partition column).'
+    description: 'Month of the CDC transaction (partition column). Always filter on this partition column in WHERE clauses
+      to enable partition pruning when scanning the table.'
   day:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.day
-    description: 'Day of the CDC transaction (partition column).'
+    description: 'Day of the CDC transaction (partition column). Always filter on this partition column in WHERE clauses
+      to enable partition pruning when scanning the table.'

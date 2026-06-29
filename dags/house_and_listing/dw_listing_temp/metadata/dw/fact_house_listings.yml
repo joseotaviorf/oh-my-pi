@@ -1,7 +1,10 @@
 database_name: dw_public
 table_name: fact_house_listings
-description: Information about events that happened during a house listing's lifetime.
-  Each line is a house listing identified by the sk_house_listing, followed by information related to its events.
+description: "[TO BE DEPRECATED, AVOID USING THIS TABLE] Information about events that
+  happened during a house listing's lifetime. Each line is a house listing identified
+  by the sk_house_listing, followed by information related to its events. Partitioned
+  by country_code. Always filter on country_code in WHERE clauses to enable partition
+  pruning and avoid full table scans."
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -21,8 +24,8 @@ columns:
     description:
       Key of the next published house listing and the rental wasn't extended.
       This column was created to help to identify the next sk house listing because the sk_house_listing + 1 won't work with all the cases.
-      Due to the early demand, if a termination is canceled and the listing was published, a new version is created but it won't have a contract associated to it
-      and the contract will continue.
+      Due to the early demand, if a termination is canceled and the listing was published, a new version is created but it won't have a contract
+      associated to it and the contract will continue.
   sk_next_house_listing_consolidated:
     lineage:
       - datalake_ebdb_listing.house_listing.sk_next_house_listing_consolidated
@@ -96,7 +99,8 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code of the listing.
+    description: Country code of the listing. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
