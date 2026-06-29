@@ -21,6 +21,19 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  raw_inner_dependencies:
+    statement_879200452586:
+      - statement_879200452685
+    statement_879200494588:
+      - statement_879200452586
+    statement_879200426887:
+      - statement_067000392216
+    statement_879200429691:
+      - statement_879200426887
+    statement_879200502307:
+      - statement_879200433065
+    statement_879200984646:
+      - statement_879200502307
   tables_customization:
     statement_879200452685:
       merge_on: [ 'id']
