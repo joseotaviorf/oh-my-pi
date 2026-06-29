@@ -1,13 +1,21 @@
 database_name: datalake_terminator_clean
 table_name: rev_info
+description:
+  One row per rev info in the contract termination (offboarding) workflow
+  managed by the Terminator service. Tracks step progression, fees, and
+  inspection outcomes.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_user:
     lineage:
       - datalake_terminator_raw.revinfo.user_id
+    description: QuintoAndar user identifier associated with the IVR interaction or scheduled call.
   rev:
     lineage:
       - datalake_terminator_raw.revinfo.rev
+    description: Attribute of the termination workflow describing rev.
   ts_rev:
     lineage:
       - datalake_terminator_raw.revinfo.revtstmp
+    description: Timestamp when rev occurred according to the source system.

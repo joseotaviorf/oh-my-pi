@@ -2,7 +2,7 @@ database_name: datalake_terminator_clean
 table_name: inspection_opted_out
 description: Clean table that aims to store inspection opt out information.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_inspection_opted_out:
     lineage:
@@ -19,11 +19,11 @@ columns:
   reason:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.reason
-    description: Reason for inspection opted out.
+    description: Business reason code explaining why the telephony event or task transition occurred.
   reason_details:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.reason_details
-    description: Details of the reason why inspection opted out.
+    description: Attribute of the termination workflow describing reason details.
   dt_opt_out:
     lineage:
       - datalake_terminator_raw.inspection_opted_out.date_opt_out

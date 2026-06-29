@@ -2,7 +2,7 @@ database_name: datalake_terminator_clean
 table_name: checklist_item
 description: The git that a termination is expected to fulfill according to its characteristics.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -11,7 +11,7 @@ columns:
   id_termination:
     lineage:
       - datalake_terminator_raw.checklist_item.termination_id
-    description: The ID of the termination.
+    description: Identifier for the termination referenced by this record.
   checklist_item:
     lineage:
       - datalake_terminator_raw.checklist_item.name
@@ -32,3 +32,12 @@ columns:
     lineage:
       - datalake_terminator_raw.checklist_item.updated_at
     description: The update timestamp of the termination checklist.
+  month:
+    lineage: []
+    description: Month partition for incremental loading and partition pruning.
+  day:
+    lineage: []
+    description: Day partition for incremental loading and partition pruning.
+  year:
+    lineage: []
+    description: Year partition for incremental loading and partition pruning.

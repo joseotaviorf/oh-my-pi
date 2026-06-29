@@ -1,49 +1,69 @@
 database_name: datalake_terminator_clean
 table_name: inspection_aud
+description:
+  One row per inspection aud in the contract termination (offboarding)
+  workflow managed by the Terminator service. Tracks step progression, fees,
+  and inspection outcomes.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id:
     lineage:
       - datalake_terminator_raw.inspection_aud.id
+    description: Primary surrogate identifier for the entity row in this support and service dataset.
   rev:
     lineage:
       - datalake_terminator_raw.inspection_aud.rev
+    description: Attribute of the termination workflow describing rev.
   rev_type:
     lineage:
       - datalake_terminator_raw.inspection_aud.revtype
+    description: Attribute of the termination workflow describing rev type.
   rev_end:
     lineage:
       - datalake_terminator_raw.inspection_aud.revend
+    description: Attribute of the termination workflow describing rev end.
   id_contract:
     lineage:
       - datalake_terminator_raw.inspection_aud.contract_id
+    description: Identifier for the contract referenced by this record.
   type:
     lineage:
       - datalake_terminator_raw.inspection_aud.type
+    description: Classification type assigned by the source platform for routing or reporting.
   status:
     lineage:
       - datalake_terminator_raw.inspection_aud.status
+    description: Current lifecycle status of the ticket, task, or workflow step.
   ts_inspected:
     lineage:
       - datalake_terminator_raw.inspection_aud.date
+    description: Timestamp when inspected occurred according to the source system.
   ts_created:
     lineage:
       - datalake_terminator_raw.inspection_aud.created_at
+    description: Timestamp when the record was first created in the upstream source system.
   ts_updated:
     lineage:
       - datalake_terminator_raw.inspection_aud.updated_at
+    description: Timestamp of the most recent update to the record in the upstream source system.
   keys_location:
     lineage:
       - datalake_terminator_raw.inspection_aud.keys_location
+    description: Attribute of the termination workflow describing keys location.
   keys_location_comment:
     lineage:
       - datalake_terminator_raw.inspection_aud.keys_location_comment
+    description: Attribute of the termination workflow describing keys location comment.
   year:
     lineage:
       - datalake_terminator_raw.inspection_aud.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_terminator_raw.inspection_aud.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_terminator_raw.inspection_aud.day
+    description: Day partition derived from the source event timestamp for incremental loading.
