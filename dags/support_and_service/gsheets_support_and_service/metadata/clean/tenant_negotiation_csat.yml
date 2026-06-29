@@ -1,19 +1,29 @@
 database_name: datalake_gsheets_clean
 table_name: tenant_negotiation_csat
+description:
+  Reference CSAT survey score targets curated in Google Sheets by the Support
+  and Services team. One row per tenant negotiation csat entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_csat_answer:
     lineage:
       - datalake_gsheets_raw.csat_negociacao_iq.token
+    description: Identifier for the csat answer referenced by this record.
   id_contract:
     lineage:
       - datalake_gsheets_raw.csat_negociacao_iq.contract_id
+    description: Identifier for the contract referenced by this record.
   comments:
     lineage:
       - datalake_gsheets_raw.csat_negociacao_iq.comments
+    description: Value from the Google Sheets source column mapped to comments for tenant_negotiation_csat planning.
   score_text:
     lineage:
       - datalake_gsheets_raw.csat_negociacao_iq.score_text
+    description: Value from the Google Sheets source column mapped to score_text for tenant_negotiation_csat planning.
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_negociacao_iq.submitted_at
+    description: Timestamp when submitted occurred according to the source system.

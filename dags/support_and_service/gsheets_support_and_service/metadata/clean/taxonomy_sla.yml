@@ -1,31 +1,45 @@
 database_name: datalake_gsheets_clean
 table_name: taxonomy_sla
+description:
+  Reference SLA targets by customer journey step and contact theme, curated in
+  Google Sheets by Support Operations. One row per team and contact-theme
+  combination with effective date range.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   journey_step:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.jornada
+    description: Customer journey step (jornada) for which the SLA target is defined.
   team:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.time
+    description: Support team (time) accountable for meeting the SLA at this journey step.
   de_para_team:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.de_para_team_looker
+    description: Looker-facing team name mapping used in SLA dashboards and reports.
   contact_theme_tag:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.codigo_assunto
+    description: Primary contact-theme code (assunto) used in ticket taxonomy.
   contact_theme_detail_tag:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.codigo_detalhe_do_assunto
+    description: Detailed contact-theme sub-code for finer SLA segmentation.
   sla_in_days:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.sla_visao_operacao_em_dias_uteis
+    description: Operational SLA target expressed in business days for this theme and team.
   dt_start:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.data_inicio
+    description: First date when this SLA target configuration is effective.
   dt_end:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.data_fim
+    description: Last date when this SLA target configuration remains valid.
   dt_target_invalidated:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.invalidado
+    description: Date when this SLA row was marked invalid and should no longer be used.

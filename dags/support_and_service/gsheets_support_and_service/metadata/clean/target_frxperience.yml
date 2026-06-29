@@ -1,28 +1,41 @@
 database_name: datalake_gsheets_clean
 table_name: target_frxperience
+description:
+  Reference operational KPI targets curated in Google Sheets by the Support
+  and Services team. One row per target frxperience entry used to calibrate
+  dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   birdie_opportunity:
     lineage:
       - datalake_gsheets_raw.target_frxperience.birdie_opportunity
+    description: Value from the Google Sheets source column mapped to birdie_opportunity for target_frxperience planning.
   top_offender:
     lineage:
       - datalake_gsheets_raw.target_frxperience.top_offender
+    description: Value from the Google Sheets source column mapped to top_offender for target_frxperience planning.
   client_type:
     lineage:
       - datalake_gsheets_raw.target_frxperience.client_type
+    description: Value from the Google Sheets source column mapped to client_type for target_frxperience planning.
   metric_name:
     lineage:
       - datalake_gsheets_raw.target_frxperience.metric_name
+    description: Human-readable metric name used in dashboards and operational reports.
   target:
     lineage:
       - datalake_gsheets_raw.target_frxperience.value
+    description: Value from the Google Sheets source column mapped to target for target_frxperience planning.
   metric_type:
     lineage:
       - datalake_gsheets_raw.target_frxperience.metric_type
+    description: Value from the Google Sheets source column mapped to metric_type for target_frxperience planning.
   quarter:
     lineage:
       - datalake_gsheets_raw.target_frxperience.quarter
+    description: Value from the Google Sheets source column mapped to quarter for target_frxperience planning.
   dt_target:
     lineage:
       - datalake_gsheets_raw.target_frxperience.date_ref
+    description: Calendar date associated with target in the business process.

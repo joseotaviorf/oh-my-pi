@@ -1,26 +1,38 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: service_city_holidays
+description:
+  Reference city holiday calendars affecting SLA calculations curated in
+  Google Sheets by the Support and Services team. One row per service city
+  holidays entry used to calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_city:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.id_city
+    description: Identifier for the city referenced by this record.
   category:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.Categoria
+    description: Value from the Google Sheets source column mapped to category for service_city_holidays planning.
   city:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.Cidade
+    description: Value from the Google Sheets source column mapped to city for service_city_holidays planning.
   description:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.Feriado_Nome
+    description: Free-text body describing the customer issue, task context, or field help text.
   regional:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.Regional
+    description: Value from the Google Sheets source column mapped to regional for service_city_holidays planning.
   state:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.Estado
+    description: Value from the Google Sheets source column mapped to state for service_city_holidays planning.
   dt_holiday:
     lineage:
       - datalake_gsheets_raw.service_city_holidays.Data
+    description: Calendar date associated with holiday in the business process.

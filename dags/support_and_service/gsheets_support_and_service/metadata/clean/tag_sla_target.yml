@@ -1,20 +1,29 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tag_sla_target
+description:
+  Reference SLA targets curated in Google Sheets by the Support and Services
+  team. One row per tag sla target entry used to calibrate dashboards and
+  operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   journey:
     lineage:
       - datalake_gsheets_raw.tag_sla_target.jornada
+    description: Value from the Google Sheets source column mapped to journey for tag_sla_target planning.
   tag:
     lineage:
       - datalake_gsheets_raw.tag_sla_target.tag
+    description: Value from the Google Sheets source column mapped to tag for tag_sla_target planning.
   sla:
     lineage:
       - datalake_gsheets_raw.tag_sla_target.sla
-  dt_start,:
-    lineage:
-      - datalake_gsheets_raw.tag_sla_target.data_inicio
+    description: Value from the Google Sheets source column mapped to sla for tag_sla_target planning.
   dt_end:
     lineage:
       - datalake_gsheets_raw.tag_sla_target.data_fim
+    description: Calendar date associated with end in the business process.
+  dt_start:
+    lineage: []
+    description: Calendar date associated with start in the business process.

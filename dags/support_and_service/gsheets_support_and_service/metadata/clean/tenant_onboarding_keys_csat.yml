@@ -1,16 +1,25 @@
 database_name: datalake_gsheets_clean
 table_name: tenant_onboarding_keys_csat
+description:
+  Reference CSAT survey score targets curated in Google Sheets by the Support
+  and Services team. One row per tenant onboarding keys csat entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   improvement_tags:
     lineage:
       - datalake_gsheets_raw.csat_chaves_onb_iq.tags
+    description: Value from the Google Sheets source column mapped to improvement_tags for tenant_onboarding_keys_csat planning.
   comments:
     lineage:
       - datalake_gsheets_raw.csat_chaves_onb_iq.comments
+    description: Value from the Google Sheets source column mapped to comments for tenant_onboarding_keys_csat planning.
   score:
     lineage:
       - datalake_gsheets_raw.csat_chaves_onb_iq.score
+    description: Value from the Google Sheets source column mapped to score for tenant_onboarding_keys_csat planning.
   ts_input:
     lineage:
       - datalake_gsheets_raw.csat_chaves_onb_iq.ts_input
+    description: Timestamp when input occurred according to the source system.

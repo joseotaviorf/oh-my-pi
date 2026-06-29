@@ -1,22 +1,33 @@
 database_name: datalake_gsheets_clean
 table_name: target_support_kpis
+description:
+  Reference operational KPI targets curated in Google Sheets by the Support
+  and Services team. One row per target support kpis entry used to calibrate
+  dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   metric_name:
     lineage:
       - datalake_gsheets_raw.target_support_kpis.metrica
+    description: Human-readable metric name used in dashboards and operational reports.
   team:
     lineage:
       - datalake_gsheets_raw.target_support_kpis.time
+    description: Value from the Google Sheets source column mapped to team for target_support_kpis planning.
   granularity:
     lineage:
       - datalake_gsheets_raw.target_support_kpis.granularidade
+    description: Value from the Google Sheets source column mapped to granularity for target_support_kpis planning.
   target:
     lineage:
       - datalake_gsheets_raw.target_support_kpis.target
+    description: Value from the Google Sheets source column mapped to target for target_support_kpis planning.
   dt_start:
     lineage:
       - datalake_gsheets_raw.target_support_kpis.inicio_vigencia
+    description: Calendar date associated with start in the business process.
   dt_end:
     lineage:
       - datalake_gsheets_raw.target_support_kpis.fim_vigencia
+    description: Calendar date associated with end in the business process.

@@ -1,40 +1,57 @@
 database_name: datalake_gsheets_clean
 table_name: target_ops
+description:
+  Reference operational KPI targets curated in Google Sheets by the Support
+  and Services team. One row per target ops entry used to calibrate dashboards
+  and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   date_type:
     lineage:
       - datalake_gsheets_raw.target_ops.date_type
+    description: Value from the Google Sheets source column mapped to date_type for target_ops planning.
   description:
     lineage:
       - datalake_gsheets_raw.target_ops.descricao
+    description: Free-text body describing the customer issue, task context, or field help text.
   index:
     lineage:
       - datalake_gsheets_raw.target_ops.indice_setor
+    description: Value from the Google Sheets source column mapped to index for target_ops planning.
   level:
     lineage:
       - datalake_gsheets_raw.target_ops.level
+    description: Value from the Google Sheets source column mapped to level for target_ops planning.
   journey:
     lineage:
       - datalake_gsheets_raw.target_ops.journey
+    description: Value from the Google Sheets source column mapped to journey for target_ops planning.
   sub_journey:
     lineage:
       - datalake_gsheets_raw.target_ops.subjorney
+    description: Value from the Google Sheets source column mapped to sub_journey for target_ops planning.
   channel:
     lineage:
       - datalake_gsheets_raw.target_ops.channel
+    description: Value from the Google Sheets source column mapped to channel for target_ops planning.
   team:
     lineage:
       - datalake_gsheets_raw.target_ops.team
+    description: Value from the Google Sheets source column mapped to team for target_ops planning.
   company:
     lineage:
       - datalake_gsheets_raw.target_ops.empresa
+    description: Value from the Google Sheets source column mapped to company for target_ops planning.
   metric_name:
     lineage:
       - datalake_gsheets_raw.target_ops.indicador
+    description: Human-readable metric name used in dashboards and operational reports.
   target:
     lineage:
       - datalake_gsheets_raw.target_ops.valor
+    description: Value from the Google Sheets source column mapped to target for target_ops planning.
   dt_target:
     lineage:
       - datalake_gsheets_raw.target_ops.date
+    description: Calendar date associated with target in the business process.

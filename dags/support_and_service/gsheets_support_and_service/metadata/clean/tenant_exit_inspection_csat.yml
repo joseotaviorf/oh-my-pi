@@ -3,7 +3,7 @@ database_name: datalake_gsheets_clean
 table_name: tenant_exit_inspection_csat
 description: The CSAT for exit inspections.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_contract:
     lineage:
@@ -16,11 +16,11 @@ columns:
   email:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_saida.email
-    description: User email.
+    description: Email address associated with the user or contact on this record.
   comment:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_saida.comment
-    description: CSAT optional comment.
+    description: Value from the Google Sheets source column mapped to comment for tenant_exit_inspection_csat planning.
   tags:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_saida.tags
