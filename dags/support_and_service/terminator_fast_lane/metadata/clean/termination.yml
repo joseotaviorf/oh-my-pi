@@ -3,7 +3,7 @@ table_name: termination
 description: The table from termination contracts. This table is updated every 30 minutes.
 
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -20,7 +20,7 @@ columns:
   id_current_step:
     lineage:
       - datalake_terminator_raw.termination.current_step_id
-    description: Current termination step.
+    description: Identifier for the current step referenced by this record.
   id_support_case:
     lineage:
       - datalake_terminator_raw.termination.support_case

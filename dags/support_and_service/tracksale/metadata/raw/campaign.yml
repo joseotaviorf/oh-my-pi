@@ -3,3 +3,4 @@ table_name: campaign
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Tracksale NPS campaign data. One row per campaign configuration exported from the Tracksale platform. Source system is Tracksale.
+columns: {}
