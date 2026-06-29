@@ -1,0 +1,204 @@
+database_name: datalake_crm_tasks_resolution
+table_name: tasks_resolution_history
+description:
+  One row per tasks resolution history in the internal CRM task platform used
+  by support analysts to manage customer journeys and operational workflows.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+columns:
+  id_task:
+    lineage:
+      - datalake_crm.tasks.id
+    description: Operational task identifier from the CRM platform linking events to a single work item.
+  id_action:
+    lineage:
+      - datalake_crm.task_status_histories.id
+      - datalake_crm.tasks_actions.id
+    description: CRM platform identifier for the action associated with this task.
+  id_user_action:
+    lineage:
+      - datalake_crm.task_status_histories.id_user_action
+      - datalake_crm.tasks_actions.id_user_action
+    description: CRM platform identifier for the user action associated with this task.
+  id_assignee:
+    lineage:
+      - datalake_crm.tasks.id_assignee
+    description: Zendesk user id of the agent currently assigned to the ticket.
+  id_house:
+    lineage:
+      - datalake_crm.tasks.id_house
+    description: CRM platform identifier for the house associated with this task.
+  id_rent_flow:
+    lineage:
+      - datalake_crm.tasks.id_rent_flow
+    description: CRM platform identifier for the rent flow associated with this task.
+  id_origin:
+    lineage:
+      - datalake_crm.tasks.id_origin
+    description: CRM platform identifier for the origin associated with this task.
+  id_opened_by:
+    lineage:
+      - datalake_crm.tasks.id_opened_by
+    description: CRM platform identifier for the opened by associated with this task.
+  id_tenant:
+    lineage:
+      - datalake_crm.tasks.id_tenant
+    description: CRM platform identifier for the tenant associated with this task.
+  id_negotiation:
+    lineage:
+      - datalake_crm.tasks.id_negotiation
+    description: CRM platform identifier for the negotiation associated with this task.
+  id_manager:
+    lineage:
+      - datalake_crm.tasks.id_manager
+    description: CRM platform identifier for the manager associated with this task.
+  id_owner:
+    lineage:
+      - datalake_crm.tasks.id_owner
+    description: CRM platform identifier for the owner associated with this task.
+  id_receiver:
+    lineage:
+      - datalake_crm.tasks.id_receiver
+    description: CRM platform identifier for the receiver associated with this task.
+  id_workgroup:
+    lineage:
+      - datalake_crm.tasks.id_workgroup
+    description: CRM platform identifier for the workgroup associated with this task.
+  task_status:
+    lineage:
+      - datalake_crm.task_status_histories.task_status
+    description: Current lifecycle status of the scheduled call task in the telephony orchestration system.
+  action_reason:
+    lineage:
+      - datalake_crm.task_status_histories.action_reason
+    description: CRM task attribute describing action reason for support workflow tracking.
+  action_user_name:
+    lineage:
+      - datalake_crm.task_status_histories.action_user_name
+      - datalake_crm.tasks_actions.action_user_name
+    description: Human-readable action user name used in dashboards and operational reports.
+  action_type:
+    lineage:
+      - datalake_crm.task_status_histories.action_type
+      - datalake_crm.tasks_actions.action_type
+    description: CRM task attribute describing action type for support workflow tracking.
+  type:
+    lineage:
+      - datalake_crm.tasks.type
+    description: Classification type assigned by the source platform for routing or reporting.
+  version:
+    lineage:
+      - datalake_crm.tasks.version
+    description: CRM task attribute describing version for support workflow tracking.
+  tags:
+    lineage:
+      - datalake_crm.tasks.tags
+    description: List of labels attached to the record for filtering and automation rules.
+  score:
+    lineage:
+      - datalake_crm.tasks.score
+    description: CRM task attribute describing score for support workflow tracking.
+  score_factor:
+    lineage:
+      - datalake_crm.tasks.score_factor
+    description: CRM task attribute describing score factor for support workflow tracking.
+  receiver_name:
+    lineage:
+      - datalake_crm.tasks.receiver_name
+    description: Human-readable receiver name used in dashboards and operational reports.
+  receiver_type:
+    lineage:
+      - datalake_crm.tasks.receiver_type
+    description: CRM task attribute describing receiver type for support workflow tracking.
+  task_comment:
+    lineage:
+      - datalake_crm.tasks.task_comment
+    description: CRM task attribute describing task comment for support workflow tracking.
+  origin:
+    lineage:
+      - datalake_crm.tasks.origin
+    description: Channel or product surface that initiated the IVR closed-history request.
+  description:
+    lineage:
+      - datalake_crm.tasks.description
+    description: Free-text body describing the customer issue, task context, or field help text.
+  phase:
+    lineage:
+      - datalake_crm.tasks.phase
+    description: CRM task attribute describing phase for support workflow tracking.
+  subject:
+    lineage:
+      - datalake_crm.tasks.subject
+    description: Human-readable subject line describing the CRM task purpose for agents and reporting.
+  visit_fup:
+    lineage:
+      - datalake_crm.tasks.visit_fup
+    description: CRM task attribute describing visit fup for support workflow tracking.
+  task_user_resolve_hours:
+    lineage:
+      - datalake_crm.task_status_histories.action_user_name
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+    description: CRM task attribute describing task user resolve hours for support workflow tracking.
+  is_resolved:
+    lineage:
+      - datalake_crm.tasks.is_resolved
+    description: Indicates whether resolved applies to this record.
+  ts_action:
+    lineage:
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+    description: Timestamp when action occurred according to the source system.
+  ts_previous_action:
+    lineage:
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+    description: Timestamp when previous action occurred according to the source system.
+  ts_next_action:
+    lineage:
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+    description: Timestamp when next action occurred according to the source system.
+  ts_created:
+    lineage:
+      - datalake_crm.tasks.ts_created
+    description: Timestamp when the record was first created in the upstream source system.
+  ts_start:
+    lineage:
+      - datalake_crm.tasks.ts_start
+    description: Timestamp when start occurred according to the source system.
+  ts_completed:
+    lineage:
+      - datalake_crm.tasks.ts_completed
+    description: Timestamp when completed occurred according to the source system.
+  dt_visit:
+    lineage:
+      - datalake_crm.tasks.dt_visit
+    description: Calendar date associated with visit in the business process.
+  ts_silenced_until:
+    lineage:
+      - datalake_crm.tasks.ts_silenced_until
+    description: Timestamp when silenced until occurred according to the source system.
+  ts_origin:
+    lineage:
+      - datalake_crm.tasks.ts_origin
+    description: Timestamp when origin occurred according to the source system.
+  ts_fup:
+    lineage:
+      - datalake_crm.tasks.ts_fup
+    description: Timestamp when fup occurred according to the source system.
+  year:
+    lineage:
+      - datalake_crm.task_status_histories.year
+      - datalake_crm.tasks_actions.year
+    description: Year partition derived from the source event timestamp for incremental loading.
+  month:
+    lineage:
+      - datalake_crm.task_status_histories.month
+      - datalake_crm.tasks_actions.month
+    description: Month partition derived from the source event timestamp for incremental loading.
+  day:
+    lineage:
+      - datalake_crm.task_status_histories.day
+      - datalake_crm.tasks_actions.day
+    description: Day partition derived from the source event timestamp for incremental loading.
