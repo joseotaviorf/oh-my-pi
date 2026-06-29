@@ -1,4 +1,4 @@
-database_name: dw_bpo_performance_views
+database_name: dw_bpo_performance
 table_name: twilio_chat_aht
 description: Twilio chat Average Handling Time (AHT) metrics for BPO performance reporting, measuring agent chat session duration and productivity. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 domain: Cross
