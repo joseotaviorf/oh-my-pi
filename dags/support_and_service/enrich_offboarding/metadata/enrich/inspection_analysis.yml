@@ -4,7 +4,7 @@ table_name: inspection_analysis
 description: Enrichment table that brings together information from inspection
   services sources to facilitate analyzes in this context.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_contract:
     description: Contract identification key.
@@ -20,7 +20,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
   dt_start_date:
-    description: Start date of the task.
+    description: Calendar date associated with start date in the business process.
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
   dt_completed_date:

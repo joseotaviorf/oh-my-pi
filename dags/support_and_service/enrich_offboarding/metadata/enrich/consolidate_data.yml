@@ -2,7 +2,7 @@ database_name: datalake_offboarding
 table_name: consolidate_data
 description: Table that consolidates offboarding information.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -45,7 +45,7 @@ columns:
   repair_cost:
     lineage:
       - datalake_offboarding.ongoing.repair_cost
-    description: Total repair cost.
+    description: Business value representing repair cost on the consolidate_data enrich dataset.
   frt_ldt_greater_than_0:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
@@ -94,11 +94,6 @@ columns:
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
       - datalake_offboarding.ongoing.dt_last_inspection_synched
     description: Lead Time in Days of the Terminated Lease Contract - Contract completion data, normally this is the day on which the exit inspection is synchronized as it is the day on which we are sure that the tenant has left the property.
-  ldt_an_vt2_Insp:
-    lineage:
-      - datalake_offboarding.inspection_analysis.dt_completed_date
-      - datalake_offboarding.ongoing.dt_last_inspection_synched
-    description: Lead Time in days for analysis and inspection of the second inspection.
   ldt_tf_an_vt2:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
@@ -268,3 +263,6 @@ columns:
     lineage:
       - datalake_offboarding.ongoing.ts_created_inspection
     description: Max timestamp created inspection.
+  ldt_an_vt2_insp:
+    lineage: []
+    description: Business value representing ldt an vt2 insp on the consolidate_data enrich dataset.

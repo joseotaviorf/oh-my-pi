@@ -7,7 +7,7 @@ description: >-
   Deduplicated to one mediation record per contract (most recent wins).
   Joined to terminations by contract and, when available, by termination ID.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_termination:
     lineage:

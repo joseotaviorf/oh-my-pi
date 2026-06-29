@@ -2,14 +2,14 @@ database_name: datalake_internal_chat
 table_name: agent_prospect_messages
 description: Messages exchanged between agent and prospect via Agents app
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_channel:
-    description: Channel ID from Twilio
+    description: Communication channel identifier used to route the message or call in the platform.
     lineage:
       - datalake_internal_chat_clean.internal_chat_messages.id_channel
   id_message:
-    description: Message ID from Twilio
+    description: Identifier for the message referenced by this record.
     lineage:
       - datalake_internal_chat_clean.internal_chat_messages.id_message
   id_user_sender:
@@ -25,11 +25,11 @@ columns:
   user_role_sender:
     description: If the user is an agent or a prospect
   message:
-    description: Message body
+    description: Business value representing message on the agent_prospect_messages enrich dataset.
     lineage:
       - datalake_internal_chat_clean.internal_chat_messages.message
   index:
-    description: Message index
+    description: Business value representing index on the agent_prospect_messages enrich dataset.
     lineage:
       - datalake_internal_chat_clean.internal_chat_messages.index
   ts_created:
@@ -38,3 +38,15 @@ columns:
       - datalake_internal_chat_clean.internal_chat_messages.ts_created
   ts_last_message:
     description: Timestamp of the last message
+  month:
+    description: Month partition for incremental loading and partition pruning.
+    lineage: []
+  year:
+    description: Year partition for incremental loading and partition pruning.
+    lineage: []
+  day:
+    description: Day partition for incremental loading and partition pruning.
+    lineage: []
+  chat_type:
+    description: Business value representing chat type on the agent_prospect_messages enrich dataset.
+    lineage: []

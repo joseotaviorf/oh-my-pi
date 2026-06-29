@@ -5,14 +5,14 @@ description:
   It consolidates each step that occurs during the termination of a contract, including
   termination data, output inspection, repairs, related customer support and NPS metrics.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_termination:
     description: Termination request identification code
     lineage:
       - datalake_terminator_clean.termination.id
   id_application_user:
-    description: Application user ID
+    description: Identifier for the application user referenced by this record.
     lineage:
       - datalake_terminator_clean.application_user.id_external
   id_contract:
@@ -76,7 +76,7 @@ columns:
       - datalake_tracksale.dispatch.status
       - datalake_casa_mineira_tracksale.dispatch.status
   contract_status:
-    description: Latest contract status
+    description: Business value representing contract status on the contract_termination enrich dataset.
     lineage:
       - datalake_ebdb_contract.contract.status
   customer_type:
@@ -120,7 +120,7 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.feedback
   next_property:
-    description: What will be the next property.
+    description: Business value representing next property on the contract_termination enrich dataset.
     categories:
       OTHER_REAL_ESTATE_AGENCY: ""
       DIRECTLY_WITH_OWNER: ""
@@ -151,7 +151,7 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.requested_by
   rescheduling_history:
-    description: Termination rescheduling history information
+    description: Business value representing rescheduling history on the contract_termination enrich dataset.
     lineage:
       - datalake_terminator_clean.termination.rescheduling_history
   status:
@@ -160,7 +160,7 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.status
   source:
-    description: Source of termination
+    description: Business value representing source on the contract_termination enrich dataset.
     categories:
       PWA: ""
       CRM: ""
@@ -186,11 +186,11 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.owner_keys_location
   utility_bill_info:
-    description: Voucher information
+    description: Business value representing utility bill info on the contract_termination enrich dataset.
     lineage:
       - datalake_terminator_clean.termination.utility_bill_info
   application_user_name:
-    description: Application client name
+    description: Human-readable application user name used in dashboards and operational reports.
     lineage:
       - datalake_terminator_clean.application_user.name
   application_user_email:
@@ -234,15 +234,15 @@ columns:
     lineage:
       - datalake_terminator_clean.utility_bill.type
   workflow_current_step:
-    description: Step of the current workflow that the termination is in
+    description: Business value representing workflow current step on the contract_termination enrich dataset.
     lineage:
       - datalake_terminator_clean.termination_workflow.current_step
   nps:
-    description: NPS score
+    description: Business value representing nps on the contract_termination enrich dataset.
   iq_nps:
-    description: IQ NPS score
+    description: Business value representing iq nps on the contract_termination enrich dataset.
   pp_nps:
-    description: PP NPS score
+    description: Business value representing pp nps on the contract_termination enrich dataset.
   repair_cost:
     description: Cost of Repair to be performed in the Offboarding process
     lineage:

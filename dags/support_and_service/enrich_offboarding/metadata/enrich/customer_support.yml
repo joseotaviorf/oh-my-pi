@@ -5,7 +5,7 @@ description:
   Enrichment table that aims to gather satisfaction information from the
   customer support context. The granularity of this table is the contract.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_contract:
     lineage:

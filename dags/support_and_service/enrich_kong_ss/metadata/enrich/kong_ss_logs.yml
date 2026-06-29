@@ -3,7 +3,7 @@ database_name: datalake_kong_ss
 table_name: kong_ss_logs
 description: S&S Access Logs, not considering warning and notice messages. Only magiclink, imoveis and crm logs.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   app:
     lineage:
@@ -20,7 +20,7 @@ columns:
   endpoint:
     lineage:
       - datalake_kong_clean.kong_logs.message
-    description: The endpoint requested.
+    description: HTTP endpoint path accessed through the Kong API gateway for support services.
   generic_endpoint:
     description: The endpoint generic form, such as api/contract/id.
   description:
@@ -30,7 +30,7 @@ columns:
   entity:
     lineage:
       - datalake_kong_clean.kong_logs.message
-    description: The endpoint entity.
+    description: Logical entity name extracted from the Kong access log for API traffic classification.
   entity_code:
     lineage:
       - datalake_kong_clean.kong_logs.message
@@ -42,7 +42,7 @@ columns:
   host:
     lineage:
       - datalake_kong_clean.kong_logs.message
-    description: The host address.
+    description: Hostname of the upstream service that handled the API request in the gateway log.
   ip_address:
     lineage:
       - datalake_kong_clean.kong_logs.message
@@ -62,11 +62,11 @@ columns:
   pod_name:
     lineage:
       - datalake_kong_clean.kong_logs.pod_name
-    description: The pod name.
+    description: Kubernetes pod name that served the API request for infrastructure troubleshooting.
   request_user:
     lineage:
       - datalake_kong_clean.kong_logs.message
-    description: The request user email.
+    description: Authenticated user identifier present in the Kong gateway access log entry.
   status_code:
     lineage:
       - datalake_kong_clean.kong_logs.message
@@ -78,7 +78,7 @@ columns:
   ts_event:
     lineage:
       - datalake_kong_clean.kong_logs.ts_event
-    description: The event time.
+    description: Timestamp when the API gateway recorded the HTTP request in the access log stream.
   year:
     lineage:
       - datalake_kong_clean.kong_logs.year
@@ -94,4 +94,4 @@ columns:
   hour:
     lineage:
       - datalake_kong_clean.kong_logs.hour
-    description: Partition column.
+    description: Hour-of-day bucket derived from the event timestamp for intraday traffic analysis.
