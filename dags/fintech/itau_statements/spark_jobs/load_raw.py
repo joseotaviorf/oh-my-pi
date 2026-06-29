@@ -186,9 +186,10 @@ if __name__ == "__main__":
     load_start_dt = datetime.strptime(load_start_date, "%Y-%m-%d")
     load_end_dt = datetime.strptime(load_end_date, "%Y-%m-%d")
 
-    date_range = (
-        pd.date_range(start=load_start_dt, end=load_end_date).to_pydatetime().tolist()
-    )
+    date_range = [
+        load_start_dt + timedelta(days=offset)
+        for offset in range((load_end_dt - load_start_dt).days + 1)
+    ]
 
     dfs = []
     for load_dt in date_range:

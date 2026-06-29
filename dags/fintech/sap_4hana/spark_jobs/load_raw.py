@@ -2,9 +2,8 @@ import ast
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
-import pandas as pd
 from pyspark.sql import functions as F
 from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
@@ -142,9 +141,10 @@ if __name__ == "__main__":
     load_start_dt = datetime.strptime(load_start_date, "%Y-%m-%d")
     load_end_dt = datetime.strptime(load_end_date, "%Y-%m-%d")
 
-    date_range = (
-        pd.date_range(start=load_start_dt, end=load_end_date).to_pydatetime().tolist()
-    )
+    date_range = [
+        load_start_dt + timedelta(days=offset)
+        for offset in range((load_end_dt - load_start_dt).days + 1)
+    ]
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(SparkClient())
