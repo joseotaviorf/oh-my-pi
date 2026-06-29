@@ -3,10 +3,13 @@ table_name: recs_impressions_processed
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  Table with ids, dimensions, metrics and timestamps related to recommendations.
+  One row per recommendation carousel impression enriched with house dimensions, experiment
+  variant assignments, and downstream funnel metrics (clicks, visits, offers, contracts) within
+  a 30-day window. Core dataset for recommendation health and A/B experiment analysis on the
+  Conversational XP team. Partitioned by year/month/day for efficient time-range queries.
 columns:
   ids:
-    description: A json with all relevant ids for recommendations analysis. Ex. id_user, id_house, id_recset, id_amplitude, ...
+    description: "JSON object with identifier keys used to join and deduplicate records: id_recset, id_recset_fix, id_house, id_user, id_session, id_amplitude, and id_device."
     lineage:
       - datalake_search.recs_impressions.recset_id
       - datalake_search.recs_impressions.recset_id_fix
@@ -16,7 +19,7 @@ columns:
       - datalake_search.recs_impressions.id_amplitude
       - datalake_search.recs_impressions.id_device
   dimensions:
-    description: A json with all relevant dimensions for recommendations analysis. Ex. business_context, city, ...
+    description: "JSON object with analysis dimensions: business_context, city, platform, position, showcase, listing_age (days since publication), is_classified, and is_outlier_user."
     lineage:
       - datalake_search.recs_impressions.business_context
       - datalake_search.recs_impressions.platform
@@ -28,13 +31,13 @@ columns:
       - datalake_search.rent_outlier_users_past_30_days.id_user
       - datalake_search.sale_outlier_users_past_30_days.id_user
   variants:
-    description: A json mapping `experiment_name` to `variant` the user was on that recommendation.
+    description: "JSON object mapping each active experiment_name to the variant_standard_name assigned to the user at recommendation time."
     lineage:
       - datalake_search.recs_impressions.user_properties
       - datalake_search.experiment_config_processed.experiment_name
       - datalake_search.experiment_config_processed.variant_standard_name
   metrics:
-    description: A json with all relevant metrics for recommendations analysis. Ex. clicks, offer, visit_completed
+    description: "JSON object with binary funnel metrics per impression: recommendations, click, offer, direct_offer, offer_submitted, offer_approved, visit_booked, visit_completed, and contract_signed."
     lineage:
       - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
       - datalake_search.rent_flow_past_30_days.ts_offer
@@ -50,7 +53,7 @@ columns:
       - datalake_search.sale_flow_past_30_days.ts_visit_completed
       - datalake_search.sale_flow_past_30_days.ts_contract_signed
   timestamps:
-    description: A json with all relevant timestamps
+    description: "JSON object with event timestamps used in attribution windows: ts_recommendation, ts_house_published, ts_offer, ts_direct_offer, ts_offer_submitted, ts_offer_approved, ts_visit_booked, ts_visit_completed, and ts_contract_signed."
     lineage:
       - datalake_search.recs_impressions.ts_recommendation
       - datalake_search.house_publication_dates.ts_house_published

@@ -3,14 +3,17 @@ table_name: sale_flow_past_30_days
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  This is intermediate table to help process datasets and metrics
+  Intermediate staging table. One row per user-house pair with the most recent sale flow
+  timestamps over the past 30 days (booking, visit, offer, contract). Feeds search_impressions
+  to enable experiment funnel metrics for the sale business context.
+  Z-ordered by [id_user, id_house] for efficient joins.
 columns:
   id_user:
-    description: The id of the user.
+    description: QuintoAndar buyer ID identifying the user in the sale funnel.
     lineage:
       - datalake_sale_flows.sale_flow.id_buyer
   id_house:
-    description: The id of the house.
+    description: QuintoAndar property identifier for the house involved in the sale flow event.
     lineage:
       - datalake_sale_flows.sale_flow.id_house
   ts_visit_booked:
@@ -34,7 +37,7 @@ columns:
     lineage:
       - datalake_sale_flows.sale_flow.dt_first_offer_accepted
   ts_sale_flow_latest_event:
-    description: The latest event in the sale flow.
+    description: Timestamp of the most recent event for this user-house pair across all sale flow stages, used to filter the rolling 30-day window.
     lineage:
       - datalake_sale_flows.sale_flow.ts_first_booking_created
       - datalake_sale_flows.sale_flow.ts_first_visit_completed

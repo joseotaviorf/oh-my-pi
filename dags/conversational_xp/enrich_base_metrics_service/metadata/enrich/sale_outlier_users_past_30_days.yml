@@ -7,7 +7,7 @@ description: |
   These should be identified as outliers and removed from AB test metrics.
 columns:
   id_user:
-    description: The id of the user.
+    description: QuintoAndar buyer ID for a user classified as high-activity outlier in the sale flow over the past 30 days.
     lineage:
       - datalake_sale_flows.sale_flow.id_buyer
   total_bookings:

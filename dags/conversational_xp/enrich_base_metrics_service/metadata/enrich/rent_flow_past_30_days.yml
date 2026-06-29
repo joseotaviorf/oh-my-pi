@@ -3,14 +3,17 @@ table_name: rent_flow_past_30_days
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  This is intermediate table to help process datasets and metrics
+  Intermediate staging table. One row per user-house pair with the most recent rental flow
+  timestamps over the past 30 days (booking, visit, offer, contract). Feeds search_impressions
+  to enable experiment funnel metrics for the rent business context.
+  Z-ordered by [id_user, id_house] for efficient joins.
 columns:
   id_user:
-    description: The id of the user.
+    description: QuintoAndar tenant prospect ID identifying the user in the rental funnel.
     lineage:
       - datalake_rent_flows.rent_flows.id_tenant_prospect
   id_house:
-    description: The id of the house.
+    description: QuintoAndar property identifier for the house involved in the rental flow event.
     lineage:
       - datalake_rent_flows.rent_flows.id_house
   ts_visit_booked:
@@ -43,7 +46,7 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.ts_offer_approved
   ts_rent_flow_latest_event:
-    description: The latest event in the rent flow.
+    description: Timestamp of the most recent event for this user-house pair across all rent flow stages, used to filter the rolling 30-day window.
     lineage:
       - datalake_rent_flows.rent_flows.ts_booking_created
       - datalake_rent_flows.rent_flows.ts_visit_completed

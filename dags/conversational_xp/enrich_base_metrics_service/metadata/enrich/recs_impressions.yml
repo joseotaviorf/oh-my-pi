@@ -3,7 +3,9 @@ table_name: recs_impressions
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  Table with ids, dimensions, metrics and timestamps related to user and house global metrics datasets.
+  One row per house impression within a recommendation carousel (recset_impression or recset_viewed
+  Amplitude events). Raw foundation for computing recommendation click-through rate and conversion
+  metrics. Partitioned by year/month/day (datalake ingestion date).
 columns:
   recset_id:
     description: The id os the recommendation shown
@@ -20,27 +22,27 @@ columns:
       - datalake_amplitude_clean.170698_recset_viewed_events.id_user
       - datalake_amplitude_clean.170698_recset_viewed_events.id_session
   id_user:
-    description: The id of the user
+    description: QuintoAndar user identifier tied to the recommendation event when the user is authenticated.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.id_user
       - datalake_amplitude_clean.170698_recset_viewed_events.id_user
   id_session:
-    description: The id of the session
+    description: Amplitude session ID during which the recommendation carousel was shown.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.id_session
       - datalake_amplitude_clean.170698_recset_viewed_events.id_session
   id_amplitude:
-    description: Amplitude id
+    description: Unique user identifier assigned by Amplitude. Applies to both logged-in and anonymous users.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.id_amplitude
       - datalake_amplitude_clean.170698_recset_viewed_events.id_amplitude
   id_device:
-    description: The id of the device
+    description: Amplitude device identifier for the device on which the recommendation carousel was shown.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.id_device
       - datalake_amplitude_clean.170698_recset_viewed_events.id_device
   id_house:
-    description: The id of the house
+    description: QuintoAndar property identifier for the house shown within the recommendation carousel.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.event_properties
       - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
@@ -50,7 +52,7 @@ columns:
       - datalake_amplitude_clean.170698_recset_impression_events.event_properties
       - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
   business_context:
-    description: The business context.
+    description: "Business context determining whether the recommendation is for rental or sale. Values: RENT, SALE."
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.event_properties
       - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
@@ -75,17 +77,17 @@ columns:
       - datalake_amplitude_clean.170698_recset_impression_events.ts_event
       - datalake_amplitude_clean.170698_recset_viewed_events.ts_event
   year:
-    description: The year of the recommendations event
+    description: Partition column. Year when the event was ingested into the datalake. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.year
       - datalake_amplitude_clean.170698_recset_viewed_events.year
   month:
-    description: The month of the recommendations event
+    description: Partition column. Month when the event was ingested into the datalake. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.month
       - datalake_amplitude_clean.170698_recset_viewed_events.month
   day:
-    description: The day of the recommendations event
+    description: Partition column. Day when the event was ingested into the datalake. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_recset_impression_events.day
       - datalake_amplitude_clean.170698_recset_viewed_events.day

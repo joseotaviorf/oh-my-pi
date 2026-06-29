@@ -7,7 +7,7 @@ description: |
   These should be identified as outliers and removed from AB test metrics.
 columns:
   id_user:
-    description: The id of the user.
+    description: QuintoAndar tenant prospect ID for a user classified as high-activity outlier in the rental flow over the past 30 days.
     lineage:
       - datalake_rent_flows.rent_flows.id_tenant_prospect
   total_bookings:

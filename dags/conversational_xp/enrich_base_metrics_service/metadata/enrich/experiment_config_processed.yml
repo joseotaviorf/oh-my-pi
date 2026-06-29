@@ -3,10 +3,12 @@ table_name: experiment_config_processed
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  This table has the configuration of the experiments.
+  One row per variant of each A/B experiment deployed on the search/recommendations platform.
+  Flattened from the raw experiment_config JSON so that each variant (control, treatment) is a
+  separate row, enabling direct joins with search impression events for experiment analysis.
 columns:
   experiment_name:
-    description: The name of the experiment.
+    description: Name identifying the A/B or feature experiment, used to join with search impression events and determine which variant a user was shown.
     lineage:
       - datalake_search.experiment_config.experiment_name
   begin_date:
@@ -14,11 +16,11 @@ columns:
     lineage:
       - datalake_search.experiment_config.config.begin_date
   end_date:
-    description: The end date of the experiment.
+    description: Calendar date after which the experiment stopped receiving new traffic allocations.
     lineage:
       - datalake_search.experiment_config.config.end_date
   variant_name:
-    description: The name of the variant (0 or 1)
+    description: Raw variant identifier from the experiment configuration, typically '0' (control) or '1' (treatment).
     lineage:
       - datalake_search.experiment_config.config.variants
   variant_standard_name:

@@ -62,17 +62,17 @@ columns:
       - datalake_search.search_impressions.date
       - datalake_search.house_publication_dates.ts_house_published
   year:
-    description: The year of a user interaction with a search.
+    description: Partition column. Year of the search interaction. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_search.search_impressions.year
       - datalake_search.house_publication_dates.ts_house_published
   month:
-    description: The month of a user interaction with a search.
+    description: Partition column. Month of the search interaction. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_search.search_impressions.month
       - datalake_search.house_publication_dates.ts_house_published
   day:
-    description: The day of a user interaction with a search.
+    description: Partition column. Day of the search interaction. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_search.search_impressions.day
       - datalake_search.house_publication_dates.ts_house_published

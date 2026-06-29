@@ -3,15 +3,17 @@ table_name: house_publication_dates
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  This table holds the publication date for each id house
+  One row per house-business_context combination holding the first publication date for each
+  property on QuintoAndar's marketplace. Used by search_impressions to derive listing age at the
+  time of a search event. Z-ordered by [id_house, business_context] for efficient joins.
 columns:
   id_house:
-    description: The id of house
+    description: QuintoAndar property identifier shared by the house across rent and sale business contexts.
     lineage:
       - dw_rent.fact_house_listing_status.sk_house_listing
       - dw_sale.fact_listing_status.sk_sale_listing
   business_context:
-    description: the business context of the house.
+    description: Business context of the listing, either RENT or SALE, indicating which marketplace the publication date applies to.
     lineage:
       - dw_rent.fact_house_listing_status
       - dw_sale.fact_listing_status

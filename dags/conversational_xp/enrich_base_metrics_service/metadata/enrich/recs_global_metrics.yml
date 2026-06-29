@@ -57,15 +57,15 @@ columns:
     lineage:
       - datalake_search.recs_impressions_processed.date
   year:
-    description: The year of a user interaction with a recommendation.
+    description: Partition column. Year of the recommendation interaction. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_search.recs_impressions_processed.year
   month:
-    description: The month of a user interaction with a recommendation.
+    description: Partition column. Month of the recommendation interaction. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_search.recs_impressions_processed.month
   day:
-    description: The day of a user interaction with a recommendation.
+    description: Partition column. Day of the recommendation interaction. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_search.recs_impressions_processed.day
   week:

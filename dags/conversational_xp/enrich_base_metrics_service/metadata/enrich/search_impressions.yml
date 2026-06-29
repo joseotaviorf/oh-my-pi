@@ -3,7 +3,11 @@ table_name: search_impressions
 owner: pedro.nogueira@quintoandar.com.br
 domain: Conversational XP
 description: |
-  Table with ids, dimensions, metrics and timestamps related to search.
+  One row per search event (search_page_viewed or search_results_page_viewed Amplitude events)
+  enriched with house dimensions, experiment variant assignments, and downstream funnel metrics
+  (clicks, visits, offers, contracts) within a 30-day window. Core dataset for search health and
+  A/B experiment analysis on the Conversational XP team. Partitioned by year/month/day for
+  efficient time-range queries.
 columns:
   ids:
     description: A json with all relevant ids for search analysis. Ex. id_user, id_house, id_search, id_amplitude, ...
@@ -82,17 +86,17 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
   year:
-    description: The year of the search.
+    description: Partition column. Year of the search event. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
   month:
-    description: The month of the search.
+    description: Partition column. Month of the search event. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
   day:
-    description: The day of the search.
+    description: Partition column. Day of the search event. Always filter on year/month/day for partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
