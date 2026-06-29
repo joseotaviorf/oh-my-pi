@@ -3,20 +3,20 @@ database_name: datalake_gsheets_clean
 table_name: tool_access_mapping
 description: Tool Access Mapping for atento agents.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   name:
     lineage:
       - datalake_gsheets_raw.tool_access_mapping.complete_name
-    description: Agent name.
+    description: Display name of the entity as registered in the upstream operational application.
   email:
     lineage:
       - datalake_gsheets_raw.tool_access_mapping.email
-    description: Agent email.
+    description: Email address associated with the user or contact on this record.
   team:
     lineage:
       - datalake_gsheets_raw.tool_access_mapping.team
-    description: Agent team.
+    description: Value from the Google Sheets source column mapped to team for tool_access_mapping planning.
   front_or_back:
     lineage:
       - datalake_gsheets_raw.tool_access_mapping.front_or_back

@@ -4,3 +4,4 @@ table_name: csat_reembolso_true
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Google Sheet data for TRUE reimbursement CSAT survey responses. Contains PII — access restricted.
+columns: {}

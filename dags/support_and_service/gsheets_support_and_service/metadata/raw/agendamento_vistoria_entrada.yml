@@ -8,9 +8,12 @@ columns:
   bairro:
     tags:
       - Restricted
+    description: Value from the Google Sheets source column mapped to bairro for agendamento_vistoria_entrada planning.
   cidade:
     tags:
       - Restricted
+    description: Value from the Google Sheets source column mapped to cidade for agendamento_vistoria_entrada planning.
   regiao:
     tags:
       - Restricted
+    description: Value from the Google Sheets source column mapped to regiao for agendamento_vistoria_entrada planning.

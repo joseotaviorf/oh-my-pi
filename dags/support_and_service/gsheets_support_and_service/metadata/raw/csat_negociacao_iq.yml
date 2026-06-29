@@ -8,3 +8,4 @@ columns:
     tags:
       - PII
       - Confidential
+    description: Value from the Google Sheets source column mapped to token for csat_negociacao_iq planning.

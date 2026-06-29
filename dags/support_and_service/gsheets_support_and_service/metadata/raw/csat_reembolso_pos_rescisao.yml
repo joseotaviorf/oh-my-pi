@@ -1,4 +1,10 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: csat_reembolso_pos_rescisao
+description:
+  Reference CSAT survey score targets curated in Google Sheets by the Support
+  and Services team. One row per csat reembolso pos rescisao entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
+columns: {}

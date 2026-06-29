@@ -3,3 +3,4 @@ table_name: call_inapp_users
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Google Sheet data for users enrolled in the in-app call experiment.
+columns: {}
