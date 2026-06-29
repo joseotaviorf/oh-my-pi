@@ -1,93 +1,90 @@
-database_name: metric_ss
+database_name: metric_metric_ss__segments
 table_name: transfers
 description: This table contains Transfer Rate KPI with target per many dimensions.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   channel:
     description: Identify the channel for this ticket (call, chat, email).
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.fact_tickets.channel
+    - dw_customer_support.fact_customer_contacts.channel
   journey:
-    description: Journey of the ticket.
-    dimension: True
+    description: Customer journey associated with the transferred interaction segment.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.journey
+    - dw_customer_support.dim_department.journey
   journey_step:
     description: Department journey step.
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.journey_step
+    - dw_customer_support.dim_department.journey_step
   board:
-    description: Department board.
-    dimension: True
+    description: Support operations board that owns the transferred interaction.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.board
+    - dw_customer_support.dim_department.board
   department:
-    description: Department name.
-    dimension: True
+    description: Support department that handled the transferred interaction.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.department
+    - dw_customer_support.dim_department.department
   team:
-    description: Department team.
-    dimension: True
+    description: Support team that handled the transferred interaction.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.team
+    - dw_customer_support.dim_department.team
   area:
     description: Department area (e.g. CX).
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.area
+    - dw_customer_support.dim_department.area
   customer_type:
-    description: Client type Note - This field does not belong to the taxonomy defined on Central Ops.
-    dimension: True
+    description: Client type Note - This field does not belong to the taxonomy defined
+      on Central Ops.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_taxonomy.customer_type
-  amount_interaction:
+    - dw_customer_support.dim_taxonomy.customer_type
+  amount_interactions:
     metric:
-      name: DSAT Amount interaction
-      description:
-        Sum of interaction responses, considering the following business rules
-        WHEN status = 'TRANSFERRED'
-        AND is_first_department_interaction = True
-        AND transferred_to_team <> 'Inside Sales'
-        AND channel IN ('call', 'chat')
-        AND area = 'CX'
-        AND front_or_back = 'front'
-      acronym: Amount interaction
-      is_additive: True
+      name: Transfer Amount interactions
+      description: Sum of transferred interactions, considering the following business
+        rules WHEN status = 'TRANSFERRED' AND is_first_department_interaction = True
+        AND transferred_to_team <> 'Inside Sales' AND channel IN ('call', 'chat')
+        AND area = 'CX' AND front_or_back = 'front'
+      acronym: Amount interactions
+      is_additive: true
       business_stage: CX
       hierarchy: User analisys
       approved_by: vicente.neto@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
+    description: Count of transferred interactions for front CX call and chat contacts.
   amount_contacts:
     metric:
       name: DSAT Amount Contacts
-      description: Total Contacts, considering the following business rules
-        WHEN channel IN ('call', 'chat')
-        AND area = 'CX'
-        AND front_or_back = 'front
+      description: Total Contacts, considering the following business rules WHEN channel
+        IN ('call', 'chat') AND area = 'CX' AND front_or_back = 'front
       acronym: Amount Contacts
-      is_additive: True
+      is_additive: true
       business_stage: CX
       hierarchy: User analisys
       approved_by: vicente.neto@quintoandar.com.br
-      link_to_metric: ""
-  dsat_rate:
+      link_to_metric: ''
+    description: Count of distinct front CX call and chat contacts in the segment.
+  transfer_rate:
     metric:
       name: Transfer Rate
-      description:
-        Semi-additive metrics representing the Transfer rate. Calculated by the formula
-        (Amount interaction / Amount Contacts) * 100
+      description: Semi-additive metrics representing the Transfer rate. Calculated
+        by the formula (Amount interactions / Amount Contacts) * 100
       acronym: Transfer Rate
-      is_additive: False
+      is_additive: false
       business_stage: CX
       hierarchy: User analisys
       approved_by: vicente.neto@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
+    description: Transfer rate calculated as amount_interactions divided by amount_contacts.
   dt_segment_created:
     description: The responsed transfer date.
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.fact_customer_contacts.ts_created
+    - dw_customer_support.fact_customer_contacts.ts_created
