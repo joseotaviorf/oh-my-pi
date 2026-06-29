@@ -72,6 +72,9 @@ bietlejuice.dw_customer_support:
   remove:
     - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics:first-run-of-day
     - bietlejuice.enrich_chatbot:load-enrich-messages:first-run-of-day
+    - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets:first-run-of-day
 bietlejuice.dw_customer_support_view:
   remove:
     - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
@@ -632,6 +635,8 @@ bietlejuice.enrich_nps_answer_drivers:
 bietlejuice.enrich_offboarding:
   add:
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house:first-run-of-day
+  remove:
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
 bietlejuice.enrich_offer:
   remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
@@ -697,6 +702,9 @@ bietlejuice.enrich_repairs:
     - bietlejuice.repairs:load-clean-repair-expense-group:first-run-of-day
     - bietlejuice.repairs:load-clean-repair-request-item:first-run-of-day
     - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
+    - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets:first-run-of-day
 bietlejuice.enrich_reverses_monitoring:
   add:
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
@@ -847,6 +855,8 @@ bietlejuice.enrich_sap_accounting_process:
 bietlejuice.enrich_satisfaction_rating:
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+    - bietlejuice.zendesk:load-clean-satisfaction-ratings:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
 bietlejuice.enrich_seo_funnel:
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
@@ -1431,3 +1441,31 @@ bietlejuice.dw_support_journey:
   add:
     - bietlejuice.core_support_journey:load_core_support_journey_cases
     - bietlejuice.core_support_journey:load_core_support_journey_services
+bietlejuice.dw_performance_rent:
+  remove:
+    - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
+bietlejuice.dw_repairs:
+  remove:
+    - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+bietlejuice.enrich_amplitude_magic_link:
+  remove:
+    - bietlejuice.zendesk:load-clean-groups:first-run-of-day
+    - bietlejuice.zendesk:load-clean-users:first-run-of-day
+bietlejuice.enrich_customer_support:
+  remove:
+    - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+bietlejuice.enrich_support_users:
+  remove:
+    - bietlejuice.zendesk:load-clean-organizations:first-run-of-day
+    - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
+    - bietlejuice.zendesk:load-clean-users:first-run-of-day
+bietlejuice.enrich_listing_jobs:
+  remove:
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+bietlejuice.enrich_ongoing_terminations_snapshot:
+  remove:
+    - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+bietlejuice.enrich_zendesk:
+  override: []
