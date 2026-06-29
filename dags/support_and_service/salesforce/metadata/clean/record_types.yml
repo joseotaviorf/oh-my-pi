@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: record_types
 description: Clean table for ingesting record type data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_record_type:
     lineage:
@@ -23,7 +23,7 @@ columns:
   record_type_name:
     lineage:
       - datalake_salesforce_raw.record_types.Name
-    description: Name of the record type.
+    description: Human-readable record type name used in dashboards and operational reports.
   developer_name:
     lineage:
       - datalake_salesforce_raw.record_types.DeveloperName
@@ -35,7 +35,7 @@ columns:
   record_type_description:
     lineage:
       - datalake_salesforce_raw.record_types.Description
-    description: Description of the record type.
+    description: Business value representing record type description on the record_types clean dataset.
   sobject_type:
     lineage:
       - datalake_salesforce_raw.record_types.SobjectType

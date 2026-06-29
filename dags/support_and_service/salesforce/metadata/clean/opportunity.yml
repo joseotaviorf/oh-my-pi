@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: opportunity
 description: Clean table for ingesting opportunity data from the Sales Force tool.
 domain: Support and Services
-owner: thiago.bueno@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_opportunity:
     lineage:
@@ -71,11 +71,11 @@ columns:
   opportunity_name:
     lineage:
       - datalake_salesforce_raw.opportunity.Name
-    description: Name of the opportunity.
+    description: Human-readable opportunity name used in dashboards and operational reports.
   opportunity_type:
     lineage:
       - datalake_salesforce_raw.opportunity.Type
-    description: Type of the opportunity.
+    description: Business value representing opportunity type on the opportunity clean dataset.
   stage_name:
     lineage:
       - datalake_salesforce_raw.opportunity.StageName
@@ -103,11 +103,11 @@ columns:
   fs_account_name:
     lineage:
       - datalake_salesforce_raw.opportunity.FS_AccountName__c
-    description: For Sale account name.
+    description: Human-readable fs account name used in dashboards and operational reports.
   fs_seller_name:
     lineage:
       - datalake_salesforce_raw.opportunity.FS_SellerName__c
-    description: For Sale seller name.
+    description: Human-readable fs seller name used in dashboards and operational reports.
   fs_credit_form_link:
     lineage:
       - datalake_salesforce_raw.opportunity.FS_CreditFormLink__c
@@ -155,7 +155,7 @@ columns:
   description:
     lineage:
       - datalake_salesforce_raw.opportunity.Description
-    description: Description of the opportunity.
+    description: Free-text body describing the customer issue, task context, or field help text.
   amount:
     lineage:
       - datalake_salesforce_raw.opportunity.Amount
@@ -163,7 +163,7 @@ columns:
   expected_revenue:
     lineage:
       - datalake_salesforce_raw.opportunity.ExpectedRevenue
-    description: Expected revenue from the opportunity.
+    description: Business value representing expected revenue on the opportunity clean dataset.
   probability:
     lineage:
       - datalake_salesforce_raw.opportunity.Probability
@@ -240,4 +240,3 @@ columns:
     lineage:
       - datalake_salesforce_raw.opportunity.day
     description: Day of the case history record partition.
-

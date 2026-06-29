@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: email_message
 description: Clean table for ingesting email message data from the Sales Force tool. Contains email communications including headers, body, addresses, and tracking information.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_email_message:
     lineage:
@@ -43,11 +43,11 @@ columns:
   html_body:
     lineage:
       - datalake_salesforce_raw.email_message.HtmlBody
-    description: HTML body of the email message.
+    description: Business value representing html body on the email_message clean dataset.
   headers:
     lineage:
       - datalake_salesforce_raw.email_message.Headers
-    description: Email headers.
+    description: Business value representing headers on the email_message clean dataset.
   subject:
     lineage:
       - datalake_salesforce_raw.email_message.Subject
@@ -79,7 +79,7 @@ columns:
   email_status:
     lineage:
       - datalake_salesforce_raw.email_message.Status
-    description: Status of the email message.
+    description: Business value representing email status on the email_message clean dataset.
   message_identifier:
     lineage:
       - datalake_salesforce_raw.email_message.MessageIdentifier

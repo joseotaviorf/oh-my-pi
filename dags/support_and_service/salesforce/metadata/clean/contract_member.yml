@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: contract_member
 description: Clean table for ingesting contract member data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_contract_member:
     lineage:
@@ -35,11 +35,11 @@ columns:
   contract_member_name:
     lineage:
       - datalake_salesforce_raw.contractmember.Name
-    description: Name of the contract member.
+    description: Human-readable contract member name used in dashboards and operational reports.
   contract_member_type:
     lineage:
       - datalake_salesforce_raw.contractmember.Type
-    description: Type of contract member.
+    description: Business value representing contract member type on the contract_member clean dataset.
   is_deleted:
     lineage:
       - datalake_salesforce_raw.contractmember.IsDeleted
@@ -56,3 +56,12 @@ columns:
     lineage:
       - datalake_salesforce_raw.contractmember.LastModifiedDate
     description: Timestamp of the last modification.
+  month:
+    lineage: []
+    description: Month partition for incremental loading and partition pruning.
+  year:
+    lineage: []
+    description: Year partition for incremental loading and partition pruning.
+  day:
+    lineage: []
+    description: Day partition for incremental loading and partition pruning.

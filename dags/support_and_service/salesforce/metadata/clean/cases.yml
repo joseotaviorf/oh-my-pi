@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: cases
 description: Clean table for ingesting cases data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_case:
     lineage:
@@ -99,7 +99,7 @@ columns:
   case_type:
     lineage:
       - datalake_salesforce_raw.case.Type
-    description: Type of case.
+    description: Business value representing case type on the cases clean dataset.
   case_status:
     lineage:
       - datalake_salesforce_raw.case.Status
@@ -107,11 +107,11 @@ columns:
   case_reason:
     lineage:
       - datalake_salesforce_raw.case.Reason
-    description: Reason for the case.
+    description: Business value representing case reason on the cases clean dataset.
   case_origin:
     lineage:
       - datalake_salesforce_raw.case.Origin
-    description: Origin of the case.
+    description: Business value representing case origin on the cases clean dataset.
   case_language:
     lineage:
       - datalake_salesforce_raw.case.Language
@@ -119,7 +119,7 @@ columns:
   case_subject:
     lineage:
       - datalake_salesforce_raw.case.Subject
-    description: Subject of the case.
+    description: Business value representing case subject on the cases clean dataset.
   case_priority:
     lineage:
       - datalake_salesforce_raw.case.Priority
@@ -127,7 +127,7 @@ columns:
   case_description:
     lineage:
       - datalake_salesforce_raw.case.Description
-    description: Description of the case.
+    description: Business value representing case description on the cases clean dataset.
   milestone_status:
     lineage:
       - datalake_salesforce_raw.case.MilestoneStatus
@@ -219,11 +219,11 @@ columns:
   buyer_current_onboarding_contact:
     lineage:
       - datalake_salesforce_raw.case.BYCurrentOnboardingContact__c
-    description: Buyer current onboarding contact.
+    description: Business value representing buyer current onboarding contact on the cases clean dataset.
   comments:
     lineage:
       - datalake_salesforce_raw.case.Comments
-    description: Comments on the case.
+    description: Business value representing comments on the cases clean dataset.
   contact_success:
     lineage:
       - datalake_salesforce_raw.case.ContactSuccess__c
@@ -251,7 +251,7 @@ columns:
   dt_fs_dd_accepted_date:
     lineage:
       - datalake_salesforce_raw.case.FS_DDAcceptedDate__c
-    description: FS DD accepted date.
+    description: Calendar date associated with fs dd accepted date in the business process.
   dt_fs_pds_subscription_scheduling:
     lineage:
       - datalake_salesforce_raw.case.FS_PDSL_SubscriptionSchedulingDate__c
@@ -259,7 +259,7 @@ columns:
   dt_fs_return_date:
     lineage:
       - datalake_salesforce_raw.case.FS_ReturnDate__c
-    description: FS return date.
+    description: Calendar date associated with fs return date in the business process.
   dt_fs_seller_key_delivery:
     lineage:
       - datalake_salesforce_raw.case.FS_SL_KeyDeliveryDate__c
@@ -271,19 +271,19 @@ columns:
   dt_key_delivery:
     lineage:
       - datalake_salesforce_raw.case.KeyDeliveryDate__c
-    description: Key delivery date.
+    description: Calendar date associated with key delivery in the business process.
   flow_sub_type:
     lineage:
       - datalake_salesforce_raw.case.FlowSubType__c
-    description: Flow sub type.
+    description: Business value representing flow sub type on the cases clean dataset.
   follow_up_description:
     lineage:
       - datalake_salesforce_raw.case.followUpDescription__c
-    description: Follow-up description.
+    description: Business value representing follow up description on the cases clean dataset.
   follow_up_status:
     lineage:
       - datalake_salesforce_raw.case.followUpStatus__c
-    description: Follow-up status.
+    description: Business value representing follow up status on the cases clean dataset.
   for_sale_flow:
     lineage:
       - datalake_salesforce_raw.case.ForSaleFlow__c
@@ -291,23 +291,23 @@ columns:
   fs_cri_have_demand_note:
     lineage:
       - datalake_salesforce_raw.case.FS_CRI_HaveDemandNote__c
-    description: FS CRI have demand note.
+    description: Business value representing fs cri have demand note on the cases clean dataset.
   fs_cri_status:
     lineage:
       - datalake_salesforce_raw.case.FS_CRIStatus__c
-    description: FS CRI status.
+    description: Business value representing fs cri status on the cases clean dataset.
   fs_status_cri:
     lineage:
       - datalake_salesforce_raw.case.FS_StatusCRI__c
-    description: FS status CRI.
+    description: Business value representing fs status cri on the cases clean dataset.
   fs_subscription_model_buyer:
     lineage:
       - datalake_salesforce_raw.case.FS_SubscriptionModelBuyer__c
-    description: FS subscription model buyer.
+    description: Business value representing fs subscription model buyer on the cases clean dataset.
   fs_subscription_model_seller:
     lineage:
       - datalake_salesforce_raw.case.FS_SubscriptionModelSeller__c
-    description: FS subscription model seller.
+    description: Business value representing fs subscription model seller on the cases clean dataset.
   id_customer:
     lineage:
       - datalake_salesforce_raw.case.customerId__c
@@ -439,7 +439,7 @@ columns:
   pp_informed_service_provider:
     lineage:
       - datalake_salesforce_raw.case.LandlordInformedServiceProvider__c
-    description: PP informed service provider.
+    description: Business value representing pp informed service provider on the cases clean dataset.
   publication_occurred_on_property:
     lineage:
       - datalake_salesforce_raw.case.PublicationOccurredOnProperty__c
@@ -447,23 +447,23 @@ columns:
   seller_current_onboarding_contact:
     lineage:
       - datalake_salesforce_raw.case.SLCurrentOnboardingContact__c
-    description: Seller current onboarding contact.
+    description: Business value representing seller current onboarding contact on the cases clean dataset.
   service_provider_journey:
     lineage:
       - datalake_salesforce_raw.case.serviceProviderJourney__c
-    description: Service provider journey.
+    description: Business value representing service provider journey on the cases clean dataset.
   service_provider_name:
     lineage:
       - datalake_salesforce_raw.case.serviceProviderName__c
-    description: Service provider name.
+    description: Human-readable service provider name used in dashboards and operational reports.
   service_provider_phone:
     lineage:
       - datalake_salesforce_raw.case.serviceProviderPhone__c
-    description: Service provider phone.
+    description: Business value representing service provider phone on the cases clean dataset.
   service_provider_type:
     lineage:
       - datalake_salesforce_raw.case.serviceProviderType__c
-    description: Service provider type.
+    description: Business value representing service provider type on the cases clean dataset.
   ts_follow_up_expected_resolution:
     lineage:
       - datalake_salesforce_raw.case.followUpExpectedResolutionDate__c
@@ -479,19 +479,19 @@ columns:
   ts_ms_tt_budget_review_iq_created_td:
     lineage:
       - datalake_salesforce_raw.case.MS_TT_Date_BudgetReviewIQCreatedDateTD__c
-    description: MS TT budget review IQ created timestamp.
+    description: Timestamp when ms tt budget review iq created td occurred according to the source system.
   ts_sla_exit:
     lineage:
       - datalake_salesforce_raw.case.SlaExitDate
-    description: SLA exit timestamp.
+    description: Timestamp when sla exit occurred according to the source system.
   ts_sla_start:
     lineage:
       - datalake_salesforce_raw.case.SlaStartDate
-    description: SLA start timestamp.
+    description: Timestamp when sla start occurred according to the source system.
   ts_stop_start:
     lineage:
       - datalake_salesforce_raw.case.StopStartDate
-    description: Stop start timestamp.
+    description: Timestamp when stop start occurred according to the source system.
   year:
     lineage:
       - datalake_salesforce_raw.case.LastModifiedDate
@@ -507,8 +507,8 @@ columns:
   case_type_approval:
     lineage:
       - datalake_salesforce_raw.case.TypeApproval__c
-    description: Case type approval.
+    description: Business value representing case type approval on the cases clean dataset.
   case_comments_approval:
     lineage:
       - datalake_salesforce_raw.case.CommentsApproval__c
-    description: Case comments approval.
+    description: Business value representing case comments approval on the cases clean dataset.

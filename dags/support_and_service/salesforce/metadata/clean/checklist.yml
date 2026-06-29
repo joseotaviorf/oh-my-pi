@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: checklist
 description: Clean table for ingesting checklist data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_checklist:
     lineage:
@@ -31,11 +31,11 @@ columns:
   name:
     lineage:
       - datalake_salesforce_raw.checklist.Name
-    description: Checklist name.
+    description: Display name of the entity as registered in the upstream operational application.
   type:
     lineage:
       - datalake_salesforce_raw.checklist.Type
-    description: Checklist type.
+    description: Classification type assigned by the source platform for routing or reporting.
   is_done:
     lineage:
       - datalake_salesforce_raw.checklist.Done
@@ -72,3 +72,12 @@ columns:
     lineage:
       - datalake_salesforce_raw.checklist.LastReferencedDate
     description: Timestamp of the last time the checklist was referenced.
+  month:
+    lineage: []
+    description: Month partition for incremental loading and partition pruning.
+  year:
+    lineage: []
+    description: Year partition for incremental loading and partition pruning.
+  day:
+    lineage: []
+    description: Day partition for incremental loading and partition pruning.

@@ -2,7 +2,7 @@ database_name: datalake_salesforce_clean
 table_name: contract
 description: Clean table for ingesting contract data from the Sales Force tool.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_contract:
     lineage:
@@ -64,3 +64,12 @@ columns:
     lineage:
       - datalake_salesforce_raw.contract.LastModifiedDate
     description: Timestamp of the last modification.
+  month:
+    lineage: []
+    description: Month partition for incremental loading and partition pruning.
+  year:
+    lineage: []
+    description: Year partition for incremental loading and partition pruning.
+  day:
+    lineage: []
+    description: Day partition for incremental loading and partition pruning.
