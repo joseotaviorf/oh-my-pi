@@ -1,12 +1,11 @@
 ---
 database_name: datalake_sale_ongoing_listings
 table_name: ongoing_listings_daily_info
-description: Every row of this table is a snapshot of one sale ongoing listing per
-  day. If it had the status="PUBLISHED" at that day, no matter for how long, it will
-  appear here, along with some metrics such as search, listing page viewed, visit
-  booked, and other demand data. DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE
-  15, 2025. Data before this date was obtained through the fact table, whose code
-  is not the same.
+description: Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED"
+  at that day, no matter for how long, it will appear here, along with some metrics such as search, listing page viewed,
+  visit booked, and other demand data. DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE 15, 2025. Data before this
+  date was obtained through the fact table, whose code is not the same. Partitioned by year, month, day. Always filter
+  on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -145,17 +144,17 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.ts_last_publication
   year:
-    description: Calendar year of the daily snapshot partition for this ongoing listing
-      row.
+    description: Calendar year of the daily snapshot partition for this ongoing listing row.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     lineage:
       - datalake_quintoandar.aux_date.year
   month:
-    description: Calendar month of the daily snapshot partition for this ongoing listing
-      row.
+    description: Calendar month of the daily snapshot partition for this ongoing listing row.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     lineage:
       - datalake_quintoandar.aux_date.month
   day:
-    description: Calendar day of the daily snapshot partition for this ongoing listing
-      row.
+    description: Calendar day of the daily snapshot partition for this ongoing listing row.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     lineage:
       - datalake_quintoandar.aux_date.day

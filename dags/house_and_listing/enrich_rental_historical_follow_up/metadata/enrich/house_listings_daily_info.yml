@@ -1,8 +1,9 @@
 database_name: datalake_rental_historical_follow_up
 table_name: house_listings_daily_info
-description: Enriched table for store the last status of the day of the last house's listing and other
-  historical informations like CIQ, entrance, and who is living.
-  Due to Early Demand and corner cases, duplicated houses, but with different listings are expect in this table for the same reference date (dt_day column).
+description: Enriched table for store the last status of the day of the last house's listing and other historical information
+  like CIQ, entrance, and who is living. Due to Early Demand and corner cases, duplicated houses, but with different listings
+  are expect in this table for the same reference date (dt_day column). Partitioned by year, month, day. Always filter on year,
+  month, day in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -286,7 +287,10 @@ columns:
     description: The timestamp of when the listing status ended.
   year:
     description: The year when this status was observed. Also, it's a partition of this table.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
     description: The month when this status was observed. Also, it's a partition of this table.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
     description: The day of the month when this status was observed. Also, it's a partition of this table.
+      Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.

@@ -3,9 +3,10 @@ table_name: similar_houses
 owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
 description: Enrich table that contains a "base" house and its daily list of similar houses, for both Rent and Sale.
-    A "base" house will only appear if it has been published for, at least, one day. The similar houses list is generated
-    based in specific rules applied in the SQL code. Each row of this table is a "base" house and its list of similar
-    houses in a specific business context and on a specific date.
+  Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid
+  full table scans. A "base" house will only appear if it has been published for, at least, one day. The similar houses list
+  is generated based in specific rules applied in the SQL code. Each row of this table is a "base" house and its list of similar
+  houses in a specific business context and on a specific date.
 columns:
     id:
       lineage:
@@ -51,13 +52,16 @@ columns:
         - datalake_rental_historical_follow_up.house_listings_daily_info.year
         - datalake_sale_ongoing_listings.ongoing_listings_daily_info.year
       description: Year in which the list of similar houses was generated for the "base" house. It's also a partition of this table.
+        Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     month:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.month
         - datalake_sale_ongoing_listings.ongoing_listings_daily_info.month
       description: Month in which the list of similar houses was generated for the "base" house. It's also a partition of this table.
+        Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     day:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.day
         - datalake_sale_ongoing_listings.ongoing_listings_daily_info.day
       description: Day in which the list of similar houses was generated for the "base" house. It's also a partition of this table.
+        Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
