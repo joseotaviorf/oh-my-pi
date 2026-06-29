@@ -8,34 +8,43 @@ columns:
     tags:
       - PII
       - Confidential
+    description: Identity document number for beneficiary document in the source roster (PII).
   beneficiary_name:
     tags:
       - PII
       - Confidential
+    description: Name of the payment beneficiary linked to the inspector record (PII).
   inspector_cpf:
     tags:
       - PII
       - Confidential
+    description: CPF document number for inspector cpf used in inspector roster matching (PII).
   inspector_name:
     tags:
       - PII
       - Confidential
+    description: Full name of the property inspector assigned in the control roster (PII).
   inspector_phone:
     tags:
       - PII
       - Confidential
+    description: Contact phone number for the assigned property inspector (PII).
   inspector_rg:
     tags:
       - PII
       - Confidential
+    description: Value from the Google Sheets source column mapped to inspector_rg for inspectors_control planning.
   inspector_secondary_phone:
     tags:
       - PII
       - Confidential
+    description: Contact phone number for the assigned property inspector (PII).
   insperctor_email:
     tags:
       - Confidential
+    description: Value from the Google Sheets source column mapped to insperctor_email for inspectors_control planning.
   sk_inspector:
     tags:
       - PII
       - Confidential
+    description: Data warehouse surrogate key for inspector used in support reporting joins.

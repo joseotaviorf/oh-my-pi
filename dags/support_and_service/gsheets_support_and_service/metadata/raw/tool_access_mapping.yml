@@ -9,7 +9,9 @@ columns:
     tags:
       - PII
       - Confidential
+    description: Human-readable complete name used in dashboards and operational reports.
   email:
     tags:
       - PII
       - Confidential
+    description: Email address associated with the user or contact on this record.

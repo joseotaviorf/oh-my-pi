@@ -3,3 +3,4 @@ table_name: department_control
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Google Sheet data for support department configuration mapping.
+columns: {}

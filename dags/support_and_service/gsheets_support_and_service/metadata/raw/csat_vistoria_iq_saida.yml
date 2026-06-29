@@ -9,3 +9,4 @@ columns:
     tags:
       - PII
       - Confidential
+    description: Email address associated with the user or contact on this record.

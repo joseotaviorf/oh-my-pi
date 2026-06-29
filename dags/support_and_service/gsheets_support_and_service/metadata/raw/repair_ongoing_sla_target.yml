@@ -4,3 +4,4 @@ table_name: repair_ongoing_sla_target
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 description: Raw Google Sheet data for ongoing repair SLA target configurations.
+columns: {}
