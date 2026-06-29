@@ -4,7 +4,7 @@ description:
   Enrichment table with the aim of consolidating contact information for main
   users. Each row in this table represents a user (of any type) in ebdb.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_user:
     description: Unique ebdb user identification key.

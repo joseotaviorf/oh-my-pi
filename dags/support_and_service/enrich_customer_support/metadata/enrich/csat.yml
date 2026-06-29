@@ -4,7 +4,7 @@ description:
   The customer support CSAT table consolidates all CSAT answers from tickets across
   chat, call, and email channels.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -67,3 +67,6 @@ columns:
       - datalake_bigfone_clean.event.ts_created
       - datalake_chat_fup_clean.surveys_answer.ts_created
     description: Timestamp of the most recent response recorded for the ticket.
+  sources:
+    lineage: []
+    description: Business value representing sources on the csat enrich dataset.

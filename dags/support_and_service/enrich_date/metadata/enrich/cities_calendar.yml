@@ -5,10 +5,10 @@ description:
   Calculates the interval of working days after a referenced date, indicating whether they are working days or not.
   The granularity of the table is given by id_date and id_city.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_date:
-    description: Date identifier.
+    description: Calendar date surrogate key referencing the shared date dimension for time-based joins.
     lineage:
       - datalake_quintoandar.aux_date.id_date
   id_city:

@@ -4,7 +4,7 @@ description:
   The customer support email table consolidates all metrics related to Zendesk Email
   Tickets into a single table.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -62,7 +62,7 @@ columns:
   ticket_type:
     lineage:
       - datalake_zendesk.tickets_current.type
-    description: Type of the ticket.
+    description: Business value representing ticket type on the email enrich dataset.
     categories:
       task: Ticket regarding a task.
       problem: Ticket regarding a problem.
@@ -208,7 +208,7 @@ columns:
   journey_step:
     lineage:
       - datalake_gsheets_clean.department_control.journey_step
-    description: Journey step in which the email is.
+    description: Business value representing journey step on the email enrich dataset.
   team:
     lineage:
       - datalake_gsheets_clean.department_control.team
