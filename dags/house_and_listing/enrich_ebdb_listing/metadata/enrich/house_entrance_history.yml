@@ -1,9 +1,9 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: house_entrance_history
-description: Since we have a new entry model, we need to create an unified model between
-  old and new entry models. This approach avoids data loss and facilitates field migration.
-  Every line represents an event of unified entry model with enrichments.
+description: Since we have a new entry model, we need to create an unified model between old and new entry models.
+  This approach avoids data loss and facilitates field migration. Every line represents an event of unified entry model with enrichments.
+  Partitioned by country_code. Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
@@ -141,7 +141,8 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: ISO country code of the house location (Brazil, Mexico or undefined).
+    description: ISO country code of the house location (Brazil, Mexico or undefined). Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico

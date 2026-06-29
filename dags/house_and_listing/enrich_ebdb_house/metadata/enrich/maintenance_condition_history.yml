@@ -1,8 +1,9 @@
 ---
 database_name: datalake_ebdb_house
 table_name: maintenance_condition_history
-description: Table showing the history of changes in the conservation condition of the house. 
-    Each row is a status for a property in a certain period of time (when is_last_condition is true, it becomes one row per house)
+description: Table showing the history of changes in the conservation condition of the house. Partitioned by country_code.
+  Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans. Each row is a status
+  for a property in a certain period of time (when is_last_condition is true, it becomes one row per house)
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -24,7 +25,8 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: Country code related to the house's country.
+    description: Country code related to the house's country. Partition key for multi-country isolation; always filter
+      on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico

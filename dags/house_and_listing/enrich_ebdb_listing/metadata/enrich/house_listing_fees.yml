@@ -1,14 +1,15 @@
 database_name: datalake_ebdb_listing
 table_name: house_listing_fees
-description: Information related to ForRent listings. Each line is an unique listing
-  with the information about the administration fee.
+description: Information related to ForRent listings. Each line is an unique listing with the information about the administration fee.
+  Partitioned by country_code. Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:
     - datalake_ebdb_listing.house_listing.id_house_listing
-    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version). Uniquely identifies a specific listing version.
+    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version).
+      Uniquely identifies a specific listing version.
   id_house:
     lineage:
     - datalake_ebdb_listing.house_listing.id_house
@@ -16,7 +17,8 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_listing.house_listing.country_code
-    description: Country code related to the house's country.
+    description: Country code related to the house's country. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico

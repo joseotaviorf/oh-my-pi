@@ -1,15 +1,16 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: house_listing_early_demand
-description: Information related to ForRent listings. Each line is an unique listing
-  with early demand information.
+description: Information related to ForRent listings. Each line is an unique listing with early demand information.
+  Partitioned by country_code. Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
     - datalake_ebdb_listing.business_context_history.country_code
-    description: Country code of the house. Also, it's a partition of this table.
+    description: Country code of the house. Also, it's a partition of this table. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico
@@ -21,7 +22,8 @@ columns:
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing_category.id_house_listing
-    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version). Uniquely identifies a specific listing version.
+    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version).
+      Uniquely identifies a specific listing version.
   is_early_demand:
     description: Boolean indicating if this listing participated on the Early Demand Program.
   ts_early_demand_started:

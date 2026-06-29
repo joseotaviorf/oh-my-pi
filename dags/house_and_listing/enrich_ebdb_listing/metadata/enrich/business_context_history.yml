@@ -1,8 +1,8 @@
 database_name: datalake_ebdb_listing
 table_name: business_context_history
-description: Information about listing's status and suspension_reason. Each line has
-  the initial and final date where a house had a specific status and suspension_reason
-  in listing_business_context_aud table.
+description: Information about listing's status and suspension_reason. Each line has the initial and final date where a house
+  had a specific status and suspension_reason in listing_business_context_aud table. Partitioned by country_code and business_context.
+  Always filter on both columns in WHERE clauses to enable partition pruning.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -21,7 +21,8 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
-    description: Country code of the house
+    description: Country code of the house Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico
@@ -29,11 +30,12 @@ columns:
   business_context:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.business_context
-    description: Business context of the house
+    description: Business context of the house. Partition key identifying the business context;
+      always filter on this column together with country_code in WHERE clauses.
     categories:
-      RENT: '#N/A'
-      SALE: '#N/A'
-      Undefined: '#N/A'
+      RENT: 'The house is part of the rental business.'
+      SALE: 'The house is part of the sale business.'
+      Undefined: 'Business context not determined'
   status:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.status
