@@ -1,109 +1,113 @@
-database_name: metric_ss
+database_name: metric_metric_ss__tickets
 table_name: escalation
 description: This table contains Escalation Rate KPI with target per many dimensions.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: william.angelo@quintoandar.com.br
 columns:
   channel:
     description: Identify the channel for this ticket (call, chat, email).
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.fact_tickets.channel
+    - dw_customer_support.fact_tickets.channel
   journey:
-    description: Journey of the ticket.
-    dimension: True
+    description: Customer journey segment from the support department taxonomy.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.journey
+    - dw_customer_support.dim_department.journey
   journey_step:
     description: Department journey step.
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.journey_step
+    - dw_customer_support.dim_department.journey_step
   board:
-    description: Department board.
-    dimension: True
+    description: Operations board grouping within the support department taxonomy.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.board
+    - dw_customer_support.dim_department.board
   department:
-    description: Department name.
-    dimension: True
+    description: Support department name from the customer support taxonomy.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.department
+    - dw_customer_support.dim_department.department
   team:
-    description: Department team.
-    dimension: True
+    description: Support team assigned within the department taxonomy.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.team
+    - dw_customer_support.dim_department.team
   area:
     description: Department area (e.g. CX).
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.dim_department.area
+    - dw_customer_support.dim_department.area
   customer_type:
-    description: Client type Note - This field does not belong to the taxonomy defined on Central Ops.
-    dimension: True
+    description: Client type Note - This field does not belong to the taxonomy defined
+      on Central Ops.
+    dimension: true
     lineage:
-      - dw_customer_support.dim_taxonomy.customer_type
+    - dw_customer_support.dim_taxonomy.customer_type
   amount_escalation:
     metric:
       name: Amount escalation tickets
-      description: Number of tickets that were escalated to the departments
-        '[MX] Media OPS'
-        'CX Conta Comigo [POS] [BACK]'
-        'CX ReclameAqui Adquiridas [CE] [POS] [BACK]'
-        'Midias Ops [POS] [BACK]'
-        'Notificação Extrajudicial [CE] [POS] [BACK]'
-        'Ouvidoria [CE] [POS] [BACK]'
-        'Ouvidoria For Sale [CE] [SALE] [BACK]'
-        'PROCON [CE] [POS] [BACK]'
-        'ReclameAqui [CE] [POS] [BACK]'
-        And that do not have the api_reclame_aqui TAG
-        And that were not originated on WhatsApp
+      description: Number of tickets that were escalated to the departments '[MX]
+        Media OPS' 'CX Conta Comigo [POS] [BACK]' 'CX ReclameAqui Adquiridas [CE]
+        [POS] [BACK]' 'Midias Ops [POS] [BACK]' 'Notificação Extrajudicial [CE] [POS]
+        [BACK]' 'Ouvidoria [CE] [POS] [BACK]' 'Ouvidoria For Sale [CE] [SALE] [BACK]'
+        'PROCON [CE] [POS] [BACK]' 'ReclameAqui [CE] [POS] [BACK]' And that do not
+        have the api_reclame_aqui TAG And that were not originated on WhatsApp
       acronym: Amount Escalation
-      is_additive: True
+      is_additive: true
       business_stage: CX
       hierarchy: User analisys
       approved_by: vicente.neto@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
+    description: Number of tickets that were escalated to the departments '[MX] Media
+      OPS' 'CX Conta Comigo [POS] [BACK]' 'CX ReclameAqui Adquiridas [CE] [POS] [BACK]'
+      'Midias Ops [POS] [BACK]' 'Notificação Extrajudicial [CE] [POS] [BACK]' 'Ouvidoria
+      [CE] [POS] [BACK]' 'Ouvidoria For Sale [CE] [SALE] [BACK]' 'PROCON [CE] [POS]
+      [BACK]' 'ReclameAqui [CE] [POS] [BACK]' And that do not have the api_reclame_aqui
+      TAG And that were not originated on WhatsApp
   amount_escalation_responses:
     metric:
       name: Amount Escalation Tickets
-      description: Number of tickets that were escalated to departments
-        'CX Partners Tasks [PRE] [BACK]'
-        'CX Proposals Tasks [PRE] [BACK]'
-        'Addendums [REP] [POS] [BACK]'
-        'Property Entry [ONB] [POS] [BACK]'
-        'CX Payments Active [POS] [BACK] [PAY]'
-        'Change of Bank Details [BACK]'
-        'Repairs Triage [Back]'
-        'Termination Due to Default [OFF][POS][BACK]'
-        'Scheduled Service [OFF] [POS] [BACK]'
-        'Common Repairs [Back]'
-        'Offboarding Repairs [OFF] [POS] [BACK]'
-        'QuintoAndar Protection [OFF] [POS] [BACK]'
-        'Repairs [BACK]'
-        'Self-Service Repairs [BACK]'
-        And they were not originated on WhatsApp
+      description: Number of tickets that were escalated to departments 'CX Partners
+        Tasks [PRE] [BACK]' 'CX Proposals Tasks [PRE] [BACK]' 'Addendums [REP] [POS]
+        [BACK]' 'Property Entry [ONB] [POS] [BACK]' 'CX Payments Active [POS] [BACK]
+        [PAY]' 'Change of Bank Details [BACK]' 'Repairs Triage [Back]' 'Termination
+        Due to Default [OFF][POS][BACK]' 'Scheduled Service [OFF] [POS] [BACK]' 'Common
+        Repairs [Back]' 'Offboarding Repairs [OFF] [POS] [BACK]' 'QuintoAndar Protection
+        [OFF] [POS] [BACK]' 'Repairs [BACK]' 'Self-Service Repairs [BACK]' And they
+        were not originated on WhatsApp
       acronym: Amoun Escalation Responses
-      is_additive: True
+      is_additive: true
       business_stage: CX
       hierarchy: User analisys
       approved_by: vicente.neto@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
+    description: Number of tickets that were escalated to departments 'CX Partners
+      Tasks [PRE] [BACK]' 'CX Proposals Tasks [PRE] [BACK]' 'Addendums [REP] [POS]
+      [BACK]' 'Property Entry [ONB] [POS] [BACK]' 'CX Payments Active [POS] [BACK]
+      [PAY]' 'Change of Bank Details [BACK]' 'Repairs Triage [Back]' 'Termination
+      Due to Default [OFF][POS][BACK]' 'Scheduled Service [OFF] [POS] [BACK]' 'Common
+      Repairs [Back]' 'Offboarding Repairs [OFF] [POS] [BACK]' 'QuintoAndar Protection
+      [OFF] [POS] [BACK]' 'Repairs [BACK]' 'Self-Service Repairs [BACK]' And they
+      were not originated on WhatsApp
   escalation_rate:
     metric:
       name: Escalation Rate
-      description:
-        Semi-additive metric representing the sum of tickets that are escalation tickets for
-        given departments divided by the overall sum of the number of escalation tickets
+      description: Semi-additive metric representing the sum of tickets that are escalation
+        tickets for given departments divided by the overall sum of the number of
+        escalation tickets
       acronym: DSAT Rate
-      is_additive: False
+      is_additive: false
       business_stage: CX
       hierarchy: User analisys
       approved_by: vicente.neto@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
+    description: Semi-additive metric representing the sum of tickets that are escalation
+      tickets for given departments divided by the overall sum of the number of escalation
+      tickets
   dt_ticket_created:
     description: The created date of ticket.
-    dimension: True
+    dimension: true
     lineage:
-      - dw_customer_support.fact_tickets.ts_created
+    - dw_customer_support.fact_tickets.ts_created
