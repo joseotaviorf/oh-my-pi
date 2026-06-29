@@ -1,0 +1,179 @@
+database_name: datalake_crm
+table_name: tasks
+description:
+  One row per tasks in the internal CRM task platform used by support analysts
+  to manage customer journeys and operational workflows.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crm_clean.tasks.id
+    description: Primary surrogate identifier for the entity row in this support and service dataset.
+  id_rent_flow:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the rent flow associated with this task.
+  id_origin:
+    lineage:
+      - datalake_crm_clean.tasks.id_origin
+    description: CRM platform identifier for the origin associated with this task.
+  id_assignee:
+    lineage:
+      - datalake_crm_clean.tasks.id_assignee
+    description: Zendesk user id of the agent currently assigned to the ticket.
+  id_house:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+      - datalake_crm_clean.tasks.id_house
+    description: CRM platform identifier for the house associated with this task.
+  id_owner:
+    lineage:
+      - datalake_crm_clean.tasks.id_owner
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the owner associated with this task.
+  id_opened_by:
+    lineage:
+      - datalake_crm_clean.tasks.id_opened_by
+    description: CRM platform identifier for the opened by associated with this task.
+  id_receiver:
+    lineage:
+      - datalake_crm_clean.tasks.id_receiver
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the receiver associated with this task.
+  id_negotiation:
+    lineage:
+      - datalake_crm_clean.tasks.id_negotiation
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the negotiation associated with this task.
+  id_tenant:
+    lineage:
+      - datalake_crm_clean.tasks.id_tenant
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the tenant associated with this task.
+  id_manager:
+    lineage:
+      - datalake_crm_clean.tasks.id_manager
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the manager associated with this task.
+  id_workgroup:
+    lineage:
+      - datalake_crm_clean.tasks.id_workgroup
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the workgroup associated with this task.
+  id_contract:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the contract associated with this task.
+  id_state:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+    description: CRM platform identifier for the state associated with this task.
+  version:
+    lineage:
+      - datalake_crm_clean.tasks.version
+    description: CRM task attribute describing version for support workflow tracking.
+  score_factor:
+    lineage:
+      - datalake_crm_clean.tasks.score_factor
+    description: CRM task attribute describing score factor for support workflow tracking.
+  receiver_name:
+    lineage:
+      - datalake_crm_clean.tasks.receiver_name
+      - datalake_crm_clean.tasks.metadata
+    description: Human-readable receiver name used in dashboards and operational reports.
+  receiver_label:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+    description: Human-readable receiver label used in dashboards and operational reports.
+  task_comment:
+    lineage:
+      - datalake_crm_clean.tasks.task_comment
+      - datalake_crm_clean.tasks.metadata
+    description: CRM task attribute describing task comment for support workflow tracking.
+  score:
+    lineage:
+      - datalake_crm_clean.tasks.score
+    description: CRM task attribute describing score for support workflow tracking.
+  origin:
+    lineage:
+      - datalake_crm_clean.tasks.origin
+      - datalake_crm_clean.tasks.metadata
+    description: Channel or product surface that initiated the IVR closed-history request.
+  type:
+    lineage:
+      - datalake_crm_clean.tasks.type
+    description: Classification type assigned by the source platform for routing or reporting.
+  receiver_type:
+    lineage:
+      - datalake_crm_clean.tasks.receiver_type
+    description: CRM task attribute describing receiver type for support workflow tracking.
+  description:
+    lineage:
+      - datalake_crm_clean.tasks.description
+      - datalake_crm_clean.tasks.metadata
+    description: Free-text body describing the customer issue, task context, or field help text.
+  phase:
+    lineage:
+      - datalake_crm_clean.tasks.phase
+      - datalake_crm_clean.tasks.metadata
+    description: CRM task attribute describing phase for support workflow tracking.
+  visit_fup:
+    lineage:
+      - datalake_crm_clean.tasks.visit_fup
+    description: CRM task attribute describing visit fup for support workflow tracking.
+  subject:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+    description: Human-readable subject line describing the CRM task purpose for agents and reporting.
+  tags:
+    lineage:
+      - datalake_crm_clean.tasks.tags
+    description: List of labels attached to the record for filtering and automation rules.
+  is_resolved:
+    lineage:
+      - datalake_crm_clean.tasks.is_resolved
+    description: Indicates whether resolved applies to this record.
+  ts_completed:
+    lineage:
+      - datalake_crm_clean.tasks.completed_date_object
+    description: Timestamp when completed occurred according to the source system.
+  ts_silenced_until:
+    lineage:
+      - datalake_crm_clean.tasks.silenced_until_date_object
+    description: Timestamp when silenced until occurred according to the source system.
+  ts_start:
+    lineage:
+      - datalake_crm_clean.tasks.start_date_object
+    description: Timestamp when start occurred according to the source system.
+  dt_visit:
+    lineage:
+      - datalake_crm_clean.tasks.dt_visit
+      - datalake_crm_clean.tasks.metadata
+    description: Calendar date associated with visit in the business process.
+  ts_created:
+    lineage:
+      - datalake_crm_clean.tasks.created_date_object
+      - datalake_crm_clean.tasks.metadata
+    description: Timestamp when the record was first created in the upstream source system.
+  ts_origin:
+    lineage:
+      - datalake_crm_clean.tasks.origin_date_object
+    description: Timestamp when origin occurred according to the source system.
+  ts_fup:
+    lineage:
+      - datalake_crm_clean.tasks.unix_fup
+      - datalake_crm_clean.tasks.metadata
+    description: Timestamp when fup occurred according to the source system.
+  year:
+    lineage:
+      - datalake_crm_clean.tasks.year
+    description: Year partition derived from the source event timestamp for incremental loading.
+  month:
+    lineage:
+      - datalake_crm_clean.tasks.month
+    description: Month partition derived from the source event timestamp for incremental loading.
+  day:
+    lineage:
+      - datalake_crm_clean.tasks.day
+    description: Day partition derived from the source event timestamp for incremental loading.
