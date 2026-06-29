@@ -1,8 +1,9 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: listing_business_context_suspension_history
-description: Enrich table that contains the suspension reason history of rental and sale listings.
-  Each row is a suspension reason change for each property's business context.
+description: Enrich table that contains the suspension reason history of rental and sale listings. Partitioned by country_code
+  and business_context. Always filter on both columns in WHERE clauses to enable partition pruning. Each row is a suspension reason
+  change for each property's business context.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -25,14 +26,16 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: Two-letter ISO country code of the suspended listing.
+    description: Two-letter ISO country code of the suspended listing. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   business_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.business_context
-    description: Listing's business context
+    description: Listing's business context Partition key identifying the business context;
+      always filter on this column together with country_code in WHERE clauses.
     categories:
       SALE: For sale
       RENT: For rent

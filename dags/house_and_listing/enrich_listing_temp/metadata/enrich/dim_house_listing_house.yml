@@ -1,7 +1,8 @@
 database_name: datalake_listing_temp
 table_name: dim_house_listing_house
-description: Information about property listings and some properties may be only available
-  for sale. Each line is a listing version.
+description: "[TO BE DEPRECATED, AVOID USING THIS TABLE] Information about property listings and some properties may be
+  only available for sale. Each line is a listing version. Partitioned by country_code. Always filter on country_code in
+  WHERE clauses to enable partition pruning and avoid full table scans."
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -21,7 +22,8 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code related to the listing's country of origin.
+    description: Country code related to the listing's country of origin. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.

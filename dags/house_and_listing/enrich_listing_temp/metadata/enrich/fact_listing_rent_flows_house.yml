@@ -1,9 +1,11 @@
 database_name: datalake_listing_temp
 table_name: fact_listing_rent_flows_house
-description:
-  Fact table that contains events (visit(s), offer(s), etc.) of a rent flow, starting the flow on the booking creation or direct offer submitted.
-  It's very important to keep in mind that every line of this table is related to an event of the rent flow and it's possible to occur more than one event per type in the same rent flow, e.g. multiple bookings within the same rent flow.
-  Each line is a rent flow composed by house listing + tenant prospect + event related to the rent flow.
+description: "[TO BE DEPRECATED, AVOID USING THIS TABLE] Fact table that contains events (visit(s), offer(s), etc.) of a rent flow,
+  starting the flow on the booking creation or direct offer submitted. Partitioned by country_code. Always filter on country_code in
+  WHERE clauses to enable partition pruning and avoid full table scans. It's very important to keep in mind that every line of this
+  table is related to an event of the rent flow and it's possible to occur more than one event per type in the same rent flow, e.g.
+  multiple bookings within the same rent flow. Each line is a rent flow composed by house listing + tenant prospect + event related
+  to the rent flow."
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -99,7 +101,8 @@ columns:
   sk_agent_sign_up_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_agent_sign_up
-    description: Key of the date when the agent related to the rent flow's event signed up in the platform. It's the date of the agent's sign up transformed into a number. A rent flow can have none, one or more agent's sign up date, because it can have more than one agent related.
+    description: Key of the date when the agent related to the rent flow's event signed up in the platform. It's the date of the agent's sign up transformed into a number.
+      A rent flow can have none, one or more agent's sign up date, because it can have more than one agent related.
   sk_client_sign_up_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_client_sign_up
@@ -123,11 +126,13 @@ columns:
   sk_proposal_approved_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_proposal_approved
-    description: Key of the date when the proposal was approved, which means that all steps (documentation and credit analysis) are approved. It's the proposal's approved date transformed into a number. A rent flow can have none, one or more proposal's approved dates.
+    description: Key of the date when the proposal was approved, which means that all steps (documentation and credit analysis) are approved. It's the proposal's approved date transformed into a number.
+      A rent flow can have none, one or more proposal's approved dates.
   sk_proposal_processed_date:
     lineage:
       - dw_rent.dim_proposal.ts_processed
-    description: Key of the date when the proposal was processed, which means that all steps (documentation and credit analysis) are finished. It's the proposal's processed date transformed into a number. A rent flow can have none, one or more proposal's processed dates.
+    description: Key of the date when the proposal was processed, which means that all steps (documentation and credit analysis) are finished. It's the proposal's processed date transformed into a number.
+      A rent flow can have none, one or more proposal's processed dates.
   sk_tenant_first_doc_sent_date:
     lineage:
       - dw_rent.dim_proposal.dt_tenant_first_document_sent
@@ -248,7 +253,8 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code of origin related to the property of the rent flow. It must be the same value for all events in the same property.
+    description:       Country code of origin related to the property of the rent flow. It must be the same value for all events in the same property. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
   booking_utm_campaign:
     lineage:
       - dw_public.dim_booking.utm_campaign
@@ -256,7 +262,8 @@ columns:
   booking_utm_content:
     lineage:
       - dw_public.dim_booking.utm_content
-    description: The UTM value that identifies what specifically was clicked in a campaign media to bring the tenant prospect to our platform. Is often used for A/B testing and content-targeted ads. A rent flow can have none, one or more values, since many bookings from different campaigns may happen.
+    description: The UTM value that identifies what specifically was clicked in a campaign media to bring the tenant prospect to our platform. Is often used for A/B testing and content-targeted ads.
+      A rent flow can have none, one or more values, since many bookings from different campaigns may happen.
   booking_utm_term:
     lineage:
       - dw_public.dim_booking.utm_term

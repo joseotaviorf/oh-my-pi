@@ -1,7 +1,9 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: lbc_status_version_order
-description: Information related to ForRent listings. Each line represent a state of a house in time and identify the states that should trigger a new listing version.
+description: Information related to ForRent listings. Each line represent a state of a house in time and identify the states
+  that should trigger a new listing version. Partitioned by country_code. Always filter on country_code in WHERE clauses to enable
+  partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -10,7 +12,7 @@ columns:
       - datalake_ebdb_listing.business_context_history.id_house
       - datalake_ebdb_listing.business_context_history.rev
       - datalake_ebdb_listing.house_status_version_order.rev
-    description: "Id of the house state in time. It's the unique identifier for this table."
+    description: Id of the house state in time. It's the unique identifier for this table.
   id_house:
     lineage:
       - datalake_ebdb_listing.business_context_history.id_house
@@ -18,58 +20,59 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.business_context_history.country_code
-    description: "Country code of the house."
+    description: Country code of the house. Partition key for multi-country isolation; always filter on this column in
+      WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico
       Undefined: Country could not be determined.
   days_in_state:
-    description: "Number of days in this specific state, characterized by a combination of status and status_reason."
+    description: Number of days in this specific state, characterized by a combination of status and status_reason.
   days_in_status:
-    description: "Number of days in this specific status."
+    description: Number of days in this specific status.
   is_extended_rental:
     description: Boolean indicating if the contract termination was canceled after relisting as early demand
       or the owner asked to unpublish the listing after relisting as early demand and the contract was active.
   has_termination_canceled:
     description: Boolean indicating if the contract termination was canceled after relisting as early demand.
   lbc_state_order:
-    description: "Position of this particular state in the listing_business_context history."
+    description: Position of this particular state in the listing_business_context history.
   listing_version:
-    description: "Number of the listing version."
+    description: Number of the listing version.
   max_state_order:
-    description: "Number of states registered of this house."
+    description: Number of states registered of this house.
   rev:
     lineage:
       - datalake_ebdb_listing.business_context_history.rev
       - datalake_ebdb_listing.house_status_version_order.rev
-    description: "Indicates the user revision responsible for the house state change."
+    description: Indicates the user revision responsible for the house state change.
   revision_reason:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.reason
-    description: "Reason why an user changed some aspect of the house state."
+    description: Reason why an user changed some aspect of the house state.
   state_order:
-    description: "Position of this particular state in the house history."
+    description: Position of this particular state in the house history.
   status:
     lineage:
       - datalake_ebdb_listing.business_context_history.status
-    description: "Status of the house in that specific time period."
+    description: Status of the house in that specific time period.
   status_reason:
     lineage:
       - datalake_ebdb_listing.business_context_history.status_reason
-    description: "Status reason of the house in that specific time period."
+    description: Status reason of the house in that specific time period.
   trigger_new_version:
-    description: "Number indicating if this state should trigger a new version (1 if it should and 0 if not)."
+    description: Number indicating if this state should trigger a new version (1 if it should and 0 if not).
   is_last_state_of_day:
     description: Boolean indicating if this is the last state of the day for this house.
   ts_first_publication:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started
-    description: "Timestamp of the house first publication."
+    description: Timestamp of the house first publication.
   ts_state_started:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started
-    description: "Timestamp when this house state started, characterized by a combination of status and status_reason."
+    description: Timestamp when this house state started, characterized by a combination of status and status_reason.
   ts_state_ended:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_ended
-    description: "Timestamp when this house state ended, characterized by a combination of status and status_reason."
+    description: Timestamp when this house state ended, characterized by a combination of status and status_reason.

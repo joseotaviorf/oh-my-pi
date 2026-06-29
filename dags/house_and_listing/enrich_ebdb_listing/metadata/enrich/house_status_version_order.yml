@@ -1,6 +1,7 @@
 database_name: datalake_ebdb_listing
 table_name: house_status_version_order
-description: "[DEPRECATED] Information related to ForRent listings using the table 'Imovel' from EBDB.
+description: "[TO BE DEPRECATED, AVOID USING THIS TABLE] Information related to ForRent listings using the table 'Imovel' from EBDB.
+  Partitioned by country_code. Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans.
   Each line represent a state of a house in time and identify the states that should trigger a new listing version."
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
@@ -16,7 +17,8 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: Two-letter ISO country code of the house.
+    description: Two-letter ISO country code of the house. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico

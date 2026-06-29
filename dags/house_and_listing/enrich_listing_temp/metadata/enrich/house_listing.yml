@@ -1,15 +1,17 @@
 ---
 database_name: datalake_listing_temp
 table_name: house_listing
-description: Information related to ForRent listings. Each line is an unique listing
-  related to a house. The tuple [id_house_listing, id_house] must be unique.
+description: "[TO BE DEPRECATED, AVOID USING THIS TABLE] Information related to ForRent listings. Each line is an unique listing
+  related to a house. The tuple [id_house_listing, id_house] must be unique. Partitioned by country_code. Always filter on country_code
+  in WHERE clauses to enable partition pruning and avoid full table scans."
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.country_code
-    description: ISO country code of the market where this listing version operates.
+    description: ISO country code of the market where this listing version operates. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
   dt_contract_annulment:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination

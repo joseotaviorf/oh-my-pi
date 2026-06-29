@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_listing
 table_name: rent_listing
-description: Information related to ForRent listings. Each line is an unique listing,
-  related to an unique house
+description: Information related to ForRent listings. Each line is an unique listing, related to an unique house.
+  Partitioned by country_code. Always filter on country_code in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -20,7 +20,8 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
-    description: Country code related to the house's country.
+    description: Country code related to the house's country. Partition key for multi-country isolation;
+      always filter on this column in WHERE clauses to enable partition pruning.
     categories:
       BR: Brazil
       MX: Mexico
