@@ -1,15 +1,11 @@
 database_name: datalake_gsheets_clean
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 table_name: inspectors_control
-description: Table with information about inspectors control.
+description: Reference property inspector assignments curated in Google Sheets by the Support and Services team. One row per inspectors control entry used to calibrate dashboards and operational KPIs.
 columns:
-  sk_inspector:
-    description: Inspector's unique identifier
-    lineage:
-      - datalake_gsheets_raw.inspectors_control.sk_inspector
   agenda_type:
-    description: Schedule type
+    description: Value from the Google Sheets source column mapped to agenda_type for inspectors_control planning.
     lineage:
       - datalake_gsheets_raw.inspectors_control.agenda_type
   beneficiary_document:
@@ -36,7 +32,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.inspectors_control.employee_contract_type
   inspector_address:
-    description: Inspector's address
+    description: Value from the Google Sheets source column mapped to inspector_address for inspectors_control planning.
     lineage:
       - datalake_gsheets_raw.inspectors_control.inspector_address
   inspector_cnpj:
@@ -112,7 +108,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.inspectors_control.appointed_representative
   dt_handover:
-    description: Handover date
+    description: Calendar date associated with handover in the business process.
     lineage:
       - datalake_gsheets_raw.inspectors_control.handover_date
   dt_start:
@@ -125,3 +121,6 @@ columns:
       - datalake_gsheets_raw.inspectors_control.dt_end
   ts_load:
     description: Timestamp of when this table was loaded.
+  id_inspector:
+    description: Identifier for the inspector referenced by this record.
+    lineage: []

@@ -1,104 +1,144 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: schedule_inspection_departure
+description:
+  Reference inspection scheduling reference dates curated in Google Sheets by
+  the Support and Services team. One row per schedule inspection departure
+  entry used to calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.contrato
+    description: Identifier for the contract referenced by this record.
   id_house:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.imovel
+    description: Identifier for the house referenced by this record.
   house_district:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.bairro
+    description: Value from the Google Sheets source column mapped to house_district for schedule_inspection_departure planning.
   house_city:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.cidade
+    description: Value from the Google Sheets source column mapped to house_city for schedule_inspection_departure planning.
   house_address:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.bairro_cidade
+    description: Value from the Google Sheets source column mapped to house_address for schedule_inspection_departure planning.
   crm_url:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.link_crm
+    description: URL pointing to the crm url resource in the external platform.
   company:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.foxter_cia_imobiliaria
+    description: Value from the Google Sheets source column mapped to company for schedule_inspection_departure planning.
   hsl_or_5a:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.hsl_5a
+    description: Value from the Google Sheets source column mapped to hsl_or_5a for schedule_inspection_departure planning.
   status_ct:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.status_ct
+    description: Value from the Google Sheets source column mapped to status_ct for schedule_inspection_departure planning.
   status_vt:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.status_vt
+    description: Value from the Google Sheets source column mapped to status_vt for schedule_inspection_departure planning.
   leadtime:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.leadtime
+    description: Value from the Google Sheets source column mapped to leadtime for schedule_inspection_departure planning.
   late_update:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.atualizacao_tarde
+    description: Value from the Google Sheets source column mapped to late_update for schedule_inspection_departure planning.
   cancellation_reason:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.motivo_cancelamento
+    description: Value from the Google Sheets source column mapped to cancellation_reason for schedule_inspection_departure planning.
   agent_name:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.analista
+    description: Human-readable agent name used in dashboards and operational reports.
   reasons_not_scheduling:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.motivos_nao_agendamento
+    description: Value from the Google Sheets source column mapped to reasons_not_scheduling for schedule_inspection_departure planning.
   escort_in_inspection:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.acompanhante_vistoria
+    description: Value from the Google Sheets source column mapped to escort_in_inspection for schedule_inspection_departure planning.
   summary_case:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.resumo_caso
+    description: Value from the Google Sheets source column mapped to summary_case for schedule_inspection_departure planning.
   regional_description:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.regional
-  contacted_PP:
-    lineage:
-      - datalake_gsheets_raw.agendamento_vistoria_saida.contantou_PP
+    description: Value from the Google Sheets source column mapped to regional_description for schedule_inspection_departure planning.
   number_of_attempts:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.numero_tentativas
+    description: Value from the Google Sheets source column mapped to number_of_attempts for schedule_inspection_departure planning.
   whatsapp_number:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.whatsapp
+    description: Value from the Google Sheets source column mapped to whatsapp_number for schedule_inspection_departure planning.
   email:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.email
+    description: Email address associated with the user or contact on this record.
   response_channel:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.canal_resposta
+    description: Value from the Google Sheets source column mapped to response_channel for schedule_inspection_departure planning.
   load_period:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.load
+    description: Value from the Google Sheets source column mapped to load_period for schedule_inspection_departure planning.
   scheduled:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.agendado
+    description: Value from the Google Sheets source column mapped to scheduled for schedule_inspection_departure planning.
   b2b:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.b2b
+    description: Value from the Google Sheets source column mapped to b2b for schedule_inspection_departure planning.
   open_task:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.tarefa_aberta
+    description: Value from the Google Sheets source column mapped to open_task for schedule_inspection_departure planning.
   dt_departured:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.data_saida
+    description: Calendar date associated with departured in the business process.
   dt_rescission:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.data_recisao
+    description: Calendar date associated with rescission in the business process.
   ts_load:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.ts_load
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
   year:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_saida.day
+    description: Day partition derived from the source event timestamp for incremental loading.
+  house_region:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to house_region for schedule_inspection_departure planning.
+  contacted_pp:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to contacted_pp for schedule_inspection_departure planning.

@@ -1,52 +1,57 @@
 database_name: datalake_gsheets_clean
 table_name: nps_target_share
+description:
+  NPS target allocation shares by campaign group and customer journey,
+  maintained in Google Sheets for quarterly support KPI planning. One row per
+  target period and journey segment.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   support:
-    description: "Campaign group in full."
+    description: Support squad or operational area (apoio) responsible for this NPS target share.
     lineage:
       - datalake_gsheets_raw.nps_target_share.apoio
   campaign_group:
-    description: "Name of campaign group."
+    description: Braze or survey campaign group whose NPS performance is being allocated.
     lineage:
       - datalake_gsheets_raw.nps_target_share.campaign_group
   customer_journey:
-    description: "Customer journey."
+    description: Customer journey stage (e.g. onboarding, offboarding) covered by this target.
     lineage:
       - datalake_gsheets_raw.nps_target_share.customer_journey
   target:
-    description: "Target"
+    description: Numeric NPS target score the squad should achieve in the period.
     lineage:
       - datalake_gsheets_raw.nps_target_share.target
   share:
-    description: "Represents the share that a given element holds within a larger set."
+    description: Fraction of the overall NPS target attributed to this journey or campaign slice.
     lineage:
       - datalake_gsheets_raw.nps_target_share.share
   quarter:
-    description: "Quarter"
+    description: Fiscal quarter label for which this NPS target allocation applies.
     lineage:
       - datalake_gsheets_raw.nps_target_share.quarter
   dt_start:
-    description: "Initial target and share effective date."
+    description: First calendar date when this NPS target share becomes effective.
     lineage:
       - datalake_gsheets_raw.nps_target_share.data_inicio
   dt_end:
-    description: "End date of target and share."
+    description: Last calendar date when this NPS target share remains valid.
     lineage:
       - datalake_gsheets_raw.nps_target_share.data_fim
   year:
-    description: "Year of target and share"
+    description: Calendar year associated with the NPS target planning period.
     lineage:
       - datalake_gsheets_raw.nps_target_share.ano
   macro_customer_journey:
-    description: "Macro customer journey."
+    description: High-level journey grouping used to roll up NPS shares across related stages.
     lineage:
       - datalake_gsheets_raw.nps_target_share.macro_customer_journey
   share_macro:
-    description: "Share Macro."
+    description: Share of the macro-journey NPS target allocated to this sub-segment.
     lineage:
       - datalake_gsheets_raw.nps_target_share.share_macro
   share_nps_global:
-    description:  "Share nps global"
+    description: 'Share of the company-wide NPS target assigned to this row''s scope.'
     lineage:
       - datalake_gsheets_raw.nps_target_share.share_nps_global

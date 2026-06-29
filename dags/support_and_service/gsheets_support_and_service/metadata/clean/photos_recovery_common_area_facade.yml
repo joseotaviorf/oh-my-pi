@@ -1,19 +1,29 @@
 database_name: datalake_gsheets_clean
 table_name: photos_recovery_common_area_facade
+description:
+  Reference photo recovery operational controls curated in Google Sheets by
+  the Support and Services team. One row per photos recovery common area
+  facade entry used to calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_house:
     lineage:
       - datalake_gsheets_raw.recuperacao_fachada_e_area_comum.id_house
+    description: Identifier for the house referenced by this record.
   facade_recovery_channel:
     lineage:
       - datalake_gsheets_raw.recuperacao_fachada_e_area_comum.facade_recovery_channel
+    description: Value from the Google Sheets source column mapped to facade_recovery_channel for photos_recovery_common_area_facade planning.
   has_common_area_treated:
     lineage:
       - datalake_gsheets_raw.recuperacao_fachada_e_area_comum.has_common_area_treated
+    description: Boolean flag indicating whether has common area treated applies to this support service record.
   has_facade_treated:
     lineage:
       - datalake_gsheets_raw.recuperacao_fachada_e_area_comum.has_facade_treated
+    description: Boolean flag indicating whether has facade treated applies to this support service record.
   dt_analyzed:
     lineage:
       - datalake_gsheets_raw.recuperacao_fachada_e_area_comum.dt_analyzed
+    description: Calendar date associated with analyzed in the business process.

@@ -1,98 +1,136 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: schedule_inspection_entry
+description:
+  Reference inspection scheduling reference dates curated in Google Sheets by
+  the Support and Services team. One row per schedule inspection entry entry
+  used to calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.contrato
+    description: Identifier for the contract referenced by this record.
   id_house:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.imovel
+    description: Identifier for the house referenced by this record.
   house_district:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.bairro
+    description: Value from the Google Sheets source column mapped to house_district for schedule_inspection_entry planning.
   house_city:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.cidade
+    description: Value from the Google Sheets source column mapped to house_city for schedule_inspection_entry planning.
   hsl_or_5a:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.hsl_5a
+    description: Value from the Google Sheets source column mapped to hsl_or_5a for schedule_inspection_entry planning.
   status_vt:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.status_vt
+    description: Value from the Google Sheets source column mapped to status_vt for schedule_inspection_entry planning.
   late_update:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.atualizacao_tarde
+    description: Value from the Google Sheets source column mapped to late_update for schedule_inspection_entry planning.
   status_ct:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.status_ct
+    description: Value from the Google Sheets source column mapped to status_ct for schedule_inspection_entry planning.
   served_by_network:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.atendida_pela_rede
+    description: Value from the Google Sheets source column mapped to served_by_network for schedule_inspection_entry planning.
   serverd_by_randstad:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.atendida_pela_randstad
+    description: Value from the Google Sheets source column mapped to serverd_by_randstad for schedule_inspection_entry planning.
   cancellation_reason:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.motivo_cancelamento
+    description: Value from the Google Sheets source column mapped to cancellation_reason for schedule_inspection_entry planning.
   agent_name:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.analista
+    description: Human-readable agent name used in dashboards and operational reports.
   reasons_not_scheduling:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.motivo_nao_agendamento
-  sem_contato_com_pp_iq:
-    lineage:
-      - datalake_gsheets_raw.agendamento_vistoria_entrada.no_contact_with_pp_iq
+    description: Value from the Google Sheets source column mapped to reasons_not_scheduling for schedule_inspection_entry planning.
   number_of_attempts:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.n_tentativas_ligacoes
+    description: Value from the Google Sheets source column mapped to number_of_attempts for schedule_inspection_entry planning.
   whatsapp_number:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.whatsapp
+    description: Value from the Google Sheets source column mapped to whatsapp_number for schedule_inspection_entry planning.
   email:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.email
+    description: Email address associated with the user or contact on this record.
   response_channel:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.canal_resposta
+    description: Value from the Google Sheets source column mapped to response_channel for schedule_inspection_entry planning.
   sla_response:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.qual_sla
+    description: Value from the Google Sheets source column mapped to sla_response for schedule_inspection_entry planning.
   sla_reason:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.motivo_sla
+    description: Value from the Google Sheets source column mapped to sla_reason for schedule_inspection_entry planning.
   load_period:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.periodo
+    description: Value from the Google Sheets source column mapped to load_period for schedule_inspection_entry planning.
   contact_with_pp:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.existiu_contato_com_pp
+    description: Value from the Google Sheets source column mapped to contact_with_pp for schedule_inspection_entry planning.
   needed_rehandle_inspection:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.precisou_remanejar_vistoria
+    description: Value from the Google Sheets source column mapped to needed_rehandle_inspection for schedule_inspection_entry planning.
   scheduled:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.agendado
+    description: Value from the Google Sheets source column mapped to scheduled for schedule_inspection_entry planning.
   b2b:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.b2b
+    description: Value from the Google Sheets source column mapped to b2b for schedule_inspection_entry planning.
   dt_last_scheduled:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.ultimo_agendamento
+    description: Calendar date associated with last scheduled in the business process.
   dt_effectived:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.vigencia
+    description: Calendar date associated with effectived in the business process.
   ts_load:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.ts_load
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
   year:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_gsheets_raw.agendamento_vistoria_entrada.day
+    description: Day partition derived from the source event timestamp for incremental loading.
+  no_contact_with_pp_iq:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to no_contact_with_pp_iq for schedule_inspection_entry planning.
+  house_region:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to house_region for schedule_inspection_entry planning.
