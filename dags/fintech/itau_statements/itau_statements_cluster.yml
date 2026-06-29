@@ -4,6 +4,11 @@ cluster:
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
+  custom_libraries:
+  - pypi:
+      package: numpy==1.26.4
+  - pypi:
+      package: pyarrow==15.0.2
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
