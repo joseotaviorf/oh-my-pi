@@ -18,9 +18,9 @@ product_description: |
 
   Two analytical lenses:
   - Visit View (use for conversion): what is the rate from completed visits to proposals?
-    Use dw_visits.fact_visits.
+    Use dw_visit.fact_visits.
   - Schedule View (use for operations): how many times was a booking canceled or rescheduled?
-    Use dw_visits.fact_visit_schedules.
+    Use dw_visit.fact_visit_schedules.
 
   Funnel notation:
   VB (Visit Booked) → VCf (Visit Confirmed) → VC (Visit Completed) → OS (Offer Sent) →
@@ -34,10 +34,10 @@ product_description: |
   - fact_visit_schedules: 1 row per individual booking attempt (sk_schedule). Multiple
     reschedules for the same visit generate multiple schedule rows. Use is_last_schedule = TRUE
     to see only the final/valid attempt.
-  - dim_visit: 1 row per visit (source, cancel reason, context).
+  - dim_visit: 1 row per visit (source, cancellation_reason, context).
   - dim_visit_schedule: 1 row per schedule (confirmation details, lifecycle timestamps).
   - dim_post_visit_demand: 1 row per completed visit (post-visit feedback from demand).
-  - fact_house_entrance: property entrance and key management data.
+  - dw_house.dim_house_entrance_history: property entrance and key management data.
 
   Key metrics: VB2VC rate (Visit Booked to Visit Completed), conversion from visit to proposal,
   cancellation rate by reason (demand-led/supply-led/broker-led), rescheduling frequency
@@ -47,9 +47,9 @@ product_description: |
   - Do NOT count sk_schedule as unique visits — one visit can have multiple schedules from
     rescheduling. Always use sk_visit for visit-level counting.
   - Always filter is_last_schedule = TRUE in fact_visit_schedules for the final/valid attempt.
-  - Include partition guard: dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS for performance.
+  - Include date filter: CAST(ts_visit_local_tz AS DATE) >= CURRENT_DATE - INTERVAL '6' MONTH to limit scan volume. ts_visit_local_tz is not a partition column.
   - fact_visits covers both RENT and SALE contexts — always filter when modality-specific.
-  - visit_status = 'cancelled' ≠ system error; use cancel_reason to identify demand/supply/
+  - visit_status = 'cancelled' ≠ system error; use cancellation_reason in dim_visit to identify demand/supply/
     broker-led cancellations.
   - Do not mix house_entrance data with visit status without validating entrance model availability
     at time of visit.
@@ -72,14 +72,14 @@ golden_query:
   name: "Query 1 — Visit Booked to Visit Completed (VB2VC) Rate"
   description: >-
     Primary scheduling efficiency metric: monthly VB2VC rate from fact_visits. Uses
-    num_visit_booked and num_visit_completed columns. Includes partition guard on dt_visit.
+    num_visit_booked and num_visit_completed columns. Date filter uses CAST(ts_visit_local_tz AS DATE).
     Source: docs/llm_context/business_entities/visits.md
   subjects:
     - schema: dw_visit
       table: fact_visits
   sql: |
     SELECT
-        DATE_TRUNC('month', dt_visit) AS month_ref,
+        DATE_TRUNC('month', CAST(ts_visit_local_tz AS DATE)) AS month_ref,
         SUM(num_visit_booked) AS total_visits_booked,
         SUM(num_visit_completed) AS completed_visits,
         ROUND(
@@ -87,7 +87,7 @@ golden_query:
             3
         ) AS vb2vc_rate
     FROM dw_visit.fact_visits
-    WHERE dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS
+    WHERE CAST(ts_visit_local_tz AS DATE) >= CURRENT_DATE - INTERVAL '6' MONTH
     GROUP BY 1
     ORDER BY 1 DESC
 
@@ -111,7 +111,7 @@ glossary_terms:
       description: >-
         A prospective tenant or buyer physically viewing a property before renting or buying.
         The consolidated business entity (can contain one or more schedules for the same
-        property/customer interaction). Table: dw_visits.fact_visits. NOT the same as
+        property/customer interaction). Table: dw_visit.fact_visits. NOT the same as
         inspection (vistoria), which is a technical property assessment.
     - id: visit_vb
       name: "VB (Visit Booked)"
@@ -134,7 +134,7 @@ glossary_terms:
       name: "VCc (Visit Canceled)"
       description: >-
         A visit that was canceled before it occurred. is_cancelled = TRUE or
-        visit_status = 'cancelled'. Use cancel_reason to distinguish demand-led,
+        visit_status = 'cancelled'. Use cancellation_reason in dim_visit to distinguish demand-led,
         supply-led, or broker-led cancellations — not all cancellations are system errors.
       related_terms:
         - urn: urn:li:glossaryTerm:visit_entity
@@ -161,7 +161,7 @@ glossary_terms:
       name: "House Entrance"
       description: >-
         The method of access to the property for the visit (Frontdoor, Owner, Lockbox,
-        Broker-held keys, etc.). Table: dw_visits.fact_house_entrance. Join via sk_house_entrance.
+        Broker-held keys, etc.). Table: dw_house.dim_house_entrance_history. Join via sk_house_entrance.
         Validate entrance model availability at time of visit before mixing with visit status.
     - id: vb2vc_rate
       name: "VB2VC (Visit Booked to Visit Completed)"

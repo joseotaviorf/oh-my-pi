@@ -56,7 +56,7 @@ Daily **visit** grain: one row per consolidated visit.
 |-------|--------|
 | Keys | `sk_visit`, `sk_visitor`, `sk_house`, `sk_house_entrance` |
 | Status | `visit_status`, `is_completed`, `is_cancelled`, `is_unsuccessful` |
-| Funnel | `sk_funnel_proposal`, `sk_funnel_contract` |
+| Funnel | `sk_funnel_offer_submitted`, `sk_funnel_offer_accepted`, `sk_funnel_contract_signed` |
 
 #### `fact_visit_schedules`
 
@@ -77,12 +77,12 @@ Daily **schedule** grain: one row per appointment attempt.
 - Always filter by **`is_last_schedule = TRUE`** in the schedules table if you want to see only the final/valid attempt for a visit.
 - Join **`dim_post_visit_demand`** to understand why a completed visit did not generate a proposal (qualitative feedback).
 - Check the **`visit_status`** to distinguish between "Completed" visits and "Unsuccessful" visits (where a visit was attempted but failed).
-- Include a partition guard (e.g., `dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS`) to optimize query performance.
+- Include a date filter (e.g., `CAST(ts_visit_local_tz AS DATE) >= CURRENT_DATE - INTERVAL '6' MONTH`) to limit scan volume — `ts_visit_local_tz` is not a partition column.
 
 **Don't:**
 
 - Don't count `sk_schedule` as unique visits; a user may reschedule the same visit 3 times, generating 3 schedules but only 1 `sk_visit`.
-- Don't assume `visit_status = 'cancelled'` implies a system error; use `cancel_reason` to distinguish between demand-led, supply-led, or broker-led cancellations.
+- Don't assume `visit_status = 'cancelled'` implies a system error; use `cancellation_reason` in `dim_visit` to distinguish between demand-led, supply-led, or broker-led cancellations.
 - Don't mix `house_entrance` data with visit status without validating if the entrance model was available at the time of the visit.
 
 ## Golden queries
@@ -93,12 +93,12 @@ The primary metric for understanding scheduling efficiency and completion.
 
 ```sql
 SELECT 
-    DATE_TRUNC('month', dt_visit) AS month_ref,
+    DATE_TRUNC('month', CAST(ts_visit_local_tz AS DATE)) AS month_ref,
     SUM(num_visit_booked) AS total_visits_booked,
     SUM(num_visit_completed) AS completed_visits,
     SUM(num_visit_completed) / SUM(num_visit_booked) AS vb2vc_rate
 FROM dw_visit.fact_visits
-WHERE dt_visit >= CURRENT_DATE - INTERVAL '6' MONTHS
+WHERE CAST(ts_visit_local_tz AS DATE) >= CURRENT_DATE - INTERVAL '6' MONTH
 GROUP BY 1
 ORDER BY 1 DESC;
 ```
@@ -114,8 +114,8 @@ SELECT
     SUM(num_visit_completed) AS completed_visits,
     SUM(num_visit_unsuccessful) AS unsuccessful_visits
 FROM dw_visit.fact_visits f
-JOIN dw_visit.dim_house_entrance dim_h ON f.sk_house_entrance = dim_h.sk_house_entrance
-WHERE f.dt_visit >= CURRENT_DATE - INTERVAL '30' DAYS
+JOIN dw_house.dim_house_entrance_history dim_h ON f.sk_house_entrance = dim_h.sk_house_entrance
+WHERE CAST(f.ts_visit_local_tz AS DATE) >= CURRENT_DATE - INTERVAL '30' DAY
 GROUP BY 1
 ORDER BY total_visits DESC;
 ```
