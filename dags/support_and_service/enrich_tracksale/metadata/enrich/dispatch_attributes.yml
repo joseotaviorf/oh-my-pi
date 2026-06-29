@@ -4,7 +4,7 @@ table_name: dispatch_attributes
 description: Table that unifies information about attributes of dispatches.
   Each dispatch has its own attributes, here we only want information about these attributes.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

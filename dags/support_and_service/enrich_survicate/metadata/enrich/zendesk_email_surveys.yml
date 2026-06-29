@@ -3,7 +3,7 @@ database_name: datalake_survicate
 table_name: zendesk_email_surveys
 description: Responses to service forms in the context of customer service by Zendesk via email.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_survey:
     lineage:
@@ -42,7 +42,7 @@ columns:
   is_solved:
     lineage:
       - datalake_survicate.response_content.answer_content
-    description: The problem was solved
+    description: Indicates whether solved applies to this record.
   ts_first_response:
     lineage:
       - datalake_survicate.response_content.ts_collected

@@ -3,7 +3,7 @@ database_name: datalake_tracksale
 table_name: dispatch
 description: In this table, we clean the dispatch data bringing only the most up-to-date ones.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

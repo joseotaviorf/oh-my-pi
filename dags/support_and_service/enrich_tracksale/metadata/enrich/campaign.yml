@@ -5,7 +5,7 @@ description:
   With this table we are concentrating and cleaning information about campaigns,
   it combines information about campaign names and customer journey for example.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:

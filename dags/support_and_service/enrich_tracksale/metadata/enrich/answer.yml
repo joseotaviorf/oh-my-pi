@@ -3,7 +3,7 @@ database_name: datalake_tracksale
 table_name: answer
 description: This table concentrates general information from nps responses, gathering both respondent information and information from the response itself.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -22,7 +22,7 @@ columns:
   name:
     lineage:
       - datalake_tracksale_clean.answer.name
-    description: Respondent name.
+    description: Display name of the entity as registered in the upstream operational application.
   identification:
     lineage:
       - datalake_tracksale_clean.answer.identification
