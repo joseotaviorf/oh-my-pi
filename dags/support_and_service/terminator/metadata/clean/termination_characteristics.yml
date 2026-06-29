@@ -2,7 +2,7 @@ database_name: datalake_terminator_clean
 table_name: termination_characteristics
 description: Table defining the characteristics of the contract termination.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -11,7 +11,7 @@ columns:
   id_termination:
     lineage:
       - datalake_terminator_raw.termination_characteristics.termination_id
-    description: The ID of the termination.
+    description: Identifier for the termination referenced by this record.
   is_job_transfer:
     lineage:
       - datalake_terminator_raw.termination_characteristics.job_transfer

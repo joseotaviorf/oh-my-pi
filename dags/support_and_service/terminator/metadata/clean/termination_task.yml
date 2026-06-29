@@ -2,7 +2,7 @@ database_name: datalake_terminator_clean
 table_name: termination_task
 description: Table with tickets that are created by the Terminator.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -23,7 +23,7 @@ columns:
   priority:
     lineage:
       - datalake_terminator_raw.termination_task.priority
-    description: Priority of the task.
+    description: Urgency level assigned to the ticket or task for queue ordering.
   title:
     lineage:
       - datalake_terminator_raw.termination_task.title

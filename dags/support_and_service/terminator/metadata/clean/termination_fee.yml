@@ -1,61 +1,85 @@
 database_name: datalake_terminator_clean
 table_name: termination_fee
+description:
+  One row per termination fee in the contract termination (offboarding)
+  workflow managed by the Terminator service. Tracks step progression, fees,
+  and inspection outcomes.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id:
     lineage:
       - datalake_terminator_raw.termination_fee.id
+    description: Primary surrogate identifier for the entity row in this support and service dataset.
   id_termination:
     lineage:
       - datalake_terminator_raw.termination_fee.termination_id
+    description: Identifier for the termination referenced by this record.
   dt_period_start_charge:
     lineage:
       - datalake_terminator_raw.termination_fee.period_start_charge
+    description: Calendar date associated with period start charge in the business process.
   contract_rental_amount:
     lineage:
       - datalake_terminator_raw.termination_fee.contract_rental_amount
+    description: Attribute of the termination workflow describing contract rental amount.
   dt_period_end_charge:
     lineage:
       - datalake_terminator_raw.termination_fee.period_end_charge
+    description: Calendar date associated with period end charge in the business process.
   dt_period_min_end:
     lineage:
       - datalake_terminator_raw.termination_fee.period_min_end_date
+    description: Calendar date associated with period min end in the business process.
   dt_period_fee_end:
     lineage:
       - datalake_terminator_raw.termination_fee.period_fee_end_date
+    description: Calendar date associated with period fee end in the business process.
   period_occupancy_days:
     lineage:
       - datalake_terminator_raw.termination_fee.period_occupancy_days
+    description: Attribute of the termination workflow describing period occupancy days.
   period_fee_missing_days:
     lineage:
       - datalake_terminator_raw.termination_fee.period_fee_missing_days
+    description: Attribute of the termination workflow describing period fee missing days.
   period_fee_days:
     lineage:
       - datalake_terminator_raw.termination_fee.period_fee_days
+    description: Attribute of the termination workflow describing period fee days.
   period_fee_months:
     lineage:
       - datalake_terminator_raw.termination_fee.period_fee_months
+    description: Attribute of the termination workflow describing period fee months.
   fee_ratio:
     lineage:
       - datalake_terminator_raw.termination_fee.fee_ratio
+    description: Attribute of the termination workflow describing fee ratio.
   fee_factor:
     lineage:
       - datalake_terminator_raw.termination_fee.fee_factor
+    description: Attribute of the termination workflow describing fee factor.
   is_fee_prior_notice:
     lineage:
       - datalake_terminator_raw.termination_fee.fee_prior_notice
+    description: Indicates whether fee prior notice applies to this record.
   tenant_amount:
     lineage:
       - datalake_terminator_raw.termination_fee.tenant_amount
+    description: Attribute of the termination workflow describing tenant amount.
   tenant_payment_method:
     lineage:
       - datalake_terminator_raw.termination_fee.tenant_payment_method
+    description: Attribute of the termination workflow describing tenant payment method.
   landlord_amount:
     lineage:
       - datalake_terminator_raw.termination_fee.landlord_amount
+    description: Attribute of the termination workflow describing landlord amount.
   ts_created:
     lineage:
       - datalake_terminator_raw.termination_fee.created_at
+    description: Timestamp when the record was first created in the upstream source system.
   ts_updated:
     lineage:
       - datalake_terminator_raw.termination_fee.updated_at
+    description: Timestamp of the most recent update to the record in the upstream source system.
