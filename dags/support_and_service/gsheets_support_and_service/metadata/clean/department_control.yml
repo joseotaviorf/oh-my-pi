@@ -1,37 +1,53 @@
 database_name: datalake_gsheets_clean
 table_name: department_control
+description:
+  Reference department control mappings curated in Google Sheets by the
+  Support and Services team. One row per department control entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   department:
     lineage:
       - datalake_gsheets_raw.department_control.aux_canal
+    description: Value from the Google Sheets source column mapped to department for department_control planning.
   board:
     lineage:
       - datalake_gsheets_raw.department_control.diretoria
+    description: Value from the Google Sheets source column mapped to board for department_control planning.
   team:
     lineage:
       - datalake_gsheets_raw.department_control.area_aux
+    description: Value from the Google Sheets source column mapped to team for department_control planning.
   channel:
     lineage:
       - datalake_gsheets_raw.department_control.canal
+    description: Value from the Google Sheets source column mapped to channel for department_control planning.
   concentrix_area:
     lineage:
       - datalake_gsheets_raw.department_control.area_concentrix
+    description: Value from the Google Sheets source column mapped to concentrix_area for department_control planning.
   concentrix_area_name:
     lineage:
       - datalake_gsheets_raw.department_control.area_cc
+    description: Human-readable concentrix area name used in dashboards and operational reports.
   active_department:
     lineage:
       - datalake_gsheets_raw.department_control.caixa_ativa_atualmente
+    description: Value from the Google Sheets source column mapped to active_department for department_control planning.
   journey_step:
     lineage:
       - datalake_gsheets_raw.department_control.etapa_da_jornada
+    description: Value from the Google Sheets source column mapped to journey_step for department_control planning.
   front_or_back:
     lineage:
       - datalake_gsheets_raw.department_control.front_back
+    description: Value from the Google Sheets source column mapped to front_or_back for department_control planning.
   area:
     lineage:
       - datalake_gsheets_raw.department_control.area
+    description: Value from the Google Sheets source column mapped to area for department_control planning.
   is_partner:
     lineage:
       - datalake_gsheets_raw.department_control.parceiras
+    description: Indicates whether partner applies to this record.

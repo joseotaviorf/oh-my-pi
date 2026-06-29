@@ -2,14 +2,14 @@ database_name: datalake_zendesk
 table_name: tickets_current
 description: Table containing tickets and ticket metrics data
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ticket:
-    description: Ticket ID from Zendesk
+    description: External ticketing platform identifier for the customer support case record.
     lineage:
       - datalake_zendesk.tickets.id_ticket
   id_ticket_form:
-    description: Ticket form ID from Zendesk
+    description: Zendesk ticket form id determining which fields appear on the ticket.
     lineage:
       - datalake_zendesk.tickets.id_ticket_form
   id_assignee:
@@ -45,11 +45,11 @@ columns:
     lineage:
       - datalake_zendesk.tickets.custom_fields
   id_session:
-    description: Session ID from Sauron
+    description: Support session identifier grouping related customer interactions in the same visit.
     lineage:
       - datalake_zendesk.tickets.custom_fields
   id_call:
-    description: Call ID from Twilio
+    description: Telephony provider call identifier linking multiple events to the same phone conversation.
     lineage:
       - datalake_zendesk.tickets.custom_fields
   id_job:
@@ -85,7 +85,7 @@ columns:
   analyst_name:
     lineage:
       - datalake_support_users.analysts.name
-    description: Analyst name.
+    description: Human-readable analyst name used in dashboards and operational reports.
   analyst_phone:
     lineage:
       - datalake_support_users.analysts.phone
@@ -155,7 +155,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets.custom_fields
   status:
-    description: Status of the ticket
+    description: Current lifecycle status of the ticket, task, or workflow step.
     lineage:
       - datalake_zendesk.tickets.status
   channel:
@@ -171,7 +171,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets.description
   type:
-    description: Type of the ticket
+    description: Classification type assigned by the source platform for routing or reporting.
     lineage:
       - datalake_zendesk.tickets.type
   via:
@@ -183,11 +183,11 @@ columns:
     lineage:
       - datalake_zendesk.tickets.via
   priority:
-    description: Ticket priority
+    description: Urgency level assigned to the ticket or task for queue ordering.
     lineage:
       - datalake_zendesk.tickets.priority
   recipient:
-    description: Ticket recipient
+    description: Email address that received the ticket when created via email channel.
     lineage:
       - datalake_zendesk.tickets.recipient
   tags:
@@ -311,7 +311,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets.custom_fields
   listing_type:
-    description: Type of the listing
+    description: Business value representing listing type on the tickets_current enrich dataset.
     lineage:
       - datalake_zendesk.tickets.custom_fields
   install_reason:
@@ -395,7 +395,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets.custom_fields
   dt_first_reply:
-    description: Date of the first reply
+    description: Calendar date associated with first reply in the business process.
     lineage:
       - datalake_zendesk.tickets.custom_fields
   has_plaquinha:

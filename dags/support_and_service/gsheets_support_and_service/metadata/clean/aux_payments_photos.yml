@@ -1,23 +1,37 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: aux_payments_photos
+description:
+  Reference photo recovery operational controls curated in Google Sheets by
+  the Support and Services team. One row per aux payments photos entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_year_month:
     lineage:
       - datalake_gsheets_raw.aux_payments_photos.year_month
+    description: Identifier for the year month referenced by this record.
   region_code_deprecated:
     lineage:
       - datalake_gsheets_raw.aux_payments_photos.region_code_deprecated
+    description: Value from the Google Sheets source column mapped to region_code_deprecated for aux_payments_photos planning.
   limit1:
     lineage:
       - datalake_gsheets_raw.aux_payments_photos.limit1
+    description: Value from the Google Sheets source column mapped to limit1 for aux_payments_photos planning.
   limit2:
     lineage:
       - datalake_gsheets_raw.aux_payments_photos.limit2
+    description: Value from the Google Sheets source column mapped to limit2 for aux_payments_photos planning.
   limit3:
     lineage:
       - datalake_gsheets_raw.aux_payments_photos.limit3
+    description: Value from the Google Sheets source column mapped to limit3 for aux_payments_photos planning.
   limit4:
     lineage:
       - datalake_gsheets_raw.aux_payments_photos.limit4
+    description: Value from the Google Sheets source column mapped to limit4 for aux_payments_photos planning.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

@@ -1,35 +1,50 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: agents_control
+description:
+  Reference support agent roster controls curated in Google Sheets by the
+  Support and Services team. One row per agents control entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_assignee:
     lineage:
       - datalake_gsheets_raw.agents_control.assignee_id
+    description: Zendesk user id of the agent currently assigned to the ticket.
   id_registration:
     lineage:
       - datalake_gsheets_raw.agents_control.matricula
+    description: Identifier for the registration referenced by this record.
   agent_name:
     lineage:
       - datalake_gsheets_raw.agents_control.nome
+    description: Human-readable agent name used in dashboards and operational reports.
   agent_company:
     lineage:
       - datalake_gsheets_raw.agents_control.centro_de_custo
+    description: Value from the Google Sheets source column mapped to agent_company for agents_control planning.
   department:
     lineage:
       - datalake_gsheets_raw.agents_control.departamento
+    description: Value from the Google Sheets source column mapped to department for agents_control planning.
   manager:
     lineage:
       - datalake_gsheets_raw.agents_control.gestores
+    description: Value from the Google Sheets source column mapped to manager for agents_control planning.
   email:
     lineage:
       - datalake_gsheets_raw.agents_control.email
+    description: Email address associated with the user or contact on this record.
   cpf:
     lineage:
       - datalake_gsheets_raw.agents_control.cpf
+    description: Value from the Google Sheets source column mapped to cpf for agents_control planning.
   agent_status:
     lineage:
       - datalake_gsheets_raw.agents_control.situacao
+    description: Value from the Google Sheets source column mapped to agent_status for agents_control planning.
   dt_start:
     lineage:
       - datalake_gsheets_raw.agents_control.data_inicio
+    description: Calendar date associated with start in the business process.

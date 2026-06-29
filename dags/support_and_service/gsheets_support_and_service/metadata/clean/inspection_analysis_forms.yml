@@ -1,31 +1,45 @@
 database_name: datalake_gsheets_clean
 table_name: inspection_analysis_forms
+description:
+  Reference inspection analysis form references curated in Google Sheets by
+  the Support and Services team. One row per inspection analysis forms entry
+  used to calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.sk_contract
+    description: Identifier for the contract referenced by this record.
   id_ticket:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.sk_ticket
+    description: External ticketing platform identifier for the customer support case record.
   email:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.email
+    description: Email address associated with the user or contact on this record.
   status:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.status
+    description: Current lifecycle status of the ticket, task, or workflow step.
   inspector_comments_due:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.comentarios_vistoriador_devidos
+    description: Value from the Google Sheets source column mapped to inspector_comments_due for inspection_analysis_forms planning.
   total_inspector_comments:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.comentarios_vistoriador_total
+    description: Value from the Google Sheets source column mapped to total_inspector_comments for inspection_analysis_forms planning.
   inspector_commented:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.vistoriador_comentou
+    description: Value from the Google Sheets source column mapped to inspector_commented for inspection_analysis_forms planning.
   adjustments_tenant_duty:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.analise_ajustes_devidos_iq
+    description: Value from the Google Sheets source column mapped to adjustments_tenant_duty for inspection_analysis_forms planning.
   ts_input:
     lineage:
       - datalake_gsheets_raw.forms_analise_vistoria.ts_input
+    description: Timestamp when input occurred according to the source system.

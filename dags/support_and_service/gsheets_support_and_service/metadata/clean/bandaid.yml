@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: bandaid
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 description: Table with information about Bandaid tickets.
 columns:
   key:
@@ -12,15 +12,15 @@ columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.bandaid.contrato
-    description: ID of the contract.
+    description: Identifier for the contract referenced by this record.
   id_house:
     lineage:
       - datalake_gsheets_raw.bandaid.id_imovel
-    description: ID of the house.
+    description: Identifier for the house referenced by this record.
   id_jira_analysis:
     lineage:
       - datalake_gsheets_raw.bandaid.id_analise_jira
-    description: ID of the Jira analysis.
+    description: Identifier for the jira analysis referenced by this record.
   value:
     lineage:
       - datalake_gsheets_raw.bandaid.valor
@@ -44,11 +44,11 @@ columns:
   requester_email:
     lineage:
       - datalake_gsheets_raw.bandaid.email_solicitante
-    description: Email of the requester.
+    description: Value from the Google Sheets source column mapped to requester_email for bandaid planning.
   client_email:
     lineage:
       - datalake_gsheets_raw.bandaid.email_cliente
-    description: Email of the client.
+    description: Value from the Google Sheets source column mapped to client_email for bandaid planning.
   beneficiary:
     lineage:
       - datalake_gsheets_raw.bandaid.beneficiario
@@ -64,7 +64,7 @@ columns:
   jira_analysis_date:
     lineage:
       - datalake_gsheets_raw.bandaid.data_analise_jira
-    description: Date of the Jira analysis.
+    description: Value from the Google Sheets source column mapped to jira_analysis_date for bandaid planning.
   approver:
     lineage:
       - datalake_gsheets_raw.bandaid.aprovador
@@ -72,7 +72,7 @@ columns:
   request_type:
     lineage:
       - datalake_gsheets_raw.bandaid.tipo_solicitacao
-    description: Type of the request.
+    description: Value from the Google Sheets source column mapped to request_type for bandaid planning.
   category:
     lineage:
       - datalake_gsheets_raw.bandaid.categoria
@@ -96,7 +96,7 @@ columns:
   error_analyst_email:
     lineage:
       - datalake_gsheets_raw.bandaid.email_analista_erro
-    description: Email of the error analyst.
+    description: Value from the Google Sheets source column mapped to error_analyst_email for bandaid planning.
   bpo:
     lineage:
       - datalake_gsheets_raw.bandaid.bpo
@@ -104,11 +104,11 @@ columns:
   rejection_reason:
     lineage:
       - datalake_gsheets_raw.bandaid.motivo_reprovacao
-    description: Reason of the rejection.
+    description: Value from the Google Sheets source column mapped to rejection_reason for bandaid planning.
   system_process_name:
     lineage:
       - datalake_gsheets_raw.bandaid.nome_do_processo_sistema
-    description: Process name in the bandaid system.
+    description: Human-readable system process name used in dashboards and operational reports.
   id_ticket:
     lineage:
       - datalake_gsheets_raw.bandaid.tkt_zendesk
@@ -124,4 +124,4 @@ columns:
   ts_load:
     lineage:
       - datalake_gsheets_raw.bandaid.ts_load
-    description: Timestamp load.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

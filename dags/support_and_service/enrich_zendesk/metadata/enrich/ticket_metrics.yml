@@ -2,12 +2,12 @@ database_name: datalake_zendesk
 table_name: ticket_metrics
 description: Table with all metrics related to the ticket
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
       - datalake_zendesk_clean.ticket_metrics.id_ticket
-    description: Zendesk's ticket ID
+    description: External ticketing platform identifier for the customer support case record.
   group_stations:
     lineage:
       - datalake_zendesk_clean.ticket_metrics.group_stations
@@ -99,8 +99,8 @@ columns:
   ts_load:
     description: Timestamp of when data was loaded
   year:
-    descriptiopn: Partition column
+    description: Partition column
   month:
-    descriptiopn: Partition column
+    description: Partition column
   day:
-    descriptiopn: Partition column
+    description: Partition column

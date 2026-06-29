@@ -3,24 +3,16 @@ database_name: datalake_gsheets_clean
 table_name: csat_reimbursement_true
 description: This worksheet contains the satisfaction form responses for the tenant/landlord refund or repair refund process.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_activity:
     description: Reimbursement task ID in Heimdall base
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.act_id
   token:
-    description: Customer token
+    description: Value from the Google Sheets source column mapped to token for csat_reimbursement_true planning.
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.token
-  cid:
-    description: Unique contract identifier
-    lineage:
-      - datalake_gsheets_raw.csat_reembolso_true.cid
-  uid:
-    description: User ID requesting refund
-    lineage:
-      - datalake_gsheets_raw.csat_reembolso_true.uid
   type:
     description: "Refund category: tenant_refund, landlord_refund or repairs"
     lineage:
@@ -53,3 +45,9 @@ columns:
     description: Data loading date in the datalake
     lineage:
       - datalake_gsheets_raw.csat_reembolso_true.ts_load
+  id_contract:
+    description: Identifier for the contract referenced by this record.
+    lineage: []
+  id_user:
+    description: QuintoAndar user identifier associated with the IVR interaction or scheduled call.
+    lineage: []

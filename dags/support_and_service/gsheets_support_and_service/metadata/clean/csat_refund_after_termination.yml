@@ -1,17 +1,26 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: csat_refund_after_termination
+description:
+  Reference CSAT survey score targets curated in Google Sheets by the Support
+  and Services team. One row per csat refund after termination entry used to
+  calibrate dashboards and operational KPIs.
+owner: gabriel.firmino@quintoandar.com.br
 domain: Support and Services
 columns:
   customer_experience_feedback:
     lineage:
       - datalake_gsheets_raw.csat_reembolso_pos_rescisao.experiencia_reembolso
+    description: Value from the Google Sheets source column mapped to customer_experience_feedback for csat_refund_after_termination planning.
   improvement_suggestions:
     lineage:
       - datalake_gsheets_raw.csat_reembolso_pos_rescisao.sugestao_melhorias
+    description: Value from the Google Sheets source column mapped to improvement_suggestions for csat_refund_after_termination planning.
   satisfation_level:
     lineage:
       - datalake_gsheets_raw.csat_reembolso_pos_rescisao.nivel_satisfacao
+    description: Value from the Google Sheets source column mapped to satisfation_level for csat_refund_after_termination planning.
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_reembolso_pos_rescisao.timestamp
+    description: Timestamp when submitted occurred according to the source system.
