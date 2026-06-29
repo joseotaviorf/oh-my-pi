@@ -3,14 +3,14 @@ database_name: datalake_survicate_clean
 table_name: surveys
 description: This table contains a list of all searches in your workspace, including their associated metadata and configuration parameters.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_survey:
     description: The survey's unique unchangeable identifier.
     lineage:
       - datalake_survicate_raw.surveys.id
   survey_name:
-    description: The name of the survey.
+    description: Human-readable survey name used in dashboards and operational reports.
     lineage:
       - datalake_survicate_raw.surveys.name
   type:
