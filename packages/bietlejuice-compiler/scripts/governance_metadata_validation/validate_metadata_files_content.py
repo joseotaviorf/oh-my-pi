@@ -13,6 +13,7 @@ from scripts.ci_cd.domain_cli import (
 )
 from scripts.services.git_service import GitService
 from scripts.services.metadata_file_service import (
+    DatabaseNameMismatchException,
     MetadataFileService,
     MetricValidateLayerException,
     ReverseMetadataFileException,
@@ -178,6 +179,8 @@ def main():
             except MetricValidateLayerException as error:
                 results["failed"].append(error)
             except TableNameMismatchException as error:
+                results["failed"].append(error)
+            except DatabaseNameMismatchException as error:
                 results["failed"].append(error)
         else:
             results["skipped"].append(file)

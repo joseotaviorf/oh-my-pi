@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 from sqlglot import exp, parse_one
@@ -10,6 +10,20 @@ from yamale import yamale
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
 from scripts.services.metadata_file_info import MetadataFileInfo
+
+_DB_NAME_FORMULA = {
+    "transactional": "datalake_{schema}_transactional",
+    "raw": "datalake_{schema}_raw",
+    "clean": "datalake_{schema}_clean",
+    "clean_staging": "datalake_{schema}_clean_staging",
+    "core": "{schema}",
+    "enrich": "datalake_{schema}",
+    "dw": "dw_{schema}",
+    "dw_staging": "dw_{schema}_staging",
+    "metric": "metric_{schema}",
+}
+
+_DAG_DIR_FROM_METADATA_PATH = re.compile(r"((?:.*/)?dags/[^/]+/[^/]+)/metadata/")
 
 
 class ReverseMetadataFileException(Exception):
@@ -48,6 +62,20 @@ class TableNameMismatchException(Exception):
         )
 
 
+class DatabaseNameMismatchException(Exception):
+    def __init__(self, file, declared_db, expected_db, dag_name, layer, schema):
+        self.data = file
+        self.errors = [
+            f"Error: database_name '{declared_db}' does not match the expected '{expected_db}' "
+            f"(dag='{dag_name}', layer='{layer}', schema='{schema}'). "
+            f"Update database_name to '{expected_db}'."
+        ]
+        super().__init__(
+            f"file={file}, declared={declared_db}, expected={expected_db}, "
+            f"dag={dag_name}, layer={layer}, schema={schema}"
+        )
+
+
 class MetadataFileService:
     """
     Class used to validate and extract information from metadata files
@@ -80,6 +108,65 @@ class MetadataFileService:
             )
             for layer in ("raw", "clean", "core", "enrich_dw", "metric")
         }
+
+    @staticmethod
+    def _load_declaration(file_path: str, dag_name: str) -> Optional[dict]:
+        match = re.match(_DAG_DIR_FROM_METADATA_PATH, file_path)
+        if not match:
+            return None
+        declaration_path = Path(match.group(1)) / f"{dag_name}_declaration.yml"
+        if not declaration_path.exists():
+            return None
+        with open(declaration_path) as f:
+            return yaml.safe_load(f)
+
+    @staticmethod
+    def _compute_schema(
+        dag_name: str,
+        layer: str,
+        custom_schema: Optional[str],
+        table_name: str,
+        tables_customization: dict,
+    ) -> str:
+        # Per-table custom_schema takes precedence (used in DW layer)
+        table_custom = tables_customization.get(table_name, {})
+        if isinstance(table_custom, dict) and "custom_schema" in table_custom:
+            return table_custom["custom_schema"]
+        # Metric schema is always derived from dag name; workflow ignores custom_schema
+        if layer == "metric":
+            business_unit = dag_name.split("__")[0]
+            return business_unit.replace("metric_", "")
+        # Workflow-level custom_schema
+        if custom_schema:
+            return custom_schema
+        # Default fallback mirrors TableAttributes._get_schema
+        return dag_name.replace("enrich_", "")
+
+    @staticmethod
+    def _validate_database_name(file_path: str, content: dict, table_info: dict):
+        declared_db = content.get("database_name")
+        if not declared_db:
+            return
+        dag_name = table_info["dag"]
+        layer = table_info["layer"]
+        table_name = table_info["table_name"]
+        declaration = MetadataFileService._load_declaration(file_path, dag_name)
+        if declaration is None:
+            return
+        workflow_args = declaration.get("workflow") or {}
+        custom_schema = workflow_args.get("custom_schema")
+        tables_customization = workflow_args.get("tables_customization") or {}
+        schema = MetadataFileService._compute_schema(
+            dag_name, layer, custom_schema, table_name, tables_customization
+        )
+        formula = _DB_NAME_FORMULA.get(layer)
+        if formula is None:
+            return
+        expected_db = formula.format(schema=schema)
+        if declared_db != expected_db:
+            raise DatabaseNameMismatchException(
+                file_path, declared_db, expected_db, dag_name, layer, schema
+            )
 
     @staticmethod
     def filter_metadata_files(files_and_status) -> List[Tuple[str, str]]:
@@ -305,6 +392,8 @@ class MetadataFileService:
             raise TableNameMismatchException(
                 file_path, file_table_name, yaml_table_name
             )
+
+        MetadataFileService._validate_database_name(file_path, content, table_info)
 
         if layer == "raw":
             return yamale.validate(self.schemas["raw"], yaml_data)
