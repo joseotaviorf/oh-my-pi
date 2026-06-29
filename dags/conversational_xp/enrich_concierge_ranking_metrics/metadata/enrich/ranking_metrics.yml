@@ -27,14 +27,14 @@ columns:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
     - datalake_house_listing_search_clean.recommendation_use_case.displayed_order
   year:
-    description: "The year of the recommendation creation date"
+    description: "Partition column. Year of the recommendation creation date. Always filter on year/month/day for partition pruning."
     lineage:
     - datalake_house_listing_search_clean.recommendation_user_use_case.ts_created
   month:
-    description: "The month of the recommendation creation date"
+    description: "Partition column. Month of the recommendation creation date. Always filter on year/month/day for partition pruning."
     lineage:
     - datalake_house_listing_search_clean.recommendation_user_use_case.ts_created
   day:
-    description: "The day of the recommendation creation date"
+    description: "Partition column. Day of the recommendation creation date. Always filter on year/month/day for partition pruning."
     lineage:
     - datalake_house_listing_search_clean.recommendation_user_use_case.ts_created

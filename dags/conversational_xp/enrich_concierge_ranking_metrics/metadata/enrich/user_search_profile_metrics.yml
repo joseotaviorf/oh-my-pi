@@ -99,39 +99,75 @@ columns:
     - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_city_match:
     description: "Binary flag (0/1) indicating if the actual house city matches the cluster city preference"
+    lineage:
+    - wonka.house_main.city
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_neighborhoods_match:
     description: "Binary flag (0/1) indicating if the actual house neighborhood matches any cluster neighborhood preference"
+    lineage:
+    - wonka.house_main.neighborhood
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_max_price_mape:
     description: "Mean Absolute Percentage Error between cluster max price preference and actual house price"
+    lineage:
+    - wonka.house_main.total_price
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_qty_bedrooms_match:
     description: "Binary flag (0/1) indicating if the actual bedroom count matches cluster preference (within ±1 tolerance)"
+    lineage:
+    - wonka.house_main.bedroom_count
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_qty_bathrooms_match:
     description: "Binary flag (0/1) indicating if the actual bathroom count matches cluster preference (within ±1 tolerance)"
+    lineage:
+    - wonka.house_main.bathroom_count
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_qty_parking_match:
     description: "Binary flag (0/1) indicating if the actual parking count matches cluster preference (within ±1 tolerance)"
+    lineage:
+    - wonka.house_main.parking_slots_count
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_type_match:
     description: "Binary flag (0/1) indicating if the actual property type matches cluster preference (score > 0.6)"
+    lineage:
+    - wonka.house_main.type
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_min_area_mape:
     description: "Mean Absolute Percentage Error between cluster minimum area preference and actual house area"
+    lineage:
+    - wonka.house_main.total_area
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   cluster_qty_suites_match:
     description: "Binary flag (0/1) indicating if the actual suite count matches cluster preference (within ±1 tolerance)"
+    lineage:
+    - wonka.house_main.suite_count
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
   bc_flow_date:
     description: "The business context flow date when the user interaction occurred (first visit or offer submission)"
     lineage:
     - datalake_rent_flows.rent_flows.ts_rent_flow_event
     - datalake_sale_flows.sale_flow.ts_first_event
   year:
-    description: "The year component extracted from the business context flow date"
+    description: "Partition column. Year component extracted from the business context flow date. Always filter on year/month/day for partition pruning."
     lineage:
     - datalake_rent_flows.rent_flows.ts_rent_flow_event
     - datalake_sale_flows.sale_flow.ts_first_event
   month:
-    description: "The month component extracted from the business context flow date"
+    description: "Partition column. Month component extracted from the business context flow date. Always filter on year/month/day for partition pruning."
     lineage:
     - datalake_rent_flows.rent_flows.ts_rent_flow_event
     - datalake_sale_flows.sale_flow.ts_first_event
   day:
-    description: "The day component extracted from the business context flow date"
+    description: "Partition column. Day component extracted from the business context flow date. Always filter on year/month/day for partition pruning."
     lineage:
     - datalake_rent_flows.rent_flows.ts_rent_flow_event
     - datalake_sale_flows.sale_flow.ts_first_event

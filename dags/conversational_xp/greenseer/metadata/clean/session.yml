@@ -2,7 +2,7 @@ database_name: datalake_greenseer_clean
 table_name: session
 owner: william.angelo@quintoandar.com.br
 domain: Conversational XP
-description: "[LEGACY — actively being deprecated] Greenseer chatbot sessions ingested from the Greenseer PostgreSQL database. Greenseer was the first-generation WhatsApp chatbot that routed inbound contacts to human agents; it is being replaced by the Copilot service. Each row represents a single interaction session. Prefer copilot_service tables for new analyses."
+description: "[LEGACY — actively being deprecated] Greenseer chatbot sessions ingested from the Greenseer PostgreSQL database. Greenseer was the first-generation WhatsApp chatbot that routed inbound contacts to human agents; it is being replaced by the Copilot service. Each row represents a single interaction session. Z-ordered by ts_started for efficient time-range queries. Prefer copilot_service tables for new analyses."
 columns:
   id_session:
     description: "Unique identifier for the Greenseer chatbot session."

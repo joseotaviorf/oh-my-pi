@@ -2,17 +2,13 @@
 database_name: datalake_landlord_journey
 table_name: landlord_journey_step
 description:
-  Landlord journey step daily snapshot. The respective table is a comprehensive record
-  of customer journey steps, which is designed to categorize the progress of customers
-  as they engage with the rental context.
-  Each row in the table represents a specific customer and their journey
-  through various stages or actions.
-  The primary purpose of this table is to capture and organize important milestones
-  and interactions that customers go through during their experience with the rental
-  context. It provides a snapshot view of the different steps involved in the
-  customer journey.
-domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+  Landlord journey step daily snapshot. One row per landlord (id_owner) per snapshot date,
+  categorizing each owner's position in the rental lifecycle (Listing and Search →
+  Visits to Offer → Contract to Entrance → Onboarding → Ongoing → Offboarding).
+  Partitioned by year/month/day (snapshot date). Z-ordered by [id_owner, id_snapshot]
+  for efficient point-in-time lookups per landlord.
+domain: Conversational XP
+owner: william.angelo@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"

@@ -3,7 +3,7 @@ database_name: datalake_copilot_service_clean
 table_name: message
 owner: lucas.cardozo@quintoandar.com.br
 domain: Conversational XP
-description: "This table stores information about messages sent/received by the Copilot service"
+description: "One row per message sent or received within a Copilot service session, covering user, AI, and hardcoded bot messages across all channels (WhatsApp, in-app). Z-ordered by [ts_created, id_session] for efficient session-range queries."
 columns:
   id:
     description: "Internal primary key for the Copilot service message record."
