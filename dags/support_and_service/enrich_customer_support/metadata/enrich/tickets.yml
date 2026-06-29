@@ -1,5 +1,5 @@
 database_name: datalake_customer_support
-table_name: tickes
+table_name: tickets
 description: >
   One row per enriched customer support ticket, combining CRM task attributes with
   support channel, status, and SLA metadata. Central enrichment table for support
