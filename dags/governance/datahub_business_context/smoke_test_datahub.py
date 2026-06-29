@@ -11,9 +11,10 @@ Prerequisites:
 Beyond existence, the script can validate completeness:
   - ``--deep``        also fetch + check linked-asset count (one extra call per product)
   - ``--strict``      empty description / zero golden queries / zero assets become failures
-  - ``--skip-missing`` a missing product is only a warning when its MD was ADDED in this
-                      commit (new entity, created on the post-merge push); a missing
-                      product for an existing MD is still a failure
+  - ``--skip-missing`` a missing product is a warning rather than a failure (the product
+                      is created/updated only on the post-merge push, so its absence on a
+                      PR — whether the MD was added or edited — is expected). Intended for
+                      the PR gate; the post-push step omits it and hard-fails on absence.
 
 Usage:
     python dags/governance/datahub_business_context/smoke_test_datahub.py
@@ -314,9 +315,10 @@ def main() -> None:
         "--skip-missing",
         action="store_true",
         help=(
-            "Treat a missing product as a warning when its MD was ADDED in this commit "
-            "(new entity, created on the post-merge push). A missing product for an "
-            "existing MD is still a failure. Intended for PR validation."
+            "Treat a missing Data Product as a warning instead of a failure (it is "
+            "created/updated only on the post-merge push, so its absence on a PR — for "
+            "an added or edited MD — is expected). Intended for PR validation; the "
+            "post-push step omits this flag and hard-fails on absence."
         ),
     )
     ns = parser.parse_args()
@@ -359,9 +361,19 @@ def main() -> None:
         dp = _fetch_data_product(urn)
 
         if dp is None:
-            if ns.skip_missing and rel in added_mds:
-                warned.append((entity_name, f"new entity — created on merge: {urn}"))
-                print(f"  ⚠ {entity_name} — not yet in DataHub (new, created on merge)")
+            if ns.skip_missing:
+                # On a PR a Data Product may legitimately not exist yet: it is created
+                # or updated only on the post-merge push. Whether the MD was ADDED or
+                # MODIFIED, validating existence on the PR is premature — so any missing
+                # product is a warning here. The post-push step (no --skip-missing) is
+                # the hard gate that fails if a just-published product is still absent.
+                added_note = " (new)" if rel in added_mds else " (edited)"
+                warned.append(
+                    (entity_name, f"not yet in DataHub — created on merge: {urn}")
+                )
+                print(
+                    f"  ⚠ {entity_name} — not yet in DataHub{added_note}, created on merge"
+                )
             else:
                 failed.append((entity_name, f"entity not found: {urn}"))
                 print(f"  ✗ {entity_name} ({urn})")

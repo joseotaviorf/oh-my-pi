@@ -110,8 +110,9 @@ steps:
         from_secret: datahub_token
     commands:
       # PR validation: scoped to changed MDs only (avoids failing on pre-existing empty
-      # shells unrelated to this PR), warn-only for brand-new entities that don't exist
-      # in DataHub until the post-merge push.
+      # shells unrelated to this PR). --skip-missing makes a not-yet-in-DataHub product
+      # a warning (added OR edited MD): the product is created/updated only on the
+      # post-merge push. The post-push step below is the hard gate on absence.
       - uv run python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose --changed-only --skip-missing
     when:
       - event: pull_request
