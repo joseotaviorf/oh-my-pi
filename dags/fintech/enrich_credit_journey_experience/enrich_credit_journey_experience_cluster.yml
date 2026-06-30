@@ -6,3 +6,11 @@ cluster:
       spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
     num_workers: 3
     driver_node_type_id: r7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_cluster
+    custom_configurations:
+      core_nodes:
+        instance_count: 1
+      task_nodes:
+        instance_count: 2

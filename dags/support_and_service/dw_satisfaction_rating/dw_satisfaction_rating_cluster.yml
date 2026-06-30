@@ -5,3 +5,6 @@ cluster:
     aws_attributes:
       availability: ON_DEMAND
     driver_node_type_id: r7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_cluster

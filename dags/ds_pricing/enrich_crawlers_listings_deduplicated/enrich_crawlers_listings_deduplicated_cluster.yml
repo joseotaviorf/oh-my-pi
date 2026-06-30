@@ -8,3 +8,11 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     spark_version: 16.4.x-scala2.12
+validation:
+  cluster:
+    type: emr_7_12_consolidation_l_memory_cluster
+    custom_configurations:
+      core_nodes:
+        instance_count: 1
+      task_nodes:
+        instance_count: 3

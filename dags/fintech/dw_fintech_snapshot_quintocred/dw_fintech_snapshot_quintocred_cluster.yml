@@ -13,3 +13,13 @@ cluster:
       ebs_volume_size: 200
     spark_version: 13.3.x-scala2.12
     num_workers: 3
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_general_cluster
+    custom_configurations:
+      core_nodes:
+        instance_count: 1
+      task_nodes:
+        instance_count: 2
+      aws_attributes:
+        ebs_volume_size: 200

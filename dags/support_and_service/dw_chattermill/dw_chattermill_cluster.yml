@@ -12,3 +12,9 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     driver_node_type_id: m7g.large
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_general_cluster
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200

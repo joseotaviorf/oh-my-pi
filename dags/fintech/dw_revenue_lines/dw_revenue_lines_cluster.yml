@@ -13,3 +13,6 @@ cluster:
     node_type_id: r7gd.xlarge
     runtime_engine: PHOTON
     spark_version: 13.3.x-scala2.12
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_memory_cluster

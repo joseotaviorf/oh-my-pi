@@ -6,3 +6,14 @@ cluster:
       ebs_volume_size: 200
     num_workers: 3
     driver_node_type_id: r7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_general_cluster
+    custom_configurations:
+      core_nodes:
+        instance_count: 1
+      task_nodes:
+        instance_count: 2
+      master_node_type_id: r7g.xlarge
+      aws_attributes:
+        ebs_volume_size: 200

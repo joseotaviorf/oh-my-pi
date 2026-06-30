@@ -8,3 +8,9 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     driver_node_type_id: r7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_cluster
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
