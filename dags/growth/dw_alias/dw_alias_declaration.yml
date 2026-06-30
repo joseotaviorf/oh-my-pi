@@ -1,0 +1,57 @@
+dag:
+  name: dw_alias
+  schedule_start_date: 2026, 6, 1
+  schedule_interval: 0 4,12 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Star schema for the Alias AI agent platform (dw_alias schema).
+      Provides broker, CRM, listing dimensions, lead/session/resolution/inventory facts,
+      and agent-call performance facts for B2B operations, Growth, and AI Agent analytics.
+
+      Source tables:
+        - datalake_alias_clean.* (brokers, leads, lead_sessions, lead_resolutions,
+          lead_engagements, listing_fingerprint, ai_agents, crm_integrations,
+          inventory_ingestions)
+        - datalake_langfuse_clean.observations, .traces
+        - datalake_chatbot.sessions (bot = 'alias')
+        - datalake_company_clean.company (sk_broker map)
+        - dw_brokers.dim_broker (optional runtime ordering)
+
+      DATA LINEAGE: alias_clean + langfuse_clean + enrich_chatbot + company_clean
+                    → dw_alias (star schema)
+      SCHEDULE: 2× daily (04:00, 12:00 UTC) after Alias CDC and Langfuse clean runs.
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: alias
+  default_extraction_type: full
+  tables_customization:
+    dim_alias_ai_agent:
+      partitions: [year, month, day]
+      z_order_by: [sk_ai_agent]
+    dim_alias_crm_integration:
+      partitions: [year, month, day]
+      z_order_by: [sk_crm_integration]
+    dim_alias_listing:
+      partitions: [year, month, day]
+      z_order_by: [sk_listing]
+    fact_alias_agent_calls:
+      partitions: [year, month, day]
+      z_order_by: [id_langfuse_session, sk_broker]
+    fact_alias_leads:
+      partitions: [year, month, day]
+      z_order_by: [sk_broker, sk_lead]
+    fact_alias_lead_resolutions:
+      partitions: [year, month, day]
+      z_order_by: [sk_broker, sk_lead_session]
+    fact_alias_inventory_ingestions:
+      partitions: [year, month, day]
+      z_order_by: [sk_broker]
+    fact_alias_sessions:
+      partitions: [year, month, day]
+      z_order_by: [sk_lead_session, sk_broker]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

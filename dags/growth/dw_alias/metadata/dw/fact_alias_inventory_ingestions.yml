@@ -1,0 +1,76 @@
+database_name: dw_alias
+table_name: fact_alias_inventory_ingestions
+description: |
+  Fact table at inventory ingestion grain (one row per ingestion run). Tracks CRM/XML sync
+  runs from broker systems into the Alias listing portfolio, including counts of created,
+  updated, failed, skipped, and unpublished listings, run status, and duration.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_inventory_ingestion:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.uuid_inventory_ingestion
+    description: Surrogate key for the ingestion run; primary key of this fact.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency. FK to dw_brokers.dim_broker.
+  status:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.status
+    description: Final status of the ingestion run (e.g. COMPLETED, FAILED, RUNNING).
+  is_successful:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.status
+    description: True when status = 'COMPLETED'.
+  quantity_created:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.quantity_created
+    description: Number of listing records created during this ingestion run.
+  quantity_updated:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.quantity_updated
+    description: Number of listing records updated during this ingestion run.
+  quantity_failed:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.quantity_failed
+    description: Number of listing records that failed to process during this run.
+  quantity_skipped:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.quantity_skipped
+    description: Number of listing records skipped (already up-to-date) during this run.
+  quantity_unpublished:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.quantity_unpublished
+    description: Number of listings unpublished (removed from active portfolio) during this run.
+  failure_reason:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.failure_reason
+    description: Error message or reason code when the ingestion run failed. NULL on success.
+  duration_minutes:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.ts_started
+      - datalake_alias_clean.inventory_ingestions.ts_completed
+    description: Wall-clock duration of the ingestion run in minutes (ts_completed - ts_started).
+  ts_started:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.ts_started
+    description: Timestamp when the ingestion run started.
+  ts_completed:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.ts_completed
+    description: Timestamp when the ingestion run completed. NULL if still running.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.ts_started
+    description: Partition year from ingestion start timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.ts_started
+    description: Partition month from ingestion start timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.inventory_ingestions.ts_started
+    description: Partition day from ingestion start timestamp.

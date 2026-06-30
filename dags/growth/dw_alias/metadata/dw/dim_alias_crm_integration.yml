@@ -1,0 +1,47 @@
+database_name: dw_alias
+table_name: dim_alias_crm_integration
+description: |
+  Dimension table for CRM integrations configured by each Alias broker agency.
+  One row per CRM integration; excludes sensitive API credentials (access_token, client_secret,
+  api_key, webhook_secret). Sourced from datalake_alias_clean.crm_integrations.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_crm_integration:
+    lineage:
+      - datalake_alias_clean.crm_integrations.uuid_crm_integration
+    description: Surrogate key for the CRM integration; primary key of this dimension.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency. FK to dw_brokers.dim_broker.
+  platform:
+    lineage:
+      - datalake_alias_clean.crm_integrations.platform
+    description: CRM platform identifier (e.g. SIENGE, NAVENT, VISTA).
+  is_active:
+    lineage:
+      - datalake_alias_clean.crm_integrations.is_active
+    description: True when the CRM integration is currently active.
+  ts_created:
+    lineage:
+      - datalake_alias_clean.crm_integrations.ts_created
+    description: Timestamp when the CRM integration was created.
+  ts_updated:
+    lineage:
+      - datalake_alias_clean.crm_integrations.ts_updated
+    description: Timestamp when the CRM integration was last updated.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.crm_integrations.ts_updated
+    description: Partition year from integration last update timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.crm_integrations.ts_updated
+    description: Partition month from integration last update timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.crm_integrations.ts_updated
+    description: Partition day from integration last update timestamp.

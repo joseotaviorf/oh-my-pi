@@ -1,0 +1,251 @@
+-- Sources:
+--   datalake_alias_clean.lead_sessions, leads, lead_resolutions, lead_engagements
+--   datalake_langfuse_clean.observations, traces
+--   datalake_chatbot.sessions (bot = 'alias')
+-- Reference: commit cc2f148e62 (feature/alias-obt); ported to Spark SQL (DBR 16.4 / EMR 3.5)
+--
+-- Trino→Spark conversions applied:
+--   COUNT_IF(cond)               → SUM(CASE WHEN cond THEN 1 ELSE 0 END)
+--   BOOL_OR(cond)                → MAX(CASE WHEN cond THEN TRUE ELSE FALSE END)
+--   DATE_DIFF('millisecond',a,b) → (UNIX_TIMESTAMP(b) - UNIX_TIMESTAMP(a)) * 1000.0
+--   DATE_DIFF('minute',a,b)      → (UNIX_TIMESTAMP(b) - UNIX_TIMESTAMP(a)) / 60.0
+--   JSON_EXTRACT_SCALAR(col,path)→ GET_JSON_OBJECT(col, path)
+WITH broker_map AS (
+  SELECT DISTINCT
+    uuid_company,
+    CAST(id AS VARCHAR) AS sk_broker
+  FROM datalake_company_clean.company
+),
+resolutions_agg AS (
+  SELECT
+    lr.uuid_lead_session,
+    COUNT(*)                                                                      AS qt_resolutions,
+    TRUE                                                                          AS is_resolved,
+    MAX(CASE WHEN lr.type = 'ESCALATION'     THEN TRUE ELSE FALSE END)           AS is_escalated,
+    MAX(CASE WHEN lr.type = 'VISIT_INTENTION' THEN TRUE ELSE FALSE END)          AS is_visit_intention,
+    MAX(CASE WHEN lr.ts_sent_to_crm IS NOT NULL THEN TRUE ELSE FALSE END)        AS is_crm_sent
+  FROM datalake_alias_clean.lead_resolutions AS lr
+  GROUP BY lr.uuid_lead_session
+),
+engagements_agg AS (
+  SELECT
+    uuid_lead_session,
+    COUNT(*)          AS qt_engagements,
+    MIN(ts_created)   AS ts_engagement_first
+  FROM datalake_alias_clean.lead_engagements
+  GROUP BY uuid_lead_session
+),
+first_origin AS (
+  -- First engagement origin per session via ROW_NUMBER
+  SELECT uuid_lead_session, origin AS origin_first
+  FROM (
+    SELECT
+      uuid_lead_session,
+      origin,
+      ROW_NUMBER() OVER (PARTITION BY uuid_lead_session ORDER BY ts_created) AS rn
+    FROM datalake_alias_clean.lead_engagements
+  )
+  WHERE rn = 1
+),
+trace_meta AS (
+  -- n_user_turns and turn timestamps from traces (not observations)
+  -- Source: datalake_langfuse_clean.traces (confirmed in cc2f148e62)
+  SELECT
+    t.id_session                                                     AS id_langfuse_session,
+    COUNT(DISTINCT t.id_trace)                                       AS n_user_turns,
+    MAX(t.version)                                                   AS bot_version,
+    MIN(t.ts_created)                                                AS ts_first_turn,
+    MAX(t.ts_created)                                                AS ts_last_turn
+  FROM datalake_langfuse_clean.traces AS t
+  WHERE t.id_session IS NOT NULL
+    AND t.ts_created >= '{load_start_date}'
+  GROUP BY t.id_session
+),
+obt_agg AS (
+  -- Per-session funnel flags, tool-call counters, and LLM latency/cost metrics.
+  -- cost_details is a ROW type — accessed as struct fields via TRY_CAST.
+  SELECT
+    t.id_session                                                     AS id_langfuse_session,
+    MAX(CASE WHEN o.name = 'alias_profile_agentV1'
+        THEN 1 ELSE 0 END) = 1                                       AS had_profiling,
+    MAX(CASE WHEN o.name = 'alias_inventory_agentV1'
+        THEN 1 ELSE 0 END) = 1                                       AS had_inventory,
+    MAX(CASE WHEN o.name = 'alias_get_recommendations_by_company'
+        THEN 1 ELSE 0 END) = 1                                       AS had_recommendations,
+    MAX(CASE WHEN o.name = 'alias_schedule_visit_agentV1'
+        THEN 1 ELSE 0 END) = 1                                       AS had_scheduling,
+    MAX(CASE WHEN o.name = 'alias_visit_get_availability'
+        THEN 1 ELSE 0 END) = 1                                       AS had_availability,
+    MAX(CASE WHEN o.name = 'alias_register_visit_intention'
+        THEN 1 ELSE 0 END) = 1                                       AS had_visit_registered,
+    MAX(CASE WHEN o.name = 'alias_escalation_agentV1'
+        THEN 1 ELSE 0 END) = 1                                       AS had_escalation,
+    MAX(CASE WHEN o.name = 'alias_register_visit_intention'
+                  AND LOWER(o.output) LIKE '%registered successfully%'
+        THEN 1 ELSE 0 END) = 1                                       AS visit_registered_success,
+    MAX(CASE WHEN o.name = 'alias_register_escalation'
+                  AND LOWER(o.output) LIKE '%escalation registered successfully%'
+        THEN 1 ELSE 0 END) = 1                                       AS escalation_registered_success,
+    CASE
+      WHEN MAX(CASE WHEN o.name = 'alias_register_visit_intention'  THEN 1 ELSE 0 END) = 1
+        THEN 'visit_intention_registered'
+      WHEN MAX(CASE WHEN o.name = 'alias_escalation_agentV1'        THEN 1 ELSE 0 END) = 1
+        THEN 'escalated'
+      WHEN MAX(CASE WHEN o.name = 'alias_schedule_visit_agentV1'    THEN 1 ELSE 0 END) = 1
+        THEN 'schedule_visit_agent_called'
+      WHEN MAX(CASE WHEN o.name = 'alias_get_recommendations_by_company' THEN 1 ELSE 0 END) = 1
+        THEN 'inventory_searched'
+      WHEN MAX(CASE WHEN o.name = 'alias_profile_agentV1'           THEN 1 ELSE 0 END) = 1
+        THEN 'profile_identified'
+      ELSE 'no_agent'
+    END                                                              AS funnel_stage_deepest,
+    MIN(CASE WHEN o.name = 'alias_profile_agentV1'
+             THEN o.ts_started END)                                  AS ts_profiling,
+    MIN(CASE WHEN o.name = 'alias_inventory_agentV1'
+             THEN o.ts_started END)                                  AS ts_inventory,
+    MIN(CASE WHEN o.name = 'alias_schedule_visit_agentV1'
+             THEN o.ts_started END)                                  AS ts_scheduling,
+    MIN(CASE WHEN o.name = 'alias_visit_get_availability'
+             THEN o.ts_started END)                                  AS ts_availability,
+    MIN(CASE WHEN o.name = 'alias_register_visit_intention'
+             THEN o.ts_started END)                                  AS ts_visit_registered,
+    MIN(CASE WHEN o.name = 'alias_escalation_agentV1'
+             THEN o.ts_started END)                                  AS ts_escalation,
+    SUM(CASE WHEN o.type = 'TOOL'
+              AND LOWER(COALESCE(o.output, '')) LIKE '%error%'
+              THEN 1 ELSE 0 END)                                     AS n_tool_call_errors,
+    SUM(CASE WHEN o.name = 'alias_get_recommendations_by_company'
+              AND o.type = 'TOOL'
+              THEN 1 ELSE 0 END)                                     AS n_calls_get_recommendations,
+    SUM(CASE WHEN o.name = 'alias_visit_get_availability'
+              AND o.type = 'TOOL'
+              THEN 1 ELSE 0 END)                                     AS n_calls_get_availability,
+    SUM(CASE WHEN o.name = 'alias_get_property_by_external_id'
+              AND o.type = 'TOOL'
+              THEN 1 ELSE 0 END)                                     AS n_calls_get_property,
+    SUM(CASE WHEN o.name = 'alias_register_visit_intention'
+              AND o.type = 'TOOL'
+              THEN 1 ELSE 0 END)                                     AS n_calls_register_visit,
+    SUM(CASE WHEN o.name = 'alias_register_escalation'
+              AND o.type = 'TOOL'
+              THEN 1 ELSE 0 END)                                     AS n_calls_register_escalation,
+    SUM(TRY_CAST(cost_details.total AS DOUBLE))                      AS total_llm_cost_usd,
+    percentile_approx(
+      (UNIX_TIMESTAMP(o.ts_ended) - UNIX_TIMESTAMP(o.ts_started)) * 1000.0, 0.5
+    )                                                                AS p50_llm_response_time_ms,
+    percentile_approx(
+      (UNIX_TIMESTAMP(o.ts_ended) - UNIX_TIMESTAMP(o.ts_started)) * 1000.0, 0.95
+    )                                                                AS p95_llm_response_time_ms,
+    AVG((UNIX_TIMESTAMP(o.ts_ended) - UNIX_TIMESTAMP(o.ts_started)) * 1000.0)
+                                                                     AS avg_llm_response_time_ms
+  FROM datalake_langfuse_clean.observations AS o
+  INNER JOIN datalake_langfuse_clean.traces AS t ON o.id_trace = t.id_trace
+  WHERE t.id_session IS NOT NULL
+    AND t.ts_created >= '{load_start_date}'
+  GROUP BY t.id_session
+),
+broker_config AS (
+  -- company_uuid via get_alias_configuration (same pattern as OBT cc2f148e62)
+  -- is_test UUIDs: '00000000-0000-4000-8000-000000000001' (synthetic) and
+  --                '31616192-288b-439a-baec-890a5c89e20a' (internal QA)
+  SELECT
+    t.id_session AS id_langfuse_session,
+    COALESCE(
+      GET_JSON_OBJECT(o.output, '$.companyUuid'),
+      GET_JSON_OBJECT(o.output, '$.companyUUID')
+    ) AS company_uuid,
+    ROW_NUMBER() OVER (PARTITION BY t.id_session ORDER BY o.ts_started) AS rn
+  FROM datalake_langfuse_clean.observations AS o
+  INNER JOIN datalake_langfuse_clean.traces AS t ON o.id_trace = t.id_trace
+  WHERE o.name = 'get_alias_configuration'
+    AND o.type = 'TOOL'
+    AND t.id_session IS NOT NULL
+    AND t.ts_created >= '{load_start_date}'
+)
+SELECT
+  ls.uuid_lead_session                            AS sk_lead_session,
+  ls.uuid_lead                                    AS sk_lead,
+  bm.sk_broker,
+  ls.uuid_chat_session                            AS id_langfuse_session,
+  cs.id_sauron_session,
+  ls.status,
+  COALESCE(fo.origin_first, 'UNKNOWN')            AS origin_first,
+  cs.channel,
+  ea.ts_engagement_first,
+  COALESCE(ea.qt_engagements, 0)                  AS qt_engagements,
+  COALESCE(ra.is_resolved, FALSE)                 AS is_resolved,
+  COALESCE(ra.is_escalated, FALSE)                AS is_escalated,
+  COALESCE(ra.is_visit_intention, FALSE)          AS is_visit_intention,
+  COALESCE(ra.is_crm_sent, FALSE)                 AS is_crm_sent,
+  ls.ts_chat_started IS NOT NULL                  AS is_chat_started,
+  COALESCE(ra.qt_resolutions, 0)                  AS qt_resolutions,
+  tm.bot_version,
+  -- is_test: hardcoded company UUIDs per commit cc2f148e62 (feature/alias-obt)
+  -- '00000000-0000-4000-8000-000000000001' = synthetic test placeholder
+  -- '31616192-288b-439a-baec-890a5c89e20a' = internal QA company
+  COALESCE(bc.company_uuid, '') IN (
+    '00000000-0000-4000-8000-000000000001',
+    '31616192-288b-439a-baec-890a5c89e20a'
+  )                                               AS is_test,
+  COALESCE(oa.had_profiling, FALSE)               AS had_profiling,
+  COALESCE(oa.had_inventory, FALSE)               AS had_inventory,
+  COALESCE(oa.had_recommendations, FALSE)         AS had_recommendations,
+  COALESCE(oa.had_scheduling, FALSE)              AS had_scheduling,
+  COALESCE(oa.had_availability, FALSE)            AS had_availability,
+  COALESCE(oa.had_visit_registered, FALSE)        AS had_visit_registered,
+  COALESCE(oa.had_escalation, FALSE)              AS had_escalation,
+  COALESCE(oa.visit_registered_success, FALSE)    AS visit_registered_success,
+  COALESCE(oa.escalation_registered_success, FALSE) AS escalation_registered_success,
+  COALESCE(oa.funnel_stage_deepest, 'no_agent')   AS funnel_stage_deepest,
+  oa.ts_profiling,
+  oa.ts_inventory,
+  oa.ts_scheduling,
+  oa.ts_availability,
+  oa.ts_visit_registered,
+  oa.ts_escalation,
+  COALESCE(tm.n_user_turns, 0)                    AS n_user_turns,
+  NULL                                            AS n_user_turns_until_first_recommendation,
+  NULL                                            AS n_user_turns_until_visit_intent,
+  COALESCE(oa.n_tool_call_errors, 0)              AS n_tool_call_errors,
+  COALESCE(oa.n_calls_get_recommendations, 0)     AS n_calls_get_recommendations,
+  COALESCE(oa.n_calls_get_availability, 0)        AS n_calls_get_availability,
+  COALESCE(oa.n_calls_get_property, 0)            AS n_calls_get_property,
+  COALESCE(oa.n_calls_register_visit, 0)          AS n_calls_register_visit,
+  COALESCE(oa.n_calls_register_escalation, 0)     AS n_calls_register_escalation,
+  NULL                                            AS n_recommendations_shown,
+  oa.total_llm_cost_usd,
+  CASE WHEN COALESCE(tm.n_user_turns, 0) > 0
+    THEN oa.total_llm_cost_usd / tm.n_user_turns
+  END                                             AS avg_cost_per_turn_usd,
+  NULL                                            AS total_input_tokens,
+  NULL                                            AS total_output_tokens,
+  oa.avg_llm_response_time_ms,
+  oa.p50_llm_response_time_ms,
+  oa.p95_llm_response_time_ms,
+  cs.full_conversation,
+  ls.ts_created,
+  ls.ts_closed,
+  tm.ts_first_turn,
+  tm.ts_last_turn,
+  CASE WHEN tm.ts_first_turn IS NOT NULL AND tm.ts_last_turn IS NOT NULL
+    THEN (UNIX_TIMESTAMP(tm.ts_last_turn) - UNIX_TIMESTAMP(tm.ts_first_turn)) / 60.0
+  END                                             AS session_wall_duration_min,
+  CURRENT_TIMESTAMP()                             AS ts_load,
+  YEAR(ls.ts_created)                             AS year,
+  MONTH(ls.ts_created)                            AS month,
+  DAY(ls.ts_created)                              AS day
+FROM datalake_alias_clean.lead_sessions AS ls
+LEFT JOIN datalake_alias_clean.leads AS l
+  ON ls.uuid_lead = l.uuid_lead
+LEFT JOIN broker_map AS bm
+  ON l.uuid_company = bm.uuid_company
+LEFT JOIN datalake_chatbot.sessions AS cs
+  ON ls.uuid_chat_session = cs.id_langfuse_session
+LEFT JOIN engagements_agg AS ea   ON ls.uuid_lead_session = ea.uuid_lead_session
+LEFT JOIN first_origin AS fo      ON ls.uuid_lead_session = fo.uuid_lead_session
+LEFT JOIN resolutions_agg AS ra   ON ls.uuid_lead_session = ra.uuid_lead_session
+LEFT JOIN trace_meta AS tm        ON ls.uuid_chat_session = tm.id_langfuse_session
+LEFT JOIN obt_agg AS oa           ON ls.uuid_chat_session = oa.id_langfuse_session
+LEFT JOIN broker_config AS bc     ON ls.uuid_chat_session = bc.id_langfuse_session AND bc.rn = 1
+WHERE '{load_start_date}' <= ls.ts_updated
+  AND ls.ts_updated < '{load_end_date}'

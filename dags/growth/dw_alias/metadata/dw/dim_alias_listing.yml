@@ -1,0 +1,212 @@
+database_name: dw_alias
+table_name: dim_alias_listing
+description: |
+  Dimension table for property listings in the Alias portfolio (one row per id_synthetic_house).
+  Represents inventory registered by broker agencies via the listing_fingerprint CDC table.
+  JSON fields (text2filter_prediction, cached_location) are parsed inline: scalar booleans for
+  has_elevator / has_doorman_24h / is_furnished, 16 installation booleans, 17 top-amenity booleans,
+  a pipe-separated amenities_other string for tail values, and lat/lon coordinates.
+  No SCD Type 2 in initial phase — reflects current listing state.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_listing:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.id_synthetic_house
+    description: Surrogate key for the listing (id_synthetic_house cast to VARCHAR); primary key.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency that owns this listing. FK to dw_brokers.dim_broker.
+  id_listing_original:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.id_listing_original
+    description: Original listing ID from the broker CRM system.
+  status:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.status
+    description: Current listing status (ACTIVE, INACTIVE, etc.).
+  has_elevator:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: True when the property has an elevator (from text2filter_prediction.hasElevator).
+  has_doorman_24h:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: True when the property has 24-hour doorman (from text2filter_prediction.hasAllDayDoorman).
+  is_furnished:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: True when the property is furnished (from text2filter_prediction.isFurnished).
+  has_swimming_pool:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a shared swimming pool (source value PISCINA).
+  has_party_hall:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a party hall (source value SALAO_DE_FESTAS).
+  has_gym:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a gym (source value ACADEMIA).
+  has_playground:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — property building has a playground.
+  has_building_bbq:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a BBQ area (source value CHURRASQUEIRA_NO_PREDIO).
+  has_sports_court:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a sports court (source value QUADRA_ESPORTIVA).
+  has_game_room:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a game room (source value SALAO_DE_JOGOS).
+  has_24h_front_desk:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has 24-hour front desk (source value PORTARIA_24H).
+  has_green_area:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a green area (source value AREA_VERDE).
+  has_playroom:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a playroom or kids area (source value BRINQUEDOTECA).
+  has_sauna:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — property building has a sauna.
+  has_building_elevator:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has an elevator from installations array (source value ELEVADOR). Distinct from has_elevator (text classifier).
+  has_building_laundry:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has a shared laundry room (source value LAVANDERIA_NO_PREDIO).
+  has_access_ramps:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has accessibility ramps (source value RAMPAS_DE_ACESSO).
+  has_handrails:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has handrails for accessibility (source value CORRIMAO).
+  has_tactile_paving:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Installation boolean — building has tactile paving (source value PISO_TATIL).
+  has_balcony:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has a balcony (source value VARANDA).
+  has_service_area:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has a service area (source value AREA_DE_SERVICO).
+  has_kitchen_cabinets:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has built-in kitchen cabinets (source value ARMARIOS_NA_COZINHA).
+  has_unit_bbq:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has a BBQ area (source value CHURRASQUEIRA_NO_IMOVEL).
+  has_air_conditioning:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has air conditioning (source value AR_CONDICIONADO).
+  has_bedroom_wardrobes:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has built-in bedroom wardrobes (source value ARMARIOS_EMBUTIDOS_NO_QUARTO).
+  has_backyard:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has a backyard (source value QUINTAL).
+  has_new_or_renovated:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit is new or recently renovated (source value NOVOS_OU_REFORMADOS).
+  has_closet:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — property has a walk-in closet.
+  has_unobstructed_view:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has an unobstructed view (source value VISTA_LIVRE).
+  has_garden:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has a garden (source value JARDIM).
+  has_private_swimming_pool:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has a private swimming pool (source value PISCINA_PRIVATIVA).
+  has_penthouse:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit is a penthouse (source value APARTAMENTO_COBERTURA).
+  has_open_kitchen:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has an open kitchen (source value COZINHA_AMERICANA).
+  has_home_office:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — property has a home office room.
+  has_quiet_street:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit is on a quiet street (source value RUA_SILENCIOSA).
+  has_bathroom_cabinets:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: Amenity boolean — unit has built-in bathroom cabinets (source value ARMARIOS_NOS_BANHEIROS).
+  amenities_other:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.text2filter_prediction
+    description: |
+      Pipe-separated string of all amenity values from text2filter_prediction.amenities array.
+      Used for ad-hoc LIKE queries against tail amenity values not covered by individual boolean flags.
+  lat:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.cached_location
+    description: Latitude of the property from cached_location JSON.
+  lon:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.cached_location
+    description: Longitude of the property from cached_location JSON.
+  ts_last_update:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.ts_last_update
+    description: Timestamp of the last listing data update from the source system.
+  ts_created:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.ts_created
+    description: Timestamp when the listing fingerprint record was created.
+  ts_updated:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.ts_updated
+    description: Timestamp when the listing fingerprint record was last updated (CDC).
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.ts_updated
+    description: Partition year from listing last update timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.ts_updated
+    description: Partition month from listing last update timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.listing_fingerprint.ts_updated
+    description: Partition day from listing last update timestamp.

@@ -1,0 +1,100 @@
+database_name: dw_alias
+table_name: fact_alias_agent_calls
+description: |
+  Fact table at Langfuse observation grain (one row per AGENT/TOOL call).
+  One row per observation (id_observation) from datalake_langfuse_clean.observations,
+  filtered to known Alias agent names and types AGENT/TOOL. Enables drill-down from
+  fact_alias_sessions via id_langfuse_session. Cost details sourced from the observations
+  ROW type (cost_details.input, output, total). Turn number derived via ROW_NUMBER over traces.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_agent_call:
+    lineage:
+      - datalake_langfuse_clean.observations.id_observation
+    description: Surrogate key for the agent call; primary key of this fact.
+  id_langfuse_session:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+    description: Langfuse session ID linking this call to fact_alias_sessions.
+  id_trace:
+    lineage:
+      - datalake_langfuse_clean.observations.id_trace
+    description: Langfuse trace ID (one trace per user turn).
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+      - datalake_langfuse_clean.observations.output
+    description: Surrogate key of the broker agency, resolved via get_alias_configuration output.
+  agent_name:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Name of the sub-agent or tool called (e.g. alias_profile_agentV1).
+  observation_type:
+    lineage:
+      - datalake_langfuse_clean.observations.type
+    description: Observation type from Langfuse (AGENT or TOOL).
+  is_tool_call:
+    lineage:
+      - datalake_langfuse_clean.observations.type
+    description: True when observation_type = 'TOOL'.
+  turn_number:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+      - datalake_langfuse_clean.traces.ts_created
+    description: Chronological position of the user turn within the session (ROW_NUMBER over ts_created).
+  duration_ms:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+    description: Duration of the observation in milliseconds (ts_ended - ts_started).
+  cost_input_usd:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+    description: Input token cost in USD from cost_details.input ROW field.
+  cost_output_usd:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+    description: Output token cost in USD from cost_details.output ROW field.
+  cost_total_usd:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+    description: Total LLM cost in USD from cost_details.total ROW field.
+  input_tokens:
+    description: Input token count. Not available at observation level; reserved for future use.
+  output_tokens:
+    description: Output token count. Not available at observation level; reserved for future use.
+  had_error:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: True when the observation output contains the string 'error'.
+  error_message:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: Full output string when had_error is TRUE, NULL otherwise.
+  dt_session:
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+    description: Date of the chat session (from datalake_chatbot.sessions.ts_created).
+  ts_started:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp when the observation started.
+  ts_ended:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+    description: Timestamp when the observation ended.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Partition year from observation start timestamp.
+  month:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Partition month from observation start timestamp.
+  day:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Partition day from observation start timestamp.

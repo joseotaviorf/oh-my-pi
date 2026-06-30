@@ -1,0 +1,66 @@
+database_name: dw_alias
+table_name: fact_alias_leads
+description: |
+  Fact table at lead grain (one row per lead). Aggregates session-level counts and
+  resolution outcomes per lead, joined to broker via uuid_company from datalake_alias_clean.leads.
+  Use for lead funnel analysis at the broker level (conversion, escalation, CRM send rate).
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_lead:
+    lineage:
+      - datalake_alias_clean.leads.uuid_lead
+    description: Surrogate key for the lead; primary key of this fact.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency. FK to dw_brokers.dim_broker.
+  qt_sessions_total:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead_session
+    description: Total number of distinct lead sessions for this lead.
+  qt_sessions_resolved:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead_session
+      - datalake_alias_clean.lead_resolutions.uuid_lead_resolution
+    description: Number of sessions with at least one resolution.
+  qt_sessions_escalated:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead_session
+      - datalake_alias_clean.lead_resolutions.type
+    description: Number of sessions resolved with type ESCALATION.
+  qt_sessions_visit_intention:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead_session
+      - datalake_alias_clean.lead_resolutions.type
+    description: Number of sessions resolved with type VISIT_INTENTION.
+  is_crm_sent:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_sent_to_crm
+    description: True when at least one resolution for this lead was sent to the broker CRM.
+  ts_first_contact:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Timestamp of the lead's first session (earliest ts_created).
+  ts_last_contact:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_updated
+    description: Timestamp of the most recent activity across all sessions.
+  dt_first_contact:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Date of the lead's first contact session.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Partition year from first contact timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Partition month from first contact timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Partition day from first contact timestamp.

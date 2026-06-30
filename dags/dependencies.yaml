@@ -113,6 +113,19 @@ bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb_agenda_allocation:load-clean-mask-weekly-hour:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.enrich_agenda_allocation:load-enrich-agenda-hourly-allocations:first-run-of-day
+bietlejuice.dw_alias:
+  - bietlejuice.alias:load-clean-ai-agents:first-run-of-day
+  - bietlejuice.alias:load-clean-crm-integrations:first-run-of-day
+  - bietlejuice.alias:load-clean-inventory-ingestions:first-run-of-day
+  - bietlejuice.alias:load-clean-lead-engagements:first-run-of-day
+  - bietlejuice.alias:load-clean-lead-resolutions:first-run-of-day
+  - bietlejuice.alias:load-clean-lead-sessions:first-run-of-day
+  - bietlejuice.alias:load-clean-leads:first-run-of-day
+  - bietlejuice.alias:load-clean-listing-fingerprint:first-run-of-day
+  - bietlejuice.company:load-clean-company:first-run-of-day
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
+  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
+  - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.dw_analytical_costs:
   - bietlejuice.enrich_databricks_usage_costs:load-enrich-usage-costs:first-run-of-day
 bietlejuice.dw_atta:

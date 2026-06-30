@@ -1,0 +1,63 @@
+database_name: dw_alias
+table_name: dim_alias_ai_agent
+description: |
+  Dimension table for Alias AI agents (WhatsApp bots) configured by each broker agency.
+  One row per AI agent; excludes sensitive Twilio credentials (auth token, API secret, API key).
+  Sourced from datalake_alias_clean.ai_agents joined to datalake_company_clean.company for sk_broker.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_ai_agent:
+    lineage:
+      - datalake_alias_clean.ai_agents.uuid_ai_agent
+    description: Surrogate key for the AI agent; primary key of this dimension.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency that owns this AI agent. FK to dw_brokers.dim_broker.
+  agent_name:
+    lineage:
+      - datalake_alias_clean.ai_agents.agent_name
+    description: Internal identifier name of the AI agent.
+  display_name:
+    lineage:
+      - datalake_alias_clean.ai_agents.display_name
+    description: Display name shown to end users in the WhatsApp conversation.
+  twilio_account_sid:
+    lineage:
+      - datalake_alias_clean.ai_agents.twilio_account_sid
+    description: Twilio account SID associated with this agent (non-sensitive identifier).
+  twilio_phone_number:
+    lineage:
+      - datalake_alias_clean.ai_agents.twilio_phone_number
+    description: WhatsApp phone number registered on Twilio for this agent.
+  is_phone_verified:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_phone_verified
+    description: True when the WhatsApp phone number has been verified (ts_phone_verified IS NOT NULL).
+  ts_phone_verified:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_phone_verified
+    description: Timestamp when the phone number was verified. NULL if not yet verified.
+  ts_created:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_created
+    description: Timestamp when the AI agent record was created.
+  ts_updated:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_updated
+    description: Timestamp when the AI agent record was last updated.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_updated
+    description: Partition year from agent last update timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_updated
+    description: Partition month from agent last update timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_updated
+    description: Partition day from agent last update timestamp.

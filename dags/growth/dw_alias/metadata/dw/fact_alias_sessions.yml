@@ -1,0 +1,257 @@
+database_name: dw_alias
+table_name: fact_alias_sessions
+description: |
+  Central fact table at lead session grain (one row per lead_session). Unifies Alias OLTP session
+  data with Langfuse AI observability metrics and chatbot session metadata. Provides funnel stage
+  progression flags, resolution outcomes, engagement counts, LLM cost/latency metrics, and the
+  full HostGraph conversation JSON. is_test excludes synthetic and QA company sessions.
+  Ported from OBT commit cc2f148e62 (feature/alias-obt) to Spark SQL.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_lead_session:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead_session
+    description: Surrogate key for the lead session; primary key of this fact.
+  sk_lead:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead
+    description: Surrogate key for the lead. FK to fact_alias_leads.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency. FK to dw_brokers.dim_broker.
+  id_langfuse_session:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_chat_session
+    description: Langfuse session ID. Links to datalake_langfuse_clean.traces and fact_alias_agent_calls.
+  id_sauron_session:
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+    description: Sauron session ID from the chatbot sessions table.
+  status:
+    lineage:
+      - datalake_alias_clean.lead_sessions.status
+    description: Current status of the lead session in Alias OLTP.
+  origin_first:
+    lineage:
+      - datalake_alias_clean.lead_engagements.origin
+    description: Channel origin of the first engagement in this session (e.g. WHATSAPP). 'UNKNOWN' if no engagements.
+  channel:
+    lineage:
+      - datalake_chatbot.sessions.channel
+    description: Chat channel from the chatbot sessions table.
+  ts_engagement_first:
+    lineage:
+      - datalake_alias_clean.lead_engagements.ts_created
+    description: Timestamp of the first lead engagement in this session.
+  qt_engagements:
+    lineage:
+      - datalake_alias_clean.lead_engagements.uuid_lead_session
+    description: Total count of engagements within this session.
+  is_resolved:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.uuid_lead_session
+    description: True when at least one resolution exists for this session.
+  is_escalated:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.type
+    description: True when at least one resolution of type ESCALATION exists.
+  is_visit_intention:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.type
+    description: True when at least one resolution of type VISIT_INTENTION exists.
+  is_crm_sent:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_sent_to_crm
+    description: True when at least one resolution was forwarded to the broker CRM.
+  is_chat_started:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_chat_started
+    description: True when ts_chat_started is not null (WhatsApp conversation was initiated).
+  qt_resolutions:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.uuid_lead_session
+    description: Total count of resolutions for this session.
+  bot_version:
+    lineage:
+      - datalake_langfuse_clean.traces.version
+    description: AI agent bot version (max version seen across traces in this session).
+  is_test:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: |
+      True when the session belongs to a test company. Hardcoded UUIDs from OBT commit cc2f148e62:
+      '00000000-0000-4000-8000-000000000001' (synthetic placeholder) and
+      '31616192-288b-439a-baec-890a5c89e20a' (internal QA company).
+  had_profiling:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_profile_agentV1 was called in this session.
+  had_inventory:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_inventory_agentV1 was called in this session.
+  had_recommendations:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_get_recommendations_by_company was called in this session.
+  had_scheduling:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_schedule_visit_agentV1 was called in this session.
+  had_availability:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_visit_get_availability was called in this session.
+  had_visit_registered:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_register_visit_intention was called in this session.
+  had_escalation:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: True when alias_escalation_agentV1 was called in this session.
+  visit_registered_success:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: True when alias_register_visit_intention output contains 'registered successfully'.
+  escalation_registered_success:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: True when alias_register_escalation output contains 'escalation registered successfully'.
+  funnel_stage_deepest:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: |
+      Deepest funnel stage reached in this session. Values (from deepest to shallowest):
+      visit_intention_registered, escalated, schedule_visit_agent_called, inventory_searched,
+      profile_identified, no_agent.
+  ts_profiling:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp of the first alias_profile_agentV1 call. NULL if not reached.
+  ts_inventory:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp of the first alias_inventory_agentV1 call. NULL if not reached.
+  ts_scheduling:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp of the first alias_schedule_visit_agentV1 call. NULL if not reached.
+  ts_availability:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp of the first alias_visit_get_availability call. NULL if not reached.
+  ts_visit_registered:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp of the first alias_register_visit_intention call. NULL if not reached.
+  ts_escalation:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: Timestamp of the first alias_escalation_agentV1 call. NULL if not reached.
+  n_user_turns:
+    lineage:
+      - datalake_langfuse_clean.traces.id_trace
+    description: Number of distinct user turns (traces) in this session.
+  n_user_turns_until_first_recommendation:
+    description: Number of turns before the first recommendation was shown. Not yet implemented (NULL).
+  n_user_turns_until_visit_intent:
+    description: Number of turns before the visit intent was registered. Not yet implemented (NULL).
+  n_tool_call_errors:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+    description: Count of tool calls whose output contains 'error'.
+  n_calls_get_recommendations:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Count of alias_get_recommendations_by_company tool calls.
+  n_calls_get_availability:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Count of alias_visit_get_availability tool calls.
+  n_calls_get_property:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Count of alias_get_property_by_external_id tool calls.
+  n_calls_register_visit:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Count of alias_register_visit_intention tool calls.
+  n_calls_register_escalation:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: Count of alias_register_escalation tool calls.
+  n_recommendations_shown:
+    description: Number of recommendations shown to the user. Not yet implemented (NULL).
+  total_llm_cost_usd:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+    description: Total LLM cost across all observations in this session (cost_details.total sum).
+  avg_cost_per_turn_usd:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+      - datalake_langfuse_clean.traces.id_trace
+    description: Average LLM cost per user turn (total_llm_cost_usd / n_user_turns).
+  total_input_tokens:
+    description: Total input tokens. Not available at observation level; reserved for future use.
+  total_output_tokens:
+    description: Total output tokens. Not available at observation level; reserved for future use.
+  avg_llm_response_time_ms:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+    description: Average LLM response time in milliseconds across all observations in this session.
+  p50_llm_response_time_ms:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+    description: Median (p50) LLM response time in milliseconds.
+  p95_llm_response_time_ms:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+    description: 95th percentile LLM response time in milliseconds.
+  full_conversation:
+    lineage:
+      - datalake_chatbot.sessions.full_conversation
+    description: |
+      Full HostGraph conversation JSON from datalake_chatbot.sessions. Contains the complete
+      message history including recommendations shown. Use for ad-hoc parsing of n_recommendations_shown.
+  ts_created:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Timestamp when the lead session was created in Alias OLTP.
+  ts_closed:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_closed
+    description: Timestamp when the lead session was closed. NULL if still open.
+  ts_first_turn:
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+    description: Timestamp of the first user turn (earliest trace ts_created for this session).
+  ts_last_turn:
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+    description: Timestamp of the last user turn (latest trace ts_created for this session).
+  session_wall_duration_min:
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+    description: Wall-clock duration from first to last turn in minutes.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Partition year from session creation timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Partition month from session creation timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.lead_sessions.ts_created
+    description: Partition day from session creation timestamp.

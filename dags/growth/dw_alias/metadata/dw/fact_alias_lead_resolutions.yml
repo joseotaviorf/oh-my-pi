@@ -1,0 +1,62 @@
+database_name: dw_alias
+table_name: fact_alias_lead_resolutions
+description: |
+  Fact table at resolution grain (one row per lead resolution). Records the outcome of each
+  AI agent session: resolution type (ESCALATION, VISIT_INTENTION), synthetic house reference,
+  and CRM send status. Joins lead_resolutions → lead_sessions → leads → broker_map.
+  id_synthetic_house is Alias-internal and joins to dim_alias_listing.sk_listing (87% match).
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_lead_resolution:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.uuid_lead_resolution
+    description: Surrogate key for the lead resolution; primary key of this fact.
+  sk_lead_session:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.uuid_lead_session
+    description: Surrogate key for the session that produced this resolution. FK to fact_alias_sessions.
+  sk_lead:
+    lineage:
+      - datalake_alias_clean.lead_sessions.uuid_lead
+    description: Surrogate key for the lead. FK to fact_alias_leads.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Surrogate key of the broker agency. FK to dw_brokers.dim_broker.
+  type:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.type
+    description: Resolution type (ESCALATION = human handoff, VISIT_INTENTION = visit scheduled).
+  id_synthetic_house:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.property_id
+    description: |
+      Alias-internal synthetic house ID (from listing_fingerprint). Not joinable to dw_house.dim_house
+      (Alias uses its own sequence). FK to dim_alias_listing.sk_listing (87% match validated).
+  is_sent_to_crm:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_sent_to_crm
+    description: True when the resolution was forwarded to the broker CRM system.
+  ts_resolved:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_resolved
+    description: Timestamp when the resolution was recorded.
+  ts_sent_to_crm:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_sent_to_crm
+    description: Timestamp when the resolution was sent to the broker CRM. NULL if not yet sent.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_resolved
+    description: Partition year from resolution timestamp.
+  month:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_resolved
+    description: Partition month from resolution timestamp.
+  day:
+    lineage:
+      - datalake_alias_clean.lead_resolutions.ts_resolved
+    description: Partition day from resolution timestamp.
