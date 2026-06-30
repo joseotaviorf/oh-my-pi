@@ -9,6 +9,11 @@ and publishes it to DataHub via load_collections_context.py.
 Markdown is the only versioned source of truth. Generated YAML is written to a
 temporary directory (never committed).
 
+Entity kinds (see docs/llm_context/{business,metric}_entities/_TEMPLATE.md):
+  domain — business_entities/*.md: table routing, Synonyms, owned datasets
+  metric — metric_entities/*.md: calculation contract, upstream related_data_products,
+           no owned datasets
+
 Golden query ``stable_urn``: deterministic ``uuid5(entity_slug)`` — stable across
 CI runs without a companion YAML in git.
 
@@ -47,6 +52,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -107,15 +113,18 @@ _STABLE_URN_LINE_RE = re.compile(
 _DEFAULT_MODEL = "openai/gpt-5.3-codex"
 _DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
 
-# Markdown ``## `` sections that must NOT be folded into the Data Product description:
-# Tables → linked assets; Synonyms → glossary terms; Golden Queries → Query entities;
-# DataHub catalog → pure tooling pointer. Everything else (Overview, Key Metrics,
-# Dos and Don'ts, Relationships, …) IS the description.
+# Markdown ``## `` sections that must NOT be folded into the Data Product description.
+# Aligned with docs/llm_context/{business,metric}_entities/_TEMPLATE.md:
+#   domain  — Where to query what → datasets; Synonyms → glossary; Golden query(ies) → Query entities
+#   metric  — Related Business Entities → related_data_products SP; Glossary → glossary;
+#             Golden Queries → Query entities; DataHub Catalog → tooling pointer only
 EXCLUDE_HEADING_PATTERNS = [
-    re.compile(r"^## (Tables|Where to query what)$"),
-    re.compile(r"^## (Synonyms|Glossary and Synonyms)$"),
-    re.compile(r"^## Golden [Qq]uer(y|ies)(:.+)?$"),
-    re.compile(r"^## DataHub catalog$"),
+    re.compile(r"^## (Tables|Where to query what)$", re.I),
+    re.compile(r"^## (Synonyms|Glossary and Synonyms)$", re.I),
+    re.compile(r"^## Golden [Qq]uer(y|ies)\b.*$", re.I),
+    re.compile(r"^## DataHub [Cc]atalog$"),
+    re.compile(r"^## Related Business Entities$", re.I),
+    re.compile(r"^## Superset Golden Assets$", re.I),
 ]
 
 # Matches the whole ``product_description:`` YAML block up to (but not including) the
@@ -133,6 +142,18 @@ _CI_YAML_DIR: Path | None = None
 _DATA_PRODUCT_TYPE_RE = re.compile(r"(?m)^data_product_type:.*$")
 _LIFECYCLE_STAGE_LINE_RE = re.compile(r"(?m)^lifecycle_stage:.*$")
 _DOMAIN_URN_LINE_RE = re.compile(r"(?m)^domain_urn:.*$")
+_DATASETS_BLOCK_RE = re.compile(r"(?ms)^datasets:.*?\n(?=\S|\Z)")
+_RELATED_DATA_PRODUCTS_BLOCK_RE = re.compile(
+    r"(?ms)^related_data_products:.*?\n(?=\S|\Z)"
+)
+_DOCUMENTATION_LINK_BLOCK_RE = re.compile(r"(?ms)^documentation_link:.*?\n(?=\S|\Z)")
+_GITHUB_REPO = "quintoandar/bi-etl-ejuice"
+_GITHUB_BRANCH = "master"
+_SUPERSET_DATASET_URN_RE = re.compile(
+    r"urn:li:dataset:\(urn:li:dataPlatform:superset,[^)]+\)",
+    re.I,
+)
+_TRINO_TABLE_REF_RE = re.compile(r"`([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)`")
 
 
 def md_path_to_data_product_id(md_path: Path) -> str:
@@ -143,6 +164,145 @@ def md_path_to_data_product_id(md_path: Path) -> str:
 def _md_to_data_product_type(md_path: Path) -> str:
     """Return 'metric' for metric_entities/, 'domain' for everything else."""
     return "metric" if "metric_entities" in md_path.parts else "domain"
+
+
+def _llm_context_subdir(md_path: Path) -> str:
+    return (
+        "metric_entities" if "metric_entities" in md_path.parts else "business_entities"
+    )
+
+
+def _display_name_to_product_id(name: str) -> str:
+    """``NPS`` → ``nps``; ``House and Listing`` → ``house-and-listing``."""
+    return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
+
+
+def _extract_section_body(md_text: str, *heading_substrings: str) -> str:
+    """Return the body of the first ``##`` section whose title contains any substring."""
+    lines = md_text.splitlines()
+    body: list[str] = []
+    in_section = False
+    for line in lines:
+        if line.startswith("## "):
+            title = line[3:].strip().lower()
+            in_section = any(sub.lower() in title for sub in heading_substrings)
+            if in_section:
+                body = []
+            continue
+        if in_section:
+            body.append(line)
+    return "\n".join(body).strip()
+
+
+def _extract_related_data_products(md_path: Path) -> list[str]:
+    """Parse ``## Related Business Entities`` bullets into kebab-case product IDs."""
+    section = _extract_section_body(md_path.read_text(), "related business entities")
+    ids: list[str] = []
+    seen: set[str] = set()
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("- "):
+            continue
+        product_id = _display_name_to_product_id(stripped[2:].strip())
+        if product_id and product_id not in seen:
+            seen.add(product_id)
+            ids.append(product_id)
+    return ids
+
+
+def _documentation_link(md_path: Path, entity_slug: str) -> dict[str, str]:
+    subdir = _llm_context_subdir(md_path)
+    kind = "Metric entity" if subdir == "metric_entities" else "Business entity"
+    return {
+        "label": f"{kind} documentation ({entity_slug}.md)",
+        "url": (
+            f"https://github.com/{_GITHUB_REPO}/blob/{_GITHUB_BRANCH}/"
+            f"docs/llm_context/{subdir}/{entity_slug}.md"
+        ),
+    }
+
+
+def _as_yaml_list_block(key: str, values: list[str]) -> str:
+    return f"{key}:\n" + "".join(f"  - {value}\n" for value in values)
+
+
+def _inject_documentation_link(yaml_content: str, link: dict[str, str]) -> str:
+    block = (
+        "documentation_link:\n"
+        f"  label: {json.dumps(link['label'])}\n"
+        f"  url: >-\n"
+        f"    {link['url']}\n"
+    )
+    if _DOCUMENTATION_LINK_BLOCK_RE.search(yaml_content):
+        return _DOCUMENTATION_LINK_BLOCK_RE.sub(block, yaml_content, count=1)
+    return yaml_content.rstrip() + f"\n{block}"
+
+
+def _inject_related_data_products(yaml_content: str, product_ids: list[str]) -> str:
+    if not product_ids:
+        return yaml_content
+    block = _as_yaml_list_block("related_data_products", product_ids)
+    if _RELATED_DATA_PRODUCTS_BLOCK_RE.search(yaml_content):
+        return _RELATED_DATA_PRODUCTS_BLOCK_RE.sub(block, yaml_content, count=1)
+    if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
+        return _DATA_PRODUCT_TYPE_RE.sub(
+            lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{block}"
+
+
+def _metric_asset_section_bodies(md_text: str) -> list[str]:
+    """Body of ``## Superset Golden Assets`` — Trino tables + Superset URNs for DataHub assets."""
+    body = _extract_section_body(md_text, "superset golden")
+    return [body] if body else []
+
+
+def _extract_metric_dataset_rows(md_path: Path) -> list[dict[str, str]]:
+    """Extract Trino ``schema.table`` refs and Superset URNs for metric Data Product assets.
+
+    Both are linked on the product Summary in DataHub (e.g. nps-fr: sandbox tables + Superset
+    virtual datasets). Parsed from ``## Superset Golden Assets``.
+    """
+    rows: list[dict[str, str]] = []
+    seen_tables: set[tuple[str, str]] = set()
+    seen_urns: set[str] = set()
+    for body in _metric_asset_section_bodies(md_path.read_text()):
+        for schema, table in _TRINO_TABLE_REF_RE.findall(body):
+            key = (schema.lower(), table.lower())
+            if key not in seen_tables:
+                seen_tables.add(key)
+                rows.append({"schema": schema, "table": table})
+        for urn in _SUPERSET_DATASET_URN_RE.findall(body):
+            urn = urn.strip()
+            if urn not in seen_urns:
+                seen_urns.add(urn)
+                rows.append({"urn": urn})
+    return rows
+
+
+def _as_yaml_datasets_block(rows: list[dict[str, str]]) -> str:
+    lines = ["datasets:"]
+    for row in rows:
+        if row.get("urn"):
+            lines.append(f"  - urn: {json.dumps(row['urn'])}")
+        elif row.get("schema") and row.get("table"):
+            lines.append(f"  - schema: {row['schema']}")
+            lines.append(f"    table: {row['table']}")
+    return "\n".join(lines) + "\n"
+
+
+def _inject_metric_datasets(yaml_content: str, md_path: Path) -> str:
+    """Replace ``datasets:`` with Trino + Superset reference assets extracted from the MD."""
+    rows = _extract_metric_dataset_rows(md_path)
+    yaml_content = _DATASETS_BLOCK_RE.sub("", yaml_content)
+    if not rows:
+        return yaml_content
+    block = _as_yaml_datasets_block(rows)
+    if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
+        return _DATA_PRODUCT_TYPE_RE.sub(
+            lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{block}"
 
 
 def _inject_lifecycle_stage(yaml_content: str, default: str = "prod") -> str:
@@ -408,6 +568,93 @@ def _validate_domain_urn(
     )
 
 
+def _build_entity_rules(
+    md_path: Path,
+    *,
+    entity_slug: str,
+    domains_block: str,
+    domain_count: int,
+) -> str:
+    data_product_type = _md_to_data_product_type(md_path)
+    doc_link = _documentation_link(md_path, md_path.stem)
+    related_ids = _extract_related_data_products(md_path)
+
+    common = f"""- Infer domain_urn from the entity Markdown: pick exactly ONE domain from the
+  LIVE DATAHUB CATALOG below. Copy the URN verbatim — do NOT invent slugs.
+  Choose the domain whose name and description best match the entity's scope.
+
+LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
+{domains_block}
+
+- Emit ALL golden queries from the Markdown as a `golden_queries:` list (plural).
+  Domain docs may use `## Golden query: {{Name}}` (singular H2) or `## Golden Queries`
+  with `###` sub-headings; metric docs use `## Golden Queries`. For EACH query set
+  `stable_urn: "TBD"` — CI assigns the real deterministic URN per query.
+  Do NOT generate UUIDs yourself.
+- Glossary term `id` values must match existing DataHub term slugs when the term
+  already exists; the loader resolves by display name as fallback.
+- Do NOT hand-author `product_description`. CI overwrites it with the full Markdown body
+  (minus asset-routing, glossary, golden-query, catalog, and upstream-entity sections).
+  Emit a one-line placeholder, e.g. `product_description: "(injected by CI from Markdown)"`.
+- Set `data_product_type: {data_product_type}` and `lifecycle_stage: prod` unless the
+  Markdown clearly indicates draft/review/deprecated.
+- Use `structured_property.qualified_name: br.com.quintoandar.datahub.data_product.golden_query`
+  and legacy drops `br.com.quintoandar.datahub.{entity_slug}.golden_query` /
+  `...golden_query_url`.
+- Set `documentation_link` exactly to:
+    label: {doc_link["label"]!r}
+    url: {doc_link["url"]}
+- Output ONLY the YAML. No markdown fences, no commentary."""
+
+    if data_product_type == "metric":
+        related_rule = ""
+        if related_ids:
+            related_rule = (
+                "\n- Set `related_data_products` to this list (CI also injects from MD):\n"
+                + "".join(f"    - {pid}\n" for pid in related_ids)
+            )
+        metric_rows = _extract_metric_dataset_rows(md_path)
+        asset_rule = ""
+        if metric_rows:
+            asset_rule = (
+                "\n- CI injects reference assets from `## Superset Golden Assets` into `datasets:` "
+                "(Trino `schema`/`table` rows + Superset `urn:` rows). Example:\n"
+            )
+            for row in metric_rows:
+                if row.get("urn"):
+                    asset_rule += f"    - urn: {row['urn']}\n"
+                else:
+                    asset_rule += (
+                        f"    - schema: {row['schema']}\n      table: {row['table']}\n"
+                    )
+        return (
+            common
+            + f"""
+- This is a **metric entity** (`docs/llm_context/metric_entities/`). Follow the metric
+  template: thin on schema, thick on calculation.
+- `## Superset Golden Assets` lists **reference assets** linked on the Data Product Summary in
+  DataHub: Trino/Databricks `schema.table` pairs (materialized metric tables) AND Superset
+  virtual-dataset URNs (in backticks). CI injects both into `datasets:` — do not drop either.{asset_rule}
+- Parse glossary from `## Glossary and Synonyms` bullet list (`- **term** → mapping`).
+- Do NOT hand-author `related_data_products` — CI injects from `## Related Business Entities`.{related_rule}"""
+        )
+
+    return (
+        common
+        + """
+- This is a **domain entity** (`docs/llm_context/business_entities/`). Follow the business
+  template: table routing + canonical golden query.
+- Parse glossary from `## Synonyms` table (Term | Meaning | Notes) OR bullet list if present.
+- In `datasets`, include only concrete `schema.table` pairs from `## Where to query what`
+  (and per-schema table sections) that this product is the PRIMARY OWNER of. A table you
+  only JOIN to but that another product owns belongs in the description prose, NOT in
+  `datasets` — listing it would steal it from the other product (assignment is exclusive).
+  Never use wildcards (`*`), schema globs (`schema.*`), or placeholder patterns
+  (`statement_*`, `reverse_accounts_*`). Omit patterns; expand to explicit names or skip.
+- Do NOT emit `related_data_products` (domain products only)."""
+    )
+
+
 def _build_messages(
     md_path: Path,
     *,
@@ -421,10 +668,16 @@ def _build_messages(
     rel_md = md_path.relative_to(_REPO_ROOT)
     entity_slug = md_path_to_data_product_id(md_path)
     domains_block = format_domains_for_prompt(domains)
+    entity_rules = _build_entity_rules(
+        md_path,
+        entity_slug=entity_slug,
+        domains_block=domains_block,
+        domain_count=len(domains),
+    )
 
     system = (
         "You are a data engineer at QuintoAndar. "
-        "Your task is to convert a business entity Markdown file into a DataHub YAML. "
+        "Your task is to convert a business or metric entity Markdown file into a DataHub YAML. "
         "Output ONLY the raw YAML content — no markdown fences, no commentary, "
         "no explanation. The entire response must be valid YAML that can be written "
         "directly to a file."
@@ -460,28 +713,7 @@ FIXED INPUTS (use these verbatim — do not change):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Infer domain_urn from the entity Markdown: pick exactly ONE domain from the
-  LIVE DATAHUB CATALOG below. Copy the URN verbatim — do NOT invent slugs.
-  Choose the domain whose name and description best match the entity's scope.
-
-LIVE DATAHUB DOMAIN CATALOG ({len(domains)} domains):
-{domains_block}
-
-- Emit ALL golden queries from the Markdown's `## Golden Queries` section as a
-  `golden_queries:` list (plural). For EACH query set `stable_urn: "TBD"` — CI assigns the
-  real deterministic URN per query. Do NOT generate UUIDs yourself.
-- In `datasets`, include only concrete `schema.table` pairs that exist as real tables AND
-  that this product is the PRIMARY OWNER of (its own domain schemas). A table you only JOIN
-  to but that another product owns belongs in the description prose, NOT in `datasets` —
-  listing it would steal it from the other product (assignment is exclusive).
-  Never use wildcards (`*`), schema globs (`schema.*`), or placeholder patterns
-  (`statement_*`, `reverse_accounts_*`). Omit patterns; expand to explicit names or skip.
-- Glossary term `id` values must match existing DataHub term slugs when the term
-  already exists; the loader resolves by display name as fallback.
-- Do NOT hand-author `product_description`. CI overwrites it with the full Markdown body
-  (minus Tables / Synonyms / Golden Queries / DataHub-catalog sections). Emit a one-line
-  placeholder, e.g. `product_description: "(injected by CI from Markdown)"`.
-- Output ONLY the YAML. No markdown fences, no commentary.
+{entity_rules}
 """
 
     return [
@@ -680,6 +912,14 @@ def main(argv: list[str] | None = None) -> int:
         yaml_content = _inject_data_product_type(
             yaml_content, _md_to_data_product_type(md_path)
         )
+        yaml_content = _inject_documentation_link(
+            yaml_content, _documentation_link(md_path, md_path.stem)
+        )
+        if _md_to_data_product_type(md_path) == "metric":
+            yaml_content = _inject_metric_datasets(yaml_content, md_path)
+            yaml_content = _inject_related_data_products(
+                yaml_content, _extract_related_data_products(md_path)
+            )
 
         domain_err = _validate_domain_urn(
             _yaml_domain_urn(yaml_content),

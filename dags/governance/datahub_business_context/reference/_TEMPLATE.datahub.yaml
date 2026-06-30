@@ -3,16 +3,21 @@
 # ==============================================================================
 #
 # Entity configs are NOT committed per entity. CI generates ephemeral YAML from
-# docs/llm_context/business_entities/{entity}.md via:
+# docs/llm_context/{business_entities,metric_entities}/{entity}.md via:
 #   packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py
 #
 # Authoring flow:
-#   1. Write / update docs/llm_context/business_entities/{entity}.md
+#   1. Write / update the entity .md (see _TEMPLATE.md in the matching directory)
 #   2. Push to master (or run the generate script locally) — CI publishes to DataHub
-#   3. Verify: python dags/governance/datahub_business_context/smoke_test_datahub.py
+#   3. Verify: uv run python dags/governance/datahub_business_context/smoke_test_datahub.py
 #
 # Each golden query's stable_urn is assigned deterministically by CI (uuid5 from entity
 # slug for query 0, uuid5 from "slug:N" for the rest). Author them as "TBD".
+#
+# Domain vs metric:
+#   domain — from business_entities/_TEMPLATE.md; requires `datasets:` (primary-owner tables)
+#   metric — from metric_entities/_TEMPLATE.md; Trino + Superset URNs from ## Superset Golden Assets
+#            linked as reference assets on the product Summary; add `related_data_products:`
 #
 # ==============================================================================
 
@@ -54,9 +59,21 @@ golden_queries:
     sql: |
       ...
 
+# Domain entities only — primary-owner Trino/Databricks tables.
 datasets:
   - schema: ...
     table: ...
+
+# Metric entities — Trino/Databricks + Superset URNs from ## Superset Golden Assets.
+# datasets:
+#   - schema: sandbox
+#     table: nps_fr
+#   - urn: urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)
+
+# Metric entities only — upstream business entity data product ids (kebab-case).
+# related_data_products:
+#   - nps
+#   - supply
 
 glossary_terms:
   parent_node_urn: urn:li:glossaryNode:{domain}
@@ -67,6 +84,6 @@ glossary_terms:
         ...
 
 documentation_link:
-  label: "Business entity documentation ({entity}.md)"
+  label: "Business entity documentation ({entity}.md)"  # or "Metric entity documentation ..."
   url: >-
     https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/business_entities/{entity}.md

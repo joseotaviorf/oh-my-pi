@@ -22,7 +22,7 @@ Metric entity docs are **calculation contracts** — they tell TARS (and analyst
 7. **Canonical filter** — the exact SQL predicates that define the metric's universe (mandatory fields + values).
 8. **Weight / parameter source** — where do coefficients, targets, or thresholds live (e.g., a GSheets table)? Never hardcode.
 9. **Common analyst mistakes** — the top 2–3 traps that produce a wrong number (drives Dos and Don'ts and the warning in Canonical Filter).
-10. **Superset golden assets** — any reference Superset dataset or dashboard that serves as the canonical starting point. Optional.
+10. **Superset golden assets** — the reference assets for this metric: canonical Superset virtual datasets and/or the materialized Trino/Databricks `schema.table` tables they map to (e.g. `sandbox.nps_fr`). These are linked as reference assets on the DataHub Data Product Summary. Optional.
 
 Do NOT infer formula details from context — the whole point of this file is to be the definitive source of truth.
 
@@ -43,7 +43,7 @@ Before writing, verify the data model and calculation. Launch parallel explore s
 
 ## Step 3 — Write the metric entity file
 
-Create `docs/llm_context/metric_entities/{metric_slug}.md` following the template below exactly. Every section is required except **Superset Golden Assets** (optional). Keep the file concise: thick on calculation, thin on schema.
+Create `docs/llm_context/metric_entities/{metric_slug}.md` following the template below exactly. Every section is required except **Superset Golden Assets** (optional when the metric has no Trino table and no Superset asset to link). Keep the file concise: thick on calculation, thin on schema.
 
 ### Template
 
@@ -141,9 +141,16 @@ ORDER BY 1
 
 ## Superset Golden Assets
 
-<!-- Optional — omit this section if no golden Superset asset exists. -->
+<!--
+Optional. List Superset virtual datasets (and the materialized Trino/Databricks tables they
+map to) that serve as the canonical starting point for this metric in Superset.
 
-- **{Asset Name}** — {one-sentence description of what this asset is and when to use it as a base.}
+CI links both as reference assets on the Data Product Summary in DataHub — same pattern as
+nps-fr: Trino `schema.table` pairs (e.g. materialized `sandbox.nps_fr`) AND Superset dataset
+URNs in backticks. Omit this section when no Superset asset exists for this metric.
+-->
+
+- **{Asset Name}** — {one-sentence description}. Materialized in `{schema}.{table}` when applicable. URN: `urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)`
 ```
 
 ### Section-by-section guidance
@@ -188,8 +195,10 @@ ORDER BY 1
 - Validate all table and column names against governance metadata YAMLs or database MCP.
 
 **Superset Golden Assets:**
-- Omit the section entirely if no canonical Superset asset exists.
-- If present, asset name must match what is in Superset exactly.
+- Lists Superset virtual datasets and the materialized Trino `` `schema.table` `` pairs they map to, linked as reference assets on the Data Product Summary in DataHub (nps-fr pattern).
+- Include Superset URNs in backticks: `` `urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)` ``.
+- Include every `` `schema.table` `` and Superset URN in backticks so CI can extract them deterministically.
+- Omit the section when the metric has no Trino table and no Superset asset.
 
 ---
 
@@ -235,4 +244,4 @@ Before presenting to the user, verify:
 - [ ] Golden Query references the business entity component pattern in a comment instead of duplicating it
 - [ ] Metric registered in `docs/llm_context/intro.md` under "Available metric entities"
 - [ ] Back-link added to "Related Metric Entities" in the related business entity file(s)
-- [ ] Superset Golden Assets section omitted if no canonical asset exists
+- [ ] Superset Golden Assets omitted if no canonical asset; Superset URNs and Trino tables in backticks when present

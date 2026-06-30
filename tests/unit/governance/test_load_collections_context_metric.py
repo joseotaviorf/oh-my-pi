@@ -171,3 +171,78 @@ class TestGoldenQuerySubjectFallback:
         cfg = {"data_product_type": "domain"}
         gqs = [{"name": "q", "sql": "SELECT 1 FROM cte"}]
         assert loader._product_subject_pool(cfg, gqs) == []
+
+
+class TestPruneStaleAssets:
+    """Full-overwrite: a republish detaches assets the YAML no longer lists."""
+
+    @staticmethod
+    def _fetch_response(*urns: str) -> dict:
+        return {
+            "dataProduct": {
+                "entities": {
+                    "searchResults": [{"entity": {"urn": u}} for u in urns]
+                }
+            }
+        }
+
+    def test_fetch_linked_asset_urns_parses_and_skips_nulls(self, monkeypatch) -> None:
+        resp = {
+            "dataProduct": {
+                "entities": {
+                    "searchResults": [
+                        {"entity": {"urn": "urn:a"}},
+                        {"entity": {"urn": "urn:b"}},
+                        {"entity": None},  # defensive: malformed row
+                        {},
+                    ]
+                }
+            }
+        }
+        monkeypatch.setattr(loader, "_post", lambda q, v: resp)
+        assert loader._fetch_linked_asset_urns("urn:li:dataProduct:x") == {
+            "urn:a",
+            "urn:b",
+        }
+
+    def test_unlinks_only_the_set_difference(self, monkeypatch) -> None:
+        calls: list[tuple[str, dict]] = []
+
+        def _post(query: str, variables: dict):
+            calls.append((query, variables))
+            if "FetchDataProductAssets" in query:
+                return self._fetch_response("urn:a", "urn:b", "urn:c")
+            return {"batchSetDataProduct": True}
+
+        monkeypatch.setattr(loader, "_post", _post)
+        loader._prune_stale_assets("urn:li:dataProduct:x", ["urn:a"])
+
+        mutations = [v for q, v in calls if "FetchDataProductAssets" not in q]
+        assert len(mutations) == 1
+        inp = mutations[0]["input"]
+        assert "dataProductUrn" not in inp  # null dataProductUrn => detach from product
+        assert sorted(inp["resourceUrns"]) == ["urn:b", "urn:c"]
+
+    def test_noop_when_nothing_stale(self, monkeypatch) -> None:
+        calls: list[tuple[str, dict]] = []
+
+        def _post(query: str, variables: dict):
+            calls.append((query, variables))
+            return self._fetch_response("urn:a") if "FetchDataProductAssets" in query else {}
+
+        monkeypatch.setattr(loader, "_post", _post)
+        loader._prune_stale_assets("urn:li:dataProduct:x", ["urn:a", "urn:extra"])
+        # Only the fetch happened — no detach mutation when current ⊆ desired.
+        assert all("FetchDataProductAssets" in q for q, _ in calls)
+
+    def test_fail_open_when_lookup_fails(self, monkeypatch) -> None:
+        calls: list[tuple[str, dict]] = []
+
+        def _post(query: str, variables: dict):
+            calls.append((query, variables))
+            return None if "FetchDataProductAssets" in query else {"batchSetDataProduct": True}
+
+        monkeypatch.setattr(loader, "_post", _post)
+        loader._prune_stale_assets("urn:li:dataProduct:x", ["urn:a"])
+        # Never detach on incomplete information (fail-open) — no mutation attempted.
+        assert all("FetchDataProductAssets" in q for q, _ in calls)

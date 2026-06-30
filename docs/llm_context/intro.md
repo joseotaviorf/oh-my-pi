@@ -59,7 +59,7 @@ Each **metric entity** file follows a different, leaner structure focused on the
 | **Calculation** | The exact official calculation (weighting, aggregation), the **Canonical Filter**, and **Nuances** (weight sources, fallback, dedup) — this **overrides** any generic logic in the business entity |
 | **Dos and Don'ts** | Traps specific to the official metric (e.g. don't hardcode weights, don't pool journeys directly) |
 | **Golden Queries** | The single canonical query that produces the official metric — references the business-entity component pattern instead of re-teaching it |
-| **Superset Golden Assets** | Reference Superset datasets/dashboards to use as the canonical starting point for data manipulation on this metric in Superset |
+| **Superset Golden Assets** | Superset virtual datasets and materialized Trino tables linked as reference assets on the Data Product Summary (optional) |
 
 > **Cross-link sections** (`Related Business Entities` / `Related Metric Entities`): these are plain lists of the **names** of related entities — no paths or descriptions. To open one, look it up in the "Available entities" / "Available metric entities" index below: business entities live in `business_entities/`, metric entities in `metric_entities/`, one file per entity. A business entity points *up* to the official metrics built on it; a metric entity points *down* to the business entities it draws its schema from.
 

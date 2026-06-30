@@ -152,9 +152,12 @@ ORDER BY 1
 ## Superset Golden Assets
 
 <!--
-Optional. List Superset datasets or dashboards that serve as the canonical starting point for
-data manipulation on this metric in Superset. Include the asset name and a short note on its
-role. Omit this section if no golden Superset asset exists for this metric.
+Optional. List Superset virtual datasets (and materialized Trino/Databricks tables they map to)
+that serve as the canonical starting point for this metric in Superset.
+
+CI links both as reference assets on the Data Product Summary in DataHub — same pattern as
+nps-fr: Trino ``schema.table`` pairs (e.g. materialized ``sandbox.nps_fr``) AND Superset
+dataset URNs in backticks. Omit this section when no Superset asset exists for this metric.
 -->
 
-- **{Asset Name}** — {one-sentence description of what this asset is and when to use it as a base.}
+- **{Asset Name}** — {one-sentence description}. Materialized in `{schema}.{table}` when applicable. URN: `urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)`

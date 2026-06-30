@@ -19,8 +19,24 @@ documentation link from the bundle, Golden ``createQuery``, merge-preserving sid
 property + legacy ``removeLink`` cleanup). Payload and default URNs are supplied by Python modules
 such as ``collections_recovery_bundle.py`` — not by this orchestrator.
 
-``data_product_curated_entity``: declarative YAML only (datasets, documentation link,
-``createQuery``, structured property sidebar) — no Python bundle module.
+``data_product_curated_entity``: declarative YAML only — the shape produced by CI from
+``docs/llm_context/business_entities/_TEMPLATE.md`` (``data_product_type: domain``) or
+``docs/llm_context/metric_entities/_TEMPLATE.md`` (``data_product_type: metric``). See
+``reference/_TEMPLATE.datahub.yaml`` for the full schema.
+
+Domain products: link owned ``datasets``, glossary, golden queries, documentation link, lifecycle
+and type structured properties.
+
+Metric products: link Trino/Databricks tables and Superset dataset URNs from
+``## Superset Golden Assets`` as reference assets on the product Summary; wire
+``related_data_products`` to upstream domain products; golden-query ``subjects`` may
+duplicate Trino tables for Query entity wiring.
+
+Full-overwrite semantics: the Markdown/YAML is the single source of truth. A republish
+*reconciles* the product to the YAML — assets dropped from ``datasets`` are unlinked
+(``_prune_stale_assets``) and legacy structured properties named in
+``legacy_qualified_names_to_drop`` are deleted (``_drop_legacy_structured_properties``) —
+so editing the MD and re-pushing never leaves orphaned assets or stale sidebar properties.
 
 Usage:
     export DATAHUB_GRAPHQL_URL=https://<your-datahub-host>/api/graphql
@@ -1572,9 +1588,11 @@ def _golden_query_subject_urns(
 
 
 def _is_metric_product(cfg: dict[str, Any]) -> bool:
-    """A metric Data Product (``data_product_type: metric``) is a calculation over tables
-    owned by domain products — it owns no base tables of its own and surfaces its sources
-    through golden-query subjects, not exclusive dataset ownership."""
+    """A metric Data Product documents an official calculated metric.
+
+    It links reference assets on the product Summary — Trino/Databricks tables the metric
+    reads (e.g. ``sandbox.nps_fr``) and Superset virtual-dataset URNs — plus upstream domain
+    products via ``related_data_products``."""
     return str(cfg.get("data_product_type") or "").strip().lower() == "metric"
 
 
@@ -1738,6 +1756,62 @@ def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]
     return assignable
 
 
+_FETCH_DATA_PRODUCT_ASSETS = """
+query FetchDataProductAssets($urn: String!) {
+  dataProduct(urn: $urn) {
+    entities(input: { query: "*", start: 0, count: 1000 }) {
+      searchResults { entity { urn } }
+    }
+  }
+}
+"""
+
+
+def _fetch_linked_asset_urns(dp_urn: str) -> set[str] | None:
+    """URNs of every asset currently linked to the Data Product, or None on lookup failure."""
+    data = _post(_FETCH_DATA_PRODUCT_ASSETS, {"urn": dp_urn})
+    dp = _graphql_field(data, "dataProduct")
+    if not dp:
+        return None
+    results = (dp.get("entities") or {}).get("searchResults") or []
+    return {
+        str((r.get("entity") or {}).get("urn"))
+        for r in results
+        if isinstance(r, dict) and (r.get("entity") or {}).get("urn")
+    }
+
+
+def _prune_stale_assets(dp_urn: str, desired_urns: list[str]) -> None:
+    """Detach assets currently on the product that are no longer in the YAML (full overwrite).
+
+    The Markdown is the single source of truth: an asset dropped from ``datasets`` (or a
+    metric's ``## Superset Golden Assets``) is unlinked here so a republish converges to exactly
+    the YAML set instead of accumulating orphans (``batchSetDataProduct`` only *adds* links).
+
+    Removal uses ``batchSetDataProduct`` with a null ``dataProductUrn`` — the GraphQL contract
+    for detaching the listed resources from any data product. Only assets currently linked to
+    THIS product are passed, so the call only ever detaches this product's own stale links.
+    Fail-open: a lookup failure logs and skips (never deletes on incomplete information).
+    """
+    current = _fetch_linked_asset_urns(dp_urn)
+    if current is None:
+        print(
+            "  ! could not fetch current assets — skipping stale-asset prune (fail-open)",
+            file=sys.stderr,
+        )
+        return
+    stale = sorted(current - set(desired_urns))
+    if not stale:
+        return
+    data = _post(_SET_DATA_PRODUCT_ASSETS, {"input": {"resourceUrns": stale}})
+    if data is None:
+        _fail("curated.pruneStaleAssets", "batchSetDataProduct(null) returned None")
+        return
+    _ok(f"Unlinked {len(stale)} stale asset(s) no longer in YAML")
+    for urn in stale:
+        print(f"      - {urn}")
+
+
 def _create_or_update_data_product(
     pid: str, pname: Any, pdesc_raw: str, dom: Any, dp_u: str
 ) -> bool:
@@ -1838,10 +1912,17 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     if not _create_or_update_data_product(pid, pname, pdesc_raw, dom, dp_u):
         return
 
+    # Full-overwrite: detach anything currently linked that the YAML no longer lists, so the
+    # product converges to exactly the MD-declared set (batchSetDataProduct only adds links).
+    _prune_stale_assets(dp_u, urns)
+
     if not urns:
         if _is_metric_product(cfg):
             # Metric product — owns no base tables; sources surface via golden-query subjects.
-            print("  -> metric product: no owned datasets to link (expected).")
+            print(
+                "  -> metric product: no reference assets linked "
+                "(add Trino tables and/or Superset URNs in ## Superset Golden Assets)."
+            )
         else:
             print(
                 f"  -> 0 datasets linked; {len(pending)} pending DataHub ingestion "
@@ -2222,6 +2303,55 @@ def curated_push_sidebar_struct_props(
         return
     _ok(f"Upserted {len(merged_blob)} structured-prop bucket(s)")
 
+    # Excluding the legacy SP from the merge above stops it being re-asserted, but the aspect
+    # still lingers on the entity — upsert never deletes omitted keys. Drop it outright so a
+    # republish fully overwrites: only the current data_product.golden_query SP remains.
+    _drop_legacy_structured_properties(dp_u, legacy_skip)
+
+
+_REMOVE_STRUCTURED_PROPERTIES = """
+mutation RemoveStructuredProperties($input: RemoveStructuredPropertiesInput!) {
+  removeStructuredProperties(input: $input) {
+    properties { structuredProperty { urn } }
+  }
+}
+"""
+
+
+def _drop_legacy_structured_properties(
+    dp_urn: str, legacy_sp_urns: frozenset[str]
+) -> None:
+    """Delete legacy ``*_qualified_names_to_drop`` structured-property aspects from the product.
+
+    Non-fatal: removing an absent SP is a no-op on most DataHub builds; any error is logged
+    softly rather than failing the publish (the sidebar already shows the current SP)."""
+    if not legacy_sp_urns:
+        return
+    root = _graphql_root(
+        _REMOVE_STRUCTURED_PROPERTIES,
+        {
+            "input": {
+                "assetUrn": dp_urn,
+                "structuredPropertyUrns": sorted(legacy_sp_urns),
+            }
+        },
+    )
+    if root is None:
+        print(
+            "  ! removeStructuredProperties HTTP failure — legacy SP(s) left in place",
+            file=sys.stderr,
+        )
+        return
+    errs = root.get("errors") or []
+    if errs:
+        print(
+            f"  -> legacy SP removal note (likely already absent): "
+            f"{json.dumps(errs)[:200]}",
+            file=sys.stderr,
+        )
+        return
+    _ok(f"Dropped {len(legacy_sp_urns)} legacy structured propert(y/ies)")
+
 
 def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
     print("\n[7/10] Re-affirm dataset-only memberships...")
@@ -2231,7 +2361,10 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
     )
     if not urns_r:
         if _is_metric_product(cfg):
-            print("  -> metric product: no owned datasets to re-affirm (expected).")
+            print(
+                "  -> metric product: no reference assets to re-affirm "
+                "(Trino tables / Superset URNs may be pending DataHub ingestion)."
+            )
             return
         # Tables may not yet be ingested into DataHub (handled gracefully in step [1/10]).
         # Log a warning but do not fail — the description already notes the pending tables.
