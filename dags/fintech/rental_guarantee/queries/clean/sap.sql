@@ -77,6 +77,9 @@ SELECT
     CAST(GET_JSON_OBJECT(request, '$.due-date') AS DATE) AS dt_due_date,
     CAST(GET_JSON_OBJECT(request, '$.event-date') AS DATE) AS dt_event_date,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    op_cdc,
+    ts_cdc_transaction,
+    ts_database_transaction
 FROM
     entries_parsed
