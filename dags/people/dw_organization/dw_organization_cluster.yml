@@ -20,3 +20,5 @@ validation:
         instance_count: 1
       task_nodes:
         instance_count: 2
+      aws_attributes:
+        instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
