@@ -15,6 +15,7 @@ WITH filtered AS (
         AND job_name IS NOT NULL
         AND dt >= '{load_start_date}'
         AND dt < '{load_end_date}'
+        AND ('{job_name}' = '' OR job_name = '{job_name}')
 ),
 deduped AS (
     SELECT

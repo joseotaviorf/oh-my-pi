@@ -29,12 +29,14 @@ workflow:
     - "{schema}"
     - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+    - "{{ dag_run.conf.get('monitoring_dag_name', '') if dag_run and dag_run.conf else '' }}"
   execution_timeout_hours: 2
   default_extraction_type: incremental
   default_partitions: []
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+    job_name: "{{ dag_run.conf.get('monitoring_dag_name', '') if dag_run and dag_run.conf else '' }}"
   tables_customization:
     evidently_ml_monitor:
       merge_on: [run_id, suite_name, metric_id]

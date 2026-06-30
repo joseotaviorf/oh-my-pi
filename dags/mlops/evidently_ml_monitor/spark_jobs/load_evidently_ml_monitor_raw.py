@@ -146,6 +146,12 @@ def main() -> None:
         help="First calendar day after the load window (exclusive). Format: YYYY-MM-DD",
     )
     add_validation_target_args(parser)
+    parser.add_argument(
+        "monitoring_dag_name",
+        nargs="?",
+        default=None,
+        help="If set, restrict load to this monitoring job only (e.g. 'fintech_ml_monitor').",
+    )
     args = parser.parse_args()
 
     environment = args.environment
@@ -153,6 +159,7 @@ def main() -> None:
     schema = args.schema
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date or default_load_end_date(load_start_date)
+    job_name_filter = args.monitoring_dag_name or None
     validate_load_date_range(load_start_date, load_end_date)
 
     table_name = "evidently_ml_monitor"
@@ -160,7 +167,8 @@ def main() -> None:
     logger.info(
         f"m={JOB_NAME}, environment={environment}, schema={schema}, "
         f"datalake_bucket={datalake_bucket}, load_start_date={load_start_date}, "
-        f"load_end_date={load_end_date}, msg=Starting spark job..."
+        f"load_end_date={load_end_date}, job_name_filter={job_name_filter}, "
+        f"msg=Starting spark job..."
     )
 
     config_service = ConfigurationService("evidently_ml_monitor")
@@ -190,7 +198,12 @@ def main() -> None:
     spark_metastore_service.create_database(write_database_name)
 
     # Read metric files:
-    df = _read_metric_files(spark_client.conn, source_root_path, file_format)
+    effective_source = (
+        f"{source_root_path.rstrip('/')}/{job_name_filter}/"
+        if job_name_filter
+        else source_root_path
+    )
+    df = _read_metric_files(spark_client.conn, effective_source, file_format)
     df = _enrich_path_columns(df)
     df = _filter_by_date_range(df, load_start_date, load_end_date)
 
