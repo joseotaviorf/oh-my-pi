@@ -9,6 +9,7 @@ column_level_validations:
   id_person_legislative:
     is_complete:
       severity_level: Error
+  one_row_per_person_legislative_and_effective_start:
     custom:
       # No duplicate records per person and effective start date.
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.people_legislative GROUP BY id_person_legislative, dt_effective_started HAVING COUNT(*) > 1)) = 0"
@@ -16,7 +17,7 @@ column_level_validations:
   id_person:
     is_complete:
       severity_level: Error
-  dt_effective_started:
+  effective_end_must_not_be_before_effective_start:
     custom:
       # Effective end date cannot be earlier than start date.
       constraint: |-

@@ -9,6 +9,8 @@ column_level_validations:
   id_job_legislative:
     is_complete:
       severity_level: Warning
+  one_row_per_job_legislative_and_effective_start:
     custom:
+      # No duplicate rows for the same (id_job_legislative, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.job_legislative GROUP BY id_job_legislative, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

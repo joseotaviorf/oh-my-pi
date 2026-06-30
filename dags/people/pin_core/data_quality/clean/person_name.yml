@@ -9,6 +9,8 @@ column_level_validations:
   id_person_name:
     is_complete:
       severity_level: Warning
+  one_row_per_person_name_and_effective_start:
     custom:
+      # No duplicate rows for the same (id_person_name, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.person_name GROUP BY id_person_name, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

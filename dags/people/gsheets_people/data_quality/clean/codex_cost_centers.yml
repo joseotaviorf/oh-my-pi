@@ -24,6 +24,7 @@ column_level_validations:
   dt_updated:
     is_complete:
       severity_level: Error
+  dt_updated_string_matches_yyyy_mm_dd:
     custom:
       # DATE column: string form must be YYYY-MM-DD (e.g. 2026-03-01).
       constraint: |-

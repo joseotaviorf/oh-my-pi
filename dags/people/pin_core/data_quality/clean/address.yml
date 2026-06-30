@@ -9,6 +9,8 @@ column_level_validations:
   id_address:
     is_complete:
       severity_level: Warning
+  one_row_per_address_and_effective_period:
     custom:
+      # No duplicate rows for the same (id_address, dt_effective_started, dt_effective_ended).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.address GROUP BY id_address, dt_effective_started, dt_effective_ended HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

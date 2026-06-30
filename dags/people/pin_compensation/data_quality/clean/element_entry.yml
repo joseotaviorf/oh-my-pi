@@ -9,7 +9,9 @@ column_level_validations:
   id_element_entry:
     is_complete:
       severity_level: Warning
+  one_row_per_element_entry_and_object_version:
     custom:
+      # No duplicate rows for the same (id_element_entry, object_version_number).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_compensation_clean.element_entry GROUP BY id_element_entry, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
   id_person:

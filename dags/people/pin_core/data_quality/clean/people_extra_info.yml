@@ -9,7 +9,7 @@ column_level_validations:
   id_person_extra_info:
     is_complete:
       severity_level: Error
-  dt_effective_started:
+  effective_end_must_not_be_before_effective_start:
     custom:
       # Validate that the effective period is not open with an inverted date range.
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.people_extra_info WHERE dt_effective_started > dt_effective_ended)) = 0"

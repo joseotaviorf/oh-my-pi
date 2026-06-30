@@ -13,6 +13,8 @@ column_level_validations:
   id_row:
     is_complete:
       severity_level: Warning
+  one_row_per_foundation_lookup_row_language_and_updated_timestamp:
     custom:
+      # No duplicate rows for the same (id_row, language, ts_updated).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.foundation_lookup_value GROUP BY id_row, language, ts_updated HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

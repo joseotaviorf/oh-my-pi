@@ -9,6 +9,8 @@ column_level_validations:
   id_set:
     is_complete:
       severity_level: Warning
+  one_row_per_set_language_and_updated_timestamp:
     custom:
+      # No duplicate rows for the same (id_set, language, ts_updated).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.set_identifiers GROUP BY id_set, language, ts_updated HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

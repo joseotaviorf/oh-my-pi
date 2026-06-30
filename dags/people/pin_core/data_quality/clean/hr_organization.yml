@@ -9,6 +9,8 @@ column_level_validations:
   id_organization:
     is_complete:
       severity_level: Warning
+  one_row_per_organization_action_occurrence_effective_start_and_classification:
     custom:
+      # No duplicate rows for the same (id_action_occurrence, id_organization, dt_effective_started, classification_code).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.hr_organization GROUP BY id_action_occurrence, id_organization, dt_effective_started, classification_code HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

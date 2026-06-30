@@ -9,6 +9,7 @@ column_level_validations:
   id_disability:
     is_complete:
       severity_level: Warning
+  one_row_per_disability_and_object_version:
     custom:
       # id_disability + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.disability GROUP BY id_disability, object_version_number HAVING COUNT(*) > 1)) = 0"

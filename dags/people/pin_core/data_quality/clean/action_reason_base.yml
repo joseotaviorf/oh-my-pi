@@ -9,6 +9,7 @@ column_level_validations:
   id_action_reason:
     is_complete:
       severity_level: Warning
+  one_row_per_action_reason_and_object_version:
     custom:
       # id_action_reason + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.action_reason_base GROUP BY id_action_reason, object_version_number HAVING COUNT(*) > 1)) = 0"

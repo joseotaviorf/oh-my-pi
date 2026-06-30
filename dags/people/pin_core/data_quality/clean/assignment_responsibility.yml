@@ -17,8 +17,9 @@ column_level_validations:
   id_person:
     is_complete:
       severity_level: Warning
-  responsibility_name:
+  one_row_per_person_and_responsibility_name:
     custom:
+      # No duplicate rows for the same (responsibility_name, id_person).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.assignment_responsibility GROUP BY responsibility_name, id_person HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
   responsibility_type:

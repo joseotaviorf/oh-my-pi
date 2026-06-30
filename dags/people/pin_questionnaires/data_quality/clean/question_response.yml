@@ -9,6 +9,7 @@ column_level_validations:
   id_question_response:
     is_complete:
       severity_level: Warning
+  one_row_per_question_response_and_object_version:
     custom:
       # id_question_response + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_questionnaires_clean.question_response GROUP BY id_question_response, object_version_number HAVING COUNT(*) > 1)) = 0"

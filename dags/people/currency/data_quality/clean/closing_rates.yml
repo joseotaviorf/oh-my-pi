@@ -20,6 +20,7 @@ column_level_validations:
     is_contained_in:
       values: ["USD-BRL", "EUR-BRL", "ARS-BRL", "MXN-BRL"]
       severity_level: Warning
+  one_row_per_currency_pair_and_date:
     custom:
       # We should only have 1 currency_pair line per day
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_currency_clean.closing_rates GROUP BY currency_pair, dt_created HAVING COUNT(*) > 1)) = 0"
@@ -64,7 +65,9 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Warning
+  high_rate_must_not_be_below_low_rate:
     custom:
+      # OHLC sanity: high_rate must be greater than or equal to low_rate.
       constraint: "high_rate >= low_rate"
       severity_level: Warning
 
@@ -82,6 +85,7 @@ column_level_validations:
   ts_recorded_at:
     is_complete:
       severity_level: Warning
+  recorded_at_must_not_be_after_load_time:
     custom:
       # This ensures the pipeline's temporal consistency
       constraint: "ts_recorded_at <= ts_load"

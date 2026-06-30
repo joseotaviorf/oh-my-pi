@@ -29,7 +29,7 @@ column_level_validations:
   day:
     is_complete:
       severity_level: Error
-  ts_interval_ended:
+  finite_requests_have_interval_end:
     # Finite requests (is_endless = false) must have an end timestamp so duration and payroll logic stay well-defined.
     custom:
       constraint: |-
@@ -38,7 +38,7 @@ column_level_validations:
         WHERE is_endless = false
           AND ts_interval_ended IS NULL) = 0
       severity_level: Warning
-  ts_interval_started:
+  interval_end_must_not_be_before_start:
     # When both interval bounds are present, the end instant must not be strictly before the start instant (invalid ranges).
     custom:
       constraint: |-

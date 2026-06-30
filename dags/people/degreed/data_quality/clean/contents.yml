@@ -18,7 +18,7 @@ column_level_validations:
       severity_level: Warning
     is_complete:
       severity_level: Error
-  ts_load:
+  ts_load_not_older_than_two_days:
     custom:
       # Freshness guard: every row is rewritten on each run (NOW() AS ts_load).
       # Flag when the newest row is older than 2 days — this would have caught

@@ -9,7 +9,9 @@ column_level_validations:
   id_rate_value:
     is_complete:
       severity_level: Warning
+  one_row_per_rate_value_and_effective_start:
     custom:
+      # No duplicate rows for the same (id_rate_value, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.rate_values GROUP BY id_rate_value, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
 

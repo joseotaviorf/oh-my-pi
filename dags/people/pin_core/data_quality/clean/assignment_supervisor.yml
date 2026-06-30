@@ -9,6 +9,8 @@ column_level_validations:
   id_assignment_supervisor:
     is_complete:
       severity_level: Warning
+  one_row_per_assignment_supervisor_and_effective_start:
     custom:
+      # No duplicate rows for the same (id_assignment_supervisor, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.assignment_supervisor GROUP BY id_assignment_supervisor, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
