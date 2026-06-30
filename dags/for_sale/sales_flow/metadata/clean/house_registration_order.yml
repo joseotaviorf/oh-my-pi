@@ -1,54 +1,86 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: house_registration_order
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: null
+description: >
+  Stores requests to obtain the official property registration document ("matrícula")
+  from Brazilian notary offices (cartórios), triggered automatically when a property
+  sale is accepted on QuintoAndar's platform. Each record tracks the full lifecycle
+  of a document acquisition order — from creation (PENDING) through completion or
+  failure — via one of two external providers: InfoSimples (legacy) or ONR
+  (Operador Nacional do Sistema de Registro de Imóveis). Successfully retrieved documents are stored in DocX
+  (InfoSimples) or BlobVault (ONR). Each property (external_house_id) has at most
+  one active registration order. Orders are only created when the property has an
+  active, accepted sales flow.
 columns:
   id:
-    description: House registration unique ID for this table.
+    description: Surrogate primary key for the house registration order record.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.id
   id_house_external:
-    description: House ID on main (EBDB) tables
+    description: Property identifier on the main platform database (EBDB), used to link the registration order to the corresponding listing.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.external_house_id
   house_registration_number:
-    description: House registration number on the notary office.
+    description: Official property registration number ("número de matrícula") at the notary office.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.house_registration_number
   city:
-    description: City name
+    description: City where the property is registered.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.city
   state:
-    description: State name
+    description: Brazilian state (UF) where the property is registered.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.state
   registry_office:
-    description: Registry office number where this house is registered
+    description: Notary office (cartório) number responsible for the property registration.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.registry_office
   status:
-    description: Request status.
+    description: Current lifecycle status of the registration order.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.status
+    categories:
+      PENDING: Order has been created and is awaiting document retrieval from the external provider.
+      COMPLETED: Registration document was successfully obtained and stored.
+      FAILED: Document acquisition failed with a terminal error; see error_status for details.
+      NOT_FOUND: Property registration was not found at the specified notary office.
   order_number:
-    description: Registration process number
+    description: Order tracking number returned by the external registration document provider (InfoSimples or ONR).
     lineage:
       - datalake_sales_flow_raw.house_registration_order.order_number
   error_status:
-    description: Error description
+    description: Detailed error code when status is FAILED, describing the step at which document acquisition failed.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.error_status
+    categories:
+      CREATE_ORDER_INTERNAL_ERROR: Internal error while creating the order at the external provider.
+      DOWNLOAD_DOCUMENT_INTERNAL_ERROR: Internal error while downloading the document from the external provider.
+      GET_ORDER_NUMBER_ERROR: External provider returned success but did not include an order number.
+      GET_DOCUMENT_URL_ERROR: Failed to retrieve the download URL for the document.
+      GET_FILE_FROM_URL_ERROR: Failed to download the document file from the returned URL.
+      UPLOAD_DOCUMENT_TO_DOCX_ERROR: Failed to upload the retrieved document to DocX storage.
+      INSUFFICIENT_BALANCE: InfoSimples account has insufficient balance; order is retried via SQS DLQ.
+      DOCUMENT_EXPIRED: Document viewing period expired; order is retried from the queue.
+      INVALID_INPUT: Invalid state or registration number provided; no retry is attempted.
+      REGISTRATION_ALREADY_REQUESTED: A registration document was already requested for this registry office; no retry is attempted.
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the registration order was created.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp of the most recent update to the registration order.
     lineage:
       - datalake_sales_flow_raw.house_registration_order.updated_at
+  source_registration_document:
+    description: External service used to retrieve the property registration document ("matrícula").
+    lineage:
+      - datalake_sales_flow_raw.house_registration_order.source
+    categories:
+      ONR: ONR (Operador Nacional do Sistema de Registro de Imóveis) service — the current preferred provider.
+      INFO_SIMPLES: InfoSimples API — legacy provider, being deprecated in favor of ONR.
   year:
     description: Year partition value.
     lineage:

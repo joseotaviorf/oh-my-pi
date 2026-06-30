@@ -8,6 +8,7 @@ SELECT
     status,
     order_number,
     error_status,
+    COALESCE(source, "INFO_SIMPLES") AS source_registration_document,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
@@ -15,4 +16,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.house_registration_order
-
