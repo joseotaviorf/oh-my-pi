@@ -201,10 +201,6 @@ bietlejuice.dw_offboarding:
 bietlejuice.dw_offer:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
-bietlejuice.dw_performance:
-  add:
-    - bietlejuice.enrich_performance:load-enrich-performance-evaluation:first-run-of-day
-    - bietlejuice.enrich_performance:load-enrich-talent-review:first-run-of-day
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day

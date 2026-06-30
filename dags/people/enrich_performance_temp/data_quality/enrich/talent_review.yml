@@ -1,5 +1,5 @@
 ---
-table_name: datalake_performance.talent_review
+table_name: datalake_pin.talent_review
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:

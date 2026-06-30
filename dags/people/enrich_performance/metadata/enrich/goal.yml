@@ -1,4 +1,4 @@
-database_name: datalake_pin
+database_name: datalake_performance
 table_name: goal
 owner: pedro.prates@quintoandar.com.br
 domain: People
@@ -17,7 +17,7 @@ columns:
     lineage:
     - datalake_pin_core_clean.all_people.person_number
   assigned_by_person_number:
-    description: Person number of the person who assigned the goal.
+    description: Person number of the employee who assigned the goal, distinct from person_number (the goal owner).
     lineage:
     - datalake_pin_core_clean.all_people.person_number
   name:
@@ -25,19 +25,19 @@ columns:
     lineage:
     - datalake_people.identifier_mapping.name
   review_period_name:
-    description: Name of the review period associated with the goal plan, in Portuguese (PTB).
+    description: Name of the annual talent review cycle the goal's plan belongs to (e.g. 'Performa 2025'), in Portuguese.
     lineage:
     - datalake_pin_talent_clean.review_period_translation.review_period_name
   goal_plan_name:
-    description: Name of the goal plan, in Portuguese (PTB).
+    description: Name of the goal plan that groups this goal, tied to a review period (e.g. 'Ciclo de Metas - Q1/25'), in Portuguese.
     lineage:
     - datalake_pin_goal_clean.goal_plan_translation.goal_plan_name
   goal_name:
-    description: Name of the goal.
+    description: Free-text title of the goal, such as a KPI metric or project name.
     lineage:
     - datalake_pin_goal_clean.goal.goal_name
   expected_completion_period:
-    description: Expected completion period for the goal.
+    description: Fiscal quarter (Q1-Q4) targeted for the goal's completion.
     lineage:
     - datalake_pin_goal_clean.goal.expected_completion_period
   category:
@@ -59,7 +59,7 @@ columns:
     lineage:
     - datalake_pin_goal_clean.goal.attribute2_text
   goal_weight:
-    description: Weight of the goal within the goal plan.
+    description: Percentage weight (0-100) of the goal within its plan, indicating its relative importance among the plan's goals.
     lineage:
     - datalake_pin_goal_clean.goal_plan_to_goal.goal_weight
   minimum_value:
@@ -99,12 +99,12 @@ columns:
       For KPI goals without thresholds: simple ratio calculation (result/target for maximize, 
       target/result for minimize). Returns NULL if required fields are missing or result_value is NULL.
     lineage:
-    - datalake_pin.goal.result_value
-    - datalake_pin.goal.minimum_value
-    - datalake_pin.goal.target_value
-    - datalake_pin.goal.maximum_value
-    - datalake_pin.goal.category
-    - datalake_pin.goal.goal_orientation
+    - datalake_performance.goal.result_value
+    - datalake_performance.goal.minimum_value
+    - datalake_performance.goal.target_value
+    - datalake_performance.goal.maximum_value
+    - datalake_performance.goal.category
+    - datalake_performance.goal.goal_orientation
   dt_started:
     description: Date when the goal was started.
     lineage:

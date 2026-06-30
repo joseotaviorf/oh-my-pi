@@ -1,4 +1,4 @@
-database_name: datalake_performance
+database_name: datalake_pin
 table_name: performa_calibration_evaluation
 owner: pedro.prates@quintoandar.com.br
 domain: People
