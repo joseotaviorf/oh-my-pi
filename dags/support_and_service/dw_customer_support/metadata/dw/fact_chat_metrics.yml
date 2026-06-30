@@ -5,7 +5,7 @@ description:
   Each session represents a chat conversation carried out with QuintoAndar, and in this fact table we compile
   metrics that describe the interactions that occur within these chats.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_session:
     lineage:

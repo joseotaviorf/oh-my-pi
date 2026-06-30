@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: fact_ivr_interactions
 description: Fact table containing all IVR interactions of a call
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_interaction:
     lineage:
@@ -32,7 +32,7 @@ columns:
   type:
     lineage:
       - datalake_customer_support.ivr_interactions.type
-    description: Type of interaction.
+    description: Classification type assigned by the source platform for routing or reporting.
   value:
     lineage:
       - datalake_customer_support.ivr_interactions.value

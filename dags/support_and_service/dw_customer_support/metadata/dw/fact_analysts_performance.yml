@@ -6,7 +6,7 @@ description:
   photo of each analyst's performance numbers. The granularity of this table is sk_agent + date.
   For more information, [access ](docs.google.com/document/d/17mRa7cBu2P-gTwQucxZi-DFsY2y5uqh5cVBpW66-8yQ/edit?tab=t.0#heading=h.7q84d2nz0ikj).
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_snapshot:
     description:

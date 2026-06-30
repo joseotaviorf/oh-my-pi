@@ -5,7 +5,7 @@ description:
   one or many interactions between the customer and an analyst. Time metrics for each interaction are
   also present in this table
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_contact:
     lineage:
@@ -46,7 +46,7 @@ columns:
   origin:
     lineage:
       - dw_customer_support.fact_customer_contacts.origin
-    description: Origin of the contact.
+    description: Channel or product surface that initiated the IVR closed-history request.
   total_talk_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time

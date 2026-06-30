@@ -2,7 +2,7 @@ database_name: dw_customer_support
 table_name: fact_chat_messages
 description: This table contains all chat messages exchanged via Twilio
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_channel:
     lineage:

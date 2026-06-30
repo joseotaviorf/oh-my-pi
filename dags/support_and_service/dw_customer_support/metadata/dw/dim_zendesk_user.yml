@@ -4,7 +4,7 @@ description:
   Dimension table that contains context data of all users created in Zendesk
   Support, including assignees, admins and external users
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_zendesk_user:
     lineage:
@@ -40,7 +40,7 @@ columns:
   time_zone:
     lineage:
       - datalake_support_users.zendesk_users.time_zone
-    description: The user's time zone
+    description: Time zone configured for the Zendesk user account.
   locale:
     lineage:
       - datalake_support_users.zendesk_users.locale
@@ -60,7 +60,7 @@ columns:
   cost_center:
     lineage:
       - datalake_support_users.zendesk_users.organization
-    description: User cost center
+    description: Business value representing cost center on the dim_zendesk_user dw dataset.
   is_active:
     lineage:
       - datalake_support_users.zendesk_users.is_active

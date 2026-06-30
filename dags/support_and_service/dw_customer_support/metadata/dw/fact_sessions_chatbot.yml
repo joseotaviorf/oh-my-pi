@@ -4,7 +4,7 @@ description:
   This table presents session data from the chatbots along with retention attempt data
   from the JourneyFlow service and customer support data from the Sauron service.
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   sk_session:
     lineage:
@@ -128,19 +128,19 @@ columns:
   model_with_context:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Model with context.
+    description: Business value representing model with context on the fact_sessions_chatbot dw dataset.
   model_no_context:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Model without context.
+    description: Business value representing model no context on the fact_sessions_chatbot dw dataset.
   model_greeting:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Model greeting.
+    description: Business value representing model greeting on the fact_sessions_chatbot dw dataset.
   model_no_answer_needed:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Model no answer needed.
+    description: Business value representing model no answer needed on the fact_sessions_chatbot dw dataset.
   before_reception:
     lineage:
       - datalake_greenseer.sessions.before_reception
@@ -152,11 +152,11 @@ columns:
   last_hsm_type:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Last HSM type.
+    description: Business value representing last hsm type on the fact_sessions_chatbot dw dataset.
   secs_since_last_hsm:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Seconds since last HSM.
+    description: Business value representing secs since last hsm on the fact_sessions_chatbot dw dataset.
   automatic_selection:
     lineage:
       - datalake_greenseer.sessions.automatic_selection
