@@ -1,13 +1,12 @@
 database_name: dw_brokers
 table_name: dim_broker
 description: |
-  Data warehouse dimension for 3P broker companies from core_brokers.brokers, enriched with the email of
-  the current HubSpot account manager (from datalake_hubspot.owner via the current
-  hubspot_brokers_history row), active profile counts from core_brokers.brokers_profile
-  (third_party_agent and company_admin), passive lead-gen agent counts from datalake_ebdb_clean.agent_data,
-  and last membership transition timestamps derived from datalake_brokers.broker_status_history
-  (overall and Rede Rent / Rede Sale product lanes). Per-business-context SALE/RENT agent counts from
-  brokers_profile are not exposed on this table.
+  Data warehouse dimension for broker companies from core_brokers.brokers, covering 3P Rede (products 27/30)
+  and Alias (product 40) agencies. Enriched with the HubSpot account manager email, active profile counts,
+  passive lead-gen agent counts, last membership transition timestamps (Rede Rent / Rede Sale lanes),
+  and Alias-specific flags (is_alias_broker, is_alias_active, alias_crm_platform, ts_alias_registered)
+  sourced from datalake_alias_clean. Per-business-context SALE/RENT agent counts from brokers_profile
+  are not exposed on this table.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -214,6 +213,22 @@ columns:
       - datalake_brokers.broker_status_history.is_current
     description: |
       Latest ts_start where broker_status is INACTIVE, is_current is true, and product_name is Rede Sale.
+  is_alias_broker:
+    lineage:
+      - core_brokers.brokers_product.business_context
+    description: True when the agency has the Alias product (business_context = 'ALIAS' in core_brokers.brokers_product).
+  is_alias_active:
+    lineage:
+      - datalake_alias_clean.ai_agents.ts_phone_verified
+    description: True when the agency's WhatsApp AI agent has been phone-verified and is operational.
+  alias_crm_platform:
+    lineage:
+      - datalake_alias_clean.crm_integrations.platform
+    description: CRM platform configured for the Alias integration (e.g. SIENGE, NAVENT). NULL for non-Alias brokers.
+  ts_alias_registered:
+    lineage:
+      - datalake_alias_clean.brokers.ts_created
+    description: Timestamp when the agency first registered on the Alias platform. NULL for non-Alias brokers.
   ts_broker_created:
     lineage:
       - core_brokers.brokers.ts_broker_created

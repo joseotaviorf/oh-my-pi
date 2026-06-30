@@ -1,8 +1,8 @@
 database_name: dw_brokers
 table_name: dim_broker_products
 description: |
-  Data warehouse dimension for broker products (Rede Sale, Rede Rent, etc.) from core_brokers.brokers_product,
-  including fee attributes and banking fields used for settlements.
+  Data warehouse dimension for broker products (Rede Sale, Rede Rent, Alias) from core_brokers.brokers_product,
+  including fee attributes, banking fields used for settlements, and CRM platform for Alias product rows.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -30,7 +30,7 @@ columns:
     lineage:
       - core_brokers.brokers_product.business_context
     description: |
-      Business context of the broker product from core brokers_product (e.g. SALE, RENT).
+      Business context of the broker product from core brokers_product (SALE, RENT, or ALIAS).
   integrator_partner:
     lineage:
       - core_brokers.brokers_product.integrator_partner
@@ -115,6 +115,12 @@ columns:
       registered with purpose AGENT_OPERATION_AREA in company_product_region — i.e. the
       imobiliaria's agents are allowed to operate in some region for this product. True when
       agent_region_list from core brokers_product is non-empty.
+  crm_platform:
+    lineage:
+      - datalake_alias_clean.crm_integrations.platform
+    description: |
+      CRM platform configured for the Alias integration (e.g. SIENGE, NAVENT). Populated only for
+      rows where business_context = 'ALIAS'; NULL for Rede Sale / Rede Rent rows.
   has_3p_access_control:
     description: |
       Boolean flag indicating that this row is subject to 3P Partners access control policies;

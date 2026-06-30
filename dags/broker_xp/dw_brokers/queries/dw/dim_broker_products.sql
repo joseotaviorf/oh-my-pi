@@ -24,6 +24,7 @@ SELECT
   cbp.has_opt_in_navent,
   COALESCE(cbp.general_region_list, '') <> '' AS has_general_operation_area,
   COALESCE(cbp.agent_region_list, '') <> '' AS has_agent_operation_area,
+  aci.platform AS crm_platform,
   TRUE AS has_3p_access_control,
   cbp.ts_product_created,
   cbp.ts_product_updated,
@@ -33,3 +34,6 @@ SELECT
   DAY(cbp.ts_product_updated) AS day
 FROM
   core_brokers.brokers_product AS cbp
+LEFT JOIN datalake_alias_clean.crm_integrations AS aci
+  ON cbp.uuid_company = aci.uuid_company
+  AND cbp.business_context = 'ALIAS'

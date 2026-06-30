@@ -20,7 +20,8 @@ lead_gen_agents AS (
     ad.agent_type = 'CORRETOR_REDE'
     AND ad.is_active
     AND ad.is_passive_lead_receiver
-  GROUP BY ALL
+  GROUP BY
+    ad.uuid_company
 ),
 broker_membership AS (
   SELECT
@@ -88,6 +89,10 @@ SELECT
   bm.ts_last_rent_membership_end,
   bm.ts_last_sale_membership_start,
   bm.ts_last_sale_membership_end,
+  aai.uuid_company IS NOT NULL AS is_alias_broker,
+  aai.ts_phone_verified IS NOT NULL AS is_alias_active,
+  aci.platform AS alias_crm_platform,
+  ab.ts_created AS ts_alias_registered,
   cb.ts_broker_created,
   cb.ts_broker_updated,
   CURRENT_TIMESTAMP() AS ts_load,
@@ -115,3 +120,12 @@ LEFT JOIN
 LEFT JOIN
   broker_operation_areas AS boa
   ON boa.sk_broker = cb.sk_broker
+LEFT JOIN
+  datalake_alias_clean.ai_agents AS aai
+  ON aai.uuid_company = cb.uuid_company
+LEFT JOIN
+  datalake_alias_clean.crm_integrations AS aci
+  ON aci.uuid_company = cb.uuid_company
+LEFT JOIN
+  datalake_alias_clean.brokers AS ab
+  ON ab.uuid_company = cb.uuid_company

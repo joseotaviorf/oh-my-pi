@@ -238,6 +238,9 @@ bietlejuice.dw_braze_events_user_dispatch:
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events:first-run-of-day
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events:first-run-of-day
 bietlejuice.dw_brokers:
+  - bietlejuice.alias:load-clean-ai-agents:first-run-of-day
+  - bietlejuice.alias:load-clean-brokers:first-run-of-day
+  - bietlejuice.alias:load-clean-crm-integrations:first-run-of-day
   - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day
   - bietlejuice.company:load-clean-tier:first-run-of-day
