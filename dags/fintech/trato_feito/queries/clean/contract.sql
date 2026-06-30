@@ -20,6 +20,7 @@ SELECT
     end_date AS dt_end,
     expected_end_date AS dt_expected_end,
     start_date AS dt_start,
+    termination_date AS dt_termination,
     created_at AS ts_created,
     updated_at AS ts_updated,
     last_received_at AS ts_last_received,

@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract.imovel_id
   id_debtor:
-    description: ""
+    description: "Internal identifier of the debtor linked to this Trato Feito contract for collections workflows"
     lineage:
       - datalake_trato_feito_raw.contract.debtor_id
   sync_status:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract.sync_status
   cyber_sync_status:
-    description: ""
+    description: "Synchronization status of the contract payload exchanged with the Cyber collections platform during recovery"
     lineage:
       - datalake_trato_feito_raw.contract.cyber_sync_status
   guarantee:
@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract.external_status
   version:
-    description: "Contract version"
+    description: "Version number assigned to the contract record in Trato Feito, incremented on each source update"
     lineage:
       - datalake_trato_feito_raw.contract.version
   rental_administrator:
@@ -46,11 +46,15 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract.rental_administrator
   consultancy:
-    description: ""
+    description: "Consultancy agency responsible for managing or mediating collections actions and negotiations on the contract"
     lineage:
       - datalake_trato_feito_raw.contract.consultancy
+  rev:
+    description: "Revision number"
+    lineage:
+      - datalake_trato_feito_raw.contract.rev
   rental_amount:
-    description: "Rent amount"
+    description: "Monthly rental amount in Brazilian reais, as registered on the contract when ingested from Trato Feito"
     lineage:
       - datalake_trato_feito_raw.contract.rental_amount
   iptu_installments:
@@ -58,13 +62,17 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract.iptu_installments
   iptu_amount:
-    description: "IPTU amount"
+    description: "Property tax (IPTU) amount in Brazilian reais associated with the rental contract from Trato Feito"
     lineage:
       - datalake_trato_feito_raw.contract.iptu_amount
   condominium_amount:
-    description: "Condominium amount"
+    description: "Monthly condominium fee in Brazilian reais associated with the rental contract as stored in Trato Feito"
     lineage:
       - datalake_trato_feito_raw.contract.condominium_amount
+  total_amount:
+    description: "Total contracted monthly amount in BRL combining rent, IPTU, and condominium charges for the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract.total_amount
   dt_guarantee_start:
     description: "Guarantee effective date"
     lineage:
@@ -81,15 +89,23 @@ columns:
     description: "When the contract started"
     lineage:
       - datalake_trato_feito_raw.contract.start_date
+  dt_termination:
+    description: "When the contract terminated"
+    lineage:
+      - datalake_trato_feito_raw.contract.termination_date
   ts_created:
-    description: "Created at"
+    description: "Timestamp when the contract record was first created in the Trato Feito source application"
     lineage:
       - datalake_trato_feito_raw.contract.created_at
   ts_updated:
-    description: "Updated at"
+    description: "Timestamp when the contract record was last modified in the Trato Feito source application"
     lineage:
       - datalake_trato_feito_raw.contract.updated_at
   ts_last_received:
     description: "Entity last synchronized at"
     lineage:
       - datalake_trato_feito_raw.contract.last_received_at
+  ts_consultancy_updated:
+    description: "When the consultancy field was last updated"
+    lineage:
+      - datalake_trato_feito_raw.contract.consultancy_updated_at

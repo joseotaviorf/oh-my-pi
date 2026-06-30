@@ -386,9 +386,3 @@ sheets_info:
     sheet_name: "[base stilingue] midias sociais"
     clean_table_name: stilingue_data
     sheet_context: fintech
-
-  pix_rollout_contracts:
-    sheet_id: 1cwHX1n9ukY-yLxzDWSqeCQwvHGJ4okLVTRgDnkl2veI
-    sheet_name: pix_rollout_contracts
-    clean_table_name: pix_rollout_contracts
-    sheet_context: fintech
