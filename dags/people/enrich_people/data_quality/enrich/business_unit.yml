@@ -31,7 +31,7 @@ column_level_validations:
   dt_valid_from:
     is_complete:
       severity_level: Error
-  dt_valid_to:
+  valid_to_must_be_after_valid_from:
     # SCD2 validity: when end date is set, it must be strictly after start date.
     custom:
       constraint: |-

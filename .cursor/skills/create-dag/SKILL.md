@@ -466,6 +466,8 @@ column_level_validations:
 
 Add a `data_quality` file for all tables where data correctness is business-critical. 
 
+For People DAGs (`dags/people/`), `custom` SQL constraints follow `.cursor/rules/people/people_domain.mdc` (section *Custom check keys*): one `custom` per top-level key, descriptive plain-language name, intent comment.
+
 **Note on `severity_level`:** Both `Error` and `Warning` serve only to categorize how alerts are registered; neither actually blocks the pipeline. Use `Error` for critical validations that require immediate attention, and `Warning` for less critical checks that should be monitored but don't require immediate action.
 
 ## Step 7 — Fine-tune cluster with right-size-cluster

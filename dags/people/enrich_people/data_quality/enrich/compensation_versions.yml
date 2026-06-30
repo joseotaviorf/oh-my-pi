@@ -33,7 +33,9 @@ column_level_validations:
   salary_amount:
     is_complete:
       severity_level: Error
+  salary_amount_must_not_be_negative:
     custom:
+      # Salary amount must be non-negative.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.compensation_versions
@@ -49,6 +51,7 @@ column_level_validations:
   dt_valid_from:
     is_complete:
       severity_level: Error
+  valid_from_must_not_be_after_valid_to:
     custom:
       # SCD bounds: valid-from must not be after valid-to.
       constraint: |-

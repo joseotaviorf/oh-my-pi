@@ -27,7 +27,7 @@ column_level_validations:
   dt_hired:
     is_complete:
       severity_level: Error
-  dt_terminated:
+  termination_or_notification_date_present:
     # Ensures every row has at least one of dt_terminated or dt_notified (table filter rule).
     custom:
       constraint: |-

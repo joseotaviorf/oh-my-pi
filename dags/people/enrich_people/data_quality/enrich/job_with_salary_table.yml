@@ -24,8 +24,9 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  job_family:
+  active_current_jobs_have_job_family:
     custom:
+      # Ensure job_family is populated for current active jobs.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.job_with_salary_table
@@ -34,8 +35,9 @@ column_level_validations:
            AND job_family IS NULL
         ) = 0
       severity_level: Warning
-  band:
+  active_current_jobs_have_band:
     custom:
+      # Ensure band is populated for current active jobs.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.job_with_salary_table
@@ -44,8 +46,9 @@ column_level_validations:
            AND band IS NULL
         ) = 0
       severity_level: Warning
-  career_track:
+  active_current_jobs_have_career_track:
     custom:
+      # Ensure career_track is populated for current active jobs.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.job_with_salary_table
@@ -65,7 +68,9 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  job_history_versions_do_not_overlap:
     custom:
+      # SCD2 versions for the same job must not overlap in time.
       constraint: |-
         (SELECT COUNT(*)
          FROM (
@@ -80,8 +85,9 @@ column_level_validations:
            AND dt_valid_from < prev_dt_valid_to
         ) = 0
       severity_level: Error
-  dt_valid_to:
+  valid_to_must_not_be_before_valid_from:
     custom:
+      # dt_valid_to must not precede dt_valid_from when both are set.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.job_with_salary_table
@@ -89,8 +95,9 @@ column_level_validations:
            AND dt_valid_to < dt_valid_from
         ) = 0
       severity_level: Error
-  target_plr:
+  single_version_jobs_have_consistent_target_plr:
     custom:
+      # Jobs with a single SCD version must not carry conflicting target_plr values.
       constraint: |-
         (SELECT COUNT(*)
          FROM (
@@ -103,7 +110,7 @@ column_level_validations:
          )
         ) = 0
       severity_level: Warning
-  salary_range_min:
+  salary_range_min_mid_max_ordered:
     custom:
       constraint: |-
         (SELECT COUNT(*)
@@ -118,7 +125,7 @@ column_level_validations:
            )
         ) = 0
       severity_level: Warning
-  salary_range_mid:
+  salary_range_mid_not_above_max:
     custom:
       constraint: |-
         (SELECT COUNT(*)

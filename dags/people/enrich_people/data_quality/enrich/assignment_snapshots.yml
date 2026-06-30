@@ -26,7 +26,7 @@ column_level_validations:
   ts_load:
     is_complete:
       severity_level: Warning
-  grain_uniqueness_per_assignment_per_day:
+  one_row_per_assignment_and_reference_date:
     custom:
       # Grain: one row per (id_assignment, dt_reference). Duplicates indicate a broken dedup in the final ROW_NUMBER step.
       constraint: |-

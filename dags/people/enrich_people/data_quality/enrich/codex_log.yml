@@ -19,6 +19,7 @@ column_level_validations:
     # has_pattern: enforced at ingest on datalake_gsheets_people_clean.codex_cost_centers (see codex_history_base DQ note).
     is_complete:
       severity_level: Error
+  one_row_per_cost_center_and_valid_from:
     custom:
       # One SCD2 row per (cost_center_code, validity start)
       constraint: |-
@@ -36,7 +37,7 @@ column_level_validations:
   dt_valid_from:
     is_complete:
       severity_level: Error
-  dt_valid_to:
+  valid_to_bounds_and_adjacent_versions_align:
     custom:
       # Closed intervals: dt_valid_to >= dt_valid_from; adjacent version starts the day after dt_valid_to.
       constraint: |-
@@ -65,6 +66,7 @@ column_level_validations:
   is_current:
     is_complete:
       severity_level: Error
+  exactly_one_current_row_per_cost_center:
     custom:
       # Open end iff current; one current row per cost center and every CC has a current row.
       constraint: |-

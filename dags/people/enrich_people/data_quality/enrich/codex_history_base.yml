@@ -37,6 +37,7 @@ column_level_validations:
   vertical:
     is_complete:
       severity_level: Error
+  vertical_allowed_values:
     custom:
       # Allowed values only (non-null enforced by is_complete).
       constraint: |-
@@ -54,7 +55,7 @@ column_level_validations:
   dt_closing_month:
     is_complete:
       severity_level: Error
-  headcount_type:
+  headcount_type_allowed_values:
     custom:
       # When set must be Capacity or Overhead (PIN classification).
       constraint: |-

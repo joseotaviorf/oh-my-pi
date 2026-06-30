@@ -173,6 +173,8 @@ column_level_validations:
       severity_level: Error
 ```
 
+**People domain (`dags/people/`):** stricter conventions for isolated `custom` keys and PEOPLE_ALERTS naming — see `.cursor/rules/people/people_domain.mdc` (section *Custom check keys*).
+
 ## Deequ Limitation — Deeply Nested Column Types
 
 Deequ's `isNotNested` precondition **rejects any column with more than one level of nesting**. Applying any column-level check (`has_completeness`, `is_complete`, `has_null_count`, etc.) to such a column throws `WrongColumnTypeException` at runtime and crashes the entire data quality run for that table — not just the offending check.

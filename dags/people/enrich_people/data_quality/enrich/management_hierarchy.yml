@@ -30,6 +30,7 @@ column_level_validations:
   version:
     is_complete:
       severity_level: Warning
+  minimum_version_at_least_one:
     custom:
       # Ensures the minimum version number is at least 1. Data should have been processed at least once.
       constraint: |-
@@ -37,7 +38,7 @@ column_level_validations:
          FROM datalake_people.management_hierarchy) >= 1
       severity_level: Warning
 
-  is_current:
+  one_current_version_per_assignment:
     custom:
       # Ensures each assignment has at most one current version. No duplicate is_current = TRUE per assignment_number.
       constraint: |-

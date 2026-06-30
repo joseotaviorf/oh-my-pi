@@ -111,6 +111,80 @@ Every table from the **clean** layer onwards must have a corresponding data qual
 
 When creating or editing `data_quality/*.yml` files in the People domain, **always apply** `.cursor/rules/data_quality_tests.mdc`. Use `alert_channel: PEOPLE_ALERTS` and `table_name` fully qualified (e.g. `dw_employee_details.fact_absence_requests`).
 
+### Custom check keys (Inmetro / PEOPLE_ALERTS)
+
+PEOPLE_ALERTS surfaces the **YAML key** of each `custom` check as the failure name. These rules apply to every `data_quality/**/*.yml` under `dags/people/`.
+
+#### One key per `custom` block — isolated keys
+
+Each `custom` check must live under **its own** top-level key in `column_level_validations`. **Never** nest `custom` under the same key as another validation (`is_complete`, `is_unique`, `has_null_count`, `has_min_value`, etc.).
+
+When a column needs both standard Deequ checks and a `custom` rule, keep the **column name** only for the standard checks; add a **separate descriptive sibling key** for the `custom` block.
+
+```yaml
+# Good: column completeness and custom rule are separate sibling keys
+column_level_validations:
+  salary_amount:
+    is_complete:
+      severity_level: Error
+  salary_amount_must_not_be_negative:
+    custom:
+      # Salary amount must be non-negative.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.compensation_versions
+         WHERE salary_amount < 0
+        ) = 0
+      severity_level: Error
+
+# Avoid: custom nested under the same key as is_complete
+column_level_validations:
+  salary_amount:
+    is_complete:
+      severity_level: Error
+    custom:
+      constraint: |-
+        (SELECT COUNT(*) FROM datalake_people.compensation_versions WHERE salary_amount < 0) = 0
+      severity_level: Error
+```
+
+#### Descriptive plain-language key names
+
+Choose **snake_case** that states **what business rule failed**, not programmer shorthand or a bare column/FK name when the rule is broader than single-column completeness.
+
+| Prefer | Avoid |
+|--------|-------|
+| `at_least`, `must_not_be_after`, `one_row_per_` | `gte`, `scd2`, `grain_` |
+| `one_row_per_assignment_and_reference_date` | `id_assignment` (grain rule) |
+| `valid_from_must_not_be_after_valid_to` | `dt_valid_from` (SCD bounds) |
+| `company_tenure_days_at_least_position_and_band` | `days_tenure_in_company` (cross-column hierarchy) |
+
+Applies to **all** People `custom` checks — including column-scoped value rules when `is_complete` / `has_null_count` also exist on that column:
+
+```yaml
+column_level_validations:
+  reference_year:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  reference_year_within_valid_range:
+    custom:
+      # Ensure reference_year is within reasonable range (e.g., 2020-2100)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.dim_plr_parameters
+         WHERE reference_year < 2020
+            OR reference_year > 2100
+        ) = 0
+      severity_level: Error
+```
+
+Cross-table / grain / SCD2 / referential integrity rules **always** use a descriptive key (see also `data_quality_tests.mdc` for generic examples).
+
+#### Intent comment
+
+Every `custom` block must have a comment above explaining what is validated.
+
 ### has_size_variation for People DW Tables
 
 For People DW tables that grow monotonically (facts, dimensions with history), add `has_size_variation` to detect unexpected decreases (shrinkage) and unexpected explosions (sudden large increases) in table size while allowing expected gradual growth.

@@ -36,6 +36,7 @@ column_level_validations:
   is_current:
     is_complete:
       severity_level: Error
+  exactly_one_current_version_per_organization_and_cost_center:
     custom:
       # Exactly one is_current row per organization and cost_center_code (same grain as enrich ROW_NUMBER partition)
       constraint: |-
@@ -53,6 +54,7 @@ column_level_validations:
   dt_valid_from:
     is_complete:
       severity_level: Error
+  one_row_per_organization_and_valid_from:
     custom:
       # At most one row per organization and validity start (id_organization is the grain anchor)
       constraint: |-
