@@ -1,15 +1,12 @@
 cluster:
-  type: emr_7_12_consolidation_xl_memory_single_node_cluster
+  type: emr_7_12_consolidation_xl_memory_cluster
   custom_configurations:
-    core_nodes:
-      instance_count: 1
     task_nodes:
       instance_count: 2
-      node_type_id: r7g.8xlarge
     spark_conf:
       spark.driver.memory: 8g
-      spark.driver.cores: '4'
+      spark.driver.cores: "4"
       spark.executor.memory: 24g
-      spark.executor.cores: '4'
-      spark.dynamicAllocation.minExecutors: '2'
-      spark.dynamicAllocation.maxExecutors: '24'
+      spark.executor.cores: "4"
+      spark.dynamicAllocation.minExecutors: "2"
+      spark.dynamicAllocation.maxExecutors: "24"
