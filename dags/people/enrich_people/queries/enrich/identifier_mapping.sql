@@ -371,7 +371,7 @@ SELECT
     ca.assignment_status_type = 'ACTIVE' AS is_active_pin,
     CASE
         WHEN pp.dt_actual_termination IS NOT NULL
-            AND CURRENT_DATE() >= pp.dt_actual_termination THEN FALSE
+            AND DATE('{load_start_date}') >= pp.dt_actual_termination THEN FALSE
         ELSE TRUE
     END AS is_active,
     ROW_NUMBER() OVER (

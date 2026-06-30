@@ -70,7 +70,7 @@
  *     salary_consolidation_base       — normalise NULL dt_ended to 9999-12-31
  *     salary_consolidation_groups     — detect consecutive identical salary records (gaps-and-islands)
  *     salary_consolidated             — collapse identical consecutive records into one row
- *     salary_with_reference           — add dt_reference = LEAST(CURRENT_DATE, dt_valid_to)
+ *     salary_with_reference           — add dt_reference = LEAST(DATE('{load_start_date}'), dt_valid_to)
  */
 WITH salary_with_person AS (
     -- Approved salaries enriched with person identifiers and cycle metadata from identifier_mapping.
@@ -1047,7 +1047,7 @@ salary_consolidated AS (
 ),
 salary_with_reference AS (
     -- dt_reference is the effective date used to measure tenure for each row.
-    -- For open records (dt_ended_normalized = 9999-12-31) it is CURRENT_DATE.
+    -- For open records (dt_ended_normalized = 9999-12-31) it is DATE('{load_start_date}').
     -- For closed historical records it is the last day of validity (dt_valid_to),
     -- so tenure reflects the employee's state at the end of that salary period.
     SELECT
