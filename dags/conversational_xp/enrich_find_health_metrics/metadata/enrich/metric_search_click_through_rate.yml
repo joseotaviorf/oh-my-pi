@@ -1,8 +1,8 @@
 database_name: datalake_search
 table_name: metric_search_click_through_rate
-owner: joseph.magiya@quintoandar.com
+owner: joseph.magiya@quintoandar.com.br
 domain: Conversational XP
-description: Table containing information about search results generated and which listing within the search results were clicked to calculate search health metrics related to click though rate (CTR). 
+description: "One row per house impression within a search result page shown to a user. Combines search exposure data with click signals to power search click-through rate (CTR) health metrics. Partitioned by year/month/day (server processing time, which may differ from ts_search_event — use ts_search_event for event-level analysis)."
 columns:
   id_search:
     lineage:
@@ -43,12 +43,12 @@ columns:
   year:
     lineage:
     - datalake_search.search_impressions.year
-    description: The year when the search event was processed on the server. Might differ from ts_search_event.
+    description: Partition column. Year when the search event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_search_event.
   month:
     lineage:
     - datalake_search.search_impressions.month
-    description: The month when the search event was processed on the server. Might differ from ts_search_event.
+    description: Partition column. Month when the search event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_search_event.
   day:
     lineage:
     - datalake_search.search_impressions.day
-    description: The day when the search event was processed on the server. Might differ from ts_search_event.
+    description: Partition column. Day when the search event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_search_event.

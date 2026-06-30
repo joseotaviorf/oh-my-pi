@@ -1,6 +1,6 @@
 database_name: datalake_search
 table_name: metric_search_conversion
-owner: joseph.magiya@quintoandar.com
+owner: joseph.magiya@quintoandar.com.br
 domain: Conversational XP
 description: Table containing information about visits books, direct offer, offers and contract signed related to search results to calculate search health metrics related to conversion. A flow action described above (excluding contract signed) is related to a search if it happened within 14 days of the search result click.
 columns:

@@ -2,7 +2,7 @@ database_name: datalake_search
 table_name: metric_recs_click_through_rate
 owner: yiyi.ji@quintoandar.com
 domain: Conversational XP
-description: Table containing information about recommendation sets (caroussels) generated and which listing within the recommendation set were clicked to calculate recommendation health metrics related to click though rate (CTR). 
+description: "One row per house impression within a recommendation carousel (recset) shown to a user in a single session. Combines recset exposure data with click signals to power recommendation click-through rate (CTR) health metrics. Partitioned by year/month/day (server processing time, which may differ from the event timestamp — use ts_recommendation_event for event-level analysis)."
 columns:
   id_recset_fix:
     lineage:
@@ -19,7 +19,7 @@ columns:
   house_city:
     lineage:
     - datalake_search.recs_impressions_processed.house_city
-    description: The city of the house.
+    description: City where the property is located, used to filter recommendation health metrics by geography.
   platform:
     lineage:
     - datalake_search.recs_impressions_processed.platform
@@ -47,12 +47,12 @@ columns:
   year:
     lineage:
     - datalake_search.recs_impressions_processed.year
-    description: The year when the recommendation event was processed on the server. Might differ from ts_recommendation_event.
+    description: Partition column. Year when the recommendation event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_recommendation_event.
   month:
     lineage:
     - datalake_search.recs_impressions_processed.month
-    description: The month when the recommendation event was processed on the server. Might differ from ts_recommendation_event.
+    description: Partition column. Month when the recommendation event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_recommendation_event.
   day:
     lineage:
     - datalake_search.recs_impressions_processed.day
-    description: The day when the recommendation event was processed on the server. Might differ from ts_recommendation_event.
+    description: Partition column. Day when the recommendation event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_recommendation_event.

@@ -1,8 +1,8 @@
 database_name: datalake_search
 table_name: metric_search_listing_page_viewed
-owner: joseph.magiya@quintoandar.com
+owner: joseph.magiya@quintoandar.com.br
 domain: Conversational XP
-description: Table containing listing page viewed (LPV) events data for calculating search health metrics related to LPV. 
+description: "One row per Amplitude listing_page_viewed event enriched with search context (id_search when the LPV originated from search results) and property/user geographic dimensions. Used to calculate search listing-page-viewed (LPV) health metrics. Partitioned by year/month/day (server processing time, which may differ from ts_event)."
 columns:
   id_house:
     lineage:
@@ -11,7 +11,7 @@ columns:
   id_user:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
-    description: QuintoAndar user identifier of the person who viewed the listing page, sourced from Amplitude tracking events.
+    description: QuintoAndar user ID of the user who triggered the listing page viewed event. This is the QuintoAndar user identifier, not the Amplitude ID (Amplitude's own unique identifier).
   id_search:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -95,12 +95,12 @@ columns:
   year:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.year
-    description: The year when the LPV event was processed on the server. Might differ from ts_event.
+    description: Partition column. Year when the LPV event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_event.
   month:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.month
-    description: The month when the LPV event was processed on the server. Might differ from ts_event.
+    description: Partition column. Month when the LPV event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_event.
   day:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.day
-    description: The day when the LPV event was processed on the server. Might differ from ts_event.
+    description: Partition column. Day when the LPV event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_event.

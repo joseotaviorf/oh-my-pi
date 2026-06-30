@@ -13,5 +13,4 @@ SELECT
   month,
   day
 FROM datalake_search.recs_impressions_processed
-WHERE
-  WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')

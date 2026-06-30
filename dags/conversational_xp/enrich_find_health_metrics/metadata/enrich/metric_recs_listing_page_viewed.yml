@@ -2,7 +2,7 @@ database_name: datalake_search
 table_name: metric_recs_listing_page_viewed
 owner: yiyi.ji@quintoandar.com
 domain: Conversational XP
-description: Table containing listing page viewed (LPV) events data for calculating recommendation health metrics related to LPV. 
+description: "One row per Amplitude listing_page_viewed event enriched with recommendation context (recset_id when the LPV originated from a carousel) and property/user geographic dimensions. Used to calculate recommendation listing-page-viewed (LPV) health metrics. Partitioned by year/month/day (server processing time, which may differ from ts_event)."
 columns:
   id_house:
     lineage:
@@ -11,7 +11,7 @@ columns:
   id_user:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
-    description: ID of the user.
+    description: QuintoAndar user ID of the user who triggered the listing page viewed event. This is the QuintoAndar user identifier, not the Amplitude ID (Amplitude's own unique identifier).
   id_recset:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -47,7 +47,7 @@ columns:
   house_city:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: City of the property.
+    description: City where the property is located, derived from Amplitude event properties.
   house_macro_region:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -55,7 +55,7 @@ columns:
   house_state:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: State of the property.
+    description: Brazilian state where the property is located, derived from Amplitude event properties.
   house_country:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -75,7 +75,7 @@ columns:
   sale_value:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
-    description: Value of the sale.
+    description: Listing sale price in BRL at the time of the LPV event, sourced from Amplitude event properties.
   is_recommendation:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
@@ -103,12 +103,12 @@ columns:
   year:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.year
-    description: The year when the LPV event was processed on the server. Might differ from ts_event.
+    description: Partition column. Year when the LPV event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_event.
   month:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.month
-    description: The month when the LPV event was processed on the server. Might differ from ts_event.
+    description: Partition column. Month when the LPV event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_event.
   day:
     lineage:
     - datalake_amplitude_clean.170698_listing_page_viewed_events.day
-    description: The day when the LPV event was processed on the server. Might differ from ts_event.
+    description: Partition column. Day when the LPV event was processed on the server. Always filter on year/month/day for partition pruning; may differ from ts_event.
