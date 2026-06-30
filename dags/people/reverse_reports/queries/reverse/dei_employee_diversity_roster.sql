@@ -42,7 +42,7 @@ SELECT
     LOWER(es.gender_identity) AS identidade_genero,
     LOWER(es.registered_sex) AS sexo,
     LOWER(es.religion) AS religiosidade,
-    LOWER(es.documented_disability_name) AS pcd_laudo,
+    CASE WHEN dis.is_active = TRUE THEN 'sim' ELSE 'nao' END AS pcd_laudo,
     LOWER(es.neurodiversity) AS neurodiversidade,
     LOWER(es.country) AS pais,
     NULLIF(es.owner_l1_name, '-1') AS l1_cc,
@@ -56,71 +56,58 @@ SELECT
     NULLIF(LOWER(es.line), '-1') AS line,
     es.dt_original_hire AS dt_inicio_person,
     CASE
-        WHEN LOWER(es.ethnicity) IN ('branca', 'amarela') THEN 'Non-BIM'
-        WHEN LOWER(es.ethnicity) = '-' THEN 'N/A'
-        WHEN LOWER(es.ethnicity) IN ('preta', 'parda', 'indigena') THEN 'BIM'
+        WHEN LOWER(es.ethnicity) IN ('white', 'asian') THEN 'Non-BIM'
+        WHEN LOWER(es.ethnicity) IN (
+            'black or african american',
+            'two or more races',
+            'american indian',
+            'desativado black or african american'
+        ) THEN 'BIM'
         ELSE 'N/A'
     END AS bim,
     CASE
-        WHEN LOWER(es.gender_identity) IN (
-            'mulher transgenero',
-            'mulher cis',
-            'mujer cisgenero (cis)',
-            'mulher cisgenero',
-            'cisgender woman',
-            'mulher trans ou travesti'
-        ) THEN 'Women'
-        WHEN LOWER(es.gender_identity) IN (
-            'homem cis',
-            'hombre cisgenero (cis)',
-            'homem cisgenero',
-            'homem transgenero',
-            'homemtrans',
-            'cisgender man'
-        ) THEN 'Non-Women'
-        WHEN LOWER(es.gender_identity) IN (
-            'genero nao-binaria',
-            'genero fluido',
-            'outro',
-            'demi-genero',
-            'nao-binario',
-            'homem trans nao-binario'
-        ) THEN 'Other'
-        WHEN LOWER(es.gender_identity) = '-' THEN 'N/A'
-        WHEN LOWER(es.gender_identity) = 'prefiro nao informar' THEN 'Prefiro não informar'
+        WHEN LOWER(es.gender_identity) IN ('woman cisgender', 'woman transgender') THEN 'Women'
+        WHEN LOWER(es.gender_identity) IN ('man cisgender', 'man transgender') THEN 'Non-Women'
+        WHEN LOWER(es.gender_identity) IN ('non binary', 'other') THEN 'Other'
+        WHEN LOWER(es.gender_identity) = 'prefer not to say' THEN 'Prefiro não informar'
         ELSE 'N/A'
     END AS women,
     CASE
-        WHEN LOWER(es.sexual_orientation) IN (
-            '1 - assexual',
-            '2 - bissexual',
-            '5 - pansexual',
-            '4 - homossexual',
-            '6 - outro'
-        )
-        OR LOWER(es.gender_identity) IN (
-            'genero fluido',
-            'genero nao-binaria',
-            'homem transgenero',
-            'mulher transgenero',
-            'outro',
-            'demi-genero',
-            'mulher trans ou travesti',
-            'nao-binario',
-            'homemtrans',
-            'homem trans nao-binario'
-        ) THEN 'LGBT+'
-        WHEN LOWER(es.sexual_orientation) = '3 - heterossexual' THEN 'Non-LGBT+'
-        WHEN LOWER(es.sexual_orientation) = 'prefiro nao informar'
-            OR LOWER(es.gender_identity) = 'prefiro nao informar' THEN 'Prefiro não informar'
-        WHEN LOWER(es.sexual_orientation) = '-'
-            OR LOWER(es.gender_identity) = '-' THEN 'N/A'
+        WHEN LOWER(es.sexual_orientation) IN ('homosexual', 'bisexual', 'pansexual', 'asexual', 'other')
+            OR LOWER(es.gender_identity) IN ('woman transgender', 'man transgender', 'non binary', 'other') THEN 'LGBT+'
+        WHEN LOWER(es.sexual_orientation) = 'heterosexual' THEN 'Non-LGBT+'
+        WHEN LOWER(es.sexual_orientation) LIKE '%rather not answer%'
+            OR LOWER(es.gender_identity) = 'prefer not to say' THEN 'Prefiro não informar'
+        WHEN es.sexual_orientation = '-1'
+            OR es.gender_identity = '-1' THEN 'N/A'
         ELSE 'N/A'
     END AS lgbt,
-    NULLIF(dis.documented_name, '-1') AS com_laudo,
+    CASE dis.category
+        WHEN 'Motor Deficiency' THEN 'Deficiência física'
+        WHEN 'Visual impairment' THEN 'Deficiência visual'
+        WHEN 'Hearing impairment' THEN 'Deficiência auditiva'
+        WHEN 'Mental disorder' THEN 'Deficiência mental/psicossocial'
+        WHEN 'Intellectual disability' THEN 'Deficiência intelectual'
+        WHEN 'Múltiplo' THEN 'Múltiplas'
+    END AS com_laudo,
     COALESCE(
-        NULLIF(dis.self_declared_name, '-1'),
-        NULLIF(dis.documented_name, '-1')
+        CASE dis.self_declared_name
+            WHEN '2' THEN 'Deficiência auditiva'
+            WHEN '3' THEN 'Deficiência física'
+            WHEN '4' THEN 'Deficiência intelectual'
+            WHEN '5' THEN 'Deficiência visual'
+            WHEN '6' THEN 'Deficiência mental/psicossocial'
+            WHEN '7' THEN 'Múltiplas'
+            WHEN '8' THEN 'Outra'
+        END,
+        CASE dis.category
+            WHEN 'Motor Deficiency' THEN 'Deficiência física'
+            WHEN 'Visual impairment' THEN 'Deficiência visual'
+            WHEN 'Hearing impairment' THEN 'Deficiência auditiva'
+            WHEN 'Mental disorder' THEN 'Deficiência mental/psicossocial'
+            WHEN 'Intellectual disability' THEN 'Deficiência intelectual'
+            WHEN 'Múltiplo' THEN 'Múltiplas'
+        END
     ) AS auto_declarado,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
