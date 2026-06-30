@@ -1,7 +1,6 @@
 dag:
   name: dw_alias
   schedule_start_date: 2026, 6, 1
-  schedule_interval: 0 4,12 * * *
   owner: Data Growth
   documentation:
     dag_purpose: |
@@ -20,7 +19,6 @@ dag:
 
       DATA LINEAGE: alias_clean + langfuse_clean + enrich_chatbot + company_clean
                     → dw_alias (star schema)
-      SCHEDULE: 2× daily (04:00, 12:00 UTC) after Alias CDC and Langfuse clean runs.
 
 workflow:
   type: query_delta
@@ -52,6 +50,3 @@ workflow:
     fact_alias_sessions:
       partitions: [year, month, day]
       z_order_by: [sk_lead_session, sk_broker]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

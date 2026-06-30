@@ -1,0 +1,22 @@
+---
+table_name: dw_alias.fact_alias_agent_calls
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_agent_call:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_langfuse_session:
+    is_complete:
+      severity_level: Error
+  agent_name:
+    is_complete:
+      severity_level: Error
+  observation_type:
+    is_complete:
+      severity_level: Error

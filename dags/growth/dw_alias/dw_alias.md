@@ -3,7 +3,7 @@
 **Status:** Draft  
 **Owner:** vitor.musachio@quintoandar.com.br  
 **Domain:** Broker XP / Growth  
-**Last updated:** 2026-06-25  
+**Last updated:** 2026-06-30  
 
 ---
 
@@ -126,7 +126,7 @@ Alias rows will have `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `
 | Field | Type | Source |
 |---|---|---|
 | `sk_lead` | STRING | `uuid_lead` (same value — PK) |
-| `sk_broker` | STRING | `CAST(company.id AS VARCHAR)` |
+| `sk_broker` | STRING | `company.id` |
 | `qt_sessions_total` | INT | COUNT of `lead_sessions` per `uuid_lead` |
 | `qt_sessions_resolved` | INT | COUNT of sessions with at least one `lead_resolution` |
 | `qt_sessions_escalated` | INT | COUNT of sessions with resolution type `ESCALATION` |
@@ -266,7 +266,7 @@ Alias rows will have `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `
 | Field | Type | Source |
 |---|---|---|
 | `sk_ai_agent` | STRING | `uuid_ai_agent` (same value — PK) |
-| `sk_broker` | STRING | `CAST(company.id AS VARCHAR)` via `uuid_company` |
+| `sk_broker` | INT | `company.id` via `uuid_company` |
 | `agent_name` | STRING | `ai_agents.agent_name` |
 | `display_name` | STRING | `ai_agents.display_name` — name shown to the lead |
 | `phone_number` | STRING | `ai_agents.phone_number` — WhatsApp Business (config, not personal PII) |
@@ -292,7 +292,7 @@ Alias rows will have `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `
 | Field | Type | Source |
 |---|---|---|
 | `sk_crm_integration` | STRING | `uuid_crm_integration` (same value — PK) |
-| `sk_broker` | STRING | `CAST(company.id AS VARCHAR)` via `uuid_company` |
+| `sk_broker` | INT | `company.id` via `uuid_company` |
 | `platform` | STRING | `crm_integrations.platform` — e.g. SIENGE, NAVENT |
 | `is_active` | BOOLEAN | `crm_integrations.is_active` |
 | `ts_ready_gate_sent` | TIMESTAMP | `crm_integrations.ts_ready_gate_sent` — onboarding completed |
@@ -316,8 +316,8 @@ Alias rows will have `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `
 
 | Field | Type | Source | Coverage |
 |---|---|---|---|
-| `sk_listing` | STRING | `CAST(id_synthetic_house AS VARCHAR)` (PK) | 100% |
-| `sk_broker` | STRING | `CAST(company.id AS VARCHAR)` via `uuid_company` | ~95% |
+| `sk_listing` | INT | `id_synthetic_house` (PK) | 100% |
+| `sk_broker` | INT | `company.id` via `uuid_company` | ~95% |
 | `id_listing_original` | STRING | `listing_fingerprint.id_listing_original` | 100% |
 | `status` | STRING | `listing_fingerprint.status` (ACTIVE, INACTIVE, ...) | 100% |
 | — **text2filter_prediction (scalar boolean fields)** — | | | |
@@ -737,7 +737,7 @@ Track 3 can be **developed in parallel** with Tracks 1 and 2 — `sk_broker` is 
 | `company_product` schema | No own `ts_created/ts_updated` | Use `company.ts_*` (same source as `core_brokers`) |
 | `uuid_chat_session → id_langfuse_session` | 89.6% match (period with active WhatsApp) | Valid join for conversational enrichment |
 | Alias brokers without product 27/30 | 13 of 25 (pure Alias) | These 13 need Track 1 to get `sk_broker` |
-| `sk_broker` formula | `CAST(company.id AS VARCHAR)` | Identical to Spark job — no collision risk |
+| `sk_broker` formula | `company.id` (no cast — INT type preserved) | Identical to Spark job — no collision risk |
 | Address coverage for Alias agencies | 20/25 (80%) | `broker_address` populated for 80%; NULLs are exception, not rule |
 | CNPJ coverage for Alias agencies | 25/25 (100%) | `cnpj` populated for all; columns will not be NULL for Alias |
 | CRECI coverage for Alias agencies | 23/25 (92%) | `creci` populated for 92% |
@@ -845,7 +845,7 @@ Track 3 can be **developed in parallel** with Tracks 1 and 2 — `sk_broker` is 
 
 ## 9. Reference SQL by Table
 
-> Spark SQL templates for each `dw_alias` `.sql` file. Parameters `{load_start_date}` / `{load_end_date}` are injected by the DAG Builder. `dim_alias_listing.sql` is already documented in Section 4.3 (Track 3).
+> Spark SQL templates for each `dw_alias` `.sql` file. The DAG runs as **full load** (`default_extraction_type: full`) — date-range parameters are not used. `dim_alias_listing.sql` is already documented in Section 4.3 (Track 3).
 >
 > **Confirmed Langfuse tables** (commit `cc2f148e62` — `feature/alias-obt`):
 > - `datalake_langfuse_clean.observations` — one row per AGENT/TOOL call; fields: `id_observation`, `id_trace`, `name`, `type`, `output`, `ts_started`, `ts_ended`, `cost_details` (ROW type).

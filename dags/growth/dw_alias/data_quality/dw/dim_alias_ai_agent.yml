@@ -1,0 +1,16 @@
+---
+table_name: dw_alias.dim_alias_ai_agent
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_ai_agent:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error

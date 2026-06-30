@@ -122,7 +122,7 @@ bietlejuice.dw_alias:
   - bietlejuice.alias:load-clean-lead-sessions:first-run-of-day
   - bietlejuice.alias:load-clean-leads:first-run-of-day
   - bietlejuice.alias:load-clean-listing-fingerprint:first-run-of-day
-  - bietlejuice.company:load-clean-company:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
   - bietlejuice.langfuse:load-clean-observations:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day

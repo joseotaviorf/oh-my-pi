@@ -1,0 +1,20 @@
+---
+table_name: dw_alias.dim_alias_crm_integration
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_crm_integration:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  platform:
+    has_completeness:
+      greater_than_or_equal_to: 0.95
+      severity_level: Warning
