@@ -1,5 +1,7 @@
--- Mailing address on the current contact version resolves as of CURRENT_DATE so address
+-- Mailing address on the current contact version resolves as of load_start_date so address
 -- SCD updates without a new all_people version are reflected; historical versions use dt_valid_from.
+-- When all_people.id_mailing_address is null or points to an address row missing at the reference
+-- date, fall back to the HOME row in person_address_usage (DBP-1562).
 WITH
 employees AS (
     SELECT DISTINCT
@@ -27,6 +29,39 @@ contact_versions AS (
     WHERE
         ap.dt_effective_started <= DATE('{load_start_date}')
 ),
+contact_versions_ranked AS (
+    SELECT
+        cv.id_person,
+        cv.person_number,
+        cv.dt_effective_started,
+        cv.dt_effective_ended,
+        cv.id_primary_email,
+        cv.id_primary_phone,
+        cv.id_mailing_address,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                cv.id_person,
+                cv.dt_effective_started
+            ORDER BY
+                cv.dt_effective_ended DESC NULLS LAST
+        ) AS rn
+    FROM
+        contact_versions AS cv
+),
+contact_versions_deduped AS (
+    SELECT
+        id_person,
+        person_number,
+        dt_effective_started,
+        dt_effective_ended,
+        id_primary_email,
+        id_primary_phone,
+        id_mailing_address
+    FROM
+        contact_versions_ranked
+    WHERE
+        rn = 1
+),
 contact_versions_with_address_ref AS (
     SELECT
         cv.id_person,
@@ -45,7 +80,7 @@ contact_versions_with_address_ref AS (
             ELSE cv.dt_effective_started
         END AS dt_address_referenced
     FROM
-        contact_versions AS cv
+        contact_versions_deduped AS cv
 ),
 personal_email_ranked AS (
     SELECT
@@ -60,7 +95,7 @@ personal_email_ranked AS (
                 ea.dt_started DESC
         ) AS rn
     FROM
-        contact_versions AS cv
+        contact_versions_deduped AS cv
     INNER JOIN
         datalake_pin_core_clean.email_address AS ea
             ON cv.id_person = ea.id_person
@@ -93,7 +128,7 @@ phone_ranked AS (
                 p.dt_started DESC
         ) AS rn
     FROM
-        contact_versions AS cv
+        contact_versions_deduped AS cv
     INNER JOIN
         datalake_pin_core_clean.phone AS p
             ON cv.id_primary_phone = p.id_phone
@@ -125,7 +160,7 @@ github_ranked AS (
                 pl.dt_effective_started DESC
         ) AS rn
     FROM
-        contact_versions AS cv
+        contact_versions_deduped AS cv
     INNER JOIN
         datalake_pin_core_clean.people_legislative AS pl
             ON cv.id_person = pl.id_person
@@ -143,7 +178,7 @@ github_at_version AS (
     WHERE
         rn = 1
 ),
-address_ranked AS (
+mailing_address_ranked AS (
     SELECT
         cv.id_person,
         cv.dt_effective_started,
@@ -174,7 +209,7 @@ address_ranked AS (
                 OR a.dt_effective_ended = DATE('9999-12-31')
             )
 ),
-address_at_version AS (
+mailing_address_at_version AS (
     SELECT
         id_person,
         dt_effective_started,
@@ -188,36 +223,123 @@ address_at_version AS (
         address_state,
         address_country
     FROM
-        address_ranked
+        mailing_address_ranked
     WHERE
         rn = 1
 ),
-contact_versions_ranked AS (
+home_address_ranked AS (
     SELECT
         cv.id_person,
-        cv.person_number,
         cv.dt_effective_started,
-        cv.dt_effective_ended,
+        a.street_type AS address_street_type,
+        a.street,
+        a.number AS address_number,
+        a.complement AS address_complement,
+        a.neighborhood AS address_district,
+        a.postal_code AS address_zip_code,
+        a.town_or_city AS address_city,
+        a.state AS address_state,
+        a.country_code AS address_country,
         ROW_NUMBER() OVER (
             PARTITION BY
                 cv.id_person,
                 cv.dt_effective_started
             ORDER BY
-                cv.dt_effective_ended DESC NULLS LAST
+                pau.dt_effective_started DESC,
+                pau.id_person_address_usage DESC,
+                a.dt_effective_started DESC
         ) AS rn
     FROM
-        contact_versions AS cv
+        contact_versions_with_address_ref AS cv
+    INNER JOIN
+        datalake_pin_core_clean.person_address_usage AS pau
+            ON cv.id_person = pau.id_person
+            AND pau.address_type = 'HOME'
+            AND pau.dt_effective_started <= cv.dt_address_referenced
+            AND (
+                pau.dt_effective_ended >= cv.dt_address_referenced
+                OR pau.dt_effective_ended = DATE('9999-12-31')
+            )
+    INNER JOIN
+        datalake_pin_core_clean.address AS a
+            ON pau.id_address = a.id_address
+            AND a.dt_effective_started <= cv.dt_address_referenced
+            AND (
+                a.dt_effective_ended >= cv.dt_address_referenced
+                OR a.dt_effective_ended = DATE('9999-12-31')
+            )
 ),
-contact_versions_deduped AS (
+home_address_at_version AS (
     SELECT
         id_person,
-        person_number,
         dt_effective_started,
-        dt_effective_ended
+        address_street_type,
+        TRIM(CONCAT_WS(' ', address_street_type, street)) AS address_street,
+        address_number,
+        address_complement,
+        address_district,
+        address_zip_code,
+        address_city,
+        address_state,
+        address_country
     FROM
-        contact_versions_ranked
+        home_address_ranked
     WHERE
         rn = 1
+),
+address_at_version AS (
+    SELECT
+        cv.id_person,
+        cv.dt_effective_started,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_street_type
+            ELSE ha.address_street_type
+        END AS address_street_type,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_street
+            ELSE ha.address_street
+        END AS address_street,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_number
+            ELSE ha.address_number
+        END AS address_number,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_complement
+            ELSE ha.address_complement
+        END AS address_complement,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_district
+            ELSE ha.address_district
+        END AS address_district,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_zip_code
+            ELSE ha.address_zip_code
+        END AS address_zip_code,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_city
+            ELSE ha.address_city
+        END AS address_city,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_state
+            ELSE ha.address_state
+        END AS address_state,
+        CASE
+            WHEN ma.id_person IS NOT NULL THEN ma.address_country
+            ELSE ha.address_country
+        END AS address_country
+    FROM
+        contact_versions_deduped AS cv
+    LEFT JOIN
+        mailing_address_at_version AS ma
+            ON cv.id_person = ma.id_person
+            AND cv.dt_effective_started = ma.dt_effective_started
+    LEFT JOIN
+        home_address_at_version AS ha
+            ON cv.id_person = ha.id_person
+            AND cv.dt_effective_started = ha.dt_effective_started
+    WHERE
+        ma.id_person IS NOT NULL
+        OR ha.id_person IS NOT NULL
 )
 SELECT
     MD5(CONCAT_WS('|', CAST(cv.id_person AS STRING), CAST(cv.dt_effective_started AS STRING))) AS sk_contact_version,

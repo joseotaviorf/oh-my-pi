@@ -47,39 +47,48 @@ columns:
     description: Street type of the mailing address (e.g. rua, avenida).
     lineage:
       - datalake_pin_core_clean.address.street_type
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_street:
     description: Street line combining street type and logradouro, aligned with legacy employee contact exports.
     lineage:
       - datalake_pin_core_clean.address.street_type
       - datalake_pin_core_clean.address.street
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_number:
     description: Street number of the employee mailing address.
     lineage:
       - datalake_pin_core_clean.address.number
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_complement:
     description: Apartment, block, or other complement for the mailing address.
     lineage:
       - datalake_pin_core_clean.address.complement
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_district:
     description: District or neighborhood of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.neighborhood
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_zip_code:
     description: Postal code of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.postal_code
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_city:
     description: Municipality or city of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.town_or_city
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_state:
     description: State or region of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.state
+      - datalake_pin_core_clean.person_address_usage.id_address
   address_country:
     description: Country code of the mailing address.
     lineage:
       - datalake_pin_core_clean.address.country_code
+      - datalake_pin_core_clean.person_address_usage.id_address
   full_address:
     description: Complete mailing address unifying street line, number, complement, district, zip, city, state and country.
     lineage:
@@ -92,6 +101,7 @@ columns:
       - datalake_pin_core_clean.address.town_or_city
       - datalake_pin_core_clean.address.state
       - datalake_pin_core_clean.address.country_code
+      - datalake_pin_core_clean.person_address_usage.id_address
   dt_valid_from:
     description: Start date of the validity period for this contact version.
     lineage:
@@ -101,7 +111,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.dt_effective_started
   is_current:
-    description: True when this is the current contact version for the employee. When true, this is the latest version whose validity includes today's date (future-only rows are excluded).
+    description: True when this is the current contact version for the employee as of the load reference date (future-only rows are excluded).
     lineage:
       - datalake_pin_core_clean.all_people.dt_effective_started
   ts_load:
