@@ -1,5 +1,5 @@
 ---
-database_name: people
+database_name: metric_people
 table_name: employee_snapshots
 owner: gabriel.berger@quintoandar.com.br
 domain: People
@@ -406,16 +406,16 @@ columns:
       - dw_employee_details.dim_management_hierarchy.manager_assignment_number
 
   manager_name:
-    description: Snapshot attribute for manager_name on the employee_snapshots wide metric table.
+    description: Name of the direct manager on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_employee_details.dim_management_hierarchy.name_l1
+      - dw_employee_details.dim_employee.name
 
   manager_work_email:
-    description: Snapshot attribute for manager_work_email on the employee_snapshots wide metric table.
+    description: Work email of the direct manager on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_employee_details.dim_management_hierarchy.email_l1
+      - dw_employee_details.dim_employee.work_email
 
   assignment_number_l0:
     description: Snapshot attribute for assignment_number_l0 on the employee_snapshots wide metric table.

@@ -88,8 +88,8 @@ SELECT
     ev_term.reason_name_ptb AS termination_reason_name,
     ev_term.action_name_ptb AS termination_category,
     mh.manager_assignment_number,
-    mh.name_l1 AS manager_name,
-    mh.email_l1 AS manager_work_email,
+    man_emp.name AS manager_name,
+    man_emp.work_email AS manager_work_email,
     mh.assignment_number_l0,
     mh.assignment_number_l1,
     mh.assignment_number_l2,
@@ -339,6 +339,9 @@ LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS man_fas
         ON man_fas.assignment_number = mh.manager_assignment_number
         AND man_fas.dt_reference = fas.dt_reference
+LEFT JOIN
+    dw_employee_details.dim_employee AS man_emp
+        ON man_emp.sk_employee = man_fas.sk_employee
 LEFT JOIN
     dw_demographics.dim_employee_demographic AS dem
         ON dem.sk_employee = fas.sk_employee
