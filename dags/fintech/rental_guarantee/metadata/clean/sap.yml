@@ -30,7 +30,7 @@ columns:
   transaction_name:
     lineage:
     - datalake_rental_guarantee_raw.sap.transaction_name
-    description: "Name of the SAP transaction."
+    description: "SAP posting type for the Rental Guarantee integration event (e.g. PIX payment confirmation or revenue recognition); drives which ledger template is sent to SAP."
   sap_status:
     lineage:
     - datalake_rental_guarantee_raw.sap.status
@@ -42,7 +42,7 @@ columns:
   payment_entries:
     lineage:
     - datalake_rental_guarantee_raw.sap.request
-    description: "Parsed payment entries array from JSON request, containing amount, payment details, transaction type, and finance entity entry ID."
+    description: "Parsed payment entries array from JSON request. Each element is a struct with amount, payment (flag, method, installments), transaction_type, and finance_entity_entry_id."
   description:
     lineage:
     - datalake_rental_guarantee_raw.sap.request
