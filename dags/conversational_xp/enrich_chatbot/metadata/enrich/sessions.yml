@@ -83,6 +83,10 @@ columns:
     description: 'Langfuse version for the session'
     lineage:
     - datalake_langfuse_clean.traces.version
+  host_tag:
+    description: 'First tag from the Langfuse trace, identifying the host/bot variant handling the session (e.g. sonia, wall-e). Derived from the most recent trace per session.'
+    lineage:
+    - datalake_langfuse_clean.traces.tags
   first_queue:
     description: 'First support queue (department)'
     lineage:

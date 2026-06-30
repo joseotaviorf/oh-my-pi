@@ -14,7 +14,11 @@ WITH langfuse AS (
     ) IGNORE NULLS OVER (
       PARTITION BY t.id_session ORDER BY o.ts_started DESC
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS queue_name
+    ) AS queue_name,
+    FIRST_VALUE(t.tags[0]) OVER (
+      PARTITION BY t.id_session ORDER BY t.ts_created DESC
+      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS host_tag
   FROM
     datalake_langfuse_clean.traces AS t
   INNER JOIN
@@ -172,6 +176,7 @@ SELECT
   END AS whatsapp_number,
   s.status,
   lf.version,
+  lf.host_tag,
   CASE WHEN COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task) IS NOT NULL THEN lf.queue_name END AS first_queue,
   REPLACE(COALESCE(c_sss.last_queue, c_sauron.last_queue, c_sauron_sss.last_queue), '[AeC] ', '') AS last_queue,
   COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task) IS NOT NULL AS is_escalated,
