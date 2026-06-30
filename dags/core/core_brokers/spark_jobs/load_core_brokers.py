@@ -167,8 +167,8 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
         )
 
     def _process_company_product(self, company_product_df):
-        """Aggregate 3P product flags per company (products 27=sale, 30=rent)."""
-        filtered = company_product_df.filter(col("id_product").isin([27, 30]))
+        """Aggregate product flags per company (products 27=sale, 30=rent, 40=alias)."""
+        filtered = company_product_df.filter(col("id_product").isin([27, 30, 40]))
 
         return filtered.groupBy("id_company").agg(
             spark_max(

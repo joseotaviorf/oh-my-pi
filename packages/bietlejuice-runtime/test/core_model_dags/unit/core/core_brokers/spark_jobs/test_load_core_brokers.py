@@ -355,6 +355,58 @@ class TestProcessCompanyDocument:
         assert out[1]["cnpj"] == "22222222000122"
 
 
+_COMPANY_PRODUCT_SCHEMA = StructType(
+    [
+        StructField("id_company", LongType(), True),
+        StructField("id_product", LongType(), True),
+        StructField("status", StringType(), True),
+    ]
+)
+
+
+class TestProcessCompanyProduct:
+    """Tests for ``_process_company_product`` — product filter and 3P flag aggregation."""
+
+    def _run(self, spark_session, job, rows):
+        df = spark_session.createDataFrame(rows, schema=_COMPANY_PRODUCT_SCHEMA)
+        result = job._process_company_product(df)
+        return {row["id_company"]: row.asDict() for row in result.collect()}
+
+    def test_product_40_company_appears_in_output(
+        self, spark_session, core_brokers_job
+    ):
+        """A company with only product 40 (Alias) must be included after the filter."""
+        rows = [(1, 40, "ACTIVE")]
+        out = self._run(spark_session, core_brokers_job, rows)
+        assert 1 in out
+
+    def test_product_40_is_3p_flags_are_false(self, spark_session, core_brokers_job):
+        """Alias-only companies must not get any 3P rent/sale/active flags."""
+        rows = [(1, 40, "ACTIVE")]
+        out = self._run(spark_session, core_brokers_job, rows)
+        row = out[1]
+        assert row["is_3p_rent_broker"] is False
+        assert row["is_3p_sale_broker"] is False
+        assert row["is_3p_active_broker"] is False
+        assert row["is_3p_active_rent_broker"] is False
+        assert row["is_3p_active_sale_broker"] is False
+
+    def test_rede_and_alias_products_coexist(self, spark_session, core_brokers_job):
+        """A company with both product 27 and product 40 retains its 3P sale flag."""
+        rows = [(1, 27, "ACTIVE"), (1, 40, "ACTIVE")]
+        out = self._run(spark_session, core_brokers_job, rows)
+        row = out[1]
+        assert row["is_3p_sale_broker"] is True
+        assert row["is_3p_rent_broker"] is False
+
+    def test_product_not_in_scope_excluded(self, spark_session, core_brokers_job):
+        """Products other than 27, 30, 40 must be filtered out."""
+        rows = [(1, 1, "ACTIVE"), (2, 40, "ACTIVE")]
+        out = self._run(spark_session, core_brokers_job, rows)
+        assert 1 not in out
+        assert 2 in out
+
+
 _COMPANY_SCHEMA = StructType(
     [
         StructField("id", LongType(), True),

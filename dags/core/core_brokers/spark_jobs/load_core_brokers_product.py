@@ -107,11 +107,11 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
     def _process_company_product(self, company_product_df):
         """Extract JSON settings and compute boolean flags per company-product.
 
-        Filters for 3P products (27=sale, 30=rent) and extracts banking,
-        integrator partner, revenue share UUIDs and opt-in flag from the
-        product_settings JSON column.
+        Filters for 3P and Alias products (27=sale, 30=rent, 40=alias) and
+        extracts banking, integrator partner, revenue share UUIDs and opt-in
+        flag from the product_settings JSON column.
         """
-        filtered = company_product_df.filter(col("id_product").isin([27, 30]))
+        filtered = company_product_df.filter(col("id_product").isin([27, 30, 40]))
 
         return filtered.select(
             col("id_company"),
@@ -268,6 +268,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             col("cp.status").alias("product_status"),
             when(col("cp.id_product") == 27, lit("SALE"))
             .when(col("cp.id_product") == 30, lit("RENT"))
+            .when(col("cp.id_product") == 40, lit("ALIAS"))
             .alias("business_context"),
             col("ip.company_name").alias("integrator_partner"),
             col("ip.status").alias("integrator_partner_status"),
