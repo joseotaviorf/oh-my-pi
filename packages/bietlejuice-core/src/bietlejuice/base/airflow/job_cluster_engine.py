@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from collections import deque
 from datetime import timedelta
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Deque, Dict, List, Optional, Sequence, Union
 
 from airflow.models.baseoperator import BaseOperator
+from airflow.utils.task_group import TaskGroup
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
@@ -481,8 +483,101 @@ def get_job_cluster_completion_sink(
         execute_cluster_task_id=execute_job_cluster_task.task_id,
         terminate_task_local_suffix=terminate_suffix,
     )
-    emr_terminate_task.set_downstream(job_cluster_finished_task)
+    # terminate >> job-cluster-finished is wired in attach_emr_terminate_cluster_work_prerequisites
+    # so job-cluster-finished is never downstream of execute during work-task collection.
     return emr_terminate_task
+
+
+_EMR_TERMINAL_TASK_ID_PREFIXES = (
+    "job-cluster-finished",
+    "terminate-emr-cluster",
+)
+
+
+def _is_emr_terminal_task_id(task_id: str) -> bool:
+    return task_id.startswith(_EMR_TERMINAL_TASK_ID_PREFIXES)
+
+
+def _is_emr_terminate_sink(sink: BaseOperator) -> bool:
+    return sink.task_id.startswith("terminate-emr-cluster")
+
+
+def _is_job_cluster_finished_sink(sink: BaseOperator) -> bool:
+    return sink.task_id.startswith("job-cluster-finished")
+
+
+def _emr_terminate_wiring_enabled(
+    dag_execution_context: DagExecutionContext,
+    cluster_completion_sink: BaseOperator,
+) -> bool:
+    """True only when the DAG uses an EMR terminate-emr-cluster completion sink."""
+    if not dag_execution_context.use_airflow_emr:
+        return False
+    engine = dag_execution_context.job_cluster_engine
+    if engine is None or not engine.uses_emr_terminate_after_optimize:
+        return False
+    return _is_emr_terminate_sink(cluster_completion_sink)
+
+
+def _is_cluster_completion_sink_node(
+    node: Union[BaseOperator, TaskGroup],
+    cluster_completion_sink: BaseOperator,
+) -> bool:
+    if node is cluster_completion_sink:
+        return True
+    if (
+        isinstance(node, BaseOperator)
+        and node.task_id == cluster_completion_sink.task_id
+    ):
+        return True
+    return False
+
+
+def _resolve_job_cluster_finished_task(
+    cluster_completion_sink: BaseOperator,
+) -> Optional[BaseOperator]:
+    for downstream in cluster_completion_sink.downstream_list:
+        if isinstance(downstream, BaseOperator) and downstream.task_id.startswith(
+            "job-cluster-finished"
+        ):
+            return downstream
+    try:
+        return cluster_completion_sink.dag.get_task("job-cluster-finished")
+    except Exception:
+        return None
+
+
+def _attach_emr_cluster_work_prerequisites(
+    dag_execution_context: DagExecutionContext,
+    cluster_completion_sink: BaseOperator,
+    *,
+    execute_job_cluster_task: BaseOperator,
+    job_cluster_finished_task: Optional[BaseOperator] = None,
+) -> None:
+    if not _emr_terminate_wiring_enabled(
+        dag_execution_context, cluster_completion_sink
+    ):
+        return
+
+    if job_cluster_finished_task is None:
+        job_cluster_finished_task = _resolve_job_cluster_finished_task(
+            cluster_completion_sink
+        )
+    if job_cluster_finished_task is None:
+        return
+
+    work_tasks = collect_emr_cluster_work_tasks(
+        execute_job_cluster_task, cluster_completion_sink
+    )
+    for task in work_tasks:
+        if task is cluster_completion_sink or task is job_cluster_finished_task:
+            continue
+        if _is_emr_terminal_task_id(task.task_id):
+            continue
+        cluster_completion_sink.set_upstream(task)
+        job_cluster_finished_task.set_upstream(task)
+
+    cluster_completion_sink.set_downstream(job_cluster_finished_task)
 
 
 def attach_emr_job_cluster_finished_work_prerequisites(
@@ -499,11 +594,19 @@ def attach_emr_job_cluster_finished_work_prerequisites(
     (same set that feeds the cluster completion sink) so the finished task
     uses the default ``all_success`` and reflects failures. No-op on Databricks.
 
+    Also call :func:`attach_emr_terminate_cluster_work_prerequisites` with
+    ``execute_job_cluster_task`` and ``cluster_completion_sink`` so
+    ``terminate-emr-cluster`` waits for all retry attempts (``all_done`` on an
+    optimize-only upstream can fire early when optimize is ``upstream_failed``
+    while sibling spark tasks are still ``up_for_retry``).
+
     Pass **either** ``work_completion_tasks`` **or** ``cluster_completion_sink``
-    (not both). When ``cluster_completion_sink`` is set, direct upstreams of
-    the sink (usually ``terminate-emr-*``) are used—call this after all edges to
-    the sink are wired. If the sink is already ``job-cluster-finished`` (e.g.
-    Databricks), the function is a no-op.
+    (not both). When ``cluster_completion_sink`` is an EMR ``terminate-emr-*``
+    task, this function is a no-op — call
+    :func:`attach_emr_terminate_cluster_work_prerequisites` after all edges to the
+    sink are wired (it wires both terminate and ``job-cluster-finished``). When
+    ``cluster_completion_sink`` is ``job-cluster-finished`` (Databricks), the
+    function is a no-op.
     """
     if not dag_execution_context.use_airflow_emr:
         return
@@ -512,13 +615,112 @@ def attach_emr_job_cluster_finished_work_prerequisites(
             "Pass at most one of work_completion_tasks or cluster_completion_sink"
         )
     if cluster_completion_sink is not None:
+        if _is_job_cluster_finished_sink(cluster_completion_sink):
+            return
         if cluster_completion_sink is job_cluster_finished_task:
+            return
+        if _is_emr_terminate_sink(cluster_completion_sink):
             return
         work_completion_tasks = list(cluster_completion_sink.upstream_list)
     elif not work_completion_tasks:
         return
     for task in work_completion_tasks:
         job_cluster_finished_task.set_upstream(task)
+
+
+def _operators_in_task_group(task_group: TaskGroup) -> List[BaseOperator]:
+    operators: List[BaseOperator] = []
+    for child in task_group.children.values():
+        if isinstance(child, BaseOperator):
+            operators.append(child)
+        elif isinstance(child, TaskGroup):
+            operators.extend(_operators_in_task_group(child))
+    return operators
+
+
+def collect_emr_cluster_work_tasks(
+    execute_job_cluster_task: BaseOperator,
+    cluster_completion_sink: BaseOperator,
+) -> List[BaseOperator]:
+    """
+    All tasks downstream of ``execute-job-cluster`` that feed the completion sink,
+    stopping before the sink itself. Traverses TaskGroups. Never collects
+    ``job-cluster-finished`` or ``terminate-emr-cluster*``.
+    """
+    collected: List[BaseOperator] = []
+    seen: set[str] = set()
+    queue: Deque[Union[BaseOperator, TaskGroup]] = deque(
+        execute_job_cluster_task.downstream_list
+    )
+
+    while queue:
+        node = queue.popleft()
+        if _is_cluster_completion_sink_node(node, cluster_completion_sink):
+            continue
+        if isinstance(node, TaskGroup):
+            for operator in _operators_in_task_group(node):
+                if operator.task_id in seen:
+                    continue
+                if _is_emr_terminal_task_id(operator.task_id):
+                    continue
+                seen.add(operator.task_id)
+                collected.append(operator)
+                for downstream in operator.downstream_list:
+                    if not _is_cluster_completion_sink_node(
+                        downstream, cluster_completion_sink
+                    ):
+                        queue.append(downstream)
+            for downstream in node.downstream_list:
+                if not _is_cluster_completion_sink_node(
+                    downstream, cluster_completion_sink
+                ):
+                    queue.append(downstream)
+            continue
+        if isinstance(node, BaseOperator):
+            if node.task_id in seen:
+                continue
+            if _is_emr_terminal_task_id(node.task_id):
+                continue
+            seen.add(node.task_id)
+            collected.append(node)
+            for downstream in node.downstream_list:
+                if not _is_cluster_completion_sink_node(
+                    downstream, cluster_completion_sink
+                ):
+                    queue.append(downstream)
+
+    return collected
+
+
+def attach_emr_terminate_cluster_work_prerequisites(
+    dag_execution_context: DagExecutionContext,
+    cluster_completion_sink: BaseOperator,
+    *,
+    execute_job_cluster_task: BaseOperator,
+    job_cluster_finished_task: Optional[BaseOperator] = None,
+) -> None:
+    """
+    EMR: wire every cluster work task directly upstream of ``terminate-emr-cluster``
+    and ``job-cluster-finished``, then link ``terminate-emr-cluster >>
+    job-cluster-finished``. No-op on Databricks.
+
+    When workflows route ``work >> optimize >> terminate``, optimize may become
+    ``upstream_failed`` while parallel loads or accessory tasks (register, sync,
+    data_quality, etc.) are still retrying; ``all_done`` on terminate then fires
+    early because ``upstream_failed`` counts as done. Collecting all tasks between
+    ``execute-job-cluster`` and the completion sink ensures terminate waits until
+    every branch finishes all retries. No-op on Databricks.
+
+    Pass ``job_cluster_finished_task`` when the finished task has a non-standard
+    task id (i.e. not ``job-cluster-finished``). If omitted, the function resolves
+    the finished task by looking for ``job-cluster-finished`` in the DAG.
+    """
+    _attach_emr_cluster_work_prerequisites(
+        dag_execution_context,
+        cluster_completion_sink,
+        execute_job_cluster_task=execute_job_cluster_task,
+        job_cluster_finished_task=job_cluster_finished_task,
+    )
 
 
 def build_job_cluster_engine(

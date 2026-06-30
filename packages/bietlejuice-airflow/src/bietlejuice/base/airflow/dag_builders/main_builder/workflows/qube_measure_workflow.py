@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.enums.task_enum import TaskEnum
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     attach_job_cluster_engine_to_context,
     get_job_cluster_completion_sink,
 )
@@ -127,11 +128,13 @@ class QubeMeasureWorkflow(BaseWorkflow):
 
         measure_specs = self._get_measure_specs()
 
+        measure_tasks = []
         # Create tasks for each measure spec
         for table_attributes in measure_specs:
             measure_task = self.build_qube_measure_task_creator.create_task(
                 table_attributes
             )
+            measure_tasks.append(measure_task)
             execute_job_cluster_task >> measure_task
 
             # Add Trino registration if has_hive_sync is enabled
@@ -147,6 +150,11 @@ class QubeMeasureWorkflow(BaseWorkflow):
             self.dag_execution_context,
             dummy_terminate_job_cluster_task,
             cluster_completion_sink=cluster_completion_sink,
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            self.dag_execution_context,
+            cluster_completion_sink,
+            execute_job_cluster_task=execute_job_cluster_task,
         )
 
     def _check_include_sync_hive_tasks(self, table_attributes: TableAttributes) -> bool:

@@ -6,6 +6,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -47,8 +48,10 @@ class ReverseLoadWorkflow(BaseWorkflow):
         )
 
         tables = self._get_tables()
+        reverse_load_tasks = []
         for table in tables:
             load_reverse_task = self.load_reverse_task_creator.create_task(table)
+            reverse_load_tasks.append(load_reverse_task)
             if not self.is_validation:
                 optimize_delta_table_task = (
                     self.optimize_delta_table_task_creator.create_task([table])
@@ -70,6 +73,11 @@ class ReverseLoadWorkflow(BaseWorkflow):
             dag_execution_context,
             dummy_terminate_job_cluster_task,
             cluster_completion_sink=cluster_completion_sink,
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            dag_execution_context,
+            cluster_completion_sink,
+            execute_job_cluster_task=execute_job_cluster_task,
         )
 
         DatasetAdder.attach_reprocessing_guard(

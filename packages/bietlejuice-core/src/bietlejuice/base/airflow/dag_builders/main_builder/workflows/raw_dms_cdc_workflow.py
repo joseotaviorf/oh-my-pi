@@ -6,6 +6,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.enums.task_enum import TaskEnum
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -145,6 +146,11 @@ class RawDMSCDCWorkflow(BaseWorkflow):
             self.dag_execution_context,
             dummy_terminate_job_cluster_task,
             cluster_completion_sink=dag_final_tasks,
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            self.dag_execution_context,
+            dag_final_tasks,
+            execute_job_cluster_task=execute_job_cluster_task,
         )
 
     def _create_raw_tasks(

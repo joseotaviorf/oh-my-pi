@@ -8,6 +8,7 @@ from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 from bietlejuice.base.airflow.short_circuit_function_enum import (
@@ -206,4 +207,9 @@ class DWQueryWorkflow(BaseWorkflow):
             dag_execution_context,
             job_cluster_finished_task,
             cluster_completion_sink=cluster_completion_sink,
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            dag_execution_context,
+            cluster_completion_sink,
+            execute_job_cluster_task=execute_job_cluster_task,
         )

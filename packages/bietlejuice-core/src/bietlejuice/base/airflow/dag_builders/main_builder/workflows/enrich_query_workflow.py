@@ -7,6 +7,7 @@ from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -134,6 +135,11 @@ class EnrichQueryWorkflow(BaseWorkflow):
             dag_execution_context,
             job_cluster_finished_task,
             cluster_completion_sink=cluster_completion_sink,
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            dag_execution_context,
+            cluster_completion_sink,
+            execute_job_cluster_task=execute_job_cluster_task,
         )
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):

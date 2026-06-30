@@ -292,6 +292,27 @@ class BaseWorkflow(BuilderInterface):
             if table_name not in tables_with_dependents:
                 table_task >> end_task
 
+    def _leaf_table_last_tasks(
+        self,
+        table_last_tasks: dict,
+        inner_dependencies_key: str = "inner_dependencies",
+    ) -> list:
+        """
+        Last tasks of tables with no inner dependents (same leaf set as
+        ``_link_tables_without_dependents_to_end_task``).
+        """
+        inner_dependencies = self._get_lowercase_inner_dependencies(
+            inner_dependencies_key
+        )
+        tables_with_dependents = set()
+        for dependencies in inner_dependencies.values():
+            tables_with_dependents.update(dependencies)
+        return [
+            table_task
+            for table_name, table_task in table_last_tasks.items()
+            if table_name not in tables_with_dependents
+        ]
+
     def _get_data_quality_tables(self, layer: str) -> Set[str]:
         """Return cached set of table paths with data quality files, loading once per layer."""
         return self._dq_cache.get(layer)

@@ -12,6 +12,7 @@ from airflow.models.baseoperator import BaseOperator
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.job_cluster_engine import (
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     attach_job_cluster_engine_to_context,
     get_job_cluster_completion_sink,
 )
@@ -212,4 +213,10 @@ with DAG(
         >> execute_job_cluster
         >> load_tasks
         >> cluster_completion_sink
+    )
+    attach_emr_terminate_cluster_work_prerequisites(
+        dag_execution_context,
+        cluster_completion_sink,
+        execute_job_cluster_task=execute_job_cluster,
+        job_cluster_finished_task=end,
     )

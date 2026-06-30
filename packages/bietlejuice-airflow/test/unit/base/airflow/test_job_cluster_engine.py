@@ -10,7 +10,9 @@ from bietlejuice.base.airflow.job_cluster_engine import (
     DatabricksJobClusterEngine,
     EmrJobClusterEngine,
     attach_emr_job_cluster_finished_work_prerequisites,
+    attach_emr_terminate_cluster_work_prerequisites,
     build_job_cluster_engine,
+    collect_emr_cluster_work_tasks,
     get_job_cluster_completion_sink,
 )
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -648,7 +650,7 @@ class TestGetJobClusterCompletionSink:
             execute_cluster_task_id="execute-job-cluster",
             terminate_task_local_suffix=None,
         )
-        assert finished.upstream_task_ids == {"terminate-emr-cluster"}
+        assert not finished.upstream_task_ids
 
     def test_emr_passes_suffix_when_local_id_gt_one(self):
         dag = DAG(dag_id="sink_emr2", schedule=None)
@@ -705,16 +707,22 @@ class TestAttachEmrJobClusterFinishedPrerequisites:
         work = EmptyOperator(task_id="work", dag=dag)
         term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
         jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
-        work.set_downstream(term)
-        term.set_downstream(jcf)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        execute >> work >> term
         ctx = MagicMock()
         ctx.use_airflow_emr = True
 
         attach_emr_job_cluster_finished_work_prerequisites(
             ctx, jcf, cluster_completion_sink=term
         )
+        assert not jcf.upstream_task_ids
+
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, term, execute_job_cluster_task=execute
+        )
 
         assert jcf.upstream_task_ids == {"work", "terminate-emr-cluster"}
+        assert term.upstream_task_ids == {"work"}
 
     def test_raises_if_both_explicit_and_sink(self):
         dag = DAG(dag_id="a_bad", schedule=None)
@@ -731,3 +739,360 @@ class TestAttachEmrJobClusterFinishedPrerequisites:
             attach_emr_job_cluster_finished_work_prerequisites(
                 ctx, jcf, (a,), cluster_completion_sink=b
             )
+
+
+class TestCollectEmrClusterWorkTasks:
+    def test_collect_emr_cluster_work_tasks(self):
+        dag = DAG(dag_id="collect_work", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        load = EmptyOperator(task_id="load", dag=dag)
+        register = EmptyOperator(task_id="register", dag=dag)
+        sync = EmptyOperator(task_id="sync", dag=dag)
+        data_quality = EmptyOperator(task_id="data_quality", dag=dag)
+        optimize = EmptyOperator(task_id="optimize", dag=dag)
+        term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
+
+        execute >> load >> register >> sync >> optimize >> term
+        load >> data_quality >> optimize
+
+        collected = collect_emr_cluster_work_tasks(execute, term)
+
+        assert {task.task_id for task in collected} == {
+            "load",
+            "register",
+            "sync",
+            "data_quality",
+            "optimize",
+        }
+
+    def test_collect_skips_sink_and_does_not_traverse_past_terminate(self):
+        dag = DAG(dag_id="collect_sink", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        load = EmptyOperator(task_id="load", dag=dag)
+        term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
+        finished = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+
+        execute >> load >> term >> finished
+
+        collected = collect_emr_cluster_work_tasks(execute, term)
+
+        assert [task.task_id for task in collected] == ["load"]
+        assert "job-cluster-finished" not in {task.task_id for task in collected}
+
+    def test_collector_never_includes_job_cluster_finished_parallel_path(self):
+        dag = DAG(dag_id="collect_jcf_parallel", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        load = EmptyOperator(task_id="load", dag=dag)
+        term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
+        finished = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+
+        execute >> load >> term >> finished
+        load >> finished
+
+        collected = collect_emr_cluster_work_tasks(execute, term)
+
+        assert [task.task_id for task in collected] == ["load"]
+        assert "job-cluster-finished" not in {task.task_id for task in collected}
+
+
+class TestAttachEmrTerminateClusterWorkPrerequisites:
+    def test_noop_when_not_emr(self):
+        dag = DAG(dag_id="term_noop_off", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        w1 = EmptyOperator(task_id="w1", dag=dag)
+        optimize = EmptyOperator(task_id="optimize", dag=dag)
+        term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
+        execute >> w1 >> optimize >> term
+        ctx = MagicMock()
+        ctx.use_airflow_emr = False
+
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, term, execute_job_cluster_task=execute
+        )
+
+        assert term.upstream_task_ids == {"optimize"}
+
+    def test_emr_wires_all_collected_work_tasks_as_upstreams(self):
+        dag = DAG(dag_id="term_work_up", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        w1 = EmptyOperator(task_id="w1", dag=dag)
+        w2 = EmptyOperator(task_id="w2", dag=dag)
+        optimize = EmptyOperator(task_id="optimize", dag=dag)
+        term = EmptyOperator(
+            task_id="terminate-emr-cluster",
+            dag=dag,
+            trigger_rule="all_done",
+        )
+        EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        execute >> w1 >> optimize
+        execute >> w2 >> optimize
+        optimize >> term
+        ctx = MagicMock()
+        ctx.use_airflow_emr = True
+
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, term, execute_job_cluster_task=execute
+        )
+
+        assert term.upstream_task_ids == {"w1", "w2", "optimize"}
+
+    def test_emr_register_retry_race_regression(self):
+        """Register must be a direct upstream while sync/optimize are only via edges."""
+        dag = DAG(dag_id="term_retry_race", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        load = EmptyOperator(task_id="load", dag=dag)
+        register = EmptyOperator(task_id="register", dag=dag)
+        sync = EmptyOperator(task_id="sync", dag=dag)
+        optimize = EmptyOperator(
+            task_id="optimize", dag=dag, trigger_rule="all_success"
+        )
+        term = EmptyOperator(
+            task_id="terminate-emr-cluster",
+            dag=dag,
+            trigger_rule="all_done",
+        )
+        EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        execute >> load >> register >> sync >> optimize >> term
+        ctx = MagicMock()
+        ctx.use_airflow_emr = True
+
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, term, execute_job_cluster_task=execute
+        )
+
+        assert "register" in term.upstream_task_ids
+        assert term.upstream_task_ids >= {"load", "register", "sync", "optimize"}
+        finished = dag.get_task("job-cluster-finished")
+        assert finished.upstream_task_ids >= {"load", "register", "sync", "optimize"}
+        assert finished.upstream_task_ids >= {"terminate-emr-cluster"}
+
+
+class TestDatabricksAttachIsNoop:
+    def test_databricks_attach_does_not_add_edges(self):
+        dag = DAG(dag_id="dbr_noop", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        load = EmptyOperator(task_id="load", dag=dag)
+        optimize = EmptyOperator(task_id="optimize", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        execute >> load >> optimize >> jcf
+
+        ctx = MagicMock()
+        ctx.use_airflow_emr = False
+        engine = MagicMock()
+        engine.uses_emr_terminate_after_optimize = False
+        ctx.job_cluster_engine = engine
+
+        attach_emr_job_cluster_finished_work_prerequisites(
+            ctx, jcf, cluster_completion_sink=jcf
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, jcf, execute_job_cluster_task=execute
+        )
+
+        assert jcf.upstream_task_ids == {"optimize"}
+        assert not load.upstream_task_ids.intersection({"job-cluster-finished"})
+
+    def test_databricks_sink_by_task_id_even_when_objects_differ(self):
+        """Databricks: never wire when sink task_id is job-cluster-finished."""
+        dag = DAG(dag_id="dbr_sink_task_id", schedule=None)
+        other_dag = DAG(dag_id="dbr_sink_other", schedule=None)
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        load = EmptyOperator(task_id="load", dag=dag)
+        optimize = EmptyOperator(task_id="optimize", dag=dag)
+        jcf_on_graph = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        jcf_param = EmptyOperator(task_id="job-cluster-finished", dag=other_dag)
+        execute >> load >> optimize >> jcf_on_graph
+
+        ctx = MagicMock()
+        ctx.use_airflow_emr = False
+        ctx.job_cluster_engine = MagicMock(uses_emr_terminate_after_optimize=False)
+
+        attach_emr_job_cluster_finished_work_prerequisites(
+            ctx,
+            jcf_param,
+            cluster_completion_sink=jcf_on_graph,
+        )
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx, jcf_on_graph, execute_job_cluster_task=execute
+        )
+
+        assert jcf_on_graph.upstream_task_ids == {"optimize"}
+        assert not jcf_param.upstream_task_ids
+
+    def test_databricks_dw_query_delta_set_dependencies_no_cycle(self):
+        from datetime import datetime
+
+        from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_delta_workflow import (
+            DwQueryDeltaWorkflow,
+        )
+
+        dag = DAG(
+            dag_id="dw_agent_contract_dbr",
+            schedule=None,
+            start_date=datetime(2020, 8, 6),
+        )
+        with patch.dict("os.environ", {"ENVIRONMENT": "forno"}):
+            workflow = DwQueryDeltaWorkflow(
+                {"name": "dw_agent_contract", "owner": "Data Agents"},
+                {
+                    "type": "query_delta",
+                    "layer": "dw",
+                    "custom_schema": "agent",
+                    "default_extraction_type": "full",
+                    "inner_dependencies": {
+                        "fact_agent_contract": ["dim_work_contract"],
+                        "fact_daily_accredited_agent": ["fact_agent_contract"],
+                    },
+                },
+                {
+                    "type": "consolidation_m_general_cluster",
+                    "databricks_conn_id": "databricks_new_env",
+                },
+            )
+            workflow.config_service = MagicMock()
+            workflow.config_service._deep_update = lambda a, b: {**a, **(b or {})}
+            workflow.config_service.get_config.side_effect = lambda key: {
+                "dw_bucket": "dw-bucket",
+                "consolidation_m_general_cluster": {
+                    "spark_version": "16.4.x-scala2.12"
+                },
+                "databricks_bietlejuice_repo_path": "s3://repo",
+                "default_access_control_list": [],
+                "default_libraries": [],
+            }.get(key, {})
+            ctx = workflow._get_dag_execution_context(dag, "dw-bucket")
+
+        assert not ctx.use_airflow_emr
+
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        optimize = EmptyOperator(task_id="optimize-dw", dag=dag)
+
+        dim_load = EmptyOperator(task_id="load-dim_work_contract", dag=dag)
+        dim_add_default = EmptyOperator(
+            task_id="add-default-dim_work_contract", dag=dag
+        )
+        fact_load = EmptyOperator(task_id="load-fact_agent_contract", dag=dag)
+        daily_load = EmptyOperator(task_id="load-fact_daily_accredited_agent", dag=dag)
+
+        table_first_tasks = {
+            "dim_work_contract": dim_load,
+            "fact_agent_contract": fact_load,
+            "fact_daily_accredited_agent": daily_load,
+        }
+        table_last_tasks = {
+            "dim_work_contract": dim_add_default,
+            "fact_agent_contract": fact_load,
+            "fact_daily_accredited_agent": daily_load,
+        }
+
+        workflow._set_dependencies(
+            ctx,
+            execute,
+            table_first_tasks,
+            table_last_tasks,
+            optimize,
+            jcf,
+        )
+
+        list(dag.topological_sort())
+        assert jcf.upstream_task_ids == {"optimize-dw"}
+        assert "terminate-emr-cluster" not in {t.task_id for t in dag.tasks}
+
+
+class TestEmrDwQueryDeltaInnerDepsNoCycle:
+    def test_emr_dw_query_delta_inner_deps_no_cycle(self):
+        from datetime import datetime
+
+        from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_delta_workflow import (
+            DwQueryDeltaWorkflow,
+        )
+
+        dag = DAG(
+            dag_id="dw_agent_contract_cycle",
+            schedule=None,
+            start_date=datetime(2020, 8, 6),
+        )
+        with patch.dict("os.environ", {"ENVIRONMENT": "forno"}):
+            workflow = DwQueryDeltaWorkflow(
+                {"name": "dw_agent_contract", "owner": "Data Agents"},
+                {
+                    "type": "query_delta",
+                    "layer": "dw",
+                    "custom_schema": "agent",
+                    "default_extraction_type": "full",
+                    "inner_dependencies": {
+                        "fact_agent_contract": ["dim_work_contract"],
+                        "fact_daily_accredited_agent": ["fact_agent_contract"],
+                    },
+                },
+                {"type": "emr_7_12_consolidation_xs_memory_cluster"},
+            )
+            workflow.config_service = MagicMock()
+            workflow.config_service._deep_update = lambda a, b: {**a, **(b or {})}
+            workflow.config_service.get_config.side_effect = lambda key: {
+                "dw_bucket": "dw-bucket",
+                "emr_7_12_consolidation_xs_memory_cluster": {
+                    "spark_version": "emr-7-12"
+                },
+                "databricks_bietlejuice_repo_path": "s3://repo",
+                "default_access_control_list": [],
+                "default_libraries": [],
+            }.get(key, {})
+            ctx = workflow._get_dag_execution_context(dag, "dw-bucket")
+
+        assert ctx.use_airflow_emr
+
+        execute = EmptyOperator(task_id="execute-job-cluster", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        optimize = EmptyOperator(task_id="optimize-dw", dag=dag)
+        term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
+
+        dim_load = EmptyOperator(task_id="load-dim_work_contract", dag=dag)
+        dim_add_default = EmptyOperator(
+            task_id="add-default-dim_work_contract", dag=dag
+        )
+        dim_register = EmptyOperator(task_id="register-dim_work_contract", dag=dag)
+        dim_sync = EmptyOperator(task_id="sync-dim_work_contract", dag=dag)
+
+        fact_load = EmptyOperator(task_id="load-fact_agent_contract", dag=dag)
+        fact_register = EmptyOperator(task_id="register-fact_agent_contract", dag=dag)
+        fact_sync = EmptyOperator(task_id="sync-fact_agent_contract", dag=dag)
+
+        daily_load = EmptyOperator(task_id="load-fact_daily_accredited_agent", dag=dag)
+        daily_register = EmptyOperator(
+            task_id="register-fact_daily_accredited_agent", dag=dag
+        )
+        daily_sync = EmptyOperator(task_id="sync-fact_daily_accredited_agent", dag=dag)
+
+        execute >> dim_load >> dim_add_default >> fact_load
+        dim_load >> dim_register >> dim_sync >> optimize
+        fact_load >> fact_register >> fact_sync >> optimize
+        daily_load >> daily_register >> daily_sync >> optimize
+        optimize >> term
+
+        table_first_tasks = {
+            "dim_work_contract": dim_load,
+            "fact_agent_contract": fact_load,
+            "fact_daily_accredited_agent": daily_load,
+        }
+        table_last_tasks = {
+            "dim_work_contract": dim_add_default,
+            "fact_agent_contract": fact_load,
+            "fact_daily_accredited_agent": daily_load,
+        }
+
+        with patch(
+            "bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_delta_workflow.get_job_cluster_completion_sink",
+            return_value=term,
+        ):
+            workflow._set_dependencies(
+                ctx,
+                execute,
+                table_first_tasks,
+                table_last_tasks,
+                optimize,
+                jcf,
+            )
+
+        list(dag.topological_sort())

@@ -269,6 +269,9 @@ class TestValidationWorkflow:
             mock.patch(
                 "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow.attach_emr_job_cluster_finished_work_prerequisites"
             ),
+            mock.patch(
+                "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow.attach_emr_terminate_cluster_work_prerequisites"
+            ),
             mock.patch.object(
                 workflow, "_check_include_data_quality_task", return_value=False
             ),
@@ -340,6 +343,9 @@ class TestValidationWorkflow:
             mock.patch(
                 "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow.attach_emr_job_cluster_finished_work_prerequisites"
             ),
+            mock.patch(
+                "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow.attach_emr_terminate_cluster_work_prerequisites"
+            ),
             mock.patch.object(
                 workflow, "_check_include_sync_hive_tasks", return_value=False
             ),
@@ -402,6 +408,9 @@ class TestValidationWorkflow:
             ),
             mock.patch(
                 "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow.attach_emr_job_cluster_finished_work_prerequisites"
+            ),
+            mock.patch(
+                "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow.attach_emr_terminate_cluster_work_prerequisites"
             ),
             mock.patch.object(
                 workflow, "_check_include_data_quality_task", return_value=False
