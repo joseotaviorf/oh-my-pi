@@ -11,6 +11,7 @@ column_level_validations:
   sk_employee:
     is_complete:
       severity_level: Error
+  one_row_per_employee_and_month_reference:
     custom:
       # Employee-day grain uniqueness after collapse from assignment-level snapshots.
       constraint: |-
