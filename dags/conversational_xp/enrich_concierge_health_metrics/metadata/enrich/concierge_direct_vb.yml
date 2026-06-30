@@ -77,12 +77,12 @@ columns:
   year:
     lineage:
     - datalake_visit.visit_status_events.ts_created
-    description: The year of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').
+    description: "Partition column. Year of the visit event creation (VISIT_SCHEDULED/VISIT_RESCHEDULED). Always filter on year/month/day for partition pruning."
   month:
     lineage:
     - datalake_visit.visit_status_events.ts_created
-    description: The month of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').
+    description: "Partition column. Month of the visit event creation. Always filter on year/month/day for partition pruning."
   day:
     lineage:
     - datalake_visit.visit_status_events.ts_created
-    description: The day of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').
+    description: "Partition column. Day of the visit event creation. Always filter on year/month/day for partition pruning."

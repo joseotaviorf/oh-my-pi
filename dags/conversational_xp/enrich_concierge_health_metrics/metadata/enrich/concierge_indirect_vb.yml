@@ -74,12 +74,12 @@ columns:
   year:
     lineage:
     - dw_visit.dim_visit.dt_created
-    description: The year of the creation of the visit.
+    description: "Partition column. Year of the visit creation. Always filter on year/month/day for partition pruning."
   month:
     lineage:
     - dw_visit.dim_visit.dt_created
-    description: The month of the creation of the visit.
+    description: "Partition column. Month of the visit creation. Always filter on year/month/day for partition pruning."
   day:
     lineage:
     - dw_visit.dim_visit.dt_created
-    description: The day of the creation of the visit.
+    description: "Partition column. Day of the visit creation. Always filter on year/month/day for partition pruning."

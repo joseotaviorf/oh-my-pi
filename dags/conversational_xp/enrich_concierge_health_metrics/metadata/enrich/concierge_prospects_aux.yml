@@ -55,12 +55,12 @@ columns:
   year:
     lineage:
     - dw_growth.fact_demand_prospect_events.ts_event
-    description: The year of the creation of the prospect event (activation or churn).
+    description: "Partition column. Year of the prospect event (activation or churn). Always filter on year/month/day for partition pruning."
   month:
     lineage:
     - dw_growth.fact_demand_prospect_events.ts_event
-    description: The month of the creation of the prospect event (activation or churn).
+    description: "Partition column. Month of the prospect event. Always filter on year/month/day for partition pruning."
   day:
     lineage:
     - dw_growth.fact_demand_prospect_events.ts_event
-    description: The day of the creation of the prospect event (activation or churn).
+    description: "Partition column. Day of the prospect event. Always filter on year/month/day for partition pruning."
