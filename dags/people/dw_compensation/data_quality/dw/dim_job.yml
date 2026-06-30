@@ -26,7 +26,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  job_family:
+  active_current_jobs_have_job_family:
     custom:
       # Ensure job_family is not null for current active jobs
       constraint: |-
@@ -37,7 +37,7 @@ column_level_validations:
            AND job_family IS NULL
         ) = 0
       severity_level: Warning
-  employment_type:
+  employment_type_allowed_values_and_job_family_mapping:
     custom:
       # NULL only when job_family is NULL; allowed set and job_family mapping for current active jobs
       constraint: |-
@@ -63,7 +63,7 @@ column_level_validations:
            )
         ) = 0
       severity_level: Warning
-  band:
+  active_current_jobs_have_band:
     custom:
       # Ensure band is not null for current active jobs
       constraint: |-
@@ -86,6 +86,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  job_history_versions_do_not_overlap:
     custom:
       # Ensure no overlapping versions for the same job
       # Validates that SCD Type 2 versions do not overlap for the same job
@@ -113,7 +114,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  target_plr:
+  target_plr_changes_have_separate_job_versions:
     custom:
       # Ensure target_plr changes are captured in SCD Type 2 versions
       # This validation checks that jobs with different target_plr values have separate versions

@@ -27,7 +27,9 @@ column_level_validations:
   amount_salary:
     is_complete:
       severity_level: Error
+  amount_salary_must_not_be_negative:
     custom:
+      # Salary amount must be non-negative for all compensation records.
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_compensation.fact_compensations
@@ -43,6 +45,7 @@ column_level_validations:
   is_promotion_movement:
     is_complete:
       severity_level: Error
+  promotion_movements_positive_adjustment_ratio_within_limit:
     custom:
       # Promotions should have positive salary adjustments. A small ratio of null/zero/negative
       # is expected (salary row splits, legacy data, retroactive adjustments), but > 5% signals
@@ -65,6 +68,12 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+    has_completeness:
+      # dt_original_hired (and id_continuous_employment_cycle) should be populated for nearly all
+      # compensation records; a low completeness rate signals a regression in identifier_mapping join.
+      greater_than_or_equal_to: 0.95
+      severity_level: Warning
+  company_tenure_days_at_least_position_and_band:
     custom:
       # Tenure hierarchy: company >= position and company >= band when all non-null.
       # band >= position is NOT enforced: when dim_job receives a new SCD2 version
@@ -80,15 +89,11 @@ column_level_validations:
            )
         ) = 0
       severity_level: Error
-    has_completeness:
-      # dt_original_hired (and id_continuous_employment_cycle) should be populated for nearly all
-      # compensation records; a low completeness rate signals a regression in identifier_mapping join.
-      greater_than_or_equal_to: 0.95
-      severity_level: Warning
   months_tenure_in_company:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+  company_tenure_months_at_least_position_and_band:
     custom:
       # Same hierarchy check as days: company >= position and company >= band when all non-null.
       # band >= position is NOT enforced (see days_tenure_in_company custom check for rationale).
@@ -114,6 +119,7 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+  band_tenure_days_populated_when_dim_job_has_band:
     custom:
       # Band tenure must be populated for all current rows where dim_job has a band.
       # Historical PLR sub-period splits can legitimately produce NULL tenure when
@@ -132,6 +138,7 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+  band_tenure_months_populated_when_dim_job_has_band:
     custom:
       # Same completeness rule as days_tenure_in_band — restricted to current rows.
       constraint: |-
@@ -147,6 +154,7 @@ column_level_validations:
   dt_valid_from:
     is_complete:
       severity_level: Error
+  valid_from_must_not_be_after_valid_to:
     custom:
       # SCD bounds: valid-from must not be after valid-to.
       constraint: |-

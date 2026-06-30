@@ -11,7 +11,7 @@ column_level_validations:
       severity_level: Warning
     is_unique:
       severity_level: Warning
-  sk_performance_calibration:
+  one_current_version_per_calibration:
     custom:
       # At most one is_current = TRUE row per logical calibration
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_performance.dim_performance_calibration WHERE is_current = TRUE GROUP BY sk_performance_calibration HAVING COUNT(*) > 1)) = 0"

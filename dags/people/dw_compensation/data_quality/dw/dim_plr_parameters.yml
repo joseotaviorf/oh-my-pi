@@ -22,6 +22,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  reference_year_within_valid_range:
     custom:
       # Ensure reference_year is within reasonable range (e.g., 2020-2100)
       constraint: |-
@@ -31,7 +32,7 @@ column_level_validations:
             OR reference_year > 2100
         ) = 0
       severity_level: Error
-  pct_corporate_goals:
+  pct_corporate_goals_within_allowed_range:
     custom:
       # Ensure pct_corporate_goals is NULL or between 0 and 1.5 (0% to 150%)
       constraint: |-
@@ -46,6 +47,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  pct_min_corporate_goals_between_zero_and_one:
     custom:
       # Ensure pct_min_corporate_goals is between 0 and 1
       constraint: |-
@@ -59,6 +61,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  pct_default_corporate_goals_terminated_between_zero_and_one:
     custom:
       # Ensure pct_default_corporate_goals_terminated is between 0 and 1
       constraint: |-
@@ -72,6 +75,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  pct_default_ipa_terminated_between_zero_and_one:
     custom:
       # Ensure pct_default_ipa_terminated is between 0 and 1
       constraint: |-
@@ -85,6 +89,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  pct_min_protected_leave_ipa_between_zero_and_one:
     custom:
       # Ensure pct_min_protected_leave_ipa is at least 1.0 (100%)
       constraint: |-
@@ -97,6 +102,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  min_days_worked_in_year_for_eligibility_non_negative:
     custom:
       # Ensure min_days_worked_in_year_for_eligibility is positive
       constraint: |-
@@ -109,6 +115,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  min_days_worked_in_month_to_count_non_negative:
     custom:
       # Ensure min_days_worked_in_month_to_count is positive and reasonable (1-31)
       constraint: |-
