@@ -159,6 +159,12 @@ workflow:
       extra_spark_job_arguments:
         - "19JbdaddwOmC5cTdTWDLSSqFj4Vygehmeq7fDjPhMtp4"
         - "Base"
+    # Former notebook view: license_to_hire_list
+    # Governance: docs/license_to_hire_roster.md
+    license_to_hire_roster:
+      extra_spark_job_arguments:
+        - "1UgZVV5FDuFTvmJ-Pc3ejzCTcyr94g8w4M29nuTDjy8s"
+        - "license_to_hire_list"
 
     # --- reports_dw.py notebook migration (DBP-1333) ---
     # Former notebook view: base_de_para
