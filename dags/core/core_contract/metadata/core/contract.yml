@@ -1,7 +1,7 @@
 database_name: core_contract
 table_name: contract
 domain: For Rent
-owner: marcio.gomes@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 description: Core model for rent contracts. One row per contract, enriched with owner info via house and house_listing_relation.
 columns:
   sk_core_contract:
@@ -85,14 +85,14 @@ columns:
   signature_type:
     lineage:
       - datalake_ebdb_clean.contract.signature_type
-    description: Type of contract signature.
+    description: Method used to collect signatures for the contract, distinguishing electronic channels (e.g. Eletronica (for DocuSign)) from null when no signature method is on record.
     categories:
       Eletronica: If the signature is eletronic (e.g. Docusign).
       "null": If the signature type is null.
   status_closing:
     lineage:
       - datalake_ebdb_clean.contract.status_closing
-    description: Closing status of the contract.
+    description: Insurance policy state when a contract closes; ApoliceEmitida means the policy was issued, ApoliceSolicitada means it was requested but not yet issued.
     categories:
       ApoliceEmitida: Policy was issued.
       ApoliceSolicitada: Policiy was requested.

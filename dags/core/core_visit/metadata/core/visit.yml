@@ -1,7 +1,7 @@
 database_name: core_visit
 table_name: visit
 domain: For Sale
-owner: isadora.gallerani@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 description: Visit Core Model test.
 columns:
   sk_core_visit:
@@ -57,7 +57,7 @@ columns:
   type:
     lineage:
       - datalake_ebdb_clean.visit.type
-    description: The type of the visit.
+    description: Scheduling mode or format of the visit (e.g. 0 or 1), sourced from the EBDB visit record.
   business_context:
     lineage:
       - datalake_ebdb_clean.visit.business_context

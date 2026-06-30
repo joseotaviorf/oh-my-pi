@@ -49,7 +49,7 @@ columns:
   region_name:
     lineage:
       - datalake_ebdb_clean.region.name
-    description: Region's name.
+    description: Display name of the geographic region as defined in the EBDB region hierarchy.
   city_region_name:
     lineage:
       - datalake_ebdb_clean.region.name
@@ -68,7 +68,7 @@ columns:
   state_name:
     lineage:
       - datalake_ebdb_clean.state.name
-    description: Region's state name.
+    description: Full name of the Brazilian state (or country-equivalent administrative division) that contains this region.
   state_abbreviation:
     lineage:
       - datalake_ebdb_clean.state.abbreviation
@@ -76,7 +76,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_clean.country.code
-    description: Region's country code.
+    description: ISO 3166-1 alpha-2 country code for the country containing this region (e.g. BR for Brazil).
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.
