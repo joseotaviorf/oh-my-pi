@@ -1,0 +1,18 @@
+dag:
+  name: enrich_bianca_follow_up
+  schedule_start_date: 2026, 6, 29
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Enriched audience of Bianca WhatsApp follow-up candidates.
+      Runs after Jaiminho and Copilot clean loads complete.
+      Identifies stalled conversations where the last message is a qualifying
+      Bianca template and surfaces phone_number + trigger_type pairs for HighTouch.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  tables_customization:
+    bianca_users:
+      z_order_by: [phone_number]

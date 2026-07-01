@@ -1,0 +1,30 @@
+database_name: datalake_bianca_follow_up
+table_name: bianca_users
+description: Bianca follow-up audiences for stalled conversations where the last message is a qualifying Bianca template
+domain: Growth
+owner: tomas.mena@quintoandar.com.br
+columns:
+  id:
+    description: MD5 hash of phone_number, trigger_type, and signal_timestamp — stable unique key per signal event for HighTouch deduplication
+  phone_number:
+    description: WhatsApp phone number used for Bianca outreach
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.destination
+  trigger_type:
+    description: >
+      Follow-up use case identifier consumed by HighTouch and HLS routing.
+      Values: greeting_context (A1), greeting_generic (A2/D1), greeting_filters (D2),
+      confirm_contact (B1), confirm_contact_returning (B2), confirm_contact_visit (C1/C2),
+      after_recommendations (E1).
+  signal_timestamp:
+    description: Timestamp of the last qualifying Bianca message in the session
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
+  created_at:
+    description: Timestamp when the record was created by the batch job
+  year:
+    description: Partition — year of batch run
+  month:
+    description: Partition — month of batch run
+  day:
+    description: Partition — day of batch run

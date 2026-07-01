@@ -3,6 +3,9 @@ bietlejuice.alias_classifieds:
   - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.enrich_bianca_follow_up:
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
 bietlejuice.concierge_propensity_model_service:
   - quintoml.concierge.concierge_propensity_model_batch.inference:first-run-of-day
 bietlejuice.conversation_explorer:
