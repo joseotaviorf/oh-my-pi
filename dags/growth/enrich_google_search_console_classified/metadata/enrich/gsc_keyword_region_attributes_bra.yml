@@ -1,6 +1,6 @@
 database_name: datalake_google_search_console_classified
 table_name: gsc_keyword_region_attributes_bra
-owner: caio.francisco@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
   Keyword-level regional enrichment for Google Search Console (GSC) data for Brazilian portals (Imovelweb, wimoveis and CasaMineira).
@@ -8,11 +8,11 @@ description: |
   while preserving keyword performance metrics for regional SEO analysis and region match by URL.
 columns:
   keyword:
-    description: "Original search query from GSC."
+    description: Original search query from GSC.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword
   keyword_clean:
-    description: "Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept)."
+    description: Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword_clean
   match_igbe_city:
@@ -21,81 +21,81 @@ columns:
       - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword_clean
   city_abbreviation:
-    description: "Brazilian city/region abbreviation derived from page URL analysis."
+    description: Brazilian city/region abbreviation derived from page URL analysis.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.page
     categories:
-      RJ: "Rio de Janeiro"
-      POA: "Porto Alegre"
-      BH: "Belo Horizonte"
-      BSB: "Brasília"
-      CWB: "Curitiba"
-      SP INTERIOR+LITORAL: "São Paulo interior and coast"
-      RMSP: "Some cities in the Região Metropolitana de São Paulo (São Paulo, Guarulhos, Santo André, São Bernardo do Campo and São Caetano do Sul)"
-      RMSP OUTROS: "Other regions in the Região Metropolitana de São Paulo"
-      OUTROS: "Other regions"
+      RJ: Rio de Janeiro
+      POA: Porto Alegre
+      BH: Belo Horizonte
+      BSB: Brasília
+      CWB: Curitiba
+      SP INTERIOR+LITORAL: São Paulo interior and coast
+      RMSP: Some cities in the Região Metropolitana de São Paulo (São Paulo, Guarulhos, Santo André, São Bernardo do Campo and São Caetano do Sul)
+      RMSP OUTROS: Other regions in the Região Metropolitana de São Paulo
+      OUTROS: Other regions
   page:
-    description: "Full page URL."
+    description: Full page URL.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.page
   structure:
-    description: "Page structure according to business rules."
+    description: Page structure according to business rules.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.structure
   business_context:
-    description: "Business context category classification according to business rules."
+    description: Business context category classification according to business rules.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.business_context
   site_url:
-    description: "Main property URL measured by GSC."
+    description: Main property URL measured by GSC.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.site_url
   device:
-    description: "Device type where the search was made (desktop, mobile, tablet)."
+    description: Device type where the search was made (desktop, mobile, tablet).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.device
   domain:
-    description: "Generic referring domain grouping (Supply, Content, Help, QuintoAndar)."
+    description: Generic referring domain grouping (Supply, Content, Help, QuintoAndar).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.domain
   country:
-    description: "Country from GSC"
+    description: Country where the search occurred, as reported by GSC for Brazilian classified portals.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.country
   state:
-    description: "State match by URL"
+    description: Brazilian state inferred by matching the page URL against the regional URL taxonomy.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.state
   city:
-    description: "City match by URL"
+    description: Brazilian city inferred by matching the page URL against the regional URL taxonomy.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.city
   neighborhood:
-    description: "Neighborhood match by URL"
+    description: Neighborhood inferred by matching the page URL against the regional URL taxonomy.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.neighborhood
   position:
-    description: "Aggregated average position computed as SUM(posimp) / SUM(impressions)."
+    description: Aggregated average position computed as SUM(posimp) / SUM(impressions).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.position
   impressions:
-    description: "Total impressions in the month for the group (SUM of impressions)."
+    description: Total impressions in the month for the group (SUM of impressions).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.impressions
   clicks:
-    description: "Total clicks in the month for the group (SUM of clicks)."
+    description: Total clicks in the month for the group (SUM of clicks).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.clicks
   ctr:
-    description: "Aggregated click-through rate computed as SUM(clicks) / SUM(impressions)."
+    description: Aggregated click-through rate computed as SUM(clicks) / SUM(impressions).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.ctr
   posimp:
-    description: "Total position-impressions product in the month for the group (SUM of posimp)."
+    description: Total position-impressions product in the month for the group (SUM of posimp).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.posimp
   is_branded:
-    description: "Flag indicating whether the search query is branded."
+    description: Flag indicating whether the search query is branded.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.is_branded
   has_region:
@@ -108,19 +108,18 @@ columns:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword_clean
       - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
   dt_created:
-    description: "Month reference date (first day of month) derived from the original search date."
+    description: Month reference date (first day of month) derived from the original search date.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.dt_created
   year:
-    description: "Partition year."
+    description: Calendar year of the monthly GSC reference date; Hive partition for SEO keyword reporting.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.year
   month:
-    description: "Partition month."
+    description: Calendar month of the monthly GSC reference date; Hive partition for SEO keyword reporting.
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.month
   day:
-    description: "Partition day (set to 01 for monthly aggregation)."
+    description: Partition day (set to 01 for monthly aggregation).
     lineage:
       - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.day
-

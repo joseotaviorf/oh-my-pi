@@ -1,11 +1,13 @@
 database_name: datalake_seo_funnel
 table_name: seo_funnel
-owner: henrique.miamoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains information about SEO (Search Engine Optimization). It compiles the events data with our bussiness information.
+description: |
+  SEO acquisition funnel joining organic search-attributed user events with business dimensions (city group, campaign, business context).
+  Used to track how SEO traffic progresses through marketing and product conversion stages.
 columns:
   id_user:
-    description: User identifier
+    description: QuintoAndar user identifier joining SEO funnel events across attribution and top-of-funnel sources.
     lineage:
       - datalake_online_attribution.online_attribution.id_user
       - datalake_online_attribution.online_attribution.id_amplitude
@@ -75,14 +77,14 @@ columns:
       - datalake_online_attribution.online_attribution.ts_event
       - datalake_top_of_funnel_demand.user_interactions.dt_event
   year:
-    description: Event year.
+    description: Calendar year of the SEO funnel event date; Hive partition for daily funnel reporting.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.dt_event
   month:
-    description: Event month.
+    description: Calendar month of the SEO funnel event date; Hive partition alongside year and day.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.dt_event
   day:
-    description: Event day.
+    description: Calendar day of the SEO funnel event date; Hive partition alongside year and month.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.dt_event

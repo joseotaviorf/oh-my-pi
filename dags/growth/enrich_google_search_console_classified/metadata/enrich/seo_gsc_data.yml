@@ -1,6 +1,6 @@
 database_name: datalake_google_search_console_classified
 table_name: seo_gsc_data
-owner: caio.francisco@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
   This table contains enriched SEO (Search Engine Optimization) data from
@@ -10,121 +10,141 @@ description: |
   comprehensive SEO analysis across QuintoAndar's property portal ecosystem.
 columns:
   query:
-    description: |
-      Search terms and keywords entered by users in Google search that triggered the appearance of our pages in search results.
+    description: 'Search terms and keywords entered by users in Google search that triggered the appearance of our pages in search results.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.query
   site_url:
-    description: |
-      The main domain URL property registered in Google Search Console that is being analyzed and tracked.
+    description: 'The main domain URL property registered in Google Search Console that is being analyzed and tracked.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.site_url
   device:
-    description: |
-      Device category used by the user when performing the search (desktop, mobile, or tablet).
+    description: 'Device category used by the user when performing the search (desktop, mobile, or tablet).
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.device
   page:
-    description: |
-      Complete URL of the specific page that appeared in Google search results for the given query.
+    description: 'Complete URL of the specific page that appeared in Google search results for the given query.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.page
   country:
-    description: |
-      ISO country code representing the geographic location where the search was performed (bra, per, arg, mex, ecu, pan).
+    description: 'ISO country code representing the geographic location where the search was performed (bra, per, arg, mex, ecu, pan).
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.country
   ctr:
-    description: |
-      Click-Through Rate calculated as the percentage of impressions that resulted in clicks (clicks/impressions).
+    description: 'Click-Through Rate calculated as the percentage of impressions that resulted in clicks (clicks/impressions).
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.ctr
   clicks:
-    description: |
-      Total number of times users clicked on our page link from Google search results for the specific query.
+    description: 'Total number of times users clicked on our page link from Google search results for the specific query.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.clicks
   position:
-    description: |
-      Average ranking position of our page in Google search results for the query, where 1 is the top position.
+    description: 'Average ranking position of our page in Google search results for the query, where 1 is the top position.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.position
   impressions:
-    description: |
-      Total number of times our page appeared in Google search results for the specific query, regardless of clicks.
+    description: 'Total number of times our page appeared in Google search results for the specific query, regardless of clicks.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.impressions
   posimp:
-    description: |
-      Weighted metric calculated as average position multiplied by impressions, used for position-weighted impression analysis.
+    description: 'Weighted metric calculated as average position multiplied by impressions, used for position-weighted impression analysis.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.posimp
   domain:
-    description: |
-      Classified domain brand extracted from the page URL.
+    description: 'Classified domain brand extracted from the page URL.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.page
     categories:
-      imovelweb: "Page from imovelweb"
-      wimoveis: "Page from wimoveis"
-      casamineira: "Page from casamineira"
-      inmuebles24: "Page from inmuebles24"
-      vivanuncios: "Page from vivanuncios"
-      zonaprop: "Page from zonaprop"
-      urbania: "Page from urbania"
-      adondevivir: "Page from adondevivir"
-      plusvalia: "Page from plusvalia"
-      compreoalquile: "Page from compreoalquile"
+      imovelweb: Page from imovelweb
+      wimoveis: Page from wimoveis
+      casamineira: Page from casamineira
+      inmuebles24: Page from inmuebles24
+      vivanuncios: Page from vivanuncios
+      zonaprop: Page from zonaprop
+      urbania: Page from urbania
+      adondevivir: Page from adondevivir
+      plusvalia: Page from plusvalia
+      compreoalquile: Page from compreoalquile
   struct:
-    description: |
-      Page structure category classification based on URL patterns (Lancamentos, Inmobiliaria, Condominio, Content, Home, Transactional, Other).
+    description: 'Page structure category classification based on URL patterns (Lancamentos, Inmobiliaria, Condominio, Content, Home, Transactional, Other).
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.page
     categories:
-      Lancamentos: "Property development and new project pages (desarrollos, emprendimientos, proyectos) showcasing upcoming real estate developments and pre-construction properties"
-      Inmobiliaria: "Real estate agency and broker listing pages featuring professional real estate services and agent portfolios"
-      Condominio: "Condominium and residential complex pages displaying building amenities, units, and community information"
-      Content: "Editorial and informational content pages including news articles, blog posts, market insights, and educational real estate content"
-      Home: "Main landing pages and homepages of property portal brands (zonaprop.com.ar, imovelweb.com.br, wimoveis.com.br, inmuebles24.com, etc.)"
-      Transactional: "Property search and listing pages where users can browse, filter, and view specific properties for sale or rent"
-      Other: "Miscellaneous pages that don't fit into the standard categorization, including legal pages, contact forms, and other utility pages"
+      Lancamentos: Property development and new project pages (desarrollos, emprendimientos, proyectos) showcasing upcoming real estate developments and pre-construction properties
+      Inmobiliaria: Real estate agency and broker listing pages featuring professional real estate services and agent portfolios
+      Condominio: Condominium and residential complex pages displaying building amenities, units, and community information
+      Content: Editorial and informational content pages including news articles, blog posts, market insights, and educational real estate content
+      Home: Main landing pages and homepages of property portal brands (zonaprop.com.ar, imovelweb.com.br, wimoveis.com.br, inmuebles24.com, etc.)
+      Transactional: Property search and listing pages where users can browse, filter, and view specific properties for sale or rent
+      Other: Miscellaneous pages that don't fit into the standard categorization, including legal pages, contact forms, and other utility pages
   is_branded:
-    description: |
-      Boolean flag indicating whether the search query contains branded terms related to
-      QuintoAndar's property portals.
+    description: 'Boolean flag indicating whether the search query contains branded terms related to
+
+      QuintoAndar''s property portals.
+
       True for branded queries, False for generic/non-branded queries.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.query
   business_context:
-    description: |
-      Business context category classification based on URL patterns (Rent, Sale, Sale primary market, Short term rent, Auction, Transfer, N/A).
+    description: 'Business context category classification based on URL patterns (Rent, Sale, Sale primary market, Short term rent, Auction, Transfer, N/A).
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.page
     categories:
-      Rent: "Search page for properties available for rent"
-      Sale: "Search page for properties listed for sale"
-      Sale primary market: "Search page listing real estate developments available for sale (new properties)"
-      Short term rent: "Search page with properties available for seasonal rental"
-      Auction: "Page with properties available for sale through auction"
-      Transfer: "Page with predominantly commercial properties available through transfer"
-      N/A: "Pages that don't fit into the other classifications, including all non-transactional pages"
+      Rent: Search page for properties available for rent
+      Sale: Search page for properties listed for sale
+      Sale primary market: Search page listing real estate developments available for sale (new properties)
+      Short term rent: Search page with properties available for seasonal rental
+      Auction: Page with properties available for sale through auction
+      Transfer: Page with predominantly commercial properties available through transfer
+      N/A: Pages that don't fit into the other classifications, including all non-transactional pages
   dt_created:
-    description: |
-      Date when the search interaction occurred and the data was recorded in Google Search Console.
+    description: 'Date when the search interaction occurred and the data was recorded in Google Search Console.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.dt_created
   year:
-    description: |
-      Year component extracted from the search date for time-based analysis and partitioning.
+    description: 'Year component extracted from the search date for time-based analysis and partitioning.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.year
   month:
-    description: |
-      Month component extracted from the search date for time-based analysis and partitioning.
+    description: 'Month component extracted from the search date for time-based analysis and partitioning.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.month
   day:
-    description: |
-      Day component extracted from the search date for time-based analysis and partitioning.
+    description: 'Day component extracted from the search date for time-based analysis and partitioning.
+
+      '
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.day

@@ -1,6 +1,6 @@
 database_name: datalake_google_search_console
 table_name: seo_gsc_data
-owner: henrique.miamoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: This table contains information about SEO (Search Engine Optimization). It compiles the GSC (Google Search Console) data with our bussiness information.
 columns:
@@ -114,7 +114,7 @@ columns:
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     filter_count:
-      description: Count of the filters
+      description: Number of search filters applied on the QuintoAndar SERP landing page URL.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
     is_branded:
@@ -142,18 +142,18 @@ columns:
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.posimp
     dt_created:
-      description: Search date.
+      description: Calendar date associated with the metric, target, or event represented in this row.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.dt_created
     year:
-      description: Search year.
+      description: Calendar year of the monthly GSC reference date; Hive partition for SEO keyword reporting.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.year
     month:
-      description: Search month.
+      description: Calendar month of the monthly GSC reference date; Hive partition for SEO keyword reporting.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.month
     day:
-      description: Search day.
+      description: Calendar day (first day of month) for monthly GSC keyword aggregations.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.day

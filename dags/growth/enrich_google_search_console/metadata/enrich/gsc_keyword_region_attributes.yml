@@ -1,6 +1,6 @@
 database_name: datalake_google_search_console
 table_name: gsc_keyword_region_attributes
-owner: erica.bertan@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
   Keyword-level regional enrichment for Google Search Console (GSC) data.
@@ -33,19 +33,19 @@ columns:
         - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
         - datalake_google_search_console.gsc_keywords.keyword_clean
     city_abbreviation:
-      description: "Brazilian city/region abbreviation derived from page URL analysis."
+      description: Brazilian city/region abbreviation derived from page URL analysis.
       lineage:
         - datalake_google_search_console.gsc_keywords.page
       categories:
-        RJ: "Rio de Janeiro"
-        POA: "Porto Alegre"
-        BH: "Belo Horizonte"
-        BSB: "Brasília"
-        CWB: "Curitiba"
-        SP INTERIOR+LITORAL: "São Paulo interior and coast"
-        RMSP: "Some cities in the Região Metropolitana de São Paulo (São Paulo, Guarulhos, Santo André, São Bernardo do Campo and São Caetano do Sul)"
-        RMSP OUTROS: "Other regions in the Região Metropolitana de São Paulo"
-        OUTROS: "Other regions"
+        RJ: Rio de Janeiro
+        POA: Porto Alegre
+        BH: Belo Horizonte
+        BSB: Brasília
+        CWB: Curitiba
+        SP INTERIOR+LITORAL: São Paulo interior and coast
+        RMSP: Some cities in the Região Metropolitana de São Paulo (São Paulo, Guarulhos, Santo André, São Bernardo do Campo and São Caetano do Sul)
+        RMSP OUTROS: Other regions in the Região Metropolitana de São Paulo
+        OUTROS: Other regions
     match_operation_city:
       description: Operation city matched using internal regions dataset and the cleaned keyword.
       lineage:
@@ -159,7 +159,7 @@ columns:
       lineage:
         - datalake_google_search_console.gsc_keywords.is_branded
     is_goldenset:
-      description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
+      description: Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)
       lineage:
         - datalake_gsheets_clean.seo_goldenset.keyword
     has_mention_to_location:
@@ -180,15 +180,14 @@ columns:
         - datalake_google_search_console.gsc_keywords.keyword_clean
         - datalake_region.region.name
     year:
-      description: Partition year.
+      description: Calendar year of the monthly GSC reference date; Hive partition for SEO keyword reporting.
       lineage:
         - datalake_google_search_console.gsc_keywords.year
     month:
-      description: Partition month.
+      description: Calendar month of the monthly GSC reference date; Hive partition for SEO keyword reporting.
       lineage:
         - datalake_google_search_console.gsc_keywords.month
     day:
-      description: Partition day.
+      description: Calendar day (first day of month) for monthly GSC keyword aggregations.
       lineage:
         - datalake_google_search_console.gsc_keywords.day
-

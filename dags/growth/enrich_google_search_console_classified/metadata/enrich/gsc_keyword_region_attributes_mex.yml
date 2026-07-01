@@ -1,17 +1,17 @@
 database_name: datalake_google_search_console_classified
 table_name: gsc_keyword_region_attributes_mex
-owner: caio.francisco@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
   Keyword-level regional enrichment for Google Search Console (GSC) data for Mexican portals (Inmuebles24 and Vivanuncios).
   Adds inferred matches for city and zone, while preserving keyword performance metrics.
 columns:
   keyword:
-    description: "Original search query from GSC."
+    description: Original search query from GSC.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.keyword
   keyword_clean:
-    description: "Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept)."
+    description: Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.keyword_clean
   match_city:
@@ -25,55 +25,55 @@ columns:
       - datalake_gsheet_clean.mexico_regions.zone_clean
       - datalake_google_search_console_classified.gsc_keywords.keyword_clean
   page:
-    description: "Full page URL."
+    description: Full page URL.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.page
   structure:
-    description: "Page structure according to business rules."
+    description: Page structure according to business rules.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.structure
   business_context:
-    description: "Business context category classification according to business rules."
+    description: Business context category classification according to business rules.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.business_context
   site_url:
-    description: "Main property URL measured by GSC."
+    description: Main property URL measured by GSC.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.site_url
   device:
-    description: "Device type where the search was made (desktop, mobile, tablet)."
+    description: Device type where the search was made (desktop, mobile, tablet).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.device
   domain:
-    description: "Generic referring domain grouping (Supply, Content, Help, QuintoAndar)."
+    description: Generic referring domain grouping (Supply, Content, Help, QuintoAndar).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.domain
   country:
-    description: "Country from GSC"
+    description: Country where the search occurred, as reported by GSC for Mexican classified portals.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.country
   position:
-    description: "Aggregated average position computed as SUM(posimp) / SUM(impressions)."
+    description: Aggregated average position computed as SUM(posimp) / SUM(impressions).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.position
   impressions:
-    description: "Total impressions in the month for the group (SUM of impressions)."
+    description: Total impressions in the month for the group (SUM of impressions).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.impressions
   clicks:
-    description: "Total clicks in the month for the group (SUM of clicks)."
+    description: Total clicks in the month for the group (SUM of clicks).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.clicks
   ctr:
-    description: "Aggregated click-through rate computed as SUM(clicks) / SUM(impressions)."
+    description: Aggregated click-through rate computed as SUM(clicks) / SUM(impressions).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.ctr
   posimp:
-    description: "Total position-impressions product in the month for the group (SUM of posimp)."
+    description: Total position-impressions product in the month for the group (SUM of posimp).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.posimp
   is_branded:
-    description: "Flag indicating whether the search query is branded."
+    description: Flag indicating whether the search query is branded.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.is_branded
   has_mention_to_city:
@@ -87,19 +87,18 @@ columns:
       - datalake_gsheet_clean.mexico_regions.zone_clean
       - datalake_google_search_console_classified.gsc_keywords.keyword_clean
   dt_created:
-    description: "Month reference date (first day of month) derived from the original search date."
+    description: Month reference date (first day of month) derived from the original search date.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.dt_created
   year:
-    description: "Partition year."
+    description: Calendar year of the monthly GSC reference date; Hive partition for SEO keyword reporting.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.year
   month:
-    description: "Partition month."
+    description: Calendar month of the monthly GSC reference date; Hive partition for SEO keyword reporting.
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.month
   day:
-    description: "Partition day (set to 01 for monthly aggregation)."
+    description: Partition day (set to 01 for monthly aggregation).
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.day
-

@@ -1,16 +1,18 @@
 ---
 database_name: datalake_google_search_console_clean
 table_name: report_by_google_news
-owner: data.growth@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains the clean informations about the Google Search Console tool in the page granularity.
+description: |
+  Daily cleaned Google Search Console metrics for Google News search appearance at page grain for QuintoAndar web properties.
+  Tracks News-specific impressions, clicks, CTR, and position per landing page.
 columns:
   site_url:
     description: Main URL that are being queried.
     lineage:
       - datalake_google_search_console_raw.report_by_google_news.site_url
   type:
-    description: Extraction type.
+    description: GSC search appearance type for the extracted report dimension (e.g. web, discover, googleNews).
     lineage:
       - datalake_google_search_console_raw.report_by_google_news.type
   page:
@@ -54,14 +56,14 @@ columns:
     lineage:
       - datalake_google_search_console_raw.report_by_google_news.date
   year:
-    description: Extraction year.
+    description: Calendar year of the GSC extraction date; Hive partition for daily Search Console report loads.
     lineage:
       - datalake_google_search_console_raw.report_by_google_news.date
   month:
-    description: Extraction month.
+    description: Calendar month of the GSC extraction date; Hive partition alongside year and day.
     lineage:
       - datalake_google_search_console_raw.report_by_google_news.date
   day:
-    description: Extraction day.
+    description: Calendar day of the GSC extraction date; Hive partition alongside year and month.
     lineage:
       - datalake_google_search_console_raw.report_by_google_news.date

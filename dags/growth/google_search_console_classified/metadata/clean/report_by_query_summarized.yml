@@ -1,16 +1,18 @@
 ---
 database_name: datalake_google_search_console_classified_clean
 table_name: report_by_query_summarized
-owner: marcio.gomes@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains the clean informations about the Google Search Console tool in the query granularity only.
+description: |
+  Daily cleaned Google Search Console query-level metrics with summarized query dimension for Latin American classified portals.
+  Aggregates performance at query grain without page breakdown.
 columns:
   site_url:
     description: Main URL that are being queried.
     lineage:
       - datalake_google_search_console_classified_raw.report_by_query_summarized.site_url
   type:
-    description: Extraction type.
+    description: GSC search appearance type for the extracted report dimension (e.g. web, discover, googleNews).
     lineage:
       - datalake_google_search_console_classified_raw.report_by_query_summarized.type
   query:
@@ -43,14 +45,14 @@ columns:
     lineage:
       - datalake_google_search_console_classified_raw.report_by_query_summarized.date
   year:
-    description: Extraction year.
+    description: Calendar year of the monthly GSC reference date; Hive partition for SEO keyword reporting.
     lineage:
       - datalake_google_search_console_classified_raw.report_by_query_summarized.date
   month:
-    description: Extraction month.
+    description: Calendar month of the monthly GSC reference date; Hive partition for SEO keyword reporting.
     lineage:
       - datalake_google_search_console_classified_raw.report_by_query_summarized.date
   day:
-    description: Extraction day.
+    description: Calendar day (first day of month) for monthly GSC keyword aggregations.
     lineage:
       - datalake_google_search_console_classified_raw.report_by_query_summarized.date

@@ -1,11 +1,11 @@
 database_name: datalake_google_analytics_classified
 table_name: seo_ga_data
-owner: henrique.miamoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: This table contains information about GA (Google analytics). It compiles the GA (Google analytics) data with our bussiness information.
 columns:
   id_property:
-    description: Unique GA property ID.
+    description: Unique GA4 property identifier for the classified portal site.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_property
   id_stream:
@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_stream
   id_user_custom:
-    description: Custom user ID.
+    description: Logged-in user identifier when available in the GA4 classified stream.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_user_custom
   id_user_pseudo:
@@ -25,19 +25,19 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_session
   id_session_campaign:
-    description: Campaign ID for the session.
+    description: Campaign identifier attached to the GA4 session.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_session_campaign
   id_session_gads_ad_group:
-    description: Google Ads Ad Group ID for the session.
+    description: Google Ads ad group identifier for the classified site session.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_session_gads_ad_group
   id_event_campaign:
-    description: Campaign ID for the event.
+    description: Campaign identifier attached to the GA4 event hit.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_event_campaign
   id_lead:
-    description: Unique ID for the lead.
+    description: Lead identifier captured on classified portal conversion events.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.id_lead
   platform:
@@ -45,7 +45,7 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.platform
   ga_number:
-    description: GA session number.
+    description: Sequential GA4 session number for the classified site user.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ga_number
   site_section:
@@ -65,7 +65,7 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.region
   hostname:
-    description: Website hostname.
+    description: Hostname of the classified portal page where the event occurred.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.hostname
   device:
@@ -73,7 +73,7 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.device
   lead_type:
-    description: Type of lead.
+    description: Lead classification (e.g. tenant, buyer) inferred from classified portal behavior.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.lead_type
   page_location:
@@ -85,11 +85,11 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.operation_type
   ses_src:
-    description: Session source.
+    description: Session traffic source from GA4 classified attribution (utm/source parameter).
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ses_src
   ses_medium:
-    description: Session medium.
+    description: Session marketing medium from GA4 classified attribution (utm/medium parameter).
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ses_medium
   ses_cmp_name:
@@ -121,7 +121,7 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ses_gads_ad_grp_name
   ev_name:
-    description: Event name.
+    description: GA4 event name recorded on the classified portal (e.g. page_view, generate_lead).
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ev_name
   ev_cmp_name:
@@ -129,15 +129,15 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ev_cmp_name
   ev_src:
-    description: Source of the event.
+    description: Event-level traffic source from GA4 classified attribution.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ev_src
   ev_medium:
-    description: Medium of the event.
+    description: Event-level marketing medium from GA4 classified attribution.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ev_medium
   ev_term:
-    description: Term for the event.
+    description: Event-level paid search keyword from GA4 classified attribution.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.ev_term
   ev_content:

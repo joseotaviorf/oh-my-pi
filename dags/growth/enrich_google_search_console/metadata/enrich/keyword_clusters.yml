@@ -1,6 +1,6 @@
 database_name: datalake_google_search_console
 table_name: keyword_clusters
-owner: erica.bertan@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
   Keyword clustering and categorization derived from `gsc_keyword_attributes`.
@@ -32,7 +32,7 @@ columns:
       lineage:
         - datalake_google_search_console.gsc_keyword_attributes.match_igbe_city
     city_abbreviation:
-      description: "Brazilian city/region abbreviation derived from page URL analysis."
+      description: Brazilian city/region abbreviation derived from page URL analysis.
       lineage:
         - datalake_google_search_console.gsc_keyword_attributes.city_abbreviation
     match_operation_city:
@@ -146,7 +146,7 @@ columns:
       lineage:
         - datalake_google_search_console.gsc_keyword_attributes.is_branded
     is_goldenset:
-      description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
+      description: Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)
       lineage:
         - datalake_gsheets_clean.seo_goldenset.keyword
     has_mention_to_location:
@@ -430,15 +430,14 @@ columns:
         - datalake_google_search_console.gsc_keyword_attributes.location
         - datalake_google_search_console.gsc_keyword_attributes.house_flag
     year:
-      description: Partition year.
+      description: Calendar year of the monthly GSC reference date; Hive partition for SEO keyword reporting.
       lineage:
         - datalake_google_search_console.gsc_keyword_attributes.year
     month:
-      description: Partition month.
+      description: Calendar month of the monthly GSC reference date; Hive partition for SEO keyword reporting.
       lineage:
         - datalake_google_search_console.gsc_keyword_attributes.month
     day:
-      description: Partition day.
+      description: Calendar day (first day of month) for monthly GSC keyword aggregations.
       lineage:
         - datalake_google_search_console.gsc_keyword_attributes.day
-
