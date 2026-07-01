@@ -685,6 +685,7 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
+  - bietlejuice.enrich_pin:load-enrich-movement-details:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.hr_system:load-clean-areas-of-responsibility:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
@@ -3339,6 +3340,7 @@ bietlejuice.enrich_people:
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
+  - bietlejuice.enrich_pin:load-enrich-movement-details:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.hr_system:load-clean-job-families:first-run-of-day
   - bietlejuice.hr_system:load-clean-jobs:first-run-of-day

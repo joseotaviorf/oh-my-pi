@@ -1,5 +1,5 @@
 database_name: datalake_pin
-table_name: movement_detail
+table_name: movement_details
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
