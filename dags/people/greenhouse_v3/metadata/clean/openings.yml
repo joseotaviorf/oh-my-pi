@@ -64,7 +64,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___classifieds.external_id
   internal_position_name_classifieds:
-    description: The internal position name at Classifieds.
+    description: Internal position title used in classifieds channels for this job opening.
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___classifieds.value
   internal_position_code_benvi_pt:
@@ -72,7 +72,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___benvi_pt.external_id
   internal_position_name_benvi_pt:
-    description: The internal position name at Benvi PT.
+    description: Internal position title localized for the Benvi Portugal hiring channel.
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___benvi_pt.value
   internal_position_code_mlsp:
@@ -80,7 +80,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___mlsp.external_id
   internal_position_name_mlsp:
-    description: The internal position name at MLSP.
+    description: Internal position title used in the MLSP hiring channel for this opening.
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___mlsp.value
   internal_position_code_grupo_navent:

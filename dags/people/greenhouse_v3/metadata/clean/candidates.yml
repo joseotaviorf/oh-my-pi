@@ -54,19 +54,19 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.candidates.custom_fields.portugal_offer_passaporte.value
   hired_accessibility_need:
-    description: The primary accessibility need for hired PwD candidates.
+    description: Primary accessibility accommodation the hired candidate requested for their role.
     lineage:
     - datalake_greenhouse_v3_raw.candidates.custom_fields.pc_d_offer_acessibilidade_1__esp_.value
   hired_accessibility_hybrid_office_needs:
-    description: Hybrid office accessibility needs for hired PwD candidates.
+    description: Accessibility accommodations the hired candidate requested for hybrid office work.
     lineage:
     - datalake_greenhouse_v3_raw.candidates.custom_fields.pc_d_offer_acessibilidade_2__esp_.value
   hired_accessibility_funding_preference:
-    description: Accessibility funding preference for hired PwD candidates.
+    description: Candidate preference for how accessibility-related expenses should be funded after hire.
     lineage:
     - datalake_greenhouse_v3_raw.candidates.custom_fields.pc_d_offer_acessibilidade_3__esp_.value
   pin_internal_person_number:
-    description: The employee ID from the internal HR system (PIn/Oracle HCM).
+    description: PIN person number linking the Greenhouse candidate to internal workforce records.
     lineage:
     - datalake_greenhouse_v3_raw.candidates.custom_fields.employee_id.value
   pin_internal_job_title:

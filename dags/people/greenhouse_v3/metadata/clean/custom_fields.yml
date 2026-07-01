@@ -10,7 +10,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.custom_fields.id
   name:
-    description: The name of the custom field.
+    description: Human-readable label of the custom field configured in Greenhouse ATS.
     lineage:
     - datalake_greenhouse_v3_raw.custom_fields.name
   field_type:
@@ -26,11 +26,11 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.custom_fields.name_key
   description:
-    description: A description of the custom field.
+    description: Guidance text explaining the purpose and expected values of the Greenhouse custom field.
     lineage:
     - datalake_greenhouse_v3_raw.custom_fields.description
   template_token_string:
-    description: The template token for the custom field.
+    description: Placeholder token string used when rendering the custom field in Greenhouse templates.
     lineage:
     - datalake_greenhouse_v3_raw.custom_fields.template_token_string
   sort_order:

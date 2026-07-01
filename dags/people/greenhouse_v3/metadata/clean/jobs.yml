@@ -23,7 +23,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.jobs.department_id
   name:
-    description: The name of the job.
+    description: Public job posting title as configured in Greenhouse for this requisition.
     lineage:
     - datalake_greenhouse_v3_raw.jobs.name
   status:

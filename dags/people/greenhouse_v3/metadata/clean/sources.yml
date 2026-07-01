@@ -14,7 +14,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.sources.type.id
   name:
-    description: The name of the source.
+    description: Label of the candidate sourcing channel in Greenhouse, such as referral or job board.
     lineage:
     - datalake_greenhouse_v3_raw.sources.name
   type_name:

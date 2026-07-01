@@ -10,7 +10,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.candidate_tags.id
   name:
-    description: The name of the tag.
+    description: Display label of the tag applied to candidates for sourcing and pipeline segmentation.
     lineage:
     - datalake_greenhouse_v3_raw.candidate_tags.name
   ts_load:

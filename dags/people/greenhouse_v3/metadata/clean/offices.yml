@@ -18,7 +18,7 @@ columns:
     lineage:
     - datalake_greenhouse_v3_raw.offices.external_id
   name:
-    description: The name of the office.
+    description: Name of the Greenhouse office location associated with job postings and candidates.
     lineage:
     - datalake_greenhouse_v3_raw.offices.name
   location_name:
