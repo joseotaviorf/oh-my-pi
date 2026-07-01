@@ -9,15 +9,15 @@ description: |
   in Growth contact-center operations. Partitioned by `year`, `month`, `day`.
 columns:
   id_login_raw_data:
-    description: Unique identifier of the login raw data.
+    description: Primary key of the login session record, uniquely identifying each individual agent login event in the Olos system.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.loginrawdataid
   id_agent:
-    description: Unique identifier of the agent.
+    description: References the dialer agent whose login session is recorded, used to attribute session time and shift compliance metrics.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.agentid
   id_campaign:
-    description: Unique identifier of the campaign.
+    description: References the outbound campaign the agent logged into, linking session records to campaign-level workforce utilization.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.campaignid
   insert_time:
@@ -25,22 +25,22 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.inserttime
   ts_login_started:
-    description: Timestamp when the record was login started.
+    description: Moment when the agent authenticated and began their dialing session, used as the start anchor for shift and productivity calculations.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.startlogin
   ts_login_ended:
-    description: Timestamp when the record was login ended.
+    description: Moment when the agent's dialing session ended, used together with ts_login_started to compute total logged-in duration per shift.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.endlogin
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the login event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the login event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the login event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.loginrawdata.day

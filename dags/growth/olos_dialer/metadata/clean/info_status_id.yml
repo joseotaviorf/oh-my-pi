@@ -9,22 +9,22 @@ description: |
   Partitioned by `year`, `month`, `day`.
 columns:
   id_info_status:
-    description: Unique identifier of the info status.
+    description: Numeric code assigned by Olos to each contact or attempt lifecycle state, used to join this lookup to queue and attempt records.
     lineage:
       - datalake_olos_dialer_raw.info_statusid.id
   description:
-    description: Textual description of the info status id.
+    description: Human-readable label for the contact lifecycle status (e.g., pending, in progress, completed), used to track lead progression through the outbound workflow.
     lineage:
       - datalake_olos_dialer_raw.info_statusid.description
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_statusid.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_statusid.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_statusid.day

@@ -9,22 +9,22 @@ description: |
   reporting in outbound contact operations. Partitioned by `year`, `month`, `day`.
 columns:
   id_disposition:
-    description: Unique identifier of the disposition.
+    description: Numeric code assigned by Olos to each agent status category, used to join this lookup to agent state event records.
     lineage:
       - datalake_olos_dialer_raw.info_agentstatus.agentstatusid
   description:
-    description: Textual description of the info agent status.
+    description: Human-readable label for the agent status (e.g., available, on call, paused), used in workforce reporting dashboards.
     lineage:
       - datalake_olos_dialer_raw.info_agentstatus.description
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_agentstatus.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_agentstatus.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_agentstatus.day

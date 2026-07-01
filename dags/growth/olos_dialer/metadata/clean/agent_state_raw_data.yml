@@ -10,11 +10,11 @@ description: |
   Partitioned by `year`, `month`, `day`.
 columns:
   id_agent:
-    description: Unique identifier of the agent.
+    description: References the dialer agent whose status changed, used to link state events to workforce records.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.agentid
   id_agent_state_raw_data:
-    description: Unique identifier of the agent state raw data.
+    description: Primary key of the agent state event record, uniquely identifying each individual state transition in the Olos system.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.agentstaterawdataid
   agent_status:
@@ -22,15 +22,15 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.agentstatus
   id_call:
-    description: Unique identifier of the call.
+    description: References the associated call in the Olos dialer, present when the state change was triggered by a call event.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.callid
   id_call_telecom:
-    description: Unique identifier of the call telecom.
+    description: Telephony provider call identifier corresponding to this state event, used for cross-referencing with carrier records.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.callidtelecom
   id_campaign:
-    description: Unique identifier of the campaign.
+    description: References the outbound campaign the agent was logged into when the state change occurred.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.campaignid
   reason:
@@ -42,22 +42,22 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.inserttime
   ts_state_started:
-    description: Timestamp when the record was state started.
+    description: Moment when the agent entered the current status, used to measure the duration of each state (e.g., pause length, available time).
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.startstate
   ts_state_ended:
-    description: Timestamp when the record was state ended.
+    description: Moment when the agent exited the current status and transitioned to the next, used alongside ts_state_started to compute state duration.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.endstate
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.agentstaterawdata.day

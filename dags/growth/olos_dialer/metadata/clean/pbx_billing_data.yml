@@ -9,43 +9,43 @@ description: |
   reconciliation with Olos. Partitioned by `year`, `month`, `day`.
 columns:
   id_pbx_billing_data:
-    description: Unique identifier of the pbx billing data.
+    description: Primary key of the PBX billing record, uniquely identifying each individual telephony billing event for cost allocation and reconciliation.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.pbxbillingdataid
   id_pbx_disposition:
-    description: Unique identifier of the pbx disposition.
+    description: References the PBX-level outcome classification for this call, joining to the info_pbx_disposition lookup for result labeling.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.pbxdispositionid
   id_agent:
-    description: Unique identifier of the agent.
+    description: References the dialer agent associated with this billed call leg, used to attribute telephony costs to individual agents.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.agentid
   id_campaign:
-    description: Unique identifier of the campaign.
+    description: References the outbound campaign this billing record belongs to, used to allocate telephony costs at the campaign level.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.campaignid
   id_call_direction:
-    description: Unique identifier of the call direction.
+    description: References the call direction classification for this billing event, joining to info_call_direction for inbound/outbound labeling.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.calldirectionid
   id_customer:
-    description: Unique identifier of the customer.
+    description: References the customer or lead contacted in this billed call, linking telephony costs to the corresponding contact record.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.customerid
   id_phone_humber:
-    description: Unique identifier of the phone humber.
+    description: References the specific phone number record in Olos that was dialed for this billed call leg.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.phonenumberid
   id_record:
-    description: Unique identifier of the record.
+    description: References the PBX recording identifier for this call, used to link billing events to call recording assets.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.recordid
   id_session:
-    description: Unique identifier of the session.
+    description: References the PBX session that grouped this billed call leg within a broader agent activity session.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.sessionid
   id_telecom_call:
-    description: Unique identifier of the telecom call.
+    description: Telephony provider call identifier for this billing record, used to reconcile PBX billing with carrier invoices.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.telecomcallid
   total_time:
@@ -81,7 +81,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.campaigncode
   channel:
-    description: Communication channel used.
+    description: Communication channel type (e.g., voice, digital) through which the billed interaction was delivered.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.channel
   company:
@@ -121,7 +121,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.dnis
   link:
-    description: URL link associated with the record.
+    description: Reference URL associated with the billing record, typically pointing to call details or recording access in the Olos portal.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.link
   mailing_name:
@@ -129,22 +129,22 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.mailingname
   original_phone_number:
-    description: Contact phone number associated with the record.
+    description: Raw phone number from the mailing list that was dialed for this billed call, before any PBX normalization.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.originalphonenumber
   ts_started:
-    description: Timestamp when the record was started.
+    description: Moment when the PBX began processing this call, used as the reference timestamp for billing duration calculations.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.startdate
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the billing event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the billing event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the billing event date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.pbxbillingdata.day

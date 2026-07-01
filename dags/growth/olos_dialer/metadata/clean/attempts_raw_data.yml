@@ -10,43 +10,43 @@ description: |
   Partitioned by `year`, `month`, `day`.
 columns:
   id_agent:
-    description: Unique identifier of the agent.
+    description: References the dialer agent who handled or was assigned the call attempt, used to attribute contact performance metrics.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.agentid
   id_attempts_raw_data:
-    description: Unique identifier of the attempts raw data.
+    description: Primary key of the dialing attempt record, uniquely identifying each individual outbound contact event in the Olos system.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.attemptsrawdataid
   id_call:
-    description: Unique identifier of the call.
+    description: References the Olos call session associated with this attempt, used to join with call-level detail tables.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.callid
   id_call_telecom:
-    description: Unique identifier of the call telecom.
+    description: Telephony provider call identifier for this attempt, used for cross-referencing with carrier billing and PBX records.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.callidtelecom
   id_campaign:
-    description: Unique identifier of the campaign.
+    description: References the outbound campaign under which this contact attempt was made, used for campaign-level performance analysis.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.campaignid
   id_lead:
-    description: Unique identifier of the lead.
+    description: References the prospective landlord or customer being contacted in this attempt, linking the dialing record to the lead management system.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.customerid
   id_disposition:
-    description: Unique identifier of the disposition.
+    description: References the outcome classification assigned to this attempt after the call ended, joining to the disposition dimension for conversion analysis.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.dispositionid
   id_mailing_phone_number:
-    description: Unique identifier of the mailing phone number.
+    description: References the specific phone number entry in the Olos mailing list that was dialed for this attempt.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.mailingphonenumberid
   id_mailing_record:
-    description: Unique identifier of the mailing record.
+    description: References the mailing list record (lead entry) in Olos that originated this dialing attempt.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.mailingrecordid
   id_phone_type:
-    description: Unique identifier of the phone type.
+    description: References the phone type classification (mobile, landline, etc.) for the number dialed in this attempt.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.phonetypeid
   dnis:
@@ -54,7 +54,7 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.dnis
   original_phone_number:
-    description: Contact phone number associated with the record.
+    description: Raw phone number from the mailing list that was used for this outbound contact attempt before any dialer normalization.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.originalphonenumber
   route:
@@ -66,26 +66,26 @@ columns:
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.tablename
   ts_started:
-    description: Timestamp when the record was started.
+    description: Moment when the dialing attempt began, marking the start of agent engagement time and call duration calculations.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.startdate
   ts_call_ended:
-    description: Timestamp when the record was call ended.
+    description: Moment when the call conversation ended, used to compute talk time by subtracting ts_started.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.endcall
   ts_wrap_ended:
-    description: Timestamp when the record was wrap ended.
+    description: Moment when the post-call wrap-up work finished, marking the end of agent time attributed to this contact attempt.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.endwrap
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the attempt date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the attempt date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the attempt date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.day

@@ -9,22 +9,22 @@ description: |
   Partitioned by `year`, `month`, `day`.
 columns:
   id_call_direction:
-    description: Unique identifier of the call direction.
+    description: Numeric code assigned by Olos to each call direction category, used to join this lookup to attempt and billing event records.
     lineage:
       - datalake_olos_dialer_raw.info_calldirection.calldirectionid
   description:
-    description: Textual description of the info call direction.
+    description: Human-readable label for the call direction (e.g., inbound, outbound), used to classify contact events in analytics reports.
     lineage:
       - datalake_olos_dialer_raw.info_calldirection.description
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_calldirection.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_calldirection.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_calldirection.day

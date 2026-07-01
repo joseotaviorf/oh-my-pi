@@ -9,22 +9,22 @@ description: |
   reconciliation. Partitioned by `year`, `month`, `day`.
 columns:
   id_pbx_disposition:
-    description: Unique identifier of the pbx disposition.
+    description: Numeric code assigned by the telephony PBX to each call outcome, used to join this lookup to PBX billing and attempt records.
     lineage:
       - datalake_olos_dialer_raw.info_pbxdisposition.pbxdispositionid
   description:
-    description: Textual description of the info pbx disposition.
+    description: Human-readable label for the PBX-level call outcome (e.g., answered, failed, abandoned), used to reconcile telephony results with dialer dispositions.
     lineage:
       - datalake_olos_dialer_raw.info_pbxdisposition.description
   year:
-    description: Partition column for the year of the record.
+    description: Year component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_pbxdisposition.year
   month:
-    description: Partition column for the month of the record.
+    description: Month component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_pbxdisposition.month
   day:
-    description: Partition column for the day of the record.
+    description: Day component of the record date, used as a partition key to enable efficient querying by date range.
     lineage:
       - datalake_olos_dialer_raw.info_pbxdisposition.day
