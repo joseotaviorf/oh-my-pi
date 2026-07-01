@@ -88,7 +88,7 @@ columns:
     lineage:
       - datalake_semrush_classified_raw.searches.date
   ts_report:
-    description: Timestamp of the SEMrush report snapshot used to extract this keyword ranking row.
+    description: Timestamp when the Semrush organic search report row was generated.
     lineage:
       - datalake_semrush_classified_raw.searches._timestamp
   year:

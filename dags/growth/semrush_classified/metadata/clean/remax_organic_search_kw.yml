@@ -1,5 +1,5 @@
 ---
-database_name: datalake_semrush_classified_raw
+database_name: datalake_semrush_classified_clean
 table_name: remax_organic_search_kw
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
@@ -88,7 +88,7 @@ columns:
     lineage:
       - datalake_semrush_classified_raw.searches.date
   ts_report:
-    description: Timestamp of the SEMrush report snapshot used to extract this keyword ranking row.
+    description: Timestamp when the Semrush organic search report row was generated.
     lineage:
       - datalake_semrush_classified_raw.searches._timestamp
   year:
