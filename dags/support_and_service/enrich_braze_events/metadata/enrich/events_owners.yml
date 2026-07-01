@@ -1,53 +1,53 @@
 ---
 database_name: datalake_braze
 table_name: events_owners
-owner: leticia.lima@quintoandar.com.br
-domain: Growth
-description: This table contains details about event related/realized by owners, e.g. disptaches or clicks.
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
+description: Braze messaging engagement events for the property-owner app group. Each row is one owner interaction with a campaign or Canvas communication (send, delivery, open, click, bounce, or unsubscribe) parsed from Braze Currents exports.
 columns:
   id_event:
-    description: Unique code to identify an event (dispatch or interaction of the user with the communication).
+    description: Braze event identifier from the Currents payload (`id` in `event_info` JSON).
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_dispatch:
-    description: Unique code to identify a communication transmitted to the user by Braze.
+    description: Braze dispatch identifier grouping messages sent in the same communication wave.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_user_dispatch:
-    description: The combination of id_dispatch and id_user.
+    description: Surrogate key (MD5) combining dispatch identifier and Braze user id to uniquely identify a message sent to a specific owner.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
       - datalake_braze_events_clean.events_owners.event_type
   id_user_braze:
-    description: Unique code to identify an user created by Braze.
+    description: Braze internal user profile identifier (`user_id` in Currents payloads).
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_user:
-    description: Unique code to identify an user created here at QuintoAndar.
+    description: QuintoAndar platform user identifier mapped as Braze `external_user_id`.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_campaign:
-    description: Unique code to identify a campaign.
+    description: Braze campaign identifier when the event originated from a standalone campaign.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_variant_campaign:
-    description: Unique code to identify a campaign variant.
+    description: Braze message variation id (A/B test variant) within the campaign.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_canvas:
-    description: Unique code to identify a canvas.
+    description: Braze Canvas journey identifier when the event originated from a Canvas flow.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_variant_canvas:
-    description: Unique code to identify a canvas variant.
+    description: Braze Canvas variation id when the Canvas has multiple entry paths or variants.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   id_step_canvas:
-    description: Unique code to identify to which step the event related to.
+    description: Braze Canvas step id linking the event to a specific node in the owner journey.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   event_channel:
-    description: Through where the event occurred.
+    description: Message delivery channel parsed from the Braze event type namespace (email, pushnotification, inappmessage, or webhook).
     categories:
       email: It's a message sent via email.
       inappmessage: It's a message that's not delivered outside of the user's app i.e. it's delivered when the user is active within the app.
@@ -56,13 +56,13 @@ columns:
     lineage:
       - datalake_braze_events_clean.events_owners.event_type
   event_action:
-    description: Type of event that occured (simplified).
+    description: Normalized action extracted from the Braze event type suffix (send, open, click, delivery, bounce, etc.).
     categories:
       bounce: Occurs when there is not a valid push token, the email addresses were incorrect or deactivated, or the user unsubscribed after the campaign was launched.
       click: Occurs when the user clicks on the message.
       delivery: Occurs when the message is accepted by the receiving email server.
       impression: Occurs when the in-app message has been viewed.
-      markasspam: Occurs when the email is marked as "spam". 
+      markasspam: Occurs when the email is marked as "spam".
       newsfeedimpression: Occurs when the News Feed has been viewed.
       open: Occurs when the message is opened.
       send: Occurs when a message is sent in a campaign. This number is received from Braze.
@@ -71,22 +71,22 @@ columns:
     lineage:
       - datalake_braze_events_clean.events_owners.event_type
   event_type:
-    description: Type of event that occured (complete).
+    description: Full Braze Currents event type string as received in the source export (for example `users.messages.email.Open`).
     lineage:
       - datalake_braze_events_clean.events_owners.event_type
   ts_event:
-    description: Timestamp of when the event occurred.
+    description: Timestamp when the Braze event occurred, converted from the Unix epoch in the Currents payload.
     lineage:
       - datalake_braze_events_clean.events_owners.event_info
   year:
-    description: Year of when the event occurred.
+    description: Partition year derived from `ts_event`.
     lineage:
       - datalake_braze_events_clean.events_owners.year
   month:
-    description: Month of when the event occurred.
+    description: Partition month derived from `ts_event`.
     lineage:
       - datalake_braze_events_clean.events_owners.month
   day:
-    description: Day of when the event occurred.
+    description: Partition day derived from `ts_event`.
     lineage:
       - datalake_braze_events_clean.events_owners.day

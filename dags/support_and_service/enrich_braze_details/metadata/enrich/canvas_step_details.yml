@@ -1,65 +1,59 @@
 database_name: datalake_braze_details
 table_name: canvas_step_details
-description: This enrich opens the Braze clean layer data with the details of each
-  Canvas. Each line of enrich is a step of a Canvas, and from this table it is possible
-  to extract information about what each step executes, what is the next step and
-  the information passed via Webhook to other applications, for example.
-domain: Growth
-owner: ae-growth@quintoandar.com.br
+description: Step-level reference for Braze Canvas journeys across owner, tenant, and affiliate (Indica Aí) app groups. Each row is one Canvas step with its delivery channel, message configuration, next-step routing, and last sync timestamp from the Braze API clean layer.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_canvas:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.id_canvas
     - datalake_braze_details_clean.canvas_details_tenants.id_canvas
     - datalake_braze_details_clean.canvas_details_indica_ai.id_canvas
-    description: Key of the Braze Canvas.
+    description: Braze Canvas identifier linking the step to its parent journey definition.
   canvas_name:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.canvas_name
     - datalake_braze_details_clean.canvas_details_tenants.canvas_name
     - datalake_braze_details_clean.canvas_details_indica_ai.canvas_name
-    description: Canvas name.
+    description: Display name of the Braze Canvas as configured in the Braze dashboard.
   id_step:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.step
     - datalake_braze_details_clean.canvas_details_tenants.step
     - datalake_braze_details_clean.canvas_details_indica_ai.step
-    description: Key of the Braze Canvas step.
+    description: Braze Canvas step identifier from the exploded step definition.
   step_name:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.step
     - datalake_braze_details_clean.canvas_details_tenants.step
     - datalake_braze_details_clean.canvas_details_indica_ai.step
-    description: Name of the Canvas step.
+    description: Name of the individual step within the Canvas flow, extracted from the step definition JSON.
   step_channel:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.step
     - datalake_braze_details_clean.canvas_details_tenants.step
     - datalake_braze_details_clean.canvas_details_indica_ai.step
-    description: Channel through which Canvas should perform the programmed action
-      programmed for that step.
+    description: Delivery channel configured for this Canvas step (for example email, push, in-app message, or webhook).
   step_message:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.step
     - datalake_braze_details_clean.canvas_details_tenants.step
     - datalake_braze_details_clean.canvas_details_indica_ai.step
-    description: Content with instructions and extra information about the actions
-      programmed for that step.
+    description: Serialized message payload and step configuration from Braze, including templates and webhook parameters.
   id_next_step:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.step
     - datalake_braze_details_clean.canvas_details_tenants.step
     - datalake_braze_details_clean.canvas_details_indica_ai.step
-    description: Id of the next step to be performed by Canvas after the current one
-      is executed.
+    description: Identifier of the next Canvas step executed after this step completes, when the journey branches or continues sequentially.
   ts_updated:
     lineage:
     - datalake_braze_details_clean.canvas_details_owners.ts_updated
     - datalake_braze_details_clean.canvas_details_tenants.ts_updated
     - datalake_braze_details_clean.canvas_details_indica_ai.ts_updated
-    description: Timestamp of the data update.
+    description: Timestamp when Braze last updated this Canvas step definition in the source API extract.
   app_group:
-    description: User group that Canvas targets its actions for.
+    description: Braze app group that owns the Canvas definition (OWNERS for landlords, TENANTS for renters, or AFFILIATES for the Indica Aí referral program).
   year:
     description: Partition column, year of the data update.
   month:
