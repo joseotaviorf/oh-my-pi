@@ -24,29 +24,46 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: alias
-  default_extraction_type: full
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     dim_alias_ai_agent:
+      merge_on: [sk_ai_agent]
       partitions: [year, month, day]
       z_order_by: [sk_ai_agent]
+      when_matched_update_condition: "source.ts_updated > target.ts_updated OR target.ts_updated IS NULL"
     dim_alias_crm_integration:
+      merge_on: [sk_crm_integration]
       partitions: [year, month, day]
       z_order_by: [sk_crm_integration]
+      when_matched_update_condition: "source.ts_updated > target.ts_updated OR target.ts_updated IS NULL"
     dim_alias_listing:
+      merge_on: [sk_listing]
       partitions: [year, month, day]
       z_order_by: [sk_listing]
+      when_matched_update_condition: "source.ts_updated > target.ts_updated OR target.ts_updated IS NULL"
     fact_alias_agent_calls:
+      merge_on: [sk_agent_call]
       partitions: [year, month, day]
       z_order_by: [id_langfuse_session, sk_broker]
     fact_alias_leads:
+      merge_on: [sk_lead]
       partitions: [year, month, day]
       z_order_by: [sk_broker, sk_lead]
+      when_matched_update_condition: "source.ts_last_contact > target.ts_last_contact OR target.ts_last_contact IS NULL"
     fact_alias_lead_resolutions:
+      merge_on: [sk_lead_resolution]
       partitions: [year, month, day]
       z_order_by: [sk_broker, sk_lead_session]
+      when_matched_update_condition: "source.ts_resolved > target.ts_resolved OR target.ts_resolved IS NULL"
     fact_alias_inventory_ingestions:
+      merge_on: [sk_inventory_ingestion]
       partitions: [year, month, day]
       z_order_by: [sk_broker]
     fact_alias_sessions:
+      merge_on: [sk_lead_session]
       partitions: [year, month, day]
       z_order_by: [sk_lead_session, sk_broker]
+      when_matched_update_condition: "source.ts_closed > target.ts_closed OR (source.ts_closed IS NOT NULL AND target.ts_closed IS NULL) OR source.ts_created > target.ts_created"

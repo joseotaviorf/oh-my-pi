@@ -51,6 +51,9 @@ WITH parsed AS (
         lf.day
     FROM
         datalake_alias_clean.listing_fingerprint AS lf
+    WHERE
+        lf.ts_updated >= TIMESTAMP('{load_start_date}')
+        AND lf.ts_updated < TIMESTAMP('{load_end_date}')
 )
 SELECT
     p.id_synthetic_house AS sk_listing,

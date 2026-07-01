@@ -14,3 +14,6 @@ FROM
 LEFT JOIN
     core_brokers.brokers AS cb
         ON aci.uuid_company = cb.uuid_company
+WHERE
+    aci.ts_updated >= TIMESTAMP('{load_start_date}')
+    AND aci.ts_updated < TIMESTAMP('{load_end_date}')

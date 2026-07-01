@@ -30,7 +30,7 @@ columns:
     description: Resolution type (ESCALATION = human handoff, VISIT_INTENTION = visit scheduled).
   id_synthetic_house:
     lineage:
-      - datalake_alias_clean.lead_resolutions.property_id
+      - datalake_alias_clean.lead_resolutions.id_property
     description: |
       Alias-internal synthetic house ID (from listing_fingerprint). Not joinable to dw_house.dim_house
       (Alias uses its own sequence). FK to dim_alias_listing.sk_listing (87% match validated).

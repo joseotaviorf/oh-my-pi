@@ -4,7 +4,7 @@ SELECT
     ls.uuid_lead AS sk_lead,
     COALESCE(cb.sk_broker, -1) AS sk_broker,
     lr.type,
-    lr.property_id AS id_synthetic_house,
+    lr.id_property AS id_synthetic_house,
     lr.ts_sent_to_crm IS NOT NULL AS is_sent_to_crm,
     lr.ts_resolved,
     lr.ts_sent_to_crm,
@@ -23,3 +23,6 @@ JOIN
 LEFT JOIN
     core_brokers.brokers AS cb
         ON l.uuid_company = cb.uuid_company
+WHERE
+    lr.ts_updated >= TIMESTAMP('{load_start_date}')
+    AND lr.ts_updated < TIMESTAMP('{load_end_date}')

@@ -24,3 +24,12 @@ FROM
 LEFT JOIN
     core_brokers.brokers AS cb
         ON ii.uuid_company = cb.uuid_company
+WHERE
+    (
+        ii.ts_started >= TIMESTAMP('{load_start_date}')
+        AND ii.ts_started < TIMESTAMP('{load_end_date}')
+    )
+    OR (
+        ii.ts_completed >= TIMESTAMP('{load_start_date}')
+        AND ii.ts_completed < TIMESTAMP('{load_end_date}')
+    )

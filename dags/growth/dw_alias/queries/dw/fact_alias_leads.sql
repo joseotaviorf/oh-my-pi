@@ -1,4 +1,32 @@
-WITH sessions_agg AS (
+WITH affected_leads AS (
+    SELECT
+        uuid_lead
+    FROM
+        datalake_alias_clean.leads
+    WHERE
+        ts_updated >= TIMESTAMP('{load_start_date}')
+        AND ts_updated < TIMESTAMP('{load_end_date}')
+    UNION
+    SELECT
+        uuid_lead
+    FROM
+        datalake_alias_clean.lead_sessions
+    WHERE
+        ts_updated >= TIMESTAMP('{load_start_date}')
+        AND ts_updated < TIMESTAMP('{load_end_date}')
+    UNION
+    SELECT
+        ls.uuid_lead
+    FROM
+        datalake_alias_clean.lead_resolutions AS lr
+    INNER JOIN
+        datalake_alias_clean.lead_sessions AS ls
+            ON lr.uuid_lead_session = ls.uuid_lead_session
+    WHERE
+        lr.ts_updated >= TIMESTAMP('{load_start_date}')
+        AND lr.ts_updated < TIMESTAMP('{load_end_date}')
+),
+sessions_agg AS (
     SELECT
         ls.uuid_lead,
         COUNT(DISTINCT ls.uuid_lead_session) AS qt_sessions_total,
@@ -16,6 +44,9 @@ WITH sessions_agg AS (
         MAX(ls.ts_updated) AS ts_last_contact
     FROM
         datalake_alias_clean.lead_sessions AS ls
+    INNER JOIN
+        affected_leads AS al
+            ON ls.uuid_lead = al.uuid_lead
     LEFT JOIN
         datalake_alias_clean.lead_resolutions AS lr
             ON ls.uuid_lead_session = lr.uuid_lead_session
@@ -39,6 +70,9 @@ SELECT
     DAY(sa.ts_first_contact) AS day
 FROM
     datalake_alias_clean.leads AS l
+INNER JOIN
+    affected_leads AS al
+        ON l.uuid_lead = al.uuid_lead
 LEFT JOIN
     core_brokers.brokers AS cb
         ON l.uuid_company = cb.uuid_company

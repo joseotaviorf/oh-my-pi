@@ -3,8 +3,8 @@ SELECT
     COALESCE(cb.sk_broker, -1) AS sk_broker,
     aai.agent_name,
     aai.display_name,
-    aai.twilio_account_sid,
-    aai.twilio_phone_number,
+    aai.id_twilio_account AS twilio_account_sid,
+    aai.phone_number AS twilio_phone_number,
     aai.ts_phone_verified IS NOT NULL AS is_phone_verified,
     aai.ts_phone_verified,
     aai.ts_created,
@@ -18,3 +18,6 @@ FROM
 LEFT JOIN
     core_brokers.brokers AS cb
         ON aai.uuid_company = cb.uuid_company
+WHERE
+    aai.ts_updated >= TIMESTAMP('{load_start_date}')
+    AND aai.ts_updated < TIMESTAMP('{load_end_date}')

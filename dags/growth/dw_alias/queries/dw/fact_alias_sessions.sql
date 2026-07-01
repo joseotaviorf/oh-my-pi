@@ -1,4 +1,24 @@
-WITH resolutions_agg AS (
+WITH affected_lead_sessions AS (
+    SELECT
+        uuid_lead_session
+    FROM
+        datalake_alias_clean.lead_sessions
+    WHERE
+        ts_updated >= TIMESTAMP('{load_start_date}')
+        AND ts_updated < TIMESTAMP('{load_end_date}')
+),
+affected_langfuse_sessions AS (
+    SELECT DISTINCT
+        ls.uuid_chat_session AS id_langfuse_session
+    FROM
+        datalake_alias_clean.lead_sessions AS ls
+    INNER JOIN
+        affected_lead_sessions AS als
+            ON ls.uuid_lead_session = als.uuid_lead_session
+    WHERE
+        ls.uuid_chat_session IS NOT NULL
+),
+resolutions_agg AS (
     SELECT
         lr.uuid_lead_session,
         COUNT(*) AS qt_resolutions,
@@ -8,18 +28,24 @@ WITH resolutions_agg AS (
         MAX(CASE WHEN lr.ts_sent_to_crm IS NOT NULL THEN TRUE ELSE FALSE END) AS is_crm_sent
     FROM
         datalake_alias_clean.lead_resolutions AS lr
+    INNER JOIN
+        affected_lead_sessions AS als
+            ON lr.uuid_lead_session = als.uuid_lead_session
     GROUP BY
         lr.uuid_lead_session
 ),
 engagements_agg AS (
     SELECT
-        uuid_lead_session,
+        le.uuid_lead_session,
         COUNT(*) AS qt_engagements,
-        MIN(ts_created) AS ts_engagement_first
+        MIN(le.ts_created) AS ts_engagement_first
     FROM
-        datalake_alias_clean.lead_engagements
+        datalake_alias_clean.lead_engagements AS le
+    INNER JOIN
+        affected_lead_sessions AS als
+            ON le.uuid_lead_session = als.uuid_lead_session
     GROUP BY
-        uuid_lead_session
+        le.uuid_lead_session
 ),
 first_origin AS (
     SELECT
@@ -27,11 +53,14 @@ first_origin AS (
         origin AS origin_first
     FROM (
         SELECT
-            uuid_lead_session,
-            origin,
-            ROW_NUMBER() OVER (PARTITION BY uuid_lead_session ORDER BY ts_created) AS rn
+            le.uuid_lead_session,
+            le.origin,
+            ROW_NUMBER() OVER (PARTITION BY le.uuid_lead_session ORDER BY le.ts_created) AS rn
         FROM
-            datalake_alias_clean.lead_engagements
+            datalake_alias_clean.lead_engagements AS le
+        INNER JOIN
+            affected_lead_sessions AS als
+                ON le.uuid_lead_session = als.uuid_lead_session
     )
     WHERE
         rn = 1
@@ -45,6 +74,9 @@ trace_meta AS (
         MAX(t.ts_created) AS ts_last_turn
     FROM
         datalake_langfuse_clean.traces AS t
+    INNER JOIN
+        affected_langfuse_sessions AS als
+            ON t.id_session = als.id_langfuse_session
     WHERE
         t.id_session IS NOT NULL
     GROUP BY
@@ -120,6 +152,9 @@ obt_agg AS (
     INNER JOIN
         datalake_langfuse_clean.traces AS t
             ON o.id_trace = t.id_trace
+    INNER JOIN
+        affected_langfuse_sessions AS als
+            ON t.id_session = als.id_langfuse_session
     WHERE
         t.id_session IS NOT NULL
     GROUP BY
@@ -138,6 +173,9 @@ broker_config AS (
     INNER JOIN
         datalake_langfuse_clean.traces AS t
             ON o.id_trace = t.id_trace
+    INNER JOIN
+        affected_langfuse_sessions AS als
+            ON t.id_session = als.id_langfuse_session
     WHERE
         o.name = 'get_alias_configuration'
         AND o.type = 'TOOL'
@@ -201,7 +239,7 @@ SELECT
     oa.avg_llm_response_time_ms,
     oa.p50_llm_response_time_ms,
     oa.p95_llm_response_time_ms,
-    cs.full_conversation,
+    NULL AS full_conversation,
     ls.ts_created,
     ls.ts_closed,
     tm.ts_first_turn,
@@ -216,6 +254,9 @@ SELECT
     DAY(ls.ts_created) AS day
 FROM
     datalake_alias_clean.lead_sessions AS ls
+INNER JOIN
+    affected_lead_sessions AS als
+        ON ls.uuid_lead_session = als.uuid_lead_session
 LEFT JOIN
     datalake_alias_clean.leads AS l
         ON ls.uuid_lead = l.uuid_lead

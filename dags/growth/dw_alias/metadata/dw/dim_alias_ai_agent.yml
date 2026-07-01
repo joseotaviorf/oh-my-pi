@@ -25,11 +25,11 @@ columns:
     description: Display name shown to end users in the WhatsApp conversation.
   twilio_account_sid:
     lineage:
-      - datalake_alias_clean.ai_agents.twilio_account_sid
+      - datalake_alias_clean.ai_agents.id_twilio_account
     description: Twilio account SID associated with this agent (non-sensitive identifier).
   twilio_phone_number:
     lineage:
-      - datalake_alias_clean.ai_agents.twilio_phone_number
+      - datalake_alias_clean.ai_agents.phone_number
     description: WhatsApp phone number registered on Twilio for this agent.
   is_phone_verified:
     lineage:

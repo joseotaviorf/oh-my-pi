@@ -216,11 +216,9 @@ columns:
       - datalake_langfuse_clean.observations.ts_ended
     description: 95th percentile LLM response time in milliseconds.
   full_conversation:
-    lineage:
-      - datalake_chatbot.sessions.full_conversation
     description: |
-      Full HostGraph conversation JSON from datalake_chatbot.sessions. Contains the complete
-      message history including recommendations shown. Use for ad-hoc parsing of n_recommendations_shown.
+      Placeholder for HostGraph conversation JSON. Not yet available in datalake_chatbot.sessions;
+      populated as NULL until enrich_chatbot exposes full_conversation for alias sessions.
   ts_created:
     lineage:
       - datalake_alias_clean.lead_sessions.ts_created
