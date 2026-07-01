@@ -61,7 +61,7 @@ WITH
       fri.ts_budget_approval_sent_to_tenant,
       fri.ts_budget_approval_started_by_tenant,
       fri.ts_reviewed,
-      ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni
+      ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY CASE WHEN di.status = 'cancelled' THEN 1 ELSE 0 END ASC, fi.ts_updated DESC) AS rni
     FROM 
       dw_inspections.fact_inspection AS fi
     LEFT JOIN 
