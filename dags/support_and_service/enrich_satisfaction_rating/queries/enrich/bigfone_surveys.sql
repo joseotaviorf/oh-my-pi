@@ -59,12 +59,34 @@ csat_events AS (
       csat_events_raw
     WHERE
       rn = 1
-
-  ),
-  call_csat AS (
-    SELECT DISTINCT
+),
+tickets_by_call_raw AS (
+    SELECT
+        id_call,
+        CAST(id_contract AS BIGINT) AS id_contract,
+        id_ticket,
+        id_user_main,
+        ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY id_ticket DESC) AS rn
+    FROM
+        datalake_customer_support.tickets
+    WHERE
+        channel = 'call'
+),
+tickets_by_call AS (
+    SELECT
+        id_call,
+        id_contract,
+        id_ticket,
+        id_user_main
+    FROM
+        tickets_by_call_raw
+    WHERE
+        rn = 1
+),
+call_csat AS (
+    SELECT
       ce.id_call,
-      CAST(cs.id_contract AS BIGINT) AS id_contract,
+      cs.id_contract,
       cs.id_ticket,
       cs.id_user_main AS id_user,
       COALESCE(css_call.public_id, css_task.public_id) AS id_support_session,
@@ -88,9 +110,8 @@ csat_events AS (
       call_sessions AS css_task
         ON css_task.source_identity = ce.id_task
     LEFT JOIN
-      datalake_customer_support.tickets AS cs
+      tickets_by_call AS cs
         ON ce.id_call = cs.id_call
-        AND cs.channel = 'call'
   )
   SELECT
       MD5(CONCAT(id_call, "csat1", ts_created_local)) AS id_answer,
