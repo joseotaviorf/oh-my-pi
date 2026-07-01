@@ -4,7 +4,7 @@ SELECT
     replaced_by AS id_replaced_by,
     author,
     reason,
-    description,
+    invalidation_description,
     TIMESTAMP(invalidated_at) AS ts_invalidated,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
