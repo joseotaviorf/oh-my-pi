@@ -11,7 +11,7 @@ validation:
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 200
-      master_node_type_id: r7g.2xlarge
+      master_node_type_id: r6g.2xlarge
       spark_conf:
         spark.driver.memory: 16g
         spark.driver.memoryOverhead: 4g

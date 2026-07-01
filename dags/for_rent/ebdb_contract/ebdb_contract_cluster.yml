@@ -9,6 +9,6 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     core_nodes:
-      instance_count: 1
-    task_nodes:
       instance_count: 2
+    task_nodes:
+      instance_count: 1

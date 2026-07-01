@@ -3,6 +3,6 @@ cluster:
   custom_configurations:
     runtime_engine: PHOTON
     core_nodes:
-      instance_count: 1
-    task_nodes:
       instance_count: 2
+    task_nodes:
+      instance_count: 1

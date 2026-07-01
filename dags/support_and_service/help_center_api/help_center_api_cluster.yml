@@ -9,6 +9,6 @@ cluster:
       ebs_volume_size: 200
     num_workers: 3
     core_nodes:
-      instance_count: 1
-    task_nodes:
       instance_count: 2
+    task_nodes:
+      instance_count: 1

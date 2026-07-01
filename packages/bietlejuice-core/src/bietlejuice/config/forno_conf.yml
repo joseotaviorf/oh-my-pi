@@ -1793,13 +1793,13 @@ emr_cluster_base: &emr_cluster_anchor
     cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
     spark_version: emr-7.12.0
     emr_deploy_mode: client
-    master_node_type_id: m7a.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7a.xlarge
-        instance_count: 1
+        node_type_id: m6g.xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: m7a.xlarge
-        instance_count: 1
+        node_type_id: m6g.xlarge
+        instance_count: 0
     autotermination_minutes: 20
     emr_auto_terminate: false
     aws_attributes: &emr_aws_anchor
@@ -2225,13 +2225,13 @@ emr_7_12_med_general_cluster:
 
 emr_7_12_med_general_3_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.2xlarge
+    master_node_type_id: m6g.2xlarge
     core_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: m7a.2xlarge
+        node_type_id: m6g.2xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: m6g.2xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
@@ -2240,13 +2240,13 @@ emr_7_12_med_general_3_workers_cluster:
 # DBR databricks_16_4_med_general_photon_cluster → m5d.xlarge × 3 workers, SPOT_WITH_FALLBACK
 emr_7_12_med_general_photon_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7a.xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: m7a.xlarge
+        node_type_id: m6g.xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: m6g.xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2256,13 +2256,13 @@ emr_7_12_med_general_photon_cluster:
 # DBR databricks_16_4_med_memory_general_cluster → r5a.xlarge × 3 workers, SPOT_WITH_FALLBACK
 emr_7_12_med_memory_general_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: r7a.xlarge
+    master_node_type_id: r6g.xlarge
     core_nodes:
-        node_type_id: r7a.xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: r7a.xlarge
+        node_type_id: r6g.xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: r6g.xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2273,11 +2273,11 @@ emr_7_12_med_memory_general_cluster:
 emr_7_12_med_memory_cluster:
     <<: *emr_consolidation_anchor
     core_nodes:
-        node_type_id: m7g.2xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: m7g.2xlarge
+        node_type_id: m6g.2xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: m6g.2xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2286,13 +2286,13 @@ emr_7_12_med_memory_cluster:
 
 emr_7_12_med_general_2_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.2xlarge
+    master_node_type_id: m6g.2xlarge
     core_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
@@ -2301,7 +2301,7 @@ emr_7_12_med_general_2_workers_cluster:
 # DBR databricks_16_4_small_general_fleet_2xlarge_single_node → master-only (num_workers=0)
 emr_7_12_small_general_2xlarge_single_node_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.2xlarge
+    master_node_type_id: m6g.2xlarge
     core_nodes:
         instance_count: 0
     task_nodes:
@@ -2313,13 +2313,13 @@ emr_7_12_small_general_2xlarge_single_node_cluster:
 
 emr_7_12_small_general_2xlarge_2_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.2xlarge
+    master_node_type_id: m6g.2xlarge
     core_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2327,13 +2327,13 @@ emr_7_12_small_general_2xlarge_2_workers_cluster:
 
 emr_7_12_min_general_2_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7a.xlarge
-        instance_count: 1
+        node_type_id: m6g.xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: m7a.xlarge
-        instance_count: 1
+        node_type_id: m6g.xlarge
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
@@ -2341,28 +2341,28 @@ emr_7_12_min_general_2_workers_cluster:
 
 emr_7_12_min_general_3_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7a.xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: m7a.xlarge
+        node_type_id: m6g.xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: m6g.xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 100
         availability: ON_DEMAND
 
-# DBR databricks_16_4_min_memory_cluster → r7a.xlarge × 3 workers
+# DBR databricks_16_4_min_memory_cluster → r6g.xlarge × 3 workers
 emr_7_12_min_memory_3_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: r7a.xlarge
+    master_node_type_id: r6g.xlarge
     core_nodes:
-        node_type_id: r7a.xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: r7a.xlarge
+        node_type_id: r6g.xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: r6g.xlarge
+        instance_count: 1
     custom_tags:
         - key: app
           value: airflow
@@ -2393,11 +2393,11 @@ emr_7_12_min_memory_3_workers_cluster:
 emr_7_12_min_memory_2_workers_cluster:
     <<: *emr_consolidation_anchor
     core_nodes:
-        node_type_id: r7g.2xlarge
-        instance_count: 1
+        node_type_id: r6g.2xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: r7g.2xlarge
-        instance_count: 1
+        node_type_id: r6g.2xlarge
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
@@ -2408,155 +2408,155 @@ emr_7_12_min_memory_2_workers_cluster:
 emr_7_12_min_io_general_2_workers_cluster:
     <<: *emr_consolidation_anchor
     core_nodes:
-        node_type_id: m7g.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: m7g.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
         availability: ON_DEMAND
         task_availability: SPOT
 
-# Min master (YARN) + m7g.2xlarge worker: 1 CORE + 1 TASK
+# Min master (YARN) + m6g.2xlarge worker: 1 CORE + 1 TASK
 emr_7_12_min_master_2xlarge_workers_1_task_cluster:
     <<: *emr_consolidation_anchor
     core_nodes:
-        node_type_id: m7g.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: m7g.2xlarge
-        instance_count: 1
+        node_type_id: m6g.2xlarge
+        instance_count: 0
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
         availability: ON_DEMAND
         task_availability: SPOT
 
-# Min master + m7a.2xlarge × 3: 1 CORE + 2 TASK (DBR asymmetric driver sizing)
+# Min master + m6g.2xlarge × 3: 1 CORE + 2 TASK (DBR asymmetric driver sizing)
 emr_7_12_min_master_med_memory_3_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7a.2xlarge
-        instance_count: 1
-    task_nodes:
-        node_type_id: m7a.2xlarge
+        node_type_id: m6g.2xlarge
         instance_count: 2
+    task_nodes:
+        node_type_id: m6g.2xlarge
+        instance_count: 1
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
         availability: ON_DEMAND
 
-# Min master + r7a.2xlarge × 6: 1 CORE + 5 TASK
+# Min master + r6g.2xlarge × 6: 1 CORE + 5 TASK
 emr_7_12_min_master_2xlarge_6_workers_cluster:
     <<: *emr_cluster_anchor
-    master_node_type_id: m7a.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: r7a.2xlarge
-        instance_count: 1
+        node_type_id: r6g.2xlarge
+        instance_count: 2
     task_nodes:
-        node_type_id: r7a.2xlarge
-        instance_count: 5
+        node_type_id: r6g.2xlarge
+        instance_count: 4
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
         availability: ON_DEMAND
 
 ##### EMR Consolidation Cluster Presets (presets) #####
-# Aligned with Databricks consolidation tiers. Forno: 1 CORE worker (ON_DEMAND).
+# Aligned with Databricks consolidation tiers. Forno: 1 CORE worker (ON_DEMAND); W>=2 uses >=2 CORE + rest TASK.
 
-##### EMR Compute (c7g — consolidation family) #####
+##### EMR Compute (c6g — consolidation family) #####
 
 emr_7_12_consolidation_xs_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.xlarge
+    master_node_type_id: c6g.xlarge
     core_nodes:
-        node_type_id: c7g.xlarge
+        node_type_id: c6g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xs_compute, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_s_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.xlarge
+    master_node_type_id: c6g.xlarge
     core_nodes:
-        node_type_id: c7g.xlarge
+        node_type_id: c6g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_s_compute, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_m_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.2xlarge
+    master_node_type_id: c6g.2xlarge
     core_nodes:
-        node_type_id: c7g.2xlarge
+        node_type_id: c6g.2xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_m_compute, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_l_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.4xlarge
+    master_node_type_id: c6g.4xlarge
     core_nodes:
-        node_type_id: c7g.4xlarge
+        node_type_id: c6g.4xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_l_compute, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_xl_compute_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: c7g.8xlarge
+    master_node_type_id: c6g.8xlarge
     core_nodes:
-        node_type_id: c7g.8xlarge
+        node_type_id: c6g.8xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xl_compute, *emr_cluster_spark_conf_anchor]
 
-##### EMR General (m7g — consolidation family) #####
+##### EMR General (m6g — consolidation family) #####
 
 emr_7_12_consolidation_xs_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7g.xlarge
+        node_type_id: m6g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xs_general, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_s_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
-        node_type_id: m7g.xlarge
+        node_type_id: m6g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_s_general, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_m_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.2xlarge
+    master_node_type_id: m6g.2xlarge
     core_nodes:
-        node_type_id: m7g.2xlarge
+        node_type_id: m6g.2xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_m_general, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_l_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.4xlarge
+    master_node_type_id: m6g.4xlarge
     core_nodes:
-        node_type_id: m7g.4xlarge
+        node_type_id: m6g.4xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_l_general, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_xl_general_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.8xlarge
+    master_node_type_id: m6g.8xlarge
     core_nodes:
-        node_type_id: m7g.8xlarge
+        node_type_id: m6g.8xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xl_general, *emr_cluster_spark_conf_anchor]
@@ -2565,7 +2565,7 @@ emr_7_12_consolidation_xl_general_cluster:
 
 emr_7_12_consolidation_xs_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2573,7 +2573,7 @@ emr_7_12_consolidation_xs_general_single_node_cluster:
 
 emr_7_12_consolidation_s_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.xlarge
+    master_node_type_id: m6g.xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2581,7 +2581,7 @@ emr_7_12_consolidation_s_general_single_node_cluster:
 
 emr_7_12_consolidation_m_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.2xlarge
+    master_node_type_id: m6g.2xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2589,7 +2589,7 @@ emr_7_12_consolidation_m_general_single_node_cluster:
 
 emr_7_12_consolidation_l_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.4xlarge
+    master_node_type_id: m6g.4xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2597,55 +2597,55 @@ emr_7_12_consolidation_l_general_single_node_cluster:
 
 emr_7_12_consolidation_xl_general_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: m7g.8xlarge
+    master_node_type_id: m6g.8xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
         <<: *emr_spark_xl_general_single_node
 
-##### EMR Memory (r7g — consolidation family) #####
+##### EMR Memory (r6g — consolidation family) #####
 
 emr_7_12_consolidation_xs_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.xlarge
+    master_node_type_id: r6g.xlarge
     core_nodes:
-        node_type_id: r7g.xlarge
+        node_type_id: r6g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xs_memory, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_s_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.xlarge
+    master_node_type_id: r6g.xlarge
     core_nodes:
-        node_type_id: r7g.xlarge
+        node_type_id: r6g.xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_s_memory, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_m_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.2xlarge
+    master_node_type_id: r6g.2xlarge
     core_nodes:
-        node_type_id: r7g.2xlarge
+        node_type_id: r6g.2xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_m_memory, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_l_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.4xlarge
+    master_node_type_id: r6g.4xlarge
     core_nodes:
-        node_type_id: r7g.4xlarge
+        node_type_id: r6g.4xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_l_memory, *emr_cluster_spark_conf_anchor]
 
 emr_7_12_consolidation_xl_memory_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.8xlarge
+    master_node_type_id: r6g.8xlarge
     core_nodes:
-        node_type_id: r7g.8xlarge
+        node_type_id: r6g.8xlarge
         instance_count: 1
     spark_conf:
         <<: [*emr_spark_xl_memory, *emr_cluster_spark_conf_anchor]
@@ -2654,7 +2654,7 @@ emr_7_12_consolidation_xl_memory_cluster:
 
 emr_7_12_consolidation_xs_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.xlarge
+    master_node_type_id: r6g.xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2662,7 +2662,7 @@ emr_7_12_consolidation_xs_memory_single_node_cluster:
 
 emr_7_12_consolidation_s_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.xlarge
+    master_node_type_id: r6g.xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2670,7 +2670,7 @@ emr_7_12_consolidation_s_memory_single_node_cluster:
 
 emr_7_12_consolidation_m_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.2xlarge
+    master_node_type_id: r6g.2xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2678,7 +2678,7 @@ emr_7_12_consolidation_m_memory_single_node_cluster:
 
 emr_7_12_consolidation_l_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.4xlarge
+    master_node_type_id: r6g.4xlarge
     core_nodes:
         instance_count: 0
     spark_conf:
@@ -2686,7 +2686,7 @@ emr_7_12_consolidation_l_memory_single_node_cluster:
 
 emr_7_12_consolidation_xl_memory_single_node_cluster:
     <<: *emr_consolidation_anchor
-    master_node_type_id: r7g.8xlarge
+    master_node_type_id: r6g.8xlarge
     core_nodes:
         instance_count: 0
     spark_conf:

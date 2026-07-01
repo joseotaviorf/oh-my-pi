@@ -7,4 +7,4 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
-    master_node_type_id: r7g.12xlarge
+    master_node_type_id: r6g.12xlarge

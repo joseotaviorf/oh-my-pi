@@ -5,8 +5,8 @@ cluster:
     spark_conf:
       spark.executor.memory: 8g
       spark.executor.memoryOverhead: 2g
-      spark.executor.cores: "2"
-      spark.dynamicAllocation.maxExecutors: "2"
+      spark.executor.cores: '2'
+      spark.dynamicAllocation.maxExecutors: '2'
       spark.sql.shuffle.partitions: 200
     aws_attributes:
       availability: ON_DEMAND
@@ -17,6 +17,6 @@ validation:
     type: emr_7_12_consolidation_m_general_cluster
     custom_configurations:
       core_nodes:
-        instance_count: 1
-      task_nodes:
         instance_count: 2
+      task_nodes:
+        instance_count: 1

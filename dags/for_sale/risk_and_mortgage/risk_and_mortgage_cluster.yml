@@ -20,6 +20,6 @@ validation:
       aws_attributes:
         ebs_volume_size: 200
       core_nodes:
-        instance_count: 1
-      task_nodes:
         instance_count: 2
+      task_nodes:
+        instance_count: 1

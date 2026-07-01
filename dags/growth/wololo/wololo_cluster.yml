@@ -12,7 +12,7 @@ validation:
   cluster:
     type: emr_7_12_consolidation_s_general_cluster
     custom_configurations:
-      master_node_type_id: r7g.xlarge
+      master_node_type_id: r6g.xlarge
       spark_conf:
         spark.driver.memory: 12g
         spark.driver.memoryOverhead: 4g

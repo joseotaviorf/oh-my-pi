@@ -103,7 +103,7 @@ class TestAuditClusterFile:
         violations = audit_cluster_file(cluster_path, config_service)
         assert violations == []
 
-    def test_emr_min_m7g_explicit_override_is_compliant(
+    def test_emr_min_m6g_explicit_override_is_compliant(
         self, config_service: ConfigurationService, tmp_path: Path
     ):
         cluster_path = tmp_path / "bob_cluster.yml"
@@ -113,8 +113,8 @@ class TestAuditClusterFile:
                     "cluster": {
                         "type": "emr_7_12_min_general_2_workers_cluster",
                         "custom_configurations": {
-                            "master_node_type_id": "m7g.xlarge",
-                            "node_type_id": "m7g.2xlarge",
+                            "master_node_type_id": "m6g.xlarge",
+                            "node_type_id": "m6g.2xlarge",
                         },
                     }
                 }
@@ -124,7 +124,7 @@ class TestAuditClusterFile:
         violations = audit_cluster_file(cluster_path, config_service)
         assert violations == []
 
-    def test_emr_min_memory_m7a_worker_override_is_compliant(
+    def test_emr_min_memory_m6g_worker_override_is_compliant(
         self, config_service: ConfigurationService, tmp_path: Path
     ):
         cluster_path = tmp_path / "betopera_cluster.yml"
@@ -134,8 +134,8 @@ class TestAuditClusterFile:
                     "cluster": {
                         "type": "emr_7_12_min_memory_3_workers_cluster",
                         "custom_configurations": {
-                            "master_node_type_id": "m7a.xlarge",
-                            "node_type_id": "m7a.2xlarge",
+                            "master_node_type_id": "m6g.xlarge",
+                            "node_type_id": "m6g.2xlarge",
                         },
                     }
                 }

@@ -52,7 +52,7 @@ EMR_LEGACY_MIN_PREFIX = "emr_7_12_min_"
 
 EXPECTED_GENERATION = {
     "databricks_consolidation": 7,
-    "emr_consolidation": 7,
+    "emr_consolidation": 6,
     "emr_legacy_min": 7,
 }
 
@@ -101,16 +101,6 @@ def is_graviton_6g_family(instance_type: str) -> bool:
 def is_graviton_7g_family(instance_type: str) -> bool:
     _class, generation, variant, _size = _parse_instance_type(instance_type)
     return generation == 7 and variant in ("g", "gd")
-
-
-def is_emr_7g_family(instance_type: str) -> bool:
-    _class, generation, variant, _size = _parse_instance_type(instance_type)
-    return generation == 7 and variant == "g"
-
-
-def is_emr_7a_family(instance_type: str) -> bool:
-    _class, generation, variant, _size = _parse_instance_type(instance_type)
-    return generation == 7 and variant == "a"
 
 
 def _get_nested(config: dict, path: Tuple[str, ...]) -> Optional[Any]:
@@ -172,11 +162,11 @@ def _check_consolidation_family(
     if policy == "emr_consolidation":
         if topology_label.startswith("master:"):
             return None
-        if not is_emr_7g_family(instance_type):
-            return "emr_consolidation_requires_7g_family"
+        if not is_graviton_6g_family(instance_type):
+            return "emr_consolidation_requires_6g_family"
     if policy == "emr_legacy_min":
-        if not is_emr_7a_family(instance_type) and not is_emr_7g_family(instance_type):
-            return "emr_legacy_min_requires_7a_or_7g_family"
+        if not is_graviton_6g_family(instance_type):
+            return "emr_legacy_min_requires_6g_family"
         return None
     return None
 
@@ -221,10 +211,8 @@ def _compare_override_to_preset(
     effective_preset: dict,
 ) -> Optional[str]:
     if _emr_legacy_min_allows_explicit_override(cluster_type):
-        if not is_emr_7a_family(override_value) and not is_emr_7g_family(
-            override_value
-        ):
-            return "emr_legacy_override_must_be_7a_or_7g"
+        if not is_graviton_6g_family(override_value):
+            return "emr_legacy_override_must_be_6g"
         return _check_consolidation_family(cluster_type, override_value, topology_label)
 
     try:

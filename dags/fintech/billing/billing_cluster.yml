@@ -2,6 +2,6 @@ cluster:
   type: emr_7_12_consolidation_m_general_cluster
   custom_configurations:
     core_nodes:
-      instance_count: 1
+      instance_count: 2
     task_nodes:
-      instance_count: 3
+      instance_count: 2

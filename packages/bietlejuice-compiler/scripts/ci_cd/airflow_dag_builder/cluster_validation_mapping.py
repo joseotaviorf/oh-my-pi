@@ -435,6 +435,31 @@ def strip_redundant_preset_default_overrides(
     return result
 
 
+def emr_worker_core_task_split(total_workers: int) -> tuple[int, int]:
+    """Split EMR worker nodes: >=2 workers -> 2 CORE + rest TASK; W<=1 -> all CORE."""
+    if total_workers <= 1:
+        return (max(total_workers, 0), 0)
+    return (2, total_workers - 2)
+
+
+def map_instance_type_to_emr_gen6(instance_type: str) -> str:
+    """Map any instance type to EMR gen6 Graviton (c6g/m6g/r6g), preserving size."""
+    value = str(instance_type).strip()
+    use_nvme = value.endswith("gd") or ".gd." in value
+    value = value.replace("m7a.", "m7g.").replace("r7a.", "r7g.")
+    value = map_instance_type_to_graviton(value, use_nvme=use_nvme)
+    for old, new in (
+        ("c7gd", "c6gd"),
+        ("m7gd", "m6gd"),
+        ("r7gd", "r6gd"),
+        ("c7g", "c6g"),
+        ("m7g", "m6g"),
+        ("r7g", "r6g"),
+    ):
+        value = value.replace(old, new)
+    return value
+
+
 def _map_topology_value(instance_type: str, *, photon_enabled: bool) -> str:
     use_nvme = _use_nvme_for_topology_value(
         instance_type, photon_enabled=photon_enabled

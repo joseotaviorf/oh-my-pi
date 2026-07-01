@@ -402,7 +402,7 @@ class TestComputeValidationOverrides:
         resolved = ConfigurationService().get_config(
             "emr_7_12_consolidation_s_memory_cluster"
         )
-        assert resolved.get("master_node_type_id") == "r7g.xlarge"
+        assert resolved.get("master_node_type_id") == "r6g.xlarge"
         assert "driver_node_type_id" not in resolved
 
 
@@ -1128,9 +1128,9 @@ class TestEmrConsolidationSparkDefaults:
 
 
 def _map_dbr_instance_to_emr(instance_type: str) -> str:
-    """Forno DBR uses gen6; EMR consolidation uses gen7."""
-    for gen6, gen7 in (("m6g", "m7g"), ("r6g", "r7g"), ("c6g", "c7g")):
-        instance_type = instance_type.replace(gen6, gen7)
+    """Prod DBR gen7 → EMR gen6 Graviton."""
+    for gen7, gen6 in (("m7g", "m6g"), ("r7g", "r6g"), ("c7g", "c6g")):
+        instance_type = instance_type.replace(gen7, gen6)
     return instance_type
 
 
@@ -1175,22 +1175,80 @@ def _parse_memory_gib(value: str) -> float:
 
 # Graviton instance RAM (GiB) for master budget checks.
 _INSTANCE_RAM_GIB = {
+    "c6g.large": 4,
+    "c6g.xlarge": 8,
+    "c6g.2xlarge": 16,
+    "c6g.4xlarge": 32,
+    "c6g.8xlarge": 64,
     "c7g.large": 4,
     "c7g.xlarge": 8,
     "c7g.2xlarge": 16,
     "c7g.4xlarge": 32,
     "c7g.8xlarge": 64,
+    "m6g.large": 8,
+    "m6g.xlarge": 16,
+    "m6g.2xlarge": 32,
+    "m6g.4xlarge": 64,
+    "m6g.8xlarge": 128,
     "m7g.large": 8,
     "m7g.xlarge": 16,
     "m7g.2xlarge": 32,
     "m7g.4xlarge": 64,
     "m7g.8xlarge": 128,
+    "r6g.large": 16,
+    "r6g.xlarge": 32,
+    "r6g.2xlarge": 64,
+    "r6g.4xlarge": 128,
+    "r6g.8xlarge": 256,
     "r7g.large": 16,
     "r7g.xlarge": 32,
     "r7g.2xlarge": 64,
     "r7g.4xlarge": 128,
     "r7g.8xlarge": 256,
 }
+
+
+class TestEmrWorkerCoreTaskSplit:
+    @pytest.mark.parametrize(
+        "total_workers,expected_core,expected_task",
+        [
+            (0, 0, 0),
+            (1, 1, 0),
+            (2, 2, 0),
+            (3, 2, 1),
+            (4, 2, 2),
+            (5, 2, 3),
+        ],
+    )
+    def test_split(self, total_workers, expected_core, expected_task):
+        from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+            emr_worker_core_task_split,
+        )
+
+        assert emr_worker_core_task_split(total_workers) == (
+            expected_core,
+            expected_task,
+        )
+
+
+class TestMapInstanceTypeToEmrGen6:
+    @pytest.mark.parametrize(
+        "raw,expected",
+        [
+            ("m7g.xlarge", "m6g.xlarge"),
+            ("r7g.2xlarge", "r6g.2xlarge"),
+            ("c7g.4xlarge", "c6g.4xlarge"),
+            ("m7a.xlarge", "m6g.xlarge"),
+            ("r7a.2xlarge", "r6g.2xlarge"),
+            ("m5a.2xlarge", "m6g.2xlarge"),
+        ],
+    )
+    def test_maps_to_gen6_graviton(self, raw, expected):
+        from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+            map_instance_type_to_emr_gen6,
+        )
+
+        assert map_instance_type_to_emr_gen6(raw) == expected
 
 
 class TestEmrConsolidationDbrParity:
@@ -1212,10 +1270,14 @@ class TestEmrConsolidationDbrParity:
 
         expected_worker = _emr_instance_type(dbr_preset["node_type_id"])
         assert emr["core_nodes"]["node_type_id"] == expected_worker
-        assert emr["core_nodes"]["instance_count"] == 1
         if num_workers == 2:
+            assert emr["core_nodes"]["instance_count"] == 2
             assert emr["task_nodes"]["node_type_id"] == expected_worker
-            assert emr["task_nodes"]["instance_count"] == 1
+            assert emr["task_nodes"]["instance_count"] == 0
+        elif num_workers == 1:
+            assert emr["core_nodes"]["instance_count"] == 1
+            task_nodes = emr.get("task_nodes")
+            assert task_nodes is None or task_nodes.get("instance_count", 0) == 0
         else:
             assert emr.get("task_nodes") is None
 

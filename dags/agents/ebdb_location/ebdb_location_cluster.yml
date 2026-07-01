@@ -18,10 +18,10 @@ cluster:
       spark.kryo.registrator: org.apache.sedona.core.serde.SedonaKryoRegistrator
     num_workers: 3
     core_nodes:
-      instance_count: 1
-    task_nodes:
       instance_count: 2
-    master_node_type_id: m7g.xlarge
+    task_nodes:
+      instance_count: 1
+    master_node_type_id: m6g.xlarge
   custom_libraries:
   - maven:
       coordinates: org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating

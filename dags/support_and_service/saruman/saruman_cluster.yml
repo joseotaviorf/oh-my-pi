@@ -8,6 +8,6 @@ validation:
     type: emr_7_12_consolidation_xs_memory_cluster
     custom_configurations:
       core_nodes:
-        instance_count: 1
-      task_nodes:
         instance_count: 2
+      task_nodes:
+        instance_count: 1
