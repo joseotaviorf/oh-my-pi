@@ -1,7 +1,7 @@
 ---
 database_name: datalake_tracked_events
 table_name: concierge_attribution
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table utilized by the Growth team to describe concierge attribution events from WhatsApp Concierge Chat interactions, including Facebook, Online Classifieds, and Placas.
 columns:

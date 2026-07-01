@@ -1,110 +1,119 @@
----
 database_name: datalake_tracked_events
 table_name: cross_channel_full
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table utilized by the Growth team to describe the attribution cross channel of online and offline events.
+description: 'Unified online and offline conversion events with final cross-channel attribution dimensions.
+
+  Built from enrich_online_attribution.online_attribution UNION ALL offline_attribution,
+
+  applying last-touch logic across web, app, and offline touchpoints. One row per conversion
+
+  event with resolved UTM, branded flags, media source, and entrance URI for Growth analytics.
+
+  '
 columns:
   id_user:
     description: sk_user of the user that did the event.
     lineage:
-      - datalake_online_attribution.online_attribution.id_user
-      - datalake_tracked_events.offline_attribution.id_user
+    - datalake_online_attribution.online_attribution.id_user
+    - datalake_tracked_events.offline_attribution.id_user
   id_amplitude:
     description: ID to identify the amplitude user.
     lineage:
-      - datalake_online_attribution.online_attribution.id_amplitude
+    - datalake_online_attribution.online_attribution.id_amplitude
   id_session:
-    description: ID of the session.
+    description: Amplitude session identifier from the online attribution branch of the unified event.
     lineage:
-      - datalake_online_attribution.online_attribution.id_session
+    - datalake_online_attribution.online_attribution.id_session
   id_house:
-    description: ID of the house.
+    description: Property identifier from online or offline sources joined into the conversion row.
     lineage:
-      - datalake_online_attribution.online_attribution.id_house
+    - datalake_online_attribution.online_attribution.id_house
   id_firestore:
-    description: ID of the firestore database.
+    description: Firestore document identifier from online conversion events when available.
     lineage:
-      - datalake_online_attribution.online_attribution.id_firestore
+    - datalake_online_attribution.online_attribution.id_firestore
   id_contact:
-    description: ID of the contact.
+    description: Offline contact identifier from secretaria, plaquinhas, or concierge touchpoints.
     lineage:
-      - datalake_tracked_events.offline_attribution.id_contact
+    - datalake_tracked_events.offline_attribution.id_contact
   event_name:
     description: Name of the amplitude event.
     lineage:
-      - datalake_online_attribution.online_attribution.event_type_sanitized
-      - datalake_tracked_events.offline_attribution.event_name
+    - datalake_online_attribution.online_attribution.event_type_sanitized
+    - datalake_tracked_events.offline_attribution.event_name
   visit_code:
     description: Code of the visit when the event is related to a visit.
     lineage:
-      - datalake_online_attribution.online_attribution.visit_code
+    - datalake_online_attribution.online_attribution.visit_code
   final_attribution_app_type:
-    description: |
-      Final app type attributed to the event, derived from the platform or amplitude_platform fields.
+    description: 'Final app type attributed to the event, derived from the platform or amplitude_platform fields.
+
       Uses attribution logic to determine the app type from the last touchpoint before conversion, with fallback to conversion event attribution when needed.
+
+      '
     lineage:
-      - datalake_online_attribution.online_attribution.platform
-      - datalake_online_attribution.online_attribution.amplitude_platform
+    - datalake_online_attribution.online_attribution.platform
+    - datalake_online_attribution.online_attribution.amplitude_platform
   final_attribution_branded:
     description: If in the final attribution, the user came through a branded campaign.
     lineage:
-      - datalake_online_attribution.online_attribution.branded
-      - datalake_tracked_events.offline_attribution.origin
+    - datalake_online_attribution.online_attribution.branded
+    - datalake_tracked_events.offline_attribution.origin
   final_attribution_origin:
     description: Final origin attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.ts_app_attribution
-      - datalake_online_attribution.online_attribution.ts_web_attribution
-      - datalake_tracked_events.offline_attribution.agent
+    - datalake_online_attribution.online_attribution.ts_app_attribution
+    - datalake_online_attribution.online_attribution.ts_web_attribution
+    - datalake_tracked_events.offline_attribution.agent
   final_attribution_source:
     description: Final source attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.utm_source
-      - datalake_tracked_events.offline_attribution.origin
+    - datalake_online_attribution.online_attribution.utm_source
+    - datalake_tracked_events.offline_attribution.origin
   final_attribution_medium:
     description: Final medium attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.utm_medium
-      - datalake_tracked_events.offline_attribution.channel
+    - datalake_online_attribution.online_attribution.utm_medium
+    - datalake_tracked_events.offline_attribution.channel
   final_attribution_campaign:
     description: Final campaign attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.utm_campaign
-      - datalake_tracked_events.offline_attribution.channel
+    - datalake_online_attribution.online_attribution.utm_campaign
+    - datalake_tracked_events.offline_attribution.channel
   final_attribution_term:
     description: Final term attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.utm_term
+    - datalake_online_attribution.online_attribution.utm_term
   final_attribution_content:
     description: Final content attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.utm_content
+    - datalake_online_attribution.online_attribution.utm_content
   final_attribution_media_source:
     description: Final media source attributed to the event.
     lineage:
-      - datalake_online_attribution.online_attribution.media_source
+    - datalake_online_attribution.online_attribution.media_source
   final_attribution_entrance_uri:
     description: The URL of the first page a user visits in a session
     lineage:
-      - datalake_online_attribution.online_attribution.entrance_uri
+    - datalake_online_attribution.online_attribution.entrance_uri
   ts_event:
-    description: Date of the event.
+    description: Conversion event timestamp from online or offline sources after UNION ALL merge.
     lineage:
-      - datalake_online_attribution.online_attribution.ts_event
-      - datalake_tracked_events.offline_attribution.ts_event
+    - datalake_online_attribution.online_attribution.ts_event
+    - datalake_tracked_events.offline_attribution.ts_event
   year:
     description: Year of the event.
     lineage:
-      - datalake_online_attribution.online_attribution.ts_event
-      - datalake_tracked_events.offline_attribution.ts_event
+    - datalake_online_attribution.online_attribution.ts_event
+    - datalake_tracked_events.offline_attribution.ts_event
   month:
     description: Month of the event.
     lineage:
-      - datalake_online_attribution.online_attribution.ts_event
-      - datalake_tracked_events.offline_attribution.ts_event
+    - datalake_online_attribution.online_attribution.ts_event
+    - datalake_tracked_events.offline_attribution.ts_event
   day:
     description: Day of the event.
     lineage:
-      - datalake_online_attribution.online_attribution.ts_event
-      - datalake_tracked_events.offline_attribution.ts_event
+    - datalake_online_attribution.online_attribution.ts_event
+    - datalake_tracked_events.offline_attribution.ts_event

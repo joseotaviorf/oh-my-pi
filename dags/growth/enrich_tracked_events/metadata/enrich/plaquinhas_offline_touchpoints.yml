@@ -1,7 +1,7 @@
 ---
 database_name: datalake_tracked_events
 table_name: plaquinhas_offline_touchpoints
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Each row in this table is a contact made to the Plaquinhas number, via phone call or chat (Whatsapp).
 columns:
