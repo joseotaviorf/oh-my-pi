@@ -74,7 +74,7 @@ WITH union_surveys_answers AS (
         MD5(ssb.source_name) AS id_survey,
         ssb.id_contract,
         ssb.id_ticket,
-        NULL AS id_support_session,
+        ssb.id_support_session,
         NULL AS id_case,
         NULL AS id_account, 
         NULL AS id_origin,

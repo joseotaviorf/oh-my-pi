@@ -23,6 +23,12 @@ columns:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_customer_support.tickets.id_user_main
+  id_support_session:
+    description: |
+      Public identifier of the Support Session Service session linked to the call that generated the CSAT response.
+      Matched via support_session.source_identity to the Bigfone id_call or id_task. NULL when no session exists for the call.
+    lineage:
+      - datalake_support_session_service_clean.support_session.public_id
   service_type:
     description: Indicates the service that originated the satisfaction response.
   service_context:

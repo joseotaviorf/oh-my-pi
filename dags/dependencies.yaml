@@ -3,9 +3,6 @@ bietlejuice.alias_classifieds:
   - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
-bietlejuice.enrich_bianca_follow_up:
-  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
-  - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
 bietlejuice.concierge_propensity_model_service:
   - quintoml.concierge.concierge_propensity_model_batch.inference:first-run-of-day
 bietlejuice.conversation_explorer:
@@ -1731,6 +1728,9 @@ bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate-request:first-run-of-day
   - bietlejuice.betopera:load-clean-certificate:first-run-of-day
   - bietlejuice.betopera:load-clean-insurance:first-run-of-day
+bietlejuice.enrich_bianca_follow_up:
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
 bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent_fast_lane:load-clean-agency-aud:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-agency:first-run-of-day
@@ -3923,6 +3923,7 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat:first-run-of-day
+  - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
 bietlejuice.enrich_search:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events:first-run-of-day
