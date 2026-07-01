@@ -11,6 +11,3 @@ SELECT
     contract_created_at AS ts_analysis_start,
     contract_updated_at AS ts_analysis_end
 FROM datalake_legalops_raw.lego_backtest_results 
-WHERE 
-  backtest_id = 'unified_benchmark.week_20260302' AND
-  status = 'DONE'
