@@ -35,7 +35,7 @@ SELECT DISTINCT
     monthly_timeline_renewal,
     monthly_timeline_renewal_corrected,
     monthly_timeline_propose_aud,
-    monthly_value_propose,
+    CAST(monthly_value_propose AS DECIMAL(38, 18)) AS monthly_value_propose,
     annual_timeline_renewal,
     annual_timeline_propose_aud,
     annual_value_propose,
