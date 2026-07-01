@@ -164,6 +164,14 @@ bietlejuice.dw_fintech_snapshot_quintocred:
 bietlejuice.dw_recon_quintocred:
   remove:
     - bietlejuice.dw_fintech_snapshot_quintocred:load-dw-fintech-snapshot-quintocred-quintocred-ifrs-occurrence:first-run-of-day
+    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
+    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-metrics:first-run-of-day
+bietlejuice.dw_recon_quintocred_snapshot:
+  remove:
+    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
+    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-metrics:first-run-of-day
+bietlejuice.dw_velo_zendesk__validation:
+  override: []
 bietlejuice.dw_losses:
   add:
     - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations:first-run-of-day
@@ -1143,6 +1151,8 @@ bietlejuice.reverse_birdie:
   remove:
     - bietlejuice.dw_chattermill:load-dw-chattermill-dim-answer-category:first-run-of-day
     - bietlejuice.dw_chattermill:load-dw-chattermill-fact-answer-category:first-run-of-day
+    - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day
+    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
 bietlejuice.reverse_birdie_access:
   add:
     - bietlejuice.reverse_birdie:load-reverse-dsat-bot:first-run-of-day
