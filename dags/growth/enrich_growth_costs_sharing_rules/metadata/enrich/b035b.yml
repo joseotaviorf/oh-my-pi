@@ -3,21 +3,23 @@ database_name: datalake_growth_costs_sharing_rules
 table_name: b035b
 owner: uilson.bonfim@quintoandar.com.br
 domain: Growth
-description: Allocation of classified ad campaign costs among RMSP, Rio de Janeiro, Belo Horizonte, Porto Alegre, and Brasília.
+description: Allocation of branding and classified-ad campaign costs among RMSP, Rio de Janeiro, Belo Horizonte, Porto Alegre, and Brasília.
 columns:
   business_context:
-    description: Business context of the rule.
+    description: Not used for this rule; always NULL. Rent/sale segmentation is not applied at the rule level.
   city_group:
-    description: city_group segmentation
+    description: QuintoAndar geographic market cluster receiving the allocated share; limited to the city bundle defined in the rule SQL.
     lineage:
       - datalake_region.region.city_group
   funnel_side:
-    description: Marketplace side of business   
+    description: Always `branding` for fixed-percentage classified-ad and branding cost rules.
+    categories:
+      branding: Branding and classified-ad campaign costs with fixed city-group shares.
   id_date:
-    description: Date of applied share
+    description: Calendar date (yyyyMMdd integer) for which the cost-sharing percentage applies. One row per date, city_group, and rule combination.
     lineage:
       - datalake_quintoandar.aux_date.id_date
   id_rule:
-    description: Id rule
+    description: Cost-sharing rule code matching this enrich table name; injected at runtime from the SQL filename (e.g. a002a, d046d).
   share:
-    description: Percentage of cost that will be applied to specific city_group
+    description: Fixed fraction of total branding spend for this city_group on this date. Hardcoded in rule SQL; shares within a rule sum to 1.0.

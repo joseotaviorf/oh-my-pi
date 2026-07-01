@@ -3,230 +3,315 @@ database_name: datalake_growth_costs_sharing_rules
 table_name: sharing_rules
 domain: Growth
 owner: uilson.bonfim@quintoandar.com.br
-description: This table concat all share rules by date
+description: >
+  Unified union of all marketing cost-sharing rules used to split campaign spend across
+  city_groups (and optionally UTM campaign variants). Each row carries the rule code (id_rule),
+  allocation date, funnel_side, and share fraction. Consumed downstream by consolidated media
+  metrics pipelines. Not partitioned; no Z-ORDER.
 columns:
-  business_context:
-    description: Business context of the rule.
-    lineage:
-      - datalake_marketing_costs_sharing_rules.a002a.business_context
-      - datalake_marketing_costs_sharing_rules.a003a.business_context
-      - datalake_marketing_costs_sharing_rules.a004a.business_context
-      - datalake_marketing_costs_sharing_rules.a009a.business_context
-      - datalake_marketing_costs_sharing_rules.b016b.business_context
-      - datalake_marketing_costs_sharing_rules.b017b.business_context
-      - datalake_marketing_costs_sharing_rules.b018b.business_context
-      - datalake_marketing_costs_sharing_rules.b035b.business_context
-      - datalake_marketing_costs_sharing_rules.d000d.business_context
-      - datalake_marketing_costs_sharing_rules.d001d.business_context
-      - datalake_marketing_costs_sharing_rules.d005d.business_context
-      - datalake_marketing_costs_sharing_rules.d006d.business_context
-      - datalake_marketing_costs_sharing_rules.d007d.business_context
-      - datalake_marketing_costs_sharing_rules.d008d.business_context
-      - datalake_marketing_costs_sharing_rules.d010d.business_context
-      - datalake_marketing_costs_sharing_rules.d011d.business_context
-      - datalake_marketing_costs_sharing_rules.d020d.business_context
-      - datalake_marketing_costs_sharing_rules.d021d.business_context
-      - datalake_marketing_costs_sharing_rules.d023d.business_context
-      - datalake_marketing_costs_sharing_rules.d046d.business_context
-      - datalake_marketing_costs_sharing_rules.d047d.business_context
-      - datalake_marketing_costs_sharing_rules.p014p.business_context
-      - datalake_marketing_costs_sharing_rules.s012s.business_context
-      - datalake_marketing_costs_sharing_rules.s019s.business_context
-      - datalake_marketing_costs_sharing_rules.s024s.business_context
-      - datalake_marketing_costs_sharing_rules.s025s.business_context
-      - datalake_marketing_costs_sharing_rules.s026s.business_context
-      - datalake_marketing_costs_sharing_rules.s027s.business_context
-      - datalake_marketing_costs_sharing_rules.s029s.business_context
-      - datalake_marketing_costs_sharing_rules.s030s.business_context
-      - datalake_marketing_costs_sharing_rules.s031s.business_context
-      - datalake_marketing_costs_sharing_rules.s032s.business_context
-      - datalake_marketing_costs_sharing_rules.s051s.business_context
-  city_group:
-    description: city_group segmentation
-    lineage:
-      - datalake_marketing_costs_sharing_rules.a002a.city_group
-      - datalake_marketing_costs_sharing_rules.a003a.city_group
-      - datalake_marketing_costs_sharing_rules.a004a.city_group
-      - datalake_marketing_costs_sharing_rules.a009a.city_group
-      - datalake_marketing_costs_sharing_rules.b016b.city_group
-      - datalake_marketing_costs_sharing_rules.b017b.city_group
-      - datalake_marketing_costs_sharing_rules.b018b.city_group
-      - datalake_marketing_costs_sharing_rules.b035b.city_group
-      - datalake_marketing_costs_sharing_rules.d000d.city_group
-      - datalake_marketing_costs_sharing_rules.d001d.city_group
-      - datalake_marketing_costs_sharing_rules.d005d.city_group
-      - datalake_marketing_costs_sharing_rules.d006d.city_group
-      - datalake_marketing_costs_sharing_rules.d007d.city_group
-      - datalake_marketing_costs_sharing_rules.d008d.city_group
-      - datalake_marketing_costs_sharing_rules.d010d.city_group
-      - datalake_marketing_costs_sharing_rules.d011d.city_group
-      - datalake_marketing_costs_sharing_rules.d020d.city_group
-      - datalake_marketing_costs_sharing_rules.d021d.city_group
-      - datalake_marketing_costs_sharing_rules.d023d.city_group
-      - datalake_marketing_costs_sharing_rules.d046d.city_group
-      - datalake_marketing_costs_sharing_rules.d047d.city_group
-      - datalake_marketing_costs_sharing_rules.p014p.city_group
-      - datalake_marketing_costs_sharing_rules.s012s.city_group
-      - datalake_marketing_costs_sharing_rules.s019s.city_group
-      - datalake_marketing_costs_sharing_rules.s024s.city_group
-      - datalake_marketing_costs_sharing_rules.s025s.city_group
-      - datalake_marketing_costs_sharing_rules.s026s.city_group
-      - datalake_marketing_costs_sharing_rules.s027s.city_group
-      - datalake_marketing_costs_sharing_rules.s029s.city_group
-      - datalake_marketing_costs_sharing_rules.s030s.city_group
-      - datalake_marketing_costs_sharing_rules.s031s.city_group
-      - datalake_marketing_costs_sharing_rules.s032s.city_group
-      - datalake_marketing_costs_sharing_rules.s051s.city_group
-  country_code:
-    description: country_code segmentation
-    lineage: 
-  funnel_side:
-    description: Marketplace side of business
-    lineage:
-      - datalake_marketing_costs_sharing_rules.a002a.funnel_side
-      - datalake_marketing_costs_sharing_rules.a003a.funnel_side
-      - datalake_marketing_costs_sharing_rules.a004a.funnel_side
-      - datalake_marketing_costs_sharing_rules.a009a.funnel_side
-      - datalake_marketing_costs_sharing_rules.b016b.funnel_side
-      - datalake_marketing_costs_sharing_rules.b017b.funnel_side
-      - datalake_marketing_costs_sharing_rules.b018b.funnel_side
-      - datalake_marketing_costs_sharing_rules.b035b.funnel_side
-      - datalake_marketing_costs_sharing_rules.d000d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d001d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d005d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d006d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d007d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d008d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d010d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d011d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d020d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d021d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d023d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d046d.funnel_side
-      - datalake_marketing_costs_sharing_rules.d047d.funnel_side
-      - datalake_marketing_costs_sharing_rules.p014p.funnel_side
-      - datalake_marketing_costs_sharing_rules.s012s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s019s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s024s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s025s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s026s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s027s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s029s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s030s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s031s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s032s.funnel_side
-      - datalake_marketing_costs_sharing_rules.s051s.funnel_side
   id_date:
-    description: Date segmentation
+    description: Calendar date (yyyyMMdd integer) for which the cost-sharing percentage applies.
     lineage:
-      - datalake_marketing_costs_sharing_rules.a002a.id_date
-      - datalake_marketing_costs_sharing_rules.a003a.id_date
-      - datalake_marketing_costs_sharing_rules.a004a.id_date
-      - datalake_marketing_costs_sharing_rules.a009a.id_date
-      - datalake_marketing_costs_sharing_rules.b016b.id_date
-      - datalake_marketing_costs_sharing_rules.b017b.id_date
-      - datalake_marketing_costs_sharing_rules.b018b.id_date
-      - datalake_marketing_costs_sharing_rules.b035b.id_date
-      - datalake_marketing_costs_sharing_rules.d000d.id_date
-      - datalake_marketing_costs_sharing_rules.d001d.id_date
-      - datalake_marketing_costs_sharing_rules.d005d.id_date
-      - datalake_marketing_costs_sharing_rules.d006d.id_date
-      - datalake_marketing_costs_sharing_rules.d007d.id_date
-      - datalake_marketing_costs_sharing_rules.d008d.id_date
-      - datalake_marketing_costs_sharing_rules.d010d.id_date
-      - datalake_marketing_costs_sharing_rules.d011d.id_date
-      - datalake_marketing_costs_sharing_rules.d020d.id_date
-      - datalake_marketing_costs_sharing_rules.d021d.id_date
-      - datalake_marketing_costs_sharing_rules.d023d.id_date
-      - datalake_marketing_costs_sharing_rules.d046d.id_date
-      - datalake_marketing_costs_sharing_rules.d047d.id_date
-      - datalake_marketing_costs_sharing_rules.p014p.id_date
-      - datalake_marketing_costs_sharing_rules.s012s.id_date
-      - datalake_marketing_costs_sharing_rules.s019s.id_date
-      - datalake_marketing_costs_sharing_rules.s024s.id_date
-      - datalake_marketing_costs_sharing_rules.s025s.id_date
-      - datalake_marketing_costs_sharing_rules.s026s.id_date
-      - datalake_marketing_costs_sharing_rules.s027s.id_date
-      - datalake_marketing_costs_sharing_rules.s029s.id_date
-      - datalake_marketing_costs_sharing_rules.s030s.id_date
-      - datalake_marketing_costs_sharing_rules.s031s.id_date
-      - datalake_marketing_costs_sharing_rules.s032s.id_date
-      - datalake_marketing_costs_sharing_rules.s051s.id_date
+      - datalake_growth_costs_sharing_rules.a002a.id_date
+      - datalake_growth_costs_sharing_rules.a003a.id_date
+      - datalake_growth_costs_sharing_rules.a004a.id_date
+      - datalake_growth_costs_sharing_rules.a009a.id_date
+      - datalake_growth_costs_sharing_rules.a028a.id_date
+      - datalake_growth_costs_sharing_rules.a033a.id_date
+      - datalake_growth_costs_sharing_rules.a034a.id_date
+      - datalake_growth_costs_sharing_rules.b016b.id_date
+      - datalake_growth_costs_sharing_rules.b017b.id_date
+      - datalake_growth_costs_sharing_rules.b018b.id_date
+      - datalake_growth_costs_sharing_rules.b035b.id_date
+      - datalake_growth_costs_sharing_rules.d000d.id_date
+      - datalake_growth_costs_sharing_rules.d001d.id_date
+      - datalake_growth_costs_sharing_rules.d005d.id_date
+      - datalake_growth_costs_sharing_rules.d006d.id_date
+      - datalake_growth_costs_sharing_rules.d007d.id_date
+      - datalake_growth_costs_sharing_rules.d008d.id_date
+      - datalake_growth_costs_sharing_rules.d010d.id_date
+      - datalake_growth_costs_sharing_rules.d011d.id_date
+      - datalake_growth_costs_sharing_rules.d020d.id_date
+      - datalake_growth_costs_sharing_rules.d021d.id_date
+      - datalake_growth_costs_sharing_rules.d023d.id_date
+      - datalake_growth_costs_sharing_rules.d046d.id_date
+      - datalake_growth_costs_sharing_rules.d047d.id_date
+      - datalake_growth_costs_sharing_rules.d048d.id_date
+      - datalake_growth_costs_sharing_rules.d049d.id_date
+      - datalake_growth_costs_sharing_rules.p014p.id_date
+      - datalake_growth_costs_sharing_rules.s012s.id_date
+      - datalake_growth_costs_sharing_rules.s019s.id_date
+      - datalake_growth_costs_sharing_rules.s024s.id_date
+      - datalake_growth_costs_sharing_rules.s025s.id_date
+      - datalake_growth_costs_sharing_rules.s026s.id_date
+      - datalake_growth_costs_sharing_rules.s027s.id_date
+      - datalake_growth_costs_sharing_rules.s029s.id_date
+      - datalake_growth_costs_sharing_rules.s030s.id_date
+      - datalake_growth_costs_sharing_rules.s031s.id_date
+      - datalake_growth_costs_sharing_rules.s032s.id_date
+      - datalake_growth_costs_sharing_rules.s051s.id_date
   id_rule:
-    description: Id rule
+    description: Cost-sharing rule code identifying which allocation logic produced this row (matches the child enrich table name).
     lineage:
-      - datalake_marketing_costs_sharing_rules.a002a.id_rule
-      - datalake_marketing_costs_sharing_rules.a003a.id_rule
-      - datalake_marketing_costs_sharing_rules.a004a.id_rule
-      - datalake_marketing_costs_sharing_rules.a009a.id_rule
-      - datalake_marketing_costs_sharing_rules.b016b.id_rule
-      - datalake_marketing_costs_sharing_rules.b017b.id_rule
-      - datalake_marketing_costs_sharing_rules.b018b.id_rule
-      - datalake_marketing_costs_sharing_rules.b035b.id_rule
-      - datalake_marketing_costs_sharing_rules.d000d.id_rule
-      - datalake_marketing_costs_sharing_rules.d001d.id_rule
-      - datalake_marketing_costs_sharing_rules.d005d.id_rule
-      - datalake_marketing_costs_sharing_rules.d006d.id_rule
-      - datalake_marketing_costs_sharing_rules.d007d.id_rule
-      - datalake_marketing_costs_sharing_rules.d008d.id_rule
-      - datalake_marketing_costs_sharing_rules.d010d.id_rule
-      - datalake_marketing_costs_sharing_rules.d011d.id_rule
-      - datalake_marketing_costs_sharing_rules.d020d.id_rule
-      - datalake_marketing_costs_sharing_rules.d021d.id_rule
-      - datalake_marketing_costs_sharing_rules.d023d.id_rule
-      - datalake_marketing_costs_sharing_rules.d046d.id_rule
-      - datalake_marketing_costs_sharing_rules.d047d.id_rule
-      - datalake_marketing_costs_sharing_rules.p014p.id_rule
-      - datalake_marketing_costs_sharing_rules.s012s.id_rule
-      - datalake_marketing_costs_sharing_rules.s019s.id_rule
-      - datalake_marketing_costs_sharing_rules.s024s.id_rule
-      - datalake_marketing_costs_sharing_rules.s025s.id_rule
-      - datalake_marketing_costs_sharing_rules.s026s.id_rule
-      - datalake_marketing_costs_sharing_rules.s027s.id_rule
-      - datalake_marketing_costs_sharing_rules.s029s.id_rule
-      - datalake_marketing_costs_sharing_rules.s030s.id_rule
-      - datalake_marketing_costs_sharing_rules.s031s.id_rule
-      - datalake_marketing_costs_sharing_rules.s032s.id_rule
-      - datalake_marketing_costs_sharing_rules.s051s.id_rule
+      - datalake_growth_costs_sharing_rules.a002a.id_rule
+      - datalake_growth_costs_sharing_rules.a003a.id_rule
+      - datalake_growth_costs_sharing_rules.a004a.id_rule
+      - datalake_growth_costs_sharing_rules.a009a.id_rule
+      - datalake_growth_costs_sharing_rules.a028a.id_rule
+      - datalake_growth_costs_sharing_rules.a033a.id_rule
+      - datalake_growth_costs_sharing_rules.a034a.id_rule
+      - datalake_growth_costs_sharing_rules.b016b.id_rule
+      - datalake_growth_costs_sharing_rules.b017b.id_rule
+      - datalake_growth_costs_sharing_rules.b018b.id_rule
+      - datalake_growth_costs_sharing_rules.b035b.id_rule
+      - datalake_growth_costs_sharing_rules.d000d.id_rule
+      - datalake_growth_costs_sharing_rules.d001d.id_rule
+      - datalake_growth_costs_sharing_rules.d005d.id_rule
+      - datalake_growth_costs_sharing_rules.d006d.id_rule
+      - datalake_growth_costs_sharing_rules.d007d.id_rule
+      - datalake_growth_costs_sharing_rules.d008d.id_rule
+      - datalake_growth_costs_sharing_rules.d010d.id_rule
+      - datalake_growth_costs_sharing_rules.d011d.id_rule
+      - datalake_growth_costs_sharing_rules.d020d.id_rule
+      - datalake_growth_costs_sharing_rules.d021d.id_rule
+      - datalake_growth_costs_sharing_rules.d023d.id_rule
+      - datalake_growth_costs_sharing_rules.d046d.id_rule
+      - datalake_growth_costs_sharing_rules.d047d.id_rule
+      - datalake_growth_costs_sharing_rules.d048d.id_rule
+      - datalake_growth_costs_sharing_rules.d049d.id_rule
+      - datalake_growth_costs_sharing_rules.p014p.id_rule
+      - datalake_growth_costs_sharing_rules.s012s.id_rule
+      - datalake_growth_costs_sharing_rules.s019s.id_rule
+      - datalake_growth_costs_sharing_rules.s024s.id_rule
+      - datalake_growth_costs_sharing_rules.s025s.id_rule
+      - datalake_growth_costs_sharing_rules.s026s.id_rule
+      - datalake_growth_costs_sharing_rules.s027s.id_rule
+      - datalake_growth_costs_sharing_rules.s029s.id_rule
+      - datalake_growth_costs_sharing_rules.s030s.id_rule
+      - datalake_growth_costs_sharing_rules.s031s.id_rule
+      - datalake_growth_costs_sharing_rules.s032s.id_rule
+      - datalake_growth_costs_sharing_rules.s051s.id_rule
+  country_code:
+    description: ISO 3166-1 alpha-2 country of the city_group receiving allocated spend (`BR` or `MX`). Hardcoded as `BR` for most rules; passthrough from child rules where computed.
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.country_code
+      - datalake_growth_costs_sharing_rules.a003a.country_code
+      - datalake_growth_costs_sharing_rules.a004a.country_code
+      - datalake_growth_costs_sharing_rules.a009a.country_code
+      - datalake_growth_costs_sharing_rules.a028a.country_code
+      - datalake_growth_costs_sharing_rules.a033a.country_code
+      - datalake_growth_costs_sharing_rules.a034a.country_code
+      - datalake_growth_costs_sharing_rules.b016b.country_code
+      - datalake_growth_costs_sharing_rules.b017b.country_code
+      - datalake_growth_costs_sharing_rules.b018b.country_code
+      - datalake_growth_costs_sharing_rules.b035b.country_code
+      - datalake_growth_costs_sharing_rules.d000d.country_code
+      - datalake_growth_costs_sharing_rules.d001d.country_code
+      - datalake_growth_costs_sharing_rules.d005d.country_code
+      - datalake_growth_costs_sharing_rules.d006d.country_code
+      - datalake_growth_costs_sharing_rules.d007d.country_code
+      - datalake_growth_costs_sharing_rules.d008d.country_code
+      - datalake_growth_costs_sharing_rules.d010d.country_code
+      - datalake_growth_costs_sharing_rules.d011d.country_code
+      - datalake_growth_costs_sharing_rules.d020d.country_code
+      - datalake_growth_costs_sharing_rules.d021d.country_code
+      - datalake_growth_costs_sharing_rules.d023d.country_code
+      - datalake_growth_costs_sharing_rules.d046d.country_code
+      - datalake_growth_costs_sharing_rules.d047d.country_code
+      - datalake_growth_costs_sharing_rules.d048d.country_code
+      - datalake_growth_costs_sharing_rules.d049d.country_code
+      - datalake_growth_costs_sharing_rules.p014p.country_code
+      - datalake_growth_costs_sharing_rules.s012s.country_code
+      - datalake_growth_costs_sharing_rules.s019s.country_code
+      - datalake_growth_costs_sharing_rules.s024s.country_code
+      - datalake_growth_costs_sharing_rules.s025s.country_code
+      - datalake_growth_costs_sharing_rules.s026s.country_code
+      - datalake_growth_costs_sharing_rules.s027s.country_code
+      - datalake_growth_costs_sharing_rules.s029s.country_code
+      - datalake_growth_costs_sharing_rules.s030s.country_code
+      - datalake_growth_costs_sharing_rules.s031s.country_code
+      - datalake_growth_costs_sharing_rules.s032s.country_code
+      - datalake_growth_costs_sharing_rules.s051s.country_code
+    categories:
+      BR: Brazil
+      MX: Mexico
+  city_group:
+    description: QuintoAndar geographic market cluster receiving the allocated share.
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.city_group
+      - datalake_growth_costs_sharing_rules.a003a.city_group
+      - datalake_growth_costs_sharing_rules.a004a.city_group
+      - datalake_growth_costs_sharing_rules.a009a.city_group
+      - datalake_growth_costs_sharing_rules.a028a.city_group
+      - datalake_growth_costs_sharing_rules.a033a.city_group
+      - datalake_growth_costs_sharing_rules.a034a.city_group
+      - datalake_growth_costs_sharing_rules.b016b.city_group
+      - datalake_growth_costs_sharing_rules.b017b.city_group
+      - datalake_growth_costs_sharing_rules.b018b.city_group
+      - datalake_growth_costs_sharing_rules.b035b.city_group
+      - datalake_growth_costs_sharing_rules.d000d.city_group
+      - datalake_growth_costs_sharing_rules.d001d.city_group
+      - datalake_growth_costs_sharing_rules.d005d.city_group
+      - datalake_growth_costs_sharing_rules.d006d.city_group
+      - datalake_growth_costs_sharing_rules.d007d.city_group
+      - datalake_growth_costs_sharing_rules.d008d.city_group
+      - datalake_growth_costs_sharing_rules.d010d.city_group
+      - datalake_growth_costs_sharing_rules.d011d.city_group
+      - datalake_growth_costs_sharing_rules.d020d.city_group
+      - datalake_growth_costs_sharing_rules.d021d.city_group
+      - datalake_growth_costs_sharing_rules.d023d.city_group
+      - datalake_growth_costs_sharing_rules.d046d.city_group
+      - datalake_growth_costs_sharing_rules.d047d.city_group
+      - datalake_growth_costs_sharing_rules.d048d.city_group
+      - datalake_growth_costs_sharing_rules.d049d.city_group
+      - datalake_growth_costs_sharing_rules.p014p.city_group
+      - datalake_growth_costs_sharing_rules.s012s.city_group
+      - datalake_growth_costs_sharing_rules.s019s.city_group
+      - datalake_growth_costs_sharing_rules.s024s.city_group
+      - datalake_growth_costs_sharing_rules.s025s.city_group
+      - datalake_growth_costs_sharing_rules.s026s.city_group
+      - datalake_growth_costs_sharing_rules.s027s.city_group
+      - datalake_growth_costs_sharing_rules.s029s.city_group
+      - datalake_growth_costs_sharing_rules.s030s.city_group
+      - datalake_growth_costs_sharing_rules.s031s.city_group
+      - datalake_growth_costs_sharing_rules.s032s.city_group
+      - datalake_growth_costs_sharing_rules.s051s.city_group
   share:
-    description: Percentage of cost that will be applied to specific city_group
+    description: Fraction of campaign spend allocated to this city_group (and optional UTM variant) on this date. Range 0 to 1.
     lineage:
-      - datalake_marketing_costs_sharing_rules.a002a.share
-      - datalake_marketing_costs_sharing_rules.a003a.share
-      - datalake_marketing_costs_sharing_rules.a004a.share
-      - datalake_marketing_costs_sharing_rules.a009a.share
-      - datalake_marketing_costs_sharing_rules.b016b.share
-      - datalake_marketing_costs_sharing_rules.b017b.share
-      - datalake_marketing_costs_sharing_rules.b018b.share
-      - datalake_marketing_costs_sharing_rules.b035b.share
-      - datalake_marketing_costs_sharing_rules.d000d.share
-      - datalake_marketing_costs_sharing_rules.d001d.share
-      - datalake_marketing_costs_sharing_rules.d005d.share
-      - datalake_marketing_costs_sharing_rules.d006d.share
-      - datalake_marketing_costs_sharing_rules.d007d.share
-      - datalake_marketing_costs_sharing_rules.d008d.share
-      - datalake_marketing_costs_sharing_rules.d010d.share
-      - datalake_marketing_costs_sharing_rules.d011d.share
-      - datalake_marketing_costs_sharing_rules.d020d.share
-      - datalake_marketing_costs_sharing_rules.d021d.share
-      - datalake_marketing_costs_sharing_rules.d023d.share
-      - datalake_marketing_costs_sharing_rules.d046d.share
-      - datalake_marketing_costs_sharing_rules.d047d.share
-      - datalake_marketing_costs_sharing_rules.p014p.share
-      - datalake_marketing_costs_sharing_rules.s012s.share
-      - datalake_marketing_costs_sharing_rules.s019s.share
-      - datalake_marketing_costs_sharing_rules.s024s.share
-      - datalake_marketing_costs_sharing_rules.s025s.share
-      - datalake_marketing_costs_sharing_rules.s026s.share
-      - datalake_marketing_costs_sharing_rules.s027s.share
-      - datalake_marketing_costs_sharing_rules.s029s.share
-      - datalake_marketing_costs_sharing_rules.s030s.share
-      - datalake_marketing_costs_sharing_rules.s031s.share
-      - datalake_marketing_costs_sharing_rules.s032s.share
-      - datalake_marketing_costs_sharing_rules.s051s.share
-  utm_campaign:
-    description: utm_campaign segmentation
-    lineage: 
-      - datalake_marketing_costs_sharing_rules.d046d.utm_campaign
-      - datalake_marketing_costs_sharing_rules.d047d.utm_campaign
-      - datalake_marketing_costs_sharing_rules.s051s.utm_campaign
+      - datalake_growth_costs_sharing_rules.a002a.share
+      - datalake_growth_costs_sharing_rules.a003a.share
+      - datalake_growth_costs_sharing_rules.a004a.share
+      - datalake_growth_costs_sharing_rules.a009a.share
+      - datalake_growth_costs_sharing_rules.a028a.share
+      - datalake_growth_costs_sharing_rules.a033a.share
+      - datalake_growth_costs_sharing_rules.a034a.share
+      - datalake_growth_costs_sharing_rules.b016b.share
+      - datalake_growth_costs_sharing_rules.b017b.share
+      - datalake_growth_costs_sharing_rules.b018b.share
+      - datalake_growth_costs_sharing_rules.b035b.share
+      - datalake_growth_costs_sharing_rules.d000d.share
+      - datalake_growth_costs_sharing_rules.d001d.share
+      - datalake_growth_costs_sharing_rules.d005d.share
+      - datalake_growth_costs_sharing_rules.d006d.share
+      - datalake_growth_costs_sharing_rules.d007d.share
+      - datalake_growth_costs_sharing_rules.d008d.share
+      - datalake_growth_costs_sharing_rules.d010d.share
+      - datalake_growth_costs_sharing_rules.d011d.share
+      - datalake_growth_costs_sharing_rules.d020d.share
+      - datalake_growth_costs_sharing_rules.d021d.share
+      - datalake_growth_costs_sharing_rules.d023d.share
+      - datalake_growth_costs_sharing_rules.d046d.share
+      - datalake_growth_costs_sharing_rules.d047d.share
+      - datalake_growth_costs_sharing_rules.d048d.share
+      - datalake_growth_costs_sharing_rules.d049d.share
+      - datalake_growth_costs_sharing_rules.p014p.share
+      - datalake_growth_costs_sharing_rules.s012s.share
+      - datalake_growth_costs_sharing_rules.s019s.share
+      - datalake_growth_costs_sharing_rules.s024s.share
+      - datalake_growth_costs_sharing_rules.s025s.share
+      - datalake_growth_costs_sharing_rules.s026s.share
+      - datalake_growth_costs_sharing_rules.s027s.share
+      - datalake_growth_costs_sharing_rules.s029s.share
+      - datalake_growth_costs_sharing_rules.s030s.share
+      - datalake_growth_costs_sharing_rules.s031s.share
+      - datalake_growth_costs_sharing_rules.s032s.share
+      - datalake_growth_costs_sharing_rules.s051s.share
+  funnel_side:
+    description: Marketing funnel side that owns the shared spend (affiliates, branding, demand, ciq, or supply).
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.funnel_side
+      - datalake_growth_costs_sharing_rules.a003a.funnel_side
+      - datalake_growth_costs_sharing_rules.a004a.funnel_side
+      - datalake_growth_costs_sharing_rules.a009a.funnel_side
+      - datalake_growth_costs_sharing_rules.a028a.funnel_side
+      - datalake_growth_costs_sharing_rules.a033a.funnel_side
+      - datalake_growth_costs_sharing_rules.a034a.funnel_side
+      - datalake_growth_costs_sharing_rules.b016b.funnel_side
+      - datalake_growth_costs_sharing_rules.b017b.funnel_side
+      - datalake_growth_costs_sharing_rules.b018b.funnel_side
+      - datalake_growth_costs_sharing_rules.b035b.funnel_side
+      - datalake_growth_costs_sharing_rules.d000d.funnel_side
+      - datalake_growth_costs_sharing_rules.d001d.funnel_side
+      - datalake_growth_costs_sharing_rules.d005d.funnel_side
+      - datalake_growth_costs_sharing_rules.d006d.funnel_side
+      - datalake_growth_costs_sharing_rules.d007d.funnel_side
+      - datalake_growth_costs_sharing_rules.d008d.funnel_side
+      - datalake_growth_costs_sharing_rules.d010d.funnel_side
+      - datalake_growth_costs_sharing_rules.d011d.funnel_side
+      - datalake_growth_costs_sharing_rules.d020d.funnel_side
+      - datalake_growth_costs_sharing_rules.d021d.funnel_side
+      - datalake_growth_costs_sharing_rules.d023d.funnel_side
+      - datalake_growth_costs_sharing_rules.d046d.funnel_side
+      - datalake_growth_costs_sharing_rules.d047d.funnel_side
+      - datalake_growth_costs_sharing_rules.d048d.funnel_side
+      - datalake_growth_costs_sharing_rules.d049d.funnel_side
+      - datalake_growth_costs_sharing_rules.p014p.funnel_side
+      - datalake_growth_costs_sharing_rules.s012s.funnel_side
+      - datalake_growth_costs_sharing_rules.s019s.funnel_side
+      - datalake_growth_costs_sharing_rules.s024s.funnel_side
+      - datalake_growth_costs_sharing_rules.s025s.funnel_side
+      - datalake_growth_costs_sharing_rules.s026s.funnel_side
+      - datalake_growth_costs_sharing_rules.s027s.funnel_side
+      - datalake_growth_costs_sharing_rules.s029s.funnel_side
+      - datalake_growth_costs_sharing_rules.s030s.funnel_side
+      - datalake_growth_costs_sharing_rules.s031s.funnel_side
+      - datalake_growth_costs_sharing_rules.s032s.funnel_side
+      - datalake_growth_costs_sharing_rules.s051s.funnel_side
+    categories:
+      affiliates: Affiliate and referral campaign costs.
+      branding: Branding and classified-ad campaign costs.
+      demand: Demand-side performance marketing costs.
+      ciq: CIQ autonomous-agent partner program costs.
+      supply: Hybrid supply-side campaign costs.
+  business_context:
+    description: Rent/sale business line when the rule applies segmentation; NULL for rules that do not split by business context.
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.business_context
+      - datalake_growth_costs_sharing_rules.a003a.business_context
+      - datalake_growth_costs_sharing_rules.a004a.business_context
+      - datalake_growth_costs_sharing_rules.a009a.business_context
+      - datalake_growth_costs_sharing_rules.a028a.business_context
+      - datalake_growth_costs_sharing_rules.a033a.business_context
+      - datalake_growth_costs_sharing_rules.a034a.business_context
+      - datalake_growth_costs_sharing_rules.b016b.business_context
+      - datalake_growth_costs_sharing_rules.b017b.business_context
+      - datalake_growth_costs_sharing_rules.b018b.business_context
+      - datalake_growth_costs_sharing_rules.b035b.business_context
+      - datalake_growth_costs_sharing_rules.d000d.business_context
+      - datalake_growth_costs_sharing_rules.d001d.business_context
+      - datalake_growth_costs_sharing_rules.d005d.business_context
+      - datalake_growth_costs_sharing_rules.d006d.business_context
+      - datalake_growth_costs_sharing_rules.d007d.business_context
+      - datalake_growth_costs_sharing_rules.d008d.business_context
+      - datalake_growth_costs_sharing_rules.d010d.business_context
+      - datalake_growth_costs_sharing_rules.d011d.business_context
+      - datalake_growth_costs_sharing_rules.d020d.business_context
+      - datalake_growth_costs_sharing_rules.d021d.business_context
+      - datalake_growth_costs_sharing_rules.d023d.business_context
+      - datalake_growth_costs_sharing_rules.d046d.business_context
+      - datalake_growth_costs_sharing_rules.d047d.business_context
+      - datalake_growth_costs_sharing_rules.d048d.business_context
+      - datalake_growth_costs_sharing_rules.d049d.business_context
+      - datalake_growth_costs_sharing_rules.p014p.business_context
+      - datalake_growth_costs_sharing_rules.s012s.business_context
+      - datalake_growth_costs_sharing_rules.s019s.business_context
+      - datalake_growth_costs_sharing_rules.s024s.business_context
+      - datalake_growth_costs_sharing_rules.s025s.business_context
+      - datalake_growth_costs_sharing_rules.s026s.business_context
+      - datalake_growth_costs_sharing_rules.s027s.business_context
+      - datalake_growth_costs_sharing_rules.s029s.business_context
+      - datalake_growth_costs_sharing_rules.s030s.business_context
+      - datalake_growth_costs_sharing_rules.s031s.business_context
+      - datalake_growth_costs_sharing_rules.s032s.business_context
+      - datalake_growth_costs_sharing_rules.s051s.business_context
+  utm_campaign_modified:
+    description: |
+      UTM campaign suffix for UTM-modified sharing rules. Null for standard rules; populated for
+      rules that split cost by campaign variant (d046d, d047d, d048d, d049d, s051s).
+    lineage:
+      - datalake_growth_costs_sharing_rules.d046d.utm_campaign_modified
+      - datalake_growth_costs_sharing_rules.d047d.utm_campaign_modified
+      - datalake_growth_costs_sharing_rules.d048d.utm_campaign_modified
+      - datalake_growth_costs_sharing_rules.d049d.utm_campaign_modified
+      - datalake_growth_costs_sharing_rules.s051s.utm_campaign_modified

@@ -1,23 +1,25 @@
 ---
 database_name: datalake_growth_costs_sharing_rules
 table_name: a002a
-owner: monica.faria@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Allocation of classified ad campaign costs among all cities in Brasil.
+description: Allocation of affiliate campaign costs among all cities in Brasil.
 columns:
   business_context:
-    description: Business context of the rule.
+    description: Not used for this rule; always NULL. Rent/sale segmentation is not applied at the rule level.
   city_group:
-    description: city_group segmentation
+    description: QuintoAndar geographic market cluster receiving the allocated share; limited to the city bundle defined in the rule SQL.
     lineage:
       - datalake_region.region.city_group
   funnel_side:
-    description: Marketplace side of business     
+    description: Always `affiliates` for affiliate and referral campaign cost rules.
+    categories:
+      affiliates: Affiliate and referral program campaign costs.
   id_date:
-    description: Date of applied share
+    description: Calendar date (yyyyMMdd integer) for which the cost-sharing percentage applies. One row per date, city_group, and rule combination.
     lineage:
       - datalake_quintoandar.aux_date.id_date
   id_rule:
-    description: Id rule
+    description: Cost-sharing rule code matching this enrich table name; injected at runtime from the SQL filename (e.g. a002a, d046d).
   share:
-    description: Percentage of cost that will be applied to specific city_group
+    description: Dynamic fraction of campaign spend for this city_group on this date, computed as the rule conversion metric divided by the total metric (range 0 to 1).
