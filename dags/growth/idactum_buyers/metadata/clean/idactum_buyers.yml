@@ -1,43 +1,45 @@
 database_name: datalake_idactum_buyers_clean
 table_name: idactum_buyers
 description:
-  Table acquired from Idactum. Contains buyer/purchaser data from real estate
-  transactions.
-domain: Growth
-owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+  Third-party buyer intelligence data sourced from Idactum, capturing the identity
+  of purchasers in Brazilian real estate transactions extracted from notary records.
+  Used by the Growth team for market analysis, buyer behavior profiling, and demand-side
+  competitive intelligence in the real estate market.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.id
     description: |
-      "Table unique identifier."
+      Surrogate primary key that uniquely identifies a buyer record within this table.
   id_transaction:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.id_transacao
     description: |
-      "Transaction identifier."
+      Foreign key linking the buyer to the specific real estate transaction in which they participated as a purchaser.
   id_idactum:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.id_idactum
     description: |
-      "Idactum identifier."
+      Idactum's internal identifier for the property unit associated with this buyer's transaction, used to join with other Idactum datasets.
   buyer_name:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.nome
     description: |
-      "Buyer name."
+      Full legal name of the buyer as recorded in the notary transaction deed.
   buyer_document:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.documento
     description: |
-      "Buyer document number (CPF or CNPJ)."
+      Brazilian tax identification number of the buyer — CPF for individuals or CNPJ for legal entities — as registered in the transaction.
   is_document_missing_at_some_step:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.doc_faltante_em_algum_ponto
     description: |
-      "Whether the buyer document was missing at some point in the transaction."
+      Indicates whether the buyer's identification document was absent at any stage of the transaction registration process, signaling potential data quality issues.
   dt_load:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.dt_load
     description: |
-      "Date when the idactum buyers data was loaded."
+      Date on which this buyer record was ingested from the Idactum source into the data lake.

@@ -1,178 +1,181 @@
 database_name: datalake_idactum_houses_clean
 table_name: idactum_houses
 description:
-  Table acquired from Idactum. Contain house related data, including address,
-  location, features and others.
-domain: Growth
-owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+  Third-party property master data sourced from Idactum, providing comprehensive
+  physical and financial attributes of residential and commercial properties in
+  Brazil, including address, geolocation, area measurements, valuation estimates,
+  and fiscal information. Used by the Growth team for market intelligence, property
+  scoring, and cross-referencing QuintoAndar's supply with broader market context.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.id
     description: |
-      "Table unique identifier."
+      Surrogate primary key that uniquely identifies a property record within this table.
   id_municipal_house:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.id_unidade
     description: |
-      "Municipal house id."
+      Municipal cadastral identifier assigned by city hall to uniquely identify a property unit in government records.
   id_idactum:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.id_idactum
     description: |
-      "Idactum house id."
+      Idactum's proprietary identifier for the property, used as the join key across all Idactum datasets (buyers, sellers, transactions, registrations).
   id_patrimonial_assets:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.bpatri_key
     description: |
-      "Patrimonial assets unique identifier."
+      Unique key for the patrimonial asset record in Idactum's property valuation system (iPatri), linking to valuation and appreciation data.
   state:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.uf
     description: |
-      "State acronym."
+      Two-letter Brazilian state abbreviation (e.g., SP, RJ, MG) indicating where the property is located.
   city:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.municipio
     description: |
-      "City name."
+      Municipality name where the property is located, as recorded in official cadastral data.
   neighborhood:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.bairro
     description: |
-      "Neighborhood name."
+      Neighborhood name within the city where the property is situated, useful for geographic market segmentation.
   street:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.logradouro_correios
     description: |
-      "Street name."
+      Standardized street name as validated by Brazil's postal service (Correios), used for geocoding and address matching.
   address_number:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.numero
     description: |
-      "Address number."
+      Street number of the property entrance, part of the full address used for geocoding and delivery logistics.
   zipcode:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.cep
     description: |
-      "Zipcode."
+      Brazilian postal code (CEP) of the property, used for geographic filtering and address enrichment.
   address_details:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.complemento
     description: |
-      "Address details: unit and building."
+      Address complement containing unit and building identifiers (e.g., "Apto 42, Bloco B") to distinguish individual units within a condominium.
   address_details_unit:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.unidade
     description: |
-      "Unit number."
+      Apartment or unit number within a building, extracted from the address complement to uniquely identify a residential unit.
   address_details_building:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.bloco_id
     description: |
-      "Building number."
+      Building block identifier within a condominium complex, used together with the unit number to uniquely locate a property.
   real_estate_register:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.cartorio
     description: |
-      "Real estate register name."
+      Name of the notary office (cartório) where the property's legal title is registered, an official reference for property ownership verification.
   real_estate_registry:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.matricula
     description: |
-      "Real estate registry number."
+      Property registry number (matrícula) at the notary office, which is the primary legal identifier for ownership and encumbrance records in Brazil.
   building_year:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.ano_construcao
     description: |
-      "Building year."
+      Year in which the building was constructed, used for property age calculations and depreciation analysis.
   lot_area:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.m2_terreno
     description: |
-      "Lot area in square meters."
+      Total land area of the property lot in square meters, including all built and unbuilt portions of the plot.
   building_area:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.m2_construido
     description: |
-      "Building area in square meters."
+      Total built area of the property in square meters, covering all constructed space including common areas.
   private_area:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.m2_privativo
     description: |
-      "House private area in square meters."
+      Exclusive private area of the property unit in square meters, excluding common areas shared with other residents.
   idactum_price_estimation:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.estimativa_ipatri
     description: |
-      "Idactum price estimation."
+      Idactum's proprietary market value estimate for the property (iPatri model), combining transaction medians and statistical modeling.
   idactum_price_estimation_quality:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.assertividade_estimativa_ipatri
     description: |
-      "Idactum price estimation quality."
+      Confidence or accuracy score of Idactum's iPatri price estimate, indicating how reliable the valuation is for this specific property.
   avg_annual_appreciation_idactum_estimation:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.valorizacao_anual_media
     description: |
-      "Average annual appreciation of idactum price estimation on the last 5 years."
+      Average annual price appreciation rate estimated by Idactum for the property over the last 5 years, expressed as a percentage.
   estimated_annual_revenue:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.giro_anual_estimado
     description: |
-      "Idactum estimated annual revenue."
+      Idactum's estimate of the annual transaction volume (turnover) for properties similar to this one in the same market segment.
   condominium_estimation:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.condominio_estimado
     description: |
-      "Idactum estimated condominium."
+      Idactum's estimated monthly condominium fee for the property, derived from comparable buildings in the same neighborhood.
   assessed_iptu_value:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.valor_venal_iptu
     description: |
-      "Assessed IPTU value."
+      Government-assessed fiscal value of the property for IPTU (municipal property tax) calculation purposes.
   assessed_itbi_value:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.valor_venal_itbi
     description: |
-      "Assessed ITBI value."
+      Government-assessed reference value of the property used as the tax base for ITBI (real estate transfer tax) when the property changes ownership.
   latitude:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.latitude
     description: |
-      "Latitude."
+      Geographic latitude coordinate of the property, enabling spatial analysis and map-based visualizations.
   longitude:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.longitude
     description: |
-      "Longitude."
+      Geographic longitude coordinate of the property, enabling spatial analysis and map-based visualizations.
   kind:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.tipo
     description: |
-      "House type(apartment, house, etc.)."
+      Physical property type classification (e.g., apartment, house, commercial store), reflecting the structural nature of the real estate unit.
   usage_purpose:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.finalidade
     description: |
-      "House usage purpose(residential, commercial, etc.)."
+      Intended use category of the property (e.g., residential, commercial), as classified in cadastral records.
   usage_type:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.tipo_utilizacao
     description: |
-      "Usage type(private, public, etc.)."
+      Occupancy classification of the property indicating ownership nature (e.g., private, public), used for regulatory and market segmentation purposes.
   is_iptu_exempt:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.isento_iptu
     description: |
-      "IPTU exempt(1 or 0)."
+      Indicates whether the property benefits from an IPTU municipal property tax exemption (1 = exempt, 0 = not exempt).
   is_active:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.ativo
     description: |
-      "Idactum's house status (1 or 0)."
+      Indicates whether the property is currently active in Idactum's database (1 = active, 0 = inactive or deregistered).
   dt_load:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.dt_load
     description: |
-      "Date when the idactum houses data was loaded."
+      Date on which this property record was ingested from the Idactum source into the data lake.

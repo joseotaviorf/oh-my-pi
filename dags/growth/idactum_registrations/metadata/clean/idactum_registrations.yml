@@ -1,352 +1,356 @@
 database_name: datalake_idactum_registrations_clean
 table_name: idactum_registrations
-description: Table acquired from Idactum. Contain property registration data,
-  including address, location, features and others.
-domain: Growth
-owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+description:
+  Comprehensive property registration data sourced from Idactum, combining
+  cadastral records, physical characteristics, fiscal valuations, and geospatial
+  attributes for properties across Brazilian municipalities. This is the richest
+  property-level dataset from Idactum, used by the Growth team for market pricing
+  models, supply scoring, geographic analysis, and competitive benchmarking.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_unit:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.id_unidade
     description: |
-      "Property unit unique identifier."
+      Municipal cadastral identifier assigned by city hall to uniquely identify the property unit in government fiscal records.
   id_idactum:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.id_idactum
     description: |
-      "Idactum property id."
+      Idactum's proprietary property identifier, used as the primary join key to link this registration with buyers, sellers, and transaction datasets.
   id_patrimonial_assets:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.bpatri_key
     description: |
-      "Patrimonial assets unique identifier."
+      Unique key for the patrimonial asset in Idactum's iPatri valuation system, enabling price estimation and appreciation data lookups.
   id_lot:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.chave_lote
     description: |
-      "Lot unique identifier."
+      Identifier for the land lot to which this property unit belongs, used for grouping units within the same building or plot.
   real_estate_register:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.cartorio
     description: |
-      "Real estate register name."
+      Name of the notary office (cartório) where the property's legal title is registered, an official reference for ownership verification.
   real_estate_registry:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.matricula
     description: |
-      "Real estate registry number."
+      Property registry number (matrícula) at the notary office, which is the primary legal identifier for ownership and encumbrance records in Brazil.
   building_year:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.ano_construcao_ajustado
     description: |
-      "Building year."
+      Adjusted year the building was constructed, normalized by Idactum to correct inconsistencies across different source records.
   number_of_floors:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.n_pavimentos
     description: |
-      "Building amount of floors."
+      Total number of floors in the building where this property unit is located, used for vertical property classification.
   floor:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.andar_unidade
     description: |
-      "Property floor."
+      Floor number on which the property unit is located within the building, relevant for pricing and desirability analysis.
   bathrooms_count:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.banheiros
     description: |
-      "Number of bathrooms."
+      Number of bathrooms in the property unit, a key physical attribute used in pricing models and supply scoring.
   bedrooms_count:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.quartos
     description: |
-      "Number of bedrooms."
+      Number of bedrooms in the property unit, one of the primary dimensions for real estate market segmentation.
   suites_count:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.suites
     description: |
-      "Number of suites."
+      Number of en-suite bedrooms (suítes) in the property, indicating premium features that influence market value.
   parking_slots:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.vagas
     description: |
-      "Number of parking slots."
+      Number of dedicated parking spaces associated with the property, a significant factor in urban real estate valuation.
   lot_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_terreno
     description: |
-      "Lot area in square meters."
+      Total land area of the property lot in square meters, covering the full plot regardless of what is built on it.
   occupied_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_ocupada
     description: |
-      "Occupied area in square meters."
+      Area of the lot that is physically occupied by built structures in square meters, excluding open land portions.
   tested_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_testada
     description: |
-      "Tested area in square meters."
+      Frontage length of the property lot facing the street in meters (testada), used in urban zoning and tax calculations.
   built_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_construido
     description: |
-      "Built area in square meters."
+      Total built area of the property in square meters as registered in fiscal records, covering all floors and common areas.
   built_area_with_parking_slots:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_construido_ajustado
     description: |
-      "Built area with parking slots in square meters."
+      Adjusted built area in square meters that includes the proportional area of parking spaces, used for more accurate size comparisons.
   private_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_privativo
     description: |
-      "Private area in square meters."
+      Exclusive private area of the property unit in square meters, excluding shared common areas, as the most comparable size metric across listings.
   assessed_market_value_per_lot_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.valor_m2_terreno
     description: |
-      "Assessed market value per lot area."
+      Government-assessed fiscal value per square meter of land, used as a benchmark for land valuation and tax base calculations.
   assessed_market_value_per_built_area:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.valor_m2_construido
     description: |
-      "Assessed market value per built area in square meters."
+      Government-assessed fiscal value per square meter of built area, indicating the official per-unit construction value for tax purposes.
   assessed_market_value:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.valor_venal
     description: |
-      "Assessed market value."
+      Total government-assessed fiscal value (valor venal) of the property, which serves as the tax base for IPTU and ITBI calculations.
   assessed_market_value_year_reference:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.valor_venal_ano
     description: |
-      "Year used on assessed market value."
+      Fiscal year for which the assessed market value was calculated, necessary to interpret the valuation in the correct tax context.
   iptu_value:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.valor_iptu
     description: |
-      "Property IPTU value."
+      Annual IPTU (municipal property tax) amount due for this property, derived from the assessed fiscal value and applicable tax rates.
   fractional_share:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.fracao_ideal
     description: |
-      "Fractional share of the property."
+      Fractional ownership share (fração ideal) of the property unit relative to the entire condominium or lot, expressed as a decimal ratio.
   zipcode:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.cep_original
     description: |
-      "Zipcode."
+      Original Brazilian postal code (CEP) as recorded in the source registration document before any postal standardization.
   source_street:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.logradouro_original
     description: |
-      "Street name."
+      Street name as originally recorded in the municipal registration source, before postal normalization by Correios.
   address_number:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.numero
     description: |
-      "Address number."
+      Street number of the property entrance, part of the full address used for geocoding and location matching.
   address_details:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.complemento
     description: |
-      "Address details: unit and building."
+      Address complement containing unit and building identifiers (e.g., "Apto 42, Bloco B") to distinguish individual units within a condominium.
   address_details_unit:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.unidade
     description: |
-      "Unit number."
+      Apartment or unit number within a building, extracted from the complement to uniquely identify a residential unit.
   address_details_building:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.bloco
     description: |
-      "Building number."
+      Building block identifier within a condominium complex, used together with the unit number to uniquely locate a property.
   postal_state_code:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.uf_correios
     description: |
-      "Postal state code."
+      Two-letter state abbreviation as validated by Brazil's postal service (Correios), used for standardized geographic classification.
   postal_neighborhood_name:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.bairro_correios
     description: |
-      "Postal neighborhood name."
+      Neighborhood name as standardized by Brazil's postal service (Correios), used for consistent geographic segmentation across datasets.
   postal_street_name:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.logradouro_correios
     description: |
-      "Postal street name."
+      Standardized street name as validated by Brazil's postal service (Correios), used for geocoding and cross-dataset address matching.
   latitude:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.latitude
     description: |
-      "Latitude."
+      Geographic latitude coordinate of the property, enabling spatial analysis, proximity calculations, and map-based visualizations.
   longitude:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.longitude
     description: |
-      "Longitude."
+      Geographic longitude coordinate of the property, enabling spatial analysis, proximity calculations, and map-based visualizations.
   private_area_estimated:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.m2_privativo_estimado
     description: |
-      "Estimated private area in square meters."
+      Idactum's estimated private area in square meters for properties where the official cadastral area is missing or unreliable.
   census_tract_code:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_codigo
     description: |
-      "Census tract code."
+      IBGE census sector code identifying the statistical enumeration area where the property is located, used for socioeconomic enrichment.
   census_tract_status:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_situacao
     description: |
-      "Census tract situation status."
+      Situation classification of the census tract (e.g., urban, rural, subnormal), indicating the urbanization status of the area.
   census_tract_type:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_tipo
     description: |
-      "Census tract type."
+      Type category of the census tract, distinguishing between different settlement types defined by IBGE for statistical purposes.
   census_tract_status_description:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_desc_situacao
     description: |
-      "Census tract situation status description."
+      Human-readable description of the census tract situation status, providing context for the coded classification.
   census_tract_type_description:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_desc_tipo
     description: |
-      "Census tract type description."
+      Human-readable description of the census tract type, providing context for the coded classification used in IBGE records.
   census_tract:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitária
     description: |
-      "Census tract code."
+      Full IBGE census tract identifier combining municipality, district, sub-district, and sector codes for this property's location.
   census_tract_income_avg:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitária_renda_media_responsavel
     description: |
-      "Census tract household average income."
+      Average monthly household income of the census tract head of household (responsável), derived from IBGE census data for socioeconomic profiling.
   census_tract_income_standard_deviation:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.zona_censitária_renda_media_desvio_padrao
     description: |
-      "Census tract household income standard deviation."
+      Standard deviation of household income within the census tract, indicating income inequality and homogeneity of the neighborhood.
   latest_transaction_value:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente_valor_total
     description: |
-      "Latest transaction value."
+      Total monetary value of the most recent real estate transaction recorded for this property, used as a market price reference.
   zone_code:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.sgl_zona
     description: |
-      "Zone acronym."
+      Municipal zoning designation acronym for the property's location (e.g., ZM, ZC, ZI), indicating allowed land uses per city zoning laws.
   idactum_price_estimation:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.price_ref_estimate_michel
     description: |
-      "Idactum price estimation."
+      Idactum's statistical reference price estimate for the property, derived from a regression model using comparable transaction data.
   idactum_price_estimation_percentage_absolute_deviation:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.perc_abs_deviation_estimate_michel
     description: |
-      "Idactum price estimation percentage absolute deviation."
+      Percentage absolute deviation of Idactum's price estimate from actual transaction values, measuring the accuracy of the valuation model.
   average_annual_appreciation:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.valorizacao_media_anual
     description: |
-      "Average annual appreciation in last 5 years estimated by Idactum."
+      Average annual price appreciation rate for this property over the last 5 years, as estimated by Idactum from comparable transaction data.
   idactum_market_price_estimation_score:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.estimativa_ipatri_regra
     description: |
-      "Score of Idactum market price estimation."
+      Quality score assigned by Idactum's iPatri model to the market price estimate, indicating which estimation rule or tier was applied.
   idactum_market_price_estimation:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.estimativa_ipatri
     description: |
-      "Idactum market price estimation(model plus transaction median value)."
+      Idactum's iPatri market price estimate combining model output with local transaction median values for a more robust valuation.
   quantity:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.qtd
     description: |
-      "Quantity."
+      Number of property units represented by this registration record, used when a single record aggregates multiple identical units.
   is_iptu_exempt:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.iptu_isento
     description: |
-      "IPTU exempt(1 or 0)."
+      Indicates whether the property benefits from an IPTU municipal property tax exemption (1 = exempt, 0 = not exempt).
   usage_purpose:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.finalidade
     description: |
-      "Property usage purpose(residential, commercial, etc.)."
+      Intended use category of the property (e.g., residential, commercial), as classified in the municipal cadastral registration.
   building_type:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.tipo_de_construcao
     description: |
-      "Property building type(apartment, house, etc.)."
+      Physical construction type of the property (e.g., apartment, house, commercial store), reflecting the structural classification.
   usage_type:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.tipo_de_uso
     description: |
-      "Property usage type(private, public, etc.)."
+      Occupancy classification of the property indicating ownership nature (e.g., private, public), used for regulatory and market segmentation.
   is_vertical_property:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.vertical
     description: |
-      "Property is vertical."
+      Indicates whether the property is part of a vertical building (true) or a horizontal development such as a house or townhouse (false).
   typology:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.tipologia
     description: |
-      "Property typology(apartment, house, etc.)."
+      Numeric typology code assigned by Idactum to classify the property configuration (e.g., studio, 2-bedroom apartment, house).
   is_parking_slots_in_latest_transaction:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente_envolve_garagem
     description: |
-      "Property has parking slots in latest transaction."
+      Indicates whether parking spaces were included in the most recent property transaction, relevant for understanding what was transferred.
   is_house_in_sp_popular_lot_program:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_loteamento
     description: |
-      "Property is in SP popular lot program."
+      Indicates whether the property is located within a São Paulo popular lot subdivision program area, identifying social housing contexts.
   is_informal_housing_nucleus_sp:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_nucleo
     description: |
-      "Property is in informal housing nucleus in SP."
+      Indicates whether the property is situated within an informal housing nucleus in São Paulo, as mapped in city urbanization records.
   is_house_in_sp_favela:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_favela
     description: |
-      "Property is in favela in SP."
+      Indicates whether the property is located within a favela area in São Paulo, as classified in city shapefile urban risk data.
   is_house_in_sp_cortico:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_cortico
     description: |
-      "Property is in cortico in SP."
+      Indicates whether the property is in a cortiço (overcrowded collective housing) area in São Paulo per city spatial datasets.
   is_house_in_bh_favela:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.VILA_FAVELA
     description: |
-      "Property is in favela/vila in BH."
+      Indicates whether the property is located in a favela or informal vila community in Belo Horizonte, per city urbanization records.
   is_informal_housing_nucleus_bh:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.OCUPACAO_LOTEAMENTO_IRREGULAR
     description: |
-      "Property is in informal housing nucleus in BH."
+      Indicates whether the property is in an irregular lot occupation or informal settlement in Belo Horizonte, per city planning data.
   is_public_housing_bh:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.CONJUNTO_HABITACIONAL
     description: |
-      "Property is in public housing in BH."
+      Indicates whether the property belongs to a public social housing complex (conjunto habitacional) in Belo Horizonte.
   dt_load:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.dt_load
     description: |
-      "Date when the idactum registrations data was loaded."
+      Date on which this registration record was ingested from the Idactum source into the data lake.
   ts_latest_transaction_date:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente
     description: |
-      "Latest transaction date."
+      Date of the most recent real estate transaction recorded for this property, indicating market activity recency.

@@ -1,231 +1,237 @@
 database_name: datalake_idactum_transactions_clean
 table_name: idactum_transactions
-description: Table acquired from Idactum. Contain real estate transactions data.
-domain: Growth
-owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+description:
+  Real estate transaction records sourced from Idactum, capturing property sale
+  events extracted from Brazilian notary (cartório) and ITBI tax declaration records.
+  Each row represents a single property transfer event with price, legal metadata,
+  property attributes, and geolocation. Used by the Growth team for market price
+  analysis, transaction volume tracking, and competitive benchmarking against
+  QuintoAndar's own transaction data.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_idactum:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.id_idactum
     description: |
-      "Idactum house id."
+      Idactum's proprietary property identifier linking this transaction to the corresponding property in other Idactum datasets.
   id_unit:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.id_unidade
     description: |
-      "Municipal house id."
+      Municipal cadastral identifier for the property unit as recorded in the transaction, linking to city hall fiscal records.
   id_original_unit:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.id_unidade_original
     description: |
-      "Municipal original house id."
+      Original municipal property unit identifier before any cadastral renumbering, used to trace historical property records.
   id_lot:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.chave_lote
     description: |
-      "Lot key."
+      Identifier for the land lot associated with the transacted property, used to group transactions within the same building or plot.
   id_patrimonial_assets:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.bpatri_key
     description: |
-      "Patrimonial assets key."
+      Unique key for the patrimonial asset in Idactum's iPatri system, enabling linkage to price estimation and valuation data.
   id_condominium:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.id_condominio
     description: |
-      "Condominium id."
+      Identifier for the condominium complex to which the transacted property belongs, used for building-level aggregations.
   reported_price:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.preco_declarado
     description: |
-      "Reported transaction price."
+      Transaction price declared by the parties in the ITBI tax declaration, which may differ from the actual market price paid.
   assessed_value:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.valor_venal
     description: |
-      "Transaction assessed value (property tax value)."
+      Government-assessed fiscal value of the property at the time of the transaction, used as the IPTU tax base and a valuation benchmark.
   assessed_value_reference:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.valor_venal_de_referencia
     description: |
-      "Transaction assessed value reference."
+      Government reference value used as the minimum ITBI tax base when the declared price is lower than the assessed fiscal value.
   transfered_percentage:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.proporcao_transmitida
     description: |
-      "House transfered percentage (0 to 1)."
+      Fraction of the property ownership transferred in this transaction, expressed as a decimal between 0 and 1 (e.g., 0.5 for a 50% share transfer).
   calculus_base_used:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.base_de_calculo_adotada
     description: |
-      "Calculus base used."
+      The calculation basis adopted by the tax authority for ITBI assessment, indicating whether declared price or reference value was used.
   funding_price:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.valor_financiado
     description: |
-      "Transaction funding price."
+      Amount of the transaction financed through a mortgage or other credit facility, indicating the degree of leverage in the purchase.
   real_estate_register:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.cartorio
     description: |
-      "Real estate register name."
+      Name of the notary office (cartório) where the property transfer was legally registered and the deed was recorded.
   real_estate_registry:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.matricula
     description: |
-      "Real estate registry number."
+      Property registry number (matrícula) at the notary office, uniquely identifying the legal title record for this property.
   building_type:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.situacao
     description: |
-      "Building type("Apartamento", "Casa", "Loja", etc.)."
+      Physical structure classification of the transacted property (e.g., Apartamento, Casa, Loja), indicating the type of real estate sold.
   usage_category:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.padrao
     description: |
-      "Property usage category("Residencial", "Comercial", etc.)."
+      Use and standard category of the property (e.g., Residencial, Comercial), classifying the transaction for market segmentation.
   property_description:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.descricao
     description: |
-      "Property usage description."
+      Free-text description of the property and its characteristics as recorded in the notary or ITBI declaration document.
   building_year:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.acc
     description: |
-      "Building year."
+      Year the building was constructed, used for property age analysis and depreciation modeling in market price calculations.
   lot_area:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.area_terreno
     description: |
-      "Lot area in square meters."
+      Total land area of the property lot in square meters as declared in the transaction documents.
   building_area:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.area_construida
     description: |
-      "Building area in square meters."
+      Total built area of the property in square meters, covering all constructed space including common areas, as declared in the transaction.
   private_area:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.area_privativa
     description: |
-      "Private area in square meters."
+      Exclusive private area of the transacted property unit in square meters, excluding shared common spaces.
   area:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.area
     description: |
-      "Property area in square meters."
+      General property area in square meters as declared in the transaction, typically the most relevant area figure for the property type.
   state:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.uf
     description: |
-      "State acronym."
+      Two-letter Brazilian state abbreviation indicating the location of the transacted property (e.g., SP, RJ, MG).
   city:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.cidade
     description: |
-      "City name."
+      Municipality name where the transacted property is located, identifying the real estate market geography.
   neighborhood:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.bairro
     description: |
-      "Neighborhood name."
+      Neighborhood where the transacted property is located, used for local market price analysis and geographic segmentation.
   street:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.logradouro
     description: |
-      "Street name."
+      Street name of the transacted property as recorded in the notary or ITBI declaration document.
   number:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.numero
     description: |
-      "Address number."
+      Street number of the transacted property entrance, part of the full address used for geocoding.
   address_details:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.complemento
     description: |
-      "Address details (unit and building)."
+      Address complement containing unit and building identifiers (e.g., "Apto 42, Bloco B") to distinguish individual units within a condominium.
   unit:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.unidade
     description: |
-      "Property unit number."
+      Apartment or unit number within the building, uniquely identifying which residential unit was transacted.
   building:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.bloco
     description: |
-      "Property building."
+      Building block designation within the condominium complex, used with unit number to fully identify the transacted property.
   building_number:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.bloco_id
     description: |
-      "Building id."
+      Numeric identifier of the building block within a condominium complex, as used in the cadastral and registration records.
   zipcode:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.cep
     description: |
-      "Zipcode."
+      Brazilian postal code (CEP) of the transacted property, used for geographic filtering and address enrichment.
   postal_street_name:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.logradouro_correios
     description: |
-      "Postal street standardized name."
+      Standardized street name as validated by Brazil's postal service (Correios), used for geocoding and cross-dataset address matching.
   zone_code:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.sgl_zona
     description: |
-      "Zone code."
+      Municipal zoning designation acronym for the property's location (e.g., ZM, ZC), indicating allowed uses per city zoning laws.
   block_number:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.setor_quadra
     description: |
-      "Block number."
+      Urban sector and block code identifying the city block where the property is located, used for spatial aggregation in market analysis.
   census_tract:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.zona_censitária
     description: |
-      "Census tract."
+      IBGE census tract identifier for the property's location, enabling socioeconomic enrichment with demographic and income data.
   transaction_type:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.natureza_transacao
     description: |
-      "Transaction type("Compra e Venda", "Doação", "Herança", etc.)."
+      Legal nature of the property transfer (e.g., Compra e Venda for sale, Doação for donation, Herança for inheritance), determining the ITBI applicability.
   funding_method:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.tipo_de_financiamento
     description: |
-      "Transaction funding method(eg.: "Minha Casa Minha Vida")."
+      Financing program or method used to fund the transaction (e.g., Minha Casa Minha Vida, FGTS), indicating credit type and buyer profile.
   property_usage_purpose:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.finalidade
     description: |
-      "Property usage purpose("Residencial" or "Comercial").
+      Intended use category of the transacted property (Residencial or Comercial), as declared for ITBI tax classification purposes.
   is_in_limbo:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.limbo
     description: |
-      "Property has unresolved legal status."
+      Indicates whether the transaction has an unresolved legal status (e.g., pending court review or regulatory hold), flagging records that should be excluded from market analysis.
   is_vertical_property:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.vertical
     description: |
-      "Whether the property is vertical(true) or horizontal(false)."
+      Indicates whether the transacted property is part of a vertical building such as an apartment (true) or a horizontal unit such as a house (false).
   typology:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.tipologia
     description: |
-      "Property typology number."
+      Numeric typology code classifying the property configuration (e.g., studio, 2-bedroom apartment, house), used for market segmentation.
   ts_transaction_date:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.data_transacao
     description: |
-      "Date of the transaction."
+      Date when the real estate transaction was officially executed at the notary office, used as the primary event timestamp for time-series analysis.
   ts_transaction_declaration_date:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.data_declaracao_transacao
     description: |
-      "Date of the transaction declaration."
+      Date when the transaction was declared to the municipal tax authority for ITBI assessment purposes, which may lag the actual transaction date.
   dt_load:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.dt_load
     description: |
-      "Date when the idactum transactions data was loaded."
+      Date on which this transaction record was ingested from the Idactum source into the data lake.

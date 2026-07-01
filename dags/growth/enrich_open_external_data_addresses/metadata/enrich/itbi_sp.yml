@@ -1,25 +1,31 @@
 ---
 database_name: datalake_open_external_data_addresses
 table_name: itbi_sp
-description: "Table with all the distinct residential addresses present in the ITBI SP table. Used to retrieve the latitude and longitude via Geocoding."
-domain: Growth
-owner: andre.melo@quintoandar.com.br
+description: >
+  Deduplicated set of distinct residential property addresses extracted from São Paulo's
+  ITBI (Imposto sobre Transmissão de Bens Imóveis) real estate transfer tax declarations,
+  filtered to sale transactions (Compra e Venda) for residential building types. Each row
+  represents a unique address used as input for geocoding to obtain latitude and longitude
+  coordinates, enabling geographic enrichment of transaction and market data for Growth
+  analytics.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_address:
-    description: Hash of the street name plus the number plus the source of the information, being unique for each address.
+    description: MD5 hash of the concatenated street name, unit number, and city name, serving as a unique surrogate key for each distinct address.
   address:
     lineage:
       - datalake_itbi_clean.itbi_sp.address_street_name
-    description: Street name linked to the transaction's zip code.
+    description: Street name as recorded in the ITBI São Paulo tax declaration, used as the primary address field for geocoding.
   number:
-    description: Unit number of the property.
+    description: Street number of the property; set to 'N/A' when absent or when the original value indicates an unknown address (99999).
   neighborhood:
     lineage:
       - datalake_itbi_clean.itbi_sp.address_neighborhood
-    description: "The neighborhood, if any, with the highest probability of having that zipcode in its extension."
+    description: Neighborhood name formatted in title case with the highest probability of corresponding to this address's postal code.
   zipcode:
     lineage:
       - datalake_itbi_clean.itbi_sp.address_zipcode
-    description: 'Zip code of the property address.'
+    description: Brazilian postal code (CEP) associated with the property address, used for geographic filtering and cross-dataset joining.
   city:
-    description: 'ITBI city of the property address.'
+    description: Municipality name of the property address; always 'São Paulo' for this table, as data is sourced exclusively from the SP ITBI dataset.

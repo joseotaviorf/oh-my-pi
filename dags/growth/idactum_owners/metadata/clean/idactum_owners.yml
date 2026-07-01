@@ -1,66 +1,71 @@
 database_name: datalake_idactum_owners_clean
 table_name: idactum_owners
-description: Table acquired from Idactum. Contains property owners data.
-domain: Growth
-owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+description:
+  Third-party property ownership data sourced from Idactum, linking real estate
+  units to their current registered owners extracted from Brazilian municipal
+  cadastral records. Used by the Growth team to identify property owners for
+  outreach campaigns, understand ownership concentration, and enrich supply-side
+  intelligence for market analysis.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_unit:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.id_unidade
     description: |
-      "Municipal house id."
+      Municipal cadastral identifier for the property unit, linking this owner record to the corresponding property in city hall records.
   id_idactum:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.id_idactum
     description: |
-      "Idactum house id."
+      Idactum's proprietary property identifier, used to join ownership data with other Idactum datasets such as houses and transactions.
   owner_name:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.nome
     description: |
-      "Owner name."
+      Full legal name of the property owner as registered in municipal tax records (IPTU contributor records).
   owner_adjusted_name:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.contribuinte_ajustado
     description: |
-      "Owner adjusted name."
+      Normalized and standardized version of the owner's name, cleaned for deduplication and matching against other data sources.
   owner_document_number:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.documento
     description: |
-      "Owner document number."
+      Brazilian tax identification number of the property owner — CPF for individuals or CNPJ for legal entities — as registered in cadastral records.
   city:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.cidade
     description: |
-      "City name."
+      Municipality where the property is located, identifying the market geography for this ownership record.
   city_radical:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.radical
     description: |
-      "City abbreviation."
+      Short alphabetic abbreviation for the city, used by Idactum internally to identify the municipal data source.
   data_source:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.origem
     description: |
-      "Data source."
+      Origin system or government database from which Idactum extracted this ownership record (e.g., IPTU rolls, cartório registries).
   is_valid:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.valido
     description: |
-      "Whether the owner is valid."
+      Indicates whether Idactum considers this ownership record valid and current based on their data quality checks.
   ts_query:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.data_consulta
     description: |
-      "Timestamp when the data was queried."
+      Timestamp when Idactum queried the source system to retrieve this ownership record, indicating data freshness.
   ts_reference:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.data_referencia
     description: |
-      "Calculus base used."
+      Reference date used as the base for calculating ownership validity and determining the applicable fiscal year for this record.
   dt_load:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.dt_load
     description: |
-      "Date when the idactum owners data was loaded."
+      Date on which this ownership record was ingested from the Idactum source into the data lake.

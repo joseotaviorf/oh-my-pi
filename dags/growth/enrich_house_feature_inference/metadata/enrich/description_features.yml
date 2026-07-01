@@ -1,92 +1,97 @@
 ---
 database_name: datalake_house_feature_inference
 table_name: description_features
-owner: andre.melo@quintoandar.com.br
-domain: Growth
-description: Infers features about the houses from the description.
+owner: gabriel.mota@quintoandar.com.br
+domain: Atlas DB
+description: >
+  ML-derived property feature flags extracted from listing descriptions using natural
+  language processing, covering both QuintoAndar's own supply and third-party (3P) leads.
+  Each row represents one property with binary indicators for amenities and characteristics
+  mentioned in the description text. Used by the Growth team for supply scoring, demand
+  matching, and market segmentation based on property quality signals.
 columns:
   id_house:
-    description: "Id of the house in EBDB"
+    description: Unique identifier of the property in QuintoAndar's core property database (EBDB), linking feature flags to the canonical property record.
     lineage:
       - datalake_ebdb_clean.house.id
   house_description:
-    description: "Description of the house (or 3P lead, if it is a third party house)"
+    description: Original free-text property listing description used as input to the feature inference model; for third-party leads, the 3P listing description is used instead.
     lineage:
       - datalake_3p_supply.lead_3p.house_description
       - datalake_ebdb_clean.house.house_description
   country_code:
-    description: "Country code of the house"
+    description: Country code of the property, used to scope feature inference models to the correct language and market context.
     lineage:
       - datalake_ebdb_country.house.country_code
   has_swim_pool:
-    description: "Whether the house has a swim pool, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a swimming pool, based on keywords detected in the property description.
   has_gym:
-    description: "Whether the condo has a gym, according to the description"
+    description: ML-inferred flag indicating whether the condominium offers a gym or fitness center, based on keywords detected in the property description.
   has_elevator:
-    description: "Whether the house has an elevator, according to the description"
+    description: ML-inferred flag indicating whether the building has an elevator, a key accessibility and desirability factor detected from the description.
   has_sports_court:
-    description: "Whether the condo has a sports court, according to the description"
+    description: ML-inferred flag indicating whether the condominium includes a sports court (e.g., tennis, basketball), based on the property description.
   has_grill_area:
-    description: "Whether the condo has a grill area, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a shared grill or barbecue area (churrasqueira), based on the property description.
   has_party_hall:
-    description: "Whether the condo has a party hall, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a party room or event space (salão de festas), based on the property description.
   has_sauna:
-    description: "Whether the condo has a sauna, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a sauna, based on keywords detected in the property description.
   has_laundry:
-    description: "Whether the condo has a laundry, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a shared laundry facility, based on keywords detected in the property description.
   has_metro_or_train_close:
-    description: "Whether the house is close to a metro or train station, according to the description"
+    description: ML-inferred flag indicating whether the property is located near a metro or train station, based on proximity references in the description.
   has_toy_library:
-    description: "Whether the condo has a toy library, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a toy library or children's play space (brinquedoteca), based on the property description.
   has_piped_gas:
-    description: "Whether the house has piped gas, according to the description"
+    description: ML-inferred flag indicating whether the property has piped natural gas infrastructure, based on keywords detected in the listing description.
   has_gourmet_area:
-    description: "Whether the condo has a gourmet area, according to the description"
+    description: ML-inferred flag indicating whether the condominium has a gourmet entertainment area with kitchen facilities, based on the property description.
   has_entrance_hall:
-    description: "Whether the condo has an entrance hall, according to the description"
+    description: ML-inferred flag indicating whether the property or building has a dedicated entrance hall (hall de entrada), based on the description.
   is_furnished:
-    description: "Whether the house is furnished, according to the description"
+    description: ML-inferred flag indicating whether the property is offered fully or partially furnished, based on keywords in the listing description.
   has_balcony:
-    description: "Whether the house has a balcony, according to the description"
+    description: ML-inferred flag indicating whether the property has a balcony or terrace, a high-value amenity detected from the listing description.
   has_walk_in_closet:
-    description: "Whether the house has a walk-in closet, according to the description"
+    description: ML-inferred flag indicating whether the property has a walk-in closet (suíte master with closet), based on the listing description.
   has_unobstructed_view:
-    description: "Whether the house has an unobstructed view, according to the description"
+    description: ML-inferred flag indicating whether the property offers an unobstructed or panoramic view, based on view references in the description.
   has_laundry_area:
-    description: "Whether the house has a laundry area, according to the description"
+    description: ML-inferred flag indicating whether the property has a dedicated internal laundry area (área de serviço), based on the listing description.
   has_maid_room:
-    description: "Whether the house has a maid room, according to the description"
+    description: ML-inferred flag indicating whether the property has a maid's room (quarto de empregada), based on keywords in the listing description.
   is_penthouse_apartment:
-    description: "Whether the house is a penthouse apartment, according to the description"
+    description: ML-inferred flag indicating whether the property is a penthouse apartment (cobertura), based on explicit references in the description.
   has_morning_sun:
-    description: "Whether the house has morning sun, according to the description"
+    description: ML-inferred flag indicating whether the listing description mentions morning sun (sol da manhã), a desirability factor in Brazilian real estate.
   has_open_kitchen:
-    description: "Whether the house has an open kitchen, according to the description"
+    description: ML-inferred flag indicating whether the property has an open-plan kitchen integrated with the living area, based on the description.
   has_gourmet_balcony:
-    description: "Whether the house has a gourmet balcony, according to the description"
+    description: ML-inferred flag indicating whether the property has a gourmet balcony with kitchen or barbecue facilities, based on the listing description.
   has_quiet_street:
-    description: "Whether the house is in a quiet street, according to the description"
+    description: ML-inferred flag indicating whether the listing description mentions a quiet or low-traffic street as a location benefit.
   has_adapted_bathroom:
-    description: "Whether the house has an adapted bathroom, according to the description"
+    description: ML-inferred flag indicating whether the property has an accessibility-adapted bathroom for people with reduced mobility, based on the description.
   has_backyard:
-    description: "Whether the house has a backyard, according to the description"
+    description: ML-inferred flag indicating whether the property has a private backyard or garden area, based on keywords in the listing description.
   has_bathtub:
-    description: "Whether the house has a bathtub, according to the description"
+    description: ML-inferred flag indicating whether the property has a bathtub, a premium amenity detected from the listing description.
   has_shower_enclosure:
-    description: "Whether the house has a shower enclosure, according to the description"
+    description: ML-inferred flag indicating whether the property has a glass shower enclosure (box de vidro), based on the listing description.
   has_private_pool:
-    description: "Whether the house has a private pool, according to the description"
+    description: ML-inferred flag indicating whether the property has a private swimming pool (as opposed to a shared condominium pool), based on the description.
   has_bedroom_closets:
-    description: "Whether the house has bedroom closets, according to the description"
+    description: ML-inferred flag indicating whether the bedrooms have built-in closets, based on keywords detected in the property description.
   has_bathroom_cabinets:
-    description: "Whether the house has bathroom cabinets, according to the description"
+    description: ML-inferred flag indicating whether the bathrooms have built-in cabinets or storage, based on keywords in the listing description.
   has_kitchen_cabinets:
-    description: "Whether the house has kitchen cabinets, according to the description"
+    description: ML-inferred flag indicating whether the kitchen has built-in cabinetry (armários planejados), based on the listing description.
   has_air_conditioning:
-    description: "Whether the house has air conditioning, according to the description"
+    description: ML-inferred flag indicating whether the property has air conditioning installed, a significant comfort feature detected from the description.
   has_gas_shower:
-    description: "Whether the house has a gas shower, according to the description"
+    description: ML-inferred flag indicating whether the property uses a gas-powered water heater for the shower, based on keywords in the description.
   has_maid_bathroom:
-    description: "Whether the house has a maid bathroom, according to the description"
+    description: ML-inferred flag indicating whether the property has a dedicated bathroom for domestic staff, based on the listing description.
   has_assigned_parking_space:
-    description: "Whether the house has an assigned parking space, according to the description"
+    description: ML-inferred flag indicating whether the property includes a dedicated or assigned parking space (vaga demarcada), based on the description.

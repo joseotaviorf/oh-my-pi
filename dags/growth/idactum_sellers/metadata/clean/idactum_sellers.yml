@@ -1,36 +1,40 @@
 database_name: datalake_idactum_sellers_clean
 table_name: idactum_sellers
-description: Table acquired from Idactum. Contains real estate transactions sellers data.
-domain: Growth
-owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+description:
+  Third-party seller intelligence data sourced from Idactum, capturing the identity
+  of vendors in Brazilian real estate transactions extracted from notary (cartório)
+  records. Used by the Growth team for supply-side market analysis, seller behavior
+  profiling, and understanding property disposition patterns across the real estate market.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_idactum:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.id_idactum
     description: |
-      "Idactum house id."
+      Idactum's proprietary property identifier linking the seller to the specific property transacted, used to join with other Idactum datasets.
   id_transaction:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.id_transacao
     description: |
-      "Transaction id."
+      Foreign key linking the seller to the specific real estate transaction in which they participated as a vendor.
   seller_name:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.nome
     description: |
-      "Seller name."
+      Full legal name of the seller as recorded in the notary transaction deed at the time of the property transfer.
   seller_document_number:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.documento
     description: |
-      "Seller document number."
+      Brazilian tax identification number of the seller — CPF for individuals or CNPJ for legal entities — as registered in the transaction.
   ts_transaction:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.data_transacao
     description: |
-      "Timestamp when the transaction was made."
+      Date and time when the real estate sale transaction was officially executed at the notary office.
   dt_load:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.dt_load
     description: |
-      "Date when the idactum sellers data was loaded."
+      Date on which this seller record was ingested from the Idactum source into the data lake.

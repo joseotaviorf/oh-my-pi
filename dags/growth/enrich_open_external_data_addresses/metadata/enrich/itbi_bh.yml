@@ -1,19 +1,24 @@
 ---
 database_name: datalake_open_external_data_addresses
 table_name: itbi_bh
-description: "Table with all the distinct residential addresses present in the ITBI BH table. Used to retrieve the latitude and longitude via Geocoding."
-domain: Growth
-owner: andre.melo@quintoandar.com.br
+description: >
+  Deduplicated set of distinct residential property addresses extracted from Belo
+  Horizonte's ITBI (Imposto sobre Transmissão de Bens Imóveis) real estate transfer
+  tax declarations, filtered to residential occupation. Each row represents a unique
+  address parsed from the BH city hall's concatenated address format and used as input
+  for geocoding to obtain geographic coordinates for Growth market analytics.
+domain: Atlas DB
+owner: gabriel.mota@quintoandar.com.br
 columns:
   id_address:
-    description: Hash of the street name plus the number plus the source of the information, being unique for each address.
+    description: MD5 hash of the concatenated street name, unit number, and city name, serving as a unique surrogate key for each distinct address.
   address:
-    description: Street name linked to the transaction's zip code.
+    description: Street name parsed from the BH city hall's hyphen-delimited address string, extracted as the portion before the street number.
   number:
-    description: Unit number of the property.
+    description: Street number extracted from the BH address string; set to 'N/A' when the address does not end with a numeric value or when not parseable.
   neighborhood:
-    description: "The neighborhood, if any, with the highest probability of having that zipcode in its extension."
+    description: Neighborhood name parsed from the BH hyphen-delimited address string, corresponding to the area with the highest probability of matching the postal code.
   zipcode:
-    description: 'Zip code of the property address.'
+    description: Brazilian postal code (CEP) parsed from the BH city hall address string, used for geographic filtering and cross-dataset joining.
   city:
-    description: 'ITBI city of the property address.'
+    description: Municipality name of the property address; always 'Belo Horizonte' for this table, as data is sourced exclusively from the BH ITBI dataset.
