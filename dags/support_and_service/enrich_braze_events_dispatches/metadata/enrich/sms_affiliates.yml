@@ -1,7 +1,7 @@
 database_name: datalake_braze_dispatches
 table_name: sms_affiliates
-owner: data-growth@quintoandar.com
-domain: Growth
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
 description: Table containing details about SMS communications sent to affiliates.
 columns:
   id_user_dispatch:

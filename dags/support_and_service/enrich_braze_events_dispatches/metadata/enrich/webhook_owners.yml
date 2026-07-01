@@ -1,8 +1,8 @@
 ---
 database_name: datalake_braze_dispatches
 table_name: webhook_owners
-owner: data-growth@quintoandar.com
-domain: Growth
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
 description: Table with details about communications sent through webhook to owners.
 columns:
   id_user_dispatch:

@@ -1,40 +1,43 @@
 ---
 database_name: datalake_braze_dispatches
 table_name: inapp_tenants
-owner: data-growth
-domain: Growth
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
 description: Table with details about communications sent in-app.
 columns:
-  id_dispatch:
-    description: Unique code to identify a communication transmitted to the user by Braze.
   id_user_braze:
     description: Unique code to identify an user created by Braze.
     lineage:
       - datalake_braze.events_tenants.id_user_braze
+
   id_user_dispatch:
     description: The combination of id_dispatch and id_user.
     lineage:
       - datalake_braze.events_tenants.id_user_dispatch
+
   id_user:
     description: Unique code to identify an user created here at QuintoAndar.
+
   event_channel:
     description: Through where the event occurred. In this table it's going to be only inappmessage.
     lineage:
       - datalake_braze.events_tenants.event_channel
+
   ts_inapp_impressioned:
     description: Timestamp of when the in-app communication was visualized.
     lineage:
       - datalake_braze.events_tenants.ts_event
-  ts_inapp_clicked:
-    description: Timestamp of when the email was opened.
+
   year:
     description: Year of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.year
+
   month:
     description: Month of when the information was updated.
     lineage:
       - datalake_braze.events_tenants.month
+
   day:
     description: Day of when the information was updated.
     lineage:

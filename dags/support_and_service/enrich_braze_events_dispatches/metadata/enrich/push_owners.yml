@@ -1,8 +1,8 @@
 ---
 database_name: datalake_braze_dispatches
 table_name: push_owners
-owner: data-growth@quintoandar.com.br
-domain: Growth
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
 description: Table with details about communications sent through push to affiliates.
 columns:
   id_user:
@@ -45,4 +45,3 @@ columns:
     description: Day of when the information was updated.
     lineage:
       - datalake_braze.events_owners.day
-
