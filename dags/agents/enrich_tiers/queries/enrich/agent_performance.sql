@@ -230,6 +230,48 @@ combined_agent_performance AS (
         dt_last_processing
     FROM OS2CCV_BY_compound_metric
 ),
+-- Keep every valid/invalid row untouched; only add a is_valid=TRUE / 0 row for a
+-- (id_user, id_metric_period, metric_name) key that has no TRUE row anywhere else
+-- (i.e. the metric was computed but every event for it was invalid).
+agent_performance_for_output AS (
+    SELECT
+        id_user,
+        id_agent,
+        uuid_person,
+        id_metric_period,
+        metric_name,
+        metric_value,
+        is_valid,
+        dt_metric_period_started,
+        dt_metric_period_ended,
+        dt_last_processing
+    FROM
+        combined_agent_performance
+    UNION ALL
+    SELECT DISTINCT
+        cap.id_user,
+        cap.id_agent,
+        cap.uuid_person,
+        cap.id_metric_period,
+        cap.metric_name,
+        0 AS metric_value,
+        TRUE AS is_valid,
+        cap.dt_metric_period_started,
+        cap.dt_metric_period_ended,
+        cap.dt_last_processing
+    FROM
+        combined_agent_performance AS cap
+    WHERE
+        cap.is_valid IS FALSE
+        AND NOT EXISTS (
+            SELECT 1
+            FROM combined_agent_performance AS valid_row
+            WHERE valid_row.id_user = cap.id_user
+                AND valid_row.id_metric_period = cap.id_metric_period
+                AND valid_row.metric_name = cap.metric_name
+                AND valid_row.is_valid IS TRUE
+        )
+),
 latest_agent_by_metric_period AS (
     SELECT
         mpp.id_metric_period,
@@ -275,7 +317,7 @@ SELECT
 FROM
     latest_agent_by_metric_period AS lmp
 LEFT JOIN
-    combined_agent_performance AS cap
+    agent_performance_for_output AS cap
         ON cap.id_user = lmp.id_user
         AND cap.id_metric_period = lmp.id_metric_period
         AND cap.metric_name = lmp.metric_name
@@ -283,4 +325,3 @@ WHERE
     lmp.is_latest IS TRUE
     AND lmp.is_status_valid_by_metric_period IS TRUE
     AND lmp.id_user IS NOT NULL
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
