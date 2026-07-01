@@ -3,7 +3,7 @@ database_name: datalake_big_agent_clean
 table_name: earning_invalidations
 description: |
   Invalidation events for earnings, including the original earning reference,
-  replacement linkage, author, reason, timestamps, and partitions.
+  replacement linkage, author, reason, description, timestamps, and partitions.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -27,6 +27,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.reason
     description: Business reason describing why the earning was invalidated.
+  description:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.description
+    description: Free-text description with additional details about the invalidation.
   ts_invalidated:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.invalidated_at
