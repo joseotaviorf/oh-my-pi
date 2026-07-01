@@ -73,8 +73,8 @@ booking_attribution AS (
     ) AS entrance_uri,
     IF(
       acc.visit_code IS NOT NULL,
-      COALESCE(acc.final_attribution_branded, "Outro"),
-      COALESCE(src.branded, "Outro")
+      COALESCE(acc.final_attribution_branded, 'Outro'),
+      COALESCE(src.branded, 'Outro')
     ) AS branded,
     IF(
       acc.visit_code IS NOT NULL,
@@ -104,6 +104,44 @@ booking_attribution AS (
   WHERE
     bce.id_event_type = 1
 ),
+secretariat_allocation_history AS (
+    SELECT
+        u.id_main_user AS id_secretariat_user,
+        mp.ts_relationship_started AS ts_allocation_started,
+        mp.ts_relationship_ended AS ts_allocation_ended
+    FROM
+        datalake_hub_services.member_profile AS mp
+    LEFT JOIN 
+        datalake_hub_services.users AS u
+            ON u.id_user = mp.id_user
+    WHERE
+        mp.profile LIKE '%SECRETARIAT%'
+),
+sale_offer_from_amplitude_ranked AS (
+  SELECT
+    id_user,
+    id_house,
+    id_offer,
+    app_type,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    entrance_uri,
+    branded,
+    ts_event,
+    year,
+    month,
+    day,
+    ROW_NUMBER() OVER(
+      PARTITION BY id_offer
+      ORDER BY
+        ts_event ASC
+    ) AS rn
+  FROM
+    datalake_amplitude_offer.sale_offer_raw_events
+),
 sale_offer_from_amplitude AS (
   SELECT
     id_user,
@@ -121,14 +159,8 @@ sale_offer_from_amplitude AS (
     year,
     month,
     day
-  FROM
-    datalake_amplitude_offer.sale_offer_raw_events
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY id_offer
-      ORDER BY
-        ts_event ASC
-    ) = 1
+  FROM sale_offer_from_amplitude_ranked
+  WHERE rn = 1
 ),
 sale_offer_attribution AS (
   SELECT
@@ -211,6 +243,31 @@ sale_offer_attribution AS (
     soce.id_event_type = 3
     AND soce.business_context = 'sale'
 ),
+rent_offer_from_amplitude_ranked AS (
+  SELECT
+    id_user,
+    id_house,
+    id_firestore,
+    app_type,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    entrance_uri,
+    branded,
+    ts_event,
+    year,
+    month,
+    day,
+    ROW_NUMBER() OVER(
+      PARTITION BY id_firestore
+      ORDER BY
+        ts_event ASC
+    ) AS rn
+  FROM
+    datalake_amplitude_offer.offer_submitted_events
+),
 rent_offer_from_amplitude AS (
   SELECT
     id_user,
@@ -228,14 +285,8 @@ rent_offer_from_amplitude AS (
     year,
     month,
     day
-  FROM
-    datalake_amplitude_offer.offer_submitted_events
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY id_firestore
-      ORDER BY
-        ts_event ASC
-    ) = 1
+  FROM rent_offer_from_amplitude_ranked
+  WHERE rn = 1
 ),
 rent_offer_attribution AS (
   SELECT
@@ -469,7 +520,7 @@ events_with_attribution AS (
   WHERE
     ce.id_event_type = 99
 ),
-booking_info AS (
+booking_info_ranked AS (
   SELECT
     vs.id_schedule AS id_booking,
     vs.id_visit,
@@ -484,16 +535,28 @@ booking_info AS (
     vs.channel_creation AS first_update_source,
     vs.is_3p_demand,
     vs.is_rescheduled AS flg_via_reschedule,
-    vs.ts_schedule_created AS ts_created
+    vs.ts_schedule_created AS ts_created,
+    ROW_NUMBER() OVER(PARTITION BY vs.id_schedule ORDER BY sec.ts_allocation_started DESC) AS rn
   FROM
     datalake_visit.visit_schedules AS vs
   LEFT JOIN
-    datalake_hub_services.secretariat_allocation_history AS sec
+    secretariat_allocation_history AS sec
       ON vs.id_user_creation = sec.id_secretariat_user
       AND vs.ts_schedule_created >= sec.ts_allocation_started
       AND vs.ts_schedule_created <= COALESCE(sec.ts_allocation_ended, NOW())
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY vs.id_schedule ORDER BY sec.ts_allocation_started DESC) = 1
+),
+booking_info AS (
+  SELECT
+    id_booking,
+    id_visit,
+    visit_code,
+    user_booking_creator,
+    first_update_source,
+    is_3p_demand,
+    flg_via_reschedule,
+    ts_created
+  FROM booking_info_ranked
+  WHERE rn = 1
 ) -- , final AS(
 SELECT
   e.id_demand_prospect_conversion_event,

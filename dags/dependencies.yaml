@@ -2350,6 +2350,8 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
+  - bietlejuice.enrich_hub_services:load-enrich-member-profile:first-run-of-day
+  - bietlejuice.enrich_hub_services_users:load-enrich-users:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-conversion-events:first-run-of-day
