@@ -1,6 +1,37 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: house_listing_views_metrics
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Captures the demand signal for each active house listing by measuring how many
+  unique page views it received in the past 7 days relative to its nearest comparable
+  listings. The pricing team uses this demand classification to identify listings
+  that may be over- or under-priced based on buyer or renter engagement.
+columns:
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+    description: >-
+      Identifier of the house listing whose page-view demand is being measured.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.business_context
+    description: >-
+      Market segment for this listing, either 'RENT' or 'SALE', determining
+      which comparable set is used for demand benchmarking.
+  demand_level:
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
+    description: >-
+      Relative demand classification compared to similar listings: 'LOW' when
+      views fall below the 25th percentile of comparables, 'HIGH' when above
+      the 75th percentile, and 'MEDIUM' otherwise. Informs pricing adjustment
+      recommendations.
+  views_quantity:
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
+    description: >-
+      Total count of distinct page-view events recorded for this listing in the
+      last 7 days, representing actual market interest from prospective tenants
+      or buyers.

@@ -1,6 +1,108 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: new_pricing_report_engagement
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Central enrichment table for the Atlas Pricing Report that consolidates pricing
+  intelligence for each active listing, including market benchmarks from comparable
+  properties (median prices, total values, price per square meter), buyer/renter demand
+  signals, and condominium costs. The pricing team uses this table to generate data-driven
+  pricing recommendations for house owners and agents.
+columns:
+  ts_event:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.id_house
+    description: >-
+      Timestamp recording when this pricing snapshot was generated, enabling
+      point-in-time analysis and audit of pricing recommendations.
+  id:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.id_house
+    description: >-
+      Monotonically increasing surrogate identifier uniquely distinguishing each
+      row in this snapshot for deduplication and downstream joins.
+  id_house:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.id_house
+    description: >-
+      Identifier of the house listing for which pricing metrics are being computed
+      and reported to the pricing team.
+  business_context:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.business_context
+    description: >-
+      Market segment the listing belongs to, either 'RENT' or 'SALE', which
+      determines which set of comparable listings and pricing benchmarks is applied.
+  views_quantity:
+    lineage:
+      - datalake_atlas_pricing_report.house_listing_views_metrics.views_quantity
+    description: >-
+      Number of distinct page-view events the listing received in the last 7 days,
+      reflecting real market interest from prospective tenants or buyers.
+  demand_level:
+    lineage:
+      - datalake_atlas_pricing_report.house_listing_views_metrics.demand_level
+    description: >-
+      Relative demand classification ('LOW', 'MEDIUM', 'HIGH', or 'NO_VIEWS') based
+      on how many views the listing received compared to its nearest comparable properties.
+  condominium_price_median:
+    lineage:
+      - datalake_atlas_pricing_report.house_condo_metrics.similar_condo
+    description: >-
+      Median monthly condominium fee (in BRL) across the listing's nearest comparable
+      properties, used to benchmark housing carrying costs for the pricing analysis.
+  urban_property_tax_median:
+    lineage:
+      - datalake_atlas_pricing_report.house_condo_metrics.similar_iptu
+    description: >-
+      Median annual IPTU property tax (in BRL) among comparable listings, helping
+      the pricing team contextualize the full cost of ownership in the area.
+  on_market_price_median:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_price
+    description: >-
+      Median asking price (in BRL) of currently active comparable listings, serving
+      as the primary market reference for on-market pricing benchmarks.
+  on_market_price_by_square_meter:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_sale_price_m2
+    description: >-
+      Median price per square meter (in BRL) of active comparable listings, enabling
+      standardized comparisons across properties of different sizes.
+  off_market_price_median:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_price
+    description: >-
+      Median contracted price (in BRL) of recently negotiated comparable listings,
+      reflecting actual closing prices rather than asking prices.
+  off_market_price_by_square_meter:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_sale_price_m2
+    description: >-
+      Median price per square meter (in BRL) of comparable listings that have already
+      been rented or sold, providing a realized-market benchmark.
+  on_market_total_value_median:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_rent_total_value
+    description: >-
+      Median total monthly rental cost (rent plus fees) of active comparable listings,
+      used for total-cost benchmarking in the rent business context.
+  off_market_total_value_median:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_rent_total_value
+    description: >-
+      Median total monthly rental cost of recently contracted comparable listings,
+      showing the actual total value at which similar properties were leased.
+  on_market_days_in_the_market:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_days_in_the_market
+    description: >-
+      Median number of days that active comparable listings have been published,
+      indicating how quickly properties at similar price points attract interest.
+  off_market_days_to_contract_sign:
+    lineage:
+      - datalake_atlas_pricing_report.similar_listings.similar_days_in_the_market
+    description: >-
+      Median number of days comparable listings took from first publication to
+      contract signing, reflecting typical market absorption speed.

@@ -1,6 +1,157 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: status_history_house_negotiation
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Off-market snapshot of houses that have been successfully negotiated (either rented
+  or sold), capturing the agreed price, full property attributes, and the moment the
+  contract was signed. The Atlas Pricing Report uses these records as the off-market
+  comparable set, allowing the pricing team to benchmark active listings against
+  actual realized transaction prices from recently closed deals.
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+    description: >-
+      Identifier of the house that was successfully rented or sold, used to link
+      this negotiation record back to the listing in the pricing report.
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: >-
+      Geographic region identifier of the negotiated property, used to filter
+      off-market comparables within the same market area as the reference listing.
+  version:
+    lineage:
+      - dw_rent.fact_house_listings.sk_house_listing
+      - dw_sale.fact_listings.sk_sale_listing
+    description: >-
+      Version identifier extracted from the listing surrogate key, used to
+      distinguish multiple listing periods for the same house across different
+      market cycles.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: >-
+      Market segment of the negotiated deal, either 'RENT' or 'SALE', determining
+      which contract source and price fields are used for this record.
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+    description: >-
+      Always 'NEGOTIATED' in this table, indicating the property has been successfully
+      contracted and is now off-market, making it eligible as a closed-transaction benchmark.
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+    description: >-
+      Reason code associated with the negotiation status; currently populated as 'NA'
+      as detailed reason codes are not yet available from the source systems.
+  neighborhood:
+    lineage:
+      - dw_public.dim_region.name
+    description: >-
+      Neighborhood where the negotiated property is located, used for geographic
+      filtering when selecting off-market comparables for active listings.
+  city:
+    lineage:
+      - dw_public.dim_region.city_name
+    description: >-
+      City of the negotiated property, enabling city-level aggregations and filters
+      when constructing off-market pricing benchmarks.
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+    description: >-
+      Sub-regional market code for the negotiated property, used as a broader
+      geographic fallback when neighborhood-level comparables are insufficient.
+  house_type:
+    lineage:
+      - datalake_ebdb_clean.house.type
+    description: >-
+      Normalized property category of the negotiated house ('apartamento' or 'casa'),
+      used to ensure only structurally equivalent properties are selected as comparables.
+  house_status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+    description: >-
+      Always 'off-market' in this table, flagging the property as a completed
+      transaction rather than an active listing, distinguishing it from on-market peers.
+  price:
+    lineage:
+      - dw_rent.dim_contract.rent
+      - dw_sale.dim_sale_agreement.sale_price_agreed
+    description: >-
+      Agreed transaction price (in BRL) at which the property was rented or sold,
+      representing the realized market price used in off-market benchmark calculations.
+  rent_total_value:
+    lineage:
+      - dw_rent.dim_contract.rent
+      - dw_rent.dim_contract.condo
+      - dw_rent.dim_contract.iptu
+      - dw_rent.dim_contract.tenant_service_fee
+      - dw_rent.dim_contract.home_insurance_value
+    description: >-
+      Total monthly cost (in BRL) for the rented property including rent, condominium
+      fee, IPTU, service fee, and home insurance; null for sale transactions.
+  sale_price_m2:
+    lineage:
+      - datalake_ebdb_clean.house.sale_price
+      - datalake_ebdb_clean.house.total_area
+    description: >-
+      Agreed sale price per square meter (in BRL) for sold properties, used to
+      compute off-market price-per-square-meter benchmarks for active sale listings.
+  condo:
+    lineage:
+      - dw_rent.dim_contract.condo
+      - datalake_ebdb_clean.house.condo
+    description: >-
+      Monthly condominium fee (in BRL) associated with the negotiated property,
+      included when the fee type is 'Normal' and used in total cost benchmarking.
+  iptu:
+    lineage:
+      - dw_rent.dim_contract.iptu
+      - datalake_ebdb_clean.house.iptu
+    description: >-
+      Annual municipal property tax (IPTU, in BRL) for the negotiated property
+      when declared as 'Normal' type, contributing to carrying-cost comparisons.
+  days_in_the_market:
+    lineage:
+      - dw_rent.fact_house_listings.days_listing_to_contract_signed
+      - dw_sale.fact_listings.days_first_publication_to_first_sale_agreement_signed
+    description: >-
+      Number of days the property was listed before the contract was signed,
+      providing the realized time-to-contract benchmark for off-market comparisons.
+  lat:
+    lineage:
+      - datalake_ebdb_clean.house.lat
+    description: >-
+      Latitude coordinate of the negotiated property, used to calculate geographic
+      proximity when matching off-market comparables to active reference listings.
+  lng:
+    lineage:
+      - datalake_ebdb_clean.house.lng
+    description: >-
+      Longitude coordinate of the negotiated property, combined with latitude to
+      compute the Haversine distance for proximity-based comparable selection.
+  bedrooms:
+    lineage:
+      - datalake_ebdb_clean.house.bedrooms
+    description: >-
+      Number of bedrooms in the negotiated property, used as a filter to select
+      off-market comparables within one bedroom of the reference listing.
+  total_area:
+    lineage:
+      - datalake_ebdb_clean.house.total_area
+    description: >-
+      Total floor area of the negotiated property in square meters, used to restrict
+      comparable selection to properties within 30% of the reference listing's size.
+  ts_status_started:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+      - dw_public.dim_date.date
+    description: >-
+      Timestamp when the contract was signed, marking the moment the property
+      transitioned from on-market to off-market status and anchoring the negotiation
+      in the price history reconstruction.

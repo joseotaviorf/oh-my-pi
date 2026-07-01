@@ -1,6 +1,135 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: on_market_house_listings
-owner: "@data-growth"
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Snapshot of all currently published house listings enriched with geographic, property,
+  and pricing attributes needed by the Atlas Pricing Report. This table serves as the
+  primary source of on-market comparables for the pricing team's benchmarking analysis,
+  combining listing status, physical characteristics, market prices, and model-predicted
+  price bounds.
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+    description: >-
+      Identifier of the active house listing, used to join with other pricing tables
+      and to uniquely reference each property in the report.
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: >-
+      Geographic region identifier for the listing, linking the property to its
+      market area for regional benchmarking and pricing analysis.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: >-
+      Market segment of the listing, either 'RENT' or 'SALE', determining which
+      price field and comparable set applies to this property.
+  neighborhood:
+    lineage:
+      - dw_public.dim_region.name
+    description: >-
+      Name of the neighborhood where the property is located, providing local
+      market context for pricing comparisons.
+  city:
+    lineage:
+      - dw_public.dim_region.city_name
+    description: >-
+      City where the listing is located, used to segment market benchmarks
+      at the city level in the pricing report.
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+    description: >-
+      Alphanumeric code identifying the sub-regional market area, used as a
+      broader geographic grouping when neighborhood-level comparables are scarce.
+  house_type:
+    lineage:
+      - datalake_ebdb_clean.house.type
+    description: >-
+      Normalized property category, either 'apartamento' (apartment/studio) or
+      'casa' (house/condominium house), used to ensure like-for-like comparisons
+      among similar listings.
+  house_status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+    description: >-
+      Market status of the listing, always 'on-market' in this table, indicating
+      the property is currently published and available.
+  price:
+    lineage:
+      - datalake_ebdb_clean.house.rent
+      - datalake_ebdb_clean.house.sale_price
+    description: >-
+      Asking price (in BRL) for the listing in the relevant business context:
+      monthly rent for 'RENT' listings or sale price for 'SALE' listings.
+  rent_total_value:
+    lineage:
+      - datalake_ebdb_clean.house.total_value
+    description: >-
+      Total monthly cost (in BRL) for rent listings, including rent plus all
+      associated fees; null for sale listings.
+  sale_price_m2:
+    lineage:
+      - datalake_ebdb_clean.house.sale_price
+      - datalake_ebdb_clean.house.total_area
+    description: >-
+      Asking sale price per square meter (in BRL), enabling standardized
+      price comparisons across properties of different sizes; null for rent listings.
+  condo:
+    lineage:
+      - datalake_ebdb_clean.house.condo
+    description: >-
+      Monthly condominium fee (in BRL) declared for the property when of type
+      'Normal', used to calculate total housing cost for buyers and tenants.
+  iptu:
+    lineage:
+      - datalake_ebdb_clean.house.iptu
+    description: >-
+      Annual municipal property tax (IPTU, in BRL) when declared as 'Normal'
+      type, informing the pricing team of the fiscal carrying cost for this property.
+  calculator_min_price:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_10
+    description: >-
+      10th percentile of the model's predicted price range (in BRL), used as the
+      lower bound when filtering comparable listings within an acceptable price band.
+  calculator_max_price:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_90
+    description: >-
+      90th percentile of the model's predicted price range (in BRL), used as the
+      upper bound when filtering comparable listings within an acceptable price band.
+  days_in_the_market:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+    description: >-
+      Number of days the listing has been continuously published, indicating how
+      long the property has been available without attracting a contract.
+  lat:
+    lineage:
+      - datalake_ebdb_clean.house.lat
+    description: >-
+      Geographic latitude coordinate of the property, used to compute straight-line
+      distances to comparable listings for proximity-based benchmarking.
+  lng:
+    lineage:
+      - datalake_ebdb_clean.house.lng
+    description: >-
+      Geographic longitude coordinate of the property, combined with latitude to
+      calculate distances when finding nearby comparable listings.
+  bedrooms:
+    lineage:
+      - datalake_ebdb_clean.house.bedrooms
+    description: >-
+      Number of bedrooms in the property, used as a primary filter when selecting
+      comparable listings (within a one-bedroom tolerance).
+  total_area:
+    lineage:
+      - datalake_ebdb_clean.house.total_area
+    description: >-
+      Total floor area of the property in square meters, used to ensure comparable
+      listings fall within a 30% size range of the reference property.

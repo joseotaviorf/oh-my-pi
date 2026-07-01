@@ -1,6 +1,54 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: new_pricing_report_region
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Regional-level demand and pricing accuracy metrics for the Atlas Pricing Report,
+  combining the median number of listing page views per region with the region's
+  model accuracy score (MDAPE). The pricing team uses this data to understand
+  how competitive each geographic market is and how reliable the pricing model's
+  predictions are for a given area.
+columns:
+  ts_event:
+    lineage:
+      - datalake_atlas_pricing_report.region_metrics.id_region
+    description: >-
+      Timestamp recording when this regional snapshot was generated, supporting
+      temporal tracking of demand and accuracy metrics.
+  id:
+    lineage:
+      - datalake_atlas_pricing_report.region_metrics.id_region
+    description: >-
+      Monotonically increasing surrogate key uniquely identifying each row in the
+      snapshot, used for deduplication downstream.
+  id_region:
+    lineage:
+      - datalake_atlas_pricing_report.region_metrics.id_region
+    description: >-
+      Geographic region identifier linking regional demand metrics to the corresponding
+      market area, used to join with other region-level datasets in the pricing report.
+  neighborhood:
+    lineage:
+      - dw_public.dim_region.name
+    description: >-
+      Name of the neighborhood associated with the region, providing a human-readable
+      geographic label for the pricing team's regional analysis.
+  business_context:
+    lineage:
+      - datalake_atlas_pricing_report.region_metrics.business_context
+    description: >-
+      Market segment for this regional snapshot, either 'RENT' or 'SALE', which
+      determines which listing views and model accuracy figures are aggregated.
+  lpv_p_50:
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
+    description: >-
+      Median (50th percentile) number of listing page views across houses in the region
+      during the last 7 days, representing the typical demand level for the market area.
+  mdape_city:
+    lineage:
+      - datalake_atlas_pricing_report.region_metrics.mdape_city
+    description: >-
+      Median Absolute Percentage Error of the pricing model for the city associated
+      with this region, indicating how accurately the model predicts prices in this market.

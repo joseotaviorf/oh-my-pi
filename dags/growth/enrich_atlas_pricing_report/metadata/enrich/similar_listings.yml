@@ -1,6 +1,156 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: similar_listings
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Pairs each active listing with its nearest comparable properties (both on-market
+  and recently negotiated) based on proximity, property type, size, and price range.
+  The Atlas Pricing Report relies on this table as the foundation for all peer-based
+  pricing benchmarks, computing reference price medians, total values, price per square
+  meter, and days-on-market from the comparable set.
+columns:
+  id_house:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_house
+    description: >-
+      Identifier of the reference listing being evaluated, linking this comparable
+      pair to the active house for which pricing recommendations are generated.
+  similar_id_house:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_house
+      - datalake_atlas_pricing_report.status_history_house_negotiation.id_house
+    description: >-
+      Identifier of the comparable listing selected as a benchmark, chosen from
+      properties within 2 km that share similar type, size, bedroom count, and price range.
+  reference_id_region:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_region
+    description: >-
+      Geographic region of the reference listing, used to anchor the comparable
+      search and to contextualize market benchmarks within the correct area.
+  similar_id_region:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_region
+      - datalake_atlas_pricing_report.status_history_house_negotiation.id_region
+    description: >-
+      Geographic region of the comparable listing, indicating which market area
+      the benchmark property belongs to.
+  reference_region_code:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.region_code
+    description: >-
+      Sub-regional market code for the reference property, used when neighborhood-level
+      comparables are insufficient and broader region matching is applied.
+  similar_region_code:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.region_code
+      - datalake_atlas_pricing_report.status_history_house_negotiation.region_code
+    description: >-
+      Sub-regional market code for the comparable property, used for recovery
+      matching when enough neighborhood-level peers cannot be found.
+  business_context:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.business_context
+    description: >-
+      Market segment shared by both the reference and comparable listing, either
+      'RENT' or 'SALE', ensuring cross-context comparisons are never made.
+  house_type:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.house_type
+    description: >-
+      Property category of the reference listing ('apartamento' or 'casa'), used
+      as a hard filter so comparables are always of the same structural type.
+  city:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.city
+    description: >-
+      City of the reference listing, providing geographic context for the comparable
+      pair and for city-level aggregations in the pricing report.
+  reference_neighborhood:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.neighborhood
+    description: >-
+      Neighborhood of the reference property, used to display the listing's local
+      market context alongside its benchmark comparables.
+  similar_neighborhood:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.neighborhood
+      - datalake_atlas_pricing_report.status_history_house_negotiation.neighborhood
+    description: >-
+      Neighborhood of the comparable property, showing pricing analysts where the
+      benchmark listing is physically located relative to the reference.
+  reference_house_status:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.house_status
+    description: >-
+      Current market status of the reference listing, always 'on-market' in this
+      table since only published listings are evaluated for pricing recommendations.
+  similar_house_status:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.house_status
+      - datalake_atlas_pricing_report.status_history_house_negotiation.house_status
+    description: >-
+      Market status of the comparable listing, either 'on-market' (still published)
+      or 'off-market' (recently negotiated), allowing the pricing team to compare
+      against both active peers and recently closed transactions.
+  distance_km:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.lat
+      - datalake_atlas_pricing_report.on_market_house_listings.lng
+    description: >-
+      Straight-line distance in kilometers between the reference and comparable
+      listing, computed via the Haversine formula; only listings within 2 km qualify.
+  reference_rent_total_value:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.rent_total_value
+    description: >-
+      Total monthly rental cost (in BRL) of the reference listing, used to contextualize
+      how the listing's total value compares to nearby comparable properties.
+  similar_rent_total_value:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.rent_total_value
+      - datalake_atlas_pricing_report.status_history_house_negotiation.rent_total_value
+    description: >-
+      Total monthly rental cost (in BRL) of the comparable listing, contributing
+      to the on-market or off-market total-value median benchmarks in the engagement table.
+  reference_price:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.price
+    description: >-
+      Asking price (in BRL) of the reference listing in the relevant business context,
+      used to confirm the listing is within the expected price band relative to comparables.
+  similar_price:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.price
+      - datalake_atlas_pricing_report.status_history_house_negotiation.price
+    description: >-
+      Asking or agreed price (in BRL) of the comparable listing, aggregated into
+      on-market and off-market price medians that power the Atlas Pricing Report.
+  reference_sale_price_m2:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.sale_price_m2
+    description: >-
+      Sale price per square meter (in BRL) of the reference listing, used to
+      compare the listing's unit price against the benchmarks of similar properties.
+  similar_sale_price_m2:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.sale_price_m2
+      - datalake_atlas_pricing_report.status_history_house_negotiation.sale_price_m2
+    description: >-
+      Sale price per square meter (in BRL) of the comparable listing, aggregated
+      into the price-per-square-meter benchmarks used in pricing recommendations.
+  reference_days_in_the_market:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.days_in_the_market
+    description: >-
+      Number of days the reference listing has been published without a contract,
+      shown alongside comparable metrics to assess relative market velocity.
+  similar_days_in_the_market:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.days_in_the_market
+      - datalake_atlas_pricing_report.status_history_house_negotiation.days_in_the_market
+    description: >-
+      Number of days the comparable listing spent on market before negotiation
+      or current publication, used to compute the time-on-market benchmarks
+      reported in the engagement table.

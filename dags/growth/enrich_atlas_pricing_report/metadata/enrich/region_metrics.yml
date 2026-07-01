@@ -1,25 +1,40 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: region_metrics
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: This table contains pricing accuracy metrics (MDAPE) by region and business context (RENT/SALE), comparing actual contract prices against predicted prices from the house_predicted_price model.
+description: >-
+  Pricing model accuracy metrics (MDAPE) aggregated by city and business context,
+  calculated from contracts signed in the last 60 days by comparing actual transaction
+  prices against the model's predicted median. The pricing team uses this table to
+  assess how trustworthy the model's recommendations are in each market and to flag
+  regions where manual pricing review may be warranted.
 columns:
   id_region:
     lineage:
       - dw_public.dim_region.sk_region
-    description: Unique region identifier from the dimension table.
+    description: >-
+      Geographic region identifier linking the accuracy metric to a specific market
+      area within the pricing report's regional hierarchy.
   city_name:
     lineage:
       - datalake_ebdb_clean.house.city
-    description: Name of the city associated with the region.
+    description: >-
+      Name of the city for which the pricing model accuracy is being measured,
+      used to segment MDAPE results at the city level.
   business_context:
     lineage:
       - datalake_ebdb_clean.house_predicted_price.business_context
-    description: Business context indicator, either 'SALE' or 'RENT'.
+    description: >-
+      Market segment for this accuracy record, either 'SALE' or 'RENT', reflecting
+      which contract type was used to evaluate the model's predictions.
   mdape_city:
     lineage:
       - datalake_sale_offer.sale_offer.last_price_offered_by_buyer
       - datalake_ebdb_clean.house_predicted_price.p_50
       - datalake_ebdb_clean.contract.rent
-    description: Median Absolute Percentage Error (MDAPE) rounded to 2 decimal places, measuring the pricing accuracy at the city level.
+    description: >-
+      Median Absolute Percentage Error of the pricing model at the city level,
+      rounded to 2 decimal places. A lower value indicates the model's predicted
+      prices closely match actual contracted prices, signaling reliable recommendations
+      for listings in that city.

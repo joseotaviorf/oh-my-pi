@@ -1,6 +1,101 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: house_condo_metrics
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Enriched dataset pairing each active house listing with its nearest similar listings
+  to extract condominium fee (condo) and municipal property tax (IPTU) benchmarks.
+  Used by the Atlas Pricing Report to provide the pricing team with context on typical
+  carrying costs for comparable properties within a 2 km radius.
+columns:
+  id_house:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_house
+    description: >-
+      Identifier of the reference house listing being evaluated for pricing purposes.
+  similar_id_house:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_house
+    description: >-
+      Identifier of a comparable house listing selected as a benchmark neighbor
+      based on proximity, size, and type similarity.
+  reference_id_region:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_region
+    description: >-
+      Geographic region identifier for the reference house, used to contextualize
+      pricing within the correct market area.
+  similar_id_region:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.id_region
+    description: >-
+      Geographic region identifier for the comparable house, indicating which market
+      area the benchmark listing belongs to.
+  reference_region_code:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.region_code
+    description: >-
+      Alphanumeric code representing the sub-region of the reference property,
+      used for geographic segmentation in pricing analysis.
+  similar_region_code:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.region_code
+    description: >-
+      Alphanumeric code representing the sub-region of the comparable property,
+      enabling cross-region benchmark comparisons.
+  house_type:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.house_type
+    description: >-
+      Normalized property category (e.g., 'apartamento' or 'casa') shared between
+      the reference and similar listings to ensure fair comparisons.
+  city:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.city
+    description: >-
+      City name of the reference listing, anchoring the benchmark analysis to
+      the correct urban market.
+  reference_neighborhood:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.neighborhood
+    description: >-
+      Neighborhood name of the reference property, providing local market context
+      for the pricing team.
+  similar_neighborhood:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.neighborhood
+    description: >-
+      Neighborhood name of the comparable listing, showing where benchmark properties
+      are physically located relative to the reference.
+  distance_km:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.lat
+      - datalake_atlas_pricing_report.on_market_house_listings.lng
+    description: >-
+      Straight-line distance in kilometers between the reference and similar listing,
+      computed via the Haversine formula to ensure geographic proximity in comparisons.
+  reference_condo:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.condo
+    description: >-
+      Monthly condominium fee (in BRL) for the reference listing, used as a baseline
+      when evaluating the total housing cost for the pricing team.
+  similar_condo:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.condo
+    description: >-
+      Monthly condominium fee (in BRL) for the comparable listing, providing a
+      market benchmark for the typical condo cost in the area.
+  reference_iptu:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.iptu
+    description: >-
+      Annual municipal property tax (IPTU, in BRL) for the reference listing,
+      helping the pricing team assess the total ownership cost.
+  similar_iptu:
+    lineage:
+      - datalake_atlas_pricing_report.on_market_house_listings.iptu
+    description: >-
+      Annual municipal property tax (IPTU, in BRL) for the comparable listing,
+      serving as a benchmark for typical tax burden in the reference neighborhood.

@@ -1,6 +1,50 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: status_history_house_listing
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Chronological record of each house listing's publication and unpublication events
+  for both rent and sale business contexts, enriched with the listing price active at
+  the time of each status transition. The Atlas Pricing Report uses this table to
+  reconstruct a listing's market lifecycle, supporting price history analysis and
+  negotiation timeline reconstruction.
+columns:
+  id_house:
+    lineage:
+      - dw_sale.fact_listing_status.sk_sale_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
+    description: >-
+      Identifier of the house listing whose publication status history is being tracked,
+      used to join with negotiation and price change history in the pricing report.
+  business_context:
+    lineage:
+      - dw_sale.fact_listing_status.sk_sale_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
+    description: >-
+      Market segment for this status event, either 'RENT' or 'SALE', determining
+      which data source and price field applies to the listing's history record.
+  status:
+    lineage:
+      - dw_sale.fact_listing_status.status_history
+      - dw_rent.fact_house_listing_status.status_history
+    description: >-
+      Lifecycle stage of the listing at the recorded timestamp, either 'PUBLISHED'
+      (active on market) or 'UNPUBLISHED' (removed from market), forming the backbone
+      of the price history reconstruction pipeline.
+  price:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_price_change.price
+      - datalake_rental_historical_follow_up.house_listings_daily_info.rent
+      - datalake_ebdb_clean.house_aud.sale_price
+    description: >-
+      Listing price (in BRL) that was active at the time of the status event,
+      resolved from price change records or fallback historical sources when
+      the primary price is unavailable.
+  ts_status_started:
+    lineage:
+      - dw_sale.fact_listing_status.ts_status_started
+      - dw_rent.fact_house_listing_status.ts_status_start
+    description: >-
+      Timestamp marking when the listing entered the recorded status, enabling
+      chronological ordering and duration calculation for each publication period.

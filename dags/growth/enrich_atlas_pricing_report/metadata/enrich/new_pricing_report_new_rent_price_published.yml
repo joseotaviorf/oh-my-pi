@@ -1,6 +1,51 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: new_pricing_report_new_rent_price_published
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Quarterly median rent price per square meter benchmarks by geographic region,
+  derived from actual signed rental contracts since 2019. The pricing team uses
+  this table to understand historical rent price trends in each neighborhood and
+  to contextualize current listing prices against realized market rates.
+columns:
+  ts_event:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: >-
+      Timestamp recording when this benchmark record was generated, supporting
+      point-in-time tracking of the price trend dataset.
+  id:
+    lineage:
+      - dw_rent.fact_house_listings.sk_house_listing
+    description: >-
+      Monotonically increasing surrogate key that uniquely identifies each row in
+      the snapshot, used for deduplication in downstream consumers.
+  dt_quarter:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: >-
+      First day of the quarter (ISO date) in which the underlying contracts were
+      signed, enabling quarterly trend analysis of rental price evolution by region.
+  id_region:
+    lineage:
+      - dw_public.dim_region.sk_region
+    description: >-
+      Region identifier linking each price benchmark to a specific geographic area,
+      allowing the pricing team to compare trends across neighborhoods and cities.
+  region_name:
+    lineage:
+      - dw_public.dim_region.name
+      - dw_public.dim_region.city_name
+      - dw_public.dim_region.short_region_name
+    description: >-
+      Human-readable label for the region composed of neighborhood, city, and
+      short region name, used for display in the pricing report interface.
+  median_price_per_m2:
+    lineage:
+      - dw_rent.dim_house_listing.house_rent
+      - dw_rent.dim_house_listing.house_total_area
+    description: >-
+      Median rent price per square meter (in BRL) across all signed contracts in
+      the region during the quarter, representing the realized market rate that
+      serves as the historical benchmark for new listing prices.

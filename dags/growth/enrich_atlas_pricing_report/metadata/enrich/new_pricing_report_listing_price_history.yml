@@ -1,6 +1,56 @@
 ---
 database_name: datalake_atlas_pricing_report
 table_name: new_pricing_report_listing_price_history
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: WIP
+description: >-
+  Reconstructed price timeline for each house listing, merging publication events,
+  price changes, and negotiation closures into a deduplicated chronological sequence.
+  The Atlas Pricing Report uses this history to show the pricing team how a listing's
+  price evolved over time and whether past adjustments correlated with negotiation outcomes.
+columns:
+  ts_event:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.ts_status_started
+    description: >-
+      Timestamp marking when this price history record was generated, supporting
+      point-in-time audits of the pricing reconstruction pipeline.
+  id:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.id_house
+    description: >-
+      Monotonically increasing surrogate key uniquely identifying each row in the
+      snapshot, used for downstream deduplication and indexing.
+  id_house:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.id_house
+    description: >-
+      Identifier of the house listing whose price history is being reconstructed
+      for display in the pricing report.
+  business_context:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.business_context
+    description: >-
+      Market segment of the listing, either 'RENT' or 'SALE', determining which
+      status transitions and price sources are included in the history.
+  price:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.price
+      - datalake_atlas_pricing_report.status_history_house_price_change.price
+      - datalake_atlas_pricing_report.status_history_house_negotiation.price
+    description: >-
+      Listing price (in BRL) recorded at the given status transition, representing
+      the asking or agreed price at each point in the listing's lifecycle.
+  status:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.status
+    description: >-
+      Lifecycle stage of the listing at the recorded price point, such as 'PUBLISHED',
+      'PRICE_CHANGE', 'UNPUBLISHED', or 'NEGOTIATED', providing context for each
+      price movement in the history.
+  ts_status_started:
+    lineage:
+      - datalake_atlas_pricing_report.status_history_house_listing.ts_status_started
+    description: >-
+      Timestamp when this particular status and price became effective for the listing,
+      anchoring each price point in the chronological price evolution timeline.
