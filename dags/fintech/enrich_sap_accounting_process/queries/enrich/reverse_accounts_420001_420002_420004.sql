@@ -192,7 +192,7 @@ sap_ledger AS (
     WHERE
         dt_reference >= DATE('2025-01-01')
         AND (account_number IN ('420001', '420002', '420004') 
-             OR (account_number IN ('420005') AND dt_reference >= DATE('2026-07-01'))
+             OR (account_number IN ('420005') AND dt_reference >= DATE('2026-08-01'))
             )
         AND ((source_client NOT IN ('rental-guarantee-pla')) OR (source_client IS NULL))
     GROUP BY 

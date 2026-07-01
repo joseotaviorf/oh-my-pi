@@ -64,35 +64,57 @@ sap_entity AS (
     status,
     failed_status,
     failed_reason
-  FROM
-    datalake_retsuko_clean.sap_entity
+  FROM (
+    SELECT
+      id_finance_entity,
+      id_sap_gateway_feature,
+      version,
+      event,
+      status,
+      failed_status,
+      failed_reason,
+      ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) AS rn
+    FROM
+      datalake_retsuko_clean.sap_entity
+    WHERE
+      id_finance_entity IS NOT NULL
+      AND event IN ('tenant-invoices-paid', 'nota-fiscal-items', 'new-accounting-entries')
+  )
   WHERE
-    id_finance_entity IS NOT NULL
-    AND event IN ('tenant-invoices-paid', 'nota-fiscal-items', 'new-accounting-entries')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
+    rn = 1
 ),
 
 sap_gateway AS (
-   SELECT
-    i.id_feature,
-    i.id_finance_entity,
-    i.amount,
-    CAST(ci.doc_entry AS INT) AS doc_entry,
-    s.status as sync_sap_job_status
-FROM
-    datalake_sap_gateway_clean.invoice i
-LEFT JOIN
-  datalake_sap_gateway_clean.consolidated_invoice ci
-    ON ci.id = i.id_consolidated
-INNER JOIN
-  datalake_sap_gateway_clean.sync_sap_job s
-    ON i.id_feature = s.id_feature
-WHERE
-    i.account_code in ('SRPN000001','SRPN000006')
-    AND s.type IN ('NF', 'PN')
-    AND s.status IN ('waiting-unified-invoice', 'done')
-    AND s.erp_solution IN ('S4')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY i.id_finance_entity, i.id_feature ORDER BY s.ts_updated) = 1
+  SELECT
+    id_feature,
+    id_finance_entity,
+    amount,
+    doc_entry,
+    sync_sap_job_status
+  FROM (
+    SELECT
+      i.id_feature,
+      i.id_finance_entity,
+      i.amount,
+      CAST(ci.doc_entry AS INT) AS doc_entry,
+      s.status AS sync_sap_job_status,
+      ROW_NUMBER() OVER (PARTITION BY i.id_finance_entity, i.id_feature ORDER BY s.ts_updated) AS rn
+    FROM
+      datalake_sap_gateway_clean.invoice i
+    LEFT JOIN
+      datalake_sap_gateway_clean.consolidated_invoice ci
+        ON ci.id = i.id_consolidated
+    INNER JOIN
+      datalake_sap_gateway_clean.sync_sap_job s
+        ON i.id_feature = s.id_feature
+    WHERE
+      i.account_code IN ('SRPN000001', 'SRPN000006')
+      AND s.type IN ('NF', 'PN')
+      AND s.status IN ('waiting-unified-invoice', 'done')
+      AND s.erp_solution IN ('S4')
+  )
+  WHERE
+    rn = 1
 ),
 
 sap_ledger AS (
@@ -110,7 +132,7 @@ sap_ledger AS (
   FROM
     datalake_accounting_funnel.ledger
   WHERE
-    dt_reference >= DATE('2025-01-01') AND dt_reference < DATE('2026-07-01')
+    dt_reference >= DATE('2025-01-01') AND dt_reference < DATE('2026-08-01')
     AND account_number IN ('420005')
     AND id_finance_entity IN ('SFNFUnica', 'AdmNFUnica')
   GROUP BY 1, 2, 3, 4, 5, 6, 7

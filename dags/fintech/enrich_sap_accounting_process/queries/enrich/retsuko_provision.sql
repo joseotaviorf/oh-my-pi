@@ -49,8 +49,8 @@ retsuko AS (
     (
       e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 'entry.bill-item/brokerage-installment-fee')
       OR (ct.landlord_legal_person = 'juridical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
-      OR (DATE(e.ts_created) >= '2026-07-01' AND ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
-      OR (DATE(e.ts_created) >= '2026-07-01' AND e.bill_item IN ('entry.bill-item/service-fee'))
+      OR (DATE(e.ts_created) >= '2026-08-01' AND ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+      OR (DATE(e.ts_created) >= '2026-08-01' AND e.bill_item IN ('entry.bill-item/service-fee'))
     )
     AND DATE(e.ts_created) >= '2024-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
@@ -66,37 +66,61 @@ sap_entity AS (
     status,
     failed_status,
     failed_reason
-  FROM
-    datalake_retsuko_clean.sap_entity
+  FROM (
+    SELECT
+      id_finance_entity,
+      id_sap_gateway_feature,
+      version,
+      event,
+      status,
+      failed_status,
+      failed_reason,
+      ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) AS rn
+    FROM
+      datalake_retsuko_clean.sap_entity
+    WHERE
+      id_finance_entity IS NOT NULL
+      AND event = 'new-accounting-entries'
+  )
   WHERE
-    id_finance_entity IS NOT NULL
-    AND event = 'new-accounting-entries'
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
+    rn = 1
 ),
 
 sap_gateway AS (
   SELECT
-    f.id_finance_entity,
-    s.id_feature,
-    s.hash,
-    s.status as sync_sap_job_status,
-    w.status as sap_send_status,
-    w.webhook_status as sap_processed_status,
-    w.errors AS webhook_error
-  FROM
-    datalake_sap_gateway_clean.feature f
-  LEFT JOIN
-    datalake_sap_gateway_clean.sync_sap_job s
-      ON f.id_feature = s.id_feature
-  LEFT JOIN
-    datalake_sap_gateway_clean.webhook_log w
-      ON s.idoc = w.idoc
+    id_finance_entity,
+    id_feature,
+    hash,
+    sync_sap_job_status,
+    sap_send_status,
+    sap_processed_status,
+    webhook_error
+  FROM (
+    SELECT
+      f.id_finance_entity,
+      s.id_feature,
+      s.hash,
+      s.status AS sync_sap_job_status,
+      w.status AS sap_send_status,
+      w.webhook_status AS sap_processed_status,
+      w.errors AS webhook_error,
+      ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) AS rn
+    FROM
+      datalake_sap_gateway_clean.feature f
+    LEFT JOIN
+      datalake_sap_gateway_clean.sync_sap_job s
+        ON f.id_feature = s.id_feature
+    LEFT JOIN
+      datalake_sap_gateway_clean.webhook_log w
+        ON s.idoc = w.idoc
+    WHERE
+      s.erp_solution IN ('S4')
+      AND s.type = 'LCM'
+      AND s.status NOT IN ('ignore', 'ignored')
+      AND DATE(f.ts_created) >= DATE('2024-01-01')
+  )
   WHERE
-    s.erp_solution IN ('S4')
-    AND s.type = 'LCM'
-    AND s.status NOT IN ('ignore', 'ignored')
-    AND DATE(f.ts_created) >= DATE('2024-01-01')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) = 1
+    rn = 1
 ),
 
 sap_ledger AS (

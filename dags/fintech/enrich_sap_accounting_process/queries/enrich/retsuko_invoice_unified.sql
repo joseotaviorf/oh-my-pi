@@ -57,7 +57,7 @@ retsuko AS (
     e.description != 'Crédito - Parcelamento corretagem - QuintoAndar'
     AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin', 'entry.bill-item/service-fee')
     AND ct.country_code = 'BR'
-    AND DATE(e.ts_created)>= DATE ('2025-01-01') AND DATE(e.ts_created)< DATE ('2026-07-01')
+    AND DATE(e.ts_created)>= DATE ('2025-01-01') AND DATE(e.ts_created)< DATE ('2026-08-01')
     AND af.type IN ('contract', 'tenant', 'landlord')
     AND at.type IN ('contract', 'tenant','landlord')
     AND i.status != 'canceled'
@@ -73,41 +73,57 @@ sap_entity AS (
     status,
     failed_status,
     failed_reason
-  FROM
-    datalake_retsuko_clean.sap_entity
+  FROM (
+    SELECT
+      id_finance_entity,
+      id_sap_gateway_feature,
+      version,
+      event,
+      status,
+      failed_status,
+      failed_reason,
+      ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) AS rn
+    FROM
+      datalake_retsuko_clean.sap_entity
+    WHERE
+      id_finance_entity IS NOT NULL
+      AND event IN ('tenant-invoices-paid', 'nota-fiscal-items', 'new-accounting-entries')
+  )
   WHERE
-    id_finance_entity IS NOT NULL
-    AND event IN ('tenant-invoices-paid', 'nota-fiscal-items', 'new-accounting-entries')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
+    rn = 1
 ),
 
 sap_gateway AS (
-   SELECT
-    i.id_feature,
-    i.id_finance_entity,
-    i.amount,
-    CAST(ci.doc_entry AS INT) AS doc_entry,
-    s.status as sync_sap_job_status
-  --  w.status as sap_send_status,
-  --  w.webhook_status as sap_processed_status,
-  --  w.errors AS webhook_error
-FROM
-    datalake_sap_gateway_clean.invoice i
-LEFT JOIN
-  datalake_sap_gateway_clean.consolidated_invoice ci
-    ON ci.id = i.id_consolidated
-INNER JOIN
-  datalake_sap_gateway_clean.sync_sap_job s
-    ON i.id_feature = s.id_feature
---LEFT JOIN
---    datalake_sap_gateway_clean.webhook_log w
---      ON s.idoc = w.idoc
-WHERE
-    i.account_code in ('SRPN000001','SRPN000006')
-    AND s.type IN ('NF', 'PN')
-    AND s.status IN ('waiting-unified-invoice', 'done')
-    AND s.erp_solution IN ('S4')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY i.id_finance_entity, i.id_feature ORDER BY s.ts_updated) = 1
+  SELECT
+    id_feature,
+    id_finance_entity,
+    amount,
+    doc_entry,
+    sync_sap_job_status
+  FROM (
+    SELECT
+      i.id_feature,
+      i.id_finance_entity,
+      i.amount,
+      CAST(ci.doc_entry AS INT) AS doc_entry,
+      s.status AS sync_sap_job_status,
+      ROW_NUMBER() OVER (PARTITION BY i.id_finance_entity, i.id_feature ORDER BY s.ts_updated) AS rn
+    FROM
+      datalake_sap_gateway_clean.invoice i
+    LEFT JOIN
+      datalake_sap_gateway_clean.consolidated_invoice ci
+        ON ci.id = i.id_consolidated
+    INNER JOIN
+      datalake_sap_gateway_clean.sync_sap_job s
+        ON i.id_feature = s.id_feature
+    WHERE
+      i.account_code IN ('SRPN000001', 'SRPN000006')
+      AND s.type IN ('NF', 'PN')
+      AND s.status IN ('waiting-unified-invoice', 'done')
+      AND s.erp_solution IN ('S4')
+  )
+  WHERE
+    rn = 1
 
 --- obs.: o que está comentando será ativado quando o processo for automático
 ),
