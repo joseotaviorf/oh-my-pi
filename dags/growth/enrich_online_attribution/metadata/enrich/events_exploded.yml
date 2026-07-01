@@ -201,14 +201,14 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.referrer
   year:
-    description: year of event
+    description: Calendar year of the Amplitude event timestamp; Hive partition for incremental reads.
     lineage:
     - datalake_amplitude_clean.events.year
   month:
-    description: month of event
+    description: Calendar month of the Amplitude event timestamp; Hive partition for incremental reads.
     lineage:
     - datalake_amplitude_clean.events.month
   day:
-    description: day of event
+    description: Calendar day of the Amplitude event timestamp; Hive partition for incremental reads.
     lineage:
     - datalake_amplitude_clean.events.day

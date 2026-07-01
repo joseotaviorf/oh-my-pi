@@ -1,12 +1,12 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: facebook_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates metrics extracted from facebook ads platform
 columns:
   id_date:
-    description: Date segmentation
+    description: Surrogate date key derived from source report load dates used to join consolidated marketing metrics to the calendar dimension.
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.day
       - datalake_facebook_insights_clean.facebook_insights.month
@@ -38,9 +38,8 @@ columns:
   other_cost: 
     description: Cost from any platform different from desktop or mobile
   total_cost: 
-    description: Total cost
+    description: Total media spend in BRL for the campaign, channel, and report date grain of this row.
   impressions:
     description: Impressions from facebook ads platform
   clicks:
     description: Clicks from facebook ads platform
-

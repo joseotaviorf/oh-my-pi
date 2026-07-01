@@ -1,16 +1,16 @@
 ---
 database_name: datalake_google_ads_clean
 table_name: campaigns_performance
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table load Campaigns Performance Report from Google Ads API extraction. Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v13/overview
 columns:
   id_external_customer:
-    description: Customer identificator
+    description: Google Ads customer account ID from the API performance report.
     lineage:
       - datalake_google_ads_raw.campaigns_performance.customer
   id_campaign:
-    description: Campaign identificator
+    description: Google Ads campaign resource ID from the performance report.
     lineage:
       - datalake_google_ads_raw.campaigns_performance.campaign
   campaign_name:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_google_ads_raw.campaigns_performance.segments
   ad_network_type:
-    description: Ad network type
+    description: Google Ads network type (Search, Display, YouTube, etc.) for the metric row.
     lineage:
       - datalake_google_ads_raw.campaigns_performance.segments
   impressions:
@@ -79,7 +79,7 @@ columns:
     lineage:
       - datalake_google_ads_raw.campaigns_performance.metrics
   dt_loaded:
-    description: Date of loaded data
+    description: Load date when the Google Ads report row was ingested into the datalake.
     lineage:
       - datalake_google_ads_raw.campaigns_performance.segments
   dt_created:

@@ -1,6 +1,6 @@
 database_name: datalake_facebook_insights_clean
 table_name: facebook_social_insights
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table load Facebook Insigths Performance Report from Facebook Ads API extraction. Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
 columns:
@@ -49,11 +49,11 @@ columns:
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.impressions
   platform_position:
-    description: platform_position
+    description: Facebook/Meta placement position where the social ad was shown.
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.platform_position
   publisher_platform:
-    description: publisher_platform
+    description: Facebook/Meta publisher platform (Facebook, Instagram, Audience Network, etc.).
     lineage:
       - datalake_facebook_insights_raw.facebook_social_insights.publisher_platform
   reach:

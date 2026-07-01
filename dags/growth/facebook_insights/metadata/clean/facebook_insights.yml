@@ -1,6 +1,6 @@
 database_name: datalake_facebook_insights_clean
 table_name: facebook_insights
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table load Facebook Insights Performance Report from Facebook Ads API extraction. Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
 columns:
@@ -45,7 +45,7 @@ columns:
     lineage:
       - datalake_facebook_insights_raw.facebook_insights.campaign_name
   impression_device:
-    description: Impression_device
+    description: Facebook device type on which the ad impression was served (e.g. mobile, desktop).
     lineage:
       - datalake_facebook_insights_raw.facebook_insights.impression_device
   actions:

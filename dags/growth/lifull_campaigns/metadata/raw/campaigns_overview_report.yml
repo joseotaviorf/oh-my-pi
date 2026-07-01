@@ -1,4 +1,5 @@
 ---
 database_name: datalake_lifull_campaigns_raw
 table_name: campaigns_overview_report
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth

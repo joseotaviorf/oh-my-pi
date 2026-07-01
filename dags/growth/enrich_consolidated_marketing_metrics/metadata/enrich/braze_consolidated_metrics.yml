@@ -1,12 +1,12 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: braze_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates metrics extracted from braze platform
 columns:
   id_date:
-    description: Date segmentation
+    description: Surrogate date key derived from source report load dates used to join consolidated marketing metrics to the calendar dimension.
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.dt_webhook_sent
   campaign_name:
@@ -30,17 +30,17 @@ columns:
       Doorman: ''
       Indica Aí - Agents: ''
   city_group:
-    description: City group segmentation
+    description: QuintoAndar city group used to allocate Braze campaign costs in sharing rules.
     lineage:
       - datalake_marketing_costs_sharing_rules.a028a.city_group
   cost:
-    description: Segmented
+    description: Braze campaign cost amount allocated to the city group and business context.
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.notification_count
   funnel_side:
     description: Informs the side of the funnel, in this case, the affiliates side. 
   business_context:
-    description: Business context.
+    description: QuintoAndar business context (rent, sale, etc.) for cost allocation.
     lineage:
       - datalake_marketing_costs_sharing_rules.a028a.business_context
       - datalake_marketing_costs_sharing_rules.a034a.business_context

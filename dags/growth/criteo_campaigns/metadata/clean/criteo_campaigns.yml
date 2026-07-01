@@ -1,7 +1,7 @@
 ---
 database_name: datalake_criteo_campaigns_clean
 table_name: criteo_campaigns
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table load Criteo Performance Report from Criteo Ads API extraction.
 columns:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.adsetid
   advertiser_name:
-    description: Name of the Advertiser
+    description: Criteo advertiser account name from the performance report.
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.advertiser
   all_sales:
@@ -30,7 +30,7 @@ columns:
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.ecpc
   campaign_name:
-    description: Name of the campaign
+    description: Criteo ad set (campaign) name from the performance report.
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.adset
   country_code:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.advertisercost
   currency:
-    description: Cost currency
+    description: ISO currency code of advertiser cost in the Criteo report.
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.currency
   impressions:
@@ -60,6 +60,6 @@ columns:
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.revenuegeneratedpc1d
   dt_attribution:
-    description: Date of attribution
+    description: Attribution date of the Criteo campaign metrics row.
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.attributiondate

@@ -1,3 +1,4 @@
 database_name: datalake_facebook_insights_raw
 table_name: facebook_ads_insights_by_region
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth

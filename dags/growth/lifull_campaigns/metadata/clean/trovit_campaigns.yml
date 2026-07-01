@@ -1,7 +1,7 @@
 ---
 database_name: datalake_lifull_campaigns_clean
 table_name: trovit_campaigns
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table load Criteo Performance Report from Trovit API extraction.
 columns:
@@ -42,10 +42,10 @@ columns:
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.total_cost
   dt_loaded:
-    description: Date of loaded data
+    description: Date when the Lifull/Trovit campaign report row was loaded into the datalake.
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.curr_date
   dt_attribution:
-    description: Date of attribution
+    description: Attribution date of the Trovit campaign metrics row.
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.dt

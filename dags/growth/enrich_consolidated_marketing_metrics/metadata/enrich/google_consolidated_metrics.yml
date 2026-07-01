@@ -1,12 +1,12 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: google_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates metrics extracted from google ads platform
 columns:
   id_date:
-    description: Date segmentation
+    description: Surrogate date key derived from source report load dates used to join consolidated marketing metrics to the calendar dimension.
     lineage:
       - datalake_google_ads_clean.ads_performance.dt_loaded
       - datalake_google_ads_clean.campaigns_performance.dt_loaded
@@ -84,7 +84,7 @@ columns:
       - datalake_google_ads_clean.keywords_performance.cost
       - datalake_google_ads_clean.videos_performance.cost
   total_cost:
-    description: Total cost
+    description: Total media spend in BRL for the campaign, channel, and report date grain of this row.
     lineage:
       - datalake_google_ads_clean.ads_performance.cost
       - datalake_google_ads_clean.campaigns_performance.cost

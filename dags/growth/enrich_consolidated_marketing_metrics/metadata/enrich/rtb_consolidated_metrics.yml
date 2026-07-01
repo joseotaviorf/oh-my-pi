@@ -1,12 +1,12 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: rtb_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates metrics extracted from rtb platform
 columns:
   id_date:
-    description: Date segmentation
+    description: Surrogate date key derived from source report load dates used to join consolidated marketing metrics to the calendar dimension.
     lineage:
       - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
   campaign_name:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_rtb_campaigns_clean.rtb_campaigns.cost
   total_cost:
-    description: Total cost
+    description: Total media spend in BRL for the campaign, channel, and report date grain of this row.
     lineage:
       - datalake_rtb_campaigns_clean.rtb_campaigns.cost
   impressions:

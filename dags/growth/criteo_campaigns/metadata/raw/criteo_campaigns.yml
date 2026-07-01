@@ -1,4 +1,5 @@
 ---
 database_name: datalake_criteo_campaigns_raw
 table_name: criteo_campaigns
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth

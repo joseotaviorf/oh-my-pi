@@ -1,15 +1,16 @@
 ---
 database_name: datalake_google_ads_clean
 table_name: search_term_performance
-owner: henrique.miamoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
+description: Clean layer for Google Ads Search Term Performance report rows ingested from the API.
 columns:
   id_adgroup:
     description: Ad Group identificator
     lineage:
       - datalake_google_ads_raw.search_term_performance.adGroup
   id_campaign:
-    description: Campaign identificator
+    description: Google Ads campaign resource ID from the performance report.
     lineage:
       - datalake_google_ads_raw.search_term_performance.campaign
   id_external_customer:
@@ -29,11 +30,11 @@ columns:
     lineage:
       - datalake_google_ads_raw.search_term_performance.searchTermView
   search_term_status:
-    description: Status of the term in the google ads
+    description: Approval status of the search term in the Google Ads account.
     lineage:
       - datalake_google_ads_raw.search_term_performance.searchTermView
   ad_network_type:
-    description: Ad network type
+    description: Google Ads network type (Search, Display, YouTube, etc.) for the metric row.
     lineage:
       - datalake_google_ads_raw.search_term_performance.segments
   device:
@@ -41,11 +42,11 @@ columns:
     lineage:
       - datalake_google_ads_raw.search_term_performance.segments
   keyword_info_text:
-    description: Keyword text
+    description: Matched keyword text associated with the search term view row.
     lineage:
       - datalake_google_ads_raw.search_term_performance.segments
   account_descriptive_name:
-    description: Name of the google account
+    description: Human-readable Google Ads account name from the search term report.
     lineage:
       - datalake_google_ads_raw.search_term_performance.customer
   account_snake_case:
@@ -81,7 +82,7 @@ columns:
     lineage:
       - datalake_google_ads_raw.search_term_performance.metrics
   dt_loaded:
-    description: Date of loaded data
+    description: Load date when the Google Ads report row was ingested into the datalake.
     lineage:
       - datalake_google_ads_raw.search_term_performance.segments
   dt_created:

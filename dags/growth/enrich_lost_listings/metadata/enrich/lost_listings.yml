@@ -1,69 +1,92 @@
 ---
 database_name: datalake_marketing_segmentations
 table_name: lost_listings
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
+description: LightGBM segmentation of lost rental listings. Each row is a listing snapshot with dim_house_listing attributes, region, and model-assigned cluster label used by Growth to analyze friction drivers in the renting funnel.
 columns:
   sk_house_listing:
     lineage:
       - dw_rent.dim_house_listing.sk_house_listing
+    description: Surrogate key of the house listing version from dw_rent.dim_house_listing.
   region_code:
     lineage:
       - datalake_region.region.region_code
+    description: QuintoAndar region code joined from datalake_region.region.
   house_total_area:
     lineage:
       - dw_rent.dim_house_listing.house_total_area
+    description: Total property area in square meters from the listing dimension.
   house_bathrooms:
     lineage:
       - dw_rent.dim_house_listing.house_bathrooms
+    description: Number of bathrooms on the listing.
   house_bedrooms:
     lineage:
       - dw_rent.dim_house_listing.house_bedrooms
+    description: Number of bedrooms on the listing.
   house_iptu:
     lineage:
       - dw_rent.dim_house_listing.house_iptu
+    description: Annual IPTU (property tax) amount on the listing.
   is_house_furnished:
     lineage:
       - dw_rent.dim_house_listing.is_house_furnished
+    description: Flag indicating whether the listing is furnished.
   is_originals_active:
     lineage:
       - dw_rent.dim_house_listing.is_originals_active
+    description: Flag indicating whether QuintoAndar Originals program is active on the listing.
   house_garages:
     lineage:
       - dw_rent.dim_house_listing.house_garages
+    description: Number of parking spaces or garages on the listing.
   house_rent:
     lineage:
       - dw_rent.dim_house_listing.house_rent
+    description: Listed monthly rent amount.
   house_condo:
     lineage:
       - dw_rent.dim_house_listing.house_condo
+    description: Monthly condominium fee on the listing.
   house_total_value:
     lineage:
       - dw_rent.dim_house_listing.house_total_value
+    description: Total listing value metric from dim_house_listing.
   house_predicted_price:
     lineage:
       - dw_rent.dim_house_listing.house_predicted_price
+    description: Model-predicted fair rent price for the listing.
   rent_above_prediction:
     lineage:
       - dw_rent.dim_house_listing.house_rent
       - dw_rent.dim_house_listing.house_predicted_price
+    description: Derived indicator comparing listed rent against house_predicted_price to flag overpriced listings.
   has_visit_restriction:
     lineage:
       - dw_rent.dim_house_listing.has_visit_restriction
+    description: Flag indicating visit scheduling restrictions on the listing.
   house_elevator:
     lineage:
       - dw_rent.dim_house_listing.house_elevator
+    description: Elevator availability attribute from the listing dimension.
   house_entrance:
     lineage:
       - dw_rent.dim_house_listing.house_entrance
+    description: Entrance or access type attribute from the listing dimension.
   house_type:
     lineage:
       - dw_rent.dim_house_listing.house_type
+    description: Property type classification (e.g. apartment, house) from dim_house_listing.
   year:
     lineage:
       - dw_rent.dim_house_listing.ts_listing_version_start
+    description: Hive partition year derived from ts_listing_version_start.
   month:
     lineage:
       - dw_rent.dim_house_listing.ts_listing_version_start
+    description: Hive partition month derived from ts_listing_version_start.
   day:
     lineage:
       - dw_rent.dim_house_listing.ts_listing_version_start
+    description: Hive partition day derived from ts_listing_version_start.

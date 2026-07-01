@@ -1,7 +1,7 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: mitula_consolidated_metrics
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates metrics extracted from mitula platform
 columns:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.mobile_cost
   total_cost:
-    description: Total cost
+    description: Total media spend in BRL for the campaign, channel, and report date grain of this row.
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.total_cost
   clicks:
@@ -34,4 +34,4 @@ columns:
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.clicks
   id_date:
-    description: Date segmentation
+    description: Surrogate date key derived from source report load dates used to join consolidated marketing metrics to the calendar dimension.
