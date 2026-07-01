@@ -1,14 +1,17 @@
 cluster:
   type: emr_7_12_consolidation_m_memory_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.executor.memory: 8g
+      spark.executor.memoryOverhead: 2g
+      spark.executor.cores: "2"
+      spark.dynamicAllocation.maxExecutors: "2"
+      spark.sql.shuffle.partitions: 200
     aws_attributes:
+      availability: ON_DEMAND
       ebs_volume_size: 200
     num_workers: 3
     core_nodes:
-      instance_count: 1
+      instance_count: 3
     task_nodes:
-      instance_count: 2
+      instance_count: 0
