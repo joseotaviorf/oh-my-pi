@@ -1,9 +1,11 @@
 ---
 database_name: datalake_semrush_classified_raw
-table_name: searches
-owner: henrique.miamoto@quintoandar.com.br
+table_name: propiedades_organic_search_kw
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains information about the organic search keywords. Each row represents a keyword per month.
+description: |
+  SEMrush organic search keyword rankings for Propiedades.com, tracked as part of QuintoAndar's competitive SEO intelligence against classified listings competitors in Latin America. One row per keyword per month with position, volume, and SERP feature data. Partitioned by year, month, and day on the raw layer and by year, month, and day on clean for partition pruning in date-range queries.
+
 columns:
   keyword:
     description: Keyword bringing users to the website via Google's top 100 organic search results.
@@ -77,12 +79,16 @@ columns:
     description: An estimate of how difficult it would be to rank well in organic search results for a particular keyword. The higher the percentage, the harder it
     lineage:
       - datalake_semrush_classified_raw.searches._keyword__difficulty
+  dt_display:
+    description: Display date (same as extraction date)
+    lineage:
+      - datalake_semrush_classified_raw.searches.date
   dt_report:
     description: Extraction date
     lineage:
       - datalake_semrush_classified_raw.searches.date
   ts_report:
-    description: Report Timestamp.
+    description: Timestamp of the SEMrush report snapshot used to extract this keyword ranking row.
     lineage:
       - datalake_semrush_classified_raw.searches._timestamp
   year:
