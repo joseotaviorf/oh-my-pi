@@ -30,15 +30,15 @@ columns:
     lineage:
     - datalake_hr_system.employee_info.documented_full_name
   first_social_name:
-    description: First social name of the employee
+    description: Employee preferred first name used in internal communications and social contexts.
     lineage:
     - datalake_hr_system.employee_info.first_social_name
   last_social_name:
-    description: Last social name of the employee
+    description: Employee preferred last name used in internal communications and social contexts.
     lineage:
     - datalake_hr_system.employee_info.last_social_name
   birth_town:
-    description: Birth town of the employee
+    description: Municipality where the employee was born, as recorded in Oracle HCM person records.
     lineage:
     - datalake_hr_system.employee_info.birth_town
   birth_state:
@@ -46,15 +46,15 @@ columns:
     lineage:
     - datalake_hr_system.employee_info.birth_state
   birth_country:
-    description: Birth country of the employee
+    description: Country of birth for the employee used in compliance and demographic reporting.
     lineage:
     - datalake_hr_system.employee_info.birth_country
   mother_name:
-    description: Mother name of the employee
+    description: Full legal name of the employee mother as required for Brazilian HR documentation.
     lineage:
     - datalake_hr_system.employee_info.mother_name
   father_name:
-    description: Father name of the employee
+    description: Full legal name of the employee father when provided in Oracle HCM person records.
     lineage:
     - datalake_hr_system.employee_info.father_name
   gender_code:
@@ -66,15 +66,15 @@ columns:
     lineage:
     - datalake_hr_system.demographic_attributes.gender
   marital_status_code:
-    description: Marital status of the employee
+    description: Oracle lookup code representing the employee current marital status category.
     lineage:
     - datalake_hr_system.demographic_attributes.marital_status
   marital_status_description:
-    description: Marital status description of the employee
+    description: Human-readable label for the employee marital status derived from Oracle lookups.
     lineage:
     - datalake_hr_system_clean.workers.marital_status
   highest_education_level_code:
-    description: Code for the highest education level of the employee
+    description: Lookup code for the highest education credential completed by the employee.
     lineage:
     - datalake_hr_system.demographic_attributes.highest_education_level
   highest_education_level_description:
@@ -82,7 +82,7 @@ columns:
     lineage:
     - datalake_hr_system.demographic_attributes.highest_education_level
   age_range:
-    description: Age range of the employee
+    description: Banded age bracket grouping employees for anonymized demographic analytics.
     lineage:
     - datalake_hr_system.employee_info.dt_birth
   dt_birth:

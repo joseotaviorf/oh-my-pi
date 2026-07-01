@@ -66,7 +66,7 @@ columns:
     lineage:
     - dw_employee.fact_assignments.assignment_number
   salary_currency_code:
-    description: Currency code of the salary.
+    description: ISO currency code for the employee current compensation, typically BRL.
     lineage:
     - dw_employee.fact_assignments.salary_currency_code
   is_active:

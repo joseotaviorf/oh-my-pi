@@ -9,56 +9,56 @@ columns:
     lineage:
     - datalake_hr_system_clean.workers.id_person
   work_email:
-    description: Work email of the employee.
+    description: Corporate email address assigned to the employee for QuintoAndar business communication.
     lineage:
     - datalake_hr_system_clean.workers.emails.EmailAddress
   personal_email:
-    description: Personal email of the employee.
+    description: Personal email address provided by the employee for non-work correspondence.
     lineage:
     - datalake_hr_system_clean.workers.emails.EmailAddress
   country_code_number:
-    description: Country code number of the employee.
+    description: International dialing prefix for the employee primary phone contact.
     lineage:
     - datalake_hr_system_clean.workers.phones.CountryCodeNumber
   area_code:
-    description: Area code of the employee.
+    description: Regional area code prefix for the employee phone number within the country.
     lineage:
     - datalake_hr_system_clean.workers.phones.AreaCode
   phone_number:
-    description: Phone number of the employee.
+    description: Local subscriber number for the employee primary phone excluding country and area codes.
     lineage:
     - datalake_hr_system_clean.workers.phones.PhoneNumber
   address:
-    description: Address of the employee.
+    description: Street name portion of the employee primary residence address.
     lineage:
     - datalake_hr_system_clean.workers.addresses.AddlAddressAttribute3
     - datalake_hr_system_clean.workers.addresses.AddressLine1
   address_number:
-    description: Address number of the employee.
+    description: Building or street number for the employee primary residence address.
     lineage:
     - datalake_hr_system_clean.workers.addresses.AddressLine2
   address_complement:
-    description: Address complement of the employee.
+    description: Additional address detail such as apartment or suite for the employee residence.
     lineage:
     - datalake_hr_system_clean.workers.addresses.AddressLine3
   address_district:
-    description: Address district of the employee.
+    description: Neighborhood or bairro of the employee primary residence within the city.
     lineage:
     - datalake_hr_system_clean.workers.addresses.AddressLine4
   address_zip_code:
-    description: Address zip code of the employee.
+    description: Postal or ZIP code for mail delivery to the employee primary residence.
     lineage:
     - datalake_hr_system_clean.workers.addresses.PostalCode
   address_city:
-    description: Address city of the employee.
+    description: City or municipality of the employee primary residence.
     lineage:
     - datalake_hr_system_clean.workers.addresses.TownOrCity
   address_state:
-    description: Address state of the employee.
+    description: State or province of the employee primary residence.
     lineage:
     - datalake_hr_system_clean.workers.addresses.Region2
   address_country:
-    description: Address country of the employee.
+    description: Country where the employee primary residence is located.
     lineage:
     - datalake_hr_system_clean.workers.addresses.Country
   ts_last_update:

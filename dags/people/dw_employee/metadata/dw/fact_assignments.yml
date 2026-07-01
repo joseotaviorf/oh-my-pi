@@ -64,7 +64,7 @@ columns:
     lineage:
     - datalake_people.identifier_mapping.assignment_number
   salary_currency_code:
-    description: Currency code of the salary.
+    description: ISO currency code for the employee salary on this assignment, typically BRL.
     lineage:
     - datalake_pin_compensation_clean.salary.currency_code
   last_salary_increase_type:

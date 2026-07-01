@@ -43,7 +43,7 @@ columns:
     lineage:
     - datalake_pin_absence_clean.person_entry.dt_ended
   request_comments:
-    description: Comments about the absence request.
+    description: Free-text notes submitted by the employee explaining the reason for the absence request.
     lineage:
     - datalake_pin_absence_clean.person_entry.comments
   days_requested:

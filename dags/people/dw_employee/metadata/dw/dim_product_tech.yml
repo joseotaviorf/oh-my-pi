@@ -10,11 +10,11 @@ columns:
     lineage:
     - datalake_people.identifier_mapping.id_period_of_service
   line:
-    description: Line of the employee
+    description: Product line within the QuintoAndar engineering organization structure.
     lineage:
     - datalake_gsheets_people_clean.team_formation_product_tech.line
   chapter:
-    description: Chapter of the employee
+    description: Engineering chapter grouping specialists sharing practices within a product line.
     lineage:
     - datalake_gsheets_people_clean.team_formation_product_tech.chapter
   team_1:
@@ -58,7 +58,7 @@ columns:
     lineage:
     - datalake_gsheets_people_clean.team_formation_product_tech.team_10
   line_leader:
-    description: What line the employee is the line leader of
+    description: Name of the leader responsible for the product line in the tech org chart.
     lineage:
     - datalake_gsheets_people_clean.team_formation_product_tech.line_leader
   team_leader:
