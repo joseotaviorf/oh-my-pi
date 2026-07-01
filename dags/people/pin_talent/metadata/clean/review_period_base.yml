@@ -22,7 +22,7 @@ columns:
     lineage:
     - datalake_pin_talent_raw.hrt_review_periods_b.updated_by
   status_code:
-    description: Status code for the review period.
+    description: PIN code indicating whether the talent review period is open, closed, or in progress.
     lineage:
     - datalake_pin_talent_raw.hrt_review_periods_b.status_code
     categories:

@@ -34,11 +34,11 @@ columns:
     lineage:
     - datalake_pin_talent_raw.hrt_rating_models_tl.source_lang
   rating_model_name:
-    description: Name of the rating model.
+    description: Localized name of the performance rating scale model in the target language.
     lineage:
     - datalake_pin_talent_raw.hrt_rating_models_tl.rating_name
   rating_model_description:
-    description: Description of the rating model.
+    description: Localized description explaining how the performance rating scale model is applied.
     lineage:
     - datalake_pin_talent_raw.hrt_rating_models_tl.rating_description
   seed_data_source:

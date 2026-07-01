@@ -42,11 +42,11 @@ columns:
     lineage:
     - datalake_hr_system_raw.areas_of_responsibility.AssignmentName
   responsibility_name:
-    description: Name of the responsibility.
+    description: Label for the workforce responsibility area defined in the legacy HR system.
     lineage:
     - datalake_hr_system_raw.areas_of_responsibility.ResponsibilityName
   responsibility_type:
-    description: Type of the responsibility.
+    description: Classification of the responsibility scope, such as department or business unit.
     lineage:
     - datalake_hr_system_raw.areas_of_responsibility.ResponsibilityType
   display_name:

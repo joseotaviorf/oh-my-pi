@@ -70,7 +70,7 @@ columns:
     lineage:
     - datalake_hr_system_raw.salaries.ActionCode
   action_reason_code:
-    description: Code of the action reason.
+    description: Code explaining why a salary change action was performed in the legacy system.
     lineage:
     - datalake_hr_system_raw.salaries.ActionReasonCode
   action_reason:
@@ -82,7 +82,7 @@ columns:
     lineage:
     - datalake_hr_system_raw.salaries.ActionName
   salary_basis_code:
-    description: Code for the salary basis.
+    description: Code identifying the pay frequency basis such as monthly or hourly in legacy HR.
     lineage:
     - datalake_hr_system_raw.salaries.code
   legal_employer_name:
@@ -122,7 +122,7 @@ columns:
     lineage:
     - datalake_hr_system_raw.salaries.AssignmentType
   salary_basis_name:
-    description: Name of the salary basis.
+    description: Human-readable label for the pay frequency basis in the legacy HR system.
     lineage:
     - datalake_hr_system_raw.salaries.SalaryBasisName
   amount_rounding_code:

@@ -62,7 +62,7 @@ columns:
     lineage:
     - datalake_hr_system_raw.jobs.RegularTemporary
   job_name:
-    description: Name of the job.
+    description: Display title of the job position in the legacy HR system job catalog.
     lineage:
     - datalake_hr_system_raw.jobs.Name
   approval_authority:

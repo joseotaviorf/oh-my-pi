@@ -32,13 +32,13 @@ columns:
   object_version_number:
     description: Counter for optimistic locking, incremented on each update.
     lineage:
-    - datalake_pin_talent_raw.hrt_rating_levels_tl.CAST(object_version_number AS INT)
+    - datalake_pin_talent_raw.hrt_rating_levels_tl.object_version_number
   rating_description:
-    description: Description of the rating level.
+    description: Localized long-form explanation of the performance rating level in the target language.
     lineage:
     - datalake_pin_talent_raw.hrt_rating_levels_tl.rating_description
   rating_short_description:
-    description: Short description of the rating level.
+    description: Localized abbreviated label for the performance rating level shown in compact views.
     lineage:
     - datalake_pin_talent_raw.hrt_rating_levels_tl.rating_short_descr
   review_rating_description:
