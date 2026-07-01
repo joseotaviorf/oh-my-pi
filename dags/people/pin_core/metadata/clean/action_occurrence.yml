@@ -62,7 +62,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_action_occurrences.parent_entity_type
   proposed_action_type:
-    description: Type of the proposed action.
+    description: PIN code for the proposed workforce change awaiting approval, such as transfer, promotion, or termination.
     lineage:
     - datalake_pin_core_raw.per_action_occurrences.proposed_action_type
   proposed_worker_type:

@@ -32,11 +32,11 @@ columns:
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.action_occurrence_id
   organization_code:
-    description: Code of the organization.
+    description: Short alphanumeric code uniquely identifying the department or cost center in PIN.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.organization_code
   cost_center_code:
-    description: Code for the Cost Center.
+    description: Finance cost center identifier used for budget allocation and payroll accounting.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.attribute1
   created_by:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.last_updated_by
   directorate:
-    description: Directorate of the organization.
+    description: Executive directorate or leadership area owning this organizational unit at QuintoAndar.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.attribute3
   business:

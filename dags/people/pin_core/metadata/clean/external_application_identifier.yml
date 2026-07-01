@@ -14,11 +14,11 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_ext_app_identifiers.person_id
   id_enterprise:
-    description: Identifier for the enterprise.
+    description: PIN enterprise identifier partitioning multi-tenant workforce data for QuintoAndar.
     lineage:
     - datalake_pin_core_raw.per_ext_app_identifiers.enterprise_id
   type_external_identifier:
-    description: Type of the external identifier.
+    description: Category of third-party identifier linking a PIN person to external systems, such as ATS (Greenhouse, Workable), payroll (Salu), employee matrícula, or country-specific legajo codes.
     lineage:
     - datalake_pin_core_raw.per_ext_app_identifiers.ext_identifier_type
   number_external_identifier:

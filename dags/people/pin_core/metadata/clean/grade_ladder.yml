@@ -50,7 +50,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_grade_ladders_f.auto_progression_code
   progression_style_code:
-    description: Progression style, such as grade progression or grade point progression.
+    description: PIN code defining how employees advance along the ladder, by grade level or grade points.
     lineage:
     - datalake_pin_core_raw.per_grade_ladders_f.progression_style_code
   progression_date_code:

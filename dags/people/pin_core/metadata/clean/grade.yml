@@ -38,7 +38,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_grades_f.grade_code
   grade_type:
-    description: Type of the grade.
+    description: PIN grade classification distinguishing salary bands from step-based grades.
     lineage:
     - datalake_pin_core_raw.per_grades_f.grade_type
   object_version_number:

@@ -42,7 +42,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_asg_responsibilities.last_updated_by
   responsibility_name:
-    description: Name of the responsibility.
+    description: Human-readable label for the workforce responsibility area assigned to the employee.
     lineage:
     - datalake_pin_core_raw.per_asg_responsibilities.responsibility_name
   responsibility_type:

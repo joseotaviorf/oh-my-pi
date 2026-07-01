@@ -14,7 +14,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_actions_tl.business_group_id
   action_name:
-    description: Translated action name.
+    description: Localized display label for the HR action type shown to users in the target language.
     lineage:
     - datalake_pin_core_raw.per_actions_tl.action_name
   description:

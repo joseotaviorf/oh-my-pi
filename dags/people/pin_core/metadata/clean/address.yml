@@ -31,20 +31,20 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_addresses_f.address_line_1
   number:
-    description: Number for the address.
+    description: Building or street number component of the employee residence address.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.address_line_2
   complement:
-    description: Complement for the address.
+    description: Additional address detail such as apartment, suite, or floor identifier.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.address_line_3
   neighborhood:
-    description: Neighborhood for the address.
+    description: District or neighborhood where the employee residence is located within the city.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.address_line_4
       - datalake_pin_core_raw.per_addresses_f.addl_address_attribute2
   town_or_city:
-    description: Town or city for the address.
+    description: Municipality or city name of the employee residence as recorded in PIN.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.town_or_city
   region_1:
@@ -56,15 +56,15 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_addresses_f.region_2
   region_3:
-    description: Sub-region of region 2.
+    description: Third-level administrative region used for address geocoding in some countries.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.region_3
   country_code:
-    description: Country code for the address.
+    description: ISO country code identifying the nation where the employee address is registered.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.country
   postal_code:
-    description: Postal code of the address.
+    description: ZIP or postal code used for mail delivery to the employee residence.
     lineage:
       - datalake_pin_core_raw.per_addresses_f.postal_code
   street_type:
