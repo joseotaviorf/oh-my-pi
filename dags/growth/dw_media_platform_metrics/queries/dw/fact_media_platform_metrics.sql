@@ -54,12 +54,52 @@ automated_costs AS (
       datalake_growth_taxonomy.media_setup ms 
         ON ms.naming_convention_sufix = cs.naming_convention_sufix
   WHERE 
-      dt_cost::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
+      CAST(dt_cost AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
-  *
+  sk_campaign,
+  sk_adset,
+  sk_ad,
+  sk_region,
+  sk_cost_date,
+  bk_sharing_rules,
+  naming_convention_sufix,
+  origin,
+  country_code,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  clicks,
+  conversions,
+  impressions,
+  total_cost,
+  dt_cost,
+  year,
+  month,
+  day,
+  ts_load
 FROM automated_costs
 UNION ALL 
 SELECT
-  *
+  sk_campaign,
+  sk_adset,
+  sk_ad,
+  sk_region,
+  sk_cost_date,
+  bk_sharing_rules,
+  naming_convention_sufix,
+  origin,
+  country_code,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  clicks,
+  conversions,
+  impressions,
+  total_cost,
+  dt_cost,
+  year,
+  month,
+  day,
+  ts_load
 FROM manual_costs

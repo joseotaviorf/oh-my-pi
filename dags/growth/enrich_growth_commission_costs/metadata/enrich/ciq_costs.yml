@@ -1,7 +1,7 @@
 ---
 database_name: datalake_growth_commission_costs
 table_name: ciq_costs
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: This table consolidates the commission costs within the context of CIQ(Consultor Imobiliario QuintoAndar).
 columns:
@@ -61,4 +61,4 @@ columns:
       - datalake_monopoly_clean.outcome_reference.dt_outcome
     description: Partition column.
   ts_load:
-    description: Timestamp of when the table was last processed.
+    description: Timestamp when the enrich or DW row was materialized by the pipeline load.

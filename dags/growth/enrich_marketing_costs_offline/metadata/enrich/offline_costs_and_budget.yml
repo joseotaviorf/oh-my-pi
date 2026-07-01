@@ -1,6 +1,6 @@
 database_name: datalake_marketing_costs
 table_name: offline_costs_and_budget
-owner: thiago.jesus@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Each row of this table is a daily offline advertising cost and budget.
 columns:
@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_marketing_costs.offline_manual_costs.id
   id_date:
-    description: Date of the cost and budget, in integer format (yyyyMMdd).
+    description: Calendar date key for the daily marketing cost row; joins to the shared date dimension.
     lineage:
       - datalake_marketing_costs.offline_manual_costs.id_date
       - datalake_marketing_offline_costs_clean.marketing_offline_budget.dt_budget
@@ -54,7 +54,7 @@ columns:
     lineage:
       - datalake_marketing_costs.offline_manual_costs.description
   campaign_name:
-    description: Name of the advertising.
+    description: Campaign name as reported by the media platform before taxonomy enrichment.
     lineage:
       - datalake_marketing_costs.offline_manual_costs.campaign_name
   cost_category:
@@ -70,7 +70,7 @@ columns:
     lineage:
       - datalake_marketing_costs.offline_manual_costs.action
   business_context:
-    description: Business context to which the advertisement was directed.
+    description: Business line (Rent, Sale, Hybrid) associated with the campaign spend after enrichment.
     lineage:
       - datalake_marketing_costs.offline_manual_costs.business_context
   has_city_group_share:
@@ -86,7 +86,7 @@ columns:
     lineage:
       - datalake_marketing_costs.offline_manual_costs.cost_center
   city_group:
-    description: Target city group of the advertising.
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
       - datalake_marketing_costs.offline_manual_costs.city_group
       - datalake_marketing_offline_costs_clean.marketing_offline_budget.city_group

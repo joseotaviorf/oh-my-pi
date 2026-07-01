@@ -3,13 +3,12 @@ database_name: datalake_growth_media_platform
 table_name: campaign_name_history
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: 'This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization.'
-
+description: SCD Type 2 history of campaign names per media platform and id_campaign. Partitioned by origin; Z-ORDER BY id_campaign and dt_start for merge lookups. Consumed by media platform metrics and growth cost pipelines.
 columns:
   merge_key:
-    description: 'Key to uniquely identify records for merge operations in SCD.'
+    description: Key to uniquely identify records for merge operations in SCD.
   id_campaign:
-    description: "Unique identifier for each campaign across different media platforms."
+    description: Unique identifier for each campaign across different media platforms.
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_region.id_campaign
       - datalake_criteo.criteo_campaigns.id_campaign
@@ -17,10 +16,9 @@ columns:
       - datalake_google_ads_clean.ad_group_geo_performance.id_campaign
       - datalake_google_ads_clean.campaigns_geo_performance.id_campaign
   origin:
-    description: "Source platform of the campaign data."  
-
+    description: Paid media platform or channel origin of the spend row (facebook, google, criteo, trovit, braze).
   campaign_name:
-    description: "Name of the campaign provided by each media platform."
+    description: Campaign name as reported by the media platform before taxonomy enrichment.
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_region.campaign_name
       - datalake_criteo.criteo_campaigns.campaign_name
@@ -28,9 +26,9 @@ columns:
       - datalake_google_ads_clean.ad_group_geo_performance.campaign_name
       - datalake_google_ads_clean.campaigns_geo_performance.campaign_name
   is_current:
-    description: "Indicates if the record represents the latest data for a campaign, marked as True for current records."
+    description: Indicates if the record represents the latest data for a campaign, marked as True for current records.
   dt_start:
-    description: "Earliest start date of the campaign as per platform data."
+    description: Earliest start date of the campaign as per platform data.
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_region.dt_start
       - datalake_criteo.criteo_campaigns.dt_report
@@ -38,4 +36,4 @@ columns:
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded
       - datalake_google_ads_clean.campaigns_geo_performance.dt_loaded
   dt_end:
-    description: "End date of the campaign, null if currently active."
+    description: End date of the campaign, null if currently active.

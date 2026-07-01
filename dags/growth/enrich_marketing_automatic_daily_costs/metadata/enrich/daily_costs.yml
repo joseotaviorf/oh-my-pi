@@ -1,122 +1,124 @@
 ---
 database_name: datalake_marketing_costs
 table_name: daily_costs
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates costs extract from growth marketing platforms
 columns:
   id_date:
-    description: Date segmentation
+    description: Calendar date key for the daily marketing cost row; joins to the shared date dimension.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.id_date
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.dt_cost
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.dt_cost
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.id_date
   origin:
-    description: Growth marketing platform
+    description: Paid media platform or channel origin of the spend row (facebook, google, criteo, trovit, braze).
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.origin
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.origin
-    categories: 
+    categories:
       mitula: ''
       trovit: ''
       criteo: ''
       facebook: ''
       google: ''
   account_name:
-    description: Accont name at braze platform
+    description: Advertising account name on the source platform used to group campaigns and invoices.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.account_name
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.account_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.account_name
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.account_name
   campaign_name:
-    description: Name of campaign segmentation
+    description: Campaign name as reported by the media platform before taxonomy enrichment.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.campaign_name
   utm_campaign:
-    description: utm_campaign applied on growth marketing platform
+    description: UTM campaign parameter captured from the platform or manual cost sheet for attribution.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.utm_campaign
   utm_term:
-    description: utm_term applied on growth marketing platform
+    description: UTM term parameter, typically ad group or keyword granularity for paid search and social.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.utm_term
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_term
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.utm_term
   utm_content:
-    description: utm_content applied on growth marketing platform
+    description: UTM content parameter, typically ad or creative granularity for performance reporting.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.utm_content
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_content
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.utm_content
   city_group:
-    description: City group segmentation
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
       - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.city_group
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.city_group
   campaign_origin_acquisition:
-    description: mkt_origin which marketing campaign was intent to destiate effort
+    description: Marketing acquisition origin bucket from the cost taxonomy (Agents, Doorman, New Channels).
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.campaign_origin_acquisition
-    categories: 
+    categories:
       Agents: ''
       New Channels: ''
       Other: ''
       Doorman: ''
   mkt_category:
-    description: Level of growth marketing taxonomy
+    description: Top-level marketing taxonomy category describing the campaign objective grouping.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_category
   mkt_flow:
-    description: Level of growth marketing taxonomy
+    description: Growth marketing taxonomy flow label describing the campaign journey stage in the acquisition funnel.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_flow
   mkt_completion:
-    description: Level of growth marketing taxonomy
+    description: Growth marketing taxonomy completion label describing how far the user progressed in the funnel.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_completion
   mkt_origin:
-    description: Level of growth marketing taxonomy
+    description: Marketing origin label from taxonomy used to attribute spend to acquisition programs.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_origin
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_origin
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_origin
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.context
   mkt_channel:
-    description: Level of growth marketing taxonomy
+    description: Growth marketing taxonomy channel indicating the specific pathway of acquisition (e.g., SEM, Display).
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_channel
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_channel
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_channel
   mkt_medium:
-    description: Level of growth marketing taxonomy
+    description: Growth marketing taxonomy medium describing the format of the ad or traffic.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_medium
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_medium
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_medium
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.ia_general
   mkt_source:
-    description: Level of growth marketing taxonomy
+    description: Growth marketing taxonomy source indicating the platform or vendor driving the traffic.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.mkt_source
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.mkt_source
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.ia_general
   mkt_platform:
-    description: Level of growth marketing taxonomy
+    description: Growth marketing taxonomy platform grouping costs by high-level advertising platform.
+    lineage:
+      - datalake_gsheets_clean.marketing_cost_taxonomy.cost_factor
   cost:
-    description: Cost
+    description: Business attribute `cost` materialized by the daily_costs pipeline.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.desktop_cost
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.mobile_cost
@@ -133,20 +135,20 @@ columns:
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.cost_share_other
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.cost
   funnel_side:
-    description: Squad resposible for that cost
+    description: Funnel side from taxonomy indicating demand-side versus supply-side marketing focus.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.side
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.side
       - datalake_marketing_manual_daily_costs_clean.marketing_name_convention_shared_costs.side
       - datalake_consolidated_marketing_metrics.braze_consolidated_metrics.funnel_side
-    categories: 
+    categories:
       demand: ''
       affiliates: ''
       partners: ''
       branding: ''
       social: ''
   flow_type:
-    description: Indicates if data came from a manual or automatic input in costs pipeline
-    categories: 
-        manual: ''
-        automatic: ''
+    description: Cost flow type distinguishing automatic platform extracts from manual shared cost uploads.
+    categories:
+      manual: ''
+      automatic: ''

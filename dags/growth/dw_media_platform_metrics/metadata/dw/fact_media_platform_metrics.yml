@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: fact_media_platform_metrics
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: This fact table consolidates media platform metrics, including campaign performance, costs, and regional data, enriched with campaign historical information and business rules. Note that this table does not have a unique identifier per row, as multiple rows may represent overlapping or aggregated data depending on the metrics and dimensions involved.
 columns:
@@ -27,31 +27,42 @@ columns:
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.dt_cost
       - datalake_growth_media_platform.manual_costs.dt_cost
+  bk_sharing_rules:
+    description: Business key linking hybrid supply automated costs to the sharing rules dimension.
+    lineage:
+      - datalake_growth_taxonomy.media_setup.funnel_side
+      - datalake_growth_taxonomy.media_setup.campaign_business_context
+  naming_convention_sufix:
+    description: Media setup naming convention suffix used to join taxonomy attributes to platform costs.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.naming_convention_sufix
+      - datalake_growth_media_platform.manual_costs.naming_convention_sufix
+      - datalake_growth_taxonomy.media_setup.naming_convention_sufix
   origin:
-    description: The source of the data (e.g., media platform such as Facebook, Google).
+    description: Paid media platform or channel origin of the spend row (facebook, google, criteo, trovit, braze).
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.origin
   utm_campaign:
-    description: Campaign UTM parameter for tracking.
+    description: UTM campaign parameter captured from the platform or manual cost sheet for attribution.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.utm_campaign
       - datalake_growth_media_platform.manual_costs.utm_campaign
   utm_term:
-    description: Term UTM parameter for tracking, typically representing ad group-level granularity.
+    description: UTM term parameter, typically ad group or keyword granularity for paid search and social.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.utm_term
       - datalake_growth_media_platform.manual_costs.utm_term
   utm_content:
-    description: Content UTM parameter for tracking, representing ad-level granularity.
+    description: UTM content parameter, typically ad or creative granularity for performance reporting.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.utm_content
       - datalake_growth_media_platform.manual_costs.utm_content
   country_code:
-    description: Country code associated with the user's click on the campaign.
+    description: ISO country code of the campaign or account where the marketing spend was recorded.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.country_code
   clicks:
-    description: Number of clicks recorded for the campaign.
+    description: Number of ad clicks recorded by the media platform on the cost date.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.clicks
       - datalake_growth_media_platform.manual_costs.clicks
@@ -60,20 +71,15 @@ columns:
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.conversions
   impressions:
-    description: Number of impressions recorded for the campaign.
+    description: Number of ad impressions delivered by the media platform on the cost date.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.impressions
       - datalake_growth_media_platform.manual_costs.impressions
   total_cost:
-    description: Total cost associated with the campaign.
+    description: Total marketing spend amount in local currency for the row after consolidation and sharing.
     lineage:
       - datalake_growth_media_platform.consolidated_metrics.total_cost
       - datalake_growth_media_platform.manual_costs.total_cost
-  name_convention_suffix:
-    description: Suffix used for naming conventions in the media platform.
-    lineage:
-      - datalake_growth_media_platform.consolidated_metrics.name_convention_suffix
-      - datalake_growth_media_platform.manual_costs.name_convention_suffix
   dt_cost:
     description: Date when the cost was recorded.
     lineage:
@@ -95,4 +101,4 @@ columns:
       - datalake_growth_media_platform.consolidated_metrics.day
       - datalake_growth_media_platform.manual_costs.day
   ts_load:
-    description: Timestamp when the record was loaded into the fact table.
+    description: Timestamp when the enrich or DW row was materialized by the pipeline load.

@@ -1,16 +1,21 @@
 ---
 database_name: datalake_growth_costs
 table_name: daily_costs
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Table that consolidates costs extract from growth marketing platforms
 columns:
   id_date:
-    description: Date segmentation
+    description: Calendar date key for the daily marketing cost row; joins to the shared date dimension.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.id_date
+  flow_type:
+    description: Cost flow type distinguishing automatic platform extracts from manual shared cost uploads.
+    categories:
+      manual: ''
+      automatic: ''
   origin:
-    description: Growth marketing platform
+    description: Paid media platform or channel origin of the spend row (facebook, google, criteo, trovit, braze).
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.origin
     categories:
@@ -20,41 +25,41 @@ columns:
       facebook: ''
       google: ''
   business_context:
-    description: Growth marketing platform
+    description: Business line (Rent, Sale, Hybrid) associated with the campaign spend after enrichment.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.business_context
   account_name:
-    description: Accont name at braze platform
+    description: Advertising account name on the source platform used to group campaigns and invoices.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.account_name
   campaign_name:
-    description: Name of campaign segmentation
+    description: Campaign name as reported by the media platform before taxonomy enrichment.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.campaign_name
   country_code:
-    description: Country code the campaign belongs to
+    description: ISO country code of the campaign or account where the marketing spend was recorded.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.country_code
   utm_campaign:
-    description: utm_campaign applied on growth marketing platform
+    description: UTM campaign parameter captured from the platform or manual cost sheet for attribution.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.utm_campaign
   utm_term:
-    description: utm_term applied on growth marketing platform
+    description: UTM term parameter, typically ad group or keyword granularity for paid search and social.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.utm_term
   utm_content:
-    description: utm_content applied on growth marketing platform
+    description: UTM content parameter, typically ad or creative granularity for performance reporting.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.utm_content
   city_group:
-    description: City group segmentation
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.city_group
       - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
       - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.city_group
   campaign_business_context:
-    description: Level of growth marketing taxonomy
+    description: Taxonomy-derived business context label (Rent, Sale, Hybrid) for growth media setup.
     lineage:
       - datalake_growth_taxonomy.media_setup.campaign_business_context
     categories:
@@ -64,7 +69,7 @@ columns:
       Other: ''
       Lost Tracking: ''
   campaign_strategy_intent:
-    description: Level of growth marketing taxonomy
+    description: Taxonomy strategy intent (Acquisition, Brand Awareness, Engagement) for the campaign.
     lineage:
       - datalake_growth_taxonomy.media_setup.campaign_strategy_intent
     categories:
@@ -76,7 +81,7 @@ columns:
       Other: ''
       Recovery: ''
   behavior_type:
-    description: Level of growth marketing taxonomy
+    description: Taxonomy behavior type distinguishing organic versus non-organic paid acquisition.
     lineage:
       - datalake_growth_taxonomy.media_setup.behavior_type
     categories:
@@ -84,34 +89,34 @@ columns:
       Other: ''
       non organic: ''
       organic: ''
-  landing_page:
-    description: Level of growth marketing taxonomy
+  campaign_landing_page:
+    description: Landing page category from media setup taxonomy linked to the campaign destination.
     lineage:
-      - datalake_growth_taxonomy.media_setup.landing_page
+      - datalake_growth_taxonomy.media_setup.campaign_landing_page
   medium:
-    description: Level of growth marketing taxonomy
+    description: Marketing medium from taxonomy (cpc, display, email) describing the delivery channel.
     lineage:
       - datalake_growth_taxonomy.media_setup.medium
   source:
-    description: Level of growth marketing taxonomy
+    description: Marketing source from taxonomy (google, facebook) describing the traffic origin.
     lineage:
       - datalake_growth_taxonomy.media_setup.source
   funnel_side:
-    description: Level of growth marketing taxonomy
+    description: Funnel side from taxonomy indicating demand-side versus supply-side marketing focus.
     lineage:
       - datalake_growth_taxonomy.media_setup.funnel_side
   total_cost:
-    description: Amount spent on Marketing Media Plataforms
+    description: Total marketing spend amount in local currency for the row after consolidation and sharing.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.total_cost
   impressions:
-    description: Impressions on Marketing Media Plataforms
+    description: Number of ad impressions delivered by the media platform on the cost date.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.impressions
       - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.impressions
       - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.impressions
   clicks:
-    description: Clicks on Marketing Media Plataforms
+    description: Number of ad clicks recorded by the media platform on the cost date.
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.clicks
       - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.clicks

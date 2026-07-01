@@ -1,6 +1,6 @@
 WITH historical_manual_costs AS (
     SELECT
-    REPLACE(dt_cost, '-', '')::INT AS id_date,
+    INT(REPLACE(dt_cost, '-', '')) AS id_date,
     'manual' AS flow_type,
     CAST(NULL AS STRING)  AS origin,
     CAST(NULL AS STRING) AS business_context,
@@ -30,7 +30,7 @@ WITH historical_manual_costs AS (
 ),
 historical_manual_costs_share_rules AS (
     SELECT
-    REPLACE(dt_cost, '-', '')::INT AS id_date,
+    INT(REPLACE(dt_cost, '-', '')) AS id_date,
     'manual' AS flow_type,
     CAST(NULL AS STRING) AS origin,
     CAST(NULL AS STRING) AS business_context,
@@ -48,9 +48,9 @@ historical_manual_costs_share_rules AS (
     s.medium,
     s.source,
     s.funnel_side,
-    s.cost::FLOAT * r.share AS total_cost, 
-    s.impressions::FLOAT AS impressions, 
-    s.clicks::FLOAT AS clicks
+    CAST(s.cost AS FLOAT) * r.share AS total_cost, 
+    CAST(s.impressions AS FLOAT) AS impressions, 
+    CAST(s.clicks AS FLOAT) AS clicks
     FROM
         datalake_growth_costs.historical_marketing_manual_costs_name_convention AS s
     JOIN
@@ -60,12 +60,12 @@ historical_manual_costs_share_rules AS (
             AND LOWER(s.funnel_side) = LOWER(r.funnel_side)
     WHERE
         DATE(dt_cost) >= DATE('2021-01-01') -- manual costs from before this date are included in historical partition
-        AND s.cost::FLOAT * r.share != 0
+        AND CAST(s.cost AS FLOAT) * r.share != 0
         AND LOWER(SUBSTRING(NVL(s.campaign_name, ''), 1, 3)) <> 'dsa'
 ),
 manual_costs AS (
     SELECT
-    REPLACE(dt_cost, '-', '')::INT AS id_date,
+    INT(REPLACE(dt_cost, '-', '')) AS id_date,
     'manual' AS flow_type,
     CAST(NULL AS STRING)  AS origin,
     CAST(NULL AS STRING) AS business_context,
@@ -95,7 +95,7 @@ manual_costs AS (
 ),
 manual_costs_share_rules AS (
     SELECT
-    REPLACE(dt_cost, '-', '')::INT AS id_date,
+    INT(REPLACE(dt_cost, '-', '')) AS id_date,
     'manual' AS flow_type,
     CAST(NULL AS STRING) AS origin,
     CAST(NULL AS STRING) AS business_context,
@@ -113,9 +113,9 @@ manual_costs_share_rules AS (
     s.medium,
     s.source,
     s.funnel_side,
-    s.cost::FLOAT * r.share AS total_cost, 
-    s.impressions::FLOAT AS impressions, 
-    s.clicks::FLOAT AS clicks
+    CAST(s.cost AS FLOAT) * r.share AS total_cost, 
+    CAST(s.impressions AS FLOAT) AS impressions, 
+    CAST(s.clicks AS FLOAT) AS clicks
     FROM
         datalake_gsheets_clean.marketing_manual_costs_name_convetion AS s
     JOIN
@@ -125,18 +125,102 @@ manual_costs_share_rules AS (
             AND LOWER(s.funnel_side) = LOWER(r.funnel_side)
     WHERE
         DATE(dt_cost) >= DATE('2021-01-01') -- manual costs from before this date are included in historical partition
-        AND s.cost::FLOAT * r.share != 0
+        AND CAST(s.cost AS FLOAT) * r.share != 0
         AND LOWER(SUBSTRING(NVL(s.campaign_name, ''), 1, 3)) <> 'dsa'
 )
 
-SELECT *
+SELECT
+  id_date,
+  flow_type,
+  origin,
+  business_context,
+  account_name,
+  campaign_name,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  city_group,
+  country_code,
+  campaign_business_context,
+  campaign_strategy_intent,
+  behavior_type,
+  campaign_landing_page,
+  medium,
+  source,
+  funnel_side,
+  total_cost,
+  impressions,
+  clicks
 FROM manual_costs
 UNION ALL
-SELECT *
+SELECT
+  id_date,
+  flow_type,
+  origin,
+  business_context,
+  account_name,
+  campaign_name,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  city_group,
+  country_code,
+  campaign_business_context,
+  campaign_strategy_intent,
+  behavior_type,
+  campaign_landing_page,
+  medium,
+  source,
+  funnel_side,
+  total_cost,
+  impressions,
+  clicks
 FROM manual_costs_share_rules
 UNION ALL
-SELECT *
+SELECT
+  id_date,
+  flow_type,
+  origin,
+  business_context,
+  account_name,
+  campaign_name,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  city_group,
+  country_code,
+  campaign_business_context,
+  campaign_strategy_intent,
+  behavior_type,
+  campaign_landing_page,
+  medium,
+  source,
+  funnel_side,
+  total_cost,
+  impressions,
+  clicks
 FROM historical_manual_costs
 UNION ALL
-SELECT *
+SELECT
+  id_date,
+  flow_type,
+  origin,
+  business_context,
+  account_name,
+  campaign_name,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  city_group,
+  country_code,
+  campaign_business_context,
+  campaign_strategy_intent,
+  behavior_type,
+  campaign_landing_page,
+  medium,
+  source,
+  funnel_side,
+  total_cost,
+  impressions,
+  clicks
 FROM historical_manual_costs_share_rules

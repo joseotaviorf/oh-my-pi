@@ -1,43 +1,45 @@
 ---
 database_name: dw_growth
 table_name: dim_sharing_rules
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: This dimension consolidates cost-sharing rules by date and segmentation attributes.
 columns:
   bk_sharing_rules:
-    description: Business key for each sharing rule, combining date and rule ID.
+    description: Business key combining allocation date and rule code for the sharing rule dimension.
     lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.share
-      - datalake_growth_costs_sharing_rules.sharing_rules.id_date    
+      - datalake_growth_costs_sharing_rules.sharing_rules.id_date
   business_context:
-    description: Business context of the rule.
+    description: Business line (Rent, Sale, Hybrid) associated with the campaign spend after enrichment.
     lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.business_context
   city_group:
-    description: city_group segmentation
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.city_group
   country_code:
-    description: country_code segmentation
-    lineage: 
+    description: ISO country code of the campaign or account where the marketing spend was recorded.
+    lineage: null
   funnel_side:
-    description: Marketplace side of business
+    description: Funnel side from taxonomy indicating demand-side versus supply-side marketing focus.
     lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.funnel_side
   rule_code:
-    description: Id rule
+    description: Sharing rule code from the enrich layer identifying the allocation logic applied.
     lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.id_rule
   share:
-    description: Percentage of cost that will be applied to specific city_group
+    description: Fraction or percentage of the source campaign cost allocated to this city group or segment.
     lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.share
   utm_campaign_modified:
-    description: utm_campaign segmentation
-    lineage: 
+    description: UTM campaign string after sharing-rule transformations used in downstream cost joins.
+    lineage:
       - datalake_growth_costs_sharing_rules.sharing_rules.utm_campaign_modified
   dt_rule_costs:
-    description: Date segmentation
+    description: Calendar date when the sharing rule allocation was applied to marketing costs.
     lineage:
-      - datalake_growth_costs_sharing_rules.sharing_rules.id_date    
+      - datalake_growth_costs_sharing_rules.sharing_rules.id_date
+  ts_load:
+    description: Timestamp when the dimension row was materialized by the pipeline load.
