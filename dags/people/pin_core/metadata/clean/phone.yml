@@ -43,7 +43,7 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_phones.area_code
   country_code_number:
-    description: Country code of the phone number.
+    description: International dialing prefix for the employee phone number, such as 55 for Brazil.
     lineage:
       - datalake_pin_core_raw.per_phones.country_code_number
   search_phone_number:

@@ -45,7 +45,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.highest_education_level
   highest_education_level_description:
-    description: Highest education level description.
+    description: Text label for the employee highest completed education level per Brazilian legislation.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute16
   citizenship_context:
@@ -113,7 +113,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute21
   rnh_program_application_status:
-    description: RNH program application status.
+    description: Status of the employee application to the RNH foreign residency program when applicable.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute24
   gender_identity:
@@ -161,15 +161,15 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute4
   has_hiring_bonus:
-    description: Hiring bonus flag.
+    description: Boolean flag indicating whether the employee offer includes a one-time hiring bonus.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute6
   has_stock_option:
-    description: Stock option flag.
+    description: Boolean flag indicating whether the employee compensation package includes stock options.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute7
   has_relocation_bonus:
-    description: Relocation bonus flag.
+    description: Boolean flag indicating whether the employee received a relocation assistance bonus.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute17
   has_health_insurance_portability:

@@ -31,7 +31,7 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_jobs_f_tl.source_lang
   name:
-    description: Name of the job.
+    description: Localized display title for the job position shown to users in the target language.
     lineage:
       - datalake_pin_core_raw.per_jobs_f_tl.name
   object_version_number:

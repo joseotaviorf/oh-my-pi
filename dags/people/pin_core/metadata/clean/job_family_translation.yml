@@ -23,7 +23,7 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.last_updated_by
   job_family_name:
-    description: Name of the job family.
+    description: Localized label for the job family grouping related positions in PIN.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.job_family_name
   language:

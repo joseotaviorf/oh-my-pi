@@ -44,7 +44,7 @@ columns:
     lineage:
       - datalake_pin_core_raw.hr_organization_v.classification_code
   name:
-    description: Organization name.
+    description: Localized display name of the HR organization unit in the target language.
     lineage:
       - datalake_pin_core_raw.hr_organization_v.name
   status:
