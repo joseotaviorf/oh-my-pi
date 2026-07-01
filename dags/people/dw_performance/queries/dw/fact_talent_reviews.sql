@@ -21,7 +21,7 @@ rating_change AS (
         OVER (PARTITION BY id_period_of_service ORDER BY dt_committee_meeting, id_meeting) 
     AS dif_potential
   FROM
-    datalake_pin.talent_review
+    datalake_performance.talent_review
 )
 
 SELECT
@@ -133,7 +133,7 @@ SELECT
   tr.ts_updated,
   NOW() AS ts_load
 FROM
-  datalake_pin.talent_review AS tr
+  datalake_performance.talent_review AS tr
 INNER JOIN
   rating_change AS rc
     ON tr.id_period_of_service = rc.id_period_of_service 

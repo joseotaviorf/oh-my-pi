@@ -8,23 +8,23 @@ columns:
   sk_talent_rating:
     description: Surrogate key for the talent rating dimension. It is an MD5 hash generated from the concatenation of the criticality, readiness, potential, and risk of loss rating descriptions.
     lineage:
-    - datalake_pin.talent_review.calibrated_criticality
-    - datalake_pin.talent_review.calibrated_potential
-    - datalake_pin.talent_review.calibrated_readiness
-    - datalake_pin.talent_review.calibrated_risk_of_loss
+    - datalake_performance.talent_review.calibrated_criticality
+    - datalake_performance.talent_review.calibrated_potential
+    - datalake_performance.talent_review.calibrated_readiness
+    - datalake_performance.talent_review.calibrated_risk_of_loss
   criticality:
     description: The calibrated rating description for an employee's or role's criticality.
     lineage:
-    - datalake_pin.talent_review.calibrated_criticality
+    - datalake_performance.talent_review.calibrated_criticality
   readiness:
     description: The calibrated rating description for an employee's readiness for promotion or new roles.
     lineage:
-    - datalake_pin.talent_review.calibrated_readiness
+    - datalake_performance.talent_review.calibrated_readiness
   potential:
     description: The calibrated rating description for an employee's career potential.
     lineage:
-    - datalake_pin.talent_review.calibrated_potential
+    - datalake_performance.talent_review.calibrated_potential
   risk_of_loss:
     description: The calibrated rating description for an employee's risk of loss.
     lineage:
-    - datalake_pin.talent_review.calibrated_risk_of_loss
+    - datalake_performance.talent_review.calibrated_risk_of_loss

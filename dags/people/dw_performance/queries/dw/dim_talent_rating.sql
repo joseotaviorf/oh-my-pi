@@ -10,4 +10,4 @@ SELECT DISTINCT
     calibrated_potential AS potential,
     calibrated_risk_of_loss AS risk_of_loss
 FROM 
-    datalake_pin.talent_review
+    datalake_performance.talent_review

@@ -19,7 +19,7 @@ all_evaluations AS (
     pre_calibration_leadership_numeric,
     ts_meeting AS dt_evaluation
   FROM
-    datalake_pin.performa_calibration_evaluation
+    datalake_performance.performa_calibration_evaluation
   UNION ALL
   SELECT
     'extra_info' AS source_type,
@@ -40,7 +40,7 @@ all_evaluations AS (
     NULL AS pre_calibration_leadership_numeric,
     dt_evaluation
   FROM
-    datalake_pin.performa_calibration_extra_info
+    datalake_performance.performa_calibration_extra_info
 ),
 calibrations_with_version AS (
   SELECT

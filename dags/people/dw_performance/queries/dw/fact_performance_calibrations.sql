@@ -4,7 +4,7 @@ distinct_calibrations AS (
     person_number,
     id_meeting
   FROM
-    datalake_pin.performa_calibration_evaluation
+    datalake_performance.performa_calibration_evaluation
   WHERE
     person_number IS NOT NULL
     AND id_meeting IS NOT NULL
@@ -13,7 +13,7 @@ distinct_calibrations AS (
     person_number,
     id_meeting
   FROM
-    datalake_pin.performa_calibration_extra_info
+    datalake_performance.performa_calibration_extra_info
   WHERE
     person_number IS NOT NULL
     AND id_meeting IS NOT NULL

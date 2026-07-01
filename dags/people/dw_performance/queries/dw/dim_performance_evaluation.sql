@@ -26,7 +26,7 @@ evaluations_with_version AS (
       DATE('9999-12-31')
     ) AS dt_valid_to
   FROM
-    datalake_pin.performance_evaluation
+    datalake_performance.performance_evaluation
   WHERE
     cycle_name IS NOT NULL
 )

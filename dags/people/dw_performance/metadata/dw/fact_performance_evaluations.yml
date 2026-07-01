@@ -24,11 +24,11 @@ columns:
   assignment_number:
     description: The business identifier for the employee's assignment. Part of the grain of the fact table along with cycle_name.
     lineage:
-    - datalake_pin.performance_evaluation.assignment_number
+    - datalake_performance.performance_evaluation.assignment_number
   cycle_name:
     description: Name of the performance review cycle. Part of the grain of the fact table along with assignment_number.
     lineage:
-    - datalake_pin.performance_evaluation.cycle_name
+    - datalake_performance.performance_evaluation.cycle_name
   behavior_self:
     description: Textual description of the Behavior rating from the employee's self-assessment (SELF evaluation type).
     lineage:

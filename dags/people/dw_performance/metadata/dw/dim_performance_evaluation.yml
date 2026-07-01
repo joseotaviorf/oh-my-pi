@@ -8,76 +8,76 @@ columns:
   sk_performance_evaluation_version:
     description: Surrogate key that uniquely identifies a specific version of a performance evaluation. Includes the evaluation date (dt_valid_from) to distinguish between different versions of the same evaluation type for the same cycle and assignment.
     lineage:
-    - datalake_pin.performance_evaluation.assignment_number
-    - datalake_pin.performance_evaluation.evaluation_type
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
-    - datalake_pin.performance_evaluation.cycle_name
+    - datalake_performance.performance_evaluation.assignment_number
+    - datalake_performance.performance_evaluation.evaluation_type
+    - datalake_performance.performance_evaluation.dt_evaluation_occurred
+    - datalake_performance.performance_evaluation.cycle_name
   sk_performance_evaluation:
     description: Surrogate key that identifies a performance evaluation type (SELF or MANAGER) for a given cycle and assignment, regardless of version. Used to link to the current version when combined with is_current = TRUE.
     lineage:
-    - datalake_pin.performance_evaluation.assignment_number
-    - datalake_pin.performance_evaluation.evaluation_type
-    - datalake_pin.performance_evaluation.cycle_name
+    - datalake_performance.performance_evaluation.assignment_number
+    - datalake_performance.performance_evaluation.evaluation_type
+    - datalake_performance.performance_evaluation.cycle_name
   assignment_number:
     description: The business identifier for the employee's assignment.
     lineage:
-    - datalake_pin.performance_evaluation.assignment_number
+    - datalake_performance.performance_evaluation.assignment_number
   manager_assignment_number:
     description: The assignment number associated with the manager registered at evaluation.
     lineage:
-    - datalake_pin.performance_evaluation
+    - datalake_performance.performance_evaluation
   cycle_name:
     description: Name of the performance review cycle.
     lineage:
-    - datalake_pin.performance_evaluation.cycle_name
+    - datalake_performance.performance_evaluation.cycle_name
   evaluation_type:
     description: Type of evaluation perspective. Can be 'SELF' (self-assessment by the employee) or 'MANAGER' (evaluation by the manager).
     lineage:
-    - datalake_pin.performance_evaluation.evaluation_type
+    - datalake_performance.performance_evaluation.evaluation_type
   evaluation_version:
     description: Sequential version number for this evaluation, starting at 1. Increments with each new evaluation occurrence (dt_evaluation_occurred) for the same cycle, assignment, and evaluation type.
     lineage:
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
+    - datalake_performance.performance_evaluation.dt_evaluation_occurred
   description_behavior:
     description: Textual description of the rating for the Behavior section.
     lineage:
-    - datalake_pin.performance_evaluation.description_behavior
+    - datalake_performance.performance_evaluation.description_behavior
   description_impact:
     description: Textual description of the rating for the Impact section.
     lineage:
-    - datalake_pin.performance_evaluation.description_impact
+    - datalake_performance.performance_evaluation.description_impact
   description_leadership:
     description: Textual description of the rating for the Leadership section.
     lineage:
-    - datalake_pin.performance_evaluation.description_leadership
+    - datalake_performance.performance_evaluation.description_leadership
   numeric_behavior:
     description: Numeric value of the rating for the Behavior section.
     lineage:
-    - datalake_pin.performance_evaluation.numeric_behavior
+    - datalake_performance.performance_evaluation.numeric_behavior
   numeric_impact:
     description: Numeric value of the rating for the Impact section.
     lineage:
-    - datalake_pin.performance_evaluation.numeric_impact
+    - datalake_performance.performance_evaluation.numeric_impact
   numeric_leadership:
     description: Numeric value of the rating for the Leadership section.
     lineage:
-    - datalake_pin.performance_evaluation.numeric_leadership
+    - datalake_performance.performance_evaluation.numeric_leadership
   open_evaluation:
     description: Free text answer from the open evaluation question, providing additional context or comments about the performance evaluation.
     lineage:
-    - datalake_pin.performance_evaluation.open_evaluation
+    - datalake_performance.performance_evaluation.open_evaluation
   is_current:
     description: Boolean flag indicating if this is the current active version of the evaluation (TRUE) or a historical version (FALSE). When TRUE, this is the latest version whose validity includes today's date (future-only rows are excluded).
     lineage:
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
+    - datalake_performance.performance_evaluation.dt_evaluation_occurred
   dt_valid_from:
     description: The date from which this version of the evaluation becomes effective (SCD Type 2). Represents when the evaluation occurred (dt_evaluation_occurred).
     lineage:
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
+    - datalake_performance.performance_evaluation.dt_evaluation_occurred
   dt_valid_to:
     description: The date until which this version of the evaluation remains valid (exclusive, SCD Type 2). Set to '9999-12-31' for the current version. For historical versions, equals (next version's dt_valid_from - 1 day).
     lineage:
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
+    - datalake_performance.performance_evaluation.dt_evaluation_occurred
   ts_load:
     description: Timestamp when the record was loaded into the table.
 

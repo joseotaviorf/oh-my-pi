@@ -4,7 +4,7 @@ distinct_cycles AS (
     cycle_name,
     assignment_number
   FROM
-    datalake_pin.performance_evaluation
+    datalake_performance.performance_evaluation
   WHERE
     cycle_name IS NOT NULL
 )

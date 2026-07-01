@@ -29,13 +29,13 @@ columns:
     description: Foreign key to dim_committee_meeting.sk_meeting identifying the performance calibration committee meeting for this calibration row.
     lineage:
     - dw_performance.dim_committee_meeting.sk_meeting
-    - datalake_pin.performa_calibration_evaluation.id_meeting
-    - datalake_pin.performa_calibration_extra_info.id_meeting
+    - datalake_performance.performa_calibration_evaluation.id_meeting
+    - datalake_performance.performa_calibration_extra_info.id_meeting
   person_number:
     description: Unique identifier for the person (employee) who was evaluated.
     lineage:
-    - datalake_pin.performa_calibration_evaluation.person_number
-    - datalake_pin.performa_calibration_extra_info.person_number
+    - datalake_performance.performa_calibration_evaluation.person_number
+    - datalake_performance.performa_calibration_extra_info.person_number
   calibrated_behavior_description:
     description: Textual description of the calibrated (post-meeting) Behavior rating.
     lineage:
