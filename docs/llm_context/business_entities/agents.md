@@ -42,7 +42,7 @@ QuintoAndar is **mid-migration** from legacy agent services to the new Agent Dom
 >
 > Some tables are still legacy, some are already on the new system — **check which ID system a table uses before joining it to another.** When in doubt, bridge through a table that carries both `sk_agent` and `sk_agent_data` (e.g. `dw_agent.fact_agent_daily`).
 
-DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datalake_agent_reports`**, **`datalake_hub_services`**, **`datalake_agent_payments`**, **`datalake_big_agent`**, **`datalake_ebdb_agents`**, **`datalake_tiers`**, **`datalake_ciq`**, **`datalake_brokerage`**, and the (stale) **`dw_agent`** star schema.
+DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datalake_agent_reports`**, **`datalake_hub_services`**, **`datalake_agent_payments`**, **`datalake_big_agent`**, **`datalake_ebdb_agents`**, **`datalake_tiers`**, **`datalake_ciq`**, **`dw_ciq`**, **`datalake_brokerage`**, and the (stale) **`dw_agent`** star schema.
 
 ---
 
@@ -73,6 +73,9 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **Capability / capacidade** | Fine-grained permission | `agent_capability.type + status`; prefer over legacy subtype jargon. |
 | **Primeira listagem / first listing** | ⚠ "any first listing" vs "valid first listing" (dedup-gated) | Valid first listing gated by `datalake_listing_deduplication.valid_first_listing`; used for CIQ payment eligibility and activation. Default to valid for CIQ/activation, confirm. |
 | **Valid First Listing** | A first listing that survives property **deduplication** — a re-listed / duplicated property does NOT count again | Custom QuintoAndar concept; lives in `datalake_listing_deduplication`. ⚠ Metric definition still evolving — see schema section. |
+| **Compra de Carteira / CIQ listing purchase** | CIQ_FULL rent **listing-purchase** fact — payment eligibility, pricing segment, portfolio loss | Analyst table: `dw_ciq.fact_ciq_listing_purchase`; enrich source: `datalake_ciq.ciq_listing_purchase`. Grain: house × listing version × partner × CIQ user. |
+| **Perda de carteira / portfolio loss** | Relist still on market >90 days without a signed rent contract | `is_portfolio_loss = true` on `dw_ciq.fact_ciq_listing_purchase` only (not on enrich). |
+| **Re-Listing (rent version category)** | New rent listing cycle after a prior rental ended | `listing_category = 'Re-Listing'` on purchase rows (from `datalake_ebdb_listing.house_listing`). See [`house_and_listing.md`](house_and_listing.md). |
 
 ---
 
@@ -92,7 +95,9 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | For-Sale agent revenue share, BigAgent vs Nazaré | `datalake_agent_payments.agent_revenue_share` |
 | For-Rent contract broker share (revision history) | `datalake_big_agent.brokerage_share_history` |
 | Per-offer brokerage fee (Nazaré legacy) | `datalake_brokerage.partner_brokerage` |
-| CIQ rent commission per house | `datalake_ciq.ciq_listing_purchase` |
+| CIQ rent commission / listing-purchase (enrich) | `datalake_ciq.ciq_listing_purchase` |
+| CIQ Compra de Carteira — analyst fact (pricing + **portfolio loss**) | `dw_ciq.fact_ciq_listing_purchase` |
+| Listing-purchase acquisition tiers / duplicity pricing | `datalake_ciq.listing_purchase_pricing` (join on `id_listing_purchase` / `sk_listing_purchase`) |
 | Valid first listing (dedup-gated) for CIQ / activation | `datalake_listing_deduplication.valid_first_listing` |
 | **CIQ** first-listing validation for tiers (15-day rule, invalidation) | `datalake_tiers.ciq_first_listing` |
 | Property dedup analysis / duplicate detection | `datalake_listing_deduplication.listing_deduplication` |
@@ -319,6 +324,41 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 
 ---
 
+## CIQ listing purchase (Compra de Carteira)
+
+**Purpose:** CIQ_FULL **rent listing-purchase** — which houses qualify for the Compra de Carteira payment program, Robin Hood payment state, commercial **pricing segments** (transition rules), and **portfolio loss** (relist published >90 days without renting). **Pipelines:** `enrich_ciq` → `datalake_ciq.ciq_listing_purchase`; `dw_ciq_listing_purchase` → `dw_ciq.fact_ciq_listing_purchase` (joins enrich with `listing_purchase_pricing` for acquisition tiers).
+
+**Grain (enrich & fact):** one row per **house listing version** in CIQ context (house × `sk_house_listing` × partner × CIQ user × consultant type), not one row per house.
+
+| You need… | Where |
+|-----------|--------|
+| Full operational detail, all enrich columns | `datalake_ciq.ciq_listing_purchase` |
+| Dashboards / OKRs / portfolio loss flag | **`dw_ciq.fact_ciq_listing_purchase`** |
+| Acquisition bucket + duplicity pricing | `dw_ciq.fact_ciq_listing_purchase` (`acquisition_type`, `purchase_value` from pricing join) |
+
+### Relist vs republication vs portfolio loss
+
+| Signal | Column | Meaning |
+|--------|--------|---------|
+| Later listing version exists | `has_republication` | On **this** version: a subsequent `sk_house_listing` exists (ordered by version start). Does not by itself mean portfolio loss. |
+| This version is a relist cycle | `listing_category = 'Re-Listing'` | Rent listing versioning label from `house_listing` — publication after a prior rental cycle. |
+| Start of publish for this version | `ts_publicated` | Anchor for “new publish event” on this listing version (aligns with rent versioning; see [`house_and_listing.md`](house_and_listing.md)). |
+| Days since that publish | `total_days_since_publish` | Calendar days from `ts_publicated` to load date for **every** listing version on enrich and fact (no Re-Listing filter in enrich). |
+| **Portfolio loss (business rule)** | **`is_portfolio_loss`** | **DW only:** `Re-Listing` AND `listing_status` in (`PUBLISHED`, `publicado`) AND no signed rent contract on this version (`ts_contract_signed` null) AND `total_days_since_publish > 90`. |
+
+> Do **not** use `total_days_since_house_inactived` for portfolio loss — it counts **inactive** listing-version days, not time on market since publish.
+
+> **`sk_partner`** on the fact is the CIQ partner key (`id_partner` in enrich) for joins to partner-scoped tables.
+
+### Other filters analysts often need
+
+- **CIQ_FULL scope:** enrich rows are built from `house_consultant_history` with `consultant_type = 'CIQ_FULL'` and RENT business context in pricing rules.
+- **Payment:** `payment_status`, `is_paid`, `amount_paid`; fact merge updates matched rows only while `is_paid` is not true.
+- **Pricing segment:** `pricing_type` / `pricing_type_reason` (transition cohorts such as ongoing-listings, ongoing-rentals, new-listings).
+- **Duplicity:** `has_similiar_house_by_address_parsed`, `has_similiar_house_by_atlas`; pricing join adds similar-house acquisition logic.
+
+---
+
 ## `dw_agent` (Agent-Domain star schema)
 
 **Purpose:** DW projection of the new Agent Domain accreditation layer. **Pipeline:** `dw_agent_accreditation` DAG. Built on the **new** ID system (`sk_agent`), but carries `sk_agent_data` for legacy bridging — see the identity-migration warning above.
@@ -351,6 +391,7 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - **Hub → hub services:** `agent.id_user = member_hub_allocation.id_user` (1:N per day; filter `is_active = true`).
 - **Hub → PFA:** `agent.id_agent = preferred_property_agent_relation_history.id_related_agent` (1:N per listing).
 - **Hub → revenue:** `agent.id_user = agent_revenue_share.id_user` (filter `revenue_source` first).
+- **Hub → Compra de Carteira:** `agent.id_partner = fact_ciq_listing_purchase.sk_partner` and/or `agent.id_user = fact_ciq_listing_purchase.sk_user` (grain is listing-version × partner, not one row per agent).
 - **Identity bridge (legacy):** `dw_public.dim_agent.id_user = agent.id_user`; bridge legacy `sk_agent ↔ id_user` through `dw_public.dim_agent`. ⚠ This `sk_agent` is the **legacy** star-schema key — NOT the same as `dw_agent.*.sk_agent` (new). To cross legacy↔new, bridge through a table carrying both `sk_agent` and `sk_agent_data` (e.g. `dw_agent.fact_agent_daily`). See the identity-migration warning.
 - **Visits:** agents link to `dw_visit.fact_visits` / `fact_visit_schedules` via `sk_agent`; see [`visits.md`](visits.md).
 - **Support tickets:** `agent_support_tickets_by_month` → `dw_customer_support.fact_tickets`.
@@ -370,6 +411,8 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - Filter `ts_relation_ended IS NULL` (active PFA) and `ts_status_ended IS NULL` (current eligibility).
 - Filter daily tables by integer `year = X AND month = X AND day = X`, not `dt_reference BETWEEN` (scans all partitions).
 - For `offer_flow_events` / `offer_flow_performance`, add `WHERE ts_event > DATE '2010-01-01'` (epoch-overflow min dates show as `1899-12-29`).
+- For **CIQ portfolio loss**, use **`dw_ciq.fact_ciq_listing_purchase.is_portfolio_loss`** — do not re-derive from `has_republication` alone (that flag is on the **prior** cycle when a later version exists).
+- Join **listing relist semantics** to [`house_and_listing.md`](house_and_listing.md) when explaining `listing_category` vs sale hybrid tables.
 
 **Don't:**
 
@@ -381,6 +424,8 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - Reference `dw_brokers.dim_brokers` (trailing `s`) — `DELTA_LAKE_INVALID_SCHEMA`; use `dw_public.dim_agent`.
 - Treat `datalake_big_agent.house_consultant_history.consultant_type` (`CIQ_FULL`, `CIQ_MANAGER`, `ASP`) as stable — active RFC pending.
 - Assume AI agents (Wall-E, Matthew, Sauron, Dominic/Matias) belong here — see [`chatbot_sessions.md`](chatbot_sessions.md).
+- Use **`total_days_since_house_inactived`** as “days available without rent” for Compra de Carteira — use **`total_days_since_publish`** / **`is_portfolio_loss`** on `dw_ciq.fact_ciq_listing_purchase`.
+- Expect **`is_portfolio_loss`** on `datalake_ciq.ciq_listing_purchase` — it is materialized only on the **DW fact**.
 
 ---
 
@@ -419,3 +464,25 @@ WHERE ars.year = 2026 AND ars.month = 6
 GROUP BY 1, 2          -- never SUM without grouping/filtering revenue_source
 ORDER BY 1, 2;
 ```
+
+### CIQ portfolio loss (Compra de Carteira)
+
+Current-state rows flagged by the business rule on the DW fact (relist published, no rent contract, >90 days since version publish).
+
+```sql
+SELECT
+    f.sk_house,
+    f.sk_house_listing,
+    f.sk_partner,
+    f.sk_user,
+    f.listing_category,
+    f.listing_status,
+    f.total_days_since_publish,
+    f.ts_publicated,
+    f.is_portfolio_loss
+FROM dw_ciq.fact_ciq_listing_purchase AS f
+WHERE f.is_portfolio_loss = true;
+```
+
+> For ad-hoc checks on enrich inputs only, the same rule is  
+> `listing_category = 'Re-Listing'` + `listing_status IN ('PUBLISHED', 'publicado')` + `ts_contract_signed IS NULL` + `total_days_since_publish > 90` on `datalake_ciq.ciq_listing_purchase`.

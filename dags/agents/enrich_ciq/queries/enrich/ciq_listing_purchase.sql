@@ -25,6 +25,8 @@ WITH house_listing AS (
             FALSE
         ) AS is_last_contract_signed,
         hl.is_last_version,
+        hl.listing_category,
+        hl.ts_publicated,
         hl.ts_listing_version_start,
         hl.ts_listing_version_end,
         hl.ts_contract_signed,
@@ -170,6 +172,7 @@ SELECT
     lbc.business_context,
     hch.consultant_type,
     COALESCE(hl.listing_status, lbc.status) AS listing_status,
+    hl.listing_category,
     hl.contract_status,
     CASE
         WHEN hl.contract_status = 'Cancelado'	THEN 'cancelled'
@@ -209,6 +212,7 @@ SELECT
         TIMESTAMPDIFF(DAY, hl.ts_listing_version_start, COALESCE(hl.ts_listing_version_end, DATE(NOW()))), 
         0
     ) AS total_days_since_house_inactived,
+    TIMESTAMPDIFF(DAY, hl.ts_publicated, DATE(NOW())) AS total_days_since_publish,
     ld.has_duplicates AS has_similiar_house_by_address_parsed,
     ahd.id_duplicity IS NOT NULL AS has_similiar_house_by_atlas,
     hl.has_republication,
@@ -223,6 +227,7 @@ SELECT
     hl.ts_contract_signed,
     hl.ts_next_contract_signed,
     hl.ts_previous_contract_signed,
+    hl.ts_publicated,
     IF(hl.is_house_inactive IS TRUE, hl.ts_listing_version_start, NULL) AS ts_house_inactived,
     hch.ts_house_registration,
     lbc.ts_first_publication AS ts_first_listing,

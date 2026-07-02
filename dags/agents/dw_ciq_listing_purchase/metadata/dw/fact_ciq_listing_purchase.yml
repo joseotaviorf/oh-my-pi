@@ -76,6 +76,10 @@ columns:
     description: Listing status from house listing or business context.
     lineage:
       - datalake_ciq.ciq_listing_purchase.listing_status
+  listing_category:
+    description: Rent listing version category passed through from enrich for relist identification.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.listing_category
   contract_status:
     description: Contract status from core contract.
     lineage:
@@ -112,6 +116,10 @@ columns:
     description: Inactive listing-version days when in qualifying inactive state.
     lineage:
       - datalake_ciq.ciq_listing_purchase.total_days_since_house_inactived
+  total_days_since_publish:
+    description: Calendar days since listing version publication (ts_publicated) from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.total_days_since_publish
   has_similiar_house_by_address_parsed:
     description: True when address-parsed deduplication flags duplicates for the house.
     lineage:
@@ -136,6 +144,15 @@ columns:
     description: True when the listing version is in qualifying inactive state.
     lineage:
       - datalake_ciq.ciq_listing_purchase.is_house_inactive
+  is_portfolio_loss:
+    description: >
+      True when the listing is a Re-Listing still published without a signed rent contract and
+      total_days_since_publish exceeds 90 days (CIQ portfolio loss rule).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.listing_category
+      - datalake_ciq.ciq_listing_purchase.listing_status
+      - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+      - datalake_ciq.ciq_listing_purchase.total_days_since_publish
   is_eligible:
     description: True when the house has a signed rent contract timestamp.
     lineage:
@@ -160,6 +177,10 @@ columns:
     description: Previous contract signature timestamp on the same house when present.
     lineage:
       - datalake_ciq.ciq_listing_purchase.ts_previous_contract_signed
+  ts_publicated:
+    description: Publication timestamp of this listing version from enrich (relist publish anchor).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_publicated
   ts_house_inactived:
     description: Listing version start when inactive; null when the listing is active.
     lineage:

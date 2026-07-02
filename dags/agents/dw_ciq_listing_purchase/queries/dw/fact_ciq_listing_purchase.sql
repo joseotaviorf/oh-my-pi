@@ -16,6 +16,7 @@ SELECT
     clp.city_group,
     clp.supply_source,
     clp.listing_status,
+    clp.listing_category,
     clp.contract_status,
     clp.payment_status,
     clp.pricing_type,
@@ -25,18 +26,27 @@ SELECT
     lpp.purchase_value,
     clp.amount_paid,
     clp.total_days_since_house_inactived,
+    clp.total_days_since_publish,
     clp.has_similiar_house_by_address_parsed,
     clp.has_similiar_house_by_atlas,
     clp.has_republication,
     clp.is_first_contract_signed_by_house,
     clp.is_last_house_listing,
     clp.is_house_inactive,
+    COALESCE(
+        clp.listing_category = 'Re-Listing'
+        AND clp.ts_contract_signed IS NULL
+        AND clp.listing_status IN ('PUBLISHED', 'publicado')
+        AND clp.total_days_since_publish > 90,
+        FALSE
+    ) AS is_portfolio_loss,
     clp.is_eligible,
     clp.is_paid,
     clp.dt_paid,
     clp.ts_contract_signed,
     clp.ts_next_contract_signed,
     clp.ts_previous_contract_signed,
+    clp.ts_publicated,
     clp.ts_house_inactived,
     clp.ts_house_registration,
     clp.ts_first_listing,

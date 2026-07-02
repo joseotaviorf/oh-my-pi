@@ -95,6 +95,12 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.status
       - datalake_ebdb_clean.listing_business_context.status
+  listing_category:
+    description: >
+      Rent listing version category from house listing (First Listing, Re-Listing, Recovered, or null),
+      used to identify relist cycles for CIQ portfolio analytics.
+    lineage:
+      - datalake_ebdb_listing.house_listing.listing_category
   contract_status:
     description: Contract status from core contract.
     lineage:
@@ -136,6 +142,12 @@ columns:
       - datalake_ebdb_listing.house_listing.ts_listing_version_end
       - datalake_ebdb_listing.house_listing.status
       - datalake_ebdb_listing.house_listing.status_reason
+  total_days_since_publish:
+    description: >
+      Calendar days from ts_publicated to the load date for this listing version; null when
+      ts_publicated is missing.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_publicated
   has_similiar_house_by_address_parsed:
     description: True when listing deduplication flags the house as duplicated on parsed address.
     lineage:
@@ -195,6 +207,12 @@ columns:
     description: Previous contract signature timestamp on the same house (LAG by listing version).
     lineage:
       - datalake_ebdb_listing.house_listing.ts_contract_signed
+  ts_publicated:
+    description: >
+      Timestamp when this rent listing version was published; for Re-Listing rows this anchors the
+      start of the new publish event after a prior rental cycle.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_publicated
   ts_house_inactived:
     description: Listing version start timestamp when the version is in qualifying inactive state; null otherwise.
     lineage:
