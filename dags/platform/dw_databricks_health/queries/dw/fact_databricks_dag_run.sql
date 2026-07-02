@@ -36,6 +36,20 @@ SELECT
     FIRST(ftr.ecosystem      IGNORE NULLS)                        AS ecosystem,
     FIRST(ftr.environment    IGNORE NULLS)                        AS environment,
     FIRST(ftr.provisioner    IGNORE NULLS)                        AS provisioner,
+    -- Deterministic rollup: lowest rank wins, mirroring dim_cost_cohort rule
+    -- precedence (mlops/wonka 10-33 < cdp 40 < tech-platform 50 < bietlejuice
+    -- 60-61 < unmatched). Tasks in one logical run can diverge when cluster
+    -- tags differ; FIRST() would pick arbitrarily.
+    MIN_BY(
+        ftr.cost_cohort,
+        CASE ftr.cost_cohort
+            WHEN 'quintoml_wonka' THEN 1
+            WHEN 'cdp'            THEN 2
+            WHEN 'tech_platform'  THEN 3
+            WHEN 'bietlejuice'    THEN 4
+            ELSE 5
+        END
+    )                                                             AS cost_cohort,
     FIRST(ftr.data_classification IGNORE NULLS)                 AS data_classification,
     -- --- Cluster profile ---
     MAX_BY(ftr.driver_node_type, ftr.total_dbu_consumed)         AS driver_node_type,

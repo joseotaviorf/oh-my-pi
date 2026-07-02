@@ -1,0 +1,18 @@
+---
+table_name: dw_databricks_health.fact_databricks_dag_run
+alert_channel: "#alerts-de-airflow-dags"
+
+column_level_validations:
+  cost_cohort:
+    custom:
+      # Every Airflow-orchestrated workload must classify to a non-'other'
+      # cohort. A residual 'other' row means datalake_databricks_pricing
+      # .dim_cost_cohort is missing a rule — fix by adding a rule (priority
+      # 62+), never by weakening this check.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_databricks_health.fact_databricks_dag_run
+         WHERE cost_cohort = 'other'
+           AND dt_dag_run_started >= DATE('2026-01-01')
+        ) = 0
+      severity_level: Error

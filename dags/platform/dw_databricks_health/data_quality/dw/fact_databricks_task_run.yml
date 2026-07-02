@@ -1,0 +1,21 @@
+---
+table_name: dw_databricks_health.fact_databricks_task_run
+alert_channel: "#alerts-de-airflow-dags"
+
+column_level_validations:
+  cost_cohort:
+    custom:
+      # Task-grain twin of the fact_databricks_dag_run zero-'other' gate:
+      # the dag-level rollup resolves mixed-cohort runs to the highest-
+      # precedence cohort, so a residual 'other' task could hide behind a
+      # classified dag row without this check. Scoped to Airflow-orchestrated
+      # rows (airflow_dag_id set) to mirror the dag-level contract. Fix by
+      # adding a dim_cost_cohort rule (priority 62+), never by weakening.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_databricks_health.fact_databricks_task_run
+         WHERE cost_cohort = 'other'
+           AND airflow_dag_id IS NOT NULL
+           AND dt_task_started >= DATE('2026-01-01')
+        ) = 0
+      severity_level: Error

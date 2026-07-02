@@ -185,6 +185,19 @@ columns:
       `bietlejuice`, `quintoml`, `customer-data-platform`). NULL when the tag is absent.
     lineage:
       - system.compute.clusters.tags
+  cost_cohort:
+    description: |
+      Initiative-level cost cohort — the lowest-priority matching rule from
+      `datalake_databricks_pricing.dim_cost_cohort`, evaluated over `team_owner`,
+      `provisioner` and `airflow_dag_id`, falling back to `other` when no rule
+      matches. Taxonomy: `bietlejuice`, `quintoml_wonka`, `cdp`, `tech_platform`,
+      `other`. Because this fact is scoped to the Airflow-orchestrated stack,
+      every row is expected to classify to a non-`other` cohort; a residual
+      `other` row means a missing dim_cost_cohort rule and trips the Error-level
+      data-quality check on dw_databricks_health.fact_databricks_dag_run (fix by
+      adding a rule, never by weakening the check).
+    lineage:
+      - datalake_databricks_pricing.dim_cost_cohort.cost_cohort
   cluster_name:
     description: Cluster name (typically `<dag_id>_<run_id>` for job clusters).
     lineage:

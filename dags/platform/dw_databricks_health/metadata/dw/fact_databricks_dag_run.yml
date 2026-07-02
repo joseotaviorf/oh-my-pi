@@ -63,6 +63,19 @@ columns:
     description: Governance tag — `FIRST` within the logical-run group.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.provisioner
+  cost_cohort:
+    description: |
+      Initiative-level cost cohort — deterministic `MIN_BY` rollup within the
+      logical-run group, ranked by dim_cost_cohort rule precedence
+      (quintoml_wonka, cdp, tech_platform, bietlejuice, other), so mixed-tag
+      runs resolve stably. Taxonomy: `bietlejuice`, `quintoml_wonka`, `cdp`,
+      `tech_platform`, `other`. Every Airflow workload must classify to a
+      non-`other` cohort — enforced at Error level by this table's data-quality
+      check; a residual `other` row means a missing
+      datalake_databricks_pricing.dim_cost_cohort rule.
+    lineage:
+      - datalake_databricks_pricing.dim_cost_cohort.cost_cohort
+      - dw_databricks_health.fact_databricks_task_run.cost_cohort
   data_classification:
     description: LGPD / data-classification label — `FIRST IGNORE NULLS` within the logical-run group.
     lineage:

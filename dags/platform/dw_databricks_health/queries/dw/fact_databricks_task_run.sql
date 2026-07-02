@@ -737,7 +737,9 @@ task_dch_health AS (
             AND dch.dt_cluster_run          = tcdo.dt_cluster_run
     GROUP BY
         tcdo.workspace_id, tcdo.run_id, tcdo.task_run_id
-)
+),
+
+final AS (
 SELECT
     XXHASH64(s.workspace_id, s.run_id, s.task_run_id)              AS sk_databricks_task_run,
     XXHASH64(s.workspace_id, s.run_id)                             AS sk_databricks_run,
@@ -979,3 +981,132 @@ WHERE
     -- workloads (CDP, databricks-managed, AtlasDB/Overwatch/manual, UI/API
     -- interactive leak) are the cost fact's responsibility, not dag_health's.
     lcs.tags['provisioner'] IN ('bietlejuice', 'wonka', 'quintoml')
+),
+
+cohort_match AS (
+    SELECT
+        f.sk_databricks_task_run,
+        MIN_BY(r.cost_cohort, r.priority)                      AS cost_cohort
+    FROM
+        final f
+    JOIN
+        datalake_databricks_pricing.dim_cost_cohort r
+            ON (r.rule_type = 'team_owner_exact'  AND f.team_owner = r.match_value)
+            OR (r.rule_type = 'team_owner_prefix' AND f.team_owner LIKE CONCAT(r.match_value, '%'))
+            OR (r.rule_type = 'provisioner_exact' AND f.provisioner = r.match_value)
+            OR (r.rule_type = 'workload_prefix'   AND LOWER(f.airflow_dag_id) LIKE CONCAT(r.match_value, '%'))
+            OR (r.rule_type = 'workload_like'     AND LOWER(f.airflow_dag_id) LIKE r.match_value)
+    GROUP BY
+        f.sk_databricks_task_run
+)
+-- Attach the initiative cost cohort: lowest-priority matching dim_cost_cohort
+-- rule wins; rows matching no rule fall back to 'other' (guarded at Error
+-- level by the fact_databricks_dag_run data-quality check).
+SELECT
+    f.sk_databricks_task_run,
+    f.sk_databricks_run,
+    f.sk_databricks_cluster,
+    f.sk_task_started_date,
+    f.id_databricks_workspace,
+    f.id_databricks_run,
+    f.id_databricks_task_run,
+    f.id_databricks_job,
+    f.id_databricks_task_key,
+    f.id_cluster,
+    f.databricks_run_url,
+    f.airflow_dag_id,
+    f.airflow_task_id,
+    f.team_owner,
+    f.cost_center,
+    f.ecosystem,
+    f.environment,
+    f.data_classification,
+    f.provisioner,
+    COALESCE(cm.cost_cohort, 'other')                              AS cost_cohort,
+    f.cluster_name,
+    f.cluster_source,
+    f.driver_node_type,
+    f.worker_node_type,
+    f.dbr_version,
+    f.worker_count,
+    f.min_autoscale_workers,
+    f.max_autoscale_workers,
+    f.peak_concurrent_workers,
+    f.run_type,
+    f.run_result_state,
+    f.task_result_state,
+    f.total_duration_seconds,
+    f.execution_duration_seconds,
+    f.p50_driver_cpu_busy_percent,
+    f.p95_driver_cpu_busy_percent,
+    f.p50_driver_cpu_wait_percent,
+    f.p95_driver_cpu_wait_percent,
+    f.p50_worker_cpu_busy_percent,
+    f.p95_worker_cpu_busy_percent,
+    f.p50_worker_cpu_wait_percent,
+    f.p95_worker_cpu_wait_percent,
+    f.p50_driver_mem_used_percent,
+    f.p95_driver_mem_used_percent,
+    f.p50_worker_mem_used_percent,
+    f.p95_worker_mem_used_percent,
+    f.local_disk_utilization_pct_p95,
+    f.total_dbu_consumed,
+    f.total_dbu_cost_usd,
+    f.total_dbu_list_cost_usd,
+    f.dbu_rate_usd,
+    f.dbu_pricing_sku,
+    f.total_ec2_cost_calculated_usd,
+    f.ec2_spot_hours,
+    f.ec2_on_demand_hours,
+    f.ec2_source,
+    f.is_ec2_estimated,
+    f.ec2_pricing_missing,
+    f.ec2_unpriced_hours,
+    f.total_cost_usd,
+    f.is_photon,
+    f.has_local_nvme,
+    f.is_pool_backed,
+    f.is_job_on_interactive,
+    f.dbu_negotiated_price_missing,
+    f.is_success,
+    f.is_failed,
+    f.is_pool_acquisition_slow,
+    f.is_sensitive_data,
+    f.has_stage_data,
+    f.is_stage_attribution_ambiguous,
+    f.stage_count,
+    f.failed_stage_count,
+    f.spark_app_count,
+    f.total_executor_run_time_ms,
+    f.total_executor_cpu_time_ms,
+    f.total_disk_bytes_spilled,
+    f.total_memory_bytes_spilled,
+    f.max_peak_execution_memory_bytes,
+    f.total_input_bytes_read,
+    f.total_output_bytes_written,
+    f.total_shuffle_bytes_read,
+    f.total_shuffle_bytes_written,
+    f.max_jvm_heap_bytes,
+    f.total_gc_time_ms,
+    f.max_task_run_time_ms,
+    f.max_task_skew_ratio,
+    f.last_stage_failure_reason,
+    f.setup_duration_seconds,
+    f.pre_init_script_seconds,
+    f.init_script_seconds,
+    f.post_init_script_seconds,
+    f.cluster_startup_seconds,
+    f.dt_task_started,
+    f.ts_task_started,
+    f.ts_task_ended,
+    f.ts_run_started,
+    f.ts_run_ended,
+    f.ts_load,
+    f.year,
+    f.month,
+    f.day
+FROM
+    final f
+LEFT JOIN
+    cohort_match cm
+        ON cm.sk_databricks_task_run = f.sk_databricks_task_run
