@@ -31,3 +31,4 @@ column_level_validations:
   test_group:
     is_complete:
       severity_level: Error
+      
