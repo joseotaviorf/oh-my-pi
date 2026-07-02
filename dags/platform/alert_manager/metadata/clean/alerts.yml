@@ -1,0 +1,62 @@
+---
+database_name: datalake_alert_manager_clean
+table_name: alerts
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Platform
+description: |
+  Clean-layer Alertmanager notifications ingested from the raw alerts stream.
+  One row per alert fingerprint with channel, severity, status, and alert time
+  window for platform monitoring and incident triage.
+columns:
+  id:
+    description: Stable fingerprint that uniquely identifies the alert instance.
+    lineage:
+      - datalake_alert_manager_raw.alerts.fingerprint
+  alert_channel:
+    description: Delivery channel label for the alert (e.g. Slack or PagerDuty).
+    lineage:
+      - datalake_alert_manager_raw.alerts.labels.alarm_channel
+  alert_name:
+    description: Alert rule name as defined in Alertmanager/Prometheus.
+    lineage:
+      - datalake_alert_manager_raw.alerts.labels.alertname
+  alert_app:
+    description: Application or service label attached to the alert.
+    lineage:
+      - datalake_alert_manager_raw.alerts.labels.app
+  status:
+    description: Alert lifecycle status (e.g. firing or resolved).
+    lineage:
+      - datalake_alert_manager_raw.alerts.status
+  severity:
+    description: Severity level label assigned to the alert.
+    lineage:
+      - datalake_alert_manager_raw.alerts.labels.severity
+  line:
+    description: Business line or squad label propagated from common alert labels.
+    lineage:
+      - datalake_alert_manager_raw.alerts.commonLabels.line
+  ts_start:
+    description: Timestamp when the alert started firing.
+    lineage:
+      - datalake_alert_manager_raw.alerts.startsAt
+  ts_end:
+    description: Timestamp when the alert was resolved; null while still firing.
+    lineage:
+      - datalake_alert_manager_raw.alerts.endsAt
+  ts_alert:
+    description: Event timestamp when the alert payload was recorded in the source.
+    lineage:
+      - datalake_alert_manager_raw.alerts.`@timestamp`
+  year:
+    description: Partition year derived from the alert event timestamp.
+    lineage:
+      - datalake_alert_manager_raw.alerts.year
+  month:
+    description: Partition month derived from the alert event timestamp.
+    lineage:
+      - datalake_alert_manager_raw.alerts.month
+  day:
+    description: Partition day derived from the alert event timestamp.
+    lineage:
+      - datalake_alert_manager_raw.alerts.day
