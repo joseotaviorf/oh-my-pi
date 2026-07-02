@@ -25,7 +25,7 @@ SELECT
   paying_account, 
   paying_digit,
   activator_amount,
-  monthly_guarantee,
+  CAST(monthly_guarantee AS DECIMAL(38, 18)) AS monthly_guarantee,
   payment_value,
   paid_value_rh,
   days_contract_life,

@@ -54,6 +54,11 @@ columns:
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_detailed
 
+  description:
+    description: "Description of the accounting entry or billing occurrence"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
   holder_name:
     description: "Name of the payment holder"
     lineage:
@@ -80,7 +85,7 @@ columns:
       - dw_recon_quintocred.fact_pending_transfers_detailed
 
   type_account:
-    description: "Type of bank account"
+    description: "Bank account category of the payment holder used for outbound QuintoCred transfers"
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_detailed
 
@@ -183,3 +188,23 @@ columns:
     description: "Date payment was confirmed by RH"
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  ts_snapshot:
+    description: "Timestamp when the monthly snapshot was captured"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed.NOW()
+
+  year:
+    description: "Partition year from snapshot run date"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed.YEAR(CURRENT_DATE)
+
+  month:
+    description: "Partition month from snapshot run date"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed.MONTH(CURRENT_DATE)
+
+  day:
+    description: "Partition day from snapshot run date"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed.DAY(CURRENT_DATE)
