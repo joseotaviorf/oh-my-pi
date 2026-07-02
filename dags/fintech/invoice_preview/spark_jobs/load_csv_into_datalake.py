@@ -32,8 +32,34 @@ from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_invoice_preview_into_datalake"
 
+# SeuBarriga afternoon export starts at 12:00 and may take up to 4h30.
+# Keep every file from the latest batch when multiple exports land on the same day.
+LATEST_EXPORT_BATCH_WINDOW_SECONDS = 5 * 3600
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def _file_timestamp(path):
+    return int(path.split("/")[-1].split("-")[0])
+
+
+def _select_latest_export_batch(file_paths):
+    if not file_paths:
+        return []
+
+    max_ts = max(_file_timestamp(path) for path in file_paths)
+    batch_threshold = max_ts - LATEST_EXPORT_BATCH_WINDOW_SECONDS
+    latest_batch = [
+        path for path in file_paths if _file_timestamp(path) >= batch_threshold
+    ]
+
+    logger.info(
+        f"m=_select_latest_export_batch, total_files={len(file_paths)}, "
+        f"latest_batch_files={len(latest_batch)}, max_ts={max_ts}, "
+        f"batch_threshold={batch_threshold}, msg=Selected latest export batch."
+    )
+    return latest_batch
 
 
 def _generate_date_range(load_start_date, load_end_date):
@@ -122,8 +148,9 @@ if __name__ == "__main__":
     by_day_files = defaultdict(list)
 
     for path in filtered_files:
-        timestamp = int(path.split("/")[-1].split("-")[0])
-        yearmonthday = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
+        yearmonthday = datetime.fromtimestamp(_file_timestamp(path)).strftime(
+            "%Y-%m-%d"
+        )
         by_day_files[yearmonthday].append(path)
 
     days_to_send_warning = []
@@ -137,7 +164,8 @@ if __name__ == "__main__":
             )
             days_to_send_warning.append(date_ingested)
         else:
-            for csv in by_day_files[date_ingested]:
+            csv_files = _select_latest_export_batch(by_day_files[date_ingested])
+            for csv in csv_files:
                 df = s3_consumer.get_data_from_file(
                     path=csv, format=format, options=options
                 )
