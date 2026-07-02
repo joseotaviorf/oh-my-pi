@@ -1,38 +1,57 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: company_executive
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per company executive in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   uuid_person:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.personuuid
+    description: QuintoCred rental guarantee attribute describing uuid person in the policy lifecycle.
   uuid_company:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.companyuuid
+    description: QuintoCred rental guarantee attribute describing uuid company in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.userinsert
+    description: QuintoCred rental guarantee attribute describing user insert in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.active
+    description: Indicates whether active applies to this financial record.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_executive.day
+    description: Day partition derived from the source event timestamp for incremental loading.

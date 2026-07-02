@@ -1,59 +1,85 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: contract
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per contract in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.userupdate
+    description: Identifier for the user update referenced by this financial record.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.propose
+    description: Identifier for the propose referenced by this financial record.
   id_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.status
+    description: Identifier for the status referenced by this financial record.
   id_main_tenant:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.maintenant
+    description: Identifier for the main tenant referenced by this financial record.
   id_real_estate:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.realestate
+    description: Identifier for the real estate referenced by this financial record.
   id_realtor:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.realtor
+    description: Identifier for the realtor referenced by this financial record.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.active
+    description: Indicates whether active applies to this financial record.
   current_payment_method:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.current_payment_method
+    description: QuintoCred rental guarantee attribute describing current payment method in the policy lifecycle.
   dt_next_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.next_renewal_date
+    description: Calendar date associated with next renewal in the financial workflow.
   ts_began:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.begin
+    description: Timestamp when began occurred in the upstream fintech system.
   ts_done:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.done
+    description: Timestamp when done occurred in the upstream fintech system.
   ts_inserted:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.dateupdate
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.day
+    description: Day partition derived from the source event timestamp for incremental loading.

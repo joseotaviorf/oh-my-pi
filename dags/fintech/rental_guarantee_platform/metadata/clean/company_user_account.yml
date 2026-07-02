@@ -1,41 +1,61 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: company_user_account
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per company user account in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_user_account:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.user_account_id
+    description: Identifier for the user account referenced by this financial record.
   id_profile_account:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.profile_account_id
+    description: Identifier for the profile account referenced by this financial record.
   id_company:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.company_id
+    description: Identifier for the company referenced by this financial record.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   agent_split_fee:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.agent_split_fee
+    description: QuintoCred rental guarantee attribute describing agent split fee in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.active
+    description: Indicates whether active applies to this financial record.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.company_user_account.day
+    description: Day partition derived from the source event timestamp for incremental loading.

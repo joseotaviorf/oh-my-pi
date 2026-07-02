@@ -1,53 +1,65 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: contract_item_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per contract item aud in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_contract:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.contract_id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   description:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.description
+    description: Human-readable description of the financial transaction or ledger entry.
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.value
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   mod_id_contract:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.contract_id_mod
+    description: QuintoCred rental guarantee attribute describing mod id contract in the policy lifecycle.
   mod_description:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.description_mod
+    description: QuintoCred rental guarantee attribute describing mod description in the policy lifecycle.
   mod_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.value_mod
+    description: QuintoCred rental guarantee attribute describing mod value in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_item_aud.updated_at
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract_item_aud.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract_item_aud.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract_item_aud.day
+    description: Timestamp when updated occurred in the upstream fintech system.

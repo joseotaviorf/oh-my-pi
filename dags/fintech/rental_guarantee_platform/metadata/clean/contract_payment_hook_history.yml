@@ -1,38 +1,57 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: contract_payment_hook_history
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per contract payment hook history in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_payment:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.payment_id
+    description: Payment transaction identifier in the fintech payments platform.
   hook_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.hook_type
+    description: QuintoCred rental guarantee attribute describing hook type in the policy lifecycle.
   hook_payload_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.hook_payload_response
+    description: QuintoCred rental guarantee attribute describing hook payload response in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   ts_hook:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.hook_date
+    description: Timestamp when hook occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.day
+    description: Day partition derived from the source event timestamp for incremental loading.

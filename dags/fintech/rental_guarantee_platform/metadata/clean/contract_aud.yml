@@ -1,122 +1,169 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: contract_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per contract aud in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.userupdate
+    description: Identifier for the user update referenced by this financial record.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.propose
+    description: Identifier for the propose referenced by this financial record.
   id_company_plan:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.company_plan
+    description: Identifier for the company plan referenced by this financial record.
   id_main_tenant:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.maintenant
+    description: Identifier for the main tenant referenced by this financial record.
   id_real_estate:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.realestate
+    description: Identifier for the real estate referenced by this financial record.
   id_realtor:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.realtor
+    description: Identifier for the realtor referenced by this financial record.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   financial_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.financial_status
+    description: QuintoCred rental guarantee attribute describing financial status in the policy lifecycle.
   activator:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.activator
+    description: QuintoCred rental guarantee attribute describing activator in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   current_payment_method:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.current_payment_method
+    description: QuintoCred rental guarantee attribute describing current payment method in the policy lifecycle.
   mod_start_billing_after:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.start_billing_after_mod
+    description: QuintoCred rental guarantee attribute describing mod start billing after in the policy lifecycle.
   mod_realtor:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.realtor_mod
+    description: QuintoCred rental guarantee attribute describing mod realtor in the policy lifecycle.
   mod_real_estate:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.realestate_mod
+    description: QuintoCred rental guarantee attribute describing mod real estate in the policy lifecycle.
   mod_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.propose_mod
+    description: QuintoCred rental guarantee attribute describing mod propose in the policy lifecycle.
   mod_dt_next_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.next_renewal_date_mod
+    description: QuintoCred rental guarantee attribute describing mod dt next renewal in the policy lifecycle.
   mod_maintenant:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.maintenant_mod
+    description: QuintoCred rental guarantee attribute describing mod maintenant in the policy lifecycle.
   mod_financial_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.financial_status_mod
+    description: QuintoCred rental guarantee attribute describing mod financial status in the policy lifecycle.
   mod_done:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.done_mod
+    description: QuintoCred rental guarantee attribute describing mod done in the policy lifecycle.
   mod_delinquent:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.delinquent_mod
+    description: QuintoCred rental guarantee attribute describing mod delinquent in the policy lifecycle.
   mod_current_payment_method:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.current_payment_method_mod
+    description: QuintoCred rental guarantee attribute describing mod current payment method in the policy lifecycle.
   mod_company_plan:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.company_plan_mod
+    description: QuintoCred rental guarantee attribute describing mod company plan in the policy lifecycle.
   mod_begin:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.begin_mod
+    description: QuintoCred rental guarantee attribute describing mod begin in the policy lifecycle.
   mod_ts_bad_debt_at:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.bad_debt_at_mod
+    description: QuintoCred rental guarantee attribute describing mod ts bad debt at in the policy lifecycle.
   mod_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.active_mod
+    description: QuintoCred rental guarantee attribute describing mod active in the policy lifecycle.
   mod_activator:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.activator_mod
+    description: QuintoCred rental guarantee attribute describing mod activator in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.active
+    description: Indicates whether active applies to this financial record.
   is_delinquent:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.delinquent
+    description: Indicates whether delinquent applies to this financial record.
   dt_next_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.next_renewal_date
+    description: Calendar date associated with next renewal in the financial workflow.
   dt_start_billing_after:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.start_billing_after
+    description: Calendar date associated with start billing after in the financial workflow.
   ts_began:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.begin
+    description: Timestamp when began occurred in the upstream fintech system.
   ts_done:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.done
+    description: Timestamp when done occurred in the upstream fintech system.
   ts_bad_debt_at:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.bad_debt_at
+    description: Timestamp when bad debt at occurred in the upstream fintech system.
   ts_inserted:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract_aud.dateupdate
+    description: Timestamp when updated occurred in the upstream fintech system.
