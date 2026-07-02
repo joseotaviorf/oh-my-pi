@@ -1,92 +1,117 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: agreement_payment_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per agreement payment aud in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_bank_payment:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.bank_payment_id
+    description: Identifier for the bank payment referenced by this financial record.
   id_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.agreement_id
+    description: Identifier for the agreement referenced by this financial record.
   billing_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.billing_type
+    description: QuintoCred rental guarantee attribute describing billing type in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   source_system:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.source_system
+    description: QuintoCred rental guarantee attribute describing source system in the policy lifecycle.
   payment_code:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.payment_code
+    description: QuintoCred rental guarantee attribute describing payment code in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.value
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   paid_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.paid_value
+    description: QuintoCred rental guarantee attribute describing paid value in the policy lifecycle.
   mod_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.value_mod
+    description: QuintoCred rental guarantee attribute describing mod value in the policy lifecycle.
   mod_paid_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.paid_value_mod
+    description: QuintoCred rental guarantee attribute describing mod paid value in the policy lifecycle.
   mod_due_date:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.due_date_mod
+    description: QuintoCred rental guarantee attribute describing mod due date in the policy lifecycle.
   mod_paid_date:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.paid_date_mod
+    description: QuintoCred rental guarantee attribute describing mod paid date in the policy lifecycle.
   mod_billing_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.billing_type_mod
+    description: QuintoCred rental guarantee attribute describing mod billing type in the policy lifecycle.
   mod_statua:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.status_mod
+    description: QuintoCred rental guarantee attribute describing mod statua in the policy lifecycle.
   mod_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.agreement_mod
+    description: QuintoCred rental guarantee attribute describing mod agreement in the policy lifecycle.
   mod_source_system:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.source_system_mod
+    description: QuintoCred rental guarantee attribute describing mod source system in the policy lifecycle.
   mod_id_bank_payment:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.bank_payment_id_mod
+    description: QuintoCred rental guarantee attribute describing mod id bank payment in the policy lifecycle.
   mod_payment_code:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.payment_code_mod
+    description: QuintoCred rental guarantee attribute describing mod payment code in the policy lifecycle.
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.due_date
+    description: Calendar date associated with due in the financial workflow.
   dt_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.paid_date
+    description: Calendar date associated with paid in the financial workflow.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.agreement_payment_aud.created_at
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.agreement_payment_aud.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.agreement_payment_aud.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.agreement_payment_aud.day
+    description: Timestamp when created occurred in the upstream fintech system.

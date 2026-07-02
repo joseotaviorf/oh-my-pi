@@ -1,92 +1,114 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: bill_aud
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per bill aud in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   code:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.code
+    description: QuintoCred rental guarantee attribute describing code in the policy lifecycle.
   mod_code:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.code_mod
+    description: QuintoCred rental guarantee attribute describing mod code in the policy lifecycle.
   file_url:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.file_url
+    description: QuintoCred rental guarantee attribute describing file url in the policy lifecycle.
   mod_file_url:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.file_url_mod
+    description: QuintoCred rental guarantee attribute describing mod file url in the policy lifecycle.
   due_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.due_amount
+    description: QuintoCred rental guarantee attribute describing due amount in the policy lifecycle.
   mod_due_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.due_amount_mod
+    description: QuintoCred rental guarantee attribute describing mod due amount in the policy lifecycle.
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.due_date
+    description: Calendar date associated with due in the financial workflow.
   mod_due_date:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.due_date_mod
-  dt_paid:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.boleto_aud.paid_at
+    description: QuintoCred rental guarantee attribute describing mod due date in the policy lifecycle.
   mod_paid_at:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.paid_at_mod
+    description: QuintoCred rental guarantee attribute describing mod paid at in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   mod_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.status_mod
+    description: QuintoCred rental guarantee attribute describing mod status in the policy lifecycle.
   business_context:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.business_context
+    description: QuintoCred rental guarantee attribute describing business context in the policy lifecycle.
   mod_business_context:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.business_context_mod
+    description: QuintoCred rental guarantee attribute describing mod business context in the policy lifecycle.
   raw_request:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.raw_request
+    description: QuintoCred rental guarantee attribute describing raw request in the policy lifecycle.
   mod_raw_request:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.raw_request_mod
+    description: QuintoCred rental guarantee attribute describing mod raw request in the policy lifecycle.
   raw_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.raw_response
+    description: QuintoCred rental guarantee attribute describing raw response in the policy lifecycle.
   mod_raw_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.raw_response_mod
-  external_id:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.boleto_aud.external_id
+    description: QuintoCred rental guarantee attribute describing mod raw response in the policy lifecycle.
   mod_external_id:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto_aud.external_id_mod
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.boleto_aud.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.boleto_aud.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.boleto_aud.day
+    description: QuintoCred rental guarantee attribute describing mod external id in the policy lifecycle.
+  ts_paid:
+    lineage: []
+    description: Timestamp when paid occurred in the upstream fintech system.
+  id_external:
+    lineage: []
+    description: Identifier for the external referenced by this financial record.

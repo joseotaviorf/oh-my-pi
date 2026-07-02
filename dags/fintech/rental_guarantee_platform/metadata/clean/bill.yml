@@ -1,59 +1,83 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: bill
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per bill in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_external:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.external_id
+    description: Identifier for the external referenced by this financial record.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   code:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.code
+    description: QuintoCred rental guarantee attribute describing code in the policy lifecycle.
   file_url:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.file_url
+    description: QuintoCred rental guarantee attribute describing file url in the policy lifecycle.
   due_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.due_amount
-  due_date:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.boleto.due_date
+    description: QuintoCred rental guarantee attribute describing due amount in the policy lifecycle.
   ts_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   business_context:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.business_context
+    description: QuintoCred rental guarantee attribute describing business context in the policy lifecycle.
   raw_request:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.raw_request
+    description: QuintoCred rental guarantee attribute describing raw request in the policy lifecycle.
   raw_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.raw_response
+    description: QuintoCred rental guarantee attribute describing raw response in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_credit:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.credit_at
+    description: Timestamp when credit occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.day
+    description: Day partition derived from the source event timestamp for incremental loading.
+  dt_due:
+    lineage: []
+    description: Calendar date associated with due in the financial workflow.

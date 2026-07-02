@@ -1,53 +1,77 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: address
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per address in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   zip_code:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.zip_code
+    description: QuintoCred rental guarantee attribute describing zip code in the policy lifecycle.
   street:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.street
+    description: QuintoCred rental guarantee attribute describing street in the policy lifecycle.
   complement:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.complement
+    description: QuintoCred rental guarantee attribute describing complement in the policy lifecycle.
   neighborhood:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.neighborhood
+    description: QuintoCred rental guarantee attribute describing neighborhood in the policy lifecycle.
   city:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.city
+    description: QuintoCred rental guarantee attribute describing city in the policy lifecycle.
   state:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.state
+    description: QuintoCred rental guarantee attribute describing state in the policy lifecycle.
   country:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.country
+    description: QuintoCred rental guarantee attribute describing country in the policy lifecycle.
   address_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.address_type
+    description: QuintoCred rental guarantee attribute describing address type in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   number:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.number
+    description: QuintoCred rental guarantee attribute describing number in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.address.day
+    description: Day partition derived from the source event timestamp for incremental loading.

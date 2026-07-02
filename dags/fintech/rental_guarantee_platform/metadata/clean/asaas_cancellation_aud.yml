@@ -1,81 +1,112 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: asaas_cancellation_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per asaas cancellation aud in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_asaas_customer:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.asaas_customer_id
+    description: Identifier for the asaas customer referenced by this financial record.
   id_asaas_subscription:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_subscription_id
+    description: Identifier for the asaas subscription referenced by this financial record.
   id_batch:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.batch_id
-  propose:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.propose
+    description: Identifier for the batch referenced by this financial record.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   event:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.event
+    description: QuintoCred rental guarantee attribute describing event in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   raw_request:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_request
+    description: QuintoCred rental guarantee attribute describing raw request in the policy lifecycle.
   raw_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_response
+    description: QuintoCred rental guarantee attribute describing raw response in the policy lifecycle.
   mod_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.status_mod
+    description: QuintoCred rental guarantee attribute describing mod status in the policy lifecycle.
   mod_event:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.event_mod
+    description: QuintoCred rental guarantee attribute describing mod event in the policy lifecycle.
   mod_id_asaas_customer:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.asaas_customer_id_mod
+    description: QuintoCred rental guarantee attribute describing mod id asaas customer in the policy lifecycle.
   mod_id_asaas_subscription:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.asaas_subscription_id_mod
+    description: QuintoCred rental guarantee attribute describing mod id asaas subscription in the policy lifecycle.
   mod_raw_request:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_request_mod
+    description: QuintoCred rental guarantee attribute describing mod raw request in the policy lifecycle.
   mod_raw_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_response_mod
+    description: QuintoCred rental guarantee attribute describing mod raw response in the policy lifecycle.
   mod_ts_canceled:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.canceled_at_mod
+    description: QuintoCred rental guarantee attribute describing mod ts canceled in the policy lifecycle.
   mod_ts_reversed:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.reversed_at_mod
+    description: QuintoCred rental guarantee attribute describing mod ts reversed in the policy lifecycle.
   mod_id_batch:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.batch_id_mod
+    description: QuintoCred rental guarantee attribute describing mod id batch in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_canceled:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.canceled_at
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_reversed:
     lineage:
       - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.reversed_at
+    description: Timestamp when reversed occurred in the upstream fintech system.
+  id_propose:
+    lineage: []
+    description: Identifier for the propose referenced by this financial record.
