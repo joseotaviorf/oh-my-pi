@@ -1,28 +1,39 @@
+---
 database_name: datalake_gsheets_clean
 table_name: ticket_rate_classification
-domain: Cross
+owner: gabriel.firmino@quintoandar.com.br
+domain: Support and Services
+description: Customer support ticket taxonomy and journey classification reference. Static lookup used by Support and Services to map macro and micro taxonomies to journeys and owners.
 columns:
   macro_taxonomy:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.macro_taxonomy
+    description: High-level support ticket taxonomy grouping related micro taxonomies.
   micro_taxonomy:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.micro_taxonomy
+    description: Detailed support ticket taxonomy code used in ticket rate classification.
   journey:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.journey
+    description: Customer journey stage associated with the ticket taxonomy classification.
   sub_journey:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.sub_journey
+    description: Sub-journey within the customer journey linked to the ticket taxonomy.
   line_owner:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.line_owner
+    description: Business line owner responsible for tickets in this taxonomy classification.
   micro_taxonomy_description:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.micro_taxonomy_description
+    description: Human-readable description of the micro taxonomy ticket classification.
   ops_focal_point:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.ops_focal_point
+    description: Operations focal point team accountable for tickets in this taxonomy.
   is_active:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.is_active
+    description: Boolean flag indicating whether the taxonomy classification is currently active.

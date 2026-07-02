@@ -1,64 +1,67 @@
+---
 database_name: datalake_gsheets_clean
 table_name: supply_targets_retro_2
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Retrospective Growth supply funnel targets (version 2) by city group and planning dimensions. Captures planned volumes across prospects, qualifieds, and first listings.
 columns:
   dt_target:
-    description: Date of the target.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.date
+    description: Reference date identifying the retrospective supply target period for the row.
   city_group:
-    description: City group.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.city_group
+    description: QuintoAndar city group associated with the retrospective supply targets.
   lead_processing_operation:
-    description: Operation that processed the listing lead.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.lead_processing_operation
+    description: Operation team or workflow that processed the listing lead for the target row.
   supply_mkt_origin_detailed:
-    description: Market origin of the lead.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.supply_mkt_origin_detailed
+    description: Detailed marketing origin of the owner lead used in supply target planning.
   planning_taxonomy:
-    description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.planning_taxonomy
+    description: Planning taxonomy combining supply marketing origin and medium channel for the row.
   rental_administrator:
-    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.rental_administrator
+    description: Contract administrator responsible for the listing (QuintoAndar, third party, or brokerage only).
   planning_conversion:
-    description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.planning_conversion
+    description: Detailed conversion operation type, distinguishing Inside Sales inbound, outbound, and expert flows.
   planning_operation:
-    description: Identifies the conversion operation type.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.planning_operation
+    description: High-level conversion operation type associated with the supply target row.
   planning_cluster:
-    description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.planning_cluster
+    description: Channel cluster for affiliates or medium for Owner PWA and price calculator flows.
   company_report_origin:
-    description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.company_report_origin
+    description: Acquisition channel for IS and FSS operations or conversion source for CIQ, Rede, and Captaí flows.
   prospects:
-    description: Target volume of prospects.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.prospects
+    description: Retrospective target count of owner prospects entering the supply funnel.
   qualifieds:
-    description: Target volume of qualifieds.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.qualifieds
+    description: Retrospective target count of owner leads qualified for listing in the supply funnel.
   opportunities:
-    description: Target volume of opportunities.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.opportunities
+    description: Retrospective target count of supply opportunities created from qualified owner leads.
   available_qualifieds:
-    description: Target volume of available qualifieds.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.available_qualifieds
+    description: Retrospective target count of qualified owner leads with an available property to list.
   first_listings:
-    description: Target volume of first listings.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_2.first_listings
+    description: Retrospective target count of first listings published from the supply funnel.

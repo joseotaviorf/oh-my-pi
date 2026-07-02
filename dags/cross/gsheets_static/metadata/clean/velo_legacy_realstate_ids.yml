@@ -1,11 +1,15 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: velo_legacy_realstate_ids
-domain: Cross
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Mapping between legacy Velo real estate identifiers and current QuintoAndar real estate IDs. Static reference used by Cross integrations to reconcile historical Velo records.
 columns:
   id_realstate_legacy:
     lineage:
       - datalake_gsheets_raw.velo_legacy_realstate_ids.id_real_state_legacy
+    description: Legacy Velo real estate identifier from the pre-migration system.
   id_real_state_new:
     lineage:
       - datalake_gsheets_raw.velo_legacy_realstate_ids.id_real_state_new
+    description: Current QuintoAndar real estate identifier corresponding to the legacy Velo record.

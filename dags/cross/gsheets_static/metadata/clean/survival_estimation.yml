@@ -1,37 +1,51 @@
+---
 database_name: datalake_gsheets_clean
 table_name: survival_estimation
+owner: gustavo.silva@quintoandar.com.br
 domain: Cross
+description: Rental contract survival estimation curves by cohort month. Static reference used by Cross analytics to model retention and churn across first rentals and re-rentals.
 columns:
   first_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation.first_rentals
+    description: Count of first rental contracts in the survival estimation cohort.
   contract_start_month:
     lineage:
       - datalake_gsheets_raw.survival_estimation.contract_start_month
+    description: Month when contracts in the cohort started, used as the survival analysis anchor.
   months_after:
     lineage:
       - datalake_gsheets_raw.survival_estimation.months_after
+    description: Number of months elapsed after the contract start month in the survival curve.
   months_after_first_contract:
     lineage:
       - datalake_gsheets_raw.survival_estimation.months_after_first_contract
+    description: Number of months elapsed after the tenant first contract in the survival curve.
   total_re_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation.total_re_rentals
+    description: Total count of re-rental contracts observed in the survival estimation cohort.
   total_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation.total_rentals
+    description: Total count of rental contracts observed in the survival estimation cohort.
   ended_first_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation.ended_first_rentals
+    description: Count of ended first rental contracts at the given months-after interval.
   ended_re_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation.ended_re_rentals
+    description: Count of ended re-rental contracts at the given months-after interval.
   ended_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation.ended_rentals
+    description: Count of all ended rental contracts at the given months-after interval.
   year:
     lineage:
       - datalake_gsheets_raw.survival_estimation.year
+    description: Calendar year associated with the survival estimation reference data.
   dt_last_updated:
     lineage:
       - datalake_gsheets_raw.survival_estimation.dt_last_updated
+    description: Date when the survival estimation spreadsheet was last updated.

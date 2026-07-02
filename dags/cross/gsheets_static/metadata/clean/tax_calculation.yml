@@ -1,46 +1,63 @@
+---
 database_name: datalake_gsheets_clean
 table_name: tax_calculation
-domain: Cross
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Tax calculation parameters by entity, city, and general ledger account. Static reference used by Fintech and finance teams to map ISS, PIS, and COFINS rates and accounts.
 columns:
   gl_acctbp_code:
     lineage:
       - datalake_gsheets_raw.tax_calculation.gl_acctbp_code
+    description: General ledger account code used in tax calculation mapping.
   name:
     lineage:
       - datalake_gsheets_raw.tax_calculation.name
+    description: Descriptive name of the general ledger account or tax calculation row.
   grouper:
     lineage:
       - datalake_gsheets_raw.tax_calculation.agrupador1
+    description: Primary grouping category for tax calculation classification.
   subgrouper:
     lineage:
       - datalake_gsheets_raw.tax_calculation.agrupador2
+    description: Secondary grouping category within the primary tax calculation grouper.
   fs_grouper:
     lineage:
       - datalake_gsheets_raw.tax_calculation.fs_grouper
+    description: Financial statement grouper used to aggregate tax calculation accounts.
   entity_code:
     lineage:
       - datalake_gsheets_raw.tax_calculation.entity_code
+    description: Legal entity code associated with the tax calculation parameters.
   city:
     lineage:
       - datalake_gsheets_raw.tax_calculation.city
+    description: City where the tax rates and accounts apply for the entity.
   regime:
     lineage:
       - datalake_gsheets_raw.tax_calculation.regime
+    description: Tax regime classification governing the applicable rates and accounts.
   iss_rate:
     lineage:
       - datalake_gsheets_raw.tax_calculation.iss_rate
+    description: ISS tax rate percentage applicable to the account and entity combination.
   pis_rate:
     lineage:
       - datalake_gsheets_raw.tax_calculation.pis_rate
+    description: PIS tax rate percentage applicable to the account and entity combination.
   cofins_rate:
     lineage:
       - datalake_gsheets_raw.tax_calculation.cof_rate
+    description: COFINS tax rate percentage applicable to the account and entity combination.
   iss_account:
     lineage:
       - datalake_gsheets_raw.tax_calculation.iss_account
+    description: General ledger account code used to book ISS tax amounts.
   pis_account:
     lineage:
       - datalake_gsheets_raw.tax_calculation.pis_account
+    description: General ledger account code used to book PIS tax amounts.
   cofins_account:
     lineage:
       - datalake_gsheets_raw.tax_calculation.cofins_account
+    description: General ledger account code used to book COFINS tax amounts.

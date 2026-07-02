@@ -1,72 +1,75 @@
+---
 database_name: datalake_gsheets_clean
 table_name: supply_targets_retro_cohort
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Retrospective Growth supply funnel targets by cohort week and planning dimensions. Captures planned conversion volumes across prospects, qualifieds, and first listings.
 columns:
   dt_week_started:
-    description: Week of the target.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.week_start
+    description: Reference week start date identifying the retrospective cohort supply target period.
   city_group:
-    description: City group.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.city_group
+    description: QuintoAndar city group associated with the retrospective cohort supply targets.
   lead_processing_operation:
-    description: Operation that processed the listing lead.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.lead_processing_operation
+    description: Operation team or workflow that processed the listing lead for the cohort target row.
   supply_mkt_origin_detailed:
-    description: Market origin of the listing lead.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.supply_mkt_origin_detailed
+    description: Detailed marketing origin of the owner lead used in cohort supply target planning.
   planning_taxonomy:
-    description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.planning_taxonomy
+    description: Planning taxonomy combining supply marketing origin and medium channel for the cohort row.
   rental_administrator:
-    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.rental_administrator
+    description: Contract administrator responsible for the listing (QuintoAndar, third party, or brokerage only).
   planning_conversion:
-    description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.planning_conversion
+    description: Detailed conversion operation type, distinguishing Inside Sales inbound, outbound, and expert flows.
   planning_operation:
-    description: Identifies the conversion operation type.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.planning_operation
+    description: High-level conversion operation type associated with the cohort supply target row.
   planning_cluster:
-    description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.planning_cluster
+    description: Channel cluster for affiliates or medium for Owner PWA and price calculator flows.
   company_report_origin:
-    description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.company_report_origin
+    description: Acquisition channel for IS and FSS operations or conversion source for CIQ, Rede, and Captaí flows.
   weeks_conversion:
-    description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.weeks_conversion
+    description: Cohort week indicator representing elapsed weeks between funnel events (W0, W1, and so on).
   op2q:
-    description: Target volume of owner prospects that converted into a qualified in the cohort.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.op2q
+    description: Cohort target volume of owner prospects that converted into qualified leads.
   q2opp:
-    description: Target volume of qualifieds that converted into an opportunity in the cohort.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.q2opp
+    description: Cohort target volume of qualified leads that converted into supply opportunities.
   opp2fl:
-    description: Target volume of opportunities that converted into a first listing in the cohort.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.opp2fl
+    description: Cohort target volume of opportunities that converted into first listings published.
   q2avq:
-    description: Target volume of qualifieds that converted into an available qualified in the cohort.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.q2avq
+    description: Cohort target volume of qualified leads that converted into available qualifieds.
   avq2opp:
-    description: Target volume of available qualifieds that converted into an opportunity in the cohort.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.avq2opp
+    description: Cohort target volume of available qualifieds that converted into supply opportunities.
   fl:
-    description: Target volume of first listings.
     lineage:
       - datalake_gsheets_raw.supply_targets_retro_cohort.fl
+    description: Cohort target volume of first listings published in the reference period.

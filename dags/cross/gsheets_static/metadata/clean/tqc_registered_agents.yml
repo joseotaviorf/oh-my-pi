@@ -1,16 +1,23 @@
+---
 database_name: datalake_gsheets_clean
 table_name: tqc_registered_agents
-domain: Cross
+owner: gustavo.rompe@quintoandar.com.br
+domain: Agents
+description: TQC program registered agents and their enrollment phase. Static reference used by Agents operations to track agent participation in the TQC training program.
 columns:
   agent_email:
     lineage:
       - datalake_gsheets_raw.tqc_registered_agents.agent_email
+    description: Email address of the real estate agent registered in the TQC program.
   agent_cpf:
     lineage:
       - datalake_gsheets_raw.tqc_registered_agents.agent_cpf
+    description: Brazilian CPF tax identifier of the registered TQC agent.
   program_phase:
     lineage:
       - datalake_gsheets_raw.tqc_registered_agents.program_phase
+    description: Current phase or stage of the agent within the TQC program curriculum.
   ts_subscription:
     lineage:
       - datalake_gsheets_raw.tqc_registered_agents.subscription_date
+    description: Timestamp when the agent subscribed or enrolled in the TQC program.
