@@ -60,4 +60,4 @@ columns:
     lineage:
     - datalake_batch_inference_clean.batch_inference.input_data
     description: Date when the machine learning inference was run; partition key for incremental scoring loads.
-owner: gabriel.salla@quintoandar.com
+owner: vinicius.araujo@quintoandar.com

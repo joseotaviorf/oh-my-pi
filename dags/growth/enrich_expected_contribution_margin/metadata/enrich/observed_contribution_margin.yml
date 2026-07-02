@@ -64,4 +64,4 @@ columns:
     - datalake_losses.fact_provision.id_contract
     - datalake_losses.fact_provision.dt_closing
     description: The contribution margin that the (contract, month) generated to QuintoAndar.
-owner: gabriel.salla@quintoandar.com
+owner: vinicius.araujo@quintoandar.com

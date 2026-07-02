@@ -1,0 +1,93 @@
+database_name: datalake_expected_contribution_margin
+table_name: expected_contribution_margin
+domain: Growth
+description: |
+  Curated enrich table with online expected contribution margin projections emitted by
+  EMLIO for the eltv and for-sale-ecm services. One row per inference request
+  (id_request), with flattened keys, margin estimates, and semi-structured request and
+  features payloads for Growth analytics and model monitoring.
+columns:
+  id_request:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Unique identifier of the EMLIO inference request, equivalent to the source log uuid.
+  id_service:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.id_service
+    description: EMLIO service identifier that produced the projection (eltv or for-sale-ecm).
+  id_house:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: QuintoAndar property identifier associated with the margin projection request.
+  id_user:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: User identifier associated with the margin projection request.
+  ecm_version:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Version of the online ECM model configuration used for the inference.
+  service_version:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.service_version
+    description: Version of the EMLIO service that generated the log entry.
+  estimated_gross_revenue:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Projected gross revenue returned by the online ECM service before taxes and revenue sharing.
+  estimated_net_revenue:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Projected net revenue after sales tax and brokerage revenue sharing deductions.
+  estimated_contribution_margin:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Projected contribution margin after revenue and operational cost adjustments.
+  estimated_conversion_probability:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Estimated probability of conversion associated with the projection request.
+  estimated_discount:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Estimated discount rate applied to the listing price in the margin model.
+  estimated_duration:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Estimated contract or funnel duration used by the margin model, in model-native units.
+  estimated_default_probability:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Estimated probability of default used in the contribution margin calculation.
+  ts_event:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+      - datalake_emlio_clean.emlio_logs.ts_log
+    description: |
+      Timestamp of the demand funnel event that triggered the ECM inference. Falls back
+      to ts_log for legacy for-sale-ecm logs that use the deprecated flat JSON structure.
+  features:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: |
+      JSON string with the model feature vector sent to the online ECM service. Used by
+      model monitoring and drift jobs; parse at consumption time with a version-specific schema.
+  request:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: |
+      JSON string with the inference request context (event_type, UTM, risk_category,
+      analysis result, timestamps, and related fields). Null for legacy for-sale-ecm logs.
+  year:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.year
+    description: Partition year of the source EMLIO log record.
+  month:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.month
+    description: Partition month of the source EMLIO log record.
+  day:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.day
+    description: Partition day of the source EMLIO log record.
+owner: vinicius.araujo@quintoandar.com

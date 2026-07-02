@@ -15,4 +15,4 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract
     description: The survival probability (survival curve) for a given _quarter_ and _days_since_start_.
-owner: gabriel.salla@quintoandar.com
+owner: vinicius.araujo@quintoandar.com

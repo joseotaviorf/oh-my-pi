@@ -1,14 +1,19 @@
 dag:
   name: enrich_expected_contribution_margin
-  owner: MLOps
+  owner: Data Growth
   schedule_start_date: 2024, 01, 01
   documentation:
-    dag_purpose: Computes the observed and expected contribution margin of the 4Rent contracts.
+    dag_purpose: Computes the observed and expected contribution margin for the Rent and Sale ECM services.
 workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
   tables_customization:
+    expected_contribution_margin:
+      partitions: [year, month, day]
+      extra_query_template_params:
+        load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_end_date') }}"
     expected_contribution_margin_by_event:
       partitions: [dt_event_time]
       extra_query_template_params:
