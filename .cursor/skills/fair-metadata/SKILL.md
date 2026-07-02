@@ -49,7 +49,7 @@ Run on **every file in the closed scope inventory** before the PLAN deliverable 
 | Gate | What | Tool |
 |------|------|------|
 | **A — Owners** | Every distinct `owner:` disposition recorded (ACTIVE via Trino, replacement, or UNVERIFIED in plan) | [`owner_remediation.md`](reference/owner_remediation.md) + owner SQL |
-| **B — Descriptions** | Substantive **table** (F2-01) + **column** (F2-02) descriptions on **clean / core / enrich / dw / metric** | `make audit-fair-metadata-scope domain=…` or `--audit --domain …` |
+| **B — Descriptions** | Substantive, **business-meaningful** **table** (F2-01) + **column** (F2-02) descriptions on **clean / core / enrich / dw / metric** — reviewed against the swap test, not only script failures | `make audit-fair-metadata-scope domain=…` or `--audit --domain …` **plus** the manual review in [`description_remediation.md`](reference/description_remediation.md) |
 | **C — Physical Layout** | Partition/z-order from declaration reflected in metadata descriptions (**all layers**) | Read `*_declaration.yml` + metadata — see **Gate C** below |
 | **Raw (optional)** | Column docs on raw encouraged, **not required** | Scope audit prints a raw summary only — never blocks |
 
@@ -63,17 +63,21 @@ For **each metadata file in scope** (any layer — raw, clean, core, enrich, dw,
 
 1. Read the DAG `*_declaration.yml` in the same folder.
 2. Infer layer from the metadata path (`metadata/raw/` → raw, `metadata/clean/` → clean, etc.).
-3. Resolve effective **partitions** and **z-order** for that layer:
-   - **raw:** `raw_partitions` → `partitions` → `default_raw_partitions` → `default_partitions`
-   - **clean:** `clean_partitions` → `partitions` → `default_clean_partitions` → `default_partitions`
-   - **core / enrich / dw / metric:** `partitions` → `default_partitions`
-   - **z-order (raw):** `raw_z_order_by` → `z_order_by`
-   - **z-order (clean):** `clean_z_order_by` → `z_order_by`
-   - **z-order (other layers):** `z_order_by`
-   - Table-level keys in `tables_customization` override workflow defaults.
+3. Resolve effective **partitions** and **z-order** for that layer. **Always look in `workflow.tables_customization.<table_name>` first** — most partition/z-order config lives there, per-table, not at the workflow root. Precedence (first key found wins), verified against the DAG builder source (re-check these files if this table and the code ever diverge):
+
+   | Config | Precedence (first match wins) | Source of truth |
+   |--------|-------------------------------|------------------|
+   | Partitions — raw | `tables_customization.<table>.raw_partitions` → `tables_customization.<table>.partitions` → workflow-root `default_raw_partitions` → workflow-root `default_partitions` → `[]` | `table_attributes.py::_get_partitions` |
+   | Partitions — clean | `tables_customization.<table>.clean_partitions` → `tables_customization.<table>.partitions` → workflow-root `default_clean_partitions` → workflow-root `default_partitions` → `[]` | same |
+   | Partitions — core / enrich / dw / metric | `tables_customization.<table>.partitions` → workflow-root `default_partitions` → `[]` | same |
+   | Z-order — raw | `tables_customization.<table>.raw_z_order_by` → `tables_customization.<table>.z_order_by` → `[]` | `optimize_delta_table_task_creator.py::_build_tables_config` |
+   | Z-order — clean | `tables_customization.<table>.clean_z_order_by` → `tables_customization.<table>.z_order_by` → `[]` | same |
+   | Z-order — core / enrich / dw / metric | `tables_customization.<table>.z_order_by` → `[]` | same |
+
+   **Z-order has no workflow-root fallback — ever.** Unlike partitions (which can be set once at the workflow root as `default_partitions` / `default_raw_partitions` / `default_clean_partitions` and apply to every table), z-order keys (`z_order_by`, `raw_z_order_by`, `clean_z_order_by`) only exist inside `tables_customization.<table_name>`. If you check only the workflow root and don't find a z-order key there, that does **not** mean z-order is unset — you must open `tables_customization.<table_name>` for that specific table before concluding there is none. This is the most common way Gate C gets missed: an agent finds `default_partitions` at the workflow root, documents partitions, and stops — without also opening `tables_customization.<table_name>` to check for a per-table `z_order_by`/`clean_z_order_by`/`raw_z_order_by`.
 4. If both lists are empty → **SKIP**.
 5. Otherwise, check that metadata **descriptions** mention those columns and advise filtering on them (partition pruning, z-order data skipping). Table `description` should summarize the layout when config exists.
-6. **Example:** `dags/growth/hightouch_logs/metadata/clean/sync_runs_trino.yml`.
+6. **Example:** `dags/growth/hightouch_logs/metadata/clean/sync_runs_trino.yml` — its declaration (`dags/growth/hightouch_logs/hightouch_logs_declaration.yml`) sets `partitions: [year, month, day]` and `clean_z_order_by: [id_sync]` both under `tables_customization.sync_runs_trino`, not at the workflow root.
 
 On EXECUTE: append layout guidance to existing column/table descriptions — do not replace business semantics. Do not invent columns not present in the declaration. Follow **YAML shape** in [`reference/description_remediation.md`](reference/description_remediation.md) so `validate-fair-metadata` can parse the file (invalid YAML fails CI before F2 checks).
 
@@ -90,7 +94,7 @@ uv run --project packages/bietlejuice-runtime python \
 make audit-fair-metadata-scope fqn=datalake_metabase_clean.metabase_table
 ```
 
-**Done criteria:** Gate A disposition — no MISSING `owner:` without user decision; each owner ACTIVE (Trino), replaced via AskQuestion, or UNVERIFIED with PLAN acknowledgment **recorded in the remediation plan** (UNVERIFIED ≠ ACTIVE). Gate B — 0 F2-01/F2-02 description failures in clean+; Gate C — 0 tables with declaration layout config missing partition/z-order docs in metadata.
+**Done criteria:** Gate A disposition — no MISSING `owner:` without user decision; each owner ACTIVE (Trino), replaced via AskQuestion, or UNVERIFIED with PLAN acknowledgment **recorded in the remediation plan** (UNVERIFIED ≠ ACTIVE). Gate B — 0 F2-01/F2-02 description failures in clean+ **and** every existing description in scope has been read and passed against the swap test in [`description_remediation.md`](reference/description_remediation.md) (script PASS alone does not satisfy Gate B — see that file's "heuristic is a floor" section); Gate C — 0 tables with declaration layout config missing partition/z-order docs in metadata.
 
 ---
 
@@ -168,6 +172,8 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
 - Skip owners in the inventory (“most are fine”)
 - Document columns on `metadata/raw/` or restore `-pii`/`-confidential` tags there
 - Use governance-lake filler to pass F2-02
+- Write templated filler that only clears the length/word heuristic (e.g. `"Business attribute from $table $layer."` with the identifier swapped in) — see the swap test in [`description_remediation.md`](reference/description_remediation.md)
+- Treat "0 F2-01/F2-02 failures" as Gate B done — existing descriptions that already pass but fail the swap test still need rewriting
 - Guess owners or substitute without **AskQuestion**
 - Treat Trino/owner **AskQuestion** as execute approval — post the plan and wait for a separate explicit execute message
 - Mark owners UNVERIFIED without calling **`mcp_auth`** when Trino MCP is enabled

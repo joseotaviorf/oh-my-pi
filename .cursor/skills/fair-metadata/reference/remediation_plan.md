@@ -6,16 +6,7 @@ Enforced by [`plan_gate.md`](plan_gate.md). Post this plan and **end the turn** 
 
 ### A0. Scope inventory (mandatory first step)
 
-Match user intent exactly ([`scoping.md`](scoping.md)):
-
-| User said | Inventory |
-|-----------|-----------|
-| Domain | All `dags/{domain}/**/metadata/**/*.yml` |
-| Owner | All YAML with that `owner:` |
-| Table / FQN | All layers for `database_name.table_name` |
-| DAG | All `dags/{domain}/{dag}/metadata/**/*.yml` |
-
-Publish: `**Scope:** …` and `**Inventory:** N file(s)`.
+Match user intent exactly — inventory table lives in [`scoping.md`](scoping.md) (do not re-derive it here). Publish: `**Scope:** …` and `**Inventory:** N file(s)`.
 
 ### A1. Local gates (mandatory on full inventory)
 
@@ -56,7 +47,7 @@ If any owner is missing, invalid, or not ACTIVE → **AskQuestion** before EXECU
 | Gate | Status | Notes |
 |------|--------|-------|
 | A Owners | PASS / FAIL | distinct owners: … |
-| B Substantive descriptions | PASS / FAIL | N file(s) failing (F2-01 table + F2-02 columns) |
+| B Substantive descriptions | PASS / FAIL | N file(s) failing F2-01/F2-02; M additional file(s) flagged on swap-test review (script-passing but generic) |
 | C Physical layout | PASS / FAIL | N table(s) missing partition/z-order docs |
 | Raw (optional) | PASS / FAIL | N raw file(s) with columns: |
 
@@ -65,8 +56,10 @@ If any owner is missing, invalid, or not ACTIVE → **AskQuestion** before EXECU
 |-------|--------------|--------|----------|
 
 ### Proposed changes (max ~10 tables / PR)
-| priority | FQN | file path | gate | action |
-|----------|-----|-----------|------|--------|
+| priority | FQN | file path | reason | before → after |
+|----------|-----|-----------|--------|-----------------|
+
+`reason` = `F2 failure` (script-flagged) or `quality improvement` (already passes F2 but fails the swap test — see [`description_remediation.md`](description_remediation.md)). Both kinds are in scope; do not omit `quality improvement` rows just because Gate B shows 0 failures.
 
 **Waiting for your approval before editing any metadata files.**
 ```

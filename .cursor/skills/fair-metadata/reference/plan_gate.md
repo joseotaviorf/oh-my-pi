@@ -15,7 +15,7 @@ Hard stop for **`fair-metadata`**. If you have not completed the checklist below
 
 1. [ ] **Scope resolved** — inventory matches user request (repo folder / YAML `domain:` / owner / table / DAG) per [`scoping.md`](scoping.md) and [`domain_disambiguation.md`](domain_disambiguation.md); count published (`N files`); plan states **scope type**, repo folder (if any), and YAML allowlist value when fixing `domain:`
 2. [ ] **Gate A disposition** — Trino kick-off per [`owner_remediation.md`](owner_remediation.md) (`mcp_auth` when MCP enabled, then owner SQL); every distinct `owner:` addressed: ACTIVE, replacement via **AskQuestion** (missing / invalid / inactive — in PLAN, not EXECUTE), or UNVERIFIED only after kick-off failure with user PLAN acknowledgment (**none skipped**). UNVERIFIED ≠ ACTIVE; does not replace checklist items 5–7.
-3. [ ] **Gate B** — `make audit-fair-metadata-scope …` shows 0 F2-01/F2-02 description failures on clean / core / enrich / dw / metric in scope
+3. [ ] **Gate B** — `make audit-fair-metadata-scope …` shows 0 F2-01/F2-02 description failures on clean / core / enrich / dw / metric in scope, **and** every existing description in scope (not only script failures) has been reviewed against the swap test in [`description_remediation.md`](description_remediation.md); generic-but-passing descriptions listed as `quality improvement` rows in the plan
 4. [ ] **Gate C** — physical layout assessed; failures listed in plan gate summary (see [`SKILL.md`](../SKILL.md) Gate C)
 5. [ ] Posted plan with heading `## FAIR metadata remediation plan` ([`remediation_plan.md`](remediation_plan.md) Phase D)
 6. [ ] Ended PLAN message with **“Waiting for your approval before editing any metadata files.”**
