@@ -9,6 +9,10 @@ columns:
     description: unique identifier of regions.
     lineage:
       - datalake_hub_services_raw.region.id
+  id_city:
+    description: Foreign key referencing the city that this region belongs to.
+    lineage:
+      - datalake_hub_services_raw.region.city_id
   version:
     description: Record version, identifies which records are older or newer.
     lineage:

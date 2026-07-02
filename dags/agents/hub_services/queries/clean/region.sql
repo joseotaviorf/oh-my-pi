@@ -1,6 +1,7 @@
 WITH deduped AS (
     SELECT
         id,
+        city_id,
         version,
         name AS region_name,
         created_at AS ts_created,
@@ -14,6 +15,7 @@ WITH deduped AS (
 )
 SELECT
     id,
+    city_id AS id_city,
     version,
     region_name,
     ts_created,
