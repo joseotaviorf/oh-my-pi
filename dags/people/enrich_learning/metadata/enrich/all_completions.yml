@@ -30,7 +30,7 @@ columns:
     lineage:
     - datalake_learning.lesson_contents.id_pathway
   learning_object_type:
-    description: Type of the learning object.
+    description: Category of the completed learning item, such as course, pathway, or skill plan.
     categories:
       Pathway: Learning path (top-level container); metrics aggregated over all its contents.
       Section: Section within a pathway; metrics aggregated over contents in that section.

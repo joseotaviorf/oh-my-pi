@@ -17,11 +17,11 @@ columns:
     lineage:
     - datalake_degreed_clean.pathway_details.id
   section_title:
-    description: Title of the section.
+    description: Display title of the section grouping related lessons within a learning pathway.
     lineage:
     - datalake_degreed_clean.pathway_details.sections.title
   section_description:
-    description: Description of the section.
+    description: Summary text describing the topics and skills covered across the section lessons.
     lineage:
     - datalake_degreed_clean.pathway_details.sections.description
   section_sequence:

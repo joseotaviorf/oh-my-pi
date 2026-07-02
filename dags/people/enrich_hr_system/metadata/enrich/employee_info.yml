@@ -7,11 +7,11 @@ description: |-
   documented_* columns are official / document-aligned names from HCM; first_social_name and last_social_name are preferred social name parts when present.
 columns:
   id_person:
-    description: Id of the person
+    description: Surrogate key linking enriched employee attributes to the PIN person record.
     lineage:
     - datalake_people.identifier_mapping.id_person
   person_number:
-    description: Person number
+    description: PIN person number uniquely identifying the employee across workforce records.
     lineage:
     - datalake_people.identifier_mapping.person_number
   documented_first_name:
@@ -27,31 +27,31 @@ columns:
     lineage:
     - datalake_pin_core_clean.person_name.documented_full_name
   first_social_name:
-    description: First social name of the employee
+    description: Employee preferred first name used in internal communications and social contexts.
     lineage:
     - datalake_pin_core_clean.person_name.first_social_name
   last_social_name:
-    description: Last social name of the employee
+    description: Employee preferred last name used in internal communications and social contexts.
     lineage:
     - datalake_pin_core_clean.person_name.last_social_name
   mother_name:
-    description: Mother name of the employee
+    description: Full legal name of the employee mother as required for Brazilian HR documentation.
     lineage:
     - datalake_pin_core_clean.person.mother_name
   father_name:
-    description: Father name of the employee
+    description: Full legal name of the employee father when provided in PIN person records.
     lineage:
     - datalake_pin_core_clean.person.father_name
   birth_town:
-    description: Birth town of the employee
+    description: Municipality where the employee was born, as recorded in PIN person records.
     lineage:
     - datalake_pin_core_clean.person.town_of_birth
   birth_state:
-    description: Birth state of the employee
+    description: State or province where the employee was born for demographic reporting.
     lineage:
     - datalake_pin_core_clean.person.region_of_birth
   birth_country:
-    description: Birth country of the employee
+    description: Country of birth for the employee used in compliance and demographic reporting.
     lineage:
     - datalake_pin_core_clean.person.country_of_birth
   dt_birth:

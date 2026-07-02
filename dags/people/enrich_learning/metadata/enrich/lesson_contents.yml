@@ -23,11 +23,11 @@ columns:
     lineage:
     - datalake_degreed_clean.pathway_details.sections.lessons.lesson_id
   id_section:
-    description: Section of the lesson.
+    description: Surrogate key linking the lesson content to its parent section in the learning catalog.
     lineage:
     - datalake_degreed_clean.pathway_details.sections.section_id
   id_pathway:
-    description: Pathway of the section.
+    description: Surrogate key linking the lesson content to the learning pathway it belongs to.
     lineage:
     - datalake_degreed_clean.pathway_details.id
   requirement:
