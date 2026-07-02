@@ -1,5 +1,5 @@
 ---
-database_name: enrich_stale_dags
+database_name: datalake_stale_dags
 table_name: stale_dags
 description: |
   Active, unpaused Airflow DAGs with no successful run in the last month, or whose DAG file
