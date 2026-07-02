@@ -1,42 +1,61 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: delinquency_accounting
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per delinquency accounting in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_agreement_payment:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.agreement_payment_id
+    description: Identifier for the agreement payment referenced by this financial record.
   id_delinquency:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.delinquency_id
+    description: Identifier for the delinquency referenced by this financial record.
   delinquency_paid_amount:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.delinquency_paid_amount
+    description: QuintoCred rental guarantee attribute describing delinquency paid amount in the policy lifecycle.
   interest:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.interest
+    description: QuintoCred rental guarantee attribute describing interest in the policy lifecycle.
   fine:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.fine
+    description: QuintoCred rental guarantee attribute describing fine in the policy lifecycle.
   late_fee:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.late_fee
+    description: QuintoCred rental guarantee attribute describing late fee in the policy lifecycle.
   version:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   condition:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.condition
+    description: QuintoCred rental guarantee attribute describing condition in the policy lifecycle.
   dt_paid:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.paid_date
+    description: Calendar date associated with paid in the financial workflow.
   ts_created:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

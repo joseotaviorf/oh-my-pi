@@ -1,123 +1,169 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: delinquency_aud
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per delinquency aud in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.propose
+    description: Identifier for the propose referenced by this financial record.
   mod_id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.propose_mod
+    description: QuintoCred rental guarantee attribute describing mod id propose in the policy lifecycle.
   id_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.status
+    description: Identifier for the status referenced by this financial record.
   mod_id_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.status_mod
+    description: QuintoCred rental guarantee attribute describing mod id status in the policy lifecycle.
   id_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.type
+    description: Identifier for the type referenced by this financial record.
   mod_id_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.type_mod
+    description: QuintoCred rental guarantee attribute describing mod id type in the policy lifecycle.
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.userupdate
+    description: Identifier for the user update referenced by this financial record.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   subcategory:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory
+    description: QuintoCred rental guarantee attribute describing subcategory in the policy lifecycle.
   mod_subcategory:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory_mod
+    description: QuintoCred rental guarantee attribute describing mod subcategory in the policy lifecycle.
   source:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.source
+    description: QuintoCred rental guarantee attribute describing source in the policy lifecycle.
   mod_source:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.source_mod
+    description: QuintoCred rental guarantee attribute describing mod source in the policy lifecycle.
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.value
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   mod_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.value_mod
+    description: QuintoCred rental guarantee attribute describing mod value in the policy lifecycle.
   original_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.original_value
+    description: QuintoCred rental guarantee attribute describing original value in the policy lifecycle.
   mod_original_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.original_value_mod
+    description: QuintoCred rental guarantee attribute describing mod original value in the policy lifecycle.
   amount_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.amount_paid
+    description: QuintoCred rental guarantee attribute describing amount paid in the policy lifecycle.
   mod_amount_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.amount_paid
+    description: QuintoCred rental guarantee attribute describing mod amount paid in the policy lifecycle.
   bill_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_value
+    description: QuintoCred rental guarantee attribute describing bill value in the policy lifecycle.
   mod_bill_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_value_mod
+    description: QuintoCred rental guarantee attribute describing mod bill value in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.active
+    description: Indicates whether active applies to this financial record.
   mod_is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.active_mod
+    description: QuintoCred rental guarantee attribute describing mod is active in the policy lifecycle.
   is_valid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.valid
+    description: Indicates whether valid applies to this financial record.
   mod_is_valid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.valid_mod
+    description: QuintoCred rental guarantee attribute describing mod is valid in the policy lifecycle.
   is_legacy_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.legacy_agreement
+    description: Indicates whether legacy agreement applies to this financial record.
   mod_is_legacy_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.legacy_agreement_mod
+    description: QuintoCred rental guarantee attribute describing mod is legacy agreement in the policy lifecycle.
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.due_date
+    description: Calendar date associated with due in the financial workflow.
   mod_dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.due_date_mod
+    description: QuintoCred rental guarantee attribute describing mod dt due in the policy lifecycle.
   dt_bill_month:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_month
+    description: Calendar date associated with bill month in the financial workflow.
   mod_dt_bill_month:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_month_mod
+    description: QuintoCred rental guarantee attribute describing mod dt bill month in the policy lifecycle.
   dt_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.payment_date
+    description: Calendar date associated with paid in the financial workflow.
   mod_dt_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.payment_date_mod
+    description: QuintoCred rental guarantee attribute describing mod dt paid in the policy lifecycle.
   dt_payment_scheduled:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.schedule_payment_date
+    description: Calendar date associated with payment scheduled in the financial workflow.
   mod_dt_payment_scheduled:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.schedule_payment_date_mod
+    description: QuintoCred rental guarantee attribute describing mod dt payment scheduled in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

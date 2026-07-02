@@ -1,15 +1,24 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: delinquency
-owner: athos.sampayo@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per delinquency in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.propose
+    description: Identifier for the propose referenced by this financial record.
   id_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.status
@@ -22,6 +31,7 @@ columns:
       "5": "REQUESTED_AGREEMENT - Agreement requested but not confirmed yet"
       "6": "ACTIVE_FALSE - The delinquency has active as false"
       "7": "FORGIVEN - The delinquency was forgiven"
+    description: Identifier for the status referenced by this financial record.
   id_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.type
@@ -33,76 +43,101 @@ columns:
       "4": "RENEWAL - DEPRECATED"
       "5": "RENEWAL_MONTH - represents the monthly bill of renewal, renewals are monthly by default"
       "6": "ACTIVATION_PARTIAL_LINK - represents a partial link activation debt of migrated contract from asaas"
+    description: Identifier for the type referenced by this financial record.
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.userupdate
+    description: Identifier for the user update referenced by this financial record.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.type
+    description: QuintoCred rental guarantee attribute describing type in the policy lifecycle.
   subcategory:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.subcategory
+    description: QuintoCred rental guarantee attribute describing subcategory in the policy lifecycle.
   source:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.source
+    description: QuintoCred rental guarantee attribute describing source in the policy lifecycle.
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.value
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   original_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.original_value
+    description: QuintoCred rental guarantee attribute describing original value in the policy lifecycle.
   amount_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.amount_paid
+    description: QuintoCred rental guarantee attribute describing amount paid in the policy lifecycle.
   bill_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.boleto_value
+    description: QuintoCred rental guarantee attribute describing bill value in the policy lifecycle.
   discount_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.amount_paid
       - datalake_rental_guarantee_platform_raw.delinquency.original_value
+    description: QuintoCred rental guarantee attribute describing discount amount in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.active
+    description: Indicates whether active applies to this financial record.
   is_valid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.valid
+    description: Indicates whether valid applies to this financial record.
   is_legacy_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.legacy_agreement
+    description: Indicates whether legacy agreement applies to this financial record.
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.due_date
+    description: Calendar date associated with due in the financial workflow.
   dt_bill_month:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.boleto_month
+    description: Calendar date associated with bill month in the financial workflow.
   dt_paid:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.payment_date
+    description: Calendar date associated with paid in the financial workflow.
   dt_payment_scheduled:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.schedule_payment_date
+    description: Calendar date associated with payment scheduled in the financial workflow.
   dt_archived:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.active
+    description: Calendar date associated with archived in the financial workflow.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.day
+    description: Day partition derived from the source event timestamp for incremental loading.

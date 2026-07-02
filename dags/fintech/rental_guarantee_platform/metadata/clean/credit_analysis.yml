@@ -1,50 +1,73 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: credit_analysis
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per credit analysis in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_contract:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.propose
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   approved_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.approved_value
+    description: QuintoCred rental guarantee attribute describing approved value in the policy lifecycle.
   decision_text:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.decision_text
+    description: QuintoCred rental guarantee attribute describing decision text in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   request:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.request
+    description: QuintoCred rental guarantee attribute describing request in the policy lifecycle.
   response:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.response
+    description: QuintoCred rental guarantee attribute describing response in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   ts_request:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.request_date
+    description: Timestamp when request occurred in the upstream fintech system.
   ts_response:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.response_date
+    description: Timestamp when response occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.credit_analysis.day
+    description: Day partition derived from the source event timestamp for incremental loading.
