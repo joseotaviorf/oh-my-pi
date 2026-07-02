@@ -1,10 +1,15 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
-    core_nodes:
-      instance_count: 2
     task_nodes:
-      instance_count: 3
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 0
+      target_spot: 3
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
 validation:
   cluster:
     type: consolidation_m_memory_cluster

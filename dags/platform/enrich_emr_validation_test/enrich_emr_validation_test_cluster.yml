@@ -1,2 +1,2 @@
 cluster:
-  type: emr_7_12_med_general_cluster
+  type: emr_7_12_med_general_fleet_cluster

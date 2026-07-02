@@ -1,12 +1,19 @@
 cluster:
-  type: emr_7_12_consolidation_xl_memory_cluster
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    task_nodes:
-      instance_count: 2
     spark_conf:
       spark.driver.memory: 8g
-      spark.driver.cores: "4"
+      spark.driver.cores: '4'
       spark.executor.memory: 24g
-      spark.executor.cores: "4"
-      spark.dynamicAllocation.minExecutors: "2"
-      spark.dynamicAllocation.maxExecutors: "24"
+      spark.executor.cores: '4'
+      spark.dynamicAllocation.minExecutors: '2'
+      spark.dynamicAllocation.maxExecutors: '24'
+    task_nodes:
+      instance_types:
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100

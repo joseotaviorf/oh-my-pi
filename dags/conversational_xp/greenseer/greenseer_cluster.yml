@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_cluster
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       availability: ON_DEMAND

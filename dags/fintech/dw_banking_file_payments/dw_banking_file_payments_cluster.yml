@@ -1,8 +1,13 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
     master_node_type_id: r6g.xlarge
-    core_nodes:
-      instance_count: 2
     task_nodes:
-      instance_count: 1
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100

@@ -1,4 +1,4 @@
 cluster:
-  type: emr_7_12_consolidation_s_memory_cluster
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
     master_node_type_id: m6g.xlarge
