@@ -8,3 +8,5 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_gsheets_raw.qproposta_link_generator
+
+-- redeploy trigger
