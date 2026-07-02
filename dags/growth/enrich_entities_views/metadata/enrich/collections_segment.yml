@@ -47,9 +47,9 @@ columns:
       - datalake_trato_feito_clean.contract_segment_distribution.ts_created
     description: |
       JSON structure containing collections segment properties: status and creation timestamp (when).
-      status values: 'debts_settled' (csd.is_active = FALSE — tenant paid debts, is_active = FALSE),
+      status values: 'debts_settled' (contract has no active contract_segment_distribution — tenant left collections, is_active = FALSE),
       'is_on_evictions' (segment name = EVICTIONS and segment is active),
-      'is_on_pre_evictions' (segment name LIKE STOCK_RISK% and segment is active),
+      'is_on_pre_evictions' (segment name in ACTIVE_STOCK_RISK_DEAL_LOW, ACTIVE_STOCK_RISK_DEAL_HIGH, ACTIVE_STOCK_RISK_NODEAL_LOW, ACTIVE_STOCK_RISK_NODEAL_HIGH and segment is active),
       'has_late_fee_discount' (audience has a negotiation option with 100% discount on fee and fine),
       'is_segmented' (fallback — CSD is active but no specific segment condition matched, is_active = TRUE).
       Structure: {"status": "<status_value>", "when": "<ts_created>"}
@@ -61,8 +61,9 @@ columns:
       - datalake_trato_feito_clean.audience_negotiation_option.id_audience
     description: |
       Boolean flag indicating whether the collections segment entity is currently active.
-      Derived from status: TRUE for has_late_fee_discount, is_on_pre_evictions, is_on_evictions, and is_segmented (i.e. status != 'debts_settled').
-      FALSE only for debts_settled (contract_segment_distribution.is_active = FALSE — tenant paid debts and is no longer segmented).
+      TRUE when the contract still has an active collections segmentation (status is not debts_settled).
+      FALSE only for debts_settled, when the contract has no active contract_segment_distribution record.
+      Superseded inactive segment rows are excluded when the contract moved to another active segment.
   ts_created:
     lineage:
       - datalake_trato_feito_clean.contract_segment_distribution.ts_created
