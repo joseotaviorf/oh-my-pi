@@ -14,7 +14,11 @@ rent_flow_events AS (
     JSON_EXTRACT_SCALAR(event_properties, '$.person_uuid')                                 AS uuid_person,
     CAST(JSON_EXTRACT_SCALAR(event_properties, '$.id_house') AS INTEGER)                   AS id_house,
     JSON_EXTRACT_SCALAR(event_properties, '$.id_tenant')                                   AS id_tenant,
-    CASE WHEN event_name = 'rent_flow_tenant_contract_sent' THEN 'tenant' ELSE 'owner' END AS user_role,
+    CASE 
+      WHEN event_name IN ('rent_flow_tenant_contract_sent',   'rent_flow_tenant_contract_signed') THEN 'tenant' 
+      WHEN event_name IN ('rent_flow_owner_contract_sent',   'rent_flow_owner_contract_signed') THEN 'owner' 
+      ELSE NULL 
+    END AS user_role,
     CASE
       WHEN event_name IN ('rent_flow_tenant_contract_sent',   'rent_flow_owner_contract_sent')   THEN 'sent'
       WHEN event_name IN ('rent_flow_tenant_contract_signed', 'rent_flow_owner_contract_signed') THEN 'signed'
