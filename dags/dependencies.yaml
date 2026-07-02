@@ -3686,17 +3686,6 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.sales_flow:load-clean-sales-flow-aud:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
-bietlejuice.enrich_sale_journey:
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-apply-filters-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-tts-success-page-viewed-events:first-run-of-day
-  - bietlejuice.ebdb_user:load-clean-user-aud:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-  - bietlejuice.enrich_sale_lead_flows:load-enrich-hub-services-lead-flow:first-run-of-day
-  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
-  - bietlejuice.hub_services:load-clean-lead-aud:first-run-of-day
-  - bietlejuice.hub_services:load-clean-observation:first-run-of-day
 bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.casa_mineira_crm:load-clean-city:first-run-of-day
   - bietlejuice.casa_mineira_crm:load-clean-client:first-run-of-day
