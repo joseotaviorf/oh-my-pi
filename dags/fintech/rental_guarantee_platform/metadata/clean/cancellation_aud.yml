@@ -1,77 +1,96 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: cancellation_aud
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per cancellation aud in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   cancellation_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.type
+    description: QuintoCred rental guarantee attribute describing cancellation type in the policy lifecycle.
   user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.userinsert
+    description: QuintoCred rental guarantee attribute describing user insert in the policy lifecycle.
   user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.userupdate
+    description: QuintoCred rental guarantee attribute describing user update in the policy lifecycle.
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.propose
+    description: QuintoCred rental guarantee attribute describing propose in the policy lifecycle.
   origin:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.origin
+    description: QuintoCred rental guarantee attribute describing origin in the policy lifecycle.
   return_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value
+    description: QuintoCred rental guarantee attribute describing return value in the policy lifecycle.
   return_value_interest:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value_interest
+    description: QuintoCred rental guarantee attribute describing return value interest in the policy lifecycle.
   mod_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.type_mod
+    description: QuintoCred rental guarantee attribute describing mod type in the policy lifecycle.
   mod_return_value_interest:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value_interest_mod
+    description: QuintoCred rental guarantee attribute describing mod return value interest in the policy lifecycle.
   mod_return_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value_mod
+    description: QuintoCred rental guarantee attribute describing mod return value in the policy lifecycle.
   mod_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.propose_mod
+    description: QuintoCred rental guarantee attribute describing mod propose in the policy lifecycle.
   mod_request_date:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.request_date_mod
+    description: QuintoCred rental guarantee attribute describing mod request date in the policy lifecycle.
   mod_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.active_mod
+    description: QuintoCred rental guarantee attribute describing mod active in the policy lifecycle.
   mod_origin:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.origin_mod
+    description: QuintoCred rental guarantee attribute describing mod origin in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.active
+    description: Indicates whether active applies to this financial record.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_requested:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.request_date
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.cancellation_aud.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.cancellation_aud.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.cancellation_aud.day
+    description: Timestamp when requested occurred in the upstream fintech system.
