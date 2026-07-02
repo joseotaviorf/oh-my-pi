@@ -1,0 +1,13 @@
+dag:
+  name: gsheets_agents_fast_lane
+  schedule_interval: 0,30 8-20 * * *
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      High-frequency Google Sheets ingestion for the Agents domain. Loads selected spreadsheets into
+      `datalake_gsheets_raw` / `datalake_gsheets_clean` on a :00 and :30 cadence between 08:00 and 20:30.
+      Daily bulk sheets remain on `gsheets_agents`.
+workflow:
+  type: gsheets
+  layer: raw
+  custom_schema: gsheets

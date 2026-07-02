@@ -1,0 +1,26 @@
+database_name: datalake_gsheets_clean
+table_name: qproposta_link_generator
+description:
+  Manual mapping of sale offers to IdActum PDF document links from the QProposta link generator sheet (tab Link arquivo).
+  Grain is one row per offer surrogate key (sk_offer); consumed by CIQ and offer compliance workflows that need the PDF URL.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  sk_offer:
+    description: Surrogate key of the sale offer in the DW star schema, as maintained in the spreadsheet.
+    lineage:
+      - datalake_gsheets_raw.qproposta_link_generator.sk_offer
+  has_idactum:
+    description: Whether the offer row is flagged as having an IdActum registration in the source sheet.
+    lineage:
+      - datalake_gsheets_raw.qproposta_link_generator.has_idactum
+  number:
+    description: Offer reference number or identifier string from the spreadsheet (business-facing number, not a lake id).
+    lineage:
+      - datalake_gsheets_raw.qproposta_link_generator.number
+  link_pdf:
+    description: URL or path string pointing to the offer PDF document linked in the spreadsheet.
+    lineage:
+      - datalake_gsheets_raw.qproposta_link_generator.link_pdf
+  ts_load:
+    description: Timestamp when this row was loaded into the clean table by the gsheets pipeline.

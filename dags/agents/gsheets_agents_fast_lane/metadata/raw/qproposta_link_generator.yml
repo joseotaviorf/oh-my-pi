@@ -1,0 +1,3 @@
+database_name: datalake_gsheets_raw
+table_name: qproposta_link_generator
+domain: Agents
