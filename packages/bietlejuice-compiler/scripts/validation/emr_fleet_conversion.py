@@ -177,4 +177,15 @@ def fleet_override_diff(preset_fleet: dict, effective_fleet: dict) -> dict:
                 custom[block_name] = copy.deepcopy(effective_block)
             elif preset_block is not None:
                 custom[block_name] = {}
+
+    task_custom = custom.get("task_nodes")
+    if isinstance(task_custom, dict):
+        task_target = int(task_custom.get("target_on_demand", 0) or 0) + int(
+            task_custom.get("target_spot", 0) or 0
+        )
+        if task_target > 0 and "core_nodes" not in custom:
+            core_block = effective_fleet.get("core_nodes")
+            if isinstance(core_block, dict):
+                custom["core_nodes"] = copy.deepcopy(core_block)
+
     return custom

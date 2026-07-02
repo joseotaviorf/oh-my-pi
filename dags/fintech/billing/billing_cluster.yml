@@ -9,3 +9,9 @@ cluster:
       target_spot: 2
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - m6g.2xlarge
+      - m7g.2xlarge
