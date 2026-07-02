@@ -55,7 +55,7 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.percent_complete_code
   goal_source_code:
-    description: Source of assignment.
+    description: PIN code identifying how the performance goal was created or imported.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.goal_source_code
     categories:
@@ -64,7 +64,7 @@ columns:
       MANAGER: Goal assigned by a manager.
       WORKER: Goal created by the employee.
   goal_type_code:
-    description: Type of goal.
+    description: PIN code classifying the goal as performance, development, or other category.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.goal_type_code
     categories:
@@ -77,11 +77,11 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.goal_version_type_code
   status_code:
-    description: Status of the goal.
+    description: PIN code for the current lifecycle status of the employee performance goal.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.status_code
   priority_code:
-    description: Priority of the goal.
+    description: PIN code indicating the relative priority ranking of the goal.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.priority_code
     categories:
@@ -89,7 +89,7 @@ columns:
       Medium: Goal with medium importance.
       Low: Goal with low importance.
   goal_name:
-    description: Name of the goal.
+    description: Short title describing the employee performance or development objective.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.goal_name
   updated_by:
@@ -101,7 +101,7 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.last_modified_by
   request_context:
-    description: Goal creation context.
+    description: Business context or justification provided when the goal was requested.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.request_context
   goal_approval_state:
@@ -132,11 +132,11 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute3
   expected_completion_period:
-    description: Expected period for completion of the goal.
+    description: Target review period or timeframe when the goal should be completed.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute5
   goal_category:
-    description: Goal category.
+    description: Grouping category for the goal used in performance management reporting.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute_category
     categories:

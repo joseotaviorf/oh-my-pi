@@ -32,7 +32,7 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.review_period_id
   priority_code:
-    description: Priority of the goal.
+    description: PIN code indicating the priority of this goal within its goal plan.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.priority_code
     categories:

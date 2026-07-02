@@ -40,11 +40,11 @@ columns:
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.last_updated_by
   status:
-    description: Status of the questionnaire participant.
+    description: Current participation status of the employee in the HR questionnaire survey.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.status
   object_version_number:
-    description: Version number of the object
+    description: Optimistic locking counter incremented on each participant record update.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.object_version_number
   ts_created:

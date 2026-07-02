@@ -235,7 +235,7 @@ columns:
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.work_at_home
   dt_salary_proposal:
-    description: Date when the salary proposal was submitted in Oracle HCM, stored as a generic date attribute (attribute_date15).
+    description: Date when the salary proposal was submitted or last revised in PIN (source attribute_date15).
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.attribute_date15
   dt_started:

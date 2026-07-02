@@ -152,11 +152,11 @@ columns:
     lineage:
     - datalake_greenhouse_v3_clean.openings.person_replaced_band
   person_replaced_email:
-    description: The email of the person being replaced.
+    description: Email of the departing employee whose role this opening is intended to backfill.
     lineage:
     - datalake_greenhouse_v3_clean.openings.person_replaced_email
   monthly_salary_range_currency:
-    description: The currency for the monthly salary range.
+    description: ISO currency code for the advertised monthly salary range on the job opening.
     lineage:
     - datalake_greenhouse_v3_clean.openings.monthly_salary_range_currency
   plr_currency:

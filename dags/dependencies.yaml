@@ -3350,6 +3350,7 @@ bietlejuice.enrich_performance:
   - bietlejuice.pin_goal:load-clean-goal-plan-translation:first-run-of-day
   - bietlejuice.pin_goal:load-clean-goal:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
+  - bietlejuice.pin_hr_review:load-clean-dashboard:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-item:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-participant:first-run-of-day
@@ -3377,6 +3378,7 @@ bietlejuice.enrich_performance_temp:
   - bietlejuice.pin_goal:load-clean-goal-plan-translation:first-run-of-day
   - bietlejuice.pin_goal:load-clean-goal:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
+  - bietlejuice.pin_hr_review:load-clean-dashboard:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-item:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-participant:first-run-of-day

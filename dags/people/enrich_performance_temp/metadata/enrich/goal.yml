@@ -17,7 +17,7 @@ columns:
     lineage:
     - datalake_pin_core_clean.all_people.person_number
   assigned_by_person_number:
-    description: Person number of the employee who assigned the goal, distinct from person_number (the goal owner).
+    description: PIN person number of the manager user who assigned the goal, distinct from person_number (the goal owner).
     lineage:
     - datalake_pin_core_clean.all_people.person_number
   name:

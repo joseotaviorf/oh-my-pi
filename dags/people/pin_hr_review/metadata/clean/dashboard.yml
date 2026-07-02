@@ -1,6 +1,6 @@
 ---
 database_name: datalake_pin_hr_review_clean
-table_name: dashboards
+table_name: dashboard
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: Stores data for talent review dashboards.
@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_rt_lvl_id
   id_risk_loss_rating_level_calibrated:
-    description: Identifier of the calibrated risk of loss rating level.
+    description: Calibrated flight-risk rating level shown on the HR review talent dashboard.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_calib_rt_lvl_id
   id_metric_value_3:

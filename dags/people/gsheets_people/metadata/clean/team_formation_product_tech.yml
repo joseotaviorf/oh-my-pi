@@ -2,7 +2,7 @@ database_name: datalake_gsheets_people_clean
 table_name: team_formation_product_tech
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table that contains the team formation of the Product and Tech team
+description: Roster of product and tech team members sourced from Google Sheets, mapping employees to lines, chapters, and managers for org planning.
 columns:
   id:
     description: Generate a unique identifier for each row
@@ -27,15 +27,15 @@ columns:
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.assignment_number
   employee_name:
-    description: Employee name
+    description: Full name of the employee listed in the product and tech team formation spreadsheet.
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.employees_name
   email:
-    description: Employee email
+    description: Corporate email address of the employee in the team formation roster.
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.email
   manager:
-    description: Manager of the employee
+    description: Name of the direct manager for the employee in the team formation roster.
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.manager
   department:
@@ -51,11 +51,11 @@ columns:
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.subdirectorate
   line:
-    description: Line of the employee
+    description: Product line assignment for the employee in the tech organization structure.
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.line
   chapter:
-    description: Chapter of the employee
+    description: Engineering chapter assignment for the employee within the product line.
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.chapter
   team_1:
@@ -122,9 +122,9 @@ columns:
     description: Number of direct headcount
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.direct_headcount
-  dt_admission:
-    description: Date of admission
+  dt_admissioned:
+    description: Date when the employee was admitted in the company.
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.admission
   ts_load:
-    description: Timestamp of load
+    description: Timestamp when this roster row was ingested from the Google Sheets source.

@@ -38,7 +38,7 @@ columns:
     lineage:
     - datalake_pin_questionnaires_raw.hrq_qstnr_responses.object_version_number
   total_score:
-    description: Total score for the questionnaire.
+    description: Aggregated numeric score calculated from all answers in the questionnaire response.
     lineage:
     - datalake_pin_questionnaires_raw.hrq_qstnr_responses.total_score
   attempt_number:
