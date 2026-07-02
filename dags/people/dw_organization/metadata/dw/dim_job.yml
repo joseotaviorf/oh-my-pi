@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_people.job_with_salary_table.id_job
   job_name:
-    description: Job name in English.
+    description: Display title of the job position in the organizational dimension.
     lineage:
       - datalake_people.job_with_salary_table.job_name
   job_family:

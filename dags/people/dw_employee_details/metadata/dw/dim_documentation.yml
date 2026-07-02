@@ -82,7 +82,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.people_legislative.ctps_number
   ctps_series:
-    description: CTPS series number.
+    description: Series number printed on the employee Brazilian work booklet CTPS document.
     lineage:
       - datalake_pin_core_clean.people_legislative.ctps_series
   electoral_registration_number:
@@ -94,7 +94,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.people_legislative.electoral_zone
   electoral_polling_station:
-    description: Polling station number.
+    description: Electoral polling station section where the employee is registered to vote.
     lineage:
       - datalake_pin_core_clean.people_legislative.polling_station
   dt_valid_from:

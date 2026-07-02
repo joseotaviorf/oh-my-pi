@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.work_email
   employee_tmf_code:
-    description: TMF code for the employee.
+    description: Legacy TMF system identifier for the employee in historical HR integrations.
     lineage:
       - datalake_people.identifier_mapping.employee_tmf_code
   highest_education_level:

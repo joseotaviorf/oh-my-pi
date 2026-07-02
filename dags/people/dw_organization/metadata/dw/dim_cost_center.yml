@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.work_email
   cost_center_name:
-    description: Cost center name.
+    description: Display name of the cost center in the organizational dimension.
     lineage:
       - datalake_people.cost_center_history.cost_center_name
   business:

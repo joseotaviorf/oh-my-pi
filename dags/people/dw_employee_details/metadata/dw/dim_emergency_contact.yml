@@ -23,20 +23,20 @@ columns:
     lineage:
       - datalake_pin_core_clean.people_extra_info.id_meeting
   contact_relationship:
-    description: Relationship of the emergency contact to the employee.
+    description: Relationship of the emergency contact to the employee, such as spouse or parent.
     lineage:
       - datalake_pin_core_clean.people_extra_info.contact_relationship
       - datalake_pin_core_clean.foundation_lookup_value.meaning
   phone_country_code:
-    description: Country code of the emergency contact phone.
+    description: International dialing prefix for the emergency contact phone number.
     lineage:
       - datalake_pin_core_clean.people_extra_info.id_rating_impact
   phone_area_code:
-    description: Area code of the emergency contact phone.
+    description: Regional area code for the emergency contact phone number within the country.
     lineage:
       - datalake_pin_core_clean.people_extra_info.id_rating_behavior
   phone_number:
-    description: Phone number of the emergency contact.
+    description: Local subscriber number for the emergency contact excluding country and area codes.
     lineage:
       - datalake_pin_core_clean.people_extra_info.id_rating_leadership
   full_phone_number:
