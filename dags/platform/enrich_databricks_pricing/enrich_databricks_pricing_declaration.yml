@@ -3,10 +3,10 @@ dag:
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
-      Source-controlled FINAL price dimensions for the Databricks cost model.
+      Source-controlled FINAL dimensions for the Databricks cost model.
 
-      Publishes two static, auditable price seeds that are the single source of
-      truth for converting Databricks usage into USD:
+      Publishes three static, auditable seeds that are the single source of
+      truth for the Databricks cost model:
 
         - dim_dbu_price: negotiated USD/DBU by compute_type and contract
           validity window. Replaces the stale gsheet
@@ -16,12 +16,16 @@ dag:
         - dim_ec2_price: standard on-demand USD/hour per EC2 instance type
           plus a derived spot row (0.37 x on-demand). Replaces the runtime
           dependency on overwatch.instancedetails with an in-repo seed.
+        - dim_cost_cohort: initiative-level cost cohort rules (bietlejuice /
+          quintoml_wonka / cdp / tech_platform) replacing the inline Superset
+          CASE in dataset 21202.
 
-      Both tables are full-refresh static seeds (no date partitions); the data
-      lives in the queries, so there is no upstream lake dependency. They feed
-      the dw_databricks_costs billing-spine cost fact, which prices net DBU and
-      EC2 node-hours by joining usage to these dimensions on the validity
-      windows.
+      All three tables are full-refresh static seeds (no date partitions); the
+      data lives in the queries, so there is no upstream lake dependency. The
+      price dims feed the dw_databricks_costs billing-spine cost fact, which
+      prices net DBU and EC2 node-hours by joining usage to them on the
+      validity windows; dim_cost_cohort feeds the cost_cohort column in that
+      fact and in dw_databricks_health.fact_databricks_task_run.
 
       This DAG is a manually-triggered static seed: it is neither cron-scheduled
       nor dataset-triggered. Run it once at deploy and again on any contract or
@@ -33,6 +37,12 @@ workflow:
   default_extraction_type: full
   has_hive_sync: true
   tables_customization:
+    dim_cost_cohort:
+      extraction_type: full
+      partitions: []
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
     dim_dbu_price:
       extraction_type: full
       partitions: []

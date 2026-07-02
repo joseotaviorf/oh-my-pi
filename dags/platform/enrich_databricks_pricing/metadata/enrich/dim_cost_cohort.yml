@@ -1,0 +1,42 @@
+---
+database_name: datalake_databricks_pricing
+table_name: dim_cost_cohort
+domain: Data Ops & Governance
+owner: mario.abreu@quintoandar.com.br
+description: |
+  Source-controlled FINAL seed dimension: initiative-level cost cohort rules
+  (bietlejuice / quintoml_wonka / cdp / tech_platform). Single source of truth
+  for initiative cost attribution, replacing the inline CASE in Superset
+  dataset 21202 (dashboard data-platform-cost-all-cohorts). Consumed by
+  dw_databricks_costs.fact_databricks_costs and
+  dw_databricks_health.fact_databricks_task_run, which match each fact row
+  against every rule and keep the lowest-priority hit (MIN_BY). Workloads
+  matching no rule fall back to the 'other' cohort via COALESCE in the
+  consuming facts; 'other' is intentionally never a row in this dimension.
+  Static full-refresh seed (no upstream lake table); the whole table is
+  replaced whenever the rules change.
+columns:
+  priority:
+    description: Rule precedence; the lowest matching priority wins per fact row (MIN_BY). Team-owner rules (10, 50) deliberately outrank the bietlejuice provisioner fallbacks (60, 61) so the shared fleet does not swallow initiative-owned workloads.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_cost_cohort.sql (priority)"
+  rule_type:
+    description: "Predicate the consuming fact applies for this rule: team_owner_exact (team_owner = match_value), team_owner_prefix (team_owner LIKE match_value || '%'), provisioner_exact (provisioner(_resolved) = match_value), workload_prefix (LOWER(workload identity) LIKE match_value || '%'), workload_like (LOWER(workload identity) LIKE match_value)."
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_cost_cohort.sql (rule_type)"
+  match_value:
+    description: Value the rule_type predicate compares against (exact value, prefix, or LIKE pattern depending on rule_type).
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_cost_cohort.sql (match_value)"
+  cost_cohort:
+    description: Initiative-level cohort assigned when the rule matches; one of bietlejuice, quintoml_wonka, cdp, tech_platform. The fallback value 'other' is applied by the consuming facts, never stored here.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_cost_cohort.sql (cost_cohort)"
+  rule_note:
+    description: Human-readable rationale for the rule (why the workload belongs to the cohort and any precedence caveat).
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_cost_cohort.sql (rule_note)"
+  ts_load:
+    description: Timestamp the row was written by the DAG (CURRENT_TIMESTAMP at load).
+    lineage:
+      - "derived at load time via CURRENT_TIMESTAMP() in dim_cost_cohort.sql"
