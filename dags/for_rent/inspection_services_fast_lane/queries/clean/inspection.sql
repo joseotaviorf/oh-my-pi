@@ -7,6 +7,7 @@ SELECT
     external_id AS id_external,
     inspector_id AS id_inspector,
     schedule_id AS id_schedule,
+    house_id AS id_house,
     contract,
     house,
     schedule,

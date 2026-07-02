@@ -44,6 +44,10 @@ columns:
     lineage:
       - datalake_inspection_services_raw.inspection.schedule_id
     description: Unique identifier of the inspection date and time schedule
+  id_house:
+    lineage:
+      - datalake_inspection_services_raw.inspection.house_id
+    description: Unique identifier of the house/property being inspected
   contract:
     lineage:
       - datalake_inspection_services_raw.inspection.contract
@@ -79,7 +83,9 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.inspection.type
-    description: The type of inspection.
+    description:
+      Stage of the tenancy the inspection is tied to (onboarding, verification,
+      or offboarding), determining which checklist and workflow rules apply.
     categories:
       onboarding: Inspection carried out before the tenant enters the property, to certify the conditions of the house
       verification: Inspection carried out when there is any relevant change in the property, such as the creation of rooms, for example
