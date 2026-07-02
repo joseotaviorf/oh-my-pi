@@ -18,6 +18,25 @@ _EMR_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
         "task_nodes",
     }
 )
+_EMR_FLEET_ALLOCATION_STRATEGIES = frozenset(
+    {"price-capacity-optimized", "capacity-optimized", "lowest-price", "diversified"}
+)
+# Legacy scalar keys that only make sense for instance groups. These must never
+# be silently ignored once core_nodes/task_nodes switch to instance-fleet shape.
+_LEGACY_GROUP_ONLY_KEYS = frozenset(
+    {"node_type_id", "num_workers", "num_task_workers", "task_node_type_id"}
+)
+_GROUP_ONLY_NODE_BLOCK_KEYS = frozenset({"node_type_id", "instance_count"})
+_FLEET_ONLY_NODE_BLOCK_KEYS = frozenset(
+    {
+        "target_on_demand",
+        "target_spot",
+        "allocation_strategy",
+        "instance_types",
+        "bid_price_percentage",
+        "spot_timeout_minutes",
+    }
+)
 
 
 class DAGClusterValidator(Validator):
@@ -148,18 +167,68 @@ class DAGClusterValidator(Validator):
         task_nodes = custom.get("task_nodes")
         if core_nodes is not None or task_nodes is not None:
             self._validate_emr_node_group(core_nodes, "core_nodes", min_count=0)
+            core_is_fleet = self._is_emr_fleet_block(core_nodes)
+            task_is_fleet = False
             if task_nodes is not None:
                 self._validate_emr_node_group(task_nodes, "task_nodes", min_count=0)
-                task_count = int((task_nodes or {}).get("instance_count", 0) or 0)
-                if task_count > 0:
-                    core_count = int((core_nodes or {}).get("instance_count", 1))
-                    if core_count < 1:
-                        raise AssertionError(
-                            "m=_check_emr_cluster_configuration, "
-                            "msg='core_nodes.instance_count' must be >= 1 when "
-                            "task_nodes.instance_count > 0"
-                        )
+                task_is_fleet = self._is_emr_fleet_block(task_nodes)
+
+                if core_nodes is not None and core_is_fleet != task_is_fleet:
+                    raise AssertionError(
+                        "m=_check_emr_cluster_configuration, "
+                        "msg='core_nodes' and 'task_nodes' must both use instance "
+                        "groups or both use instance fleets (AWS EMR does not "
+                        "support mixing InstanceGroups and InstanceFleets in one "
+                        "cluster)"
+                    )
+
+                if not core_is_fleet and not task_is_fleet:
+                    task_count = int((task_nodes or {}).get("instance_count", 0) or 0)
+                    if task_count > 0:
+                        core_count = int((core_nodes or {}).get("instance_count", 1))
+                        if core_count < 1:
+                            raise AssertionError(
+                                "m=_check_emr_cluster_configuration, "
+                                "msg='core_nodes.instance_count' must be >= 1 when "
+                                "task_nodes.instance_count > 0"
+                            )
+                else:
+                    task_target = int(task_nodes.get("target_on_demand", 0) or 0) + int(
+                        task_nodes.get("target_spot", 0) or 0
+                    )
+                    if task_target > 0:
+                        core_target = int(
+                            (core_nodes or {}).get("target_on_demand", 0) or 0
+                        ) + int((core_nodes or {}).get("target_spot", 0) or 0)
+                        if core_target < 1:
+                            raise AssertionError(
+                                "m=_check_emr_cluster_configuration, "
+                                "msg='core_nodes' target_on_demand+target_spot "
+                                "must be >= 1 when 'task_nodes' has TASK capacity "
+                                "> 0"
+                            )
+
+            is_fleet_mode = core_is_fleet or task_is_fleet
+            if is_fleet_mode:
+                legacy_keys_present = _LEGACY_GROUP_ONLY_KEYS.intersection(
+                    custom.keys()
+                )
+                if legacy_keys_present:
+                    raise AssertionError(
+                        "m=_check_emr_cluster_configuration, "
+                        f"msg=Legacy instance-group keys "
+                        f"{sorted(legacy_keys_present)} cannot be combined with "
+                        "instance-fleet core_nodes/task_nodes"
+                    )
+
             if task_availability is not None:
+                if task_is_fleet:
+                    raise AssertionError(
+                        "m=_check_emr_cluster_configuration, "
+                        "msg='aws_attributes.task_availability' is not applicable "
+                        "when 'task_nodes' uses instance fleets; use "
+                        "task_nodes.target_on_demand/target_spot instead"
+                    )
                 self._validate_task_availability(task_availability)
             return
 
@@ -219,13 +288,37 @@ class DAGClusterValidator(Validator):
             )
 
     @staticmethod
-    def _validate_emr_node_group(block: dict, name: str, *, min_count: int) -> None:
+    def _is_emr_fleet_block(block) -> bool:
+        return isinstance(block, dict) and "instance_types" in block
+
+    @classmethod
+    def _validate_emr_node_group(
+        cls, block: dict, name: str, *, min_count: int
+    ) -> None:
         if block is None:
             return
         if not isinstance(block, dict):
             raise AssertionError(
                 f"m=_check_emr_cluster_configuration, msg='{name}' must be a dict"
             )
+
+        present_group_keys = _GROUP_ONLY_NODE_BLOCK_KEYS.intersection(block.keys())
+        present_fleet_keys = _FLEET_ONLY_NODE_BLOCK_KEYS.intersection(block.keys())
+        if present_group_keys and present_fleet_keys:
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}' mixes instance-group keys "
+                f"{sorted(present_group_keys)} with instance-fleet keys "
+                f"{sorted(present_fleet_keys)}; use one style or the other, not both"
+            )
+
+        if cls._is_emr_fleet_block(block):
+            cls._validate_emr_fleet_block(block, name)
+        else:
+            cls._validate_emr_group_block(block, name, min_count=min_count)
+
+    @staticmethod
+    def _validate_emr_group_block(block: dict, name: str, *, min_count: int) -> None:
         instance_count = block.get("instance_count")
         if instance_count is not None:
             if not isinstance(instance_count, int) or isinstance(instance_count, bool):
@@ -244,4 +337,71 @@ class DAGClusterValidator(Validator):
                 raise AssertionError(
                     "m=_check_emr_cluster_configuration, "
                     f"msg='{name}.node_type_id' must be a non-empty string"
+                )
+
+    @staticmethod
+    def _validate_emr_fleet_block(block: dict, name: str) -> None:
+        instance_types = block.get("instance_types")
+        if not isinstance(instance_types, list) or not instance_types:
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}.instance_types' must be a non-empty list"
+            )
+        if not all(isinstance(t, str) and t.strip() for t in instance_types):
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}.instance_types' entries must be non-empty strings"
+            )
+
+        target_on_demand = block.get("target_on_demand", 0)
+        target_spot = block.get("target_spot", 0)
+        for field_name, value in (
+            ("target_on_demand", target_on_demand),
+            ("target_spot", target_spot),
+        ):
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.{field_name}' must be a non-negative integer"
+                )
+        if int(target_on_demand) + int(target_spot) <= 0:
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}' must set target_on_demand and/or target_spot > 0"
+            )
+
+        allocation_strategy = block.get("allocation_strategy")
+        if allocation_strategy is not None and (
+            not isinstance(allocation_strategy, str)
+            or allocation_strategy not in _EMR_FLEET_ALLOCATION_STRATEGIES
+        ):
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                f"msg='{name}.allocation_strategy' must be one of "
+                f"{sorted(_EMR_FLEET_ALLOCATION_STRATEGIES)}"
+            )
+
+        bid_price_percentage = block.get("bid_price_percentage")
+        if bid_price_percentage is not None:
+            if (
+                not isinstance(bid_price_percentage, (int, float))
+                or isinstance(bid_price_percentage, bool)
+                or bid_price_percentage <= 0
+            ):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.bid_price_percentage' must be a positive number"
+                )
+
+        spot_timeout_minutes = block.get("spot_timeout_minutes")
+        if spot_timeout_minutes is not None:
+            if (
+                not isinstance(spot_timeout_minutes, int)
+                or isinstance(spot_timeout_minutes, bool)
+                or not (5 <= spot_timeout_minutes <= 1440)
+            ):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.spot_timeout_minutes' must be an integer between "
+                    "5 and 1440"
                 )
