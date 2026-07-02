@@ -43,6 +43,17 @@
 -- sandbox/test/poc/temp/fix => sandbox-test, known team keywords =>
 -- team-workflow); unmatched => 'unresolved'.
 --
+-- cost_cohort: initiative-level cost attribution from the static seed
+-- datalake_databricks_pricing.dim_cost_cohort — the lowest-priority matching
+-- rule wins (MIN_BY) over team_owner / provisioner_resolved / the normalized
+-- workload identity. Taxonomy: bietlejuice / quintoml_wonka / cdp /
+-- tech_platform / other. 'other' is legitimate unattributed spend —
+-- interactive notebooks, SQL warehouses, ML serving, sandbox and ad-hoc BI
+-- jobs (e.g. Overwatch, exec-dash sandbox tables) — reported as the
+-- dashboard's "On demand" slice. The health family
+-- (dw_databricks_health.fact_databricks_task_run / fact_databricks_dag_run)
+-- applies the same dim, so cost and health dashboards slice identically.
+--
 -- DBU pricing — negotiated with list fallback. negotiated_usd_per_dbu comes
 -- from datalake_databricks_pricing.dim_dbu_price keyed on compute_type and the
 -- contract validity window [dt_valid_from, COALESCE(dt_valid_to, 9999-12-31)).
@@ -74,6 +85,7 @@
 --                                                     node_timeline coverage)
 --   - datalake_databricks_pricing.dim_dbu_price (negotiated USD/DBU by compute_type, window)
 --   - datalake_databricks_pricing.dim_ec2_price  (standard USD/hour by instance, availability)
+--   - datalake_databricks_pricing.dim_cost_cohort (initiative cohort rules — lowest priority wins)
 --
 -- Reconciliation: a custom data-quality check
 -- (data_quality/dw/fact_databricks_costs.yml) asserts that, for every
@@ -482,7 +494,8 @@ priced AS (
             ON  ddp.compute_type = e.compute_type
             AND e.usage_date    >= ddp.dt_valid_from
             AND e.usage_date    <  COALESCE(ddp.dt_valid_to, DATE '9999-12-31')
-)
+),
+final AS (
 SELECT
     -- Surrogate key over the full seven-key grain (job_id included so it is unique).
     XXHASH64(
@@ -550,6 +563,25 @@ SELECT
             THEN 'team-workflow'
         ELSE 'unresolved'
     END                                                          AS provisioner_resolved,
+    -- Normalized workload identity (Airflow run-suffix stripped, canonical
+    -- framework prefixes restored) — used ONLY for cohort rule matching in
+    -- cohort_match below; NOT emitted by the outer query.
+    regexp_replace(
+        regexp_replace(
+            CASE
+                WHEN COALESCE(p.workload_name, '')
+                    RLIKE '(_scheduled__|_manual__|_dataset__|_dataset_triggered__|__)'
+                THEN regexp_extract(
+                    regexp_replace(COALESCE(p.workload_name, ''), '^job-[0-9]+-run-[0-9]+-', ''),
+                    '^(.*?)(_scheduled__|_manual__|_dataset__|_dataset_triggered__|__).*',
+                    1
+                )
+                ELSE COALESCE(p.workload_name, '')
+            END,
+            '^bietlejuice-', 'bietlejuice.'
+        ),
+        '^quintoml-wonka-', 'quintoml.wonka.'
+    )                                                          AS workload_name_norm,
     p.tags['owner']                                              AS team_owner,
     p.tags['cost-center']                                        AS cost_center,
     p.tags['ecosystem']                                         AS ecosystem,
@@ -586,3 +618,82 @@ SELECT
     DAY(p.usage_date)                                           AS day
 FROM
     priced p
+),
+cohort_match AS (
+    -- One row per fact row: lowest-priority matching rule wins. MIN_BY is
+    -- Spark 3.0+ and EMR-safe (MAX_BY precedent in the billing CTE above).
+    SELECT
+        f.sk_databricks_cost,
+        MIN_BY(r.cost_cohort, r.priority)                      AS cost_cohort
+    FROM
+        final f
+    JOIN
+        datalake_databricks_pricing.dim_cost_cohort r
+            ON (r.rule_type = 'team_owner_exact'  AND f.team_owner = r.match_value)
+            OR (r.rule_type = 'team_owner_prefix' AND f.team_owner LIKE CONCAT(r.match_value, '%'))
+            OR (r.rule_type = 'provisioner_exact' AND f.provisioner_resolved = r.match_value)
+            OR (r.rule_type = 'workload_prefix'   AND LOWER(f.workload_name_norm) LIKE CONCAT(r.match_value, '%'))
+            OR (r.rule_type = 'workload_like'     AND LOWER(f.workload_name_norm) LIKE r.match_value)
+    GROUP BY
+        f.sk_databricks_cost
+)
+SELECT
+    f.sk_databricks_cost,
+
+    -- Identifiers.
+    f.id_databricks_workspace,
+    f.id_cluster,
+    f.id_warehouse,
+    f.id_databricks_job,
+
+    -- Generic workload identity (spans non-Airflow workloads — NOT airflow_dag_id).
+    f.workload_name,
+
+    -- Characteristics.
+    f.billing_origin_product,
+    f.sku_name,
+    f.cluster_source,
+    f.cluster_name,
+    f.compute_type,
+    f.pricing_category,
+    f.bucket,
+    f.provisioner_resolved,
+    COALESCE(cm.cost_cohort, 'other')                          AS cost_cohort,
+    f.team_owner,
+    f.cost_center,
+    f.ecosystem,
+    f.environment,
+
+    -- Metrics.
+    f.dbu,
+    f.negotiated_usd_per_dbu,
+    f.dbu_cost_usd,
+    f.dbu_list_cost_usd,
+    f.ec2_cost_usd,
+    f.on_demand_hours,
+    f.spot_hours,
+    f.ec2_source,
+    f.is_ec2_estimated,
+    f.ec2_pricing_missing,
+    f.ec2_unpriced_hours,
+    f.total_cost_usd,
+
+    -- Booleans.
+    f.is_serverless,
+    f.is_continuous,
+    f.is_job_on_interactive,
+    f.price_missing,
+
+    -- Dates / timestamps.
+    f.dt_usage,
+    f.ts_load,
+
+    -- Partitions (last).
+    f.year,
+    f.month,
+    f.day
+FROM
+    final f
+LEFT JOIN
+    cohort_match cm
+        ON cm.sk_databricks_cost = f.sk_databricks_cost

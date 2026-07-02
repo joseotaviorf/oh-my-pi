@@ -198,3 +198,42 @@ column_level_validations:
   ts_load:
     is_complete:
       severity_level: Warning
+  # Initiative-shaped workloads must classify to a non-'other' cohort. The
+  # predicate is deliberately provisioner/name-prefix based — NOT
+  # `team_owner IS NOT NULL` — because owner-tagged ad-hoc/platform jobs
+  # (Overwatch, data_quality_tests_streaming, sandbox tables) legitimately
+  # live in 'other'. Raw hyphenated names (bietlejuice-*, quintoml-*) are
+  # included so a workload_name_norm normalization regression cannot hide
+  # name-only-matchable rows from this guard. A failure means
+  # dim_cost_cohort needs a new rule (priority 62+), not a weaker check.
+  cost_cohort_initiative_workloads_classified:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_databricks_costs.fact_databricks_costs
+         WHERE cost_cohort = 'other'
+           AND (provisioner_resolved IN ('bietlejuice', 'wonka', 'quintoml', 'quintoml-ml', 'customer-data-platform')
+                OR LOWER(workload_name) LIKE 'bietlejuice.%'
+                OR LOWER(workload_name) LIKE 'bietlejuice-%'
+                OR LOWER(workload_name) LIKE 'quintoml.%'
+                OR LOWER(workload_name) LIKE 'quintoml-%'
+                OR LOWER(workload_name) LIKE 'wonka.%'
+                OR LOWER(workload_name) LIKE 'wonka-%')
+        ) = 0
+      severity_level: Error
+  # Unattributed-share drift alarm: 'other' sits at ~33-37% of monthly spend in
+  # 2026; a month above 45% means the cohort rules stopped covering new spend.
+  cost_cohort_other_share_ceiling:
+    custom:
+      constraint: |-
+        (SELECT MAX(other_share)
+         FROM (
+             SELECT
+                 SUM(CASE WHEN cost_cohort = 'other' THEN total_cost_usd ELSE 0 END)
+                     / NULLIF(SUM(total_cost_usd), 0) AS other_share
+             FROM dw_databricks_costs.fact_databricks_costs
+             WHERE dt_usage >= DATE('2026-01-01')
+             GROUP BY year, month
+         )
+        ) <= 0.45
+      severity_level: Warning

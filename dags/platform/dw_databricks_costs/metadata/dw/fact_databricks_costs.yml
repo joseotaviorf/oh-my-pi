@@ -148,6 +148,21 @@ columns:
       - system.compute.clusters.cluster_source
       - system.compute.clusters.cluster_name
       - system.billing.usage.usage_metadata
+  cost_cohort:
+    description: |
+      Initiative-level cost cohort from the static seed
+      datalake_databricks_pricing.dim_cost_cohort — the lowest-priority matching
+      rule wins over team_owner, provisioner_resolved and the normalized
+      workload identity. Taxonomy: bietlejuice / quintoml_wonka / cdp /
+      tech_platform / other. On this fact 'other' is a reportable bucket (the
+      dashboard's "On demand" slice): interactive notebooks, SQL warehouses,
+      ML serving, sandbox and ad-hoc BI jobs (e.g. Overwatch, exec-dash sandbox
+      tables) legitimately live there. The health family
+      (dw_databricks_health.fact_databricks_task_run / fact_databricks_dag_run)
+      applies the same dim.
+    lineage:
+      - datalake_databricks_pricing.dim_cost_cohort.cost_cohort
+      - system.compute.clusters.tags
   team_owner:
     description: Team or person from the cluster `owner` tag. NULL when unset or for cluster-less usage.
     lineage:
