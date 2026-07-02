@@ -37,7 +37,6 @@ expected_times_to_finish:
   bietlejuice.currency: 07:22
   bietlejuice.cyber: "11:45"
   bietlejuice.cyber_complement: "11:35"
-  bietlejuice.cypress_reports: 07:27
   bietlejuice.dag_inventory: 01:32
   bietlejuice.databricks_usage: "11:23"
   bietlejuice.demand_balancer_service: "15:15"

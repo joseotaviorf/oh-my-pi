@@ -141,31 +141,6 @@
       }
     },
     {
-      "dag_id": "bietlejuice.cypress_reports",
-      "promoted_at": "2026-06-13",
-      "previous_cluster_spec": {
-        "type": "consolidation_s_general_cluster",
-        "databricks_conn_id": "databricks_new",
-        "custom_configurations": {
-          "single_user_name": "{{ var.value.databricks_single_user_name }}",
-          "data_security_mode": "SINGLE_USER",
-          "spark_conf": {
-            "spark.databricks.sql.initial.catalog.namespace": "quintoandar_{{ var.value.environment }}"
-          },
-          "num_workers": 3
-        }
-      },
-      "baseline": {
-        "avg_cost_usd": 0.2069,
-        "wall_p50_min": 20.0,
-        "wall_p95_min": 20.0,
-        "mem_p95_max": 77.9,
-        "schedule_interval_minutes": 1440.0,
-        "failure_count": 0,
-        "snapshot_through": "2026-06-13"
-      }
-    },
-    {
       "dag_id": "bietlejuice.dw_bpo_performance",
       "promoted_at": "2026-06-13",
       "previous_cluster_spec": {

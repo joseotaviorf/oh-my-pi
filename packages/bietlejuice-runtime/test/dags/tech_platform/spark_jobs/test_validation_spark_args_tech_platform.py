@@ -89,9 +89,6 @@ from dags.tech_platform.cloudfront.spark_jobs.cloudfront_logs_load import (  # n
 from dags.tech_platform.crowdstrike.spark_jobs.load_crowdstrike_raw import (  # noqa: E402
     CrowdStrikeJobArgumentParser,
 )
-from dags.tech_platform.cypress_reports.spark_jobs.load_cypress_reports_raw import (  # noqa: E402
-    parse_arguments as parse_cypress_reports_args,
-)
 from dags.tech_platform.idn.spark_jobs.load_idn_raw import (  # noqa: E402
     IdnJobArgumentParser,
 )
@@ -273,19 +270,10 @@ _OPENAPI_POSITIONAL = [
     "openapi",
 ]
 
-_CYPRESS_REPORTS_POSITIONAL = [
-    _TEST_ENV,
-    _TEST_BUCKET,
-    "cypress_reports",
-    "2024-01-01",
-    "2024-01-02",
-]
-
 _TECH_PLATFORM_JOB_PATHS = [
     "dags/tech_platform/application_audit_logs/spark_jobs/application_audit_logs_load.py",
     "dags/tech_platform/botcity/spark_jobs/botcity_audit_logs_load.py",
     "dags/tech_platform/cloudfront/spark_jobs/cloudfront_logs_load.py",
-    "dags/tech_platform/cypress_reports/spark_jobs/load_cypress_reports_raw.py",
     "dags/tech_platform/identitynow/spark_jobs/account_activities_load.py",
     "dags/tech_platform/identitynow/spark_jobs/events_load.py",
     "dags/tech_platform/openapi/spark_jobs/openapi_load.py",
@@ -452,11 +440,6 @@ class TestTechPlatformSparkJobValidationArgs:
                 "datalake_application_audit_logs_clean___logs",
             ),
             (
-                parse_cypress_reports_args,
-                _CYPRESS_REPORTS_POSITIONAL,
-                "datalake_cypress_reports_raw___cypress_reports",
-            ),
-            (
                 parse_vault_events_args,
                 _VAULT_EVENTS_POSITIONAL,
                 "datalake_vault_audit_logs_clean___events",
@@ -579,7 +562,6 @@ class TestTechPlatformSparkJobValidationArgs:
                 parse_application_audit_logs_args,
                 _APPLICATION_AUDIT_LOGS_POSITIONAL,
             ),
-            (parse_cypress_reports_args, _CYPRESS_REPORTS_POSITIONAL),
             (parse_vault_events_args, _VAULT_EVENTS_POSITIONAL),
             (parse_identitynow_events_args, _IDENTITYNOW_EVENTS_POSITIONAL),
             (
