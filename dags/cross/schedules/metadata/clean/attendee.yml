@@ -3,7 +3,7 @@ database_name: datalake_schedules_clean
 table_name: attendee
 description: Data from all appointment personas (attendee). Currently it only has agent data, but in the future customer data is expected.
 domain: Cross
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -16,10 +16,11 @@ columns:
   id_internal_reference:
     lineage:
       - datalake_schedules_raw.attendee.internal_reference_id
-    description: Agent ID
+    description: Internal reference identifier of the attendee, such as the assigned agent user ID.
   version:
     lineage:
       - datalake_schedules_raw.attendee.version
+    description: Optimistic locking version number incremented on each attendee record update.
   prefers_contact:
     lineage:
       - datalake_schedules_raw.attendee.prefers_contact
@@ -35,19 +36,21 @@ columns:
   internal_reference_name:
     lineage:
       - datalake_schedules_raw.attendee.internal_reference_name
-    description: Source of agent data
+    description: Source system or entity type for the attendee internal reference identifier.
   attendee_type:
     lineage:
       - datalake_schedules_raw.attendee.attendee_type
-    description: Attendee type
+    description: Role of the attendee in the appointment, such as agent, owner, or tenant.
     categories:
       AGENT: ""
   attendee_date_time:
     lineage:
       - datalake_schedules_raw.attendee.attendee_date_time
+    description: Scheduled date and time when the attendee is expected at the appointment.
   is_confirmed:
     lineage:
       - datalake_schedules_raw.attendee.confirmed
+    description: Boolean flag indicating whether the attendee confirmed participation in the appointment.
   ts_created:
     lineage:
       - datalake_schedules_raw.attendee.created_at
@@ -55,7 +58,7 @@ columns:
   ts_updated:
     lineage:
       - datalake_schedules_raw.attendee.updated_at
-    description: Updated date.
+    description: Timestamp when the attendee record was last updated in the source system.
   year:
     lineage:
       - datalake_schedules_raw.attendee.year

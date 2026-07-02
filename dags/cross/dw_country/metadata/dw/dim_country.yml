@@ -3,7 +3,7 @@ database_name: dw_public
 table_name: dim_country
 description: Contains information about each country QuintoAndar is present.
 domain: Cross
-owner: bruna.prates@quintoandar.com.br
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   sk_country_code:
     lineage:
@@ -12,23 +12,23 @@ columns:
   id_country:
     lineage:
       - datalake_ebdb_clean.country.id
-    description: Country id
+    description: Numeric primary key of the country in the EBDB operational source system.
   country_code:
     lineage:
       - datalake_ebdb_clean.country.code
-    description: Country code
+    description: ISO-style country code used as the natural key for QuintoAndar country dimension.
   country_name:
     lineage:
       - datalake_ebdb_clean.country.name
-    description: Country name
+    description: Official country name displayed in QuintoAndar applications and reporting.
   default_locale:
     lineage:
       - datalake_ebdb_clean.country.default_locale
-    description: Country default locale
+    description: Default locale string configured for the country in product and content localization.
   default_timezone:
     lineage:
       - datalake_ebdb_clean.country.default_timezone
-    description: Country default timezone
+    description: Default IANA timezone configured for business operations in the country.
   ts_created:
     lineage:
       - datalake_ebdb_clean.country.ts_created

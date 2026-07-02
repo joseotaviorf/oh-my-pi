@@ -1,7 +1,7 @@
 ---
 database_name: datalake_data_quality
 table_name: validations
-description: This table consolidates the data quality validations applied to bietlejuice DAGs.
+description: This table consolidates the data quality validations applied to bietlejuice DAGs. Partitioned by id_dag, year, month, day. Always filter on id_dag, year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
 domain: Cross
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -13,19 +13,19 @@ columns:
       - datalake_inmetro_clean.data_validations.table
       - datalake_inmetro_clean.data_validations.validations
   id_dag:
-    description: DAG id, which is also the DAG name on Airflow.
+    description: DAG id, which is also the DAG name on Airflow. Partition key identifying the DAG whose validation results are stored; filter on id_dag together with year, month, and day in WHERE clauses.
     lineage:
       - datalake_dag_inventory_clean.table.dag
   database:
-    description: Database name.
+    description: Lake database schema name of the table evaluated by the Inmetro data-quality validation run.
     lineage:
       - datalake_inmetro_clean.data_validations.database
   table:
-    description: Table name.
+    description: Lake table name within the database that was validated in the execution snapshot.
     lineage:
       - datalake_inmetro_clean.data_validations.table
   validation_level:
-    description: The level of validation.
+    description: Scope at which the check runs, either table-level for suite-wide rules or column-level for a single field.
     categories:
       table: Validation is applied at table level.
       column: Validation is applied at column level.
@@ -44,7 +44,7 @@ columns:
     lineage:
       - datalake_inmetro_clean.data_validations.validations
   validation_status:
-    description: Status of the validation.
+    description: Outcome of the individual check after execution, indicating whether the data passed or failed the rule.
     categories:
       success: The data meets the determined validation.
       failure: The data does not meet the determined validation.
@@ -75,14 +75,14 @@ columns:
     lineage:
       - datalake_inmetro_clean.data_validations.ts_execution_local
   year:
-    description: Year of when data quality was executed.
+    description: Year of when data quality was executed. Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     lineage:
       - datalake_inmetro_clean.data_validations.year
   month:
-    description: Month of when data quality was executed.
+    description: Month of when data quality was executed. Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     lineage:
       - datalake_inmetro_clean.data_validations.month
   day:
-    description: Day of when data quality was executed.
+    description: Day of when data quality was executed. Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
     lineage:
       - datalake_inmetro_clean.data_validations.day

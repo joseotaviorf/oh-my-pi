@@ -1,8 +1,8 @@
 database_name: datalake_kong_clean
 table_name: kong_logs
-description: Table with 5A applications logs.
-domain: Cross
-owner: data-ae-ss@quintoandar.com.br
+description: Table with 5A applications logs. Partitioned by year, month, day, hour. Always filter on year, month, day, hour in WHERE clauses to enable partition pruning and avoid full table scans.
+domain: Support and Services
+owner: gabriel.firmino@quintoandar.com.br
 columns:
   app:
     lineage:
@@ -31,7 +31,7 @@ columns:
   pod_name:
     lineage:
       - "datalake_kong_raw.kong_logs.kubernetes.pod_name"
-    description: The pod name.
+    description: Kubernetes pod name that emitted the Kong ingress log line in the cluster.
   stream:
     lineage:
       - datalake_kong_raw.kong_logs.stream
@@ -39,7 +39,7 @@ columns:
   ts_event:
     lineage:
       - datalake_kong_raw.kong_logs.timestamp
-    description: The event time.
+    description: Timestamp when the Kong access log event was recorded by the ingress controller.
   year:
     lineage:
       - datalake_kong_raw.kong_logs.year
@@ -55,4 +55,4 @@ columns:
   hour:
     lineage:
       - datalake_kong_raw.kong_logs.hour
-    description: Partition column.
+    description: Hour-of-day partition key derived from the event timestamp for incremental reads.

@@ -2,8 +2,8 @@
 database_name: datalake_schedules_clean
 table_name: appointment
 description: Scheduling data currently only includes Inspections, but in the future it should contain data on Visits and Photos scheduling.
-domain: Cross
-owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -12,6 +12,7 @@ columns:
   id_parente:
     lineage:
       - datalake_schedules_raw.appointment.parent_id
+    description: Parent appointment identifier when the schedule is linked to a rescheduled or derived booking.
   id_location_reference:
     lineage:
       - datalake_schedules_raw.appointment.location_reference_id
@@ -29,10 +30,11 @@ columns:
   version:
     lineage:
       - datalake_schedules_raw.appointment.version
+    description: Optimistic locking version number incremented on each appointment update.
   type:
     lineage:
       - datalake_schedules_raw.appointment.type
-    description: Scheduling type
+    description: Scheduling service type such as visit, inspection, or photo session for the appointment.
     categories:
       VISIT: Scheduling the Visit
       INSPECTION: Scheduling the property inspection
@@ -54,7 +56,7 @@ columns:
   status:
     lineage:
       - datalake_schedules_raw.appointment.status
-    description: Schedule status
+    description: Current lifecycle status of the appointment in the scheduling workflow.
     categories:
       WAITING_CONFIRMATION: ""
       DONE: ""
@@ -63,12 +65,15 @@ columns:
   check_in_status:
     lineage:
       - datalake_schedules_raw.appointment.check_in_status
+    description: Check-in progress status for field operations tied to the scheduled appointment.
   last_app_origin:
     lineage:
       - datalake_schedules_raw.appointment.last_app_origin
+    description: Client application or channel that last modified the appointment record.
   code:
     lineage:
       - datalake_schedules_raw.appointment.code
+    description: Human-readable or system code identifying the appointment in scheduling operations.
   business_context:
     lineage:
       - datalake_schedules_raw.appointment.business_context
@@ -76,27 +81,31 @@ columns:
   location_reference_name:
     lineage:
       - datalake_schedules_raw.appointment.location_reference_name
-    description: Source of house data
+    description: Source system or entity type for the property location linked to the appointment.
   internal_reference_name:
     lineage:
       - datalake_schedules_raw.appointment.internal_reference_name
-    description: Source of service data
+    description: Source system or entity type for the scheduled service reference identifier.
   visitant_date_time:
     lineage:
       - datalake_schedules_raw.appointment.visitant_date_time
+    description: Scheduled date and time for the visitor or field agent attendance at the property.
   visitant_reference_name:
     lineage:
       - datalake_schedules_raw.appointment.visitant_reference_name
-    description: Source of visitant data
+    description: Source system or entity type for the visitor or attendee reference identifier.
   business_metadata:
     lineage:
       - datalake_schedules_raw.appointment.business_metadata
+    description: JSON metadata with business-specific attributes attached to the appointment.
   datetime:
     lineage:
       - datalake_schedules_raw.appointment.datetime
+    description: Canonical scheduled date and time of the appointment in local context.
   timezone:
     lineage:
       - datalake_schedules_raw.appointment.timezone
+    description: IANA timezone identifier applied to the appointment scheduled datetime.
   is_confirmed:
     lineage:
       - datalake_schedules_raw.appointment.confirmed

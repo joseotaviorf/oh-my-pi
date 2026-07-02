@@ -1,7 +1,7 @@
 ---
 database_name: datalake_jira_bugs
 table_name: attachments
-description: Attachments extracted from Jira Bugs project issues
+description: Attachments extracted from Jira Bugs project issues. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by id_issue, id_attachment, ts_updated, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -20,7 +20,7 @@ columns:
   file_name:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.filename
-    description: Attached file name
+    description: Original filename of the file attached to the Jira bug issue as stored in Atlassian.
   file_type:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.mimeType
@@ -28,7 +28,7 @@ columns:
   file_content_url:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.content
-    description: URL to the file content in Jira
+    description: Atlassian-hosted download endpoint URL for retrieving the attachment binary content.
   file_thumbnail:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.thumbnail
@@ -36,7 +36,7 @@ columns:
   file_size:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.size
-    description: File size in bytes
+    description: Attachment payload size in bytes as reported by Jira at upload time.
   ts_created:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.created
@@ -50,12 +50,12 @@ columns:
   year:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.created
-    description: Attachment creation year
+    description: Attachment creation year Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.created
-    description: Attachment creation month
+    description: Attachment creation month Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
     lineage:
       - datalake_jira_clean.issues.fields.attachment.created
-    description: Attachment creation day
+    description: Attachment creation day Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.

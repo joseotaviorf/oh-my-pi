@@ -1,7 +1,7 @@
 ---
 database_name: datalake_jira_bugs
 table_name: bug_issues
-description: Enriched Jira issues table (Bugs project) with context, SLAs, and comments/attachments summaries
+description: Enriched Jira issues table (Bugs project) with context, SLAs, and comments/attachments summaries. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by id_issue, id_line, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -33,7 +33,7 @@ columns:
   id_reporter_account:
     lineage:
       - datalake_jira_clean.issues.fields.reporter.accountId
-    description: Account ID of the reporter
+    description: Atlassian account identifier of the user who reported the Jira bug issue.
   id_creator_account:
     lineage:
       - datalake_jira_clean.issues.fields.creator.accountId
@@ -49,11 +49,11 @@ columns:
   project_key:
     lineage:
       - datalake_jira_clean.issues.fields.project.key
-    description: Project key in Jira
+    description: Short Jira project key identifying the Bugs project workspace for the issue.
   project_name:
     lineage:
       - datalake_jira_clean.issues.fields.project.name
-    description: Project name in Jira
+    description: Human-readable Jira project name associated with the bug issue record.
   summary:
     lineage:
       - datalake_jira_clean.issues.fields.summary
@@ -65,11 +65,11 @@ columns:
   issue_description:
     lineage:
       - datalake_jira_clean.issues.fields.description
-    description: Issue description
+    description: Free-text description body of the bug issue as entered in Jira.
   priority:
     lineage:
       - datalake_jira_clean.issues.fields.priority.name
-    description: Issue priority
+    description: Jira priority label assigned to the bug issue for triage and SLA routing.
   request_type_name:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_10200.requestType.name
@@ -77,27 +77,27 @@ columns:
   assignee_name:
     lineage:
       - datalake_jira_clean.issues.fields.assignee.displayName
-    description: Assignee name
+    description: Display name of the Jira user currently assigned to resolve the bug issue.
   assignee_email:
     lineage:
       - datalake_jira_clean.issues.fields.assignee.emailAddress
-    description: Assignee email
+    description: Email address of the Jira user currently assigned to the bug issue.
   reporter_name:
     lineage:
       - datalake_jira_clean.issues.fields.reporter.displayName
-    description: Reporter name
+    description: Display name of the Jira user who originally reported the bug issue.
   reporter_email:
     lineage:
       - datalake_jira_clean.issues.fields.reporter.emailAddress
-    description: Reporter email
+    description: Email address of the Jira user who originally reported the bug issue.
   creator_name:
     lineage:
       - datalake_jira_clean.issues.fields.creator.displayName
-    description: Issue creator name
+    description: Display name of the Jira user who created the bug issue record.
   creator_email:
     lineage:
       - datalake_jira_clean.issues.fields.creator.emailAddress
-    description: Issue creator email
+    description: Email address of the Jira user who created the bug issue record.
   line_name:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_12221.value
@@ -110,92 +110,58 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_11681
     description: Initial squads list (custom field)
-  form_response_issue_module:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_22689.value
-    description: |
-      Form answer - which module has the issue. 
-      Field: [Form S&S Dados] Módulo
-      Question: Em que módulo está o problema?
-  form_response_issue_type:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_25836.value
-    description: |
-      Form answer - issue type. 
-      Field: [Form S&S Dados] Qual o tipo de problema?
-      Question: Qual o tipo de problema?
-  form_response_integration_type:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_22600.value
-    description: |
-      Form answer - integration/update flow. 
-      Field: [Form S&S Dados] Integração/Atualização Dados > Jornada
-  form_response_data_model_issue:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_22602.value
-    description: |
-      Form answer - data modeling issue. 
-      Field: [Form S&S Dados] Problemas na modelagem dos dados > Jornada
-  form_response_dag:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_22692.value
-    description: |
-      Form answer - impacted DAG. 
-      Field: [Form S&S Dados] Em qual dag está o problema?
-  form_response_data_integration:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_25333.value
-    description: |
-      Form answer - data integration. 
-      Field: [Form S&S Dados] Integração de dados
-  form_response_atento_issue:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_22605.value
-    description: |
-      Form answer - Atento problem. 
-      Field: [Form S&S Dados] Atento > Problema
-  form_response_birdie_issue:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_22604.value
-    description: |
-      Form answer - Birdie problem. 
-      Field: [Form S&S Dados] Birdie > Problema
   dag:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_22692.value
-    description: Impacted DAG from the form (alias of form_response_dag)
+    description: Impacted DAG from the form (customfield_22692)
   problem_type:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_22689.value
-    description: Which module has the issue (alias of form_response_issue_module)
+    description: |
+      Form answer - which module has the issue.
+      Field: [Form S&S Dados] Módulo
+      Question: Em que módulo está o problema?
   problem_description:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_25836.value
-    description: Issue type from the form (alias of form_response_issue_type)
+    description: |
+      Form answer - issue type.
+      Field: [Form S&S Dados] Qual o tipo de problema?
+      Question: Qual o tipo de problema?
   integration_type:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_22600.value
-    description: Integration/update flow from the form (alias of form_response_integration_type)
+    description: |
+      Form answer - integration/update flow.
+      Field: [Form S&S Dados] Integração/Atualização Dados > Jornada
   data_model_issue:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_22602.value
-    description: Data modeling issue from the form (alias of form_response_data_model_issue)
+    description: |
+      Form answer - data modeling issue.
+      Field: [Form S&S Dados] Problemas na modelagem dos dados > Jornada
   data_integration:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_25333.value
-    description: Data integration from the form (alias of form_response_data_integration)
+    description: |
+      Form answer - data integration.
+      Field: [Form S&S Dados] Integração de dados
   atento_issue:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_22605.value
-    description: Atento problem from the form (alias of form_response_atento_issue)
+    description: |
+      Form answer - Atento problem.
+      Field: [Form S&S Dados] Atento > Problema
   birdie_issue:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_22604.value
-    description: Birdie problem from the form (alias of form_response_birdie_issue)
+    description: |
+      Form answer - Birdie problem.
+      Field: [Form S&S Dados] Birdie > Problema
   final_resolution:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_19688.value
-    description: Final resolution from B custom field (alias of b_final_resolution)
+    description: Final resolution from B custom field (customfield_19688)
   request_participants:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_10201
@@ -211,15 +177,11 @@ columns:
   labels:
     lineage:
       - datalake_jira_clean.issues.fields.labels
-    description: Issue labels list
+    description: Array of Jira labels applied to the bug issue for filtering and categorization.
   b_labels:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_19832
     description: B labels list (custom field)
-  b_final_resolution:
-    lineage:
-      - datalake_jira_clean.issues.fields.customfield_19688.value
-    description: Final B resolution (custom field)
   aura_invalid_agent_rule_applied:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_25199
@@ -380,12 +342,12 @@ columns:
   year:
     lineage:
       - datalake_jira_clean.issues.created
-    description: Issue creation year
+    description: Issue creation year Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   month:
     lineage:
       - datalake_jira_clean.issues.created
-    description: Issue creation month
+    description: Issue creation month Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.
   day:
     lineage:
       - datalake_jira_clean.issues.created
-    description: Issue creation day
+    description: Issue creation day Always filter on this partition column in WHERE clauses to enable partition pruning when scanning the table.

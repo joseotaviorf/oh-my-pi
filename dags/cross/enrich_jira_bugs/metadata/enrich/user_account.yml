@@ -1,7 +1,7 @@
 ---
 database_name: datalake_jira_bugs
 table_name: user_account
-description: Dimension of Jira user accounts observed in Bugs project issues
+description: Dimension of Jira user accounts observed in Bugs project issues. When filtering by id_account, ts_updated, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -22,7 +22,7 @@ columns:
       - datalake_jira_clean.issues.fields.comment.comments.author.displayName
       - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.displayName
       - datalake_jira_clean.issues.fields.attachment.author.displayName
-    description: Displayed user name
+    description: Jira display name of the user account observed on bug issue interactions.
   email:
     lineage:
       - datalake_jira_clean.issues.fields.assignee.emailAddress
@@ -31,7 +31,7 @@ columns:
       - datalake_jira_clean.issues.fields.comment.comments.author.emailAddress
       - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.emailAddress
       - datalake_jira_clean.issues.fields.attachment.author.emailAddress
-    description: User email
+    description: Corporate or Atlassian email address associated with the Jira user account.
   time_zone:
     lineage:
       - datalake_jira_clean.issues.fields.assignee.timeZone
@@ -40,7 +40,7 @@ columns:
       - datalake_jira_clean.issues.fields.comment.comments.author.timeZone
       - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.timeZone
       - datalake_jira_clean.issues.fields.attachment.author.timeZone
-    description: User time zone
+    description: IANA time zone configured for the Jira user account profile.
   account_type:
     lineage:
       - datalake_jira_clean.issues.fields.assignee.accountType

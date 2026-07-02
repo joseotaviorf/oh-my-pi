@@ -3,7 +3,7 @@ database_name: datalake_schedules_clean
 table_name: appointment_history
 description: Update history of a schedule and its person responsible
 domain: Cross
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -24,10 +24,11 @@ columns:
   version:
     lineage:
       - datalake_schedules_raw.appointment_history.version
+    description: Optimistic locking version number of the appointment at the time of the history event.
   status:
     lineage:
       - datalake_schedules_raw.appointment_history.status
-    description: Schedule status
+    description: Appointment status recorded in this history event within the scheduling workflow.
   category_name:
     lineage:
       - datalake_schedules_raw.appointment_history.category_name
@@ -54,6 +55,7 @@ columns:
   is_visitor_can_see:
     lineage:
       - datalake_schedules_raw.appointment_history.visitor_can_see
+    description: Boolean flag indicating whether the status change is visible to the property visitor.
   ts_created:
     lineage:
       - datalake_schedules_raw.appointment_history.created_at
@@ -61,7 +63,7 @@ columns:
   ts_updated:
     lineage:
       - datalake_schedules_raw.appointment_history.updated_at
-    description: Updated date.
+    description: Timestamp when the appointment history event was last updated in the source system.
   year:
     lineage:
       - datalake_schedules_raw.appointment_history.year
