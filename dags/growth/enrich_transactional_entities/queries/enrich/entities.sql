@@ -1,16 +1,25 @@
 WITH visit AS (
-    WITH visit_events AS (
+    WITH visit_events_ranked AS (
         SELECT
             id_visit,
             event_type,
-            ts_created
+            ts_created,
+            ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) AS rn
         FROM
             datalake_ebdb_clean.visit_status_log
         WHERE
             event_type IN ('VISIT_REQUESTED', 'VISIT_SCHEDULED', 'VISIT_CONFIRMED', 'VISIT_DONE',
                 'VISIT_CANCELED', 'VISIT_UNSUCCESSFUL', 'VISIT_REGISTERED', 'VISIT_RESCHEDULED', 'VISIT_STALLED')
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
+    ),
+    visit_events AS (
+        SELECT
+            id_visit,
+            event_type,
+            ts_created
+        FROM
+            visit_events_ranked
+        WHERE
+            rn = 1
     ),
     visit_base AS (
         SELECT
@@ -516,6 +525,24 @@ house_draft AS (
     FROM
         datalake_entities_views.house_draft
 ),
+collections_segment AS (
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        datalake_entities_views.collections_segment
+    WHERE
+        id_user IS NOT NULL
+),
 reservation AS (
     WITH reservation_base AS (
         SELECT
@@ -982,6 +1009,22 @@ base AS (
         ts_updated
     FROM
         house_draft
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        collections_segment
 )
 SELECT
     b.sk_entity,

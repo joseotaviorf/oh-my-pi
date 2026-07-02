@@ -39,6 +39,10 @@ columns:
       - datalake_entities_views.photo_session.id_user
       - datalake_entities_views.house_draft.id_entity
       - datalake_entities_views.house_draft.id_owner
+      - datalake_entities_views.collections_segment.id_entity
+      - datalake_entities_views.collections_segment.id_user
+      - datalake_entities_views.collections_segment.entity
+      - datalake_entities_views.collections_segment.persona
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique.
@@ -56,6 +60,7 @@ columns:
       - datalake_retsuko_clean.invoice.id
       - datalake_entities_views.photo_session.id_entity
       - datalake_entities_views.house_draft.id_entity
+      - datalake_entities_views.collections_segment.id_entity
     description:
       The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
@@ -71,6 +76,7 @@ columns:
       - datalake_kill_queue_clean.reservation.id_house
       - datalake_entities_views.photo_session.id_house
       - datalake_entities_views.house_draft.id_house
+      - datalake_entities_views.collections_segment.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     lineage:
@@ -80,6 +86,7 @@ columns:
       - datalake_entities_views.onboarding.id_contract
       - datalake_inspection_services_clean.inspection.id_contract
       - datalake_repairs_clean.repair_request.id_contract
+      - datalake_entities_views.collections_segment.id_contract
     description: Contract id related to the entity, if it has any.
       It's the id of the Contrato/Contract table, from Main's database (EBDB).
   id_user:
@@ -104,6 +111,7 @@ columns:
       - datalake_retsuko_clean.account.id_main_user
       - datalake_entities_views.photo_session.id_user
       - datalake_entities_views.house_draft.id_owner
+      - datalake_entities_views.collections_segment.id_user
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -128,6 +136,7 @@ columns:
       FR_INVOICE: The entity is an invoice, with its id_entity mapping directly to the id from the Invoice table in the Retsuko system.
       PHOTO_SESSION: The entity is a photo session, with its id_entity mapping directly to the id from the Photographer Job table in EBDB database.
       HOUSE_DRAFT: The entity is a house draft, with its id_entity mapping directly to the id from the House Draft table in BOB system, representing property registration drafts created through the self-service flow by owners.
+      FR_COLLECTIONS_SEGMENT: The entity is a rental collections segment, with its id_entity mapping directly to id_contract_segment_distribution from the Trato Feito contract_segment_distribution table. It tracks the collections status of a tenant's contract.
   persona:
     lineage:
       - datalake_entities_views.listing.persona
@@ -187,6 +196,8 @@ columns:
       - datalake_entities_views.photo_session.ts_created
       - datalake_entities_views.house_draft.properties
       - datalake_entities_views.house_draft.ts_created
+      - datalake_entities_views.collections_segment.properties
+      - datalake_entities_views.collections_segment.ts_created
     description:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
@@ -233,6 +244,7 @@ columns:
       An invoice entity will be considered as active for status open, and inactive for statuses divergent-payment, not-payable, written-down, canceled, or paid.
       A PHOTO_SESSION entity will be considered as active for all statuses except PUBLICADO, CANCELADO, COMPLETADO, or FOTOSTIRADAS (case-insensitive, after UPPER and TRIM), which are considered inactive.
       A HOUSE_DRAFT entity will be considered as active for statuses 'EDITING' or 'PROCESSING', and inactive for all other statuses.
+      A FR_COLLECTIONS_SEGMENT entity will be considered active for statuses has_late_fee_discount, is_on_pre_evictions, is_on_evictions, and is_segmented (fallback when active but no specific segment matched), and inactive for status debts_settled (contract_segment_distribution.is_active = FALSE).
   ts_inactive:
     lineage:
       - core_visit.visit.ts_updated
@@ -249,6 +261,7 @@ columns:
       - datalake_retsuko_clean.invoice.ts_retsuko_updated
       - datalake_entities_views.photo_session.ts_updated
       - datalake_entities_views.house_draft.ts_updated
+      - datalake_entities_views.collections_segment.ts_updated
     description: Timestamp when the entity became inactive (is_active = FALSE).
       This field captures the ts_updated timestamp for entities that are currently inactive.
       For active entities (is_active = TRUE), this field will be NULL.
@@ -269,6 +282,7 @@ columns:
       - datalake_retsuko_clean.invoice.ts_created
       - datalake_entities_views.photo_session.ts_created
       - datalake_entities_views.house_draft.ts_created
+      - datalake_entities_views.collections_segment.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
@@ -286,6 +300,7 @@ columns:
       - datalake_retsuko_clean.invoice.ts_retsuko_updated
       - datalake_entities_views.photo_session.ts_updated
       - datalake_entities_views.house_draft.ts_updated
+      - datalake_entities_views.collections_segment.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.
