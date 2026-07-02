@@ -1,3 +1,31 @@
+WITH visit_tenant_living AS (
+  WITH visit_tenant_living_ranked AS (
+    SELECT
+      v.id_visit,
+      fc.sk_contract AS sk_contract_tenant_living,
+      fc.sk_tenant AS sk_tenant_living,
+      ROW_NUMBER() OVER(PARTITION BY v.id_visit ORDER BY dc.dt_start DESC) AS rn
+    FROM
+      datalake_visit.visits AS v
+    JOIN
+      dw_rent.fact_contracts AS fc
+        ON v.id_house = fc.sk_house
+    JOIN
+      dw_rent.dim_contract dc
+        ON fc.sk_contract = dc.sk_contract
+        AND dc.status IN ('Ativo', 'Finalizado')
+        AND DATE(v.ts_visit) >= dc.dt_start
+        AND DATE(v.ts_visit) < COALESCE(dc.dt_annulment, CURRENT_DATE)
+  )
+  SELECT
+    id_visit,
+    sk_contract_tenant_living,
+    sk_tenant_living
+  FROM
+    visit_tenant_living_ranked
+  WHERE
+    rn = 1
+)
 SELECT
   v.id_visit AS sk_visit,
   v.id_last_schedule AS sk_last_schedule,
@@ -9,6 +37,8 @@ SELECT
   pfa.id_agent AS sk_fixed_agent,
   pfa.id_user_agent AS sk_user_fixed_agent,
   v.id_house AS sk_house,
+  vtl.sk_contract_tenant_living AS sk_contract_tenant_living,
+  vtl.sk_tenant_living AS sk_tenant_living,
   h.id_region AS sk_region,
   v.id_house_listing AS sk_house_listing,
   v.id_company_demand AS sk_company_demand,
@@ -60,11 +90,11 @@ SELECT
   v.is_3p_lead_gen,
   v.has_3p_access_control,
   v.journey_days,
-  DATEDIFF(HOUR, v.ts_created, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_created_and_visit_day,
-  DATEDIFF(HOUR, v.ts_created, v.ts_visit_canceled) AS hours_between_request_and_cancellation,
-  DATEDIFF(HOUR, v.ts_visit_first_confirmed, v.ts_visit_canceled) AS hours_between_first_booked_and_visit_day,
-  DATEDIFF(HOUR, v.ts_visit_last_confirmed, v.ts_visit_canceled) AS hours_between_last_booked_and_visit_day,
-  DATEDIFF(HOUR, v.ts_visit_canceled, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_cancellation_and_visit_date,
+  TIMESTAMPDIFF(HOUR, v.ts_created, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_created_and_visit_day,
+  TIMESTAMPDIFF(HOUR, v.ts_created, v.ts_visit_canceled) AS hours_between_request_and_cancellation,
+  TIMESTAMPDIFF(HOUR, v.ts_visit_first_confirmed, v.ts_visit_canceled) AS hours_between_first_booked_and_visit_day,
+  TIMESTAMPDIFF(HOUR, v.ts_visit_last_confirmed, v.ts_visit_canceled) AS hours_between_last_booked_and_visit_day,
+  TIMESTAMPDIFF(HOUR, v.ts_visit_canceled, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_cancellation_and_visit_date,
   v.hours_waiting_for_answers,
   v.is_waiting_for_response,
   v.ts_visit_requested,
@@ -125,3 +155,6 @@ LEFT JOIN
     AND r.id_city = pfa.id_region
     AND v.business_context = pfa.business_context
     AND v.ts_created BETWEEN pfa.ts_status_started AND COALESCE(pfa.ts_status_ended, NOW())
+LEFT JOIN
+  visit_tenant_living AS vtl
+    ON v.id_visit = vtl.id_visit

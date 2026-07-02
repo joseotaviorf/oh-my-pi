@@ -20,7 +20,10 @@ workflow:
       - exp_1_15_visits_reconfirmation_hsm_rent
     exp_owner_identifier:
       - exp_1_16_visits_triangulation_owner
+    exp_tenant_living_identifier:
+      - exp_1_17_visits_triangulation_tenant_living
     exp_identifier_unified:
       - exp_visitor_identifier
       - exp_visit_identifier
       - exp_owner_identifier
+      - exp_tenant_living_identifier

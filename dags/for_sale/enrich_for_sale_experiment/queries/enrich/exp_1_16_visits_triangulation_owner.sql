@@ -4,8 +4,8 @@ SELECT
     1 AS id_neotribe,
     16 AS id_experiment,
     'VISITS XP' AS name_neotribe,
-    'visits_triangulation_owner' as name_experiment,
-    'OWNER' as identifier_type,
+    'visits_triangulation_owner' AS name_experiment,
+    'OWNER' AS identifier_type,
     v.business_context,
     CASE
       WHEN RIGHT(NULLIF(u.main_phone, ''), 1) IN (1,3,4,6,9) THEN 'CONTROL'
@@ -14,8 +14,8 @@ SELECT
     END AS test_group,
     CAST(NULL AS STRING) AS documentation_link,
     'Os Owners são identificados de acordo com o dígito final do seu telefone.' AS additional_information,
-    MIN(v.ts_created::DATE) AS dt_identifier_started,
-    MAX(v.ts_created::DATE) AS dt_identifier_ended
+    MIN(DATE(v.ts_created)) AS dt_identifier_started,
+    MAX(DATE(v.ts_created)) AS dt_identifier_ended
 FROM
     datalake_ebdb_clean.visit AS v
 LEFT JOIN

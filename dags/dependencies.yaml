@@ -1414,6 +1414,8 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics:first-run-of-day
   - bietlejuice.velo_zendesk:load-clean-users:first-run-of-day
 bietlejuice.dw_visit:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_contract:load-dw-rent-fact-contracts:first-run-of-day
   - bietlejuice.dw_house:load-dw-house-dim-house-entrance-history:first-run-of-day
   - bietlejuice.dw_rent_demand_events:load-dw-rent-dim-rent-event-type:first-run-of-day
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events:first-run-of-day
@@ -2689,6 +2691,7 @@ bietlejuice.enrich_fintech_snapshot:
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_for_sale_experiment:
+  - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day

@@ -44,6 +44,14 @@ columns:
     description: House's Id.
     lineage:
       - datalake_visit.visits.id_house
+  sk_contract_tenant_living:
+    description: Contract ID of the tenant living associated with the visit.
+    lineage:
+      - dw_rent.fact_contracts.sk_contract
+  sk_tenant_living:
+    description: User ID of the tenant living associated with the visit.
+    lineage:
+      - dw_rent.fact_contracts.sk_tenant
   sk_region:
     description: Region's Id.
     lineage:
@@ -53,11 +61,11 @@ columns:
     lineage:
       - datalake_visit.visits.id_house_listing
   sk_company_demand:
-    description: Id of company demand.
+    description: Company ID of the demand-side partner company linked to the visit agent when the business model involves a demand partner.
     lineage:
       - datalake_visit.visits.id_company_demand
   sk_company_supply:
-    description: Id of company supply.
+    description: Company ID of the supply-side partner company linked to the visit house listing when the business model involves a supply partner.
     lineage:
       - datalake_visit.visits.id_company_supply
   sk_broker_supply:

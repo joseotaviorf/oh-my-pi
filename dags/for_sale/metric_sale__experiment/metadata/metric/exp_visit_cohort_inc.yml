@@ -41,6 +41,11 @@ columns:
       - dw_visit.fact_visits.sk_owner
     description: Foreign key identifying the property owner.
     dimension: True
+  sk_tenant_living:
+    lineage:
+      - dw_visit.fact_visits.sk_tenant_living
+    description: Foreign key identifying the tenant living.
+    dimension: True
   sk_first_associated_agent:
     lineage:
       - dw_visit.fact_visits.sk_first_associated_agent
