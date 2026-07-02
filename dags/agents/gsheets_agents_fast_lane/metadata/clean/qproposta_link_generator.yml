@@ -7,7 +7,7 @@ domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_offer:
-    description: Surrogate key of the sale offer in the DW star schema, as maintained in the spreadsheet.
+    description: Offer identifier string from the spreadsheet (QProposta / offer key), not cast to numeric.
     lineage:
       - datalake_gsheets_raw.qproposta_link_generator.sk_offer
   has_idactum:
