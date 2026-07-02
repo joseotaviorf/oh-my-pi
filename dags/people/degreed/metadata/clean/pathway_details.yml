@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_degreed_raw.pathway_details.relationships[].created_by.data.id
   title:
-    description: Title of the pathway.
+    description: Display title of the Degreed learning pathway presented to learners.
     lineage:
       - datalake_degreed_raw.pathway_details.attributes.title
   summary:

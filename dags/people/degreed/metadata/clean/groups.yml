@@ -18,7 +18,7 @@ columns:
     lineage:
     - datalake_degreed_raw.groups.attributes.external_group_id
   name:
-    description: The name of the group.
+    description: Display name of the learner group in Degreed used for content assignment.
     lineage:
     - datalake_degreed_raw.groups.attributes.name
   description:

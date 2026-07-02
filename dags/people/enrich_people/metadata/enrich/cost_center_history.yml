@@ -27,7 +27,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.assignment_responsibility.id_person
   cost_center_name:
-    description: Cost center name.
+    description: Historical display name of the cost center during the effective period.
     lineage:
       - datalake_pin_core_clean.hr_organization.name
   business:

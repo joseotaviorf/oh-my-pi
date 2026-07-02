@@ -23,7 +23,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.hr_organization.organization_code
   business_unit_name:
-    description: Business unit name.
+    description: Display name of the QuintoAndar business unit in the enriched org structure.
     lineage:
       - datalake_pin_core_clean.hr_organization.name
   legislation_code:

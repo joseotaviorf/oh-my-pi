@@ -14,15 +14,15 @@ columns:
     lineage:
     - datalake_degreed_raw.users.attributes.alias_uid
   full_name:
-    description: The users full name.
+    description: Complete display name of the Degreed user combining first and last name.
     lineage:
     - datalake_degreed_raw.users.attributes.full_name
   first_name:
-    description: The users first name.
+    description: Given name of the Degreed user as registered in the learning platform.
     lineage:
     - datalake_degreed_raw.users.attributes.first_name
   last_name:
-    description: The users last name.
+    description: Family name of the Degreed user as registered in the learning platform.
     lineage:
     - datalake_degreed_raw.users.attributes.last_name
   personal_email:
