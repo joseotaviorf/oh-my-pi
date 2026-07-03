@@ -1,32 +1,42 @@
----
 database_name: datalake_atta_clean
 table_name: users_info
 domain: For Sale
 columns:
   id_user:
     lineage:
-      - datalake_atta_raw.max_usuarios.id
+    - datalake_atta_raw.max_usuarios.id
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_user_registration:
     lineage:
-      - datalake_atta_raw.max_usuarios.id_usuario_cadastro
+    - datalake_atta_raw.max_usuarios.id_usuario_cadastro
+    description: Identifier of the user who registered or created this user account.
   id_partner:
     lineage:
-      - datalake_atta_raw.max_usuarios.idparceiro
+    - datalake_atta_raw.max_usuarios.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_franchise:
     lineage:
-      - datalake_atta_raw.max_usuarios.idfranquia
+    - datalake_atta_raw.max_usuarios.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   user_name:
     lineage:
-      - datalake_atta_raw.max_usuarios.nome
+    - datalake_atta_raw.max_usuarios.nome
+    description: First or given name of the platform user.
   user_last_name:
     lineage:
-      - datalake_atta_raw.max_usuarios.sobrenome
+    - datalake_atta_raw.max_usuarios.sobrenome
+    description: Last name or surname of the platform user.
   user_email:
     lineage:
-      - datalake_atta_raw.max_usuarios.email
+    - datalake_atta_raw.max_usuarios.email
+    description: Email address registered for the platform user.
   user_status:
     lineage:
-      - datalake_atta_raw.max_usuarios.status
+    - datalake_atta_raw.max_usuarios.status
+    description: Account status indicating whether the user is active or inactive.
   ts_last_updated:
     lineage:
-      - datalake_atta_raw.max_usuarios.data_ultima_atualizacao
+    - datalake_atta_raw.max_usuarios.data_ultima_atualizacao
+    description: Timestamp of the most recent update to this user record in the source system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of users info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per users info record with standardized names and types in datalake_atta_clean.

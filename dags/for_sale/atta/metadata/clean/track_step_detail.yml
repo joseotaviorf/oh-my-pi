@@ -1,23 +1,30 @@
----
 database_name: datalake_atta_clean
 table_name: track_step_detail
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_atta_raw.produto_esteira.ID
+    - datalake_atta_raw.produto_esteira.ID
+    description: Surrogate primary key of the track step detail row in the source system.
   id_product:
     lineage:
-      - datalake_atta_raw.produto_esteira.IDProduto
+    - datalake_atta_raw.produto_esteira.IDProduto
+    description: Identifier of the financing product whose workflow step this row tracks.
   decision_number:
     lineage:
-      - datalake_atta_raw.produto_esteira.NrDecisao
+    - datalake_atta_raw.produto_esteira.NrDecisao
+    description: Sequential decision number assigned to this step in the product workflow.
   proposal_status:
     lineage:
-      - datalake_atta_raw.produto_esteira.Descricao
+    - datalake_atta_raw.produto_esteira.Descricao
+    description: Current status of the financing or sale proposal in the partner workflow.
   id_proposal_status:
     lineage:
-      - datalake_atta_raw.produto_esteira.PrxStatus
+    - datalake_atta_raw.produto_esteira.PrxStatus
+    description: Code identifying the proposal status reached at this product workflow step.
   id_proposal_situation:
     lineage:
-      - datalake_atta_raw.produto_esteira.Situacao
+    - datalake_atta_raw.produto_esteira.Situacao
+    description: Code identifying the situation or state of the proposal at this workflow step.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of track step detail sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per track step detail record with standardized names and types in datalake_atta_clean.
