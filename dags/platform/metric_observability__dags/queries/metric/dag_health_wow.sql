@@ -26,6 +26,7 @@ WITH window_runs AS (
         ecosystem,
         environment,
         provisioner,
+        cost_cohort,
         data_classification,
         primary_dbr_version,
         n_databricks_job_runs,
@@ -225,6 +226,7 @@ SELECT
     FIRST(ecosystem)                                                                       AS ecosystem,
     FIRST(environment)                                                                     AS environment,
     FIRST(provisioner)                                                                     AS provisioner,
+    FIRST(cost_cohort)                                                                     AS cost_cohort,
     FIRST(data_classification)                                                           AS data_classification,
     -- --- Cluster profile ---
     FIRST(primary_dbr_version)                                                           AS primary_dbr_version,

@@ -314,6 +314,33 @@ ORDER BY dt_usage, id_databricks_workspace;
 
 Expected result: this is a directional sanity check only. `fact_databricks_costs` remains the cost authority; task facts remain operational attribution.
 
+## Cohort Consistency Cross-Check
+
+`cost_cohort` (bietlejuice / quintoml_wonka / cdp / tech_platform / other) is sourced from `datalake_databricks_pricing.dim_cost_cohort` and applied consistently to `fact_databricks_costs`, `fact_databricks_task_run`, and `fact_databricks_dag_run`. Zero-`other` expectation for the health family: every Airflow workload in `dw_databricks_health.fact_databricks_dag_run` must classify to a non-`other` cohort — any `cost_cohort = 'other'` row with `dt_dag_run_started >= DATE('2026-01-01')` is a regression (guarded at Error level by that table's data-quality check; the fix is a new `dim_cost_cohort` rule, not weakening the check). On the cost spine, `other` remains a legitimate reportable bucket (interactive notebooks, SQL warehouses, ML serving, sandbox, and ad-hoc BI jobs).
+
+The Superset dataset that previously defined the cohort CASE inline (dataset 21202, dashboard `data-platform-cost-all-cohorts`) now consumes the fact column; its versioned audit copy lives at `docs/superset/dataset_21202_platform_cost.sql` (committed in Phase D of the cost-cohort rollout).
+
+```sql
+WITH spine AS (
+    SELECT month, cost_cohort, ROUND(SUM(dbu_cost_usd), 2) AS spine_dbu_usd
+    FROM dw_databricks_costs.fact_databricks_costs
+    WHERE year = 2026 AND bucket = 'orchestrated_jobs'
+    GROUP BY month, cost_cohort
+),
+task AS (
+    SELECT MONTH(dt_task_started) AS month, cost_cohort, ROUND(SUM(total_dbu_cost_usd), 2) AS task_dbu_usd
+    FROM dw_databricks_health.fact_databricks_task_run
+    WHERE YEAR(dt_task_started) = 2026 AND NOT is_job_on_interactive
+    GROUP BY MONTH(dt_task_started), cost_cohort
+)
+SELECT s.month, s.cost_cohort, s.spine_dbu_usd, t.task_dbu_usd,
+       ROUND(ABS(s.spine_dbu_usd - COALESCE(t.task_dbu_usd, 0)) / NULLIF(s.spine_dbu_usd, 0), 3) AS rel_delta
+FROM spine s LEFT JOIN task t ON s.month = t.month AND s.cost_cohort = t.cost_cohort
+ORDER BY s.month, s.cost_cohort;
+```
+
+Expected result: DBU cost per cohort matches within ~2% for settled months; EC2/idle attribution differences are expected and larger.
+
 ## Consumer Guidance
 
 - Total Platform Databricks tracking: `dw_databricks_costs.fact_databricks_costs`.

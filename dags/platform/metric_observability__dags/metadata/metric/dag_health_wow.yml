@@ -54,6 +54,11 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.provisioner
     description: Cluster `provisioner` tag when present.
     dimension: True
+  cost_cohort:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.cost_cohort
+    description: Initiative cost cohort (bietlejuice / quintoml_wonka / cdp / tech_platform / other) passed through from fact_databricks_dag_run.
+    dimension: True
   data_classification:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.data_classification

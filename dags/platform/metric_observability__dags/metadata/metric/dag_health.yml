@@ -61,7 +61,7 @@ columns:
   airflow_dag_id:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
-    description: Airflow DAG identifier without the bietlejuice. prefix (e.g. enrich_ebdb_booking).
+    description: Airflow DAG identifier as emitted by fact_databricks_dag_run — full canonical id including the framework prefix (e.g. bietlejuice.enrich_ebdb_booking, quintoml.wonka.user_activity).
     dimension: True
   team_owner:
     lineage:
@@ -110,6 +110,11 @@ columns:
       fact_databricks_dag_run.provisioner (originally the cluster
       `provisioner` tag). Use to segment cost by orchestrator/platform.
       NULL for clusters without the tag (typically ad-hoc notebook jobs).
+    dimension: True
+  cost_cohort:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.cost_cohort
+    description: Initiative cost cohort (bietlejuice / quintoml_wonka / cdp / tech_platform / other) passed through from fact_databricks_dag_run.
     dimension: True
   data_classification:
     lineage:
