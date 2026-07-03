@@ -1,0 +1,91 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: integration_preset
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Reusable configuration templates for broker CRM/XML feed integrations in Brokers Supply Processor.
+  Each preset defines the integration type (e.g. Vista, Kenlo, file feed), field mapping rules, optional
+  file parser settings, and filter rules applied to incoming property payloads before lead creation.
+
+  BUSINESS CONTEXT: Central catalog of integration recipes shared across partner broker integrations.
+  Enables consistent parsing and mapping logic across companies while allowing per-broker connection
+  parameters on broker_integration.
+
+  RELATED TABLES: broker_integration (many integrations reference one preset via uuid_integration_preset).
+columns:
+  uuid_integration_preset:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.id
+    description: >
+      Primary key UUID for the integration preset (UUID, Primary Key, Not Nullable).
+  name:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.name
+    description: >
+      Human-readable preset name (STRING, Not Nullable, max length 255).
+  description:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.description
+    description: >
+      Optional long-form description of the preset purpose and supported source systems (TEXT, Nullable).
+  type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.type
+    description: >
+      Integration engine type discriminator (STRING, Not Nullable, max length 64). Determines which
+      enricher/parser pipeline runs at sync time (e.g. Vista CRM, file feed).
+  file_parser:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.file_parser
+    description: >
+      JSON configuration for file-based feed parsing (JSON, Nullable). Null for API/CRM polling presets.
+  mapping:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.mapping
+    description: >
+      JSON field-mapping rules from source payload to BSP lead schema (JSON, Not Nullable).
+  filter_rules:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.filter_rules
+    description: >
+      JSON array of filter rules applied before lead processing (JSON, Not Nullable, default empty array).
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.created_at
+    description: >
+      Timestamp when the preset was created (TIMESTAMP, Not Nullable).
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.updated_at
+    description: >
+      Timestamp of the last preset update (TIMESTAMP, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'
+  op_cdc:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.integration_preset.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

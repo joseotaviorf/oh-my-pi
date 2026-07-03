@@ -1,0 +1,105 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: broker_integration
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Per-partner broker integration configuration in Brokers Supply Processor. Each row binds a company
+  and integrator partner to an integration_preset, storing connection parameters (cron schedule, API
+  credentials, feed URLs) and lifecycle flags (active, deleted). Drives scheduled CRM/XML sync jobs
+  and ingestion orchestration.
+
+  BUSINESS CONTEXT: Operational source of truth for which partners have automated inventory feeds,
+  whether sync is enabled, and how each feed connects to BSP. Used to monitor integration health,
+  onboarding, and decommissioning.
+
+  RELATED TABLES: integration_preset (uuid_integration_preset), broker_integration_item (id_broker_integration),
+  broker_integration_ingestion (id_broker_integration).
+columns:
+  id_broker_integration:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.id
+    description: >
+      Auto-increment primary key for the broker integration (BIGINT, Primary Key, Not Nullable).
+  name:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.name
+    description: >
+      Display name for the integration instance (STRING, Not Nullable, max length 255).
+  uuid_company:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.company_uuid
+    description: >
+      QuintoAndar company UUID that owns this integration (UUID, Nullable). Nullable for future
+      multi-company integration models.
+  uuid_integrator_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.integrator_partner_uuid
+    description: >
+      UUID of the integrator partner entity in the partner ecosystem (UUID, Not Nullable).
+  uuid_integration_preset:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.preset_id
+    description: >
+      Foreign key to integration_preset defining parser, mapping, and filter rules (UUID, Not Nullable).
+  integration_params:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.integration_params
+    description: >
+      Per-broker connection settings as JSON (JSON, Not Nullable). Structure depends on preset type
+      (e.g. cron expression and API credentials for polling integrations).
+  is_active:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.active
+    description: >
+      Whether scheduled sync and processing are enabled for this integration (BOOLEAN, Not Nullable).
+  is_deleted:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.deleted
+    description: >
+      Logical delete flag; deleted integrations are terminal and ineligible for sync (BOOLEAN, Not Nullable).
+  ts_last_source_modified:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.last_source_modified_at
+    description: >
+      Cursor timestamp of the last successful source modification seen during sync (TIMESTAMP, Nullable).
+      Null indicates the integration has never synced or was reset for full reprocess.
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.created_at
+    description: >
+      Timestamp when the integration was created (TIMESTAMP, Not Nullable).
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.updated_at
+    description: >
+      Timestamp of the last integration update (TIMESTAMP, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'
+  op_cdc:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

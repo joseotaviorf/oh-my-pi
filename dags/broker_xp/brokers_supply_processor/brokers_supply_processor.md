@@ -90,6 +90,12 @@ erDiagram
     lead_3p ||--o{ lead_merge_event : "uuid_existing_lead"
     rev_info ||--o{ lead_3p_aud : "rev"
     rev_info ||--o{ business_context_detail_aud : "rev"
+    integration_preset ||--o{ broker_integration : "uuid_integration_preset"
+    broker_integration ||--o{ broker_integration_item : "id_broker_integration"
+    broker_integration_item ||--o{ broker_integration_item_status_entry : "id_broker_integration_item"
+    broker_integration ||--o{ broker_integration_ingestion : "id_broker_integration"
+    broker_integration_ingestion ||--o{ broker_integration_ingestion_item : "id_broker_integration_ingestion"
+    broker_integration_ingestion ||--o| broker_integration_ingestion : "id_parent_broker_integration_ingestion"
 
     lead_3p {
         bigint id PK
@@ -172,6 +178,73 @@ erDiagram
     rev_info {
         bigint rev PK
         timestamp ts_created
+    }
+
+    integration_preset {
+        uuid uuid_integration_preset PK
+        string name
+        string type
+        json mapping
+        json filter_rules
+        timestamp ts_created
+        timestamp ts_updated
+    }
+
+    broker_integration {
+        bigint id_broker_integration PK
+        uuid uuid_company
+        uuid uuid_integrator_partner
+        uuid uuid_integration_preset FK
+        json integration_params
+        bool is_active
+        bool is_deleted
+        timestamp ts_last_source_modified
+        timestamp ts_created
+        timestamp ts_updated
+    }
+
+    broker_integration_item {
+        bigint id_broker_integration_item PK
+        bigint id_broker_integration FK
+        string broker_source_id
+        string status
+        string operation
+        json latest_payload
+        timestamp ts_source_modified
+        timestamp ts_created
+        timestamp ts_updated
+    }
+
+    broker_integration_item_status_entry {
+        bigint id_broker_integration_item_status_entry PK
+        bigint id_broker_integration_item FK
+        string status
+        string message
+        timestamp ts_occurred
+    }
+
+    broker_integration_ingestion {
+        bigint id_broker_integration_ingestion PK
+        bigint id_broker_integration FK
+        bigint id_parent_broker_integration_ingestion FK
+        string status
+        int total_rows
+        timestamptz ts_started
+        timestamptz ts_finished
+        timestamptz ts_created
+    }
+
+    broker_integration_ingestion_item {
+        bigint id_broker_integration_ingestion_item PK
+        bigint id_broker_integration_ingestion FK
+        string broker_source_id
+        int row_index
+        json payload
+        string status
+        int retry_count
+        timestamptz ts_next_retry
+        timestamptz ts_created
+        timestamptz ts_updated
     }
 ```
 
@@ -541,6 +614,116 @@ Key clean columns: `business_context`, `status`, `status_reason`, `id_partner`, 
 
 ---
 
+### `integration_preset`
+
+Reusable CRM/XML/file-feed integration templates. Defines parser, mapping, and filter rules shared by `broker_integration` instances.
+
+| Column (clean) | OLTP column | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `uuid_integration_preset` | `id` | UUID | NOT NULL | **PK** |
+| `name` | `name` | STRING | NOT NULL | |
+| `description` | `description` | TEXT | NULL | |
+| `type` | `type` | STRING | NOT NULL | Integration engine discriminator |
+| `file_parser` | `file_parser` | JSON | NULL | File-feed parser config |
+| `mapping` | `mapping` | JSON | NOT NULL | Field mapping rules |
+| `filter_rules` | `filter_rules` | JSON | NOT NULL | Default `[]` |
+| `ts_created` | `created_at` | TIMESTAMP | NOT NULL | |
+| `ts_updated` | `updated_at` | TIMESTAMP | NOT NULL | |
+
+---
+
+### `broker_integration`
+
+Per-partner integration configuration bound to a preset. Stores connection params and sync lifecycle flags.
+
+| Column (clean) | OLTP column | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id_broker_integration` | `id` | BIGINT | NOT NULL | **PK** |
+| `name` | `name` | STRING | NOT NULL | |
+| `uuid_company` | `company_uuid` | UUID | NULL | Relaxed from NOT NULL in migration |
+| `uuid_integrator_partner` | `integrator_partner_uuid` | UUID | NOT NULL | |
+| `uuid_integration_preset` | `preset_id` | UUID | NOT NULL | FK → `integration_preset` |
+| `integration_params` | `integration_params` | JSON | NOT NULL | Cron, credentials, feed URLs |
+| `is_active` | `active` | BOOLEAN | NOT NULL | |
+| `is_deleted` | `deleted` | BOOLEAN | NOT NULL | Logical delete |
+| `ts_last_source_modified` | `last_source_modified_at` | TIMESTAMP | NULL | Sync cursor |
+| `ts_created` | `created_at` | TIMESTAMP | NOT NULL | |
+| `ts_updated` | `updated_at` | TIMESTAMP | NOT NULL | |
+
+---
+
+### `broker_integration_item`
+
+Long-lived inventory row per `(broker_integration, broker_source_id)`. Denormalized current status; full history in `broker_integration_item_status_entry`.
+
+| Column (clean) | OLTP column | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id_broker_integration_item` | `id` | BIGINT | NOT NULL | **PK** |
+| `id_broker_integration` | `broker_integration_id` | BIGINT | NOT NULL | FK |
+| `broker_source_id` | `broker_source_id` | STRING | NOT NULL | Partner external ID |
+| `payload_hash` | `payload_hash` | STRING | NULL | Change detection |
+| `latest_payload` | `latest_payload` | JSON | NULL | Last enriched snapshot |
+| `status` | `status` | STRING | NOT NULL | PENDING, COMPLETED, ERROR, … |
+| `operation` | `operation` | STRING | NULL | CREATE / UPDATE |
+| `ts_source_modified` | `source_modified_at` | TIMESTAMP | NULL | |
+| `ts_created` | `created_at` | TIMESTAMP | NOT NULL | |
+| `ts_updated` | `updated_at` | TIMESTAMP | NOT NULL | |
+
+---
+
+### `broker_integration_item_status_entry`
+
+Append-only status transition audit for integration items.
+
+| Column (clean) | OLTP column | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id_broker_integration_item_status_entry` | `id` | BIGINT | NOT NULL | **PK** |
+| `id_broker_integration_item` | `broker_integration_item_id` | BIGINT | NOT NULL | FK, CASCADE delete |
+| `status` | `status` | STRING | NOT NULL | |
+| `message` | `message` | TEXT | NULL | Error/info text |
+| `ts_occurred` | `occurred_at` | TIMESTAMP | NOT NULL | |
+
+---
+
+### `broker_integration_ingestion`
+
+One ingestion run (sync, upload, or reprocess) for a broker integration.
+
+| Column (clean) | OLTP column | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id_broker_integration_ingestion` | `id` | BIGINT | NOT NULL | **PK** |
+| `id_broker_integration` | `broker_integration_id` | BIGINT | NOT NULL | FK |
+| `status` | `status` | STRING | NOT NULL | RUNNING, COMPLETED, PARTIAL, FAILED |
+| `id_parent_broker_integration_ingestion` | `parent_ingestion_id` | BIGINT | NULL | Reprocess parent |
+| `total_rows` | `total_rows` | INTEGER | NULL | Set on completion |
+| `ts_started` | `started_at` | TIMESTAMPTZ | NOT NULL | |
+| `ts_finished` | `finished_at` | TIMESTAMPTZ | NULL | |
+| `ts_created` | `created_at` | TIMESTAMPTZ | NOT NULL | |
+
+---
+
+### `broker_integration_ingestion_item`
+
+Per-row processing within an ingestion run.
+
+| Column (clean) | OLTP column | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id_broker_integration_ingestion_item` | `id` | BIGINT | NOT NULL | **PK** |
+| `id_broker_integration_ingestion` | `ingestion_id` | BIGINT | NOT NULL | FK |
+| `broker_source_id` | `broker_source_id` | STRING | NOT NULL | |
+| `row_index` | `row_index` | INTEGER | NULL | File feeds only |
+| `payload` | `payload` | JSON | NULL | Null for Vista CRM |
+| `payload_hash` | `payload_hash` | STRING | NULL | |
+| `ts_source_modified` | `source_modified_at` | TIMESTAMPTZ | NULL | |
+| `status` | `status` | STRING | NOT NULL | PENDING, SKIPPED, COMPLETED, FAILED |
+| `status_message` | `status_message` | TEXT | NULL | |
+| `retry_count` | `retry_count` | INTEGER | NULL | |
+| `ts_next_retry` | `next_retry_at` | TIMESTAMPTZ | NULL | |
+| `ts_created` | `created_at` | TIMESTAMPTZ | NOT NULL | |
+| `ts_updated` | `updated_at` | TIMESTAMPTZ | NOT NULL | |
+
+---
+
 ### `rev_info`
 
 Hibernate Envers revision metadata for all `_aud` tables.
@@ -558,7 +741,6 @@ Hibernate Envers revision metadata for all `_aud` tables.
 | Table / area | Notes |
 |---|---|
 | `file`, `file_aud` | Bulk import batch metadata |
-| `broker_integration*`, `integration_preset`, `broker_integration_ingestion*` | CRM/XML feed engine (scheduled sync, reconcile) |
 | `crm_integrator_process*` | CRM integrator orchestration |
 | `analytic_event` | Internal analytics events |
 | `lead_blocklist` | Blocked lead identifiers |
@@ -577,6 +759,8 @@ Hibernate Envers revision metadata for all `_aud` tables.
 | `lead_3p` | `location` (JSON) | Address PII |
 | `lead_3p_aud` | same JSON fields | Historical PII in audit snapshots |
 | `lead_update_operation_history` | `metadata` (JSON) | May contain PII depending on operation |
+| `broker_integration_item` | `latest_payload` (JSON) | May contain owner/contact PII from source CRM |
+| `broker_integration_ingestion_item` | `payload` (JSON) | May contain owner/contact PII from file feeds |
 
 Downstream enrich/DW models should **not** propagate raw owner contact fields — use `sk_person` / `dim_person` joins where person identity is needed.
 
@@ -586,7 +770,7 @@ Downstream enrich/DW models should **not** propagate raw owner contact fields �
 
 | Layer | Schema | Tables |
 |---|---|---|
-| Raw | `datalake_brokers_supply_processor_raw` | 11 source tables (CDC) |
-| Clean | `datalake_brokers_supply_processor_clean` | 11 normalized tables (see `queries/clean/`) |
+| Raw | `datalake_brokers_supply_processor_raw` | 17 source tables (CDC) |
+| Clean | `datalake_brokers_supply_processor_clean` | 17 normalized tables (see `queries/clean/`) |
 
 **Downstream DAGs:** `enrich_3p_supply`, `dw_3p_supply`, `dw_brokers`, `enrich_brokers`.

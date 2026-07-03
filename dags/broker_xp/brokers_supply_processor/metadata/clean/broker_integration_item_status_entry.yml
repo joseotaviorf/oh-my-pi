@@ -1,0 +1,69 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: broker_integration_item_status_entry
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Append-only audit log of status transitions for broker_integration_item rows. Each entry records
+  when a status changed, the new status value, and an optional informational or error message.
+  The current status is also denormalized on the parent item for efficient filtering.
+
+  BUSINESS CONTEXT: Debugging and operational analysis of integration processing failures, filter
+  exclusions, and multi-step completion flows (e.g. PARTIAL_COMPLETED awaiting sibling data).
+
+  RELATED TABLES: broker_integration_item (id_broker_integration_item).
+columns:
+  id_broker_integration_item_status_entry:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.id
+    description: >
+      Auto-increment primary key for the status history entry (BIGINT, Primary Key, Not Nullable).
+  id_broker_integration_item:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.broker_integration_item_id
+    description: >
+      Parent integration item (BIGINT, Foreign Key, Not Nullable). Cascade-deleted with parent item.
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.status
+    description: >
+      Status value at this transition (STRING, Not Nullable, max length 32).
+  message:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.message
+    description: >
+      Optional error or informational message associated with the transition (TEXT, Nullable).
+  ts_occurred:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.occurred_at
+    description: >
+      Timestamp when the status transition occurred (TIMESTAMP, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'
+  op_cdc:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.op_cdc
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.ts_cdc_transaction
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_brokers_supply_processor_raw.broker_integration_item_status_entry.ts_database_transaction
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

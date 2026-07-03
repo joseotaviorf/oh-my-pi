@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       CDC pipeline for the Brokers Supply Processor microservice (3P partner lead ingestion).
       Captures property leads, business-context processing status, deduplication locks, merge events,
-      and Hibernate Envers audit history from PostgreSQL
+      broker CRM/XML integration configuration and ingestion runs, and Hibernate Envers audit history from PostgreSQL
       (brokers-supply-processor.db.core-prd.habitat.zone / brokers_supply_processor.public).
 
       Source repo: backend-services/applications/brokers-supply-processor
@@ -57,6 +57,24 @@ workflow:
       clean_primary_keys: [id_lead_merge_event]
     revinfo:
       clean_table_name: rev_info
+    integration_preset:
+      z_order_by: [id]
+      clean_z_order_by: [uuid_integration_preset]
+    broker_integration:
+      z_order_by: [id]
+      clean_z_order_by: [id_broker_integration]
+    broker_integration_item:
+      z_order_by: [id]
+      clean_z_order_by: [id_broker_integration_item]
+    broker_integration_item_status_entry:
+      z_order_by: [id]
+      clean_z_order_by: [id_broker_integration_item_status_entry]
+    broker_integration_ingestion:
+      z_order_by: [id]
+      clean_z_order_by: [id_broker_integration_ingestion]
+    broker_integration_ingestion_item:
+      z_order_by: [id]
+      clean_z_order_by: [id_broker_integration_ingestion_item]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
