@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: ongoing_contracts_daily
 description: Count of unique contracts that were signed and were active on a day.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   day:
     lineage:
@@ -13,13 +13,13 @@ columns:
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code identifier.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   ongoing_contracts:
     description: Count of unique contracts that were signed and were active on each day.
     metric:
       name: Ongoing Contracts Daily
-      description:
+      description: 
         Count of unique contracts that were signed and were active on each day.
         Attention to the contracts of type DealOnly (we only had contracts with this type until 2016).
         It was a service only for contracts, without the administration of the rent, therefore only generated brokerage but no

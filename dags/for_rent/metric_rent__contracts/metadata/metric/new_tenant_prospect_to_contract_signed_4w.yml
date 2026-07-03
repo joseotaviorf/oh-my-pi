@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: new_tenant_prospect_to_contract_signed_4w
 description: Monthly metric of new tenant prospects with signed contract within 4 weeks after first booking or offer.
 domain: For Rent
-owner: marcus.pinto@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   dt_month_started:
     lineage:

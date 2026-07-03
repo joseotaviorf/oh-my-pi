@@ -1,13 +1,13 @@
 ---
 database_name: metric_rent
 table_name: ongoing_rentals_daily
-description:
+description: |
   Daily table that has the amount of unique signed contracts that started and were active at the day.
   Attention to the contracts of type DealOnly (we only had contracts with this type until 2016).
   It was a service only for contracts, without the administration of the rent, therefore only generated brokerage but no
   administration fees and will be accounted once on the day of contract started.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   day:
     lineage:
@@ -17,13 +17,13 @@ columns:
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code of the house.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   ongoing_rentals:
     description: Amount of signed contracts that started and were active during the day.
     metric:
       name: Ongoing Rentals Daily
-      description:
+      description: 
         Count of unique signed contracts that started and were active at the
         last day of the period (day). Attention to the contracts of type DealOnly
         (we only had contracts with this type until 2016). It was a service only for contracts,

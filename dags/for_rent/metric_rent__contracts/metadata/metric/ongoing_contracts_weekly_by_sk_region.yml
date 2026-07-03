@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: ongoing_contracts_weekly_by_sk_region
 description: Count of unique contracts that were signed and were active on each week per sk_region.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   week_start:
     lineage:
@@ -13,18 +13,18 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_house_listings.sk_region
-    description: Region identifier.
+    description: Surrogate key of the region used to segment this rental metric.
     dimension: True
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code identifier.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   ongoing_contracts:
     description: Count of unique contracts that were signed and were active on each week per sk_region.
     metric:
       name: Ongoing Contracts Weekly by SK Region
-      description:
+      description: 
         Count of unique contracts that were signed and were active at the last
         day of the period (week). Attention to the contracts of type DealOnly
         (we only had contracts with this type until 2016). It was a service only for contracts,
