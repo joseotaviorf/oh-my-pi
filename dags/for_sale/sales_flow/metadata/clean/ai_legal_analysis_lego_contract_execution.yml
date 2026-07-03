@@ -1,52 +1,50 @@
----
 database_name: datalake_sales_flow_clean
 table_name: ai_legal_analysis_lego_contract_execution
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Contains records of AI legal analysis for Lego contract execution in sales flows.
 columns:
   id:
     description: Unique identifier for the Lego contract execution record.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.id
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.sales_flow_id
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.sales_flow_id
   id_legocontract_execution:
     description: Identifier for the Lego contract execution.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.legocontract_execution_id
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.legocontract_execution_id
   id_person:
     description: Identifier for the person associated with the contract execution.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.person_id
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.person_id
   payload_fields_hash:
     description: Hash of the payload fields for integrity verification.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.payload_fields_hash
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.payload_fields_hash
   legalops_saved_fields:
-    description: Fields saved by LegalOps during the contract execution process.
+    description: JSON of contract clause values persisted by the legal operations team during review.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.legalops_saved_fields
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.legalops_saved_fields
   ts_created:
     description: Timestamp of when the record was created.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.created_at
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.created_at
   ts_updated:
     description: Timestamp of the last update to the record.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.updated_at
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.year
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.month
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.day
-
+    - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.day

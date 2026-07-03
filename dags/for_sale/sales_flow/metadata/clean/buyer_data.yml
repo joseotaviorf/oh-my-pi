@@ -1,67 +1,66 @@
----
 database_name: datalake_sales_flow_clean
 table_name: buyer_data
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table with the buyer information that will be used on the CCV. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
 columns:
   id_buyer:
     description: Buyer user ID on SalesFlow tables.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.id
+    - datalake_sales_flow_raw.buyer_data.id
   id_sales_flow:
     description: SalesFlow offer ID. Joins with datalake_sales_flow_clean.sales_flow.id
     lineage:
-      - datalake_sales_flow_raw.buyer_data.sales_flow_id
+    - datalake_sales_flow_raw.buyer_data.sales_flow_id
   id_docx_folder:
-    description: Buyer Docx Folder ID on Docx tables.
+    description: Identifier of the document folder storing seller or buyer paperwork.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.docx_folder_id
+    - datalake_sales_flow_raw.buyer_data.docx_folder_id
   name:
-    description: Buyer full name
+    description: Human-readable display name associated with the person or entity in this row.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.name
+    - datalake_sales_flow_raw.buyer_data.name
   email:
-    description: User email
+    description: Contact email address used for notifications and identity matching.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.email
+    - datalake_sales_flow_raw.buyer_data.email
   holding_value:
     description: Indicates how much this buyer is participating on the offer value.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.holding_value
+    - datalake_sales_flow_raw.buyer_data.holding_value
   ccv_role:
     description: Indicates the user role on this CCV, on this case will be BUYER.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.ccv_role
+    - datalake_sales_flow_raw.buyer_data.ccv_role
   signer_status:
     description: Indicate if this user is a CCV signer.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.signer_status
+    - datalake_sales_flow_raw.buyer_data.signer_status
   investor:
     description: Indicates if this user is an investor.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.investor
+    - datalake_sales_flow_raw.buyer_data.investor
   triage_status:
-    description: Triage status for this buyer.
+    description: Triage status of the buyer in the document review process.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.triage_status
+    - datalake_sales_flow_raw.buyer_data.triage_status
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.created_at
+    - datalake_sales_flow_raw.buyer_data.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.updated_at
+    - datalake_sales_flow_raw.buyer_data.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.year
+    - datalake_sales_flow_raw.buyer_data.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.month
+    - datalake_sales_flow_raw.buyer_data.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.buyer_data.day
+    - datalake_sales_flow_raw.buyer_data.day

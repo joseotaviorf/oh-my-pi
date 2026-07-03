@@ -1,103 +1,102 @@
----
 database_name: datalake_sales_flow_clean
 table_name: addendums_aud
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Audit table for addendums containing historical changes and modifications.
 columns:
   id:
     description: Unique ID for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.id
+    - datalake_sales_flow_raw.addendums_aud.id
   rev:
     description: Unique id for this modification and can be joined with table rev_info to get more details.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.rev
+    - datalake_sales_flow_raw.addendums_aud.rev
   rev_type:
-    description: Modification type.
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
     categories:
-      "0" : Create
-      "1" : Update
-      "2" : Delete
+      '0': Create
+      '1': Update
+      '2': Delete
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.revtype
+    - datalake_sales_flow_raw.addendums_aud.revtype
   rev_end:
     description: ID of the revision that replaced the current entry.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.revend
+    - datalake_sales_flow_raw.addendums_aud.revend
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.sales_flow_id
+    - datalake_sales_flow_raw.addendums_aud.sales_flow_id
   mod_id_sales_flow:
     description: Flag indicating if the column id_sales_flow has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.addendums_aud.sales_flow_id_mod
   id_ccv:
     description: Foreign key to the CCV (contract) table.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.ccv_id
+    - datalake_sales_flow_raw.addendums_aud.ccv_id
   mod_id_ccv:
     description: Flag indicating if the column id_ccv has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.ccv_id_mod
+    - datalake_sales_flow_raw.addendums_aud.ccv_id_mod
   status:
     description: Current status of the addendum.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.status
+    - datalake_sales_flow_raw.addendums_aud.status
   mod_status:
     description: Flag indicating if the column status has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.status_mod
+    - datalake_sales_flow_raw.addendums_aud.status_mod
   ts_signed:
     description: Timestamp when the addendum was signed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.signed_at
+    - datalake_sales_flow_raw.addendums_aud.signed_at
   mod_ts_signed:
     description: Flag indicating if the column ts_signed has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.signed_at_mod
+    - datalake_sales_flow_raw.addendums_aud.signed_at_mod
   signed_document_token:
-    description: Token for the signed document.
+    description: Audited storage token identifying the signed addendum document file.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.signed_document_token
+    - datalake_sales_flow_raw.addendums_aud.signed_document_token
   mod_signed_document_token:
     description: Flag indicating if the column signed_document_token has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.signed_document_token_mod
+    - datalake_sales_flow_raw.addendums_aud.signed_document_token_mod
   unsigned_document_token:
-    description: Token for the unsigned document.
+    description: Audited storage token identifying the unsigned addendum document file.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.unsigned_document_token
+    - datalake_sales_flow_raw.addendums_aud.unsigned_document_token
   mod_unsigned_document_token:
     description: Flag indicating if the column unsigned_document_token has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.unsigned_document_token_mod
+    - datalake_sales_flow_raw.addendums_aud.unsigned_document_token_mod
   reasons:
     description: Reasons for the addendum.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.reasons
+    - datalake_sales_flow_raw.addendums_aud.reasons
   mod_reasons:
     description: Flag indicating if the column reasons has changed.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.reasons_mod
+    - datalake_sales_flow_raw.addendums_aud.reasons_mod
   ts_created:
     description: Timestamp when the addendum was created.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.created_at
+    - datalake_sales_flow_raw.addendums_aud.created_at
   ts_updated:
     description: Timestamp of the last update to the addendum.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.updated_at
+    - datalake_sales_flow_raw.addendums_aud.updated_at
   year:
     description: Year partition for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.year
+    - datalake_sales_flow_raw.addendums_aud.year
   month:
     description: Month partition for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.month
+    - datalake_sales_flow_raw.addendums_aud.month
   day:
     description: Day partition for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums_aud.day
+    - datalake_sales_flow_raw.addendums_aud.day

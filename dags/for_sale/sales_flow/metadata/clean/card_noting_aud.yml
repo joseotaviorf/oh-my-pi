@@ -4,46 +4,63 @@ domain: For Sale
 columns:
   id_card_noting:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.id
+    - datalake_sales_flow_raw.card_noting_aud.id
+    description: Unique identifier of the audited card noting record.
   rev:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.rev
+    - datalake_sales_flow_raw.card_noting_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.revtype
+    - datalake_sales_flow_raw.card_noting_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.revend
+    - datalake_sales_flow_raw.card_noting_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   buyer_and_seller:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.buyer_and_seller
+    - datalake_sales_flow_raw.card_noting_aud.buyer_and_seller
+    description: Audited notes recorded about the buyer and seller on the deal card.
   commitment_closing_transfer:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.commitment_closing_transfer
+    - datalake_sales_flow_raw.card_noting_aud.commitment_closing_transfer
+    description: Audited notes about the commitment, closing, and transfer steps on the deal card.
   negotiation_note:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.negotiation_note
+    - datalake_sales_flow_raw.card_noting_aud.negotiation_note
+    description: Audited free-text negotiation note recorded on the deal card.
   buyer_and_seller_mod:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.buyer_and_seller_mod
+    - datalake_sales_flow_raw.card_noting_aud.buyer_and_seller_mod
+    description: Envers boolean flag indicating whether buyer_and_seller changed in this audit revision.
   commitment_closing_transfer_mod:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.commitment_closing_transfer_mod
+    - datalake_sales_flow_raw.card_noting_aud.commitment_closing_transfer_mod
+    description: Envers boolean flag indicating whether commitment_closing_transfer changed in this audit revision.
   negotiation_note_mod:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.negotiation_note_mod
+    - datalake_sales_flow_raw.card_noting_aud.negotiation_note_mod
+    description: Envers boolean flag indicating whether negotiation_note changed in this audit revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.created_at
+    - datalake_sales_flow_raw.card_noting_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.updated_at
+    - datalake_sales_flow_raw.card_noting_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.year
+    - datalake_sales_flow_raw.card_noting_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.month
+    - datalake_sales_flow_raw.card_noting_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.card_noting_aud.day
+    - datalake_sales_flow_raw.card_noting_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of card noting rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

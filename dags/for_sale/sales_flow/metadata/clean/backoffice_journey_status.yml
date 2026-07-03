@@ -1,60 +1,58 @@
----
 database_name: datalake_sales_flow_clean
 table_name: backoffice_journey_status
-owner: vinicius.vargas@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Tracks the backoffice journey onboarding status for buyers and sellers
-  in a sales flow, recording when each party completed the onboarding process."
+description: Tracks the backoffice journey onboarding status for buyers and sellers in a sales flow, recording when each party completed the onboarding process.
 columns:
   id:
-    description: 'Id of the backoffice journey status record.'
+    description: Id of the backoffice journey status record.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.id
+    - datalake_sales_flow_raw.backoffice_journey_status.id
   id_sales_flow:
-    description: 'Id of the associated sales flow.'
+    description: Id of the associated sales flow.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.sales_flow_id
+    - datalake_sales_flow_raw.backoffice_journey_status.sales_flow_id
   is_buyer_onboarded:
-    description: 'Flag indicating whether the buyer has completed onboarding.'
+    description: Flag indicating whether the buyer has completed onboarding.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.is_buyer_onboarded
+    - datalake_sales_flow_raw.backoffice_journey_status.is_buyer_onboarded
   is_seller_onboarded:
-    description: 'Flag indicating whether the seller has completed onboarding.'
+    description: Flag indicating whether the seller has completed onboarding.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.is_seller_onboarded
+    - datalake_sales_flow_raw.backoffice_journey_status.is_seller_onboarded
   is_buyer_eligible_for_chatbot:
-    description: 'Flag indicating whether the buyer is eligible to interact via chatbot.'
+    description: Flag indicating whether the buyer is eligible to interact via chatbot.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.is_buyer_eligible_for_chatbot
+    - datalake_sales_flow_raw.backoffice_journey_status.is_buyer_eligible_for_chatbot
   is_seller_eligible_for_chatbot:
-    description: 'Flag indicating whether the seller is eligible to interact via chatbot.'
+    description: Flag indicating whether the seller is eligible to interact via chatbot.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.is_seller_eligible_for_chatbot
+    - datalake_sales_flow_raw.backoffice_journey_status.is_seller_eligible_for_chatbot
   ts_buyer_onboarding_concluded:
-    description: 'Timestamp when the buyer completed the onboarding process.'
+    description: Timestamp when the buyer completed the onboarding process.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.buyer_onboarding_concluded_at
+    - datalake_sales_flow_raw.backoffice_journey_status.buyer_onboarding_concluded_at
   ts_seller_onboarding_concluded:
-    description: 'Timestamp when the seller completed the onboarding process.'
+    description: Timestamp when the seller completed the onboarding process.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.seller_onboarding_concluded_at
+    - datalake_sales_flow_raw.backoffice_journey_status.seller_onboarding_concluded_at
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: Timestamp of the creation of the record.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.created_at
+    - datalake_sales_flow_raw.backoffice_journey_status.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: Timestamp of the last update of the record.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.updated_at
+    - datalake_sales_flow_raw.backoffice_journey_status.updated_at
   year:
-    description: 'Year of the record.'
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.year
+    - datalake_sales_flow_raw.backoffice_journey_status.year
   month:
-    description: 'Month of the record.'
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.month
+    - datalake_sales_flow_raw.backoffice_journey_status.month
   day:
-    description: 'Day of the record.'
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.backoffice_journey_status.day
+    - datalake_sales_flow_raw.backoffice_journey_status.day

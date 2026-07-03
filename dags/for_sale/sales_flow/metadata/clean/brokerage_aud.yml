@@ -1,58 +1,74 @@
----
 database_name: datalake_sales_flow_clean
 table_name: brokerage_aud
 description: Audit of brokerage information associated with an offer.
 domain: For Sale
-owner: gustavo.miller@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_brokerage_aud:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.id
+    - datalake_sales_flow_raw.brokerage_aud.id
+    description: Unique identifier of the audited brokerage record.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.sales_flow_id
+    - datalake_sales_flow_raw.brokerage_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   brokerage_fee_payer:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.brokerage_fee_payer
+    - datalake_sales_flow_raw.brokerage_aud.brokerage_fee_payer
+    description: Audited party responsible for paying the brokerage fee.
   quinto_andar_brokerage_split:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.quinto_andar_brokerage_split
+    - datalake_sales_flow_raw.brokerage_aud.quinto_andar_brokerage_split
+    description: Audited QuintoAndar share of the brokerage fee.
   brokerage_fee:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.brokerage_fee
+    - datalake_sales_flow_raw.brokerage_aud.brokerage_fee
+    description: Audited brokerage fee amount charged on the sale.
   rev:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.rev
+    - datalake_sales_flow_raw.brokerage_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.revtype
+    - datalake_sales_flow_raw.brokerage_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.revend
+    - datalake_sales_flow_raw.brokerage_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.brokerage_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
   mod_brokerage_fee_payer:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.brokerage_fee_payer_mod
+    - datalake_sales_flow_raw.brokerage_aud.brokerage_fee_payer_mod
+    description: Envers boolean flag indicating whether brokerage fee payer changed in this audit revision.
   mod_quinto_andar_brokerage_split:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.quinto_andar_brokerage_split_mod
+    - datalake_sales_flow_raw.brokerage_aud.quinto_andar_brokerage_split_mod
+    description: Envers boolean flag indicating whether quinto andar brokerage split changed in this audit revision.
   mod_brokerage_fee:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.brokerage_fee_mod
+    - datalake_sales_flow_raw.brokerage_aud.brokerage_fee_mod
+    description: Envers boolean flag indicating whether brokerage fee changed in this audit revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.created_at
+    - datalake_sales_flow_raw.brokerage_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.updated_at
+    - datalake_sales_flow_raw.brokerage_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.year
+    - datalake_sales_flow_raw.brokerage_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.month
+    - datalake_sales_flow_raw.brokerage_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.brokerage_aud.day
+    - datalake_sales_flow_raw.brokerage_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.

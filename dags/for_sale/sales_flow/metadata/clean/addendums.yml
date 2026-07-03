@@ -1,59 +1,58 @@
----
 database_name: datalake_sales_flow_clean
 table_name: addendums
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Contains information about addendums (amendments) to sales flow contracts.
 columns:
   id:
     description: Unique ID for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums.id
+    - datalake_sales_flow_raw.addendums.id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.addendums.sales_flow_id
+    - datalake_sales_flow_raw.addendums.sales_flow_id
   id_ccv:
     description: Foreign key to the CCV (contract) table.
     lineage:
-      - datalake_sales_flow_raw.addendums.ccv_id
+    - datalake_sales_flow_raw.addendums.ccv_id
   status:
     description: Current status of the addendum.
     lineage:
-      - datalake_sales_flow_raw.addendums.status
+    - datalake_sales_flow_raw.addendums.status
   ts_signed:
     description: Timestamp when the addendum was signed.
     lineage:
-      - datalake_sales_flow_raw.addendums.signed_at
+    - datalake_sales_flow_raw.addendums.signed_at
   signed_document_token:
-    description: Token for the signed document.
+    description: Storage token identifying the signed addendum document file.
     lineage:
-      - datalake_sales_flow_raw.addendums.signed_document_token
+    - datalake_sales_flow_raw.addendums.signed_document_token
   unsigned_document_token:
-    description: Token for the unsigned document.
+    description: Storage token identifying the unsigned addendum document file.
     lineage:
-      - datalake_sales_flow_raw.addendums.unsigned_document_token
+    - datalake_sales_flow_raw.addendums.unsigned_document_token
   reasons:
     description: Reasons for the addendum.
     lineage:
-      - datalake_sales_flow_raw.addendums.reasons
+    - datalake_sales_flow_raw.addendums.reasons
   ts_created:
     description: Timestamp when the addendum was created.
     lineage:
-      - datalake_sales_flow_raw.addendums.created_at
+    - datalake_sales_flow_raw.addendums.created_at
   ts_updated:
     description: Timestamp of the last update to the addendum.
     lineage:
-      - datalake_sales_flow_raw.addendums.updated_at
+    - datalake_sales_flow_raw.addendums.updated_at
   year:
     description: Year partition for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums.year
+    - datalake_sales_flow_raw.addendums.year
   month:
     description: Month partition for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums.month
+    - datalake_sales_flow_raw.addendums.month
   day:
     description: Day partition for the addendum record.
     lineage:
-      - datalake_sales_flow_raw.addendums.day
+    - datalake_sales_flow_raw.addendums.day

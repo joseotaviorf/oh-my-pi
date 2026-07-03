@@ -1,52 +1,50 @@
----
 database_name: datalake_sales_flow_clean
 table_name: ai_legal_analysis_document_extraction
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Contains records of AI legal analysis document extraction for sales flows.
 columns:
   id:
     description: Unique identifier for the document extraction record.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.id
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.sales_flow_id
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.sales_flow_id
   id_docx_attachment_document:
     description: Identifier for the attached DOCX document.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docx_attachment_document_id
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docx_attachment_document_id
   id_docpilot_document_external:
     description: External identifier for the document in DocPilot system.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docpilot_document_external_id
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docpilot_document_external_id
   docx_attachment_filename:
     description: Filename of the attached DOCX document.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docx_attachment_filename
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docx_attachment_filename
   docpilot_document_extractor_type:
-    description: Type of extractor used by DocPilot for document analysis.
+    description: Type of DocPilot extractor used to parse the legal document.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docpilot_document_extractor_type
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.docpilot_document_extractor_type
   ts_created:
     description: Timestamp of when the record was created.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.created_at
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.created_at
   ts_updated:
     description: Timestamp of the last update to the record.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.updated_at
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.year
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.month
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.day
-
+    - datalake_sales_flow_raw.ai_legal_analysis_document_extraction.day

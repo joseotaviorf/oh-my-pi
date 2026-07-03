@@ -4,70 +4,95 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.id
+    - datalake_sales_flow_raw.address_data_aud.id
+    description: Surrogate primary key of the address data aud row in the source system.
   street:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.street
+    - datalake_sales_flow_raw.address_data_aud.street
+    description: Audited street name of the property address at this revision.
   number:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.number
+    - datalake_sales_flow_raw.address_data_aud.number
+    description: Audited street number of the property address at this revision.
   complement:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.complement
+    - datalake_sales_flow_raw.address_data_aud.complement
+    description: Audited address complement such as apartment or unit number at this revision.
   neighborhood:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.neighborhood
+    - datalake_sales_flow_raw.address_data_aud.neighborhood
+    description: Audited neighborhood of the property address at this revision.
   city:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.city
+    - datalake_sales_flow_raw.address_data_aud.city
+    description: Audited city of the property address at this revision.
   state:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.state
+    - datalake_sales_flow_raw.address_data_aud.state
+    description: Audited state (federative unit) of the property address at this revision.
   zip_code:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.zip_code
+    - datalake_sales_flow_raw.address_data_aud.zip_code
+    description: Audited postal ZIP code (CEP) of the property address at this revision.
   rev:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.rev
+    - datalake_sales_flow_raw.address_data_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.revtype
+    - datalake_sales_flow_raw.address_data_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.revend
+    - datalake_sales_flow_raw.address_data_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   mod_street:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.street_mod
+    - datalake_sales_flow_raw.address_data_aud.street_mod
+    description: Envers boolean flag indicating whether street changed in this audit revision.
   mod_number:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.number_mod
+    - datalake_sales_flow_raw.address_data_aud.number_mod
+    description: Envers boolean flag indicating whether number changed in this audit revision.
   mod_complement:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.complement_mod
+    - datalake_sales_flow_raw.address_data_aud.complement_mod
+    description: Envers boolean flag indicating whether complement changed in this audit revision.
   mod_neighborhood:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.neighborhood_mod
+    - datalake_sales_flow_raw.address_data_aud.neighborhood_mod
+    description: Envers boolean flag indicating whether neighborhood changed in this audit revision.
   mod_city:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.city_mod
+    - datalake_sales_flow_raw.address_data_aud.city_mod
+    description: Envers boolean flag indicating whether city changed in this audit revision.
   mod_state:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.state_mod
+    - datalake_sales_flow_raw.address_data_aud.state_mod
+    description: Envers boolean flag indicating whether state changed in this audit revision.
   mod_zip_code:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.zip_code_mod
+    - datalake_sales_flow_raw.address_data_aud.zip_code_mod
+    description: Envers boolean flag indicating whether zip code changed in this audit revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.created_at
+    - datalake_sales_flow_raw.address_data_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.updated_at
+    - datalake_sales_flow_raw.address_data_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.year
+    - datalake_sales_flow_raw.address_data_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.month
+    - datalake_sales_flow_raw.address_data_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.address_data_aud.day
+    - datalake_sales_flow_raw.address_data_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of address data rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.
