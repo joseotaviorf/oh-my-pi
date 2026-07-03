@@ -1,49 +1,47 @@
----
 database_name: datalake_legalops_clean
 table_name: lego_analysis_results
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: >
-  Table with LegoContract assessment results, exploded from the full_analysis JSON. Each row represents one assessment within a contract analysis
-  request (each contract analysis have many different assessments), enabling tracking of validation results by assessment type over time.
+description: |
+  Table with LegoContract assessment results, exploded from the full_analysis JSON. Each row represents one assessment within a contract analysis request (each contract analysis have many different assessments), enabling tracking of validation results by assessment type over time.
 columns:
   id_contract_analysis_job:
     description: Identifier of the contract analysis job execution that produced this assessment result. Joins with id_contract_analysis_job from datalake_legalops_clean.contract_analysis_request.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.contract_analysis_job_id
+    - datalake_legalops_raw.contract_analysis_request.contract_analysis_job_id
   id_sales_flow:
     description: Foreign key to the sales flow associated with this contract analysis. Joins with all id_sales_flow from datalake_sales_flow_clean tables.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.id_sales_flow
+    - datalake_legalops_raw.contract_analysis_request.id_sales_flow
   analysis_date:
     description: Date when the contract analysis request was created.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.ts_created
+    - datalake_legalops_raw.contract_analysis_request.ts_created
   validation_id:
     description: Identifier of the Rule ID of the validation associated with this assessment (e.g. B01, SL01, HA12, H05). Comes from nested json attribute validation_id
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.full_analysis
+    - datalake_legalops_raw.contract_analysis_request.full_analysis
   assessment_name:
     description: Name of the assessment for the given valudation evaluated by LegoContract (e.g. house_address_number, is_non_residential_suspicion, seller_is_house_holder).  Comes from nested json attribute assessment_name
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.full_analysis
+    - datalake_legalops_raw.contract_analysis_request.full_analysis
   assessment_status:
     description: Status of the individual assessment returned by LegoContract (e.g. MATCH, CHECK_PASS, CHECK_WARNING, DIFFERENT). Comes from nested json attribute assessment_status
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.full_analysis
+    - datalake_legalops_raw.contract_analysis_request.full_analysis
   assessment_consolidated_status:
     description: Final status of the assessment, indicates ACTION_NEEDED, OK or UNAVAILABLE.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.full_analysis
+    - datalake_legalops_raw.contract_analysis_request.full_analysis
   assessment_confidence:
     description: Confidence level of the validation assessment indicates if the validation has HIGH/LOW/MEDIUM confidence in its result.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.full_analysis
+    - datalake_legalops_raw.contract_analysis_request.full_analysis
   ts_analysis_started:
     description: Timestamp when the contract analysis job started processing the request in LegoContract.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.analysis_started_at
+    - datalake_legalops_raw.contract_analysis_request.analysis_started_at
   ts_analysis_end:
     description: Timestamp when the contract analysis job finished processing the request in LegoContract.
     lineage:
-      - datalake_legalops_raw.contract_analysis_request.analysis_ended_at
+    - datalake_legalops_raw.contract_analysis_request.analysis_ended_at

@@ -1,47 +1,46 @@
----
 database_name: datalake_legalops_clean
 table_name: document_extraction
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table with document extraction results from DocPilot or other extractors.
 columns:
   id:
     description: Unique ID for the document extraction record.
     lineage:
-      - datalake_legalops_raw.document_extraction.id
+    - datalake_legalops_raw.document_extraction.id
   docpilot_external_id:
     description: External ID from DocPilot for this extraction job.
     lineage:
-      - datalake_legalops_raw.document_extraction.docpilot_external_id
+    - datalake_legalops_raw.document_extraction.docpilot_external_id
   status:
     description: Current status of the document extraction (e.g. PENDING, SUCCESS, FAILED).
     lineage:
-      - datalake_legalops_raw.document_extraction.status
+    - datalake_legalops_raw.document_extraction.status
   extractor:
     description: Name of the extractor service used (e.g. LEGO_HOUSE_REGISTRATION).
     lineage:
-      - datalake_legalops_raw.document_extraction.extractor
+    - datalake_legalops_raw.document_extraction.extractor
   error_message:
     description: Error message if the document extraction failed.
     lineage:
-      - datalake_legalops_raw.document_extraction.error_message
+    - datalake_legalops_raw.document_extraction.error_message
   ts_created:
     description: Timestamp when the document extraction was created.
     lineage:
-      - datalake_legalops_raw.document_extraction.created_at
+    - datalake_legalops_raw.document_extraction.created_at
   ts_updated:
     description: Timestamp of the last update to the document extraction.
     lineage:
-      - datalake_legalops_raw.document_extraction.updated_at
+    - datalake_legalops_raw.document_extraction.updated_at
   year:
     description: Year partition for the document extraction record.
     lineage:
-      - datalake_legalops_raw.document_extraction.year
+    - datalake_legalops_raw.document_extraction.year
   month:
     description: Month partition for the document extraction record.
     lineage:
-      - datalake_legalops_raw.document_extraction.month
+    - datalake_legalops_raw.document_extraction.month
   day:
     description: Day partition for the document extraction record.
     lineage:
-      - datalake_legalops_raw.document_extraction.day
+    - datalake_legalops_raw.document_extraction.day

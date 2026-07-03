@@ -1,75 +1,74 @@
----
 database_name: datalake_legalops_clean
 table_name: contract_analysis_feedback_observations
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table with individual field-level feedback observations for contract analysis results.
 columns:
   id:
     description: Unique ID for the feedback observation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.id
+    - datalake_legalops_raw.contract_analysis_feedback_observations.id
   id_feedback_batch:
     description: Foreign key to the feedback batch this observation belongs to.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.feedback_batch_id
+    - datalake_legalops_raw.contract_analysis_feedback_observations.feedback_batch_id
   field_name:
     description: Name of the contract analysis field being evaluated in this observation.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.field_name
+    - datalake_legalops_raw.contract_analysis_feedback_observations.field_name
   user_selection:
     description: Selection made by the analyst for this field during feedback.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.user_selection
+    - datalake_legalops_raw.contract_analysis_feedback_observations.user_selection
   saved_value:
     description: Value saved by the analyst for the field, if applicable.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.saved_value
+    - datalake_legalops_raw.contract_analysis_feedback_observations.saved_value
   assessment_display_type:
     description: Display type used for the assessment of this field in the UI.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.assessment_display_type
+    - datalake_legalops_raw.contract_analysis_feedback_observations.assessment_display_type
   assessment_consolidated_status:
     description: Consolidated assessment status for this field observation.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.assessment_consolidated_status
+    - datalake_legalops_raw.contract_analysis_feedback_observations.assessment_consolidated_status
   id_observation:
     description: Identifier linking this feedback to the original observation in the analysis.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.observation_id
+    - datalake_legalops_raw.contract_analysis_feedback_observations.observation_id
   trace_id:
     description: Trace identifier for tracking this observation across systems.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.trace_id
+    - datalake_legalops_raw.contract_analysis_feedback_observations.trace_id
   comment:
     description: Optional comment provided by the analyst for this observation.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.comment
+    - datalake_legalops_raw.contract_analysis_feedback_observations.comment
   status:
     description: Current processing status of the feedback observation.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.status
+    - datalake_legalops_raw.contract_analysis_feedback_observations.status
   error_message:
     description: Error message if the feedback observation processing failed.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.error_message
+    - datalake_legalops_raw.contract_analysis_feedback_observations.error_message
   ts_created:
     description: Timestamp when the feedback observation was created.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.created_at
+    - datalake_legalops_raw.contract_analysis_feedback_observations.created_at
   ts_updated:
     description: Timestamp of the last update to the feedback observation.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.updated_at
+    - datalake_legalops_raw.contract_analysis_feedback_observations.updated_at
   year:
     description: Year partition for the feedback observation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.year
+    - datalake_legalops_raw.contract_analysis_feedback_observations.year
   month:
     description: Month partition for the feedback observation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.month
+    - datalake_legalops_raw.contract_analysis_feedback_observations.month
   day:
     description: Day partition for the feedback observation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_feedback_observations.day
+    - datalake_legalops_raw.contract_analysis_feedback_observations.day

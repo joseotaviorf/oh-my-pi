@@ -1,59 +1,58 @@
----
 database_name: datalake_legalops_clean
 table_name: contract_analysis_data_relation
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table linking contract analysis requests to document attachments and extractions.
 columns:
   id:
     description: Unique ID for the contract analysis data relation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.id
+    - datalake_legalops_raw.contract_analysis_data_relation.id
   id_contract_analysis_request:
     description: Foreign key to the contract analysis request.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.contract_analysis_request_id
+    - datalake_legalops_raw.contract_analysis_data_relation.contract_analysis_request_id
   id_document_attachment:
     description: Foreign key to the document attachment.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.document_attachment_id
+    - datalake_legalops_raw.contract_analysis_data_relation.document_attachment_id
   id_document_extraction:
     description: Foreign key to the document extraction.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.document_extraction_id
+    - datalake_legalops_raw.contract_analysis_data_relation.document_extraction_id
   download_started_at:
     description: Timestamp when the download of the document started.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.download_started_at
+    - datalake_legalops_raw.contract_analysis_data_relation.download_started_at
   download_ended_at:
     description: Timestamp when the download of the document ended.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.download_ended_at
+    - datalake_legalops_raw.contract_analysis_data_relation.download_ended_at
   extraction_started_at:
     description: Timestamp when the extraction of the document started.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.extraction_started_at
+    - datalake_legalops_raw.contract_analysis_data_relation.extraction_started_at
   extraction_ended_at:
     description: Timestamp when the extraction of the document ended.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.extraction_ended_at
+    - datalake_legalops_raw.contract_analysis_data_relation.extraction_ended_at
   ts_created:
     description: Timestamp when the relation was created.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.created_at
+    - datalake_legalops_raw.contract_analysis_data_relation.created_at
   ts_updated:
     description: Timestamp of the last update to the relation.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.updated_at
+    - datalake_legalops_raw.contract_analysis_data_relation.updated_at
   year:
     description: Year partition for the contract analysis data relation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.year
+    - datalake_legalops_raw.contract_analysis_data_relation.year
   month:
     description: Month partition for the contract analysis data relation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.month
+    - datalake_legalops_raw.contract_analysis_data_relation.month
   day:
     description: Day partition for the contract analysis data relation record.
     lineage:
-      - datalake_legalops_raw.contract_analysis_data_relation.day
+    - datalake_legalops_raw.contract_analysis_data_relation.day

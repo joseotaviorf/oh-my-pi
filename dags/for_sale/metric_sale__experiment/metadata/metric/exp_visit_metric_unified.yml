@@ -2,46 +2,42 @@ database_name: metric_sale
 table_name: exp_visit_metric_unified
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
-description:
-  Unified experiment metrics table combining visit conversion rates and identifier metrics
-  across different cohort time windows (1d, 3d, 7d, 14d, 21d, 28d) for For Sale experiments.
-  This table consolidates both visit conversion metrics and visit identifier metrics into a single
-  view for comprehensive experiment analysis.
+description: Unified experiment metrics table combining visit conversion rates and identifier metrics across different cohort time windows (1d, 3d, 7d, 14d, 21d, 28d) for For Sale experiments. This table consolidates both visit conversion metrics and visit identifier metrics into a single view for comprehensive experiment analysis.
 columns:
   sk_exp_visit_metric:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.sk_exp_visit_metric
-      - metric_sale.exp_visit_identifier_metric_inc.sk_exp_visit_metric
+    - metric_sale.exp_visit_metric_conversion_inc.sk_exp_visit_metric
+    - metric_sale.exp_visit_identifier_metric_inc.sk_exp_visit_metric
     description: Unique key combining experiment, cohort period, metric name, and reference date.
-    dimension: True
+    dimension: true
   exp_name_neotribe:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.exp_name_neotribe
-      - metric_sale.exp_visit_identifier_metric_inc.exp_name_neotribe
+    - metric_sale.exp_visit_metric_conversion_inc.exp_name_neotribe
+    - metric_sale.exp_visit_identifier_metric_inc.exp_name_neotribe
     description: Name of the neotribe conducting the experiment.
-    dimension: True
+    dimension: true
   exp_name_experiment:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.exp_name_experiment
-      - metric_sale.exp_visit_identifier_metric_inc.exp_name_experiment
+    - metric_sale.exp_visit_metric_conversion_inc.exp_name_experiment
+    - metric_sale.exp_visit_identifier_metric_inc.exp_name_experiment
     description: Name of the specific experiment being conducted.
-    dimension: True
+    dimension: true
   exp_identifier_type:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.exp_identifier_type
-      - metric_sale.exp_visit_identifier_metric_inc.exp_identifier_type
+    - metric_sale.exp_visit_metric_conversion_inc.exp_identifier_type
+    - metric_sale.exp_visit_identifier_metric_inc.exp_identifier_type
     description: Type of identifier used for experiment participants (e.g., VISITOR, HOUSE, AGENT).
-    dimension: True
+    dimension: true
   business_context:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.business_context
-      - metric_sale.exp_visit_identifier_metric_inc.business_context
+    - metric_sale.exp_visit_metric_conversion_inc.business_context
+    - metric_sale.exp_visit_identifier_metric_inc.business_context
     description: Business context of the experiment (RENT or SALE).
-    dimension: True
+    dimension: true
   metric_cohort:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.metric_cohort
-      - metric_sale.exp_visit_identifier_metric_inc.metric_cohort
+    - metric_sale.exp_visit_metric_conversion_inc.metric_cohort
+    - metric_sale.exp_visit_identifier_metric_inc.metric_cohort
     description: Cohort time window for metric calculation.
     categories:
       1d: 1-day cohort metrics.
@@ -50,90 +46,90 @@ columns:
       14d: 14-day cohort metrics.
       21d: 21-day cohort metrics.
       28d: 28-day cohort metrics.
-    dimension: True
+    dimension: true
   metric_name:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.metric_name
-      - metric_sale.exp_visit_identifier_metric_inc.metric_name
+    - metric_sale.exp_visit_metric_conversion_inc.metric_name
+    - metric_sale.exp_visit_identifier_metric_inc.metric_name
     description: Name of the specific metric being measured in the experiment.
-    dimension: True
+    dimension: true
   control_metric_value:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.control_metric_value
-      - metric_sale.exp_visit_identifier_metric_inc.control_metric_value
+    - metric_sale.exp_visit_metric_conversion_inc.control_metric_value
+    - metric_sale.exp_visit_identifier_metric_inc.control_metric_value
     description: Calculated metric value for the control group in the experiment.
     metric:
       name: Control Group Metric Value
       description: Measured value of the metric for the control group participants.
       acronym: Control
-      is_additive: False
+      is_additive: false
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
   control_metric_error:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.control_metric_error
-      - metric_sale.exp_visit_identifier_metric_inc.control_metric_error
+    - metric_sale.exp_visit_metric_conversion_inc.control_metric_error
+    - metric_sale.exp_visit_identifier_metric_inc.control_metric_error
     description: Statistical error margin for the control group metric value using binomial proportion confidence interval.
     metric:
       name: Control Group Metric Error
       description: Statistical error margin for control group metric measurement.
       acronym: Control Error
-      is_additive: False
+      is_additive: false
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
   treatment_metric_value:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.treatment_metric_value
-      - metric_sale.exp_visit_identifier_metric_inc.treatment_metric_value
+    - metric_sale.exp_visit_metric_conversion_inc.treatment_metric_value
+    - metric_sale.exp_visit_identifier_metric_inc.treatment_metric_value
     description: Calculated metric value for the treatment group in the experiment.
     metric:
       name: Treatment Group Metric Value
       description: Measured value of the metric for the treatment group participants.
       acronym: Treatment
-      is_additive: False
+      is_additive: false
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
   treatment_metric_error:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.treatment_metric_error
-      - metric_sale.exp_visit_identifier_metric_inc.treatment_metric_error
+    - metric_sale.exp_visit_metric_conversion_inc.treatment_metric_error
+    - metric_sale.exp_visit_identifier_metric_inc.treatment_metric_error
     description: Statistical error margin for the treatment group metric value using binomial proportion confidence interval.
     metric:
       name: Treatment Group Metric Error
       description: Statistical error margin for treatment group metric measurement.
       acronym: Treatment Error
-      is_additive: False
+      is_additive: false
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
-      link_to_metric: ""
+      link_to_metric: ''
   dt_ref:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
-      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
+    - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+    - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Reference date for metric calculation and incremental processing.
-    dimension: True
+    dimension: true
   year:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
-      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
+    - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+    - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Year component of the reference date for partitioning.
-    dimension: True
+    dimension: true
   month:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
-      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
+    - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+    - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Month component of the reference date for partitioning.
-    dimension: True
+    dimension: true
   day:
     lineage:
-      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
-      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
+    - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+    - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Day component of the reference date for partitioning.
-    dimension: True
+    dimension: true

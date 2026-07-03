@@ -1,92 +1,88 @@
----
 database_name: metric_sale
 table_name: exp_visit_cohort
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Experiment cohort analysis table tracking visit status and funnel progression
-  across multiple time windows (1d, 3d, 7d, 14d, 21d, 28d) for visits within active experiments.
-  Each row is a unique visit of an experiment and cohort in a specific date
-  between the creation date of the visit and the end date of the experiment.
+description: Experiment cohort analysis table tracking visit status and funnel progression across multiple time windows (1d, 3d, 7d, 14d, 21d, 28d) for visits within active experiments. Each row is a unique visit of an experiment and cohort in a specific date between the creation date of the visit and the end date of the experiment.
 columns:
   sk_exp_visit_cohort:
     lineage:
-      - dw_for_sale_experiment.fact_experiment.sk_neotribe_exp
-      - dw_visit.fact_visits.sk_visit
-      - dw_public.dim_date.date
+    - dw_for_sale_experiment.fact_experiment.sk_neotribe_exp
+    - dw_visit.fact_visits.sk_visit
+    - dw_public.dim_date.date
     description: Unique key combining experiment, visit, cohort period, and reference date.
-    dimension: True
+    dimension: true
   sk_neotribe_exp:
     lineage:
-      - dw_for_sale_experiment.fact_experiment.sk_neotribe_exp
+    - dw_for_sale_experiment.fact_experiment.sk_neotribe_exp
     description: Foreign key to experiment dimension table identifying the specific experiment.
-    dimension: True
+    dimension: true
   sk_visit:
     lineage:
-      - dw_visit.fact_visits.sk_visit
+    - dw_visit.fact_visits.sk_visit
     description: Foreign key to visit fact table identifying the specific visit.
-    dimension: True
+    dimension: true
   sk_house:
     lineage:
-      - dw_visit.fact_visits.sk_house
+    - dw_visit.fact_visits.sk_house
     description: Foreign key identifying the house visited.
-    dimension: True
+    dimension: true
   sk_visitor:
     lineage:
-      - dw_visit.fact_visits.sk_visitor
+    - dw_visit.fact_visits.sk_visitor
     description: Foreign key identifying the visitor.
-    dimension: True
+    dimension: true
   sk_owner:
     lineage:
-      - dw_visit.fact_visits.sk_owner
+    - dw_visit.fact_visits.sk_owner
     description: Foreign key identifying the property owner.
-    dimension: True
+    dimension: true
   sk_tenant_living:
     lineage:
       - dw_visit.fact_visits.sk_tenant_living
     description: Foreign key identifying the tenant living.
-    dimension: True
+    dimension: true
   sk_first_associated_agent:
     lineage:
-      - dw_visit.fact_visits.sk_first_associated_agent
+    - dw_visit.fact_visits.sk_first_associated_agent
     description: Foreign key identifying the first agent associated with the visit.
-    dimension: True
+    dimension: true
   sk_exp_identifier:
     lineage:
-      - dw_for_sale_experiment.fact_experiment.sk_identifier
+    - dw_for_sale_experiment.fact_experiment.sk_identifier
     description: Foreign key identifying the experiment identifier.
-    dimension: True
+    dimension: true
   business_context:
     lineage:
-      - dw_visit.dim_visit.business_context
+    - dw_visit.dim_visit.business_context
     description: Business context of the visit (RENT or SALE).
-    dimension: True
+    dimension: true
   exp_name_neotribe:
     lineage:
-      - dw_for_sale_experiment.dim_experiment.name_neotribe
+    - dw_for_sale_experiment.dim_experiment.name_neotribe
     description: Name of the neotribe conducting the experiment.
-    dimension: True
+    dimension: true
   exp_name_experiment:
     lineage:
-      - dw_for_sale_experiment.dim_experiment.name_experiment
+    - dw_for_sale_experiment.dim_experiment.name_experiment
     description: Name of the specific experiment being conducted.
-    dimension: True
+    dimension: true
   exp_identifier_type:
     lineage:
-      - dw_for_sale_experiment.dim_experiment.identifier_type
+    - dw_for_sale_experiment.dim_experiment.identifier_type
     description: Type of identifier used for experiment participants (e.g., VISITOR, HOUSE, AGENT).
-    dimension: True
+    dimension: true
   exp_test_group:
     lineage:
-      - dw_for_sale_experiment.fact_experiment.test_group
+    - dw_for_sale_experiment.fact_experiment.test_group
     description: Test group assignment for the experiment participant.
     categories:
       CONTROL: Participant assigned to the control group.
       TREATMENT: Participant assigned to the treatment group.
-    dimension: True
+    dimension: true
   metric_cohort:
     lineage:
-      - dw_visit.dim_date.date
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_date.date
+    - dw_visit.dim_visit.dt_created
     description: Cohort time window for metric calculation.
     categories:
       1d: 1-day cohort metrics.
@@ -95,352 +91,352 @@ columns:
       14d: 14-day cohort metrics.
       21d: 21-day cohort metrics.
       28d: 28-day cohort metrics.
-    dimension: True
+    dimension: true
   num_vb:
     lineage:
-      - dw_visit.dim_date.date
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_date.date
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if visit was booked within the cohort time window.
     metric:
       name: Visits Booked
       description: Target of visits Booked within the aggregation.
       acronym: VB
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vc:
     lineage:
-      - dw_visit.dim_visit.ts_visit_done
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit.ts_visit_done
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if visit was completed within the cohort time window.
     metric:
       name: Visits Completed
       description: Target of visits Completed within the aggregation.
       acronym: VC
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vcf:
     lineage:
-      - dw_visit.dim_visit.ts_visit_first_confirmed
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit.ts_visit_first_confirmed
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if the first confirmation of the visit was within the cohort time window.
     metric:
       name: Visits Confirmed
       description: Target of first confirmation of the visit within the aggregation.
       acronym: VCf
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vcc:
     lineage:
-      - dw_visit.dim_visit.ts_visit_canceled
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit.ts_visit_canceled
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if visit was canceled within the cohort time window.
     metric:
       name: Visits Canceled
       description: Target of visits Canceled within the aggregation.
       acronym: VCc
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vu:
     lineage:
-      - dw_visit.dim_visit.ts_visit_unsuccessful
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit.ts_visit_unsuccessful
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if visit was unsuccessful within the cohort time window.
     metric:
       name: Visits Unsuccessful
       description: Target of visits Unsuccessful within the aggregation.
       acronym: VU
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_os:
     lineage:
-      - dw_visit.dim_visit_funnel.ts_first_event
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit_funnel.ts_first_event
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if offer was submitted within the cohort time window.
     metric:
       name: Offers Submitted
       description: Target of offers Submitted within the aggregation.
       acronym: OS
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_oa:
     lineage:
-      - dw_visit.dim_visit_funnel.ts_first_event
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit_funnel.ts_first_event
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if offer was accepted within the cohort time window.
     metric:
       name: Offers Accepted
       description: Target of offers Accepted within the aggregation.
       acronym: OA
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_cs:
     lineage:
-      - dw_visit.dim_visit_funnel.ts_first_event
-      - dw_visit.dim_visit.dt_created
+    - dw_visit.dim_visit_funnel.ts_first_event
+    - dw_visit.dim_visit.dt_created
     description: Binary indicator (1/0) if contract was signed within the cohort time window.
     metric:
       name: Contract Signed
       description: Target of contract Signed within the aggregation.
       acronym: CS
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers within the cohort time window.
     metric:
       name: Number of Identifiers
       description: Target of number of Identifiers within the aggregation.
       acronym: NI
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_vb:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with visit booked within the cohort time window.
     metric:
       name: Number of Identifiers with Visit Booked
       description: Target of number of Identifiers with Visit Booked within the aggregation.
       acronym: NIwVB
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_vc:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with visit completed within the cohort time window.
     metric:
       name: Number of Identifiers with Visit Completed
       description: Target of number of Identifiers with Visit Completed within the aggregation.
       acronym: NIwVC
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_vcf:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with first confirmation of the visit within the cohort time window.
     metric:
       name: Number of Identifiers with Visit Confirmed
       description: Target of number of Identifiers with First Confirmation of the Visit within the aggregation.
       acronym: NIwVCf
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_vcc:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with visit canceled within the cohort time window.
     metric:
       name: Number of Identifiers with Visit Canceled
       description: Target of number of Identifiers with Visit Canceled within the aggregation.
       acronym: NIwVCC
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_vu:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with visit unsuccessful within the cohort time window.
     metric:
       name: Number of Identifiers with Visit Unsuccessful
       description: Target of number of Identifiers with Visit Unsuccessful within the aggregation.
       acronym: NIwVU
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_os:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with offer submitted within the cohort time window.
     metric:
       name: Number of Identifiers with Offer Submitted
       description: Target of number of Identifiers with Offer Submitted within the aggregation.
       acronym: NIwOS
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_oa:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with offer accepted within the cohort time window.
     metric:
       name: Number of Identifiers with Offer Accepted
       description: Target of number of Identifiers with Offer Accepted within the aggregation.
       acronym: NIwOA
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   number_identifiers_with_cs:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of identifiers with contract signed within the cohort time window.
     metric:
       name: Number of Identifiers with Contract Signed
       description: Target of number of Identifiers with Contract Signed within the aggregation.
       acronym: NIwCS
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vb_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of visits booked within the cohort time window.
     metric:
       name: Number of Visits Booked
       description: Target of number of Visits Booked within the aggregation.
       acronym: VB
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vc_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of visits completed within the cohort time window.
     metric:
       name: Number of Visits Completed
       description: Target of number of Visits Completed within the aggregation.
       acronym: VC
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vcf_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of visits confirmed within the cohort time window.
     metric:
       name: Number of Visits Confirmed
       description: Target of number of Visits Confirmed within the aggregation.
       acronym: VCf
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vcc_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of visits canceled within the cohort time window.
     metric:
       name: Number of Visits Canceled
       description: Target of number of Visits Canceled within the aggregation.
       acronym: VCc
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_vu_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of visits unsuccessful within the cohort time window.
     metric:
       name: Number of Visits Unsuccessful
       description: Target of number of Visits Unsuccessful within the aggregation.
       acronym: VU
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_os_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of offers submitted within the cohort time window.
     metric:
       name: Number of Offers Submitted
       description: Target of number of Offers Submitted within the aggregation.
       acronym: OS
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_oa_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of offers accepted within the cohort time window.
     metric:
       name: Number of Offers Accepted
       description: Target of number of Offers Accepted within the aggregation.
       acronym: OA
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   num_cs_id:
     lineage:
-      - dw_visit.dim_visit.sk_exp_identifier
+    - dw_visit.dim_visit.sk_exp_identifier
     description: Number of contracts signed within the cohort time window.
     metric:
       name: Number of Contracts Signed
       description: Target of number of Contracts Signed within the aggregation.
       acronym: CS
-      is_additive: True
+      is_additive: true
       business_stage: Demand
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
   dt_exp_started:
     lineage:
-      - dw_for_sale_experiment.dim_experiment.dt_started
+    - dw_for_sale_experiment.dim_experiment.dt_started
     description: Official start date of the experiment.
-    dimension: True
+    dimension: true
   dt_exp_ended:
     lineage:
-      - dw_for_sale_experiment.dim_experiment.dt_ended
+    - dw_for_sale_experiment.dim_experiment.dt_ended
     description: Official end date of the experiment (or current date if ongoing).
-    dimension: True
+    dimension: true
   dt_ref:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
     description: Reference date for cohort calculation, representing the analysis date for time-based metrics.
-    dimension: True
+    dimension: true
