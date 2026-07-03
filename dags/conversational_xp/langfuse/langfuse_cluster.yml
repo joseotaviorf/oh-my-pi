@@ -8,5 +8,5 @@ cluster:
     spark_conf:
       spark.driver.maxResultSize: '0'
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    num_workers: 5
+    num_workers: 7
     driver_node_type_id: r7g.2xlarge
