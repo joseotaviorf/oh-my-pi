@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: resident_info
 description: This table consolidates the resident information related to an offer.
   Each line should be unique and identified by the id column.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -16,11 +17,11 @@ columns:
   introduction:
     lineage:
     - datalake_rental_transact_raw.resident_info.introduction
-    description: Introduction of the resident.
+    description: Introductory text shown to users at the start of the workflow.
   number_of_cohabitants:
     lineage:
     - datalake_rental_transact_raw.resident_info.number_of_cohabitants
-    description: Number of cohabitants.
+    description: Count of people besides the tenant who will live in the rented property.
   ts_created:
     lineage:
     - datalake_rental_transact_raw.resident_info.created_at

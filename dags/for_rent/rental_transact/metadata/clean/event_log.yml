@@ -1,8 +1,9 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: event_log
 description: This table has logs of all Rental Transact events. Each line is a unique event.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:

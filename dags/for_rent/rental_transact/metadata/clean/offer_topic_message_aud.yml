@@ -1,31 +1,31 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: offer_topic_message_aud
 description: This table consolidates the audition of offer topic message information related to the ForRent operation.
   Each line should be unique audition identified by the rev column.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.id
-    description: Offer topic message id.
+    description: Surrogate key identifying a single message posted within an offer topic thread.
   uuid_offer_topic_message:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.offer_topic_message_uuid
-    description: Offer topic message uuid.
+    description: Business UUID identifying a message within an offer topic thread.
   id_offer_topic:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.offer_topic_id
-    description: Offer topic id.
+    description: Foreign key to the negotiation topic this message belongs to.
   id_firestore:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.firestore_id
-    description: Firestore id.
+    description: Document identifier of the message in the Firestore negotiation store.
   rev:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.rev
-    description: Revision of the offer topic message, unique id of the modification.
-      Can be joined with table rev_info to get more details.
+    description: Revision of the offer topic message, unique id of the modification. Can be joined with table rev_info to get more details.
   rev_end:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.revend
@@ -33,7 +33,7 @@ columns:
   rev_type:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.revtype
-    description: Type of the revision.
+    description: Envers operation type for this revision (insert, update, or delete).
     categories:
       '0': Create
       '1': Update
@@ -41,22 +41,22 @@ columns:
   comment:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.comment
-    description: Offer topic message comment.
+    description: Free-text note written by the tenant or owner during topic negotiation.
   iteration:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.iteration
-    description: Offer topic message iteration.
+    description: Negotiation round number when this message was posted in the topic thread.
   actor_role:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.actor_role
-    description: Message author's role on the negotiation.
+    description: "Message author's role on the negotiation."
     categories:
       SUPPLY: Owner.
       DEMAND: Tenant prospect.
   proposed_rent_value:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.proposed_rent_value
-    description: Offer topic message proposed rent value.
+    description: Monthly rent amount proposed in this message, in local currency.
   mod_comment:
     lineage:
       - datalake_rental_transact_raw.offer_topic_message_aud.comment_mod

@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: advance_payment_order_aud
 description: This table contains the audit history for advance payment order records in the ForRent operation.
   Each line represents a historical version of an order and is identified by id and rev columns.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -32,7 +33,7 @@ columns:
   revtype:
     lineage:
     - datalake_rental_transact_raw.advance_payment_order_aud.revtype
-    description: Type of revision (0=ADD, 1=MOD, 2=DEL).
+    description: "Type of revision (0=ADD, 1=MOD, 2=DEL)."
   status:
     lineage:
     - datalake_rental_transact_raw.advance_payment_order_aud.status
@@ -44,7 +45,7 @@ columns:
   payment_amount:
     lineage:
     - datalake_rental_transact_raw.advance_payment_order_aud.payment_amount
-    description: Amount of the payment order.
+    description: Monetary value of the payment transaction in local currency.
   unique_hash:
     lineage:
     - datalake_rental_transact_raw.advance_payment_order_aud.unique_hash

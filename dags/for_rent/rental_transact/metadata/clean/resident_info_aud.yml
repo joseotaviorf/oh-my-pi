@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: resident_info_aud
 description: This table consolidates the audition of the resident information related to an offer.
   Each line should be unique and identified by the rev column.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -16,12 +17,11 @@ columns:
   rev:
     lineage:
     - datalake_rental_transact_raw.resident_info_aud.rev
-    description: Revision of the offer, unique id of the modification.
-      Can be joined with table rev_info to get more details.
+    description: Revision of the offer, unique id of the modification. Can be joined with table rev_info to get more details.
   rev_type:
     lineage:
     - datalake_rental_transact_raw.resident_info_aud.revtype
-    description: Type of the revision.
+    description: Envers operation type for this revision (insert, update, or delete).
     categories:
       '0': Create
       '1': Update
@@ -33,11 +33,11 @@ columns:
   introduction:
     lineage:
     - datalake_rental_transact_raw.resident_info_aud.introduction
-    description: Introduction of the resident.
+    description: Introductory text shown to users at the start of the workflow.
   number_of_cohabitants:
     lineage:
     - datalake_rental_transact_raw.resident_info_aud.number_of_cohabitants
-    description: Number of cohabitants.
+    description: Count of people besides the tenant who will live in the rented property.
   mod_id_tenant_external:
     lineage:
     - datalake_rental_transact_raw.resident_info_aud.tenant_external_id_mod

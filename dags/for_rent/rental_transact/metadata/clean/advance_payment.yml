@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: advance_payment
 description: This table consolidates advance payment information related to the ForRent operation.
   Each line should be unique and identified by the id column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -12,7 +13,7 @@ columns:
   uuid_advance_payment:
     lineage:
     - datalake_rental_transact_raw.advance_payment.advance_payment_uuid
-    description: UUID of the advance payment.
+    description: Global UUID assigned to the advance payment in Rental Transact, used to trace the payment across services.
   id_house_external:
     lineage:
     - datalake_rental_transact_raw.advance_payment.house_external_id
@@ -44,7 +45,7 @@ columns:
   payment_amount:
     lineage:
     - datalake_rental_transact_raw.advance_payment.payment_amount
-    description: Amount of the advance payment.
+    description: Monetary value of the payment transaction in local currency.
   ts_created:
     lineage:
     - datalake_rental_transact_raw.advance_payment.created_at

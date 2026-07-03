@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: message
 description: This table consolidates outbox message information from the Rental Transact system.
   Each line should be unique and identified by the id column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -16,7 +17,7 @@ columns:
   destination:
     lineage:
       - datalake_rental_transact_raw.message.destination
-    description: Message destination.
+    description: Kafka topic or downstream queue where the outbox message is dispatched after processing.
   headers:
     lineage:
       - datalake_rental_transact_raw.message.headers
@@ -28,7 +29,7 @@ columns:
   is_published:
     lineage:
       - datalake_rental_transact_raw.message.published
-    description: Boolean flag indicating whether the message has been published (TRUE) or not (FALSE).
+    description: Whether the outbox message was successfully published to its destination (TRUE) or is still pending (FALSE).
   message_partition:
     lineage:
       - datalake_rental_transact_raw.message.message_partition

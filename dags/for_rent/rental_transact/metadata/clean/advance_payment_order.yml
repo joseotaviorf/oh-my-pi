@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: advance_payment_order
 description: This table contains order information for advance payments in the ForRent operation.
   Each line represents a payment order and is uniquely identified by the id column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -32,7 +33,7 @@ columns:
   payment_amount:
     lineage:
     - datalake_rental_transact_raw.advance_payment_order.payment_amount
-    description: Amount of the payment order.
+    description: Monetary value of the payment transaction in local currency.
   unique_hash:
     lineage:
     - datalake_rental_transact_raw.advance_payment_order.unique_hash
