@@ -270,10 +270,9 @@ columns:
     description: |
       Idactum's iPatri market price estimate combining model output with local transaction median values for a more robust valuation.
   quantity:
-    lineage:
-      - datalake_idactum_registrations_raw.idactum_registrations.qtd
+    lineage: []
     description: |
-      Number of property units represented by this registration record, used when a single record aggregates multiple identical units.
+      Number of property units represented by this registration record. Source column qtd was removed from the June 2026 Idactum dump; retained as NULL for schema compatibility.
   is_iptu_exempt:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.iptu_isento
@@ -305,10 +304,9 @@ columns:
     description: |
       Numeric typology code assigned by Idactum to classify the property configuration (e.g., studio, 2-bedroom apartment, house).
   is_parking_slots_in_latest_transaction:
-    lineage:
-      - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente_envolve_garagem
+    lineage: []
     description: |
-      Indicates whether parking spaces were included in the most recent property transaction, relevant for understanding what was transferred.
+      Indicates whether parking spaces were included in the most recent property transaction. Source column transacao_mais_recente_envolve_garagem was removed from the June 2026 Idactum dump; retained as NULL for schema compatibility.
   is_house_in_sp_popular_lot_program:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_loteamento
