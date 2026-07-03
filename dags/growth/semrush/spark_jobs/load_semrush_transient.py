@@ -201,7 +201,8 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    api_key = dbutils.secrets.get("quintoandar", APIEnum.SEMRUSH)
+    api_key_json = dbutils.secrets.get("quintoandar", APIEnum.SEMRUSH)
+    api_key = json.loads(api_key_json)["value"]
 
     """
     [1] PREPARE REQUISITIONS TO BE MADE
