@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: bookers_daily
 description: Daily table that contains the amount of bookers (sk_client) that scheduled a booking.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   day:
     lineage:
@@ -13,7 +13,7 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_listing_rent_flows.country_code
-    description: Country code identifier.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   bookers:
     description: Amount of users that scheduled a booking.

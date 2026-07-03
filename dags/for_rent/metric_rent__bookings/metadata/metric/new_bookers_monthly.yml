@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: new_bookers_monthly
 description: This is a monthly table contains the amount of the users that made their first booking.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   month:
     lineage:
@@ -13,13 +13,13 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_listing_rent_flows.country_code
-    description: Country code
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   new_bookers:
     description: Amount of users that made their first booking.
     metric:
       name: TP New Bookers Monthly
-      description:
+      description: 
         Amount of users that made their first booking segmented by sk_region.
         This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows,
         segmented by country_code and we're filtering just the first booking of this sk_client.

@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: new_bookers_daily_by_sk_region
 description: This is a daily table that contains the amount of the users that made their first booking segmented by sk_region.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   first_booking_created_date:
     lineage:
@@ -13,18 +13,18 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_region
-    description: Region identifier.
+    description: Surrogate key of the region used to segment this rental metric.
     dimension: True
   country_code:
     lineage:
       - dw_rent.fact_listing_rent_flows.country_code
-    description: Country code identifier.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   new_bookers:
     description: Amount of usersthat made their first booking.
     metric:
       name: TP New Bookers Daily by SK Region
-      description:
+      description: 
         Amount of users that made their first booking segmented by sk_region.
         This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows,
         segmented by country_code and we're filtering just the first booking of this sk_client.

@@ -1,11 +1,11 @@
 ---
 database_name: metric_rent
 table_name: visits_booked_per_ongoing_listings_daily
-description:
+description: |
   Daily table with the amount of visits booked divided by the Ongoing Listing.
   Metric used to connect the supply and demand funnels.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   day:
     lineage:
@@ -15,14 +15,13 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_listing_rent_flows.country_code
-    description: Country code of the house
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   visits_booked_per_ongoing_listings:
-    description: Total of Visits Booked divided by the Ongoing Listing on a day.
-      Metric used to connect the supply and demand funnels.
+    description: Total of Visits Booked divided by the Ongoing Listing on a day. Metric used to connect the supply and demand funnels.
     metric:
       name: Visits Booked per Ongoing Listings Daily
-      description:
+      description: 
         Total of Visits Booked divided by the Ongoing Listing on a day.
         Metric used to connect the supply and demand funnels.
       acronym: VB2OL

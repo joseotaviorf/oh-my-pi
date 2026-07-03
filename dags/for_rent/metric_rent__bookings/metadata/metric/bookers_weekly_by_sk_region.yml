@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: bookers_weekly_by_sk_region
 description: Weekly table that contains the amount of bookers (sk_client) that scheduled a booking segmented by sk_region.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   booking_created_week:
     lineage:
@@ -13,18 +13,18 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_region
-    description: Region identifier.
+    description: Surrogate key of the region used to segment this rental metric.
     dimension: True
   country_code:
     lineage:
       - dw_rent.fact_listing_rent_flows.country_code
-    description: Country code identifier.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   bookers:
     description: Amount of users that scheduled a booking on a week segmented by region.
     metric:
       name: TP Bookers Weekly by SK Region
-      description:
+      description: 
         Amount of users that scheduled a booking on a week segmented by sk_region.
         This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows,
         segmented by country_code and sk_region.
