@@ -1,43 +1,42 @@
----
 database_name: datalake_sales_flow_clean
 table_name: status_order
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: The main objective of the table is to identify which is the big step of the process of offer. Each offer has its own big status order, like offer, sale agreement, diligence, credit and others.
 columns:
   id:
     description: ID microstatus of Closing process
     lineage:
-      - datalake_sales_flow_raw.status_order.id
+    - datalake_sales_flow_raw.status_order.id
   id_closing_type:
     description: Closing type ID on closing_type Tables
     lineage:
-      - datalake_sales_flow_raw.status_order.closing_type_id
+    - datalake_sales_flow_raw.status_order.closing_type_id
   id_status:
     description: ID macrostatus of Closing process on status Tables
     lineage:
-      - datalake_sales_flow_raw.status_order.status_id
+    - datalake_sales_flow_raw.status_order.status_id
   ordering:
     description: Ordering of micro and macro status of Closing process, like 1st Offer Sent, 2nd Signature CCV, 3rd Down Payment and etc.
     lineage:
-      - datalake_sales_flow_raw.status_order.ordering
+    - datalake_sales_flow_raw.status_order.ordering
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.status_order.created_at
+    - datalake_sales_flow_raw.status_order.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.status_order.updated_at
+    - datalake_sales_flow_raw.status_order.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status_order.year
+    - datalake_sales_flow_raw.status_order.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status_order.month
+    - datalake_sales_flow_raw.status_order.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status_order.day
+    - datalake_sales_flow_raw.status_order.day

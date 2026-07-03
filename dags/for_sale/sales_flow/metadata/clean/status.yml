@@ -1,43 +1,42 @@
----
 database_name: datalake_sales_flow_clean
 table_name: status
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: The main idea of the table is to relate microstatus and macrostatus with their respective names and labels. From the table is possible to identify the hierarchy of ForSale status.
 columns:
   id:
     description: ID status of Closing process.
     lineage:
-      - datalake_sales_flow_raw.status.id
+    - datalake_sales_flow_raw.status.id
   id_label:
     description: Identification of each of the keys in the table.
     lineage:
-      - datalake_sales_flow_raw.status.label_id
+    - datalake_sales_flow_raw.status.label_id
   id_parent:
     description: ID about process hierarchy and Closing models. If the identification is null, the status corresponds to a microstatus. Otherwise, it corresponds to a microstatus.
     lineage:
-      - datalake_sales_flow_raw.status.parent_id
+    - datalake_sales_flow_raw.status.parent_id
   key:
     description: Names of micro and macro status of Closing process (e.g. CCV_SENT_TO_SIGNED, DILIGENCE_PROCESSING, FINANCING_SIGNED)
     lineage:
-      - datalake_sales_flow_raw.status.key
+    - datalake_sales_flow_raw.status.key
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.status.created_at
+    - datalake_sales_flow_raw.status.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.status.updated_at
+    - datalake_sales_flow_raw.status.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status.year
+    - datalake_sales_flow_raw.status.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status.month
+    - datalake_sales_flow_raw.status.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status.day
+    - datalake_sales_flow_raw.status.day

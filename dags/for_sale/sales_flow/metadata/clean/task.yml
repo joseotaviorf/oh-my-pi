@@ -1,48 +1,50 @@
----
 database_name: datalake_sales_flow_clean
 table_name: task
-owner: leonardo.soares@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Table with the tasks of the sales flow
 columns:
   id:
-    description: 'Id of the task'
+    description: Surrogate primary key of the task row in the source system.
     lineage:
     - datalake_sales_flow_raw.task.id
   id_source_related:
-    description: 'Id of the related source'
+    description: Foreign key referencing source related in the sales flow workflow domain.
     lineage:
     - datalake_sales_flow_raw.task.source_related_id
   label:
-    description: 'Label of the task'
+    description: Short UI or workflow label describing the task, tag, or category shown to operators.
     lineage:
     - datalake_sales_flow_raw.task.label
   subject:
-    description: 'Subject of the task'
+    description: Task subject line summarizing the action required from operations or legal teams.
     lineage:
     - datalake_sales_flow_raw.task.subject
   source:
-    description: 'Source of the task'
+    description: Upstream system or module that produced this row before lake ingestion.
     lineage:
     - datalake_sales_flow_raw.task.source
   task_trigger:
-    description: 'Trigger of the task'
+    description: Event or condition that created this task in the sales operations queue.
     lineage:
     - datalake_sales_flow_raw.task.task_trigger
   ts_created:
-    description: 'Timestamp of the creation of the task'
+    description: Timestamp of the creation of the task
     lineage:
     - datalake_sales_flow_raw.task.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the task'
+    description: Timestamp of the last update of the task
     lineage:
     - datalake_sales_flow_raw.task.updated_at
   year:
     lineage:
-      - datalake_sales_flow_raw.task.year
+    - datalake_sales_flow_raw.task.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.task.month
+    - datalake_sales_flow_raw.task.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.task.day
+    - datalake_sales_flow_raw.task.day
+    description: Partition day when the ETL run loaded this row into the lake table.

@@ -1,53 +1,54 @@
----
 database_name: datalake_sales_flow_clean
 table_name: subtask
-owner: leonardo.soares@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Table with the subtasks of the sales flow
 columns:
   id:
-    description: 'Id of the subtask'
+    description: Surrogate primary key of the subtask row in the source system.
     lineage:
     - datalake_sales_flow_raw.subtask.id
   id_task:
-    description: 'Id of the parent task'
+    description: Foreign key to the parent task in the sales operations task manager.
     lineage:
     - datalake_sales_flow_raw.subtask.task_id
   label:
-    description: 'Label of the subtask'
+    description: Short UI or workflow label describing the task, tag, or category shown to operators.
     lineage:
     - datalake_sales_flow_raw.subtask.label
   type:
-    description: 'Type of the subtask'
+    description: Classifier distinguishing record subtype or participant role in the workflow.
     lineage:
     - datalake_sales_flow_raw.subtask.type
   target:
-    description: 'Target of the subtask'
+    description: Downstream workflow target or entity this subtask or action applies to.
     lineage:
     - datalake_sales_flow_raw.subtask.target
   deadline:
-    description: 'Deadline of the subtask'
+    description: Due date by which the subtask or legal action must be completed.
     lineage:
     - datalake_sales_flow_raw.subtask.deadline
   activation_trigger:
-    description: 'Activation trigger of the subtask'
+    description: Business rule trigger that activates this subtask in the task manager.
     lineage:
     - datalake_sales_flow_raw.subtask.activation_trigger
   ts_created:
-    description: 'Timestamp of the creation of the subtask'
+    description: Timestamp of the creation of the subtask
     lineage:
     - datalake_sales_flow_raw.subtask.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the subtask'
+    description: Timestamp of the last update of the subtask
     lineage:
     - datalake_sales_flow_raw.subtask.updated_at
   year:
     lineage:
     - datalake_sales_flow_raw.subtask.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.subtask.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.subtask.day
-
+    description: Partition day when the ETL run loaded this row into the lake table.

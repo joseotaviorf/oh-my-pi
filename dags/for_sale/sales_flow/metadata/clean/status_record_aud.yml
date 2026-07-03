@@ -1,79 +1,78 @@
----
 database_name: datalake_sales_flow_clean
 table_name: status_record_aud
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Status record type aud table.
 columns:
   id:
     description: Macrostatus ID on status Tables
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.id
+    - datalake_sales_flow_raw.status_record_aud.id
   id_sales_flow:
     description: Offer ID on SalesFlow tables.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.sales_flow_id
+    - datalake_sales_flow_raw.status_record_aud.sales_flow_id
   id_status:
     description: Status ID on status Tables.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.status_id
+    - datalake_sales_flow_raw.status_record_aud.status_id
   rev:
     description: ID of the revision that replaced the current entry.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.rev
+    - datalake_sales_flow_raw.status_record_aud.rev
   rev_type:
-    description: Modification type.
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
     categories:
-      "0" : Create
-      "1" : Update
-      "2" : Delete
+      '0': Create
+      '1': Update
+      '2': Delete
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.revtype
+    - datalake_sales_flow_raw.status_record_aud.revtype
   rev_end:
     description: ID of the revision that replaced the current entry.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.revend
+    - datalake_sales_flow_raw.status_record_aud.revend
   mod_id_sales_flow:
     description: Flag indicating if the id_sales_flow phone has changed.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.status_record_aud.sales_flow_id_mod
   mod_id_status:
     description: Flag indicating if the id_status phone has changed.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.status_id_mod
+    - datalake_sales_flow_raw.status_record_aud.status_id_mod
   mod_ts_status_start:
     description: Flag indicating if the ts_status_start phone has changed.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.status_start_date_mod
+    - datalake_sales_flow_raw.status_record_aud.status_start_date_mod
   mod_ts_status_end:
     description: Flag indicating if the ts_status_end phone has changed.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.status_end_date_mod
+    - datalake_sales_flow_raw.status_record_aud.status_end_date_mod
   ts_status_start:
     description: Date of registration of start of a status.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.status_start_date
+    - datalake_sales_flow_raw.status_record_aud.status_start_date
   ts_status_end:
     description: Date of registration of finish of a status.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.status_end_date
+    - datalake_sales_flow_raw.status_record_aud.status_end_date
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.created_at
+    - datalake_sales_flow_raw.status_record_aud.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.updated_at
+    - datalake_sales_flow_raw.status_record_aud.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.year
+    - datalake_sales_flow_raw.status_record_aud.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.month
+    - datalake_sales_flow_raw.status_record_aud.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.status_record_aud.day
+    - datalake_sales_flow_raw.status_record_aud.day
