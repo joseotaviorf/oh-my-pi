@@ -1,250 +1,433 @@
 database_name: dw_sale
 table_name: dim_offer
-description: This tables shows details and characteristics about all sale offers.
-  Each line is an offer submitted.
+description: >
+  Dimension table with attributes and characteristics of all sale offers. One row per offer submitted.
+  Complements dw_sale.fact_offers (which holds timestamps, measures, and lead times) with offer-level
+  descriptive attributes: negotiation status, drop reason, payment details, pricing, 3P flags,
+  marketing attribution, and salesflow tags.
+  Always LEFT JOIN from fact_offers via sk_offer — this table has one row per offer regardless of funnel stage.
+  Critical: tags_from_salesflow is the mandatory filter column for excluding legacy Casa Mineira flows
+  (tags #fluxo-cm, #casa-mineira, #fluxo_cm) from 1P analyses. This column lives HERE, not in dim_sale_agreement.
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
     - datalake_sale_offer.sale_offer.id_offer
-    description: Hash ID offer from firestore
+    description: Surrogate key of the offer (hash ID from Firestore for legacy offers). Primary key and join key to dw_sale.fact_offers, dw_sale.dim_sale_agreement, and dw_sale.fact_closing_flows.
   offer_status:
     lineage:
     - datalake_sale_offer.sale_offer.offer_status
-    description: Offer status
+    description: >
+      Current negotiation status of the offer in the SalesFlow system. Represents the stage
+      within the OS→OA pipeline managed by the Negotiation Executive (EN).
+      Use this column to filter active vs. closed offers, or to analyze negotiation funnel drop-offs.
+      Note: terminal statuses are OFFER_ACCEPTED, OFFER_REJECTED, and POST_ACCEPTED_DISPOSAL.
     categories:
-      Chat em branco: ''
-      Contra Buyer: ''
-      Contra Seller: ''
-      Corretor Vendedor: ''
-      Descarte Pós Aceite: ''
-      Invalid Offer: ''
-      Negociação fora do 5A: ''
-      Não tratado: ''
-      OA em validação: ''
-      Offer Accepted: ''
-      Offer Rejected: ''
-      Offer Sent: ''
-      Offer validated: ''
-      Sem Contato - Buyer: ''
-      Sem Contato - Seller: ''
-      Stand By: ''
-      Teste Corretor: ''
+      OFFER_ONGOING: "Offer is active and in negotiation — initial state after submission (formerly 'Offer Sent')."
+      OFFER_ACCEPTED: "Seller accepted the buyer's offer — corresponds to the OA (Offer Accepted) event in fact_offers.ts_offer_accepted."
+      OFFER_REJECTED: "Offer was rejected by the seller or discarded — corresponds to fact_offers.ts_offer_dismissed."
+      OFFER_VALIDATED: "Offer validated by the EN before being formally accepted — intermediate state before OFFER_ACCEPTED."
+      OA_VALIDATION: "Offer acceptance is under validation — EN is confirming acceptance conditions."
+      POST_ACCEPTED_DISPOSAL: "Offer was discarded after initial acceptance (post-acceptance drop) — e.g. deal fell through after OA."
+      CONTRA_SELLER: "Seller made a counter-offer to the buyer."
+      CONTRA_BUYER: "Buyer made a counter-offer back to the seller."
+      STAND_BY_SELLER: "Negotiation is on hold waiting for seller response."
+      STAND_BY_BUYER: "Negotiation is on hold waiting for buyer response."
+      NO_CONTACT_BUYER: "EN was unable to reach the buyer (formerly 'Sem Contato - Buyer')."
+      BLANK_CHAT: "No conversation messages have been exchanged in the negotiation chat (formerly 'Chat em branco')."
+      NEGOTIATION_OUT_OF_5A: "Negotiation is happening outside the QuintoAndar (5A) standard model (formerly 'Negociação fora do 5A')."
+      INVALID_OFFER: "Offer was flagged as invalid (e.g. test, duplicate, or data quality issue)."
+      BROKER_SELLER: "Offer managed by a broker acting as seller representative (formerly 'Corretor Vendedor')."
+      BROKER_TEST: "Offer created for broker testing purposes — should be excluded from production analyses."
+      DEFAULT: "Default/unclassified status — treat as unresolved or legacy records."
   drop_reason:
     lineage:
     - datalake_sale_offer.sale_offer.drop_reason
-    description: Reason why the offer dropped before sale agreement signature
+    description: >
+      Reason why the offer was dropped before Sale Agreement Signed (CCV). Populated when an offer
+      reaches a terminal rejected or cancelled state. Use together with drop_reason_responsible
+      to segment drop attribution. NULL for active or accepted offers.
+      Values prefixed with OBSOLETE_ are legacy reasons no longer actively assigned; they may appear
+      in historical data. Key business categories: buyer financial barriers, seller unwillingness,
+      documentation issues, competing deals, and operational reasons.
+    categories:
+      # --- Buyer-side drops ---
+      GAVE_UP_ON_BUYING: "Buyer gave up on purchasing any property."
+      GAVE_UP_OFFER: "Buyer gave up on this specific offer."
+      BUYER_GAVE_UP_TO_BUY_THIS_PROPERTY: "Buyer decided not to buy this specific property."
+      BUYER_GAVE_UP_TO_BUY_ANY_PROPERTY: "Buyer decided not to buy any property at this time."
+      BOUGHT_ANOTHER_HOUSE: "Buyer purchased a different property outside QuintoAndar."
+      BOUGHT_ANOTHER_HOUSE_BY_5A: "Buyer purchased a different property through QuintoAndar."
+      BUYING_ANOTHER_HOUSE_WITH_5A: "Buyer is in the process of buying another house through QuintoAndar."
+      SEARCH_ANOTHER_HOUSE_INSIDE_5A: "Buyer is searching for another property within QuintoAndar."
+      SEARCH_ANOTHER_HOUSE_OUTSIDE_5A: "Buyer is searching for another property outside QuintoAndar."
+      SEARCH_ANOTHER_HOUSE_WITH_5A: "Buyer is searching for another property with QuintoAndar assistance."
+      BUYER_NO_CONTACT_OR_RETURN: "EN could not reach the buyer."
+      BUYER_DONT_HAVE_ENTRY_AMOUNT: "Buyer does not have the required down payment amount."
+      BUYER_DONT_HAVE_NOTARY_FESS_AMOUNT: "Buyer cannot cover notary/cartório fees (ITBI, registry costs)."
+      HAS_NO_VALUES_TO_PURCHASE: "Buyer lacks sufficient funds to complete the purchase."
+      DONT_HAVE_AMOUNT_FOR_THIS_HOUSE: "Buyer cannot afford this specific property."
+      DONT_HAVE_AMOUNT_FOR_ANY_HOUSE: "Buyer cannot afford any property currently."
+      NOT_ENOUGH_TO_PROCEED_WITH_THE_PURCHASE: "Buyer's financial capacity is insufficient to proceed."
+      CREDIT_NOT_APPROVED: "Buyer's mortgage/credit application was not approved."
+      PROBLEM_WITH_REAL_ESTATE_CREDIT: "Buyer faced issues with real estate credit or financing."
+      BUYER_FINANCED_VALUE_SMALLER_THAN_SELLER: "The financed amount approved for the buyer is lower than the seller's minimum price."
+      FGTS_NOT_ALLOWED: "FGTS cannot be used for this transaction (e.g. property or buyer ineligible)."
+      CANT_PAY_REGISTRY: "Buyer is unable to pay the property registry (cartório) fees."
+      BUYER_NEEDS_TO_SELL_YOUR_PROPERTY_FIRST: "Buyer needs to sell their current property before completing the purchase."
+      BUYER_DIDNT_ACCEPT_5A_MODEL: "Buyer rejected QuintoAndar's commercial model (5A model terms)."
+      BUYER_CONTRACT_PROBLEMS: "Buyer has legal or documentation issues preventing contract signature."
+      COUNTER_OFFER_REJECTED: "Buyer rejected the seller's counter-offer."
+      NOT_ACCEPT_PAYMENT_CONDITIONS: "Buyer did not accept the proposed payment conditions."
+      # --- Seller-side drops ---
+      SELLER_GAVE_UP_SELLING_THE_PROPERTY: "Seller decided not to sell the property."
+      WONT_SELL_ANYMORE: "Seller no longer wants to sell."
+      SUSPENDED_SELL: "Sale process is suspended by the seller."
+      SELLER_ONLY_ACCEPTS_LISTING_PRICE: "Seller refuses to negotiate and only accepts the full listing price."
+      ONLY_ACCEPTS_LISTING_PRICE: "Seller only accepts the original listing price (legacy value — same as SELLER_ONLY_ACCEPTS_LISTING_PRICE)."
+      SELLER_ONLY_ACCEPTS_CASH_PAYMENT: "Seller will only accept cash payment, refusing financed offers."
+      ONLY_ACCEPTS_CASH_PAYMENT: "Seller only accepts cash (legacy value)."
+      SELLER_DONT_ACCEPT_5A_MODEL: "Seller rejected QuintoAndar's commercial model (5A model terms)."
+      REJECTED_5A_MODEL: "Seller rejected the 5A model (legacy value)."
+      DISAGREED_WITH_BROKERAGE_FEE: "Seller disagreed with the brokerage fee percentage."
+      COMMISSION_BELOW_THAN_PERCENTAGE_ACCEPTED_BY_QUINTO: "Seller's proposed commission is below QuintoAndar's minimum accepted rate."
+      SELLER_NO_CONTACT_OR_RETURN: "EN could not reach the seller."
+      SELLER_INCREASED_PROPERTY_VALUE: "Seller raised the asking price during negotiation."
+      SELLER_CONTRACT_PROBLEMS: "Seller has legal or documentation issues preventing contract signature."
+      SELLER_DIDNT_KNOW_PARTNERSHIP_WITH_QUINTO: "Seller was unaware of the partnership conditions with QuintoAndar."
+      RENTED_OR_WILL_RENT: "Seller decided to rent the property instead of selling."
+      INTEND_TO_RENT: "Seller intends to rent the property."
+      WILL_RENT_NOT_FOR_SALE_ANYMORE: "Seller switched the property from sale to rental."
+      INVESTED_RENT_PAYMENT: "Seller opted for a rent-based investment instead of sale."
+      MORTGAGE_DONT_PAY_SL: "Seller's mortgage or debt obligations prevent the sale."
+      # --- Documentation issues ---
+      PROBLEMATIC_HOUSE_DOCUMENTATION: "Property has documentation problems blocking the transaction."
+      PROBLEMS_WITH_HOUSE_DOCUMENTATION: "Issues with house registration or legal documentation."
+      PROBLEMATIC_SELLER_DOCUMENTATION: "Seller's personal documentation has issues preventing the deal."
+      PROBLEMS_WITH_SELLER_DOCUMENTATION: "Seller documentation problems."
+      PROBLEMS_WITH_PROPERTY_OR_SELLER_DOCUMENTATION: "Combined property and/or seller documentation issues."
+      HOUSE_SELLER_DOCUMENTATION_ISSUES: "Joint documentation issues involving house and/or seller."
+      DIFFICULT_IN_OBTAINING_CONTACT_DATA_OR_SELLER_OR_BUYER_DOCUMENTATION: "Difficulty collecting documentation or contact details from parties."
+      HOUSE_UNAVAILABLE: "Property is no longer available for sale."
+      EXCLUSIVE_HOUSE_IN_ANOTHER_COMPANY: "Property is exclusively listed with another real estate agency."
+      HOUSE_GIVEN_AS_PAYMENT_GUARANTEE: "Property is pledged as collateral (fiduciária or guarantee), preventing the sale."
+      CCV_CLAUSES_TOO_STRICT: "Buyer or seller rejected the CCV due to overly restrictive contractual clauses."
+      # --- Competing deals ---
+      HOUSE_SOLD_TO_ANOTHER_BUYER: "Property was sold to another buyer outside this offer."
+      SOLD_TO_ANOTHER_5A_BUYER: "Property was sold to another buyer through QuintoAndar."
+      SOLD_OUTSIDE_5A: "Property was sold through a competing real estate channel."
+      DEAL_WITH_ANOTHER_REAL_STATE: "Seller or buyer closed a deal with another real estate company."
+      WILL_DEAL_WITH_ANOTHER_REAL_STATE: "Seller or buyer intends to work with another real estate agency."
+      WILL_DEAL_WITH_ANOTHER_PERSON: "Deal was made directly between parties, bypassing QuintoAndar."
+      ALREADY_DEALT_WITH_ANOTHER_PERSON: "Deal was already completed with another party."
+      REDE_MEMBER_DIDNT_ACCEPT_TO_SELL_OR_MADE_NEGOTIATION_DIFFICULT: "A Rede QuintoAndar partner rejected the sale or obstructed negotiation."
+      NO_REAL_ESTATE_AGENCY_RETURN: "No response from the partner real estate agency."
+      # --- Payment / financial structure ---
+      PAYMENT_BY_INSTALLMENTS: "Buyer proposed or requested payment in installments, not accepted by QuintoAndar."
+      PAYMENT_BY_EXCHANGE: "Buyer proposed payment by property exchange (permuta)."
+      BARTER_PAYMENT: "Payment proposed as barter/property swap."
+      INSTALLMENT_PAYMENT: "Offer involved installment payment structure."
+      NOT_BUYING_RENTED_HOUSE: "Buyer refuses to purchase a property with an active tenant."
+      RENTED_OR_BOUGHT_OUTSIDE_5A: "Buyer rented or bought a property outside QuintoAndar."
+      # --- Operational / other ---
+      DIDNT_ACCEPT_BUYER_OFFER: "Seller simply did not accept the buyer's offer price."
+      INCORRECT_SALE_PRICE: "The listed sale price was incorrect or inconsistent."
+      WRONG_SALE_PRICE: "Incorrect sale price recorded in the system."
+      ERROR_IN_LISTING_INFO: "Error in property listing information."
+      OFFER_DISCOUNT_BIGGER_THAN_20_PERCENT: "Buyer's proposed discount exceeded the 20% threshold accepted by QuintoAndar."
+      CONDITIONS_OUTSIDE_5A_STANDARDS: "Transaction conditions fell outside QuintoAndar's standard operating model."
+      NO_RESPONSE: "No response from one of the parties."
+      NOT_ACCEPTED_COUNTER_SL: "Seller did not accept the counter-offer."
+      MULTIPLES_OFFERS_VISITS: "Multiple competing offers or visits led to this offer being dropped."
+      TENANT_PROBLEMS: "Issues with the current tenant of the property."
+      TENANT_STOPPED_PROCESS: "Tenant in the property stopped the sale process (e.g. exercising right of first refusal)."
+      OFFER_WITHOUT_VISIT: "Offer was submitted without a prior visit — operational anomaly."
+      POSSIBLE_BYPASS: "Potential bypass transaction (parties attempting to close outside QuintoAndar)."
+      PARTNER_POSSIBLE_BYPASS: "Potential bypass involving a Rede QuintoAndar partner."
+      DISREGARD: "Offer was disregarded for operational reasons."
+      # --- Obsolete (legacy — appear in historical data only) ---
+      OBSOLETE_BY_INVALID_OFFER_ACCEPTED: "Legacy — replaced by a valid offer accepted in the same flow."
+      OBSOLETE_BY_BARTER_PAYMENT: "Legacy — barter payment reason (obsolete)."
+      OBSOLETE_BY_IGNORE_OFFER: "Legacy — offer ignored."
+      OBSOLETE_SL_DIDNT_ACCEPT_BUYER_OFFER: "Legacy — seller did not accept."
+      OBSOLETE_BY_DISCOUNT_GREATER_THAN_30: "Legacy — discount >30%."
+      OBSOLETE_BY_MORTGAGE_DONT_PAY_SL: "Legacy — mortgage issue."
+      OBSOLETE_BY_PROBLEMS_WITH_DOCUMENTATION: "Legacy — documentation problems."
+      OBSOLETE_BY_NOT_ACCEPTED_COUNTER_SL: "Legacy — counter not accepted."
+      OBSOLETE_SL_SOLD_OUTSIDE_5A: "Legacy — sold outside 5A."
+      OBSOLETE_SL_NEVER_ANSWER: "Legacy — seller never responded."
+      OBSOLETE_SL_INCORRECT_SALE_PRICE: "Legacy — incorrect price."
+      OBSOLETE_SL_LEGAL_CONDITIONS: "Legacy — legal conditions."
+      OBSOLETE_SL_DELAY_TO_RETURN: "Legacy — delayed response."
+      OBSOLETE_SL_INVALID_OFFER_ACCEPTED: "Legacy — invalid offer accepted."
+      OBSOLETE_SL_PROBLEMS_WITH_HOUSE_DOCUMENTATION: "Legacy — house documentation issues."
+      OBSOLETE_SL_RENTED_OR_WILL_RENT: "Legacy — property rented or to be rented."
+      OBSOLETE_SL_SOLD_TO_ANOTHER_5A_BUYER: "Legacy — sold to another QA buyer."
+      OBSOLETE_SL_DOESNT_ACCEPT_FINANCED_PAYMENT: "Legacy — seller doesn't accept financed payment."
+      OBSOLETE_SL_WONT_SELL_ANYMORE: "Legacy — seller won't sell."
+      OBSOLETE_SL_DONT_ACCEPT_5A_MODEL: "Legacy — seller doesn't accept 5A model."
+      OBSOLETE_SL_TENANT_STOPPED_PROCESS: "Legacy — tenant stopped the process."
+      OBSOLETE_BY_RENTED_OR_BOUGHT_OUTSIDE_5A: "Legacy — rented or bought outside 5A."
+      OBSOLETE_BY_GAVE_UP_ON_BUYING: "Legacy — buyer gave up."
+      OBSOLETE_BY_DELAY_TO_RETURN: "Legacy — delayed return."
+      OBSOLETE_BY_RENTED_OR_BOUGHT_IN_5A: "Legacy — rented or bought within 5A."
+      OBSOLETE_BY_SEARCH_ANOTHER_HOUSE: "Legacy — searched for another house."
+      OBSOLETE_BY_NEVER_ANSWER: "Legacy — no response."
+      OBSOLETE_BY_DIDNT_ACCEPT_5A_MODEL: "Legacy — didn't accept 5A model."
+      OBSOLETE_BY_DONT_HAVE_AMOUNT_FOR_THIS_HOUSE: "Legacy — insufficient funds for this house."
+      OBSOLETE_BY_DONT_HAVE_AMOUNT_FOR_ANY_HOUSE: "Legacy — insufficient funds for any house."
+      OBSOLETE_BY_INSTALLMENT_PAYMENT: "Legacy — installment payment."
+      OBSOLETE_POSSIBLE_BYPASS: "Legacy — possible bypass."
+      OBSOLETE_SL_IS_PJ: "Legacy — seller is a legal entity (PJ)."
+      OBSOLETE_SL_NOT_ACCEPTED_COUNTER_BY: "Legacy — counter not accepted by buyer."
   drop_reason_responsible:
     lineage:
     - datalake_sale_offer.sale_offer.drop_reason_responsible
-    description: Responsible by Reason why the offer dropped before sale agreement
-      signature
+    description: >
+      Party attributed as responsible for the offer drop. Used to segment drop attribution
+      between buyer-side and seller-side causes. NULL for offers that were not dropped.
     categories:
-      Buyer: ''
-      Other: ''
-      Seller: ''
+      Buyer: "Drop is attributed to the buyer (e.g. financial barriers, gave up, no contact)."
+      Seller: "Drop is attributed to the seller (e.g. unwillingness to sell, documentation, price disagreement)."
+      Other: "Drop is attributed to external factors or operational reasons not specific to buyer or seller."
   payment_method:
     lineage:
     - datalake_sale_offer.sale_offer.current_payment_method
-    description: Payment method chose to accomplish sale transaction. It can be in
-      cash, financed or undecided
+    description: >
+      Payment method selected by the buyer for the transaction at the time of the offer.
+      Captures the buyer's intended financing structure. May change during negotiation;
+      this reflects the current state. Use to segment offers by financial track (Cash vs. Financed)
+      and to join with dw_sale.dim_sale_agreement.payment_method for confirmed CCV-level data.
     categories:
-      CASH: ''
-      FINANCED: ''
-      FINANCED_OUTSIDE_5A: ''
-      UNDECIDED: ''
+      CASH: "Full cash payment with no financing."
+      CASH_USING_FGTS: "Cash payment using FGTS (Fundo de Garantia do Tempo de Serviço) funds."
+      FINANCED: "Standard mortgage/bank financing (via QuintoAndar's ATTA or partner Corban)."
+      FINANCED_USING_FGTS: "Mortgage financing with FGTS used as part of the down payment."
+      FINANCED_USING_THIRD_COMPANY: "Financing through an external third-party financial institution, outside QuintoAndar's Corban network."
+      FINANCED_OUTSIDE_5A: "Financing arranged entirely outside the QuintoAndar platform — buyer using their own bank or channel."
+      UNDECIDED: "Buyer has not yet decided on the payment method."
+      NOT_DEFINED: "Payment method not defined or not yet informed — equivalent to UNDECIDED for older records."
   business_unit:
     lineage:
     - datalake_sale_offer.sale_offer.business_unit
-    description: The business unit that originated the offer.
+    description: The business unit that originated the offer (e.g. a city or regional unit). Can be used to segment offers by operational territory.
   offer_flow:
     lineage:
     - datalake_sale_offer.sale_offer.offer_flow
-    description: Negotiation model that originated the offer (Hub, Deal Making or
-      Closing Central).
+    description: >
+      Negotiation model / operational flow under which the offer was handled.
+      Determines which team and tooling managed the OS→OA stage.
+    categories:
+      HUB: "Standard Hub model — offer managed by a Negotiation Executive (EN) in the centralized Hub team."
+      CLOSING_CENTRAL: "Closing Central model — offer managed by the Closing Central team (more specialized negotiation support)."
+      DEFAULT: "Default/legacy flow — used for older offers or when the flow was not explicitly defined."
+      NOT DEFINED: "Flow not defined — treat as unclassified."
   credit_model:
     lineage:
     - datalake_sale_offer.sale_offer.credit_model
-    description: Offer credit model
+    description: >
+      Credit/financing model associated with the offer. Indicates which financing track the buyer
+      is using. Used to segment financed offers by whether they go through QuintoAndar's internal
+      credit platform (ATTA) or an external institution.
+    categories:
+      ATTA: "Financing through QuintoAndar's internal credit platform (ATTA / Corban). Includes both Internal Corban and partner Corban channels."
+      EXTERNAL: "Financing entirely outside the QuintoAndar ecosystem — buyer uses their own bank or credit institution."
+      UNDEFINED: "Credit model not yet defined or not applicable (e.g. cash offers, undecided payment method)."
   registry_price:
     lineage:
     - datalake_sale_offer.sale_offer.registry_price
-    description: Cost of the registrations changes and house documentation
+    description: Estimated cost of property registration changes and documentation in BRL (custas cartoriais / registro de imóvel). Informed by the buyer during the offer form. May be null if not provided.
   itbi_price:
     lineage:
     - datalake_sale_offer.sale_offer.itbi_price
-    description: Cost of the tax for sale real estate transactions
+    description: Estimated cost of ITBI (Imposto de Transmissão de Bens Imóveis) — the municipal property transfer tax — in BRL. Informed by the buyer during the offer form. May be null if not provided.
   payment_entry_amount:
     lineage:
     - datalake_sale_offer.sale_offer.payment_entry_amount
-    description: Amount of the sale value that will be applied as a down payment on
-      the financing
+    description: Down payment amount (entrada) in BRL that the buyer will apply toward the purchase, used as a down payment on the financing. Relevant for FINANCED payment methods. May be null for cash offers or if not informed.
   sale_price:
     lineage:
     - datalake_sale_offer.sale_offer.sale_price
-    description: Sale price set on listing
+    description: >
+      Advertised listing price (preço do anúncio) captured at the moment the offer was submitted, in BRL.
+      This is the seller's asking price, sourced from the salesflow service (offer.sale_price).
+      It is a point-in-time snapshot — it does NOT change if the listing price is later updated.
+      Use this as the baseline for seller discount calculations:
+      discount = (sale_price - sale_price_agreed) / sale_price,
+      where sale_price_agreed comes from dw_sale.fact_offers or dw_sale.dim_sale_agreement.
+      Do NOT use dw_sale.dim_listing.price for discount analysis — that column reflects the current
+      listing price and is not updated when an offer is accepted.
   is_3p_supply:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_supply
-    description: Flag if supply belongs to a 3P partner
+    description: True if the property (supply side) is provided by a 3P partner company (Rede QuintoAndar). 3P supply transactions follow a different operational and commercial flow from 1P. Always segment or filter separately. See also fact_offers.is_3p_supply.
   is_3p_demand:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_demand
-    description: Flag if offer was submitted by a 3P demand agent
+    description: True if the buyer (demand side) was brought to the platform by a 3P partner agent or company (Rede QuintoAndar). Always segment or filter separately from 1P demand. See also fact_offers.is_3p_demand.
   is_a_rescued_offer:
     lineage:
     - datalake_sale_offer.sale_offer.is_a_rescued_offer
-    description: Boolean to identify if this offer is a rescued one (An offer that
-      was cancelled and opened again)
+    description: True if this offer was rescued — i.e. a previously cancelled offer that was reopened and reactivated. Rescued offers should be considered when computing unique buyer or house offer counts to avoid double-counting. See also fact_offers.ts_offer_rescued.
   has_used_fgts_in_payment:
     lineage:
     - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
-    description: If part of the payment will use some amount from the FGTS fund
+    description: True if the buyer used (or plans to use) FGTS (Fundo de Garantia do Tempo de Serviço) as part of the payment. Consistent with fact_offers.has_used_fgts_in_payment; this copy lives in the dimension for attribute-based filtering.
   has_used_negotiation_chat:
     lineage:
     - datalake_sale_offer.sale_offer.has_used_negotiation_chat
-    description: If the offer deal happened through the negotiation chat
+    description: True if the offer negotiation involved the in-app negotiation chat feature between buyer and seller (mediated by the EN). Useful for analyzing the impact of chat-based negotiation on conversion rates.
   tags_from_salesflow:
     lineage:
     - datalake_sale_offer.sale_offer.tags_from_salesflow
-    description: Tags from the sales flow associated with the offer
+    description: >
+      Free-form tags applied to the sales flow associated with the offer, sourced from the SalesFlow system.
+      Critical use: this column is the mandatory filter for excluding legacy Casa Mineira flows from 1P analyses.
+      Apply the following filters in all EoF/EoP queries to restrict to valid 1P transactions:
+        COALESCE(tags_from_salesflow, '') NOT LIKE '%#fluxo-cm%'
+        COALESCE(tags_from_salesflow, '') NOT LIKE '%#casa-mineira%'
+        COALESCE(tags_from_salesflow, '') NOT LIKE '%#fluxo_cm%'
+      Important: this column lives in dim_offer, NOT in dim_sale_agreement (Trino returns COLUMN_NOT_FOUND if queried there).
+      Always use COALESCE to avoid excluding valid offers with NULL tags.
   ts_offer_submitted:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Datetime of offer submission
+    description: Timestamp of offer submission (OS event). Duplicated from fact_offers for convenience in dimension-only queries. Use fact_offers.ts_offer_submitted as the canonical source for funnel and time-series analysis.
   ts_updated:
     lineage:
     - datalake_sale_offer.sale_offer.ts_updated
-    description: Datetime of offer last update
+    description: Timestamp of the last update to the offer record in the SalesFlow system. Useful for detecting recently modified offers but should not be used as an event timestamp for funnel analysis.
   app_type:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.app_type
     - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
-    description: Amplitude's app type
+    description: >
+      Device/platform type used by the buyer at the time of the offer submission event
+      (sale_offer_form_accepted), sourced from Amplitude attribution. From H2/2021 onwards,
+      uses the new cross-channel attribution (attribution_cross_channel); prior offers use
+      the legacy Amplitude source (sale_offer_raw_events).
     categories:
-      ? ''
-      : ''
-      android: ''
-      android_flutter: ''
-      ios: ''
-      web_desktop: ''
-      web_mobile: ''
+      android: "Native Android app."
+      android_flutter: "Android app built with Flutter framework."
+      ios: "Native iOS app."
+      web_desktop: "Web browser on desktop."
+      web_mobile: "Web browser on mobile device."
   utm_source:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.utm_source
     - datalake_tracked_events.attribution_cross_channel.final_attribution_source
-    description: UTM used to track the advertising source
+    description: UTM source parameter from the buyer's attribution at offer submission — identifies the traffic source (e.g. google, facebook, organic). From H2/2021 onwards, uses cross-channel attribution; legacy offers use Amplitude data.
   utm_medium:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.utm_medium
     - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
-    description: UTM used to track the advertising medium
+    description: UTM medium parameter from the buyer's attribution at offer submission — identifies the marketing channel type (e.g. cpc, seo, email, social). From H2/2021 onwards, uses cross-channel attribution; legacy offers use Amplitude data.
     categories:
-      ? ''
-      : ''
-      CPC: ''
-      branding: ''
-      classifieds: ''
-      copy_share: ''
-      cpc: ''
-      custom_shar: ''
-      custom_share: ''
-      display: ''
-      email: ''
-      logo: ''
-      notifications: ''
-      performance_max: ''
-      referrer: ''
-      retargeting: ''
-      seo: ''
-      sms: ''
-      social: ''
-      whatsapp: ''
+      CPC: ""
+      branding: ""
+      classifieds: ""
+      copy_share: ""
+      cpc: ""
+      custom_shar: ""
+      custom_share: ""
+      display: ""
+      email: ""
+      logo: ""
+      notifications: ""
+      performance_max: ""
+      referrer: ""
+      retargeting: ""
+      seo: ""
+      sms: ""
+      social: ""
+      whatsapp: ""
   utm_campaign:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
     - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
-    description: UTM used to identify the campaign in the media
+    description: UTM campaign parameter identifying the specific marketing campaign that drove the buyer to submit the offer.
   final_attribution_origin:
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
-    description: Used to identify the category of the final attribution origin
+    description: >
+      High-level category of the final attribution origin for the offer submission event,
+      sourced from the cross-channel attribution model (available from H2/2021 onwards).
+      Older offers have value 'old_attribution'.
   mkt_category:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.category
-    description: Standard category from the offer
+    description: Marketing taxonomy — top-level category classifying the demand channel type. Defaults to 'Not Mapped' when no taxonomy match is found.
     categories:
-      Inbound: ''
-      Not Mapped: ''
+      Inbound: "Buyer came through an inbound marketing channel (organic, paid, referral)."
+      Not Mapped: "No taxonomy match found for the buyer's UTM combination."
   mkt_flow:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.flow
-    description: Type of flow in the marketing funnel by the lead
+    description: Marketing taxonomy — type of conversion flow the buyer followed in the marketing funnel. Defaults to 'Not Mapped' when no taxonomy match is found.
     categories:
-      Not Mapped: ''
-      Other: ''
-      Self-Service: ''
+      Self-Service: "Buyer self-navigated and submitted the offer without direct agent assistance."
+      Other: "Other flow type."
+      Not Mapped: "No taxonomy match found."
   mkt_completion:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.completion
-    description: Type of completion of marketing funnel by the lead
+    description: Marketing taxonomy — describes how completely the buyer followed the funnel from first touch to offer submission. Defaults to 'Not Mapped' when no taxonomy match is found.
     categories:
-      Full Self-Service: ''
-      Not Mapped: ''
-      Other: ''
+      Full Self-Service: "Buyer completed the entire funnel independently."
+      Other: "Other completion type."
+      Not Mapped: "No taxonomy match found."
   mkt_origin:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.origin
-    description: Origin of the lead in the marketing funnel
+    description: Marketing taxonomy — origin of the lead within the marketing funnel (e.g. the product surface or entry point). Defaults to 'Not Mapped' when no taxonomy match is found.
     categories:
-      Not Mapped: ''
-      Tenants PWA: ''
+      Tenants PWA: "Lead originated from the Tenants Progressive Web App."
+      Not Mapped: "No taxonomy match found."
   mkt_channel:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.channel
-    description: Channel level of the Taxonomy (used to describe the type of the channel)
+    description: Marketing taxonomy — channel type describing the media category (e.g. Paid Search, SEO, Social). Defaults to 'Not Mapped' when no taxonomy match is found.
   mkt_medium:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.medium
-    description: Medium level of the taxonomy (used to describe the midia strategy)
+    description: Marketing taxonomy — medium level describing the media strategy (e.g. SEM branded, SEO non-branded, Retargeting). Defaults to 'Not Mapped' when no taxonomy match is found.
     categories:
-      Branding: ''
-      Direct: ''
-      Display: ''
-      Lost Tracking: ''
-      Not Mapped: ''
-      Notifications: ''
-      Online Classifieds: ''
-      Other: ''
-      Performance Max: ''
-      Portals: ''
-      Retargeting: ''
-      SEM branded: ''
-      SEM non-branded: ''
-      SEO branded: ''
-      SEO non-branded: ''
-      Shared: ''
+      Branding: ""
+      Direct: ""
+      Display: ""
+      Lost Tracking: ""
+      Not Mapped: ""
+      Notifications: ""
+      Online Classifieds: ""
+      Other: ""
+      Performance Max: ""
+      Portals: ""
+      Retargeting: ""
+      SEM branded: ""
+      SEM non-branded: ""
+      SEO branded: ""
+      SEO non-branded: ""
+      Shared: ""
   mkt_source:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.source
-    description: Source level of the taxonomy (used to describe the midia used)
+    description: Marketing taxonomy — source level describing the specific media used (e.g. google, facebook, imovelweb). Defaults to 'Not Mapped' when no taxonomy match is found.
   mkt_platform:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.platform
-    description: Platform use by the lead in the marketing funnel
+    description: Marketing taxonomy — platform used by the buyer in the marketing funnel. Defaults to 'Not Mapped' when no taxonomy match is found.
     categories:
-      App Android: ''
-      App iOS: ''
-      Lost Tracking: ''
-      Not Mapped: ''
-      Web Desktop: ''
-      Web Mobile: ''
+      App Android: ""
+      App iOS: ""
+      Lost Tracking: ""
+      Not Mapped: ""
+      Web Desktop: ""
+      Web Mobile: ""
   is_branded:
     lineage:
     - datalake_amplitude_offer.sale_offer_raw_events.branded
     - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
-    description: If this offer came from a branded campaign as defined by the demand
-      taxonomy
+    description: True if the buyer's attribution for this offer originated from a branded marketing campaign (i.e. the buyer was searching for QuintoAndar by name), as defined by the demand taxonomy.
   ts_load:
-    description: Timestamp when the data was loaded on datalake
+    description: Timestamp of when the table was last loaded by the ETL pipeline (full refresh, daily).

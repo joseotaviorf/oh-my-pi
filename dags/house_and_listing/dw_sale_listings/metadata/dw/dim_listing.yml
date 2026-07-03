@@ -48,7 +48,15 @@ columns:
   price:
     lineage:
     - datalake_ebdb_clean.house.sale_price
-    description: Current publication price of the listing.
+    description: >
+      Current advertised (publication) price of the listing, in BRL.
+      Sourced from imovel.salePrice in EBDB.
+      This field reflects the asking price set by the seller and is NOT updated
+      when a sale offer is accepted or a CCV is
+      signed. To compare listing price vs. agreed contract price (e.g. to
+      compute seller discount), join with dw_sale.dim_offer (sale_price) and
+      dw_sale.dim_sale_agreement (sale_price_agreed), or use
+      dw_sale.fact_offers fields first_discount_proposed / last_discount_proposed.
   predicted_price_30:
     lineage:
       - datalake_ebdb_clean.house_predicted_price.p_30

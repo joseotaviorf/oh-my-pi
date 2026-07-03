@@ -2,7 +2,7 @@
 
 > Written for TARS, QuintoAndar's analytics AI assistant. Combines business knowledge, data model, metric formulas, and SQL patterns needed to answer FS Transact questions correctly. Read this before writing any SQL for the For Sale transaction funnel.
 >
-> Last enriched: 2026-06-03 via Superset metadata (TARS session x7k2m9).
+> Last enriched: 2026-06-30 via Superset metadata (TARS session x7k2m9)
 > Disclaimer: The numbers in this documents represent a rough estimate based on observations at the time this file was updated. Use them as a reference, but not as a definitive answer for users.
 
 ---
@@ -121,7 +121,27 @@ CD é o evento de receita do time Financeiro. Fonte no produto é: `fact_closing
 
 Dos **cancelamentos pós-CCV**: ~37% são causados por recusa de crédito.
 
-### 3.4 Motivos de cancelamento de CCV
+### 3.4 Desconto do Proprietário (Seller Discount)
+
+O desconto representa a diferença entre o **preço do anúncio** (preço pedido pelo proprietário) e o **preço acordado no CCV** após negociação.
+
+#### ⚠️ `dw_sale.dim_listing.price` NÃO é o preço do contrato
+
+`dim_listing.price` reflete o preço de publicação atual do anúncio, sourced via CDC do campo `imovel.salePrice` no EBDB (~30 min de delay). **Não é atualizado quando uma oferta é aceita ou o CCV é assinado.** Usá-lo diretamente contra `sale_price_agreed` produz comparações incorretas porque captura momentos diferentes.
+
+#### Campos corretos para análise de desconto
+
+| Campo | Tabela | Descrição |
+|-------|--------|-----------|
+| `sale_price` | `dw_sale.dim_offer` | Preço do anúncio capturado no momento da oferta (snapshot) |
+| `sale_price_agreed` | `dw_sale.dim_sale_agreement` | Preço final acordado no CCV |
+| `first_price_offered_by_buyer` | `dw_sale.fact_offers` | Primeira proposta do comprador |
+| `last_price_offered_by_buyer` | `dw_sale.fact_offers` | Última proposta do comprador |
+| `first_discount_proposed` | `dw_sale.fact_offers` | `(sale_price - first_price_offered_by_buyer) / sale_price` |
+| `last_discount_proposed` | `dw_sale.fact_offers` | `(sale_price - last_price_offered_by_buyer) / sale_price` — para ofertas aceitas, equivale ao desconto efetivo concedido |
+| `max_discount_proposed` | `dw_sale.fact_sale_flows` | Maior desconto proposto em toda a flow — inclui ofertas recusadas; não é o desconto efetivo de deals fechados |
+
+### 3.5 Motivos de cancelamento de CCV
 
 `dim_sale_agreement.sale_agreement_cancellation_reason`:
 - Buyer Desistiu
@@ -147,6 +167,9 @@ Dos **cancelamentos pós-CCV**: ~37% são causados por recusa de crédito.
 | `% Distratos` | ✅ | `COUNT(is_ccv_canceled = TRUE) / COUNT(ts_sale_agreement_signed IS NOT NULL)` — `fact_offers` + `dim_sale_agreement` | — | — |
 | `Ticket médio CCV` | ✅ | `AVG(sale_price_agreed) WHERE ts_sale_agreement_signed IS NOT NULL` — `fact_offers` | — | — |
 | `Ticket médio CD` | ✅ | `AVG(sale_price_agreed)` — `fact_offers` JOIN `fact_closing_flows` | — | — |
+| `% Desconto efetivo (seller discount)` | ✅ | `AVG(fo.last_discount_proposed) WHERE ts_offer_accepted IS NOT NULL` — `fact_offers`. Ver §3.4 para conceito e tabelas. | — | — |
+| `% Desconto na 1ª proposta` | ✅ | `AVG(fo.first_discount_proposed) WHERE ts_offer_submitted IS NOT NULL` — `fact_offers` | — | — |
+| `Desconto máximo na flow` | ✅ | `AVG(fsf.max_discount_proposed)` — `fact_sale_flows`. ⚠️ Inclui flows com ofertas não aceitas. | — | — |
 | `% Termo de corretagem` | ✅ | Numerador: CDs com TC; denominador: CCVs — `fact_closing_flows`. Confirmar nome da flag TC. | — | — |
 | `LT OS2OA` | ✅ | `AVG(days_offer_submitted_to_offer_accepted)` — coluna pré-computada em `fact_offers` | ~2 dias | — |
 | `LT OA2CCV` | ✅ | `AVG(days_offer_accepted_to_sale_agreement_signed)` — coluna pré-computada em `fact_offers` | ~6 dias | [SLA Sheet](https://docs.google.com/spreadsheets/d/1b69z6hkWqhri5FDLwtDWu2EJzJ0RsgMLyy_9qFT_IUs/edit?gid=556290245) |
@@ -396,7 +419,7 @@ Grain: 1 linha por assessment por `id_sales_flow` por `analysis_date`. Um mesmo 
 | `validation_id` | string | ID da regra de validação (ex: `H05`, `SL01`, `B01`). Identifica qual checagem foi executada. |
 | `assessment_name` | string | Nome descritivo do assessment (ex: `house_address_number`, `seller_is_house_holder`, `is_non_residential_suspicion`). |
 | `assessment_status` | string | Status granular retornado pelo LegoContract (ex: `MATCH`, `CHECK_PASS`, `CHECK_WARNING`, `DIFFERENT`). |
-| `assessment_consolidated_status` | string | Status consolidado do assessment: `OK`, `ACTION_NEEDED`, ou `UNAVAILABLE`. Métrica principal de qualidade. |
+| `assessment_consolidated_status` | string | Status consolidado do assessment: `OK`, `ACTION_NEEDED`, ou `UNAVAILABLE`. Métrica principal de qualidade. `UNAVAILABLE` indica que o assessment não pôde produzir resultado conclusivo — causas típicas: (1) **Out of scope** (regras B00/SL00/NG00 excluíram a validação; regras dependentes emitem `BLOCKED`, também `UNAVAILABLE`); (2) **Inputs ausentes** (`MISSING_SALES_FLOW_VALUE` — dados do formulário não preenchidos; `MISSING_EXTRACTION_VALUE` — valor do documento ausente); (3) **Problemas de extração** (`LOW_QUALITY_EXTRACTION`, `CONTENT_FILTER_REFUSED`; `NOT_EXTRACTED` mapeia para `ACTION_NEEDED`, não `UNAVAILABLE`); (4) **Falhas de execução** (`BLOCKED` por dependência bloqueante, `ERROR` por exceção não tratada); (5) **Ambiguidade CCV** (`TOO_MANY_CLAUSES` — mais de uma cláusula CCV match para o mesmo sujeito). |
 | `assessment_confidence` | string | Nível de confiança da validação: `HIGH`, `MEDIUM`, ou `LOW`. |
 
 **Seções de assessments:** A tabela agrega assessments de 5 seções do JSON do LegoContract:
@@ -766,6 +789,50 @@ HAVING COUNT(*) >= 30  -- excluir assessments com poucos dados
 ORDER BY action_needed_pct DESC
 ```
 
+### Desconto efetivo do proprietário por mês (deals aceitos)
+```sql
+-- ⚠️ Usar last_discount_proposed (calculado em relação ao sale_price do momento da oferta),
+-- NÃO cruzar dim_listing.price com sale_price_agreed — dim_listing.price é o preço atual
+-- do anúncio e não é atualizado quando a oferta é aceita. Ver §3.4.
+SELECT
+    DATE_TRUNC('month', fo.ts_offer_accepted)                                  AS month,
+    COUNT(*)                                                                    AS deals_aceitos,
+    ROUND(AVG(fo.last_discount_proposed) * 100, 2)                             AS avg_discount_pct,
+    ROUND(approx_percentile(fo.last_discount_proposed, 0.5) * 100, 2)          AS median_discount_pct,
+    ROUND(AVG(do.sale_price) / 1.0, 0)                                         AS avg_listing_price,
+    ROUND(AVG(fo.sale_price_agreed) / 1.0, 0)                                  AS avg_agreed_price
+FROM dw_sale.fact_offers fo
+LEFT JOIN dw_sale.dim_offer          do  ON fo.sk_offer = do.sk_offer
+LEFT JOIN dw_sale.dim_sale_agreement dsa ON fo.sk_offer = dsa.sk_offer
+WHERE fo.ts_offer_accepted IS NOT NULL
+  AND fo.last_discount_proposed IS NOT NULL
+  AND fo.last_discount_proposed >= 0
+  AND (dsa.sk_offer IS NULL
+       OR (dsa.payment_model <> 'CLOSING_3P'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#fluxo-cm%'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#casa-mineira%'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#fluxo_cm%'))
+GROUP BY 1 ORDER BY 1
+```
+
+### Distribuição do desconto efetivo (histograma em buckets de 2pp)
+```sql
+SELECT
+    FLOOR(fo.last_discount_proposed * 100 / 2) * 2  AS discount_bucket_pct,
+    COUNT(*)                                         AS deals
+FROM dw_sale.fact_offers fo
+LEFT JOIN dw_sale.dim_offer          do  ON fo.sk_offer = do.sk_offer
+LEFT JOIN dw_sale.dim_sale_agreement dsa ON fo.sk_offer = dsa.sk_offer
+WHERE fo.ts_offer_accepted IS NOT NULL
+  AND fo.last_discount_proposed BETWEEN 0 AND 0.30
+  AND (dsa.sk_offer IS NULL
+       OR (dsa.payment_model <> 'CLOSING_3P'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#fluxo-cm%'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#casa-mineira%'
+           AND COALESCE(do.tags_from_salesflow, '') NOT LIKE '%#fluxo_cm%'))
+GROUP BY 1 ORDER BY 1
+```
+
 ### Motivos de cancelamento de CCV
 ```sql
 SELECT
@@ -1120,4 +1187,6 @@ events_received_document ──── (caso__c) ─── events_case
 | Incluir `sk_* = -1` em GROUP BY sem filtrar | Todos os `sk_*` usam `-1` para linhas não atribuídas. Filtrar `sk_closing_specialist <> -1` etc. |
 | Conflitar SAC com CCV | SAC = rascunho criado (pipeline). CCV = contrato assinado (marco comercial). CD = pós-DD e TC. |
 | Usar colunas de status EoP sem validar enums | `closing_status`, `*_dilligence_status` podem ter sido estendidos. Validar valores atuais antes de usar. |
+| Usar `dim_listing.price` para calcular desconto do proprietário | `dim_listing.price` é o preço atual do anúncio (CDC do EBDB, ~30 min), **não é atualizado** quando a oferta é aceita ou o CCV é assinado. Para desconto efetivo usar `fact_offers.last_discount_proposed`; para preços brutos usar `dim_offer.sale_price` (snapshot no momento da oferta) vs `dim_sale_agreement.sale_price_agreed` (preço do CCV). Ver §3.4. |
+| Confundir `max_discount_proposed` (fact_sale_flows) com desconto efetivo | `max_discount_proposed` = maior gap de desconto em qualquer oferta da flow, incluindo ofertas recusadas. Para deals fechados, usar `fact_offers.last_discount_proposed` filtrado por `ts_offer_accepted IS NOT NULL`. |
 | Usar `fact_buyer_prospects.sale_agreements_signed` para BP2CCV cohortado | Dá conversão lifetime, não cohort mensal. Fibonacci usa janela M0+M1. |

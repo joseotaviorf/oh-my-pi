@@ -30,7 +30,20 @@ columns:
     lineage:
     - datalake_legalops_raw.contract_analysis_request.full_analysis
   assessment_consolidated_status:
-    description: Final status of the assessment, indicates ACTION_NEEDED, OK or UNAVAILABLE.
+    description: >
+      Final status of the assessment. Possible values: OK, ACTION_NEEDED, or UNAVAILABLE.
+      UNAVAILABLE means the assessment could not produce a conclusive result. Typical causes:
+      (1) Out of scope (OUT_OF_SCOPE) — scope rules (B00, SL00, NG00) determined the validation does not apply
+      (e.g. PJ buyer/seller, 0 or 2+ parties in legacy flow, non-single marital status, stable union,
+      FGTS/consortium payment method); dependent rules then emit BLOCKED assessments, also UNAVAILABLE.
+      (2) Missing inputs — MISSING_SALES_FLOW_VALUE (buyer name, email, civil status not filled in sales flow)
+      or MISSING_EXTRACTION_VALUE (document value absent for comparison/extraction rules).
+      (3) Extraction problems — LOW_QUALITY_EXTRACTION (ID document lacks required fields),
+      CONTENT_FILTER_REFUSED (Docpilot OCR refused by content filter); note that NOT_EXTRACTED maps to
+      ACTION_NEEDED, not UNAVAILABLE.
+      (4) Execution failures — BLOCKED (a blocking_dependencies check failed, e.g. D03 blocked because D01
+      did not return FOUND) or ERROR (unhandled exception in validate(); all assessments for that rule get ERROR).
+      (5) CCV clause ambiguity — TOO_MANY_CLAUSES (more than one CCV line matched the same subject).
     lineage:
     - datalake_legalops_raw.contract_analysis_request.full_analysis
   assessment_confidence:

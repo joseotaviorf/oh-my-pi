@@ -56,6 +56,12 @@ columns:
     description: Current negotiation status of the offer. Values include OFFER_ONGOING, CONTRA_SELLER/CONTRA_BUYER (counter-proposal in progress), OFFER_ACCEPTED, OFFER_REJECTED, STAND_BY_BUYER/STAND_BY_SELLER, NO_CONTACT_BUYER/NO_CONTACT_SELLER, OFFER_VALIDATED, INVALID_OFFER, and POST_ACCEPTED_DISPOSAL (discarded after acceptance), among others. OFFER_REJECTED, INVALID_OFFER, and POST_ACCEPTED_DISPOSAL are treated as canceled statuses.
     lineage:
       - datalake_sales_flow_raw.offer.status
+    categories:
+      OFFER_REJECTED: The offer was rejected.
+      OFFER_ACCEPTED: The offer was accepted.
+      OFFER_ONGOING: The negotiation started and is ongoing.
+      NEGOTIATION_OUT_OF_5A: The negotiation is not being handled by 5A.
+      DEFAULT: The offer was not seen yet. Usually the first time it was created or recovered.
   furniture_will_be_left:
     description: Flag indicating whether the seller agreed to leave furniture in the property as part of the deal.
     lineage:

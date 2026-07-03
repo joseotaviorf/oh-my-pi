@@ -2,20 +2,43 @@ database_name: datalake_sales_flow_clean
 table_name: task_manager_info
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains task manager synchronization information for sales flows.
+description: >
+  Tracks the synchronization state of a sales flow with external systems (TaskManager and Salesforce).
+  Records are created or updated via TaskManagerInfoService.upsertSyncStatusForSalesFlow().
+
+  Write paths (INSERT / UPDATE):
+  - SyncFlowService.createPurchaseSaleContract(): writes sync_status = SENT when the purchase/sale contract is created.
+  - SalesForceCcvSignedPublisher: writes sync_status = SENT when publishing a CCV_SIGNED event to Salesforce (only if validForSalesforceIntegration == true).
+  - TaskManagerInfoInternalController (PATCH /internal/task-manager-info/sync-status/{offerId}): internal HTTP endpoint to manually update the status.
+
+  Read paths (SELECT):
+  - TaskManagerValidator.shouldSendUpdateToSalesforce(): reads (or creates) the record via findOrCreateBySalesFlowId() to decide whether to sync updates to Salesforce. Updates are only sent if sync_status == SENT.
+
+  Flow summary:
+    Contract created / CCV signed → upsertSyncStatusForSalesFlow(salesFlowId, SENT) → INSERT or UPDATE in task_manager_info
+    Validation before Salesforce sync → findOrCreateBySalesFlowId(salesFlowId) → SELECT sync_status
+
+  Note: the SENT value is used for both "sent to TaskManager" and "CCV_SIGNED event published to Salesforce".
+  It is not possible to determine which write path produced the status by reading this table alone.
 columns:
   id:
     description: Unique ID for the task manager info record.
     lineage:
     - datalake_sales_flow_raw.task_manager_info.id
   id_sales_flow:
-    description: Foreign key to the sales_flow table.
+    description: Foreign key to the sales_flow table. Maps to sales_flow_id in the source model.
     lineage:
     - datalake_sales_flow_raw.task_manager_info.sales_flow_id
   sync_status:
-    description: Current synchronization status with the task manager.
+    description: >
+      Synchronization status of the sales flow with external systems. Enum with three possible values:
+      Primary read: TaskManagerValidator.shouldSendUpdateToSalesforce() uses this field to decide whether to send updates to Salesforce (only sends if sync_status == SENT).
     lineage:
-    - datalake_sales_flow_raw.task_manager_info.sync_status
+      - datalake_sales_flow_raw.task_manager_info.sync_status
+    categories:
+      NOT_SENT: default value on record creation; indicates the sales flow has not yet been sent to any external system.
+      SENT: indicates the sales flow was sent to TaskManager (via createPurchaseSaleContract) or that the CCV_SIGNED event was published to Salesforce (via SalesForceCcvSignedPublisher, only when validForSalesforceIntegration == true). This value is ambiguous — it does not distinguish which write path produced it.
+      BLOCKED: manually blocked via the internal endpoint (PATCH /internal/task-manager-info/sync-status/{offerId}).
   ts_created:
     description: Timestamp when the task manager info was created.
     lineage:

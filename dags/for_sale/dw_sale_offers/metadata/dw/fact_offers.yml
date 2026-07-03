@@ -1,276 +1,306 @@
 database_name: dw_sale
 table_name: fact_offers
-description: This table brings information about all sales offers. Each line is an
-  offer submitted. Also, it contains data about negotiation until sale agreements
-  signatures
+description: >
+  Primary table for the FS Transact End-of-Funnel (EoF). One row per sale offer submitted.
+  Covers all EoF events from Offer Submitted (OS) to Sale Agreement Signed (CCV),
+  including negotiation timestamps, pricing metrics, lead times, and 3P attribution flags.
+  Use this table as the entry point for funnel conversion analysis (OS→OA→CCV),
+  seller discount, lead time calculations, and offer-level segmentation.
+  For Closed Deals (CD), join with dw_sale.fact_closing_flows via sk_offer.
+  For offer attributes (status, drop reason, tags), join with dw_sale.dim_offer.
+  For CCV details (payment method, credit model, cancellation reason), join with dw_sale.dim_sale_agreement.
+  Note: date surrogate keys use -1 as sentinel when the event has not occurred yet.
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
     - datalake_sale_offer.sale_offer.id_offer
-    description: ID of offer
+    description: Surrogate key of the offer (hash ID from Firestore for legacy offers). Primary key of this table. Can be used to join with dw_sale.dim_offer, dw_sale.dim_sale_agreement, and dw_sale.fact_closing_flows.
   sk_sales_flow:
     lineage:
     - datalake_sale_offer.sale_offer.id_sales_flow
-    description: ID of sales flow
+    description: Surrogate key of the sales flow associated with the offer. Each sales flow orchestrates the lifecycle of a single offer from submission to closing. Can be used to join with datalake_sales_flow_clean tables.
   sk_house:
     lineage:
     - datalake_sale_offer.sale_offer.id_house
-    description: ID of house
+    description: Surrogate key of the house (property) associated with the offer. Can be joined with dw_house.dim_house.
   sk_buyer:
     lineage:
     - datalake_sale_offer.sale_offer.id_buyer
-    description: ID user of the buyer
+    description: Surrogate key of the buyer user who submitted the offer. Can be joined with dw_public.dim_user.sk_user.
   sk_owner:
     lineage:
     - datalake_sale_offer.sale_offer.id_owner
-    description: ID user of the seller
+    description: Surrogate key of the seller (property owner) user associated with the offer. Can be joined with dw_public.dim_user.sk_user.
   sk_business_unit:
     lineage:
     - datalake_sale_offer.sale_offer.id_business_unit
-    description: ID of the business unit.
+    description: Surrogate key of the business unit that originated the offer. Defaults to -1 when not assigned.
   sk_company_supply:
     lineage:
     - datalake_sale_offer.sale_offer.id_company_supply
-    description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
+    description: Surrogate key of the company in Rede QuintoAndar associated with the supply side (property). Populated only for 3P supply transactions. Can be joined with dw_rede.dim_company. Defaults to -1 when not applicable.
   sk_company_demand:
     lineage:
     - datalake_sale_offer.sale_offer.id_company_demand
-    description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company.
+    description: Surrogate key of the company in Rede QuintoAndar associated with the demand side (buyer's agent). Populated only for 3P demand transactions. Can be joined with dw_rede.dim_company. Defaults to -1 when not applicable.
   sk_broker_supply:
     lineage:
     - datalake_sale_offer.sale_offer.sk_broker_supply
-    description: Surrogate key of the supply-side broker when the business model implies 3P supply. Propagated from booking (visit_business_model).
+    description: Surrogate key of the supply-side broker (listing owner) when the business model implies 3P supply. Propagated from the booking's visit_business_model. Defaults to -1 when not applicable.
   sk_broker_demand:
     lineage:
     - datalake_sale_offer.sale_offer.sk_broker_demand
-    description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen. Propagated from booking (visit_business_model).
+    description: Surrogate key of the demand-side broker (buyer's agent) when the business model implies 3P demand or lead gen. Propagated from the booking's visit_business_model. Defaults to -1 when not applicable.
   sk_region:
     lineage:
     - datalake_sale_offer.sale_offer.id_region
-    description: ID of house region
+    description: Surrogate key of the house's region. Can be joined with dw_public.dim_region to get neighborhood, city, and state (UF). Defaults to -1 when not assigned.
   sk_booking:
     lineage:
     - datalake_sale_offer.sale_offer.id_booking
-    description: ID of booking that originated the offer
+    description: Surrogate key of the visit booking that originated the offer. Can be joined with dw_sale.fact_visits via sk_booking. Note that fact_visits.sk_offer only references the first offer per booking, so use sk_booking for the join. Defaults to -1 when no prior booking exists.
   sk_agent:
     lineage:
     - datalake_sale_offer.sale_offer.id_agent
-    description: ID (not id_user) of agent associated with the offer. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id
+    description: Surrogate key (agent ID, not user ID) of the agent associated with the offer. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id. Defaults to -1 when not assigned.
   sk_user_agent:
     lineage:
     - datalake_sale_offer.sale_offer.id_user_agent
-    description: ID user of agent associated with the offer. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user
+    description: User ID of the agent associated with the offer. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user. Defaults to -1 when not assigned.
   sk_user_team_lead:
     lineage:
     - datalake_sale_offer.sale_offer.id_user_team_lead
-    description: ID user of team lead associated with the offer. Can be joined with dw_public.dim_user.sk_user
+    description: User ID of the team lead associated with the offer. Can be joined with dw_public.dim_user.sk_user. Defaults to -1 when not assigned.
   sk_user_consultant:
     lineage:
     - datalake_sale_offer.sale_offer.id_user_consultant
-    description: ID user of consultant that managed the offer negotiation. Can be joined with dw_public.dim_user.sk_user
+    description: User ID of the consultant (Negotiation Executive / EN) who managed the offer negotiation. Can be joined with dw_public.dim_user.sk_user.
   sk_consultant:
     lineage:
     - datalake_sale_offer.sale_offer.id_consultant
-    description: ID of the consultant that managed the offer negotiation, formed by "ID_VENDAS_" or "ID_MONDAY_" concatenated with the id of their respective platforms.
+    description: Platform-specific ID of the consultant who managed the offer negotiation. Formed by concatenating "ID_VENDAS_" or "ID_MONDAY_" with the ID from their respective platforms.
   sk_closing_specialist:
     lineage:
     - datalake_sale_offer.sale_offer.id_closing_specialist
-    description: ID user of the closing specialist
+    description: User ID of the Closing Specialist (Negotiation Executive / EN) assigned to mediate the negotiation between buyer and seller. Filter <> -1 to restrict to offers with an assigned specialist. Defaults to -1 when not assigned.
   sk_secretariat_booking_creator:
     lineage:
     - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
-    description: Surrogate key of the secretariat who created the booking. Can be joined with dw_secretariat.dim_secretariat_user_version,
-      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+    description: Surrogate key of the secretariat who created the booking, captured as a versioned snapshot at the time of the booking creation. Can be joined with dw_secretariat.dim_secretariat_user_version on field sk_secretariat_user_version to retrieve the secretariat's team allocation at that point in time. Defaults to -1 when not assigned.
   sk_buyer_prospect_type:
     lineage:
     - datalake_sale_offer.sale_offer.id_buyer_prospect_type
-    description: Surrogate key of the buyer prospect type. Can be joined with dw_sale.dim_buyer_prospect_type.
+    description: Surrogate key of the buyer prospect type at the time of the offer. Can be joined with dw_sale.dim_buyer_prospect_type to segment buyers as NBP (New Buyer Prospect — first visit ever on the platform, ~70% of monthly volume) or RBP (Recovery Buyer Prospect — returning buyer after inactivity, ~30%). Defaults to -1 when not resolved.
   sk_listing_price_segment:
     lineage:
     - dw_sale.dim_sale_price_segment.sk_sale_price_segment
-    description: Surrogate key of the listing price segment. Can be joined with dw_sale.dim_sale_price_segment.
+    description: Surrogate key of the price segment of the listing at the time of the offer submission, derived from the listing price active during the offer. Can be joined with dw_sale.dim_sale_price_segment. Defaults to -1 when not resolved.
   sk_offer_submitted_date:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Sk date of offer submission
+    description: Date surrogate key (format YYYYMMDD) of the Offer Submitted (OS) event — the funnel entry point. Can be joined with dw_public.dim_date.sk_date. Value is -1 when the event has not occurred.
   sk_offer_accepted_date:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_accepted
-    description: Sk date of offer acceptance
+    description: Date surrogate key (format YYYYMMDD) of the Offer Accepted (OA) event — when the seller accepts the buyer's offer. Can be joined with dw_public.dim_date.sk_date. Value is -1 when the event has not occurred.
   sk_offer_dismissed_date:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_dismissed
-    description: Sk date of offer rejection or offer dismissed
+    description: Date surrogate key (format YYYYMMDD) of the Offer Dismissed/Rejected (OR) event — when the offer is discarded before acceptance. Can be joined with dw_public.dim_date.sk_date. Value is -1 when the event has not occurred.
   sk_offer_rescued_date:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_rescued
-    description: Sk date of offer rescued
+    description: Date surrogate key (format YYYYMMDD) of the offer rescue event — when a previously cancelled offer is reopened. Can be joined with dw_public.dim_date.sk_date. Value is -1 when the event has not occurred.
   sk_sale_agreement_created_date:
     lineage:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_created
-    description: Sk date of sale agreement creation
+    description: Date surrogate key (format YYYYMMDD) of the Sale Agreement Created (SAC) event — when the CCV draft is initiated. This is a pipeline milestone, not a revenue event. Can be joined with dw_public.dim_date.sk_date. Value is -1 when the event has not occurred.
   sk_sale_agreement_signed_date:
     lineage:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Sk date of sale agreement signature
+    description: Date surrogate key (format YYYYMMDD) of the Sale Agreement Signed (CCV) event — the commercial milestone. Note that CCV is not equivalent to Closed Deal (CD); CD also requires Due Diligence approval and is tracked in dw_sale.fact_closing_flows. Can be joined with dw_public.dim_date.sk_date. Value is -1 when the event has not occurred.
   sk_seller_fup_date:
     lineage:
       - datalake_sale_offer.sale_offer.ts_seller_fup
-    description: Date when the Closing Analyst sent a message to the Seller.
+    description: Date surrogate key (format YYYYMMDD) of the last follow-up message sent by the Closing Analyst to the Seller during negotiation. Can be joined with dw_public.dim_date.sk_date. Value is -1 when no follow-up was sent.
   sk_buyer_fup_date:
     lineage:
       - datalake_sale_offer.sale_offer.ts_buyer_fup
-    description: Date when the Closing Analyst sent a message to the Buyer.
+    description: Date surrogate key (format YYYYMMDD) of the last follow-up message sent by the Closing Analyst to the Buyer during negotiation. Can be joined with dw_public.dim_date.sk_date. Value is -1 when no follow-up was sent.
   brokerage_fee:
     lineage:
       - datalake_sale_offer.sale_offer.brokerage_fee
-    description: Percentage of brokerage fee
+    description: Brokerage fee percentage charged on the transaction (e.g., 0.05 = 5%). This is a rate, not a BRL amount.
   sale_price_agreed:
     lineage:
       - datalake_sale_offer.sale_offer.sale_price_agreed
-    description: Sale price agreed in the sale contract
+    description: >
+      Final price agreed between buyer and seller in the CCV (Contrato de
+      Compra e Venda), in BRL. Populated when the offer is accepted by the
+      seller. To compute the seller discount, compare with dim_offer.sale_price
+      (listing price at the time of the offer): discount = (sale_price - sale_price_agreed) / sale_price.
+      Do not use dw_sale.dim_listing.price for this calculation — it reflects the current
+      listing price and is not updated when an offer is accepted.
   has_used_fgts_in_payment:
     lineage:
       - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
-    description: Has used (or will use) FGTS in payment
+    description: True if the buyer used (or plans to use) FGTS (Fundo de Garantia por Tempo de Serviço) as part of the payment for this transaction.
   is_buyer_first_offer:
     lineage:
     - datalake_sale_offer.sale_offer.is_buyer_first_offer
-    description: True if the offer is the first offer of the user's life
+    description: True if this is the first offer ever submitted by this buyer on the QuintoAndar platform.
   is_house_first_offer:
     lineage:
     - datalake_sale_offer.sale_offer.is_house_first_offer
-    description: True if the offer is the first offer received by the house
+    description: True if this is the first offer ever received by this house on the QuintoAndar platform.
   is_3p_supply:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_supply
-    description: Boolean flag indicating if the offer has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
+    description: >
+      True if the offer has a 3P supply partner — a partner company (imobiliária) that listed the property
+      on the QuintoAndar platform (Rede QuintoAndar). 3P supply transactions follow a different flow
+      from 1P; always separate them in analyses. See also sk_company_supply and sk_broker_supply.
   is_3p_demand:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_demand
-    description: Boolean flag indicating if the offer has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
+    description: >
+      True if the offer has a 3P demand partner — a partner company that brought the buyer to the
+      QuintoAndar platform (Rede QuintoAndar). 3P demand transactions follow a different flow
+      from 1P; always separate them in analyses. See also sk_company_demand and sk_broker_demand.
   is_3p_lead_gen:
     lineage:
     - datalake_sale_offer.sale_offer.is_3p_lead_gen
-    description: Boolean flag indicating if the offer has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
+    description: >
+      True if the offer has a 3P lead generation partner — a company that generated the buyer lead
+      and forwarded it to the QuintoAndar platform. Unlike 3P demand, the lead gen partner does
+      not manage the transaction itself. See also sk_broker_demand.
   has_3p_access_control:
     lineage:
     - datalake_sale_offer.sale_offer.has_3p_access_control
-    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
+    description: True if the offer has any 3P partner involvement — supply, demand, or lead gen. Equivalent to (is_3p_supply OR is_3p_demand OR is_3p_lead_gen). Use this as a quick filter to isolate all 3P-touched offers.
   has_completed_visit_before_offer:
     lineage:
     - datalake_sale_offer.sale_offer.flg_visit_completed_before_offer
-    description: True if buyer had a visit completed in the house before offer submission
+    description: True if the buyer completed at least one visit to this house before submitting the offer. Used to analyze the impact of in-person visits on offer-to-acceptance conversion.
   has_booking_before_offer:
     lineage:
     - datalake_sale_offer.sale_offer.flg_booking_before_offer
-    description: True if buyer had a visit booked in the house before offer submission
+    description: True if the buyer had a visit booking (scheduled visit) for this house before submitting the offer, regardless of whether the visit was completed.
   first_price_offered_by_buyer:
     lineage:
     - datalake_sale_offer.sale_offer.first_price_offered_by_buyer
-    description: First value offered by buyer
+    description: First price (in BRL) proposed by the buyer during negotiation. Use with sale_price from dw_sale.dim_offer to compute the initial negotiation gap opened by the buyer. See also first_discount_proposed.
   last_price_offered_by_buyer:
     lineage:
     - datalake_sale_offer.sale_offer.last_price_offered_by_buyer
-    description: Last price offered by the buyer
+    description: Last price (in BRL) proposed by the buyer during negotiation. For accepted offers, this equals sale_price_agreed. See also last_discount_proposed.
   first_discount_proposed:
     lineage:
     - datalake_sale_offer.sale_offer.first_discount_proposed
-    description: First percentage of discount negotiated
+    description: >
+      Discount percentage of the buyer's first offer relative to the listing
+      price. Calculated as (sale_price - first_price_offered_by_buyer) /
+      sale_price, where sale_price comes from dw_sale.dim_offer at offer submission time.
+      Represents the initial negotiation gap opened by the buyer.
   last_discount_proposed:
     lineage:
     - datalake_sale_offer.sale_offer.last_discount_proposed
-    description: Last percentage of discount negotiated
+    description: >
+      Discount percentage of the buyer's last offer relative to the listing
+      price. Calculated as (sale_price - last_price_offered_by_buyer) /
+      sale_price. For accepted offers, the last offer equals sale_price_agreed,
+      so this also represents the effective seller discount (desconto do proprietário) granted.
+      Use AVG(last_discount_proposed) WHERE ts_offer_accepted IS NOT NULL for the monthly seller discount metric.
   hours_booking_to_offer:
     lineage:
     - datalake_sale_offer.sale_offer.hours_booking_to_offer
-    description: Hours between the visit booked and the offer submission
+    description: Number of hours elapsed between the visit booking creation and the offer submission. Null when no prior booking exists (has_booking_before_offer = false).
   hours_visit_completed_to_offer:
     lineage:
     - datalake_sale_offer.sale_offer.hours_visit_to_offer
-    description: Hours between the visit completion and the offer submission
+    description: Number of hours elapsed between the visit completion and the offer submission. Null when no completed visit exists before the offer (has_completed_visit_before_offer = false).
   days_offer_submitted_to_offer_accepted:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_submitted_to_offer_accepted
-    description: Number of days between the offer submission and the offer acceptance
+    description: Pre-computed lead time in days from Offer Submitted (OS) to Offer Accepted (OA). Use AVG of this column for the LT OS→OA metric (benchmark ~2 days). Null when offer was not accepted.
   days_offer_submitted_to_sale_agreement_created:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_submitted_to_sale_agreement_created
-    description: Number of days between the offer submission and the creation of the
-      sale agreement
+    description: Pre-computed lead time in days from Offer Submitted (OS) to Sale Agreement Created (SAC). Null when the sale agreement was not created.
   days_offer_submitted_to_offer_dismissed:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_submitted_to_offer_dismissed
-    description: Number of days between the offer submission and the offer refusal
+    description: Pre-computed lead time in days from Offer Submitted (OS) to Offer Dismissed/Rejected (OR). Null when the offer was not dismissed.
   days_offer_submitted_to_sale_agreement_signed:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_submitted_to_sale_agreement_signed
-    description: Number of days between the offer submission and the signature of
-      the sale agreement
+    description: Pre-computed lead time in days from Offer Submitted (OS) to Sale Agreement Signed (CCV). Null when the CCV was not signed.
   days_offer_accepted_to_sale_agreement_created:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_accepted_to_sale_agreement_created
-    description: Number of days between the offer acceptance and the creation of the
-      sale agreement
+    description: Pre-computed lead time in days from Offer Accepted (OA) to Sale Agreement Created (SAC). Null when either event has not occurred.
   days_offer_accepted_to_sale_agreement_signed:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_accepted_to_sale_agreement_signed
-    description: Number of days between the offer acceptance and the signature of
-      the sale agreement
+    description: Pre-computed lead time in days from Offer Accepted (OA) to Sale Agreement Signed (CCV). Use AVG of this column for the LT OA→CCV metric (benchmark ~6 days). Null when the CCV was not signed.
   days_offer_accepted_to_offer_dismissed:
     lineage:
     - datalake_sale_offer.sale_offer.days_offer_accepted_to_offer_dismissed
-    description: Number of days between the offer acceptance and the offer refusal
+    description: Pre-computed lead time in days from Offer Accepted (OA) to Offer Dismissed. Captures offers that were dismissed after initial acceptance (post-acceptance drop). Null when this sequence has not occurred.
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
     - datalake_sale_offer.sale_offer.days_sale_agreement_created_to_sale_agreement_signed
-    description: Number of days between the creation of the sale agreement and the
-      signature of the sale agreement
+    description: Pre-computed lead time in days from Sale Agreement Created (SAC) to Sale Agreement Signed (CCV). Captures the time to complete contract generation and signature. Null when the CCV was not signed.
   ts_offer_submitted:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Timestamp of offer submission
+    description: Timestamp of Offer Submitted (OS) — the funnel entry point and anchor for all EoF conversion metrics. Use DATE_TRUNC('month', ts_offer_submitted) for monthly cohort analysis.
   ts_offer_accepted:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_accepted
-    description: Timestamp of offer acceptance
+    description: Timestamp of Offer Accepted (OA) — when the seller accepts the buyer's price. Null if the offer was never accepted. Use COUNT(*) FILTER (WHERE ts_offer_accepted IS NOT NULL) / COUNT(*) for OS→OA conversion rate (benchmark ~60%).
   ts_offer_dismissed:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_dismissed
-    description: Timestamp of offer rejection or offer dismissed
+    description: Timestamp of Offer Dismissed/Rejected (OR) — when the offer is discarded before acceptance. Null if the offer was not dismissed. Use with ts_offer_accepted IS NULL to identify pre-acceptance drops.
   ts_offer_canceled:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_canceled
-    description: Timestamp of offer cancellation
+    description: Timestamp of offer cancellation. Cancellations can occur either before or after offer acceptance, unlike dismissals which occur only before acceptance. Null if the offer was not cancelled.
   ts_offer_rescued:
     lineage:
     - datalake_sale_offer.sale_offer.ts_offer_rescued
-    description: Timestamp of offer rescued
+    description: Timestamp of offer rescue — when a previously cancelled offer is reopened and reactivated. See dw_sale.dim_offer.is_a_rescued_offer for the boolean flag. Null if the offer was never rescued.
   ts_sale_agreement_drafted:
     lineage:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_drafted
-    description: Timestamp of sale agreement draft creation
+    description: Timestamp when the CCV draft (CCVe / Sale Agreement Draft) was created — the initial document generation step before parties review and sign. Null if the agreement was never drafted.
   ts_sale_agreement_created:
     lineage:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_created
-    description: Timestamp of sale agreement creation
+    description: Timestamp of Sale Agreement Created (SAC) — a pipeline milestone indicating the CCV process is formally underway. This is NOT a revenue event; the revenue event is Closed Deal (CD) in fact_closing_flows. Null if the agreement was never created.
   ts_sale_agreement_signed:
     lineage:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Timestamp of sale agreement signature
+    description: >
+      Timestamp of Sale Agreement Signed (CCV / Compromisso de Compra e Venda) — the commercial milestone
+      and primary CCV metric. Use COUNT(DISTINCT sk_offer) WHERE ts_sale_agreement_signed IS NOT NULL for # CCV.
+      Important: CCV ≠ Closed Deal (CD). CD additionally requires Due Diligence approval and
+      Termo de Corretagem, tracked in dw_sale.fact_closing_flows.sk_legal_analysis_ended_date.
+      Null if the agreement was never signed.
   ts_sale_agreement_canceled:
     lineage:
     - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
-    description: Timestamp of sale agreement cancellation
+    description: Timestamp of CCV cancellation after signature. A non-null value indicates the deal was cancelled post-signing (distrato). See dw_sale.dim_sale_agreement.is_ccv_canceled and sale_agreement_cancellation_reason for details. Null if the CCV was not cancelled.
   ts_seller_fup:
     lineage:
       - datalake_sale_offer.sale_offer.ts_seller_fup
-    description: Timestamp when the Closing Analyst sent a message to the Seller.
+    description: Timestamp of the last follow-up message sent by the Closing Analyst to the Seller during the OS→OA negotiation stage. Null if no follow-up was sent.
   ts_buyer_fup:
     lineage:
       - datalake_sale_offer.sale_offer.ts_buyer_fup
-    description: Timestamp when the Closing Analyst sent a message to the Buyer.
+    description: Timestamp of the last follow-up message sent by the Closing Analyst to the Buyer during the OS→OA negotiation stage. Null if no follow-up was sent.
   ts_load:
-    description: Timestamp of when the table was last loaded
+    description: Timestamp of when the table was last loaded by the ETL pipeline (full refresh, daily).

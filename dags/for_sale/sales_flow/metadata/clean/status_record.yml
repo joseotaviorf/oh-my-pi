@@ -2,34 +2,49 @@ database_name: datalake_sales_flow_clean
 table_name: status_record
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: The main objective of the table is registered all status changes throughout the sales process. A status can coincide with another status on the same date.
+description: >
+  Event log of SalesFlow (offer) status transitions from the SalesFlow application.
+  Grain is one row per status assignment per offer (id_sales_flow, id_status, ts_status_start).
+  Multiple statuses may be active on the same date. There is no dedicated column for funnel
+  milestones in downstream tables; derive milestone timestamps by joining
+  datalake_sales_flow_clean.status on id_status and filtering status.key, using ts_status_start
+  as the event time (e.g. CCV sent to Operations Support via key CCV_SEND_TO_OPERATIONS_SUPPORT).
 columns:
   id:
-    description: Macrostatus ID on status Tables
+    description: Primary key of the status_record row in SalesFlow.
     lineage:
     - datalake_sales_flow_raw.status_record.id
   id_sales_flow:
-    description: Offer ID on SalesFlow tables.
+    description: >
+      Foreign key to the SalesFlow offer (same identifier as datalake_sales_flow_clean.offer.id_sales_flow).
+      Filter on this column to retrieve the full status history for one offer.
     lineage:
     - datalake_sales_flow_raw.status_record.sales_flow_id
   id_status:
-    description: Status ID on status Tables.
+    description: >
+      Foreign key to datalake_sales_flow_clean.status.id. Join status to filter by status.key
+      when deriving milestone timestamps (e.g. CCV_SEND_TO_OPERATIONS_SUPPORT for when the CCV
+      was sent to Operations Support / Legal Ops).
     lineage:
     - datalake_sales_flow_raw.status_record.status_id
   ts_status_start:
-    description: Date of registration of start of a status.
+    description: >
+      Timestamp when this status period started for the offer. Use as the canonical event time
+      when deriving milestone dates from status_record (e.g. CCV sent to Operations Support =
+      ts_status_start where status.key = 'CCV_SEND_TO_OPERATIONS_SUPPORT' for the given id_sales_flow).
     lineage:
     - datalake_sales_flow_raw.status_record.status_start_date
   ts_status_end:
-    description: Date of registration of finish of a status.
+    description: >
+      Timestamp when this status period ended for the offer. NULL while the status is still active.
     lineage:
     - datalake_sales_flow_raw.status_record.status_end_date
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when this status_record row was created in SalesFlow.
     lineage:
     - datalake_sales_flow_raw.status_record.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp when this status_record row was last updated in SalesFlow.
     lineage:
     - datalake_sales_flow_raw.status_record.updated_at
   year:

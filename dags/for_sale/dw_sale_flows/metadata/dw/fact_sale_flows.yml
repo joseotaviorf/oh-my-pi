@@ -1,81 +1,130 @@
 database_name: dw_sale
 table_name: fact_sale_flows
-description: The sale flow is defined by the tuple buyer / house. It can be started
-  when the buyer makes a booking, offer ou talk to agent event in some house. The
-  table brings information about events (Dates, counts, flags, categories) that happened
-  in each sale flow.
+description: >
+  The sale flow is defined by the tuple buyer / house. Grain: one row per unique
+  buyer-house pair, identified by sk_sale_flow = CONCAT(id_buyer, '_', id_house).
+  A flow can be started when the buyer makes a booking, submits an offer, or
+  sends a talk-to-agent (TTA) message for that house. The table brings
+  information about events (dates, counts, flags, categories) that happened in
+  each sale flow, plus marketing attribution (UTM, app type, branded flag and
+  demand taxonomy) resolved from Amplitude, talk-to-agent and cross-channel
+  attribution events for the flow's first touchpoint. Rows with a null
+  sk_sale_flow are excluded, due to a known limitation where the
+  datalake_gsheets.sale_hub_offer source has no id_sale_flow information.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_sale_flow:
     lineage:
     - datalake_sale_flows.sale_flow.id_sale_flow
-    description: ID of sale flow
+    description: >
+      Unique identifier of the sale flow, built by concatenating the buyer's
+      user ID and the house ID (CONCAT(id_buyer, '_', id_house)). Primary key
+      of this table (one row per buyer/house pair). Can be joined with
+      dw_visit.fact_visit_events.sk_sale_flow, which uses the same
+      CONCAT(id_buyer, '_', id_house) format.
   sk_buyer:
     lineage:
     - datalake_sale_flows.sale_flow.id_buyer
-    description: ID user of the Buyer
+    description: ID of the buyer (user who initiated the sale flow). Can be joined with dw_public.dim_user.
   sk_house:
     lineage:
     - datalake_sale_flows.sale_flow.id_house
-    description: ID of the house
+    description: ID of the house (listing). Can be joined with dw_house.dim_house and dw_sale.dim_listing.
   sk_seller:
     lineage:
     - datalake_sale_flows.sale_flow.id_seller
-    description: ID user of the seller
+    description: ID of the seller (house owner). Can be joined with dw_public.dim_user.
   sk_region:
     lineage:
     - datalake_sale_flows.sale_flow.id_region
-    description: ID of house region
+    description: ID of the region where the house is located. Can be joined with dw_public.dim_region.
   sk_first_listing_date:
     lineage:
     - datalake_sale_flows.sale_flow.ts_first_listing
-    description: Sk date of first publication of the house in sale context
+    description: >
+      Date surrogate key (format YYYYMMDD) of the house's first publication
+      in the sale context. Can be joined with dw_public.dim_date.sk_date.
+      Value is -1 when there is no listing date recorded.
   sk_first_event_date:
     lineage:
     - datalake_sale_flows.sale_flow.ts_first_event
-    description: Sk date first event of the flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first event of the flow
+      (booking, offer, or talk-to-agent message — see first_event). Can be
+      joined with dw_public.dim_date.sk_date. Value is -1 when not available.
   sk_first_tta_message_sent_date:
     lineage:
     - datalake_sale_flows.sale_flow.ts_first_tta_message_sent
-    description: Sk date of the first message sent through talk to agent feature in
-      the flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first message sent through
+      the talk-to-agent feature in the flow. Can be joined with
+      dw_public.dim_date.sk_date. Value is -1 when no talk-to-agent message
+      was sent.
   sk_first_booking_created_date:
     lineage:
     - datalake_sale_flows.sale_flow.ts_first_booking_created
-    description: Sk date of the first booking created in the sale flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first booking created in
+      the sale flow. Can be joined with dw_public.dim_date.sk_date. Value is
+      -1 when no booking was created.
   sk_first_visit_completed_date:
     lineage:
     - datalake_sale_flows.sale_flow.ts_first_visit_completed
-    description: Sk date of the first visit completed in the sale flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first visit completed in
+      the sale flow. Can be joined with dw_public.dim_date.sk_date. Value is
+      -1 when no visit was completed.
   sk_first_offer_submitted_date:
     lineage:
     - datalake_sale_flows.sale_flow.ts_first_offer_submitted
-    description: Sk date of the first offer submitted in the flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first offer submitted in
+      the flow. Can be joined with dw_public.dim_date.sk_date. Value is -1
+      when no offer was submitted.
   sk_first_offer_accepted_date:
     lineage:
     - datalake_sale_flows.sale_flow.dt_first_offer_accepted
-    description: Sk date of the first offer acceptance in the flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first offer acceptance in
+      the flow. Can be joined with dw_public.dim_date.sk_date. Value is -1
+      when no offer was accepted.
   sk_first_offer_dismissed_date:
     lineage:
     - datalake_sale_flows.sale_flow.dt_first_offer_dismissed
-    description: Sk date of the first offer dismissed in the flow
+    description: >
+      Date surrogate key (format YYYYMMDD) of the first offer dismissed in
+      the flow. Can be joined with dw_public.dim_date.sk_date. Value is -1
+      when no offer was dismissed.
   sk_sale_agreement_created_date:
     lineage:
     - datalake_sale_flows.sale_flow.dt_sale_agreement_created
-    description: Sk date of sale agreement creation
+    description: >
+      Date surrogate key (format YYYYMMDD) of the sale agreement (CCV)
+      creation. Can be joined with dw_public.dim_date.sk_date. Value is -1
+      when the sale agreement was not created.
   sk_sale_agreement_signed_date:
     lineage:
     - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
-    description: Sk date of sale agreement signature
+    description: >
+      Date surrogate key (format YYYYMMDD) of the sale agreement (CCV)
+      signature. Can be joined with dw_public.dim_date.sk_date. Value is -1
+      when the CCV was not signed.
   sk_sale_agreement_cancelled_date:
     lineage:
     - datalake_sale_flows.sale_flow.dt_sale_agreement_cancelled
-    description: Sk date of sale agreement cancellation
+    description: >
+      Date surrogate key (format YYYYMMDD) of the sale agreement (CCV)
+      cancellation. Can be joined with dw_public.dim_date.sk_date. Value is
+      -1 when the CCV was not cancelled.
   sk_house_registry_ended_date:
     lineage:
     - datalake_sale_flows.sale_flow.dt_house_registry_ended
-    description: Sk date of the end of house registry transfered to buyer's name
+    description: >
+      Date surrogate key (format YYYYMMDD) of the end of the house registry
+      transfer to the buyer's name. Can be joined with
+      dw_public.dim_date.sk_date. Value is -1 when the registry process has
+      not ended (it means the sale process was completed).
   first_event:
     lineage:
     - datalake_sale_flows.sale_flow.first_event
@@ -91,20 +140,22 @@ columns:
     description: Indicates the event with the higher intent before offer submission
       (VC>VB>TTA> no event = Offer_only)
     categories:
-      Direct_Offer: ''
-      TTA_before_OS: ''
-      VB_before_OS: ''
-      VC_before_OS: ''
+      Direct_Offer: Made an offer without performing any event before.
+      TTA_before_OS: Talked to the agent before the offer.
+      VB_before_OS: Only booked visits before the offer.
+      VC_before_OS: Performed visits before the offer.
+      "": If the buyer didn't perform any event before the offer or not even made an offer.
   higher_intent_after_offer:
     lineage:
     - datalake_sale_flows.sale_flow.higher_intent_after_offer
     description: Indicates the event with the higher intent after offer submission
       (VC>VB>TTA> no event = Direct_Offer)
     categories:
-      TTA_after_OS: ''
-      VB_after_OS: ''
-      VC_after_OS: ''
-      only_Offer: ''
+      TTA_after_OS: Talked to the agent after the offer.
+      VB_after_OS: Booked a visit in the listing after the offer.
+      VC_after_OS: Performed a visit in the listing after the offer.
+      only_Offer: Stopped at the offer.
+      "": If the buyer didn't perform any event after the offer or not even made an offer.
   rank_buyer_sale_flow:
     lineage:
     - datalake_sale_flows.sale_flow.rank_buyer_sale_flow
@@ -120,27 +171,39 @@ columns:
   is_house_first_sale_flow:
     lineage:
     - datalake_sale_flows.sale_flow.is_house_first_sale_flow
-    description: If the flow is the first sale flow of the house
+    description: >
+      Boolean flag indicating whether this is the first sale flow associated
+      with this house (rank_house_sale_flow = 1). False means the house had
+      at least one earlier sale flow, from the same or a different buyer,
+      before this one. Use together with rank_house_sale_flow to identify
+      houses with multiple sale attempts.
   flow_type:
     lineage:
     - datalake_sale_flows.sale_flow.flow_type
     description: Combination of events that the flow received
     categories:
-      OS: ''
-      TTA: ''
-      TTA_OS: ''
-      VB: ''
-      VB_OS: ''
-      VB_TTA: ''
-      VB_TTA_OS: ''
-      VB_VC: ''
-      VB_VC_OS: ''
-      VB_VC_TTA: ''
-      VB_VC_TTA_OS: ''
+      OS: The buyer only performed offers.
+      TTA: The buyer only talked to the agent.
+      TTA_OS: The buyer talked to the agent and made an offer.
+      VB: The buyer only booked visits.
+      VB_OS: The buyer booked visits and made an offer.
+      VB_TTA: The buyer booked visits and talked to the agent.
+      VB_TTA_OS: The buyer booked visits, talked to the agent and made an offer.
+      VB_VC: The buyer performed visits.
+      VB_VC_OS: The buyer performed visits and made an offer.
+      VB_VC_TTA: The buyer performed visits and talked to the agent.
+      VB_VC_TTA_OS: The buyer performed visits, talked to the agent and made an offer.
   max_discount_proposed:
     lineage:
     - datalake_sale_flows.sale_flow.max_discount_proposed
-    description: The maximum value of discount negotiated between seller and buyer
+    description: >
+      Maximum discount percentage proposed across all offers in the sale flow,
+      relative to the listing price. Calculated as
+      (sale_price - min_offer_price) / sale_price across the flow's offers.
+      Useful for understanding the widest negotiation gap reached in a flow,
+      regardless of whether the deal was closed. For the effective discount on
+      closed deals, prefer fact_offers.last_discount_proposed filtered by
+      accepted offers.
   bookings:
     lineage:
     - datalake_sale_flows.sale_flow.bookings
@@ -175,7 +238,7 @@ columns:
   days_first_publication_to_first_offer_submitted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_first_offer_submitted
-    description: Days between the  house first publication and the first offer submitted
+    description: Days between the house first publication and the first offer submitted
       in the sale flow
   days_first_publication_to_first_offer_accepted:
     lineage:
@@ -190,28 +253,45 @@ columns:
   days_first_publication_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_house_registry_ended
-    description: Days between the house first publication  and house registry ended
+    description: Days between the house first publication and house registry ended
       in the sale flow (it means that the sale process was completed)
   days_first_event_to_first_visit_completed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_event_to_first_visit_completed
-    description: Days between the first event and the first visit completed in the
-      sale flow
+    description: >
+      Lead time in days between the flow's first event (first_event —
+      a booking, an offer, or a talk-to-agent message, whichever happened
+      first) and the first completed visit, computed as
+      DATEDIFF(ts_first_visit_completed, ts_first_event). Differs from
+      days_first_booking_created_to_first_visit_completed when the first
+      event was not itself a booking (e.g. a direct offer or TTA message
+      preceded any booking). Null when no visit was completed in the flow.
   days_first_event_to_first_offer_submitted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_event_to_first_offer_submitted
-    description: Days between the first event and first offer submitted in the sale
-      flow
+    description: >
+      Lead time in days between the flow's first event (booking, offer, or
+      talk-to-agent message) and the first offer submitted (OS), computed as
+      DATEDIFF(ts_first_offer_submitted, ts_first_event). Equals 0 when the
+      first event is itself the offer submission (first_event = 'offer').
+      Null when no offer was submitted in the flow.
   days_first_event_to_first_offer_accepted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_event_to_first_offer_accepted
-    description: Days between the first booking and the first offer accepted in the
-      sale flow
+    description: >
+      Lead time in days between the flow's first event (booking, offer, or
+      talk-to-agent message) and the first offer acceptance (OA), computed
+      as DATEDIFF(dt_first_offer_accepted, ts_first_event). Null when no
+      offer was accepted in the flow.
   days_first_event_to_sale_agreement_signed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_event_to_sale_agreement_signed
-    description: Days between the first event and sale agreement signed in the sale
-      flow
+    description: >
+      Lead time in days between the flow's first event (booking, offer, or
+      talk-to-agent message) and the sale agreement (CCV) signature,
+      computed as DATEDIFF(dt_sale_agreement_signed, ts_first_event).
+      Represents the full time-to-close from the buyer's first touchpoint.
+      Null when the CCV was not signed.
   days_first_event_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_event_to_house_registry_ended
@@ -220,23 +300,37 @@ columns:
   days_first_booking_created_to_first_visit_completed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_first_visit_completed
-    description: Days between the first booking and first visit completed in the sale
-      flow
+    description: >
+      Lead time in days between the first visit booking and the first
+      completed visit, computed as DATEDIFF(ts_first_visit_completed,
+      ts_first_booking_created). Captures how long it took the buyer to
+      actually attend after scheduling. Null when no booking was created or
+      no visit was completed.
   days_first_booking_created_to_first_offer_submitted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_first_offer_submitted
-    description: Days between the first booking and first offer submitted in the sale
-      flow
+    description: >
+      Lead time in days between the first visit booking and the first offer
+      submitted (OS), computed as DATEDIFF(ts_first_offer_submitted,
+      ts_first_booking_created). Can include cases where the offer was
+      submitted before the booked visit took place. Null when no booking
+      was created or no offer was submitted.
   days_first_booking_created_to_first_offer_accepted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_first_offer_accepted
-    description: Days between the first booking and first offer accepted in the sale
-      flow
+    description: >
+      Lead time in days between the first visit booking and the first offer
+      acceptance (OA), computed as DATEDIFF(dt_first_offer_accepted,
+      ts_first_booking_created). Null when no booking was created or the
+      offer was not accepted.
   days_first_booking_created_to_sale_agreement_signed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_sale_agreement_signed
-    description: Days between the first booking and sale agreement signed in the sale
-      flow
+    description: >
+      Lead time in days between the first visit booking and the sale
+      agreement (CCV) signature, computed as
+      DATEDIFF(dt_sale_agreement_signed, ts_first_booking_created). Null
+      when no booking was created or the CCV was not signed.
   days_first_booking_created_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_house_registry_ended
@@ -245,18 +339,28 @@ columns:
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_visit_completed_to_first_offer_submitted
-    description: Days between the first visit completed and the first offer submitted
-      in the sale flow
+    description: >
+      Lead time in days between the first completed visit and the first
+      offer submitted (OS), computed as DATEDIFF(ts_first_offer_submitted,
+      ts_first_visit_completed). Useful to measure how quickly a visit
+      converts into an offer. Null when no visit was completed or no offer
+      was submitted.
   days_first_visit_completed_to_first_offer_accepted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_visit_completed_to_first_offer_accepted
-    description: Days between the first visit completed and the first offer accepted
-      in the sale flow
+    description: >
+      Lead time in days between the first completed visit and the first
+      offer acceptance (OA), computed as DATEDIFF(dt_first_offer_accepted,
+      ts_first_visit_completed). Null when no visit was completed or the
+      offer was not accepted.
   days_first_visit_completed_to_sale_agreement_signed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_visit_completed_to_sale_agreement_signed
-    description: Days between the first visit completed and sale agreement signed
-      in the sale flow
+    description: >
+      Lead time in days between the first completed visit and the sale
+      agreement (CCV) signature, computed as
+      DATEDIFF(dt_sale_agreement_signed, ts_first_visit_completed). Null
+      when no visit was completed or the CCV was not signed.
   days_first_visit_completed_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_visit_completed_to_house_registry_ended
@@ -265,28 +369,41 @@ columns:
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_offer_submitted_to_first_offer_accepted
-    description: Days between the first offer submitted  and the first offer accepted
-      in the sale flow
+    description: >
+      Lead time in days between the first offer submitted (OS) and the
+      first offer acceptance (OA), computed as
+      DATEDIFF(dt_first_offer_accepted, ts_first_offer_submitted).
+      Equivalent to the OS→OA conversion lead time tracked at the offer
+      level in dw_sale.fact_offers.days_offer_submitted_to_offer_accepted.
+      Null when the offer was not accepted.
   days_first_offer_submitted_to_sale_agreement_signed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_offer_submitted_to_sale_agreement_signed
-    description: Days between the first offer submitted and sale agreement signed
-      in the sale flow
+    description: >
+      Lead time in days between the first offer submitted (OS) and the sale
+      agreement (CCV) signature, computed as
+      DATEDIFF(dt_sale_agreement_signed, ts_first_offer_submitted). Null
+      when the CCV was not signed.
   days_first_offer_accepted_to_sale_agreement_signed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_offer_accepted_to_sale_agreement_signed
-    description: Days between the first offer accepted and sale agreement signed in
-      the sale flow
+    description: >
+      Lead time in days between the first offer acceptance (OA) and the
+      sale agreement (CCV) signature, computed as
+      DATEDIFF(dt_sale_agreement_signed, dt_first_offer_accepted).
+      Corresponds to the OA→CCV stage tracked at the offer level in
+      dw_sale.fact_offers.days_offer_accepted_to_sale_agreement_signed. Null
+      when the CCV was not signed.
   days_first_offer_submitted_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_offer_submitted_to_house_registry_ended
-    description: Days between the first offer submitted  and house registry ended
+    description: Days between the first offer submitted and house registry ended
       in the sale flow (it means that the sale process was completed)
   app_type:
     lineage:
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
-    - datalake_amplitude_visit.amplitude_visit.utm_campaign
+    - datalake_amplitude_offer.sale_offer_raw_events.app_type
+    - datalake_talk_to_agent.talk_to_agent_events.app_type
+    - datalake_amplitude_visit.amplitude_visit.app_type
     - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
     description: Amplitude's app type
     categories:
@@ -297,16 +414,16 @@ columns:
       web_mobile: ''
   utm_source:
     lineage:
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
-    - datalake_amplitude_visit.amplitude_visit.utm_campaign
+    - datalake_amplitude_offer.sale_offer_raw_events.utm_source
+    - datalake_talk_to_agent.talk_to_agent_events.utm_source
+    - datalake_amplitude_visit.amplitude_visit.utm_source
     - datalake_tracked_events.attribution_cross_channel.final_attribution_source
     description: UTM used to track the advertising source
   utm_medium:
     lineage:
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_talk_to_agent.talk_to_agent_events.utm_campaign
-    - datalake_amplitude_visit.amplitude_visit.utm_campaign
+    - datalake_amplitude_offer.sale_offer_raw_events.utm_medium
+    - datalake_talk_to_agent.talk_to_agent_events.utm_medium
+    - datalake_amplitude_visit.amplitude_visit.utm_medium
     - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
     description: UTM used to track the advertising medium
     categories:
@@ -354,7 +471,11 @@ columns:
     description: If the sale flow came from a branded campaign as defined by the lead
       taxonomy
   final_attribution_origin:
-    description: Final origin assigned.
+    description: >
+      Final origin assigned by the cross-channel attribution model
+      (datalake_tracked_events.attribution_cross_channel), when a matching
+      visit_code is found for the flow's first event. Defaults to
+      'old_attribution' when there is no cross-channel attribution match.
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
   mkt_category:
