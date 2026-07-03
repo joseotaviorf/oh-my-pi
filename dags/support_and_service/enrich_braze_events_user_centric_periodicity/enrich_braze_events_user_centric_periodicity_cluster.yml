@@ -6,10 +6,11 @@ cluster:
     driver_node_type_id: r7g.xlarge
 validation:
   cluster:
-    type: emr_7_12_consolidation_s_general_cluster
+    type: emr_7_12_consolidation_l_memory_cluster
     custom_configurations:
-      master_node_type_id: r6g.xlarge
-      spark_conf:
-        spark.driver.memory: 12g
-        spark.driver.memoryOverhead: 4g
-        spark.yarn.am.memory: 4g
+      core_nodes:
+        instance_count: 2
+      task_nodes:
+        instance_count: 2
+      aws_attributes:
+        ebs_volume_size: 200
