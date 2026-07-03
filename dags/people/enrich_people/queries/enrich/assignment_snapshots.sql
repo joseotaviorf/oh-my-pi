@@ -357,54 +357,81 @@ assignment_snapshots_ranked AS (
             ON cv.assignment_number = ad.assignment_number
             AND ad.dt_reference >= cv.dt_valid_from
             AND ad.dt_reference <= cv.dt_valid_to
+),
+current_primary_assignment_ranked AS (
+    SELECT
+        asr.id_assignment,
+        asr.dt_reference,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                asr.id_person
+            ORDER BY
+                CASE
+                    WHEN asr.is_active THEN 0
+                    ELSE 1
+                END,
+                asr.dt_reference DESC,
+                asr.assignment_number DESC
+        ) AS person_primary_rn
+    FROM
+        assignment_snapshots_ranked AS asr
+    WHERE
+        asr.rn = 1
+        AND asr.is_current = TRUE
+        AND asr.is_primary_assignment_for_snapshot = TRUE
 )
 SELECT
-    id_assignment,
-    id_person,
-    id_organization,
-    id_business_unit,
-    id_job,
-    sk_job_version,
-    sk_cost_center_version,
-    sk_compensation_version,
-    business_unit_country,
-    sk_hierarchy_version,
-    sk_termination_event_definition,
-    sk_hired_date,
-    sk_terminated_date,
-    sk_reference_date,
-    person_number,
-    assignment_number,
-    manager_assignment_number,
-    hierarchy_level,
-    hierarchy_depth,
-    employment_status,
-    tenure_range,
-    days_tenure_in_company,
-    months_tenure_in_company,
-    days_tenure_in_assignment,
-    count_direct_report,
-    count_indirect_report,
-    count_total_report,
-    is_manager,
-    is_leadership_team_member,
-    is_executive_team_member,
-    is_active,
-    has_emergency_contact,
-    is_internal_transfer,
-    is_future_hire,
-    is_primary_assignment_for_snapshot,
-    is_reorganization_termination,
-    is_monthly_snapshot,
-    is_current,
-    dt_original_hire,
-    dt_hired,
-    dt_terminated,
-    dt_notified_termination,
-    dt_reference,
-    dt_month_reference,
-    ts_load
+    asr.id_assignment,
+    asr.id_person,
+    asr.id_organization,
+    asr.id_business_unit,
+    asr.id_job,
+    asr.sk_job_version,
+    asr.sk_cost_center_version,
+    asr.sk_compensation_version,
+    asr.business_unit_country,
+    asr.sk_hierarchy_version,
+    asr.sk_termination_event_definition,
+    asr.sk_hired_date,
+    asr.sk_terminated_date,
+    asr.sk_reference_date,
+    asr.person_number,
+    asr.assignment_number,
+    asr.manager_assignment_number,
+    asr.hierarchy_level,
+    asr.hierarchy_depth,
+    asr.employment_status,
+    asr.tenure_range,
+    asr.days_tenure_in_company,
+    asr.months_tenure_in_company,
+    asr.days_tenure_in_assignment,
+    asr.count_direct_report,
+    asr.count_indirect_report,
+    asr.count_total_report,
+    asr.is_manager,
+    asr.is_leadership_team_member,
+    asr.is_executive_team_member,
+    asr.is_active,
+    asr.has_emergency_contact,
+    asr.is_internal_transfer,
+    asr.is_future_hire,
+    asr.is_primary_assignment_for_snapshot,
+    asr.is_reorganization_termination,
+    asr.is_monthly_snapshot,
+    asr.is_current,
+    COALESCE(cpar.person_primary_rn = 1, FALSE) AS is_current_for_person,
+    asr.dt_original_hire,
+    asr.dt_hired,
+    asr.dt_terminated,
+    asr.dt_notified_termination,
+    asr.dt_reference,
+    asr.dt_month_reference,
+    asr.ts_load
 FROM
-    assignment_snapshots_ranked
+    assignment_snapshots_ranked AS asr
+LEFT JOIN
+    current_primary_assignment_ranked AS cpar
+        ON asr.id_assignment = cpar.id_assignment
+        AND asr.dt_reference = cpar.dt_reference
 WHERE
-    rn = 1
+    asr.rn = 1

@@ -42,6 +42,18 @@ column_level_validations:
           HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) != 1
         )) = 0
       severity_level: Error
+  one_current_primary_row_per_person:
+    custom:
+      # Person-grain exports rely on exactly one is_current_for_person row per person_number.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT person_number
+          FROM dw_employee_details.fact_assignment_snapshots
+          WHERE is_current_for_person = TRUE
+          GROUP BY person_number
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Error

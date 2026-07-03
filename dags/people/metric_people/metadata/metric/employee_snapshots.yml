@@ -914,6 +914,12 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_current
 
+  is_current_for_person:
+    description: True when this row is the single current primary assignment for the person. Use for person-grain exports instead of is_current AND is_primary_assignment_for_snapshot.
+    dimension: True
+    lineage:
+      - dw_employee_details.fact_assignment_snapshots.is_current_for_person
+
   dt_month_reference:
     description: Last calendar day of the snapshot month. Active employees show the month-end of today's month; terminated employees show the month-end of their termination month.
     dimension: True

@@ -87,6 +87,8 @@ Repo-wide `sql_conventions.mdc` requires reverse DAGs that export personal data 
 
 Employee PII in reverse exports is governed by People access controls (`people-team` privileges, restricted GSheet workbooks), not the consumer Person model.
 
+**`is_current_for_person`** — the main flag to use when querying the current state of employees without historical context. Returns exactly one row per person on `assignment_snapshots`, `fact_assignment_snapshots`, and `employee_snapshots`, making it the correct filter for person-grain exports (rosters, access lists, reverse reports). Tie-break: active assignment wins, then latest `dt_reference`, then highest `assignment_number`.
+
 ---
 
 ## Confluence — People Data space (Atlassian MCP)

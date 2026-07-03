@@ -91,6 +91,18 @@ column_level_validations:
             AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
         )) = 0
       severity_level: Error
+  one_current_primary_row_per_person:
+    custom:
+      # Person-grain exports rely on exactly one is_current_for_person row per id_person.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_person
+          FROM datalake_people.assignment_snapshots
+          WHERE is_current_for_person = TRUE
+          GROUP BY id_person
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
   status_termination_date_consistency:
     custom:
       # Every employee whose termination date is in the past must have is_active = FALSE on their is_current row.
