@@ -1,83 +1,110 @@
----
 database_name: datalake_atta_clean
 table_name: financing_proposal_check
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.ID
+    - datalake_atta_raw.proposta_credimob_confval.ID
+    description: Surrogate primary key of the financing proposal check row in the source system.
   id_proposal_product:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.IDPropostaPRD
+    - datalake_atta_raw.proposta_credimob_confval.IDPropostaPRD
+    description: Foreign key to the product line attached to the financing proposal.
   id_included_user:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.IDUsuInc
+    - datalake_atta_raw.proposta_credimob_confval.IDUsuInc
+    description: Foreign key to the Atta user who registered this proposal-check record.
   id_user_sol_conf:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.IDUsuSolConf
+    - datalake_atta_raw.proposta_credimob_confval.IDUsuSolConf
+    description: User who requested confirmation of this financing proposal check.
   id_confirmed_user:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.IDUsuConf
+    - datalake_atta_raw.proposta_credimob_confval.IDUsuConf
+    description: Foreign key to the Atta user who validated and signed off this proposal check.
   operation_product_type:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.TipoProdutoOperacao
+    - datalake_atta_raw.proposta_credimob_confval.TipoProdutoOperacao
+    description: Combined operation and product classification for Atta proposals.
   channel:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.Canal
+    - datalake_atta_raw.proposta_credimob_confval.Canal
+    description: Sales or service channel through which the proposal was originated.
   installments_quantity:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.Prazo
+    - datalake_atta_raw.proposta_credimob_confval.Prazo
+    description: Number of monthly installments requested in the financing simulation.
   financing_fee:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.Taxa
+    - datalake_atta_raw.proposta_credimob_confval.Taxa
+    description: Interest rate applied to the financing operation in the proposal check.
   has_seller_debt_payment:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.IQ
+    - datalake_atta_raw.proposta_credimob_confval.IQ
+    description: Whether seller debt settlement is included in the financing package.
   is_confirmed:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.Confirmado
+    - datalake_atta_raw.proposta_credimob_confval.Confirmado
+    description: Whether the financing proposal or operation step was confirmed by operations.
   house_sale_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrVendaImovel
+    - datalake_atta_raw.proposta_credimob_confval.VlrVendaImovel
+    description: Negotiated or appraised property sale value used in financing calculation.
   down_payment_own_resources_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrEntRecProp
+    - datalake_atta_raw.proposta_credimob_confval.VlrEntRecProp
+    description: Down payment portion funded by the buyer own resources.
   fgts_down_payment_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrEntFGTS
+    - datalake_atta_raw.proposta_credimob_confval.VlrEntFGTS
+    description: Down payment portion funded from the buyer FGTS balance.
   financing_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrFinan
+    - datalake_atta_raw.proposta_credimob_confval.VlrFinan
+    description: Principal financing amount requested excluding down payment and fees.
   bank_valuation_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrAvalBco
+    - datalake_atta_raw.proposta_credimob_confval.VlrAvalBco
+    description: Property value as assessed by the bank appraisal.
   bank_valuation_fee_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrTarAvalBco
+    - datalake_atta_raw.proposta_credimob_confval.VlrTarAvalBco
+    description: Fee charged by the bank for the property appraisal.
   itbi_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrITBI
+    - datalake_atta_raw.proposta_credimob_confval.VlrITBI
+    description: Property transfer tax (ITBI) amount included or excluded from financing.
   seller_debt_payment_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrIQ
+    - datalake_atta_raw.proposta_credimob_confval.VlrIQ
+    description: Amount applied to settle the seller outstanding debt at closing.
   total_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrTotalCont
+    - datalake_atta_raw.proposta_credimob_confval.VlrTotalCont
+    description: Total contracted value of the financing operation.
   payment_sale_value:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.VlrPgtoVend
+    - datalake_atta_raw.proposta_credimob_confval.VlrPgtoVend
+    description: Amount paid to the seller in the property sale transaction.
   ts_seller_debt_payment:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.DataIQ
+    - datalake_atta_raw.proposta_credimob_confval.DataIQ
+    description: Timestamp when the seller debt settlement was recorded.
   ts_inclusion:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.DtInclusao
+    - datalake_atta_raw.proposta_credimob_confval.DtInclusao
+    description: Timestamp when the proposal check record was first included.
   ts_sol_conf:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.DtSolConf
+    - datalake_atta_raw.proposta_credimob_confval.DtSolConf
+    description: Timestamp when confirmation of the proposal check was requested.
   ts_confirmation:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.DtConfirmacao
+    - datalake_atta_raw.proposta_credimob_confval.DtConfirmacao
+    description: Timestamp when the proposal check was confirmed.
   ts_updated:
     lineage:
-      - datalake_atta_raw.proposta_credimob_confval.AtualizadoEm
+    - datalake_atta_raw.proposta_credimob_confval.AtualizadoEm
+    description: Timestamp when the row was last updated in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of financing proposal check sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per financing proposal check record with standardized names and types in datalake_atta_clean.

@@ -1,50 +1,66 @@
----
 database_name: datalake_atta_clean
 table_name: franchise_info
 domain: For Sale
 columns:
   id_franchise:
     lineage:
-      - datalake_atta_raw.franquia.id
+    - datalake_atta_raw.franquia.id
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_registration_user:
     lineage:
-      - datalake_atta_raw.franquia.idusucad
+    - datalake_atta_raw.franquia.idusucad
+    description: User who registered this franchise record.
   id_franchise_status:
     lineage:
-      - datalake_atta_raw.franquia.status
+    - datalake_atta_raw.franquia.status
+    description: Current activation status of the franchise unit.
   franchise_name:
     lineage:
-      - datalake_atta_raw.franquia.nome
+    - datalake_atta_raw.franquia.nome
+    description: Commercial name of the Casa Mineira franchise partner organization.
   franchise_category:
     lineage:
-      - datalake_atta_raw.franquia.categoriafranquia
+    - datalake_atta_raw.franquia.categoriafranquia
+    description: Franchise tier or category used for royalties and reporting segmentation.
   franchise_type:
     lineage:
-      - datalake_atta_raw.franquia.tpfranquia
+    - datalake_atta_raw.franquia.tpfranquia
+    description: Type classification of the franchise unit.
   fowarding:
     lineage:
-      - datalake_atta_raw.franquia.despachante
+    - datalake_atta_raw.franquia.despachante
+    description: Franchise forwarding configuration for lead routing in Casa Mineira CRM.
   fowarding_type:
     lineage:
-      - datalake_atta_raw.franquia.despachante
+    - datalake_atta_raw.franquia.despachante
+    description: Type of lead forwarding rule applied by the franchise partner.
   royalties_percentage_value:
     lineage:
-      - datalake_atta_raw.franquia.percroyalties
+    - datalake_atta_raw.franquia.percroyalties
+    description: Percentage of revenue owed as franchise royalties under contract.
   martketing_fund_percentage:
     lineage:
-      - datalake_atta_raw.franquia.percfundomarketing
+    - datalake_atta_raw.franquia.percfundomarketing
+    description: Percentage contribution to the franchise marketing fund.
   grace_period_royalties:
     lineage:
-      - datalake_atta_raw.franquia.carenciaroyalties
+    - datalake_atta_raw.franquia.carenciaroyalties
+    description: Contractual grace period before royalty payments begin for the franchise.
   grace_period_tec:
     lineage:
-      - datalake_atta_raw.franquia.carenciatec
+    - datalake_atta_raw.franquia.carenciatec
+    description: Grace period before technical fee payments apply for the franchise unit.
   ts_contract_deadline:
     lineage:
-      - datalake_atta_raw.franquia.prazocontrato
+    - datalake_atta_raw.franquia.prazocontrato
+    description: Contractual deadline date for the franchise agreement.
   ts_registration:
     lineage:
-      - datalake_atta_raw.franquia.dtcadastro
+    - datalake_atta_raw.franquia.dtcadastro
+    description: Timestamp when the franchise was registered in the source system.
   ts_franchise_signature:
     lineage:
-      - datalake_atta_raw.franquia.dtassinatura
+    - datalake_atta_raw.franquia.dtassinatura
+    description: Date when the franchise contract was signed.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of franchise info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per franchise info record with standardized names and types in datalake_atta_clean.

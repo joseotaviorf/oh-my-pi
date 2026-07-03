@@ -1,62 +1,82 @@
----
 database_name: datalake_atta_clean
 table_name: financing_proposal
 domain: For Sale
 columns:
   id_proposal_product:
     lineage:
-      - datalake_atta_raw.proposta_itau.id
+    - datalake_atta_raw.proposta_itau.id
+    description: Foreign key to the product line attached to the financing proposal.
   id_client:
     lineage:
-      - datalake_atta_raw.proposta_itau.id_cliente
+    - datalake_atta_raw.proposta_itau.id_cliente
+    description: Foreign key to the client master record in Atta or Sales Flow.
   id_partner:
     lineage:
-      - datalake_atta_raw.proposta_itau.idparceiro
+    - datalake_atta_raw.proposta_itau.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_franchise:
     lineage:
-      - datalake_atta_raw.proposta_itau.idfranquia
+    - datalake_atta_raw.proposta_itau.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_itau:
     lineage:
-      - datalake_atta_raw.proposta_itau.id_itau
+    - datalake_atta_raw.proposta_itau.id_itau
+    description: Itau bank-side proposal identifier linking to the partner financing record.
   financing_proposal_status_details:
     lineage:
-      - datalake_atta_raw.proposta_itau.status_processo_obs
+    - datalake_atta_raw.proposta_itau.status_processo_obs
+    description: Free-text observations describing the current financing proposal process status.
   send_status:
     lineage:
-      - datalake_atta_raw.proposta_itau.status_envio
+    - datalake_atta_raw.proposta_itau.status_envio
+    description: Status of sending the financing proposal packet to the banking partner.
   estimated_house_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_preco_estimado_imovel
+    - datalake_atta_raw.proposta_itau.a_preco_estimado_imovel
+    description: Estimated property value used before formal bank appraisal.
   finance_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_valor_a_financiar
+    - datalake_atta_raw.proposta_itau.a_valor_a_financiar
+    description: Total amount the buyer intends to finance through the banking partner.
   down_payment_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_valor_entrada
+    - datalake_atta_raw.proposta_itau.a_valor_entrada
+    description: Buyer down payment amount committed from own resources.
   installments_quantity:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_prazo_meses
+    - datalake_atta_raw.proposta_itau.a_prazo_meses
+    description: Number of monthly installments requested in the financing simulation.
   fgts_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_fgts
+    - datalake_atta_raw.proposta_itau.a_fgts
+    description: FGTS balance amount applied toward the down payment when eligible.
   house_category:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_tipo_de_imovel
+    - datalake_atta_raw.proposta_itau.a_tipo_de_imovel
+    description: Property type or category of the home being financed.
   to_incorporate_costs_itbi_register_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_incorporar_valor_despesas_itbi_registro
+    - datalake_atta_raw.proposta_itau.a_incorporar_valor_despesas_itbi_registro
+    description: ITBI tax and registration costs to be incorporated into the financed amount.
   to_incorporate_evaluation_fee_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_incorporar_tarifa_de_avaliacao
+    - datalake_atta_raw.proposta_itau.a_incorporar_tarifa_de_avaliacao
+    description: Bank appraisal fee to be incorporated into the financed amount.
   fees_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_valor_tarifas
+    - datalake_atta_raw.proposta_itau.a_valor_tarifas
+    description: Bank and registry fees included in the total financed package.
   costs_value:
     lineage:
-      - datalake_atta_raw.proposta_itau.a_valor_despesas
+    - datalake_atta_raw.proposta_itau.a_valor_despesas
+    description: Additional transaction costs rolled into the financing proposal totals.
   ts_registration_financing_proposal:
     lineage:
-      - datalake_atta_raw.proposta_itau.data_cadastro
+    - datalake_atta_raw.proposta_itau.data_cadastro
+    description: Timestamp when the financing proposal was registered in the source system.
   ts_send_financing_proposal:
     lineage:
-      - datalake_atta_raw.proposta_itau.data_envio
+    - datalake_atta_raw.proposta_itau.data_envio
+    description: Timestamp when the financing proposal was sent to the banking partner.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of financing proposal sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per financing proposal record with standardized names and types in datalake_atta_clean.

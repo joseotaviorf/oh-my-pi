@@ -1,39 +1,38 @@
----
 database_name: datalake_atta_clean
 table_name: closing
-description: This table contains information about the closing.
+description: Cleaned snapshot of closing sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per closing record with standardized names and types in datalake_atta_clean.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_closing:
-    description: Id of the closing.
+    description: Foreign key to the closing case tracking commissions and document uploads.
     lineage:
-      - datalake_atta_raw.closing.id
+    - datalake_atta_raw.closing.id
   id_user_started:
-    description: Id of the user who started the closing.
+    description: User who started the closing process for this case.
     lineage:
-      - datalake_atta_raw.closing.started_by_user_id
+    - datalake_atta_raw.closing.started_by_user_id
   id_user_finished:
-    description: Id of the user who finished the closing.
+    description: User who finished the closing process for this case.
     lineage:
-      - datalake_atta_raw.closing.finished_by_user_id
+    - datalake_atta_raw.closing.finished_by_user_id
   id_user_conciliation_finished:
-    description: Id of the user who finished the conciliation.
+    description: User who finished the financial conciliation step of the closing.
     lineage:
-      - datalake_atta_raw.closing.conciliation_finished_by_user_id
+    - datalake_atta_raw.closing.conciliation_finished_by_user_id
   dt_closing:
-    description: Date of closing.
+    description: Calendar date when the property closing milestone was reached or recorded.
     lineage:
-      - datalake_atta_raw.closing.closing_date
+    - datalake_atta_raw.closing.closing_date
   ts_started:
     description: Timestamp of when the closing period started.
     lineage:
-      - datalake_atta_raw.closing.initialized_at
+    - datalake_atta_raw.closing.initialized_at
   ts_ended:
     description: Timestamp of when the closing period ended.
     lineage:
-      - datalake_atta_raw.closing.finished_at
+    - datalake_atta_raw.closing.finished_at
   ts_conciliation_ended:
     description: Timestamp of when the conciliation ended.
     lineage:
-      - datalake_atta_raw.closing.conciliation_finished_at
+    - datalake_atta_raw.closing.conciliation_finished_at

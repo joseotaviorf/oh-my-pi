@@ -1,45 +1,46 @@
----
 database_name: datalake_atta_clean
 table_name: bank_tracking
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_atta_raw.banktracking.id
+    - datalake_atta_raw.banktracking.id
     description: Id to identifies the bank tracking.
   id_bank:
     lineage:
-      - datalake_atta_raw.banktracking.bankid
+    - datalake_atta_raw.banktracking.bankid
     description: Id to identifies the bank.
   id_proposal:
     lineage:
-      - datalake_atta_raw.banktracking.proposalId
-    description: Id of the proposal.
+    - datalake_atta_raw.banktracking.proposalId
+    description: Foreign key to the financing or sale proposal in the Atta platform.
   id_bank_proposal:
     lineage:
-      - datalake_atta_raw.banktracking.bankProposalId
+    - datalake_atta_raw.banktracking.bankProposalId
     description: Id for the relation between bank and proposal.
   proposal_status:
     lineage:
-      - datalake_atta_raw.banktracking.proposalStatus
-    description: Status of the proposal.
+    - datalake_atta_raw.banktracking.proposalStatus
+    description: Current status of the financing or sale proposal in the partner workflow.
   proposal_situation:
     lineage:
-      - datalake_atta_raw.banktracking.proposalSituation
-    description: Situation about the proposal.
+    - datalake_atta_raw.banktracking.proposalSituation
+    description: Detailed situation code describing proposal stage and pending actions.
   global_status:
     lineage:
-      - datalake_atta_raw.banktracking.status
+    - datalake_atta_raw.banktracking.status
     description: The status of the credit contract.
   status_description_itau:
     lineage:
-      - datalake_atta_raw.banktracking.itauStatusDescription
+    - datalake_atta_raw.banktracking.itauStatusDescription
     description: Description used by Itau.
   ts_created:
     lineage:
-      - datalake_atta_raw.banktracking.createdAt
-    description: Created timestamp.
+    - datalake_atta_raw.banktracking.createdAt
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_atta_raw.banktracking.updatedAt
-    description: Updated timestamp.
+    - datalake_atta_raw.banktracking.updatedAt
+    description: Timestamp when the row was last updated in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of bank tracking sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per bank tracking record with standardized names and types in datalake_atta_clean.

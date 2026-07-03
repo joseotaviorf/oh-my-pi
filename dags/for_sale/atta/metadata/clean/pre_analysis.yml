@@ -1,4 +1,3 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis
 domain: For Sale
@@ -7,92 +6,94 @@ columns:
   id_pre_analysis:
     description: Unique identifier for the pre-analysis record.
     lineage:
-      - datalake_atta_raw.consulta_score.id
+    - datalake_atta_raw.consulta_score.id
   id_franchise:
     description: Identifier of the franchise associated with the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.idfranquia
+    - datalake_atta_raw.consulta_score.idfranquia
   id_partner:
     description: Identifier of the partner associated with the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.idparceiro
+    - datalake_atta_raw.consulta_score.idparceiro
   id_client:
     description: Identifier of the client who requested the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.id_cliente
+    - datalake_atta_raw.consulta_score.id_cliente
   id_consultant:
     description: Identifier of the consultant attributed to the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.attributedconsultant
+    - datalake_atta_raw.consulta_score.attributedconsultant
   id_offer:
     description: External identifier linking the pre-analysis to an offer.
     lineage:
-      - datalake_atta_raw.consulta_score.idpreanaliseext
+    - datalake_atta_raw.consulta_score.idpreanaliseext
   id_registration_user:
     description: Identifier of the user who registered the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.idusuario
+    - datalake_atta_raw.consulta_score.idusuario
   client_cpf:
     description: CPF (Brazilian tax ID) of the client requesting the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.cpf
+    - datalake_atta_raw.consulta_score.cpf
   status:
     description: Current status of the pre-analysis record.
     lineage:
-      - datalake_atta_raw.consulta_score.status
+    - datalake_atta_raw.consulta_score.status
   created_source:
     description: Source system or channel where the pre-analysis was created.
     lineage:
-      - datalake_atta_raw.consulta_score.created_source
+    - datalake_atta_raw.consulta_score.created_source
   priority_status:
     description: Priority level assigned to the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.priority
+    - datalake_atta_raw.consulta_score.priority
   situation:
     description: Current situation or state of the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.situacao
+    - datalake_atta_raw.consulta_score.situacao
   archive_reason:
     description: Reason why the pre-analysis was archived, if applicable.
     lineage:
-      - datalake_atta_raw.consulta_score.ArchiveReason
+    - datalake_atta_raw.consulta_score.ArchiveReason
   archive_complement:
     description: Additional complement information about the archive reason.
     lineage:
-      - datalake_atta_raw.consulta_score.ArchiveComplement
+    - datalake_atta_raw.consulta_score.ArchiveComplement
   down_payment_amount:
     description: Down payment amount in Brazilian Reais for the financing.
     lineage:
-      - datalake_atta_raw.consulta_score.vlrentrada
+    - datalake_atta_raw.consulta_score.vlrentrada
   financing_value:
     description: Total financing value in Brazilian Reais.
     lineage:
-      - datalake_atta_raw.consulta_score.vlrfinanciado
+    - datalake_atta_raw.consulta_score.vlrfinanciado
   house_value:
     description: Total house value in Brazilian Reais.
     lineage:
-      - datalake_atta_raw.consulta_score.vlrimovel
+    - datalake_atta_raw.consulta_score.vlrimovel
   is_archived:
     description: Boolean flag indicating whether the pre-analysis has been archived.
     lineage:
-      - datalake_atta_raw.consulta_score.archived
+    - datalake_atta_raw.consulta_score.archived
   ts_archived:
     description: Timestamp indicating when the pre-analysis was archived.
     lineage:
-      - datalake_atta_raw.consulta_score.archivedat
+    - datalake_atta_raw.consulta_score.archivedat
   ts_registration:
     description: Timestamp indicating when the pre-analysis was registered or requested.
     lineage:
-      - datalake_atta_raw.consulta_score.data_solicitacao
+    - datalake_atta_raw.consulta_score.data_solicitacao
   mortgage_intention_uuid:
     description: Unique identifier (UUID) for the mortgage intention associated with the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.MortgageIntentionUuid
+    - datalake_atta_raw.consulta_score.MortgageIntentionUuid
   ts_multibanks_form_completed:
     description: Timestamp indicating when the multibanks form was completed.
     lineage:
-      - datalake_atta_raw.consulta_score.FormCompletedAt
+    - datalake_atta_raw.consulta_score.FormCompletedAt
   id_user_5a:
     description: Identifier of the QuintoAndar user associated with the pre-analysis.
     lineage:
-      - datalake_atta_raw.consulta_score.userId5a
+    - datalake_atta_raw.consulta_score.userId5a
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre-analysis requests containing credit score inquiries and client attributes for For Sale home purchases via Atta.

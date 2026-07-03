@@ -1,29 +1,38 @@
----
 database_name: datalake_atta_clean
 table_name: log_isolve_v1
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.id
+    - datalake_atta_raw.log_proposta_esteira.id
+    description: Surrogate primary key of the log isolve v1 row in the source system.
   id_proposal:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.idproposta
+    - datalake_atta_raw.log_proposta_esteira.idproposta
+    description: Foreign key to the financing or sale proposal in the Atta platform.
   id_current_status:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.status
+    - datalake_atta_raw.log_proposta_esteira.status
+    description: Proposal status code recorded at this log entry.
   id_previous_proposal_situation:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.sitant
+    - datalake_atta_raw.log_proposta_esteira.sitant
+    description: Proposal situation code before this status change.
   id_current_proposal_situation:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.sitatu
+    - datalake_atta_raw.log_proposta_esteira.sitatu
+    description: Proposal situation code after this status change.
   id_user:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.usuario
+    - datalake_atta_raw.log_proposta_esteira.usuario
+    description: Foreign key to the QuintoAndar user who performed the action.
   control:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.controle
+    - datalake_atta_raw.log_proposta_esteira.controle
+    description: Sequence or control marker for ordered proposal status history rows.
   ts_current_log:
     lineage:
-      - datalake_atta_raw.log_proposta_esteira.dtsitatu
+    - datalake_atta_raw.log_proposta_esteira.dtsitatu
+    description: Timestamp when this proposal status change was logged.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of log isolve v1 sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per log isolve v1 record with standardized names and types in datalake_atta_clean.

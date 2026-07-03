@@ -1,26 +1,34 @@
----
 database_name: datalake_atta_clean
 table_name: partner_info
 domain: For Sale
 columns:
   id_partner:
     lineage:
-      - datalake_atta_raw.parceiro.id
+    - datalake_atta_raw.parceiro.id
+    description: Foreign key to the financing or brokerage partner organization.
   id_admin_user:
     lineage:
-      - datalake_atta_raw.parceiro.idusuresp
+    - datalake_atta_raw.parceiro.idusuresp
+    description: User responsible for administering this partner account.
   id_franchise:
     lineage:
-      - datalake_atta_raw.parceiro.idfranquia
+    - datalake_atta_raw.parceiro.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_registration_user:
     lineage:
-      - datalake_atta_raw.parceiro.idusucad
+    - datalake_atta_raw.parceiro.idusucad
+    description: User who registered this partner record.
   partner_name:
     lineage:
-      - datalake_atta_raw.parceiro.nome
+    - datalake_atta_raw.parceiro.nome
+    description: Legal or commercial name of the financing or brokerage partner entity.
   ts_registration:
     lineage:
-      - datalake_atta_raw.parceiro.dtcadastro
+    - datalake_atta_raw.parceiro.dtcadastro
+    description: Timestamp when the partner was registered in the source system.
   ts_inactive_user:
     lineage:
-      - datalake_atta_raw.parceiro.dtinativo
+    - datalake_atta_raw.parceiro.dtinativo
+    description: Timestamp when the partner was marked inactive.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of partner info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per partner info record with standardized names and types in datalake_atta_clean.

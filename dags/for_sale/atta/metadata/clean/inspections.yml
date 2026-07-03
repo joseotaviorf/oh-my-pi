@@ -1,26 +1,34 @@
----
 database_name: datalake_atta_clean
 table_name: inspections
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_atta_raw.inspections.id
+    - datalake_atta_raw.inspections.id
+    description: Surrogate primary key of the inspections row in the source system.
   id_proposal:
     lineage:
-      - datalake_atta_raw.inspections.PropostaId
+    - datalake_atta_raw.inspections.PropostaId
+    description: Foreign key to the financing or sale proposal in the Atta platform.
   status:
     lineage:
-      - datalake_atta_raw.inspections.status
+    - datalake_atta_raw.inspections.status
+    description: Current operational status code governing workflow progression for this record.
   ts_started:
     lineage:
-      - datalake_atta_raw.inspections.StartedAt
+    - datalake_atta_raw.inspections.StartedAt
+    description: Timestamp when the property inspection was started.
   ts_finished:
     lineage:
-      - datalake_atta_raw.inspections.FinishedAt
+    - datalake_atta_raw.inspections.FinishedAt
+    description: Timestamp when the property inspection was completed.
   ts_created:
     lineage:
-      - datalake_atta_raw.inspections.CreatedAt
+    - datalake_atta_raw.inspections.CreatedAt
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_atta_raw.inspections.UpdatedAt
+    - datalake_atta_raw.inspections.UpdatedAt
+    description: Timestamp when the row was last updated in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of inspections sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per inspections record with standardized names and types in datalake_atta_clean.

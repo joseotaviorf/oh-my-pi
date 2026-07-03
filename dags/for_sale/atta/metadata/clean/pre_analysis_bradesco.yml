@@ -1,104 +1,138 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_bradesco
 domain: For Sale
 columns:
   id_pre_analysis_bradesco:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.id
+    - datalake_atta_raw.consulta_score_bradesco.id
+    description: Surrogate primary key of the Bradesco pre-analysis record.
   id_registration_user:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.id_usuario
+    - datalake_atta_raw.consulta_score_bradesco.id_usuario
+    description: User who registered this Bradesco pre-analysis request.
   id_partner:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.idparceiro
+    - datalake_atta_raw.consulta_score_bradesco.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_franchise:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.idfranquia
+    - datalake_atta_raw.consulta_score_bradesco.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_request:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.idsolicitacao
+    - datalake_atta_raw.consulta_score_bradesco.idsolicitacao
+    description: Identifier of the pre-analysis request sent to Bradesco.
   id_return_user:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.id_usuarioretorno
+    - datalake_atta_raw.consulta_score_bradesco.id_usuarioretorno
+    description: User who registered the bank return for this pre-analysis.
   id_segment:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.id_segmento
+    - datalake_atta_raw.consulta_score_bradesco.id_segmento
+    description: Bradesco client segment classification for this pre-analysis.
   id_approval_user:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.idusuarioautorizacao
+    - datalake_atta_raw.consulta_score_bradesco.idusuarioautorizacao
+    description: User who authorized or approved this pre-analysis.
   id_qualification_user:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.idusuario_aptidao
+    - datalake_atta_raw.consulta_score_bradesco.idusuario_aptidao
+    description: User who assessed the client qualification for this pre-analysis.
   client_cpf:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.cpf
+    - datalake_atta_raw.consulta_score_bradesco.cpf
+    description: Brazilian CPF tax identifier for the primary client in the proposal.
   client_cpf_secondary:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.cpf2
+    - datalake_atta_raw.consulta_score_bradesco.cpf2
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer.
   owner_name:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.nomeprop1
+    - datalake_atta_raw.consulta_score_bradesco.nomeprop1
+    description: Name of the primary property owner in the pre-analysis.
   operation_type:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.tipo_operacao
+    - datalake_atta_raw.consulta_score_bradesco.tipo_operacao
+    description: Financing operation type such as purchase, refinance, or construction.
   installment_type:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.tipoparcela
+    - datalake_atta_raw.consulta_score_bradesco.tipoparcela
+    description: Installment amortization type for the financing simulation.
   product_type:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.tipoproduto
+    - datalake_atta_raw.consulta_score_bradesco.tipoproduto
+    description: Bank product type selected for the mortgage or financing proposal.
   r_score:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.r_score
+    - datalake_atta_raw.consulta_score_bradesco.r_score
+    description: Bradesco credit risk score returned for the client.
   version_number:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.versao
+    - datalake_atta_raw.consulta_score_bradesco.versao
+    description: Version number of this pre-analysis submission.
   error:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.erro
+    - datalake_atta_raw.consulta_score_bradesco.erro
+    description: Error message returned when partner pre-analysis or submission failed.
   qualification_status:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.status_aptidao
+    - datalake_atta_raw.consulta_score_bradesco.status_aptidao
+    description: Outcome of automated or manual credit qualification for the client.
   request_status:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.status_solicitacao
+    - datalake_atta_raw.consulta_score_bradesco.status_solicitacao
+    description: Processing status of the pre-analysis request with the partner bank.
   recommendation_status:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.status_indicacao
+    - datalake_atta_raw.consulta_score_bradesco.status_indicacao
+    description: Status of the client recommendation step with Bradesco.
   attachment_status:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.status_anexo
+    - datalake_atta_raw.consulta_score_bradesco.status_anexo
+    description: Status of document attachments for this pre-analysis.
   ltv_value:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.vl_ltv
+    - datalake_atta_raw.consulta_score_bradesco.vl_ltv
+    description: Loan-to-value ratio computed for the financing operation.
   fee_value:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.vl_taxa
+    - datalake_atta_raw.consulta_score_bradesco.vl_taxa
+    description: Interest rate offered by Bradesco for the financing.
   house_value:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.vlrimovel
+    - datalake_atta_raw.consulta_score_bradesco.vlrimovel
+    description: Property value declared for the pre-analysis in Brazilian Reais.
   down_payment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.vlrentrada
+    - datalake_atta_raw.consulta_score_bradesco.vlrentrada
+    description: Buyer down payment amount committed from own resources.
   financing_value:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.vlrfinanciado
+    - datalake_atta_raw.consulta_score_bradesco.vlrfinanciado
+    description: Principal financing amount requested excluding down payment and fees.
   ts_registration_returned:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.data_retorno_solicitacao
+    - datalake_atta_raw.consulta_score_bradesco.data_retorno_solicitacao
+    description: Timestamp when Bradesco returned the pre-analysis request.
   ts_recommendation:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.data_indicacao
+    - datalake_atta_raw.consulta_score_bradesco.data_indicacao
+    description: Timestamp when the client recommendation was submitted.
   ts_recommendation_returned:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.data_retorno_indicacao
+    - datalake_atta_raw.consulta_score_bradesco.data_retorno_indicacao
+    description: Timestamp when Bradesco returned the recommendation result.
   ts_qualification:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.data_aptidao
+    - datalake_atta_raw.consulta_score_bradesco.data_aptidao
+    description: Timestamp when the client qualification was assessed.
   ts_attachment:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.data_anexo
+    - datalake_atta_raw.consulta_score_bradesco.data_anexo
+    description: Timestamp when supporting documents were attached.
   ts_registration:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco.data_solicitacao
+    - datalake_atta_raw.consulta_score_bradesco.data_solicitacao
+    description: Timestamp when the Bradesco pre-analysis was requested.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis bradesco sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis bradesco record with standardized names and types in datalake_atta_clean.

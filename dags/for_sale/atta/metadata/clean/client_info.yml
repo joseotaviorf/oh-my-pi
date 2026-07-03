@@ -1,23 +1,30 @@
----
 database_name: datalake_atta_clean
 table_name: client_info
 domain: For Sale
 columns:
   id_client:
     lineage:
-      - datalake_atta_raw.cliente.id_cliente
+    - datalake_atta_raw.cliente.id_cliente
+    description: Foreign key to the client master record in Atta or Sales Flow.
   client_name:
     lineage:
-      - datalake_atta_raw.cliente.nm_cliente
+    - datalake_atta_raw.cliente.nm_cliente
+    description: Full name of the buyer or client in the financing proposal record.
   client_cpf:
     lineage:
-      - datalake_atta_raw.cliente.nr_cpf
+    - datalake_atta_raw.cliente.nr_cpf
+    description: Brazilian CPF tax identifier for the primary client in the proposal.
   client_email:
     lineage:
-      - datalake_atta_raw.cliente.nm_email
+    - datalake_atta_raw.cliente.nm_email
+    description: Email address used to contact the client about financing status updates.
   client_cellphone:
     lineage:
-      - datalake_atta_raw.cliente.nr_celular
+    - datalake_atta_raw.cliente.nr_celular
+    description: Mobile phone number used for SMS and app notifications to the client.
   client_phone:
     lineage:
-      - datalake_atta_raw.cliente.nr_telefone
+    - datalake_atta_raw.cliente.nr_telefone
+    description: Landline or alternate phone number stored for the financing client.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of client info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per client info record with standardized names and types in datalake_atta_clean.
