@@ -2,89 +2,89 @@ database_name: datalake_sales_flow_clean
 table_name: house
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains information about the properties (houses/apartments) involved in the sales flow.
+description: Clean, renamed replica of datalake_sales_flow_raw.house. Each row is a property involved in a For Sale transaction. The record is created when a sales flow starts, by looking up the property in QuintoAndar's listing platform through its external ID, and is progressively enriched during closing due diligence with registry, ownership, and title information (registration status, land tenure, debts, chattel mortgage, recent transactions).
 columns:
   id:
-    description: Unique ID for the house record in this table.
+    description: Unique identifier of the house record in this table.
     lineage:
       - datalake_sales_flow_raw.house.id
   id_external:
-    description: External identifier for the house, used for integration with other systems.
+    description: Identifier of the property in QuintoAndar's listing/property platform. Used by the Sales Flow application to create or look up the house record when a sales flow starts.
     lineage:
       - datalake_sales_flow_raw.house.external_id
   id_address_data:
-    description: Foreign key to the address_data table.
+    description: Foreign key referencing the address_data table with the property's street, number, neighborhood, city, and state.
     lineage:
       - datalake_sales_flow_raw.house.address_data_id
   land_tenure:
-    description: The type of land tenure (e.g., freehold, leasehold).
+    description: Land tenure ("aforamento") status identified during registry due diligence. Values include NOT_VERIFIED (not yet checked), UNION (federal government), RELIGIOUS (religious institution), COUNTY (municipality), and NOT_IN_LAND_TENURE (not subject to land tenure). Only UNION, RELIGIOUS, and COUNTY represent an actual applicable land tenure case.
     lineage:
       - datalake_sales_flow_raw.house.land_tenure
   house_registration_status:
-    description: The current status of the house's registration.
+    description: Status of the property registry review performed during closing due diligence. Values include NOT_STARTED, SIMPLE_APPOINTMENT, NO_APPOINTMENT, NO_GO_APPOINTMENT, PROCESSING, DIVERGENT_SELLER (registry owner differs from seller), FIDUCIARY_SALE, FIDUCIARY_SALE_DEBTS, and SHARING_ASSETS (property under asset division).
     lineage:
       - datalake_sales_flow_raw.house.house_registration_status
   has_seller_debt_payments:
-    description: Flag indicating if the seller has pending debt payments related to the property.
+    description: Flag indicating whether the seller has pending debts related to the property, identified during due diligence.
     lineage:
       - datalake_sales_flow_raw.house.has_seller_debt_payments
   has_chattel_mortgage:
-    description: Flag indicating if there is a chattel mortgage on the property.
+    description: Chattel mortgage ("alienação fiduciária") status of the property. Values are DOES_NOT (no chattel mortgage), YES_PAID (exists but fully paid off), and YES_DEBT (exists and still has an outstanding balance).
     lineage:
       - datalake_sales_flow_raw.house.has_chattel_mortgage
   has_pending_registry_update:
-    description: Flag indicating if the property's registry must be updated.
+    description: Flag indicating whether the property's registry record must be updated before the sale can proceed.
     lineage:
       - datalake_sales_flow_raw.house.registry_must_be_updated
   chattel_mortgage_remaining_value:
-    description: The remaining value of the chattel mortgage.
+    description: Outstanding balance of the property's chattel mortgage, populated when has_chattel_mortgage is YES_DEBT.
     lineage:
       - datalake_sales_flow_raw.house.chattel_mortgage_remaining_value
   has_debts_or_encumbrances:
-    description: Flag indicating if the property has any debts or encumbrances.
+    description: Flag indicating whether the property title has debts or encumbrances (liens), identified during due diligence.
     lineage:
       - datalake_sales_flow_raw.house.has_debts_or_encumbrances
   has_instituted_usufruct:
-    description: Flag indicating if there is an instituted usufruct on the property.
+    description: Flag indicating whether the property has an instituted usufruct (a third party's right to use and enjoy the property) recorded on its title.
     lineage:
       - datalake_sales_flow_raw.house.has_instituted_usufruct
   has_recent_transaction:
-    description: Flag indicating if the property had a recent transaction.
+    description: Flag indicating whether the property had a recent ownership transaction, identified during legal risk assessment for closing and used to fill the corresponding field in the sale contract.
     lineage:
       - datalake_sales_flow_raw.house.has_recent_transaction
   has_transaction_in_family:
-    description: Flag indicating if a recent transaction was within the family.
+    description: Flag indicating whether a recent property transaction occurred between family members, identified during legal risk assessment and used to fill the corresponding field in the sale contract.
     lineage:
       - datalake_sales_flow_raw.house.has_transaction_in_family
   image_url:
-    description: URL for an image of the property.
+    description: URL of a picture of the property, shown in the Sales Flow application.
     lineage:
       - datalake_sales_flow_raw.house.image_url
   is_primary_market:
-    description: Flag indicating if the property is from the primary market.
+    description: Flag indicating whether the property was acquired in the real estate primary market (new development) rather than the resale/secondary market.
     lineage:
       - datalake_sales_flow_raw.house.is_primary_market
   ts_notified_on_negotiation:
-    description: Timestamp of when a notification was sent regarding negotiation.
+    description: Timestamp when the property was flagged as being under an ongoing negotiation.
     lineage:
       - datalake_sales_flow_raw.house.notified_on_negotiation_at
   ts_created:
-    description: Timestamp of when the house record was created.
+    description: Timestamp when the house record was created in the source database.
     lineage:
       - datalake_sales_flow_raw.house.created_at
   ts_updated:
-    description: Timestamp of the last update to the house record.
+    description: Timestamp when the house record was last updated in the source database.
     lineage:
       - datalake_sales_flow_raw.house.updated_at
   year:
-    description: The Year in which the data was ingested.
+    description: Year partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.house.year
   month:
-    description: The Month in which the data was ingested.
+    description: Month partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.house.month
   day:
-    description: The Day in which the data was ingested.
+    description: Day partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.house.day

@@ -2,22 +2,22 @@ database_name: datalake_sales_flow_clean
 table_name: specialist
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table that contains information about the specialist who is involved in the sales flow.
+description: Clean, renamed replica of datalake_sales_flow_raw.specialist. Each row assigns a QuintoAndar staff member (or automated/referral role) to a functional responsibility, such as deal maker, credit analyst, or mortgage specialist, on a given sales flow.
 columns:
   id_specialist:
-    description: Primary key of the specialist record in the clean layer.
+    description: Unique identifier of the specialist record in this table.
     lineage:
       - datalake_sales_flow_raw.specialist.id
   id_sales_flow:
-    description: Identifier of the sales flow associated with this specialist.
+    description: Identifier of the sales flow this specialist is assigned to.
     lineage:
       - datalake_sales_flow_raw.specialist.sales_flow_id
   id_user:
-    description: Identifier of the user assigned as specialist for the sales flow.
+    description: Identifier of the staff member assigned as specialist, joinable with datalake_sales_flow_clean.users.id. Can be null when the role is not yet assigned to a specific person.
     lineage:
       - datalake_sales_flow_raw.specialist.user_id
   kind:
-    description: Specialist role or category within the sales flow process.
+    description: Functional role of the specialist on the deal. Values include AGENT, AUTONOMOUS_AGENT, FIFTY_AGENT, AGENT_LEAD_REFERRAL, CREDIT, CRI, CRN, DEAL_MAKER, LEGAL_RISK, MORTGAGE_START, MORTGAGE_FUP, MORTGAGE_END, PRE, POST, POST_DD, and TEAM_LEAD.
     lineage:
       - datalake_sales_flow_raw.specialist.kind
   ts_created:

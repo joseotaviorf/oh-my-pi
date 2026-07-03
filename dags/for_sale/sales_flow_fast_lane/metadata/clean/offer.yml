@@ -2,121 +2,121 @@ database_name: datalake_sales_flow_clean
 table_name: offer
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table that contains information about the offer made by the buyer.
+description: Clean, renamed replica of datalake_sales_flow_raw.offer. Each row represents a buyer's purchase proposal for a house within a sales flow, tracking its negotiation lifecycle from proposal to acceptance, rejection, or discard.
 columns:
   id:
-    description: Offer Unique ID on this table
+    description: Unique identifier of the offer record in this table.
     lineage:
       - datalake_sales_flow_raw.offer.id
   id_sales_flow:
-    description: SalesFlow offer ID. Joins with datalake_sales_flow_clean.sales_flow.id
+    description: Identifier of the sales flow this offer belongs to. Joins with datalake_sales_flow_clean.sales_flow.id. Each sales flow has exactly one offer.
     lineage:
       - datalake_sales_flow_raw.offer.sales_flow_id
   id_firestore:
-    description: Offer ID generated on Firestore.
+    description: Identifier of the offer in Firestore, used to sync the offer with the buyer/seller-facing negotiation chat.
     lineage:
       - datalake_sales_flow_raw.offer.firestore_id
   id_reject_reason:
-    description: ID to get more information about the reject reason on table sales_flow_clean.reject_reason.
+    description: Identifier to look up the negotiation's rejection details (category and sub-reason) on datalake_sales_flow_clean.reject_reason.
     lineage:
       - datalake_sales_flow_raw.offer.reject_reason_id
   id_hub:
-    description: ID to get more information abou the HUB on HubServices tables.
+    description: Identifier of the closing hub responsible for negotiating this offer, joinable with HubServices tables.
     lineage:
       - datalake_sales_flow_raw.offer.hub_id
   offer_price:
-    description: Value sent by the buyer for this offer.
+    description: Price initially proposed by the buyer.
     lineage:
       - datalake_sales_flow_raw.offer.offer_price
   sale_price:
-    description: Value set by the seller on the listing.
+    description: Listing price of the property at the time of the offer.
     lineage:
       - datalake_sales_flow_raw.offer.sale_price
   final_price:
-    description: Sale price agreed between buyer and seller.
+    description: Final price agreed upon between buyer and seller.
     lineage:
       - datalake_sales_flow_raw.offer.final_price
   itbi_price:
-    description: Value on registered on ITBI.
+    description: Property value used to calculate the ITBI (property transfer tax) for the offer.
     lineage:
       - datalake_sales_flow_raw.offer.itbi_price
   registry_price:
-    description: Property registry price.
+    description: Property value used for property registry purposes.
     lineage:
       - datalake_sales_flow_raw.offer.registry_price
   deed_price:
-    description: Property price in the deed.
+    description: Property value recorded in the deed for this offer.
     lineage:
       - datalake_sales_flow_raw.offer.deed_price
   discard_reason:
-    description: Reason why this offer was discarded.
+    description: Reason the offer negotiation was discarded, such as the buyer or seller giving up, documentation problems, or disagreement on price/terms. Values prefixed with OBSOLETE_ are legacy reasons kept only for historical records and no longer used for new discards.
     lineage:
       - datalake_sales_flow_raw.offer.discard_reason
   status:
-    description: Offer status.
+    description: Current negotiation status of the offer. Values include OFFER_ONGOING, CONTRA_SELLER/CONTRA_BUYER (counter-proposal in progress), OFFER_ACCEPTED, OFFER_REJECTED, STAND_BY_BUYER/STAND_BY_SELLER, NO_CONTACT_BUYER/NO_CONTACT_SELLER, OFFER_VALIDATED, INVALID_OFFER, and POST_ACCEPTED_DISPOSAL (discarded after acceptance), among others. OFFER_REJECTED, INVALID_OFFER, and POST_ACCEPTED_DISPOSAL are treated as canceled statuses.
     lineage:
       - datalake_sales_flow_raw.offer.status
   furniture_will_be_left:
-    description: Indicates if the furniture will be left in the house.
+    description: Flag indicating whether the seller agreed to leave furniture in the property as part of the deal.
     lineage:
       - datalake_sales_flow_raw.offer.furniture_will_be_left
   preemptive_right:
-    description: Indicates if the preemptive right was used.
+    description: Status of the tenant's right of first refusal ("direito de preferência") process, applicable when the property is rented. Values include NA, NOT_STARTED, SENT_NO_ANSWER, ANSWERED_DECLINED, IQ_EXERCISED (tenant exercised the right), RENT_MAINTAINED, and END_OF_DEADLINE.
     lineage:
       - datalake_sales_flow_raw.offer.preemptive_right
   seller_counter_proposal:
-    description: Indicates if the seller made a counter proposal.
+    description: Price value of the seller's counter-proposal made in response to the buyer's offer.
     lineage:
       - datalake_sales_flow_raw.offer.seller_counter_proposal
   updated_offer_price:
-    description: Indicates if the offer price was updated.
+    description: Updated offer price value proposed by the buyer after the initial submission.
     lineage:
       - datalake_sales_flow_raw.offer.updated_offer_price
   has_seller_done_onboarding:
-    description: Indicates if the seller has done the onboarding.
+    description: Flag indicating whether the seller completed the self-service post-CCV informational onboarding steps in the app.
     lineage:
       - datalake_sales_flow_raw.offer.seller_has_done_onboarding
   has_buyer_done_onboarding:
-    description: Indicates if the buyer has done the onboarding.
+    description: Flag indicating whether the buyer completed the self-service post-CCV informational onboarding steps in the app.
     lineage:
       - datalake_sales_flow_raw.offer.buyer_has_done_onboarding
   has_used_offer_suggestion:
-    description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
+    description: Flag indicating whether the buyer used the app's suggested offer price feature when submitting the proposal.
     lineage:
       - datalake_sales_flow_raw.offer.used_offer_suggestion
   dt_proposed:
-    description: Offer proposal date.
+    description: Date when the offer proposal was submitted in the source system.
     lineage:
       - datalake_sales_flow_raw.offer.proposal_date
   ts_accepted:
-    description: Timestamp which the seller accepted the buyer's offer.
+    description: Timestamp when the seller accepted the buyer's offer in the source system.
     lineage:
       - datalake_sales_flow_raw.offer.accepted_at
   ts_validated:
-    description: Deprecated field. Do not use.
+    description: Deprecated validation timestamp from the source database, superseded by the OFFER_VALIDATED status. Do not use.
     lineage:
       - datalake_sales_flow_raw.offer.validated_at
   ts_discarded:
-    description: Timestamp which the seller discarded the buyer's offer.
+    description: Timestamp when the offer was discarded in the source database.
     lineage:
       - datalake_sales_flow_raw.offer.discarded_at
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the offer record was created in the source database.
     lineage:
       - datalake_sales_flow_raw.offer.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp when the offer record was last updated in the source database.
     lineage:
       - datalake_sales_flow_raw.offer.updated_at
   year:
-    description: The Year in which the data was ingested.
+    description: Year partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.offer.year
   month:
-    description: The Month in which the data was ingested.
+    description: Month partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.offer.month
   day:
-    description: The Day in which the data was ingested.
+    description: Day partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.offer.day

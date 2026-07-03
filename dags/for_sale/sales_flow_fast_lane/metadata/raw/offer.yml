@@ -3,54 +3,54 @@ database_name: datalake_sales_flow_raw
 table_name: offer
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Raw CDC table from Sales Flow postgres database with buyer offer records.
+description: Raw CDC replica of the `offer` table from the Sales Flow application's PostgreSQL database (applications/sales-flow in backend-services). Each row represents a buyer's purchase proposal for a house within a sales flow, tracking its negotiation lifecycle from proposal to acceptance, rejection, or discard.
 columns:
   id:
     description: Primary key of the offer record in the source database.
   sales_flow_id:
-    description: Foreign key referencing the parent sales flow for this offer.
+    description: Foreign key referencing the sales flow this offer belongs to. Each sales flow has exactly one offer.
   firestore_id:
-    description: Offer identifier generated and stored in Firestore.
+    description: Identifier of the offer in Firestore, used to sync the offer with the buyer/seller-facing negotiation chat.
   reject_reason_id:
-    description: Foreign key referencing the reject reason lookup table.
+    description: Foreign key referencing the reject_reason lookup table, recorded when the negotiation is rejected or discarded, with its category and sub-reason.
   hub_id:
-    description: Foreign key referencing the hub in HubServices systems.
+    description: Foreign key referencing the closing hub responsible for negotiating this offer.
   offer_price:
-    description: Price value proposed by the buyer in the offer.
+    description: Price initially proposed by the buyer.
   sale_price:
-    description: Listing sale price set by the seller at the time of the offer.
+    description: Listing price of the property at the time of the offer.
   final_price:
-    description: Final negotiated price agreed between buyer and seller.
+    description: Final price agreed upon between buyer and seller.
   itbi_price:
-    description: Property transfer tax (ITBI) value registered for the offer.
+    description: Property value used to calculate the ITBI (property transfer tax) for the offer.
   registry_price:
-    description: Property registry price associated with the offer.
+    description: Property value used for property registry purposes.
   deed_price:
-    description: Property price recorded in the deed for this offer.
+    description: Property value recorded in the deed for this offer.
   discard_reason:
-    description: Reason why the offer was discarded in the source application.
+    description: Reason the offer negotiation was discarded, such as the buyer or seller giving up, documentation problems, or disagreement on price/terms. Values prefixed with OBSOLETE_ are legacy reasons kept only for historical records and no longer used for new discards.
   status:
-    description: Current status of the offer in the Sales Flow application.
+    description: Current negotiation status of the offer. Values include OFFER_ONGOING, CONTRA_SELLER/CONTRA_BUYER (counter-proposal in progress), OFFER_ACCEPTED, OFFER_REJECTED, STAND_BY_BUYER/STAND_BY_SELLER, NO_CONTACT_BUYER/NO_CONTACT_SELLER, OFFER_VALIDATED, INVALID_OFFER, and POST_ACCEPTED_DISPOSAL (discarded after acceptance), among others. OFFER_REJECTED, INVALID_OFFER, and POST_ACCEPTED_DISPOSAL are treated as canceled statuses.
   furniture_will_be_left:
-    description: Flag indicating whether furniture will remain in the property.
+    description: Flag indicating whether the seller agreed to leave furniture in the property as part of the deal.
   preemptive_right:
-    description: Flag indicating whether preemptive right applies to this offer.
+    description: Status of the tenant's right of first refusal ("direito de preferência") process, applicable when the property is rented. Values include NA, NOT_STARTED, SENT_NO_ANSWER, ANSWERED_DECLINED, IQ_EXERCISED (tenant exercised the right), RENT_MAINTAINED, and END_OF_DEADLINE.
   seller_counter_proposal:
-    description: Flag indicating whether the seller submitted a counter proposal.
+    description: Price value of the seller's counter-proposal made in response to the buyer's offer.
   updated_offer_price:
-    description: Flag indicating whether the offer price was updated after submission.
+    description: Updated offer price value proposed by the buyer after the initial submission.
   seller_has_done_onboarding:
-    description: Flag indicating whether the seller completed onboarding for this offer.
+    description: Flag indicating whether the seller completed the self-service post-CCV informational onboarding steps in the app.
   buyer_has_done_onboarding:
-    description: Flag indicating whether the buyer completed onboarding for this offer.
+    description: Flag indicating whether the buyer completed the self-service post-CCV informational onboarding steps in the app.
   used_offer_suggestion:
-    description: Flag indicating whether the buyer used an offer suggestion feature.
+    description: Flag indicating whether the buyer used the app's suggested offer price feature when submitting the proposal.
   proposal_date:
     description: Date when the offer proposal was submitted in the source system.
   accepted_at:
-    description: Timestamp when the seller accepted the buyer offer in the source system.
+    description: Timestamp when the seller accepted the buyer's offer in the source system.
   validated_at:
-    description: Deprecated validation timestamp from the source database.
+    description: Deprecated validation timestamp from the source database, superseded by the OFFER_VALIDATED status.
   discarded_at:
     description: Timestamp when the offer was discarded in the source database.
   created_at:

@@ -3,31 +3,31 @@ database_name: datalake_sales_flow_raw
 table_name: users
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Raw CDC table from Sales Flow postgres database with user records involved in sale flows.
+description: Raw CDC replica of the `users` table from the Sales Flow application's PostgreSQL database (applications/sales-flow in backend-services). Each row is a person participating in a sales flow, such as a buyer, seller, specialist, or additional contact.
 columns:
   id:
     description: Primary key of the user record in the Sales Flow source database.
   external_id:
-    description: User identifier in QuintoAndar systems, used to join with EBDB and dim_user.
+    description: Identifier of the user in QuintoAndar's central identity/account systems, used to join with EBDB and dim_user. Only populated for MAIN users; ADDITIONAL_CONTACT users created directly in Sales Flow may not have one.
   name:
-    description: Full name of the user as stored in Sales Flow.
+    description: Full name of the user as registered in Sales Flow.
     tags:
       - PII
       - Confidential
   email:
-    description: Email address of the user as stored in Sales Flow.
+    description: Email address of the user as registered in Sales Flow.
     tags:
       - PII
       - Confidential
   phone:
-    description: Phone number of the user as stored in Sales Flow.
+    description: Phone number of the user as registered in Sales Flow.
     tags:
       - PII
       - Confidential
   type:
-    description: User type classification within the Sales Flow application.
+    description: Whether the user has an account in QuintoAndar's platform. Values are MAIN (sourced from QuintoAndar's central identity/account service) and ADDITIONAL_CONTACT (created locally within Sales Flow for people without a platform account, such as a co-buyer or a family member added as a contact).
   cpf:
-    description: Brazilian individual taxpayer identification number of the user.
+    description: Brazilian individual taxpayer identification number (CPF) of the user.
     tags:
       - PII
       - Confidential

@@ -3,40 +3,40 @@ database_name: datalake_sales_flow_raw
 table_name: house
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Raw CDC table from Sales Flow postgres database with property records in sales flows.
+description: Raw CDC replica of the `house` table from the Sales Flow application's PostgreSQL database (applications/sales-flow in backend-services). Each row is a property involved in a For Sale transaction. The record is created when a sales flow starts, by looking up the property in QuintoAndar's listing platform through its external ID, and is progressively enriched during closing due diligence with registry, ownership, and title information (registration status, land tenure, debts, chattel mortgage, recent transactions).
 columns:
   id:
     description: Primary key of the house record in the source database.
   external_id:
-    description: External house identifier used for integration with other QuintoAndar systems.
+    description: Identifier of the property in QuintoAndar's listing/property platform. Used by the Sales Flow application to create or look up the house record when a sales flow starts.
   address_data_id:
-    description: Foreign key referencing the address_data table in the source database.
+    description: Foreign key referencing the address_data table with the property's street, number, neighborhood, city, and state.
   land_tenure:
-    description: Land tenure type of the property such as freehold or leasehold.
+    description: Land tenure ("aforamento") status identified during registry due diligence. Values include NOT_VERIFIED (not yet checked), UNION (federal government), RELIGIOUS (religious institution), COUNTY (municipality), and NOT_IN_LAND_TENURE (not subject to land tenure). Only UNION, RELIGIOUS, and COUNTY represent an actual applicable land tenure case.
   house_registration_status:
-    description: Current property registration status in the source application.
+    description: Status of the property registry review performed during closing due diligence. Values include NOT_STARTED, SIMPLE_APPOINTMENT, NO_APPOINTMENT, NO_GO_APPOINTMENT, PROCESSING, DIVERGENT_SELLER (registry owner differs from seller), FIDUCIARY_SALE, FIDUCIARY_SALE_DEBTS, and SHARING_ASSETS (property under asset division).
   has_seller_debt_payments:
-    description: Flag indicating pending seller debt payments related to the property.
+    description: Flag indicating whether the seller has pending debts related to the property, identified during due diligence.
   has_chattel_mortgage:
-    description: Flag indicating whether a chattel mortgage exists on the property.
+    description: Chattel mortgage ("alienação fiduciária") status of the property. Values are DOES_NOT (no chattel mortgage), YES_PAID (exists but fully paid off), and YES_DEBT (exists and still has an outstanding balance).
   registry_must_be_updated:
-    description: Flag indicating whether the property registry requires an update.
+    description: Flag indicating whether the property's registry record must be updated before the sale can proceed.
   chattel_mortgage_remaining_value:
-    description: Remaining balance of the chattel mortgage on the property.
+    description: Outstanding balance of the property's chattel mortgage, populated when has_chattel_mortgage is YES_DEBT.
   has_debts_or_encumbrances:
-    description: Flag indicating debts or encumbrances on the property title.
+    description: Flag indicating whether the property title has debts or encumbrances (liens), identified during due diligence.
   has_instituted_usufruct:
-    description: Flag indicating an instituted usufruct on the property.
+    description: Flag indicating whether the property has an instituted usufruct (a third party's right to use and enjoy the property) recorded on its title.
   has_recent_transaction:
-    description: Flag indicating a recent property transaction in the source records.
+    description: Flag indicating whether the property had a recent ownership transaction, identified during legal risk assessment for closing and used to fill the corresponding field in the sale contract.
   has_transaction_in_family:
-    description: Flag indicating a recent transaction within the seller family.
+    description: Flag indicating whether a recent property transaction occurred between family members, identified during legal risk assessment and used to fill the corresponding field in the sale contract.
   image_url:
-    description: URL of a property image stored in the Sales Flow application.
+    description: URL of a picture of the property, shown in the Sales Flow application.
   is_primary_market:
-    description: Flag indicating whether the property is from the primary market.
+    description: Flag indicating whether the property was acquired in the real estate primary market (new development) rather than the resale/secondary market.
   notified_on_negotiation_at:
-    description: Timestamp when a negotiation notification was sent for this property.
+    description: Timestamp when the property was flagged as being under an ongoing negotiation.
   created_at:
     description: Timestamp when the house record was created in the source database.
   updated_at:

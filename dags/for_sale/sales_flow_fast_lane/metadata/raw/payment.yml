@@ -3,38 +3,38 @@ database_name: datalake_sales_flow_raw
 table_name: payment
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Raw CDC table from Sales Flow postgres database with payment records for sales flows.
+description: Raw CDC replica of the `payment` table from the Sales Flow application's PostgreSQL database (applications/sales-flow in backend-services). Each row tracks the financial settlement details and payment milestones (down payment/earnest money, FGTS, financing) for a sales flow's closing process.
 columns:
   id:
     description: Primary key of the payment record in the source database.
   sales_flow_id:
-    description: Foreign key referencing the parent sales flow for this payment.
+    description: Foreign key referencing the sales flow this payment belongs to. Each sales flow has exactly one payment record.
   payment_method:
-    description: Payment method selected for the purchase such as cash or financed.
+    description: How the purchase will be paid. Values are CASH, CASH_USING_FGTS, FINANCED, FINANCED_USING_FGTS, FINANCED_USING_THIRD_COMPANY (financed outside QuintoAndar's closing model), and NOT_DEFINED.
   payment_model:
-    description: Payment model used in the property purchase such as CCV assistance.
+    description: Commercial/operational model used to run the closing and payment flow. Values include TRANSFER_BETWEEN_PARTS, MODEL_5A (legacy QuintoAndar pass-through model), ADVANCED_PAYMENT (current standard model), INSTANT_MORTGAGE, CCV_ASSISTANCE, BROKERAGE_TERM, CLOSING_3P (partner real-estate agency closing), CLOSING_PRIMARY_MARKET, and NA.
   down_payment_value:
-    description: Amount paid by the buyer as a down payment signal.
+    description: Amount of the deposit paid by the buyer. Despite the name, this field is used for any deposit type, including both the down payment ("entrada") and the earnest money signal ("sinal").
   entry_amount:
-    description: Entry amount paid by the buyer at the beginning of the contract.
+    description: Value paid by the buyer on the beginning of the contract (valor da entrada).
   fgts_value:
-    description: FGTS balance amount applied to the property purchase payment.
+    description: FGTS balance amount applied toward the property purchase.
   status:
-    description: Current payment tracking status in the Sales Flow application.
+    description: Payment progress tracking status. Values are NOT_STARTED, DOWN_PAYMENT_PAID, DOWN_PAYMENT_NOT_PAID, EARNEST_PAYMENT_PAID, EARNEST_PAYMENT_NOT_PAID, TOTAL_PAID, and TOTAL_NOT_PAID.
   fgts_doc_submission_finished_by:
-    description: User identifier who completed the FGTS document submission step.
+    description: Party that completed the FGTS documentation submission step. Value is BUYER or SELLER, not a user identifier.
   fgts_payment_finished_by:
-    description: User identifier who completed the FGTS payment step.
+    description: Party that completed the FGTS payment step. Value is BUYER or SELLER, not a user identifier.
   is_down_payment_paid:
-    description: Flag indicating whether the down payment has been paid.
+    description: Flag indicating whether the deposit (down payment or earnest money) has been paid.
   payment_type:
-    description: Payment type classification in the source Sales Flow application.
+    description: Method used to transfer the payment. Values are TRANSFER and CASHIER_CHECK.
   down_payment_paid_at:
-    description: Timestamp when the down payment was confirmed in the source system.
+    description: Timestamp when the deposit was confirmed as paid in the source system.
   fgts_doc_submission_finished_at:
-    description: Timestamp when FGTS document submission was completed in the source system.
+    description: Timestamp when the FGTS document submission step was completed in the source system.
   fgts_payment_finished_at:
-    description: Timestamp when FGTS payment was completed in the source system.
+    description: Timestamp when the FGTS payment step was completed in the source system.
   created_at:
     description: Timestamp when the payment record was created in the source database.
   updated_at:

@@ -3,16 +3,16 @@ database_name: datalake_sales_flow_raw
 table_name: specialist
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Raw CDC table from Sales Flow postgres database with specialist records linked to a sales flow.
+description: Raw CDC replica of the `specialist` table from the Sales Flow application's PostgreSQL database (applications/sales-flow in backend-services). Each row assigns a QuintoAndar staff member (or automated/referral role) to a functional responsibility, such as deal maker, credit analyst, or mortgage specialist, on a given sales flow.
 columns:
   id:
     description: Primary key of the specialist record in the source database.
   sales_flow_id:
-    description: Foreign key referencing the sales flow associated with this specialist.
+    description: Foreign key referencing the sales flow this specialist is assigned to.
   user_id:
-    description: Foreign key referencing the user assigned as specialist for the sales flow.
+    description: Foreign key referencing the users table for the staff member assigned as specialist. Can be null when the role is not yet assigned to a specific person.
   kind:
-    description: Specialist role or category within the sales flow process.
+    description: Functional role of the specialist on the deal. Values include AGENT, AUTONOMOUS_AGENT, FIFTY_AGENT, AGENT_LEAD_REFERRAL, CREDIT, CRI, CRN, DEAL_MAKER, LEGAL_RISK, MORTGAGE_START, MORTGAGE_FUP, MORTGAGE_END, PRE, POST, POST_DD, and TEAM_LEAD.
   created_at:
     description: Timestamp when the record was created in the source database.
   updated_at:

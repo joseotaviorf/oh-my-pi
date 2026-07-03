@@ -2,53 +2,53 @@ database_name: datalake_sales_flow_clean
 table_name: users
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table with sales flow users infos.
+description: Clean, renamed replica of datalake_sales_flow_raw.users. Each row is a person participating in a sales flow, such as a buyer, seller, specialist, or additional contact.
 columns:
   id:
-    description: User ID on SalesFlow tables.
+    description: Unique identifier of the user record in this table.
     lineage:
       - datalake_sales_flow_raw.users.id
   id_external:
-    description: User ID on 5A main table (EBDB) and it's the ID used on dw_public.dim_user.
+    description: Identifier of the user in QuintoAndar's central identity/account systems (EBDB), used to join with dw_public.dim_user. Only populated for MAIN users; ADDITIONAL_CONTACT users created directly in Sales Flow may not have one.
     lineage:
       - datalake_sales_flow_raw.users.external_id
   name:
-    description: User name.
+    description: Full name of the user as registered in Sales Flow.
     lineage:
       - datalake_sales_flow_raw.users.name
   email:
-    description: User e-mail.
+    description: Email address of the user as registered in Sales Flow.
     lineage:
       - datalake_sales_flow_raw.users.email
   phone:
-    description: User phone.
+    description: Phone number of the user as registered in Sales Flow.
     lineage:
       - datalake_sales_flow_raw.users.phone
   type:
-    description: User type.
+    description: Whether the user has an account in QuintoAndar's platform. Values are MAIN (sourced from QuintoAndar's central identity/account service) and ADDITIONAL_CONTACT (created locally within Sales Flow for people without a platform account, such as a co-buyer or a family member added as a contact).
     lineage:
       - datalake_sales_flow_raw.users.type
   cpf:
-    description: User personal document.
+    description: Brazilian individual taxpayer identification number (CPF) of the user.
     lineage:
       - datalake_sales_flow_raw.users.cpf
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the user record was created in the source database.
     lineage:
       - datalake_sales_flow_raw.users.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp when the user record was last updated in the source database.
     lineage:
       - datalake_sales_flow_raw.users.updated_at
   year:
-    description: The Year in which the data was ingested.
+    description: Year partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.users.year
   month:
-    description: The Month in which the data was ingested.
+    description: Month partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.users.month
   day:
-    description: The Day in which the data was ingested.
+    description: Day partition derived from the CDC ingestion timestamp.
     lineage:
       - datalake_sales_flow_raw.users.day
