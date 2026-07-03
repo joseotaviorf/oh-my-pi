@@ -54,20 +54,24 @@ def main():
         help="The Wonka pipeline package name (e.g., agent_goals).",
     )
     add_validation_target_args(parser)
+    parser.add_argument(
+        "--datalake-bucket",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     args = parser.parse_args()
 
     if is_validation_run(args.target_database_name, args.target_table_name):
-        bucket = os.environ.get("DATABRICKS_S3_BUCKET")
-        if not bucket:
+        if not args.datalake_bucket:
             raise RuntimeError(
-                "DATABRICKS_S3_BUCKET environment variable is required for "
-                "cluster validation runs"
+                "--datalake-bucket is required for cluster validation runs"
             )
         apply_validation_env(
             args.target_database_name,
             args.target_table_name,
-            bucket,
+            args.datalake_bucket,
         )
 
     runner = build_wonka_runner(pipeline_target=args.pipeline_target)

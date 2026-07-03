@@ -620,7 +620,9 @@ class TestBuildValidationClusterSpec:
         assert spec is not None
         assert spec.cluster_type == "consolidation_s_general_cluster"
         assert spec.custom_configurations["node_type_id"] == "m7gd.xlarge"
-        assert spec.custom_configurations["driver_node_type_id"] == "m7gd.xlarge"
+        # Photon no longer forces NVMe drivers: the mapped m7g.xlarge driver
+        # matches the preset default and is stripped from the overrides.
+        assert "driver_node_type_id" not in spec.custom_configurations
         assert spec.custom_configurations["runtime_engine"] == "PHOTON"
         assert spec.custom_configurations["num_workers"] == 3
 
@@ -673,7 +675,9 @@ class TestBuildValidationClusterSpec:
         )
         assert spec is not None
         assert spec.cluster_type == "consolidation_xl_compute_cluster"
-        assert "node_type_id" not in spec.custom_configurations
+        # Legacy NVMe c5d worker keeps local NVMe on Graviton (c7gd) and is a
+        # real override against the preset's non-NVMe default.
+        assert spec.custom_configurations["node_type_id"] == "c7gd.8xlarge"
         assert spec.custom_configurations["driver_node_type_id"] == "m7g.2xlarge"
         assert spec.custom_configurations.get("num_workers", 2) == 2
 
@@ -892,8 +896,9 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
+        # Driver never inherits NVMe; the legacy NVMe r5d worker keeps it.
         assert custom["driver_node_type_id"] == "m7g.xlarge"
-        assert custom["node_type_id"] == "r7g.2xlarge"
+        assert custom["node_type_id"] == "r7gd.2xlarge"
 
     def test_preserves_explicit_nvme_without_photon(self):
         cluster_args = {
@@ -912,7 +917,7 @@ class TestNormalizeDatabricksClusterTopology:
         assert custom["node_type_id"] == "r7gd.4xlarge"
         assert "runtime_engine" not in custom
 
-    def test_legacy_r5d_without_photon_still_maps_to_r6g(self):
+    def test_legacy_r5d_without_photon_maps_to_nvme_graviton(self):
         cluster_args = {
             "type": "consolidation_l_memory_cluster",
             "custom_configurations": {
@@ -923,7 +928,12 @@ class TestNormalizeDatabricksClusterTopology:
         normalized = normalize_databricks_cluster_topology(
             cluster_args, ConfigurationService()
         )
-        assert "custom_configurations" not in normalized
+        custom = normalized["custom_configurations"]
+        # Legacy NVMe workers keep local NVMe even without Photon; the driver
+        # maps to non-NVMe r7g.4xlarge, which equals the preset default and is
+        # stripped.
+        assert custom["node_type_id"] == "r7gd.4xlarge"
+        assert "driver_node_type_id" not in custom
 
     def test_photon_does_not_upgrade_explicit_graviton_to_nvme(self):
         cluster_args = {
@@ -943,7 +953,7 @@ class TestNormalizeDatabricksClusterTopology:
         assert custom["node_type_id"] == "r7g.xlarge"
         assert custom["runtime_engine"] == "PHOTON"
 
-    def test_photon_legacy_d_type_still_maps_to_nvme_graviton(self):
+    def test_photon_legacy_d_type_worker_maps_to_nvme_driver_stays_non_nvme(self):
         cluster_args = {
             "type": "consolidation_s_general_cluster",
             "custom_configurations": {
@@ -956,8 +966,51 @@ class TestNormalizeDatabricksClusterTopology:
             cluster_args, ConfigurationService()
         )
         custom = normalized["custom_configurations"]
-        assert custom["driver_node_type_id"] == "m7gd.xlarge"
+        # The worker keeps NVMe (m7gd); the driver maps to non-NVMe m7g.xlarge,
+        # which equals the preset default and is stripped.
         assert custom["node_type_id"] == "m7gd.xlarge"
+        assert "driver_node_type_id" not in custom
+
+    def test_legacy_nvme_worker_and_driver_without_photon(self):
+        cluster_args = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "node_type_id": "c6id.12xlarge",
+                "driver_node_type_id": "c6id.4xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        # Legacy NVMe x86 workers map to *gd without Photon; drivers never
+        # inherit NVMe unless prod already pinned an explicit *gd driver.
+        assert custom["node_type_id"] == "c7gd.12xlarge"
+        assert custom["driver_node_type_id"] == "c7g.4xlarge"
+
+    def test_legacy_m5d_worker_maps_to_nvme_graviton(self):
+        cluster_args = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "node_type_id": "m5d.2xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        assert normalized["custom_configurations"]["node_type_id"] == "m7gd.2xlarge"
+
+    def test_non_nvme_legacy_worker_maps_to_non_nvme_graviton(self):
+        cluster_args = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "node_type_id": "r5a.8xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        assert normalized["custom_configurations"]["node_type_id"] == "r7g.8xlarge"
 
 
 class TestBuildRightsizingValidationClusterSpec:

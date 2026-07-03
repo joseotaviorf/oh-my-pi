@@ -2,6 +2,7 @@ from airflow.models.baseoperator import BaseOperator
 
 from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 class LoadWonkaTaskCreator(LoadTaskCreator):
@@ -29,6 +30,8 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
                     target_db,
                     "--target-table-name",
                     target_table,
+                    "--datalake-bucket",
+                    ConfigurationService().get_config("datalake_bucket"),
                 ]
             )
         return parameters

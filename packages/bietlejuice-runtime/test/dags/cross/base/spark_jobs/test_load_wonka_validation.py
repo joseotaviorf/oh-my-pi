@@ -58,10 +58,8 @@ class TestLoadWonkaMain:
     @patch.object(load_wonka, "build_wonka_runner")
     @patch.object(load_wonka, "apply_validation_env")
     def test_validation_args_trigger_env_before_import(
-        self, mock_apply_validation_env, mock_build_runner, monkeypatch
+        self, mock_apply_validation_env, mock_build_runner
     ):
-        monkeypatch.setenv("DATABRICKS_S3_BUCKET", "5a-datalake-prod")
-
         mock_runner = MagicMock()
         mock_build_runner.return_value = mock_runner
 
@@ -72,6 +70,8 @@ class TestLoadWonkaMain:
             "cluster_validation",
             "--target-table-name",
             "wonka___user_visits",
+            "--datalake-bucket",
+            "5a-datalake-prod",
         ]
         with patch.object(sys, "argv", test_args):
             load_wonka.main()
@@ -100,9 +100,7 @@ class TestLoadWonkaMain:
         mock_build_runner.assert_called_once_with(pipeline_target="user_visits")
         mock_runner.execute.assert_called_once()
 
-    def test_validation_requires_databricks_bucket(self, monkeypatch):
-        monkeypatch.delenv("DATABRICKS_S3_BUCKET", raising=False)
-
+    def test_validation_requires_datalake_bucket(self):
         test_args = [
             "load_wonka.py",
             "user_visits",
@@ -112,5 +110,5 @@ class TestLoadWonkaMain:
             "wonka___user_visits",
         ]
         with patch.object(sys, "argv", test_args):
-            with pytest.raises(RuntimeError, match="DATABRICKS_S3_BUCKET"):
+            with pytest.raises(RuntimeError, match="datalake-bucket is required"):
                 load_wonka.main()
