@@ -1,0 +1,251 @@
+database_name: datalake_alias
+table_name: alias_sessions
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Uma linha por sessão do AI agent Alias (WhatsApp B2B da QuintoAndar), agregando todas
+  as métricas de funil conversacional, custo e latência de LLM, e o uuid_company do broker
+  a partir de datalake_langfuse_clean.traces e observations.
+
+  Grain: uma linha por id_langfuse_session. Escopo restrito a sessões Alias via
+  INNER JOIN datalake_chatbot.sessions (bot = 'alias'), o mesmo critério usado em
+  dw_alias.fact_alias_agent_calls. Incremental por traces.ts_created com merge_on em
+  id_langfuse_session para refletir sessões longas que cruzam janelas de carga.
+
+  Principal consumidor: dw_alias.fact_alias_sessions e dw_alias.fact_alias_agent_calls, que
+  usam esta enrich para evitar full table scans repetidos em observations (tabela de alto
+  volume). Cada run de dw_alias passa a ler uma linha pré-agregada por sessão em vez de
+  varrer observations e traces diretamente.
+
+  Layout físico: particionada por [year, month, day] com base em ts_first_turn (data do
+  primeiro turn do usuário na sessão). Z-ordenada por id_langfuse_session para habilitar
+  data skipping em lookups pontuais por sessão. Para queries eficientes, filtre por
+  partição de data e junte por id_langfuse_session.
+columns:
+  id_langfuse_session:
+    description: >
+      Identificador único da sessão no Langfuse (id_session em traces). PK desta tabela.
+      FK para dw_alias.fact_alias_sessions.id_langfuse_session e
+      dw_alias.fact_alias_agent_calls.id_langfuse_session.
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+      - datalake_chatbot.sessions.id_langfuse_session
+  uuid_company:
+    description: >
+      UUID da empresa (broker) extraído do output JSON da primeira chamada à ferramenta
+      get_alias_configuration na sessão. Usado para atribuição de sk_broker nas facts
+      do dw_alias. NULL quando a sessão não passou pela etapa de configuração do broker.
+    lineage:
+      - datalake_langfuse_clean.observations.output
+  bot_version:
+    description: >
+      Versão mais recente do agente Alias registrada nos traces da sessão (campo version
+      do trace). Permite rastrear mudanças de comportamento do agente ao longo do tempo.
+    lineage:
+      - datalake_langfuse_clean.traces.version
+  funnel_stage_deepest:
+    description: >
+      Estágio mais profundo do funil conversacional atingido na sessão, derivado dos
+      sub-agentes chamados. Hierarquia em ordem crescente de profundidade: no_agent →
+      profile_identified → inventory_searched → schedule_visit_agent_called →
+      visit_intention_registered → escalated. Permite segmentar sessões por maturidade
+      da conversa sem necessidade de juntar múltiplas flags booleanas.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  n_user_turns:
+    description: >
+      Número de turns do usuário na sessão, contado como o total de traces distintos
+      (id_trace) vinculados ao id_langfuse_session. Cada trace representa uma mensagem
+      enviada pelo usuário e processada pelo agente.
+    lineage:
+      - datalake_langfuse_clean.traces.id_trace
+  n_tool_call_errors:
+    description: >
+      Número de chamadas de tool (obs_type = TOOL) cujo output contém a string "error"
+      (case-insensitive). Inclui erros de integração com CRM, timeouts e falhas de
+      ferramenta. Útil para diagnóstico de qualidade operacional do agente.
+    lineage:
+      - datalake_langfuse_clean.observations.output
+      - datalake_langfuse_clean.observations.type
+  n_calls_get_recommendations:
+    description: >
+      Número total de chamadas à ferramenta alias_get_recommendations_by_company na
+      sessão. Valores > 1 indicam que o lead refinou sua busca ou o agente fez múltiplas
+      tentativas de recomendação.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  n_calls_get_availability:
+    description: >
+      Número total de chamadas à ferramenta alias_visit_get_availability na sessão.
+      Múltiplas chamadas podem indicar busca por horários alternativos de visita.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  n_calls_get_property:
+    description: >
+      Número total de chamadas à ferramenta alias_get_property_by_external_id na sessão.
+      Indica quantas vezes o agente buscou detalhes de um imóvel específico por ID externo.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  n_calls_register_visit:
+    description: >
+      Número total de chamadas à ferramenta alias_register_visit_intention na sessão.
+      Valores > 1 podem indicar retentativas após falha ou múltiplos imóveis de interesse.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  n_calls_register_escalation:
+    description: >
+      Número total de chamadas à ferramenta alias_register_escalation na sessão.
+      Normalmente 0 ou 1; valores > 1 indicam retentativas de escalação.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  total_llm_cost_usd:
+    description: >
+      Custo total de LLM incorrido na sessão em dólares americanos, calculado como soma
+      de cost_details.total de todas as observations. Inclui chamadas de AGENT e TOOL.
+      NULL quando nenhuma observation possui cost_details preenchido.
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+  p50_llm_response_time_ms:
+    description: >
+      Mediana (P50) da latência de resposta do LLM por observation na sessão, em
+      milissegundos. Calculada como percentile_approx(duration_ms, 0.5) sobre todas as
+      observations com ts_started e ts_ended preenchidos.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+  p95_llm_response_time_ms:
+    description: >
+      Percentil 95 da latência de resposta do LLM por observation na sessão, em
+      milissegundos. Indica o comportamento no tail da distribuição — alto P95 sinaliza
+      episódios de lentidão que degradam a experiência conversacional.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+  avg_llm_response_time_ms:
+    description: >
+      Média da latência de resposta do LLM por observation na sessão, em milissegundos.
+      Complementa P50 e P95 para análise de custo de latência médio por sessão.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+      - datalake_langfuse_clean.observations.ts_ended
+  has_profiling:
+    description: >
+      TRUE se o sub-agente alias_profile_agentV1 foi chamado ao menos uma vez na sessão.
+      Indica que o agente tentou identificar o perfil do lead (intenção de compra, aluguel,
+      faixa de preço, localização).
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_inventory:
+    description: >
+      TRUE se o sub-agente alias_inventory_agentV1 foi chamado na sessão. Indica que o
+      agente realizou busca no portfólio de imóveis do broker para o lead.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_recommendations:
+    description: >
+      TRUE se a ferramenta alias_get_recommendations_by_company foi chamada na sessão.
+      Indica que o agente listou imóveis recomendados para o lead com base no perfil.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_scheduling:
+    description: >
+      TRUE se o sub-agente alias_schedule_visit_agentV1 foi chamado na sessão. Indica
+      que o agente tentou agendar uma visita para o lead.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_availability:
+    description: >
+      TRUE se a ferramenta alias_visit_get_availability foi chamada na sessão. Indica que
+      o agente consultou a disponibilidade de agenda do imóvel para agendamento de visita.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_visit_registered:
+    description: >
+      TRUE se a ferramenta alias_register_visit_intention foi chamada na sessão. Indica
+      que o agente tentou registrar a intenção de visita do lead no CRM do broker.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_escalation:
+    description: >
+      TRUE se o sub-agente alias_escalation_agentV1 foi chamado na sessão. Indica que
+      o agente determinou que o caso deveria ser escalado para atendimento humano.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  visit_registered_success:
+    description: >
+      TRUE se o output de alias_register_visit_intention contém "registered successfully",
+      indicando que a intenção de visita foi registrada com sucesso no CRM do broker.
+      Distingue tentativas bem-sucedidas de chamadas que falharam por erro de integração.
+    lineage:
+      - datalake_langfuse_clean.observations.output
+  escalation_registered_success:
+    description: >
+      TRUE se o output de alias_register_escalation contém "escalation registered
+      successfully", indicando que a escalação para atendimento humano foi criada com
+      sucesso no sistema downstream.
+    lineage:
+      - datalake_langfuse_clean.observations.output
+  ts_first_turn:
+    description: >
+      Timestamp do primeiro turn do usuário na sessão (MIN de traces.ts_created). Marca
+      o início efetivo da conversa com o agente. Usado como base para as colunas de
+      partição year/month/day.
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+  ts_last_turn:
+    description: >
+      Timestamp do último turn do usuário na sessão (MAX de traces.ts_created). Combinado
+      com ts_first_turn permite calcular a duração da sessão.
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+  ts_profiling:
+    description: >
+      Timestamp do primeiro chamado ao sub-agente alias_profile_agentV1 na sessão.
+      NULL quando has_profiling = FALSE.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+  ts_inventory:
+    description: >
+      Timestamp do primeiro chamado ao sub-agente alias_inventory_agentV1 na sessão.
+      NULL quando has_inventory = FALSE.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+  ts_scheduling:
+    description: >
+      Timestamp do primeiro chamado ao sub-agente alias_schedule_visit_agentV1 na sessão.
+      NULL quando has_scheduling = FALSE.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+  ts_availability:
+    description: >
+      Timestamp do primeiro chamado à ferramenta alias_visit_get_availability na sessão.
+      NULL quando has_availability = FALSE.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+  ts_visit_registered:
+    description: >
+      Timestamp do primeiro chamado à ferramenta alias_register_visit_intention na sessão.
+      NULL quando has_visit_registered = FALSE.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+  ts_escalation:
+    description: >
+      Timestamp do primeiro chamado ao sub-agente alias_escalation_agentV1 na sessão.
+      NULL quando has_escalation = FALSE.
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+  ts_load:
+    description: Timestamp de carga do pipeline. Gerado via CURRENT_TIMESTAMP() no momento da execução do job Spark.
+    lineage: []
+  year:
+    description: Ano do primeiro turn da sessão (YEAR(ts_first_turn)). Coluna de partição — inclua filtros por year/month/day para habilitar partition pruning.
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+  month:
+    description: Mês do primeiro turn da sessão (MONTH(ts_first_turn)). Coluna de partição — use em conjunto com year e day para scanning eficiente por data.
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
+  day:
+    description: Dia do primeiro turn da sessão (DAY(ts_first_turn)). Coluna de partição — o Z-order em id_langfuse_session complementa o pruning por data para lookups pontuais.
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created

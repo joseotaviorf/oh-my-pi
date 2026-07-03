@@ -123,6 +123,7 @@ bietlejuice.dw_alias:
   - bietlejuice.alias:load-clean-leads:first-run-of-day
   - bietlejuice.alias:load-clean-listing-fingerprint:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.enrich_alias:load-enrich-alias-sessions:first-run-of-day
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
   - bietlejuice.langfuse:load-clean-observations:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
@@ -1565,6 +1566,10 @@ bietlejuice.enrich_ai_collections_quintoandar:
   - bietlejuice.request_logging:load-clean-collections:first-run-of-day
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated:first-run-of-day
+bietlejuice.enrich_alias:
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
+  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
+  - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.enrich_amplitude_agents_app:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-business-context:first-run-of-day

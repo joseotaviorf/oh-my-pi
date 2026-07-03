@@ -170,13 +170,13 @@ Alias rows will have `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `
 | `bot_version` | STRING | `langfuse_traces.version` — agent version at session time |
 | `is_test` | BOOLEAN | `company_uuid IN (test company UUIDs)` — flag to exclude QA sessions |
 | — **Conversational funnel flags (OBT — actual names)** — | | |
-| `had_profiling` | BOOLEAN | `alias_profile_agentV1` was called in the session |
-| `had_inventory` | BOOLEAN | `alias_inventory_agentV1` was called |
-| `had_recommendations` | BOOLEAN | `alias_get_recommendations_by_company` was called |
-| `had_scheduling` | BOOLEAN | `alias_schedule_visit_agentV1` was called |
-| `had_availability` | BOOLEAN | `alias_visit_get_availability` was called |
-| `had_visit_registered` | BOOLEAN | `alias_register_visit_intention` was called |
-| `had_escalation` | BOOLEAN | `alias_escalation_agentV1` was called |
+| `has_profiling` | BOOLEAN | `alias_profile_agentV1` was called in the session |
+| `has_inventory` | BOOLEAN | `alias_inventory_agentV1` was called |
+| `has_recommendations` | BOOLEAN | `alias_get_recommendations_by_company` was called |
+| `has_scheduling` | BOOLEAN | `alias_schedule_visit_agentV1` was called |
+| `has_availability` | BOOLEAN | `alias_visit_get_availability` was called |
+| `has_visit_registered` | BOOLEAN | `alias_register_visit_intention` was called |
+| `has_escalation` | BOOLEAN | `alias_escalation_agentV1` was called |
 | `visit_registered_success` | BOOLEAN | output of `alias_register_visit_intention` contains "registered successfully" |
 | `escalation_registered_success` | BOOLEAN | output of `alias_register_escalation` contains "escalation registered successfully" |
 | `funnel_stage_deepest` | STRING | Deepest stage reached: `no_agent` / `profile_identified` / `inventory_searched` / `schedule_visit_agent_called` / `visit_intention_registered` / `escalated` |
@@ -401,7 +401,7 @@ Alias rows will have `commission`, `demand_fee`, `supply_fee`, `platform_fee`, `
 | `input_tokens` | INT | Input tokens consumed |
 | `output_tokens` | INT | Output tokens generated |
 | — **Outcome** — | | |
-| `had_error` | BOOLEAN | Output contains "error" or error status |
+| `has_error` | BOOLEAN | Output contains "error" or error status |
 | `error_message` | STRING | Error message extracted from output (NULL if no error) |
 | — **Timestamp** — | | |
 | `dt_session` | DATE | Session date — for partitioning and fast joins |
@@ -813,7 +813,7 @@ Track 3 can be **developed in parallel** with Tracks 1 and 2 — `sk_broker` is 
 - [ ] `bot_version` non-null for all sessions with non-null `id_langfuse_session`
 - [ ] `is_test` correctly flagged for test company UUIDs (see Section 0)
 - [ ] `funnel_stage_deepest` non-null for sessions with at least one sub-agent called
-- [ ] `had_visit_registered` = TRUE implies `visit_registered_success IN (TRUE, FALSE)` — no logical NULLs
+- [ ] `has_visit_registered` = TRUE implies `visit_registered_success IN (TRUE, FALSE)` — no logical NULLs
 - [ ] `n_user_turns` ≥ 1 for sessions with non-null `id_langfuse_session`
 - [ ] `p95_llm_response_time_ms` > `avg_llm_response_time_ms` — latency distribution sanity check
 
@@ -834,7 +834,7 @@ Track 3 can be **developed in parallel** with Tracks 1 and 2 — `sk_broker` is 
 - [ ] All rows have `id_langfuse_session` — no orphan observations
 - [ ] `agent_name` contains only known values (no unexpected NULLs)
 - [ ] `cost_total_usd` = `cost_input_usd + cost_output_usd` for 100% of rows with non-null cost
-- [ ] `had_error = TRUE` only when `error_message IS NOT NULL`
+- [ ] `has_error = TRUE` only when `error_message IS NOT NULL`
 - [ ] `fact_alias_agent_calls.id_langfuse_session` has ≥ 95% match with `fact_alias_sessions.id_langfuse_session`
 
 **General**
@@ -973,7 +973,7 @@ obs_numbered AS (
     TRY_CAST(cost_details.total  AS DOUBLE)                         AS cost_total_usd,
     NULL                                                            AS input_tokens,  -- not available in observations
     NULL                                                            AS output_tokens, -- not available in observations
-    LOWER(COALESCE(o.output, '')) LIKE '%error%'                    AS had_error,
+    LOWER(COALESCE(o.output, '')) LIKE '%error%'                    AS has_error,
     CASE WHEN LOWER(COALESCE(o.output, '')) LIKE '%error%'
          THEN o.output END                                          AS error_message,
     DATE(s.ts_created)                                              AS dt_session,
@@ -1013,7 +1013,7 @@ SELECT
   on.cost_total_usd,
   on.input_tokens,
   on.output_tokens,
-  on.had_error,
+  on.has_error,
   on.error_message,
   on.dt_session,
   on.ts_started,
@@ -1143,19 +1143,19 @@ obt_agg AS (
   SELECT
     t.id_session                                                     AS id_langfuse_session,
     MAX(CASE WHEN o.name = 'alias_profile_agentV1'
-        THEN 1 ELSE 0 END) = 1                                       AS had_profiling,
+        THEN 1 ELSE 0 END) = 1                                       AS has_profiling,
     MAX(CASE WHEN o.name = 'alias_inventory_agentV1'
-        THEN 1 ELSE 0 END) = 1                                       AS had_inventory,
+        THEN 1 ELSE 0 END) = 1                                       AS has_inventory,
     MAX(CASE WHEN o.name = 'alias_get_recommendations_by_company'
-        THEN 1 ELSE 0 END) = 1                                       AS had_recommendations,
+        THEN 1 ELSE 0 END) = 1                                       AS has_recommendations,
     MAX(CASE WHEN o.name = 'alias_schedule_visit_agentV1'
-        THEN 1 ELSE 0 END) = 1                                       AS had_scheduling,
+        THEN 1 ELSE 0 END) = 1                                       AS has_scheduling,
     MAX(CASE WHEN o.name = 'alias_visit_get_availability'
-        THEN 1 ELSE 0 END) = 1                                       AS had_availability,
+        THEN 1 ELSE 0 END) = 1                                       AS has_availability,
     MAX(CASE WHEN o.name = 'alias_register_visit_intention'
-        THEN 1 ELSE 0 END) = 1                                       AS had_visit_registered,
+        THEN 1 ELSE 0 END) = 1                                       AS has_visit_registered,
     MAX(CASE WHEN o.name = 'alias_escalation_agentV1'
-        THEN 1 ELSE 0 END) = 1                                       AS had_escalation,
+        THEN 1 ELSE 0 END) = 1                                       AS has_escalation,
     MAX(CASE WHEN o.name = 'alias_register_visit_intention'
                   AND LOWER(o.output) LIKE '%registered successfully%'
         THEN 1 ELSE 0 END) = 1                                       AS visit_registered_success,
@@ -1257,13 +1257,13 @@ SELECT
     '00000000-0000-4000-8000-000000000001',
     '31616192-288b-439a-baec-890a5c89e20a'
   )                                                                AS is_test,
-  COALESCE(oa.had_profiling, FALSE)               AS had_profiling,
-  COALESCE(oa.had_inventory, FALSE)               AS had_inventory,
-  COALESCE(oa.had_recommendations, FALSE)         AS had_recommendations,
-  COALESCE(oa.had_scheduling, FALSE)              AS had_scheduling,
-  COALESCE(oa.had_availability, FALSE)            AS had_availability,
-  COALESCE(oa.had_visit_registered, FALSE)        AS had_visit_registered,
-  COALESCE(oa.had_escalation, FALSE)              AS had_escalation,
+  COALESCE(oa.has_profiling, FALSE)               AS has_profiling,
+  COALESCE(oa.has_inventory, FALSE)               AS has_inventory,
+  COALESCE(oa.has_recommendations, FALSE)         AS has_recommendations,
+  COALESCE(oa.has_scheduling, FALSE)              AS has_scheduling,
+  COALESCE(oa.has_availability, FALSE)            AS has_availability,
+  COALESCE(oa.has_visit_registered, FALSE)        AS has_visit_registered,
+  COALESCE(oa.has_escalation, FALSE)              AS has_escalation,
   COALESCE(oa.visit_registered_success, FALSE)    AS visit_registered_success,
   COALESCE(oa.escalation_registered_success, FALSE) AS escalation_registered_success,
   COALESCE(oa.funnel_stage_deepest, 'no_agent')   AS funnel_stage_deepest,

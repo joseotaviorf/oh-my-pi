@@ -84,31 +84,31 @@ columns:
       True when the session belongs to a test company. Hardcoded UUIDs from OBT commit cc2f148e62:
       '00000000-0000-4000-8000-000000000001' (synthetic placeholder) and
       '31616192-288b-439a-baec-890a5c89e20a' (internal QA company).
-  had_profiling:
+  has_profiling:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_profile_agentV1 was called in this session.
-  had_inventory:
+  has_inventory:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_inventory_agentV1 was called in this session.
-  had_recommendations:
+  has_recommendations:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_get_recommendations_by_company was called in this session.
-  had_scheduling:
+  has_scheduling:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_schedule_visit_agentV1 was called in this session.
-  had_availability:
+  has_availability:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_visit_get_availability was called in this session.
-  had_visit_registered:
+  has_visit_registered:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_register_visit_intention was called in this session.
-  had_escalation:
+  has_escalation:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_escalation_agentV1 was called in this session.

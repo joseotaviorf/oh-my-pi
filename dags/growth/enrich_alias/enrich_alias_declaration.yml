@@ -1,0 +1,40 @@
+dag:
+  name: enrich_alias
+  schedule_start_date: 2026, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Pré-agrega traces e observations do Langfuse para o AI agent Alias (WhatsApp B2B),
+      produzindo uma linha por id_langfuse_session com métricas de funil conversacional,
+      custo/latência de LLM, contagem de turns e uuid_company do broker.
+
+      Consumed by: dw_alias.fact_alias_sessions, dw_alias.fact_alias_agent_calls.
+
+      Esta DAG resolve o problema de performance das fact tables do dw_alias: ao invés de
+      cada job DW escanear datalake_langfuse_clean.observations diretamente (sem partition
+      pruning, múltiplas vezes), a enrich pré-computa as agregações incrementalmente por
+      traces.ts_created, habilitando partition pruning real nas tabelas Langfuse.
+
+      IMPORTANTE — backfill inicial: na primeira execução rodar com extraction_type=full
+      ou fazer backfill histórico para cobrir todas as sessões já existentes antes de
+      ligar dw_alias.fact_alias_sessions ao enrich.
+
+      Source tables:
+        - datalake_langfuse_clean.traces   (incremental por ts_created)
+        - datalake_langfuse_clean.observations (join a traces, partition-pruned)
+        - datalake_chatbot.sessions (filtro bot = 'alias' — escopo Alias only)
+
+      DATA LINEAGE: datalake_langfuse_clean + datalake_chatbot → datalake_alias
+
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    alias_sessions:
+      merge_on: [id_langfuse_session]
+      partitions: [year, month, day]
+      z_order_by: [id_langfuse_session]

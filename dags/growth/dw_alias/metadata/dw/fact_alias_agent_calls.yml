@@ -64,14 +64,14 @@ columns:
     description: Input token count. Not available at observation level; reserved for future use.
   output_tokens:
     description: Output token count. Not available at observation level; reserved for future use.
-  had_error:
+  has_error:
     lineage:
       - datalake_langfuse_clean.observations.output
     description: True when the observation output contains the string 'error'.
   error_message:
     lineage:
       - datalake_langfuse_clean.observations.output
-    description: Full output string when had_error is TRUE, NULL otherwise.
+    description: Full output string when has_error is TRUE, NULL otherwise.
   dt_session:
     lineage:
       - datalake_chatbot.sessions.ts_created

@@ -53,34 +53,14 @@ traces_ordered AS (
     WHERE
         s.bot = 'alias'
         AND t.id_session IS NOT NULL
-),
-broker_config AS (
-    SELECT
-        t.id_session AS id_langfuse_session,
-        COALESCE(
-            GET_JSON_OBJECT(o.output, '$.companyUuid'),
-            GET_JSON_OBJECT(o.output, '$.companyUUID')
-        ) AS company_uuid,
-        ROW_NUMBER() OVER (PARTITION BY t.id_session ORDER BY o.ts_started) AS rn
-    FROM
-        datalake_langfuse_clean.observations AS o
-    INNER JOIN
-        datalake_langfuse_clean.traces AS t
-            ON o.id_trace = t.id_trace
-    INNER JOIN
-        affected_session_ids AS asi
-            ON t.id_session = asi.id_session
-    WHERE
-        o.name = 'get_alias_configuration'
-        AND o.type = 'TOOL'
-        AND t.id_session IS NOT NULL
+        AND t.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
 ),
 obs_base AS (
     SELECT
         io.id_observation AS sk_agent_call,
         tr.id_langfuse_session,
         io.id_trace,
-        bc.company_uuid,
+        lsa.uuid_company,
         io.name AS agent_name,
         io.type AS observation_type,
         io.type = 'TOOL' AS is_tool_call,
@@ -91,7 +71,7 @@ obs_base AS (
         TRY_CAST(io.cost_details.total AS DOUBLE) AS cost_total_usd,
         NULL AS input_tokens,
         NULL AS output_tokens,
-        LOWER(COALESCE(io.output, '')) LIKE '%error%' AS had_error,
+        LOWER(COALESCE(io.output, '')) LIKE '%error%' AS has_error,
         CASE
             WHEN LOWER(COALESCE(io.output, '')) LIKE '%error%' THEN io.output
         END AS error_message,
@@ -107,9 +87,8 @@ obs_base AS (
         datalake_chatbot.sessions AS s
             ON tr.id_langfuse_session = s.id_langfuse_session
     LEFT JOIN
-        broker_config AS bc
-            ON tr.id_langfuse_session = bc.id_langfuse_session
-            AND bc.rn = 1
+        datalake_alias.alias_sessions AS lsa
+            ON tr.id_langfuse_session = lsa.id_langfuse_session
 )
 SELECT
     obs.sk_agent_call,
@@ -126,7 +105,7 @@ SELECT
     obs.cost_total_usd,
     obs.input_tokens,
     obs.output_tokens,
-    obs.had_error,
+    obs.has_error,
     obs.error_message,
     obs.dt_session,
     obs.ts_started,
@@ -139,4 +118,4 @@ FROM
     obs_base AS obs
 LEFT JOIN
     core_brokers.brokers AS cb
-        ON obs.company_uuid = cb.uuid_company
+        ON obs.uuid_company = cb.uuid_company

@@ -1,0 +1,52 @@
+---
+table_name: datalake_alias.alias_sessions
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -20
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_langfuse_session:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  n_user_turns:
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+  uuid_company:
+    has_completeness:
+      greater_than_or_equal_to: 0.8
+      severity_level: Warning
+  funnel_stage_deepest:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - 'no_agent'
+        - 'profile_identified'
+        - 'inventory_searched'
+        - 'schedule_visit_agent_called'
+        - 'visit_intention_registered'
+        - 'escalated'
+      severity_level: Error
+  ts_first_turn:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
