@@ -127,7 +127,7 @@ def update_table_partitions(
     logger = set_logger("sync_metastore_table_partitions")
     logger.info(
         f"m={logger.name}, database_name={database_name}, table_name={table_name}, "
-        f"partition_values={partition_values}, msg=Starting table partition values update"
+        f"partition_count={len(partition_values)}, msg=Starting table partition values update"
     )
 
     hive_ms_loader.update_table_partitions(
@@ -138,7 +138,7 @@ def update_table_partitions(
 
     logger.info(
         f"m={logger.name}, database_name={database_name}, table_name={table_name}, "
-        f"partition_values={partition_values}, msg=Completed table partition values update"
+        f"partition_count={len(partition_values)}, msg=Completed table partition values update"
     )
 
 

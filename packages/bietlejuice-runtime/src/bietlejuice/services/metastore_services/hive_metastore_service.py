@@ -1,3 +1,4 @@
+from hive_metastore_client import HiveMetastoreClient
 from hive_metastore_client.builders import (
     ColumnBuilder,
     DatabaseBuilder,
@@ -6,6 +7,9 @@ from hive_metastore_client.builders import (
     TableBuilder,
 )
 from quintoandar_logger import QuintoAndarLogger
+from thrift_files.libraries.thrift_hive_metastore_client.ttypes import (
+    AddPartitionsRequest,
+)
 
 from bietlejuice.services.metastore_services.metastore_service import MetastoreService
 
@@ -16,6 +20,10 @@ class HiveMetastoreService(MetastoreService):
     """Service to interact with our internal Hive Metastore."""
 
     DEFAULT_TABLE_OWNER = "Data Engineering Team"
+
+    # Partitions per add_partitions_req thrift call. ~2 KB/partition => ~1 MB
+    # per request, far under thrift/server limits; one server transaction each.
+    ADD_PARTITIONS_BATCH_SIZE = 500
 
     def __init__(self, client):
         """
@@ -156,7 +164,12 @@ class HiveMetastoreService(MetastoreService):
 
     def add_partitions_to_table(self, database_name, table_name, partition_list):
         """
-        Add partitions to the Hive table.
+        Add partitions to the Hive table, skipping the ones that already exist.
+
+        Uses the native bulk thrift API (add_partitions_req with ifNotExists=True):
+        one round-trip and one server-side transaction per ADD_PARTITIONS_BATCH_SIZE
+        partitions, instead of the client library's one-round-trip-per-partition
+        add_partitions_if_not_exists loop.
 
         :param database_name: the database name
         :type database_name: str
@@ -165,8 +178,37 @@ class HiveMetastoreService(MetastoreService):
         :param partition_list: list of partitions to be added to the table
         :type partition_list: List[Partition]
         """
+        if not partition_list:
+            raise ValueError(
+                "m=add_partitions_to_table, msg=The partition list is empty."
+            )
+
         with self.client as conn:
-            conn.add_partitions_if_not_exists(database_name, table_name, partition_list)
+            table = conn.get_table(dbname=database_name, tbl_name=table_name)
+            partitions = HiveMetastoreClient._format_partitions_location(
+                partition_list=partition_list,
+                table_storage_descriptor=table.sd,
+                table_partition_keys=table.partitionKeys,
+            )
+            total_batches = -(-len(partitions) // self.ADD_PARTITIONS_BATCH_SIZE)
+            for index, start in enumerate(
+                range(0, len(partitions), self.ADD_PARTITIONS_BATCH_SIZE), start=1
+            ):
+                batch = partitions[start : start + self.ADD_PARTITIONS_BATCH_SIZE]
+                logger.info(
+                    f"m=add_partitions_to_table, db={database_name}, "
+                    f"table={table_name}, batch={index}/{total_batches}, "
+                    f"size={len(batch)}, msg=Sending bulk add_partitions_req."
+                )
+                conn.add_partitions_req(
+                    AddPartitionsRequest(
+                        dbName=database_name,
+                        tblName=table_name,
+                        parts=batch,
+                        ifNotExists=True,
+                        needResult=False,
+                    )
+                )
 
     def drop_partitions_from_table(self, database_name, table_name, partition_list):
         """
@@ -179,6 +221,9 @@ class HiveMetastoreService(MetastoreService):
         :param partition_list: partition values
         :type partition_list: List[List[str]]
         """
+        # Intentionally unitary drops: HMS thrift bulk drop only takes partition
+        # NAMES (escaping-sensitive, silent-skip risk with ifExists) and daily
+        # drop volume is ~0.
         with self.client as conn:
             conn.bulk_drop_partitions(database_name, table_name, partition_list)
 

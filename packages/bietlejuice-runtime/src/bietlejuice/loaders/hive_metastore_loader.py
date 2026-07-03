@@ -257,7 +257,7 @@ class HiveMetastoreLoader:
         if dropped_partitions:
             logger.info(
                 f"m=update_table_partitions, db={database_name}, table={table_name}, "
-                f"dropped_partitions={dropped_partitions}, msg=Dropping partitions in Hive Metastore Table."
+                f"partitions_to_drop={len(dropped_partitions)}, sample={dropped_partitions[:3]}, msg=Dropping partitions in Hive Metastore Table."
             )
             self.hive_metastore_service.drop_partitions_from_table(
                 database_name, table_name, dropped_partitions
@@ -265,7 +265,7 @@ class HiveMetastoreLoader:
         if new_partitions:
             logger.info(
                 f"m=update_table_partitions, db={database_name}, table={table_name}, "
-                f"new_partitions={new_partitions}, msg=Adding partitions in Hive Metastore table."
+                f"partitions_to_add={len(new_partitions)}, sample={[p.values for p in new_partitions[:3]]}, msg=Adding partitions in Hive Metastore table."
             )
             self.hive_metastore_service.add_partitions_to_table(
                 database_name, table_name, new_partitions
@@ -398,27 +398,24 @@ class HiveMetastoreLoader:
         :type spark_partition_values: List[List[str]]
         :param metastore_partition_values: the partitions values list from table's data lake metastore
         :type metastore_partition_values: List[List[str]]
-        :return: a list with new partitions and another list with the removed ones
+        :return: a list with new partitions and another list with the removed
+         ones, both in arbitrary order (set difference)
         :rtype: List[str], List[str]
         """
-        removed_partitions = metastore_partition_values[:]
-        added_partitions = []
-        for partition_values in spark_partition_values:
-            if partition_values in metastore_partition_values:
-                try:
-                    removed_partitions.remove(partition_values)
-                except ValueError:
-                    logger.info(
-                        f"m=_map_partition_values_difference, partition={partition_values} msg=Tried to remove a key that has already been removed."
-                    )
-            else:
-                added_partitions.append(
-                    PartitionBuilder(
-                        values=partition_values,
-                        db_name=database_name,
-                        table_name=table_name,
-                    ).build()
-                )
+        spark_values = {tuple(values) for values in spark_partition_values}
+        metastore_values = {tuple(values) for values in metastore_partition_values}
+
+        added_partitions = [
+            PartitionBuilder(
+                values=list(values),
+                db_name=database_name,
+                table_name=table_name,
+            ).build()
+            for values in spark_values - metastore_values
+        ]
+        removed_partitions = [
+            list(values) for values in metastore_values - spark_values
+        ]
 
         return added_partitions, removed_partitions
 

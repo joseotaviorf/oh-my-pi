@@ -331,40 +331,27 @@ class TestHiveMetastoreService:
             mocked_db_obj.build()
         )
 
-    @pytest.mark.parametrize(
-        "database_name, table_name, partition_list",
-        [
-            (
-                "my_db_name",
-                "user",
-                [
-                    PartitionBuilder(
-                        ["2020", "12", "13"], "my_db_name", "user"
-                    ).build(),
-                    PartitionBuilder(
-                        ["2020", "12", "14"], "my_db_name", "user"
-                    ).build(),
-                ],
-            ),
-            (
-                "my_db_name",
-                "house",
-                [
-                    PartitionBuilder(
-                        ["2020", "12", "13"], "my_db_name", "house"
-                    ).build(),
-                    PartitionBuilder(
-                        ["2020", "12", "14"], "my_db_name", "house"
-                    ).build(),
-                ],
-            ),
-        ],
+    @mock.patch(
+        "bietlejuice.services.metastore_services.hive_metastore_service.HiveMetastoreClient"
     )
-    def test_add_partitions_to_table(
-        self, database_name, table_name, partition_list, hive_metastore_service
+    def test_add_partitions_to_table_sends_bulk_request(
+        self, mocked_hive_metastore_client, hive_metastore_service
     ):
         # arrange
+        database_name = "my_db_name"
+        table_name = "user"
+        partition_list = [
+            PartitionBuilder(["2020", "12", "13"], database_name, table_name).build(),
+            PartitionBuilder(["2020", "12", "14"], database_name, table_name).build(),
+            PartitionBuilder(["2020", "12", "15"], database_name, table_name).build(),
+        ]
+        formatted_partitions = [Mock(), Mock(), Mock()]
+        mocked_hive_metastore_client._format_partitions_location.return_value = (
+            formatted_partitions
+        )
+
         mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+        mocked_table = mocked_open_conn.get_table.return_value
 
         # act
         hive_metastore_service.add_partitions_to_table(
@@ -372,9 +359,70 @@ class TestHiveMetastoreService:
         )
 
         # assert
-        mocked_open_conn.add_partitions_if_not_exists.assert_called_once_with(
-            database_name, table_name, partition_list
+        mocked_open_conn.get_table.assert_called_once_with(
+            dbname=database_name, tbl_name=table_name
         )
+        mocked_hive_metastore_client._format_partitions_location.assert_called_once_with(
+            partition_list=partition_list,
+            table_storage_descriptor=mocked_table.sd,
+            table_partition_keys=mocked_table.partitionKeys,
+        )
+        mocked_open_conn.add_partitions_req.assert_called_once()
+        request = mocked_open_conn.add_partitions_req.call_args.args[0]
+        assert request.dbName == database_name
+        assert request.tblName == table_name
+        assert request.parts == formatted_partitions
+        assert request.ifNotExists is True
+        assert request.needResult is False
+        mocked_open_conn.add_partitions_if_not_exists.assert_not_called()
+
+    @mock.patch(
+        "bietlejuice.services.metastore_services.hive_metastore_service.HiveMetastoreClient"
+    )
+    def test_add_partitions_to_table_batches_requests(
+        self, mocked_hive_metastore_client, hive_metastore_service
+    ):
+        # arrange
+        database_name = "my_db_name"
+        table_name = "user"
+        partition_list = [
+            PartitionBuilder(
+                ["2020", "12", str(day)], database_name, table_name
+            ).build()
+            for day in range(1, 6)
+        ]
+        mocked_hive_metastore_client._format_partitions_location.return_value = (
+            partition_list
+        )
+
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+
+        # act
+        with mock.patch.object(HiveMetastoreService, "ADD_PARTITIONS_BATCH_SIZE", 2):
+            hive_metastore_service.add_partitions_to_table(
+                database_name, table_name, partition_list
+            )
+
+        # assert
+        assert mocked_open_conn.add_partitions_req.call_count == 3
+        requests = [
+            call.args[0] for call in mocked_open_conn.add_partitions_req.call_args_list
+        ]
+        assert [len(request.parts) for request in requests] == [2, 2, 1]
+        assert (
+            requests[0].parts + requests[1].parts + requests[2].parts == partition_list
+        )
+        assert all(request.ifNotExists is True for request in requests)
+
+    def test_add_partitions_to_table_empty_list_raises(self, hive_metastore_service):
+        # arrange
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+
+        # act and assert
+        with pytest.raises(ValueError):
+            hive_metastore_service.add_partitions_to_table("my_db_name", "user", [])
+
+        mocked_open_conn.add_partitions_req.assert_not_called()
 
     def test_get_partition_keys(self, hive_metastore_service):
         # arrange

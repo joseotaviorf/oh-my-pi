@@ -3,7 +3,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from hive_metastore_client.builders import ColumnBuilder, PartitionBuilder
+from hive_metastore_client.builders import ColumnBuilder
 
 from bietlejuice.loaders import HiveMetastoreLoader
 
@@ -315,8 +315,8 @@ class TestHiveMetastoreLoader:
         mocked_ms_part_values = Mock()
         hive_metastore_loader.hive_metastore_service.get_partition_values.return_value = mocked_ms_part_values
 
-        added = [1, 2, 3]
-        dropped = [4, 5, 6]
+        added = [Mock(), Mock(), Mock()]
+        dropped = [["2020", "1", "4"], ["2020", "1", "5"], ["2020", "1", "6"]]
         mocked__map_partition_values_difference.return_value = added, dropped
 
         # act
@@ -368,22 +368,15 @@ class TestHiveMetastoreLoader:
         hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_not_called()
 
     @pytest.mark.parametrize(
-        "spark_partition_values, metastore_partition_values, expected_added_partitions, expected_removed_partitions",
+        "spark_partition_values, metastore_partition_values, expected_added_values, expected_removed_partitions",
         [
             (  # Case 1 - added
                 [["2020", "1", "1"], ["2020", "1", "2"]],
                 [],
-                [
-                    PartitionBuilder(
-                        values=["2020", "1", "1"], db_name=mock.ANY, table_name=mock.ANY
-                    ).build(),
-                    PartitionBuilder(
-                        values=["2020", "1", "2"], db_name=mock.ANY, table_name=mock.ANY
-                    ).build(),
-                ],
+                [["2020", "1", "1"], ["2020", "1", "2"]],
                 [],
             ),
-            (  # Case 2 - dropṕed
+            (  # Case 2 - dropped
                 [["2020", "1", "1"]],
                 [["2020", "1", "1"], ["2020", "1", "2"]],
                 [],
@@ -392,14 +385,7 @@ class TestHiveMetastoreLoader:
             (  # Case 3 - added & dropped
                 [["2000", "2", "1"], ["2000", "2", "2"]],
                 [["1999", "10", "11"], ["1999", "10", "12"]],
-                [
-                    PartitionBuilder(
-                        values=["2000", "2", "1"], db_name=mock.ANY, table_name=mock.ANY
-                    ).build(),
-                    PartitionBuilder(
-                        values=["2000", "2", "2"], db_name=mock.ANY, table_name=mock.ANY
-                    ).build(),
-                ],
+                [["2000", "2", "1"], ["2000", "2", "2"]],
                 [["1999", "10", "11"], ["1999", "10", "12"]],
             ),
             (  # Case 4 - metastores synced
@@ -415,7 +401,7 @@ class TestHiveMetastoreLoader:
         self,
         spark_partition_values,
         metastore_partition_values,
-        expected_added_partitions,
+        expected_added_values,
         expected_removed_partitions,
         hive_metastore_loader,
     ):
@@ -428,8 +414,76 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
-        assert added_partitions == expected_added_partitions
-        assert removed_partitions == expected_removed_partitions
+        assert len(added_partitions) == len(expected_added_values)
+        assert {tuple(partition.values) for partition in added_partitions} == {
+            tuple(values) for values in expected_added_values
+        }
+        assert sorted(removed_partitions) == sorted(expected_removed_partitions)
+
+    def test_map_partition_values_difference_disjoint(self, hive_metastore_loader):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        spark_partition_values = [["2026", "7", "1"], ["2026", "7", "2"]]
+        metastore_partition_values = [["2026", "7", "2"], ["2026", "6", "30"]]
+
+        # act
+        (
+            added_partitions,
+            removed_partitions,
+        ) = hive_metastore_loader._map_partition_values_difference(
+            database_name,
+            table_name,
+            spark_partition_values,
+            metastore_partition_values,
+        )
+
+        # assert
+        assert {tuple(partition.values) for partition in added_partitions} == {
+            ("2026", "7", "1")
+        }
+        assert all(
+            partition.dbName == database_name and partition.tableName == table_name
+            for partition in added_partitions
+        )
+        assert sorted(removed_partitions) == [["2026", "6", "30"]]
+
+    def test_map_partition_values_difference_empty_spark_side(
+        self, hive_metastore_loader
+    ):
+        # arrange
+        metastore_partition_values = [["2026", "7", "1"], ["2026", "7", "2"]]
+
+        # act
+        (
+            added_partitions,
+            removed_partitions,
+        ) = hive_metastore_loader._map_partition_values_difference(
+            "<database_name>", "<table_name>", [], metastore_partition_values
+        )
+
+        # assert
+        assert added_partitions == []
+        assert sorted(removed_partitions) == sorted(metastore_partition_values)
+
+    def test_map_partition_values_difference_identical(self, hive_metastore_loader):
+        # arrange
+        partition_values = [["2026", "7", "1"], ["2026", "7", "2"]]
+
+        # act
+        (
+            added_partitions,
+            removed_partitions,
+        ) = hive_metastore_loader._map_partition_values_difference(
+            "<database_name>",
+            "<table_name>",
+            partition_values,
+            list(partition_values),
+        )
+
+        # assert
+        assert added_partitions == []
+        assert removed_partitions == []
 
     @pytest.mark.parametrize(
         "source_pkeys, hive_pkeys, expected_value",
