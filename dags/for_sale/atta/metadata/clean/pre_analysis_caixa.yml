@@ -1,74 +1,98 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_caixa
 domain: For Sale
 columns:
   id_pre_analysis_caixa:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.id
+    - datalake_atta_raw.consulta_score_caixa.id
+    description: Identifier of the Caixa pre-analysis score request record in the atta platform.
   id_registration_user:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.id_usuario
+    - datalake_atta_raw.consulta_score_caixa.id_usuario
+    description: Identifier of the user who registered this Caixa pre-analysis request.
   id_partner:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.idparceiro
+    - datalake_atta_raw.consulta_score_caixa.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_franchise:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.idfranquia
+    - datalake_atta_raw.consulta_score_caixa.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_request:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.idsolicitacao
+    - datalake_atta_raw.consulta_score_caixa.idsolicitacao
+    description: Foreign key to the financing request that triggered this Caixa pre-analysis.
   id_segment:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.id_segmento
+    - datalake_atta_raw.consulta_score_caixa.id_segmento
+    description: Foreign key to the customer segment classification used in Caixa pre-analysis.
   client_cpf:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.cpf
+    - datalake_atta_raw.consulta_score_caixa.cpf
+    description: Brazilian CPF tax identifier for the primary client in the proposal.
   client_cpf_secondary:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.cpf2
+    - datalake_atta_raw.consulta_score_caixa.cpf2
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer in the proposal.
   product:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.produto
+    - datalake_atta_raw.consulta_score_caixa.produto
+    description: Caixa financing product selected for the pre-analysis simulation.
   state:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.uf
+    - datalake_atta_raw.consulta_score_caixa.uf
+    description: Brazilian state (UF) of the property in the Caixa financing request.
   house_type:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.tpimovel
+    - datalake_atta_raw.consulta_score_caixa.tpimovel
+    description: Property type (residential or commercial) financed in the Caixa request.
   r_name:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.r_nome
+    - datalake_atta_raw.consulta_score_caixa.r_nome
+    description: Client name returned by the Caixa scoring response for the pre-analysis.
   r_score:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.r_score
+    - datalake_atta_raw.consulta_score_caixa.r_score
+    description: Credit score returned by Caixa for the client in the pre-analysis response.
   error:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.erro
+    - datalake_atta_raw.consulta_score_caixa.erro
+    description: Error message returned when partner pre-analysis or submission failed.
   pre_analysis_status:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.status
+    - datalake_atta_raw.consulta_score_caixa.status
+    description: Current status of the Caixa pre-analysis request such as pending, approved, or rejected.
   deadline:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.prazo
+    - datalake_atta_raw.consulta_score_caixa.prazo
+    description: Due date by which the subtask or legal action must be completed.
   ltv_value:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.vl_ltv
+    - datalake_atta_raw.consulta_score_caixa.vl_ltv
+    description: Loan-to-value ratio of the financing relative to the property value at Caixa.
   fee_value:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.vl_taxa
+    - datalake_atta_raw.consulta_score_caixa.vl_taxa
+    description: Interest rate quoted by Caixa for the financing in the pre-analysis.
   house_value:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.vlrimovel
+    - datalake_atta_raw.consulta_score_caixa.vlrimovel
+    description: Appraised property value used as the basis for the Caixa financing.
   down_payment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.vlrentrada
+    - datalake_atta_raw.consulta_score_caixa.vlrentrada
+    description: Buyer down payment amount committed from own resources.
   financing_value:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.vlrfinanciado
+    - datalake_atta_raw.consulta_score_caixa.vlrfinanciado
+    description: Principal financing amount requested excluding down payment and fees.
   ts_returned:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.data_retorno
+    - datalake_atta_raw.consulta_score_caixa.data_retorno
+    description: Date when Caixa returned the pre-analysis scoring response.
   ts_registration:
     lineage:
-      - datalake_atta_raw.consulta_score_caixa.data_solicitacao
+    - datalake_atta_raw.consulta_score_caixa.data_solicitacao
+    description: Date when the Caixa pre-analysis request was submitted.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis caixa sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis caixa record with standardized names and types in datalake_atta_clean.

@@ -1,83 +1,110 @@
----
 database_name: datalake_atta_clean
 table_name: proposal
 domain: For Sale
 columns:
   id_proposal:
     lineage:
-      - datalake_atta_raw.proposta.id
+    - datalake_atta_raw.proposta.id
+    description: Foreign key to the financing or sale proposal in the Atta platform.
   id_client:
     lineage:
-      - datalake_atta_raw.proposta.idcliente
+    - datalake_atta_raw.proposta.idcliente
+    description: Foreign key to the client master record in Atta or Sales Flow.
   id_consultant:
     lineage:
-      - datalake_atta_raw.proposta.idconsultor
+    - datalake_atta_raw.proposta.idconsultor
+    description: Foreign key to the consultant handling the financing proposal.
   id_pre_analysis:
     lineage:
-      - datalake_atta_raw.proposta.idcstimob
+    - datalake_atta_raw.proposta.idcstimob
+    description: Foreign key to the pre-analysis (credit score consultation) tied to this proposal.
   id_credit_analyst:
     lineage:
-      - datalake_atta_raw.proposta.idanalistacredito
+    - datalake_atta_raw.proposta.idanalistacredito
+    description: Foreign key to the credit analyst assigned to evaluate the proposal.
   id_juridical_analyst:
     lineage:
-      - datalake_atta_raw.proposta.idanalistajuridico
+    - datalake_atta_raw.proposta.idanalistajuridico
+    description: Foreign key to the legal analyst responsible for the proposal review.
   id_emission_provider:
     lineage:
-      - datalake_atta_raw.proposta.idfornecemissao
+    - datalake_atta_raw.proposta.idfornecemissao
+    description: Foreign key to the provider responsible for issuing the financing contract.
   id_franchise:
     lineage:
-      - datalake_atta_raw.proposta.idfranquia
+    - datalake_atta_raw.proposta.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_partner:
     lineage:
-      - datalake_atta_raw.proposta.idparceiro
+    - datalake_atta_raw.proposta.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_product:
     lineage:
-      - datalake_atta_raw.proposta.idproduto
+    - datalake_atta_raw.proposta.idproduto
+    description: Foreign key to the financing product chosen for this proposal.
   id_offer:
     lineage:
-      - datalake_atta_raw.proposta.idpropostaext
+    - datalake_atta_raw.proposta.idpropostaext
+    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
   id_proposal_product:
     lineage:
-      - datalake_atta_raw.proposta.idpropostaprd
+    - datalake_atta_raw.proposta.idpropostaprd
+    description: Foreign key to the product line attached to the financing proposal.
   id_multibank_typist_user:
     lineage:
-      - datalake_atta_raw.proposta.idusudigitador
+    - datalake_atta_raw.proposta.idusudigitador
+    description: Foreign key to the user who keyed the proposal into the multibank system.
   id_proposal_situation:
     lineage:
-      - datalake_atta_raw.proposta.situacao
+    - datalake_atta_raw.proposta.situacao
+    description: Code for the current situation of the financing proposal in its lifecycle.
   id_proposal_status:
     lineage:
-      - datalake_atta_raw.proposta.status
+    - datalake_atta_raw.proposta.status
+    description: Code for the current processing status of the financing proposal.
   created_by:
     lineage:
-      - datalake_atta_raw.proposta.CreatedBy
+    - datalake_atta_raw.proposta.CreatedBy
+    description: User or system that created the proposal record.
   client_cpf:
     lineage:
-      - datalake_atta_raw.proposta.cpf
+    - datalake_atta_raw.proposta.cpf
+    description: Brazilian CPF tax identifier for the primary client in the proposal.
   client_name:
     lineage:
-      - datalake_atta_raw.proposta.nome
+    - datalake_atta_raw.proposta.nome
+    description: Full name of the buyer or client in the financing proposal record.
   financing_value:
     lineage:
-      - datalake_atta_raw.proposta.valor
+    - datalake_atta_raw.proposta.valor
+    description: Principal financing amount requested excluding down payment and fees.
   status_translation:
     lineage:
-      - datalake_atta_raw.proposta.StatusTranslation
+    - datalake_atta_raw.proposta.StatusTranslation
+    description: Human-readable label describing the proposal status code.
   chosen_by:
     lineage:
-      - datalake_atta_raw.proposta.ChosenBy
+    - datalake_atta_raw.proposta.ChosenBy
+    description: User who selected this proposal as the chosen financing option.
   cancellation_reason:
     lineage:
-      - datalake_atta_raw.proposta.MotivoCancelamento
+    - datalake_atta_raw.proposta.MotivoCancelamento
+    description: Reason recorded for cancelling the financing proposal.
   ts_registration:
     lineage:
-      - datalake_atta_raw.proposta.dtentrada
+    - datalake_atta_raw.proposta.dtentrada
+    description: Date when the proposal entered the financing pipeline.
   ts_financing_ended:
     lineage:
-      - datalake_atta_raw.proposta.dtfinalizacao
+    - datalake_atta_raw.proposta.dtfinalizacao
+    description: Date when the financing proposal was finalized or closed.
   ts_last_updated:
     lineage:
-      - datalake_atta_raw.proposta.dtultatu
+    - datalake_atta_raw.proposta.dtultatu
+    description: Date of the most recent update to the proposal record.
   ts_chosen:
     lineage:
-      - datalake_atta_raw.proposta.ChosenAt
+    - datalake_atta_raw.proposta.ChosenAt
+    description: Timestamp when this proposal was selected as the chosen financing option.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of proposal sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per proposal record with standardized names and types in datalake_atta_clean.

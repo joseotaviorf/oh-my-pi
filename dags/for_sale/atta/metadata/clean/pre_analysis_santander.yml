@@ -1,116 +1,154 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_santander
 domain: For Sale
 columns:
   id_pre_analysis_santander:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.id
+    - datalake_atta_raw.consulta_score_santander.id
+    description: Identifier of the Santander pre-analysis score request record in the atta platform.
   id_registration_user:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.id_usuario
+    - datalake_atta_raw.consulta_score_santander.id_usuario
+    description: Identifier of the user who registered this Santander pre-analysis request.
   id_return_user:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.id_usuarioretorno
+    - datalake_atta_raw.consulta_score_santander.id_usuarioretorno
+    description: Identifier of the user who recorded the Santander pre-analysis return response.
   id_partner:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.idparceiro
+    - datalake_atta_raw.consulta_score_santander.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_franchise:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.idfranquia
+    - datalake_atta_raw.consulta_score_santander.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_request:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.idsolicitacao
+    - datalake_atta_raw.consulta_score_santander.idsolicitacao
+    description: Foreign key to the financing request that triggered this Santander pre-analysis.
   id_segment:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.id_segmento
+    - datalake_atta_raw.consulta_score_santander.id_segmento
+    description: Foreign key to the customer segment classification used in Santander pre-analysis.
   client_cpf:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.cpf
+    - datalake_atta_raw.consulta_score_santander.cpf
+    description: Brazilian CPF tax identifier for the primary client in the proposal.
   client_cpf_secondary:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.cpf2
+    - datalake_atta_raw.consulta_score_santander.cpf2
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer in the proposal.
   client_cpf_masked:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.cpf_mascara
+    - datalake_atta_raw.consulta_score_santander.cpf_mascara
+    description: Partially masked client CPF used for display in the Santander pre-analysis.
   requester_email:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.email_solicitante
+    - datalake_atta_raw.consulta_score_santander.email_solicitante
+    description: Email address of the requester who submitted the Santander pre-analysis.
   state:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.uf
+    - datalake_atta_raw.consulta_score_santander.uf
+    description: Brazilian state (UF) of the property in the Santander financing request.
   house_type:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.tpimovel
+    - datalake_atta_raw.consulta_score_santander.tpimovel
+    description: Property type (residential or commercial) financed in the Santander request.
   operation_type:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.tipo_operacao
+    - datalake_atta_raw.consulta_score_santander.tipo_operacao
+    description: Financing operation type such as purchase, refinance, or construction.
   r_name:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.r_nome
+    - datalake_atta_raw.consulta_score_santander.r_nome
+    description: Client name returned by the Santander scoring response for the pre-analysis.
   r_score:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.r_score
+    - datalake_atta_raw.consulta_score_santander.r_score
+    description: Credit score returned by Santander for the client in the pre-analysis.
   r_origin:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.r_origem
+    - datalake_atta_raw.consulta_score_santander.r_origem
+    description: Origin or source of the credit score returned by Santander.
   r_age:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.r_idade
+    - datalake_atta_raw.consulta_score_santander.r_idade
+    description: Client age returned by Santander and used as a scoring input.
   error:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.erro
+    - datalake_atta_raw.consulta_score_santander.erro
+    description: Error message returned when partner pre-analysis or submission failed.
   pre_analysis_status:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.status
+    - datalake_atta_raw.consulta_score_santander.status
+    description: Current status of the Santander pre-analysis request such as pending, approved, or rejected.
   deadline:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.prazo
+    - datalake_atta_raw.consulta_score_santander.prazo
+    description: Due date by which the subtask or legal action must be completed.
   ltv_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.vl_ltv
+    - datalake_atta_raw.consulta_score_santander.vl_ltv
+    description: Loan-to-value ratio of the financing relative to the property value at Santander.
   fee_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.vl_taxa
+    - datalake_atta_raw.consulta_score_santander.vl_taxa
+    description: Interest rate quoted by Santander for the financing in the pre-analysis.
   house_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.vlrimovel
+    - datalake_atta_raw.consulta_score_santander.vlrimovel
+    description: Appraised property value used as the basis for the Santander financing.
   down_payment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.vlrentrada
+    - datalake_atta_raw.consulta_score_santander.vlrentrada
+    description: Buyer down payment amount committed from own resources.
   financing_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.vlrfinanciado
+    - datalake_atta_raw.consulta_score_santander.vlrfinanciado
+    description: Principal financing amount requested excluding down payment and fees.
   r_approved_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.r_vlr_aprovado
+    - datalake_atta_raw.consulta_score_santander.r_vlr_aprovado
+    description: Financing amount approved by Santander in the pre-analysis response.
   s_first_installment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_priparc
+    - datalake_atta_raw.consulta_score_santander.s_priparc
+    description: First installment amount in the Santander financing simulation.
   s_last_installment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_ultparc
+    - datalake_atta_raw.consulta_score_santander.s_ultparc
+    description: Last installment amount in the Santander financing simulation.
   s_ribti_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_vlribti
+    - datalake_atta_raw.consulta_score_santander.s_vlribti
+    description: IBTI charge amount included in the Santander financing simulation.
   s_tax_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_vlrtarifa
+    - datalake_atta_raw.consulta_score_santander.s_vlrtarifa
+    description: Service tariff amount charged in the Santander financing simulation.
   s_iof_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_vlriof
+    - datalake_atta_raw.consulta_score_santander.s_vlriof
+    description: IOF tax amount charged in the Santander financing simulation.
   s_min_income_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_vlrrendamin
+    - datalake_atta_raw.consulta_score_santander.s_vlrrendamin
+    description: Minimum income required to qualify for the Santander financing simulation.
   s_fee_value:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.s_taxa
+    - datalake_atta_raw.consulta_score_santander.s_taxa
+    description: Interest rate applied in the Santander financing simulation.
   is_read:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.lido
+    - datalake_atta_raw.consulta_score_santander.lido
+    description: Flag indicating whether the Santander pre-analysis return has been read by an operator.
   ts_returned:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.data_retorno
+    - datalake_atta_raw.consulta_score_santander.data_retorno
+    description: Date when Santander returned the pre-analysis scoring response.
   ts_registration:
     lineage:
-      - datalake_atta_raw.consulta_score_santander.data_solicitacao
+    - datalake_atta_raw.consulta_score_santander.data_solicitacao
+    description: Date when the Santander pre-analysis request was submitted.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis santander sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis santander record with standardized names and types in datalake_atta_clean.

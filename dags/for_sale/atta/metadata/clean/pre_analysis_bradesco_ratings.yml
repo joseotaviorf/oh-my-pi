@@ -1,41 +1,54 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_bradesco_ratings
 domain: For Sale
 columns:
   id_ratings_bradesco:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.id
+    - datalake_atta_raw.consulta_score_bradesco_ratings.id
+    description: Identifier of the Bradesco credit-rating parameter row in the pre-analysis scoring rules.
   id_user_started:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.idusuarioini
+    - datalake_atta_raw.consulta_score_bradesco_ratings.idusuarioini
+    description: Identifier of the user who opened the validity period for this Bradesco rating rule.
   id_user_ended:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.idusuariofim
+    - datalake_atta_raw.consulta_score_bradesco_ratings.idusuariofim
+    description: Identifier of the user who closed the validity period for this Bradesco rating rule.
   rating:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.rating
+    - datalake_atta_raw.consulta_score_bradesco_ratings.rating
+    description: Bradesco credit-rating bucket that the approval and income-commitment limits below apply to.
   apr_max_res_percentage:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.percaprmaxres
+    - datalake_atta_raw.consulta_score_bradesco_ratings.percaprmaxres
+    description: Maximum residential financing approval percentage allowed for this Bradesco rating bucket.
   apr_auto_res_percentage:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.peraprautores
+    - datalake_atta_raw.consulta_score_bradesco_ratings.peraprautores
+    description: Residential financing percentage eligible for automatic approval under this Bradesco rating bucket.
   apr_max_com_percentage:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.percaprmaxcom
+    - datalake_atta_raw.consulta_score_bradesco_ratings.percaprmaxcom
+    description: Maximum commercial financing approval percentage allowed for this Bradesco rating bucket.
   apr_auto_com_percentage:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.peraprautocom
+    - datalake_atta_raw.consulta_score_bradesco_ratings.peraprautocom
+    description: Commercial financing percentage eligible for automatic approval under this Bradesco rating bucket.
   cpmr_income_res_percentage:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.percpmrrendares
+    - datalake_atta_raw.consulta_score_bradesco_ratings.percpmrrendares
+    description: Maximum share of income committable to the residential installment for this Bradesco rating bucket.
   cpmr_income_com_percentage:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.percpmrrendacom
+    - datalake_atta_raw.consulta_score_bradesco_ratings.percpmrrendacom
+    description: Maximum share of income committable to the commercial installment for this Bradesco rating bucket.
   ts_started:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.dtinivigencia
+    - datalake_atta_raw.consulta_score_bradesco_ratings.dtinivigencia
+    description: Start of the validity period during which this Bradesco rating rule is effective.
   ts_ended:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_ratings.dtfimvigencia
+    - datalake_atta_raw.consulta_score_bradesco_ratings.dtfimvigencia
+    description: End of the validity period after which this Bradesco rating rule no longer applies.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis bradesco ratings sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis bradesco ratings record with standardized names and types in datalake_atta_clean.

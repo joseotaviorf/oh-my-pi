@@ -1,20 +1,26 @@
----
 database_name: datalake_atta_clean
 table_name: product_info
 domain: For Sale
 columns:
   id_product:
     lineage:
-      - datalake_atta_raw.produto.id
+    - datalake_atta_raw.produto.id
+    description: Identifier of the financing product offered in the atta platform.
   product_name:
     lineage:
-      - datalake_atta_raw.produto.descricao
+    - datalake_atta_raw.produto.descricao
+    description: Descriptive name of the financing product.
   profile_doc:
     lineage:
-      - datalake_atta_raw.produto.perfildoc
+    - datalake_atta_raw.produto.perfildoc
+    description: Document profile defining the paperwork required for this financing product.
   is_active:
     lineage:
-      - datalake_atta_raw.produto.ativo
+    - datalake_atta_raw.produto.ativo
+    description: Whether the party or record remains active in the current sales flow.
   ts_registration:
     lineage:
-      - datalake_atta_raw.produto.dtcadastro
+    - datalake_atta_raw.produto.dtcadastro
+    description: Date when the financing product was registered in the source system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of product info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per product info record with standardized names and types in datalake_atta_clean.

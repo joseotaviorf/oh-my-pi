@@ -1,14 +1,18 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_bradesco_params
 domain: For Sale
 columns:
   id_pre_analysis_parameters:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_params.id
+    - datalake_atta_raw.consulta_score_bradesco_params.id
+    description: Identifier of the Bradesco pre-analysis parameter record sourced from consulta_score_bradesco_params.
   parameter:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_params.parametro
+    - datalake_atta_raw.consulta_score_bradesco_params.parametro
+    description: Configuration parameter name used in partner pre-analysis rule evaluation.
   parameter_value:
     lineage:
-      - datalake_atta_raw.consulta_score_bradesco_params.valor
+    - datalake_atta_raw.consulta_score_bradesco_params.valor
+    description: Configured value for the pre-analysis parameter at evaluation time.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis bradesco params sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis bradesco params record with standardized names and types in datalake_atta_clean.

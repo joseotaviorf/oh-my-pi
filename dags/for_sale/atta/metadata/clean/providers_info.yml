@@ -1,20 +1,26 @@
----
 database_name: datalake_atta_clean
 table_name: providers_info
 domain: For Sale
 columns:
   id_provider:
     lineage:
-      - datalake_atta_raw.fornecedores.id
+    - datalake_atta_raw.fornecedores.id
+    description: Identifier of the service provider (fornecedor) in the atta platform.
   provider_name:
     lineage:
-      - datalake_atta_raw.fornecedores.nome
+    - datalake_atta_raw.fornecedores.nome
+    description: Name of the service provider.
   provider_description:
     lineage:
-      - datalake_atta_raw.fornecedores.descricao
+    - datalake_atta_raw.fornecedores.descricao
+    description: Description of the service provider and the services it supplies.
   is_active:
     lineage:
-      - datalake_atta_raw.fornecedores.ativo
+    - datalake_atta_raw.fornecedores.ativo
+    description: Whether the party or record remains active in the current sales flow.
   ts_created:
     lineage:
-      - datalake_atta_raw.fornecedores.dtcadastro
+    - datalake_atta_raw.fornecedores.dtcadastro
+    description: Timestamp when the row was first created in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of providers info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per providers info record with standardized names and types in datalake_atta_clean.

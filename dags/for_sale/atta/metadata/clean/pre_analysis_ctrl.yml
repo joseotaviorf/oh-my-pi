@@ -1,17 +1,22 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_ctrl
 domain: For Sale
 columns:
   id_request:
     lineage:
-      - datalake_atta_raw.consulta_score_ctrl.idsolicitacao
+    - datalake_atta_raw.consulta_score_ctrl.idsolicitacao
+    description: Foreign key to the pre-analysis request controlled by this row.
   id_supplier:
     lineage:
-      - datalake_atta_raw.consulta_score_ctrl.idfornecedor
+    - datalake_atta_raw.consulta_score_ctrl.idfornecedor
+    description: Foreign key to the score-provider supplier consulted for this pre-analysis.
   id_check:
     lineage:
-      - datalake_atta_raw.consulta_score_ctrl.idconsulta
+    - datalake_atta_raw.consulta_score_ctrl.idconsulta
+    description: Foreign key to the specific score query (consulta) executed for the proposal.
   id_proposal:
     lineage:
-      - datalake_atta_raw.consulta_score_ctrl.idpropostaprd
+    - datalake_atta_raw.consulta_score_ctrl.idpropostaprd
+    description: Foreign key to the financing or sale proposal in the Atta platform.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis ctrl sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis ctrl record with standardized names and types in datalake_atta_clean.

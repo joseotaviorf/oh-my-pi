@@ -1,134 +1,178 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_itau
 domain: For Sale
 columns:
   id_pre_analysis_itau:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.id
+    - datalake_atta_raw.consulta_score_itau.id
+    description: Identifier of the Itau pre-analysis score request record in the atta platform.
   id_registration_user:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.id_usuario
+    - datalake_atta_raw.consulta_score_itau.id_usuario
+    description: Identifier of the user who registered this Itau pre-analysis request.
   id_return_user:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.id_usuarioretorno
+    - datalake_atta_raw.consulta_score_itau.id_usuarioretorno
+    description: Identifier of the user who recorded the Itau pre-analysis return response.
   id_partner:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.idparceiro
+    - datalake_atta_raw.consulta_score_itau.idparceiro
+    description: Foreign key to the financing or brokerage partner organization.
   id_franchise:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.idfranquia
+    - datalake_atta_raw.consulta_score_itau.idfranquia
+    description: Foreign key to the Casa Mineira franchise unit serving the client.
   id_request:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.idsolicitacao
+    - datalake_atta_raw.consulta_score_itau.idsolicitacao
+    description: Foreign key to the financing request that triggered this Itau pre-analysis.
   id_segment:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.id_segmento
+    - datalake_atta_raw.consulta_score_itau.id_segmento
+    description: Foreign key to the customer segment classification used in Itau pre-analysis.
   client_cpf:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.cpf
+    - datalake_atta_raw.consulta_score_itau.cpf
+    description: Brazilian CPF tax identifier for the primary client in the proposal.
   client_cpf_secondary:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.cpf2
+    - datalake_atta_raw.consulta_score_itau.cpf2
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer in the proposal.
   client_cpf_masked:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.cpf_mascara
+    - datalake_atta_raw.consulta_score_itau.cpf_mascara
+    description: Partially masked client CPF used for display in the Itau pre-analysis.
   requester_email:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.email_solicitante
+    - datalake_atta_raw.consulta_score_itau.email_solicitante
+    description: Email address of the requester who submitted the Itau pre-analysis.
   product_sac_plus:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.produtosacplus
+    - datalake_atta_raw.consulta_score_itau.produtosacplus
+    description: Indicator of the Itau SAC Plus amortization product offered in the pre-analysis.
   state:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.uf
+    - datalake_atta_raw.consulta_score_itau.uf
+    description: Brazilian state (UF) of the property in the Itau financing request.
   house_type:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.tpimovel
+    - datalake_atta_raw.consulta_score_itau.tpimovel
+    description: Property type (residential or commercial) financed in the Itau request.
   operation_type:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.tipo_operacao
+    - datalake_atta_raw.consulta_score_itau.tipo_operacao
+    description: Financing operation type such as purchase, refinance, or construction.
   r_name:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_nome
+    - datalake_atta_raw.consulta_score_itau.r_nome
+    description: Client name returned by the Itau scoring response for the pre-analysis.
   r_score:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_score
+    - datalake_atta_raw.consulta_score_itau.r_score
+    description: Primary credit score returned by Itau for the client in the pre-analysis.
   r_score2:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_score2
+    - datalake_atta_raw.consulta_score_itau.r_score2
+    description: Secondary credit score component returned by Itau in the pre-analysis.
   r_score3:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_score3
+    - datalake_atta_raw.consulta_score_itau.r_score3
+    description: Tertiary credit score component returned by Itau in the pre-analysis.
   r_origin:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_origem
+    - datalake_atta_raw.consulta_score_itau.r_origem
+    description: Origin or source of the credit score returned by Itau.
   r_age:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_idade
+    - datalake_atta_raw.consulta_score_itau.r_idade
+    description: Client age returned by Itau and used as a scoring input.
   r_bhv:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_bhv
+    - datalake_atta_raw.consulta_score_itau.r_bhv
+    description: Primary behavior (behavioral) score returned by Itau in the pre-analysis.
   r_bhv2:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_bhv2
+    - datalake_atta_raw.consulta_score_itau.r_bhv2
+    description: Secondary behavior score component returned by Itau in the pre-analysis.
   r_bhv3:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_bhv3
+    - datalake_atta_raw.consulta_score_itau.r_bhv3
+    description: Tertiary behavior score component returned by Itau in the pre-analysis.
   error:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.erro
+    - datalake_atta_raw.consulta_score_itau.erro
+    description: Error message returned when partner pre-analysis or submission failed.
   pre_analysis_status:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.status
+    - datalake_atta_raw.consulta_score_itau.status
+    description: Current status of the Itau pre-analysis request such as pending, approved, or rejected.
   deadline:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.prazo
+    - datalake_atta_raw.consulta_score_itau.prazo
+    description: Due date by which the subtask or legal action must be completed.
   ltv_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.vl_ltv
+    - datalake_atta_raw.consulta_score_itau.vl_ltv
+    description: Loan-to-value ratio of the financing relative to the property value at Itau.
   fee_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.vl_taxa
+    - datalake_atta_raw.consulta_score_itau.vl_taxa
+    description: Interest rate quoted by Itau for the financing in the pre-analysis.
   house_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.vlrimovel
+    - datalake_atta_raw.consulta_score_itau.vlrimovel
+    description: Appraised property value used as the basis for the Itau financing.
   down_payment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.vlrentrada
+    - datalake_atta_raw.consulta_score_itau.vlrentrada
+    description: Buyer down payment amount committed from own resources.
   financing_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.vlrfinanciado
+    - datalake_atta_raw.consulta_score_itau.vlrfinanciado
+    description: Principal financing amount requested excluding down payment and fees.
   r_approved_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.r_vlr_aprovado
+    - datalake_atta_raw.consulta_score_itau.r_vlr_aprovado
+    description: Financing amount approved by Itau in the pre-analysis response.
   s_first_installment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_priparc
+    - datalake_atta_raw.consulta_score_itau.s_priparc
+    description: First installment amount in the Itau financing simulation.
   s_last_installment_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_ultparc
+    - datalake_atta_raw.consulta_score_itau.s_ultparc
+    description: Last installment amount in the Itau financing simulation.
   s_ribti_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_vlribti
+    - datalake_atta_raw.consulta_score_itau.s_vlribti
+    description: IBTI charge amount included in the Itau financing simulation.
   s_tax_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_vlrtarifa
+    - datalake_atta_raw.consulta_score_itau.s_vlrtarifa
+    description: Service tariff amount charged in the Itau financing simulation.
   s_iof_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_vlriof
+    - datalake_atta_raw.consulta_score_itau.s_vlriof
+    description: IOF tax amount charged in the Itau financing simulation.
   s_min_income_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_vlrrendamin
+    - datalake_atta_raw.consulta_score_itau.s_vlrrendamin
+    description: Minimum income required to qualify for the Itau financing simulation.
   s_fee_value:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.s_taxa
+    - datalake_atta_raw.consulta_score_itau.s_taxa
+    description: Interest rate applied in the Itau financing simulation.
   is_read:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.lido
+    - datalake_atta_raw.consulta_score_itau.lido
+    description: Flag indicating whether the Itau pre-analysis return has been read by an operator.
   ts_returned:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.data_retorno
+    - datalake_atta_raw.consulta_score_itau.data_retorno
+    description: Date when Itau returned the pre-analysis scoring response.
   ts_registration:
     lineage:
-      - datalake_atta_raw.consulta_score_itau.data_solicitacao
+    - datalake_atta_raw.consulta_score_itau.data_solicitacao
+    description: Date when the Itau pre-analysis request was submitted.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis itau sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis itau record with standardized names and types in datalake_atta_clean.

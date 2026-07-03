@@ -1,17 +1,22 @@
----
 database_name: datalake_atta_clean
 table_name: pre_analysis_santander_matrix
 domain: For Sale
 columns:
   id_pre_analysis_matrix:
     lineage:
-      - datalake_atta_raw.consulta_score_santander_matriz_decisao.id
+    - datalake_atta_raw.consulta_score_santander_matriz_decisao.id
+    description: Identifier of the row in the Santander decision matrix mapping equivalent ratings across banks.
   itau:
     lineage:
-      - datalake_atta_raw.consulta_score_santander_matriz_decisao.itau
+    - datalake_atta_raw.consulta_score_santander_matriz_decisao.itau
+    description: Equivalent Itau rating value mapped in this Santander decision-matrix row.
   bradesco:
     lineage:
-      - datalake_atta_raw.consulta_score_santander_matriz_decisao.bradesco
+    - datalake_atta_raw.consulta_score_santander_matriz_decisao.bradesco
+    description: Equivalent Bradesco rating value mapped in this Santander decision-matrix row.
   santander:
     lineage:
-      - datalake_atta_raw.consulta_score_santander_matriz_decisao.santander
+    - datalake_atta_raw.consulta_score_santander_matriz_decisao.santander
+    description: Equivalent Santander rating value mapped in this Santander decision-matrix row.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of pre analysis santander matrix sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis santander matrix record with standardized names and types in datalake_atta_clean.

@@ -1,35 +1,46 @@
----
 database_name: datalake_atta_clean
 table_name: proposal_notes
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_atta_raw.proposta_observacao.id
+    - datalake_atta_raw.proposta_observacao.id
+    description: Surrogate primary key of the proposal notes row in the source system.
   id_proposal:
     lineage:
-      - datalake_atta_raw.proposta_observacao.idproposta
+    - datalake_atta_raw.proposta_observacao.idproposta
+    description: Foreign key to the financing or sale proposal in the Atta platform.
   id_user:
     lineage:
-      - datalake_atta_raw.proposta_observacao.idusuario
+    - datalake_atta_raw.proposta_observacao.idusuario
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_shipping_area:
     lineage:
-      - datalake_atta_raw.proposta_observacao.idobsareaenvio
+    - datalake_atta_raw.proposta_observacao.idobsareaenvio
+    description: Foreign key to the sending-area observation category for this proposal note.
   id_document:
     lineage:
-      - datalake_atta_raw.proposta_observacao.iddocumento
+    - datalake_atta_raw.proposta_observacao.iddocumento
+    description: Foreign key to the document type registry for closing paperwork.
   proposal_control:
     lineage:
-      - datalake_atta_raw.proposta_observacao.ctrlproposta
+    - datalake_atta_raw.proposta_observacao.ctrlproposta
+    description: Control indicator linking this note to the proposal-level tracking flow.
   control_notes:
     lineage:
-      - datalake_atta_raw.proposta_observacao.ctrlobs
+    - datalake_atta_raw.proposta_observacao.ctrlobs
+    description: Control indicator classifying the observation within the proposal note workflow.
   notes:
     lineage:
-      - datalake_atta_raw.proposta_observacao.observacao
+    - datalake_atta_raw.proposta_observacao.observacao
+    description: Free-text observation or comment recorded against the proposal.
   ts_notes:
     lineage:
-      - datalake_atta_raw.proposta_observacao.dtobs
+    - datalake_atta_raw.proposta_observacao.dtobs
+    description: Date when the observation was recorded on the proposal.
   is_internal:
     lineage:
-      - datalake_atta_raw.proposta_observacao.interna
+    - datalake_atta_raw.proposta_observacao.interna
+    description: Flag indicating whether the note is internal-only and not visible to the client.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of proposal notes sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per proposal notes record with standardized names and types in datalake_atta_clean.
