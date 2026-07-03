@@ -6,7 +6,7 @@ cluster:
     driver_node_type_id: r7g.xlarge
 validation:
   cluster:
-    type: emr_7_12_consolidation_l_memory_cluster
+    type: emr_7_12_consolidation_xl_memory_cluster
     custom_configurations:
       core_nodes:
         instance_count: 2
@@ -14,3 +14,7 @@ validation:
         instance_count: 2
       aws_attributes:
         ebs_volume_size: 200
+      spark_conf:
+        spark.executor.cores: '2'
+        spark.sql.shuffle.partitions: '800'
+        spark.dynamicAllocation.maxExecutors: '4'

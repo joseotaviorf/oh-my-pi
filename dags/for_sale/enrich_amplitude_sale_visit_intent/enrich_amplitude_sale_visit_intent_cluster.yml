@@ -8,7 +8,7 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 validation:
   cluster:
-    type: emr_7_12_consolidation_m_memory_cluster
+    type: emr_7_12_consolidation_l_memory_cluster
     custom_configurations:
       core_nodes:
         instance_count: 2
@@ -16,3 +16,7 @@ validation:
         instance_count: 1
       aws_attributes:
         ebs_volume_size: 200
+      spark_conf:
+        spark.executor.cores: '2'
+        spark.sql.shuffle.partitions: '400'
+        spark.dynamicAllocation.maxExecutors: '3'
