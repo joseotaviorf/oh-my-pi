@@ -1,0 +1,70 @@
+database_name: datalake_google_admin
+table_name: cloud_identity_devices
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: |
+  Current-state Google Cloud Identity managed endpoints: latest ingest partition within the Airflow
+  batch window and one row per device (not a historical stack of partitions). Covers Windows, macOS,
+  Linux, Chrome OS, iOS and Android devices. Derived from clean by keeping MAX(year, month, day) in
+  scope and deduplicating by device with QUALIFY.
+columns:
+  id_device:
+    description: Unique device identifier (UUID) assigned by Google Cloud Identity, stable across syncs.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.id_device
+  ds_serial_number:
+    description: Hardware serial number assigned by the manufacturer.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ds_serial_number
+  nm_hostname:
+    description: Network hostname of the device as reported to Google Cloud Identity.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.nm_hostname
+  nm_model:
+    description: Device model name or identifier as reported by the operating system.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.nm_model
+  nm_manufacturer:
+    description: Device manufacturer name as reported by the operating system.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.nm_manufacturer
+  ds_device_type:
+    description: Operating system family (WINDOWS, MAC_OS, LINUX, ANDROID, IOS, CHROME_OS, DEVICE_TYPE_UNSPECIFIED).
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ds_device_type
+  ds_os_version:
+    description: Full operating system version string as reported by the device.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ds_os_version
+  ds_owner_type:
+    description: Device ownership classification (BYOD for personally-owned, COMPANY for corporate-owned).
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ds_owner_type
+  ds_encryption_state:
+    description: Disk encryption state (ENCRYPTED, UNENCRYPTED, ENCRYPTION_STATE_UNSPECIFIED).
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ds_encryption_state
+  ds_user_email:
+    description: Email of the primary Google Workspace user assigned to the device (most recent sign-in), from the Cloud Identity deviceUsers mapping. Null when no user assignment exists.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_device_users.ds_user_email
+  ts_created:
+    description: Timestamp when the device was first registered in Google Cloud Identity.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ts_created
+  ts_last_sync:
+    description: Timestamp of the most recent synchronization between the device and Google Cloud Identity.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.ts_last_sync
+  year:
+    description: Year of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.year
+  month:
+    description: Month of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.month
+  day:
+    description: Day of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_google_admin_clean.cloud_identity_devices.day

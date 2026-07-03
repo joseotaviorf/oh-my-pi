@@ -1,0 +1,146 @@
+database_name: datalake_google_admin
+table_name: mobile_devices
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: |
+  Current-state Google Admin SDK managed mobile devices: latest ingest partition within the Airflow
+  batch window and one row per device (not a historical stack of partitions). Covers iOS and Android
+  devices registered via the Admin SDK Directory API. Derived from clean by keeping MAX(year, month, day)
+  in scope and deduplicating by resource ID with QUALIFY.
+columns:
+  id_resource:
+    description: Unique internal Google resource identifier for the mobile device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.id_resource
+  ds_device_id:
+    description: Hardware device identifier (IMEI or MEID) as returned by the Google Admin API.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_device_id
+  ds_serial_number:
+    description: Device serial number assigned by the manufacturer.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_serial_number
+  ds_hardware_id:
+    description: Additional hardware identifier (IMEI/MEID variant) stored by Google Admin.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_hardware_id
+  ds_imei:
+    description: International Mobile Equipment Identity number for GSM devices.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_imei
+  ds_meid:
+    description: Mobile Equipment Identifier for CDMA devices.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_meid
+  ds_wifi_mac_address:
+    description: Wi-Fi MAC address of the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_wifi_mac_address
+  ds_device_type:
+    description: Device type as classified by Google (ANDROID, IOS, GOOGLE_SYNC, WINDOWS, etc.).
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_device_type
+  ds_status:
+    description: Management status of the device (APPROVED, PENDING, REJECTED, WIPED, UNKNOWN).
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_status
+  nm_model:
+    description: Device model name as reported by the manufacturer.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.nm_model
+  nm_manufacturer:
+    description: Device manufacturer name.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.nm_manufacturer
+  nm_brand:
+    description: Device brand name as reported by the operating system.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.nm_brand
+  ds_os:
+    description: Operating system and version string reported by the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_os
+  ds_build_number:
+    description: OS build number of the device firmware.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_build_number
+  ds_release_version:
+    description: OS release version string.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_release_version
+  ds_kernel_version:
+    description: Kernel version of the device operating system.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_kernel_version
+  ds_baseband_version:
+    description: Baseband firmware version for the device modem.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_baseband_version
+  ds_bootloader_version:
+    description: Bootloader version installed on the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_bootloader_version
+  ds_security_patch_level:
+    description: Android security patch level date.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_security_patch_level
+  ds_user_email:
+    description: Primary email address of the Google Workspace user associated with the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_user_email
+  nm_user:
+    description: Display name of the Google Workspace user associated with the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.nm_user
+  ds_network_operator:
+    description: Mobile network operator name associated with the device SIM.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_network_operator
+  ds_privilege:
+    description: Privilege level of the managed account on the device (DEVICE_ADMIN, PROFILE_OWNER, DEVICE_OWNER).
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_privilege
+  ds_device_password_status:
+    description: Status of the device screen lock password.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ds_device_password_status
+  is_managed_account_on_owner_profile:
+    description: Indicates whether the managed Google account is on the device owner profile.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.is_managed_account_on_owner_profile
+  is_work_profile_supported:
+    description: Indicates whether the device supports Android Work Profile separation.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.is_work_profile_supported
+  is_unknown_sources_enabled:
+    description: Indicates whether installation from unknown sources is enabled on the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.is_unknown_sources_enabled
+  is_adb_enabled:
+    description: Indicates whether Android Debug Bridge (ADB) is enabled on the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.is_adb_enabled
+  is_developer_options_enabled:
+    description: Indicates whether developer options are enabled on the device.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.is_developer_options_enabled
+  ts_first_sync:
+    description: Timestamp of the first synchronization between the device and Google Workspace.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ts_first_sync
+  ts_last_sync:
+    description: Timestamp of the most recent synchronization between the device and Google Workspace.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.ts_last_sync
+  year:
+    description: Year of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.year
+  month:
+    description: Month of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.month
+  day:
+    description: Day of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_google_admin_clean.mobile_devices.day

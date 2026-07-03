@@ -1,0 +1,62 @@
+database_name: datalake_google_admin_clean
+table_name: cloud_identity_devices
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: Clean snapshot of all managed endpoints registered in Google Cloud Identity, covering Windows, macOS, Linux, Chrome OS, iOS and Android devices, with normalized identifiers, device type, OS version, and ownership classification.
+columns:
+  id_device:
+    description: Unique device identifier (UUID) assigned by Google Cloud Identity, stable across syncs.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.deviceId
+  ds_serial_number:
+    description: Hardware serial number assigned by the manufacturer. Present for most device types; may be null for some mobile or BYOD devices.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.serialNumber
+  nm_hostname:
+    description: Network hostname of the device as reported to Google Cloud Identity. Typically set for Windows and macOS endpoints.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.hostname
+  nm_model:
+    description: Device model name or identifier as reported by the operating system (e.g. Mac15,6 or ThinkPad X1).
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.model
+  nm_manufacturer:
+    description: Device manufacturer name as reported by the operating system (e.g. Apple Inc., Lenovo). Present for macOS; may be null for Windows or mobile.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.manufacturer
+  ds_device_type:
+    description: Operating system family of the device as classified by Google Cloud Identity (WINDOWS, MAC_OS, LINUX, ANDROID, IOS, CHROME_OS, DEVICE_TYPE_UNSPECIFIED).
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.deviceType
+  ds_os_version:
+    description: Full operating system version string as reported by the device (e.g. Windows 10.0.26100, MacOS 26.4.0).
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.osVersion
+  ds_owner_type:
+    description: Device ownership classification as recorded in Google Cloud Identity (BYOD for personally-owned, COMPANY for corporate-owned).
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.ownerType
+  ds_encryption_state:
+    description: Disk encryption state of the device as reported to Google Cloud Identity (ENCRYPTED, UNENCRYPTED, ENCRYPTION_STATE_UNSPECIFIED). Present for macOS; may be null for other types.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.encryptionState
+  ts_created:
+    description: Timestamp when the device was first registered in Google Cloud Identity.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.createTime
+  ts_last_sync:
+    description: Timestamp of the most recent synchronization between the device and Google Cloud Identity.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.lastSyncTime
+  year:
+    description: Year partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.year
+  month:
+    description: Month partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.month
+  day:
+    description: Day partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_devices.day

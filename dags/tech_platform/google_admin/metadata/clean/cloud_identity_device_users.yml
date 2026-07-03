@@ -1,0 +1,46 @@
+database_name: datalake_google_admin_clean
+table_name: cloud_identity_device_users
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: Clean snapshot of device-to-user assignments from Google Cloud Identity, mapping each managed endpoint to the Google Workspace user(s) that signed in on it. One row per device and user, with the device identifier normalized from the deviceUsers resource name.
+columns:
+  id_device:
+    description: Unique device identifier (UUID) assigned by Google Cloud Identity, extracted from the deviceUsers resource name. Joins to cloud_identity_devices.id_device.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.name
+  ds_user_email:
+    description: Email address of the Google Workspace user assigned to the device.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.userEmail
+  ds_management_state:
+    description: Management state of the device-user assignment as reported by Google Cloud Identity (APPROVED, BLOCKED, PENDING, UNMANAGED, etc.).
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.managementState
+  ds_password_state:
+    description: Password state of the device-user assignment as reported by Google Cloud Identity (e.g. PASSWORD_SET, PASSWORD_NOT_SET).
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.passwordState
+  ds_user_agent:
+    description: User agent string of the client used by the device user at the time of the last sync.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.userAgent
+  ts_first_sync:
+    description: Timestamp when the user first synchronized with the device.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.firstSyncTime
+  ts_last_sync:
+    description: Timestamp of the most recent synchronization between the user and the device.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.lastSyncTime
+  year:
+    description: Year partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.year
+  month:
+    description: Month partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.month
+  day:
+    description: Day partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.cloud_identity_device_users.day

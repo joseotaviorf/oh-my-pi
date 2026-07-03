@@ -1,0 +1,5 @@
+database_name: datalake_google_admin_raw
+table_name: cloud_identity_devices
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: "Raw snapshot of all managed endpoints (Windows, macOS, Linux, Chrome OS, iOS, Android) from the Google Cloud Identity Devices API."

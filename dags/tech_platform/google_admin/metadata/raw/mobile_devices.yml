@@ -1,0 +1,5 @@
+database_name: datalake_google_admin_raw
+table_name: mobile_devices
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: "Raw snapshot of managed mobile devices (iOS and Android) from Google Workspace Admin SDK Directory API."

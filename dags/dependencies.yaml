@@ -2703,6 +2703,10 @@ bietlejuice.enrich_for_sale_experiment:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set:first-run-of-day
+bietlejuice.enrich_google_admin:
+  - bietlejuice.google_admin:load-clean-cloud-identity-device-users:first-run-of-day
+  - bietlejuice.google_admin:load-clean-cloud-identity-devices:first-run-of-day
+  - bietlejuice.google_admin:load-clean-mobile-devices:first-run-of-day
 bietlejuice.enrich_google_analytics_classified:
   - bietlejuice.google_analytics_classified:load-clean-google-analytics-classified:first-run-of-day
 bietlejuice.enrich_google_search_console:

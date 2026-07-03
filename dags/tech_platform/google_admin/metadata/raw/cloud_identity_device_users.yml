@@ -1,0 +1,5 @@
+database_name: datalake_google_admin_raw
+table_name: cloud_identity_device_users
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: "Raw snapshot of device-to-user assignments from the Google Cloud Identity deviceUsers endpoint, mapping each managed endpoint to the Google Workspace user(s) that signed in on it."

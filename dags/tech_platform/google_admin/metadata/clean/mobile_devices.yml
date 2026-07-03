@@ -1,0 +1,142 @@
+database_name: datalake_google_admin_clean
+table_name: mobile_devices
+domain: Tech Platform
+owner: danilo.barbosa@quintoandar.com.br
+description: Clean snapshot of managed mobile devices from Google Workspace Admin SDK, with normalized identifiers, statuses, and timestamps.
+columns:
+  id_resource:
+    description: Unique internal Google resource identifier for the mobile device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.resourceId
+  ds_device_id:
+    description: Hardware device identifier (e.g. IMEI or MEID) as returned by the Google Admin API.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.deviceId
+  ds_serial_number:
+    description: Device serial number assigned by the manufacturer.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.serialNumber
+  ds_hardware_id:
+    description: Additional hardware identifier (IMEI/MEID variant) stored by Google Admin.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.hardwareId
+  ds_imei:
+    description: International Mobile Equipment Identity number for GSM devices.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.imei
+  ds_meid:
+    description: Mobile Equipment Identifier for CDMA devices.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.meid
+  ds_wifi_mac_address:
+    description: Wi-Fi MAC address of the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.wifiMacAddress
+  ds_device_type:
+    description: Device type as classified by Google (ANDROID, IOS, GOOGLE_SYNC, WINDOWS, etc.).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.type
+  ds_status:
+    description: Management status of the device (APPROVED, PENDING, REJECTED, WIPED, UNKNOWN).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.status
+  nm_model:
+    description: Device model name as reported by the manufacturer (e.g. iPhone 15 Pro).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.model
+  nm_manufacturer:
+    description: Device manufacturer name (e.g. Apple, Samsung).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.manufacturer
+  nm_brand:
+    description: Device brand name as reported by the operating system.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.brand
+  ds_os:
+    description: Operating system and version string reported by the device (e.g. iOS 17.4.1).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.os
+  ds_build_number:
+    description: OS build number of the device firmware.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.buildNumber
+  ds_release_version:
+    description: OS release version string (e.g. 17.4.1 for iOS).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.releaseVersion
+  ds_kernel_version:
+    description: Kernel version of the device operating system.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.kernelVersion
+  ds_baseband_version:
+    description: Baseband firmware version for the device modem.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.basebandVersion
+  ds_bootloader_version:
+    description: Bootloader version installed on the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.bootloaderVersion
+  ds_security_patch_level:
+    description: Android security patch level date (relevant for Android devices).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.securityPatchLevel
+  ds_user_email:
+    description: Primary email address of the Google Workspace user associated with the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.email
+  nm_user:
+    description: Display name of the Google Workspace user associated with the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.name
+  ds_network_operator:
+    description: Mobile network operator name associated with the device SIM.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.networkOperator
+  ds_privilege:
+    description: Privilege level of the managed account on the device (DEVICE_ADMIN, PROFILE_OWNER, DEVICE_OWNER).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.privilege
+  ds_device_password_status:
+    description: Status of the device screen lock password (e.g. ACTIVE, INACTIVE).
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.devicePasswordStatus
+  is_managed_account_on_owner_profile:
+    description: Indicates whether the managed Google account is on the device owner profile.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.managedAccountIsOnOwnerProfile
+  is_work_profile_supported:
+    description: Indicates whether the device supports Android Work Profile separation.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.supportsWorkProfile
+  is_unknown_sources_enabled:
+    description: Indicates whether installation from unknown sources is enabled on the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.unknownSourcesStatus
+  is_adb_enabled:
+    description: Indicates whether Android Debug Bridge (ADB) is enabled on the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.adbStatus
+  is_developer_options_enabled:
+    description: Indicates whether developer options are enabled on the device.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.developerOptionsStatus
+  ts_first_sync:
+    description: Timestamp of the first synchronization between the device and Google Workspace.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.firstSync
+  ts_last_sync:
+    description: Timestamp of the most recent synchronization between the device and Google Workspace.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.lastSync
+  year:
+    description: Year partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.year
+  month:
+    description: Month partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.month
+  day:
+    description: Day partition of the ingestion snapshot date.
+    lineage:
+      - datalake_google_admin_raw.mobile_devices.day

@@ -1,0 +1,74 @@
+dag:
+  name: google_admin
+  owner: Tech Platform Cyber Security
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      Ingests managed devices from Google Workspace Admin into raw and clean layers via three
+      API sources: mobile devices (iOS and Android) from the Admin SDK Directory API, all
+      endpoints (Windows, macOS, Linux, Chrome OS) from the Cloud Identity Devices API, and the
+      device-to-user assignments from the Cloud Identity deviceUsers endpoint (the mapping shown
+      in the Admin console E-mail column). All use a service account with domain-wide delegation.
+  schedule_interval: 0 3 * * *
+
+workflow:
+  layer: raw
+  has_hive_sync: false
+  type: custom_ingestion
+  bucket_config_name: datalake_bucket
+  load_spark_job: load_google_admin_raw
+  dbutils_secret_key: GOOGLE_ADMIN_API_CREDENTIALS
+  default_table_privileges:
+    auditlogs:
+      - ALL PRIVILEGES
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ data_interval_start | ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_privileges}"
+
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start |
+      ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+
+  default_partitions: [ year, month, day ]
+
+  tables_customization:
+    mobile_devices:
+      clean_table_name: mobile_devices
+      merge_on: [ year, month, day, id_resource ]
+      clean_partitions: [ year, month, day ]
+      extraction_type: full
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - base_filters:
+            maxResults: "100"
+    cloud_identity_devices:
+      clean_table_name: cloud_identity_devices
+      merge_on: [ year, month, day, id_device ]
+      clean_partitions: [ year, month, day ]
+      extraction_type: full
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - base_filters:
+            pageSize: "1000"
+    cloud_identity_device_users:
+      clean_table_name: cloud_identity_device_users
+      merge_on: [ year, month, day, id_device, ds_user_email ]
+      clean_partitions: [ year, month, day ]
+      extraction_type: full
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - base_filters:
+            pageSize: "1000"
