@@ -4,7 +4,6 @@
 --   Gate 0: number_of_signatories = 2,                                        threshold 0-100 (100 = fully open)
 --   Gate 1: all contract signatories registered (every uuid_person NOT NULL),  threshold 0-100 (100 = fully open)
 --   Gate 2: contract has any unregistered signatory (any uuid_person IS NULL), threshold 0-100 (100 = fully open)
--- PII note: stores contact PII (email, phone, name) as an approved reverse-DAG exception (feeds SFMC).
 WITH
 rent_flow_events AS (
   SELECT
@@ -86,9 +85,6 @@ SELECT
   e.uuid_person,
   CONCAT_WS(', ', house.address, house.number) AS address_text,
   e.user_role,
-  cpc.user_email,
-  cpc.user_phone,
-  cpc.first_name AS user_first_name,
   e.ts_canceled   IS NOT NULL AS is_canceled,
   e.ts_signed_eff IS NOT NULL AS is_signed,
   (
@@ -109,8 +105,6 @@ SELECT
   DATE_FORMAT(e.ts_canceled,    '%Y-%m-%d %T') AS ts_canceled,
   DATE_FORMAT(e.ts_signed_eff,  '%Y-%m-%d %T') AS ts_signed
 FROM enriched AS e
-INNER JOIN datalake_sonia_journeys.closing_contract_person_view AS cpc
-  ON e.id_contract_person = cpc.id_contract_person
 INNER JOIN datalake_ebdb_clean.house
   ON e.id_house = house.id
 WHERE e.n_sent > 0 -- drop canceled-only helper rows & signed-only persons
