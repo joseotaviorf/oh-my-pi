@@ -1,39 +1,38 @@
----
 database_name: datalake_sales_flow_clean
 table_name: ccv_edition_reason
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table that stores the ccv edition reasons.
 columns:
   id:
     description: Unique ID for this entry.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.id
+    - datalake_sales_flow_raw.ccv_edition_reason.id
   id_ccv:
     description: Unique ID for this CCV. Joins with the ccv tables (ccv_flow, ccv, ccv_party and others).
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.ccv_id
+    - datalake_sales_flow_raw.ccv_edition_reason.ccv_id
   edition_reason:
     description: Reason why this CCV was edited.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.edition_reason
+    - datalake_sales_flow_raw.ccv_edition_reason.edition_reason
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.created_at
+    - datalake_sales_flow_raw.ccv_edition_reason.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.updated_at
+    - datalake_sales_flow_raw.ccv_edition_reason.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.year
+    - datalake_sales_flow_raw.ccv_edition_reason.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.month
+    - datalake_sales_flow_raw.ccv_edition_reason.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.ccv_edition_reason.day
+    - datalake_sales_flow_raw.ccv_edition_reason.day

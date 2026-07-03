@@ -1,38 +1,50 @@
----
 database_name: datalake_sales_flow_clean
 table_name: ccv_flow
 domain: For Sale
 columns:
   id_ccv_flow:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.id
+    - datalake_sales_flow_raw.ccv_flow.id
+    description: Primary key identifying this CCV confection-and-signing flow record.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.sales_flow_id
+    - datalake_sales_flow_raw.ccv_flow.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   status:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.status
+    - datalake_sales_flow_raw.ccv_flow.status
+    description: Current operational status code governing workflow progression for this record.
   is_5a_model:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.is_5a_model
+    - datalake_sales_flow_raw.ccv_flow.is_5a_model
+    description: Boolean flag indicating whether 5a model applies to this record.
   ts_confection_started:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.started_confection_at
+    - datalake_sales_flow_raw.ccv_flow.started_confection_at
+    description: Timestamp marking when drafting (confection) of the CCV contract started.
   ts_signed:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.signed_at
+    - datalake_sales_flow_raw.ccv_flow.signed_at
+    description: Timestamp marking when the CCV contract was signed in this flow.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.created_at
+    - datalake_sales_flow_raw.ccv_flow.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.updated_at
+    - datalake_sales_flow_raw.ccv_flow.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.year
+    - datalake_sales_flow_raw.ccv_flow.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.month
+    - datalake_sales_flow_raw.ccv_flow.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow.day
+    - datalake_sales_flow_raw.ccv_flow.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of ccv flow sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv flow record with standardized names and types in datalake_sales_flow_clean.

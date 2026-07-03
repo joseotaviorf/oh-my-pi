@@ -4,82 +4,111 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.id
+    - datalake_sales_flow_raw.ccv_party_aud.id
+    description: Surrogate primary key of the ccv party aud row in the source system.
   id_ccv:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.ccv_id
+    - datalake_sales_flow_raw.ccv_party_aud.ccv_id
+    description: Audited foreign key to the CCV contract in datalake_sales_flow_clean.ccv this party belongs to.
   id_address_data:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.address_data_id
+    - datalake_sales_flow_raw.ccv_party_aud.address_data_id
+    description: Audited foreign key to the address data record associated with this party.
   type:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.type
+    - datalake_sales_flow_raw.ccv_party_aud.type
+    description: Classifier distinguishing record subtype or participant role in the workflow.
   name:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.name
+    - datalake_sales_flow_raw.ccv_party_aud.name
+    description: Human-readable display name associated with the person or entity in this row.
   email:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.email
+    - datalake_sales_flow_raw.ccv_party_aud.email
+    description: Contact email address used for notifications and identity matching.
   document:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.document
+    - datalake_sales_flow_raw.ccv_party_aud.document
+    description: Audited official document number of the party (e.g., CPF, CNPJ).
   nationality:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.nationality
+    - datalake_sales_flow_raw.ccv_party_aud.nationality
+    description: Audited declared nationality of the party in the CCV contract.
   profession:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.profession
+    - datalake_sales_flow_raw.ccv_party_aud.profession
+    description: Audited declared profession of the party in the CCV contract.
   marital_status:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.marital_status
+    - datalake_sales_flow_raw.ccv_party_aud.marital_status
+    description: Audited marital status of the party (e.g., Single, Married).
   rev:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.rev
+    - datalake_sales_flow_raw.ccv_party_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.revtype
+    - datalake_sales_flow_raw.ccv_party_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.revend
+    - datalake_sales_flow_raw.ccv_party_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   mod_id_ccv:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.ccv_id_mod
+    - datalake_sales_flow_raw.ccv_party_aud.ccv_id_mod
+    description: Envers boolean flag indicating whether id ccv changed in this audit revision.
   mod_id_address_data:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.address_data_id_mod
+    - datalake_sales_flow_raw.ccv_party_aud.address_data_id_mod
+    description: Envers boolean flag indicating whether id address data changed in this audit revision.
   mod_type:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.type_mod
+    - datalake_sales_flow_raw.ccv_party_aud.type_mod
+    description: Envers boolean flag indicating whether type changed in this audit revision.
   mod_name:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.name_mod
+    - datalake_sales_flow_raw.ccv_party_aud.name_mod
+    description: Envers boolean flag indicating whether name changed in this audit revision.
   mod_email:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.email_mod
+    - datalake_sales_flow_raw.ccv_party_aud.email_mod
+    description: Envers boolean flag indicating whether email changed in this audit revision.
   mod_document:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.document_mod
+    - datalake_sales_flow_raw.ccv_party_aud.document_mod
+    description: Envers boolean flag indicating whether document changed in this audit revision.
   mod_nationality:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.nationality_mod
+    - datalake_sales_flow_raw.ccv_party_aud.nationality_mod
+    description: Envers boolean flag indicating whether nationality changed in this audit revision.
   mod_profession:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.profession_mod
+    - datalake_sales_flow_raw.ccv_party_aud.profession_mod
+    description: Envers boolean flag indicating whether profession changed in this audit revision.
   mod_marital_status:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.marital_status_mod
+    - datalake_sales_flow_raw.ccv_party_aud.marital_status_mod
+    description: Envers boolean flag indicating whether marital status changed in this audit revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.created_at
+    - datalake_sales_flow_raw.ccv_party_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.updated_at
+    - datalake_sales_flow_raw.ccv_party_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.year
+    - datalake_sales_flow_raw.ccv_party_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.month
+    - datalake_sales_flow_raw.ccv_party_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.ccv_party_aud.day
+    - datalake_sales_flow_raw.ccv_party_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of ccv party rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

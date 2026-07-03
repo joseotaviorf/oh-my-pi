@@ -4,43 +4,59 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.ccv.id
+    - datalake_sales_flow_raw.ccv.id
+    description: Surrogate primary key of the ccv row in the source system.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.ccv.sales_flow_id
+    - datalake_sales_flow_raw.ccv.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_house:
     lineage:
-      - datalake_sales_flow_raw.ccv.house_id
+    - datalake_sales_flow_raw.ccv.house_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   signed_document_token:
     lineage:
-      - datalake_sales_flow_raw.ccv.signed_document_token
+    - datalake_sales_flow_raw.ccv.signed_document_token
+    description: Storage token referencing the signed CCV contract document.
   unsigned_document_token:
     lineage:
-      - datalake_sales_flow_raw.ccv.unsigned_document_token
+    - datalake_sales_flow_raw.ccv.unsigned_document_token
+    description: Storage token referencing the unsigned draft of the CCV contract document.
   sale_price:
     lineage:
-      - datalake_sales_flow_raw.ccv.sale_value
+    - datalake_sales_flow_raw.ccv.sale_value
+    description: Agreed sale price of the property recorded in the CCV contract.
   ccv_version:
     lineage:
-      - datalake_sales_flow_raw.ccv.ccv_version
+    - datalake_sales_flow_raw.ccv.ccv_version
+    description: Version of the CCV contract template applied to this record.
   status:
     lineage:
-      - datalake_sales_flow_raw.ccv.status
+    - datalake_sales_flow_raw.ccv.status
+    description: Current operational status code governing workflow progression for this record.
   ts_signed:
     lineage:
-      - datalake_sales_flow_raw.ccv.signed_at
+    - datalake_sales_flow_raw.ccv.signed_at
+    description: Timestamp marking when the CCV contract was signed by the parties.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.ccv.created_at
+    - datalake_sales_flow_raw.ccv.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.ccv.updated_at
+    - datalake_sales_flow_raw.ccv.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.ccv.year
+    - datalake_sales_flow_raw.ccv.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.ccv.month
+    - datalake_sales_flow_raw.ccv.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.ccv.day
+    - datalake_sales_flow_raw.ccv.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of ccv sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv record with standardized names and types in datalake_sales_flow_clean.

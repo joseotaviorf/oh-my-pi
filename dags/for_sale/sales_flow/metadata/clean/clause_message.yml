@@ -1,71 +1,70 @@
----
 database_name: datalake_sales_flow_clean
 table_name: clause_message
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Stores messages and templates for legal clauses used in contracts.
 columns:
   id:
     description: Unique ID for the clause message.
     lineage:
-      - datalake_sales_flow_raw.clause_message.id
+    - datalake_sales_flow_raw.clause_message.id
   id_subject:
     description: Foreign key to the subject of the clause.
     lineage:
-      - datalake_sales_flow_raw.clause_message.subject_id
+    - datalake_sales_flow_raw.clause_message.subject_id
   id_parent:
     description: Parent ID for hierarchical clause structures.
     lineage:
-      - datalake_sales_flow_raw.clause_message.parent_id
+    - datalake_sales_flow_raw.clause_message.parent_id
   is_negotiation_clause:
     description: Flag indicating if this is a negotiation-specific clause.
     lineage:
-      - datalake_sales_flow_raw.clause_message.is_negotiation_clause
+    - datalake_sales_flow_raw.clause_message.is_negotiation_clause
   description:
     description: The full text or description of the clause.
     lineage:
-      - datalake_sales_flow_raw.clause_message.description
+    - datalake_sales_flow_raw.clause_message.description
   payment_method:
     description: Specifies the payment method this clause applies to.
     lineage:
-      - datalake_sales_flow_raw.clause_message.payment_method
+    - datalake_sales_flow_raw.clause_message.payment_method
   title:
-    description: The title of the clause.
+    description: Title or heading of the legal clause template.
     lineage:
-      - datalake_sales_flow_raw.clause_message.title
+    - datalake_sales_flow_raw.clause_message.title
   order_clause:
     description: The order in which the clause should appear.
     lineage:
-      - datalake_sales_flow_raw.clause_message.order_clause
+    - datalake_sales_flow_raw.clause_message.order_clause
   variables:
     description: JSON or text field containing variables to be interpolated into the clause text.
     lineage:
-      - datalake_sales_flow_raw.clause_message.variables
+    - datalake_sales_flow_raw.clause_message.variables
   clause_identifier:
     description: A unique identifier for the clause.
     lineage:
-      - datalake_sales_flow_raw.clause_message.clause_identifier
+    - datalake_sales_flow_raw.clause_message.clause_identifier
   notary_complexity:
     description: Indicates the complexity level of the notary process for this clause.
     lineage:
-      - datalake_sales_flow_raw.clause_message.notary_complexity
+    - datalake_sales_flow_raw.clause_message.notary_complexity
   ts_created:
     description: Timestamp of when the clause message was created.
     lineage:
-      - datalake_sales_flow_raw.clause_message.created_at
+    - datalake_sales_flow_raw.clause_message.created_at
   ts_updated:
     description: Timestamp of the last update to the clause message.
     lineage:
-      - datalake_sales_flow_raw.clause_message.updated_at
+    - datalake_sales_flow_raw.clause_message.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.clause_message.year
+    - datalake_sales_flow_raw.clause_message.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.clause_message.month
+    - datalake_sales_flow_raw.clause_message.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.clause_message.day
+    - datalake_sales_flow_raw.clause_message.day

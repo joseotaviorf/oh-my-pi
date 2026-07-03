@@ -1,32 +1,42 @@
----
 database_name: datalake_sales_flow_clean
 table_name: ccv_clause
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.id
+    - datalake_sales_flow_raw.ccv_clause.id
+    description: Surrogate primary key of the ccv clause row in the source system.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.sales_flow_id
+    - datalake_sales_flow_raw.ccv_clause.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_message_clause:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.clause_message_id
+    - datalake_sales_flow_raw.ccv_clause.clause_message_id
+    description: Foreign key to the clause template in datalake_sales_flow_clean.clause_message used by this CCV clause.
   variables:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.variables
+    - datalake_sales_flow_raw.ccv_clause.variables
+    description: Variable values interpolated into the clause template text for this CCV.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.created_at
+    - datalake_sales_flow_raw.ccv_clause.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.updated_at
+    - datalake_sales_flow_raw.ccv_clause.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.year
+    - datalake_sales_flow_raw.ccv_clause.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.month
+    - datalake_sales_flow_raw.ccv_clause.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.ccv_clause.day
+    - datalake_sales_flow_raw.ccv_clause.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of ccv clause sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv clause record with standardized names and types in datalake_sales_flow_clean.

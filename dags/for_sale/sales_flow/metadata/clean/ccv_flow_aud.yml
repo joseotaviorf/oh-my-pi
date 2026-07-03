@@ -1,62 +1,82 @@
----
 database_name: datalake_sales_flow_clean
 table_name: ccv_flow_aud
 domain: For Sale
 columns:
   id_ccv_flow_aud:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.id
+    - datalake_sales_flow_raw.ccv_flow_aud.id
+    description: Audited identifier of the CCV flow record, matching ccv_flow.id_ccv_flow in datalake_sales_flow_clean.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.sales_flow_id
+    - datalake_sales_flow_raw.ccv_flow_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   status:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.status
+    - datalake_sales_flow_raw.ccv_flow_aud.status
+    description: Current operational status code governing workflow progression for this record.
   rev:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.rev
+    - datalake_sales_flow_raw.ccv_flow_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.revtype
+    - datalake_sales_flow_raw.ccv_flow_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.revend
+    - datalake_sales_flow_raw.ccv_flow_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   is_5a_model:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.is_5a_model
+    - datalake_sales_flow_raw.ccv_flow_aud.is_5a_model
+    description: Boolean flag indicating whether 5a model applies to this record.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.ccv_flow_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
   mod_status:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.status_mod
+    - datalake_sales_flow_raw.ccv_flow_aud.status_mod
+    description: Envers boolean flag indicating whether status changed in this audit revision.
   mod_is_5a_model:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.is_5a_model_mod
+    - datalake_sales_flow_raw.ccv_flow_aud.is_5a_model_mod
+    description: Envers boolean flag indicating whether is 5a model changed in this audit revision.
   mod_ts_confection_started:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.started_confection_at_mod
+    - datalake_sales_flow_raw.ccv_flow_aud.started_confection_at_mod
+    description: Envers boolean flag indicating whether ts confection started changed in this audit revision.
   mod_ts_signed:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.signed_at_mod
+    - datalake_sales_flow_raw.ccv_flow_aud.signed_at_mod
+    description: Envers boolean flag indicating whether ts signed changed in this audit revision.
   ts_confection_started:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.started_confection_at
+    - datalake_sales_flow_raw.ccv_flow_aud.started_confection_at
+    description: Audited timestamp marking when drafting (confection) of the CCV contract started.
   ts_signed:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.signed_at
+    - datalake_sales_flow_raw.ccv_flow_aud.signed_at
+    description: Audited timestamp marking when the CCV contract was signed in this flow.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.created_at
+    - datalake_sales_flow_raw.ccv_flow_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.updated_at
+    - datalake_sales_flow_raw.ccv_flow_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.year
+    - datalake_sales_flow_raw.ccv_flow_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.month
+    - datalake_sales_flow_raw.ccv_flow_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.ccv_flow_aud.day
+    - datalake_sales_flow_raw.ccv_flow_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of ccv flow rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.
