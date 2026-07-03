@@ -1,47 +1,46 @@
----
 database_name: datalake_sales_flow_clean
 table_name: closing_type
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: The main idea of this table is to identify status and types of closing process in For Sale.
 columns:
   id:
-    description: Closing type ID
+    description: Surrogate primary key of the closing type row in the source system.
     lineage:
-      - datalake_sales_flow_raw.closing_type.id
+    - datalake_sales_flow_raw.closing_type.id
   id_label:
     description: Label of Closing process
     lineage:
-      - datalake_sales_flow_raw.closing_type.label_id
+    - datalake_sales_flow_raw.closing_type.label_id
   id_parent:
     description: ID to match and identify the macro and micro status in the Closing process.
     lineage:
-      - datalake_sales_flow_raw.closing_type.parent_id
+    - datalake_sales_flow_raw.closing_type.parent_id
   key:
     description: Which offer model (CCV Assistance, Pampas etc), type of financing (External or Internal) and payment method (Financed or Cash).
     lineage:
-      - datalake_sales_flow_raw.closing_type.key
+    - datalake_sales_flow_raw.closing_type.key
   is_active:
     description: Indicates if this closing type is active.
     lineage:
-      - datalake_sales_flow_raw.closing_type.active
+    - datalake_sales_flow_raw.closing_type.active
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.closing_type.created_at
+    - datalake_sales_flow_raw.closing_type.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.closing_type.updated_at
+    - datalake_sales_flow_raw.closing_type.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.closing_type.year
+    - datalake_sales_flow_raw.closing_type.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.closing_type.month
+    - datalake_sales_flow_raw.closing_type.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.closing_type.day
+    - datalake_sales_flow_raw.closing_type.day

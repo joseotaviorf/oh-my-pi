@@ -1,80 +1,106 @@
----
 database_name: datalake_sales_flow_clean
 table_name: diligence_aud
 domain: For Sale
 columns:
   id_diligence_aud:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.id
+    - datalake_sales_flow_raw.diligence_aud.id
+    description: Audited identifier of the diligence record at this revision.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.sales_flow_id
+    - datalake_sales_flow_raw.diligence_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   rev:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.rev
+    - datalake_sales_flow_raw.diligence_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.revtype
+    - datalake_sales_flow_raw.diligence_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.revend
+    - datalake_sales_flow_raw.diligence_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   classification:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.classification
+    - datalake_sales_flow_raw.diligence_aud.classification
+    description: Audited classification of the diligence result (e.g. approved, pending).
   step:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.step
+    - datalake_sales_flow_raw.diligence_aud.step
+    description: Audited current step of the diligence process.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.diligence_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
   mod_classification:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.classification_mod
+    - datalake_sales_flow_raw.diligence_aud.classification_mod
+    description: Envers boolean flag indicating whether classification changed in this audit revision.
   mod_step:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.step_mod
+    - datalake_sales_flow_raw.diligence_aud.step_mod
+    description: Envers boolean flag indicating whether step changed in this audit revision.
   mod_ts_partner_started:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.partner_started_at_mod
+    - datalake_sales_flow_raw.diligence_aud.partner_started_at_mod
+    description: Envers boolean flag indicating whether ts partner started changed in this audit revision.
   mod_ts_partner_ended:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.partner_ended_at_mod
+    - datalake_sales_flow_raw.diligence_aud.partner_ended_at_mod
+    description: Envers boolean flag indicating whether ts partner ended changed in this audit revision.
   mod_ts_legal_risk_started:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.legal_risk_started_at_mod
+    - datalake_sales_flow_raw.diligence_aud.legal_risk_started_at_mod
+    description: Envers boolean flag indicating whether ts legal risk started changed in this audit revision.
   mod_ts_legal_risk_ended:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.legal_risk_ended_at_mod
+    - datalake_sales_flow_raw.diligence_aud.legal_risk_ended_at_mod
+    description: Envers boolean flag indicating whether ts legal risk ended changed in this audit revision.
   mod_ts_buyer_seller_ended:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.buyer_seller_ended_at_mod
+    - datalake_sales_flow_raw.diligence_aud.buyer_seller_ended_at_mod
+    description: Envers boolean flag indicating whether ts buyer seller ended changed in this audit revision.
   ts_partner_started:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.partner_started_at
+    - datalake_sales_flow_raw.diligence_aud.partner_started_at
+    description: Audited timestamp of when the partner started the diligence process.
   ts_partner_ended:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.partner_ended_at
+    - datalake_sales_flow_raw.diligence_aud.partner_ended_at
+    description: Audited timestamp of when the partner ended the diligence process.
   ts_legal_risk_started:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.legal_risk_started_at
+    - datalake_sales_flow_raw.diligence_aud.legal_risk_started_at
+    description: Audited timestamp of when the legal risk analysis started.
   ts_legal_risk_ended:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.legal_risk_ended_at
+    - datalake_sales_flow_raw.diligence_aud.legal_risk_ended_at
+    description: Audited timestamp of when the legal risk analysis ended.
   ts_buyer_seller_ended:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.buyer_seller_ended_at
+    - datalake_sales_flow_raw.diligence_aud.buyer_seller_ended_at
+    description: Audited timestamp of when the buyer/seller stage of diligence ended.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.created_at
+    - datalake_sales_flow_raw.diligence_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.updated_at
+    - datalake_sales_flow_raw.diligence_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.year
+    - datalake_sales_flow_raw.diligence_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.month
+    - datalake_sales_flow_raw.diligence_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.day
+    - datalake_sales_flow_raw.diligence_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of diligence rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

@@ -1,32 +1,42 @@
----
 database_name: datalake_sales_flow_clean
 table_name: diligence_appointment
 domain: For Sale
 columns:
   id_diligence_appointment:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.id
+    - datalake_sales_flow_raw.diligence_appointment.id
+    description: Unique identifier of the diligence appointment record.
   id_diligence:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.diligence_id
+    - datalake_sales_flow_raw.diligence_appointment.diligence_id
+    description: Identifier of the parent diligence record this appointment belongs to.
   appointment:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.appointment
+    - datalake_sales_flow_raw.diligence_appointment.appointment
+    description: Scheduled appointment detail recorded for the diligence process.
   ts_deleted:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.deleted_at
+    - datalake_sales_flow_raw.diligence_appointment.deleted_at
+    description: Timestamp when this diligence appointment was soft-deleted, if applicable.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.created_at
+    - datalake_sales_flow_raw.diligence_appointment.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.updated_at
+    - datalake_sales_flow_raw.diligence_appointment.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.year
+    - datalake_sales_flow_raw.diligence_appointment.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.month
+    - datalake_sales_flow_raw.diligence_appointment.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.diligence_appointment.day
+    - datalake_sales_flow_raw.diligence_appointment.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of diligence appointment sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per diligence appointment record with standardized names and types in datalake_sales_flow_clean.

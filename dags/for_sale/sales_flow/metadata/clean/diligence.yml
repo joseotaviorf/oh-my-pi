@@ -1,107 +1,106 @@
----
 database_name: datalake_sales_flow_clean
 table_name: diligence
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Contains records of the due diligence process for sales flows.
 columns:
   id_diligence:
     description: Unique ID for the diligence record.
     lineage:
-      - datalake_sales_flow_raw.diligence.id
+    - datalake_sales_flow_raw.diligence.id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.diligence.sales_flow_id
+    - datalake_sales_flow_raw.diligence.sales_flow_id
   classification:
     description: The classification of the diligence result (e.g., approved, pending).
     lineage:
-      - datalake_sales_flow_raw.diligence.classification
+    - datalake_sales_flow_raw.diligence.classification
   step:
     description: The current step of the diligence process.
     lineage:
-      - datalake_sales_flow_raw.diligence.step
+    - datalake_sales_flow_raw.diligence.step
   acceptance_model:
     description: The model used for acceptance in the diligence process.
     lineage:
-      - datalake_sales_flow_raw.diligence.acceptance_model
+    - datalake_sales_flow_raw.diligence.acceptance_model
   accepted_by:
     description: Identifier for the user or system that accepted the diligence.
     lineage:
-      - datalake_sales_flow_raw.diligence.accepted_by
+    - datalake_sales_flow_raw.diligence.accepted_by
   is_tacit_acceptance:
     description: Flag indicating if the acceptance was tacit (implicit).
     lineage:
-      - datalake_sales_flow_raw.diligence.is_tacit_acceptance
+    - datalake_sales_flow_raw.diligence.is_tacit_acceptance
   had_risk_reclassification:
     description: Flag indicating if there was a risk reclassification during the process.
     lineage:
-      - datalake_sales_flow_raw.diligence.had_risk_reclassification
+    - datalake_sales_flow_raw.diligence.had_risk_reclassification
   report_document_token:
     description: Token or identifier for the diligence report document.
     lineage:
-      - datalake_sales_flow_raw.diligence.report_document_token
+    - datalake_sales_flow_raw.diligence.report_document_token
   reset_reason:
     description: The reason why the diligence process was reset.
     lineage:
-      - datalake_sales_flow_raw.diligence.reset_reason
+    - datalake_sales_flow_raw.diligence.reset_reason
   ts_help_requested_by_buyer:
     description: Timestamp of when the buyer requested help.
     lineage:
-      - datalake_sales_flow_raw.diligence.help_requested_by_buyer_at
+    - datalake_sales_flow_raw.diligence.help_requested_by_buyer_at
   ts_help_requested_by_seller:
     description: Timestamp of when the seller requested help.
     lineage:
-      - datalake_sales_flow_raw.diligence.help_requested_by_seller_at
+    - datalake_sales_flow_raw.diligence.help_requested_by_seller_at
   ts_partner_started:
     description: Timestamp of when the partner started the diligence process.
     lineage:
-      - datalake_sales_flow_raw.diligence.partner_started_at
+    - datalake_sales_flow_raw.diligence.partner_started_at
   ts_partner_ended:
     description: Timestamp of when the partner ended the diligence process.
     lineage:
-      - datalake_sales_flow_raw.diligence.partner_ended_at
+    - datalake_sales_flow_raw.diligence.partner_ended_at
   ts_legal_risk_started:
     description: Timestamp of when the legal risk analysis started.
     lineage:
-      - datalake_sales_flow_raw.diligence.legal_risk_started_at
+    - datalake_sales_flow_raw.diligence.legal_risk_started_at
   ts_legal_risk_ended:
     description: Timestamp of when the legal risk analysis ended.
     lineage:
-      - datalake_sales_flow_raw.diligence.legal_risk_ended_at
+    - datalake_sales_flow_raw.diligence.legal_risk_ended_at
   ts_buyer_seller_ended:
     description: Timestamp of when the buyer/seller stage ended.
     lineage:
-      - datalake_sales_flow_raw.diligence.buyer_seller_ended_at
+    - datalake_sales_flow_raw.diligence.buyer_seller_ended_at
   ts_buyer_sent:
     description: Timestamp of when the diligence information was sent to the buyer.
     lineage:
-      - datalake_sales_flow_raw.diligence.buyer_sent_at
+    - datalake_sales_flow_raw.diligence.buyer_sent_at
   ts_seller_sent:
     description: Timestamp of when the diligence information was sent to the seller.
     lineage:
-      - datalake_sales_flow_raw.diligence.seller_sent_at
+    - datalake_sales_flow_raw.diligence.seller_sent_at
   ts_acceptance_requested_by_buyer:
     description: Timestamp of when acceptance was requested by the buyer.
     lineage:
-      - datalake_sales_flow_raw.diligence.acceptance_requested_by_buyer_at
+    - datalake_sales_flow_raw.diligence.acceptance_requested_by_buyer_at
   ts_created:
     description: Timestamp of when the diligence record was created.
     lineage:
-      - datalake_sales_flow_raw.diligence.created_at
+    - datalake_sales_flow_raw.diligence.created_at
   ts_updated:
     description: Timestamp of the last update to the diligence record.
     lineage:
-      - datalake_sales_flow_raw.diligence.updated_at
+    - datalake_sales_flow_raw.diligence.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.diligence.year
+    - datalake_sales_flow_raw.diligence.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.diligence.month
+    - datalake_sales_flow_raw.diligence.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.diligence.day
+    - datalake_sales_flow_raw.diligence.day

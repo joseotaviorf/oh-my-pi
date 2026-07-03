@@ -4,58 +4,79 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.house_aud.id
+    - datalake_sales_flow_raw.house_aud.id
+    description: Surrogate primary key of the house aud row in the source system.
   id_external:
     lineage:
-      - datalake_sales_flow_raw.house_aud.external_id
+    - datalake_sales_flow_raw.house_aud.external_id
+    description: Audited external house identifier from the main (EBDB) house tables.
   id_address_data:
     lineage:
-      - datalake_sales_flow_raw.house_aud.address_data_id
+    - datalake_sales_flow_raw.house_aud.address_data_id
+    description: Audited identifier of the address data record for this house.
   has_seller_debt_payments:
     lineage:
-      - datalake_sales_flow_raw.house_aud.has_seller_debt_payments
+    - datalake_sales_flow_raw.house_aud.has_seller_debt_payments
+    description: Boolean flag indicating whether seller debt payments applies to this record.
   house_registration_status:
     lineage:
-      - datalake_sales_flow_raw.house_aud.house_registration_status
+    - datalake_sales_flow_raw.house_aud.house_registration_status
+    description: Audited status of the house property registration at the notary office.
   land_tenure:
     lineage:
-      - datalake_sales_flow_raw.house_aud.land_tenure
+    - datalake_sales_flow_raw.house_aud.land_tenure
+    description: Audited land tenure classification of the house property.
   rev:
     lineage:
-      - datalake_sales_flow_raw.house_aud.rev
+    - datalake_sales_flow_raw.house_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.house_aud.revtype
+    - datalake_sales_flow_raw.house_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.house_aud.revend
+    - datalake_sales_flow_raw.house_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   mod_id_external:
     lineage:
-      - datalake_sales_flow_raw.house_aud.external_id_mod
+    - datalake_sales_flow_raw.house_aud.external_id_mod
+    description: Envers boolean flag indicating whether id external changed in this audit revision.
   mod_id_address_data:
     lineage:
-      - datalake_sales_flow_raw.house_aud.address_data_id_mod
+    - datalake_sales_flow_raw.house_aud.address_data_id_mod
+    description: Envers boolean flag indicating whether id address data changed in this audit revision.
   mod_has_seller_debt_payments:
     lineage:
-      - datalake_sales_flow_raw.house_aud.has_seller_debt_payments_mod
+    - datalake_sales_flow_raw.house_aud.has_seller_debt_payments_mod
+    description: Envers boolean flag indicating whether has seller debt payments changed in this audit revision.
   mod_house_registration_status:
     lineage:
-      - datalake_sales_flow_raw.house_aud.house_registration_status_mod
+    - datalake_sales_flow_raw.house_aud.house_registration_status_mod
+    description: Envers boolean flag indicating whether house registration status changed in this audit revision.
   mod_land_tenure:
     lineage:
-      - datalake_sales_flow_raw.house_aud.land_tenure_mod
+    - datalake_sales_flow_raw.house_aud.land_tenure_mod
+    description: Envers boolean flag indicating whether land tenure changed in this audit revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.house_aud.created_at
+    - datalake_sales_flow_raw.house_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.house_aud.updated_at
+    - datalake_sales_flow_raw.house_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.house_aud.year
+    - datalake_sales_flow_raw.house_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.house_aud.month
+    - datalake_sales_flow_raw.house_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.house_aud.day
+    - datalake_sales_flow_raw.house_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of house rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

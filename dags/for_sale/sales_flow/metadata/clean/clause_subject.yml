@@ -1,7 +1,6 @@
----
 database_name: datalake_sales_flow_clean
 table_name: clause_subject
-owner: aya.sato@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Table that stores unique subjects for contractual clauses, with an identifier, a description, and timestamps.
 columns:
@@ -10,11 +9,11 @@ columns:
     lineage:
     - datalake_sales_flow_raw.clause_subject.id
   description:
-    description: Description of clause subject
+    description: Free-text description of the contractual clause subject.
     lineage:
     - datalake_sales_flow_raw.clause_subject.description
   ts_created:
-    description: Timestamp of when the record was created 
+    description: Timestamp of when the record was created
     lineage:
     - datalake_sales_flow_raw.clause_subject.created_at
   ts_updated:
