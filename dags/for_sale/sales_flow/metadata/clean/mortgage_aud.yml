@@ -1,122 +1,162 @@
----
 database_name: datalake_sales_flow_clean
 table_name: mortgage_aud
 domain: For Sale
 columns:
   id_mortgage_aud:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.id
+    - datalake_sales_flow_raw.mortgage_aud.id
+    description: Audited identifier of the mortgage record this revision belongs to.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.sales_flow_id
+    - datalake_sales_flow_raw.mortgage_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   rev:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.rev
+    - datalake_sales_flow_raw.mortgage_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.revtype
+    - datalake_sales_flow_raw.mortgage_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.revend
+    - datalake_sales_flow_raw.mortgage_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   status:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.status
+    - datalake_sales_flow_raw.mortgage_aud.status
+    description: Current operational status code governing workflow progression for this record.
   bank:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.bank
+    - datalake_sales_flow_raw.mortgage_aud.bank
+    description: Audited name of the bank or financial institution at this revision.
   credit_model:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_model
+    - datalake_sales_flow_raw.mortgage_aud.credit_model
+    description: Audited credit model used for the mortgage financing at this revision.
   credit_status:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_status
+    - datalake_sales_flow_raw.mortgage_aud.credit_status
+    description: Audited status of the credit analysis at this revision.
   bank_fee:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.bank_fee
+    - datalake_sales_flow_raw.mortgage_aud.bank_fee
+    description: Audited fee charged by the bank for the financing at this revision.
   institution_choice_reason:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.institution_choice_reason
+    - datalake_sales_flow_raw.mortgage_aud.institution_choice_reason
+    description: Audited reason recorded for choosing the financial institution at this revision.
   credit_letter:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_letter
+    - datalake_sales_flow_raw.mortgage_aud.credit_letter
+    description: Audited credit-approval letter status or reference at this revision.
   mortgage_pendency:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.mortgage_pendency
+    - datalake_sales_flow_raw.mortgage_aud.mortgage_pendency
+    description: Audited pending issues or items blocking the mortgage at this revision.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.mortgage_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
   mod_status:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.status_mod
+    - datalake_sales_flow_raw.mortgage_aud.status_mod
+    description: Envers boolean flag indicating whether status changed in this audit revision.
   mod_bank:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.bank_mod
+    - datalake_sales_flow_raw.mortgage_aud.bank_mod
+    description: Envers boolean flag indicating whether bank changed in this audit revision.
   mod_credit_model:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_model_mod
+    - datalake_sales_flow_raw.mortgage_aud.credit_model_mod
+    description: Envers boolean flag indicating whether credit model changed in this audit revision.
   mod_credit_status:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_status_mod
+    - datalake_sales_flow_raw.mortgage_aud.credit_status_mod
+    description: Envers boolean flag indicating whether credit status changed in this audit revision.
   mod_bank_fee:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.bank_fee_mod
+    - datalake_sales_flow_raw.mortgage_aud.bank_fee_mod
+    description: Envers boolean flag indicating whether bank fee changed in this audit revision.
   mod_institution_choice_reason:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.institution_choice_reason_mod
+    - datalake_sales_flow_raw.mortgage_aud.institution_choice_reason_mod
+    description: Envers boolean flag indicating whether institution choice reason changed in this audit revision.
   mod_credit_letter:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_letter_mod
+    - datalake_sales_flow_raw.mortgage_aud.credit_letter_mod
+    description: Envers boolean flag indicating whether credit letter changed in this audit revision.
   mod_mortgage_pendency:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.mortgage_pendency_mod
+    - datalake_sales_flow_raw.mortgage_aud.mortgage_pendency_mod
+    description: Envers boolean flag indicating whether mortgage pendency changed in this audit revision.
   mod_dt_credit_started:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_start_date_mod
+    - datalake_sales_flow_raw.mortgage_aud.credit_start_date_mod
+    description: Envers boolean flag indicating whether dt credit started changed in this audit revision.
   mod_dt_credit_ended:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_end_date_mod
+    - datalake_sales_flow_raw.mortgage_aud.credit_end_date_mod
+    description: Envers boolean flag indicating whether dt credit ended changed in this audit revision.
   mod_dt_bank_started:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.bank_start_date_mod
+    - datalake_sales_flow_raw.mortgage_aud.bank_start_date_mod
+    description: Envers boolean flag indicating whether dt bank started changed in this audit revision.
   mod_dt_started:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.start_date_mod
+    - datalake_sales_flow_raw.mortgage_aud.start_date_mod
+    description: Envers boolean flag indicating whether dt started changed in this audit revision.
   mod_dt_ended:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.end_date_mod
+    - datalake_sales_flow_raw.mortgage_aud.end_date_mod
+    description: Envers boolean flag indicating whether dt ended changed in this audit revision.
   mod_ts_seller_paid:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.seller_paid_at_mod
+    - datalake_sales_flow_raw.mortgage_aud.seller_paid_at_mod
+    description: Envers boolean flag indicating whether ts seller paid changed in this audit revision.
   dt_credit_started:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_start_date
+    - datalake_sales_flow_raw.mortgage_aud.credit_start_date
+    description: Calendar date of credit started for this mortgage aud record.
   dt_credit_ended:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.credit_end_date
+    - datalake_sales_flow_raw.mortgage_aud.credit_end_date
+    description: Calendar date of credit ended for this mortgage aud record.
   dt_bank_started:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.bank_start_date
+    - datalake_sales_flow_raw.mortgage_aud.bank_start_date
+    description: Calendar date of bank started for this mortgage aud record.
   dt_started:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.start_date
+    - datalake_sales_flow_raw.mortgage_aud.start_date
+    description: Calendar date of started for this mortgage aud record.
   dt_ended:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.end_date
+    - datalake_sales_flow_raw.mortgage_aud.end_date
+    description: Calendar date of ended for this mortgage aud record.
   ts_seller_paid:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.seller_paid_at
+    - datalake_sales_flow_raw.mortgage_aud.seller_paid_at
+    description: Audited timestamp of when the seller was paid at this revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.created_at
+    - datalake_sales_flow_raw.mortgage_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.updated_at
+    - datalake_sales_flow_raw.mortgage_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.year
+    - datalake_sales_flow_raw.mortgage_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.month
+    - datalake_sales_flow_raw.mortgage_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.day
+    - datalake_sales_flow_raw.mortgage_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of mortgage rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

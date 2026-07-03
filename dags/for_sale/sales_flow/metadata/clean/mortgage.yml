@@ -1,135 +1,134 @@
----
 database_name: datalake_sales_flow_clean
 table_name: mortgage
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Contains information related to the mortgage process for a sales flow.
 columns:
   id_mortgage:
     description: Unique ID for the mortgage record.
     lineage:
-      - datalake_sales_flow_raw.mortgage.id
+    - datalake_sales_flow_raw.mortgage.id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.mortgage.sales_flow_id
+    - datalake_sales_flow_raw.mortgage.sales_flow_id
   status:
     description: The current status of the mortgage process.
     lineage:
-      - datalake_sales_flow_raw.mortgage.status
+    - datalake_sales_flow_raw.mortgage.status
   bank:
     description: The name of the bank or financial institution.
     lineage:
-      - datalake_sales_flow_raw.mortgage.bank
+    - datalake_sales_flow_raw.mortgage.bank
   credit_model:
     description: The credit model being used.
     lineage:
-      - datalake_sales_flow_raw.mortgage.credit_model
+    - datalake_sales_flow_raw.mortgage.credit_model
   credit_status:
     description: The current status of the credit analysis.
     lineage:
-      - datalake_sales_flow_raw.mortgage.credit_status
+    - datalake_sales_flow_raw.mortgage.credit_status
   bank_fee:
     description: The fee charged by the bank.
     lineage:
-      - datalake_sales_flow_raw.mortgage.bank_fee
+    - datalake_sales_flow_raw.mortgage.bank_fee
   institution_choice_reason:
     description: The reason for choosing the financial institution.
     lineage:
-      - datalake_sales_flow_raw.mortgage.institution_choice_reason
+    - datalake_sales_flow_raw.mortgage.institution_choice_reason
   credit_letter:
-    description: Information about the credit letter.
+    description: Credit-approval letter status or reference issued by the bank for the financing.
     lineage:
-      - datalake_sales_flow_raw.mortgage.credit_letter
+    - datalake_sales_flow_raw.mortgage.credit_letter
   mortgage_pendency:
     description: Any pending issues or items related to the mortgage.
     lineage:
-      - datalake_sales_flow_raw.mortgage.mortgage_pendency
+    - datalake_sales_flow_raw.mortgage.mortgage_pendency
   approved_amount:
     description: The amount of credit that was approved.
     lineage:
-      - datalake_sales_flow_raw.mortgage.approved_amount
+    - datalake_sales_flow_raw.mortgage.approved_amount
   approved_value_less_than_requested:
     description: Flag indicating if the approved value was less than the requested amount.
     lineage:
-      - datalake_sales_flow_raw.mortgage.approved_value_less_than_requested
+    - datalake_sales_flow_raw.mortgage.approved_value_less_than_requested
   entry_amount_paid_finished_by:
     description: Identifier for the user or system that finished the entry amount payment.
     lineage:
-      - datalake_sales_flow_raw.mortgage.entry_amount_paid_finished_by
+    - datalake_sales_flow_raw.mortgage.entry_amount_paid_finished_by
   financed_value:
     description: The total value being financed.
     lineage:
-      - datalake_sales_flow_raw.mortgage.financed_value
+    - datalake_sales_flow_raw.mortgage.financed_value
   payment_id:
     description: Foreign key to the payment table.
     lineage:
-      - datalake_sales_flow_raw.mortgage.payment_id
+    - datalake_sales_flow_raw.mortgage.payment_id
   installments_quantity:
     description: The number of installments for the mortgage.
     lineage:
-      - datalake_sales_flow_raw.mortgage.installments_quantity
+    - datalake_sales_flow_raw.mortgage.installments_quantity
   is_entry_amount_paid:
     description: Flag indicating if the entry amount has been paid.
     lineage:
-      - datalake_sales_flow_raw.mortgage.is_entry_amount_paid
+    - datalake_sales_flow_raw.mortgage.is_entry_amount_paid
   is_itbi_paid:
     description: Flag indicating if the ITBI (Imposto sobre Transmissão de Bens Imóveis) has been paid.
     lineage:
-      - datalake_sales_flow_raw.mortgage.is_itbi_paid
+    - datalake_sales_flow_raw.mortgage.is_itbi_paid
   itbi_paid_finished_by:
     description: Identifier for the user or system that finished the ITBI payment.
     lineage:
-      - datalake_sales_flow_raw.mortgage.itbi_paid_finished_by
+    - datalake_sales_flow_raw.mortgage.itbi_paid_finished_by
   dt_credit_started:
     description: The date when the credit analysis started.
     lineage:
-      - datalake_sales_flow_raw.mortgage.credit_start_date
+    - datalake_sales_flow_raw.mortgage.credit_start_date
   dt_credit_ended:
     description: The date when the credit analysis ended.
     lineage:
-      - datalake_sales_flow_raw.mortgage.credit_end_date
+    - datalake_sales_flow_raw.mortgage.credit_end_date
   dt_bank_started:
     description: The date when the bank process started.
     lineage:
-      - datalake_sales_flow_raw.mortgage.bank_start_date
+    - datalake_sales_flow_raw.mortgage.bank_start_date
   dt_started:
     description: The start date of the mortgage process.
     lineage:
-      - datalake_sales_flow_raw.mortgage.start_date
+    - datalake_sales_flow_raw.mortgage.start_date
   dt_ended:
     description: The end date of the mortgage process.
     lineage:
-      - datalake_sales_flow_raw.mortgage.end_date
+    - datalake_sales_flow_raw.mortgage.end_date
   ts_seller_paid:
     description: Timestamp of when the seller was paid.
     lineage:
-      - datalake_sales_flow_raw.mortgage.seller_paid_at
+    - datalake_sales_flow_raw.mortgage.seller_paid_at
   ts_entry_amount_paid:
     description: Timestamp of when the entry amount was paid.
     lineage:
-      - datalake_sales_flow_raw.mortgage.entry_amount_paid_at
+    - datalake_sales_flow_raw.mortgage.entry_amount_paid_at
   ts_itbi_paid:
     description: Timestamp of when the ITBI was paid.
     lineage:
-      - datalake_sales_flow_raw.mortgage.itbi_paid_at
+    - datalake_sales_flow_raw.mortgage.itbi_paid_at
   ts_created:
     description: Timestamp of when the mortgage record was created.
     lineage:
-      - datalake_sales_flow_raw.mortgage.created_at
+    - datalake_sales_flow_raw.mortgage.created_at
   ts_updated:
     description: Timestamp of the last update to the mortgage record.
     lineage:
-      - datalake_sales_flow_raw.mortgage.updated_at
+    - datalake_sales_flow_raw.mortgage.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.mortgage.year
+    - datalake_sales_flow_raw.mortgage.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.mortgage.month
+    - datalake_sales_flow_raw.mortgage.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.mortgage.day
+    - datalake_sales_flow_raw.mortgage.day

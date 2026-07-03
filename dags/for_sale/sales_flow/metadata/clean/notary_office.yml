@@ -1,79 +1,78 @@
----
 database_name: datalake_sales_flow_clean
 table_name: notary_office
-owner: leonardo.soares@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Table that stores the data about the notary offices.
 columns:
   id:
-    description: 'Id of the notary office.'
+    description: Surrogate primary key of the notary office row in the source system.
     lineage:
     - datalake_sales_flow_raw.notary_office.id
   id_hubs:
-    description: 'Hubs that the notary office is part of.'
+    description: Hubs that the notary office is part of.
     lineage:
     - datalake_sales_flow_raw.notary_office.hubs_id
   name:
-    description: 'Name of the notary office.'
+    description: Human-readable display name associated with the person or entity in this row.
     lineage:
     - datalake_sales_flow_raw.notary_office.name
   mobile_phone:
-    description: 'Mobile phone of the notary office.'
+    description: Mobile phone number for contacting the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.mobile_phone
   phone:
-    description: 'Phone of the notary office.'
+    description: Contact phone number stored for coordination during the For Sale transaction.
     lineage:
     - datalake_sales_flow_raw.notary_office.phone
   email:
-    description: 'Email of the notary office.'
+    description: Contact email address used for notifications and identity matching.
     lineage:
     - datalake_sales_flow_raw.notary_office.email
   address:
-    description: 'Address of the notary office.'
+    description: Street address where the notary office is located.
     lineage:
     - datalake_sales_flow_raw.notary_office.address
   city:
-    description: 'City of the notary office.'
+    description: City where the notary office is located.
     lineage:
     - datalake_sales_flow_raw.notary_office.city
   state:
-    description: 'State of the notary office.'
+    description: State or federal unit where the notary office is located.
     lineage:
     - datalake_sales_flow_raw.notary_office.state
   label:
-    description: 'Label of the notary office.'
+    description: Short UI or workflow label describing the task, tag, or category shown to operators.
     lineage:
     - datalake_sales_flow_raw.notary_office.label
   type:
-    description: 'Type of the notary office.'
+    description: Classifier distinguishing record subtype or participant role in the workflow.
     lineage:
     - datalake_sales_flow_raw.notary_office.type
   latitude:
-    description: 'Latitude of the notary office.'
+    description: Geographic latitude coordinate of the notary office location.
     lineage:
     - datalake_sales_flow_raw.notary_office.latitude
   longitude:
-    description: 'Longitude of the notary office.'
+    description: Geographic longitude coordinate of the notary office location.
     lineage:
     - datalake_sales_flow_raw.notary_office.longitude
   ts_created:
-    description: 'Timestamp of the creation of the notary office.'
+    description: Timestamp of the creation of the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the notary office.'
+    description: Timestamp of the last update of the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.updated_at
   year:
-    description: 'Year of the last update of the notary office.'
+    description: Year of the last update of the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.year
   month:
-    description: 'Month of the last update of the notary office.'
+    description: Month of the last update of the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.month
   day:
-    description: 'Day of the last update of the notary office.'
+    description: Day of the last update of the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.day

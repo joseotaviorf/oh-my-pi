@@ -1,139 +1,138 @@
----
 database_name: datalake_sales_flow_clean
 table_name: notary
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Contains information related to the notary process for a sales flow.
 columns:
   id_notary:
     description: Unique ID for the notary record.
     lineage:
-      - datalake_sales_flow_raw.notary.id
+    - datalake_sales_flow_raw.notary.id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.notary.sales_flow_id
+    - datalake_sales_flow_raw.notary.sales_flow_id
   id_specialist:
     description: ID of the specialist responsible for the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.specialist_id
+    - datalake_sales_flow_raw.notary.specialist_id
   id_notary_office:
-    description: ID of the notary office.
+    description: Identifier of the notary office handling this process, referencing notary_office.
     lineage:
-      - datalake_sales_flow_raw.notary.notary_office_id
+    - datalake_sales_flow_raw.notary.notary_office_id
   label:
     description: A label for the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.label
+    - datalake_sales_flow_raw.notary.label
   status:
     description: The current status of the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.status
+    - datalake_sales_flow_raw.notary.status
   protocol:
     description: The protocol number for the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.protocol
+    - datalake_sales_flow_raw.notary.protocol
   password:
     description: The password for accessing the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.password
+    - datalake_sales_flow_raw.notary.password
   available_costs:
     description: The available costs for the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.available_costs
+    - datalake_sales_flow_raw.notary.available_costs
   paid_costs:
     description: The paid costs for the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.paid_costs
+    - datalake_sales_flow_raw.notary.paid_costs
   seller_payment_status:
-    description: The payment status of the seller.
+    description: Status of the payment owed to the seller within the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.seller_payment_status
+    - datalake_sales_flow_raw.notary.seller_payment_status
   customer_follow_up:
-    description: Customer follow up information.
+    description: Customer follow-up status or notes recorded during the notary process.
     lineage:
-      - datalake_sales_flow_raw.notary.customer_follow_up
+    - datalake_sales_flow_raw.notary.customer_follow_up
   deed_emission_finished_by:
     description: Identifier for the user or system that finished the deed emission.
     lineage:
-      - datalake_sales_flow_raw.notary.deed_emission_finished_by
+    - datalake_sales_flow_raw.notary.deed_emission_finished_by
   deed_signature_finished_by:
     description: Identifier for the user or system that finished the deed signature.
     lineage:
-      - datalake_sales_flow_raw.notary.deed_signature_finished_by
+    - datalake_sales_flow_raw.notary.deed_signature_finished_by
   crn_finished_by:
     description: Identifier for the user or system that finished the CRN (Central de Registro Nacional).
     lineage:
-      - datalake_sales_flow_raw.notary.crn_finished_by
+    - datalake_sales_flow_raw.notary.crn_finished_by
   key_delivery_finished_by:
     description: Identifier for the user or system that finished the key delivery.
     lineage:
-      - datalake_sales_flow_raw.notary.key_delivery_finished_by
+    - datalake_sales_flow_raw.notary.key_delivery_finished_by
   cri_finished_by:
     description: Identifier for the user or system that finished the CRI (Certidão de Registro de Imóveis).
     lineage:
-      - datalake_sales_flow_raw.notary.cri_finished_by
+    - datalake_sales_flow_raw.notary.cri_finished_by
   ts_started:
     description: Timestamp of when the notary process started.
     lineage:
-      - datalake_sales_flow_raw.notary.started_at
+    - datalake_sales_flow_raw.notary.started_at
   ts_ended:
     description: Timestamp of when the notary process ended.
     lineage:
-      - datalake_sales_flow_raw.notary.ended_at
+    - datalake_sales_flow_raw.notary.ended_at
   ts_prevision_ended:
     description: Timestamp of when the notary process is expected to end.
     lineage:
-      - datalake_sales_flow_raw.notary.end_prevision_at
+    - datalake_sales_flow_raw.notary.end_prevision_at
   ts_buyer_received_keys:
     description: Timestamp of when the buyer received the keys.
     lineage:
-      - datalake_sales_flow_raw.notary.buyer_received_keys_at
+    - datalake_sales_flow_raw.notary.buyer_received_keys_at
   ts_kit_sent:
     description: Timestamp of when the kit was sent.
     lineage:
-      - datalake_sales_flow_raw.notary.kit_sent_at
+    - datalake_sales_flow_raw.notary.kit_sent_at
   ts_created:
     description: Timestamp of when the notary record was created.
     lineage:
-      - datalake_sales_flow_raw.notary.created_at
+    - datalake_sales_flow_raw.notary.created_at
   ts_updated:
     description: Timestamp of the last update to the notary record.
     lineage:
-      - datalake_sales_flow_raw.notary.updated_at
+    - datalake_sales_flow_raw.notary.updated_at
   ts_deed_emission_finished:
     description: Timestamp of when the deed emission was finished.
     lineage:
-      - datalake_sales_flow_raw.notary.deed_emission_finished_at
+    - datalake_sales_flow_raw.notary.deed_emission_finished_at
   ts_deed_signature_finished:
     description: Timestamp of when the deed signature was finished.
     lineage:
-      - datalake_sales_flow_raw.notary.deed_signature_finished_at
+    - datalake_sales_flow_raw.notary.deed_signature_finished_at
   ts_crn_finished:
     description: Timestamp of when the CRN was finished.
     lineage:
-      - datalake_sales_flow_raw.notary.crn_finished_at
+    - datalake_sales_flow_raw.notary.crn_finished_at
   ts_key_delivery_finished:
     description: Timestamp of when the key delivery was finished.
     lineage:
-      - datalake_sales_flow_raw.notary.key_delivery_finished_at
+    - datalake_sales_flow_raw.notary.key_delivery_finished_at
   ts_cri_finished:
     description: Timestamp of when the CRI was finished.
     lineage:
-      - datalake_sales_flow_raw.notary.cri_finished_at
+    - datalake_sales_flow_raw.notary.cri_finished_at
   ts_seller_paid:
     description: Timestamp of when the seller was paid.
     lineage:
-      - datalake_sales_flow_raw.notary.seller_paid_at
+    - datalake_sales_flow_raw.notary.seller_paid_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.notary.year
+    - datalake_sales_flow_raw.notary.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.notary.month
+    - datalake_sales_flow_raw.notary.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.notary.day
+    - datalake_sales_flow_raw.notary.day

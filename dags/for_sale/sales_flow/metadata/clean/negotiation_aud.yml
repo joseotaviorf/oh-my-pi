@@ -1,4 +1,3 @@
----
 database_name: datalake_sales_flow_clean
 table_name: negotiation_aud
 domain: For Sale
@@ -6,90 +5,126 @@ columns:
   id:
     lineage:
     - datalake_sales_flow_raw.negotiation_aud.id
+    description: Surrogate primary key of the negotiation aud row in the source system.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.sales_flow_id
+    - datalake_sales_flow_raw.negotiation_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   rev:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.rev
+    - datalake_sales_flow_raw.negotiation_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.revtype
+    - datalake_sales_flow_raw.negotiation_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.revend
+    - datalake_sales_flow_raw.negotiation_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   has_fgts_draft:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.use_fgts
+    - datalake_sales_flow_raw.negotiation_aud.use_fgts
+    description: Boolean flag indicating whether fgts draft applies to this record.
   has_final_value_refund:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.has_final_value_refund
+    - datalake_sales_flow_raw.negotiation_aud.has_final_value_refund
+    description: Boolean flag indicating whether final value refund applies to this record.
   is_seller_pj:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.is_seller_pj
+    - datalake_sales_flow_raw.negotiation_aud.is_seller_pj
+    description: Boolean flag indicating whether seller pj applies to this record.
   is_buyer_pj:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.is_buyer_pj
+    - datalake_sales_flow_raw.negotiation_aud.is_buyer_pj
+    description: Boolean flag indicating whether buyer pj applies to this record.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.sales_flow_id_mod
-  mod_has_fgts_draft:
+    - datalake_sales_flow_raw.negotiation_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
+  mod_has_fgts_draf:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.use_fgts_mod
+    - datalake_sales_flow_raw.negotiation_aud.use_fgts_mod
+    description: Envers boolean flag indicating whether has fgts draft changed in this audit revision.
+  mod_has_final_value_refund:
+    lineage:
+    - datalake_sales_flow_raw.negotiation_aud.has_final_value_refund_mod
+    description: Envers boolean flag indicating whether has final value refund changed in this audit revision.
   mod_is_seller_pj:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.is_seller_pj_mod
+    - datalake_sales_flow_raw.negotiation_aud.is_seller_pj_mod
+    description: Envers boolean flag indicating whether is seller pj changed in this audit revision.
   mod_is_buyer_pj:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.is_buyer_pj_mod
+    - datalake_sales_flow_raw.negotiation_aud.is_buyer_pj_mod
+    description: Envers boolean flag indicating whether is buyer pj changed in this audit revision.
   mod_ts_buyer_documentation_started:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_started_at_mod
+    - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_started_at_mod
+    description: Envers boolean flag indicating whether ts buyer documentation started changed in this audit revision.
   mod_ts_buyer_documentation_submitted:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_submitted_at_mod
+    - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_submitted_at_mod
+    description: Envers boolean flag indicating whether ts buyer documentation submitted changed in this audit revision.
   mod_ts_seller_documentation_started:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_started_at_mod
+    - datalake_sales_flow_raw.negotiation_aud.seller_documentation_started_at_mod
+    description: Envers boolean flag indicating whether ts seller documentation started changed in this audit revision.
   mod_ts_seller_documentation_submitted:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_submitted_at_mod
+    - datalake_sales_flow_raw.negotiation_aud.seller_documentation_submitted_at_mod
+    description: Envers boolean flag indicating whether ts seller documentation submitted changed in this audit revision.
   mod_ts_buyer_credit_started:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_credit_started_at_mod
+    - datalake_sales_flow_raw.negotiation_aud.buyer_credit_started_at_mod
+    description: Envers boolean flag indicating whether ts buyer credit started changed in this audit revision.
   mod_ts_buyer_credit_submitted:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_credit_submitted_at_mod
+    - datalake_sales_flow_raw.negotiation_aud.buyer_credit_submitted_at_mod
+    description: Envers boolean flag indicating whether ts buyer credit submitted changed in this audit revision.
   ts_buyer_documentation_started:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_started_at
+    - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_started_at
+    description: Audited timestamp of when the buyer documentation step started at this revision.
   ts_buyer_documentation_submitted:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_submitted_at
+    - datalake_sales_flow_raw.negotiation_aud.buyer_documentation_submitted_at
+    description: Audited timestamp of when the buyer documentation was submitted at this revision.
   ts_seller_documentation_started:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_started_at
+    - datalake_sales_flow_raw.negotiation_aud.seller_documentation_started_at
+    description: Audited timestamp of when the seller documentation step started at this revision.
   ts_seller_documentation_submitted:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.seller_documentation_submitted_at
+    - datalake_sales_flow_raw.negotiation_aud.seller_documentation_submitted_at
+    description: Audited timestamp of when the seller documentation was submitted at this revision.
   ts_buyer_credit_started:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_credit_started_at
+    - datalake_sales_flow_raw.negotiation_aud.buyer_credit_started_at
+    description: Audited timestamp of when the buyer credit analysis started at this revision.
   ts_buyer_credit_submitted:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.buyer_credit_submitted_at
+    - datalake_sales_flow_raw.negotiation_aud.buyer_credit_submitted_at
+    description: Audited timestamp of when the buyer credit request was submitted at this revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.created_at
+    - datalake_sales_flow_raw.negotiation_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.updated_at
+    - datalake_sales_flow_raw.negotiation_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.year
+    - datalake_sales_flow_raw.negotiation_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.month
+    - datalake_sales_flow_raw.negotiation_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.negotiation_aud.day
+    - datalake_sales_flow_raw.negotiation_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of negotiation rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

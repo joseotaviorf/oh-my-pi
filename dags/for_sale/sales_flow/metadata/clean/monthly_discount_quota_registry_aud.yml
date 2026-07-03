@@ -1,76 +1,58 @@
----
 database_name: datalake_sales_flow_clean
-
 table_name: monthly_discount_quota_registry_aud
-
 domain: For Sale
-
-owner: rachel.carvalho@quintoandar.com.br
-
+owner: helder.rodrigues@quintoandar.com.br
 description: Audit table for monthly_discount_quota_registry containing historical changes and modifications.
-
 columns:
   id:
     description: Unique ID for the monthly discount quota registry record.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.id
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.id
   rev:
     description: Unique id for this modification and can be joined with table rev_info to get more details.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.rev
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.rev
   rev_type:
-    description: Modification type.
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
     categories:
-      "0" : Create
-      "1" : Update
-      "2" : Delete
+      '0': Create
+      '1': Update
+      '2': Delete
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.revtype
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.revtype
   rev_end:
     description: ID of the revision that replaced the current entry.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.revend
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.revend
   id_monthly_discount_quota:
     description: Foreign key to the monthly_discount_quota table.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.monthly_discount_quota_id
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.monthly_discount_quota_id
   id_sales_flow:
     description: Foreign key to the sales_flow table.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.sales_flow_id
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.sales_flow_id
   status:
-    description: Status of the monthly discount quota registry.
+    description: Current operational status code governing workflow progression for this record.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.status
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.status
   ts_created:
-    description: Timestamp when the monthly discount quota registry was created.
+    description: Timestamp when the row was first created in the source operational system.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.created_at
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.created_at
   ts_updated:
     description: Timestamp of the last update to the monthly discount quota registry.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.updated_at
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.updated_at
   year:
     description: Year partition for the monthly discount quota registry record.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.year
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.year
   month:
     description: Month partition for the monthly discount quota registry record.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.month
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.month
   day:
     description: Day partition for the monthly discount quota registry record.
     lineage:
-      - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.day
-
+    - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.day

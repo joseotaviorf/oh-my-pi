@@ -1,188 +1,250 @@
----
 database_name: datalake_sales_flow_clean
 table_name: notary_aud
 domain: For Sale
 columns:
   id_notary_aud:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.id
+    - datalake_sales_flow_raw.notary_aud.id
+    description: Audited identifier of the notary record this revision belongs to.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.sales_flow_id
+    - datalake_sales_flow_raw.notary_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_specialist:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.specialist_id
+    - datalake_sales_flow_raw.notary_aud.specialist_id
+    description: Audited identifier of the specialist responsible for the notary process at this revision.
   id_notary_office:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.notary_office_id
+    - datalake_sales_flow_raw.notary_aud.notary_office_id
+    description: Audited identifier of the notary office handling this process, referencing notary_office.
   rev:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.rev
+    - datalake_sales_flow_raw.notary_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.revtype
+    - datalake_sales_flow_raw.notary_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.revend
+    - datalake_sales_flow_raw.notary_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   label:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.label
+    - datalake_sales_flow_raw.notary_aud.label
+    description: Short UI or workflow label describing the task, tag, or category shown to operators.
   status:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.status
+    - datalake_sales_flow_raw.notary_aud.status
+    description: Current operational status code governing workflow progression for this record.
   protocol:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.protocol
+    - datalake_sales_flow_raw.notary_aud.protocol
+    description: Audited protocol number of the notary process at this revision.
   password:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.password
+    - datalake_sales_flow_raw.notary_aud.password
+    description: Audited access password for the notary process at this revision.
   available_costs:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.available_costs
+    - datalake_sales_flow_raw.notary_aud.available_costs
+    description: Audited available costs of the notary process at this revision.
   paid_costs:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.paid_costs
+    - datalake_sales_flow_raw.notary_aud.paid_costs
+    description: Audited paid costs of the notary process at this revision.
   seller_payment_status:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.seller_payment_status
+    - datalake_sales_flow_raw.notary_aud.seller_payment_status
+    description: Audited status of the payment owed to the seller at this revision.
   customer_follow_up:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.customer_follow_up
+    - datalake_sales_flow_raw.notary_aud.customer_follow_up
+    description: Audited customer follow-up status or notes at this revision.
   deed_emission_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_by
+    - datalake_sales_flow_raw.notary_aud.deed_emission_finished_by
+    description: Audited identifier of the user or system that finished the deed emission at this revision.
   deed_signature_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_by
+    - datalake_sales_flow_raw.notary_aud.deed_signature_finished_by
+    description: Audited identifier of the user or system that finished the deed signature at this revision.
   crn_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.crn_finished_by
+    - datalake_sales_flow_raw.notary_aud.crn_finished_by
+    description: Audited identifier of the user or system that finished the CRN step at this revision.
   key_delivery_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_by
+    - datalake_sales_flow_raw.notary_aud.key_delivery_finished_by
+    description: Audited identifier of the user or system that finished the key delivery at this revision.
   cri_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.cri_finished_by
+    - datalake_sales_flow_raw.notary_aud.cri_finished_by
+    description: Audited identifier of the user or system that finished the CRI step at this revision.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.notary_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
   mod_id_specialist:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.specialist_id_mod
+    - datalake_sales_flow_raw.notary_aud.specialist_id_mod
+    description: Envers boolean flag indicating whether id specialist changed in this audit revision.
   mod_label:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.label_mod
+    - datalake_sales_flow_raw.notary_aud.label_mod
+    description: Envers boolean flag indicating whether label changed in this audit revision.
   mod_status:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.status_mod
+    - datalake_sales_flow_raw.notary_aud.status_mod
+    description: Envers boolean flag indicating whether status changed in this audit revision.
   mod_protocol:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.protocol_mod
+    - datalake_sales_flow_raw.notary_aud.protocol_mod
+    description: Envers boolean flag indicating whether protocol changed in this audit revision.
   mod_password:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.password_mod
+    - datalake_sales_flow_raw.notary_aud.password_mod
+    description: Envers boolean flag indicating whether password changed in this audit revision.
   mod_available_costs:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.available_costs_mod
+    - datalake_sales_flow_raw.notary_aud.available_costs_mod
+    description: Envers boolean flag indicating whether available costs changed in this audit revision.
   mod_paid_costs:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.paid_costs_mod
+    - datalake_sales_flow_raw.notary_aud.paid_costs_mod
+    description: Envers boolean flag indicating whether paid costs changed in this audit revision.
   mod_seller_payment_status:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.seller_payment_status_mod
+    - datalake_sales_flow_raw.notary_aud.seller_payment_status_mod
+    description: Envers boolean flag indicating whether seller payment status changed in this audit revision.
   mod_ts_started:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.started_at_mod
+    - datalake_sales_flow_raw.notary_aud.started_at_mod
+    description: Envers boolean flag indicating whether ts started changed in this audit revision.
   mod_ts_ended:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.ended_at_mod
+    - datalake_sales_flow_raw.notary_aud.ended_at_mod
+    description: Envers boolean flag indicating whether ts ended changed in this audit revision.
   mod_ts_prevision_ended:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.end_prevision_at_mod
+    - datalake_sales_flow_raw.notary_aud.end_prevision_at_mod
+    description: Envers boolean flag indicating whether ts prevision ended changed in this audit revision.
   mod_ts_buyer_received_keys:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.buyer_received_keys_at_mod
+    - datalake_sales_flow_raw.notary_aud.buyer_received_keys_at_mod
+    description: Envers boolean flag indicating whether ts buyer received keys changed in this audit revision.
   mod_ts_kit_sent:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.kit_sent_at_mod
+    - datalake_sales_flow_raw.notary_aud.kit_sent_at_mod
+    description: Envers boolean flag indicating whether ts kit sent changed in this audit revision.
   mod_id_notary_office:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.notary_office_id_mod
+    - datalake_sales_flow_raw.notary_aud.notary_office_id_mod
+    description: Envers boolean flag indicating whether id notary office changed in this audit revision.
   mod_customer_follow_up:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.customer_follow_up_mod
+    - datalake_sales_flow_raw.notary_aud.customer_follow_up_mod
+    description: Envers boolean flag indicating whether customer follow up changed in this audit revision.
   mod_deed_emission_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_by_mod
+    - datalake_sales_flow_raw.notary_aud.deed_emission_finished_by_mod
+    description: Envers boolean flag indicating whether deed emission finished by changed in this audit revision.
   mod_deed_signature_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_by_mod
+    - datalake_sales_flow_raw.notary_aud.deed_signature_finished_by_mod
+    description: Envers boolean flag indicating whether deed signature finished by changed in this audit revision.
   mod_crn_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.crn_finished_by_mod
+    - datalake_sales_flow_raw.notary_aud.crn_finished_by_mod
+    description: Envers boolean flag indicating whether crn finished by changed in this audit revision.
   mod_key_delivery_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_by_mod
+    - datalake_sales_flow_raw.notary_aud.key_delivery_finished_by_mod
+    description: Envers boolean flag indicating whether key delivery finished by changed in this audit revision.
   mod_cri_finished_by:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.cri_finished_by_mod
+    - datalake_sales_flow_raw.notary_aud.cri_finished_by_mod
+    description: Envers boolean flag indicating whether cri finished by changed in this audit revision.
   mod_ts_deed_emission_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_at_mod
+    - datalake_sales_flow_raw.notary_aud.deed_emission_finished_at_mod
+    description: Envers boolean flag indicating whether ts deed emission finished changed in this audit revision.
   mod_ts_deed_signature_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_at_mod
+    - datalake_sales_flow_raw.notary_aud.deed_signature_finished_at_mod
+    description: Envers boolean flag indicating whether ts deed signature finished changed in this audit revision.
   mod_ts_crn_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.crn_finished_at_mod
+    - datalake_sales_flow_raw.notary_aud.crn_finished_at_mod
+    description: Envers boolean flag indicating whether ts crn finished changed in this audit revision.
   mod_ts_key_delivery_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_at_mod
+    - datalake_sales_flow_raw.notary_aud.key_delivery_finished_at_mod
+    description: Envers boolean flag indicating whether ts key delivery finished changed in this audit revision.
   mod_ts_cri_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.cri_finished_at_mod
+    - datalake_sales_flow_raw.notary_aud.cri_finished_at_mod
+    description: Envers boolean flag indicating whether ts cri finished changed in this audit revision.
   ts_started:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.started_at
+    - datalake_sales_flow_raw.notary_aud.started_at
+    description: Audited timestamp of when the notary process started at this revision.
   ts_ended:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.ended_at
+    - datalake_sales_flow_raw.notary_aud.ended_at
+    description: Audited timestamp of when the notary process ended at this revision.
   ts_prevision_ended:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.end_prevision_at
+    - datalake_sales_flow_raw.notary_aud.end_prevision_at
+    description: Audited expected end timestamp of the notary process at this revision.
   ts_buyer_received_keys:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.buyer_received_keys_at
+    - datalake_sales_flow_raw.notary_aud.buyer_received_keys_at
+    description: Audited timestamp of when the buyer received the keys at this revision.
   ts_kit_sent:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.kit_sent_at
+    - datalake_sales_flow_raw.notary_aud.kit_sent_at
+    description: Audited timestamp of when the kit was sent at this revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.created_at
+    - datalake_sales_flow_raw.notary_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.updated_at
+    - datalake_sales_flow_raw.notary_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   ts_deed_emission_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_at
+    - datalake_sales_flow_raw.notary_aud.deed_emission_finished_at
+    description: Audited timestamp of when the deed emission was finished at this revision.
   ts_deed_signature_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_at
+    - datalake_sales_flow_raw.notary_aud.deed_signature_finished_at
+    description: Audited timestamp of when the deed signature was finished at this revision.
   ts_crn_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.crn_finished_at
+    - datalake_sales_flow_raw.notary_aud.crn_finished_at
+    description: Audited timestamp of when the CRN step was finished at this revision.
   ts_key_delivery_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_at
+    - datalake_sales_flow_raw.notary_aud.key_delivery_finished_at
+    description: Audited timestamp of when the key delivery was finished at this revision.
   ts_cri_finished:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.cri_finished_at
+    - datalake_sales_flow_raw.notary_aud.cri_finished_at
+    description: Audited timestamp of when the CRI step was finished at this revision.
   year:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.year
+    - datalake_sales_flow_raw.notary_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.month
+    - datalake_sales_flow_raw.notary_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.notary_aud.day
+    - datalake_sales_flow_raw.notary_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of notary rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.
