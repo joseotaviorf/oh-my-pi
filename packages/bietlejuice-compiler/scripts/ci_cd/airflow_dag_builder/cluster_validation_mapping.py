@@ -3,6 +3,9 @@ Instance-topology mapping from effective prod cluster config to consolidation va
 
 Resolves prod cluster args via merge_cluster_configuration (same as runtime), maps legacy
 instance types to Graviton equivalents, and selects a consolidation_* preset from prod_conf.
+
+GPU families (g4dn/g5/p-family) are excluded: the only ARM GPU EC2 family (g5g,
+Graviton2 + T4G) is not a Databricks-supported node type — GPU jobs stay x86.
 """
 
 from __future__ import annotations
@@ -105,8 +108,27 @@ CONSOLIDATION_PRESET_NAMES_RE = re.compile(
     r"^(consolidation_[a-z0-9_]+):", re.MULTILINE
 )
 
-GENERAL_PREFIXES = ("m-fleet", "m5", "m5a", "m5d", "m6g", "m6i", "m7a", "m7g", "m7i")
+GENERAL_PREFIXES = (
+    "m-fleet",
+    "m4",
+    "m5",
+    "m5a",
+    "m5d",
+    "m6g",
+    "m6i",
+    "m7a",
+    "m7g",
+    "m7i",
+)
+# i-family (storage-optimized) is 8 GB/vCPU — memory-preset economics. Only
+# "rd-fleet" is added among the *-fleet variants: the wonka census shows no
+# md-fleet/mg-fleet/... in use.
 MEMORY_PREFIXES = (
+    "i3",
+    "i4g",
+    "i4i",
+    "i7i",
+    "i8g",
     "r-fleet",
     "r4",
     "r5",
@@ -117,8 +139,9 @@ MEMORY_PREFIXES = (
     "r7a",
     "r7g",
     "r7i",
+    "rd-fleet",
 )
-COMPUTE_PREFIXES = ("c-fleet", "c5", "c5a", "c5n", "c6g", "c6i", "c7g", "c7i")
+COMPUTE_PREFIXES = ("c-fleet", "c5", "c5a", "c5n", "c6g", "c6i", "c7a", "c7g", "c7i")
 
 # Size tokens scanned (longest-first) when a fleet cluster exposes no explicit
 # node_type_id; the fleet pools default to xlarge when no token is present.
@@ -266,8 +289,25 @@ def _is_graviton_non_nvme_instance_type(instance_type: str) -> bool:
     return generation in (6, 7) and variant == "g"
 
 
+# x86 storage-optimized families: local NVMe by definition ("i3" also covers
+# i3en). "rd-fleet" is the r-family local-disk fleet pool.
+_STORAGE_NVME_BASES = frozenset({"i3", "i3en", "i4i", "i7i", "rd-fleet"})
+
+# ARM storage-optimized families (Graviton2 i4g / Graviton4 i8g): already ARM
+# with local NVMe — mapped through unchanged (per-job disk fallback targets).
+_ARM_STORAGE_BASES = frozenset({"i4g", "i8g"})
+
+
+def _instance_base(instance_type: str) -> str:
+    return str(instance_type).strip().lower().split(".", 1)[0]
+
+
 def _is_legacy_nvme_instance_type(instance_type: str) -> bool:
-    """True for non-Graviton m/r/c types with local NVMe (variant contains 'd': m5d, c6id, r6id, m5ad...)."""
+    """True for non-Graviton types with local NVMe: m/r/c variants containing 'd'
+    (m5d, c6id, r6id, m5ad...), x86 storage-optimized (i3/i3en/i4i/i7i), and
+    the rd-fleet local-disk pool."""
+    if _instance_base(instance_type) in _STORAGE_NVME_BASES:
+        return True
     match = _INSTANCE_TYPE_RE.match(str(instance_type).strip().lower())
     if not match:
         return False
@@ -294,6 +334,8 @@ def map_instance_type_to_graviton(instance_type: str, *, use_nvme: bool = False)
     if _is_graviton_nvme_instance_type(
         normalized
     ) or _is_graviton_non_nvme_instance_type(normalized):
+        return normalized
+    if _instance_base(normalized) in _ARM_STORAGE_BASES:
         return normalized
     family = _instance_family(instance_type)
     graviton_suffix = _graviton_suffix_for_instance_type(instance_type)

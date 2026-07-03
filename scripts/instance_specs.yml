@@ -105,3 +105,15 @@ instances:
   r5a.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
   r5a.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
   r5a.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}
+  # Storage-optimised ARM  i8g (Graviton4) / i4g (Graviton2) — per-job disk
+  # fallbacks for i3/i4i/i7i migrations (local NVMe, memory-family ratio)
+  i8g.large: {vcpus: 2, memory_gb: 16, family: memory}
+  i8g.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  i8g.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  i8g.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  i8g.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}
+  i4g.large: {vcpus: 2, memory_gb: 16, family: memory}
+  i4g.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  i4g.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  i4g.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  i4g.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}

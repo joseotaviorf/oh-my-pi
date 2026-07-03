@@ -7,7 +7,10 @@ import pytest
 from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+    _instance_family,
+    _is_legacy_nvme_instance_type,
     _mapped_worker_and_driver,
+    _use_nvme_for_topology_value,
     build_consolidation_catalog,
     build_rightsizing_validation_cluster_spec,
     build_validation_cluster_spec,
@@ -107,6 +110,124 @@ class TestMapInstanceTypeToGraviton:
             map_instance_type_to_graviton("c5a.2xlarge", use_nvme=False)
             == "c7g.2xlarge"
         )
+
+
+def _map_worker_topology(instance_type: str) -> str:
+    """Worker-side mapping: NVMe policy resolved as topology normalization does."""
+    use_nvme = _use_nvme_for_topology_value(instance_type, photon_enabled=False)
+    return map_instance_type_to_graviton(instance_type, use_nvme=use_nvme)
+
+
+class TestStorageFamilyToGraviton:
+    @pytest.mark.parametrize(
+        ("instance_type", "expected"),
+        [
+            ("i3.2xlarge", "r7gd.2xlarge"),
+            ("i4i.4xlarge", "r7gd.4xlarge"),
+            ("i4i.8xlarge", "r7gd.8xlarge"),
+            ("i7i.2xlarge", "r7gd.2xlarge"),
+            ("i7i.4xlarge", "r7gd.4xlarge"),
+            ("rd-fleet.8xlarge", "r7gd.8xlarge"),
+        ],
+    )
+    def test_worker_keeps_nvme_on_graviton_memory(self, instance_type, expected):
+        assert _map_worker_topology(instance_type) == expected
+
+    @pytest.mark.parametrize(
+        ("instance_type", "expected"),
+        [
+            ("i3.2xlarge", "r7g.2xlarge"),
+            ("i7i.xlarge", "r7g.xlarge"),
+            ("rd-fleet.2xlarge", "r7g.2xlarge"),
+        ],
+    )
+    def test_driver_drops_nvme(self, instance_type, expected):
+        assert map_instance_type_to_graviton(instance_type, use_nvme=False) == expected
+
+    @pytest.mark.parametrize("use_nvme", [True, False])
+    @pytest.mark.parametrize("instance_type", ["i8g.2xlarge", "i4g.2xlarge"])
+    def test_arm_storage_passes_through_unchanged(self, instance_type, use_nvme):
+        assert (
+            map_instance_type_to_graviton(instance_type, use_nvme=use_nvme)
+            == instance_type
+        )
+        assert _map_worker_topology(instance_type) == instance_type
+
+    @pytest.mark.parametrize(
+        "instance_type",
+        [
+            "i3.2xlarge",
+            "i4i.4xlarge",
+            "i7i.2xlarge",
+            "i4g.2xlarge",
+            "i8g.2xlarge",
+            "rd-fleet.8xlarge",
+        ],
+    )
+    def test_storage_families_classified_as_memory(self, instance_type):
+        assert _instance_family(instance_type) == "memory"
+
+    @pytest.mark.parametrize(
+        ("instance_type", "expected_tier"),
+        [
+            ("i3.2xlarge", "m"),
+            ("i7i.2xlarge", "m"),
+            ("i7i.4xlarge", "l"),
+            ("i4i.4xlarge", "l"),
+            ("i4i.8xlarge", "xl"),
+            ("rd-fleet.8xlarge", "xl"),
+        ],
+    )
+    def test_storage_size_tiers(self, instance_type, expected_tier):
+        assert size_tier_from_instance_type(instance_type) == expected_tier
+
+    @pytest.mark.parametrize(
+        "instance_type",
+        [
+            "i3.2xlarge",
+            "i3en.2xlarge",
+            "i4i.4xlarge",
+            "i7i.2xlarge",
+            "rd-fleet.8xlarge",
+        ],
+    )
+    def test_legacy_nvme_detection_true_for_storage_families(self, instance_type):
+        assert _is_legacy_nvme_instance_type(instance_type) is True
+
+    @pytest.mark.parametrize(
+        "instance_type",
+        ["m4.xlarge", "c7a.4xlarge", "r7g.2xlarge", "i8g.2xlarge", "i4g.2xlarge"],
+    )
+    def test_legacy_nvme_detection_false_for_non_nvme_and_arm(self, instance_type):
+        assert _is_legacy_nvme_instance_type(instance_type) is False
+
+
+class TestLegacyGeneralComputeFamilies:
+    @pytest.mark.parametrize(
+        ("instance_type", "expected"),
+        [
+            ("m4.xlarge", "m7g.xlarge"),
+            ("m4.2xlarge", "m7g.2xlarge"),
+            ("m4.4xlarge", "m7g.4xlarge"),
+            ("c7a.4xlarge", "c7g.4xlarge"),
+        ],
+    )
+    def test_worker_and_driver_map_identically(self, instance_type, expected):
+        # Arrange / Act
+        worker = _map_worker_topology(instance_type)
+        driver = map_instance_type_to_graviton(instance_type, use_nvme=False)
+        # Assert: these families carry no local NVMe, so worker == driver
+        assert worker == expected
+        assert driver == expected
+
+    def test_m4_classified_as_general(self):
+        assert _instance_family("m4.xlarge") == "general"
+
+    def test_c7a_classified_as_compute(self):
+        assert _instance_family("c7a.4xlarge") == "compute"
+
+    def test_c7a_4xlarge_is_l_tier(self):
+        assert size_tier_from_instance_type("c7a.4xlarge") == "l"
 
 
 class TestMatchConsolidationPreset:

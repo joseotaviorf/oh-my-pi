@@ -296,6 +296,8 @@ def _node_family(node_type: str) -> str:
         return "compute"
     if prefix.startswith("r"):
         return "memory"
+    if prefix.startswith("i"):
+        return "memory"  # storage-optimized (i4g/i8g/...): 8 GB/vCPU ⇒ memory economics
     return "general"  # m6g, m6gd, m7g → general
 
 
