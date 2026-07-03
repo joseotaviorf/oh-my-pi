@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from functools import partial
 
 from hive_metastore_client import HiveMetastoreClient
+from hive_metastore_client.builders import PartitionBuilder
 from pyspark.sql.types import StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
@@ -229,6 +230,43 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
     )
 
     logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
+
+
+def sync_metastore_table_partitions_incremental(
+    bucket, layer, schema, table_name, partition_values
+):
+    """
+    Adds the given partition values to the external Hive Metastore table without
+    enumerating or reconciling existing partitions (no drops). Used by DAGs that
+    opt into `incremental_partition_sync`, where the run's own partition is known
+    upfront; the full reconciliation in `sync_metastore_table_partitions` remains
+    the default and can be run manually to clean up drift or dropped partitions.
+    """
+    logger = set_logger("sync_metastore_table_partitions_incremental")
+    logger.info(
+        f"m={logger.name}, bucket={bucket}, layer={layer}, schema={schema}, "
+        f"table_name={table_name}, partition_values={partition_values}, "
+        "msg=Incremental partition sync started."
+    )
+    spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, False)
+    spark_ms.validate_table_arguments()
+
+    partitions = [
+        PartitionBuilder(
+            values=values,
+            db_name=spark_ms.spark_database_name,
+            table_name=table_name,
+        ).build()
+        for values in partition_values
+    ]
+
+    hive_ms_host = _get_hive_metastore_host()
+    hive_ms_client = HiveMetastoreClient(hive_ms_host)
+    hive_ms_service = HiveMetastoreService(hive_ms_client)
+    hive_ms_service.add_partitions_to_table(
+        spark_ms.spark_database_name, table_name, partitions
+    )
+    logger.info(f"m={logger.name}, msg=Finished incremental synchronization.")
 
 
 # propagate metadata function
@@ -460,6 +498,18 @@ def main():
         const=True,
         help="flag to bypass propagation of lineage",
     )
+    parser.add_argument(
+        "--partition-values",
+        type=str,
+        dest="partition_values",
+        required=False,
+        default=None,
+        help=(
+            'JSON list of partition-value lists (e.g. \'[["2026", "7", "3"]]\'). '
+            "When set, skips full partition reconciliation and only adds these "
+            "partitions to the external Hive metastore (no drops)."
+        ),
+    )
 
     args = parser.parse_args()
     global spark
@@ -503,18 +553,38 @@ def main():
     jobs_to_run = []
 
     if not bypass_hive:
-        jobs_to_run.extend(
-            [
-                {
-                    "job": sync_metastore_table_structure,
-                    "params": [bucket, layer, schema, table_name, all_tables_flag],
-                },
+        jobs_to_run.append(
+            {
+                "job": sync_metastore_table_structure,
+                "params": [bucket, layer, schema, table_name, all_tables_flag],
+            }
+        )
+        if args.partition_values:
+            partition_values = json.loads(args.partition_values)
+            if not table_name or all_tables_flag:
+                raise ValueError(
+                    "--partition-values requires --table-name single-table mode"
+                )
+            if partition_values:
+                jobs_to_run.append(
+                    {
+                        "job": sync_metastore_table_partitions_incremental,
+                        "params": [
+                            bucket,
+                            layer,
+                            schema,
+                            table_name,
+                            partition_values,
+                        ],
+                    }
+                )
+        else:
+            jobs_to_run.append(
                 {
                     "job": sync_metastore_table_partitions,
                     "params": [bucket, layer, schema, table_name, all_tables_flag],
-                },
-            ]
-        )
+                }
+            )
     if not bypass_propagate:
         jobs_to_run.append({"job": propagate_job, "params": propagate_params})
 

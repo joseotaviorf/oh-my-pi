@@ -17,6 +17,8 @@ workflow:
     - "{partitions}"
     - "{{ data_interval_start | ds }}"
   execution_timeout_hours: 6
+  # Asserts daily raw partitions are exactly year/month/day derived from data_interval_start
+  incremental_partition_sync: true
   default_extraction_type: incremental
   tables_customization:
     emlio_logs:

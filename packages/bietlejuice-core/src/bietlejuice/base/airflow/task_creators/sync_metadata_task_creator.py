@@ -27,7 +27,30 @@ class SyncMetadataTaskCreator(BaseTaskCreator):
         if bypass_task:
             parameters.append(bypass_task)
 
-        return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)
+        if (
+            table_attributes.layer == LayerEnum.RAW
+            and self.dag_execution_context.workflow_args.get(
+                "incremental_partition_sync", False
+            )
+        ):
+            # Incremental mode: only add this run's partition to the external Hive
+            # metastore instead of reconciling every partition since table creation.
+            # The flag asserts daily raw partitions are exactly year/month/day
+            # derived from data_interval_start (unpadded ints, matching
+            # SparkDataFrameService.create_year_month_day_columns_from_date).
+            parameters += [
+                "--partition-values",
+                '[["{{ data_interval_start.year }}", '
+                '"{{ data_interval_start.month }}", '
+                '"{{ data_interval_start.day }}"]]',
+            ]
+
+        return self._create_spark_job_task(
+            self.SPARK_JOB_NAME,
+            task_id,
+            parameters,
+            execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
+        )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         product_database_name = self._get_product_database_name()

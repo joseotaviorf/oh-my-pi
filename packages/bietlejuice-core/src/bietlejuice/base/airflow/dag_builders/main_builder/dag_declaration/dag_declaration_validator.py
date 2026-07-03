@@ -88,6 +88,11 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "incremental_partition_sync": {
+                    "type": "boolean",
+                    "empty": False,
+                    "required": False,
+                },
                 "source_schema": {"type": "string", "empty": False},
                 "source_database": {"type": "string", "empty": False},
                 "has_soft_delete": {"type": "boolean", "empty": False},
