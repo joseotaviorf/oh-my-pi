@@ -337,6 +337,75 @@ class TestGenerateValidationConfig:
         assert "node_type_id" not in custom
 
 
+class TestGenerateValidationConfigWonkaPresetRetarget:
+    def test_wonka_dag_retargets_multi_node_preset_to_wonka_variant(self, tmp_path):
+        rec = _Rec(
+            dag_id="quintoml.wonka.house_main",
+            cohort="right_size_multi",
+            confidence="high",
+            actions="reduce_worker_count",
+            current_preset="wonka_cluster",
+            recommended_preset="consolidation_m_memory_cluster",
+            rec_driver_node_type="r7g.2xlarge",
+            rec_worker_node_type="r7g.2xlarge",
+            rec_worker_count=2,
+        )
+
+        cfg = generate_validation_config(
+            rec, dags_root=tmp_path / "dags", quintoml_root=tmp_path
+        )
+
+        assert cfg is not None
+        assert (
+            cfg["validation"]["cluster"]["type"]
+            == "wonka_consolidation_m_memory_cluster"
+        )
+
+    def test_wonka_dag_keeps_generic_single_node_preset(self, tmp_path):
+        # No wonka single-node presets exist: collapse recommendations must
+        # keep the generic single-node preset name.
+        rec = _Rec(
+            dag_id="quintoml.wonka.house_main",
+            cohort="collapse_to_single",
+            confidence="high",
+            actions="collapse_to_single",
+            current_preset="wonka_cluster",
+            recommended_preset="consolidation_m_memory_single_node_cluster",
+            rec_driver_node_type="r7g.2xlarge",
+            rec_worker_count=0,
+        )
+
+        cfg = generate_validation_config(
+            rec, dags_root=tmp_path / "dags", quintoml_root=tmp_path
+        )
+
+        assert cfg is not None
+        assert (
+            cfg["validation"]["cluster"]["type"]
+            == "consolidation_m_memory_single_node_cluster"
+        )
+
+    def test_non_wonka_dag_keeps_generic_multi_node_preset(self, tmp_path):
+        rec = _Rec(
+            dag_id="bietlejuice.plain_dag",
+            cohort="right_size_multi",
+            confidence="high",
+            actions="reduce_worker_count",
+            current_preset="consolidation_l_memory_cluster",
+            recommended_preset="consolidation_m_memory_cluster",
+            rec_driver_node_type="r7g.2xlarge",
+            rec_worker_node_type="r7g.2xlarge",
+            rec_worker_count=2,
+        )
+
+        cfg = generate_validation_config(
+            rec, dags_root=tmp_path / "dags", quintoml_root=tmp_path
+        )
+
+        assert cfg is not None
+        assert cfg["validation"]["cluster"]["type"] == "consolidation_m_memory_cluster"
+
+
 class TestWriteValidationClusterFile:
     def test_remove_validation_section(self, tmp_path):
         path = tmp_path / "test_cluster.yml"

@@ -3570,35 +3570,35 @@ emr_7_12_consolidation_xl_memory_single_node_fleet_cluster:
 
 ##### Compute Optimized (c6g — 1 vCPU : 2 GiB RAM) #####
 
-consolidation_xs_compute_cluster:
+consolidation_xs_compute_cluster: &consolidation_xs_compute_cluster
     <<: *cluster_anchor
     driver_node_type_id: c6g.large
     node_type_id: c6g.large
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_s_compute_cluster:
+consolidation_s_compute_cluster: &consolidation_s_compute_cluster
     <<: *cluster_anchor
     driver_node_type_id: c6g.xlarge
     node_type_id: c6g.xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_m_compute_cluster:
+consolidation_m_compute_cluster: &consolidation_m_compute_cluster
     <<: *cluster_anchor
     driver_node_type_id: c6g.2xlarge
     node_type_id: c6g.2xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_l_compute_cluster:
+consolidation_l_compute_cluster: &consolidation_l_compute_cluster
     <<: *cluster_anchor
     driver_node_type_id: c6g.4xlarge
     node_type_id: c6g.4xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_xl_compute_cluster:
+consolidation_xl_compute_cluster: &consolidation_xl_compute_cluster
     <<: *cluster_anchor
     driver_node_type_id: c6g.8xlarge
     node_type_id: c6g.8xlarge
@@ -3607,35 +3607,35 @@ consolidation_xl_compute_cluster:
 
 ##### General Purpose (m6g — 1 vCPU : 4 GiB RAM) #####
 
-consolidation_xs_general_cluster:
+consolidation_xs_general_cluster: &consolidation_xs_general_cluster
     <<: *cluster_anchor
     driver_node_type_id: m6g.large
     node_type_id: m6g.large
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_s_general_cluster:
+consolidation_s_general_cluster: &consolidation_s_general_cluster
     <<: *cluster_anchor
     driver_node_type_id: m6g.xlarge
     node_type_id: m6g.xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_m_general_cluster:
+consolidation_m_general_cluster: &consolidation_m_general_cluster
     <<: *cluster_anchor
     driver_node_type_id: m6g.2xlarge
     node_type_id: m6g.2xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_l_general_cluster:
+consolidation_l_general_cluster: &consolidation_l_general_cluster
     <<: *cluster_anchor
     driver_node_type_id: m6g.4xlarge
     node_type_id: m6g.4xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_xl_general_cluster:
+consolidation_xl_general_cluster: &consolidation_xl_general_cluster
     <<: *cluster_anchor
     driver_node_type_id: m6g.8xlarge
     node_type_id: m6g.8xlarge
@@ -3644,56 +3644,141 @@ consolidation_xl_general_cluster:
 
 ##### Memory Optimized (r6g — 1 vCPU : 8 GiB RAM) #####
 
-consolidation_xs_memory_cluster:
+consolidation_xs_memory_cluster: &consolidation_xs_memory_cluster
     <<: *cluster_anchor
     driver_node_type_id: r6g.large
     node_type_id: r6g.large
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_s_memory_cluster:
+consolidation_s_memory_cluster: &consolidation_s_memory_cluster
     <<: *cluster_anchor
     driver_node_type_id: r6g.xlarge
     node_type_id: r6g.xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_m_memory_cluster:
+consolidation_m_memory_cluster: &consolidation_m_memory_cluster
     <<: *cluster_anchor
     driver_node_type_id: r6g.2xlarge
     node_type_id: r6g.2xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_l_memory_cluster:
+consolidation_l_memory_cluster: &consolidation_l_memory_cluster
     <<: *cluster_anchor
     driver_node_type_id: r6g.4xlarge
     node_type_id: r6g.4xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
-consolidation_xl_memory_cluster:
+consolidation_xl_memory_cluster: &consolidation_xl_memory_cluster
     <<: *cluster_anchor
     driver_node_type_id: r6g.8xlarge
     node_type_id: r6g.8xlarge
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
+##### Wonka Consolidation Presets #####
+# Each preset = the same-tier consolidation_* preset + the wonka runtime
+# (env vars, init scripts, ACL, conn id), so generated wonka validation
+# blocks carry only real per-job overrides.
+# Merge order matters: in a block-sequence merge, EARLIER entries win key
+# collisions, so *wonka_runtime is listed first — it overrides the tier
+# preset (init_scripts, aws_attributes, ...) exactly like wonka_cluster.
+# Runtime pinned to 15.4.x-scala2.12: wonka prod jobs run 15.4, and
+# validation must mirror the prod runtime (unlike the 16.4 generic set).
+# No single-node wonka variants: no wonka cluster is single-node.
+
+wonka_consolidation_xs_compute_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_xs_compute_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_s_compute_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_s_compute_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_m_compute_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_m_compute_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_l_compute_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_l_compute_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_xl_compute_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_xl_compute_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_xs_general_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_xs_general_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_s_general_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_s_general_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_m_general_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_m_general_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_l_general_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_l_general_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_xl_general_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_xl_general_cluster
+    spark_version: 15.4.x-scala2.12
+
 wonka_consolidation_xs_memory_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: r6g.large
-    node_type_id: r6g.large
-    num_workers: 2
-    spark_version: 16.4.x-scala2.12
-    <<: *wonka_runtime
+    <<:
+        - *wonka_runtime
+        - *consolidation_xs_memory_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_s_memory_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_s_memory_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_m_memory_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_m_memory_cluster
+    spark_version: 15.4.x-scala2.12
+
+wonka_consolidation_l_memory_cluster:
+    <<:
+        - *wonka_runtime
+        - *consolidation_l_memory_cluster
+    spark_version: 15.4.x-scala2.12
 
 wonka_consolidation_xl_memory_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: r6g.4xlarge
-    node_type_id: r6g.8xlarge
-    num_workers: 2
-    spark_version: 16.4.x-scala2.12
-    <<: *wonka_runtime
+    <<:
+        - *wonka_runtime
+        - *consolidation_xl_memory_cluster
+    spark_version: 15.4.x-scala2.12
 
 ##### Consolidation Single-Node Presets #####
 # Naming: consolidation_{size}_{family}_single_node_cluster

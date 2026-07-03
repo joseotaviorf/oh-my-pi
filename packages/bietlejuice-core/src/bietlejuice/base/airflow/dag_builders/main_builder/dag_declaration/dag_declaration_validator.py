@@ -29,6 +29,9 @@ from bietlejuice.base.pipeline.query_view_sync import (
     normalize_query_view_sync_config,
 )
 from bietlejuice.base.udfs.udf_enum import UDFEnum
+from bietlejuice.base.validation.cluster_args import (
+    CONSOLIDATION_PRESET_TYPE_PREFIXES,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -670,13 +673,13 @@ class DAGDeclarationValidator(Validator):
 
         validation_cluster_type = cluster["type"]
         if not (
-            validation_cluster_type.startswith("consolidation_")
+            validation_cluster_type.startswith(CONSOLIDATION_PRESET_TYPE_PREFIXES)
             or validation_cluster_type.startswith("emr_7_12_")
         ):
             raise AssertionError(
                 "m=_check_cluster_validation_config, "
-                "msg='validation.cluster.type' must start with 'consolidation_' "
-                "or 'emr_7_12_'"
+                "msg='validation.cluster.type' must start with 'consolidation_', "
+                "'wonka_consolidation_', or 'emr_7_12_'"
             )
 
         workflow = dag_declaration.get("workflow", {})

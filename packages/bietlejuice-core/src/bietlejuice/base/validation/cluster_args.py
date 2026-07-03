@@ -1,4 +1,12 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
+
+# Preset-name prefixes that identify consolidation validation presets.
+# wonka_consolidation_* = consolidation twin + wonka runtime (see
+# bietlejuice-core conf "Wonka Consolidation Presets" section).
+CONSOLIDATION_PRESET_TYPE_PREFIXES: Tuple[str, ...] = (
+    "wonka_consolidation_",
+    "consolidation_",
+)
 
 # Prod instance topology must not leak into consolidation validation clusters;
 # validation custom_configurations and preset defaults define Graviton types.
@@ -60,7 +68,7 @@ def _is_emr_to_databricks_validation(
     prod_cluster_type: str, validation_cluster_type: str
 ) -> bool:
     return prod_cluster_type.startswith("emr_") and validation_cluster_type.startswith(
-        "consolidation_"
+        CONSOLIDATION_PRESET_TYPE_PREFIXES
     )
 
 
@@ -85,7 +93,7 @@ def _strip_prod_topology_for_consolidation_validation(
     validation_cluster_type: str,
     prod_cluster_type: str = "",
 ) -> Dict[str, Any]:
-    if not validation_cluster_type.startswith("consolidation_"):
+    if not validation_cluster_type.startswith(CONSOLIDATION_PRESET_TYPE_PREFIXES):
         return prod_custom
     stripped = {
         key: value
@@ -134,12 +142,15 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
     # Empty validation custom means "preset defaults only". Do not inherit prod's
     # explicit PHOTON engine — consolidation presets default to STANDARD unless
     # validation.cluster re-states runtime_engine (see rightsizing disable_photon).
-    if validation_cluster_type.startswith("consolidation_") and not validation_custom:
+    if (
+        validation_cluster_type.startswith(CONSOLIDATION_PRESET_TYPE_PREFIXES)
+        and not validation_custom
+    ):
         prod_custom = {
             key: value for key, value in prod_custom.items() if key != "runtime_engine"
         }
     if (
-        validation_cluster_type.startswith("consolidation_")
+        validation_cluster_type.startswith(CONSOLIDATION_PRESET_TYPE_PREFIXES)
         and not validation_cluster_type.endswith("_single_node_cluster")
         and "num_workers" not in validation_custom
     ):

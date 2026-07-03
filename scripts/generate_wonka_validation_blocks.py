@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generate 1:1 Gen7 validation blocks for QuintoML Wonka feature sets.
 
-Maps each prod wonka_cluster topology to a consolidation_* Graviton Gen7 validation
-spec without resizing. Writes validation: into jobs/wonka/*/configs/prod.yml.
+Maps each prod wonka_cluster topology to a wonka_consolidation_* Graviton Gen7
+validation spec without resizing. Writes validation: into jobs/wonka/*/configs/prod.yml.
 
 Usage:
   ENVIRONMENT=prod uv run python scripts/generate_wonka_validation_blocks.py --dry-run
@@ -62,7 +62,9 @@ class GenerationResult:
     detail: str = ""
 
 
-def _spark_version_override(spec_custom: dict, preset_spark_version: str | None) -> bool:
+def _spark_version_override(
+    spec_custom: dict, preset_spark_version: str | None
+) -> bool:
     if not spec_custom:
         return False
     prod_spark = spec_custom.get("spark_version")
@@ -74,10 +76,11 @@ def _spark_version_override(spec_custom: dict, preset_spark_version: str | None)
 
 
 def generate_for_path(prod_yml_path: Path) -> GenerationResult:
-    rel = str(prod_yml_path)
     declaration = load_wonka_prod_declaration(prod_yml_path)
     if declaration is None:
-        return GenerationResult(prod_yml_path, None, "failed", detail="yaml_parse_error")
+        return GenerationResult(
+            prod_yml_path, None, "failed", detail="yaml_parse_error"
+        )
 
     dag_id = wonka_airflow_dag_id(declaration)
     cluster_args = declaration.get("cluster")

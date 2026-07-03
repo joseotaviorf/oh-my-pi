@@ -61,6 +61,7 @@ class TestBumpClusterTopologyToGen7:
 class TestIsConsolidationClusterType:
     def test_consolidation_prefix(self):
         assert is_consolidation_cluster_type("consolidation_s_general_cluster")
+        assert is_consolidation_cluster_type("wonka_consolidation_s_general_cluster")
         assert not is_consolidation_cluster_type("databricks_16_4_med_general_cluster")
 
 

@@ -233,7 +233,14 @@ class TestLegacyGeneralComputeFamilies:
 class TestMatchConsolidationPreset:
     @pytest.fixture(scope="class")
     def catalog(self):
-        return build_consolidation_catalog(ConfigurationService())
+        # Production (build_validation_cluster_spec) always hands the matcher a
+        # flavor-filtered pool: non-wonka DAGs never see wonka_consolidation_*
+        # twins. Mirror that here — these tests pin generic-preset behavior.
+        return [
+            preset
+            for preset in build_consolidation_catalog(ConfigurationService())
+            if not preset.name.startswith("wonka_consolidation_")
+        ]
 
     def test_med_general_three_workers(self, catalog):
         service = ConfigurationService()
@@ -299,6 +306,19 @@ class TestMatchConsolidationPreset:
         assert is_single_node_cluster(effective)
         assert matched is not None
         assert matched.name == "consolidation_s_general_single_node_cluster"
+
+
+class TestBuildConsolidationCatalogWonkaTwins:
+    def test_wonka_twin_shares_topology_and_pins_wonka_runtime(self):
+        catalog = build_consolidation_catalog(ConfigurationService())
+        by_name = {preset.name: preset for preset in catalog}
+        generic = by_name["consolidation_m_memory_cluster"]
+        wonka = by_name["wonka_consolidation_m_memory_cluster"]
+        assert wonka.family == "memory"
+        assert wonka.size_tier == "m"
+        # Wonka prod jobs run 15.4; validation must mirror the prod runtime.
+        assert wonka.spark_version == "15.4.x-scala2.12"
+        assert wonka.node_type_id == generic.node_type_id
 
 
 class TestComputeValidationOverrides:
@@ -872,6 +892,67 @@ class TestBuildValidationClusterSpec:
         assert len(init_scripts) == 2
         assert "sedona-init.sh" in init_scripts[0]["s3"]["destination"]
         assert "init_script.sh" in init_scripts[1]["s3"]["destination"]
+
+
+class TestBuildValidationClusterSpecWonkaRouting:
+    @staticmethod
+    def _wonka_declaration() -> dict:
+        return {
+            "dag": {"name": "house_main"},
+            "workflow": {
+                "type": "wonka",
+                "layer": "wonka",
+                "wonka_config": {"name": "house_main"},
+            },
+            "cluster": {
+                "type": "wonka_cluster",
+                "custom_configurations": {
+                    "spark_version": "15.4.x-scala2.12",
+                    "driver_node_type_id": "c5a.4xlarge",
+                    "node_type_id": "r5a.8xlarge",
+                    "num_workers": 2,
+                },
+            },
+        }
+
+    def test_wonka_cluster_routes_to_wonka_preset_without_runtime_boilerplate(self):
+        declaration = self._wonka_declaration()
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is not None
+        assert spec.cluster_type.startswith("wonka_consolidation_")
+        # The wonka presets carry the wonka runtime; the generated block must
+        # not restate it as per-job overrides.
+        custom = spec.custom_configurations or {}
+        assert "spark_env_vars" not in custom
+        assert "init_scripts" not in custom
+        assert "access_control_list" not in custom
+
+    def test_non_wonka_cluster_never_routes_to_wonka_preset(self):
+        # Same topology and 15.4 runtime as a wonka prod job — the closest
+        # catalog entry by spark_version is the wonka twin — but non-wonka
+        # DAGs must only ever match the generic pool.
+        declaration = {
+            "dag": {"name": "lookalike_custom"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {
+                "type": "custom_cluster",
+                "custom_configurations": {
+                    "spark_version": "15.4.x-scala2.12",
+                    "driver_node_type_id": "c5a.4xlarge",
+                    "node_type_id": "r5a.8xlarge",
+                    "num_workers": 2,
+                },
+            },
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_xl_memory_cluster"
 
 
 class TestStripRedundantPresetDefaultOverrides:

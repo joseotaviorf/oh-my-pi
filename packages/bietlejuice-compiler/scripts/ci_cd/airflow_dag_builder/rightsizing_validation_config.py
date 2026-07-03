@@ -281,10 +281,20 @@ def generate_validation_config(
     if is_emr_prod_cluster_args(prod_cluster_args):
         return None
 
+    recommended_preset = rec.recommended_preset
+    if (
+        is_wonka
+        and recommended_preset.startswith("consolidation_")
+        and not recommended_preset.endswith("_single_node_cluster")
+    ):
+        # Wonka blocks use the wonka_* preset variants (carry wonka_runtime).
+        # Single-node stays generic: no wonka single-node presets exist.
+        recommended_preset = f"wonka_{recommended_preset}"
+
     spec = build_rightsizing_validation_cluster_spec(
         prod_cluster_args=prod_cluster_args,
         declaration=declaration,
-        recommended_preset=rec.recommended_preset,
+        recommended_preset=recommended_preset,
         recommended_num_workers=rec.num_workers_override or rec.rec_worker_count,
         recommended_driver_node_type=(
             rec.driver_override_node_type_id or rec.rec_driver_node_type

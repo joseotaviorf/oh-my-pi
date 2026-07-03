@@ -23,6 +23,9 @@ from bietlejuice.base.airflow.cluster_config_resolver import (
     validation_resolves_to_prod_spec,
 )
 from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
+from bietlejuice.base.validation.cluster_args import (
+    CONSOLIDATION_PRESET_TYPE_PREFIXES,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Eligibility aligned with scripts/list_cluster_validation_eligible_dags.py
@@ -104,8 +107,13 @@ CONSOLIDATION_PRESET_RE = re.compile(
     r"(?:_single_node)?_cluster$"
 )
 
+WONKA_CONSOLIDATION_PRESET_RE = re.compile(
+    r"^wonka_consolidation_(xs|s|m|l|xl)_(general|memory|compute)"
+    r"(?:_single_node)?_cluster$"
+)
+
 CONSOLIDATION_PRESET_NAMES_RE = re.compile(
-    r"^(consolidation_[a-z0-9_]+):", re.MULTILINE
+    r"^((?:wonka_)?consolidation_[a-z0-9_]+):", re.MULTILINE
 )
 
 GENERAL_PREFIXES = (
@@ -633,7 +641,9 @@ def build_consolidation_catalog(
     service = config_service or ConfigurationService()
     catalog: List[ConsolidationPreset] = []
     for name in _list_consolidation_preset_names():
-        match = CONSOLIDATION_PRESET_RE.match(name)
+        match = CONSOLIDATION_PRESET_RE.match(
+            name
+        ) or WONKA_CONSOLIDATION_PRESET_RE.match(name)
         if not match:
             continue
         resolved = service.get_config(name)
@@ -1208,6 +1218,15 @@ def build_validation_cluster_spec(
     preset_catalog = (
         catalog if catalog is not None else build_consolidation_catalog(service)
     )
+    # Wonka DAGs match only wonka_consolidation_* presets (they carry the
+    # wonka runtime); everything else must never match them. A missing wonka
+    # combo hard-fails in match_consolidation_preset - no generic fallback.
+    wonka = prod_cluster_type == "wonka_cluster"
+    preset_pool = [
+        preset
+        for preset in preset_catalog
+        if preset.name.startswith("wonka_consolidation_") == wonka
+    ]
     mapped_worker, mapped_driver = _mapped_worker_and_driver(
         effective_prod, prod_cluster_type
     )
@@ -1215,7 +1234,7 @@ def build_validation_cluster_spec(
     matched = match_consolidation_preset(
         effective_prod=effective_prod,
         prod_cluster_type=prod_cluster_type,
-        catalog=preset_catalog,
+        catalog=preset_pool,
     )
     if matched is None:
         return None
@@ -1337,14 +1356,12 @@ def build_rightsizing_validation_cluster_spec(
     )
 
 
-CONSOLIDATION_PRESET_TYPE_PREFIX = "consolidation_"
-
 _GEN6_INSTANCE_RE = re.compile(r"^([cmr])6(gd?)\.(.+)$", re.IGNORECASE)
 
 
 def is_consolidation_cluster_type(cluster_type: str | None) -> bool:
     return bool(cluster_type) and str(cluster_type).startswith(
-        CONSOLIDATION_PRESET_TYPE_PREFIX
+        CONSOLIDATION_PRESET_TYPE_PREFIXES
     )
 
 

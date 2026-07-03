@@ -43,6 +43,10 @@ class TestClusterValidationConfig:
         declaration = _base_declaration(type="consolidation_s_general_cluster")
         validator.validate(declaration)
 
+    def test_valid_wonka_consolidation_cluster(self, validator):
+        declaration = _base_declaration(type="wonka_consolidation_m_general_cluster")
+        validator.validate(declaration)
+
     def test_valid_emr_validation_cluster_when_prod_is_databricks(self, validator):
         declaration = _base_declaration(type="emr_7_12_consolidation_xl_memory_cluster")
         declaration["cluster"]["type"] = "consolidation_xl_memory_cluster"
@@ -234,6 +238,32 @@ class TestMergeValidationClusterArgs:
         }
         assert "node_type_id" not in merged["custom_configurations"]
         assert merged["custom_configurations"]["driver_node_type_id"] == "m6g.xlarge"
+
+    def test_strips_prod_instance_topology_for_wonka_consolidation_validation(self):
+        prod = {
+            "type": "wonka_cluster",
+            "custom_configurations": {
+                "spark_conf": {"spark.sql.caseSensitive": "true"},
+                "node_type_id": "r5a.8xlarge",
+                "driver_node_type_id": "c5a.4xlarge",
+                "num_workers": 2,
+                "spark_version": "15.4.x-scala2.12",
+            },
+        }
+        validation = {
+            "type": "wonka_consolidation_m_general_cluster",
+            "custom_configurations": {"num_workers": 3},
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["type"] == "wonka_consolidation_m_general_cluster"
+        # wonka_consolidation_* must gate the same topology strip as
+        # consolidation_*: prod instance types never leak into validation.
+        assert "node_type_id" not in merged["custom_configurations"]
+        assert "driver_node_type_id" not in merged["custom_configurations"]
+        assert merged["custom_configurations"]["num_workers"] == 3
+        assert merged["custom_configurations"]["spark_conf"] == {
+            "spark.sql.caseSensitive": "true"
+        }
 
     def test_strips_emr_only_keys_for_emr_to_databricks_validation(self):
         prod = {
