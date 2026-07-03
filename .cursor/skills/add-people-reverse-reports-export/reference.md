@@ -47,6 +47,32 @@ All SQL under `dags/people/reverse_reports/queries/reverse/` follows [`sql_conve
 
 Run skill **`databricks-emr-sql-lint`** after every `.sql` edit.
 
+### SQL header comments
+
+Keep the header minimal. Rules:
+
+| Comment | Include? | Notes |
+| --- | --- | --- |
+| One-line description of what the report contains | **Yes** | e.g. `-- Active minority candidates in Jovem Aprendiz pipeline (requisition 435).` |
+| `-- Exception:` when using clean/enrich instead of DW | **Yes (mandatory)** | Explain why DW has no path + reference Jira key. |
+| `-- Sources:` listing tables | **No** | Redundant — visible from the `FROM`/`JOIN` clauses. |
+| `-- Sheet:` or `-- sheet_id:` | **No** | Lives in `docs/{table_name}.md` and declaration `extra_spark_job_arguments`. |
+
+---
+
+## Declaration comments
+
+In `reverse_reports_declaration.yml`, the only comment to add above a migration entry is:
+
+```yaml
+    # Former notebook: {notebook_name} ({source}).
+    {table_name}:
+```
+
+- `{source}` = `Daily Pipeline` — the only pipeline source for reverse report notebook migrations.
+- Do **not** include: card numbers, business owner names, governance doc paths, or section separators (`# ---`).
+- Net-new exports (no legacy notebook) need no comment at all.
+
 ---
 
 ## Export column names
@@ -73,9 +99,33 @@ One file per sheet tab under `dags/people/reverse_reports/docs/`.
 - Business owner + technical owner
 - Operational source of truth (DW tables and/or external owner)
 
-Optional programme index (link-only) for related tabs — e.g. `codex_pin_gsheet_exports.md`.
+### Canonical format
 
-Mirror key facts in `reverse_reports_declaration.yml` comments when helpful.
+Use a **single Markdown table** — no separate sections (no column inventory, no owners heading, no governance heading):
+
+```markdown
+# `{table_name}` — reverse export governance
+
+
+| Field | Value |
+| --- | --- |
+| **Metastore table** | `reverse_reports.{table_name}` |
+| **Business owner** | {name/email} ({team}) |
+| **Technical owner** | Enterprise Engineering |
+| **Domain** | People |
+| **One-line summary** | {single sentence} |
+| **Business purpose** | {1–3 sentences on process + consumer + why Sheets}. Migrated from Daily Pipeline notebook `{notebook_name}` ([{KEY}](https://quintoandar.atlassian.net/browse/{KEY})). |
+| **Business consumer** | {team/person}. |
+| **Operational source of truth** | {DW/metric tables used; exception note when clean/enrich required}. |
+| **Delivery channel** | Google Sheets tab **{tab_name}** in workbook [{full_url}]({full_url}). Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
+| **Contract notes** | {grain, header contract, known drifts, etc.} |
+```
+
+Rules:
+- **Delivery channel:** always include the **full** Google Sheets URL (with `/edit?usp=sharing`), formatted as a clickable Markdown link — not just the `sheet_id`.
+- Do not add programme index links unless the tab is part of a multi-tab export set that already has an index doc.
+
+Optional programme index (link-only) for related tabs — e.g. `codex_pin_gsheet_exports.md`.
 
 ---
 
@@ -116,6 +166,12 @@ WHERE
 - **Do not** suggest Trino, `@tars`, or skill **`trino`** for validation in this workflow — results would be incomplete or wrong.
 
 ### Validation (before Forno / PR)
+
+**Tier 1 — row counts:** compare legacy vs migrated total rows and distinct key counts.
+
+**Tier 2 — column-by-column diff:** run an `EXCEPT`-based comparison for **every exported column**. All business columns must match; the only exclusions are load-time stamps (see table below). Investigate and explain every non-zero diff before marking validation OK.
+
+**Tier 3 — sample inspection:** spot-check a handful of rows end-to-end.
 
 User replies **validation OK** plus at least one of:
 
@@ -164,13 +220,13 @@ Waivers must be explicit and documented in the PR body.
 | DW 2.0 / deprecations | [`people_domain.mdc`](../../rules/people/people_domain.mdc) |
 | Declaration / service account | [`reverse_reports_declaration.yml`](../../../dags/people/reverse_reports/reverse_reports_declaration.yml) |
 | `load_to_gsheet` | [`load_to_gsheet.py`](../../../dags/people/reverse_reports/spark_jobs/load_to_gsheet.py) |
-| Examples | [`salary_tables.md`](../../../dags/people/reverse_reports/docs/salary_tables.md), [`jobs.md`](../../../dags/people/reverse_reports/docs/jobs.md), [`organization_codex_pin_sync.md`](../../../dags/people/reverse_reports/docs/organization_codex_pin_sync.md) |
+| Examples | [`access_list_dp.md`](../../../dags/people/reverse_reports/docs/access_list_dp.md) (compact single-table format), [`demographics_analytic_report.md`](../../../dags/people/reverse_reports/docs/demographics_analytic_report.md) (clean/enrich exception + full URL + Jira link), [`salary_tables.md`](../../../dags/people/reverse_reports/docs/salary_tables.md), [`jobs.md`](../../../dags/people/reverse_reports/docs/jobs.md), [`organization_codex_pin_sync.md`](../../../dags/people/reverse_reports/docs/organization_codex_pin_sync.md) |
 | Validation playbook | [`exodus_validation_playbook.md`](../../../dags/people/reverse_reports/docs/exodus_validation_playbook.md) (Databricks; not Trino) |
 | Cutover | [`exodus_migration_guide.md`](../../../dags/people/reverse_reports/docs/exodus_migration_guide.md) |
 | Local Airflow | [`run-dag-locally`](../run-dag-locally/SKILL.md) |
 | PR | [`review-pr`](../review-pr/SKILL.md), [`create-or-update-pr`](../create-or-update-pr/SKILL.md) |
 | Jira kickoff / create DBP issue | [SKILL.md — Shared Jira (DBP kickoff)](SKILL.md#shared--jira-dbp-kickoff), [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) |
-| **DBP** | Jira project do squad **People Data** — kickoff: *"Já existe um card no board do Jira de People Data (DBP) para esse trabalho?"* (ver [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) para nome legado do board) |
+| **DBP** | Jira project do squad **Enterprise Engineering** — kickoff: *"Já existe um card no board do Jira de Enterprise Engineering (DBP) para esse trabalho?"* (ver [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) para nome legado do board) |
 | **Interaction** | First turn → **AskQuestion** tool ([Flow selection](SKILL.md#flow-selection)); intake only after flows 1–2; bullets in chat ≠ AskQuestion |
 | **Language** | Perguntas ao usuário → **PT-BR**; summary/description/comments no Jira → **English** |
 | Jira branch | [`people-jira-branch-setup`](../people/jira-branch-setup/SKILL.md) |

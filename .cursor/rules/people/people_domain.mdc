@@ -679,7 +679,7 @@ Governance metadata (`metadata/{layer}/{table}.yml`) must clearly document **bus
 
 **Scope:** `metadata/dw/` and `metadata/metric/` under `dags/people/` (and People-facing columns in `metric_people`).
 
-**Audience:** HR, People Analytics, Benefits, and other **business** consumers — not engineers tracing SQL. Descriptions are read in DataHub/catalog UIs; **`lineage`** carries technical provenance.
+**Audience:** HR, People Insights, Benefits, and other **business** consumers — not engineers tracing SQL. Descriptions are read in DataHub/catalog UIs; **`lineage`** carries technical provenance.
 
 | Rule | Detail |
 |------|--------|

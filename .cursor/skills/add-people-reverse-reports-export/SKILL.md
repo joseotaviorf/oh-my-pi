@@ -4,7 +4,7 @@ description: >-
   People domain (`dags/people/` only). Add, migrate, or edit a Google Sheets export under
   `dags/people/reverse_reports/`. Interactive one-question-at-a-time flow in PT-BR
   (notebook migration, net-new tab, edit existing, validation/Forno/PR/cutover). DBP Jira
-  kickoff on People Data (DBP). First turn: AskQuestion flow selection (like
+  kickoff on Enterprise Engineering (DBP). First turn: AskQuestion flow selection (like
   provision-data-contract). Source priority DW (`dw_*`) then
   metric-layer; avoid enrich/clean unless documented exception.
 ---
@@ -19,7 +19,7 @@ Technical rules live in [reference.md](reference.md). Apply them when generating
 
 - Ask **one question at a time**. Wait for the user's answer before the next step.
 - **User-facing questions and option labels → PT-BR.** Jira **summary**, **description**, and **comments** → **English** ([`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md)).
-- **DBP** = Jira project/board do squad **People Data**. Nos prompts PT-BR: **"board do Jira de People Data (DBP)"**. Não expandir o nome legado do board (*Data Bedrock and People*) — time Bedrock não existe mais; só a sigla/nome no Jira permaneceu.
+- **DBP** = Jira project/board of the **Enterprise Engineering** squad. In PT-BR prompts: **"board do Jira de Enterprise Engineering (DBP)"**. Do not expand the legacy board name (*Data Bedrock and People*) — the Bedrock team no longer exists; only the acronym/name in Jira remains.
 - **First turn:** call the **AskQuestion** tool with [Flow selection](#flow-selection) — **mandatory** when the user invokes the skill without a clear flow already chosen. One short ack line is OK; **do not** substitute a prose-only menu or open with [Intake inicial](#shared--intake-inicial). **Do not** explore the repo before that AskQuestion (except reading this skill + `reference.md`).
 - **AskQuestion is required** whenever options are known — listing bullets in chat **does not** count. Same pattern as [`provision-data-contract`](https://github.com/quintoandar/data-contracts/tree/main/.cursor/skills/provision-data-contract).
 - **Do not** dump a multi-field intake table on the first turn.
@@ -206,7 +206,7 @@ Read [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) before 
 
 Ask with **AskQuestion** (tool):
 
-**"Já existe um card no board do Jira de People Data (DBP) para esse trabalho?"**
+**"Já existe um card no board do Jira de Enterprise Engineering (DBP) para esse trabalho?"**
 
 - **Sim — tenho a chave** → [Step 2a](#step-2a--issue-key)
 - **Sim — mas não lembro a chave** → [Step 2b](#step-2b--find-existing-issue)
@@ -228,7 +228,7 @@ No match → Step 3.
 
 ### Step 3 — Create a card?
 
-Ask: **"Quer que eu crie um card no board do Jira de People Data (DBP) para esse trabalho?"**
+Ask: **"Quer que eu crie um card no board do Jira de Enterprise Engineering (DBP) para esse trabalho?"**
 
 - **Não** → **"Continuar como local-only (sem Jira) ou parar até você ter um card?"**
 - **Sim** → [Shared — Create DBP issue](#shared--create-dbp-issue)
@@ -329,7 +329,7 @@ Comment notebook write cells; remove Daily Pipeline task if full migration. [`ex
 ## References
 
 - [reference.md](reference.md)
-- [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) — project **DBP**, squad **People Data**
+- [`dbp-jira-reference.md`](../../rules/people/dbp-jira-reference.md) — project **DBP**, squad **Enterprise Engineering**
 - [`people-jira-branch-setup`](../people/jira-branch-setup/SKILL.md)
 - [DBP-1310](https://quintoandar.atlassian.net/browse/DBP-1310)
 

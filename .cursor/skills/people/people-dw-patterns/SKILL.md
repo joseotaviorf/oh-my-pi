@@ -45,7 +45,7 @@ Read those sections before implementing or reviewing. This skill is a **routing 
 
 | Check | Action |
 |-------|--------|
-| **Audience** | Business wording — HR / People Analytics, not engineering |
+| **Audience** | Business wording — HR / People Insights, not engineering |
 | Table `description` | Grain, SCD, consumers — no join algorithm; **PIN** if source named, never Oracle table names |
 | Column `description` | Business meaning; no `per_*` / Oracle objects; no per-column "at this version" boilerplate |
 | Technical detail | SQL `--` comments only |

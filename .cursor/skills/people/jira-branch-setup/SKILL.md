@@ -1,12 +1,12 @@
 ---
 name: people-jira-branch-setup
 description: >-
-  People Data squad — ensure Jira issue exists, branch naming, sync from
+  Enterprise Engineering squad — ensure Jira issue exists, branch naming, sync from
   origin/master, local branch only (remote sync out of scope here). Invoke when
   beginning ticketed work on bi-etl-ejuice.
 ---
 
-# People Data — Jira issue and branch setup
+# Enterprise Engineering — Jira issue and branch setup
 
 **Before Jira/MCP or Git branch steps:** Read **[`dbp-jira-reference.md`](../../../rules/people/dbp-jira-reference.md)** (kickoff policies, **Sprints and buffer (DBP)**, language, branch/slug/Jira summary, API quirks, workflow). **Buffer vs planned** sprint work is defined there — **confirm with the user**; do not guess. **Artifact paths:** **[`people_domain.mdc`](../../../rules/people/people_domain.mdc)** — **Delivery artifact folder (`.cursor/temp/`)**. Extend the reference when you learn new durable Jira facts.
 
