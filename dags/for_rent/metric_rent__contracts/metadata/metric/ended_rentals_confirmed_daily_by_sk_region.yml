@@ -1,12 +1,13 @@
+---
 database_name: metric_rent
 table_name: ended_rentals_confirmed_daily_by_sk_region
-description:
+description: |
   Table to count ended rentals, which are finalized contracts, on daily
   basis segmented by sk_region. The date reference here is related to contract analyst anullment or anullment.
   In addition, we have the region dimension embedded here on the column sk_region
   to segment this metric.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   contract_annulment_date:
     lineage:
@@ -17,18 +18,18 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_house_listings.sk_region
-    description: Region identifier
+    description: Surrogate key of the region used to segment this rental metric.
     dimension: True
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code of the house.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   ended_rentals_confirmed:
     description: Amount of anulled contracts on a day segmented by sk_region.
     metric:
       name: Ended Rentals Confirmed Daily by SK Region
-      description:
+      description: 
         Daily accumulated sum of the contracts that were annulled segmented by sk_region
         (based on the date which the offboarding analyst inputs the annulment in the system)
       acronym: ERC

@@ -1,12 +1,13 @@
+---
 database_name: metric_rent
 table_name: new_rentals_daily_by_sk_region
-description:
+description: |
   Table to count new rentals, which are contracts actived or finalized,
   on daily basis. The date reference here is related to contract start or entrance.
   In addition, we have the region dimension embedded here on the column sk_region
   to segment this metric.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   rental_date:
     lineage:
@@ -17,12 +18,12 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_house_listings.sk_region
-    description: Region identifier
+    description: Surrogate key of the region used to segment this rental metric.
     dimension: True
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code of the house.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   new_rentals:
     description: Amount of new signed contracts on a day segmented by sk_region.

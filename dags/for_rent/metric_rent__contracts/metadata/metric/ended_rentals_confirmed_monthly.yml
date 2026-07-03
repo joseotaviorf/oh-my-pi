@@ -1,10 +1,11 @@
+---
 database_name: metric_rent
 table_name: ended_rentals_confirmed_monthly
-description:
+description: |
   Table to count ended rentals, which are finalized contracts, on monthly
   basis. The date reference here is related to contract analyst anullment or anullment.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   month:
     lineage:
@@ -15,7 +16,7 @@ columns:
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code of the house.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   ended_rentals_confirmed:
     description: Amount of anulled contracts on a month.
