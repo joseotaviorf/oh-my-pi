@@ -1,59 +1,78 @@
----
 database_name: datalake_legaut_clean
 table_name: meusite_document
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.meusite_document.id
+    - datalake_legaut_raw.meusite_document.id
+    description: Surrogate primary key of the meusite document row in the source system.
   id_unit:
     lineage:
-      - datalake_legaut_raw.meusite_document.unit_id
+    - datalake_legaut_raw.meusite_document.unit_id
+    description: Foreign key to the property unit this document belongs to.
   id_user:
     lineage:
-      - datalake_legaut_raw.meusite_document.user_id
+    - datalake_legaut_raw.meusite_document.user_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_crawler_group:
     lineage:
-      - datalake_legaut_raw.meusite_document.crawlergroup_id
+    - datalake_legaut_raw.meusite_document.crawlergroup_id
+    description: Foreign key to the crawler group in datalake_legaut_clean.crawlers_crawlergroup that fetched this document.
   id_assignment:
     lineage:
-      - datalake_legaut_raw.meusite_document.assignment_id
+    - datalake_legaut_raw.meusite_document.assignment_id
+    description: Foreign key to the analyst assignment responsible for reviewing this document.
   id_suggested_document:
     lineage:
-      - datalake_legaut_raw.meusite_document.suggested_document_id
+    - datalake_legaut_raw.meusite_document.suggested_document_id
+    description: Foreign key to the suggested document template this document was created from.
   id_operation:
     lineage:
-      - datalake_legaut_raw.meusite_document.operation_id
+    - datalake_legaut_raw.meusite_document.operation_id
+    description: Foreign key to the diligence operation in datalake_legaut_clean.meusite_operation this document belongs to.
   type:
     lineage:
-      - datalake_legaut_raw.meusite_document.type
+    - datalake_legaut_raw.meusite_document.type
+    description: Classifier distinguishing record subtype or participant role in the workflow.
   document_crawler_type:
     lineage:
-      - datalake_legaut_raw.meusite_document.document_crawler_type
+    - datalake_legaut_raw.meusite_document.document_crawler_type
+    description: Crawler type that retrieved this document, identifying its source registry.
   status:
     lineage:
-      - datalake_legaut_raw.meusite_document.status
+    - datalake_legaut_raw.meusite_document.status
+    description: Current operational status code governing workflow progression for this record.
   file_name:
     lineage:
-      - datalake_legaut_raw.meusite_document.filename
+    - datalake_legaut_raw.meusite_document.filename
+    description: Original filename of the document uploaded during closing or legal review.
   document_file_path:
     lineage:
-      - datalake_legaut_raw.meusite_document.document_filepath
+    - datalake_legaut_raw.meusite_document.document_filepath
+    description: Storage path where the document file is persisted.
   document_file:
     lineage:
-      - datalake_legaut_raw.meusite_document.document_file
+    - datalake_legaut_raw.meusite_document.document_file
+    description: Stored file reference or contents of the document.
   obs:
     lineage:
-      - datalake_legaut_raw.meusite_document.obs
+    - datalake_legaut_raw.meusite_document.obs
+    description: Free-text observations recorded by analysts about this document.
   description:
     lineage:
-      - datalake_legaut_raw.meusite_document.description
+    - datalake_legaut_raw.meusite_document.description
+    description: Free-text description of the document and its contents.
   slug:
     lineage:
-      - datalake_legaut_raw.meusite_document.slug
+    - datalake_legaut_raw.meusite_document.slug
+    description: URL-friendly slug identifying this document type.
   ts_created:
     lineage:
-      - datalake_legaut_raw.meusite_document.created_at
+    - datalake_legaut_raw.meusite_document.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_delivered:
     lineage:
-      - datalake_legaut_raw.meusite_document.delivered_at
+    - datalake_legaut_raw.meusite_document.delivered_at
+    description: Timestamp when the document was delivered to the requesting party.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of meusite document sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite document record with standardized names and types in datalake_legaut_clean.

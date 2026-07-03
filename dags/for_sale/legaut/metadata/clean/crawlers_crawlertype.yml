@@ -1,44 +1,58 @@
----
 database_name: datalake_legaut_clean
 table_name: crawlers_crawlertype
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.id
+    - datalake_legaut_raw.crawlers_crawlertype.id
+    description: Surrogate primary key of the crawlers crawlertype row in the source system.
   default:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.default
+    - datalake_legaut_raw.crawlers_crawlertype.default
+    description: Flag marking whether this crawler type runs by default.
   value:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.value
+    - datalake_legaut_raw.crawlers_crawlertype.value
+    description: Identifier value of the crawler type used by the crawling engine.
   repeat:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.repeat
+    - datalake_legaut_raw.crawlers_crawlertype.repeat
+    description: Flag indicating whether this crawler type may be executed repeatedly.
   monitor:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.monitor
+    - datalake_legaut_raw.crawlers_crawlertype.monitor
+    description: Flag indicating whether runs of this crawler type are monitored for changes.
   results:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.results
+    - datalake_legaut_raw.crawlers_crawlertype.results
+    description: Expected result schema or output configuration for this crawler type.
   classifier:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.classifier
+    - datalake_legaut_raw.crawlers_crawlertype.classifier
+    description: Classifier name applied to interpret documents returned by this crawler type.
   keys:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.keys
+    - datalake_legaut_raw.crawlers_crawlertype.keys
+    description: Set of input keys required to execute this crawler type.
   label:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.label
+    - datalake_legaut_raw.crawlers_crawlertype.label
+    description: Short UI or workflow label describing the task, tag, or category shown to operators.
   link:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.link
+    - datalake_legaut_raw.crawlers_crawlertype.link
+    description: URL or link to the document source targeted by this crawler type.
   topic:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.topic
+    - datalake_legaut_raw.crawlers_crawlertype.topic
+    description: Messaging topic where requests for this crawler type are published.
   return_topic:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.return_topic
+    - datalake_legaut_raw.crawlers_crawlertype.return_topic
+    description: Messaging topic where results from this crawler type are returned.
   description:
     lineage:
-      - datalake_legaut_raw.crawlers_crawlertype.description
+    - datalake_legaut_raw.crawlers_crawlertype.description
+    description: Free-text description of what this crawler type collects.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of crawlers crawlertype sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per crawlers crawlertype record with standardized names and types in datalake_legaut_clean.

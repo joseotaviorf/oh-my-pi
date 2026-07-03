@@ -1,23 +1,30 @@
----
 database_name: datalake_legaut_clean
 table_name: meusite_state
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.meusite_state.id
+    - datalake_legaut_raw.meusite_state.id
+    description: Surrogate primary key of the meusite state row in the source system.
   ibge:
     lineage:
-      - datalake_legaut_raw.meusite_state.ibge
+    - datalake_legaut_raw.meusite_state.ibge
+    description: IBGE code uniquely identifying this Brazilian state.
   pais:
     lineage:
-      - datalake_legaut_raw.meusite_state.pais
+    - datalake_legaut_raw.meusite_state.pais
+    description: Country to which this state belongs.
   name:
     lineage:
-      - datalake_legaut_raw.meusite_state.name
+    - datalake_legaut_raw.meusite_state.name
+    description: Full official name of the Brazilian state or federative unit.
   uf:
     lineage:
-      - datalake_legaut_raw.meusite_state.uf
+    - datalake_legaut_raw.meusite_state.uf
+    description: Two-letter Brazilian state abbreviation (UF).
   ddd:
     lineage:
-      - datalake_legaut_raw.meusite_state.ddd
+    - datalake_legaut_raw.meusite_state.ddd
+    description: Telephone area code (DDD) associated with the state.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of meusite state sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite state record with standardized names and types in datalake_legaut_clean.

@@ -1,137 +1,182 @@
----
 database_name: datalake_legaut_clean
 table_name: meusite_operation
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.meusite_operation.id
+    - datalake_legaut_raw.meusite_operation.id
+    description: Surrogate primary key of the meusite operation row in the source system.
   id_project:
     lineage:
-      - datalake_legaut_raw.meusite_operation.project_id
+    - datalake_legaut_raw.meusite_operation.project_id
+    description: Foreign key to the project in datalake_legaut_clean.meusite_project this operation belongs to.
   id_google_docs_ccv:
     lineage:
-      - datalake_legaut_raw.meusite_operation.google_docs_ccv_id
+    - datalake_legaut_raw.meusite_operation.google_docs_ccv_id
+    description: Foreign key to the Google Docs file holding the purchase-and-sale contract (CCV) for this operation.
   id_notary:
     lineage:
-      - datalake_legaut_raw.meusite_operation.notary_id
+    - datalake_legaut_raw.meusite_operation.notary_id
+    description: Foreign key to the notary office in datalake_legaut_clean.meusite_notary handling this operation.
   id_place:
     lineage:
-      - datalake_legaut_raw.meusite_operation.place_id
+    - datalake_legaut_raw.meusite_operation.place_id
+    description: Foreign key to the place record describing the property location for this operation.
   id_created_by:
     lineage:
-      - datalake_legaut_raw.meusite_operation.created_by_id
+    - datalake_legaut_raw.meusite_operation.created_by_id
+    description: Foreign key to the user who created this operation.
   id_house:
     lineage:
-      - datalake_legaut_raw.meusite_operation.house_id
+    - datalake_legaut_raw.meusite_operation.house_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_offer:
     lineage:
-      - datalake_legaut_raw.meusite_operation.offer_id
+    - datalake_legaut_raw.meusite_operation.offer_id
+    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
   id_sales_flow:
     lineage:
-      - datalake_legaut_raw.meusite_operation.salesflow_id
+    - datalake_legaut_raw.meusite_operation.salesflow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_financing_type:
     lineage:
-      - datalake_legaut_raw.meusite_operation.financing_type
+    - datalake_legaut_raw.meusite_operation.financing_type
+    description: Coded financing type chosen for this operation (e.g. cash, bank financing, FGTS).
   id_status:
     lineage:
-      - datalake_legaut_raw.meusite_operation.status
+    - datalake_legaut_raw.meusite_operation.status
+    description: Coded status identifier of this operation in the diligence workflow.
   name:
     lineage:
-      - datalake_legaut_raw.meusite_operation.name
+    - datalake_legaut_raw.meusite_operation.name
+    description: Display name identifying this diligence operation.
   financing_bank:
     lineage:
-      - datalake_legaut_raw.meusite_operation.financing_bank
+    - datalake_legaut_raw.meusite_operation.financing_bank
+    description: Bank providing the mortgage financing for this operation.
   formatted_address:
     lineage:
-      - datalake_legaut_raw.meusite_operation.formatted_address
+    - datalake_legaut_raw.meusite_operation.formatted_address
+    description: Full formatted street address of the property in this operation.
   cep:
     lineage:
-      - datalake_legaut_raw.meusite_operation.cep
+    - datalake_legaut_raw.meusite_operation.cep
+    description: Brazilian postal code (CEP) of the property address.
   disposal_bank:
     lineage:
-      - datalake_legaut_raw.meusite_operation.banco_alienacao
+    - datalake_legaut_raw.meusite_operation.banco_alienacao
+    description: Bank holding the fiduciary alienation (alienacao) on the property.
   payment_obs:
     lineage:
-      - datalake_legaut_raw.meusite_operation.payment_obs
+    - datalake_legaut_raw.meusite_operation.payment_obs
+    description: Free-text observations about the payment arrangement for this operation.
   geometry:
     lineage:
-      - datalake_legaut_raw.meusite_operation.geometry
+    - datalake_legaut_raw.meusite_operation.geometry
+    description: Geographic coordinates of the property location.
   address_components:
     lineage:
-      - datalake_legaut_raw.meusite_operation.address_components
+    - datalake_legaut_raw.meusite_operation.address_components
+    description: Structured address components parsed from the property address.
   fgts_amount:
     lineage:
-      - datalake_legaut_raw.meusite_operation.fgts_amount
+    - datalake_legaut_raw.meusite_operation.fgts_amount
+    description: Amount of FGTS funds applied toward the purchase.
   signal_down_payment:
     lineage:
-      - datalake_legaut_raw.meusite_operation.signal_down_payment
+    - datalake_legaut_raw.meusite_operation.signal_down_payment
+    description: Initial signal (sinal) amount paid to reserve the purchase.
   down_payment:
     lineage:
-      - datalake_legaut_raw.meusite_operation.down_payment
+    - datalake_legaut_raw.meusite_operation.down_payment
+    description: Down payment amount paid by the buyer.
   financing_amount:
     lineage:
-      - datalake_legaut_raw.meusite_operation.financing_amount
+    - datalake_legaut_raw.meusite_operation.financing_amount
+    description: Amount financed through a mortgage loan.
   total_amount:
     lineage:
-      - datalake_legaut_raw.meusite_operation.total_amount
+    - datalake_legaut_raw.meusite_operation.total_amount
+    description: Total transaction amount for this property operation.
   disposal_amount:
     lineage:
-      - datalake_legaut_raw.meusite_operation.valor_alienacao
+    - datalake_legaut_raw.meusite_operation.valor_alienacao
+    description: Outstanding amount of the fiduciary alienation (alienacao) on the property.
   bathrooms:
     lineage:
-      - datalake_legaut_raw.meusite_operation.num_banheiros_sem_emp
+    - datalake_legaut_raw.meusite_operation.num_banheiros_sem_emp
+    description: Number of bathrooms in the property, excluding maid bathrooms.
   bedrooms:
     lineage:
-      - datalake_legaut_raw.meusite_operation.num_quartos
+    - datalake_legaut_raw.meusite_operation.num_quartos
+    description: Number of bedrooms in the property.
   parking_slots_deed:
     lineage:
-      - datalake_legaut_raw.meusite_operation.num_vagas_garagem_escritura
+    - datalake_legaut_raw.meusite_operation.num_vagas_garagem_escritura
+    description: Number of parking spaces registered on the property deed.
   floor:
     lineage:
-      - datalake_legaut_raw.meusite_operation.pos_pavimento
+    - datalake_legaut_raw.meusite_operation.pos_pavimento
+    description: Floor or storey on which the property unit is located.
   complement:
     lineage:
-      - datalake_legaut_raw.meusite_operation.complement
+    - datalake_legaut_raw.meusite_operation.complement
+    description: Address complement such as apartment or block number.
   is_disabled:
     lineage:
-      - datalake_legaut_raw.meusite_operation.disable
+    - datalake_legaut_raw.meusite_operation.disable
+    description: Boolean flag indicating whether disabled applies to this record.
   is_favorite:
     lineage:
-      - datalake_legaut_raw.meusite_operation.favorite
+    - datalake_legaut_raw.meusite_operation.favorite
+    description: Boolean flag indicating whether favorite applies to this record.
   is_closing:
     lineage:
-      - datalake_legaut_raw.meusite_operation.is_closing
+    - datalake_legaut_raw.meusite_operation.is_closing
+    description: Boolean flag indicating whether closing applies to this record.
   is_fgts:
     lineage:
-      - datalake_legaut_raw.meusite_operation.fgts
+    - datalake_legaut_raw.meusite_operation.fgts
+    description: Boolean flag indicating whether fgts applies to this record.
   is_financed:
     lineage:
-      - datalake_legaut_raw.meusite_operation.financing
+    - datalake_legaut_raw.meusite_operation.financing
+    description: Boolean flag indicating whether financed applies to this record.
   has_leasure_area:
     lineage:
-      - datalake_legaut_raw.meusite_operation.area_lazer
+    - datalake_legaut_raw.meusite_operation.area_lazer
+    description: Boolean flag indicating whether leasure area applies to this record.
   has_maid_bathroom:
     lineage:
-      - datalake_legaut_raw.meusite_operation.banheiro_emp
+    - datalake_legaut_raw.meusite_operation.banheiro_emp
+    description: Boolean flag indicating whether maid bathroom applies to this record.
   has_elevator:
     lineage:
-      - datalake_legaut_raw.meusite_operation.elevador
+    - datalake_legaut_raw.meusite_operation.elevador
+    description: Boolean flag indicating whether elevator applies to this record.
   is_foreiro:
     lineage:
-      - datalake_legaut_raw.meusite_operation.imovel_foreiro
+    - datalake_legaut_raw.meusite_operation.imovel_foreiro
+    description: Boolean flag indicating whether foreiro applies to this record.
   has_maid_bedroom:
     lineage:
-      - datalake_legaut_raw.meusite_operation.quarto_emp
+    - datalake_legaut_raw.meusite_operation.quarto_emp
+    description: Boolean flag indicating whether maid bedroom applies to this record.
   has_balcony:
     lineage:
-      - datalake_legaut_raw.meusite_operation.varanda
+    - datalake_legaut_raw.meusite_operation.varanda
+    description: Boolean flag indicating whether balcony applies to this record.
   has_fiduciary_alienation:
     lineage:
-      - datalake_legaut_raw.meusite_operation.alienacao_fiduciaria
+    - datalake_legaut_raw.meusite_operation.alienacao_fiduciaria
+    description: Boolean flag indicating whether fiduciary alienation applies to this record.
   is_credit_approved:
     lineage:
-      - datalake_legaut_raw.meusite_operation.credit_approved
+    - datalake_legaut_raw.meusite_operation.credit_approved
+    description: Boolean flag indicating whether credit approved applies to this record.
   ts_created:
     lineage:
-      - datalake_legaut_raw.meusite_operation.created_at
+    - datalake_legaut_raw.meusite_operation.created_at
+    description: Timestamp when the row was first created in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of meusite operation sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite operation record with standardized names and types in datalake_legaut_clean.

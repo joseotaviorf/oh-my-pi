@@ -4,13 +4,19 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.crawlers_company.id
+    - datalake_legaut_raw.crawlers_company.id
+    description: Surrogate primary key of the crawlers company row in the source system.
   id_crawler_group:
     lineage:
-      - datalake_legaut_raw.crawlers_company.crawlergroup_id
+    - datalake_legaut_raw.crawlers_company.crawlergroup_id
+    description: Foreign key to the crawler group in datalake_legaut_clean.crawlers_crawlergroup that this company belongs to.
   name:
     lineage:
-      - datalake_legaut_raw.crawlers_company.name
+    - datalake_legaut_raw.crawlers_company.name
+    description: Registered company name of the document-crawler provider entity.
   cnpj:
     lineage:
-      - datalake_legaut_raw.crawlers_company.cnpj
+    - datalake_legaut_raw.crawlers_company.cnpj
+    description: Brazilian CNPJ tax identification number of the company.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of crawlers company sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per crawlers company record with standardized names and types in datalake_legaut_clean.

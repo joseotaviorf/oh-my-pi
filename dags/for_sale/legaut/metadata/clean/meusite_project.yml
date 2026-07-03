@@ -1,32 +1,42 @@
----
 database_name: datalake_legaut_clean
 table_name: meusite_project
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.meusite_project.id
+    - datalake_legaut_raw.meusite_project.id
+    description: Surrogate primary key of the meusite project row in the source system.
   id_google_drive_folder:
     lineage:
-      - datalake_legaut_raw.meusite_project.google_drive_folder_id
+    - datalake_legaut_raw.meusite_project.google_drive_folder_id
+    description: Foreign key to the Google Drive folder storing this project's documents.
   id_google_spreadsheet:
     lineage:
-      - datalake_legaut_raw.meusite_project.google_spreadsheet_id
+    - datalake_legaut_raw.meusite_project.google_spreadsheet_id
+    description: Foreign key to the Google Spreadsheet tracking this project.
   id_company:
     lineage:
-      - datalake_legaut_raw.meusite_project.company_id
+    - datalake_legaut_raw.meusite_project.company_id
+    description: Foreign key to the company in datalake_legaut_clean.crawlers_company that owns this project.
   activated:
     lineage:
-      - datalake_legaut_raw.meusite_project.activated
+    - datalake_legaut_raw.meusite_project.activated
+    description: Flag indicating whether the project is currently activated.
   type:
     lineage:
-      - datalake_legaut_raw.meusite_project.type
+    - datalake_legaut_raw.meusite_project.type
+    description: Classifier distinguishing record subtype or participant role in the workflow.
   name:
     lineage:
-      - datalake_legaut_raw.meusite_project.name
+    - datalake_legaut_raw.meusite_project.name
+    description: Display name of the legalization project.
   slug:
     lineage:
-      - datalake_legaut_raw.meusite_project.slug
+    - datalake_legaut_raw.meusite_project.slug
+    description: URL-friendly slug identifying this project.
   ts_created:
     lineage:
-      - datalake_legaut_raw.meusite_project.created_at
+    - datalake_legaut_raw.meusite_project.created_at
+    description: Timestamp when the row was first created in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of meusite project sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite project record with standardized names and types in datalake_legaut_clean.

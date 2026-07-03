@@ -1,33 +1,32 @@
----
 database_name: datalake_legaut_clean
 table_name: crawlers_crawler_key
-owner: leonardo.soares@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Table with the keys used by the crawlers
 columns:
   id:
-    description: 'Id of the key'
+    description: Surrogate primary key of the crawlers crawler key row in the source system.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.id
   id_crawler:
-    description: 'Id of the crawler'
+    description: Foreign key to the crawler in datalake_legaut_clean.crawlers_crawler that uses this key.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.crawler_id
   id_crawler_group:
-    description: 'Id of the crawler group'
+    description: Foreign key to the crawler group in datalake_legaut_clean.crawlers_crawlergroup associated with this key.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.crawlergroup_id
   id_suggestion_group:
-    description: 'Id of the suggestion group'
+    description: Foreign key to the suggestion group that proposed this crawler key value.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.suggestiongroup_id
   value:
-    description: 'Value of the key'
+    description: Value of the crawler key used to query or authenticate the document source.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.value
   type:
-    description: 'Type of the key'
+    description: Type classifier of the crawler key, indicating which key kind it represents.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.type
   ts_load:
-    description: 'Timestamp when the data was loaded'
+    description: Timestamp when the data was loaded

@@ -1,25 +1,24 @@
----
 database_name: datalake_legaut_clean
 table_name: crawlers_crawler_key_type
-owner: leonardo.soares@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Table with the types of keys used by the crawlers
 columns:
   id:
-    description: 'Id of the key type'
+    description: Surrogate primary key of the crawlers crawler key type row in the source system.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.id
   type:
-    description: 'Type of the key'
+    description: Code identifying this crawler key type within the document-crawler app.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.type
   name:
-    description: 'Name of the key type'
+    description: Human-readable name of the crawler key type.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.name
   variable:
-    description: 'Variable of the key type'
+    description: Template variable name used to bind this key type into crawler requests.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.variable
   ts_load:
-    description: 'Timestamp when the data was loaded'
+    description: Timestamp when the data was loaded

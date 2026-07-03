@@ -1,32 +1,42 @@
----
 database_name: datalake_legaut_clean
 table_name: meusite_analysisqueue
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.id
+    - datalake_legaut_raw.meusite_analysisqueue.id
+    description: Surrogate primary key of the meusite analysisqueue row in the source system.
   id_unit:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.unit_id
+    - datalake_legaut_raw.meusite_analysisqueue.unit_id
+    description: Foreign key to the property unit queued for document analysis.
   id_user:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.user_id
+    - datalake_legaut_raw.meusite_analysisqueue.user_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   active:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.active
+    - datalake_legaut_raw.meusite_analysisqueue.active
+    description: Flag indicating whether this analysis queue entry is currently active.
   status:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.status
+    - datalake_legaut_raw.meusite_analysisqueue.status
+    description: Current operational status code governing workflow progression for this record.
   tries:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.tries
+    - datalake_legaut_raw.meusite_analysisqueue.tries
+    description: Number of processing attempts made on this analysis queue entry.
   has_started:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.started
+    - datalake_legaut_raw.meusite_analysisqueue.started
+    description: Boolean flag indicating whether started applies to this record.
+  ts_created:
+    lineage:
+    - datalake_legaut_raw.meusite_analysisqueue.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.created_at
-  updated_at:
-    lineage:
-      - datalake_legaut_raw.meusite_analysisqueue.updated_at
+    - datalake_legaut_raw.meusite_analysisqueue.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of meusite analysisqueue sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite analysisqueue record with standardized names and types in datalake_legaut_clean.
