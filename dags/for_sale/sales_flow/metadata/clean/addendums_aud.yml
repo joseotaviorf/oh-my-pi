@@ -89,14 +89,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.addendums_aud.updated_at
   year:
-    description: Year partition for the addendum record.
+    description: Year  for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums_aud.year
   month:
-    description: Month partition for the addendum record.
+    description: Month  for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums_aud.month
   day:
-    description: Day partition for the addendum record.
+    description: Day  for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums_aud.day

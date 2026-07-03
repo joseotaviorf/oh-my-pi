@@ -2,37 +2,37 @@ database_name: datalake_sales_flow_clean
 table_name: screening
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: The primary purpose of the screening table is to store the main screening information and legal pendency status, serving as the central table for all screening-related validations and tracking the overall status of the screening process.
+description: Root table of the Sales Flow screening domain, with one row per home-purchase transaction (sales_flow_id) that has entered the closing screening process. It represents the parent case that aggregates the individual buyer, seller, house, negotiation, and note screening checks, and tracks whether the case has an open legal pendency (a documentation/legal issue blocking approval) at the overall case level. (JPA entity — `Screening`, `br.com.quintoandar.salesflow.core.screening.Screening`; managed by `ScreeningService`)
 columns:
   id:
     description: Surrogate primary key of the screening row in the source system.
     lineage:
     - datalake_sales_flow_raw.screening.id
   id_sales_flow:
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: Foreign key to the parent sales flow (home-purchase closing) transaction that this screening case belongs to. Set once at screening creation and not updatable afterward.
     lineage:
     - datalake_sales_flow_raw.screening.sales_flow_id
   legal_pendency_status:
-    description: Legal pendency status indicating if there are any legal issues or pending documentation.
+    description: 'Enum indicating whether the screening case currently has an open legal/documentation pendency. Possible values: ACTIVE (a legal pendency is open and blocking progress) or RESOLVED (any previously opened pendency has been cleared). Null when no pendency has ever been raised.'
     lineage:
     - datalake_sales_flow_raw.screening.legal_pendency_status
   ts_created:
-    description: Timestamp of the creation of the record.
+    description: Timestamp when the screening case record was first created in the source system.
     lineage:
     - datalake_sales_flow_raw.screening.created_at
   ts_updated:
-    description: Timestamp of the last update of the record.
+    description: Timestamp of the most recent update to the screening case record (e.g. legal pendency status change).
     lineage:
     - datalake_sales_flow_raw.screening.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening.day

@@ -1,26 +1,26 @@
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_tag
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Join table linking a sales flow (the end-to-end home-purchase closing process for a deal) to the tags applied to it. Tags are used to label or categorize a deal for reporting and workflow purposes; most are free-text labels created manually via the tagging API, while a specific standardized subset records the reason a CCV (purchase agreement) was terminated (e.g. with/without brokerage, brokerage exemption, no post-sale). One row per (sales_flow, tag) association in datalake_sales_flow_clean. (JPA relationship — many-to-many between the SalesFlow and Tag entities, in the Sales Flow service)
 columns:
   id:
     lineage:
     - datalake_sales_flow_raw.sales_flow_tag.id
-    description: Surrogate primary key of the sales flow tag row in the source system.
+    description: Surrogate primary key of the join row linking a sales flow to a tag.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.sales_flow_tag.sales_flow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: Foreign key to the sales flow (deal) that the tag is attached to.
   id_tag:
     lineage:
     - datalake_sales_flow_raw.sales_flow_tag.tag_id
-    description: Foreign key to the workflow tag applied to categorize the sales flow.
+    description: Foreign key to the tag lookup record applied to the sales flow. Tags are mostly free-text labels (e.g. "mediações"), with a narrower set of standardized labels used for CCV (purchase agreement) termination reasons, such as no post-sale ("sem-pós-venda"), termination with brokerage ("com-corretagem"), termination without brokerage ("sem-corretagem"), and brokerage-fee exemption ("isenção-de-corretagem").
   ts_created:
     lineage:
     - datalake_sales_flow_raw.sales_flow_tag.created_at
-    description: Timestamp when the row was first created in the source operational system.
+    description: Timestamp when the tag was first attached to the sales flow.
   ts_updated:
     lineage:
     - datalake_sales_flow_raw.sales_flow_tag.updated_at
-    description: Timestamp when the row was last updated in the source operational system.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of sales flow tag sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per sales flow tag record with standardized names and types in datalake_sales_flow_clean.
+    description: Timestamp when this tag-to-sales-flow association was last updated.

@@ -2,7 +2,7 @@ database_name: datalake_sales_flow_clean
 table_name: mortgage
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains information related to the mortgage process for a sales flow.
+description: Tracks the mortgage financing process for a home purchase in the "For Sale" flow, from credit analysis and bank approval through disbursement of the financed amount, entry-amount (down payment) and ITBI (property transfer tax) payment, and final settlement with the seller. Each row is one-to-one with a record in the payment table, and its status is advanced by backend services through a state machine as the bank's credit analysis and closing steps progress. (JPA entity — `Mortgage`, `br.com.quintoandar.salesflow.core.mortgage.Mortgage`)
 columns:
   id_mortgage:
     description: Unique ID for the mortgage record.
@@ -13,122 +13,164 @@ columns:
     lineage:
     - datalake_sales_flow_raw.mortgage.sales_flow_id
   status:
-    description: The current status of the mortgage process.
+    description: |
+      Enum (state machine) tracking the current stage of the mortgage process, from initial
+      document collection through bank credit analysis, contract signature, and closing.
+      Transitions between these values are validated in code.
+    categories:
+      NOT_STARTED: Mortgage process not yet started, or not applicable.
+      NEW: Pre-start of financing — collecting initial documents.
+      DOCS_PENDING: Pre-start of financing — still pending required documents.
+      READY_TO_REVISION: Financing started — documents and forms sent for review.
+      STARTED: Legal analysis of the financing in progress.
+      INSPECTION: Property inspection/appraisal report stage.
+      IQ_INFORMATION: Collecting information from the mortgage settlement institution (Instituição Quitante).
+      FGTS_WITHDRAW: Bank is requesting the FGTS withdrawal.
+      VALUES_CONFIRMED: Contract values have been confirmed.
+      CONTRACT_ISSUANCE: Bank is emitting the financing contract.
+      SIGNING: Contract signature logistics are underway.
+      CONTRACT_CORRECTION: Bank is re-emitting the financing contract to correct an issue.
+      SIGNED: Financing contract has been signed.
+      CREDIT_ANALYSIS: Bank credit analysis stage.
+      BACK_REANALYZING: Back office is collecting documents again for reanalysis.
+      FRONT_PENDING: Pending action from the front office / documents still required.
     lineage:
     - datalake_sales_flow_raw.mortgage.status
   bank:
-    description: The name of the bank or financial institution.
+    description: Free-text name of the bank or financial institution financing the mortgage (plain string field, not an enum).
     lineage:
     - datalake_sales_flow_raw.mortgage.bank
   credit_model:
-    description: The credit model being used.
+    description: 'Enum indicating how the credit was originated. Values: ATTA, EXTERNAL, UNDEFINED, INTERNAL (INTERNAL is deprecated in the source code).'
     lineage:
     - datalake_sales_flow_raw.mortgage.credit_model
   credit_status:
-    description: The current status of the credit analysis.
+    description: Enum tracking the current status of the bank credit analysis for the mortgage.
+    categories:
+      NA: Credit analysis not yet started, or not applicable.
+      OPEN_TICKET: Credit analysis ticket opened / simulation sent.
+      SIMU_SENT: Credit simulation sent to the bank.
+      WAITING_DOCUMENTATION: Waiting for documentation before bank analysis.
+      BANK_ANALYSIS: Credit is under analysis by the bank.
+      APPROVED_CORRESP: Credit approved via correspondent bank.
+      EXTERNAL_CREDIT: Using an externally obtained credit letter (carta de crédito).
+      APPROVED_DIFF_COND: Credit approved under different conditions than requested.
+      APPROVED_OUTSIDE_5A: Credit approved outside the standard partner bank network (5A).
+      REJECTED: Credit analysis was rejected by the bank.
+      CLIENT_ANALYSIS: Credit is under analysis by the client.
     lineage:
     - datalake_sales_flow_raw.mortgage.credit_status
   bank_fee:
-    description: The fee charged by the bank.
+    description: Monetary fee charged by the bank for originating the mortgage.
     lineage:
     - datalake_sales_flow_raw.mortgage.bank_fee
   institution_choice_reason:
-    description: The reason for choosing the financial institution.
+    description: Enum capturing the reason the financial institution was chosen for the mortgage.
+    categories:
+      BEST_RATE: Institution offered the best interest rate.
+      BEST_DEADLINE: Institution offered the best repayment term.
+      HIGHER_VALUE_APPROVED: Institution approved a higher financed amount.
+      APPROVED_ONLY_CREDIT: This was the only institution that approved credit.
+      RELATION_WITH_INSTITUTION: Buyer already had an account/relationship with the institution.
+      INSUFFICIENT_INCOME: Other institutions rejected due to insufficient income.
+      LOW_SCORE: Other institutions rejected due to low credit score.
+      INTERNAL_BANK_ISSUES: Other institutions had internal issues preventing approval.
+      BLANK: Reason not informed.
     lineage:
     - datalake_sales_flow_raw.mortgage.institution_choice_reason
   credit_letter:
-    description: Credit-approval letter status or reference issued by the bank for the financing.
+    description: Flag indicating whether the bank has issued the credit-approval letter (carta de crédito) for the financing.
     lineage:
     - datalake_sales_flow_raw.mortgage.credit_letter
   mortgage_pendency:
-    description: Any pending issues or items related to the mortgage.
+    description: Enum identifying the specific pending item currently blocking progress on the mortgage (e.g. ITBI tracking, keys handover, signature scheduling), defaulting to NO_PENDENCY when nothing is pending. Contains over 30 possible values covering the different checkpoints of the mortgage closing process.
     lineage:
     - datalake_sales_flow_raw.mortgage.mortgage_pendency
   approved_amount:
-    description: The amount of credit that was approved.
+    description: Monetary amount of credit approved by the bank.
     lineage:
     - datalake_sales_flow_raw.mortgage.approved_amount
   approved_value_less_than_requested:
-    description: Flag indicating if the approved value was less than the requested amount.
+    description: Flag indicating whether the amount approved by the bank was less than the amount requested.
     lineage:
     - datalake_sales_flow_raw.mortgage.approved_value_less_than_requested
   entry_amount_paid_finished_by:
-    description: Identifier for the user or system that finished the entry amount payment.
+    description: 'Enum indicating which party (CcvPartyType) completed/confirmed the entry-amount (down payment) payment — not a user identifier despite the column name. Values: BUYER, SELLER.'
     lineage:
     - datalake_sales_flow_raw.mortgage.entry_amount_paid_finished_by
   financed_value:
-    description: The total value being financed.
+    description: Total monetary value being financed through the mortgage.
     lineage:
     - datalake_sales_flow_raw.mortgage.financed_value
   payment_id:
-    description: Foreign key to the payment table.
+    description: Foreign key to the payment table (one-to-one relationship).
     lineage:
     - datalake_sales_flow_raw.mortgage.payment_id
   installments_quantity:
-    description: The number of installments for the mortgage.
+    description: Number of installments contracted for the mortgage.
     lineage:
     - datalake_sales_flow_raw.mortgage.installments_quantity
   is_entry_amount_paid:
-    description: Flag indicating if the entry amount has been paid.
+    description: Flag indicating whether the entry amount (down payment) has been paid.
     lineage:
     - datalake_sales_flow_raw.mortgage.is_entry_amount_paid
   is_itbi_paid:
-    description: Flag indicating if the ITBI (Imposto sobre Transmissão de Bens Imóveis) has been paid.
+    description: Flag indicating whether the ITBI (Imposto sobre Transmissão de Bens Imóveis, property transfer tax) has been paid.
     lineage:
     - datalake_sales_flow_raw.mortgage.is_itbi_paid
   itbi_paid_finished_by:
-    description: Identifier for the user or system that finished the ITBI payment.
+    description: 'Enum indicating which party (CcvPartyType) completed/confirmed the ITBI payment — not a user identifier despite the column name. Values: BUYER, SELLER.'
     lineage:
     - datalake_sales_flow_raw.mortgage.itbi_paid_finished_by
   dt_credit_started:
-    description: The date when the credit analysis started.
+    description: Timestamp when the bank credit analysis started.
     lineage:
     - datalake_sales_flow_raw.mortgage.credit_start_date
   dt_credit_ended:
-    description: The date when the credit analysis ended.
+    description: Timestamp when the bank credit analysis ended.
     lineage:
     - datalake_sales_flow_raw.mortgage.credit_end_date
   dt_bank_started:
-    description: The date when the bank process started.
+    description: Timestamp when the process with the bank started.
     lineage:
     - datalake_sales_flow_raw.mortgage.bank_start_date
   dt_started:
-    description: The start date of the mortgage process.
+    description: Timestamp when the overall mortgage process started.
     lineage:
     - datalake_sales_flow_raw.mortgage.start_date
   dt_ended:
-    description: The end date of the mortgage process.
+    description: Timestamp when the overall mortgage process ended.
     lineage:
     - datalake_sales_flow_raw.mortgage.end_date
   ts_seller_paid:
-    description: Timestamp of when the seller was paid.
+    description: Timestamp of when the seller was paid the proceeds from the mortgage.
     lineage:
     - datalake_sales_flow_raw.mortgage.seller_paid_at
   ts_entry_amount_paid:
-    description: Timestamp of when the entry amount was paid.
+    description: Timestamp of when the entry amount (down payment) was paid.
     lineage:
     - datalake_sales_flow_raw.mortgage.entry_amount_paid_at
   ts_itbi_paid:
-    description: Timestamp of when the ITBI was paid.
+    description: Timestamp of when the ITBI (property transfer tax) was paid.
     lineage:
     - datalake_sales_flow_raw.mortgage.itbi_paid_at
   ts_created:
-    description: Timestamp of when the mortgage record was created.
+    description: Timestamp of when the mortgage record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.mortgage.created_at
   ts_updated:
-    description: Timestamp of the last update to the mortgage record.
+    description: Timestamp of the last update to the mortgage record in the source operational system.
     lineage:
     - datalake_sales_flow_raw.mortgage.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.mortgage.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.mortgage.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.mortgage.day

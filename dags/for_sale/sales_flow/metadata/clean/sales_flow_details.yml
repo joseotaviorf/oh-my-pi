@@ -2,18 +2,26 @@ database_name: datalake_sales_flow_clean
 table_name: sales_flow_details
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table with complementary details about the sales flow, including external system IDs and follow-up timestamps.
+description: >
+  Stores complementary, mutable details about a sales flow that support the post-offer
+  operational workflow, one row per sales flow (1:1 with the sales_flow table). It links
+  the sales flow to related tickets/records in internal systems — Taskmaster (the internal
+  ticketing tool, including buyer/seller onboarding tasks and the post-CCV "Incubator EOP"
+  follow-up ticket), Hefesto (the specialist portfolio-assignment system, tracked separately
+  for buyer and seller), and iSolve (the internal mortgage/credit pre-analysis pipeline) —
+  plus a Google Drive link and buyer/seller follow-up (FUP) timestamps used by the
+  operations team while shepherding the deal to closing.
 columns:
   id:
-    description: Unique ID for the sales flow detail.
+    description: Surrogate primary key for the sales flow detail record.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.id
   id_sales_flow:
-    description: Foreign key to the sales_flow table, identifying which sales flow this detail belongs to.
+    description: Foreign key to the sales_flow table, identifying which sales flow this detail belongs to (one-to-one relationship).
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.sales_flow_id
   id_taskmaster:
-    description: ID of the main task in the Taskmaster system associated with this flow.
+    description: ID of the main task in the Taskmaster system (QuintoAndar's internal ticketing tool) associated with this sales flow.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.taskmaster_id
   id_buyer_onboarding_taskmaster:
@@ -25,58 +33,65 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.seller_onboarding_taskmaster_id
   id_buyer_hefesto_portfolio_unit:
-    description: ID of the buyer's portfolio unit in the Hefesto system.
+    description: ID of the buyer's specialist portfolio unit in the Hefesto system, which handles specialist assignment ("encarteiramento") for the buyer side of the deal.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.buyer_hefesto_portfolio_unit_id
   id_seller_hefesto_portfolio_unit:
-    description: ID of the seller's portfolio unit in the Hefesto system.
+    description: ID of the seller's specialist portfolio unit in the Hefesto system, which handles specialist assignment ("encarteiramento") for the seller side of the deal.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.seller_hefesto_portfolio_unit_id
   id_incubator_eop_taskmaster:
-    description: Taskmaster task ID for the "Incubator EOP" process.
+    description: Taskmaster ticket ID for the "Incubator EOP" (End-of-Process) task, created right after the CCV (purchase agreement) is signed to track the case during the post-signature phase until it is handed off to a specialist's Hefesto portfolio.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.incubator_eop_taskmaster_id
   opportunities_of_the_week:
-    description: Field related to "Opportunities of the Week", possibly an identifier or flag.
+    description: >
+      Enum flag classifying the sales flow as a highlighted "Opportunity of the Week" for
+      tracking/reporting purposes, backed by the OpportunitiesOfTheWeek enum. Null when the
+      flow is not flagged.
+    categories:
+      START_CRI_FORECAST: "Previsão CRI Início: flagged for a CRI (real estate credit certificate) forecast at the start of the process."
+      MA_FORECAST: "Previsão MA: flagged for a mortgage (MA) forecast."
+      START_BANK_FORECAST: "Previsão Banco início: flagged for a bank financing forecast at the start of the process."
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.opportunities_of_the_week
   isolve_link:
-    description: Link to the corresponding record in the iSolve system.
+    description: URL to the corresponding record in iSolve, QuintoAndar's internal mortgage/credit pre-analysis tool (covers stages such as pre-analysis, credit letter, property inspection, checklist, and contracting).
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.isolve_link
   google_drive_link:
-    description: Link to a Google Drive folder or document related to this flow.
+    description: URL to a Google Drive folder or document associated with this sales flow, set and updated manually via a dedicated API endpoint.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.google_drive_link
   ticket_complexity_level:
-    description: Complexity level of the associated ticket.
+    description: Numeric complexity level (integer, default 3) assigned to the associated Taskmaster ticket, used to size/prioritize the operational workload for the sales flow.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.ticket_complexity_level
   ts_seller_fup:
-    description: Timestamp of the last follow-up with the seller.
+    description: Timestamp of the last follow-up (FUP) contact with the seller.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.seller_fup_at
   ts_buyer_fup:
-    description: Timestamp of the last follow-up with the buyer.
+    description: Timestamp of the last follow-up (FUP) contact with the buyer.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.buyer_fup_at
   ts_created:
-    description: Record creation timestamp.
+    description: Timestamp when the sales flow detail record was created.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.created_at
   ts_updated:
-    description: Record last update timestamp.
+    description: Timestamp of the most recent update to the sales flow detail record.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_details.day

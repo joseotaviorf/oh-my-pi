@@ -53,14 +53,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.note_aud.updated_at
   year:
-    description: CDC partition year of the record.
+    description: CDC Year of the record.
     lineage:
     - datalake_sales_flow_raw.note_aud.year
   month:
-    description: CDC partition month of the record.
+    description: CDC Month of the record.
     lineage:
     - datalake_sales_flow_raw.note_aud.month
   day:
-    description: CDC partition day of the record.
+    description: CDC Day of the record.
     lineage:
     - datalake_sales_flow_raw.note_aud.day

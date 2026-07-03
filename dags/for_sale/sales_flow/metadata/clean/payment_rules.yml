@@ -2,58 +2,95 @@ database_name: datalake_sales_flow_clean
 table_name: payment_rules
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: The payment_rules table contains data related to the 'Triagem CCV' process within the Sales department. This process involves the creation of CCVs (Contracts) through LegalOps team input, where client and property information is entered. Based on this information, a CCV is generated automatically
+description: Defines the installment structure and terms (values, due-date term/day-count rules, and optional payment extensions) for the down payment, cash value, and entry-amount portions of a home-purchase payment during the 'Triagem CCV' process. This process involves the creation of CCVs (Contracts) through LegalOps team input, where client and property information is entered; based on this information, a CCV is generated automatically and its installment rules are recorded here. Each row is one-to-one with a record in the payment table (PaymentRules entity, br.com.quintoandar.salesflow.core.paymentrules.PaymentRules).
 columns:
   id:
     description: Identifier for the payment rule.
     lineage:
     - datalake_sales_flow_raw.payment_rules.id
   id_payment:
-    description: Identifier for the payment.
+    description: Foreign key to the payment table (one-to-one relationship).
     lineage:
     - datalake_sales_flow_raw.payment_rules.payment_id
   cash_first_installment_day_count_type:
-    description: Day-counting basis used to compute the due date of the first cash installment (for example business days or calendar days).
+    description: Enum defining the day-counting basis used to compute the due date of the first cash installment.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.cash_first_installment_day_count_type
   cash_second_installment_condition:
-    description: Condition that triggers or governs the second cash installment in the CCV contract.
+    description: Enum defining the condition that triggers the second cash installment in the CCV contract.
+    categories:
+      TOGETHER_WITH_DEED_SIGN: Second installment is due together with the notary deed signature.
+      AFTER_FIRST_INSTALLMENT_PAYMENT: Second installment is due after the first installment is paid.
+      AFTER_CCV_SIGN: Second installment is due after the CCV contract is signed.
     lineage:
     - datalake_sales_flow_raw.payment_rules.cash_second_installment_condition
   cash_second_installment_day_count_type:
-    description: Day-counting basis used to compute the due date of the second cash installment.
+    description: Enum defining the day-counting basis used to compute the due date of the second cash installment.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.cash_second_installment_day_count_type
   cash_value_payment_extension_markdown:
-    description: Markdown-formatted clause text describing the cash value payment extension shown in the generated contract.
+    description: Enum (not free-text/markdown content despite the field name) identifying the trigger point for the cash value payment extension clause included in the generated contract.
+    categories:
+      CCV_SIGN: Extension clause is triggered at CCV contract signature.
+      DILIGENCE_ACCEPTED: Extension clause is triggered when due diligence is accepted.
+      CONCURRENT_TO_THE_CONTRACT_SIGNING: Extension clause runs concurrently with the contract signing.
     lineage:
     - datalake_sales_flow_raw.payment_rules.cash_value_payment_extension_markdown
   entry_amount_first_installment_day_count_type:
-    description: Day-counting basis used to compute the due date of the first entry-amount installment.
+    description: Enum defining the day-counting basis used to compute the due date of the first entry-amount installment.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.entry_amount_first_installment_day_count_type
   entry_amount_second_installment_condition:
-    description: Condition that triggers or governs the second entry-amount installment in the CCV contract.
+    description: Enum defining the condition that triggers the second entry-amount installment in the CCV contract.
+    categories:
+      TOGETHER_WITH_DEED_SIGN: Second installment is due together with the notary deed signature.
+      AFTER_FIRST_INSTALLMENT_PAYMENT: Second installment is due after the first installment is paid.
+      AFTER_CCV_SIGN: Second installment is due after the CCV contract is signed.
     lineage:
     - datalake_sales_flow_raw.payment_rules.entry_amount_second_installment_condition
   entry_amount_second_installment_day_count_type:
-    description: Day-counting basis used to compute the due date of the second entry-amount installment.
+    description: Enum defining the day-counting basis used to compute the due date of the second entry-amount installment.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.entry_amount_second_installment_day_count_type
   entry_amount_payment_extension_markdown:
-    description: Markdown-formatted clause text describing the entry-amount payment extension shown in the generated contract.
+    description: Enum (not free-text/markdown content despite the field name) identifying the trigger point for the entry-amount payment extension clause included in the generated contract.
+    categories:
+      CCV_SIGN: Extension clause is triggered at CCV contract signature.
+      DILIGENCE_ACCEPTED: Extension clause is triggered when due diligence is accepted.
+      CONCURRENT_TO_THE_CONTRACT_SIGNING: Extension clause runs concurrently with the contract signing.
     lineage:
     - datalake_sales_flow_raw.payment_rules.entry_amount_payment_extension_markdown
   entry_amount_payment_extension_day_count_type:
-    description: Day-counting basis used to compute the due date of the entry-amount payment extension.
+    description: Enum defining the day-counting basis used to compute the due date of the entry-amount payment extension.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.entry_amount_payment_extension_day_count_type
   down_payment_day_count_type:
-    description: Day-counting basis used to compute the due date of the down payment.
+    description: Enum defining the day-counting basis used to compute the due date of the down payment.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.down_payment_day_count_type
   cash_value_payment_extension_day_count_type:
-    description: Day-counting basis used to compute the due date of the cash value payment extension.
+    description: Enum defining the day-counting basis used to compute the due date of the cash value payment extension.
+    categories:
+      BUSINESS_DAYS: Due date is computed counting business days only.
+      REGULAR_DAYS: Due date is computed counting regular calendar days.
     lineage:
     - datalake_sales_flow_raw.payment_rules.cash_value_payment_extension_day_count_type
   down_payment_term:
@@ -101,42 +138,42 @@ columns:
     lineage:
     - datalake_sales_flow_raw.payment_rules.entry_amount_payment_extension_term
   has_down_payment_extension:
-    description: Boolean indicating if the payment has a down payment extension.
+    description: Flag indicating whether the payment has a down payment extension.
     lineage:
     - datalake_sales_flow_raw.payment_rules.has_down_payment_extension
   has_cash_value_installment:
-    description: Boolean indicating if the payment has a cash value installment.
+    description: Flag indicating whether the payment has a cash value installment.
     lineage:
     - datalake_sales_flow_raw.payment_rules.has_cash_value_installment
   has_cash_value_payment_extension:
-    description: Boolean indicating if the payment has a cash value payment extension.
+    description: Flag indicating whether the payment has a cash value payment extension.
     lineage:
     - datalake_sales_flow_raw.payment_rules.has_cash_value_payment_extension
   has_entry_amount_installment:
-    description: Boolean indicating if the payment has an entry amount installment.
+    description: Flag indicating whether the payment has an entry amount installment.
     lineage:
     - datalake_sales_flow_raw.payment_rules.has_entry_amount_installment
   has_entry_amount_payment_extension:
-    description: Boolean indicating if the payment has an entry amount payment extension.
+    description: Flag indicating whether the payment has an entry amount payment extension.
     lineage:
     - datalake_sales_flow_raw.payment_rules.has_entry_amount_payment_extension
   ts_created:
-    description: Timestamp indicating when the payment rule was created.
+    description: Timestamp indicating when the payment rule record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.payment_rules.created_at
   ts_updated:
-    description: Timestamp indicating when the payment rule was last updated.
+    description: Timestamp indicating when the payment rule record was last updated in the source operational system.
     lineage:
     - datalake_sales_flow_raw.payment_rules.updated_at
   year:
-    description: Year of the payment rule.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.payment_rules.year
   month:
-    description: Month of the payment rule.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.payment_rules.month
   day:
-    description: Day of the payment rule.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.payment_rules.day

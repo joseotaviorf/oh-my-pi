@@ -57,14 +57,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.listing_fee_aud.updated_at
   year:
-    description: Year partition for the listing fee record.
+    description: Year  for the listing fee record.
     lineage:
     - datalake_sales_flow_raw.listing_fee_aud.year
   month:
-    description: Month partition for the listing fee record.
+    description: Month  for the listing fee record.
     lineage:
     - datalake_sales_flow_raw.listing_fee_aud.month
   day:
-    description: Day partition for the listing fee record.
+    description: Day  for the listing fee record.
     lineage:
     - datalake_sales_flow_raw.listing_fee_aud.day

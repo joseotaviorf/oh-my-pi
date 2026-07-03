@@ -1,6 +1,6 @@
 database_name: datalake_sales_flow_clean
 table_name: brokerage
-description: Brokerage information associated with an offer.
+description: Records the brokerage fee terms agreed for a sales flow — who pays the fee, when it is due, the fee percentage charged, and how that fee is split between QuintoAndar and its partner — as part of closing a "For Sale" home-purchase transaction (Brokerage entity, br.com.quintoandar.salesflow.core.brokerage.Brokerage).
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -15,23 +15,28 @@ columns:
   brokerage_fee_payer:
     lineage:
     - datalake_sales_flow_raw.brokerage.brokerage_fee_payer
-    description: Party responsible for paying the brokerage fee.
+    description: 'Enum indicating the party responsible for paying the brokerage fee. Values: BUYER, SELLER, REAL_ESTATE.'
   brokerage_payment_timeframe:
     lineage:
     - datalake_sales_flow_raw.brokerage.brokerage_payment_timeframe
-    description: Agreed timeframe for paying the brokerage fee.
+    description: Enum indicating the agreed timeframe/milestone for paying the brokerage fee.
+    categories:
+      DD: Brokerage fee due at due diligence (DD) acceptance.
+      CRI_START: Brokerage fee due at the start of the CRI (registry/CRN clearance) process.
+      CRI_END: Brokerage fee due at the end of the CRI (registry/CRN clearance) process.
+      CCV: Brokerage fee due at CCV (purchase and sale contract) signature.
   brokerage_fee:
     lineage:
     - datalake_sales_flow_raw.brokerage.brokerage_fee
-    description: Brokerage fee amount charged on the sale.
+    description: Brokerage fee percentage (decimal, e.g. default 0.06 = 6%) charged on the sale.
   quinto_andar_brokerage_split:
     lineage:
     - datalake_sales_flow_raw.brokerage.quinto_andar_brokerage_split
-    description: QuintoAndar share of the brokerage fee.
+    description: QuintoAndar's share (decimal percentage, e.g. default 0.65 = 65%) of the total brokerage fee, with the remainder going to the partner/real estate agent.
   brokerage_payment_deadline:
     lineage:
     - datalake_sales_flow_raw.brokerage.brokerage_payment_deadline
-    description: Deadline date for paying the brokerage fee.
+    description: Number of days allowed to pay the brokerage fee after the applicable milestone (integer value, not a calendar date, despite the column name).
   ts_created:
     lineage:
     - datalake_sales_flow_raw.brokerage.created_at
@@ -43,12 +48,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.brokerage.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.brokerage.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.brokerage.day
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.

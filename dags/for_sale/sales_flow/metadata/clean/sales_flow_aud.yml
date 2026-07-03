@@ -145,14 +145,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_aud.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_aud.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_aud.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_aud.day

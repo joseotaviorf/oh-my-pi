@@ -1,39 +1,50 @@
 database_name: datalake_sales_flow_clean
 table_name: ccv
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Represents the purchase and sale agreement (Contrato de Compra e Venda, CCV) drawn up for a given sales flow once an offer is accepted. Each row holds the contract's template version, sale price, document tokens for the draft and signed PDFs, the signing timestamp, and the current lifecycle status (CcvStatus). Rows are created and progressed by the Sales Flow application's CCV drafting/signing workflow as the contract moves from edition through sending, signature, and eventual completion, voiding, or cancellation. (JPA entity — CcvEntity, in the Sales Flow service)
 columns:
   id:
     lineage:
     - datalake_sales_flow_raw.ccv.id
-    description: Surrogate primary key of the ccv row in the source system.
+    description: Surrogate primary key of the ccv row (CcvEntity), one row per purchase and sale agreement (Contrato de Compra e Venda) generated for a sales flow.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.ccv.sales_flow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: Foreign key to the parent sales flow (SalesFlowEntity) that this CCV contract belongs to; the relationship is one-to-one in the source system.
   id_house:
     lineage:
     - datalake_sales_flow_raw.ccv.house_id
-    description: Foreign key to the property listing involved in the visit or transaction.
+    description: Foreign key to the property (house) that is the subject of the purchase and sale agreement.
   signed_document_token:
     lineage:
     - datalake_sales_flow_raw.ccv.signed_document_token
-    description: Storage token referencing the signed CCV contract document.
+    description: Storage token referencing the fully signed version of the CCV contract document.
   unsigned_document_token:
     lineage:
     - datalake_sales_flow_raw.ccv.unsigned_document_token
-    description: Storage token referencing the unsigned draft of the CCV contract document.
+    description: Storage token referencing the unsigned/draft version of the CCV contract document, generated before signature collection.
   sale_price:
     lineage:
     - datalake_sales_flow_raw.ccv.sale_value
-    description: Agreed sale price of the property recorded in the CCV contract.
+    description: Agreed sale price of the property (decimal monetary value) as recorded on the CCV contract.
   ccv_version:
     lineage:
     - datalake_sales_flow_raw.ccv.ccv_version
-    description: Version of the CCV contract template applied to this record.
+    description: Numeric version of the CCV contract template/wording applied to this record.
   status:
     lineage:
     - datalake_sales_flow_raw.ccv.status
-    description: Current operational status code governing workflow progression for this record.
+    description: Current lifecycle status of the CCV contract (enum CcvStatus) as it moves from initial edition through sending and signature to a final state such as SIGNED, VOIDED, or CANCELED.
+    categories:
+      EDITION: Contract is being drafted/edited and has not yet been generated for sending.
+      CREATED: Contract document has been generated and confirmed, ready to be sent.
+      SENT_DRAFT: Draft version of the contract was sent for review before the final send.
+      SENT_DRAFT_ERROR: "Sending the draft version failed; a final, non-final-flagged error state requiring retry or void/cancel."
+      SENT: Final contract document has been sent to the parties for signature.
+      SIGNED: Contract has been signed by the parties; final state.
+      VOIDED: Contract was voided/annulled; final state. Also covers the legacy DISTRACT value, migrated into VOIDED historically.
+      CANCELED: Contract process was canceled; final state.
   ts_signed:
     lineage:
     - datalake_sales_flow_raw.ccv.signed_at
@@ -49,14 +60,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.ccv.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.ccv.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.ccv.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of ccv sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

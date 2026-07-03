@@ -2,86 +2,125 @@ database_name: datalake_sales_flow_clean
 table_name: diligence
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains records of the due diligence process for sales flows.
+description: Tracks the legal due-diligence process performed on a property/seller before closing a sales flow — a third-party partner researches the property and prior owners for legal/tax risks (lawsuits, debts, tax liabilities), classifies the risk level, and the report is shared with buyer and seller for acceptance. One row per sales_flow, with step transitions managed by DiligenceStatusTransitionHandler and individual findings tracked in the related diligence_appointment table. (JPA entity — `Diligence`, `br.com.quintoandar.salesflow.core.diligence.Diligence`)
 columns:
   id_diligence:
     description: Unique ID for the diligence record.
     lineage:
     - datalake_sales_flow_raw.diligence.id
   id_sales_flow:
-    description: Foreign key to the sales_flow table.
+    description: Foreign key to the sales_flow table. One diligence record exists per sales flow.
     lineage:
     - datalake_sales_flow_raw.diligence.sales_flow_id
   classification:
-    description: The classification of the diligence result (e.g., approved, pending).
+    description: |
+      Enum with the risk classification of the diligence findings. Mixes two historical scales —
+      appointment severity and risk level. Defaults to NOT_STARTED. Note: this column was renamed
+      from the original `status` column by a 2022 migration.
+    categories:
+      NOT_STARTED: Diligence classification not yet assigned ("Não Iniciada").
+      NO_APPOINTMENT: No findings raised against the property or owners ("Sem apontamento").
+      LIGHT_APPOINTMENT: Minor finding(s) raised, low business impact ("Apontamento leve").
+      MODERATE_APPOINTMENT: Moderate-severity finding(s) raised ("Apontamento moderado").
+      CRITICAL_APPOINTMENT: Critical-severity finding(s) raised ("Apontamento crítico").
+      NO_GO_APPOINTMENT: Finding(s) severe enough to block the deal ("Apontamento NO GO").
+      LOW_RISK: Overall risk assessed as low under the risk-level scale ("Risco baixo").
+      MODERATE_RISK: Overall risk assessed as moderate under the risk-level scale ("Risco moderado").
+      HIGH_RISK: Overall risk assessed as high under the risk-level scale ("Risco alto").
+      NO_GO_HIGH_RISK: Risk high enough to block the deal under the risk-level scale ("Risco alto NO GO").
     lineage:
     - datalake_sales_flow_raw.diligence.classification
   step:
-    description: The current step of the diligence process.
+    description: |
+      Enum with the current workflow step of the diligence process, ordered from earliest to
+      latest. PENDING and LONG_TERM_PAYMENT are explicitly marked deprecated in code
+      (DiligenceStepStatus.getDeprecatedStatuses()). Defaults to NOT_STARTED.
+    categories:
+      NOT_STARTED: Diligence process not yet started ("Não Iniciada").
+      LONG_TERM_PAYMENT: "Deprecated step, no longer used: long-term payment stage (\"PG Longo Prazo\")."
+      REQUEST_DD_LEGAL_RISK: Legal-risk due-diligence has been requested from the outsourced partner ("Solicitar DD LR").
+      PROCESSING: Partner is actively researching the property/seller ("Em processamento").
+      PENDING: "Deprecated step, no longer used: process pending (\"Pendência\")."
+      DOC_AVAILABLE: Supporting documentation from the partner is available ("Documentação disponível").
+      REPORT_UNDER_PREPARATION: Diligence report is being drafted internally ("Relatório em confecção").
+      REPORT_AVAILABLE: Diligence report has been generated and is ready to send ("Relatório disponível").
+      REPORT_SENT_SELLER: Diligence report has been sent to the seller ("Relatório enviado p/ vendedor").
+      REPORT_SENT_BUYER: Diligence report has been sent to the buyer ("Relatório enviado p/ comprador").
+      CANCELLED: Diligence process was cancelled ("Cancelamento").
     lineage:
     - datalake_sales_flow_raw.diligence.step
   acceptance_model:
-    description: The model used for acceptance in the diligence process.
+    description: |
+      Enum describing how the diligence report was accepted. AUTO_TACIT_ACCEPTANCE and
+      MANUAL_TACIT_ACCEPTANCE are grouped as tacit-acceptance models in code.
+    categories:
+      AUTO_TACIT_ACCEPTANCE: System automatically considered the report accepted after a deadline passed with no objection.
+      MANUAL_TACIT_ACCEPTANCE: Operator manually marked the report as tacitly accepted.
+      ACCEPTED_BY_BUYER: Buyer explicitly accepted the diligence report.
     lineage:
     - datalake_sales_flow_raw.diligence.acceptance_model
   accepted_by:
-    description: Identifier for the user or system that accepted the diligence.
+    description: Free-text identifier (not an enum) of the user or system that accepted the diligence report.
     lineage:
     - datalake_sales_flow_raw.diligence.accepted_by
   is_tacit_acceptance:
-    description: Flag indicating if the acceptance was tacit (implicit).
+    description: Flag indicating whether the diligence report was accepted tacitly (implicitly, without explicit buyer confirmation) rather than explicitly accepted.
     lineage:
     - datalake_sales_flow_raw.diligence.is_tacit_acceptance
   had_risk_reclassification:
-    description: Flag indicating if there was a risk reclassification during the process.
+    description: Flag indicating whether the diligence risk classification was changed (reclassified) after its initial assignment.
     lineage:
     - datalake_sales_flow_raw.diligence.had_risk_reclassification
   report_document_token:
-    description: Token or identifier for the diligence report document.
+    description: Token/identifier used to retrieve or access the generated diligence report document.
     lineage:
     - datalake_sales_flow_raw.diligence.report_document_token
   reset_reason:
-    description: The reason why the diligence process was reset.
+    description: Enum with the reason the diligence process/acceptance was reset.
+    categories:
+      RECLASSIFICATION_AFTER_ACCEPTANCE: Risk classification was changed after the report had already been accepted.
+      CLASSIFICATION_ERROR: The original classification was made in error and needed correction.
+      OTHER: Reset for a reason not covered by the other categories.
     lineage:
     - datalake_sales_flow_raw.diligence.reset_reason
   ts_help_requested_by_buyer:
-    description: Timestamp of when the buyer requested help.
+    description: Timestamp of when the buyer requested help/support regarding the diligence process.
     lineage:
     - datalake_sales_flow_raw.diligence.help_requested_by_buyer_at
   ts_help_requested_by_seller:
-    description: Timestamp of when the seller requested help.
+    description: Timestamp of when the seller requested help/support regarding the diligence process.
     lineage:
     - datalake_sales_flow_raw.diligence.help_requested_by_seller_at
   ts_partner_started:
-    description: Timestamp of when the partner started the diligence process.
+    description: Timestamp of when the outsourced legal-diligence partner started researching the property/seller.
     lineage:
     - datalake_sales_flow_raw.diligence.partner_started_at
   ts_partner_ended:
-    description: Timestamp of when the partner ended the diligence process.
+    description: Timestamp of when the outsourced legal-diligence partner finished researching the property/seller.
     lineage:
     - datalake_sales_flow_raw.diligence.partner_ended_at
   ts_legal_risk_started:
-    description: Timestamp of when the legal risk analysis started.
+    description: Timestamp of when the internal legal-risk analysis of the diligence findings started.
     lineage:
     - datalake_sales_flow_raw.diligence.legal_risk_started_at
   ts_legal_risk_ended:
-    description: Timestamp of when the legal risk analysis ended.
+    description: Timestamp of when the internal legal-risk analysis of the diligence findings ended.
     lineage:
     - datalake_sales_flow_raw.diligence.legal_risk_ended_at
   ts_buyer_seller_ended:
-    description: Timestamp of when the buyer/seller stage ended.
+    description: Timestamp of when the diligence process was confirmed/concluded for both buyer and seller (set by Diligence.confirmDiligence()); also used to determine whether the diligence has been accepted.
     lineage:
     - datalake_sales_flow_raw.diligence.buyer_seller_ended_at
   ts_buyer_sent:
-    description: Timestamp of when the diligence information was sent to the buyer.
+    description: Timestamp of when the diligence report was sent to the buyer.
     lineage:
     - datalake_sales_flow_raw.diligence.buyer_sent_at
   ts_seller_sent:
-    description: Timestamp of when the diligence information was sent to the seller.
+    description: Timestamp of when the diligence report was sent to the seller.
     lineage:
     - datalake_sales_flow_raw.diligence.seller_sent_at
   ts_acceptance_requested_by_buyer:
-    description: Timestamp of when acceptance was requested by the buyer.
+    description: Timestamp of when the buyer was asked to formally accept the diligence report/findings.
     lineage:
     - datalake_sales_flow_raw.diligence.acceptance_requested_by_buyer_at
   ts_created:
@@ -93,14 +132,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.diligence.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.diligence.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.diligence.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.diligence.day

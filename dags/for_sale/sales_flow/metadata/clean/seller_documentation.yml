@@ -1,25 +1,25 @@
 database_name: datalake_sales_flow_clean
 table_name: seller_documentation
-description: Table that contains the information about the seller documentation process.
+description: Tracks the seller's legal-documentation collection process for a house/property, independent of any specific sales flow — recording when the seller started providing property documents and when they finished submitting them. Keyed by house_id (not sales_flow_id), one row per house's documentation cycle. (JPA entity — `SellerDocumentation`, `br.com.quintoandar.salesflow.core.sellerdocumentation.SellerDocumentation`)
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.id
-    description: Document unique ID.
+    description: Unique ID for the seller documentation record.
   id_house:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.house_id
-    description: House ID on SalesFlow tables (datalake_sales_flow_clean.house).
+    description: Foreign key to the house being sold (datalake_sales_flow_clean.house). Unlike most Sales Flow tables, this record is keyed by house, not by sales_flow_id.
   ts_started:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.started_at
-    description: Timestamp related to the first document(s) sent by the seller.
+    description: Timestamp of when the seller started the property documentation submission process.
   ts_submitted:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.submitted_at
-    description: Timestamp related to the documentation process end, when the seller submitted the documents.
+    description: Timestamp of when the seller finished submitting all required property documents.
   ts_created:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.created_at
@@ -31,12 +31,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.seller_documentation.day
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.

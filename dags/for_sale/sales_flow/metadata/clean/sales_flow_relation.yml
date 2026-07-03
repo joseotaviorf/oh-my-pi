@@ -4,7 +4,7 @@ domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 description: |
   Associates a sales_flow to an external entity (company or agent) with a given role (related_as).
-  Used for listing owner, visit agent, demand owner, property consultant, etc.
+  Used for listing owner, visit agent, demand owner, property consultant, property acquirer, etc.
   One-to-one per sales_flow (sales_flow_id is unique). Source of the related entity is indicated by source_type.
 columns:
   id:
@@ -16,7 +16,7 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.sales_flow_id
   id_related:
-    description: External identifier of the related entity (company or agent ID according to source_type).
+    description: External string identifier of the related entity (company or agent ID, depending on source_type), sourced from the listing/mobile-api domain rather than an internal Sales Flow primary key.
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.related_id
   source_type:
@@ -27,13 +27,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.source_type
   related_as:
-    description: Role of the related entity in the sales flow.
+    description: Role of the related entity in the sales flow. Populated either from the property's last visit (visit agent, demand owner, listing owner, all sourced as COMPANY_REF) or from the property listing's relations (listing owner, autonomous agent, property consultant, property acquirer).
     categories:
       LISTING_OWNER: Owner of the listing.
-      AUTONOMOUS_AGENT: Autonomous agent.
-      VISIT_AGENT_REAL_STATE: Visit agent (real estate).
-      DEMAND_OWNER: Owner of the demand.
-      PROPERTY_CONSULTANT: Property consultant.
+      AUTONOMOUS_AGENT: Autonomous real-estate agent associated with the listing.
+      VISIT_AGENT_REAL_STATE: Real-estate agent who conducted the property visit.
+      DEMAND_OWNER: Owner of the buyer's demand/search that generated the visit.
+      PROPERTY_CONSULTANT: Property consultant associated with the listing.
+      PROPERTY_ACQUIRER: Acquirer (buyer) of the property.
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.related_as
   ts_created:
@@ -45,15 +46,15 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.updated_at
   year:
-    description: Calendar year used as a partition key for incremental table loads.
+    description: Calendar year used as a  key for incremental table loads.
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.year
   month:
-    description: Calendar month used as a partition key for incremental table loads.
+    description: Calendar month used as a  key for incremental table loads.
     lineage:
     - datalake_sales_flow_raw.sales_flow_relation.month
   day:
-    description: Calendar day used as a partition key for incremental table loads.
+    description: Calendar day used as a  key for incremental table loads.
     lineage:
       - datalake_sales_flow_raw.sales_flow_relation.day
   op_cdc:

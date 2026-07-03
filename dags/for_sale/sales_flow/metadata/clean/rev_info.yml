@@ -2,37 +2,37 @@ database_name: datalake_sales_flow_clean
 table_name: rev_info
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table that contains revision information for audited tables.
+description: Shared Hibernate Envers audit-revision metadata table (physical table name `revinfo`, no underscore) used across the sales-flow schema. It is not a business entity — it is auto-managed infrastructure that Envers writes to once per committed transaction that touches any `@Audited` entity, and every corresponding `*_aud` history table's `rev` column joins back to this table's id to identify who made the change and when. The custom revision listener extends Envers' revision tracking with request-level user/tracing context (Spring Security JWT context in the API module; typically empty in the async worker module). (Custom revision entity — `UserRevisionEntity`, `br.com.quintoandar.salesflow.core.audit.UserRevisionEntity`, populated by `UserRevisionListener`)
 columns:
   id:
-    description: Hibernate Envers revision id; each audited _aud row joins back to this id to identify the revision that produced it.
+    description: Hibernate Envers revision number (auto-incremented identity); each audited *_aud row's `rev` column joins back to this id to identify the revision that produced it.
     lineage:
     - datalake_sales_flow_raw.revinfo.id
   id_user:
-    description: User ID associated with the revision.
+    description: External user ID (userId) of the authenticated user who triggered the audited change, captured from the Spring Security JWT context by UserRevisionListener; may be empty for changes made by asynchronous workers with no request context.
     lineage:
     - datalake_sales_flow_raw.revinfo.user_id
   id_keycloak:
-    description: Keycloak ID associated with the user who made the change.
+    description: Keycloak identity ID (keycloakId) of the authenticated user who triggered the audited change.
     lineage:
     - datalake_sales_flow_raw.revinfo.keycloak_id
   id_trace:
-    description: Trace ID for request tracking and debugging.
+    description: Distributed tracing ID (traceId) associated with the request that produced this revision, used for cross-service request tracking and debugging.
     lineage:
     - datalake_sales_flow_raw.revinfo.trace_id
   ts_created:
-    description: Revision timestamp recorded by Envers, converted from the source epoch-millis value to when the audited change was committed.
+    description: Revision timestamp recorded by Envers (@RevisionTimestamp, stored as epoch millis in the source table), converted here to a proper timestamp indicating when the audited change was committed.
     lineage:
     - datalake_sales_flow_raw.revinfo.timestamp
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.revinfo.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.revinfo.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.revinfo.day

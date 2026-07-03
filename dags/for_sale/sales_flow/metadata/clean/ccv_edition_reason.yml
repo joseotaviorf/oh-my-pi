@@ -2,18 +2,39 @@ database_name: datalake_sales_flow_clean
 table_name: ccv_edition_reason
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table that stores the ccv edition reasons.
+description: Records the reason(s) given each time a CCV contract is edited/redrafted after its initial creation. Each row links a CCV to one reason code selected by the user who requested the edition. Rows are created by the CCV edition workflow whenever an already-generated contract needs a change (e.g., to party qualification, payment terms, or special clauses) and must be re-issued. (JPA entity — CcvEditionReason, in the Sales Flow service)
 columns:
   id:
-    description: Unique ID for this entry.
+    description: Surrogate primary key of the ccv_edition_reason row.
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.id
   id_ccv:
-    description: Unique ID for this CCV. Joins with the ccv tables (ccv_flow, ccv, ccv_party and others).
+    description: Foreign key to the CCV contract (ccv table) that was edited.
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.ccv_id
   edition_reason:
-    description: Reason why this CCV was edited.
+    description: Reason selected for editing/redrafting an already-generated CCV contract (enum CcvEditionReasonEnum), e.g. a party qualification change, a payment-term adjustment, or a special clause update.
+    categories:
+      BUYER_PJ: Edit to reflect the buyer being a legal entity (pessoa jurídica) rather than an individual.
+      SELLER_PJ: Edit to reflect the seller being a legal entity (pessoa jurídica) rather than an individual.
+      BY_QUALIFICATION: Edit to correct/update the buyer's qualification data (e.g. name, document, marital status).
+      SL_QUALIFICATION: Edit to correct/update the seller's qualification data (e.g. name, document, marital status).
+      PROPERTY_DESCRIPTION: Edit to correct/update the description of the property being sold.
+      SIGNAL_INSTALLMENT: Edit to the signal/down-payment installment terms.
+      DOWN_PAYMENT_IN_INSTALLMENTS: Edit to split the down payment into installments.
+      BALANCE_INSTALLMENT: Edit to the remaining balance installment terms.
+      DOWN_PAYMENT_PERIOD: Edit to the down payment period/deadline.
+      BALANCE_TERM: Edit to the term/deadline for paying the remaining balance.
+      ENTRY_DEADLINE: Edit to the deadline for the entry payment.
+      PAYMENT_TABLE_OTHER: Other edit to the payment table not covered by a more specific reason.
+      BODY_OF_THE_CCV: Edit to the main body/wording of the CCV contract.
+      SPECIAL_CLAUSE_VARIABLE: Edit to a variable/parameterized special clause in the contract.
+      SPECIAL_CLAUSE_OTHER: Edit to add or change another special clause not covered by a more specific reason.
+      SIGNATURE_FIELDS: Edit to the signature fields/signatories of the contract.
+      CONSORTIUM: Edit related to a consortium (financing via consórcio) arrangement.
+      ATTORNEY: Edit related to a party being represented by an attorney/power of attorney.
+      OTHER: Edit for a reason not covered by any other predefined category.
+      OLD_UPLOAD: "Legacy/deprecated value from a discontinued manual-upload edition path, no longer produced by current flows."
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.edition_reason
   ts_created:
@@ -25,14 +46,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.ccv_edition_reason.day

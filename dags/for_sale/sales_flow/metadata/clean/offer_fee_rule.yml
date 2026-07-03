@@ -49,14 +49,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.offer_fee_rule.updated_at
   year:
-    description: Year partition for the offer fee rule record.
+    description: Year  for the offer fee rule record.
     lineage:
     - datalake_sales_flow_raw.offer_fee_rule.year
   month:
-    description: Month partition for the offer fee rule record.
+    description: Month  for the offer fee rule record.
     lineage:
     - datalake_sales_flow_raw.offer_fee_rule.month
   day:
-    description: Day partition for the offer fee rule record.
+    description: Day  for the offer fee rule record.
     lineage:
     - datalake_sales_flow_raw.offer_fee_rule.day

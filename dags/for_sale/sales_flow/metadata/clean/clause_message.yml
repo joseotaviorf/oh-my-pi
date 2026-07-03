@@ -2,30 +2,30 @@ database_name: datalake_sales_flow_clean
 table_name: clause_message
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Stores messages and templates for legal clauses used in contracts.
+description: The master catalog of reusable legal clause templates that can be assembled into CCV contracts and addendums (see ccv_clause). Templates are organized under a subject (clause_subject), can be nested into a parent/child tree for grouping related clauses, and carry the variable placeholders, payment-method applicability, and legal task identifier used to render and classify each clause. Rows are managed by the legal/contract-authoring tooling that maintains the firm's library of standard and negotiation-specific clauses. (JPA entity — ClauseMessage, in the Sales Flow service)
 columns:
   id:
-    description: Unique ID for the clause message.
+    description: Surrogate primary key of the clause_message row, one row per clause template.
     lineage:
     - datalake_sales_flow_raw.clause_message.id
   id_subject:
-    description: Foreign key to the subject of the clause.
+    description: Foreign key to the subject (clause_subject) that categorizes this clause template.
     lineage:
     - datalake_sales_flow_raw.clause_message.subject_id
   id_parent:
-    description: Parent ID for hierarchical clause structures.
+    description: Foreign key to the parent clause_message row, used to build hierarchical/nested clause structures (a clause can contain inner sub-clauses).
     lineage:
     - datalake_sales_flow_raw.clause_message.parent_id
   is_negotiation_clause:
-    description: Flag indicating if this is a negotiation-specific clause.
+    description: Flag indicating whether this clause template is specific to negotiation terms rather than standard boilerplate contract text.
     lineage:
     - datalake_sales_flow_raw.clause_message.is_negotiation_clause
   description:
-    description: The full text or description of the clause.
+    description: Full text of the clause template, including any variable placeholders to be interpolated at render time.
     lineage:
     - datalake_sales_flow_raw.clause_message.description
   payment_method:
-    description: Specifies the payment method this clause applies to.
+    description: 'Payment method this clause template applies to (enum ClausePaymentMethod): CASH ("A VISTA"), FINANCED ("FINANCIADO"), or BOTH ("AMBOS").'
     lineage:
     - datalake_sales_flow_raw.clause_message.payment_method
   title:
@@ -33,19 +33,19 @@ columns:
     lineage:
     - datalake_sales_flow_raw.clause_message.title
   order_clause:
-    description: The order in which the clause should appear.
+    description: Integer defining the display/print order of this clause relative to others within the same contract.
     lineage:
     - datalake_sales_flow_raw.clause_message.order_clause
   variables:
-    description: JSON or text field containing variables to be interpolated into the clause text.
+    description: JSON structure listing the variable placeholders that this clause template exposes for interpolation when instantiated into a CCV (see ccv_clause.variables for the actual values used per contract).
     lineage:
     - datalake_sales_flow_raw.clause_message.variables
   clause_identifier:
-    description: A unique identifier for the clause.
+    description: Legal/task label identifying this clause (large shared enum TaskLabel used across contract and task domains). Note that a substantial batch of these labels for cash-flow special clauses was generated with AI assistance and is pending manual review.
     lineage:
     - datalake_sales_flow_raw.clause_message.clause_identifier
   notary_complexity:
-    description: Indicates the complexity level of the notary process for this clause.
+    description: Integer indicating the notary processing complexity level associated with this clause (defaults to 1 when not otherwise specified).
     lineage:
     - datalake_sales_flow_raw.clause_message.notary_complexity
   ts_created:
@@ -57,14 +57,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.clause_message.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.clause_message.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.clause_message.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.clause_message.day

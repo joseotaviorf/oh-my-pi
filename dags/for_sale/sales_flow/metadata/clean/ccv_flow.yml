@@ -1,23 +1,39 @@
 database_name: datalake_sales_flow_clean
 table_name: ccv_flow
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Tracks the operational workflow used to draft, review, and collect signatures for a sales flow's CCV contract, independent from the CCV document record itself. Each row represents one such workflow instance, holding its current stage (CcvFlowStatus), whether the "5a" contract model applies, and the timestamps for when drafting (confection) started and when the contract was signed. Rows are created and advanced by the Sales Flow application as operations/legal teams move a contract through documentation, drafting, signature, and issue-resolution queues. (JPA entity — CcvFlow, in the Sales Flow service)
 columns:
   id_ccv_flow:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.id
-    description: Primary key identifying this CCV confection-and-signing flow record.
+    description: Primary key of the ccv_flow row (CcvFlow entity), one row per CCV drafting-and-signing workflow instance for a sales flow.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.sales_flow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: Foreign key to the parent sales flow that this CCV drafting/signing flow belongs to.
   status:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.status
-    description: Current operational status code governing workflow progression for this record.
+    description: Current stage of the CCV drafting/signing operational workflow (enum CcvFlowStatus) as operations/legal teams move the contract from documentation through queues, pending-issue resolution, and signature.
+    categories:
+      PENDING_DOCUMENTATION: "Waiting on required documentation before drafting can proceed (Pendente Documentação)."
+      SEND_TO_CCV_QUEUE: "Ready to be routed into the CCV drafting queue (Enviar para Fila de CCV)."
+      SEND_TO_BE_SIGNED: "Contract has been sent out for signature (Enviado para assinatura)."
+      SIGNED: "Contract has been signed (Assinado); final stage of this workflow."
+      LEGAL_PENDING_ISSUES: "Blocked on legal pendencies that must be resolved (Pendências jurídicas)."
+      VISIT_REVISIT: "Blocked pending a property visit or revisit (Visita/Revisita)."
+      NO_RETURN_FROM_BUYER_OR_SELLER: "Blocked because buyer or seller has not responded (Sem retorno Buyer/Seller)."
+      FINANCIAL_ISSUE: "Blocked on a financial pendency (Pendência financeira)."
+      RIGHT_OF_FIRST_REFUSAL: "Blocked pending resolution of a right-of-first-refusal/preemptive right situation (Direito de preferência)."
+      OFFER_UNDER_ANALYSIS: "The offer itself is still under analysis (Offer em Análise)."
+      ANOTHER_OFFER_ONGOING: "Blocked because another competing offer is in progress (Outra Offer em Andamento)."
+      SEND_TO_QUICK_QUEUE: "Routed to an expedited/quick processing queue (Enviar para Fila Rápida)."
+      SEND_TO_OPERATIONS_SUPPORT: "Routed to operations support for manual handling (Enviar para suporte operacional)."
   is_5a_model:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.is_5a_model
-    description: Boolean flag indicating whether 5a model applies to this record.
+    description: Boolean flag indicating whether this CCV flow uses the "5a" contract model/template.
   ts_confection_started:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.started_confection_at
@@ -37,14 +53,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.ccv_flow.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of ccv flow sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv flow record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

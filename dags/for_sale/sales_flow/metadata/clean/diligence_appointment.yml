@@ -1,6 +1,8 @@
 database_name: datalake_sales_flow_clean
 table_name: diligence_appointment
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Stores the individual legal/financial findings ("apontamentos") raised against a property, its current/former owners, or a legal-entity seller during the diligence process, each tagged with a specific appointment-reason enum. Many rows exist per diligence record (one per finding), supporting soft-delete when a finding is removed. This table replaced a deprecated diligence_tag design. (JPA entity — `DiligenceAppointment`, `br.com.quintoandar.salesflow.core.diligence.DiligenceAppointment`)
 columns:
   id_diligence_appointment:
     lineage:
@@ -9,15 +11,55 @@ columns:
   id_diligence:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.diligence_id
-    description: Identifier of the parent diligence record this appointment belongs to.
+    description: Foreign key to the parent diligence record this appointment (finding) belongs to.
   appointment:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.appointment
-    description: Scheduled appointment detail recorded for the diligence process.
+    description: |
+      Enum identifying a specific legal/financial finding ("apontamento", i.e., a red flag raised
+      during due diligence) attached to the property, its former/current owners, or a legal-entity
+      (PJ) seller and its partners/shareholders. Grouped by subject, each with a Portuguese label,
+      plus a catch-all OBJECTIVE_APPOINTMENTS category.
+    categories:
+      REAL_STATE_SIZE_DIVERGENCE: Property registered size diverges from actual/documented size ("imóvel_divergência metragem").
+      REAL_STATE_RISING_DEBT: Property has an outstanding rising/escalating debt ("imóvel_débito ascendente").
+      REAL_STATE_FORUM_DEBT: Property has an outstanding "foro" (ground rent) debt ("imóvel_débito foro").
+      REAL_STATE_IPTU: Property has an outstanding IPTU (municipal property tax) debt ("imóvel_débito iptu").
+      REAL_STATE_TAXPAYER_NOT_INDIVIDUAL: Registered taxpayer for the property is not an individual person ("imóvel_contribuinte não individ.").
+      REAL_STATE_FUNESBOM_DEBT: Property has an outstanding FUNESBOM (fire department fund) debt ("imóvel_débitos funesbom").
+      REAL_STATE_DIVERGENCE_TAXPAYER_NUMBER: Property's registered taxpayer number diverges from records ("imóvel_divergência nº contribuinte").
+      REAL_STATE_DIVERGENCE_TAXPAYER_NAME: Property's registered taxpayer name diverges from records ("imóvel_divergência nome contrib.").
+      FORMER_OWNER_CIVIL_LAWSUIT: Former owner has an active civil lawsuit on record ("ap_ações cíveis").
+      FORMER_OWNER_LABOR_LAWSUIT: Former owner has an active labor lawsuit on record ("ap_ações trabalhistas").
+      FORMER_OWNER_TAX_EXECUTION: Former owner has an active tax execution proceeding on record ("ap_ execuções fiscais").
+      FORMER_OWNER_PROTEST: Former owner has a registered protest (unpaid debt notice) on record ("ap_protesto").
+      FORMER_OWNER_STATE_TAX: Former owner has outstanding state tax liabilities ("ap_tributos estaduais").
+      FORMER_OWNER_FEDERAL_TAX: Former owner has outstanding federal tax liabilities ("ap_tributos federais").
+      OWNER_CIVIL_LAWSUIT: Current owner has an active civil lawsuit on record ("pp_ações cíveis").
+      OWNER_LABOR_LAWSUIT: Current owner has an active labor lawsuit on record ("pp_ações trabalhistas").
+      OWNER_TAX_EXECUTION: Current owner has an active tax execution proceeding on record ("pp_execuções fiscais").
+      OWNER_PROTEST: Current owner has a registered protest (unpaid debt notice) on record ("pp_protesto").
+      OWNER_STATE_TAX: Current owner has outstanding state tax liabilities ("pp_tributos estaduais").
+      OWNER_FEDERAL_TAX: Current owner has outstanding federal tax liabilities ("pp_tributos federais").
+      LEGAL_PERSON_CIVIL_LAWSUIT: Legal-entity (PJ) seller has an active civil lawsuit on record ("pj_ações cíveis").
+      LEGAL_PERSON_LABOR_LAWSUIT: Legal-entity (PJ) seller has an active labor lawsuit on record ("pj_ações trabalhistas").
+      LEGAL_PERSON_TAX_EXECUTION: Legal-entity (PJ) seller has an active tax execution proceeding on record ("pj_execuções fiscais").
+      LEGAL_PERSON_FGTS: Legal-entity (PJ) seller has outstanding FGTS (severance fund) liabilities ("pj_fgts").
+      LEGAL_PERSON_PROTEST: Legal-entity (PJ) seller has a registered protest (unpaid debt notice) on record ("pj_protesto").
+      LEGAL_PERSON_STATE_TAX: Legal-entity (PJ) seller has outstanding state tax liabilities ("pj_tributos estaduais").
+      LEGAL_PERSON_FEDERAL_TAX: Legal-entity (PJ) seller has outstanding federal tax liabilities ("pj_tributos federais").
+      LEGAL_PERSON_MUNICIPAL_TAX: Legal-entity (PJ) seller has outstanding municipal tax liabilities ("pj_tributos municipais").
+      LEGAL_PERSON_SELLER_CIVIL_LAWSUIT: Partner/shareholder of the legal-entity seller has an active civil lawsuit on record ("SLPJ_sócio_ações cíveis").
+      LEGAL_PERSON_SELLER_LABOR_LAWSUIT: Partner/shareholder of the legal-entity seller has an active labor lawsuit on record ("SLPJ_sócio_ações trabalhistas").
+      LEGAL_PERSON_SELLER_TAX_EXECUTION: Partner/shareholder of the legal-entity seller has an active tax execution proceeding on record ("SLPJ_sócio_execuções fiscais").
+      LEGAL_PERSON_SELLER_PROTEST: Partner/shareholder of the legal-entity seller has a registered protest (unpaid debt notice) on record ("SLPJ_sócio_protesto").
+      LEGAL_PERSON_SELLER_STATE_TAX: Partner/shareholder of the legal-entity seller has outstanding state tax liabilities ("SLPJ_sócio_tributos estaduais").
+      LEGAL_PERSON_SELLER_FEDERAL_TAX: Partner/shareholder of the legal-entity seller has outstanding federal tax liabilities ("SLPJ_sócio_tributos federais").
+      OBJECTIVE_APPOINTMENTS: Catch-all for objective findings not covered by the specific categories above ("apontamentos objetivos").
   ts_deleted:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.deleted_at
-    description: Timestamp when this diligence appointment was soft-deleted, if applicable.
+    description: Timestamp when this diligence appointment (finding) was soft-deleted/removed from the diligence, if applicable. A non-null value means the appointment is no longer considered active.
   ts_created:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.created_at
@@ -29,14 +71,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.diligence_appointment.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of diligence appointment sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per diligence appointment record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

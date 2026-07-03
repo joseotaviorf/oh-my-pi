@@ -2,45 +2,45 @@ database_name: datalake_sales_flow_clean
 table_name: monthly_discount_quota
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains monthly discount quota configuration and tracking.
+description: Holds, for each calendar month, the maximum number of brokerage-fee discounts that can be granted and how many have been granted so far. The cap (max_allowed) is computed as a percentage of the previous month's signed contracts, and is consumed as individual sales flows are granted a discount during brokerage-fee validation. Each grant/withdrawal against a quota is recorded per sales flow in the related monthly_discount_quota_registry table. (JPA entity — `MonthlyDiscountQuota`, `br.com.quintoandar.salesflow.core.monthlydiscount.MonthlyDiscountQuota`)
 columns:
   id:
     description: Unique ID for the monthly discount quota record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.id
   year_month:
-    description: Year and month in yyyyMM format.
+    description: Calendar year and month this quota applies to, stored as a string in yyyyMM format (e.g. "202607").
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.year_month
   max_allowed:
-    description: Maximum number of discounts allowed for the month.
+    description: Maximum number of brokerage-fee discounts allowed to be granted in this month, computed from the volume of signed contracts in the previous month.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.max_allowed
   current_given:
-    description: Current number of discounts given in the month.
+    description: Running count of brokerage-fee discounts already granted in this month, starting at 0.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.current_given
   version:
-    description: Optimistic locking version number.
+    description: Optimistic-locking version number used by JPA to prevent concurrent-update conflicts on this row.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.version
   ts_created:
-    description: Timestamp when the monthly discount quota was created.
+    description: Timestamp when the monthly discount quota record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.created_at
   ts_updated:
-    description: Timestamp of the last update to the monthly discount quota.
+    description: Timestamp of the last update to the monthly discount quota record in the source operational system.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.updated_at
   year:
-    description: Year partition for the monthly discount quota record.
+    description: Year  for the monthly discount quota record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.year
   month:
-    description: Month partition for the monthly discount quota record.
+    description: Month  for the monthly discount quota record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.month
   day:
-    description: Day partition for the monthly discount quota record.
+    description: Day  for the monthly discount quota record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota.day

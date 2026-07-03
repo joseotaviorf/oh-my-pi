@@ -1,23 +1,25 @@
 database_name: datalake_sales_flow_clean
 table_name: ccv_clause
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Links a sales flow's CCV contract to the specific clause templates (clause_message) selected for it, together with the variable values used to render each clause's final text. Each row represents one clause instance rendered into a particular CCV document. Rows are created by the Sales Flow application when assembling or editing the set of legal clauses that make up a purchase and sale agreement. (JPA entity — CcvClause, in the Sales Flow service)
 columns:
   id:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.id
-    description: Surrogate primary key of the ccv clause row in the source system.
+    description: Surrogate primary key of the ccv_clause row (CcvClause entity), one row per clause instance attached to a specific sales flow's CCV.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.sales_flow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: Foreign key to the parent sales flow that this CCV clause instance belongs to.
   id_message_clause:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.clause_message_id
-    description: Foreign key to the clause template in datalake_sales_flow_clean.clause_message used by this CCV clause.
+    description: Foreign key to the clause template (datalake_sales_flow_clean.clause_message / ClauseMessage entity) that defines this clause's text, subject, and identifier.
   variables:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.variables
-    description: Variable values interpolated into the clause template text for this CCV.
+    description: JSON list of key-value variable maps used to interpolate placeholders in the clause template text for this specific CCV instance (e.g. deadlines, amounts, or names referenced by the clause wording).
   ts_created:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.created_at
@@ -29,14 +31,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.ccv_clause.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of ccv clause sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv clause record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

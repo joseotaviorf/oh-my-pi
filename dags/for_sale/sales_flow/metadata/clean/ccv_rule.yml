@@ -1,19 +1,21 @@
 database_name: datalake_sales_flow_clean
 table_name: ccv_rule
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Stores business-rule files (and their integrity checksums) tied to a specific version of the CCV contract template. Each row represents one named rule file, its type, and a storage token pointing to the underlying file content. Rows are created when new CCV rule definitions are registered for a given contract template version, used to validate or drive contract generation logic. (JPA entity — CcvRule, in the Sales Flow service)
 columns:
   id_ccv_rule:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.id
-    description: Primary key identifying this CCV contract rule definition.
+    description: Primary key of the ccv_rule row (CcvRule entity), one row per business rule file associated with a CCV contract template version.
   ccv_version:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.ccv_version
-    description: Version of the CCV contract template this rule applies to.
+    description: Version of the CCV contract template that this rule applies to.
   type:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.type
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: Free-text type/category of the rule, as stored by the source system (plain string field, not a fixed enumeration).
   ccv_rule_name:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.name
@@ -21,7 +23,7 @@ columns:
   storage_hash_token:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.storage_hash_token
-    description: Storage token referencing the stored file backing this CCV rule.
+    description: Storage token referencing the rule's file content in the document/file storage backend.
   checksum:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.checksum
@@ -37,14 +39,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.ccv_rule.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of ccv rule sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv rule record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

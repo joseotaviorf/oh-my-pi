@@ -57,14 +57,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.task_manager_info_aud.updated_at_mod
   year:
-    description: Year partition for the task manager info record.
+    description: Year  for the task manager info record.
     lineage:
     - datalake_sales_flow_raw.task_manager_info_aud.year
   month:
-    description: Month partition for the task manager info record.
+    description: Month  for the task manager info record.
     lineage:
     - datalake_sales_flow_raw.task_manager_info_aud.month
   day:
-    description: Day partition for the task manager info record.
+    description: Day  for the task manager info record.
     lineage:
     - datalake_sales_flow_raw.task_manager_info_aud.day

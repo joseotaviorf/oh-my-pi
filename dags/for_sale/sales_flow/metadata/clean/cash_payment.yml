@@ -2,50 +2,82 @@ database_name: datalake_sales_flow_clean
 table_name: cash_payment
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains information about cash payments within the sales flow.
+description: Tracks the cash-purchase closing process for a payment in the "For Sale" home-purchase flow, covering notary (cartório) deed drafting/signature, CRN (Certidão de Regularidade / registry) clearance, and FGTS (Fundo de Garantia do Tempo de Serviço) withdrawal steps used when a buyer pays in cash rather than through mortgage financing. Each row is one-to-one with a record in the payment table and is updated by backend services as the notary, CRN, and FGTS workflows progress. (JPA entity — `CashPayment`, `br.com.quintoandar.salesflow.core.payment.model.CashPayment`)
 columns:
   id_cash_payment:
     description: Unique ID for the cash payment record.
     lineage:
     - datalake_sales_flow_raw.cash_payment.id
   id_payment:
-    description: Foreign key to the main payment table.
+    description: Foreign key to the main payment table (one-to-one relationship).
     lineage:
     - datalake_sales_flow_raw.cash_payment.payment_id
   partner_notary:
-    description: Name or identifier of the partner notary.
+    description: Flag indicating whether a partner notary (cartório parceiro) is handling the deed for this cash payment.
     lineage:
     - datalake_sales_flow_raw.cash_payment.partner_notary
   status_notary_notes:
-    description: Free-text notes recording the current status of the notary process for this cash payment.
+    description: Enum tracking the stage of the notary (cartório) deed drafting/signature process for the cash purchase.
+    categories:
+      NOT_STARTED: Notary deed process not yet started, or not applicable.
+      DRAFT_ORDER: Deed draft (minuta) has been requested from the notary.
+      DRAFT_AVAILABLE: Deed and costs preview has been made available by the notary.
+      DRAFT_IN_REVISION: Deed draft is under review by the parties.
+      PAUSED: Notary process is paused.
+      WAITING_PAYMENT: Waiting for notary costs to be paid before signature scheduling.
+      WAITING_SCHEDULE: Waiting for the signature to be scheduled.
+      SCHEDULED_SIGNATURE: Deed signature has been scheduled.
+      SIGNED: Deed has been signed at the notary.
+      OUTSIDE: Deed signed outside of the standard tracked flow.
+      DISTRACT: Transaction was rescinded (distrato).
+      LONG_TERM_PAYMENT: Notary costs are being paid under a long-term payment arrangement.
     lineage:
     - datalake_sales_flow_raw.cash_payment.status_notary_notes
   crn_details:
-    description: Details related to the CRN (Central de Registro Nacional).
+    description: Enum describing the outcome/detail of the CRN (property registry certificate) check performed on the property.
+    categories:
+      NONE: No CRN check performed yet.
+      NO_PENDING_ISSUES: CRN check completed with no pending issues on the property.
+      SIMPLE_PENDING_ISSUES: CRN check found simple/low-complexity pending issues.
+      COMPLEX_PENDING_ISSUES: CRN check found complex pending issues on the property.
+      WAITING_TRANSFER_PROTOCOL: Waiting for the transfer and registry protocol to be completed.
+      HYBRID_MATERIAL: CRN process finalized via physical (paper) documentation.
+      HYBRID_DIGITAL: CRN process finalized via digital documentation.
+      HYBRID_COMPLETED: CRN process finalized using a hybrid (physical + digital) approach.
+      DISCHARGE_TERM: CRN finalized via discharge term (termo de quitação).
     lineage:
     - datalake_sales_flow_raw.cash_payment.crn_details
   status_fgts:
-    description: Status of the FGTS (Fundo de Garantia do Tempo de Serviço) process.
+    description: Enum tracking the stage of the FGTS (government severance fund) withdrawal process used to help fund the cash purchase.
+    categories:
+      NOT_STARTED: FGTS withdrawal process not yet started, or not applicable.
+      DOCS_DELIVERY: Documents for the FGTS withdrawal request have been sent.
+      DOCS_VALIDATING: Submitted documents are being validated.
+      LEGAL_ANALYSIS: Request is under legal analysis.
+      IQ_INFORMATION: Collecting information from the mortgage settlement institution (Instituição Quitante).
+      CONTRACT_EMISSION: Bank is emitting the FGTS withdrawal contract.
+      CONTRACT_SIGNING: Contract signature logistics are underway.
+      SIGNED: FGTS withdrawal contract has been signed.
     lineage:
     - datalake_sales_flow_raw.cash_payment.status_fgts
   cash_value:
-    description: The amount of the cash payment.
+    description: Monetary amount of the cash payment.
     lineage:
     - datalake_sales_flow_raw.cash_payment.cash_value
   is_notary_costs_paid:
-    description: Flag indicating if the notary costs have been paid.
+    description: Flag indicating whether the notary (cartório) costs have been paid.
     lineage:
     - datalake_sales_flow_raw.cash_payment.is_notary_costs_paid
   is_total_price_paid:
-    description: Flag indicating if the total price has been paid.
+    description: Flag indicating whether the total purchase price has been paid.
     lineage:
     - datalake_sales_flow_raw.cash_payment.is_total_price_paid
   ts_crn_started:
-    description: Timestamp of when the CRN process started.
+    description: Timestamp of when the CRN (property registry certificate) process started.
     lineage:
     - datalake_sales_flow_raw.cash_payment.crn_started_at
   ts_crn_returned:
-    description: Timestamp of when the CRN was returned.
+    description: Timestamp of when the CRN was returned by the registry office.
     lineage:
     - datalake_sales_flow_raw.cash_payment.crn_returned_at
   ts_crn_ended:
@@ -53,30 +85,30 @@ columns:
     lineage:
     - datalake_sales_flow_raw.cash_payment.crn_ended_at
   ts_draft_fgts_started:
-    description: Timestamp of when the FGTS draft started.
+    description: Timestamp of when the FGTS withdrawal draft/request started.
     lineage:
     - datalake_sales_flow_raw.cash_payment.draft_fgts_started_at
   ts_draft_fgts_ended:
-    description: Timestamp of when the FGTS draft ended.
+    description: Timestamp of when the FGTS withdrawal draft/request ended.
     lineage:
     - datalake_sales_flow_raw.cash_payment.draft_fgts_ended_at
   ts_created:
-    description: Timestamp of when the record was created.
+    description: Timestamp of when the cash payment record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.cash_payment.created_at
   ts_updated:
-    description: Timestamp of the last update to the record.
+    description: Timestamp of the last update to the cash payment record in the source operational system.
     lineage:
     - datalake_sales_flow_raw.cash_payment.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.cash_payment.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.cash_payment.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.cash_payment.day

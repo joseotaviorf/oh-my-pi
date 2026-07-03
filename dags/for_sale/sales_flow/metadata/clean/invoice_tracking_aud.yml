@@ -105,14 +105,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.invoice_tracking_aud.updated_at
   year:
-    description: Year partition for the invoice tracking record.
+    description: Year  for the invoice tracking record.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking_aud.year
   month:
-    description: Month partition for the invoice tracking record.
+    description: Month  for the invoice tracking record.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking_aud.month
   day:
-    description: Day partition for the invoice tracking record.
+    description: Day  for the invoice tracking record.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking_aud.day

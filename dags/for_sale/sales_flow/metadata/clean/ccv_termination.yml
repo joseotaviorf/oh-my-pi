@@ -1,35 +1,63 @@
 database_name: datalake_sales_flow_clean
 table_name: ccv_termination
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: "Records the formal termination of a sales flow's CCV contract before or instead of completion. Each row captures the termination's commercial condition (e.g. with/without brokerage or burden), the business reason, which party is responsible for any associated payment and its amount, and links to the approval/support artifacts (approval email, Zendesk ticket, termination document). Rows are created by the CCV termination workflow when a deal is called off under one of three scenarios: without brokerage, with brokerage, or brokerage exemption. (JPA entity — CcvTermination, in the Sales Flow service)"
 columns:
   id_ccv_termination:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.id
-    description: Unique identifier for the termination of a CCV rule.
+    description: Primary key of the ccv_termination row (CcvTermination entity), one row per termination event recorded for a sales flow's CCV contract.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.sales_flow_id
-    description: Identifier for the corresponding sales flow.
+    description: Foreign key to the sales flow whose CCV contract was terminated.
   condition:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.condition
-    description: Specific condition related to the sales flow.
+    description: Commercial condition under which the CCV was terminated (enum CcvTerminationCondition), covering whether a burden/penalty applies and how brokerage fees are handled.
+    categories:
+      WITH_BURDEN: Termination applies a burden/penalty to the responsible party.
+      WITHOUT_BURDEN: Termination applies without any burden/penalty.
+      WITH_BROKERAGE: Termination occurs with the brokerage fee still due.
+      WITHOUT_BROKERAGE: Termination occurs without any brokerage fee due.
+      BROKERAGE_EXEMPTION: Termination grants an exemption from the brokerage fee that would otherwise apply.
   reason:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.reason
-    description: Explanation for the current state of the rule.
+    description: Business reason for terminating the CCV (enum CcvTerminationReason) — covers due-diligence risk outcomes, financing/credit issues, legal impediments, and party-driven causes such as buyer or seller giving up.
+    categories:
+      DD_HIGH_RISK_NOT_OVERCOME: Due diligence found high risk that was not overcome.
+      DD_HIGH_RISK_WITH_OVERCOME: Due diligence found high risk that was subsequently overcome, but termination still occurred.
+      DD_AVERAGE_RISK_NOT_OVERCOME: Due diligence found average risk that was not overcome.
+      DD_AVERAGE_RISK_WITH_OVERCOME: Due diligence found average risk that was subsequently overcome, but termination still occurred.
+      DD_AVERAGE_RISK_WITH_NOTE_OVERCOME: Due diligence found average risk overcome with a noted caveat/condition, but termination still occurred.
+      CREDIT_DECLINED: Buyer's credit/financing application was declined.
+      FINANCE_APPROVAL_RECUSED: Financing approval was refused/recused by the financial institution.
+      EXCESSIVE_DEADLINE_WITHOUT_FAULT: Process exceeded the acceptable deadline without either party being at fault.
+      EXCESSIVE_DEADLINE_FOR_FINANCING: Financing process exceeded the acceptable deadline.
+      RIGHT_OF_PREFERENCE: Terminated due to a right-of-preference (preemptive right) claim on the property.
+      FGTS_REFUSAL: FGTS (severance fund) usage for the purchase was refused.
+      CASE_FORTUITOUS_OR_FORCE_MAJUR: Terminated due to a fortuitous event or force majeure.
+      NON_COMPLIANCE_BUYER: Buyer failed to comply with contractual obligations.
+      NON_COMPLIANCE_SELLER: Seller failed to comply with contractual obligations.
+      BUYER_GIVEN_UP: Buyer gave up on the deal.
+      SELLER_GIVEN_UP: Seller gave up on the deal.
+      INTERNAL_ERROR: Terminated due to an internal QuintoAndar operational error.
+      SPECIAL_CONDITION: Terminated due to a special/ad hoc condition not covered by other reasons.
+      BUYER_CHANGE: Terminated because the buyer changed.
   document_token:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.document_token
-    description: Token associated with the relevant document.
+    description: Storage token referencing the document formalizing the CCV termination.
   payer_type:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.payer_type
-    description: Type of payer involved in the transaction.
+    description: 'Role of the party responsible for paying any termination-related amount (enum CcvTerminationPayerType): BUYER or SELLER. This identifies a role, not a specific user.'
   payment_value:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.payment_value
-    description: Amount of the payment processed.
+    description: Monetary amount (decimal) to be paid as part of the CCV termination, e.g. a brokerage fee or penalty; not a boolean flag despite sitting alongside condition/reason enum fields.
   approval_email:
     lineage:
     - datalake_sales_flow_raw.ccv_termination.approval_email
@@ -47,10 +75,8 @@ columns:
     - datalake_sales_flow_raw.ccv_termination.updated_at
     description: Timestamp of the last update made to the record.
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of ccv termination sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per ccv termination record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

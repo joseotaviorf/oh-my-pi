@@ -61,14 +61,14 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.reject_reason_aud.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.reject_reason_aud.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.reject_reason_aud.day
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
 owner: helder.rodrigues@quintoandar.com.br
 description: Hibernate Envers audit trail of reject reason rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

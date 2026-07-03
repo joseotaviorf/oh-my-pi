@@ -1,34 +1,34 @@
 database_name: datalake_sales_flow_clean
 table_name: tag
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Reference table of tags that can be attached to Sales Flow cases for categorization. Tags are linked to Sales Flow records through a many-to-many relationship (join table sales_flow_tag) and are used to flag situations such as mediation, buyer/seller interest in contract termination, or recognized sale write-offs. (JPA entity — `Tag`, `br.com.quintoandar.salesflow.core.tag.Tag`)
 columns:
   id:
     lineage:
     - datalake_sales_flow_raw.tag.id
-    description: Surrogate primary key of the tag row in the source system.
+    description: Unique surrogate ID for the tag record.
   label:
     lineage:
     - datalake_sales_flow_raw.tag.label
-    description: Short UI or workflow label describing the task, tag, or category shown to operators.
+    description: 'Text label describing what the tag represents, applied to Sales Flow cases for categorization (via the many-to-many sales_flow_tag join table). Known predefined labels used in code include "mediações" (mediations), "by_interesse_distrato" (buyer interested in contract termination), "sl_interesse_distrato" (seller interested in contract termination), and "perda_reconhecida" (recognized sale write-off/loss).'
   ts_created:
     lineage:
     - datalake_sales_flow_raw.tag.created_at
-    description: Timestamp when the row was first created in the source operational system.
+    description: Timestamp when the tag record was created in the source operational system.
   ts_updated:
     lineage:
     - datalake_sales_flow_raw.tag.updated_at
-    description: Timestamp when the row was last updated in the source operational system.
+    description: Timestamp when the tag record was last updated in the source operational system.
   year:
     lineage:
     - datalake_sales_flow_raw.tag.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.tag.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.tag.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of tag sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per tag record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

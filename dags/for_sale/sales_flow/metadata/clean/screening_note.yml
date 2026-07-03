@@ -2,49 +2,54 @@ database_name: datalake_sales_flow_clean
 table_name: screening_note
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: The primary purpose of the screening_note table is to store the status of the screening/validation form for note, indicating whether the form is complete or pending, as well as capturing any outstanding data issues or missing information.
+description: Stores the screening/document-verification check associated with a free-text operator note (general remarks or special-case flags) attached to a screening case, with one row per note under review. It tracks the internal screening workflow status and the legal/document proposal validation outcome for that note, plus any legal pendency note raised against it. A screening case can have both a GENERAL note and a SPECIAL_CASE note (see the note table's type column). (JPA entity — `ScreeningNote`, `br.com.quintoandar.salesflow.core.screening.note.ScreeningNote`; managed by `ScreeningNoteService`)
 columns:
   id:
     description: Surrogate primary key of the screening note row in the source system.
     lineage:
     - datalake_sales_flow_raw.screening_note.id
   id_screening:
-    description: Foreign key to the screening case evaluating proposal readiness.
+    description: Foreign key to the parent screening case (screening table) this note check belongs to.
     lineage:
     - datalake_sales_flow_raw.screening_note.screening_id
   id_note:
-    description: Foreign key linking screening review to an operator note record.
+    description: Foreign key to the note record (free-text operator note, either GENERAL or SPECIAL_CASE type) under screening review.
     lineage:
     - datalake_sales_flow_raw.screening_note.note_id
   status:
-    description: Current operational status code governing workflow progression for this record.
+    description: 'Enum tracking progress of the note screening workflow itself. Possible values: ON_PROGRESS (default, screening still being worked) or COMPLETED (screening finished for the note).'
     lineage:
     - datalake_sales_flow_raw.screening_note.status
   proposal_validation_status:
-    description: Validation outcome from legal or credit review of the proposal.
+    description: Enum tracking the legal/document proposal validation outcome for the note, independent of the screening workflow status.
+    categories:
+      ON_PROGRESS: Default state; legal/document proposal validation for the note is still being worked.
+      COMPLETED: Legal/document proposal validation for the note is finished, with no open legal pendency.
+      LEGAL_PENDENCY_ON_PROGRESS: Validation paused because an open legal pendency was raised in connection with the note.
+      LEGAL_PENDENCY_COMPLETED: Validation finished after the legal pendency related to the note was resolved.
     lineage:
     - datalake_sales_flow_raw.screening_note.proposal_validation_status
   legal_pendency_note:
-    description: Legal team note describing open pendencies blocking proposal approval.
+    description: Free-text note recorded when a legal pendency (documentation or legal issue) is raised in connection with this note, describing the pendency blocking proposal approval.
     lineage:
     - datalake_sales_flow_raw.screening_note.legal_pendency_note
   ts_created:
-    description: Timestamp of the creation of the record.
+    description: Timestamp when the note screening record was first created.
     lineage:
     - datalake_sales_flow_raw.screening_note.created_at
   ts_updated:
-    description: Timestamp of the last update of the record.
+    description: Timestamp of the most recent update to the note screening record (e.g. status or validation change).
     lineage:
     - datalake_sales_flow_raw.screening_note.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_note.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_note.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_note.day

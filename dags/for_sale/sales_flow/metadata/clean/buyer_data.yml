@@ -2,65 +2,65 @@ database_name: datalake_sales_flow_clean
 table_name: buyer_data
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table with the buyer information that will be used on the CCV. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
+description: Snapshot of buyer personal and CCV-participation data for a Sales Flow case. Each row represents one buyer (or co-buyer, e.g. a spouse) associated with a Sales Flow offer and the CCV (purchase and sale contract) to be signed. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates. (JPA entity — `BuyerData`, `br.com.quintoandar.salesflow.core.buyerdata.BuyerData`)
 columns:
   id_buyer:
-    description: Buyer user ID on SalesFlow tables.
+    description: Unique surrogate ID for the buyer_data record.
     lineage:
     - datalake_sales_flow_raw.buyer_data.id
   id_sales_flow:
-    description: SalesFlow offer ID. Joins with datalake_sales_flow_clean.sales_flow.id
+    description: Foreign key to the Sales Flow case this buyer belongs to. Joins with datalake_sales_flow_clean.sales_flow.id
     lineage:
     - datalake_sales_flow_raw.buyer_data.sales_flow_id
   id_docx_folder:
-    description: Identifier of the document folder storing seller or buyer paperwork.
+    description: Identifier (docx_folder_id) of the document folder storing this buyer's paperwork for the transaction.
     lineage:
     - datalake_sales_flow_raw.buyer_data.docx_folder_id
   name:
-    description: Human-readable display name associated with the person or entity in this row.
+    description: Full name of the buyer. Contains personal data (PII).
     lineage:
     - datalake_sales_flow_raw.buyer_data.name
   email:
-    description: Contact email address used for notifications and identity matching.
+    description: Contact email address of the buyer, used for notifications and identity matching. Contains personal data (PII).
     lineage:
     - datalake_sales_flow_raw.buyer_data.email
   holding_value:
-    description: Indicates how much this buyer is participating on the offer value.
+    description: Numeric monetary value (decimal, not a flag) representing this buyer's declared asset holdings, used in financial qualification for the purchase.
     lineage:
     - datalake_sales_flow_raw.buyer_data.holding_value
   ccv_role:
-    description: Indicates the user role on this CCV, on this case will be BUYER.
+    description: 'Role of this buyer on the CCV contract, backed by the CcvRole enum. Possible values: BUYER, SPOUSE (used when a spouse is a co-signer on the contract).'
     lineage:
     - datalake_sales_flow_raw.buyer_data.ccv_role
   signer_status:
-    description: Indicate if this user is a CCV signer.
+    description: 'Whether this buyer is required to sign the CCV, backed by the SignerStatus enum rather than a plain boolean. Possible values: SIGNER, NOT_SIGNER.'
     lineage:
     - datalake_sales_flow_raw.buyer_data.signer_status
   investor:
-    description: Indicates if this user is an investor.
+    description: Flag indicating whether this buyer is acting as an investor in the transaction. Note - could not be confirmed on the buyer_data (BuyerData) entity itself; a similarly named boolean `investor` field exists on the related BuyerAppDataEntity (buyer_app_data table), so this column should be treated as not fully verified against source code.
     lineage:
     - datalake_sales_flow_raw.buyer_data.investor
   triage_status:
-    description: Triage status of the buyer in the document review process.
+    description: Status of this buyer in the document/eligibility triage process. Note - not verified against source code; no matching field was found on the BuyerData entity during review, so the exact semantics and possible values could not be confirmed.
     lineage:
     - datalake_sales_flow_raw.buyer_data.triage_status
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the buyer_data record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.buyer_data.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp when the buyer_data record was last updated in the source operational system.
     lineage:
     - datalake_sales_flow_raw.buyer_data.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.buyer_data.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.buyer_data.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.buyer_data.day

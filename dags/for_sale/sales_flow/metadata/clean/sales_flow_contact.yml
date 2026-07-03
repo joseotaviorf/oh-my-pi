@@ -1,34 +1,45 @@
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_contact
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Links a contact (a person and their user record, e.g. a name/phone/email a buyer or seller can be reached at) to a sales_flow, tagging that contact's role via type.
+  Each sales_flow has at most one contact row per type (BUYER, BUYER_ADDITIONAL_CONTACT, SELLER, SELLER_ADDITIONAL_CONTACT), enforced by a unique constraint on (sales_flow_id, type).
+  Rows are (re)created by the Sales Flow contact service whenever contact details for a deal are set or updated, replacing any prior contacts for that sales_flow.
+  Sourced from the operational Sales Flow service backing For Sale post-offer operations; one row per sales flow contact record in datalake_sales_flow_clean.
 columns:
   id_sales_flow_contact:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.id
-    description: Unique identifier of this sales flow contact association row.
+    description: Primary key of the sales_flow_contact record (the contact-to-sales-flow association row).
   id_sales_flow:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.sales_flow_id
-    description: Identifier of the sales flow this contact is linked to, joining to datalake_sales_flow_clean.sales_flow.id.
+    description: Foreign key to the sales_flow this contact is linked to, joining to datalake_sales_flow_clean.sales_flow.id.
   id_contact:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.contact_id
-    description: Identifier of the contact (person reachable for this deal) linked to the sales flow.
+    description: Foreign key to the contact record (a user reachable for this deal, e.g. via phone/email) linked to the sales flow.
   type:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.type
-    description: Role of this contact within the sales flow, such as buyer or seller contact.
+    description: |
+      Role of this contact within the sales flow, backed by the ContactType enum, e.g. BUYER or
+      SELLER. There is at most one contact per type per sales_flow.
+    categories:
+      BUYER: Main buyer contact on the sales flow.
+      BUYER_ADDITIONAL_CONTACT: Secondary contact on the buyer side.
+      SELLER: Main seller contact on the sales flow.
+      SELLER_ADDITIONAL_CONTACT: Secondary contact on the seller side.
   is_default_type:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.default_type
-    description: Indicates whether this contact is the default contact for its type on the sales flow.
+    description: Flag indicating whether this is the default contact for its type on the sales flow (maps to the boolean `defaultType` field on the Sales Flow contact entity).
   ts_created:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.created_at
-    description: Timestamp when the row was first created in the source operational system.
+    description: Timestamp when the sales flow contact record was first created in the source operational system.
   ts_updated:
     lineage:
     - datalakes_sales_flow_raw.sales_flow_contact.updated_at
-    description: Timestamp when the row was last updated in the source operational system.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of sales flow contact sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per sales flow contact record with standardized names and types in datalake_sales_flow_clean.
+    description: Timestamp when the sales flow contact record was last updated in the source operational system.

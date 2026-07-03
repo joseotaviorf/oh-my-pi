@@ -2,18 +2,18 @@ database_name: datalake_sales_flow_clean
 table_name: notary_office
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Table that stores the data about the notary offices.
+description: Registry of notary/registration offices (cartórios) — CRI real-estate registries and CRN deed/notes registries — used to process deed registration and key delivery for a sales flow. Each `Notary` process record links to one `NotaryOffice` via notary_office_id, and offices carry geolocation and hub/region coverage used for routing sales flows to the right office. (JPA entity — `NotaryOffice`, `br.com.quintoandar.salesflow.core.notaryoffice.NotaryOffice`)
 columns:
   id:
     description: Surrogate primary key of the notary office row in the source system.
     lineage:
     - datalake_sales_flow_raw.notary_office.id
   id_hubs:
-    description: Hubs that the notary office is part of.
+    description: List of hub IDs (business/operational regions) that this notary office serves.
     lineage:
     - datalake_sales_flow_raw.notary_office.hubs_id
   name:
-    description: Human-readable display name associated with the person or entity in this row.
+    description: Display name of the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.name
   mobile_phone:
@@ -21,11 +21,11 @@ columns:
     lineage:
     - datalake_sales_flow_raw.notary_office.mobile_phone
   phone:
-    description: Contact phone number stored for coordination during the For Sale transaction.
+    description: Landline/contact phone number for the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.phone
   email:
-    description: Contact email address used for notifications and identity matching.
+    description: Contact email address for the notary office.
     lineage:
     - datalake_sales_flow_raw.notary_office.email
   address:
@@ -41,11 +41,11 @@ columns:
     lineage:
     - datalake_sales_flow_raw.notary_office.state
   label:
-    description: Short UI or workflow label describing the task, tag, or category shown to operators.
+    description: Free-text label used to identify or describe the notary office (distinct in meaning from the CRI-attempt label on the notary table).
     lineage:
     - datalake_sales_flow_raw.notary_office.label
   type:
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: 'Enum classifying the kind of registry office. Values: CRN (Cartório de Registro de Notas — notes/deed registry), CRI (Cartório de Registro de Imóveis — real-estate registry).'
     lineage:
     - datalake_sales_flow_raw.notary_office.type
   latitude:

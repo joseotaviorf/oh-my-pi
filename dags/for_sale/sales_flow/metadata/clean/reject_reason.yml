@@ -2,49 +2,130 @@ database_name: datalake_sales_flow_clean
 table_name: reject_reason
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table that contains structured rejection reasons used across the sales flow.
+description: Reference/lookup table of structured rejection reasons used to record why a For Sale offer, listing, or negotiation was rejected or fell through. Each row combines a source, category, reason, and sub-reason (each backed by its own enum) to classify a rejection at multiple levels of granularity; there is no enforced relationship between these enums in the entity itself, so combinations are managed by business logic/seed data rather than the database schema. (JPA entity — `RejectReason`, `br.com.quintoandar.salesflow.core.rejectreason.RejectReason`)
 columns:
   id:
-    description: Unique ID for the reject reason.
+    description: Unique surrogate ID for the reject reason record.
     lineage:
     - datalake_sales_flow_raw.reject_reason.id
   source:
-    description: The source or system where the rejection reason originated.
+    description: 'Origin of the rejection, backed by the Source enum. Possible values: BUYER, SELLER, LISTING, BROKERS_3P (third-party brokers).'
     lineage:
     - datalake_sales_flow_raw.reject_reason.source
   category:
-    description: The category of the rejection reason.
+    description: |
+      High-level category of the rejection, backed by the Category enum.
+    categories:
+      PRICE_NEGOTIATION: Rejection driven by disagreement over the sale price or negotiation terms.
+      GIVE_UP_DEALING: One of the parties gave up on the negotiation before it concluded.
+      LEGAL_PROBLEM: Rejection caused by a legal issue blocking the transaction.
+      MODEL_5A: Rejection related to the 5A (Aluguel por Assinatura/5A model) business model conditions.
+      DEALING_WITH_COMPETITION: Party chose to negotiate with a competitor instead.
+      DEALING_ANOTHER_HOUSE_WITH_5A: Party is dealing on another property under the 5A model.
+      LISTING_ERROR: Rejection caused by an error in the property listing information.
+      FINANCIAL_PROBLEM: Rejection caused by a financial/credit issue preventing the deal.
+      GAVE_UP_PURCHASE_OR_SALE: Party gave up on the purchase or sale entirely.
+      PARTNER_BYPASS: Rejection related to a suspected or confirmed bypass of the partner agency.
+      DISENGAGED_OFFER: Offer was rejected due to disengagement/inactivity from a party.
     lineage:
     - datalake_sales_flow_raw.reject_reason.category
   reason:
-    description: The main reason for the rejection.
+    description: |
+      Main reason for the rejection, backed by the Reason enum. Most values below are active
+      and currently selectable; a legacy block of values marked INACTIVE in code may still
+      appear in historical data but is no longer used for new records (flagged below).
+    categories:
+      BOUGHT_ANOTHER_HOUSE: Buyer bought a different property instead.
+      BUYER_GAVE_UP_TO_BUY_THIS_PROPERTY: Buyer gave up on purchasing this specific property.
+      ALREADY_DEALT_WITH_ANOTHER_PERSON: Seller/listing already closed a deal with another party.
+      POSSIBLE_BYPASS: Suspected attempt to bypass QuintoAndar in the transaction.
+      NO_RESPONSE: Party stopped responding during the negotiation.
+      CREDIT_NOT_APPROVED: Buyer's credit/financing application was not approved.
+      ERROR_IN_LISTING_INFO: Listing contained incorrect or misleading information.
+      WRONG_SALE_PRICE: Listed or negotiated sale price was incorrect.
+      HOUSE_UNAVAILABLE: Property is no longer available for sale.
+      NO_REAL_ESTATE_AGENCY_RETURN: Partner real estate agency did not respond.
+      PARTNER_POSSIBLE_BYPASS: Suspected attempt by the partner agency to bypass QuintoAndar.
+      CONDITIONS_OUTSIDE_5A_STANDARDS: Negotiation conditions fall outside 5A model standards.
+      NOT_ACCEPT_PAYMENT_CONDITIONS: Party did not accept the proposed payment conditions.
+      INTEND_TO_RENT: Party decided to rent the property instead of buying/selling it.
+      HAS_NO_VALUES_TO_PURCHASE: Buyer lacks the funds needed to complete the purchase.
+      HOUSE_SELLER_DOCUMENTATION_ISSUES: Issues with the seller's or property's documentation.
+      NOT_ENOUGH_TO_PROCEED_WITH_THE_PURCHASE: Buyer does not have enough funds to proceed with the purchase.
+      PROBLEM_WITH_REAL_ESTATE_CREDIT: Issue with the real estate credit/financing process.
+      HOUSE_SOLD_TO_ANOTHER_BUYER: Property was sold to a different buyer.
+      EXCLUSIVE_HOUSE_IN_ANOTHER_COMPANY: Property is exclusively listed with another real estate company.
+      SELLER_DIDNT_KNOW_PARTNERSHIP_WITH_QUINTO: Seller was unaware of the agency's partnership with QuintoAndar.
+      REDE_MEMBER_DIDNT_ACCEPT_TO_SELL_OR_MADE_NEGOTIATION_DIFFICULT: Rede (network) member refused to sell or made the negotiation difficult.
+      DIFFICULT_IN_OBTAINING_CONTACT_DATA_OR_SELLER_OR_BUYER_DOCUMENTATION: Difficulty obtaining contact data or documentation from buyer/seller.
+      COMMISSION_BELOW_THAN_PERCENTAGE_ACCEPTED_BY_QUINTO: Commission offered was below the percentage accepted by QuintoAndar.
+      PROBLEMS_WITH_PROPERTY_OR_SELLER_DOCUMENTATION: Issues found in property or seller documentation.
+      DEAL_WITH_ANOTHER_REAL_STATE: "INACTIVE (legacy): party closed the deal through another real estate company."
+      CCV_CLAUSES_TOO_STRICT: "INACTIVE (legacy): party rejected the CCV due to overly strict contract clauses."
+      REJECTED_5A_MODEL: "INACTIVE (legacy): party rejected the 5A business model."
+      COUNTER_OFFER_REJECTED: "INACTIVE (legacy): counter-offer made during negotiation was rejected."
     lineage:
     - datalake_sales_flow_raw.reject_reason.reason
   sub_reason:
-    description: A more specific sub-reason for the rejection.
+    description: |
+      More specific sub-reason for the rejection, backed by the SubReason enum. Provides a
+      finer-grained classification than `reason`, e.g. distinguishing which document is
+      problematic or why a financial condition was not met.
+    categories:
+      BOUGHT_ANOTHER_QUINTO_HOUSE: Buyer bought a different property listed by QuintoAndar.
+      BOUGHT_IN_ANOTHER_COMPANY: Buyer bought a property through another real estate company.
+      DELAYED_FOR_PERSONAL_REASONS: Negotiation was delayed due to the party's personal reasons.
+      CLIENT_WITH_SPECULATIVE_PROPOSAL: Client made a speculative/lowball proposal not accepted.
+      CLIENT_DIDNT_CLARIFY: Client did not clarify requested information needed to proceed.
+      MISSING_FLEXIBILIZATION_IN_SOME_CCV_CLAUSES: Party required more flexibility in specific CCV clauses than was offered.
+      PAYMENT_BY_BARTER: Party proposed payment via property barter/exchange, which was not accepted.
+      PAYMENT_FLOW: Disagreement over the structure/flow of payment installments.
+      DISAGREED_WITH_TAX_OR_PERCENTAGE: Party disagreed with a tax or commission percentage applied.
+      INITIAL_OFFER_DIDNT_EVOLVED: Initial offer did not evolve/progress toward an agreement.
+      COUNTER_OFFER_NOT_ACCEPTED: A counter-offer made during negotiation was not accepted.
+      DONT_AGREE_WITH_BROKERAGE_FEE: Party did not agree with the brokerage fee charged.
+      ALREADY_RENTED: Property was already rented out.
+      WILL_RENT: Party decided to rent the property instead of selling/buying it.
+      FGTS_NOT_ALLOWED: Use of FGTS funds was not allowed for this transaction.
+      DONT_HAVE_AMOUNT_FOR_HOUSE: Buyer does not have the funds required for the property.
+      NOT_ENOUGH_FOR_REGISTRY_OFFICE_EXPENSES: Buyer lacks funds to cover notary/registry office expenses.
+      NEED_TO_SELL_HOUSE_TO_BUY_IT: Buyer needs to sell their current property before buying this one.
+      UNAPPROVED_CREDIT: Buyer's credit application was not approved.
+      NOT_ENOUGH_CREDIT: Approved credit amount was insufficient for the purchase.
+      BUYERS_MORTGAGE_DOES_NOT_PAY_SELLER: Buyer's mortgage/financing amount does not fully cover what is owed to the seller.
+      INSTALLMENT_VALUE_HIGHER_THAN_EXPECTED: Installment amount ended up higher than the buyer expected.
+      SOLD_WITH_QUINTO: Property was sold through QuintoAndar via a different deal.
+      SOLD_WITH_ANOTHER_COMPANY: Property was sold through another real estate company.
+      SELLER_INCRESEAD_HOUSE_PRICE: Seller increased the asking price during negotiation.
+      SELLER_ONLY_ACCEPTS_LISTING_PRICE: Seller would only accept the original listing price, no negotiation.
+      SELLER_ONLY_ACCEPTS_CASH_PAYMENT: Seller would only accept payment in cash.
+      PROBLEMS_WITH_HOUSE_DOCUMENTATION: Issues found with the property's documentation.
+      PROBLEMS_WITH_SELLER_DOCUMENTATION: Issues found with the seller's documentation.
+      PROPERTY_DEBTS: Property has outstanding debts blocking the transaction.
+      PROBLEMS_WITH_TENANT: Issues with a tenant currently occupying the property.
     lineage:
     - datalake_sales_flow_raw.reject_reason.sub_reason
   is_active:
-    description: Flag indicating if the reason is currently active and can be used.
+    description: Boolean flag (defaults to true) indicating whether this reject reason combination is currently active and selectable.
     lineage:
     - datalake_sales_flow_raw.reject_reason.active
   ts_created:
-    description: Timestamp of when the reject reason was created.
+    description: Timestamp when the reject reason record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.reject_reason.created_at
   ts_updated:
-    description: Timestamp of the last update to the reject reason.
+    description: Timestamp when the reject reason record was last updated in the source operational system.
     lineage:
     - datalake_sales_flow_raw.reject_reason.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.reject_reason.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.reject_reason.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.reject_reason.day

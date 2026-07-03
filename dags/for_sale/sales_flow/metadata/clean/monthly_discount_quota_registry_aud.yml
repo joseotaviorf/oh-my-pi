@@ -45,14 +45,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.updated_at
   year:
-    description: Year partition for the monthly discount quota registry record.
+    description: Year  for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.year
   month:
-    description: Month partition for the monthly discount quota registry record.
+    description: Month  for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.month
   day:
-    description: Day partition for the monthly discount quota registry record.
+    description: Day  for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry_aud.day

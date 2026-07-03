@@ -2,49 +2,54 @@ database_name: datalake_sales_flow_clean
 table_name: screening_buyer
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: The primary purpose of the screening_buyer table is to store the status of the screening/validation form for buyer, indicating whether the form is complete or pending, as well as capturing any outstanding data issues or missing information.
+description: Stores the buyer-leg screening/document-verification checks performed during a home-purchase closing, with one row per buyer profile (buyer_data) evaluated within a screening case. It tracks both the internal screening workflow status and the outcome of the legal/credit proposal validation for that buyer, plus any legal pendency note raised against them. (JPA entity — `ScreeningBuyer`, `br.com.quintoandar.salesflow.core.screening.buyer.ScreeningBuyer`; managed by `ScreeningBuyerService`)
 columns:
   id:
     description: Surrogate primary key of the screening buyer row in the source system.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.id
   id_screening:
-    description: Foreign key to the screening case evaluating proposal readiness.
+    description: Foreign key to the parent screening case (screening table) this buyer check belongs to.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.screening_id
   id_buyer_data:
-    description: Foreign key to buyer profile data used in credit and legal screening.
+    description: Foreign key to the buyer_data profile being screened; this is a one-to-one relationship between a buyer profile and its screening record.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.buyer_data_id
   status:
-    description: Current operational status code governing workflow progression for this record.
+    description: 'Enum tracking progress of the buyer screening workflow itself. Possible values: ON_PROGRESS (default, screening still being worked) or COMPLETED (screening finished for this buyer).'
     lineage:
     - datalake_sales_flow_raw.screening_buyer.status
   proposal_validation_status:
-    description: Validation outcome from legal or credit review of the proposal.
+    description: Enum tracking the legal/credit proposal validation outcome for this buyer, independent of the screening workflow status.
+    categories:
+      ON_PROGRESS: Default state; legal/credit proposal validation for the buyer is still being worked.
+      COMPLETED: Legal/credit proposal validation for the buyer is finished, with no open legal pendency.
+      LEGAL_PENDENCY_ON_PROGRESS: Validation paused because an open legal pendency was raised against the buyer.
+      LEGAL_PENDENCY_COMPLETED: Validation finished after the legal pendency against the buyer was resolved.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.proposal_validation_status
   legal_pendency_note:
-    description: Legal team note describing open pendencies blocking proposal approval.
+    description: Free-text note recorded when a legal pendency (documentation or legal issue) is raised against this buyer, describing the pendency blocking proposal approval.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.legal_pendency_note
   ts_created:
-    description: Timestamp of the creation of the record.
+    description: Timestamp when the buyer screening record was first created.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.created_at
   ts_updated:
-    description: Timestamp of the last update of the record.
+    description: Timestamp of the most recent update to the buyer screening record (e.g. status or validation change).
     lineage:
     - datalake_sales_flow_raw.screening_buyer.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_buyer.day

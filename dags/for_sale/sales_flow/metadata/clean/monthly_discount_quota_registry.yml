@@ -2,22 +2,22 @@ database_name: datalake_sales_flow_clean
 table_name: monthly_discount_quota_registry
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains registry of monthly discount quotas assigned to sales flows.
+description: "Records each individual grant (and possible withdrawal) of a brokerage-fee discount against a specific monthly quota, linking a sales flow to the monthly_discount_quota it consumed. A unique constraint enforces at most one registry row per (quota, sales flow) pair. NOTE: this table has a legacy/duplicate counterpart, monthly_discount_quota__registry (double underscore), which maps to the same underlying source table monthly_discount_quota_registry — see that file's description. (JPA entity — `MonthlyDiscountQuotaRegistry`, `br.com.quintoandar.salesflow.core.monthlydiscount.MonthlyDiscountQuotaRegistry`)"
 columns:
   id:
     description: Unique ID for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.id
   id_monthly_discount_quota:
-    description: Foreign key to the monthly_discount_quota table.
+    description: Foreign key to the monthly_discount_quota table indicating which month's quota this grant was drawn from.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.monthly_discount_quota_id
   id_sales_flow:
-    description: Foreign key to the sales_flow table.
+    description: Foreign key to the sales_flow table identifying which sales flow received the brokerage-fee discount.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.sales_flow_id
   status:
-    description: Current operational status code governing workflow progression for this record.
+    description: 'Enum indicating whether the discount grant is currently active or has been reversed. Values: GRANTED, WITHDRAWN. Defaults to GRANTED when the registry row is created.'
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.status
   ts_created:
@@ -25,18 +25,18 @@ columns:
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.created_at
   ts_updated:
-    description: Timestamp of the last update to the monthly discount quota registry.
+    description: Timestamp of the last update to the monthly discount quota registry record in the source operational system.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.updated_at
   year:
-    description: Year partition for the monthly discount quota registry record.
+    description: Year  for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.year
   month:
-    description: Month partition for the monthly discount quota registry record.
+    description: Month  for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.month
   day:
-    description: Day partition for the monthly discount quota registry record.
+    description: Day  for the monthly discount quota registry record.
     lineage:
     - datalake_sales_flow_raw.monthly_discount_quota_registry.day

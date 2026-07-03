@@ -2,45 +2,67 @@ database_name: datalake_sales_flow_clean
 table_name: closing_type
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: The main idea of this table is to identify status and types of closing process in For Sale.
+description: Reference/lookup table that defines the closing types and their status hierarchy for the For Sale closing process. Each row represents one closing type or one status node in a self-referencing parent/child hierarchy (used to group macro and micro statuses of the closing flow), identified by a `key` that encodes the offer model, financing type, and payment method. (JPA entity — `ClosingType`, `br.com.quintoandar.salesflow.core.closingtype.ClosingType`)
 columns:
   id:
     description: Surrogate primary key of the closing type row in the source system.
     lineage:
     - datalake_sales_flow_raw.closing_type.id
   id_label:
-    description: Label of Closing process
+    description: Foreign key (label_id) to the Label lookup table, which holds the multi-language (e.g. Portuguese) display text shown for this closing type/status.
     lineage:
     - datalake_sales_flow_raw.closing_type.label_id
   id_parent:
-    description: ID to match and identify the macro and micro status in the Closing process.
+    description: Self-referencing foreign key (parent_id) to another row in this same table, used to build the macro/micro status hierarchy of the closing process (a closing type can have child closing types).
     lineage:
     - datalake_sales_flow_raw.closing_type.parent_id
   key:
-    description: Which offer model (CCV Assistance, Pampas etc), type of financing (External or Internal) and payment method (Financed or Cash).
+    description: |
+      String identifier (matched against the code-side ClosingTypeKey enum, not a DB-enforced
+      enum column) that encodes the offer model, financing type, and payment method.
+    categories:
+      FINANCED_WITH_IQ: Closing financed through Inquilino QuintoAndar (IQ) financing partnership.
+      FINANCED_WITHOUT_IQ: Closing financed without going through the IQ financing partnership.
+      CASH_WITH_FGTS: Cash closing where the buyer uses FGTS funds as part of the payment.
+      CASH_WITHOUT_FGTS: Cash closing where the buyer does not use FGTS funds.
+      PAMPAS: Closing type associated with the Pampas payment/partner flow.
+      INTERNAL_NORMAL_BANK: Financed closing processed internally through a standard partner bank.
+      EXTERNAL_NORMAL_BANK: Financed closing processed externally through a standard partner bank.
+      INTERNAL_BRADESCO: Financed closing processed internally through Bradesco.
+      EXTERNAL_BRADESCO: Financed closing processed externally through Bradesco.
+      UF_WITHOUT_CRN: Union Federal (UF)/consortium closing without CRN (Certidão de Regularidade Negocial) requirement.
+      UF_WITH_CRN: Union Federal (UF)/consortium closing with CRN (Certidão de Regularidade Negocial) requirement.
+      FINANCED_WITHOUT_FGTS: Financed closing where the buyer does not use FGTS funds.
+      FINANCED_WITH_FGTS: Financed closing where the buyer uses FGTS funds as part of the payment.
+      CCV_ASSISTANCE: Closing type for offers using CCV assistance flow, payment method unspecified.
+      CCV_ASSISTANCE_CASH: CCV assistance flow closing paid in cash.
+      CCV_ASSISTANCE_FINANCED: CCV assistance flow closing paid via financing.
+      TIC_CLOSING: Closing type for 3P (partner-mediated) offers using the TIC flow, payment method unspecified.
+      TIC_CLOSING_CASH: TIC closing flow paid in cash.
+      TIC_CLOSING_FINANCED: TIC closing flow paid via financing.
     lineage:
     - datalake_sales_flow_raw.closing_type.key
   is_active:
-    description: Indicates if this closing type is active.
+    description: Boolean flag indicating whether this closing type is currently active and usable.
     lineage:
     - datalake_sales_flow_raw.closing_type.active
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the closing type record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.closing_type.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp when the closing type record was last updated in the source operational system.
     lineage:
     - datalake_sales_flow_raw.closing_type.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.closing_type.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.closing_type.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.closing_type.day

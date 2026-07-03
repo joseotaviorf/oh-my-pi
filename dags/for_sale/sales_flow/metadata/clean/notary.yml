@@ -2,94 +2,141 @@ database_name: datalake_sales_flow_clean
 table_name: notary
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains information related to the notary process for a sales flow.
+description: Tracks the post-signature notarial and deed-registration process for a sales flow — protocoling and registering the deed at the CRI (Cartório de Registro de Imóveis, real-estate registry), notary-office costs, seller-payment follow-up, and physical key delivery to the buyer. One row per sales_flow (unique sales_flow_id), with status transitions managed by NotaryStatusTransitionHandler. (JPA entity — `Notary`, `br.com.quintoandar.salesflow.core.notary.Notary`)
 columns:
   id_notary:
     description: Unique ID for the notary record.
     lineage:
     - datalake_sales_flow_raw.notary.id
   id_sales_flow:
-    description: Foreign key to the sales_flow table.
+    description: Foreign key to the sales_flow table. One notary record exists per sales flow.
     lineage:
     - datalake_sales_flow_raw.notary.sales_flow_id
   id_specialist:
-    description: ID of the specialist responsible for the notary process.
+    description: Legacy column. Previously referenced the internal specialist responsible for the notary process; the specialist_id field was removed from the Notary entity/table by migration V050 (drop_specialist_column_notary_diligence) and is no longer populated by the application.
     lineage:
     - datalake_sales_flow_raw.notary.specialist_id
   id_notary_office:
-    description: Identifier of the notary office handling this process, referencing notary_office.
+    description: Identifier of the notary office handling this process, referencing notary_office.id.
     lineage:
     - datalake_sales_flow_raw.notary.notary_office_id
   label:
-    description: A label for the notary process.
+    description: |
+      Enum identifying which sequential CRI registration attempt this record represents, used when
+      a deed registration must be re-protocoled multiple times at the registry.
+    categories:
+      CRI_1: First CRI registration attempt ("1º CRI").
+      CRI_2: Second CRI registration attempt ("2º CRI").
+      CRI_3: Third CRI registration attempt ("3º CRI").
+      CRI_4: Fourth CRI registration attempt ("4º CRI").
+      CRI_5: Fifth CRI registration attempt ("5º CRI").
+      CRI_6: Sixth CRI registration attempt ("6º CRI").
+      CRI_7: Seventh CRI registration attempt ("7º CRI").
+      CRI_8: Eighth CRI registration attempt ("8º CRI").
+      CRI_9: Ninth CRI registration attempt ("9º CRI").
+      CRI_10: Tenth CRI registration attempt ("10º CRI").
+      CRI_11: Eleventh CRI registration attempt ("11º CRI").
+      CRI_12: Twelfth CRI registration attempt ("12º CRI").
+      CRI_13: Thirteenth CRI registration attempt ("13º CRI").
+      CRI_14: Fourteenth CRI registration attempt ("14º CRI").
+      CRI_15: Fifteenth CRI registration attempt ("15º CRI").
+      CRI_16: Sixteenth CRI registration attempt ("16º CRI").
+      CRI_17: Seventeenth CRI registration attempt ("17º CRI").
+      CRI_18: Eighteenth CRI registration attempt ("18º CRI").
     lineage:
     - datalake_sales_flow_raw.notary.label
   status:
-    description: The current status of the notary process.
+    description: |
+      Enum with the current status of the notary/registration process. Defaults to NOT_STARTED.
+    categories:
+      NOT_STARTED: Notary/registration process has not started, or not applicable ("Não Iniciada / NA").
+      PROTOCOLED: Deed has been protocoled (filed) at the registry ("Protocolado").
+      REQUIREMENT_NOTE: "Registry raised a requirement note/objection that must be addressed (\"Nota de exigência\")."
+      REGISTERED: Deed has been registered at the CRI ("Registrado").
+      WITHDRAWN: Documentation was withdrawn from the CRI ("Retirado no CRI").
+      FINISHED: Notary/registration process is complete ("Finalizado").
+      PENDING: Process has a pending issue awaiting resolution ("Pendência").
+      WAITING_SIGNATURE: Waiting on a signature to proceed ("Aguardando Assinatura").
+      REQUIREMENT_NOTE_ANSWERED: The registry's requirement note has been answered ("N.E. respondida").
+      REQUIREMENT_NOTE_PHYSICAL_SEND: Response to the requirement note is being sent physically ("N.E. envio físico").
+      REQUIREMENT_NOTE_PHYSICAL_SEND_ANSWERED: Physical response to the requirement note has been answered/completed ("N.E. envio físico - respondida").
     lineage:
     - datalake_sales_flow_raw.notary.status
   protocol:
-    description: The protocol number for the notary process.
+    description: Free-text protocol number issued by the notary/registry office for this registration process.
     lineage:
     - datalake_sales_flow_raw.notary.protocol
   password:
-    description: The password for accessing the notary process.
+    description: Free-text password/access code used to check the registration status with the notary office.
     lineage:
     - datalake_sales_flow_raw.notary.password
   available_costs:
-    description: The available costs for the notary process.
+    description: 'Enum indicating whether registry costs are available/known for this process. Values: YES ("Sim"), NO ("Não"), PREVIOUS_COSTS ("Custas Prévias" — prior/advance costs already known).'
     lineage:
     - datalake_sales_flow_raw.notary.available_costs
   paid_costs:
-    description: The paid costs for the notary process.
+    description: 'Enum indicating the payment status of registry costs. Values: PAID ("Pago"), NOT_PAID ("Não Pago").'
     lineage:
     - datalake_sales_flow_raw.notary.paid_costs
   seller_payment_status:
-    description: Status of the payment owed to the seller within the notary process.
+    description: |
+      Enum with the status of the payment owed to the seller once the notarial process concludes.
+      Defaults to NOT_STARTED.
+    categories:
+      NOT_APPLICABLE: Seller payment does not apply to this sales flow ("Não se aplica").
+      NOT_STARTED: Seller payment process has not started yet ("Não iniciado").
+      DONE: Seller has been paid ("Realizado").
+      DELAYED: Seller payment is late/overdue ("Atrasado").
+      ONGOING: Seller payment is in progress ("Em andamento").
     lineage:
     - datalake_sales_flow_raw.notary.seller_payment_status
   customer_follow_up:
-    description: Customer follow-up status or notes recorded during the notary process.
+    description: |
+      Enum indicating which team is responsible for following up with the customer during the
+      notary process.
+    categories:
+      REAL_STATE_ADVISOR: The real estate advisor/partner agency is responsible for customer follow-up.
+      QUINTO_ANDAR_OPERATIONS: QuintoAndar's internal operations team is responsible for customer follow-up.
     lineage:
     - datalake_sales_flow_raw.notary.customer_follow_up
   deed_emission_finished_by:
-    description: Identifier for the user or system that finished the deed emission.
+    description: 'Enum indicating which party (not a user ID) completed the deed emission step. Values: BUYER, SELLER (CcvPartyType).'
     lineage:
     - datalake_sales_flow_raw.notary.deed_emission_finished_by
   deed_signature_finished_by:
-    description: Identifier for the user or system that finished the deed signature.
+    description: 'Enum indicating which party (not a user ID) completed the deed signature step. Values: BUYER, SELLER (CcvPartyType).'
     lineage:
     - datalake_sales_flow_raw.notary.deed_signature_finished_by
   crn_finished_by:
-    description: Identifier for the user or system that finished the CRN (Central de Registro Nacional).
+    description: 'Enum indicating which party (not a user ID) completed the CRN (Cartório de Registro de Notas, notes/deed registry office) step. Values: BUYER, SELLER (CcvPartyType).'
     lineage:
     - datalake_sales_flow_raw.notary.crn_finished_by
   key_delivery_finished_by:
-    description: Identifier for the user or system that finished the key delivery.
+    description: 'Enum indicating which party (not a user ID) completed the key delivery step. Values: BUYER, SELLER (CcvPartyType).'
     lineage:
     - datalake_sales_flow_raw.notary.key_delivery_finished_by
   cri_finished_by:
-    description: Identifier for the user or system that finished the CRI (Certidão de Registro de Imóveis).
+    description: 'Enum indicating which party (not a user ID) completed the CRI (Cartório de Registro de Imóveis, real-estate registry) step. Values: BUYER, SELLER (CcvPartyType).'
     lineage:
     - datalake_sales_flow_raw.notary.cri_finished_by
   ts_started:
-    description: Timestamp of when the notary process started.
+    description: Timestamp of when the notary/registration process started.
     lineage:
     - datalake_sales_flow_raw.notary.started_at
   ts_ended:
-    description: Timestamp of when the notary process ended.
+    description: Timestamp of when the notary/registration process ended.
     lineage:
     - datalake_sales_flow_raw.notary.ended_at
   ts_prevision_ended:
-    description: Timestamp of when the notary process is expected to end.
+    description: Timestamp when the notary/registration process is expected to end.
     lineage:
     - datalake_sales_flow_raw.notary.end_prevision_at
   ts_buyer_received_keys:
-    description: Timestamp of when the buyer received the keys.
+    description: Timestamp of when the buyer received the keys to the property.
     lineage:
     - datalake_sales_flow_raw.notary.buyer_received_keys_at
   ts_kit_sent:
-    description: Timestamp of when the kit was sent.
+    description: Timestamp of when the documentation kit was sent to the notary office.
     lineage:
     - datalake_sales_flow_raw.notary.kit_sent_at
   ts_created:
@@ -101,38 +148,38 @@ columns:
     lineage:
     - datalake_sales_flow_raw.notary.updated_at
   ts_deed_emission_finished:
-    description: Timestamp of when the deed emission was finished.
+    description: Timestamp of when the deed emission step was finished.
     lineage:
     - datalake_sales_flow_raw.notary.deed_emission_finished_at
   ts_deed_signature_finished:
-    description: Timestamp of when the deed signature was finished.
+    description: Timestamp of when the deed signature step was finished.
     lineage:
     - datalake_sales_flow_raw.notary.deed_signature_finished_at
   ts_crn_finished:
-    description: Timestamp of when the CRN was finished.
+    description: Timestamp of when the CRN (Cartório de Registro de Notas) step was finished.
     lineage:
     - datalake_sales_flow_raw.notary.crn_finished_at
   ts_key_delivery_finished:
-    description: Timestamp of when the key delivery was finished.
+    description: Timestamp of when the key delivery step was finished.
     lineage:
     - datalake_sales_flow_raw.notary.key_delivery_finished_at
   ts_cri_finished:
-    description: Timestamp of when the CRI was finished.
+    description: Timestamp of when the CRI (Cartório de Registro de Imóveis) registration step was finished.
     lineage:
     - datalake_sales_flow_raw.notary.cri_finished_at
   ts_seller_paid:
-    description: Timestamp of when the seller was paid.
+    description: Legacy column. Previously recorded when the seller was paid following the notarial process; not present on the current Notary entity (superseded by seller_payment_status) and no longer populated by the application.
     lineage:
     - datalake_sales_flow_raw.notary.seller_paid_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.notary.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.notary.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.notary.day

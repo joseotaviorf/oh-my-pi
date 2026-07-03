@@ -2,7 +2,7 @@ database_name: datalake_sales_flow_clean
 table_name: invoice_tracking
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains invoice tracking information for sales flows.
+description: Tracks the attempts made to locate and validate the invoices expected from sellers (and other parties) for a given offer within a sales flow, recording retry counts, expected vs. found invoice counts, and the reason for failure when the check does not succeed. Used to monitor and troubleshoot automated invoice-collection jobs tied to diligence and CCV signature/termination events. (JPA entity — `InvoiceTracking`, `br.com.quintoandar.salesflow.core.invoice.InvoiceTracking`)
 columns:
   id:
     description: Unique ID for the invoice tracking record.
@@ -13,54 +13,70 @@ columns:
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.sales_flow_id
   id_offer:
-    description: Offer ID associated with the invoice tracking.
+    description: Offer identifier (free-text/string) associated with the invoice tracking.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.offer_id
   recipient_type:
-    description: Type of recipient the tracked invoice is issued to (e.g. buyer, seller).
+    description: 'Enum indicating the type of recipient the tracked invoice is issued to. Values: SELLER (the only value currently defined in code).'
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.recipient_type
   status:
-    description: Current status of the invoice tracking.
+    description: Enum tracking the current status of the invoice-tracking attempt.
+    categories:
+      PENDING: Invoice check is still pending, waiting on a condition or retry.
+      SUCCESS: Expected invoices were successfully located and validated.
+      MAX_RETRIES_REACHED: Maximum number of retry attempts was reached without success.
+      CCV_TERMINATED: CCV was terminated, so invoice processing no longer applies.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.status
   failure_reason:
-    description: Reason for invoice tracking failure, if applicable.
+    description: Enum capturing why the invoice tracking attempt failed, when applicable.
+    categories:
+      DILIGENCE_FAILURE: Due diligence has not been completed yet.
+      CCV_SIGNED_FAILURE: CCV has not been signed yet.
+      CCV_TERMINATED_FAILURE: "CCV was terminated without brokerage: invoice processing not applicable."
+      PAYMENT_MODEL_FAILURE: Payment model is Primary Market, so invoice processing does not apply.
+      SELLERS_FAILURE: One or more sellers could not be matched with invoices from SAP by CPF/CNPJ.
+      SELLERS_USERS_FAILURE: One or more sellers could not be matched to users, or have missing email/CPF data.
+      SELLERS_INVOICES_FAILURE: Number of seller shareholders exceeds the number of invoices found.
+      SELLERS_EMPTY_INVOICE_FAILURE: Sellers matched from SAP have empty invoice data (missing DPS number/set).
+      SELLERS_WITHOUT_EXTERNAL_IDS_FAILURE: All sellers of the offer lack a QuintoAndar account (external ID).
+      PARTNERS_FAILURE: A partner was not found or has incomplete data in the Person service.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.failure_reason
   attempt_count:
-    description: Number of attempts made to process the invoice.
+    description: Number of attempts made so far to locate/validate the expected invoices.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.attempt_count
   expected_invoices_count:
-    description: Expected number of invoices.
+    description: Expected number of invoices to be found for this offer.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.expected_invoices_count
   found_invoices_count:
-    description: Number of invoices found.
+    description: Number of invoices actually found for this offer at the time of the check.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.found_invoices_count
   last_error_message:
-    description: Last error message encountered during invoice processing.
+    description: Text of the last error message encountered during invoice tracking (truncated to 1000 characters in the source system).
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.last_error_message
   ts_created:
-    description: Timestamp when the invoice tracking was created.
+    description: Timestamp when the invoice tracking record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.created_at
   ts_updated:
-    description: Timestamp of the last update to the invoice tracking.
+    description: Timestamp of the last update to the invoice tracking record in the source operational system.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.updated_at
   year:
-    description: Year partition for the invoice tracking record.
+    description: Year  for the invoice tracking record.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.year
   month:
-    description: Month partition for the invoice tracking record.
+    description: Month  for the invoice tracking record.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.month
   day:
-    description: Day partition for the invoice tracking record.
+    description: Day  for the invoice tracking record.
     lineage:
     - datalake_sales_flow_raw.invoice_tracking.day

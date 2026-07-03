@@ -2,57 +2,76 @@ database_name: datalake_sales_flow_clean
 table_name: addendums
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains information about addendums (amendments) to sales flow contracts.
+description: Stores addendums (contractual amendments) attached to a CCV (purchase and sale agreement) within a Sales Flow case. Each row represents one addendum clause change tracked through its lifecycle (draft, approval, sending, signature, or voiding), and links to a Sales Flow record and to the CCV it amends. (JPA entity — `Addendums`, `br.com.quintoandar.salesflow.core.addendums.Addendums`)
 columns:
   id:
-    description: Unique ID for the addendum record.
+    description: Unique surrogate ID for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums.id
   id_sales_flow:
-    description: Foreign key to the sales_flow table.
+    description: Foreign key to the Sales Flow case that this addendum belongs to (maps to the `salesFlow` relationship on the Addendums entity, joined via sales_flow_id).
     lineage:
     - datalake_sales_flow_raw.addendums.sales_flow_id
   id_ccv:
-    description: Foreign key to the CCV (contract) table.
+    description: Foreign key to the CCV (purchase and sale contract) that this addendum amends (maps to the `ccv` relationship on the Addendums entity, joined via ccv_id).
     lineage:
     - datalake_sales_flow_raw.addendums.ccv_id
   status:
-    description: Current status of the addendum.
+    description: |
+      Current lifecycle status of the addendum, backed by the AddendumStatus enum. SIGNED and
+      VOIDED are terminal (final) states; SENT_DRAFT and SENT are considered the active states
+      of an addendum in progress.
+    categories:
+      DRAFT: Addendum created and being edited, not yet submitted for approval.
+      PENDING_APPROVAL: Addendum submitted and awaiting internal approval.
+      APPROVED: Addendum approved internally and ready to be sent for signature.
+      SENT_DRAFT: Unsigned addendum draft sent to the parties for review before final signature.
+      SENT_DRAFT_ERROR: Failure occurred while sending the addendum draft to the parties.
+      SENT: Final addendum document sent to the parties for signature.
+      SIGNED: Addendum signed by the parties; terminal state.
+      VOIDED: Addendum canceled/voided before completion; terminal state.
     lineage:
     - datalake_sales_flow_raw.addendums.status
   ts_signed:
-    description: Timestamp when the addendum was signed.
+    description: Timestamp when the addendum document was signed by the parties.
     lineage:
     - datalake_sales_flow_raw.addendums.signed_at
   signed_document_token:
-    description: Storage token identifying the signed addendum document file.
+    description: Storage token identifying the signed version of the addendum document file.
     lineage:
     - datalake_sales_flow_raw.addendums.signed_document_token
   unsigned_document_token:
-    description: Storage token identifying the unsigned addendum document file.
+    description: Storage token identifying the unsigned (draft) version of the addendum document file.
     lineage:
     - datalake_sales_flow_raw.addendums.unsigned_document_token
   reasons:
-    description: Reasons for the addendum.
+    description: |
+      List of reasons that justify the addendum, backed by the AddendumReason enum (stored as
+      a list of enum values, not a single value).
+    categories:
+      PAYMENT_CONDITIONS: Addendum changes payment terms or conditions of the CCV.
+      PROPERTY_INFORMATION: Addendum corrects or updates property details in the CCV.
+      PARTIES: Addendum changes information about the buyer(s) or seller(s) party to the CCV.
+      SPECIAL_CLAUSES: Addendum adds or modifies special contractual clauses in the CCV.
     lineage:
     - datalake_sales_flow_raw.addendums.reasons
   ts_created:
-    description: Timestamp when the addendum was created.
+    description: Timestamp when the addendum record was created in the source operational system.
     lineage:
     - datalake_sales_flow_raw.addendums.created_at
   ts_updated:
-    description: Timestamp of the last update to the addendum.
+    description: Timestamp when the addendum record was last updated in the source operational system.
     lineage:
     - datalake_sales_flow_raw.addendums.updated_at
   year:
-    description: Year partition for the addendum record.
+    description: Year  for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums.year
   month:
-    description: Month partition for the addendum record.
+    description: Month  for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums.month
   day:
-    description: Day partition for the addendum record.
+    description: Day  for the addendum record.
     lineage:
     - datalake_sales_flow_raw.addendums.day

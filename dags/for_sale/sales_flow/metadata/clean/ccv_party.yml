@@ -2,22 +2,22 @@ database_name: datalake_sales_flow_clean
 table_name: ccv_party
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: This table contains detailed information about each party (such as buyers, sellers, and witnesses) involved in a Purchase and Sale Agreement (CCV). It stores demographic and contact data, as well as the signature status for each individual or entity that is part of the contract.
+description: Contains one row per individual or entity acting as a buyer or seller on a given CCV (Contrato de Compra e Venda). It stores each party's declared identity, contact, and demographic data (name, email, document number, nationality, profession, marital status) together with a flag for whether that party has signed the contract. Rows are created when a CCV is drafted, listing the parties who must review, negotiate, and ultimately sign the purchase and sale agreement. (JPA entity — CcvPartyEntity, in the Sales Flow service)
 columns:
   id:
-    description: Unique identifier for the CCV party record.
+    description: Surrogate primary key of the ccv_party row (CcvPartyEntity), one row per party listed on a CCV contract.
     lineage:
     - datalake_sales_flow_raw.ccv_party.id
   id_ccv:
-    description: Identifier of the CCV (Contrato de Compra e Venda) to which this party is associated.
+    description: Foreign key to the CCV contract (ccv table) that this party belongs to.
     lineage:
     - datalake_sales_flow_raw.ccv_party.ccv_id
   id_address_data:
-    description: Identifier for the address data associated with this party.
+    description: Foreign key to the address record associated with this party.
     lineage:
     - datalake_sales_flow_raw.ccv_party.address_data_id
   type:
-    description: Type of the party involved in the CCV (e.g., Buyer, Seller).
+    description: 'Role of this party in the CCV (enum CcvPartyType): BUYER or SELLER.'
     lineage:
     - datalake_sales_flow_raw.ccv_party.type
   name:
@@ -45,7 +45,7 @@ columns:
     lineage:
     - datalake_sales_flow_raw.ccv_party.marital_status
   is_signed:
-    description: Flag indicating whether the party has signed the CCV.
+    description: Flag indicating whether this party has signed the CCV contract.
     lineage:
     - datalake_sales_flow_raw.ccv_party.signed
   ts_created:
@@ -57,14 +57,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.ccv_party.updated_at
   year:
-    description: 'Partitioning column: Year of the record''s creation/update.'
+    description: 'ing column: Year of the record''s creation/update.'
     lineage:
     - datalake_sales_flow_raw.ccv_party.year
   month:
-    description: 'Partitioning column: Month of the record''s creation/update.'
+    description: 'ing column: Month of the record''s creation/update.'
     lineage:
     - datalake_sales_flow_raw.ccv_party.month
   day:
-    description: 'Partitioning column: Day of the record''s creation/update.'
+    description: 'ing column: Day of the record''s creation/update.'
     lineage:
     - datalake_sales_flow_raw.ccv_party.day

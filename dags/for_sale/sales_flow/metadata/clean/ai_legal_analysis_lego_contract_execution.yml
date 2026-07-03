@@ -2,26 +2,26 @@ database_name: datalake_sales_flow_clean
 table_name: ai_legal_analysis_lego_contract_execution
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Contains records of AI legal analysis for Lego contract execution in sales flows.
+description: Tracks a single execution of the "Lego Contract" system — QuintoAndar's modular, AI-assisted contract-assembly engine that generates the purchase/sale contract from reusable clause "blocks" (legalops_saved_fields) using data extracted about the sales flow and the person involved. A related, unmodeled table ai_legal_analysis_lego_contract_execution_change_log tracks field-level edits made to an execution's saved fields. (JPA entity — `LegoContractExecution`, `br.com.quintoandar.salesflow.core.ailegalanalysis.legocontractexecution.LegoContractExecution`)
 columns:
   id:
     description: Unique identifier for the Lego contract execution record.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.id
   id_sales_flow:
-    description: Foreign key to the sales_flow table.
+    description: Foreign key to the sales_flow table this contract execution was generated for.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.sales_flow_id
   id_legocontract_execution:
-    description: Identifier for the Lego contract execution.
+    description: UUID (stored as text) uniquely identifying this Lego Contract execution in the external Lego Contract engine.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.legocontract_execution_id
   id_person:
-    description: Identifier for the person associated with the contract execution.
+    description: UUID (stored as text) identifying the person (buyer, seller, or other party) this contract execution's data pertains to.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.person_id
   payload_fields_hash:
-    description: Hash of the payload fields for integrity verification.
+    description: Hash of the payload fields used to detect whether the input data changed since the last execution, avoiding unnecessary contract regeneration.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.payload_fields_hash
   legalops_saved_fields:
@@ -37,14 +37,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.day

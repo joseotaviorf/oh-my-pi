@@ -81,14 +81,14 @@ columns:
       ONR: ONR (Operador Nacional do Sistema de Registro de Imóveis) service — the current preferred provider.
       INFO_SIMPLES: InfoSimples API — legacy provider, being deprecated in favor of ONR.
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.house_registration_order.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.house_registration_order.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.house_registration_order.day

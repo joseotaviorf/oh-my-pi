@@ -2,49 +2,54 @@ database_name: datalake_sales_flow_clean
 table_name: screening_negotiation
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: The primary purpose of the screening_negotiation table is to store the status of the screening/validation form for negotiation, indicating whether the form is complete or pending, as well as capturing any outstanding data issues or missing information.
+description: Stores the negotiation-leg screening/document-verification check performed during a home-purchase closing, with a one-to-one relationship both to the parent screening case and to the specific negotiation being screened. It tracks the internal screening workflow status and the legal/document proposal validation outcome for the negotiation terms, plus any legal pendency note raised against it. (JPA entity — `ScreeningNegotiation`, `br.com.quintoandar.salesflow.core.screening.negotiation.ScreeningNegotiation`; managed by `ScreeningNegotiationService`)
 columns:
   id:
     description: Surrogate primary key of the screening negotiation row in the source system.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.id
   id_screening:
-    description: Foreign key to the screening case evaluating proposal readiness.
+    description: Foreign key to the parent screening case (screening table) this negotiation check belongs to, one-to-one.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.screening_id
   id_negotiation:
-    description: Foreign key to the negotiation entity under screening review.
+    description: Foreign key to the negotiation record (deal terms) under screening review, one-to-one.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.negotiation_id
   status:
-    description: Current operational status code governing workflow progression for this record.
+    description: 'Enum tracking progress of the negotiation screening workflow itself. Possible values: ON_PROGRESS (default, screening still being worked) or COMPLETED (screening finished for the negotiation).'
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.status
   proposal_validation_status:
-    description: Validation outcome from legal or credit review of the proposal.
+    description: Enum tracking the legal/document proposal validation outcome for the negotiation, independent of the screening workflow status.
+    categories:
+      ON_PROGRESS: Default state; legal/document proposal validation for the negotiation is still being worked.
+      COMPLETED: Legal/document proposal validation for the negotiation is finished, with no open legal pendency.
+      LEGAL_PENDENCY_ON_PROGRESS: Validation paused because an open legal pendency was raised against the negotiation.
+      LEGAL_PENDENCY_COMPLETED: Validation finished after the legal pendency against the negotiation was resolved.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.proposal_validation_status
   legal_pendency_note:
-    description: Legal team note describing open pendencies blocking proposal approval.
+    description: Free-text note recorded when a legal pendency (documentation or legal issue) is raised against the negotiation, describing the pendency blocking proposal approval.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.legal_pendency_note
   ts_created:
-    description: Timestamp of the creation of the record.
+    description: Timestamp when the negotiation screening record was first created.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.created_at
   ts_updated:
-    description: Timestamp of the last update of the record.
+    description: Timestamp of the most recent update to the negotiation screening record (e.g. status or validation change).
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_negotiation.day

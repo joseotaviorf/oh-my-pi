@@ -2,14 +2,14 @@ database_name: datalake_sales_flow_clean
 table_name: clause_subject
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Table that stores unique subjects for contractual clauses, with an identifier, a description, and timestamps.
+description: A small lookup table of subjects/categories used to group legal clause templates (clause_message) in the CCV contract-authoring domain, e.g. grouping clauses about payment terms, property description, or special conditions. Rows are managed by the legal/contract-authoring tooling as new clause categories are introduced. A previously added `type` column on this table was later removed and is not part of the current schema. (JPA entity — ClauseSubject, in the Sales Flow service)
 columns:
   id:
-    description: Unique clause subject identifier
+    description: Surrogate primary key of the clause_subject row, one row per clause subject/category.
     lineage:
     - datalake_sales_flow_raw.clause_subject.id
   description:
-    description: Free-text description of the contractual clause subject.
+    description: Free-text name/description of the contractual clause subject (e.g. the category label shown when grouping clause templates).
     lineage:
     - datalake_sales_flow_raw.clause_subject.description
   ts_created:

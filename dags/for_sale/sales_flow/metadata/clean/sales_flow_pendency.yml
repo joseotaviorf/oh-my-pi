@@ -1,6 +1,8 @@
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_pendency
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Tracks the deal-closing checklist/blocker items for a sales flow after an offer is accepted. Each row represents the current blocker state for one closing track (cash payment, credit analysis, legal diligence, mortgage financing, or notary/registry) of a given sales flow, and is created lazily and overwritten as the deal progresses through that track, with at most one row per (sales flow, type) pair. One row per sales flow pendency record in datalake_sales_flow_clean.
 columns:
   id:
     lineage:
@@ -9,15 +11,33 @@ columns:
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.sales_flow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: ID of the parent sales flow (deal) this pendency tracks. Each sales flow has at most one pendency row per type. Joins with datalake_sales_flow_clean.sales_flow.id
   pendency:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.pendency
-    description: Open pendency or blocker item preventing the sales flow from advancing.
+    description: >
+      Specific blocker state within the closing track identified by `type`, e.g. a missing
+      document, a credit denial, a notary requirement note, or the resolved/clear state. The
+      set of possible values depends on `type`: CASH and CREDIT_ANALYSIS use small dedicated
+      enums, DILIGENCE and NOTARY use their own enums, and FINANCED draws from a large
+      mortgage-specific pendency enum covering document, signature, and ITBI pendencies. Across
+      tracks, NO_PENDENCY and PENDENCY_RESOLVED (or track-specific equivalents) indicate there
+      is no active blocker.
+    categories:
+      NO_PENDENCY: "No active blocker for the track (used by CASH, CREDIT_ANALYSIS, DILIGENCE, NOTARY, and FINANCED)."
+      PENDENCY_RESOLVED: Blocker for the track has been resolved/cleared.
+      CRN_UNDER_NEGOTIATION_SIMPLE: "CASH track: simple CRN (certidão de regularidade negativa) pendency under negotiation."
+      CRN_UNDER_NEGOTIATION: "CASH track: complex CRN (certidão de regularidade negativa) pendency under negotiation."
+      DEED_ON_HOLD: "CASH track: deed (escritura) on hold pending agreements between the parties defined in the CCV."
+      CREDIT_DENIAL: "CREDIT_ANALYSIS track: buyer's credit was denied."
+      RETRYING_IN_ANOTHER_BANK: "CREDIT_ANALYSIS track: buyer is retrying the credit/financing application with another bank."
+      DD_PENDENCY: "DILIGENCE track: open pendency identified during legal due diligence (DD)."
+      REQUIREMENT_NOTE_IN_PROGRESS: "NOTARY track: registry office requirement note (nota de exigência) is in progress."
+      REQUIREMENT_NOTE_ANSWERED: "NOTARY track: registry office requirement note (nota de exigência) has been answered."
   type:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.type
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: 'Closing-process track the pendency belongs to: CASH (cash payment), CREDIT_ANALYSIS (buyer credit/financing analysis), DILIGENCE (legal due diligence), FINANCED (mortgage financing), or NOTARY (property registry and delivery). This is not a buyer/seller distinction; it identifies which stage of the deal-closing checklist the `pendency` value refers to.'
   ts_created:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.created_at
@@ -29,14 +49,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.sales_flow_pendency.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of sales flow pendency sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per sales flow pendency record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

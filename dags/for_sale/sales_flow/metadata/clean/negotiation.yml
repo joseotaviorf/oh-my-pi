@@ -1,6 +1,8 @@
 database_name: datalake_sales_flow_clean
 table_name: negotiation
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Tracks the post-offer negotiation and closing-preparation stage of a sales flow — buyer/seller documentation collection, buyer credit analysis, payment method flags (FGTS, consórcio, internal financing), and handoff of the deal to the operations support team. One row per sales_flow (unique sales_flow_id). (JPA entity — `Negotiation`, `br.com.quintoandar.salesflow.core.negotiation.Negotiation`)
 columns:
   id:
     lineage:
@@ -13,31 +15,31 @@ columns:
   sent_to_operations_support_by:
     lineage:
     - datalake_sales_flow_raw.negotiation.sent_to_operations_support_by
-    description: Identifier of the user or system that sent the negotiation to operations support.
+    description: Free-text identifier (e.g., email, not an enum or numeric user ID) of the user who sent the negotiation to the operations support team.
   has_fgts_draft:
     lineage:
     - datalake_sales_flow_raw.negotiation.use_fgts
-    description: Boolean flag indicating whether fgts draft applies to this record.
+    description: Flag indicating whether the buyer is using FGTS (Brazilian severance indemnity fund, Fundo de Garantia do Tempo de Serviço) funds as part of the payment for this negotiation.
   has_final_value_refund:
     lineage:
     - datalake_sales_flow_raw.negotiation.has_final_value_refund
-    description: Boolean flag indicating whether final value refund applies to this record.
+    description: Flag indicating whether a refund of part of the final transaction value applies to this negotiation.
   is_seller_pj:
     lineage:
     - datalake_sales_flow_raw.negotiation.is_seller_pj
-    description: Boolean flag indicating whether seller pj applies to this record.
+    description: Flag indicating whether the seller is a legal entity (pessoa jurídica) rather than an individual.
   is_buyer_pj:
     lineage:
     - datalake_sales_flow_raw.negotiation.is_buyer_pj
-    description: Boolean flag indicating whether buyer pj applies to this record.
+    description: Flag indicating whether the buyer is a legal entity (pessoa jurídica) rather than an individual.
   is_consorcio_payment:
     lineage:
     - datalake_sales_flow_raw.negotiation.is_consorcio_payment
-    description: Boolean flag indicating whether consorcio payment applies to this record.
+    description: Flag indicating whether the buyer is paying via a consórcio (Brazilian collective buying/credit pool) letter of credit.
   is_internal_financing:
     lineage:
     - datalake_sales_flow_raw.negotiation.internal_financing
-    description: Boolean flag indicating whether internal financing applies to this record.
+    description: Flag indicating whether the purchase is being financed internally by QuintoAndar rather than through an external bank/mortgage.
   ts_buyer_documentation_started:
     lineage:
     - datalake_sales_flow_raw.negotiation.buyer_documentation_started_at
@@ -81,14 +83,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.negotiation.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.negotiation.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.negotiation.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of negotiation sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per negotiation record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

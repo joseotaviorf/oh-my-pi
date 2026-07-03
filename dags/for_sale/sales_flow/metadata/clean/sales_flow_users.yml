@@ -2,14 +2,14 @@ database_name: datalake_sales_flow_clean
 table_name: sales_flow_users
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table that relates the users and the offers that they are participating.
+description: Associates users with the sales flows (deals) they participate in, and the role each user plays in that deal. Rows are created automatically when a sales flow starts (registering the original buyer and seller, and any invited co-owner sellers) and can also be added or updated later via the Sales Flow service's users API, e.g. when a co-participant is invited to a deal. One row per (sales_flow, user) participation record in datalake_sales_flow_clean.
 columns:
   id:
-    description: Unique ID for this entry on this table.
+    description: Surrogate Unique ID for this entry on this table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_users.id
   id_sales_flow:
-    description: SalesFlow offer ID. Joins with datalake_sales_flow_clean.sales_flow.id
+    description: SalesFlow deal ID. Joins with datalake_sales_flow_clean.sales_flow.id
     lineage:
     - datalake_sales_flow_raw.sales_flow_users.sales_flow_id
   id_user:
@@ -17,11 +17,11 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_users.user_id
   type:
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: 'Role the user plays in the sales flow. One of three values: BUYER, SELLER, or OWNER (a co-owner of the property being sold, e.g. an invited co-owner seller).'
     lineage:
     - datalake_sales_flow_raw.sales_flow_users.type
   is_original_user:
-    description: Indicates if this user was the one that made the offer on the platform.
+    description: Boolean flag indicating whether this is the original/main buyer or seller who initiated the deal, as opposed to a co-participant added or invited afterward (e.g. an invited co-owner seller).
     lineage:
     - datalake_sales_flow_raw.sales_flow_users.is_original_user
   ts_created:

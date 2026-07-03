@@ -1,23 +1,25 @@
 database_name: datalake_sales_flow_clean
 table_name: card_noting
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Stores the free-text notes an operator can enter on a sales flow's negotiation/deal "card" in the portfolio UI. It has a one-to-one relationship with the sales flow, sharing its primary key, and holds up to three independent note fields covering buyer/seller info, the commitment-closing-transfer process, and general negotiation notes. (JPA entity — `CardNotingEntity`, `br.com.quintoandar.salesflow.core.cardnoting.CardNotingEntity`)
 columns:
   id_card_noting:
     lineage:
     - datalake_sales_flow_raw.card_noting.id
-    description: Unique identifier of the card noting record.
+    description: Primary key of the card_noting row. This is not an independently generated surrogate key — it is set equal to the sales_flow id it belongs to (one-to-one relationship keyed by shared id, per CardNotingEntity/CardNotingService).
   buyer_and_seller:
     lineage:
     - datalake_sales_flow_raw.card_noting.buyer_and_seller
-    description: Notes recorded about the buyer and seller on the deal card.
+    description: Free-text note about the buyer and seller, shown on the negotiation/deal card in the portfolio view.
   commitment_closing_transfer:
     lineage:
     - datalake_sales_flow_raw.card_noting.commitment_closing_transfer
-    description: Notes about the commitment, closing, and transfer steps on the deal card.
+    description: Free-text note about the commitment, closing, and transfer steps of the deal, shown on the negotiation/deal card in the portfolio view.
   negotiation_note:
     lineage:
     - datalake_sales_flow_raw.card_noting.negotiation_note
-    description: Free-text negotiation note recorded on the deal card.
+    description: Free-text general negotiation note recorded on the negotiation/deal card in the portfolio view.
   ts_created:
     lineage:
     - datalake_sales_flow_raw.card_noting.created_at
@@ -29,14 +31,12 @@ columns:
   year:
     lineage:
     - datalake_sales_flow_raw.card_noting.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.card_noting.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.card_noting.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of card noting sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per card noting record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.

@@ -2,46 +2,46 @@ database_name: datalake_sales_flow_clean
 table_name: sales_flow_invite
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
-description: Table with the invites statuses.
+description: Tracks invites sent within the Sales Flow (For Sale) closing process, where a buyer or seller already on the deal invites another participant (e.g. a co-buyer or co-seller) to join it. Rows are created as PENDING when the invite is sent, updated to ACCEPTED when the invitee joins the deal, or CANCELLED when the original inviter revokes the invite. One row per invite in datalake_sales_flow_clean.
 columns:
   id:
     description: Unique ID for the invite.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.id
   id_sales_flow:
-    description: SalesFlow offer ID. Joins with datalake_sales_flow_clean.sales_flow.id
+    description: ID of the parent sales flow (deal negotiation) this invite belongs to. Joins with datalake_sales_flow_clean.sales_flow.id
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.sales_flow_id
   id_inviter:
-    description: Inviter User ID on Sales Flow databases.
+    description: User ID of the buyer or seller who created the invite (the existing participant inviting someone else into the deal).
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.inviter_id
   id_invitee:
-    description: User ID on Sales Flow databases after accepting the invite. This user id_external can be found on table sales_flow_clean.users
+    description: User ID of the person invited into the sales flow, populated once the invitee registers/accepts. This user id_external can be found on table sales_flow_clean.users
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.invitee_id
   id_folder:
-    description: Buyer Docx Folder ID on Docx tables.
+    description: ID of the buyer's document folder (Docx) the invitee is linked to once accepted.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.folder_id
   id_house:
-    description: House ID on SalesFlow tables (house).
+    description: ID of the house/listing associated with the sales flow the invite was sent for.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.house_id
   type:
-    description: User type. BUYER or SELLER
+    description: 'Side of the deal the inviter belongs to: BUYER (inviter is a buyer inviting a co-buyer) or SELLER (inviter is a seller inviting a co-seller).'
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.type
   name:
-    description: Human-readable display name associated with the person or entity in this row.
+    description: Name of the invitee provided by the inviter at the time the invite was sent.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.name
   email:
-    description: User e-mail.
+    description: Email address of the invitee, used to send the invitation.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.email
   status:
-    description: Current status of the invite, such as pending, accepted, or expired.
+    description: 'Current status of the invite: PENDING (invite sent, awaiting the invitee''s response), ACCEPTED (invitee joined the sales flow as a participant), or CANCELLED (the original inviter revoked the invite).'
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.status
   ts_created:
@@ -53,14 +53,14 @@ columns:
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.updated_at
   year:
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.year
   month:
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.month
   day:
-    description: Partition day when the ETL run loaded this row into the lake table.
+    description: Day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.sales_flow_invite.day

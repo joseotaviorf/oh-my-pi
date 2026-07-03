@@ -1,58 +1,58 @@
 database_name: datalake_sales_flow_clean
 table_name: seller_data
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Snapshot of seller personal and CCV-participation data for a Sales Flow case. Each row represents one seller (or co-seller) associated with a Sales Flow offer and the CCV (purchase and sale contract) to be signed, including their ownership share and whether they must sign the contract. (JPA entity — `SellerData`, `br.com.quintoandar.salesflow.core.sellerdata.SellerData`)
 columns:
   id_seller:
     lineage:
     - datalake_sales_flow_raw.seller_data.id
-    description: Foreign key to the seller party in the For Sale transaction.
+    description: Unique surrogate ID for the seller_data record.
   id_sales_flow:
     lineage:
     - datalake_sales_flow_raw.seller_data.sales_flow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: Foreign key to the Sales Flow case this seller belongs to.
   id_docx_folder:
     lineage:
     - datalake_sales_flow_raw.seller_data.docx_folder_id
-    description: Identifier of the document folder storing seller or buyer paperwork.
+    description: Identifier (docx_folder_id) of the document folder storing this seller's paperwork for the transaction.
   name:
     lineage:
     - datalake_sales_flow_raw.seller_data.name
-    description: Human-readable display name associated with the person or entity in this row.
+    description: Full name of the seller. Contains personal data (PII).
   email:
     lineage:
     - datalake_sales_flow_raw.seller_data.email
-    description: Contact email address used for notifications and identity matching.
+    description: Contact email address of the seller, used for notifications and identity matching. Contains personal data (PII).
   share_percentage:
     lineage:
     - datalake_sales_flow_raw.seller_data.share_percentage
-    description: Ownership share percentage assigned to this seller in the transaction.
+    description: Ownership share percentage assigned to this seller in the property being sold. Stored as a String on the SellerData entity rather than a numeric type.
   holding_value:
     lineage:
     - datalake_sales_flow_raw.seller_data.holding_value
-    description: Declared asset holding value used in seller financial qualification.
+    description: Numeric monetary value (decimal, not a flag) representing this seller's declared asset holdings, used in financial qualification for the transaction.
   is_ccv_signer:
     lineage:
     - datalake_sales_flow_raw.seller_data.is_ccv_signer
-    description: Whether this seller is required to sign the purchase agreement (CCV).
+    description: Flag (real boolean on the SellerData entity, unlike the enum-based signer_status on buyer_data) indicating whether this seller is required to sign the CCV (purchase and sale contract).
   ts_created:
     lineage:
     - datalake_sales_flow_raw.seller_data.created_at
-    description: Timestamp when the row was first created in the source operational system.
+    description: Timestamp when the seller_data record was created in the source operational system.
   ts_updated:
     lineage:
     - datalake_sales_flow_raw.seller_data.updated_at
-    description: Timestamp when the row was last updated in the source operational system.
+    description: Timestamp when the seller_data record was last updated in the source operational system.
   year:
     lineage:
     - datalake_sales_flow_raw.seller_data.year
-    description: Partition year when the ETL run loaded this row into the lake table.
+    description: Year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - datalake_sales_flow_raw.seller_data.month
-    description: Partition month when the ETL run loaded this row into the lake table.
+    description: Month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - datalake_sales_flow_raw.seller_data.day
-    description: Partition day when the ETL run loaded this row into the lake table.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of seller data sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per seller data record with standardized names and types in datalake_sales_flow_clean.
+    description: Day when the ETL run loaded this row into the lake table.
