@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 
 import requests
 from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
@@ -287,7 +288,13 @@ def main() -> None:
 
         if api_data_list:
             df = json_to_dataframe(spark, api_data_list)
-            df = insert_partitions(df)
+            df = df.withColumn("_exec_dt", F.lit(job_args["ds"]))
+            df = insert_partitions(
+                df,
+                date_column_to_partition="_exec_dt",
+                datetime_format="yyyy-MM-dd",
+            )
+            df = df.drop("_exec_dt")
             _load_to_raw(spark_client, job_args, df)
             LOGGER.info(
                 f"m=main, msg=Loaded records into raw, count={len(api_data_list)}, "
