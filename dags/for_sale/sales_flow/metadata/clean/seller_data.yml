@@ -1,44 +1,58 @@
----
 database_name: datalake_sales_flow_clean
 table_name: seller_data
 domain: For Sale
 columns:
   id_seller:
     lineage:
-      - datalake_sales_flow_raw.seller_data.id
+    - datalake_sales_flow_raw.seller_data.id
+    description: Foreign key to the seller party in the For Sale transaction.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.seller_data.sales_flow_id
+    - datalake_sales_flow_raw.seller_data.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_docx_folder:
     lineage:
-      - datalake_sales_flow_raw.seller_data.docx_folder_id
+    - datalake_sales_flow_raw.seller_data.docx_folder_id
+    description: Identifier of the document folder storing seller or buyer paperwork.
   name:
     lineage:
-      - datalake_sales_flow_raw.seller_data.name
+    - datalake_sales_flow_raw.seller_data.name
+    description: Human-readable display name associated with the person or entity in this row.
   email:
     lineage:
-      - datalake_sales_flow_raw.seller_data.email
+    - datalake_sales_flow_raw.seller_data.email
+    description: Contact email address used for notifications and identity matching.
   share_percentage:
     lineage:
-      - datalake_sales_flow_raw.seller_data.share_percentage
+    - datalake_sales_flow_raw.seller_data.share_percentage
+    description: Ownership share percentage assigned to this seller in the transaction.
   holding_value:
     lineage:
-      - datalake_sales_flow_raw.seller_data.holding_value
+    - datalake_sales_flow_raw.seller_data.holding_value
+    description: Declared asset holding value used in seller financial qualification.
   is_ccv_signer:
     lineage:
-      - datalake_sales_flow_raw.seller_data.is_ccv_signer
+    - datalake_sales_flow_raw.seller_data.is_ccv_signer
+    description: Whether this seller is required to sign the purchase agreement (CCV).
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.seller_data.created_at
+    - datalake_sales_flow_raw.seller_data.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.seller_data.updated_at
+    - datalake_sales_flow_raw.seller_data.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.seller_data.year
+    - datalake_sales_flow_raw.seller_data.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.seller_data.month
+    - datalake_sales_flow_raw.seller_data.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.seller_data.day
+    - datalake_sales_flow_raw.seller_data.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of seller data sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per seller data record with standardized names and types in datalake_sales_flow_clean.

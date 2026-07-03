@@ -1,42 +1,38 @@
----
 database_name: datalake_sales_flow_clean
 table_name: screening
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "The primary purpose of the screening table is to 
-  store the main screening information and legal pendency status, 
-  serving as the central table for all screening-related validations 
-  and tracking the overall status of the screening process."
+description: The primary purpose of the screening table is to store the main screening information and legal pendency status, serving as the central table for all screening-related validations and tracking the overall status of the screening process.
 columns:
   id:
-    description: 'Id of the screening.'
+    description: Surrogate primary key of the screening row in the source system.
     lineage:
     - datalake_sales_flow_raw.screening.id
   id_sales_flow:
-    description: 'Id of the sales flow.'
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
     lineage:
     - datalake_sales_flow_raw.screening.sales_flow_id
   legal_pendency_status:
-    description: 'Legal pendency status indicating if there are any legal issues or pending documentation.'
+    description: Legal pendency status indicating if there are any legal issues or pending documentation.
     lineage:
     - datalake_sales_flow_raw.screening.legal_pendency_status
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: Timestamp of the creation of the record.
     lineage:
     - datalake_sales_flow_raw.screening.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: Timestamp of the last update of the record.
     lineage:
     - datalake_sales_flow_raw.screening.updated_at
   year:
-    description: 'Year of the record.'
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening.year
   month:
-    description: 'Month of the record.'
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening.month
   day:
-    description: 'Day of the record.'
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening.day

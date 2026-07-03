@@ -1,20 +1,26 @@
----
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_tag
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.id
+    - datalake_sales_flow_raw.sales_flow_tag.id
+    description: Surrogate primary key of the sales flow tag row in the source system.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.sales_flow_id
+    - datalake_sales_flow_raw.sales_flow_tag.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_tag:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.tag_id
+    - datalake_sales_flow_raw.sales_flow_tag.tag_id
+    description: Foreign key to the workflow tag applied to categorize the sales flow.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.created_at
+    - datalake_sales_flow_raw.sales_flow_tag.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.updated_at
+    - datalake_sales_flow_raw.sales_flow_tag.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of sales flow tag sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per sales flow tag record with standardized names and types in datalake_sales_flow_clean.

@@ -1,54 +1,50 @@
----
 database_name: datalake_sales_flow_clean
 table_name: screening_seller
-owner: leonardo.soares@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "The primary purpose of the screening_seller table is to 
-  store the status of the screening/validation form for sellers, 
-  indicating whether the form is complete or pending, as well as capturing any 
-  outstanding data issues or missing information."
+description: The primary purpose of the screening_seller table is to store the status of the screening/validation form for sellers, indicating whether the form is complete or pending, as well as capturing any outstanding data issues or missing information.
 columns:
   id:
-    description: 'Id of the screening seller'
+    description: Surrogate primary key of the screening seller row in the source system.
     lineage:
     - datalake_sales_flow_raw.screening_seller.id
   id_screening:
-    description: 'Id of the screening'
+    description: Foreign key to the screening case evaluating proposal readiness.
     lineage:
     - datalake_sales_flow_raw.screening_seller.screening_id
   id_seller_data:
-    description: 'Id of the seller data'
+    description: Foreign key to seller profile data used in legal and registry screening.
     lineage:
     - datalake_sales_flow_raw.screening_seller.seller_data_id
   status:
-    description: 'Status of the screening'
+    description: Current operational status code governing workflow progression for this record.
     lineage:
     - datalake_sales_flow_raw.screening_seller.status
   proposal_validation_status:
-    description: 'Proposal validation status'
+    description: Validation outcome from legal or credit review of the proposal.
     lineage:
     - datalake_sales_flow_raw.screening_seller.proposal_validation_status
   legal_pendency_note:
-    description: 'Legal pendency note'
+    description: Legal team note describing open pendencies blocking proposal approval.
     lineage:
     - datalake_sales_flow_raw.screening_seller.legal_pendency_note
   ts_created:
-    description: 'Timestamp of the creation of the record'
+    description: Timestamp of the creation of the record
     lineage:
     - datalake_sales_flow_raw.screening_seller.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record'
+    description: Timestamp of the last update of the record
     lineage:
     - datalake_sales_flow_raw.screening_seller.updated_at
   year:
-    description: Year of the record'
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_seller.year
   month:
-    description: 'Month of the record'
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_seller.month
   day:
-    description: 'Day of the record'
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
     - datalake_sales_flow_raw.screening_seller.day
