@@ -241,7 +241,7 @@ columns:
       Total monetary value of the most recent real estate transaction recorded for this property, used as a market price reference.
   zone_code:
     lineage:
-      - datalake_idactum_registrations_raw.idactum_registrations.sgl_zona
+      - datalake_idactum_registrations_raw.idactum_registrations.sql_zona
     description: |
       Municipal zoning designation acronym for the property's location (e.g., ZM, ZC, ZI), indicating allowed land uses per city zoning laws.
   idactum_price_estimation:

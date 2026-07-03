@@ -45,7 +45,7 @@ SELECT
   `zona_censitária_renda_media_responsavel` AS census_tract_income_avg,
   `zona_censitária_renda_media_desvio_padrao` AS census_tract_income_standard_deviation,
   transacao_mais_recente_valor_total AS latest_transaction_value,
-  Sgl_zona AS zone_code,
+  sql_zona AS zone_code,
   price_ref_estimate_michel AS idactum_price_estimation,
   perc_abs_deviation_estimate_michel AS idactum_price_estimation_percentage_absolute_deviation,
   valorizacao_media_anual AS average_annual_appreciation,
