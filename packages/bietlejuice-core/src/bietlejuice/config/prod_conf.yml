@@ -1607,7 +1607,7 @@ emr_cluster_base: &emr_cluster_anchor
     task_nodes:
         node_type_id: m7g.xlarge
         instance_count: 0
-    autotermination_minutes: 20
+    autotermination_minutes: 60
     emr_auto_terminate: false
     aws_attributes: &emr_aws_anchor
         availability: ON_DEMAND
