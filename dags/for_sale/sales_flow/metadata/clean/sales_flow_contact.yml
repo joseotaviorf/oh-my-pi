@@ -1,26 +1,34 @@
----
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_contact
 domain: For Sale
 columns:
   id_sales_flow_contact:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.id
+    - datalakes_sales_flow_raw.sales_flow_contact.id
+    description: Unique identifier of this sales flow contact association row.
   id_sales_flow:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.sales_flow_id
+    - datalakes_sales_flow_raw.sales_flow_contact.sales_flow_id
+    description: Identifier of the sales flow this contact is linked to, joining to datalake_sales_flow_clean.sales_flow.id.
   id_contact:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.contact_id
+    - datalakes_sales_flow_raw.sales_flow_contact.contact_id
+    description: Identifier of the contact (person reachable for this deal) linked to the sales flow.
   type:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.type
+    - datalakes_sales_flow_raw.sales_flow_contact.type
+    description: Role of this contact within the sales flow, such as buyer or seller contact.
   is_default_type:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.default_type
+    - datalakes_sales_flow_raw.sales_flow_contact.default_type
+    description: Indicates whether this contact is the default contact for its type on the sales flow.
   ts_created:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.created_at
+    - datalakes_sales_flow_raw.sales_flow_contact.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.updated_at
+    - datalakes_sales_flow_raw.sales_flow_contact.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
+owner: helder.rodrigues@quintoandar.com.br
+description: Cleaned snapshot of sales flow contact sourced from operational systems backing Sales Flow service managing For Sale operations after an offer is received. One row per sales flow contact record with standardized names and types in datalake_sales_flow_clean.

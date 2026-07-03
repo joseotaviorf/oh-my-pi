@@ -1,71 +1,82 @@
----
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_details
 domain: For Sale
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table with complementary details about the sales flow, including external system IDs and follow-up timestamps.
 columns:
   id:
     description: Unique ID for the sales flow detail.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.id
+    - datalake_sales_flow_raw.sales_flow_details.id
   id_sales_flow:
     description: Foreign key to the sales_flow table, identifying which sales flow this detail belongs to.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.sales_flow_id
+    - datalake_sales_flow_raw.sales_flow_details.sales_flow_id
   id_taskmaster:
     description: ID of the main task in the Taskmaster system associated with this flow.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details.taskmaster_id
   id_buyer_onboarding_taskmaster:
     description: ID of the buyer's onboarding task in the Taskmaster system.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.buyer_onboarding_taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details.buyer_onboarding_taskmaster_id
   id_seller_onboarding_taskmaster:
     description: ID of the seller's onboarding task in the Taskmaster system.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.seller_onboarding_taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details.seller_onboarding_taskmaster_id
   id_buyer_hefesto_portfolio_unit:
     description: ID of the buyer's portfolio unit in the Hefesto system.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.buyer_hefesto_portfolio_unit_id
+    - datalake_sales_flow_raw.sales_flow_details.buyer_hefesto_portfolio_unit_id
   id_seller_hefesto_portfolio_unit:
     description: ID of the seller's portfolio unit in the Hefesto system.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.seller_hefesto_portfolio_unit_id
+    - datalake_sales_flow_raw.sales_flow_details.seller_hefesto_portfolio_unit_id
   id_incubator_eop_taskmaster:
     description: Taskmaster task ID for the "Incubator EOP" process.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.incubator_eop_taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details.incubator_eop_taskmaster_id
   opportunities_of_the_week:
     description: Field related to "Opportunities of the Week", possibly an identifier or flag.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.opportunities_of_the_week
+    - datalake_sales_flow_raw.sales_flow_details.opportunities_of_the_week
   isolve_link:
     description: Link to the corresponding record in the iSolve system.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.isolve_link
+    - datalake_sales_flow_raw.sales_flow_details.isolve_link
   google_drive_link:
     description: Link to a Google Drive folder or document related to this flow.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.google_drive_link
+    - datalake_sales_flow_raw.sales_flow_details.google_drive_link
   ticket_complexity_level:
     description: Complexity level of the associated ticket.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.ticket_complexity_level
+    - datalake_sales_flow_raw.sales_flow_details.ticket_complexity_level
   ts_seller_fup:
     description: Timestamp of the last follow-up with the seller.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.seller_fup_at
+    - datalake_sales_flow_raw.sales_flow_details.seller_fup_at
   ts_buyer_fup:
     description: Timestamp of the last follow-up with the buyer.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.buyer_fup_at
+    - datalake_sales_flow_raw.sales_flow_details.buyer_fup_at
   ts_created:
     description: Record creation timestamp.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.created_at
+    - datalake_sales_flow_raw.sales_flow_details.created_at
   ts_updated:
     description: Record last update timestamp.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details.updated_at
+    - datalake_sales_flow_raw.sales_flow_details.updated_at
+  year:
+    description: Partition year when the ETL run loaded this row into the lake table.
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_details.year
+  month:
+    description: Partition month when the ETL run loaded this row into the lake table.
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_details.month
+  day:
+    description: Partition day when the ETL run loaded this row into the lake table.
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_details.day

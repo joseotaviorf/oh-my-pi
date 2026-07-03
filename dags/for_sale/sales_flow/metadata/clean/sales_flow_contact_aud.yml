@@ -1,56 +1,74 @@
----
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_contact_aud
 domain: For Sale
 columns:
   id_sales_flow_contact:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.id
+    - datalake_sales_flow_raw.sales_flow_contact_aud.id
+    description: Audited unique identifier of the sales flow contact association row at this revision.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.sales_flow_id
+    - datalake_sales_flow_raw.sales_flow_contact_aud.sales_flow_id
+    description: Audited identifier of the sales flow this contact was linked to at this revision.
   id_contact:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.contact_id
+    - datalake_sales_flow_raw.sales_flow_contact_aud.contact_id
+    description: Audited identifier of the contact linked to the sales flow at this revision.
   rev:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.rev
+    - datalake_sales_flow_raw.sales_flow_contact_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.revtype
+    - datalake_sales_flow_raw.sales_flow_contact_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.revend
+    - datalake_sales_flow_raw.sales_flow_contact_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.type
+    - datalake_sales_flow_raw.sales_flow_contact_aud.type
+    description: Audited role of the contact within the sales flow at this revision, such as buyer or seller contact.
   is_default_type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.default_type
+    - datalake_sales_flow_raw.sales_flow_contact_aud.default_type
+    description: Audited flag indicating whether this contact was the default contact for its type at this revision.
   mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.sales_flow_contact_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
   mod_id_contact:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.contact_id_mod
+    - datalake_sales_flow_raw.sales_flow_contact_aud.contact_id_mod
+    description: Envers boolean flag indicating whether id contact changed in this audit revision.
   mod_type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.type_mod
+    - datalake_sales_flow_raw.sales_flow_contact_aud.type_mod
+    description: Envers boolean flag indicating whether type changed in this audit revision.
   mod_is_default_type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.default_type_mod
+    - datalake_sales_flow_raw.sales_flow_contact_aud.default_type_mod
+    description: Envers boolean flag indicating whether is default type changed in this audit revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.created_at
+    - datalake_sales_flow_raw.sales_flow_contact_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.updated_at
+    - datalake_sales_flow_raw.sales_flow_contact_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
   year:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.year
+    - datalake_sales_flow_raw.sales_flow_contact_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.month
+    - datalake_sales_flow_raw.sales_flow_contact_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_contact_aud.day
+    - datalake_sales_flow_raw.sales_flow_contact_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of sales flow contact rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

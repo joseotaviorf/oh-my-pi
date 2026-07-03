@@ -1,8 +1,7 @@
----
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_invite
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Table with the invites statuses.
 columns:
   id:
@@ -12,56 +11,56 @@ columns:
   id_sales_flow:
     description: SalesFlow offer ID. Joins with datalake_sales_flow_clean.sales_flow.id
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.sales_flow_id
+    - datalake_sales_flow_raw.sales_flow_invite.sales_flow_id
   id_inviter:
     description: Inviter User ID on Sales Flow databases.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.inviter_id
+    - datalake_sales_flow_raw.sales_flow_invite.inviter_id
   id_invitee:
     description: User ID on Sales Flow databases after accepting the invite. This user id_external can be found on table sales_flow_clean.users
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.invitee_id
+    - datalake_sales_flow_raw.sales_flow_invite.invitee_id
   id_folder:
     description: Buyer Docx Folder ID on Docx tables.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.folder_id
+    - datalake_sales_flow_raw.sales_flow_invite.folder_id
   id_house:
     description: House ID on SalesFlow tables (house).
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.house_id
+    - datalake_sales_flow_raw.sales_flow_invite.house_id
   type:
     description: User type. BUYER or SELLER
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.type
+    - datalake_sales_flow_raw.sales_flow_invite.type
   name:
-    description: User name.
+    description: Human-readable display name associated with the person or entity in this row.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.name
+    - datalake_sales_flow_raw.sales_flow_invite.name
   email:
     description: User e-mail.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.email
+    - datalake_sales_flow_raw.sales_flow_invite.email
   status:
-    description: Invite status.
+    description: Current status of the invite, such as pending, accepted, or expired.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.status
+    - datalake_sales_flow_raw.sales_flow_invite.status
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.created_at
+    - datalake_sales_flow_raw.sales_flow_invite.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.updated_at
+    - datalake_sales_flow_raw.sales_flow_invite.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.year
+    - datalake_sales_flow_raw.sales_flow_invite.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.month
+    - datalake_sales_flow_raw.sales_flow_invite.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.sales_flow_invite.day
+    - datalake_sales_flow_raw.sales_flow_invite.day

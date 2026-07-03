@@ -1,95 +1,138 @@
----
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_details_aud
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.id
+    - datalake_sales_flow_raw.sales_flow_details_aud.id
+    description: Surrogate primary key of the sales flow details aud row in the source system.
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.sales_flow_id
+    - datalake_sales_flow_raw.sales_flow_details_aud.sales_flow_id
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_taskmaster:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details_aud.taskmaster_id
+    description: Audited ID of the main task in the Taskmaster system associated with this flow at this revision.
   id_buyer_onboarding_taskmaster:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_onboarding_taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details_aud.buyer_onboarding_taskmaster_id
+    description: Audited ID of the buyer's onboarding task in the Taskmaster system at this revision.
   id_seller_onboarding_taskmaster:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.seller_onboarding_taskmaster_id
+    - datalake_sales_flow_raw.sales_flow_details_aud.seller_onboarding_taskmaster_id
+    description: Audited ID of the seller's onboarding task in the Taskmaster system at this revision.
   id_buyer_hefesto_portfolio_unit:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_hefesto_portfolio_unit_id
+    - datalake_sales_flow_raw.sales_flow_details_aud.buyer_hefesto_portfolio_unit_id
+    description: Audited ID of the buyer's portfolio unit in the Hefesto system at this revision.
   id_seller_hefesto_portfolio_unit:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.seller_hefesto_portfolio_unit_id
+    - datalake_sales_flow_raw.sales_flow_details_aud.seller_hefesto_portfolio_unit_id
+    description: Audited ID of the seller's portfolio unit in the Hefesto system at this revision.
   rev:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.rev
+    - datalake_sales_flow_raw.sales_flow_details_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.revtype
+    - datalake_sales_flow_raw.sales_flow_details_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   rev_end:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.revend
+    - datalake_sales_flow_raw.sales_flow_details_aud.revend
+    description: Envers revision end marker when this audited row version was superseded.
   opportunities_of_the_week:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.opportunities_of_the_week
+    - datalake_sales_flow_raw.sales_flow_details_aud.opportunities_of_the_week
+    description: Audited "Opportunities of the Week" field value at this revision, an identifier or flag for the flow.
   isolve_link:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.isolve_link
+    - datalake_sales_flow_raw.sales_flow_details_aud.isolve_link
+    description: Audited link to the corresponding record in the iSolve system at this revision.
   google_drive_link:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.google_drive_link
+    - datalake_sales_flow_raw.sales_flow_details_aud.google_drive_link
+    description: Audited link to the Google Drive folder or document related to this flow at this revision.
   ticket_complexity_level:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.ticket_complexity_level
+    - datalake_sales_flow_raw.sales_flow_details_aud.ticket_complexity_level
+    description: Audited complexity level of the associated ticket at this revision.
   mod_isolve_link:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.isolve_link_mod
-  google_drive_link_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.isolve_link_mod
+    description: Envers boolean flag indicating whether isolve link changed in this audit revision.
+  mod_google_drive_link:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.google_drive_link_mod
-  id_sales_flow_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.google_drive_link_mod
+    description: Envers boolean flag indicating whether google drive link changed in this audit revision.
+  mod_id_sales_flow:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.mod_sales_flow_id
-  opportunities_of_the_week_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.sales_flow_id_mod
+    description: Envers boolean flag indicating whether id sales flow changed in this audit revision.
+  mod_opportunities_of_the_week:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.opportunities_of_the_week_mod
-  seller_fup_at_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.opportunities_of_the_week_mod
+    description: Envers boolean flag indicating whether opportunities of the week changed in this audit revision.
+  mod_ts_seller_fup:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.seller_fup_at_mod
-  buyer_fup_at_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.seller_fup_at_mod
+    description: Envers boolean flag indicating whether seller fup timestamp changed in this audit revision.
+  mod_ts_buyer_fup:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_fup_at_mod
-  taskmaster_id_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.buyer_fup_at_mod
+    description: Envers boolean flag indicating whether buyer fup timestamp changed in this audit revision.
+  mod_id_taskmaster:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.taskmaster_id_mod
-  ticket_complexity_level_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.taskmaster_id_mod
+    description: Envers boolean flag indicating whether taskmaster id changed in this audit revision.
+  mod_ticket_complexity_level:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.ticket_complexity_level_mod
-  buyer_onboarding_taskmaster_id_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.ticket_complexity_level_mod
+    description: Envers boolean flag indicating whether ticket complexity level changed in this audit revision.
+  mod_id_buyer_onboarding_taskmaster:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_onboarding_taskmaster_id_mod
-  seller_onboarding_taskmaster_id_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.buyer_onboarding_taskmaster_id_mod
+    description: Envers boolean flag indicating whether buyer onboarding taskmaster id changed in this audit revision.
+  mod_id_seller_onboarding_taskmaster:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.seller_onboarding_taskmaster_id_mod
-  buyer_hefesto_portfolio_unit_id_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.seller_onboarding_taskmaster_id_mod
+    description: Envers boolean flag indicating whether seller onboarding taskmaster id changed in this audit revision.
+  mod_id_buyer_hefesto_portfolio_unit:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_hefesto_portfolio_unit_id_mod
-  seller_hefesto_portfolio_unit_id_mod:
+    - datalake_sales_flow_raw.sales_flow_details_aud.buyer_hefesto_portfolio_unit_id_mod
+    description: Envers boolean flag indicating whether buyer hefesto portfolio unit id changed in this audit revision.
+  mod_id_seller_hefesto_portfolio_unit:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.seller_hefesto_portfolio_unit_id_mod
-  ts_seller_fups:
+    - datalake_sales_flow_raw.sales_flow_details_aud.seller_hefesto_portfolio_unit_id_mod
+    description: Envers boolean flag indicating whether seller hefesto portfolio unit id changed in this audit revision.
+  ts_seller_fup:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.seller_fup_at
+    - datalake_sales_flow_raw.sales_flow_details_aud.seller_fup_at
+    description: Audited timestamp of the last follow-up with the seller at this revision.
   ts_buyer_fup:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_fup_at
+    - datalake_sales_flow_raw.sales_flow_details_aud.buyer_fup_at
+    description: Audited timestamp of the last follow-up with the buyer at this revision.
   ts_created:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.created_at
+    - datalake_sales_flow_raw.sales_flow_details_aud.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_details_aud.updated_at
+    - datalake_sales_flow_raw.sales_flow_details_aud.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
+  year:
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_details_aud.year
+    description: Partition year when the ETL run loaded this row into the lake table.
+  month:
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_details_aud.month
+    description: Partition month when the ETL run loaded this row into the lake table.
+  day:
+    lineage:
+    - datalake_sales_flow_raw.sales_flow_details_aud.day
+    description: Partition day when the ETL run loaded this row into the lake table.
+owner: helder.rodrigues@quintoandar.com.br
+description: Hibernate Envers audit trail of sales flow details rows from Sales Flow service managing For Sale operations after an offer is received. Each revision records field-level changes for compliance and operational forensics.

@@ -1,68 +1,66 @@
----
 database_name: datalake_sales_flow_clean
 table_name: note_aud
-owner: igor.firmo@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Hibernate Envers audit history for the note table, capturing revisions and
-  field-level change flags for sales flow notes."
+description: Hibernate Envers audit history for the note table, capturing revisions and field-level change flags for sales flow notes.
 columns:
   id_note_aud:
-    description: "Business id of the note row in this audit revision (same id as current note)."
+    description: Business id of the note row in this audit revision (same id as current note).
     lineage:
-      - datalake_sales_flow_raw.note_aud.id
+    - datalake_sales_flow_raw.note_aud.id
   id_sales_flow:
-    description: "Sales flow foreign key value at this revision."
+    description: Sales flow foreign key value at this revision.
     lineage:
-      - datalake_sales_flow_raw.note_aud.sales_flow_id
+    - datalake_sales_flow_raw.note_aud.sales_flow_id
   rev:
-    description: "Envers revision identifier linking to revinfo."
+    description: Envers revision identifier linking to revinfo.
     lineage:
-      - datalake_sales_flow_raw.note_aud.rev
+    - datalake_sales_flow_raw.note_aud.rev
   rev_type:
-    description: "Envers revision type (insert, update, delete)."
+    description: Envers revision type (insert, update, delete).
     lineage:
-      - datalake_sales_flow_raw.note_aud.revtype
+    - datalake_sales_flow_raw.note_aud.revtype
   rev_end:
-    description: "Envers revision at which this row version ended, when applicable."
+    description: Envers revision at which this row version ended, when applicable.
     lineage:
-      - datalake_sales_flow_raw.note_aud.revend
+    - datalake_sales_flow_raw.note_aud.revend
   message:
-    description: "Note message text at this revision."
+    description: Note message text at this revision.
     lineage:
-      - datalake_sales_flow_raw.note_aud.message
+    - datalake_sales_flow_raw.note_aud.message
   type:
-    description: "Note type at this revision."
+    description: Note type at this revision.
     lineage:
-      - datalake_sales_flow_raw.note_aud.type
+    - datalake_sales_flow_raw.note_aud.type
   mod_id_sales_flow:
-    description: "Envers flag indicating whether sales_flow_id changed in this revision."
+    description: Envers flag indicating whether sales_flow_id changed in this revision.
     lineage:
-      - datalake_sales_flow_raw.note_aud.sales_flow_id_mod
+    - datalake_sales_flow_raw.note_aud.sales_flow_id_mod
   mod_message:
-    description: "Envers flag indicating whether message changed in this revision."
+    description: Envers flag indicating whether message changed in this revision.
     lineage:
-      - datalake_sales_flow_raw.note_aud.message_mod
+    - datalake_sales_flow_raw.note_aud.message_mod
   mod_type:
-    description: "Envers flag indicating whether type changed in this revision."
+    description: Envers flag indicating whether type changed in this revision.
     lineage:
-      - datalake_sales_flow_raw.note_aud.type_mod
+    - datalake_sales_flow_raw.note_aud.type_mod
   ts_created:
-    description: "Timestamp when the audit row was created or defaulted in the source."
+    description: Timestamp when the audit row was created or defaulted in the source.
     lineage:
-      - datalake_sales_flow_raw.note_aud.created_at
+    - datalake_sales_flow_raw.note_aud.created_at
   ts_updated:
-    description: "Timestamp when the audit row was last updated in the source."
+    description: Timestamp when the audit row was last updated in the source.
     lineage:
-      - datalake_sales_flow_raw.note_aud.updated_at
+    - datalake_sales_flow_raw.note_aud.updated_at
   year:
-    description: "CDC partition year of the record."
+    description: CDC partition year of the record.
     lineage:
-      - datalake_sales_flow_raw.note_aud.year
+    - datalake_sales_flow_raw.note_aud.year
   month:
-    description: "CDC partition month of the record."
+    description: CDC partition month of the record.
     lineage:
-      - datalake_sales_flow_raw.note_aud.month
+    - datalake_sales_flow_raw.note_aud.month
   day:
-    description: "CDC partition day of the record."
+    description: CDC partition day of the record.
     lineage:
-      - datalake_sales_flow_raw.note_aud.day
+    - datalake_sales_flow_raw.note_aud.day
