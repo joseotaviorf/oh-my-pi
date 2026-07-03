@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
     init_scripts:
     - s3:
@@ -12,27 +12,28 @@ cluster:
       - '{{ var.value.artifacts_bucket }}'
       - '{{ var.value.databricks_s3_bucket }}'
       - '{{ dag.dag_id }}'
+    core_nodes:
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 2
+      target_spot: 0
+    task_nodes:
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
     spark_conf:
       spark.serializer: org.apache.spark.serializer.KryoSerializer
       spark.sql.extensions: org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions
       spark.kryo.registrator: org.apache.sedona.core.serde.SedonaKryoRegistrator
-    master_node_type_id: m6g.xlarge
-    task_nodes:
-      instance_types:
-      - r6g.xlarge
-      - r7g.xlarge
-      - r6i.xlarge
-      target_on_demand: 0
-      target_spot: 1
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
-    core_nodes:
-      target_on_demand: 2
-      target_spot: 0
-      instance_types:
-      - r6g.xlarge
-      - r7g.xlarge
-      - r6i.xlarge
+      spark.sql.shuffle.partitions: '200'
+      spark.dynamicAllocation.maxExecutors: '10'
   custom_libraries:
   - maven:
       coordinates: org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating

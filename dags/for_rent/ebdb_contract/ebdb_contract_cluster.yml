@@ -1,25 +1,27 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    task_nodes:
-      instance_types:
-      - r6g.xlarge
-      - r7g.xlarge
-      - r6i.xlarge
-      target_on_demand: 0
-      target_spot: 1
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
     core_nodes:
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
       target_on_demand: 2
       target_spot: 0
+    task_nodes:
       instance_types:
-      - r6g.xlarge
-      - r7g.xlarge
-      - r6i.xlarge
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.sql.shuffle.partitions: '200'
+      spark.dynamicAllocation.maxExecutors: '10'

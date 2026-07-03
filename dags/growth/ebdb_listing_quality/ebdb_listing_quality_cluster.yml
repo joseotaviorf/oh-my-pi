@@ -1,6 +1,24 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    master_node_type_id: m6g.xlarge
+    core_nodes:
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 2
+      target_spot: 0
+    task_nodes:
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 0
+      target_spot: 2
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    spark_conf:
+      spark.sql.shuffle.partitions: '200'
+      spark.dynamicAllocation.maxExecutors: '10'
