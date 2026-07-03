@@ -259,3 +259,32 @@ class TestAuditClusterFile:
         assert len(violations) == 1
         assert violations[0].reason == "redundant_preset_default_override"
         assert violations[0].cluster_path.endswith("#validation")
+
+    def test_fractional_validation_spark_memory_is_violation(
+        self, config_service: ConfigurationService, tmp_path: Path
+    ):
+        cluster_path = tmp_path / "enrich_braze_events_dispatches_user_cluster.yml"
+        cluster_path.write_text(
+            yaml.safe_dump(
+                {
+                    "cluster": {
+                        "type": "consolidation_m_memory_cluster",
+                    },
+                    "validation": {
+                        "cluster": {
+                            "type": "emr_7_12_consolidation_m_memory_cluster",
+                            "custom_configurations": {
+                                "spark_conf": {
+                                    "spark.yarn.am.memory": "1.5g",
+                                },
+                            },
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        violations = audit_cluster_file(cluster_path, config_service)
+        assert len(violations) == 1
+        assert violations[0].reason == "fractional_spark_memory_value"
+        assert violations[0].topology_key == "spark_conf.spark.yarn.am.memory"

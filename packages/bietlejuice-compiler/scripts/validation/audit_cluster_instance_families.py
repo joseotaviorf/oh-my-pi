@@ -35,6 +35,19 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
 )
 
 INSTANCE_TYPE_RE = re.compile(r"^([mrc])(\d+)([a-z]*)\.(.+)$", re.IGNORECASE)
+FRACTIONAL_SPARK_MEMORY_RE = re.compile(
+    r"^[0-9]+\.[0-9]+[bkmgtp]?$",
+    re.IGNORECASE,
+)
+SPARK_MEMORY_CONF_KEYS = frozenset(
+    {
+        "spark.driver.memory",
+        "spark.driver.memoryOverhead",
+        "spark.executor.memory",
+        "spark.executor.memoryOverhead",
+        "spark.yarn.am.memory",
+    }
+)
 
 # Spark-relevant topology keys in custom_configurations (flat and nested).
 WORKER_TOPOLOGY_PATHS = (
@@ -363,6 +376,41 @@ def _audit_cluster_block(
     return violations
 
 
+def _audit_validation_spark_memory(
+    cluster: dict,
+    *,
+    path_label: str,
+    dag_name: str,
+) -> List[Violation]:
+    cluster_type = cluster.get("type")
+    if not cluster_type or not str(cluster_type).startswith("emr_"):
+        return []
+
+    custom = cluster.get("custom_configurations") or {}
+    spark_conf = custom.get("spark_conf") or {}
+    if not isinstance(spark_conf, dict):
+        return []
+
+    violations: List[Violation] = []
+    for key, value in spark_conf.items():
+        if key not in SPARK_MEMORY_CONF_KEYS or value is None:
+            continue
+        value_str = str(value).strip().strip('"').strip("'")
+        if FRACTIONAL_SPARK_MEMORY_RE.match(value_str):
+            violations.append(
+                Violation(
+                    dag=dag_name,
+                    cluster_path=path_label,
+                    preset_type=str(cluster_type),
+                    topology_key=f"spark_conf.{key}",
+                    preset_default="(integer bytes)",
+                    override_value=value_str,
+                    reason="fractional_spark_memory_value",
+                )
+            )
+    return violations
+
+
 def _cluster_path_label(cluster_path: Path) -> str:
     try:
         return cluster_path.relative_to(REPO_ROOT).as_posix()
@@ -399,6 +447,13 @@ def audit_cluster_file(
                 path_label=f"{path_label}#validation",
                 dag_name=dag_name,
                 config_service=config_service,
+            )
+        )
+        violations.extend(
+            _audit_validation_spark_memory(
+                validation_cluster,
+                path_label=f"{path_label}#validation",
+                dag_name=dag_name,
             )
         )
 

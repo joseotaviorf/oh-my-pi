@@ -12,4 +12,4 @@ validation:
       spark_conf:
         spark.driver.memory: 4g
         spark.driver.memoryOverhead: 1g
-        spark.yarn.am.memory: 1.5g
+        spark.yarn.am.memory: 2g
