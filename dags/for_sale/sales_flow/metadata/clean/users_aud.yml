@@ -1,94 +1,94 @@
 database_name: datalake_sales_flow_clean
 table_name: users_aud
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 description: Aud table with sales flow users infos.
 columns:
   id:
     description: User ID on SalesFlow tables.
     lineage:
-      - datalake_sales_flow_raw.users_aud.id
+    - datalake_sales_flow_raw.users_aud.id
   id_external:
     description: User ID on 5A main table (EBDB) and it's the ID used on dw_public.dim_user.
     lineage:
-      - datalake_sales_flow_raw.users_aud.external_id
+    - datalake_sales_flow_raw.users_aud.external_id
   rev:
     description: Unique id for this modification and can be joined with table rev_info to get more details.
     lineage:
-      - datalake_sales_flow_raw.users_aud.rev
+    - datalake_sales_flow_raw.users_aud.rev
   rev_type:
-    description: Modification type.
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
     categories:
-      "0" : Create
-      "1" : Update
-      "2" : Delete
+      '0': Create
+      '1': Update
+      '2': Delete
     lineage:
-      - datalake_sales_flow_raw.users_aud.revtype
+    - datalake_sales_flow_raw.users_aud.revtype
   rev_end:
     description: ID of the revision that replaced the current entry.
     lineage:
-      - datalake_sales_flow_raw.users_aud.revend
+    - datalake_sales_flow_raw.users_aud.revend
   name:
-    description: User name.
+    description: Human-readable display name associated with the person or entity in this row.
     lineage:
-      - datalake_sales_flow_raw.users_aud.name
+    - datalake_sales_flow_raw.users_aud.name
   email:
     description: User e-mail.
     lineage:
-      - datalake_sales_flow_raw.users_aud.email
+    - datalake_sales_flow_raw.users_aud.email
   phone:
-    description: User phone.
+    description: Contact phone number stored for coordination during the For Sale transaction.
     lineage:
-      - datalake_sales_flow_raw.users_aud.phone
+    - datalake_sales_flow_raw.users_aud.phone
   type:
-    description: User type.
+    description: Classifier distinguishing record subtype or participant role in the workflow.
     lineage:
-      - datalake_sales_flow_raw.users_aud.type
+    - datalake_sales_flow_raw.users_aud.type
   cpf:
     description: User personal document.
     lineage:
-      - datalake_sales_flow_raw.users_aud.cpf
+    - datalake_sales_flow_raw.users_aud.cpf
   mod_id_external:
     description: Flag indicating if the column id_external has changed.
     lineage:
-      - datalake_sales_flow_raw.users_aud.external_id_mod
+    - datalake_sales_flow_raw.users_aud.external_id_mod
   mod_name:
     description: Flag indicating if the column name has changed.
     lineage:
-      - datalake_sales_flow_raw.users_aud.name_mod
+    - datalake_sales_flow_raw.users_aud.name_mod
   mod_email:
     description: Flag indicating if the column email has changed.
     lineage:
-      - datalake_sales_flow_raw.users_aud.email_mod
+    - datalake_sales_flow_raw.users_aud.email_mod
   mod_phone:
     description: Flag indicating if the column phone has changed.
     lineage:
-      - datalake_sales_flow_raw.users_aud.phone_mod
+    - datalake_sales_flow_raw.users_aud.phone_mod
   mod_type:
     description: Flag indicating if the column type has changed.
     lineage:
-      - datalake_sales_flow_raw.users_aud.type_mod
+    - datalake_sales_flow_raw.users_aud.type_mod
   mod_cpf:
     description: Flag indicating if the column cpf has changed.
     lineage:
-      - datalake_sales_flow_raw.users_aud.cpf_mod
+    - datalake_sales_flow_raw.users_aud.cpf_mod
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:
-      - datalake_sales_flow_raw.users_aud.created_at
+    - datalake_sales_flow_raw.users_aud.created_at
   ts_updated:
     description: Timestamp that indicates when this entry was last updated.
     lineage:
-      - datalake_sales_flow_raw.users_aud.updated_at
+    - datalake_sales_flow_raw.users_aud.updated_at
   year:
-    description: Year partition value.
+    description: Partition year when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.users_aud.year
+    - datalake_sales_flow_raw.users_aud.year
   month:
-    description: Month partition value.
+    description: Partition month when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.users_aud.month
+    - datalake_sales_flow_raw.users_aud.month
   day:
-    description: Day partition value.
+    description: Partition day when the ETL run loaded this row into the lake table.
     lineage:
-      - datalake_sales_flow_raw.users_aud.day
+    - datalake_sales_flow_raw.users_aud.day
