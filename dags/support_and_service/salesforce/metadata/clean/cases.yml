@@ -6,509 +6,2553 @@ owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_case:
     lineage:
-      - datalake_salesforce_raw.case.Id
+    - datalake_salesforce_raw.case.Id
     description: Unique identification key for the case in Sales Force.
   id_master_record:
     lineage:
-      - datalake_salesforce_raw.case.MasterRecordId
+    - datalake_salesforce_raw.case.MasterRecordId
     description: Master record identification key in Sales Force.
   case_number:
     lineage:
-      - datalake_salesforce_raw.case.CaseNumber
+    - datalake_salesforce_raw.case.CaseNumber
     description: Unique case reference number.
   id_contact:
     lineage:
-      - datalake_salesforce_raw.case.ContactId
+    - datalake_salesforce_raw.case.ContactId
     description: Contact identification key related to the case.
   id_account:
     lineage:
-      - datalake_salesforce_raw.case.AccountId
+    - datalake_salesforce_raw.case.AccountId
     description: Account identification key related to the case.
   id_asset:
     lineage:
-      - datalake_salesforce_raw.case.AssetId
+    - datalake_salesforce_raw.case.AssetId
     description: Asset identification key related to the case.
   id_product:
     lineage:
-      - datalake_salesforce_raw.case.ProductId
+    - datalake_salesforce_raw.case.ProductId
     description: Product identification key related to the case.
   id_entitlement:
     lineage:
-      - datalake_salesforce_raw.case.EntitlementId
+    - datalake_salesforce_raw.case.EntitlementId
     description: Entitlement identification key related to the case.
   id_source:
     lineage:
-      - datalake_salesforce_raw.case.SourceId
+    - datalake_salesforce_raw.case.SourceId
     description: Source identification key related to the case.
   id_business_hours:
     lineage:
-      - datalake_salesforce_raw.case.BusinessHoursId
+    - datalake_salesforce_raw.case.BusinessHoursId
     description: Business hours identification key.
   id_parent:
     lineage:
-      - datalake_salesforce_raw.case.ParentId
+    - datalake_salesforce_raw.case.ParentId
     description: Parent case identification key.
   id_record_type:
     lineage:
-      - datalake_salesforce_raw.case.RecordTypeId
+    - datalake_salesforce_raw.case.RecordTypeId
     description: Record type identification key.
   id_owner:
     lineage:
-      - datalake_salesforce_raw.case.OwnerId
+    - datalake_salesforce_raw.case.OwnerId
     description: Owner identification key of the case.
   id_contract:
     lineage:
-      - datalake_salesforce_raw.case.ContractId
+    - datalake_salesforce_raw.case.ContractId
     description: Contract identification key related to the case.
   id_external:
     lineage:
-      - datalake_salesforce_raw.case.ExternalId
+    - datalake_salesforce_raw.case.ExternalId
     description: External identification key for the case.
   id_repair:
     lineage:
-      - datalake_salesforce_raw.case.RepairId
+    - datalake_salesforce_raw.case.RepairId
     description: Repair identification key related to the case.
   id_termination:
     lineage:
-      - datalake_salesforce_raw.case.Termination
+    - datalake_salesforce_raw.case.Termination
     description: Termination identification key related to the case.
   id_service_contract:
     lineage:
-      - datalake_salesforce_raw.case.ServiceContractId
+    - datalake_salesforce_raw.case.ServiceContractId
     description: Service contract identification key.
   id_zendesk:
     lineage:
-      - datalake_salesforce_raw.case.ZendeskId
+    - datalake_salesforce_raw.case.ZendeskId
     description: Zendesk case identification key.
   supplied_name:
     lineage:
-      - datalake_salesforce_raw.case.SuppliedName
+    - datalake_salesforce_raw.case.SuppliedName
     description: Name supplied by the user for the case.
   supplied_email:
     lineage:
-      - datalake_salesforce_raw.case.SuppliedEmail
+    - datalake_salesforce_raw.case.SuppliedEmail
     description: Email supplied by the user for the case.
   supplied_phone:
     lineage:
-      - datalake_salesforce_raw.case.SuppliedPhone
+    - datalake_salesforce_raw.case.SuppliedPhone
     description: Phone number supplied by the user for the case.
   supplied_company:
     lineage:
-      - datalake_salesforce_raw.case.SuppliedCompany
+    - datalake_salesforce_raw.case.SuppliedCompany
     description: Company name supplied by the user for the case.
   case_type:
     lineage:
-      - datalake_salesforce_raw.case.Type
+    - datalake_salesforce_raw.case.Type
     description: Business value representing case type on the cases clean dataset.
   case_status:
     lineage:
-      - datalake_salesforce_raw.case.Status
+    - datalake_salesforce_raw.case.Status
     description: Current status of the case.
   case_reason:
     lineage:
-      - datalake_salesforce_raw.case.Reason
+    - datalake_salesforce_raw.case.Reason
     description: Business value representing case reason on the cases clean dataset.
   case_origin:
     lineage:
-      - datalake_salesforce_raw.case.Origin
+    - datalake_salesforce_raw.case.Origin
     description: Business value representing case origin on the cases clean dataset.
   case_language:
     lineage:
-      - datalake_salesforce_raw.case.Language
+    - datalake_salesforce_raw.case.Language
     description: Language in which the case was reported.
   case_subject:
     lineage:
-      - datalake_salesforce_raw.case.Subject
+    - datalake_salesforce_raw.case.Subject
     description: Business value representing case subject on the cases clean dataset.
   case_priority:
     lineage:
-      - datalake_salesforce_raw.case.Priority
+    - datalake_salesforce_raw.case.Priority
     description: Priority level of the case.
   case_description:
     lineage:
-      - datalake_salesforce_raw.case.Description
+    - datalake_salesforce_raw.case.Description
     description: Business value representing case description on the cases clean dataset.
   milestone_status:
     lineage:
-      - datalake_salesforce_raw.case.MilestoneStatus
+    - datalake_salesforce_raw.case.MilestoneStatus
     description: Status of the case milestone.
   is_ab_test:
     lineage:
-      - datalake_salesforce_raw.case.IsABTest
+    - datalake_salesforce_raw.case.IsABTest
     description: Flag indicating if the case is an AB test.
   contract_id_odd_even:
     lineage:
-      - datalake_salesforce_raw.case.ContractIdOddOrEven
+    - datalake_salesforce_raw.case.ContractIdOddOrEven
     description: Descriptive column indicating if the case contract ID is odd or even.
   omni_channel_queue:
     lineage:
-      - datalake_salesforce_raw.case.OmniChannelQueue__c
+    - datalake_salesforce_raw.case.OmniChannelQueue__c
     description: Omni channel queue for the case.
   unlisting_reason:
     lineage:
-      - datalake_salesforce_raw.case.UnlistingReason
+    - datalake_salesforce_raw.case.UnlistingReason
     description: Reason for unlisting the house.
   unassigned_reason:
     lineage:
-      - datalake_salesforce_raw.case.UnassignedReason
+    - datalake_salesforce_raw.case.UnassignedReason
     description: Reason for unassigning the case.
   zendesk_url:
     lineage:
-      - datalake_salesforce_raw.case.ZendeskUrl
+    - datalake_salesforce_raw.case.ZendeskUrl
     description: Zendesk URL for the case.
   contact_phone:
     lineage:
-      - datalake_salesforce_raw.case.ContactPhone
+    - datalake_salesforce_raw.case.ContactPhone
     description: Contact phone number associated with the case.
   contact_mobile:
     lineage:
-      - datalake_salesforce_raw.case.ContactMobile
+    - datalake_salesforce_raw.case.ContactMobile
     description: Contact mobile number associated with the case.
   contact_email:
     lineage:
-      - datalake_salesforce_raw.case.ContactEmail
+    - datalake_salesforce_raw.case.ContactEmail
     description: Contact email associated with the case.
   contact_fax:
     lineage:
-      - datalake_salesforce_raw.case.ContactFax
+    - datalake_salesforce_raw.case.ContactFax
     description: Contact fax number associated with the case.
   is_deleted:
     lineage:
-      - datalake_salesforce_raw.case.IsDeleted
+    - datalake_salesforce_raw.case.IsDeleted
     description: Flag indicating if the case is deleted.
   is_closed:
     lineage:
-      - datalake_salesforce_raw.case.IsClosed
+    - datalake_salesforce_raw.case.IsClosed
     description: Flag indicating if the case is closed.
   is_escalated:
     lineage:
-      - datalake_salesforce_raw.case.IsEscalated
+    - datalake_salesforce_raw.case.IsEscalated
     description: Flag indicating if the case is escalated.
   ts_system_mod:
     lineage:
-      - datalake_salesforce_raw.case.SystemModstamp
+    - datalake_salesforce_raw.case.SystemModstamp
     description: Date of modification in the system.
   ts_created:
     lineage:
-      - datalake_salesforce_raw.case.CreatedDate
+    - datalake_salesforce_raw.case.CreatedDate
     description: Timestamp of when the case was created.
   ts_last_modified:
     lineage:
-      - datalake_salesforce_raw.case.LastModifiedDate
+    - datalake_salesforce_raw.case.LastModifiedDate
     description: Timestamp of the last modification of the case.
   ts_closed:
     lineage:
-      - datalake_salesforce_raw.case.ClosedDate
+    - datalake_salesforce_raw.case.ClosedDate
     description: Timestamp of when the case was closed.
   ts_last_viewed:
     lineage:
-      - datalake_salesforce_raw.case.LastViewedDate
+    - datalake_salesforce_raw.case.LastViewedDate
     description: Timestamp of when the case was last viewed.
   ts_last_referenced:
     lineage:
-      - datalake_salesforce_raw.case.LastReferencedDate
+    - datalake_salesforce_raw.case.LastReferencedDate
     description: Timestamp of when the case was last referenced.
   account_name:
     lineage:
-      - datalake_salesforce_raw.case.AccountName__c
+    - datalake_salesforce_raw.case.AccountName__c
     description: Account name associated with the case.
   agent_republished_with_pp:
     lineage:
-      - datalake_salesforce_raw.case.AgentRepublishedWithPP__c
+    - datalake_salesforce_raw.case.AgentRepublishedWithPP__c
     description: Flag indicating if republished with PP.
   buyer_current_onboarding_contact:
     lineage:
-      - datalake_salesforce_raw.case.BYCurrentOnboardingContact__c
+    - datalake_salesforce_raw.case.BYCurrentOnboardingContact__c
     description: Business value representing buyer current onboarding contact on the cases clean dataset.
   comments:
     lineage:
-      - datalake_salesforce_raw.case.Comments
+    - datalake_salesforce_raw.case.Comments
     description: Business value representing comments on the cases clean dataset.
   contact_success:
     lineage:
-      - datalake_salesforce_raw.case.ContactSuccess__c
+    - datalake_salesforce_raw.case.ContactSuccess__c
     description: Contact success indicator.
   contestation_reponsability_valid:
     lineage:
-      - datalake_salesforce_raw.case.ContestationResponsabilityValid__c
+    - datalake_salesforce_raw.case.ContestationResponsabilityValid__c
     description: Contestation responsibility validation.
   criticality:
     lineage:
-      - datalake_salesforce_raw.case.criticality__c
+    - datalake_salesforce_raw.case.criticality__c
     description: Case criticality level.
   day:
     lineage:
-      - datalake_salesforce_raw.case.LastModifiedDate
+    - datalake_salesforce_raw.case.LastModifiedDate
     description: Partition day for the case load.
   dt_fs_buyer_key_delivery:
     lineage:
-      - datalake_salesforce_raw.case.FS_BY_KeyDeliveryDate__c
+    - datalake_salesforce_raw.case.FS_BY_KeyDeliveryDate__c
     description: FS buyer key delivery date.
   dt_fs_buyer_next_contact:
     lineage:
-      - datalake_salesforce_raw.case.FS_BYNextContactDate__c
+    - datalake_salesforce_raw.case.FS_BYNextContactDate__c
     description: FS buyer next contact date.
   dt_fs_dd_accepted_date:
     lineage:
-      - datalake_salesforce_raw.case.FS_DDAcceptedDate__c
+    - datalake_salesforce_raw.case.FS_DDAcceptedDate__c
     description: Calendar date associated with fs dd accepted date in the business process.
   dt_fs_pds_subscription_scheduling:
     lineage:
-      - datalake_salesforce_raw.case.FS_PDSL_SubscriptionSchedulingDate__c
+    - datalake_salesforce_raw.case.FS_PDSL_SubscriptionSchedulingDate__c
     description: FS PDS subscription scheduling date.
   dt_fs_return_date:
     lineage:
-      - datalake_salesforce_raw.case.FS_ReturnDate__c
+    - datalake_salesforce_raw.case.FS_ReturnDate__c
     description: Calendar date associated with fs return date in the business process.
   dt_fs_seller_key_delivery:
     lineage:
-      - datalake_salesforce_raw.case.FS_SL_KeyDeliveryDate__c
+    - datalake_salesforce_raw.case.FS_SL_KeyDeliveryDate__c
     description: FS seller key delivery date.
   dt_fs_seller_next_contact:
     lineage:
-      - datalake_salesforce_raw.case.FS_SLNextContactDate__c
+    - datalake_salesforce_raw.case.FS_SLNextContactDate__c
     description: FS seller next contact date.
   dt_key_delivery:
     lineage:
-      - datalake_salesforce_raw.case.KeyDeliveryDate__c
+    - datalake_salesforce_raw.case.KeyDeliveryDate__c
     description: Calendar date associated with key delivery in the business process.
   flow_sub_type:
     lineage:
-      - datalake_salesforce_raw.case.FlowSubType__c
+    - datalake_salesforce_raw.case.FlowSubType__c
     description: Business value representing flow sub type on the cases clean dataset.
   follow_up_description:
     lineage:
-      - datalake_salesforce_raw.case.followUpDescription__c
+    - datalake_salesforce_raw.case.followUpDescription__c
     description: Business value representing follow up description on the cases clean dataset.
   follow_up_status:
     lineage:
-      - datalake_salesforce_raw.case.followUpStatus__c
+    - datalake_salesforce_raw.case.followUpStatus__c
     description: Business value representing follow up status on the cases clean dataset.
   for_sale_flow:
     lineage:
-      - datalake_salesforce_raw.case.ForSaleFlow__c
+    - datalake_salesforce_raw.case.ForSaleFlow__c
     description: For sale flow indicator.
   fs_cri_have_demand_note:
     lineage:
-      - datalake_salesforce_raw.case.FS_CRI_HaveDemandNote__c
+    - datalake_salesforce_raw.case.FS_CRI_HaveDemandNote__c
     description: Business value representing fs cri have demand note on the cases clean dataset.
   fs_cri_status:
     lineage:
-      - datalake_salesforce_raw.case.FS_CRIStatus__c
+    - datalake_salesforce_raw.case.FS_CRIStatus__c
     description: Business value representing fs cri status on the cases clean dataset.
   fs_status_cri:
     lineage:
-      - datalake_salesforce_raw.case.FS_StatusCRI__c
+    - datalake_salesforce_raw.case.FS_StatusCRI__c
     description: Business value representing fs status cri on the cases clean dataset.
   fs_subscription_model_buyer:
     lineage:
-      - datalake_salesforce_raw.case.FS_SubscriptionModelBuyer__c
+    - datalake_salesforce_raw.case.FS_SubscriptionModelBuyer__c
     description: Business value representing fs subscription model buyer on the cases clean dataset.
   fs_subscription_model_seller:
     lineage:
-      - datalake_salesforce_raw.case.FS_SubscriptionModelSeller__c
+    - datalake_salesforce_raw.case.FS_SubscriptionModelSeller__c
     description: Business value representing fs subscription model seller on the cases clean dataset.
   id_customer:
     lineage:
-      - datalake_salesforce_raw.case.customerId__c
+    - datalake_salesforce_raw.case.customerId__c
     description: Customer identification key.
   id_last_modified_by:
     lineage:
-      - datalake_salesforce_raw.case.LastModifiedById
+    - datalake_salesforce_raw.case.LastModifiedById
     description: Identification key of the user who last modified the record.
   id_purchase_sale_contract:
     lineage:
-      - datalake_salesforce_raw.case.PurchaseSaleContract__c
+    - datalake_salesforce_raw.case.PurchaseSaleContract__c
     description: Purchase sale contract identification key.
   information_collected:
     lineage:
-      - datalake_salesforce_raw.case.InformationCollected__c
+    - datalake_salesforce_raw.case.InformationCollected__c
     description: Information collected for the case.
   is_already_asked_for_approval:
     lineage:
-      - datalake_salesforce_raw.case.AlreadyAskedForApproval__c
+    - datalake_salesforce_raw.case.AlreadyAskedForApproval__c
     description: Flag indicating if already asked for approval.
   is_already_contested:
     lineage:
-      - datalake_salesforce_raw.case.AlreadyContested__c
+    - datalake_salesforce_raw.case.AlreadyContested__c
     description: Flag indicating if already contested.
   is_buyer_contact_success:
     lineage:
-      - datalake_salesforce_raw.case.BYContactSuccess__c
+    - datalake_salesforce_raw.case.BYContactSuccess__c
     description: Flag indicating buyer contact success.
   is_case_creation_start_milestone:
     lineage:
-      - datalake_salesforce_raw.case.CaseCreationStartMilestone__c
+    - datalake_salesforce_raw.case.CaseCreationStartMilestone__c
     description: Flag indicating case creation start milestone.
   is_case_creation_start_milestone_closed:
     lineage:
-      - datalake_salesforce_raw.case.CaseCreationStartMilestoneClosed__c
+    - datalake_salesforce_raw.case.CaseCreationStartMilestoneClosed__c
     description: Flag indicating case creation start milestone closed.
   is_closed_on_create:
     lineage:
-      - datalake_salesforce_raw.case.IsClosedOnCreate
+    - datalake_salesforce_raw.case.IsClosedOnCreate
     description: Flag indicating if the case was closed on create.
   is_contest:
     lineage:
-      - datalake_salesforce_raw.case.isContest__c
+    - datalake_salesforce_raw.case.isContest__c
     description: Flag indicating if the case is a contest.
   is_fs_balance_payment_made:
     lineage:
-      - datalake_salesforce_raw.case.FS_BalancePaymentMade__c
+    - datalake_salesforce_raw.case.FS_BalancePaymentMade__c
     description: Flag indicating if FS balance payment was made.
   is_fs_keys_received:
     lineage:
-      - datalake_salesforce_raw.case.FS_KeysReceived__c
+    - datalake_salesforce_raw.case.FS_KeysReceived__c
     description: Flag indicating if FS keys were received.
   is_fs_milestone_finish:
     lineage:
-      - datalake_salesforce_raw.case.FS_MilestoneFinish__c
+    - datalake_salesforce_raw.case.FS_MilestoneFinish__c
     description: Flag indicating if FS milestone is finished.
   is_ll_budget_approval_time_limit:
     lineage:
-      - datalake_salesforce_raw.case.LLBudgetApprovalTimeLimit__c
+    - datalake_salesforce_raw.case.LLBudgetApprovalTimeLimit__c
     description: Flag indicating LL budget approval time limit.
   is_ms_tt_close_budget_review_iq:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Close_BudgetReviewIQ__c
+    - datalake_salesforce_raw.case.MS_TT_Close_BudgetReviewIQ__c
     description: Flag indicating MS TT close budget review IQ.
   is_ms_tt_close_budget_review_pp:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Close_BudgetReviewPP__c
+    - datalake_salesforce_raw.case.MS_TT_Close_BudgetReviewPP__c
     description: Flag indicating MS TT close budget review PP.
   is_ms_tt_close_report_review_iq:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Close_ReportReviewIQ__c
+    - datalake_salesforce_raw.case.MS_TT_Close_ReportReviewIQ__c
     description: Flag indicating MS TT close report review IQ.
   is_ms_tt_close_report_review_pp:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Close_ReportReviewPP__c
+    - datalake_salesforce_raw.case.MS_TT_Close_ReportReviewPP__c
     description: Flag indicating MS TT close report review PP.
   is_ms_tt_open_budget_review_iq:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Open_BudgetReviewIQ__c
+    - datalake_salesforce_raw.case.MS_TT_Open_BudgetReviewIQ__c
     description: Flag indicating MS TT open budget review IQ.
   is_ms_tt_open_budget_review_pp:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Open_BudgetReviewPP__c
+    - datalake_salesforce_raw.case.MS_TT_Open_BudgetReviewPP__c
     description: Flag indicating MS TT open budget review PP.
   is_ms_tt_open_report_review_iq:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Open_ReportReviewIQ__c
+    - datalake_salesforce_raw.case.MS_TT_Open_ReportReviewIQ__c
     description: Flag indicating MS TT open report review IQ.
   is_ms_tt_open_report_review_pp:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Open_ReportReviewPP__c
+    - datalake_salesforce_raw.case.MS_TT_Open_ReportReviewPP__c
     description: Flag indicating MS TT open report review PP.
   is_past_due_date_simulation:
     lineage:
-      - datalake_salesforce_raw.case.PastDueDateSimulation__c
+    - datalake_salesforce_raw.case.PastDueDateSimulation__c
     description: Flag indicating past due date simulation.
   is_requested_help_time_limit:
     lineage:
-      - datalake_salesforce_raw.case.RequestedHelpTimeLimit__c
+    - datalake_salesforce_raw.case.RequestedHelpTimeLimit__c
     description: Flag indicating requested help time limit.
   is_simulation_iq_budget_time_limit:
     lineage:
-      - datalake_salesforce_raw.case.SimulationTenantBudgetTimeLimit__c
+    - datalake_salesforce_raw.case.SimulationTenantBudgetTimeLimit__c
     description: Flag indicating simulation IQ budget time limit.
   is_sl_contact_success:
     lineage:
-      - datalake_salesforce_raw.case.SLContactSuccess__c
+    - datalake_salesforce_raw.case.SLContactSuccess__c
     description: Flag indicating seller contact success.
   is_stopped:
     lineage:
-      - datalake_salesforce_raw.case.IsStopped
+    - datalake_salesforce_raw.case.IsStopped
     description: Flag indicating if the case is stopped.
   ll_service_concluded:
     lineage:
-      - datalake_salesforce_raw.case.LLServiceConcluded__c
+    - datalake_salesforce_raw.case.LLServiceConcluded__c
     description: LL service concluded indicator.
   month:
     lineage:
-      - datalake_salesforce_raw.case.LastModifiedDate
+    - datalake_salesforce_raw.case.LastModifiedDate
     description: Partition month for the case load.
   notary_office_status:
     lineage:
-      - datalake_salesforce_raw.case.CRNStatus__c
+    - datalake_salesforce_raw.case.CRNStatus__c
     description: Notary office status (CRN).
   pp_accepted_doing_repair:
     lineage:
-      - datalake_salesforce_raw.case.PPacceptedDoingRepair__c
+    - datalake_salesforce_raw.case.PPacceptedDoingRepair__c
     description: PP accepted doing repair indicator.
   pp_informed_service_provider:
     lineage:
-      - datalake_salesforce_raw.case.LandlordInformedServiceProvider__c
+    - datalake_salesforce_raw.case.LandlordInformedServiceProvider__c
     description: Business value representing pp informed service provider on the cases clean dataset.
   publication_occurred_on_property:
     lineage:
-      - datalake_salesforce_raw.case.PublicationOccurredOnProperty__c
+    - datalake_salesforce_raw.case.PublicationOccurredOnProperty__c
     description: Publication occurred on property indicator.
   seller_current_onboarding_contact:
     lineage:
-      - datalake_salesforce_raw.case.SLCurrentOnboardingContact__c
+    - datalake_salesforce_raw.case.SLCurrentOnboardingContact__c
     description: Business value representing seller current onboarding contact on the cases clean dataset.
   service_provider_journey:
     lineage:
-      - datalake_salesforce_raw.case.serviceProviderJourney__c
+    - datalake_salesforce_raw.case.serviceProviderJourney__c
     description: Business value representing service provider journey on the cases clean dataset.
   service_provider_name:
     lineage:
-      - datalake_salesforce_raw.case.serviceProviderName__c
+    - datalake_salesforce_raw.case.serviceProviderName__c
     description: Human-readable service provider name used in dashboards and operational reports.
   service_provider_phone:
     lineage:
-      - datalake_salesforce_raw.case.serviceProviderPhone__c
+    - datalake_salesforce_raw.case.serviceProviderPhone__c
     description: Business value representing service provider phone on the cases clean dataset.
   service_provider_type:
     lineage:
-      - datalake_salesforce_raw.case.serviceProviderType__c
+    - datalake_salesforce_raw.case.serviceProviderType__c
     description: Business value representing service provider type on the cases clean dataset.
   ts_follow_up_expected_resolution:
     lineage:
-      - datalake_salesforce_raw.case.followUpExpectedResolutionDate__c
+    - datalake_salesforce_raw.case.followUpExpectedResolutionDate__c
     description: Follow-up expected resolution timestamp.
   ts_follow_up_reassign:
     lineage:
-      - datalake_salesforce_raw.case.followUpReassignDate__c
+    - datalake_salesforce_raw.case.followUpReassignDate__c
     description: Follow-up reassign timestamp.
   ts_fs_ccv_signed:
     lineage:
-      - datalake_salesforce_raw.case.FS_CCVSigned__c
+    - datalake_salesforce_raw.case.FS_CCVSigned__c
     description: FS CCV signed timestamp.
   ts_ms_tt_budget_review_iq_created_td:
     lineage:
-      - datalake_salesforce_raw.case.MS_TT_Date_BudgetReviewIQCreatedDateTD__c
+    - datalake_salesforce_raw.case.MS_TT_Date_BudgetReviewIQCreatedDateTD__c
     description: Timestamp when ms tt budget review iq created td occurred according to the source system.
   ts_sla_exit:
     lineage:
-      - datalake_salesforce_raw.case.SlaExitDate
+    - datalake_salesforce_raw.case.SlaExitDate
     description: Timestamp when sla exit occurred according to the source system.
   ts_sla_start:
     lineage:
-      - datalake_salesforce_raw.case.SlaStartDate
+    - datalake_salesforce_raw.case.SlaStartDate
     description: Timestamp when sla start occurred according to the source system.
   ts_stop_start:
     lineage:
-      - datalake_salesforce_raw.case.StopStartDate
+    - datalake_salesforce_raw.case.StopStartDate
     description: Timestamp when stop start occurred according to the source system.
   year:
     lineage:
-      - datalake_salesforce_raw.case.LastModifiedDate
+    - datalake_salesforce_raw.case.LastModifiedDate
     description: Partition year for the case load.
   ts_last_agent_interaction:
     lineage:
-      - datalake_salesforce_raw.case.LastAgentInteraction__c
+    - datalake_salesforce_raw.case.LastAgentInteraction__c
     description: Timestamp of the last agent interaction.
   ts_last_customer_interaction:
     lineage:
-      - datalake_salesforce_raw.case.LastCustomerInteraction__c
+    - datalake_salesforce_raw.case.LastCustomerInteraction__c
     description: Timestamp of the last customer interaction.
   case_type_approval:
     lineage:
-      - datalake_salesforce_raw.case.TypeApproval__c
+    - datalake_salesforce_raw.case.TypeApproval__c
     description: Business value representing case type approval on the cases clean dataset.
   case_comments_approval:
     lineage:
-      - datalake_salesforce_raw.case.CommentsApproval__c
+    - datalake_salesforce_raw.case.CommentsApproval__c
     description: Business value representing case comments approval on the cases clean dataset.
+  id_created_by_id:
+    lineage:
+    - datalake_salesforce_raw.case.CreatedById
+    description: Identifier for the created by id referenced by this record.
+  landlord_informed_tt_service_provider:
+    lineage:
+    - datalake_salesforce_raw.case.LandlordInformedTTServiceProvider__c
+    description: Business value representing landlord informed tt service provider on the cases clean dataset.
+  t_tsolicited_help:
+    lineage:
+    - datalake_salesforce_raw.case.TTsolicitedHelp__c
+    description: Business value representing t tsolicited help on the cases clean dataset.
+  landlord_provider_no_help_milestone_closed:
+    lineage:
+    - datalake_salesforce_raw.case.LandlordProviderNoHelpMilestoneClosed__c
+    description: Business value representing landlord provider no help milestone closed on the cases clean dataset.
+  landlord_provider_no_help_milestone:
+    lineage:
+    - datalake_salesforce_raw.case.LandlordProviderNoHelpMilestone__c
+    description: Business value representing landlord provider no help milestone on the cases clean dataset.
+  tenant_provider_owner_approval_closed:
+    lineage:
+    - datalake_salesforce_raw.case.TenantProviderOwnerApprovalClosed__c
+    description: Business value representing tenant provider owner approval closed on the cases clean dataset.
+  tenant_provider_owner_approval_milestone:
+    lineage:
+    - datalake_salesforce_raw.case.TenantProviderOwnerApprovalMilestone__c
+    description: Business value representing tenant provider owner approval milestone on the cases clean dataset.
+  tenant_service_provider_milestone_closed:
+    lineage:
+    - datalake_salesforce_raw.case.TenantServiceProviderMilestoneClosed__c
+    description: Business value representing tenant service provider milestone closed on the cases clean dataset.
+  tenant_service_provider_milestone:
+    lineage:
+    - datalake_salesforce_raw.case.TenantServiceProviderMilestone__c
+    description: Business value representing tenant service provider milestone on the cases clean dataset.
+  reason_for_retry:
+    lineage:
+    - datalake_salesforce_raw.case.ReasonForRetry__c
+    description: Business value representing reason for retry on the cases clean dataset.
+  fs_cri_have_demand_note_2:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRI_Have_Demand_Note__c
+    description: Business value representing fs cri have demand note 2 on the cases clean dataset.
+  fs_continue_with_partner_registry:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ContinueWithPartnerRegistry__c
+    description: Business value representing fs continue with partner registry on the cases clean dataset.
+  fs_cri_password:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRI_Password__c
+    description: Business value representing fs cri password on the cases clean dataset.
+  fs_cri_protocol:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRI_Protocol__c
+    description: Business value representing fs cri protocol on the cases clean dataset.
+  dt_fs_cri_request_date:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRI_RequestDate__c
+    description: Calendar date associated with fs cri request date in the business process.
+  dt_fs_cri_request_date_2:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRI_Request_Date__c
+    description: Calendar date associated with fs cri request date 2 in the business process.
+  dt_fs_created_date:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CreatedDate__c
+    description: Calendar date associated with fs created date in the business process.
+  fs_created_sequence:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CreatedSequence__c
+    description: Business value representing fs created sequence on the cases clean dataset.
+  tt_unlisting_approval:
+    lineage:
+    - datalake_salesforce_raw.case.TT_UnlistingApproval__c
+    description: Business value representing tt unlisting approval on the cases clean dataset.
+  status_read_only:
+    lineage:
+    - datalake_salesforce_raw.case.StatusReadOnly__c
+    description: Business value representing status read only on the cases clean dataset.
+  dt_bookkeeping_done_date:
+    lineage:
+    - datalake_salesforce_raw.case.BookkeepingDoneDate__c
+    description: Calendar date associated with bookkeeping done date in the business process.
+  dt_cri_done_date:
+    lineage:
+    - datalake_salesforce_raw.case.CRIDoneDate__c
+    description: Calendar date associated with cri done date in the business process.
+  dt_criprenoted_date:
+    lineage:
+    - datalake_salesforce_raw.case.CRIPRENOTEDDate__c
+    description: Calendar date associated with criprenoted date in the business process.
+  case_share_community_portal:
+    lineage:
+    - datalake_salesforce_raw.case.CaseShareCommunityPortal__c
+    description: Business value representing case share community portal on the cases clean dataset.
+  escrivao:
+    lineage:
+    - datalake_salesforce_raw.case.Escrivao__c
+    description: Business value representing escrivao on the cases clean dataset.
+  fs_ave_password:
+    lineage:
+    - datalake_salesforce_raw.case.FS_AVE_Password__c
+    description: Business value representing fs ave password on the cases clean dataset.
+  fs_ave_protocol:
+    lineage:
+    - datalake_salesforce_raw.case.FS_AVE_Protocol__c
+    description: Business value representing fs ave protocol on the cases clean dataset.
+  dt_fs_ave_request_date:
+    lineage:
+    - datalake_salesforce_raw.case.FS_AVE_RequestDate__c
+    description: Calendar date associated with fs ave request date in the business process.
+  fs_cri_name:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRIName__c
+    description: Business value representing fs cri name on the cases clean dataset.
+  fs_crn_partner_name:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRNPartnerName__c
+    description: Business value representing fs crn partner name on the cases clean dataset.
+  fs_crn_partner:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CRNPartner__c
+    description: Business value representing fs crn partner on the cases clean dataset.
+  fs_concomitant_registration:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ConcomitantRegistration__c
+    description: Business value representing fs concomitant registration on the cases clean dataset.
+  fs_endorsement_status:
+    lineage:
+    - datalake_salesforce_raw.case.FS_EndorsementStatus__c
+    description: Business value representing fs endorsement status on the cases clean dataset.
+  fs_fid_alienation_status:
+    lineage:
+    - datalake_salesforce_raw.case.FS_FID_AlienationStatus__c
+    description: Business value representing fs fid alienation status on the cases clean dataset.
+  fs_fid_discharge_term_received:
+    lineage:
+    - datalake_salesforce_raw.case.FS_FID_DischargeTermReceived__c
+    description: Business value representing fs fid discharge term received on the cases clean dataset.
+  fs_first_notification:
+    lineage:
+    - datalake_salesforce_raw.case.FS_FirstNotification__c
+    description: Business value representing fs first notification on the cases clean dataset.
+  fs_house_occupant:
+    lineage:
+    - datalake_salesforce_raw.case.FS_HouseOccupant__c
+    description: Business value representing fs house occupant on the cases clean dataset.
+  fs_id_cartorio:
+    lineage:
+    - datalake_salesforce_raw.case.FS_IDCartorio__c
+    description: Business value representing fs id cartorio on the cases clean dataset.
+  fs_nome_comprador:
+    lineage:
+    - datalake_salesforce_raw.case.FS_NomeComprador__c
+    description: Business value representing fs nome comprador on the cases clean dataset.
+  fs_preemptive_right:
+    lineage:
+    - datalake_salesforce_raw.case.FS_PreemptiveRight__c
+    description: Business value representing fs preemptive right on the cases clean dataset.
+  fs_reason_non_conversion:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ReasonNonConversion__c
+    description: Business value representing fs reason non conversion on the cases clean dataset.
+  fs_cancelled_not_following_crn:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CancelledNotFollowingCRN__c
+    description: Business value representing fs cancelled not following crn on the cases clean dataset.
+  fs_canceled_reason:
+    lineage:
+    - datalake_salesforce_raw.case.FS_CanceledReason__c
+    description: Business value representing fs canceled reason on the cases clean dataset.
+  fs_responsible_assistant:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ResponsibleAssistant__c
+    description: Business value representing fs responsible assistant on the cases clean dataset.
+  itbi_status:
+    lineage:
+    - datalake_salesforce_raw.case.ITBIStatus__c
+    description: Business value representing itbi status on the cases clean dataset.
+  case_list_view_user:
+    lineage:
+    - datalake_salesforce_raw.case.CaseListViewUser__c
+    description: Business value representing case list view user on the cases clean dataset.
+  lead_time:
+    lineage:
+    - datalake_salesforce_raw.case.LeadTime__c
+    description: Business value representing lead time on the cases clean dataset.
+  lt_bookkeeping_done:
+    lineage:
+    - datalake_salesforce_raw.case.LTBookkeepingDone__c
+    description: Business value representing lt bookkeeping done on the cases clean dataset.
+  ltcri:
+    lineage:
+    - datalake_salesforce_raw.case.LTCRI__c
+    description: Business value representing ltcri on the cases clean dataset.
+  dt_fs_bookkeeping_completion_date:
+    lineage:
+    - datalake_salesforce_raw.case.FS_BookkeepingCompletionDate__c
+    description: Calendar date associated with fs bookkeeping completion date in the business process.
+  fs_ave_have_demand_note:
+    lineage:
+    - datalake_salesforce_raw.case.FS_AVE_HaveDemandNote__c
+    description: Business value representing fs ave have demand note on the cases clean dataset.
+  fs_proof_payment_received:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ProofPaymentReceived__c
+    description: Business value representing fs proof payment received on the cases clean dataset.
+  fs_reasons_lt_overrun_register:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ReasonsLTOverrunRegister__c
+    description: Business value representing fs reasons lt overrun register on the cases clean dataset.
+  fs_reasons_lt_overrun:
+    lineage:
+    - datalake_salesforce_raw.case.FS_ReasonsLTOverrun__c
+    description: Business value representing fs reasons lt overrun on the cases clean dataset.
+  entry_access:
+    lineage:
+    - datalake_salesforce_raw.case.EntryAccess__c
+    description: Business value representing entry access on the cases clean dataset.
+  inspection:
+    lineage:
+    - datalake_salesforce_raw.case.Inspection__c
+    description: Business value representing inspection on the cases clean dataset.
+  analyst:
+    lineage:
+    - datalake_salesforce_raw.case.Analyst__c
+    description: Business value representing analyst on the cases clean dataset.
+  collection_addresstreet:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__Street__s
+    description: Business value representing collection addresstreet on the cases clean dataset.
+  collection_address_city:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__City__s
+    description: Business value representing collection address city on the cases clean dataset.
+  collection_address_postal_code:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__PostalCode__s
+    description: Business value representing collection address postal code on the cases clean dataset.
+  collection_addresstate_code:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__StateCode__s
+    description: Business value representing collection addresstate code on the cases clean dataset.
+  collection_address_country_code:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__CountryCode__s
+    description: Business value representing collection address country code on the cases clean dataset.
+  collection_address_latitude:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__Latitude__s
+    description: Business value representing collection address latitude on the cases clean dataset.
+  collection_address_longitude:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__Longitude__s
+    description: Business value representing collection address longitude on the cases clean dataset.
+  collection_address_geocode_accuracy:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__GeocodeAccuracy__s
+    description: Business value representing collection address geocode accuracy on the cases clean dataset.
+  collection_address:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddress__c
+    description: Business value representing collection address on the cases clean dataset.
+  dt_collection_available_date:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAvailableDate__c
+    description: Calendar date associated with collection available date in the business process.
+  collection_available_period:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAvailablePeriod__c
+    description: Business value representing collection available period on the cases clean dataset.
+  collection_available_time:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAvailableTime__c
+    description: Business value representing collection available time on the cases clean dataset.
+  collection_reference_point:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionReferencePoint__c
+    description: Business value representing collection reference point on the cases clean dataset.
+  collection_responsible_name:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionResponsibleName__c
+    description: Business value representing collection responsible name on the cases clean dataset.
+  collection_responsible_phone:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionResponsiblePhone__c
+    description: Business value representing collection responsible phone on the cases clean dataset.
+  collection_responsible_role:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionResponsibleRole__c
+    description: Business value representing collection responsible role on the cases clean dataset.
+  dt_contact_date_time:
+    lineage:
+    - datalake_salesforce_raw.case.ContactDateTime__c
+    description: Calendar date associated with contact date time in the business process.
+  contact_reply_iq:
+    lineage:
+    - datalake_salesforce_raw.case.ContactReplyIQ__c
+    description: Business value representing contact reply iq on the cases clean dataset.
+  contact_reply_pp:
+    lineage:
+    - datalake_salesforce_raw.case.ContactReplyPP__c
+    description: Business value representing contact reply pp on the cases clean dataset.
+  contact_reply_vt:
+    lineage:
+    - datalake_salesforce_raw.case.ContactReplyVT__c
+    description: Business value representing contact reply vt on the cases clean dataset.
+  criticality_sla:
+    lineage:
+    - datalake_salesforce_raw.case.CriticalitySla__c
+    description: Business value representing criticality sla on the cases clean dataset.
+  delivery_addresstreet:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__Street__s
+    description: Business value representing delivery addresstreet on the cases clean dataset.
+  delivery_address_city:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__City__s
+    description: Business value representing delivery address city on the cases clean dataset.
+  delivery_address_postal_code:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__PostalCode__s
+    description: Business value representing delivery address postal code on the cases clean dataset.
+  delivery_addresstate_code:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__StateCode__s
+    description: Business value representing delivery addresstate code on the cases clean dataset.
+  delivery_address_country_code:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__CountryCode__s
+    description: Business value representing delivery address country code on the cases clean dataset.
+  delivery_address_latitude:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__Latitude__s
+    description: Business value representing delivery address latitude on the cases clean dataset.
+  delivery_address_longitude:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__Longitude__s
+    description: Business value representing delivery address longitude on the cases clean dataset.
+  delivery_address_geocode_accuracy:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__GeocodeAccuracy__s
+    description: Business value representing delivery address geocode accuracy on the cases clean dataset.
+  delivery_address:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddress__c
+    description: Business value representing delivery address on the cases clean dataset.
+  dt_delivery_available_date:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAvailableDate__c
+    description: Calendar date associated with delivery available date in the business process.
+  delivery_available_period:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAvailablePeriod__c
+    description: Business value representing delivery available period on the cases clean dataset.
+  delivery_reference_point:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryReferencePoint__c
+    description: Business value representing delivery reference point on the cases clean dataset.
+  delivery_responsible_name:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryResponsibleName__c
+    description: Business value representing delivery responsible name on the cases clean dataset.
+  delivery_responsible_phone:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryResponsiblePhone__c
+    description: Business value representing delivery responsible phone on the cases clean dataset.
+  delivery_responsible_role:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryResponsibleRole__c
+    description: Business value representing delivery responsible role on the cases clean dataset.
+  dt_departure_inspection_date:
+    lineage:
+    - datalake_salesforce_raw.case.DepartureInspectionDate__c
+    description: Calendar date associated with departure inspection date in the business process.
+  key_location:
+    lineage:
+    - datalake_salesforce_raw.case.KeyLocation__c
+    description: Business value representing key location on the cases clean dataset.
+  leadership_approved_exception:
+    lineage:
+    - datalake_salesforce_raw.case.LeadershipApprovedException__c
+    description: Business value representing leadership approved exception on the cases clean dataset.
+  parent_case_analyst:
+    lineage:
+    - datalake_salesforce_raw.case.ParentCaseAnalyst__c
+    description: Business value representing parent case analyst on the cases clean dataset.
+  parent_case_owner:
+    lineage:
+    - datalake_salesforce_raw.case.ParentCaseOwner__c
+    description: Business value representing parent case owner on the cases clean dataset.
+  priority_lighthouse:
+    lineage:
+    - datalake_salesforce_raw.case.PriorityLighthouse__c
+    description: Business value representing priority lighthouse on the cases clean dataset.
+  property:
+    lineage:
+    - datalake_salesforce_raw.case.Property__c
+    description: Business value representing property on the cases clean dataset.
+  related_contract:
+    lineage:
+    - datalake_salesforce_raw.case.RelatedContract__c
+    description: Business value representing related contract on the cases clean dataset.
+  ride_distance:
+    lineage:
+    - datalake_salesforce_raw.case.RideDistance__c
+    description: Business value representing ride distance on the cases clean dataset.
+  sla_lighthouse:
+    lineage:
+    - datalake_salesforce_raw.case.SLALighthouse__c
+    description: Business value representing sla lighthouse on the cases clean dataset.
+  skill_priority:
+    lineage:
+    - datalake_salesforce_raw.case.SkillPriority__c
+    description: Business value representing skill priority on the cases clean dataset.
+  source:
+    lineage:
+    - datalake_salesforce_raw.case.Source__c
+    description: Business value representing source on the cases clean dataset.
+  stage:
+    lineage:
+    - datalake_salesforce_raw.case.Stage__c
+    description: Business value representing stage on the cases clean dataset.
+  dt_start_service_date:
+    lineage:
+    - datalake_salesforce_raw.case.StartServiceDate__c
+    description: Calendar date associated with start service date in the business process.
+  contract_magic_link:
+    lineage:
+    - datalake_salesforce_raw.case.ContractMagicLink__c
+    description: Business value representing contract magic link on the cases clean dataset.
+  dt_contract_start_date:
+    lineage:
+    - datalake_salesforce_raw.case.ContractStartDate__c
+    description: Calendar date associated with contract start date in the business process.
+  is_above50_km:
+    lineage:
+    - datalake_salesforce_raw.case.IsAbove50Km__c
+    description: Indicates whether above50 km applies to this record.
+  key_offboarding_lead_time:
+    lineage:
+    - datalake_salesforce_raw.case.KeyOffboardingLeadTime__c
+    description: Business value representing key offboarding lead time on the cases clean dataset.
+  property_magic_link:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyMagicLink__c
+    description: Business value representing property magic link on the cases clean dataset.
+  property_number:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyNumber__c
+    description: Business value representing property number on the cases clean dataset.
+  related_contract_link:
+    lineage:
+    - datalake_salesforce_raw.case.RelatedContractLink__c
+    description: Business value representing related contract link on the cases clean dataset.
+  sla:
+    lineage:
+    - datalake_salesforce_raw.case.SLA__c
+    description: Business value representing sla on the cases clean dataset.
+  priority_by_flow:
+    lineage:
+    - datalake_salesforce_raw.case.PriorityByFlow__c
+    description: Business value representing priority by flow on the cases clean dataset.
+  delivery_notes_dropoff:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryNotesDropoff__c
+    description: Business value representing delivery notes dropoff on the cases clean dataset.
+  active_user:
+    lineage:
+    - datalake_salesforce_raw.case.ActiveUser__c
+    description: Business value representing active user on the cases clean dataset.
+  collection_address_complement:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAddressComplement__c
+    description: Business value representing collection address complement on the cases clean dataset.
+  delivery_address_complement:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryAddressComplement__c
+    description: Business value representing delivery address complement on the cases clean dataset.
+  dt_created_date:
+    lineage:
+    - datalake_salesforce_raw.case.CreatedDate__c
+    description: Calendar date associated with created date in the business process.
+  task_notes:
+    lineage:
+    - datalake_salesforce_raw.case.TaskNotes__c
+    description: Business value representing task notes on the cases clean dataset.
+  delivery_notes_pickup:
+    lineage:
+    - datalake_salesforce_raw.case.DeliveryNotesPickup__c
+    description: Business value representing delivery notes pickup on the cases clean dataset.
+  need_run:
+    lineage:
+    - datalake_salesforce_raw.case.NeedRun__c
+    description: Business value representing need run on the cases clean dataset.
+  no_ride_reason:
+    lineage:
+    - datalake_salesforce_raw.case.NoRideReason__c
+    description: Business value representing no ride reason on the cases clean dataset.
+  collection_available_time_max:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionAvailableTimeMax__c
+    description: Business value representing collection available time max on the cases clean dataset.
+  key_process:
+    lineage:
+    - datalake_salesforce_raw.case.KeyProcess__c
+    description: Business value representing key process on the cases clean dataset.
+  pp_replied:
+    lineage:
+    - datalake_salesforce_raw.case.PPReplied__c
+    description: Business value representing pp replied on the cases clean dataset.
+  urgency:
+    lineage:
+    - datalake_salesforce_raw.case.Urgency__c
+    description: Business value representing urgency on the cases clean dataset.
+  vt_replied:
+    lineage:
+    - datalake_salesforce_raw.case.VTReplied__c
+    description: Business value representing vt replied on the cases clean dataset.
+  id_correlation_id:
+    lineage:
+    - datalake_salesforce_raw.case.CorrelationId__c
+    description: Identifier for the correlation id referenced by this record.
+  mediacao:
+    lineage:
+    - datalake_salesforce_raw.case.Mediacao__c
+    description: Business value representing mediacao on the cases clean dataset.
+  inspection_record_owner_review:
+    lineage:
+    - datalake_salesforce_raw.case.InspectionRecordOwnerReview__c
+    description: Business value representing inspection record owner review on the cases clean dataset.
+  inspection_record_tenant_review_formula:
+    lineage:
+    - datalake_salesforce_raw.case.InspectionRecordTenantReviewFormula__c
+    description: Business value representing inspection record tenant review formula on the cases clean dataset.
+  id_related_contract_id:
+    lineage:
+    - datalake_salesforce_raw.case.RelatedContractId__c
+    description: Identifier for the related contract id referenced by this record.
+  requester_account:
+    lineage:
+    - datalake_salesforce_raw.case.RequesterAccount__c
+    description: Business value representing requester account on the cases clean dataset.
+  sk_session:
+    lineage:
+    - datalake_salesforce_raw.case.SKSession__c
+    description: Business value representing sk session on the cases clean dataset.
+  is_spoc:
+    lineage:
+    - datalake_salesforce_raw.case.IsSpoc__c
+    description: Indicates whether spoc applies to this record.
+  mediation_case:
+    lineage:
+    - datalake_salesforce_raw.case.MediationCase__c
+    description: Business value representing mediation case on the cases clean dataset.
+  mediation:
+    lineage:
+    - datalake_salesforce_raw.case.Mediation__c
+    description: Business value representing mediation on the cases clean dataset.
+  csat_survey_sent:
+    lineage:
+    - datalake_salesforce_raw.case.CSATSurveySent__c
+    description: Business value representing csat survey sent on the cases clean dataset.
+  do_not_trigger_csat:
+    lineage:
+    - datalake_salesforce_raw.case.DoNotTriggerCSAT__c
+    description: Business value representing do not trigger csat on the cases clean dataset.
+  id_owner_recipient_id:
+    lineage:
+    - datalake_salesforce_raw.case.OwnerRecipientId__c
+    description: Identifier for the owner recipient id referenced by this record.
+  primary_ownerofthe_customer_service:
+    lineage:
+    - datalake_salesforce_raw.case.PrimaryOwneroftheCustomerService__c
+    description: Business value representing primary ownerofthe customer service on the cases clean dataset.
+  primary_tenantofthe_customer_service:
+    lineage:
+    - datalake_salesforce_raw.case.PrimaryTenantoftheCustomerService__c
+    description: Business value representing primary tenantofthe customer service on the cases clean dataset.
+  id_tenant_recipient_id:
+    lineage:
+    - datalake_salesforce_raw.case.TenantRecipientId__c
+    description: Identifier for the tenant recipient id referenced by this record.
+  despejo:
+    lineage:
+    - datalake_salesforce_raw.case.Despejo__c
+    description: Business value representing despejo on the cases clean dataset.
+  high_value:
+    lineage:
+    - datalake_salesforce_raw.case.HighValue__c
+    description: Business value representing high value on the cases clean dataset.
+  pp_multi:
+    lineage:
+    - datalake_salesforce_raw.case.PpMulti__c
+    description: Business value representing pp multi on the cases clean dataset.
+  cpf:
+    lineage:
+    - datalake_salesforce_raw.case.CPF__c
+    description: Business value representing cpf on the cases clean dataset.
+  case_description_2:
+    lineage:
+    - datalake_salesforce_raw.case.CaseDescription__c
+    description: Business value representing case description 2 on the cases clean dataset.
+  client_name:
+    lineage:
+    - datalake_salesforce_raw.case.ClientName__c
+    description: Business value representing client name on the cases clean dataset.
+  client_phone:
+    lineage:
+    - datalake_salesforce_raw.case.ClientPhone__c
+    description: Business value representing client phone on the cases clean dataset.
+  preferred_contact_channel:
+    lineage:
+    - datalake_salesforce_raw.case.PreferredContactChannel__c
+    description: Business value representing preferred contact channel on the cases clean dataset.
+  property_address:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyAddress__c
+    description: Business value representing property address on the cases clean dataset.
+  property_id:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyID__c
+    description: Business value representing property id on the cases clean dataset.
+  service_account_issue:
+    lineage:
+    - datalake_salesforce_raw.case.ServiceAccountIssue__c
+    description: Business value representing service account issue on the cases clean dataset.
+  accessory_property_dd:
+    lineage:
+    - datalake_salesforce_raw.case.Accessory_Property_DD__c
+    description: Business value representing accessory property dd on the cases clean dataset.
+  diligence_link_dd:
+    lineage:
+    - datalake_salesforce_raw.case.Diligence_Link_DD__c
+    description: Business value representing diligence link dd on the cases clean dataset.
+  identified_fails_dd:
+    lineage:
+    - datalake_salesforce_raw.case.Identified_Fails_DD__c
+    description: Business value representing identified fails dd on the cases clean dataset.
+  link_legaut_dd:
+    lineage:
+    - datalake_salesforce_raw.case.Link_Legaut_DD__c
+    description: Business value representing link legaut dd on the cases clean dataset.
+  risk_level_dd:
+    lineage:
+    - datalake_salesforce_raw.case.Risk_Level_DD__c
+    description: Business value representing risk level dd on the cases clean dataset.
+  item_to_be_removed:
+    lineage:
+    - datalake_salesforce_raw.case.ItemToBeRemoved__c
+    description: Business value representing item to be removed on the cases clean dataset.
+  distribution_model:
+    lineage:
+    - datalake_salesforce_raw.case.DistributionModel__c
+    description: Business value representing distribution model on the cases clean dataset.
+  id_hefesto_context_id:
+    lineage:
+    - datalake_salesforce_raw.case.HefestoContextId__c
+    description: Identifier for the hefesto context id referenced by this record.
+  manual_closing:
+    lineage:
+    - datalake_salesforce_raw.case.Manual_Closing__c
+    description: Business value representing manual closing on the cases clean dataset.
+  cx_for_rent:
+    lineage:
+    - datalake_salesforce_raw.case.CX_For_Rent__c
+    description: Business value representing cx for rent on the cases clean dataset.
+  dt_new_effective_date:
+    lineage:
+    - datalake_salesforce_raw.case.NewEffectiveDate__c
+    description: Calendar date associated with new effective date in the business process.
+  is_eviction:
+    lineage:
+    - datalake_salesforce_raw.case.isEviction__c
+    description: Indicates whether eviction applies to this record.
+  is_high_value:
+    lineage:
+    - datalake_salesforce_raw.case.isHighValue__c
+    description: Indicates whether high value applies to this record.
+  is_pp_multi:
+    lineage:
+    - datalake_salesforce_raw.case.isPPMulti__c
+    description: Indicates whether pp multi applies to this record.
+  addendum_reason_dd:
+    lineage:
+    - datalake_salesforce_raw.case.Addendum_Reason_DD__c
+    description: Business value representing addendum reason dd on the cases clean dataset.
+  is_kirk:
+    lineage:
+    - datalake_salesforce_raw.case.IsKirk__c
+    description: Indicates whether kirk applies to this record.
+  fr_case_number_magic_link:
+    lineage:
+    - datalake_salesforce_raw.case.FR_CaseNumberMagicLink__c
+    description: Business value representing fr case number magic link on the cases clean dataset.
+  fr_case_reopen_count:
+    lineage:
+    - datalake_salesforce_raw.case.FR_Case_Reopen_Count__c
+    description: Business value representing fr case reopen count on the cases clean dataset.
+  address_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Address_Cognito__c
+    description: Business value representing address cognito on the cases clean dataset.
+  amount:
+    lineage:
+    - datalake_salesforce_raw.case.Amount__c
+    description: Business value representing amount on the cases clean dataset.
+  analyst_remarks:
+    lineage:
+    - datalake_salesforce_raw.case.AnalystRemarks__c
+    description: Business value representing analyst remarks on the cases clean dataset.
+  bank_branch_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Bank_Branch_Cognito__c
+    description: Business value representing bank branch cognito on the cases clean dataset.
+  bank_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Bank_Cognito__c
+    description: Business value representing bank cognito on the cases clean dataset.
+  dt_booking_date:
+    lineage:
+    - datalake_salesforce_raw.case.BookingDate__c
+    description: Calendar date associated with booking date in the business process.
+  booking_time:
+    lineage:
+    - datalake_salesforce_raw.case.BookingTime__c
+    description: Business value representing booking time on the cases clean dataset.
+  checking_account_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Checking_Account_Cognito__c
+    description: Business value representing checking account cognito on the cases clean dataset.
+  city_state_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.City_State_Cognito__c
+    description: Business value representing city state cognito on the cases clean dataset.
+  email_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Email_Cognito__c
+    description: Business value representing email cognito on the cases clean dataset.
+  i_am:
+    lineage:
+    - datalake_salesforce_raw.case.IAm__c
+    description: Business value representing i am on the cases clean dataset.
+  member_real_estate_name:
+    lineage:
+    - datalake_salesforce_raw.case.Member_real_estate_name__c
+    description: Business value representing member real estate name on the cases clean dataset.
+  name_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Name_Cognito__c
+    description: Business value representing name cognito on the cases clean dataset.
+  other_sector:
+    lineage:
+    - datalake_salesforce_raw.case.Other_sector__c
+    description: Business value representing other sector on the cases clean dataset.
+  partner_realty_agency:
+    lineage:
+    - datalake_salesforce_raw.case.PartnerRealtyAgency__c
+    description: Business value representing partner realty agency on the cases clean dataset.
+  partner_realty_agency_others:
+    lineage:
+    - datalake_salesforce_raw.case.Partner_Realty_Agency_Others__c
+    description: Business value representing partner realty agency others on the cases clean dataset.
+  phone_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.Phone_Cognito__c
+    description: Business value representing phone cognito on the cases clean dataset.
+  property_number_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyNumberCognito__c
+    description: Business value representing property number cognito on the cases clean dataset.
+  quantity:
+    lineage:
+    - datalake_salesforce_raw.case.Quantity__c
+    description: Business value representing quantity on the cases clean dataset.
+  subject_corresponds_request_reason:
+    lineage:
+    - datalake_salesforce_raw.case.SubjectCorrespondsRequestReason__c
+    description: Business value representing subject corresponds request reason on the cases clean dataset.
+  sector:
+    lineage:
+    - datalake_salesforce_raw.case.Sector__c
+    description: Business value representing sector on the cases clean dataset.
+  id_hefesto_context_group_id:
+    lineage:
+    - datalake_salesforce_raw.case.HefestoContextGroupId__c
+    description: Identifier for the hefesto context group id referenced by this record.
+  original_queue_developer_name:
+    lineage:
+    - datalake_salesforce_raw.case.OriginalQueueDeveloperName__c
+    description: Business value representing original queue developer name on the cases clean dataset.
+  contestation_case:
+    lineage:
+    - datalake_salesforce_raw.case.ContestationCase__c
+    description: Business value representing contestation case on the cases clean dataset.
+  id_repair_analysis_id:
+    lineage:
+    - datalake_salesforce_raw.case.RepairAnalysisId__c
+    description: Identifier for the repair analysis id referenced by this record.
+  applicant_type:
+    lineage:
+    - datalake_salesforce_raw.case.ApplicantType__c
+    description: Business value representing applicant type on the cases clean dataset.
+  c_cs:
+    lineage:
+    - datalake_salesforce_raw.case.CCs__c
+    description: Business value representing c cs on the cases clean dataset.
+  client_type:
+    lineage:
+    - datalake_salesforce_raw.case.ClientType__c
+    description: Business value representing client type on the cases clean dataset.
+  contact_ticket:
+    lineage:
+    - datalake_salesforce_raw.case.ContactTicket__c
+    description: Business value representing contact ticket on the cases clean dataset.
+  demand_type:
+    lineage:
+    - datalake_salesforce_raw.case.DemandType__c
+    description: Business value representing demand type on the cases clean dataset.
+  justified_request:
+    lineage:
+    - datalake_salesforce_raw.case.JustifiedRequest__c
+    description: Business value representing justified request on the cases clean dataset.
+  open_comunication_to_other_part:
+    lineage:
+    - datalake_salesforce_raw.case.OpenComunicationToOtherPart__c
+    description: Business value representing open comunication to other part on the cases clean dataset.
+  request_reason:
+    lineage:
+    - datalake_salesforce_raw.case.RequestReason__c
+    description: Business value representing request reason on the cases clean dataset.
+  request_type:
+    lineage:
+    - datalake_salesforce_raw.case.RequestType__c
+    description: Business value representing request type on the cases clean dataset.
+  send_to_counterpart:
+    lineage:
+    - datalake_salesforce_raw.case.SendToCounterpart__c
+    description: Business value representing send to counterpart on the cases clean dataset.
+  send_to_landlord:
+    lineage:
+    - datalake_salesforce_raw.case.SendToLandlord__c
+    description: Business value representing send to landlord on the cases clean dataset.
+  send_to_requester:
+    lineage:
+    - datalake_salesforce_raw.case.SendToRequester__c
+    description: Business value representing send to requester on the cases clean dataset.
+  send_to_tenant:
+    lineage:
+    - datalake_salesforce_raw.case.SendToTenant__c
+    description: Business value representing send to tenant on the cases clean dataset.
+  id_case_inspection_id:
+    lineage:
+    - datalake_salesforce_raw.case.CaseInspectionId__c
+    description: Identifier for the case inspection id referenced by this record.
+  customer_type:
+    lineage:
+    - datalake_salesforce_raw.case.CustomerType__c
+    description: Business value representing customer type on the cases clean dataset.
+  discard_reason:
+    lineage:
+    - datalake_salesforce_raw.case.DiscardReason__c
+    description: Business value representing discard reason on the cases clean dataset.
+  internal_team:
+    lineage:
+    - datalake_salesforce_raw.case.InternalTeam__c
+    description: Business value representing internal team on the cases clean dataset.
+  is_collaborator:
+    lineage:
+    - datalake_salesforce_raw.case.IsCollaborator__c
+    description: Indicates whether collaborator applies to this record.
+  origin_cognito:
+    lineage:
+    - datalake_salesforce_raw.case.OriginCognito__c
+    description: Business value representing origin cognito on the cases clean dataset.
+  property_id_link:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyIDLink__c
+    description: Business value representing property id link on the cases clean dataset.
+  requestor:
+    lineage:
+    - datalake_salesforce_raw.case.Requestor__c
+    description: Business value representing requestor on the cases clean dataset.
+  reschedule_prioritization:
+    lineage:
+    - datalake_salesforce_raw.case.ReschedulePrioritization__c
+    description: Business value representing reschedule prioritization on the cases clean dataset.
+  service_request_channel:
+    lineage:
+    - datalake_salesforce_raw.case.ServiceRequestChannel__c
+    description: Business value representing service request channel on the cases clean dataset.
+  solicitation_type:
+    lineage:
+    - datalake_salesforce_raw.case.SolicitationType__c
+    description: Business value representing solicitation type on the cases clean dataset.
+  specific_photographer:
+    lineage:
+    - datalake_salesforce_raw.case.SpecificPhotographer__c
+    description: Business value representing specific photographer on the cases clean dataset.
+  task_origin:
+    lineage:
+    - datalake_salesforce_raw.case.TaskOrigin__c
+    description: Business value representing task origin on the cases clean dataset.
+  task_requested_correctly:
+    lineage:
+    - datalake_salesforce_raw.case.TaskRequestedCorrectly__c
+    description: Business value representing task requested correctly on the cases clean dataset.
+  ticket_type:
+    lineage:
+    - datalake_salesforce_raw.case.TicketType__c
+    description: Business value representing ticket type on the cases clean dataset.
+  type_of_provider:
+    lineage:
+    - datalake_salesforce_raw.case.TypeOfProvider__c
+    description: Business value representing type of provider on the cases clean dataset.
+  justification:
+    lineage:
+    - datalake_salesforce_raw.case.Justification__c
+    description: Business value representing justification on the cases clean dataset.
+  verification_keys_local:
+    lineage:
+    - datalake_salesforce_raw.case.VerificationKeysLocal__c
+    description: Business value representing verification keys local on the cases clean dataset.
+  what_should_be_verified:
+    lineage:
+    - datalake_salesforce_raw.case.WhatShouldBeVerified__c
+    description: Business value representing what should be verified on the cases clean dataset.
+  department:
+    lineage:
+    - datalake_salesforce_raw.case.Department__c
+    description: Business value representing department on the cases clean dataset.
+  extension:
+    lineage:
+    - datalake_salesforce_raw.case.Extension__c
+    description: Business value representing extension on the cases clean dataset.
+  magic_link_house_url:
+    lineage:
+    - datalake_salesforce_raw.case.MagicLinkHouseURL__c
+    description: Business value representing magic link house url on the cases clean dataset.
+  property_classification:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyClassification__c
+    description: Business value representing property classification on the cases clean dataset.
+  case_plates_lockbox_related:
+    lineage:
+    - datalake_salesforce_raw.case.CasePlatesLockboxRelated__c
+    description: Business value representing case plates lockbox related on the cases clean dataset.
+  case_legal_ops:
+    lineage:
+    - datalake_salesforce_raw.case.CaseLegalOps__c
+    description: Business value representing case legal ops on the cases clean dataset.
+  id_contract_external_id:
+    lineage:
+    - datalake_salesforce_raw.case.ContractExternalId__c
+    description: Identifier for the contract external id referenced by this record.
+  sla_due_days:
+    lineage:
+    - datalake_salesforce_raw.case.SLADueDays__c
+    description: Business value representing sla due days on the cases clean dataset.
+  approved:
+    lineage:
+    - datalake_salesforce_raw.case.Approved__c
+    description: Business value representing approved on the cases clean dataset.
+  id_photographer_id:
+    lineage:
+    - datalake_salesforce_raw.case.PhotographerId__c
+    description: Identifier for the photographer id referenced by this record.
+  report_reason:
+    lineage:
+    - datalake_salesforce_raw.case.ReportReason__c
+    description: Business value representing report reason on the cases clean dataset.
+  id_session_id:
+    lineage:
+    - datalake_salesforce_raw.case.SessionId__c
+    description: Identifier for the session id referenced by this record.
+  current_journey:
+    lineage:
+    - datalake_salesforce_raw.case.CurrentJourney__c
+    description: Business value representing current journey on the cases clean dataset.
+  id_inspection_external_id:
+    lineage:
+    - datalake_salesforce_raw.case.InspectionExternalId__c
+    description: Identifier for the inspection external id referenced by this record.
+  offer_id:
+    lineage:
+    - datalake_salesforce_raw.case.Offer_ID__c
+    description: Business value representing offer id on the cases clean dataset.
+  valor_do_caso:
+    lineage:
+    - datalake_salesforce_raw.case.Valor_do_caso__c
+    description: Business value representing valor do caso on the cases clean dataset.
+  hefesto_error:
+    lineage:
+    - datalake_salesforce_raw.case.HefestoError__c
+    description: Business value representing hefesto error on the cases clean dataset.
+  customer_segmentation:
+    lineage:
+    - datalake_salesforce_raw.case.CustomerSegmentation__c
+    description: Business value representing customer segmentation on the cases clean dataset.
+  customer_upset:
+    lineage:
+    - datalake_salesforce_raw.case.CustomerUpset__c
+    description: Business value representing customer upset on the cases clean dataset.
+  data_saida_imovel:
+    lineage:
+    - datalake_salesforce_raw.case.Data_Saida_Imovel__c
+    description: Business value representing data saida imovel on the cases clean dataset.
+  reason_not_rescind_via_app:
+    lineage:
+    - datalake_salesforce_raw.case.ReasonNotRescindViaApp__c
+    description: Business value representing reason not rescind via app on the cases clean dataset.
+  rescission_questions:
+    lineage:
+    - datalake_salesforce_raw.case.RescissionQuestions__c
+    description: Business value representing rescission questions on the cases clean dataset.
+  case_end_of_process:
+    lineage:
+    - datalake_salesforce_raw.case.CaseEndOfProcess__c
+    description: Business value representing case end of process on the cases clean dataset.
+  record_type_developer_name:
+    lineage:
+    - datalake_salesforce_raw.case.RecordTypeDeveloperName__c
+    description: Business value representing record type developer name on the cases clean dataset.
+  amount_acepted_by_pp:
+    lineage:
+    - datalake_salesforce_raw.case.AmountAceptedByPP__c
+    description: Business value representing amount acepted by pp on the cases clean dataset.
+  deadline_alredy_passed:
+    lineage:
+    - datalake_salesforce_raw.case.DeadlineAlredyPassed__c
+    description: Business value representing deadline alredy passed on the cases clean dataset.
+  iq_like_pay_installments:
+    lineage:
+    - datalake_salesforce_raw.case.IQLikePayInstallments__c
+    description: Business value representing iq like pay installments on the cases clean dataset.
+  number_installments:
+    lineage:
+    - datalake_salesforce_raw.case.NumberInstallments__c
+    description: Business value representing number installments on the cases clean dataset.
+  pp_accept_negotiation:
+    lineage:
+    - datalake_salesforce_raw.case.PPAcceptNegotiation__c
+    description: Business value representing pp accept negotiation on the cases clean dataset.
+  partner_protocol:
+    lineage:
+    - datalake_salesforce_raw.case.PartnerProtocol__c
+    description: Business value representing partner protocol on the cases clean dataset.
+  dt_contract_creation_date:
+    lineage:
+    - datalake_salesforce_raw.case.ContractCreationDate__c
+    description: Calendar date associated with contract creation date in the business process.
+  contract_status:
+    lineage:
+    - datalake_salesforce_raw.case.ContractStatus__c
+    description: Business value representing contract status on the cases clean dataset.
+  cost_responsible:
+    lineage:
+    - datalake_salesforce_raw.case.CostResponsible__c
+    description: Business value representing cost responsible on the cases clean dataset.
+  dt_effective_date:
+    lineage:
+    - datalake_salesforce_raw.case.EffectiveDate__c
+    description: Calendar date associated with effective date in the business process.
+  execution_deadline:
+    lineage:
+    - datalake_salesforce_raw.case.ExecutionDeadline__c
+    description: Business value representing execution deadline on the cases clean dataset.
+  has_negotiation:
+    lineage:
+    - datalake_salesforce_raw.case.HasNegotiation__c
+    description: Boolean flag indicating whether negotiation applies to this support service record.
+  proposal_text:
+    lineage:
+    - datalake_salesforce_raw.case.ProposalText__c
+    description: Business value representing proposal text on the cases clean dataset.
+  requested_by:
+    lineage:
+    - datalake_salesforce_raw.case.RequestedBy__c
+    description: Business value representing requested by on the cases clean dataset.
+  who_enters:
+    lineage:
+    - datalake_salesforce_raw.case.WhoEnters__c
+    description: Business value representing who enters on the cases clean dataset.
+  who_leaves:
+    lineage:
+    - datalake_salesforce_raw.case.WhoLeaves__c
+    description: Business value representing who leaves on the cases clean dataset.
+  who_remains:
+    lineage:
+    - datalake_salesforce_raw.case.WhoRemains__c
+    description: Business value representing who remains on the cases clean dataset.
+  magiclink_analyst_email:
+    lineage:
+    - datalake_salesforce_raw.case.MagiclinkAnalystEmail__c
+    description: Business value representing magiclink analyst email on the cases clean dataset.
+  advance_product:
+    lineage:
+    - datalake_salesforce_raw.case.AdvanceProduct__c
+    description: Business value representing advance product on the cases clean dataset.
+  demandant:
+    lineage:
+    - datalake_salesforce_raw.case.Demandant__c
+    description: Business value representing demandant on the cases clean dataset.
+  expense_name:
+    lineage:
+    - datalake_salesforce_raw.case.ExpenseName__c
+    description: Business value representing expense name on the cases clean dataset.
+  invoice_month:
+    lineage:
+    - datalake_salesforce_raw.case.InvoiceMonth__c
+    description: Business value representing invoice month on the cases clean dataset.
+  new_amount:
+    lineage:
+    - datalake_salesforce_raw.case.NewAmount__c
+    description: Business value representing new amount on the cases clean dataset.
+  previous_amount:
+    lineage:
+    - datalake_salesforce_raw.case.PreviousAmount__c
+    description: Business value representing previous amount on the cases clean dataset.
+  previously_requested_in_app:
+    lineage:
+    - datalake_salesforce_raw.case.PreviouslyRequestedInApp__c
+    description: Business value representing previously requested in app on the cases clean dataset.
+  recurring_expense:
+    lineage:
+    - datalake_salesforce_raw.case.RecurringExpense__c
+    description: Business value representing recurring expense on the cases clean dataset.
+  related_contract_status:
+    lineage:
+    - datalake_salesforce_raw.case.RelatedContractStatus__c
+    description: Business value representing related contract status on the cases clean dataset.
+  id_related_proposal_id:
+    lineage:
+    - datalake_salesforce_raw.case.RelatedProposalId__c
+    description: Identifier for the related proposal id referenced by this record.
+  solved_hour:
+    lineage:
+    - datalake_salesforce_raw.case.SolvedHour__c
+    description: Business value representing solved hour on the cases clean dataset.
+  updated_listing_value:
+    lineage:
+    - datalake_salesforce_raw.case.UpdatedListingValue__c
+    description: Business value representing updated listing value on the cases clean dataset.
+  ra_moderation_reason:
+    lineage:
+    - datalake_salesforce_raw.case.RAModerationReason__c
+    description: Business value representing ra moderation reason on the cases clean dataset.
+  associated_executive:
+    lineage:
+    - datalake_salesforce_raw.case.Associated_Executive__c
+    description: Business value representing associated executive on the cases clean dataset.
+  solicitation_reason:
+    lineage:
+    - datalake_salesforce_raw.case.SolicitationReason__c
+    description: Business value representing solicitation reason on the cases clean dataset.
+  bank_details:
+    lineage:
+    - datalake_salesforce_raw.case.BankDetails__c
+    description: Business value representing bank details on the cases clean dataset.
+  executive_email:
+    lineage:
+    - datalake_salesforce_raw.case.ExecutiveEmail__c
+    description: Business value representing executive email on the cases clean dataset.
+  action:
+    lineage:
+    - datalake_salesforce_raw.case.Action__c
+    description: Business value representing action on the cases clean dataset.
+  collection_wave:
+    lineage:
+    - datalake_salesforce_raw.case.CollectionWave__c
+    description: Business value representing collection wave on the cases clean dataset.
+  credit:
+    lineage:
+    - datalake_salesforce_raw.case.Credit__c
+    description: Business value representing credit on the cases clean dataset.
+  day_overdue:
+    lineage:
+    - datalake_salesforce_raw.case.DayOverdue__c
+    description: Business value representing day overdue on the cases clean dataset.
+  debit:
+    lineage:
+    - datalake_salesforce_raw.case.Debit__c
+    description: Business value representing debit on the cases clean dataset.
+  has_approved_band_aid:
+    lineage:
+    - datalake_salesforce_raw.case.HasApprovedBandAid__c
+    description: Boolean flag indicating whether approved band aid applies to this support service record.
+  has_open_invoices:
+    lineage:
+    - datalake_salesforce_raw.case.HasOpenInvoices__c
+    description: Boolean flag indicating whether open invoices applies to this support service record.
+  dt_invoice_date:
+    lineage:
+    - datalake_salesforce_raw.case.InvoiceDate__c
+    description: Calendar date associated with invoice date in the business process.
+  id_invoice_id:
+    lineage:
+    - datalake_salesforce_raw.case.InvoiceId__c
+    description: Identifier for the invoice id referenced by this record.
+  invoice_quantity:
+    lineage:
+    - datalake_salesforce_raw.case.InvoiceQuantity__c
+    description: Business value representing invoice quantity on the cases clean dataset.
+  is_contract_in_law_firm:
+    lineage:
+    - datalake_salesforce_raw.case.IsContractInLawFirm__c
+    description: Indicates whether contract in law firm applies to this record.
+  is_contract_linked_to_advisory:
+    lineage:
+    - datalake_salesforce_raw.case.IsContractLinkedToAdvisory__c
+    description: Indicates whether contract linked to advisory applies to this record.
+  is_customer_negatively_listed:
+    lineage:
+    - datalake_salesforce_raw.case.IsCustomerNegativelyListed__c
+    description: Indicates whether customer negatively listed applies to this record.
+  dt_payment_date:
+    lineage:
+    - datalake_salesforce_raw.case.PaymentDate__c
+    description: Calendar date associated with payment date in the business process.
+  payment_method:
+    lineage:
+    - datalake_salesforce_raw.case.PaymentMethod__c
+    description: Business value representing payment method on the cases clean dataset.
+  responsible_advisory:
+    lineage:
+    - datalake_salesforce_raw.case.ResponsibleAdvisory__c
+    description: Business value representing responsible advisory on the cases clean dataset.
+  disposal_cost:
+    lineage:
+    - datalake_salesforce_raw.case.DisposalCost__c
+    description: Business value representing disposal cost on the cases clean dataset.
+  interested_party_keeps_item:
+    lineage:
+    - datalake_salesforce_raw.case.InterestedPartyKeepsItem__c
+    description: Business value representing interested party keeps item on the cases clean dataset.
+  interested_party_payment_amount:
+    lineage:
+    - datalake_salesforce_raw.case.InterestedPartyPaymentAmount__c
+    description: Business value representing interested party payment amount on the cases clean dataset.
+  item_photos_sent:
+    lineage:
+    - datalake_salesforce_raw.case.ItemPhotosSent__c
+    description: Business value representing item photos sent on the cases clean dataset.
+  dt_item_pickup_date_time:
+    lineage:
+    - datalake_salesforce_raw.case.ItemPickupDateTime__c
+    description: Calendar date associated with item pickup date time in the business process.
+  item_pickup_key_location:
+    lineage:
+    - datalake_salesforce_raw.case.ItemPickupKeyLocation__c
+    description: Business value representing item pickup key location on the cases clean dataset.
+  prior_item_negotiation:
+    lineage:
+    - datalake_salesforce_raw.case.PriorItemNegotiation__c
+    description: Business value representing prior item negotiation on the cases clean dataset.
+  additional_contacts:
+    lineage:
+    - datalake_salesforce_raw.case.AdditionalContacts__c
+    description: Business value representing additional contacts on the cases clean dataset.
+  billing_responsible:
+    lineage:
+    - datalake_salesforce_raw.case.BillingResponsible__c
+    description: Business value representing billing responsible on the cases clean dataset.
+  dt_billing_start_date:
+    lineage:
+    - datalake_salesforce_raw.case.BillingStartDate__c
+    description: Calendar date associated with billing start date in the business process.
+  buyer_email:
+    lineage:
+    - datalake_salesforce_raw.case.BuyerEmail__c
+    description: Business value representing buyer email on the cases clean dataset.
+  id_buyer_id:
+    lineage:
+    - datalake_salesforce_raw.case.BuyerId__c
+    description: Identifier for the buyer id referenced by this record.
+  buyer_phone:
+    lineage:
+    - datalake_salesforce_raw.case.BuyerPhone__c
+    description: Business value representing buyer phone on the cases clean dataset.
+  buyer:
+    lineage:
+    - datalake_salesforce_raw.case.Buyer__c
+    description: Business value representing buyer on the cases clean dataset.
+  classification:
+    lineage:
+    - datalake_salesforce_raw.case.Classification__c
+    description: Business value representing classification on the cases clean dataset.
+  dt_condition_precedent_date:
+    lineage:
+    - datalake_salesforce_raw.case.ConditionPrecedentDate__c
+    description: Calendar date associated with condition precedent date in the business process.
+  condition_precedent:
+    lineage:
+    - datalake_salesforce_raw.case.ConditionPrecedent__c
+    description: Business value representing condition precedent on the cases clean dataset.
+  dt_entry_date:
+    lineage:
+    - datalake_salesforce_raw.case.EntryDate__c
+    description: Calendar date associated with entry date in the business process.
+  dt_extrajudicial_notification_date:
+    lineage:
+    - datalake_salesforce_raw.case.ExtrajudicialNotificationDate__c
+    description: Calendar date associated with extrajudicial notification date in the business process.
+  extrajudicial_notification:
+    lineage:
+    - datalake_salesforce_raw.case.ExtrajudicialNotification__c
+    description: Business value representing extrajudicial notification on the cases clean dataset.
+  dt_first_contact_date:
+    lineage:
+    - datalake_salesforce_raw.case.FirstContactDate__c
+    description: Calendar date associated with first contact date in the business process.
+  id_offer_fr:
+    lineage:
+    - datalake_salesforce_raw.case.IDOfferFR__c
+    description: Identifier for the offer fr referenced by this record.
+  registry_check:
+    lineage:
+    - datalake_salesforce_raw.case.RegistryCheck__c
+    description: Business value representing registry check on the cases clean dataset.
+  responsible_analyst:
+    lineage:
+    - datalake_salesforce_raw.case.ResponsibleAnalyst__c
+    description: Business value representing responsible analyst on the cases clean dataset.
+  dt_return_date:
+    lineage:
+    - datalake_salesforce_raw.case.ReturnDate__c
+    description: Calendar date associated with return date in the business process.
+  seller_email:
+    lineage:
+    - datalake_salesforce_raw.case.SellerEmail__c
+    description: Business value representing seller email on the cases clean dataset.
+  id_seller_id:
+    lineage:
+    - datalake_salesforce_raw.case.SellerId__c
+    description: Identifier for the seller id referenced by this record.
+  seller_phone:
+    lineage:
+    - datalake_salesforce_raw.case.SellerPhone__c
+    description: Business value representing seller phone on the cases clean dataset.
+  seller:
+    lineage:
+    - datalake_salesforce_raw.case.Seller__c
+    description: Business value representing seller on the cases clean dataset.
+  hefesto_portfolio_status:
+    lineage:
+    - datalake_salesforce_raw.case.HefestoPortfolioStatus__c
+    description: Business value representing hefesto portfolio status on the cases clean dataset.
+  account_type:
+    lineage:
+    - datalake_salesforce_raw.case.AccountType__c
+    description: Business value representing account type on the cases clean dataset.
+  account_value:
+    lineage:
+    - datalake_salesforce_raw.case.AccountValue__c
+    description: Business value representing account value on the cases clean dataset.
+  is_it_more_than_one_bill:
+    lineage:
+    - datalake_salesforce_raw.case.IsItMoreThanOneBill__c
+    description: Indicates whether it more than one bill applies to this record.
+  who_issues_the_bill:
+    lineage:
+    - datalake_salesforce_raw.case.WhoIssuesTheBill__c
+    description: Business value representing who issues the bill on the cases clean dataset.
+  pp_multi_picklist:
+    lineage:
+    - datalake_salesforce_raw.case.PPMultiPicklist__c
+    description: Business value representing pp multi picklist on the cases clean dataset.
+  repair_budget_approved:
+    lineage:
+    - datalake_salesforce_raw.case.RepairBudgetApproved__c
+    description: Business value representing repair budget approved on the cases clean dataset.
+  repair_budgets_sent:
+    lineage:
+    - datalake_salesforce_raw.case.RepairBudgetsSent__c
+    description: Business value representing repair budgets sent on the cases clean dataset.
+  repair_case_number:
+    lineage:
+    - datalake_salesforce_raw.case.RepairCaseNumber__c
+    description: Business value representing repair case number on the cases clean dataset.
+  repair_contestation_change_made:
+    lineage:
+    - datalake_salesforce_raw.case.RepairContestationChangeMade__c
+    description: Business value representing repair contestation change made on the cases clean dataset.
+  repair_contestation_change_reason:
+    lineage:
+    - datalake_salesforce_raw.case.RepairContestationChangeReason__c
+    description: Business value representing repair contestation change reason on the cases clean dataset.
+  repair_contestation_client_friction:
+    lineage:
+    - datalake_salesforce_raw.case.RepairContestationClientFriction__c
+    description: Business value representing repair contestation client friction on the cases clean dataset.
+  repair_contestation_criticality_approved:
+    lineage:
+    - datalake_salesforce_raw.case.RepairContestationCriticalityApproved__c
+    description: Business value representing repair contestation criticality approved on the cases clean dataset.
+  repair_contestation_responsibility_approved:
+    lineage:
+    - datalake_salesforce_raw.case.RepairContestationResponsibilityApproved__c
+    description: Business value representing repair contestation responsibility approved on the cases clean dataset.
+  repair_contestation_type:
+    lineage:
+    - datalake_salesforce_raw.case.RepairContestationType__c
+    description: Business value representing repair contestation type on the cases clean dataset.
+  dt_repair_execution_date:
+    lineage:
+    - datalake_salesforce_raw.case.RepairExecutionDate__c
+    description: Calendar date associated with repair execution date in the business process.
+  repair_is_executed:
+    lineage:
+    - datalake_salesforce_raw.case.RepairIsExecuted__c
+    description: Business value representing repair is executed on the cases clean dataset.
+  dt_repair_scheduling_date:
+    lineage:
+    - datalake_salesforce_raw.case.RepairSchedulingDate__c
+    description: Calendar date associated with repair scheduling date in the business process.
+  repair_scheduling_period:
+    lineage:
+    - datalake_salesforce_raw.case.RepairSchedulingPeriod__c
+    description: Business value representing repair scheduling period on the cases clean dataset.
+  repair_service_provider_comments:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderComments__c
+    description: Business value representing repair service provider comments on the cases clean dataset.
+  repair_service_provider_is_aware:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderIsAware__c
+    description: Business value representing repair service provider is aware on the cases clean dataset.
+  repair_service_provider_is_compulsory:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderIsCompulsory__c
+    description: Business value representing repair service provider is compulsory on the cases clean dataset.
+  repair_service_provider_name:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderName__c
+    description: Business value representing repair service provider name on the cases clean dataset.
+  repair_service_provider_phone:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderPhone__c
+    description: Business value representing repair service provider phone on the cases clean dataset.
+  repair_service_provider_type:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderType__c
+    description: Business value representing repair service provider type on the cases clean dataset.
+  repair_termination_notice_issued:
+    lineage:
+    - datalake_salesforce_raw.case.RepairTerminationNoticeIssued__c
+    description: Business value representing repair termination notice issued on the cases clean dataset.
+  rent_period:
+    lineage:
+    - datalake_salesforce_raw.case.RentPeriod__c
+    description: Business value representing rent period on the cases clean dataset.
+  amount_money:
+    lineage:
+    - datalake_salesforce_raw.case.AmountMoney__c
+    description: Business value representing amount money on the cases clean dataset.
+  amount_received:
+    lineage:
+    - datalake_salesforce_raw.case.AmountReceived__c
+    description: Business value representing amount received on the cases clean dataset.
+  band_aid_number:
+    lineage:
+    - datalake_salesforce_raw.case.BandAidNumber__c
+    description: Business value representing band aid number on the cases clean dataset.
+  disappearancetime:
+    lineage:
+    - datalake_salesforce_raw.case.Disappearancetime__c
+    description: Business value representing disappearancetime on the cases clean dataset.
+  expected_value:
+    lineage:
+    - datalake_salesforce_raw.case.ExpectedValue__c
+    description: Business value representing expected value on the cases clean dataset.
+  flow_decision:
+    lineage:
+    - datalake_salesforce_raw.case.FlowDecision__c
+    description: Business value representing flow decision on the cases clean dataset.
+  jira_link:
+    lineage:
+    - datalake_salesforce_raw.case.JiraLink__c
+    description: Business value representing jira link on the cases clean dataset.
+  last_key_location:
+    lineage:
+    - datalake_salesforce_raw.case.LastKeyLocation__c
+    description: Business value representing last key location on the cases clean dataset.
+  id_partner_id:
+    lineage:
+    - datalake_salesforce_raw.case.PartnerId__c
+    description: Identifier for the partner id referenced by this record.
+  period:
+    lineage:
+    - datalake_salesforce_raw.case.Period__c
+    description: Business value representing period on the cases clean dataset.
+  platform:
+    lineage:
+    - datalake_salesforce_raw.case.Platform__c
+    description: Business value representing platform on the cases clean dataset.
+  property_category:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyCategory__c
+    description: Business value representing property category on the cases clean dataset.
+  property_type:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyType__c
+    description: Business value representing property type on the cases clean dataset.
+  reference_month:
+    lineage:
+    - datalake_salesforce_raw.case.ReferenceMonth__c
+    description: Business value representing reference month on the cases clean dataset.
+  requires_internal_handling:
+    lineage:
+    - datalake_salesforce_raw.case.RequiresInternalHandling__c
+    description: Business value representing requires internal handling on the cases clean dataset.
+  there_was_a_need_to_open_jira:
+    lineage:
+    - datalake_salesforce_raw.case.ThereWasANeedToOpenJira__c
+    description: Business value representing there was a need to open jira on the cases clean dataset.
+  type_of_operational_property:
+    lineage:
+    - datalake_salesforce_raw.case.TypeOfOperationalProperty__c
+    description: Business value representing type of operational property on the cases clean dataset.
+  user_issueonthe_platform:
+    lineage:
+    - datalake_salesforce_raw.case.UserIssueonthePlatform__c
+    description: Business value representing user issueonthe platform on the cases clean dataset.
+  what_was_the_method_of_resolution:
+    lineage:
+    - datalake_salesforce_raw.case.WhatWasTheMethodOfResolution__c
+    description: Business value representing what was the method of resolution on the cases clean dataset.
+  where_to_pick_up_and_return_the_keys:
+    lineage:
+    - datalake_salesforce_raw.case.WhereToPickUpAndReturnTheKeys__c
+    description: Business value representing where to pick up and return the keys on the cases clean dataset.
+  balance_to_receive:
+    lineage:
+    - datalake_salesforce_raw.case.BalanceToReceive__c
+    description: Business value representing balance to receive on the cases clean dataset.
+  billing_reason:
+    lineage:
+    - datalake_salesforce_raw.case.BillingReason__c
+    description: Business value representing billing reason on the cases clean dataset.
+  dt_ccv_signed_date:
+    lineage:
+    - datalake_salesforce_raw.case.CCVSignedDate__c
+    description: Calendar date associated with ccv signed date in the business process.
+  dt_earliest_due_date:
+    lineage:
+    - datalake_salesforce_raw.case.EarliestDueDate__c
+    description: Calendar date associated with earliest due date in the business process.
+  invoice:
+    lineage:
+    - datalake_salesforce_raw.case.Invoice__c
+    description: Business value representing invoice on the cases clean dataset.
+  outstanding_amount:
+    lineage:
+    - datalake_salesforce_raw.case.OutstandingAmount__c
+    description: Business value representing outstanding amount on the cases clean dataset.
+  product:
+    lineage:
+    - datalake_salesforce_raw.case.Product__c
+    description: Business value representing product on the cases clean dataset.
+  received_balance:
+    lineage:
+    - datalake_salesforce_raw.case.ReceivedBalance__c
+    description: Business value representing received balance on the cases clean dataset.
+  service_classification:
+    lineage:
+    - datalake_salesforce_raw.case.ServiceClassification__c
+    description: Business value representing service classification on the cases clean dataset.
+  id_swapped_contract_id:
+    lineage:
+    - datalake_salesforce_raw.case.SwappedContractId__c
+    description: Identifier for the swapped contract id referenced by this record.
+  total_brokerage_amount:
+    lineage:
+    - datalake_salesforce_raw.case.TotalBrokerageAmount__c
+    description: Business value representing total brokerage amount on the cases clean dataset.
+  case_repair_item:
+    lineage:
+    - datalake_salesforce_raw.case.CaseRepairItem__c
+    description: Business value representing case repair item on the cases clean dataset.
+  case_repair_request:
+    lineage:
+    - datalake_salesforce_raw.case.CaseRepairRequest__c
+    description: Business value representing case repair request on the cases clean dataset.
+  dt_repair_service_provider_date:
+    lineage:
+    - datalake_salesforce_raw.case.RepairServiceProviderDate__c
+    description: Calendar date associated with repair service provider date in the business process.
+  customer_favorable:
+    lineage:
+    - datalake_salesforce_raw.case.CustomerFavorable__c
+    description: Business value representing customer favorable on the cases clean dataset.
+  entry_channel:
+    lineage:
+    - datalake_salesforce_raw.case.EntryChannel__c
+    description: Business value representing entry channel on the cases clean dataset.
+  fraud_analysis:
+    lineage:
+    - datalake_salesforce_raw.case.FraudAnalysis__c
+    description: Business value representing fraud analysis on the cases clean dataset.
+  legal_action:
+    lineage:
+    - datalake_salesforce_raw.case.LegalAction__c
+    description: Business value representing legal action on the cases clean dataset.
+  process_offender:
+    lineage:
+    - datalake_salesforce_raw.case.ProcessOffender__c
+    description: Business value representing process offender on the cases clean dataset.
+  product5_a:
+    lineage:
+    - datalake_salesforce_raw.case.Product5A__c
+    description: Business value representing product5 a on the cases clean dataset.
+  related_employee:
+    lineage:
+    - datalake_salesforce_raw.case.RelatedEmployee__c
+    description: Business value representing related employee on the cases clean dataset.
+  new_related_contract_status:
+    lineage:
+    - datalake_salesforce_raw.case.NewRelatedContractStatus__c
+    description: Business value representing new related contract status on the cases clean dataset.
+  credit_analysis_approved_by_the_team:
+    lineage:
+    - datalake_salesforce_raw.case.CreditAnalysisApprovedByTheTeam__c
+    description: Business value representing credit analysis approved by the team on the cases clean dataset.
+  hefesto_portfolio_status_label:
+    lineage:
+    - datalake_salesforce_raw.case.HefestoPortfolioStatusLabel__c
+    description: Business value representing hefesto portfolio status label on the cases clean dataset.
+  buyer_document:
+    lineage:
+    - datalake_salesforce_raw.case.BuyerDocument__c
+    description: Business value representing buyer document on the cases clean dataset.
+  buyer_name:
+    lineage:
+    - datalake_salesforce_raw.case.BuyerName__c
+    description: Business value representing buyer name on the cases clean dataset.
+  bypass_type:
+    lineage:
+    - datalake_salesforce_raw.case.BypassType__c
+    description: Business value representing bypass type on the cases clean dataset.
+  cri_number:
+    lineage:
+    - datalake_salesforce_raw.case.CRINumber__c
+    description: Business value representing cri number on the cases clean dataset.
+  id_idactum:
+    lineage:
+    - datalake_salesforce_raw.case.IDIdactum__c
+    description: Identifier for the idactum referenced by this record.
+  investigation_source:
+    lineage:
+    - datalake_salesforce_raw.case.InvestigationSource__c
+    description: Business value representing investigation source on the cases clean dataset.
+  landlord_document:
+    lineage:
+    - datalake_salesforce_raw.case.LandlordDocument__c
+    description: Business value representing landlord document on the cases clean dataset.
+  landlord_name:
+    lineage:
+    - datalake_salesforce_raw.case.LandlordName__c
+    description: Business value representing landlord name on the cases clean dataset.
+  property_negotiation_value:
+    lineage:
+    - datalake_salesforce_raw.case.PropertyNegotiationValue__c
+    description: Business value representing property negotiation value on the cases clean dataset.
+  registration_number:
+    lineage:
+    - datalake_salesforce_raw.case.RegistrationNumber__c
+    description: Business value representing registration number on the cases clean dataset.
+  dt_transaction_date:
+    lineage:
+    - datalake_salesforce_raw.case.TransactionDate__c
+    description: Calendar date associated with transaction date in the business process.
+  id_visit_id:
+    lineage:
+    - datalake_salesforce_raw.case.VisitId__c
+    description: Identifier for the visit id referenced by this record.
+  closed_by_automation:
+    lineage:
+    - datalake_salesforce_raw.case.ClosedByAutomation__c
+    description: Business value representing closed by automation on the cases clean dataset.
+  journey:
+    lineage:
+    - datalake_salesforce_raw.case.journey__c
+    description: Business value representing journey on the cases clean dataset.
+  case_to_be_handled:
+    lineage:
+    - datalake_salesforce_raw.case.CaseToBeHandled__c
+    description: Business value representing case to be handled on the cases clean dataset.
+  microtaxonomy:
+    lineage:
+    - datalake_salesforce_raw.case.Microtaxonomy__c
+    description: Business value representing microtaxonomy on the cases clean dataset.
+  ra_active:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Active__c
+    description: Business value representing ra active on the cases clean dataset.
+  ra_attachments_count:
+    lineage:
+    - datalake_salesforce_raw.case.RA_AttachmentsCount__c
+    description: Business value representing ra attachments count on the cases clean dataset.
+  ra_back_doing_business:
+    lineage:
+    - datalake_salesforce_raw.case.RA_BackDoingBusiness__c
+    description: Business value representing ra back doing business on the cases clean dataset.
+  ra_block_public_reply:
+    lineage:
+    - datalake_salesforce_raw.case.RA_BlockPublicReply__c
+    description: Business value representing ra block public reply on the cases clean dataset.
+  ra_block_public_until:
+    lineage:
+    - datalake_salesforce_raw.case.RA_BlockPublicUntil__c
+    description: Business value representing ra block public until on the cases clean dataset.
+  ra_categories:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Categories__c
+    description: Business value representing ra categories on the cases clean dataset.
+  ra_client_quinto_andar:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ClientQuintoAndar__c
+    description: Business value representing ra client quinto andar on the cases clean dataset.
+  ra_closed_by_inactivity:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ClosedByInactivity__c
+    description: Business value representing ra closed by inactivity on the cases clean dataset.
+  id_ra_company_id:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CompanyId__c
+    description: Identifier for the ra company id referenced by this record.
+  ra_company_name:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CompanyName__c
+    description: Business value representing ra company name on the cases clean dataset.
+  ra_contract_situation:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ContractSituation__c
+    description: Business value representing ra contract situation on the cases clean dataset.
+  dt_ra_creation_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CreationDate__c
+    description: Calendar date associated with ra creation date in the business process.
+  ra_customer_cnpj:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerCNPJ__c
+    description: Business value representing ra customer cnpj on the cases clean dataset.
+  ra_customer_city:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerCity__c
+    description: Business value representing ra customer city on the cases clean dataset.
+  ra_customer_cpf:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerCpf__c
+    description: Business value representing ra customer cpf on the cases clean dataset.
+  ra_customer_email:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerEmail__c
+    description: Business value representing ra customer email on the cases clean dataset.
+  ra_customer_interactions_count:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerInteractionsCount__c
+    description: Business value representing ra customer interactions count on the cases clean dataset.
+  ra_customer_name:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerName__c
+    description: Business value representing ra customer name on the cases clean dataset.
+  ra_customer_phone:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerPhone__c
+    description: Business value representing ra customer phone on the cases clean dataset.
+  ra_customer_state:
+    lineage:
+    - datalake_salesforce_raw.case.RA_CustomerState__c
+    description: Business value representing ra customer state on the cases clean dataset.
+  id_ra_external_id:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ExternalId__c
+    description: Identifier for the ra external id referenced by this record.
+  ra_feeling:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Feeling__c
+    description: Business value representing ra feeling on the cases clean dataset.
+  ra_hug_me_status:
+    lineage:
+    - datalake_salesforce_raw.case.RA_HugMeStatus__c
+    description: Business value representing ra hug me status on the cases clean dataset.
+  ra_interactions_count:
+    lineage:
+    - datalake_salesforce_raw.case.RA_InteractionsCount__c
+    description: Business value representing ra interactions count on the cases clean dataset.
+  dt_ra_last_modification_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_LastModificationDate__c
+    description: Calendar date associated with ra last modification date in the business process.
+  dt_ra_last_poll_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_LastPollDate__c
+    description: Calendar date associated with ra last poll date in the business process.
+  ra_moderation_description:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ModerationDescription__c
+    description: Business value representing ra moderation description on the cases clean dataset.
+  dt_ra_moderation_end_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ModerationEndDate__c
+    description: Calendar date associated with ra moderation end date in the business process.
+  ra_moderation_pending:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ModerationPending__c
+    description: Business value representing ra moderation pending on the cases clean dataset.
+  ra_moderation_result:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ModerationResult__c
+    description: Business value representing ra moderation result on the cases clean dataset.
+  dt_ra_moderation_start_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ModerationStartDate__c
+    description: Calendar date associated with ra moderation start date in the business process.
+  ra_preferred_contact_method:
+    lineage:
+    - datalake_salesforce_raw.case.RA_PreferredContactMethod__c
+    description: Business value representing ra preferred contact method on the cases clean dataset.
+  ra_private_session_open:
+    lineage:
+    - datalake_salesforce_raw.case.RA_PrivateSessionOpen__c
+    description: Business value representing ra private session open on the cases clean dataset.
+  ra_private_treatment_time:
+    lineage:
+    - datalake_salesforce_raw.case.RA_PrivateTreatmentTime__c
+    description: Business value representing ra private treatment time on the cases clean dataset.
+  ra_public_response_content:
+    lineage:
+    - datalake_salesforce_raw.case.RA_PublicResponseContent__c
+    description: Business value representing ra public response content on the cases clean dataset.
+  dt_ra_public_response_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_PublicResponseDate__c
+    description: Calendar date associated with ra public response date in the business process.
+  ra_public_treatment_time:
+    lineage:
+    - datalake_salesforce_raw.case.RA_PublicTreatmentTime__c
+    description: Business value representing ra public treatment time on the cases clean dataset.
+  ra_ra_fone_status:
+    lineage:
+    - datalake_salesforce_raw.case.RA_RaFoneStatus__c
+    description: Business value representing ra ra fone status on the cases clean dataset.
+  dt_ra_rating_date:
+    lineage:
+    - datalake_salesforce_raw.case.RA_RatingDate__c
+    description: Calendar date associated with ra rating date in the business process.
+  ra_rating_explanation:
+    lineage:
+    - datalake_salesforce_raw.case.RA_RatingExplanation__c
+    description: Business value representing ra rating explanation on the cases clean dataset.
+  ra_rating:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Rating__c
+    description: Business value representing ra rating on the cases clean dataset.
+  ra_reason_contact:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ReasonContact__c
+    description: Business value representing ra reason contact on the cases clean dataset.
+  ra_reason:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Reason__c
+    description: Business value representing ra reason on the cases clean dataset.
+  ra_reopen_reason:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ReopenReason__c
+    description: Business value representing ra reopen reason on the cases clean dataset.
+  ra_request_evaluation:
+    lineage:
+    - datalake_salesforce_raw.case.RA_RequestEvaluation__c
+    description: Business value representing ra request evaluation on the cases clean dataset.
+  ra_request_moderation:
+    lineage:
+    - datalake_salesforce_raw.case.RA_RequestModeration__c
+    description: Business value representing ra request moderation on the cases clean dataset.
+  ra_resolved_issue:
+    lineage:
+    - datalake_salesforce_raw.case.RA_ResolvedIssue__c
+    description: Business value representing ra resolved issue on the cases clean dataset.
+  ra_source:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Source__c
+    description: Business value representing ra source on the cases clean dataset.
+  id_ra_status_id:
+    lineage:
+    - datalake_salesforce_raw.case.RA_StatusId__c
+    description: Identifier for the ra status id referenced by this record.
+  ra_status:
+    lineage:
+    - datalake_salesforce_raw.case.RA_Status__c
+    description: Business value representing ra status on the cases clean dataset.
+  id_ra_ticket_id:
+    lineage:
+    - datalake_salesforce_raw.case.RA_TicketId__c
+    description: Identifier for the ra ticket id referenced by this record.
+  ra_ticket_moderations_count:
+    lineage:
+    - datalake_salesforce_raw.case.RA_TicketModerationsCount__c
+    description: Business value representing ra ticket moderations count on the cases clean dataset.
+  ra_ticket_url:
+    lineage:
+    - datalake_salesforce_raw.case.RA_TicketUrl__c
+    description: Business value representing ra ticket url on the cases clean dataset.
+  sonia_contract:
+    lineage:
+    - datalake_salesforce_raw.case.SoniaContract__c
+    description: Business value representing sonia contract on the cases clean dataset.
+  case_require_follow_up:
+    lineage:
+    - datalake_salesforce_raw.case.CaseRequireFollowUp__c
+    description: Business value representing case require follow up on the cases clean dataset.
+  favorable_review:
+    lineage:
+    - datalake_salesforce_raw.case.FavorableReview__c
+    description: Business value representing favorable review on the cases clean dataset.
+  agreement_channel_between_pp_and_iq:
+    lineage:
+    - datalake_salesforce_raw.case.AgreementChannelBetweenPPAndIQ__c
+    description: Business value representing agreement channel between pp and iq on the cases clean dataset.
+  authorized_by_owner:
+    lineage:
+    - datalake_salesforce_raw.case.AuthorizedByOwner__c
+    description: Business value representing authorized by owner on the cases clean dataset.
+  id_crm_task_id:
+    lineage:
+    - datalake_salesforce_raw.case.CrmTaskId__c
+    description: Identifier for the crm task id referenced by this record.
+  installment_plan:
+    lineage:
+    - datalake_salesforce_raw.case.InstallmentPlan__c
+    description: Business value representing installment plan on the cases clean dataset.
+  repair_value:
+    lineage:
+    - datalake_salesforce_raw.case.RepairValue__c
+    description: Business value representing repair value on the cases clean dataset.
+  ra_ticket_link:
+    lineage:
+    - datalake_salesforce_raw.case.RA_TicketLink__c
+    description: Business value representing ra ticket link on the cases clean dataset.
+  dt_date_awaiting_ra:
+    lineage:
+    - datalake_salesforce_raw.case.DateAwaitingRA__c
+    description: Calendar date associated with date awaiting ra in the business process.
+  did_front_send_complete_data:
+    lineage:
+    - datalake_salesforce_raw.case.DidFrontSendCompleteData__c
+    description: Business value representing did front send complete data on the cases clean dataset.
+  should_be_fcr:
+    lineage:
+    - datalake_salesforce_raw.case.ShouldBeFCR__c
+    description: Business value representing should be fcr on the cases clean dataset.
+  check_closure_fields:
+    lineage:
+    - datalake_salesforce_raw.case.CheckClosureFields__c
+    description: Business value representing check closure fields on the cases clean dataset.
+  discount_percentage:
+    lineage:
+    - datalake_salesforce_raw.case.DiscountPercentage__c
+    description: Business value representing discount percentage on the cases clean dataset.
+  invoice_type:
+    lineage:
+    - datalake_salesforce_raw.case.InvoiceType__c
+    description: Business value representing invoice type on the cases clean dataset.
+  penalty_amount:
+    lineage:
+    - datalake_salesforce_raw.case.PenaltyAmount__c
+    description: Business value representing penalty amount on the cases clean dataset.
+  termination_reason:
+    lineage:
+    - datalake_salesforce_raw.case.TerminationReason__c
+    description: Business value representing termination reason on the cases clean dataset.
+  billingtype:
+    lineage:
+    - datalake_salesforce_raw.case.Billingtype__c
+    description: Business value representing billingtype on the cases clean dataset.
+  case_id:
+    lineage:
+    - datalake_salesforce_raw.case.CaseID__c
+    description: Business value representing case id on the cases clean dataset.
+  inspection_realized:
+    lineage:
+    - datalake_salesforce_raw.case.InspectionRealized__c
+    description: Business value representing inspection realized on the cases clean dataset.
+  send_to_broker:
+    lineage:
+    - datalake_salesforce_raw.case.SendToBroker__c
+    description: Business value representing send to broker on the cases clean dataset.
+  send_to_buyer:
+    lineage:
+    - datalake_salesforce_raw.case.SendToBuyer__c
+    description: Business value representing send to buyer on the cases clean dataset.
+  send_to_collaborator:
+    lineage:
+    - datalake_salesforce_raw.case.SendToCollaborator__c
+    description: Business value representing send to collaborator on the cases clean dataset.
+  send_to_inspector:
+    lineage:
+    - datalake_salesforce_raw.case.SendToInspector__c
+    description: Business value representing send to inspector on the cases clean dataset.
+  send_to_photographer:
+    lineage:
+    - datalake_salesforce_raw.case.SendToPhotographer__c
+    description: Business value representing send to photographer on the cases clean dataset.
+  send_to_seller:
+    lineage:
+    - datalake_salesforce_raw.case.SendToSeller__c
+    description: Business value representing send to seller on the cases clean dataset.
+  reply_case_owner:
+    lineage:
+    - datalake_salesforce_raw.case.ReplyCaseOwner__c
+    description: Business value representing reply case owner on the cases clean dataset.
+  email_address_escalations:
+    lineage:
+    - datalake_salesforce_raw.case.EmailAddressEscalations__c
+    description: Business value representing email address escalations on the cases clean dataset.
+  magic_link_code:
+    lineage:
+    - datalake_salesforce_raw.case.MagicLinkCode__c
+    description: Business value representing magic link code on the cases clean dataset.
+  final_claimant:
+    lineage:
+    - datalake_salesforce_raw.case.FinalClaimant__c
+    description: Business value representing final claimant on the cases clean dataset.
+  publication_link:
+    lineage:
+    - datalake_salesforce_raw.case.PublicationLink__c
+    description: Business value representing publication link on the cases clean dataset.
+  social_network:
+    lineage:
+    - datalake_salesforce_raw.case.SocialNetwork__c
+    description: Business value representing social network on the cases clean dataset.
+  privacy_analysis:
+    lineage:
+    - datalake_salesforce_raw.case.PrivacyAnalysis__c
+    description: Business value representing privacy analysis on the cases clean dataset.
+  check_collections_case_closure:
+    lineage:
+    - datalake_salesforce_raw.case.CheckCollectionsCaseClosure__c
+    description: Business value representing check collections case closure on the cases clean dataset.
+  opportunity:
+    lineage:
+    - datalake_salesforce_raw.case.Opportunity__c
+    description: Business value representing opportunity on the cases clean dataset.

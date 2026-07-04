@@ -6,235 +6,235 @@ owner: gabriel.firmino@quintoandar.com.br
 columns:
   id_task:
     lineage:
-      - datalake_salesforce_raw.task.Id
+    - datalake_salesforce_raw.task.Id
     description: Unique identification key for task in Sales Force.
   id_who:
     lineage:
-      - datalake_salesforce_raw.task.WhoId
+    - datalake_salesforce_raw.task.WhoId
     description: Identification key of the person related to the task.
   id_what:
     lineage:
-      - datalake_salesforce_raw.task.WhatId
+    - datalake_salesforce_raw.task.WhatId
     description: Identification key of the object related to the task.
   id_owner:
     lineage:
-      - datalake_salesforce_raw.task.OwnerId
+    - datalake_salesforce_raw.task.OwnerId
     description: Owner identification key of the task.
   id_account:
     lineage:
-      - datalake_salesforce_raw.task.AccountId
+    - datalake_salesforce_raw.task.AccountId
     description: Account identification key associated with the task.
   id_recurrence_activity:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceActivityId
+    - datalake_salesforce_raw.task.RecurrenceActivityId
     description: Recurrence activity identification key.
   id_contract:
     lineage:
-      - datalake_salesforce_raw.task.ContractId
+    - datalake_salesforce_raw.task.ContractId
     description: Contract identification key related to the task.
   id_source_task:
     lineage:
-      - datalake_salesforce_raw.task.SourceTask__c
+    - datalake_salesforce_raw.task.SourceTask__c
     description: Custom field to record the ID of the task that originated another.
   who_count:
     lineage:
-      - datalake_salesforce_raw.task.WhoCount
+    - datalake_salesforce_raw.task.WhoCount
     description: Count of related people.
   what_count:
     lineage:
-      - datalake_salesforce_raw.task.WhatCount
+    - datalake_salesforce_raw.task.WhatCount
     description: Count of related objects.
   subject:
     lineage:
-      - datalake_salesforce_raw.task.Subject
+    - datalake_salesforce_raw.task.Subject
     description: Human-readable subject line describing the CRM task purpose for agents and reporting.
   status:
     lineage:
-      - datalake_salesforce_raw.task.Status
+    - datalake_salesforce_raw.task.Status
     description: Current status of the task.
   priority:
     lineage:
-      - datalake_salesforce_raw.task.Priority
+    - datalake_salesforce_raw.task.Priority
     description: Priority level of the task.
   type:
     lineage:
-      - datalake_salesforce_raw.task.Type
+    - datalake_salesforce_raw.task.Type
     description: Classification type assigned by the source platform for routing or reporting.
   call_duration_in_seconds:
     lineage:
-      - datalake_salesforce_raw.task.CallDurationInSeconds
+    - datalake_salesforce_raw.task.CallDurationInSeconds
     description: Business value representing call duration in seconds on the task clean dataset.
   call_type:
     lineage:
-      - datalake_salesforce_raw.task.CallType
+    - datalake_salesforce_raw.task.CallType
     description: Type of call associated with the task.
   call_disposition:
     lineage:
-      - datalake_salesforce_raw.task.CallDisposition
+    - datalake_salesforce_raw.task.CallDisposition
     description: Disposition status of the call.
   call_object:
     lineage:
-      - datalake_salesforce_raw.task.CallObject
+    - datalake_salesforce_raw.task.CallObject
     description: Object reference of the call.
   task_subtype:
     lineage:
-      - datalake_salesforce_raw.task.TaskSubtype
+    - datalake_salesforce_raw.task.TaskSubtype
     description: Business value representing task subtype on the task clean dataset.
   recurrence_type:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceType
+    - datalake_salesforce_raw.task.RecurrenceType
     description: Type of recurrence pattern.
   recurrence_interval:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceInterval
+    - datalake_salesforce_raw.task.RecurrenceInterval
     description: Interval between recurrences.
   recurrence_day_of_week_mask:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceDayOfWeekMask
+    - datalake_salesforce_raw.task.RecurrenceDayOfWeekMask
     description: Mask representing recurring days of the week.
   recurrence_day_of_month:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceDayOfMonth
+    - datalake_salesforce_raw.task.RecurrenceDayOfMonth
     description: Business value representing recurrence day of month on the task clean dataset.
   recurrence_instance:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceInstance
+    - datalake_salesforce_raw.task.RecurrenceInstance
     description: Instance of recurrence within a month.
   recurrence_month_of_year:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceMonthOfYear
+    - datalake_salesforce_raw.task.RecurrenceMonthOfYear
     description: Business value representing recurrence month of year on the task clean dataset.
   recurrence_regenerated_type:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceRegeneratedType
+    - datalake_salesforce_raw.task.RecurrenceRegeneratedType
     description: Business value representing recurrence regenerated type on the task clean dataset.
   task_name:
     lineage:
-      - datalake_salesforce_raw.task.TaskName
+    - datalake_salesforce_raw.task.TaskName
     description: Human-readable task name used in dashboards and operational reports.
   task_interaction_type:
     lineage:
-      - datalake_salesforce_raw.task.TaskInteractionType
+    - datalake_salesforce_raw.task.TaskInteractionType
     description: Type of interaction related to the task.
   case_criticality:
     lineage:
-      - datalake_salesforce_raw.task.CaseCriticality
+    - datalake_salesforce_raw.task.CaseCriticality
     description: Criticality level of the related case.
   case_account:
     lineage:
-      - datalake_salesforce_raw.task.CaseAccount
+    - datalake_salesforce_raw.task.CaseAccount
     description: Account associated with the case.
   observation:
     lineage:
-      - datalake_salesforce_raw.task.Observation
+    - datalake_salesforce_raw.task.Observation
     description: Observations about the task.
   delay_message:
     lineage:
-      - datalake_salesforce_raw.task.DelayMessage
+    - datalake_salesforce_raw.task.DelayMessage
     description: Message related to task delay.
   experiment_group:
     lineage:
-      - datalake_salesforce_raw.task.ExperimentGroup
+    - datalake_salesforce_raw.task.ExperimentGroup
     description: Business value representing experiment group on the task clean dataset.
   unlisting_reason:
     lineage:
-      - datalake_salesforce_raw.task.UnlistingReason
+    - datalake_salesforce_raw.task.UnlistingReason
     description: Reason for unlisting the house.
   is_answer:
     lineage:
-      - datalake_salesforce_raw.task.Answer
+    - datalake_salesforce_raw.task.Answer
     description: Response associated with the task.
   is_high_priority:
     lineage:
-      - datalake_salesforce_raw.task.IsHighPriority
+    - datalake_salesforce_raw.task.IsHighPriority
     description: Indicates if the task is of high priority.
   is_deleted:
     lineage:
-      - datalake_salesforce_raw.task.IsDeleted
+    - datalake_salesforce_raw.task.IsDeleted
     description: Indicates if the task is deleted.
   is_closed:
     lineage:
-      - datalake_salesforce_raw.task.IsClosed
+    - datalake_salesforce_raw.task.IsClosed
     description: Indicates if the task is closed.
   is_archived:
     lineage:
-      - datalake_salesforce_raw.task.IsArchived
+    - datalake_salesforce_raw.task.IsArchived
     description: Indicates if the task is archived.
   is_reminder_set:
     lineage:
-      - datalake_salesforce_raw.task.IsReminderSet
+    - datalake_salesforce_raw.task.IsReminderSet
     description: Indicates if a reminder is set for the task.
   is_recurrence:
     lineage:
-      - datalake_salesforce_raw.task.IsRecurrence
+    - datalake_salesforce_raw.task.IsRecurrence
     description: Indicates if the task is recurrent.
   is_ab_test:
     lineage:
-      - datalake_salesforce_raw.task.IsABTest
+    - datalake_salesforce_raw.task.IsABTest
     description: Flag indicating if the task is an AB test.
   contract_id_odd_even:
     lineage:
-      - datalake_salesforce_raw.task.ContractIdOddOrEven
+    - datalake_salesforce_raw.task.ContractIdOddOrEven
     description: Descriptive column indicating if the case contract ID is odd or even.
   communication_task:
     lineage:
-      - datalake_salesforce_raw.task.CommunicationTask
+    - datalake_salesforce_raw.task.CommunicationTask
     description: Picklist field that identifies whether the task is linked to an HSM submission.
     categories:
-      AgentTask: "This value is when an error occurs while sending and returns to the agent's action."
-      HSMAutomation: "Sending HSM Whatsapp."
-      EmailAutomation: "Sending email."
+      AgentTask: This value is when an error occurs while sending and returns to the agent's action.
+      HSMAutomation: Sending HSM Whatsapp.
+      EmailAutomation: Sending email.
   communication_status:
     lineage:
-      - datalake_salesforce_raw.task.CommunicationStatus
+    - datalake_salesforce_raw.task.CommunicationStatus
     description: Indicates the sending status of the HSM message associated with the task.
     categories:
-      Sent: "The message was transmitted successfully."
-      Pending: "The message is waiting to be sent or processed."
-      Error: "There was a failure to send or the return was error."
+      Sent: The message was transmitted successfully.
+      Pending: The message is waiting to be sent or processed.
+      Error: There was a failure to send or the return was error.
   is_hsm_sent:
     lineage:
-      - datalake_salesforce_raw.task.HSMSent
+    - datalake_salesforce_raw.task.HSMSent
     description: Indicates if the task is an HSM sent.
   is_email_sent:
     lineage:
-      - datalake_salesforce_raw.task.EmailSent
+    - datalake_salesforce_raw.task.EmailSent
     description: Indicates if the task is an email sent.
   responsability_contesting_is_good:
     lineage:
-      - datalake_salesforce_raw.task.ResponsabilityContestingIsGood
+    - datalake_salesforce_raw.task.ResponsabilityContestingIsGood
     description: Indicator of responsibility contesting.
   ts_completed:
     lineage:
-      - datalake_salesforce_raw.task.CompletedDateTime
+    - datalake_salesforce_raw.task.CompletedDateTime
     description: Timestamp when the task was completed.
   ts_reminder:
     lineage:
-      - datalake_salesforce_raw.task.ReminderDateTime
+    - datalake_salesforce_raw.task.ReminderDateTime
     description: Timestamp of the reminder set for the task.
   ts_activity:
     lineage:
-      - datalake_salesforce_raw.task.ActivityDate
+    - datalake_salesforce_raw.task.ActivityDate
     description: Date of the task activity.
   ts_pass_due:
     lineage:
-      - datalake_salesforce_raw.task.PassDueDate
+    - datalake_salesforce_raw.task.PassDueDate
     description: Past due date of the task.
   ts_first_interaction:
     lineage:
-      - datalake_salesforce_raw.task.FirstInteractionDate
+    - datalake_salesforce_raw.task.FirstInteractionDate
     description: Date of the first interaction.
   ts_recurrence_start:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceStartDateOnly
+    - datalake_salesforce_raw.task.RecurrenceStartDateOnly
     description: Start date of the recurrence.
   ts_recurrence_end:
     lineage:
-      - datalake_salesforce_raw.task.RecurrenceEndDateOnly
+    - datalake_salesforce_raw.task.RecurrenceEndDateOnly
     description: End date of the recurrence.
   ts_system_mod:
     lineage:
-      - datalake_salesforce_raw.task.SystemModstamp
+    - datalake_salesforce_raw.task.SystemModstamp
     description: System modification timestamp.
   id_fs_offer:
     lineage: []
@@ -326,3 +326,459 @@ columns:
   task_action:
     lineage: []
     description: Business value representing task action on the task clean dataset.
+  description:
+    lineage:
+    - datalake_salesforce_raw.task.Description
+    description: Business value representing description on the task clean dataset.
+  type_2:
+    lineage:
+    - datalake_salesforce_raw.task.Type
+    description: Business value representing type 2 on the task clean dataset.
+  id_created_by_id:
+    lineage:
+    - datalake_salesforce_raw.task.CreatedById
+    description: Identifier for the created by id referenced by this record.
+  is_visible_in_self_service:
+    lineage:
+    - datalake_salesforce_raw.task.IsVisibleInSelfService
+    description: Indicates whether visible in self service applies to this record.
+  recurrence_time_zone_sid_key:
+    lineage:
+    - datalake_salesforce_raw.task.RecurrenceTimeZoneSidKey
+    description: Business value representing recurrence time zone sid key on the task clean dataset.
+  id_feed_item_id:
+    lineage:
+    - datalake_salesforce_raw.task.FeedItemId__c
+    description: Identifier for the feed item id referenced by this record.
+  flow:
+    lineage:
+    - datalake_salesforce_raw.task.Flow__c
+    description: Business value representing flow on the task clean dataset.
+  fs_cri_have_demand_note:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CRI_HaveDemandNote__c
+    description: Business value representing fs cri have demand note on the task clean dataset.
+  fs_cri_have_demand_note_2:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CRI_Have_Demand_Note__c
+    description: Business value representing fs cri have demand note 2 on the task clean dataset.
+  fs_cri_registration_completed:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CRI_RegistrationCompleted__c
+    description: Business value representing fs cri registration completed on the task clean dataset.
+  fs_cri_registration_completed_2:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CRI_Registration_Completed__c
+    description: Business value representing fs cri registration completed 2 on the task clean dataset.
+  fs_client_request_time:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ClientRequestTime__c
+    description: Business value representing fs client request time on the task clean dataset.
+  fs_buyer:
+    lineage:
+    - datalake_salesforce_raw.task.FS_Buyer__c
+    description: Business value representing fs buyer on the task clean dataset.
+  dt_fs_contact_return_date:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ContactReturnDate__c
+    description: Calendar date associated with fs contact return date in the business process.
+  fs_case_subject:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CaseSubject__c
+    description: Business value representing fs case subject on the task clean dataset.
+  fs_made_by_where:
+    lineage:
+    - datalake_salesforce_raw.task.FS_MadeByWhere__c
+    description: Business value representing fs made by where on the task clean dataset.
+  close_source:
+    lineage:
+    - datalake_salesforce_raw.task.CloseSource__c
+    description: Business value representing close source on the task clean dataset.
+  fs_ave_password_task:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AVE_PasswordTask__c
+    description: Business value representing fs ave password task on the task clean dataset.
+  fs_ave_protocol_task:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AVE_ProtocolTask__c
+    description: Business value representing fs ave protocol task on the task clean dataset.
+  dt_fs_ave_request_date_task:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AVE_RequestDateTask__c
+    description: Calendar date associated with fs ave request date task in the business process.
+  fs_approval_requested:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ApprovalRequested__c
+    description: Business value representing fs approval requested on the task clean dataset.
+  fs_registration_completed:
+    lineage:
+    - datalake_salesforce_raw.task.FS_RegistrationCompleted__c
+    description: Business value representing fs registration completed on the task clean dataset.
+  fs_addendum_received:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AddendumReceived__c
+    description: Business value representing fs addendum received on the task clean dataset.
+  fs_does_buyer_want_lease_termination:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DoesBuyerWantLeaseTermination__c
+    description: Business value representing fs does buyer want lease termination on the task clean dataset.
+  fs_lease_termination_sent:
+    lineage:
+    - datalake_salesforce_raw.task.FS_LeaseTerminationSent__c
+    description: Business value representing fs lease termination sent on the task clean dataset.
+  fs_pp_transfer_addendum_sent:
+    lineage:
+    - datalake_salesforce_raw.task.FS_PPTransferAddendumSent__c
+    description: Business value representing fs pp transfer addendum sent on the task clean dataset.
+  id_case:
+    lineage:
+    - datalake_salesforce_raw.task.Case__c
+    description: Salesforce Case identifier linked to the task record.
+  team:
+    lineage:
+    - datalake_salesforce_raw.task.Team__c
+    description: Business value representing team on the task clean dataset.
+  integration_job:
+    lineage:
+    - datalake_salesforce_raw.task.IntegrationJob__c
+    description: Business value representing integration job on the task clean dataset.
+  dt_fs_cri_done_date_task:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CRIDoneDateTask__c
+    description: Calendar date associated with fs cri done date task in the business process.
+  fs_registration_received:
+    lineage:
+    - datalake_salesforce_raw.task.FS_RegistrationReceived__c
+    description: Business value representing fs registration received on the task clean dataset.
+  fs_cancelled_not_following_crn:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CancelledNotFollowingCRN__c
+    description: Business value representing fs cancelled not following crn on the task clean dataset.
+  fs_draft_received_buyers:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DraftReceivedBuyers__c
+    description: Business value representing fs draft received buyers on the task clean dataset.
+  fs_draft_received_sellers:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DraftReceivedSellers__c
+    description: Business value representing fs draft received sellers on the task clean dataset.
+  fs_canceled_reason:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CanceledReason__c
+    description: Business value representing fs canceled reason on the task clean dataset.
+  complexity:
+    lineage:
+    - datalake_salesforce_raw.task.Complexity__c
+    description: Business value representing complexity on the task clean dataset.
+  contract_link:
+    lineage:
+    - datalake_salesforce_raw.task.ContractLink__c
+    description: Business value representing contract link on the task clean dataset.
+  dt_due_date_future_status:
+    lineage:
+    - datalake_salesforce_raw.task.DueDateFutureStatus__c
+    description: Calendar date associated with due date future status in the business process.
+  dt_due_date_in2_days:
+    lineage:
+    - datalake_salesforce_raw.task.DueDateIn2Days__c
+    description: Calendar date associated with due date in2 days in the business process.
+  dt_due_date_status:
+    lineage:
+    - datalake_salesforce_raw.task.DueDateStatus__c
+    description: Calendar date associated with due date status in the business process.
+  manual_repair:
+    lineage:
+    - datalake_salesforce_raw.task.ManualRepair__c
+    description: Business value representing manual repair on the task clean dataset.
+  relisting:
+    lineage:
+    - datalake_salesforce_raw.task.Relisting__c
+    description: Business value representing relisting on the task clean dataset.
+  dt_tr_date:
+    lineage:
+    - datalake_salesforce_raw.task.TRDate__c
+    description: Calendar date associated with tr date in the business process.
+  dt_td_date:
+    lineage:
+    - datalake_salesforce_raw.task.TdDate__c
+    description: Calendar date associated with td date in the business process.
+  termination:
+    lineage:
+    - datalake_salesforce_raw.task.Termination__c
+    description: Business value representing termination on the task clean dataset.
+  dt_tf_date:
+    lineage:
+    - datalake_salesforce_raw.task.TfDate__c
+    description: Calendar date associated with tf date in the business process.
+  ldt_off:
+    lineage:
+    - datalake_salesforce_raw.task.LDTOff__c
+    description: Business value representing ldt off on the task clean dataset.
+  lead_time:
+    lineage:
+    - datalake_salesforce_raw.task.LeadTime__c
+    description: Business value representing lead time on the task clean dataset.
+  ruler:
+    lineage:
+    - datalake_salesforce_raw.task.Ruler__c
+    description: Business value representing ruler on the task clean dataset.
+  td_to_today:
+    lineage:
+    - datalake_salesforce_raw.task.TdToToday__c
+    description: Business value representing td to today on the task clean dataset.
+  task_stage:
+    lineage:
+    - datalake_salesforce_raw.task.TaskStage__c
+    description: Business value representing task stage on the task clean dataset.
+  dt_fs_task_created_date:
+    lineage:
+    - datalake_salesforce_raw.task.FS_TaskCreatedDate__c
+    description: Calendar date associated with fs task created date in the business process.
+  hsm_status:
+    lineage:
+    - datalake_salesforce_raw.task.HSMStatus__c
+    description: Business value representing hsm status on the task clean dataset.
+  supervisor:
+    lineage:
+    - datalake_salesforce_raw.task.Supervisor__c
+    description: Business value representing supervisor on the task clean dataset.
+  contract:
+    lineage:
+    - datalake_salesforce_raw.task.Contract__c
+    description: Business value representing contract on the task clean dataset.
+  dt_case_closed_date:
+    lineage:
+    - datalake_salesforce_raw.task.CaseClosedDate__c
+    description: Calendar date associated with case closed date in the business process.
+  case_type:
+    lineage:
+    - datalake_salesforce_raw.task.CaseType__c
+    description: Business value representing case type on the task clean dataset.
+  contract_name:
+    lineage:
+    - datalake_salesforce_raw.task.ContractName__c
+    description: Business value representing contract name on the task clean dataset.
+  distance_between_points_km:
+    lineage:
+    - datalake_salesforce_raw.task.DistanceBetweenPointsKm__c
+    description: Business value representing distance between points km on the task clean dataset.
+  open_days:
+    lineage:
+    - datalake_salesforce_raw.task.OpenDays__c
+    description: Business value representing open days on the task clean dataset.
+  active_user:
+    lineage:
+    - datalake_salesforce_raw.task.ActiveUser__c
+    description: Business value representing active user on the task clean dataset.
+  recipient_person:
+    lineage:
+    - datalake_salesforce_raw.task.RecipientPerson__c
+    description: Business value representing recipient person on the task clean dataset.
+  bypass_validation:
+    lineage:
+    - datalake_salesforce_raw.task.Bypass_Validation__c
+    description: Business value representing bypass validation on the task clean dataset.
+  fs_additional_information:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AdditionalInformation__c
+    description: Business value representing fs additional information on the task clean dataset.
+  fs_advantages_presented:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AdvantagesPresented__c
+    description: Business value representing fs advantages presented on the task clean dataset.
+  fs_by_document_list:
+    lineage:
+    - datalake_salesforce_raw.task.FS_BY_Document_List__c
+    description: Business value representing fs by document list on the task clean dataset.
+  fs_by_reason_for_request:
+    lineage:
+    - datalake_salesforce_raw.task.FS_BY_Reason_for_Request__c
+    description: Business value representing fs by reason for request on the task clean dataset.
+  fs_bank_chosen_by_client:
+    lineage:
+    - datalake_salesforce_raw.task.FS_BankChosenByClient__c
+    description: Business value representing fs bank chosen by client on the task clean dataset.
+  fs_banks_not_desired_for_financing:
+    lineage:
+    - datalake_salesforce_raw.task.FS_BanksNotDesiredForFinancing__c
+    description: Business value representing fs banks not desired for financing on the task clean dataset.
+  fs_buyer_withdrawn_from_purchase_process:
+    lineage:
+    - datalake_salesforce_raw.task.FS_BuyerWithdrawnFromPurchaseProcess__c
+    description: Business value representing fs buyer withdrawn from purchase process on the task clean dataset.
+  fs_can_use_fgts:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CanUseFGTS__c
+    description: Business value representing fs can use fgts on the task clean dataset.
+  fs_client_response:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ClientResponse__c
+    description: Business value representing fs client response on the task clean dataset.
+  fs_comments_or_recommendations_to_client:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CommentsOrRecommendationsToClient__c
+    description: Business value representing fs comments or recommendations to client on the task clean dataset.
+  fs_commercial_contact_made:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CommercialContactMade__c
+    description: Business value representing fs commercial contact made on the task clean dataset.
+  fs_credit_form_link_sent:
+    lineage:
+    - datalake_salesforce_raw.task.FS_CreditFormLinkSent__c
+    description: Business value representing fs credit form link sent on the task clean dataset.
+  fs_digital_flow_accepted:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DigitalFlowAccepted__c
+    description: Business value representing fs digital flow accepted on the task clean dataset.
+  fs_digital_flow_eligibility:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DigitalFlowEligibility__c
+    description: Business value representing fs digital flow eligibility on the task clean dataset.
+  fs_dispute_upheld:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DisputeUpheld__c
+    description: Business value representing fs dispute upheld on the task clean dataset.
+  fs_dispute_upheld_2:
+    lineage:
+    - datalake_salesforce_raw.task.FS_Dispute_upheld__c
+    description: Business value representing fs dispute upheld 2 on the task clean dataset.
+  fs_documents_sent_to_bank:
+    lineage:
+    - datalake_salesforce_raw.task.FS_DocumentsSentToBank__c
+    description: Business value representing fs documents sent to bank on the task clean dataset.
+  fs_form_completion_requested:
+    lineage:
+    - datalake_salesforce_raw.task.FS_FormCompletionRequested__c
+    description: Business value representing fs form completion requested on the task clean dataset.
+  fs_forms_for_signature_list:
+    lineage:
+    - datalake_salesforce_raw.task.FS_FormsForSignatureList__c
+    description: Business value representing fs forms for signature list on the task clean dataset.
+  fs_inspection_data_completed_in_i_solve:
+    lineage:
+    - datalake_salesforce_raw.task.FS_InspectionDataCompletedInISolve__c
+    description: Business value representing fs inspection data completed in i solve on the task clean dataset.
+  fs_onboarding_channel:
+    lineage:
+    - datalake_salesforce_raw.task.FS_OnboardingChannel__c
+    description: Business value representing fs onboarding channel on the task clean dataset.
+  fs_open_back_office_follow_up:
+    lineage:
+    - datalake_salesforce_raw.task.FS_OpenBackOfficeFollowUp__c
+    description: Business value representing fs open back office follow up on the task clean dataset.
+  fs_pre_proposal_client_guidance:
+    lineage:
+    - datalake_salesforce_raw.task.FS_PreProposalClientGuidance__c
+    description: Business value representing fs pre proposal client guidance on the task clean dataset.
+  fs_proceed_with_quinto_andar:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ProceedWithQuintoAndar__c
+    description: Business value representing fs proceed with quinto andar on the task clean dataset.
+  fs_proposal_ready_to_send_to_client:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ProposalReadyToSendToClient__c
+    description: Business value representing fs proposal ready to send to client on the task clean dataset.
+  fs_proposals_ready_to_send_to_client:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ProposalsReadyToSendToClient__c
+    description: Business value representing fs proposals ready to send to client on the task clean dataset.
+  fs_proposals_requiring_dispute:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ProposalsRequiringDispute__c
+    description: Business value representing fs proposals requiring dispute on the task clean dataset.
+  fs_reason:
+    lineage:
+    - datalake_salesforce_raw.task.FS_Reason__c
+    description: Business value representing fs reason on the task clean dataset.
+  fs_reasons:
+    lineage:
+    - datalake_salesforce_raw.task.FS_Reasons__c
+    description: Business value representing fs reasons on the task clean dataset.
+  fs_relationship_banks:
+    lineage:
+    - datalake_salesforce_raw.task.FS_RelationshipBanks__c
+    description: Business value representing fs relationship banks on the task clean dataset.
+  fs_request_justification:
+    lineage:
+    - datalake_salesforce_raw.task.FS_RequestJustification__c
+    description: Business value representing fs request justification on the task clean dataset.
+  fs_required_additional_documents:
+    lineage:
+    - datalake_salesforce_raw.task.FS_RequiredAdditionalDocuments__c
+    description: Business value representing fs required additional documents on the task clean dataset.
+  fs_sl_document_list:
+    lineage:
+    - datalake_salesforce_raw.task.FS_SL_Document_List__c
+    description: Business value representing fs sl document list on the task clean dataset.
+  fs_sl_reason_for_request:
+    lineage:
+    - datalake_salesforce_raw.task.FS_SL_Reason_for_Request__c
+    description: Business value representing fs sl reason for request on the task clean dataset.
+  fs_send_assessment_to_service:
+    lineage:
+    - datalake_salesforce_raw.task.FS_SendAssessmentToService__c
+    description: Business value representing fs send assessment to service on the task clean dataset.
+  fs_was_onboarding_completed:
+    lineage:
+    - datalake_salesforce_raw.task.FS_WasOnboardingCompleted__c
+    description: Business value representing fs was onboarding completed on the task clean dataset.
+  fs_is_credit_form_filled:
+    lineage:
+    - datalake_salesforce_raw.task.FS_isCreditFormFilled__c
+    description: Business value representing fs is credit form filled on the task clean dataset.
+  status_documenta_o:
+    lineage:
+    - datalake_salesforce_raw.task.Status_Documenta_o__c
+    description: Business value representing status documenta o on the task clean dataset.
+  ccv_payment_method:
+    lineage:
+    - datalake_salesforce_raw.task.CCVPaymentMethod__c
+    description: Business value representing ccv payment method on the task clean dataset.
+  fs_advise_customers_consumption:
+    lineage:
+    - datalake_salesforce_raw.task.FS_AdviseCustomersConsumption__c
+    description: Business value representing fs advise customers consumption on the task clean dataset.
+  fs_for_sale_team:
+    lineage:
+    - datalake_salesforce_raw.task.FS_ForSaleTeam__c
+    description: Business value representing fs for sale team on the task clean dataset.
+  allocated_company:
+    lineage:
+    - datalake_salesforce_raw.task.AllocatedCompany__c
+    description: Business value representing allocated company on the task clean dataset.
+  dt_date_and_time_of_the_appointment:
+    lineage:
+    - datalake_salesforce_raw.task.DateAndTimeOfTheAppointment__c
+    description: Calendar date associated with date and time of the appointment in the business process.
+  estimated_distance:
+    lineage:
+    - datalake_salesforce_raw.task.EstimatedDistance__c
+    description: Business value representing estimated distance on the task clean dataset.
+  expected_cost:
+    lineage:
+    - datalake_salesforce_raw.task.ExpectedCost__c
+    description: Business value representing expected cost on the task clean dataset.
+  final_price_of_the_race:
+    lineage:
+    - datalake_salesforce_raw.task.FinalPriceOfTheRace__c
+    description: Business value representing final price of the race on the task clean dataset.
+  race_cancelled:
+    lineage:
+    - datalake_salesforce_raw.task.RaceCancelled__c
+    description: Business value representing race cancelled on the task clean dataset.
+  race_finished:
+    lineage:
+    - datalake_salesforce_raw.task.RaceFinished__c
+    description: Business value representing race finished on the task clean dataset.
+  reason_for_cancellation:
+    lineage:
+    - datalake_salesforce_raw.task.ReasonForCancellation__c
+    description: Business value representing reason for cancellation on the task clean dataset.
+  was_the_appointment_kept:
+    lineage:
+    - datalake_salesforce_raw.task.WasTheAppointmentKept__c
+    description: Business value representing was the appointment kept on the task clean dataset.
+  is_spoc:
+    lineage:
+    - datalake_salesforce_raw.task.IsSpoc__c
+    description: Indicates whether spoc applies to this record.
