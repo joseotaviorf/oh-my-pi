@@ -26,16 +26,23 @@ def wonka_feature_set_snake_from_dag_id(dag_id: str) -> str | None:
 
 
 def wonka_airflow_dag_id(declaration: dict) -> str | None:
-    """Resolve canonical prod Airflow dag id from a Wonka prod.yml document."""
-    workflow = declaration.get("workflow") or {}
-    wonka_config = workflow.get("wonka_config") or {}
-    feature_set = wonka_config.get("name")
-    if not isinstance(feature_set, str) or not feature_set.strip():
-        dag_section = declaration.get("dag") or {}
-        feature_set = dag_section.get("name")
-    if not isinstance(feature_set, str) or not feature_set.strip():
+    """Resolve canonical prod Airflow dag id from a Wonka prod.yml document.
+
+    The deployed dag id derives from ``dag.name`` (WonkaWorkflow builds
+    ``quintoml.wonka.{dag_args['name']}``), NOT from the feature-set name:
+    e.g. house-user-for-rent-events has wonka_config.name=for_rent_events but
+    deploys as quintoml.wonka.house_user_for_rent_events. Fall back to
+    ``workflow.wonka_config.name`` only when ``dag.name`` is absent.
+    """
+    dag_section = declaration.get("dag") or {}
+    name = dag_section.get("name")
+    if not isinstance(name, str) or not name.strip():
+        workflow = declaration.get("workflow") or {}
+        wonka_config = workflow.get("wonka_config") or {}
+        name = wonka_config.get("name")
+    if not isinstance(name, str) or not name.strip():
         return None
-    return f"{WONKA_DAG_ID_PREFIX}{feature_set.strip()}"
+    return f"{WONKA_DAG_ID_PREFIX}{name.strip().replace('-', '_')}"
 
 
 def wonka_prod_yml_path(
