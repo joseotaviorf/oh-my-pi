@@ -10,6 +10,11 @@ DAG:
       deadline: 2026-06-30
       created_by: gabriel.firmino@quintoandar.com.br
       approved_by: lucas.bguerra@quintoandar.com.br
+    bietlejuice.salesforce:
+      reason: "Failure that needs a discovery after the weekend."
+      deadline: 2026-07-10
+      created_by: gabriel.firmino@quintoandar.com.br
+      approved_by: lucas.bguerra@quintoandar.com.br
     bietlejuice.demand_balancer_service:
       reason: "Pipeline owned by Data Science/MLOps teams."
       deadline: Never

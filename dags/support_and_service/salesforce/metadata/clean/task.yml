@@ -192,10 +192,6 @@ columns:
       Sent: The message was transmitted successfully.
       Pending: The message is waiting to be sent or processed.
       Error: There was a failure to send or the return was error.
-  is_hsm_sent:
-    lineage:
-    - datalake_salesforce_raw.task.HSMSent
-    description: Indicates if the task is an HSM sent.
   is_email_sent:
     lineage:
     - datalake_salesforce_raw.task.EmailSent
@@ -287,9 +283,6 @@ columns:
   year:
     lineage: []
     description: Year partition for incremental loading and partition pruning.
-  is_question_resolved:
-    lineage: []
-    description: Indicates whether question resolved applies to this record.
   ts_task_due_date_formula:
     lineage: []
     description: Timestamp when task due date formula occurred according to the source system.

@@ -43,8 +43,6 @@ SELECT
     AgentRepublishedWithPP__c AS agent_republished_with_pp,
     InformationCollected__c AS information_collected,
     LandlordInformedServiceProvider__c AS pp_informed_service_provider,
-    LLServiceConcluded__c AS ll_service_concluded,
-    PPacceptedDoingRepair__c AS pp_accepted_doing_repair,
     criticality__c AS criticality,
     ContactSuccess__c AS contact_success,
     followUpDescription__c AS follow_up_description,

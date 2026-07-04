@@ -52,7 +52,6 @@ SELECT
     SourceTask__c AS source_task,
     CommunicationStatus__c AS communication_status,
     CAST(SLA__c AS FLOAT) AS sla,
-    CAST(HSMSent__c AS BOOLEAN) AS is_hsm_sent,
     CAST(EmailSent__c AS BOOLEAN) AS is_email_sent,
     CAST(Answer__c AS BOOLEAN) AS is_answer,
     CAST(IsHighPriority AS BOOLEAN) AS is_high_priority,
@@ -74,7 +73,6 @@ SELECT
         WHEN PaidViaTed__c = 'Sim' THEN TRUE
         WHEN PaidViaTed__c = 'Não' THEN FALSE
     END AS has_paid_via_ted,
-    CAST(QuestionResolvedInformedCustomer__c AS BOOLEAN) AS is_question_resolved,
     CASE
         WHEN WasDisagreement__c = 'Sim' THEN TRUE
         WHEN WasDisagreement__c = 'Não' THEN FALSE

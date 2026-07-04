@@ -420,10 +420,6 @@ columns:
     lineage:
     - datalake_salesforce_raw.case.IsStopped
     description: Flag indicating if the case is stopped.
-  ll_service_concluded:
-    lineage:
-    - datalake_salesforce_raw.case.LLServiceConcluded__c
-    description: LL service concluded indicator.
   month:
     lineage:
     - datalake_salesforce_raw.case.LastModifiedDate
@@ -432,10 +428,6 @@ columns:
     lineage:
     - datalake_salesforce_raw.case.CRNStatus__c
     description: Notary office status (CRN).
-  pp_accepted_doing_repair:
-    lineage:
-    - datalake_salesforce_raw.case.PPacceptedDoingRepair__c
-    description: PP accepted doing repair indicator.
   pp_informed_service_provider:
     lineage:
     - datalake_salesforce_raw.case.LandlordInformedServiceProvider__c

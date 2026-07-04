@@ -867,8 +867,6 @@ def schema_define():
                     StructField("PrivacyAnalysis__c", StringType()),
                     StructField("CheckCollectionsCaseClosure__c", StringType()),
                     StructField("Opportunity__c", StringType()),
-                    StructField("LLServiceConcluded__c", StringType()),
-                    StructField("PPacceptedDoingRepair__c", StringType()),
                 ]
             )
         },
@@ -1073,8 +1071,6 @@ def schema_define():
                     StructField("ReasonForCancellation__c", StringType()),
                     StructField("WasTheAppointmentKept__c", StringType()),
                     StructField("IsSpoc__c", StringType()),
-                    StructField("QuestionResolvedInformedCustomer__c", StringType()),
-                    StructField("HSMSent__c", StringType()),
                 ]
             )
         },
