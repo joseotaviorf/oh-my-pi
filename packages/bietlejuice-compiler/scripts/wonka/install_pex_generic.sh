@@ -12,6 +12,9 @@ set -euo pipefail
 #	  file with all the dependencies and a PEX file built with tools (i.e. include_tools=True)
 #   - For EMR, the package should contain a PEX file built with
 #     tools and requirements (i.e. include_tools=True and include_requirements=True)
+#   - main-3rdparty.pex (fat 3rdparty PEX) is a build-time-only artifact used to
+#     derive requirements.txt; it is never expected on S3 and must never be
+#     executed by this script.
 #
 #####################################################################################
 
@@ -30,16 +33,27 @@ setup_databricks() {
 	mkdir -p artifacts
 
 	echo "Downloading artifacts from $PACKAGE_PATH"
-	aws s3 sync "$PACKAGE_PATH" ./artifacts
+	aws s3 sync "$PACKAGE_PATH" ./artifacts --exclude "main-3rdparty.pex"
 
 	# Install 3rdparty dependencies
 	/databricks/python/bin/pip install -r artifacts/requirements.txt # Runs on the Databricks cluster
 
-	# Create virtual environment with internal packages
-	chmod +x artifacts/*.pex
+	# Create virtual environment with internal packages.
+	# Select the runtime PEX explicitly: a glob would pass every *.pex as
+	# arguments to `PEX_TOOLS=1 ... venv` and fail when a stray extra PEX
+	# (e.g. main-3rdparty.pex) is present.
+	pex_file="artifacts/main.pex"
+	if [[ ! -f "$pex_file" ]]; then
+		pex_file=$(find artifacts -maxdepth 1 -name '*.pex' | head -n 1)
+	fi
+	[[ -n "$pex_file" && -f "$pex_file" ]] || {
+		echo "ERROR: no PEX file found under artifacts/" >&2
+		exit 1
+	}
+	chmod +x "$pex_file"
 	export PEX_TOOLS=1
 
-	if ! python ./artifacts/*.pex venv ./venv; then
+	if ! python "$pex_file" venv ./venv; then
 		echo "Failed to create virtual environment"
 		exit 1
 	fi
@@ -84,16 +98,20 @@ setup_emr() {
 	mkdir -p "$artifacts_dir"
 	echo "Downloading artifacts from $PACKAGE_PATH"
 	_ensure_emr_aws_cli
-	aws s3 sync "$PACKAGE_PATH" "$artifacts_dir"
+	aws s3 sync "$PACKAGE_PATH" "$artifacts_dir" --exclude "main-3rdparty.pex"
 
-	chmod +x "$artifacts_dir"/*.pex
 	export PEX_TOOLS=1
 
-	pex_file=$(find "$artifacts_dir" -maxdepth 1 -name "*.pex" | head -n 1)
-	[[ -n "$pex_file" && -e "$pex_file" ]] || {
+	# Prefer the canonical runtime PEX; fall back to a single-PEX layout.
+	pex_file="$artifacts_dir/main.pex"
+	if [[ ! -f "$pex_file" ]]; then
+		pex_file=$(find "$artifacts_dir" -maxdepth 1 -name "*.pex" | head -n 1)
+	fi
+	[[ -n "$pex_file" && -f "$pex_file" ]] || {
 		echo "ERROR: No PEX file found under $artifacts_dir" >&2
 		exit 1
 	}
+	chmod +x "$pex_file"
 
 	echo "Using PEX: $pex_file ($("$python_bin" --version 2>&1))"
 	PEX_TOOLS=1 "$python_bin" "$pex_file" venv --pip "$venv_dir" || {
