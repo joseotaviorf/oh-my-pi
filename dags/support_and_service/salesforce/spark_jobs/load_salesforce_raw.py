@@ -1015,7 +1015,19 @@ def get_next_page_data(
     api_endpoint = f"{instance_url}{endpoint}"
 
     response = requests.get(api_endpoint, headers=headers)
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Salesforce API request failed for table '{table_name}' "
+            f"(HTTP {response.status_code}): {response.text}"
+        )
+
     response_json = response.json()
+
+    if isinstance(response_json, list):
+        raise RuntimeError(
+            f"Salesforce API returned an error for table '{table_name}': {response_json}"
+        )
 
     is_done = response_json["done"]
     next_url = response_json.get("nextRecordsUrl", None)
