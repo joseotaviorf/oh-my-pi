@@ -43,7 +43,7 @@ from argparse import ArgumentParser, Namespace
 from datetime import date, datetime, timedelta
 from typing import Optional
 
-from pyspark.sql import DataFrame, Window
+from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql.functions import (
     coalesce,
     col,
@@ -192,6 +192,7 @@ def _filter_dt_event_range(events: DataFrame, start: date, end: date) -> DataFra
 
 # DBTITLE 1,Cohort (newly accredited agents)
 def _cohort_df(
+    spark: SparkSession,
     cohort_start_date: str,
     load_start: date,
     load_end: date,
@@ -240,7 +241,9 @@ def _cohort_df(
 
 
 # DBTITLE 1,Activation events by day (CIQ / TQC / VCBA)
-def _tqc_events_df(event_start_date: str, event_end_date: str) -> DataFrame:
+def _tqc_events_df(
+    spark: SparkSession, event_start_date: str, event_end_date: str
+) -> DataFrame:
     """TQC self-referrals per (id_user, dt_event): daily count + first ts of the day."""
     return (
         spark.table(TABLE_OFFER_SPECIALISTS)
@@ -257,7 +260,9 @@ def _tqc_events_df(event_start_date: str, event_end_date: str) -> DataFrame:
     )
 
 
-def _ciq_events_df(event_start_date: str, event_end_date: str) -> DataFrame:
+def _ciq_events_df(
+    spark: SparkSession, event_start_date: str, event_end_date: str
+) -> DataFrame:
     """Valid first listings per (id_user, dt_event): daily count + first ts of the day."""
     return (
         spark.table(TABLE_CIQ_FIRST_LISTING)
@@ -274,7 +279,9 @@ def _ciq_events_df(event_start_date: str, event_end_date: str) -> DataFrame:
     )
 
 
-def _vcba_events_df(event_start_date: str, event_end_date: str) -> DataFrame:
+def _vcba_events_df(
+    spark: SparkSession, event_start_date: str, event_end_date: str
+) -> DataFrame:
     """VCBA — completed visits booked by the agent (id_user_creation = id_user_agent)
     per (id_agent, dt_event): daily distinct-schedule count + first ts of the day."""
     return (
@@ -351,7 +358,7 @@ def _activation_summary_df(
 
 # DBTITLE 1,Passive-lead-receiver history (agent_data_aud)
 def _passive_periods_df(
-    cohort: DataFrame, load_start: date, load_end: date
+    spark: SparkSession, cohort: DataFrame, load_start: date, load_end: date
 ) -> DataFrame:
     """Validity periods of is_passive_lead_receiver per agent from the audit log.
 
@@ -390,7 +397,9 @@ def _passive_periods_df(
 
 
 # DBTITLE 1,Main builder
-def build_agent_new_agent_activation_daily(args: Namespace) -> DataFrame:
+def build_agent_new_agent_activation_daily(
+    spark: SparkSession, args: Namespace
+) -> DataFrame:
     """Daily activation fact for newly accredited agents (see header for semantics)."""
     weeks = int(args.activation_window_weeks)
     cohort_start = args.cohort_start_date
@@ -405,14 +414,14 @@ def build_agent_new_agent_activation_daily(args: Namespace) -> DataFrame:
         load_start - timedelta(days=max_tracking_days),
     ).isoformat()
 
-    cohort = _cohort_df(cohort_start, load_start, load_end, max_tracking_days)
-    tqc_events = _tqc_events_df(event_start, event_end)
-    ciq_events = _ciq_events_df(event_start, event_end)
-    vcba_events = _vcba_events_df(event_start, event_end)
+    cohort = _cohort_df(spark, cohort_start, load_start, load_end, max_tracking_days)
+    tqc_events = _tqc_events_df(spark, event_start, event_end)
+    ciq_events = _ciq_events_df(spark, event_start, event_end)
+    vcba_events = _vcba_events_df(spark, event_start, event_end)
     activation = _activation_summary_df(
         cohort, tqc_events, ciq_events, vcba_events, weeks
     )
-    passive_periods = _passive_periods_df(cohort, load_start, load_end)
+    passive_periods = _passive_periods_df(spark, cohort, load_start, load_end)
     tqc_daily = _filter_dt_event_range(tqc_events, load_start, load_end)
     ciq_daily = _filter_dt_event_range(ciq_events, load_start, load_end)
     vcba_daily = _filter_dt_event_range(vcba_events, load_start, load_end)
@@ -659,9 +668,10 @@ def main(args: Optional[Namespace] = None) -> None:
         f"cohort_start_date={args.cohort_start_date}, "
         f"max_tracking_days_after_creation={args.max_tracking_days_after_creation}"
     )
-    df = build_agent_new_agent_activation_daily(args)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    df = build_agent_new_agent_activation_daily(spark_client.conn, args)
     row_count = validate_before_write(df)
-    save_df(SparkClient(), df, args, row_count=row_count)
+    save_df(spark_client, df, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 

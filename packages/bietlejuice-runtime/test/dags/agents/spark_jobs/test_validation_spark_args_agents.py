@@ -12,6 +12,7 @@ _JOB_PATHS = [
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_support_tickets_by_month.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_independent_campinas_metrics.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_metrics.py",
+    "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_daily.py",
     "dags/agents/enrich_amplitude_agents_app/spark_jobs/load_buyer_funnel_users.py",
     "dags/agents/enrich_planner_emlio_logs/spark_jobs/load_planner_emlio_logs.py",
 ]
@@ -22,6 +23,7 @@ _JOBS_WITH_RESOLVE = {
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_support_tickets_by_month.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_independent_campinas_metrics.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_metrics.py",
+    "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_daily.py",
     "dags/agents/enrich_amplitude_agents_app/spark_jobs/load_buyer_funnel_users.py",
     "dags/agents/enrich_planner_emlio_logs/spark_jobs/load_planner_emlio_logs.py",
 }
