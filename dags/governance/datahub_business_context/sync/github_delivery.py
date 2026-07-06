@@ -138,6 +138,34 @@ def _put_file(
     _api_request("PUT", f"/contents/{path}", body)
 
 
+def _sync_scope(md_output_dir: str) -> str:
+    """Return the conventional-commit scope for gitops PR titles."""
+    _dir_suffix = md_output_dir.rsplit("/", 1)[-1]
+    return "tars-metrics-sync" if "metric" in _dir_suffix else "tars-entity-sync"
+
+
+def build_sync_pr_title(
+    *,
+    data_product_id: str,
+    is_edit: bool,
+    md_output_dir: str = MD_OUTPUT_DIR,
+) -> str:
+    """Build a Commitlint-safe PR title for TARS entity gitops sync.
+
+    Uses only the kebab-case ``data_product_id`` in the subject so titles stay
+    valid even when the DataHub document title contains colons or other punctuation
+    (e.g. ``Metric Entity: Property Integrity``).
+    """
+    action = "update" if is_edit else "add"
+    scope = _sync_scope(md_output_dir)
+    slug = data_product_id.strip().lower().replace("_", "-")
+    return f"docs({scope}): {action} {slug}"
+
+
+def _update_pr_title(pr_number: int, title: str) -> None:
+    _api_request("PATCH", f"/pulls/{pr_number}", {"title": title})
+
+
 def open_sync_pull_request(
     *,
     data_product_id: str,
@@ -154,8 +182,8 @@ def open_sync_pull_request(
     DataHub, generates YAML in memory, and pushes the Data Product — no YAML in the
     repo is required.
 
-    ``is_edit=True`` means a file already exists on master; the PR title is labelled
-    ``[EDIT]`` so reviewers know they're looking at a diff, not a net-new entity.
+    ``is_edit=True`` means a file already exists on master; the PR title uses
+    ``update`` instead of ``add`` so reviewers know they're looking at a diff.
 
     ``md_output_dir`` controls both the committed file path and the branch name prefix;
     use ``MD_OUTPUT_DIR_METRICS`` for metric data products.
@@ -172,6 +200,11 @@ def open_sync_pull_request(
         "tars-metrics-sync" if "metric" in _dir_suffix else "tars-entity-sync"
     )
     branch = f"{_branch_prefix}/{data_product_id}"
+    pr_title = build_sync_pr_title(
+        data_product_id=data_product_id,
+        is_edit=is_edit,
+        md_output_dir=md_output_dir,
+    )
 
     commit_msg = (
         f"feat(datahub): sync TARS entity '{document_title}' from Context Document"
@@ -199,6 +232,8 @@ def open_sync_pull_request(
         # Must read SHA from the PR branch (not master) to avoid sha-mismatch errors.
         md_sha = _get_file_sha(md_path, branch)
         _put_file(md_path, md_content, update_msg, branch, md_sha)
+        if existing_pr.get("title") != pr_title:
+            _update_pr_title(int(existing_pr["number"]), pr_title)
         return PullRequestResult(
             pr_url=str(existing_pr["html_url"]),
             branch=branch,
@@ -233,12 +268,11 @@ def open_sync_pull_request(
         f"- [ ] All `schema.table` pairs exist in DataHub\n"
         f"- [ ] Woodpecker `sync-tars-entities` passes after merge\n"
     )
-    kind_label = "[EDIT]" if is_edit else "[NEW]"
     pr = _api_request(
         "POST",
         "/pulls",
         {
-            "title": f"[TARS entity sync]{kind_label} {document_title} ({data_product_id})",
+            "title": pr_title,
             "head": branch,
             "base": GITHUB_DEFAULT_BRANCH,
             "body": pr_body,
