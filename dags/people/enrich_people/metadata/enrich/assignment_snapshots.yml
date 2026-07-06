@@ -168,6 +168,10 @@ columns:
     description: True when the employee was already at the company before this assignment.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
+  is_transfer_termination:
+    description: True when this assignment was closed by an internal transfer (GLB_TRANSFER) instead of a real exit. These assignments stay active on the transfer date and must not be counted as dismissals or turnover.
+    lineage:
+      - datalake_people.identifier_mapping.is_transfer_termination
   is_future_hire:
     description: Indicates if this assignment is a future hire for the current dt_reference.
   is_primary_assignment_for_snapshot:

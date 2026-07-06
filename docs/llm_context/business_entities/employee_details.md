@@ -43,7 +43,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Glossary and Synonyms
 
 - **Employee / worker / workforce member / FTE / contractor** (colaborador, funcionário) → `dim_employee` / `fact_assignment_snapshots`; contractors and full-time included when they have a valid assignment
-- **Headcount / active workforce / FTE count / quadro** → `COUNT(DISTINCT person_number)` on `fact_assignment_snapshots` where `is_active = TRUE`, `is_current = TRUE`, `is_primary_assignment_for_snapshot = TRUE`
+- **Headcount / active workforce / FTE count / quadro** → `COUNT(DISTINCT person_number)` on `fact_assignment_snapshots` where `is_active = TRUE`, `is_current = TRUE`, `is_primary_assignment_for_snapshot = TRUE`; when listing rows (not distinct-counting), also filter `is_transfer_termination = FALSE` to drop frozen rows of assignments closed by transfer
 - **Monthly snapshot / month-end headcount / base fotografias** → `fact_assignment_snapshots` with `is_monthly_snapshot = TRUE` and explicit `dt_reference` (typically month-end)
 - **Current state / latest snapshot / as-of today / base completa** → `fact_assignment_snapshots` with `is_current = TRUE`
 - **Snapshot date / as-of date / reference date** → `dt_reference` on the fact (one row per assignment per calendar day)
@@ -72,7 +72,9 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Manager / people manager** → `is_manager = TRUE`
 - **Leadership Team / LT / liderança** → `is_member_lt = TRUE` (band 10+ or EXEC)
 - **Executive Team / ET** → `is_member_et = TRUE` (L0/L1 in hierarchy and band 14+)
-- **Internal transfer / mobility / transferência interna** → `is_internal_transfer = TRUE`
+- **Internal transfer / mobility / transferência interna** → `is_internal_transfer = TRUE` (flag on the **new** assignment created by the transfer)
+- **Global Transfer / transfer termination event / transferência** → `dim_event_definition.action_name = 'Global Transfer'` on the old assignment's termination event — an internal move, **not** a real exit; must be excluded from dismissals and turnover
+- **Transfer termination / assignment closed by transfer** → `is_transfer_termination = TRUE` (flag on the **old** assignment closed by a Global Transfer) — the simplest way to exclude internal transfers from termination and turnover counts without joining `dim_event_definition`
 - **Validity window / SCD2 version** → `dt_valid_from` / `dt_valid_to` on hierarchy (and other SCD2 dims); `is_current = TRUE` for latest hierarchy version
 - **OBT / wide employee snapshot** (not in TARS pilot) → `metric_people.employee_snapshots`
 
@@ -98,6 +100,9 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - Use `is_primary_assignment_for_snapshot = TRUE` when an employee has multiple assignments on the same date.
 - `dim_management_hierarchy` exposes L0–L9 (L0 = CEO). Everyone in the same area shares the same L1 VP — filter by `name_l1`…`name_l9` without self-joins.
 - The fact has no `year/month/day` partitions — expect full-table scans when unfiltered.
+- **Internal transfers are not exits.** An internal move terminates the old assignment with `dim_event_definition.action_name = 'Global Transfer'` and opens a new `assignment_number` starting the **next day**. Never count these termination rows as dismissals, turnover, or attrition — the person remains employed. These rows carry `is_transfer_termination = TRUE`; filter it out of any termination analysis.
+- **Transferred employees stay active on the transfer date.** The pipeline keeps `is_active = TRUE` (and `employment_status = 'Active'`) on the old assignment's termination date when it is a Global Transfer, so daily active headcount does not dip on batch transfer dates (e.g. 2026-01-31, ~396 Global Transfers). If a sudden single-day headcount drop still appears, check terminations on that date against `is_transfer_termination` / `action_name = 'Global Transfer'` before reporting it as attrition.
+- **Current-state lists on the fact need `is_transfer_termination = FALSE`.** On `fact_assignment_snapshots`, an assignment closed by a transfer keeps its last snapshot as `is_current = TRUE` (and now also `is_active = TRUE`) forever at the assignment grain. `COUNT(DISTINCT person_number)` is safe, but row-level "current active employees" queries must add `is_transfer_termination = FALSE` or the transferred person appears twice (old + new assignment). `metric_people.employee_snapshots` already demotes these frozen rows to `is_current = FALSE`, so this caveat applies to the fact only.
 
 ## Key Metrics
 
@@ -106,6 +111,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Tenure in assignment** — `days_tenure_in_assignment` (current role only)
 - **Span of control** — `count_direct_report`, `count_indirect_report` (pre-computed on the fact)
 - **Voluntary terminations** — `is_terminated = TRUE` + `dim_event_definition` filtered by `action_name` / `reason_name`
+- **Turnover / attrition** — terminations via `is_terminated = TRUE`, always **excluding** internal transfers with `is_transfer_termination = FALSE` (equivalently `dim_event_definition.action_name <> 'Global Transfer'`)
 - **Managers vs ICs** — `is_manager`, `is_member_lt`
 
 ## Relationships with Other Entities
@@ -135,6 +141,8 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - Treat future `dt_terminated` as scheduled **voluntary** exits only — not as a signal of impending involuntary dismissal.
 
 **Don't:**
+- Count `Global Transfer` termination events as dismissals or turnover — filter them out with `is_transfer_termination = FALSE`; the person remains employed under a new `assignment_number`.
+- Report a single-day active-headcount drop as attrition without first checking for a `Global Transfer` batch on that date (transferred employees are kept active on the transfer date, but always verify with `is_transfer_termination`).
 - Query `fact_assignment_snapshots` without a date scope — row counts inflate across every historical day.
 - Use `dt_terminated` or `dim_event_definition` to predict **involuntary** layoffs — involuntary termination dates are recorded only after communication.
 - Treat `sk_contact_version` or `sk_hierarchy_version` as stable employee identifiers.
@@ -176,6 +184,7 @@ LEFT JOIN dw_employee_details.dim_event_definition AS evt
 WHERE fact.is_current = TRUE
   AND fact.is_active = TRUE
   AND fact.is_primary_assignment_for_snapshot = TRUE
+  AND fact.is_transfer_termination = FALSE
 ```
 
 ## DataHub catalog

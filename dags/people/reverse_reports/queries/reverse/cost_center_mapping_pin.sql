@@ -1,38 +1,44 @@
 WITH
-    total_headcount AS (
+    current_snapshots AS (
         SELECT
             snap.sk_cost_center_version,
-            COUNT(1) AS total_hc
+            snap.is_active
         FROM
             dw_employee_details.fact_assignment_snapshots AS snap
         WHERE
             snap.is_current = TRUE
+            AND COALESCE(snap.is_transfer_termination, FALSE) = FALSE
+    ),
+    total_headcount AS (
+        SELECT
+            sk_cost_center_version,
+            COUNT(1) AS total_hc
+        FROM
+            current_snapshots
         GROUP BY
-            snap.sk_cost_center_version
+            sk_cost_center_version
     ),
     active_headcount AS (
         SELECT
-            snap.sk_cost_center_version,
+            sk_cost_center_version,
             COUNT(1) AS active_hc
         FROM
-            dw_employee_details.fact_assignment_snapshots AS snap
+            current_snapshots
         WHERE
-            snap.is_current = TRUE
-            AND snap.is_active = TRUE
+            is_active = TRUE
         GROUP BY
-            snap.sk_cost_center_version
+            sk_cost_center_version
     ),
     inactive_headcount AS (
         SELECT
-            snap.sk_cost_center_version,
+            sk_cost_center_version,
             COUNT(1) AS inactive_hc
         FROM
-            dw_employee_details.fact_assignment_snapshots AS snap
+            current_snapshots
         WHERE
-            snap.is_current = TRUE
-            AND snap.is_active = FALSE
+            is_active = FALSE
         GROUP BY
-            snap.sk_cost_center_version
+            sk_cost_center_version
     ),
     cost_center_base AS (
         SELECT

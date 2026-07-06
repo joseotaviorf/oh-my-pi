@@ -102,6 +102,7 @@ Closely related employee topics that live in sibling schemas, not in `dw_employe
 * **Multi-assignment employees** : An employee who transferred internally or was rehired may hold more than one `assignment_number`. Use `is_primary_assignment_for_snapshot = TRUE` for the canonical assignment on a given `dt_reference`. For person-grain current exports, use `is_current_for_person = TRUE` to get exactly one row per person.
 * **Work email history not available** : Each assignment has an associated work email, but the current model exposes only the email from the person's most recent assignment. Emails from previous assignments are not accessible through this schema.
 * **Hire date semantics** : The fact table exposes two hire dates that serve different purposes. `dt_hired` is the start date of the employee's most recent contract, regardless of any prior employment history. `dt_original_hire` is the start date of their very first contract at the company, which may predate a cross-entity transfer. For tenure calculations that should credit prior employment, use `dt_original_hire`; for calculating seniority within the current contract, use `dt_hired`. The flag `is_internal_transfer` indicates that the current contract began as a transfer from a previous one, meaning the person was already at the company before this assignment started.
+* **Internal transfers are not exits** : When a person moves between legal entities, the old assignment is closed by a Global Transfer event and a new assignment starts the next day. These closed assignments carry `is_transfer_termination = TRUE` and remain `is_active = TRUE` on the transfer date, so daily headcount does not dip on batch transfer dates. Always exclude `is_transfer_termination = TRUE` rows from dismissal and turnover analyses — the person remains employed.
 
 ## How to Use
 
@@ -167,6 +168,7 @@ LEFT JOIN
 WHERE
     fact.is_current = TRUE
     AND fact.is_active = TRUE
+    AND fact.is_transfer_termination = FALSE
 ```
 
 ### Analytical Snapshot (Voluntary Terminations by Manager's Chain)

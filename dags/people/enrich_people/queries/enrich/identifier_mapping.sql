@@ -276,6 +276,7 @@ termination_assignments_ranked AS (
     SELECT
         aa.id_assignment,
         aa.id_action_occurrence,
+        aa.action_code,
         ROW_NUMBER() OVER (
             PARTITION BY
                 aa.id_assignment
@@ -299,7 +300,8 @@ termination_assignments_ranked AS (
 termination_assignments AS (
     SELECT
         id_assignment,
-        id_action_occurrence
+        id_action_occurrence,
+        action_code
     FROM
         termination_assignments_ranked
     WHERE
@@ -308,6 +310,7 @@ termination_assignments AS (
 termination_event_definitions AS (
     SELECT
         ta.id_assignment,
+        ta.action_code,
         CONCAT(
             CAST(ao.id_action AS STRING),
             '-',
@@ -374,6 +377,7 @@ SELECT
             AND DATE('{load_start_date}') >= pp.dt_actual_termination THEN FALSE
         ELSE TRUE
     END AS is_active,
+    COALESCE(ted.action_code = 'GLB_TRANSFER', FALSE) AS is_transfer_termination,
     ROW_NUMBER() OVER (
         PARTITION BY
             ca.id_person

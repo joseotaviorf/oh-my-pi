@@ -239,7 +239,8 @@ assignment_snapshots_ranked AS (
         mh.hierarchy_depth,
         CASE
             WHEN ad.dt_terminated IS NOT NULL
-                AND ad.dt_reference >= ad.dt_terminated THEN 'Terminated'
+                AND ad.dt_reference >= ad.dt_terminated
+                AND NOT COALESCE(im.is_transfer_termination, FALSE) THEN 'Terminated'
             ELSE 'Active'
         END AS employment_status,
         CASE
@@ -272,12 +273,14 @@ assignment_snapshots_ranked AS (
         ) AS is_executive_team_member,
         CASE
             WHEN ad.dt_terminated IS NOT NULL
-                AND ad.dt_reference >= ad.dt_terminated THEN FALSE
+                AND ad.dt_reference >= ad.dt_terminated
+                AND NOT COALESCE(im.is_transfer_termination, FALSE) THEN FALSE
             ELSE TRUE
         END AS is_active,
         pei.id_person IS NOT NULL AS has_emergency_contact,
         im.dt_original_hired IS NOT NULL
             AND im.dt_original_hired < ad.dt_started AS is_internal_transfer,
+        COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
         ad.is_future_hire,
         COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
         lo.id_employee IS NOT NULL AS is_reorganization_termination,
@@ -414,6 +417,7 @@ SELECT
     asr.is_active,
     asr.has_emergency_contact,
     asr.is_internal_transfer,
+    asr.is_transfer_termination,
     asr.is_future_hire,
     asr.is_primary_assignment_for_snapshot,
     asr.is_reorganization_termination,

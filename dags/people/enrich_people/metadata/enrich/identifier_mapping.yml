@@ -115,6 +115,10 @@ columns:
       - datalake_pin_core_clean.external_application_identifier.type_external_identifier
   is_active:
     description: True when the employee is active, False when inactive.
+  is_transfer_termination:
+    description: True when the assignment was closed by an internal transfer (GLB_TRANSFER) instead of a real exit. The person stays employed under a continuation assignment, so these rows must not be counted as dismissals or turnover.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.action_code
   is_active_pin:
     description: Raw active status from Oracle HCM. On the termination date itself, Oracle still records TRUE; it only flips to FALSE the following day.
     lineage:

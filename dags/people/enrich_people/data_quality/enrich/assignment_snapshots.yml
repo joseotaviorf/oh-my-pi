@@ -106,11 +106,14 @@ column_level_validations:
   status_termination_date_consistency:
     custom:
       # Every employee whose termination date is in the past must have is_active = FALSE on their is_current row.
+      # Transfer terminations (is_transfer_termination) are excluded: they stay active on the transfer date
+      # because the person continues employed under the continuation assignment.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.assignment_snapshots
          WHERE is_current = TRUE
            AND is_active = TRUE
+           AND COALESCE(is_transfer_termination, FALSE) = FALSE
            AND dt_terminated IS NOT NULL
            AND dt_terminated < CURRENT_DATE()
         ) = 0
