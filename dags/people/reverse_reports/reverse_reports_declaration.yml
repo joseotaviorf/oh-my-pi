@@ -63,6 +63,16 @@ workflow:
         - "1rhyzy3ANxm_lw9Wmq9tOPdFnLhpoFuAT3QY2CWOcPmc"
         - "_base"
 
+    # --- Revenue Excellence headcount (DBP-1546) ---
+    # Use context: Daily org-wide headcount base (active + terminated) with termination
+    # date and date of birth, mirroring public_information plus dt_desligamento
+    # Business Owner: diego.trejo@quintoandar.com.br
+    # Governance: docs/revenue_excellence_headcount_roster.md
+    revenue_excellence_headcount_roster:
+      extra_spark_job_arguments:
+        - "1WofTMH4dLnbKEUrHrmeGLjrPjK1AH-HRIRm9egfn368"
+        - "_base"
+
     # --- FP&A / CODEX → PIN ---
     organization_codex_pin_sync:
       column_mapping_mode: name
