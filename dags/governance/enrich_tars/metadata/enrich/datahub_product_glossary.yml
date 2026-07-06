@@ -1,0 +1,20 @@
+---
+database_name: datalake_tars
+table_name: datahub_product_glossary
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Full-refresh reference catalog of DataHub Data Products (production + test).
+  Serves as the static product list for enrich_tars coverage analysis. Populated from a
+  YAML seed file at dags/governance/enrich_tars/schemas/datahub_products.yml.
+  Refresh quarterly or after DataHub catalog changes. Excludes is_test=true rows
+  from coverage gap analysis.
+columns:
+  product_slug:
+    description: Unique slug identifying the DataHub Data Product (matches the URN suffix after :dataProduct:).
+  product_name:
+    description: Human-readable display name of the DataHub Data Product.
+  datahub_domain:
+    description: DataHub domain the product belongs to (for_rent, growth, fintech, support_and_services, untagged).
+  is_test:
+    description: True for test/sandbox products that should be excluded from coverage reports.

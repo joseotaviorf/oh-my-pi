@@ -1,0 +1,57 @@
+---
+database_name: datalake_tars
+table_name: product_topic_coverage
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Daily snapshot of DataHub Data Product × Tars business-domain coverage. Each row represents
+  one product-topic combination observed in the load window, with actual usage counts and a
+  flag indicating whether the combination is an expected match (based on domain heuristics).
+  Rows with is_used=false and expected_domain_match=true identify catalog gaps where
+  a relevant Data Product exists in DataHub but Tars never referenced it for queries in
+  that business domain.
+columns:
+  product_slug:
+    lineage:
+      - datalake_tars.datahub_product_glossary.product_slug
+    description: DataHub Data Product slug. Foreign key to datahub_product_glossary.
+  product_name:
+    lineage:
+      - datalake_tars.datahub_product_glossary.product_name
+    description: Human-readable name of the DataHub Data Product.
+  datahub_domain:
+    lineage:
+      - datalake_tars.datahub_product_glossary.datahub_domain
+    description: DataHub domain the product belongs to (for_rent, growth, fintech, support_and_services, untagged).
+  business_domain:
+    lineage:
+      - datalake_tars.datahub_asset_usage.business_domain
+    description: Tars session business domain (For Rent, Fintech, Growth, etc.).
+  urn_hits:
+    lineage:
+      - datalake_tars.datahub_asset_usage.urn_hit_count
+    description: Total DataHub URN hits for this product-topic combination in the load window. 0 if unused.
+  sessions:
+    lineage:
+      - datalake_tars.datahub_asset_usage.id_session
+    description: Distinct sessions that referenced this product for this topic. 0 if unused.
+  queries:
+    lineage:
+      - datalake_tars.datahub_asset_usage.id_query
+    description: Distinct queries that referenced this product for this topic. 0 if unused.
+  is_used:
+    lineage:
+      - datalake_tars.datahub_asset_usage.urn_hit_count
+    description: True when urn_hits > 0 for this product-topic combination.
+  expected_domain_match:
+    lineage:
+      - datalake_tars.datahub_product_glossary.datahub_domain
+    description: True when the DataHub domain of the product is heuristically expected to answer questions for this Tars business domain.
+  dt_reference:
+    description: The load_start_date of the incremental window this snapshot covers.
+  year:
+    description: Partition year derived from load_start_date.
+  month:
+    description: Partition month derived from load_start_date.
+  day:
+    description: Partition day derived from load_start_date.

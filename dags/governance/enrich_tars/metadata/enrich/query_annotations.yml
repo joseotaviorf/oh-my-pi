@@ -1,0 +1,98 @@
+---
+database_name: datalake_tars
+table_name: query_annotations
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Query-grain annotation table for Tars (the AI data analyst) usage in Trino.
+  Each row represents one SQL query executed by Tars, enriched with the structured
+  metadata extracted from the embedded `/* tars: {...} */` JSON comment. Covers
+  session identity, user intent category, DataHub context depth, and execution
+  outcome. Partitioned daily; starting data from 2026-06-18 when annotation logging began.
+columns:
+  id_query:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query_id
+    description: Unique Trino query identifier.
+  id_session:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Tars conversation session identifier extracted from the tars JSON comment. Queries without a comment use a synthetic id.
+  session_source:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Client that triggered the Tars session (e.g. claude, cursor, unknown).
+  user:
+    lineage:
+      - data_platform_metrics.trino_query_complete.user
+    description: QuintoAndar email of the user who ran the session.
+  user_question:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Original natural-language question asked by the user, as logged by Tars.
+  response_category:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Tars response category (data_query, debug, data_catalog, unknown).
+  business_domain:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Business domain of the session as classified by Tars (e.g. For Rent, Fintech, Growth).
+  query_state:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query_state
+    description: Trino query execution state (FINISHED, FAILED, etc.).
+  is_success:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query_state
+    description: True when query_state = FINISHED.
+  execution_time_sec:
+    lineage:
+      - data_platform_metrics.trino_query_complete.execution_time
+    description: Query wall-clock execution time in seconds.
+  has_tars_comment:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: True when the query contains a parseable /* tars:{} */ JSON annotation. False for older queries before annotation logging.
+  urn_count:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Total number of DataHub URNs referenced by Tars when building this query.
+  data_product_count:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Number of DataHub Data Product URNs in the query annotation.
+  dataset_count:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Number of DataHub Dataset URNs in the query annotation.
+  context_mode:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: >
+      Depth of DataHub context used. no_datahub = no URNs; dataset_only = at least one dataset URN
+      but no Data Product; with_data_product = at least one Data Product URN.
+  depth_tier:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Tiered context depth (L0=none, L1=datasets only, L2=1 product, L3=2 products, L4=3+ products).
+  ts_started:
+    lineage:
+      - data_platform_metrics.trino_query_complete.execution_start_time
+    description: Timestamp when Trino started executing the query.
+  ts_ended:
+    lineage:
+      - data_platform_metrics.trino_query_complete.end_time
+    description: Timestamp when Trino finished executing the query.
+  year:
+    lineage:
+      - data_platform_metrics.trino_query_complete.year
+    description: Partition year of query execution.
+  month:
+    lineage:
+      - data_platform_metrics.trino_query_complete.month
+    description: Partition month of query execution.
+  day:
+    lineage:
+      - data_platform_metrics.trino_query_complete.day
+    description: Partition day of query execution.

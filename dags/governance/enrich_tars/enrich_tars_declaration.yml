@@ -1,0 +1,30 @@
+dag:
+  name: enrich_tars
+  schedule_start_date: 2026, 6, 18
+  schedule_interval: 0 6 * * *
+  owner: Data Governance
+  documentation:
+    dag_purpose: |
+      Parses Tars (the AI data analyst) usage data from data_platform_metrics.trino_query_complete,
+      materialising query-grain annotations, session-grain metrics, DataHub asset usage, and a
+      product-topic coverage map. Powers the TARS: Usage and Context Coverage Superset dashboard.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    session_metrics:
+    - query_annotations
+    datahub_asset_usage:
+    - query_annotations
+    product_topic_coverage:
+    - datahub_asset_usage
+    - datahub_product_glossary
+  tables_customization:
+    datahub_product_glossary:
+      extraction_type: full
+      partitions: []

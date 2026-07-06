@@ -1,0 +1,100 @@
+---
+database_name: datalake_tars
+table_name: session_metrics
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Session-grain metrics for Tars conversations. Aggregates query_annotations per id_session
+  to measure engagement depth, quality, and DataHub context usage per conversation.
+  One row per session per load day. Used by the TARS Usage Superset dashboard to track
+  adoption KPIs (WAU, sessions/week) and DataHub context attach rates.
+columns:
+  id_session:
+    lineage:
+      - datalake_tars.query_annotations.id_session
+    description: Tars conversation session identifier.
+  user:
+    lineage:
+      - datalake_tars.query_annotations.user
+    description: QuintoAndar email of the user who ran the session.
+  session_source:
+    lineage:
+      - datalake_tars.query_annotations.session_source
+    description: Client that triggered the session (claude, cursor, unknown).
+  dominant_business_domain:
+    lineage:
+      - datalake_tars.query_annotations.business_domain
+    description: Most frequently observed business_domain across queries in the session.
+  query_count:
+    lineage:
+      - datalake_tars.query_annotations.id_query
+    description: Total number of Trino queries executed in the session.
+  data_query_count:
+    lineage:
+      - datalake_tars.query_annotations.response_category
+    description: Queries classified as data_query (analytical SQL).
+  debug_count:
+    lineage:
+      - datalake_tars.query_annotations.response_category
+    description: Queries classified as debug (iterative error correction).
+  failed_count:
+    lineage:
+      - datalake_tars.query_annotations.is_success
+    description: Number of queries that failed (query_state != FINISHED).
+  succeeded_count:
+    lineage:
+      - datalake_tars.query_annotations.is_success
+    description: Number of successfully finished queries in the session.
+  pct_finished:
+    lineage:
+      - datalake_tars.query_annotations.is_success
+    description: Percentage of queries that finished successfully (0-100).
+  used_datahub:
+    lineage:
+      - datalake_tars.query_annotations.urn_count
+    description: True if at least one query in the session referenced any DataHub URN.
+  used_data_product:
+    lineage:
+      - datalake_tars.query_annotations.data_product_count
+    description: True if at least one query in the session referenced a DataHub Data Product URN.
+  distinct_products:
+    lineage:
+      - datalake_tars.query_annotations.data_product_count
+    description: Maximum data_product_count across queries in the session (proxy for distinct products used).
+  distinct_datasets:
+    lineage:
+      - datalake_tars.query_annotations.dataset_count
+    description: Maximum dataset_count across queries in the session.
+  depth_tier:
+    lineage:
+      - datalake_tars.query_annotations.depth_tier
+    description: Highest DataHub context depth tier (L0-L4) reached in the session.
+  session_duration_min:
+    lineage:
+      - datalake_tars.query_annotations.ts_started
+      - datalake_tars.query_annotations.ts_ended
+    description: Duration from first to last query in the session, in minutes.
+  ts_session_start:
+    lineage:
+      - datalake_tars.query_annotations.ts_started
+    description: Timestamp of the first query in the session.
+  ts_session_end:
+    lineage:
+      - datalake_tars.query_annotations.ts_ended
+    description: Timestamp of the last query in the session.
+  dt_session:
+    lineage:
+      - datalake_tars.query_annotations.ts_started
+    description: Calendar date of the session start (for daily/weekly Superset time series).
+  year:
+    lineage:
+      - datalake_tars.query_annotations.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars.query_annotations.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars.query_annotations.day
+    description: Partition day.

@@ -1,0 +1,59 @@
+---
+database_name: datalake_tars
+table_name: datahub_asset_usage
+owner: aurelio.nogueira@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  URN-exploded table tracking which DataHub assets (Data Products and Datasets) Tars
+  referenced when answering user questions. One row per datahub_urn per Tars query.
+  Used to measure DataHub catalog coverage, identify which products are most used,
+  and surface which business topics have no product coverage in the context window.
+columns:
+  id_query:
+    lineage:
+      - datalake_tars.query_annotations.id_query
+    description: Trino query identifier. Foreign key to query_annotations.
+  id_session:
+    lineage:
+      - datalake_tars.query_annotations.id_session
+    description: Tars session identifier.
+  user:
+    lineage:
+      - datalake_tars.query_annotations.user
+    description: User who ran the session.
+  business_domain:
+    lineage:
+      - datalake_tars.query_annotations.business_domain
+    description: Business domain of the session.
+  datahub_urn:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Full DataHub URN of the asset referenced by Tars.
+  asset_type:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Type of DataHub asset (dataProduct, dataset, other) derived from the URN pattern.
+  asset_slug:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Extracted slug or fully-qualified name from the URN (e.g. visits, fs-transact).
+  urn_hit_count:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Always 1 per row. Sum in Superset to count total URN references.
+  ts_started:
+    lineage:
+      - datalake_tars.query_annotations.ts_started
+    description: Timestamp when the Trino query was executed.
+  year:
+    lineage:
+      - datalake_tars.query_annotations.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_tars.query_annotations.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_tars.query_annotations.day
+    description: Partition day.

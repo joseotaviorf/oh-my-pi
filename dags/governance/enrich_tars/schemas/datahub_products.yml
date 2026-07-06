@@ -1,0 +1,161 @@
+# Static catalog of DataHub Data Products used by enrich_tars.
+# Source: DataHub prod MCP audit (Jun 2026 — 36 production products + 2 test).
+# Refresh: quarterly or after a DataHub catalog change.
+# Domain values match Tars session business_domain for coverage gap detection.
+
+products:
+  # For Rent domain
+  - slug: visits
+    name: Visits
+    datahub_domain: for_rent
+    is_test: false
+  - slug: nps
+    name: NPS
+    datahub_domain: for_rent
+    is_test: false
+  - slug: offboarding
+    name: Offboarding
+    datahub_domain: for_rent
+    is_test: false
+  - slug: inspection
+    name: Inspection
+    datahub_domain: for_rent
+    is_test: false
+  - slug: repairs
+    name: Repairs
+    datahub_domain: for_rent
+    is_test: false
+  - slug: owner-statement
+    name: Owner Statement
+    datahub_domain: for_rent
+    is_test: false
+  - slug: rent-contracts
+    name: Rent Contracts
+    datahub_domain: for_rent
+    is_test: false
+
+  # Growth domain
+  - slug: supply
+    name: Supply
+    datahub_domain: growth
+    is_test: false
+  - slug: leads
+    name: Leads
+    datahub_domain: growth
+    is_test: false
+  - slug: marketing-attribution
+    name: Marketing Attribution
+    datahub_domain: growth
+    is_test: false
+  - slug: pricing
+    name: Pricing
+    datahub_domain: growth
+    is_test: false
+  - slug: listing
+    name: Listing
+    datahub_domain: growth
+    is_test: false
+  - slug: fs-transact
+    name: FS Transact
+    datahub_domain: growth
+    is_test: false
+  - slug: offers
+    name: Offers
+    datahub_domain: growth
+    is_test: false
+
+  # Fintech domain
+  - slug: closing
+    name: Closing
+    datahub_domain: fintech
+    is_test: false
+  - slug: collections-recovery
+    name: Collections Recovery
+    datahub_domain: fintech
+    is_test: false
+  - slug: ticket
+    name: Ticket
+    datahub_domain: fintech
+    is_test: false
+  - slug: payments
+    name: Payments
+    datahub_domain: fintech
+    is_test: false
+  - slug: invoice
+    name: Invoice
+    datahub_domain: fintech
+    is_test: false
+  - slug: insurance
+    name: Insurance
+    datahub_domain: fintech
+    is_test: false
+
+  # Support & Services domain
+  - slug: chatbot-sessions
+    name: Chatbot Sessions
+    datahub_domain: support_and_services
+    is_test: false
+  - slug: customer-service
+    name: Customer Service
+    datahub_domain: support_and_services
+    is_test: false
+  - slug: smart-home
+    name: Smart Home
+    datahub_domain: support_and_services
+    is_test: false
+  - slug: maintenance
+    name: Maintenance
+    datahub_domain: support_and_services
+    is_test: false
+
+  # Data Platform domain (untagged in Tars conversations)
+  - slug: data-platform-quality
+    name: Data Platform Quality
+    datahub_domain: untagged
+    is_test: false
+  - slug: datahub-assets
+    name: DataHub Assets
+    datahub_domain: untagged
+    is_test: false
+  - slug: trino-usage
+    name: Trino Usage
+    datahub_domain: untagged
+    is_test: false
+  - slug: pipeline-health
+    name: Pipeline Health
+    datahub_domain: untagged
+    is_test: false
+  - slug: superset-governance
+    name: Superset Governance
+    datahub_domain: untagged
+    is_test: false
+  - slug: airflow-governance
+    name: Airflow Governance
+    datahub_domain: untagged
+    is_test: false
+  - slug: documentation
+    name: Documentation
+    datahub_domain: untagged
+    is_test: false
+  - slug: fair-metadata
+    name: FAIR Metadata
+    datahub_domain: untagged
+    is_test: false
+  - slug: anonymization
+    name: Anonymization
+    datahub_domain: untagged
+    is_test: false
+  - slug: jira-governance
+    name: Jira Governance
+    datahub_domain: untagged
+    is_test: false
+
+  # Test (excluded from coverage gap analysis)
+  - slug: test-product-1
+    name: Test Product 1
+    datahub_domain: untagged
+    is_test: true
+  - slug: test-product-2
+    name: Test Product 2
+    datahub_domain: untagged
+    is_test: true
