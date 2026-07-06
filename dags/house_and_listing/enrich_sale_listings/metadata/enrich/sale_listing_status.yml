@@ -60,7 +60,19 @@ columns:
   status_change_reason:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_reason
-    description: The code of reason for the status change.
+    description: The code of reason for the status change. Legacy Listing Business Context (LBC) code; unchanged by deactivation enrichment.
+  deactivation_reason:
+    lineage:
+      - datalake_ebdb_clean.house_listing_status_log.reason
+    description: Structured deactivation reason from the new status log taxonomy. Populated only for first-party rows that pass the legacy deactivation gate and have a temporally matched log event. NULL before log availability (approximately February 2026) or when no match exists.
+  deactivation_reason_category:
+    lineage:
+      - datalake_ebdb_clean.house_listing_status_log.reason_category
+    description: Macro category of the deactivation reason from the new status log taxonomy (for example GAVE_UP, TEMPORARILY_UNAVAILABLE). Populated under the same conditions as deactivation_reason.
+  deactivation_additional_context:
+    lineage:
+      - datalake_ebdb_clean.house_listing_status_log.additional_context
+    description: Optional free-text context provided by the actor during deactivation in the new status log. Populated under the same conditions as deactivation_reason.
   status_change_reason_detail:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_reason_detail

@@ -10,6 +10,9 @@ SELECT
     ts_status_end,
     status_history,
     status_change_reason,
+    deactivation_reason,
+    deactivation_reason_category,
+    deactivation_additional_context,
     revision_reason,
     is_last_status_of_day,
     ts_load

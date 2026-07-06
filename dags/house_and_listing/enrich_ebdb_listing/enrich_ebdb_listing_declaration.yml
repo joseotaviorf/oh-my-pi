@@ -37,6 +37,7 @@ workflow:
     house_listing_status:
     - house_status_version_order
     - lbc_status_version_order
+    - house
     house_status:
     - house_listing
     lbc_status_version_order:

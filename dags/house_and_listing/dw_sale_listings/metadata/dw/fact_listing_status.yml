@@ -66,6 +66,18 @@ columns:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_change_reason_detail
     description: Descriptive column that shows the cause of the status change for the row.
+  deactivation_reason:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.deactivation_reason
+    description: Structured deactivation reason from the new status log taxonomy. NULL before log availability or when no match exists.
+  deactivation_reason_category:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.deactivation_reason_category
+    description: Macro category of the deactivation reason from the new status log taxonomy.
+  deactivation_additional_context:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.deactivation_additional_context
+    description: Optional free-text context from the owner during deactivation in the new status log.
   is_last_status:
     lineage:
     - datalake_sale_listings.sale_listing_status.is_last_status

@@ -49,8 +49,20 @@ columns:
     description: Date when status started.
   status_change_reason:
     lineage:
-      - datalake_ebdb_listing.house_listing_status.status_change_reason
+      - dw_rent.fact_house_listing_status.status_change_reason
     description: Business reason code explaining why the listing status changed in this event.
+  deactivation_reason:
+    lineage:
+      - dw_rent.fact_house_listing_status.deactivation_reason
+    description: Structured deactivation reason from the new status log taxonomy.
+  deactivation_reason_category:
+    lineage:
+      - dw_rent.fact_house_listing_status.deactivation_reason_category
+    description: Macro category of the deactivation reason from the new status log taxonomy.
+  deactivation_additional_context:
+    lineage:
+      - dw_rent.fact_house_listing_status.deactivation_additional_context
+    description: Optional free-text context from the owner during deactivation in the new status log.
   status_history:
     lineage:
       - datalake_ebdb_listing.house_listing_status.status_history
