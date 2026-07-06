@@ -63,6 +63,14 @@ columns:
     description: |
       True when the MAX timestamp of rent_flow_tenant_contract_signed or rent_flow_owner_contract_signed
       events for the same rent flow and contract person is strictly after ts_last_sent.
+  is_removed:
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      True when an owner_removed_from_contract or tenant_removed_from_contract mainstreamer event
+      exists for the same id_contract_person with ts_event strictly after ts_last_sent.
   is_participant:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
@@ -98,3 +106,9 @@ columns:
     description: |
       Timestamp of the per-signatory contract-signed event formatted as yyyy-MM-dd HH:mm:ss.
       Null when this signatory has not yet signed after ts_sent.
+  ts_removed:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      Timestamp of the events indicating signatory removal formatted as yyyy-MM-dd HH:mm:ss. 
+      Null when the signatory was not removed or removal occurred before ts_sent.
