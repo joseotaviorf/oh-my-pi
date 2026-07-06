@@ -243,7 +243,9 @@ new_entry_model AS (
 request_logs AS (
     SELECT
         id_house,
+        id_trace,
         host,
+        channel,
         ts_request
     FROM
         datalake_request_logging_clean.entryaccess
@@ -257,6 +259,7 @@ new_entry_model_enriched AS ( -- new entry model enriched with old entry model b
             new.id_house,
             new.id_actor_user,
             old.id_occupant,
+            rl.id_trace,
             old.occupant_type,
             old.restriction_type,
             old.key_type,
@@ -264,12 +267,17 @@ new_entry_model_enriched AS ( -- new entry model enriched with old entry model b
             new.key_location,
             old.authorization_type,
             new.has_opted_keys_with_agent,
-            CASE -- We will hard coded the channels until we have the channel in the request logging since the current data has fixed channels
-                WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
-                WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
-                WHEN rl.host = 'sonia' THEN 'WHATSAPP_SONIA'
-                WHEN rl.host = 'isaias' THEN 'WHATSAPP_ISAIAS'
-                ELSE UPPER(rl.host)
+            CASE
+                WHEN rl.channel = 'qa_app' THEN 'NATIVE'
+                ELSE UPPER(rl.channel)
+            END AS log_channel,
+            CASE -- We will hard coded the channels when we do not have the channel in the request logging since the old channel/host data has fixed channels
+                WHEN rl.host = 'wall_e' THEN CONCAT(COALESCE(log_channel, 'NATIVE'), '_WALLE')
+                WHEN rl.host = 'concierge' THEN CONCAT(COALESCE(log_channel, 'WHATSAPP'), '_CONCIERGE')
+                WHEN rl.host = 'sonia' THEN CONCAT(COALESCE(log_channel, 'WHATSAPP'), '_SONIA')
+                WHEN rl.host = 'isaias' THEN CONCAT(COALESCE(log_channel, 'WHATSAPP'), '_ISAIAS')
+                WHEN rl.host = 'claudia' THEN CONCAT(COALESCE(log_channel, 'WHATSAPP'), '_CLAUDIA')
+                ELSE NULLIF(CONCAT_WS('_', log_channel, UPPER(rl.host)), '') -- Keep the channel_host as is for new hosts with channel field filled
             END AS host_unified,
             CASE
                 WHEN new.entry_model_channel IN ('NATIVE_WALLE', 'WHATSAPP_CONCIERGE', 'WHATSAPP_SONIA', 'WHATSAPP_ISAIAS') THEN CONCAT('CONVERSATIONAL - ', new.entry_model_channel) -- Unified the old IA channels with the new unified channels
@@ -304,6 +312,7 @@ new_entry_model_enriched AS ( -- new entry model enriched with old entry model b
         id_house,
         id_actor_user,
         id_occupant,
+        id_trace,
         occupant_type,
         restriction_type,
         key_type,
@@ -333,6 +342,7 @@ unified_model AS (
         id_house,
         NULL AS id_actor_user,
         id_occupant,
+        NULL AS id_trace,
         occupant_type,
         restriction_type,
         key_type,
@@ -361,6 +371,7 @@ unified_model AS (
         id_house,
         id_actor_user,
         id_occupant,
+        id_trace,
         occupant_type,
         restriction_type,
         key_type,
@@ -415,6 +426,7 @@ enriched_model AS ( -- the events of entry models are enriched with the last eve
             unified.id_house,
             unified.id_actor_user,
             unified.id_occupant,
+            unified.id_trace,
             unified.occupant_type,
             unified.restriction_type,
             unified.key_type,
@@ -451,6 +463,7 @@ enriched_model AS ( -- the events of entry models are enriched with the last eve
         id_house,
         id_actor_user,
         id_occupant,
+        id_trace,
         occupant_type,
         restriction_type,
         key_type,
@@ -482,6 +495,7 @@ window_model AS (
         id_house,
         id_actor_user,
         id_occupant,
+        id_trace,
         occupant_type,
         restriction_type,
         key_type,
@@ -566,6 +580,7 @@ house_entrance_history AS (
                 WHEN wm.occupant_type = 'Empty' AND c.status = 'Ativo' AND wm.ts_entrance_ended IS NULL THEN 2
                 ELSE wm.id_occupant
             END AS id_occupant,
+            wm.id_trace,
             CASE
                 WHEN wm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND wm.ts_entrance_ended IS NOT NULL THEN 'Tenant'
                 WHEN wm.occupant_type = 'Empty' AND c.status = 'Ativo' AND wm.ts_entrance_ended IS NULL THEN 'Tenant'
@@ -630,6 +645,7 @@ house_entrance_history AS (
         id_house,
         id_actor_user,
         id_occupant,
+        id_trace,
         occupant_type,
         restriction_type,
         key_type,
@@ -673,6 +689,7 @@ SELECT
     id_house,
     id_actor_user,
     id_occupant,
+    id_trace,
     occupant_type,
     restriction_type,
     key_type,

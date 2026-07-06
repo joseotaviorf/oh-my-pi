@@ -12,6 +12,7 @@ SELECT
   vse.id_company_supply AS sk_company_supply,
   COALESCE(vse.sk_broker_supply, -1) AS sk_broker_supply,
   COALESCE(vse.sk_broker_demand, -1) AS sk_broker_demand,
+  vse.id_trace AS sk_trace,
   vse.is_3p_supply,
   vse.is_3p_demand,
   vse.is_3p_lead_gen,
@@ -27,8 +28,8 @@ SELECT
   REPLACE(CAST(DATE(vse.ts_created) AS STRING), '-', '') AS sk_event_date,
   vse.country_code,
   vse.ranking,
-  DATEDIFF(MINUTE,vse.ts_created , pe.ts_created) AS minutes_between_last_event,
-  DATEDIFF(HOUR,vse.ts_created , pe.ts_created) AS hours_between_last_event,
+  TIMESTAMPDIFF(MINUTE, vse.ts_created, pe.ts_created) AS minutes_between_last_event,
+  TIMESTAMPDIFF(HOUR, vse.ts_created, pe.ts_created) AS hours_between_last_event,
   NOW() AS ts_load
 FROM
   datalake_visit.visit_status_events AS vse

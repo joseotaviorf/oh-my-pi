@@ -29,6 +29,10 @@ columns:
     lineage:
       - datalake_request_logging_raw.entryaccess.application_payload
     description: Chat bot name from application_payload JSON path $.platform_info.chat_bot_name.
+  channel:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.application_payload
+    description: Channel of the request, from application_payload JSON path platform_info.origin_chat_app.
   ts_request:
     lineage:
       - datalake_request_logging_raw.entryaccess.timestamp

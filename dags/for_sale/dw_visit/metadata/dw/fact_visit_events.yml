@@ -67,6 +67,10 @@ columns:
     lineage:
       - datalake_visit.visit_status_events.sk_broker_demand
     description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen.
+  sk_trace:
+    lineage:
+      - datalake_visit.visit_status_events.id_trace
+    description: Id of langfuse trace in the request logging
   is_3p_supply:
     lineage:
       - datalake_visit.visit_status_events.is_3p_supply

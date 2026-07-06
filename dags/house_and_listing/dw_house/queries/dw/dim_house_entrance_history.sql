@@ -2,6 +2,7 @@ SELECT
     id AS sk_house_entrance,
     id_house AS sk_house,
     id_actor_user AS sk_actor_user,
+    id_trace AS sk_trace,
     occupant_type,
     key_type,
     entry_model_details,

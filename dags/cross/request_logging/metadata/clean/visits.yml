@@ -29,6 +29,14 @@ columns:
     lineage:
       - datalake_request_logging_raw.visits.application_payload
     description: Code of visit associated with the request, from application_payload JSON path domain_info.visit_code.
+  channel:
+    lineage:
+      - datalake_request_logging_raw.visits.application_payload
+    description: Channel of the request, from application_payload JSON path platform_info.origin_chat_app.
+  actor_role:
+    lineage:
+      - datalake_request_logging_raw.visits.application_payload
+    description: Actor role of the request, from application_payload JSON path domain_info.actor_role.
   ts_request:
     lineage:
       - datalake_request_logging_raw.visits.timestamp

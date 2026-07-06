@@ -32,6 +32,10 @@ columns:
       '2': Tenant
       '3': Owner
       '4': Empty
+  id_trace:
+    lineage:
+      - datalake_request_logging_clean.entryaccess.id_trace
+    description: Id of the langfuse trace in the request logging
   occupant_type:
     lineage:
       - datalake_ebdb_clean.occupant_type.name
@@ -91,6 +95,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.entry_access_tracking.channel
       - datalake_request_logging_clean.entryaccess.host
+      - datalake_request_logging_clean.entryaccess.channel
     description: Unified entry channel from new entry model. The channel is enriched
       with the host from the request logging in the conversational case.
   actor_role:

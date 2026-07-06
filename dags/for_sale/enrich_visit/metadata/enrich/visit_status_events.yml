@@ -44,13 +44,17 @@ columns:
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
-    description: House listing ID
+    description: House listing version identifier valid when the visit was created. Defaults to -1 if missing.
   id_rent_flow:
     description: Id for Rent Flow connection
   id_sale_flow:
     description: Id for Sale Flow connection, junction of visitor with house
   id_fup_details:
     description: Id for visit's follow up
+  id_trace:
+    lineage:
+      - datalake_request_logging_clean.visits.id_trace
+    description: Id of the trace in the request logging
   sk_broker_supply:
     lineage:
       - datalake_visit.visit_business_model.sk_broker_supply
@@ -106,7 +110,7 @@ columns:
   visit_code:
     lineage:
       - datalake_ebdb_clean.visit.code
-    description: Code of the visit.
+    description: Unique visit code from EBDB.
   business_context:
     description: The context of the visit, which can be RENT or SALE
   ranking:
@@ -132,6 +136,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
       - datalake_request_logging_clean.visits.host
+      - datalake_request_logging_clean.visits.channel
     description: Unified visit channel. The channel is enriched with the host from the request logging in the conversational case.
   application_source:
     lineage:
@@ -140,7 +145,7 @@ columns:
   reason:
     lineage:
       - datalake_ebdb_clean.visit_status_log.reason
-    description: Reason of the event
+    description: Explanation recorded when the visit status changed, such as cancellation or unsuccessful motive.
   is_visit_last_event:
     description: If it is the last event of that visit in the database
   ts_created:

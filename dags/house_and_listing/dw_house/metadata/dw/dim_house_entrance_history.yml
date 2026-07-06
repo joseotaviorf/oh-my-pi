@@ -18,6 +18,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.id_actor_user
     description: ID of actor user who initiated the entry.
+  sk_trace:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.id_trace
+    description: Id of the langfuse trace in the request logging
   occupant_type:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.occupant_type
