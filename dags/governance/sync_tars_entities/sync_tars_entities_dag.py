@@ -110,6 +110,7 @@ def audit_document(**context) -> dict[str, Any]:
     """
     graphql_url = Variable.get("DATAHUB_GRAPHQL_URL")
     token = Variable.get("DATAHUB_TOKEN")
+    state_path = Variable.get("TARS_SYNC_STATE_PATH", default_var="").strip()
     params = context.get("params", {})
 
     env = {
@@ -117,6 +118,8 @@ def audit_document(**context) -> dict[str, Any]:
         "DATAHUB_GRAPHQL_URL": graphql_url,
         "DATAHUB_TOKEN": token,
     }
+    if state_path:
+        env["TARS_SYNC_STATE_PATH"] = state_path
 
     cmd = [sys.executable, str(_SYNC_SCRIPT), "--mode", "gitops", "--dry-run"]
 
@@ -137,16 +140,18 @@ def audit_document(**context) -> dict[str, Any]:
         )
 
     # ── Parse stdout to build XCom payload ────────────────────────────────────
-    # We need: document_urn, document_title, data_product_id, md_content
+    # We need: document_urn, document_title, data_product_id, md_content, content_hash
     # Example stdout lines:
     #   ▶  Collections TEST  (urn:li:document:d1fd0bc2-...)
     #   → data_product_id derived from title: collections-test
     #   ✓ dry-run wrote /path/to/sync_output/collections_test.md
+    #   → content_hash: <sha256hex>
 
     _doc_header_re = re.compile(r"^▶\s+(.+?)\s+\((urn:li:document:[^)]+)\)")
     _dp_id_re = re.compile(r"→ data_product_id (?:derived from title|is): (\S+)")
     _dp_type_re = re.compile(r"→ data_product_type: (\S+)")
     _md_re = re.compile(r"✓ dry-run wrote (.+\.md)$")
+    _hash_re = re.compile(r"→ content_hash: ([0-9a-f]{64})")
 
     docs: list[dict[str, str]] = []
     current: dict[str, str] = {}
@@ -172,6 +177,11 @@ def audit_document(**context) -> dict[str, Any]:
         m = _md_re.search(line)
         if m:
             current["_md_path"] = m.group(1).strip()
+            continue
+
+        m = _hash_re.search(line)
+        if m:
+            current["content_hash"] = m.group(1).strip()
 
     if current.get("document_urn"):
         docs.append(current)
@@ -300,15 +310,41 @@ def classify_entity(**context) -> dict[str, Any]:
 
 # ── Task 3 — open_pr ──────────────────────────────────────────────────────────
 
+def _resolve_state_path() -> "Path":
+    """Resolve the sync-state file path, preferring the Airflow Variable when set.
+
+    Resolution order:
+    1. TARS_SYNC_STATE_PATH env var (directory or full file path)
+    2. /dbfs/tmp/governance/ on Databricks workers
+    3. Alongside the sync script (local / CI default)
+    """
+    from pathlib import Path  # noqa: PLC0415 (local import keeps top-level clean)
+    from sync.constants import SYNC_STATE_FILENAME  # noqa: PLC0415
+
+    env_path = os.environ.get("TARS_SYNC_STATE_PATH", "").strip()
+    if env_path:
+        p = Path(env_path)
+        return p if p.suffix else p / SYNC_STATE_FILENAME
+    if "DATABRICKS_RUNTIME_VERSION" in os.environ:
+        return Path("/dbfs/tmp/governance") / SYNC_STATE_FILENAME
+    return _SYNC_PKG_DIR / SYNC_STATE_FILENAME
+
+
 def open_pr(**context) -> None:
     """Open a GitHub PR with the generated MD file for each document that passed audit.
 
     Requires the GITHUB_TOKEN Airflow Variable. On merge, Woodpecker sync-tars-entities
     pushes the Data Product to DataHub in memory (no YAML committed to the repo).
+
+    After each successful PR open/update the document's content hash is persisted via
+    SyncStateStore so the next audit run can short-circuit at is_unchanged().
+    Set the TARS_SYNC_STATE_PATH Airflow Variable to a shared persistent directory
+    so all workers read/write the same state file.
     """
     github_token = Variable.get("GITHUB_TOKEN")
     graphql_url = Variable.get("DATAHUB_GRAPHQL_URL")
     token = Variable.get("DATAHUB_TOKEN")
+    state_path_var = Variable.get("TARS_SYNC_STATE_PATH", default_var="").strip()
 
     enriched: dict[str, Any] = context["ti"].xcom_pull(task_ids="classify_entity") or {}
     docs: list[dict[str, Any]] = enriched.get("docs", [])
@@ -317,10 +353,12 @@ def open_pr(**context) -> None:
         print("No documents in XCom payload — nothing to PR.")
         return
 
-    # Set env for github_delivery and datahub_client
+    # Set env for github_delivery, datahub_client, and state resolution
     os.environ["GITHUB_TOKEN"] = github_token
     os.environ["DATAHUB_GRAPHQL_URL"] = graphql_url
     os.environ["DATAHUB_TOKEN"] = token
+    if state_path_var:
+        os.environ["TARS_SYNC_STATE_PATH"] = state_path_var
 
     # Ensure sync/ package is importable inside the Airflow worker
     pkg_dir = str(_SYNC_PKG_DIR)
@@ -333,6 +371,9 @@ def open_pr(**context) -> None:
         is_ip_allowlist_error,
         open_sync_pull_request,
     )
+    from sync.sync_state import SyncStateStore  # noqa: PLC0415
+
+    state = SyncStateStore(_resolve_state_path())
 
     failed: list[str] = []
 
@@ -341,6 +382,7 @@ def open_pr(**context) -> None:
         doc_urn = doc["document_urn"]
         title = doc.get("document_title", dp_id)
         md_content = doc.get("md_content", "")
+        content_hash = doc.get("content_hash", "")
 
         if not md_content:
             print(f"  ❌  No MD content in XCom payload for {dp_id}")
@@ -361,9 +403,19 @@ def open_pr(**context) -> None:
                 is_edit=is_edit,
                 md_output_dir=md_output_dir,
             )
-            print(f"  ✅  PR #{pr.pr_number}: {pr.pr_url}")
+            action = "no change" if not pr.updated else "committed"
+            print(f"  ✅  PR #{pr.pr_number}: {pr.pr_url}  [{action}]")
             print(f"       branch : {pr.branch}")
             print(f"       type   : {pr_label}")
+
+            if content_hash:
+                state.mark_synced(
+                    doc_urn,
+                    content_hash,
+                    data_product_id=dp_id,
+                    delivery_mode="gitops",
+                    pr_url=pr.pr_url,
+                )
 
             write_sync_status(
                 doc_urn,

@@ -79,6 +79,8 @@ dags_not_using_builder:
   - governance/datahub_business_context/sync/sync_state.py
   - governance/datahub_business_context/sync/yaml_generator.py
   - governance/datahub_business_context/sync/__init__.py
+  - governance/datahub_business_context/sync/test_github_delivery.py
+  - governance/datahub_business_context/sync/test_sync_state_path.py
   - governance/sync_tars_entities/sync_tars_entities_dag.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
 

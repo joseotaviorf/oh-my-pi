@@ -22,6 +22,7 @@ class PullRequestResult:
     pr_url: str
     branch: str
     pr_number: int
+    updated: bool = True
 
 
 def _github_token() -> str:
@@ -78,6 +79,20 @@ def _get_file_sha(path: str, branch: str = GITHUB_DEFAULT_BRANCH) -> Optional[st
     try:
         blob = _api_request("GET", f"/contents/{path}?ref={branch}")
         return str(blob.get("sha"))
+    except RuntimeError as exc:
+        if "404" in str(exc):
+            return None
+        raise
+
+
+def _get_file_content(path: str, branch: str) -> Optional[str]:
+    """Return the decoded text content of ``path`` on ``branch``, or None if absent."""
+    try:
+        blob = _api_request("GET", f"/contents/{path}?ref={branch}")
+        encoded = blob.get("content", "")
+        if not encoded:
+            return None
+        return base64.b64decode(encoded).decode("utf-8")
     except RuntimeError as exc:
         if "404" in str(exc):
             return None
@@ -167,7 +182,20 @@ def open_sync_pull_request(
     existing_pr = _find_open_pr(branch)
 
     if existing_pr:
-        # PR is already open — update the MD file on the branch in-place.
+        # PR is already open — update the MD file on the branch in-place only when
+        # the content has actually changed. GitHub creates a real commit even for
+        # identical content, so we guard with an explicit content comparison.
+        current_content = _get_file_content(md_path, branch)
+        if current_content == md_content:
+            print(
+                f"  ↩ open PR #{existing_pr['number']} already has identical content — skipping commit"
+            )
+            return PullRequestResult(
+                pr_url=str(existing_pr["html_url"]),
+                branch=branch,
+                pr_number=int(existing_pr["number"]),
+                updated=False,
+            )
         # Must read SHA from the PR branch (not master) to avoid sha-mismatch errors.
         md_sha = _get_file_sha(md_path, branch)
         _put_file(md_path, md_content, update_msg, branch, md_sha)

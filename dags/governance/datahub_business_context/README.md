@@ -69,6 +69,23 @@ make register-datahub-context-props
 uv run python dags/governance/datahub_business_context/push_context_documents.py
 ```
 
+### Airflow Variables required for the DAG
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATAHUB_GRAPHQL_URL` | yes | DataHub GMS GraphQL endpoint |
+| `DATAHUB_TOKEN` | yes | Editor-role personal access token |
+| `GITHUB_TOKEN` | yes | GitHub PAT with `repo` write scope (for PR creation) |
+| `TARS_SYNC_STATE_PATH` | recommended | Path to a **shared, persistent directory** visible to all Airflow workers (e.g. `/mnt/shared/tars-sync/`). The DAG writes `.tars_entity_sync_state.json` there and uses it to skip unchanged documents on the next run. Without this variable the state file lives on the local worker disk and is lost on pod restart, falling back to the GitHub content-equality guard. |
+
+### Idempotency guarantees
+
+The `governance.sync_tars_entities` DAG (every 5 min) is safe to leave running against open PRs:
+
+1. **GitHub delivery guard** — `open_sync_pull_request()` fetches the current file from the PR branch before committing. If the content is identical it skips the PUT entirely, so no spurious commits are created.
+2. **Sync state** — after a successful PR open/update the document's content hash is persisted in `TARS_SYNC_STATE_PATH`. On the next run `audit_document` sees `is_unchanged()` → `True` and passes an empty XCom payload, skipping `classify_entity` and `open_pr` entirely.
+3. **`force` param** — set the `force` DAG param to `true` to bypass the state cache for a deliberate re-sync.
+
 ### Sync commands
 
 ```bash

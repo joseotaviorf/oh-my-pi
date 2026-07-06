@@ -247,6 +247,7 @@ def _process_document(
     if dry_run:
         md_path.write_text(md_text, encoding="utf-8")
         print(f"  ✓ dry-run wrote {md_path}")
+        print(f"  → content_hash: {content_hash}")
         return _OUTCOME_OK
 
     if mode == DELIVERY_MODE_GITOPS:
