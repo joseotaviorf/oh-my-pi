@@ -7,6 +7,7 @@ SELECT
     phone,
     code,
     origin,
+    business_context,
     createdAt AS ts_created,
     updatedAt AS ts_updated
 FROM

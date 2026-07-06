@@ -37,6 +37,10 @@ columns:
     description: Channel through which a lead is captured.
     lineage:
     - datalake_ebdb_raw.agentleadreferral.origin
+  business_context:
+    description: Business context assigned to the referral invite, indicating the EBDB flow where the lead referral belongs.
+    lineage:
+    - datalake_ebdb_raw.agentleadreferral.business_context
   ts_created:
     description: Register creation timestamp
     lineage:

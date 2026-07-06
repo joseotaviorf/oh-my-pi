@@ -9,11 +9,13 @@ SELECT
     phone,
     code,
     origin,
+    business_context,
     name_mod AS mod_name,
     status_mod AS mod_status,
     code_mod AS mod_code,
     phone_mod AS mod_phone,
     origin_mod AS mod_origin,
+    business_context_mod AS mod_business_context,
     agent_id_mod AS mod_id_agent,
     lead_id_mod AS mod_id_lead,
     createdAt AS ts_created

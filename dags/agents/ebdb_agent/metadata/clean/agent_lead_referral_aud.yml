@@ -47,6 +47,10 @@ columns:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.origin
     description: Value of origin in the source record.
+  business_context:
+    lineage:
+    - datalake_ebdb_raw.agentleadreferral_aud.business_context
+    description: Business context value recorded for this audited referral revision.
   mod_name:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.name_mod
@@ -67,6 +71,10 @@ columns:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.origin_mod
     description: Audit flag for changes to origin.
+  mod_business_context:
+    lineage:
+    - datalake_ebdb_raw.agentleadreferral_aud.business_context_mod
+    description: Audit flag indicating whether the business context changed in this referral revision.
   mod_id_agent:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.agent_id_mod
