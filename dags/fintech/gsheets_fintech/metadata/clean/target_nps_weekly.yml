@@ -1,67 +1,93 @@
 database_name: datalake_gsheets_clean
 table_name: target_nps_weekly
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for target
+  nps weekly. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   nps_global:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.nps_global
+    description: Value from the Google Sheets source column mapped to nps_global for target_nps_weekly planning.
   nps_global_4060_l4w:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.nps_global_4060_l4w
+    description: Value from the Google Sheets source column mapped to nps_global_4060_l4w for target_nps_weekly planning.
   fr_lost:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fr_lost
+    description: Value from the Google Sheets source column mapped to fr_lost for target_nps_weekly planning.
   lost_visits_fr:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.lost_visits_fr
+    description: Value from the Google Sheets source column mapped to lost_visits_fr for target_nps_weekly planning.
   lost_proposals_fr:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.lost_proposals_fr
+    description: Value from the Google Sheets source column mapped to lost_proposals_fr for target_nps_weekly planning.
   unpublished_fr:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.unpublished_fr
+    description: Value from the Google Sheets source column mapped to unpublished_fr for target_nps_weekly planning.
   fr_true:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fr_true
+    description: Value from the Google Sheets source column mapped to fr_true for target_nps_weekly planning.
   fr_onboarding:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fr_onboarding
+    description: Value from the Google Sheets source column mapped to fr_onboarding for target_nps_weekly planning.
   fr_ongoing:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fr_ongoing
+    description: Value from the Google Sheets source column mapped to fr_ongoing for target_nps_weekly planning.
   fr_offboarding:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fr_offboarding
+    description: Value from the Google Sheets source column mapped to fr_offboarding for target_nps_weekly planning.
   fr_lost_iq_rejected:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fr_lost_iq_rejected
+    description: Value from the Google Sheets source column mapped to fr_lost_iq_rejected for target_nps_weekly planning.
   fs_true:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fs_true
+    description: Value from the Google Sheets source column mapped to fs_true for target_nps_weekly planning.
   fs_lost:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fs_lost
+    description: Value from the Google Sheets source column mapped to fs_lost for target_nps_weekly planning.
   fs_ccv:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fs_ccv
+    description: Value from the Google Sheets source column mapped to fs_ccv for target_nps_weekly planning.
   fs_registry:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.fs_registry
+    description: Value from the Google Sheets source column mapped to fs_registry for target_nps_weekly planning.
   unpublished_fs:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.unpublished_fs
+    description: Value from the Google Sheets source column mapped to unpublished_fs for target_nps_weekly planning.
   lost_visits_fs:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.lost_visits_fs
+    description: Value from the Google Sheets source column mapped to lost_visits_fs for target_nps_weekly planning.
   lost_proposals_fs:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.lost_proposals_fs
+    description: Value from the Google Sheets source column mapped to lost_proposals_fs for target_nps_weekly planning.
   dt_week_start:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.week_start
+    description: Calendar date associated with week start in the financial workflow.
   month:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   year:
     lineage:
       - datalake_gsheets_raw.target_nps_weekly.year
+    description: Year partition derived from the source event timestamp for incremental loading.

@@ -1,48 +1,50 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_real_estates
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Google Sheets directory of QuintoCred partner real estate agencies and segmentation. One row per partner real estate agency.
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_broker:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.sk_broker
-    description: Surrogate key identifying the QuintoCred broker in the real estates
-      sheet.
+      - datalake_gsheets_raw.quintocred_real_estates.sk_broker
+    description: Surrogate key identifying the QuintoCred broker in the real estates Google Sheets.
   id_pipedrive:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.id_pipedrive
+      - datalake_gsheets_raw.quintocred_real_estates.id_pipedrive
     description: Pipedrive CRM identifier of the QuintoCred real estate partner.
   broker_name:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.broker_name
+      - datalake_gsheets_raw.quintocred_real_estates.broker_name
     description: Legal name of the QuintoCred partner real estate agency.
   cnpj:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.cnpj
+      - datalake_gsheets_raw.quintocred_real_estates.cnpj
     description: CNPJ tax identifier of the QuintoCred partner real estate agency.
   potential_segmentation:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.potential_segmentation
+      - datalake_gsheets_raw.quintocred_real_estates.potential_segmentation
     description: Potential revenue segmentation assigned to the real estate partner.
   credit_segmentation:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.credit_segmentation
+      - datalake_gsheets_raw.quintocred_real_estates.credit_segmentation
     description: Credit risk segmentation assigned to the real estate partner.
   status_imob:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.status_imob
+      - datalake_gsheets_raw.quintocred_real_estates.status_imob
     description: Real estate agency status in the QuintoCred partner program.
   status:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.status
+      - datalake_gsheets_raw.quintocred_real_estates.status
     description: Overall partnership status of the QuintoCred real estate agency row.
   executivo:
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.executivo
+      - datalake_gsheets_raw.quintocred_real_estates.executivo
     description: Account executive responsible for the QuintoCred real estate partner.
   hunter:
-    description: Hunter owner assigned to the QuintoCred real estate lead.
     lineage:
-    - datalake_gsheets_raw.quintocred_real_estates.hunter
-description: Google Sheets directory of QuintoCred partner real estate agencies and
-  segmentation.
+      - datalake_gsheets_raw.quintocred_real_estates.hunter
+    description: Hunter owner assigned to the QuintoCred real estate lead.

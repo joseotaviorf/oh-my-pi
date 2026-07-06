@@ -1,139 +1,134 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_pre_evictions
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Google Sheets tracker for QuintoCred pre-eviction cases before formal legal filing. One row per pre-eviction case in the control sheet.
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_propose:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.id_proposta
-    description: QuintoCred proposal identifier tied to the pre-eviction tracking
-      row.
+      - datalake_gsheets_raw.quintocred_pre_evictions.id_proposta
+    description: QuintoCred proposal identifier tied to the pre-eviction tracking row.
   id_broker:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.id_da_imobiliaria
+      - datalake_gsheets_raw.quintocred_pre_evictions.id_da_imobiliaria
     description: Broker identifier associated with the QuintoCred pre-eviction case.
   id_ticket_termination:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.ticket_rescisao
+      - datalake_gsheets_raw.quintocred_pre_evictions.ticket_rescisao
     description: Termination ticket identifier linked to the pre-eviction case.
   tenant:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.inquilino
+      - datalake_gsheets_raw.quintocred_pre_evictions.inquilino
     description: Tenant name involved in the QuintoCred pre-eviction tracking sheet.
   document:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.cpf
+      - datalake_gsheets_raw.quintocred_pre_evictions.cpf
     description: Tenant document number recorded in the pre-eviction control sheet.
   status_contract:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.status_contrato
+      - datalake_gsheets_raw.quintocred_pre_evictions.status_contrato
     description: Rental contract status captured for the pre-eviction case.
   status:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.status
+      - datalake_gsheets_raw.quintocred_pre_evictions.status
     description: Workflow status of the QuintoCred pre-eviction case in the sheet.
   broker_name:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.imobiliaria
+      - datalake_gsheets_raw.quintocred_pre_evictions.imobiliaria
     description: Broker name responsible for the QuintoCred pre-eviction case.
   responsible_name:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.responsavel
+      - datalake_gsheets_raw.quintocred_pre_evictions.responsavel
     description: Analyst name accountable for the pre-eviction case follow-up.
   reason:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.motivo
+      - datalake_gsheets_raw.quintocred_pre_evictions.motivo
     description: Documented reason triggering the QuintoCred pre-eviction process.
   history_comment:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.historico
+      - datalake_gsheets_raw.quintocred_pre_evictions.historico
     description: Latest analyst comment on the pre-eviction case history.
   exoneration_sent:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.enviado_exoneracao
+      - datalake_gsheets_raw.quintocred_pre_evictions.enviado_exoneracao
     description: Whether the exoneration notice was sent for the pre-eviction case.
   exoneration_deadline:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.prazo_exoneracao
+      - datalake_gsheets_raw.quintocred_pre_evictions.prazo_exoneracao
     description: Deadline date for exoneration actions on the pre-eviction case.
   status_exoneration:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.exoneracao
+      - datalake_gsheets_raw.quintocred_pre_evictions.exoneracao
     description: Status of exoneration workflow on the pre-eviction case.
   status_power_of_attorney:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.procuracao
+      - datalake_gsheets_raw.quintocred_pre_evictions.procuracao
     description: Status of power of attorney documentation for pre-eviction.
   status_adm_contract:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.contrato_adm
+      - datalake_gsheets_raw.quintocred_pre_evictions.contrato_adm
     description: Administrative contract status tracked for pre-eviction review.
   status_document_renter:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.rg_locador
+      - datalake_gsheets_raw.quintocred_pre_evictions.rg_locador
     description: Renter documentation status on the pre-eviction case.
   backoffice_analyst_name:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.analista_backoffice
+      - datalake_gsheets_raw.quintocred_pre_evictions.analista_backoffice
     description: Backoffice analyst assigned to the pre-eviction case.
   is_eviction_active:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.ativo_evic
+      - datalake_gsheets_raw.quintocred_pre_evictions.ativo_evic
     description: Whether the pre-eviction case is actively being pursued.
   pre_eviction_comment:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.obs_pretombamento
+      - datalake_gsheets_raw.quintocred_pre_evictions.obs_pretombamento
     description: Free-text comment recorded on the pre-eviction spreadsheet row.
   status_eviction:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.status_evic
-    description: Legal eviction workflow status tracked on the QuintoCred pre-eviction
-      sheet.
+      - datalake_gsheets_raw.quintocred_pre_evictions.status_evic
+    description: Legal eviction workflow status tracked on the QuintoCred pre-eviction sheet.
   status_pre_eviction:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.status_pretombamento
-    description: Pre-eviction workflow status before formal filing in the control
-      sheet.
+      - datalake_gsheets_raw.quintocred_pre_evictions.status_pretombamento
+    description: Pre-eviction workflow status before formal filing in the control sheet.
   dt_suspension:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.suspensao
+      - datalake_gsheets_raw.quintocred_pre_evictions.suspensao
     description: Date when the pre-eviction case was suspended in the tracking sheet.
   dt_release:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.liberacao
-    description: Date when the pre-eviction suspension was released in the tracking
-      sheet.
+      - datalake_gsheets_raw.quintocred_pre_evictions.liberacao
+    description: Date when the pre-eviction suspension was released in the tracking sheet.
   dt_sent:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.data_de_envio
+      - datalake_gsheets_raw.quintocred_pre_evictions.data_de_envio
     description: Date when the pre-eviction notice package was sent to stakeholders.
+  dt_exoneration_received:
+    lineage:
+      - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_exoneracao
+    description: Date when exoneration documents were received for the pre-eviction case.
+  dt_power_of_attorney_received:
+    lineage:
+      - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_prcuracao
+    description: Date when power of attorney documents were received for pre-eviction.
   dt_adm_contract_received:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_contrato_de_adm
+      - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_contrato_de_adm
     description: Date when administrative contract documents were received for pre-eviction.
   dt_document_renter_received:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_rg_locador
-    description: Date when renter documentation was received for the pre-eviction
-      case.
+      - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_rg_locador
+    description: Date when renter documentation was received for the pre-eviction case.
   dt_movement:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.data_de_movimentacao
-    description: Date of the latest procedural movement on the pre-eviction tracking
-      row.
+      - datalake_gsheets_raw.quintocred_pre_evictions.data_de_movimentacao
+    description: Date of the latest procedural movement on the pre-eviction tracking row.
   ts_load:
     lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.ts_load
-    description: Timestamp when the pre-eviction spreadsheet row was ingested into
-      the lake.
-  dt_power_of_attorney_received:
-    lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_prcuracao
-    description: Date when power of attorney documents were received for pre-eviction.
-  dt_exoneration_received:
-    lineage:
-    - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_exoneracao
-    description: Date when exoneration documents were received for the pre-eviction
-      case.
-description: Google Sheets tracker for QuintoCred pre-eviction cases before formal
-  legal filing.
+      - datalake_gsheets_raw.quintocred_pre_evictions.ts_load
+    description: Timestamp when the pre-eviction spreadsheet row was ingested into the lake.

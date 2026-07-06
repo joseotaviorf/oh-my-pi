@@ -1,17 +1,30 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_iaf_qualifies_calls
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred iaf qualifies calls. One row per planning or control record used
+  in financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   qualifies:
     lineage:
       - datalake_gsheets_raw.quintocred_iaf_qualifies_calls.qualifies
+    description: Value from the Google Sheets source column mapped to qualifies for quintocred_iaf_qualifies_calls planning.
   amount:
     lineage:
       - datalake_gsheets_raw.quintocred_iaf_qualifies_calls.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   alo:
     lineage:
       - datalake_gsheets_raw.quintocred_iaf_qualifies_calls.alo 
+    description: Value from the Google Sheets source column mapped to alo for quintocred_iaf_qualifies_calls planning.
   cpc:
     lineage:
       - datalake_gsheets_raw.quintocred_iaf_qualifies_calls.cpc
+    description: Value from the Google Sheets source column mapped to cpc for quintocred_iaf_qualifies_calls planning.

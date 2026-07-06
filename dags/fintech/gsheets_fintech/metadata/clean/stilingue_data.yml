@@ -1,62 +1,86 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: stilingue_data
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  stilingue data. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_manifestation:
     lineage:
       - datalake_gsheets_raw.stilingue_data.id
+    description: Identifier for the manifestation referenced by this financial record.
   id_author:
     lineage:
       - datalake_gsheets_raw.stilingue_data.autor_id
+    description: Identifier for the author referenced by this financial record.
   channel:
     lineage:
       - datalake_gsheets_raw.stilingue_data.canal
+    description: Value from the Google Sheets source column mapped to channel for stilingue_data planning.
   manifestation_url:
     lineage:
       - datalake_gsheets_raw.stilingue_data.link
+    description: Value from the Google Sheets source column mapped to manifestation_url for stilingue_data planning.
   author_name:
     lineage:
       - datalake_gsheets_raw.stilingue_data.autor_nome
+    description: Value from the Google Sheets source column mapped to author_name for stilingue_data planning.
   author_profile_url:
     lineage:
       - datalake_gsheets_raw.stilingue_data.autor_link
+    description: Value from the Google Sheets source column mapped to author_profile_url for stilingue_data planning.
   author_image_url:
     lineage:
       - datalake_gsheets_raw.stilingue_data.autor_imagem
+    description: Value from the Google Sheets source column mapped to author_image_url for stilingue_data planning.
   content:
     lineage:
       - datalake_gsheets_raw.stilingue_data.conteudo
+    description: Value from the Google Sheets source column mapped to content for stilingue_data planning.
   polarity:
     lineage:
       - datalake_gsheets_raw.stilingue_data.polaridade
+    description: Value from the Google Sheets source column mapped to polarity for stilingue_data planning.
   gender:
     lineage:
       - datalake_gsheets_raw.stilingue_data.genero
+    description: Value from the Google Sheets source column mapped to gender for stilingue_data planning.
   theme:
     lineage:
       - datalake_gsheets_raw.stilingue_data.temas
+    description: Value from the Google Sheets source column mapped to theme for stilingue_data planning.
   manifestation_type:
     lineage:
       - datalake_gsheets_raw.stilingue_data.tipo_de_manisfetacao
+    description: Value from the Google Sheets source column mapped to manifestation_type for stilingue_data planning.
   offending_area:
     lineage:
       - datalake_gsheets_raw.stilingue_data.area_ofensora
+    description: Value from the Google Sheets source column mapped to offending_area for stilingue_data planning.
   collection_theme:
     lineage:
       - datalake_gsheets_raw.stilingue_data.tema_collection
+    description: Value from the Google Sheets source column mapped to collection_theme for stilingue_data planning.
   tags:
     lineage:
       - datalake_gsheets_raw.stilingue_data.tags
+    description: Value from the Google Sheets source column mapped to tags for stilingue_data planning.
   dt_manifestation:
     lineage:
       - datalake_gsheets_raw.stilingue_data.data_sem_hora
+    description: Calendar date associated with manifestation in the financial workflow.
   dt_week_manifestation:
     lineage:
       - datalake_gsheets_raw.stilingue_data.semana_da_manifestacao
+    description: Calendar date associated with week manifestation in the financial workflow.
   dt_month_manifestation:
     lineage:
       - datalake_gsheets_raw.stilingue_data.mes_da_manifestacao_
+    description: Calendar date associated with month manifestation in the financial workflow.
   ts_load:
     lineage:
       - datalake_gsheets_raw.stilingue_data.ts_load
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

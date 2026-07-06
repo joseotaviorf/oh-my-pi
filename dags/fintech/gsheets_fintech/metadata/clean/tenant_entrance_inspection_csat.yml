@@ -1,28 +1,41 @@
 database_name: datalake_gsheets_clean
 table_name: tenant_entrance_inspection_csat
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for tenant
+  entrance inspection csat. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.id_do_contrato
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_csat:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.id_csat
+    description: Identifier for the csat referenced by this financial record.
   email:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.email
+    description: Value from the Google Sheets source column mapped to email for tenant_entrance_inspection_csat planning.
   improvement_tags:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.pontos_de_melhoria
+    description: Value from the Google Sheets source column mapped to improvement_tags for tenant_entrance_inspection_csat planning.
   comments:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.campo_aberto
+    description: Value from the Google Sheets source column mapped to comments for tenant_entrance_inspection_csat planning.
   general_satisfaction_evaluation:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.avaliacao_csat
+    description: Value from the Google Sheets source column mapped to general_satisfaction_evaluation for tenant_entrance_inspection_csat planning.
   house_satisfation:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.house_satisfation
+    description: Value from the Google Sheets source column mapped to house_satisfation for tenant_entrance_inspection_csat planning.
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_iq_entrada.submitted_at
+    description: Timestamp when submitted occurred in the upstream fintech system.

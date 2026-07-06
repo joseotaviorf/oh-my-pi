@@ -1,68 +1,97 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_termination_form
-owner: ae-finance-fintech@quintoandar.com.br
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred termination form. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   ts_form:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.carimbo_de_datahora
+    description: Timestamp when form occurred in the upstream fintech system.
   analyst_name:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.nome_do_analista
+    description: Value from the Google Sheets source column mapped to analyst_name for quintocred_termination_form planning.
   id_ticket:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.ticket
+    description: Identifier for the ticket referenced by this financial record.
   id_propose:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.proposta
+    description: Identifier for the propose referenced by this financial record.
   termination_type:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.qual_o_tipo_de_rescisao
+    description: Value from the Google Sheets source column mapped to termination_type for quintocred_termination_form planning.
   was_adherent:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.o_processo_foi_aderente
+    description: Value from the Google Sheets source column mapped to was_adherent for quintocred_termination_form planning.
   root_cause:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.qual_a_causa_raiz_identificada
+    description: Value from the Google Sheets source column mapped to root_cause for quintocred_termination_form planning.
   loss_due_process_error:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_por_erro_de_processo
+    description: Value from the Google Sheets source column mapped to loss_due_process_error for quintocred_termination_form planning.
   loss_amount_due_process_error:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.se_houve_prejuizo_ocasionado_por_processo_qual_o_valor
+    description: Value from the Google Sheets source column mapped to loss_amount_due_process_error for quintocred_termination_form planning.
   loss_due_exception:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_ocasionado_por_excecoes
+    description: Value from the Google Sheets source column mapped to loss_due_exception for quintocred_termination_form planning.
   loss_amount_due_exception:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.se_houve_prejuizo_ocasionado_por_excecoes_qual_o_valor
+    description: Value from the Google Sheets source column mapped to loss_amount_due_exception for quintocred_termination_form planning.
   loss_due_product:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_relacionado_a_produto
+    description: Value from the Google Sheets source column mapped to loss_due_product for quintocred_termination_form planning.
   loss_amount_due_product:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.se_houve_prejuizo_ocasionado_por_produto_qual_o_valor
+    description: Value from the Google Sheets source column mapped to loss_amount_due_product for quintocred_termination_form planning.
   financial_loss:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_financeiro
+    description: Value from the Google Sheets source column mapped to financial_loss for quintocred_termination_form planning.
   financial_loss_amount:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.qual_o_valor_que_impacta_como_prejuizo_final
+    description: Value from the Google Sheets source column mapped to financial_loss_amount for quintocred_termination_form planning.
   score:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.pontuacao
+    description: Value from the Google Sheets source column mapped to score for quintocred_termination_form planning.
   grade:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.nota
+    description: Value from the Google Sheets source column mapped to grade for quintocred_termination_form planning.
   dt_monitoring:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.data
+    description: Calendar date associated with monitoring in the financial workflow.
   value_financial_loss:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.prejuizo_financeiro
+    description: Value from the Google Sheets source column mapped to value_financial_loss for quintocred_termination_form planning.
   contested:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.contestado
+    description: Value from the Google Sheets source column mapped to contested for quintocred_termination_form planning.
   critical_error:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.erro_critico
+    description: Value from the Google Sheets source column mapped to critical_error for quintocred_termination_form planning.

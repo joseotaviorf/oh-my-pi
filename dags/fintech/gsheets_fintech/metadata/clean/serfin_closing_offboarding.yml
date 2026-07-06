@@ -4,7 +4,7 @@ table_name: serfin_closing_offboarding
 description: >-
   Quality analysis records for rental contract closing operations, sourced from
   the Qualidade Fechamento Google Sheet tab for Fintech ops monitoring.
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   duplicate_check:

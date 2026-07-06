@@ -1,14 +1,23 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_test_proposals
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred test proposals. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
-  executive:
-    lineage:
-      - datalake_gsheets_raw.quintocred_test_proposals.sk_propose
-  brokers_wes:
-    lineage:
-      - datalake_gsheets_raw.quintocred_test_proposals.name
-  target_contatos:
-    lineage:
-      - datalake_gsheets_raw.quintocred_test_proposals.email
+  sk_propose:
+    lineage: []
+    description: Data warehouse surrogate key for propose used in fintech dimensional joins.
+  name:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to name for quintocred_test_proposals planning.
+  email:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to email for quintocred_test_proposals planning.

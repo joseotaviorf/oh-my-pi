@@ -1,19 +1,33 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_wallet_history
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred wallet history. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   executive:
     lineage:
       - datalake_gsheets_raw.quintocred_wallet_history.executive
+    description: Value from the Google Sheets source column mapped to executive for quintocred_wallet_history planning.
   id_broker:
     lineage:
       - datalake_gsheets_raw.quintocred_wallet_history.id_broker
+    description: Identifier for the broker referenced by this financial record.
   dt_updated:
     lineage:
       - datalake_gsheets_raw.quintocred_wallet_history.dt_updated
+    description: Calendar date associated with updated in the financial workflow.
   month:
     lineage:
       - datalake_gsheets_raw.quintocred_wallet_history.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   year:
     lineage:
       - datalake_gsheets_raw.quintocred_wallet_history.year
+    description: Year partition derived from the source event timestamp for incremental loading.
