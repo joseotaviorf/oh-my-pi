@@ -108,3 +108,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.listingquality.atualizadoem
     description: Timestamp of the last update applied to the listing quality record in EBDB.
+  edited_by:
+    lineage:
+      - datalake_ebdb_raw.listingquality.edited_by
+    description: User who last edited the listing quality record in EBDB.

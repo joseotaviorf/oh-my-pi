@@ -24,6 +24,7 @@ SELECT
     fraud_report AS has_fraud_report,
     reason_unpublish,
     criadoEm AS ts_created,
-    atualizadoEm AS ts_updated
+    atualizadoEm AS ts_updated,
+    edited_by
 FROM
     datalake_ebdb_raw.listingquality
