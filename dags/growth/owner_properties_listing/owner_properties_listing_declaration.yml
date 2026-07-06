@@ -27,6 +27,7 @@ workflow:
   source_database: owner-properties-listing
   source_schema: public
   lineage_product_database_name: owner-properties-listing
+  dbutils_secret_key: OWNER-PROPERTIES-LISTING_DB
   tables_customization:
     revinfo:
       clean_table_name: rev_info
