@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional
 
 from dateutil.relativedelta import relativedelta
-from pyspark.sql import DataFrame, Window
+from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql.functions import (
     coalesce,
     col,
@@ -127,7 +127,9 @@ def _month_range(load_end_date: str, months_window: int) -> tuple[date, date]:
 
 
 # DBTITLE 1,TQX first lead referral by user/month
-def _tqx_first_date_df(month_start: date, month_end: date) -> DataFrame:
+def _tqx_first_date_df(
+    spark: SparkSession, month_start: date, month_end: date
+) -> DataFrame:
     """First TQX referral date per user and metrics by reference_month (self-referral leads).
     Filtered to reference_month in [month_start, month_end] for incremental merge.
     """
@@ -163,7 +165,9 @@ def _tqx_first_date_df(month_start: date, month_end: date) -> DataFrame:
 
 
 # DBTITLE 1,Valid first listing by user/month
-def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
+def _valid_first_listing_df(
+    spark: SparkSession, month_start: date, month_end: date
+) -> DataFrame:
     """First valid listing activation per user and listing count by reference_month.
     Filtered to reference_month in [month_start, month_end] for incremental merge.
     """
@@ -331,7 +335,9 @@ def _resolve_id_original_parent(region: DataFrame) -> DataFrame:
     return ancestor.select("region_id", "id_original_parent", "name_original_parent")
 
 
-def _cities_region_mapping(ancestor_ids: Optional[list[int]] = None) -> DataFrame:
+def _cities_region_mapping(
+    spark: SparkSession, ancestor_ids: Optional[list[int]] = None
+) -> DataFrame:
     """
     All regions that are cities (level == "Cidade") or descendants of a city,
     with id_original_parent and name_original_parent. Single subtree run for all
@@ -382,7 +388,7 @@ def _cities_region_mapping(ancestor_ids: Optional[list[int]] = None) -> DataFram
     return result
 
 
-def _campinas_agents_df(region_mapping: DataFrame) -> DataFrame:
+def _campinas_agents_df(spark: SparkSession, region_mapping: DataFrame) -> DataFrame:
     """Distinct id_agent_data (id_agent) for agents linked to Campinas regions."""
     return (
         spark.table(TABLE_AGENT_REGION_DATA)
@@ -399,7 +405,9 @@ def _campinas_agents_df(region_mapping: DataFrame) -> DataFrame:
 
 
 # DBTITLE 1,Main builder
-def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
+def build_agent_independent_campinas_metrics(
+    spark: SparkSession, args: Namespace
+) -> DataFrame:
     """
     Build agent-independent Campinas metrics: status by month for Campinas agents,
     joined with TQX referral, first listing, agent_data and partner_agent; add derived flags.
@@ -424,10 +432,10 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
             col("id_agent").alias("fi_id_agent"), col("dt_independent_agent_registered")
         )
     )
-    tqx = _tqx_first_date_df(month_start, month_end)
-    first_listing = _valid_first_listing_df(month_start, month_end)
-    region_mapping = _cities_region_mapping(ancestor_ids=[CAMPINAS_CITY_ID])
-    campinas_agents = _campinas_agents_df(region_mapping)
+    tqx = _tqx_first_date_df(spark, month_start, month_end)
+    first_listing = _valid_first_listing_df(spark, month_start, month_end)
+    region_mapping = _cities_region_mapping(spark, ancestor_ids=[CAMPINAS_CITY_ID])
+    campinas_agents = _campinas_agents_df(spark, region_mapping)
 
     agent_data = spark.table(TABLE_AGENT_DATA).select(
         col("id").alias("ad_id"),
@@ -606,9 +614,10 @@ def main(args: Optional[Namespace] = None) -> None:
         f"m=main, run_mode={args.run_mode}, table={args.table_name}, "
         f"load_end_date={args.load_end_date}, months_window={args.months_window}"
     )
-    df = build_agent_independent_campinas_metrics(args)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    df = build_agent_independent_campinas_metrics(spark_client.conn, args)
     row_count = validate_before_write(df)
-    save_df(SparkClient(), df, args, row_count=row_count)
+    save_df(spark_client, df, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 

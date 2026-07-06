@@ -37,7 +37,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional
 
 from dateutil.relativedelta import relativedelta
-from pyspark.sql import Column, DataFrame, Window
+from pyspark.sql import Column, DataFrame, SparkSession, Window
 from pyspark.sql.functions import (
     add_months,
     coalesce,
@@ -166,7 +166,7 @@ def _month_range(load_end_date: str, months_window: int) -> tuple[date, date]:
     return month_start, month_end
 
 
-def _agent_city_df() -> DataFrame:
+def _agent_city_df(spark: SparkSession) -> DataFrame:
     """Primary city name per agent.
     Walks each region's parent chain (up to MAX_REGION_DEPTH) to find the nearest
     ancestor with level == 'Cidade'. When an agent has multiple regions, takes the
@@ -214,7 +214,9 @@ def _agent_city_df() -> DataFrame:
 
 
 # DBTITLE 1,TQC first lead referral by user/month
-def _tqc_first_date_df(month_start: date, month_end: date) -> DataFrame:
+def _tqc_first_date_df(
+    spark: SparkSession, month_start: date, month_end: date
+) -> DataFrame:
     """TQC (self-referral) count and first activation per (id_user, reference_month)."""
     return (
         spark.table(TABLE_OFFER_SPECIALISTS)
@@ -247,7 +249,9 @@ def _tqc_first_date_df(month_start: date, month_end: date) -> DataFrame:
 
 
 # DBTITLE 1,Valid first listing by user/month
-def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
+def _valid_first_listing_df(
+    spark: SparkSession, month_start: date, month_end: date
+) -> DataFrame:
     """Valid first listing count and first activation per (id_user, reference_month)."""
     return (
         spark.table(TABLE_CIQ_FIRST_LISTING)
@@ -291,7 +295,7 @@ def _new_broker_within_reference_month(
     return (d >= 0) & (d <= NEW_AGENT_MAX_DAYS)
 
 
-def _eligible_broker_agent_profiles_df() -> DataFrame:
+def _eligible_broker_agent_profiles_df(spark: SparkSession) -> DataFrame:
     """agent_data excluding vistoria/foto personas; paired with ``_new_broker_within_reference_month`` after status join."""
     return (
         spark.table(TABLE_AGENT_DATA)
@@ -303,7 +307,7 @@ def _eligible_broker_agent_profiles_df() -> DataFrame:
     )
 
 
-def _dim_agent_business_context_df() -> DataFrame:
+def _dim_agent_business_context_df(spark: SparkSession) -> DataFrame:
     """For Sale / For Rent flags from ``agent_data_business_contexts_served`` (clean layer).
 
     Pivots one-row-per-context into per-agent boolean flags:
@@ -331,7 +335,9 @@ def _dim_agent_business_context_df() -> DataFrame:
 
 
 # DBTITLE 1,PPA visits by agent/month
-def _ppa_visits_df(month_start: date, month_end: date) -> DataFrame:
+def _ppa_visits_df(
+    spark: SparkSession, month_start: date, month_end: date
+) -> DataFrame:
     """PPA-origin completed visits per (id_agent, reference_month).
     A visit is PPA when the agent was the preferred property agent for the visited house at visit time.
     """
@@ -376,7 +382,9 @@ def _ppa_visits_df(month_start: date, month_end: date) -> DataFrame:
 
 
 # DBTITLE 1,Main builder
-def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
+def build_agent_new_agent_activation_metrics(
+    spark: SparkSession, args: Namespace
+) -> DataFrame:
     """Nationwide new-agent activation metrics: within 60 days of each row's ``reference_month`` month-end."""
     months_window = int(getattr(args, "months_window", MONTHS_WINDOW_DEFAULT))
     month_start, month_end = _month_range(args.load_end_date, months_window)
@@ -425,18 +433,18 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
         )
         .otherwise(lit("OTHER"))
     )
-    tqc_by_month = _tqc_first_date_df(activity_month_start, month_end)
-    vfl_by_month = _valid_first_listing_df(activity_month_start, month_end)
-    ppa_by_month = _ppa_visits_df(activity_month_start, month_end)
+    tqc_by_month = _tqc_first_date_df(spark, activity_month_start, month_end)
+    vfl_by_month = _valid_first_listing_df(spark, activity_month_start, month_end)
+    ppa_by_month = _ppa_visits_df(spark, activity_month_start, month_end)
     return (
         status.alias("s")
         .join(
-            _dim_agent_business_context_df().alias("da"),
+            _dim_agent_business_context_df(spark).alias("da"),
             col("s.id_agent") == col("da.id_agent"),
             "left",
         )
         .join(
-            _eligible_broker_agent_profiles_df().alias("brk"),
+            _eligible_broker_agent_profiles_df(spark).alias("brk"),
             col("s.id_agent") == col("brk.brk_id_agent"),
             "inner",
         )
@@ -508,7 +516,7 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             "left",
         )
         .join(
-            _agent_city_df().alias("city"),
+            _agent_city_df(spark).alias("city"),
             col("s.id_agent") == col("city.id_agent"),
             "left",
         )
@@ -772,9 +780,10 @@ def main(args: Optional[Namespace] = None) -> None:
         f"m=main, run_mode={args.run_mode}, table={args.table_name}, "
         f"load_end_date={args.load_end_date}, months_window={args.months_window}"
     )
-    df = build_agent_new_agent_activation_metrics(args)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    df = build_agent_new_agent_activation_metrics(spark_client.conn, args)
     row_count = validate_before_write(df)
-    save_df(SparkClient(), df, args, row_count=row_count)
+    save_df(spark_client, df, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 

@@ -115,8 +115,7 @@ def test_excluded_personas_never_enter_broker_profiles(spark):
     agents_df = spark.createDataFrame(rows, _AGENT_SOURCE_SCHEMA)
     mock_spark = MagicMock()
     mock_spark.table.return_value = agents_df
-    _job.spark = mock_spark
-    assert _job._eligible_broker_agent_profiles_df().count() == 0
+    assert _job._eligible_broker_agent_profiles_df(mock_spark).count() == 0
 
 
 def _make_build(spark, metrics_rows, broker_ts_created=None):
@@ -213,7 +212,6 @@ def _make_build(spark, metrics_rows, broker_ts_created=None):
 
     mock_spark = MagicMock()
     mock_spark.table.side_effect = _table_side_effect
-    _job.spark = mock_spark
 
     with ExitStack() as stack:
         stack.enter_context(
@@ -231,7 +229,7 @@ def _make_build(spark, metrics_rows, broker_ts_created=None):
         stack.enter_context(
             patch.object(_job, "_dim_agent_business_context_df", return_value=empty_da)
         )
-        return _job.build_agent_new_agent_activation_metrics(args)
+        return _job.build_agent_new_agent_activation_metrics(mock_spark, args)
 
 
 def test_build_integration_activation_segment_and_barren_ppa(spark):
@@ -364,7 +362,6 @@ def test_is_channel_active_rollups_prior_reference_month(spark):
 
     mock_spark = MagicMock()
     mock_spark.table.side_effect = _table_side_effect
-    _job.spark = mock_spark
 
     with ExitStack() as stack:
         stack.enter_context(
@@ -382,7 +379,9 @@ def test_is_channel_active_rollups_prior_reference_month(spark):
         stack.enter_context(
             patch.object(_job, "_dim_agent_business_context_df", return_value=empty_da)
         )
-        row_out = _job.build_agent_new_agent_activation_metrics(args).collect()[0]
+        row_out = _job.build_agent_new_agent_activation_metrics(
+            mock_spark, args
+        ).collect()[0]
 
     assert row_out.reference_month == date(2025, 1, 1)
     assert row_out.total_listings_count == 0 and row_out.total_tqc_count == 0
@@ -483,7 +482,6 @@ def test_agent_business_context_from_clean_layer(spark):
 
     mock_spark = MagicMock()
     mock_spark.table.side_effect = _table_side_effect
-    _job.spark = mock_spark
 
     with ExitStack() as stack:
         stack.enter_context(
@@ -501,7 +499,9 @@ def test_agent_business_context_from_clean_layer(spark):
         stack.enter_context(
             patch.object(_job, "_dim_agent_business_context_df", return_value=da_df)
         )
-        one = _job.build_agent_new_agent_activation_metrics(args).collect()[0]
+        one = _job.build_agent_new_agent_activation_metrics(mock_spark, args).collect()[
+            0
+        ]
     assert one.agent_business_context == "FOR_SALE_AND_FOR_RENT"
 
 

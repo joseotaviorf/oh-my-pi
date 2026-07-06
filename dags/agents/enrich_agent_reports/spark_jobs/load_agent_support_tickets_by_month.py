@@ -33,7 +33,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional
 
 from dateutil.relativedelta import relativedelta
-from pyspark.sql import DataFrame, Window
+from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql.functions import (
     add_months,
     coalesce,
@@ -193,7 +193,7 @@ def _filter_in_month_window(
 
 # DBTITLE 1,Business rules
 def _qualified_active_ciqs_by_month(
-    load_end_date: str, months_window: int = 2
+    spark: SparkSession, load_end_date: str, months_window: int = 2
 ) -> DataFrame:
     """Agent-months where the agent has a valid first listing in a 3-month window (first listing month + 2 following)."""
     month_start, month_end = _month_range(load_end_date, months_window)
@@ -225,7 +225,9 @@ def _qualified_active_ciqs_by_month(
     )
 
 
-def _all_listings_by_month(load_end_date: str, months_window: int = 2) -> DataFrame:
+def _all_listings_by_month(
+    spark: SparkSession, load_end_date: str, months_window: int = 2
+) -> DataFrame:
     """Count of all CIQ listings per (id_user, reference_month) in the window."""
     month_start, month_end = _month_range(load_end_date, months_window)
     ciq_listings_with_month = (
@@ -246,7 +248,7 @@ def _all_listings_by_month(load_end_date: str, months_window: int = 2) -> DataFr
 
 # --- Visits: each completed visit counts for its month and the next (2-month window) ---
 def _all_agents_visits_by_month(
-    load_end_date: str, months_window: int = 2
+    spark: SparkSession, load_end_date: str, months_window: int = 2
 ) -> DataFrame:
     """Count distinct visits per (id_agent, reference_month); visits counts for the month that they were made and the following month"""
     month_start, month_end = _month_range(load_end_date, months_window)
@@ -278,7 +280,7 @@ def _all_agents_visits_by_month(
     )
 
 
-def _excluded_agent_users() -> DataFrame:
+def _excluded_agent_users(spark: SparkSession) -> DataFrame:
     """Returns distinct id_user for fotógrafo/vistoriador agents to exclude from broker reports."""
     return (
         spark.table(TABLE_DIM_AGENT)
@@ -289,7 +291,7 @@ def _excluded_agent_users() -> DataFrame:
     )
 
 
-def _independent_agent_eligible() -> DataFrame:
+def _independent_agent_eligible(spark: SparkSession) -> DataFrame:
     """Service criteria for eligibility for independent agents. This is how the services see independent agent, not how Operations define (they use a sheet-based control)"""
     partner = (
         spark.table(TABLE_PARTNER)
@@ -327,7 +329,7 @@ def _independent_agent_eligible() -> DataFrame:
     )
 
 
-def _business_context() -> DataFrame:
+def _business_context(spark: SparkSession) -> DataFrame:
     """Return the current business context for an agent. Dedupes by id_user: keep latest by ts_updated; if tied, one arbitrary."""
     window_by_user = Window.partitionBy("id_user").orderBy(
         col("ts_updated").desc_nulls_last(), col("id_agent")
@@ -377,7 +379,9 @@ def _business_context() -> DataFrame:
 
 
 # DBTITLE 1,Tickets related to agents
-def _tickets_by_user_monthly(load_end_date: str, months_window: int = 2) -> DataFrame:
+def _tickets_by_user_monthly(
+    spark: SparkSession, load_end_date: str, months_window: int = 2
+) -> DataFrame:
     """(sk_user, reference_month, total_tickets, sum_reopens, ticket_breakdown_aggregated)."""
     month_start, month_end = _month_range(load_end_date, months_window)
     fact_tickets = spark.table(TABLE_FACT_TICKETS).alias("fact_tickets")
@@ -547,7 +551,9 @@ def _add_eligibility_flags(base_with_metrics: DataFrame) -> DataFrame:
     )
 
 
-def build_agent_support_tickets_by_month(args: Namespace) -> DataFrame:
+def build_agent_support_tickets_by_month(
+    spark: SparkSession, args: Namespace
+) -> DataFrame:
     """
     Build the final agent_support_tickets_by_month: base status + listings, visits, tickets,
     and eligibility/activity flags.
@@ -559,23 +565,25 @@ def build_agent_support_tickets_by_month(args: Namespace) -> DataFrame:
     status_by_month_in_window = _filter_in_month_window(
         status_by_month, "reference_month", month_start, month_end
     )
-    excluded_users = _excluded_agent_users()
+    excluded_users = _excluded_agent_users(spark)
     status_by_month_in_window = status_by_month_in_window.join(
         excluded_users, on="id_user", how="left_anti"
     )
 
     qualified_ciq_user_months = _qualified_active_ciqs_by_month(
-        args.load_end_date, months_window
+        spark, args.load_end_date, months_window
     )
     listings_count_by_user_month = _all_listings_by_month(
-        args.load_end_date, months_window
+        spark, args.load_end_date, months_window
     )
     visits_count_by_agent_month = _all_agents_visits_by_month(
-        args.load_end_date, months_window
+        spark, args.load_end_date, months_window
     )
-    independent_agent_eligibility = _independent_agent_eligible()
-    business_context = _business_context()
-    tickets_by_user_month = _tickets_by_user_monthly(args.load_end_date, months_window)
+    independent_agent_eligibility = _independent_agent_eligible(spark)
+    business_context = _business_context(spark)
+    tickets_by_user_month = _tickets_by_user_monthly(
+        spark, args.load_end_date, months_window
+    )
 
     base_with_metrics = _join_base_with_metrics(
         status_by_month_in_window,
@@ -762,9 +770,12 @@ def main(args: Namespace | None = None) -> None:
         f"interval_end={args.load_end_date}, msg=Starting"
     )
 
-    support_tickets_by_month = build_agent_support_tickets_by_month(args)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    support_tickets_by_month = build_agent_support_tickets_by_month(
+        spark_client.conn, args
+    )
     row_count = validate_before_write(support_tickets_by_month)
-    save_df(SparkClient(), support_tickets_by_month, args, row_count=row_count)
+    save_df(spark_client, support_tickets_by_month, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 

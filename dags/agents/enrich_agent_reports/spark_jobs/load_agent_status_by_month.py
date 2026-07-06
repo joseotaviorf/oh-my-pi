@@ -9,7 +9,7 @@ from argparse import ArgumentParser, Namespace
 from datetime import date, timedelta
 from typing import Optional
 
-from pyspark.sql import DataFrame, Window
+from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql.functions import (
     add_months,
     coalesce,
@@ -182,6 +182,7 @@ def _expand_status_by_month(
 
 # DBTITLE 1,CIQ by Month
 def _build_ciq_status_by_month(
+    spark: SparkSession,
     load_start_date: str,
     load_end_date: str,
 ) -> DataFrame:
@@ -221,6 +222,7 @@ def _build_ciq_status_by_month(
 
 # DBTITLE 1,Agent by Month
 def _build_agents_status_by_month(
+    spark: SparkSession,
     load_start_date: str,
     load_end_date: str,
 ) -> DataFrame:
@@ -323,6 +325,7 @@ def _build_agents_status_by_month(
 
 # DBTITLE 1,Build all agent status
 def build_agents_status(
+    spark: SparkSession,
     load_start_date: str,
     load_end_date: str,
 ) -> DataFrame:
@@ -330,8 +333,10 @@ def build_agents_status(
     Build agents status by month: CIQ + agents status by month.
     Splits CIQ and agents expansion, then joins on (id_user, reference_month).
     """
-    ciq_monthly = _build_ciq_status_by_month(load_start_date, load_end_date)
-    agents_monthly = _build_agents_status_by_month(load_start_date, load_end_date)
+    ciq_monthly = _build_ciq_status_by_month(spark, load_start_date, load_end_date)
+    agents_monthly = _build_agents_status_by_month(
+        spark, load_start_date, load_end_date
+    )
     return (
         ciq_monthly.alias("ciq")
         .join(
@@ -505,9 +510,12 @@ def main(args: Optional[Namespace] = None) -> None:
     logger.info(
         f"m=build_agents_status, load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, msg=Building CIQ + agents status by month"
     )
-    output_dataframe = build_agents_status(args.load_start_date, args.load_end_date)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    output_dataframe = build_agents_status(
+        spark_client.conn, args.load_start_date, args.load_end_date
+    )
     row_count = validate_before_write(output_dataframe)
-    save_df(SparkClient(), output_dataframe, args, row_count=row_count)
+    save_df(spark_client, output_dataframe, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 
