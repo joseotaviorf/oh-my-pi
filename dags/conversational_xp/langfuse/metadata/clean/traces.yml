@@ -48,6 +48,10 @@ columns:
     description: version identifier for the trace schema or application
     lineage:
       - datalake_langfuse_raw.traces.version
+  feature_flags:
+    description: "JSON string containing the available feature flags for this trace, both enabled and disabled."
+    lineage:
+      - datalake_langfuse_raw.traces.metadata
   is_bookmarked:
     description: boolean flag indicating whether the trace was bookmarked
     lineage:
