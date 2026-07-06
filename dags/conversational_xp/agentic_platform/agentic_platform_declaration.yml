@@ -1,0 +1,48 @@
+dag:
+  name: agentic_platform
+  schedule_start_date: 2026, 06, 01
+  schedule_interval: 40 0,3-20 * * *
+  owner: Data Conversational XP
+  documentation:
+    dag_purpose: |
+      This DAG ingests CDC generated data from the [agentic-chatbot-service](https://github.com/quintoandar/quintoml) transactional database.
+      It captures the operational `traces` table (the full versioned `TraceEvent`: conversation content + agent-execution tree)
+      and lands it in datalake_agentic_platform_{raw,clean}.traces (CNVPL-2085).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  # The S3 incoming path is built from `source_database` (NOT from the target schema below).
+  # This MUST match the Backstage `kafka-connect-s3-sink` `topics.dir` and the Debezium topic
+  # prefix `<env>_agentic_chatbot_service.data`. Confirm/align when the Backstage templates are run.
+  source_database: agentic_chatbot_service
+  # Databricks secret with the source DB connection, created by infra PR (scope `quintoandar`,
+  # key `AGENTIC_CHATBOT_SERVICE_DB`). Set explicitly because it does NOT follow the default
+  # `{custom_schema}_DB` (which would resolve to the wrong `AGENTIC_PLATFORM_DB`).
+  dbutils_secret_key: AGENTIC_CHATBOT_SERVICE_DB
+  # Target lake DB prefix -> datalake_agentic_platform_{raw,clean}, decoupled from the source service name.
+  custom_schema: agentic_platform
+  tables_customization:
+    traces:
+      raw_primary_keys: ["event_id"]
+      primary_keys: ["event_id"]
+      clean_primary_keys: ["event_id"]
+      # Append-only history: ignore the operational table's purge DELETEs so they never erase lake history.
+      has_soft_delete: true
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r7a.xlarge
+    node_type_id: r7a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    spark_conf:
+      spark.driver.maxResultSize: "0"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new
