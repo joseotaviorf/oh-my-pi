@@ -5,6 +5,8 @@ cluster:
   - pypi:
       package: langfuse==3.0.0
   custom_configurations:
+    aws_attributes:
+      availability: ON_DEMAND
     spark_conf:
       spark.driver.maxResultSize: '0'
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
