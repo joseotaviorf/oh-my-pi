@@ -13,7 +13,9 @@ workflow:
   source_schema: public
   execution_timeout_hours: 3
   tables_customization:
-    search: {}
+    search:
+      run_optimize: false
+      run_vacuum: true
     recommendation: {}
     recommendation_user_use_case: {}
     recommendation_use_case: {}
