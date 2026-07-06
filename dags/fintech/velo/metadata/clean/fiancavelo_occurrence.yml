@@ -1,59 +1,85 @@
 ---
 database_name: datalake_velo_clean
 table_name: fiancavelo_occurrence
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per fiancavelo occurrence from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.id
+    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_propose:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.propose
+    description: Identifier for the propose referenced by this financial record.
   id_tenant:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.tenant
+    description: Identifier for the tenant referenced by this financial record.
   id_type:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.type
+    description: Identifier for the type referenced by this financial record.
   id_status:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.status
+    description: Identifier for the status referenced by this financial record.
   id_user_insert:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.userupdate
+    description: Identifier for the user update referenced by this financial record.
   value:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.value
+    description: Velo platform attribute describing value for condominium billing reconciliation.
   original_value:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.originalvalue
+    description: Velo platform attribute describing original value for condominium billing reconciliation.
   paid_value:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.paid
+    description: Velo platform attribute describing paid value for condominium billing reconciliation.
   unicid:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.unicid
+    description: Velo platform attribute describing unicid for condominium billing reconciliation.
   invoice_url:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.invoiceurl
+    description: Velo platform attribute describing invoice url for condominium billing reconciliation.
   description:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.description
+    description: Human-readable description of the financial transaction or ledger entry.
   is_valid:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.valid
+    description: Indicates whether valid applies to this financial record.
   is_active:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.active
+    description: Indicates whether active applies to this financial record.
   dt_due:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.duedate
+    description: Calendar date associated with due in the financial workflow.
   ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_occurrence.dateupdate
+    description: Timestamp when updated occurred in the upstream fintech system.
