@@ -23,6 +23,8 @@ WITH incremental_observations AS (
             'alias_get_property_by_external_id',
             'alias_register_escalation'
         )
+        AND MAKE_TIMESTAMP(o.year, o.month, o.day, o.hour, 0, 0) >= TIMESTAMP('{load_start_date}')
+        AND MAKE_TIMESTAMP(o.year, o.month, o.day, o.hour, 0, 0) < TIMESTAMP('{load_end_date}')
         AND o.ts_started >= TIMESTAMP('{load_start_date}')
         AND o.ts_started < TIMESTAMP('{load_end_date}')
 ),
@@ -36,6 +38,8 @@ affected_session_ids AS (
             ON t.id_trace = io.id_trace
     WHERE
         t.id_session IS NOT NULL
+        AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) >= TIMESTAMP('{load_start_date}')
+        AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) < TIMESTAMP('{load_end_date}')
 ),
 traces_ordered AS (
     SELECT
@@ -53,6 +57,8 @@ traces_ordered AS (
     WHERE
         s.bot = 'alias'
         AND t.id_session IS NOT NULL
+        AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 7 DAY
+        AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) < TIMESTAMP('{load_end_date}')
         AND t.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
 ),
 obs_base AS (

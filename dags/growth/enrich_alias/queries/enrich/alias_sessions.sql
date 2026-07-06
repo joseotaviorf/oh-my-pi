@@ -1,7 +1,8 @@
 -- Grain: one row per id_langfuse_session (Alias bot only).
 -- Scope: INNER JOIN datalake_chatbot.sessions (bot = 'alias') — same filter as
 -- dw_alias.fact_alias_agent_calls; avoids scanning all Langfuse sessions in the window.
--- Partition pruning anchor: traces.ts_created — lookback de 1 dia cobre sessões que cruzam a meia-noite.
+-- Partition pruning: MAKE_TIMESTAMP(year,month,day,hour) habilita pruning real em traces e observations.
+-- Lookback de 1 dia cobre sessões que cruzam a meia-noite.
 WITH traces_in_window AS (
     SELECT
         t.id_trace,
@@ -16,6 +17,8 @@ WITH traces_in_window AS (
             AND s.bot = 'alias'
     WHERE
         t.id_session IS NOT NULL
+        AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
+        AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) < TIMESTAMP('{load_end_date}')
         AND t.ts_created >= DATE('{load_start_date}') - INTERVAL 1 DAY
         AND t.ts_created < TIMESTAMP('{load_end_date}')
 ),
@@ -36,6 +39,8 @@ traces_with_obs AS (
     LEFT JOIN
         datalake_langfuse_clean.observations AS o
             ON tw.id_trace = o.id_trace
+            AND MAKE_TIMESTAMP(o.year, o.month, o.day, o.hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
+            AND MAKE_TIMESTAMP(o.year, o.month, o.day, o.hour, 0, 0) < TIMESTAMP('{load_end_date}')
 ),
 config_per_session AS (
     SELECT
