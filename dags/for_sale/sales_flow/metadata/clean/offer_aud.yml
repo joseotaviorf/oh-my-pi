@@ -24,6 +24,10 @@ columns:
     description: ID to get more information abou the HUB on HubServices tables.
     lineage:
     - datalake_sales_flow_raw.offer_aud.hub_id
+  uuid_actor:
+    description: UUID of the agent (corretor) who submitted the offer on behalf of the buyer via the "offer submission by agent" feature. Null when the buyer submitted the offer directly.
+    lineage:
+    - datalake_sales_flow_raw.offer_aud.actor_uuid
   rev:
     description: Unique id for this modification and can be joined with table rev_info to get more details.
     lineage:
@@ -76,6 +80,10 @@ columns:
     description: Audited status of the offer at this revision, such as proposed, accepted, or discarded.
     lineage:
     - datalake_sales_flow_raw.offer_aud.status
+  actor_type:
+    description: Type of actor who submitted the offer at this revision. Null when the buyer submitted directly; AGENT when a corretor submitted on behalf of the buyer via the "offer submission by agent" feature. Use together with uuid_actor to identify agent-submitted offers.
+    lineage:
+    - datalake_sales_flow_raw.offer_aud.actor_type
   has_used_offer_suggestion:
     description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
     lineage:
@@ -96,6 +104,10 @@ columns:
     description: Envers flag indicating whether id_hub changed in this revision.
     lineage:
     - datalake_sales_flow_raw.offer_aud.hub_id_mod
+  mod_uuid_actor:
+    description: Envers flag indicating whether uuid_actor changed in this revision.
+    lineage:
+    - datalake_sales_flow_raw.offer_aud.actor_uuid_mod
   mod_dt_proposed:
     description: Flag indicating if the column dt_proposed has changed.
     lineage:
@@ -148,6 +160,10 @@ columns:
     description: Envers flag indicating whether status changed in this revision.
     lineage:
     - datalake_sales_flow_raw.offer_aud.status_mod
+  mod_actor_type:
+    description: Envers flag indicating whether actor_type changed in this revision.
+    lineage:
+    - datalake_sales_flow_raw.offer_aud.actor_type_mod
   mod_has_used_offer_suggestion:
     description: Flag indicating if the column has_used_offer_suggestion has changed.
     lineage:

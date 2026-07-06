@@ -24,6 +24,10 @@ columns:
     description: Identifier of the closing hub responsible for negotiating this offer, joinable with HubServices tables.
     lineage:
       - datalake_sales_flow_raw.offer.hub_id
+  uuid_actor:
+    description: UUID of the agent (corretor) who submitted the offer on behalf of the buyer via the "offer submission by agent" feature. Null when the buyer submitted the offer directly.
+    lineage:
+      - datalake_sales_flow_raw.offer.actor_uuid
   offer_price:
     description: Price initially proposed by the buyer.
     lineage:
@@ -62,6 +66,12 @@ columns:
       OFFER_ONGOING: The negotiation started and is ongoing.
       NEGOTIATION_OUT_OF_5A: The negotiation is not being handled by 5A.
       DEFAULT: The offer was not seen yet. Usually the first time it was created or recovered.
+  actor_type:
+    description: Type of actor who submitted the offer. Null when the buyer submitted directly; AGENT when a corretor submitted on behalf of the buyer via the "offer submission by agent" feature. Use together with uuid_actor to identify agent-submitted offers.
+    lineage:
+      - datalake_sales_flow_raw.offer.actor_type
+    categories:
+      AGENT: The offer was submitted by a corretor (agent) on behalf of the buyer.
   furniture_will_be_left:
     description: Flag indicating whether the seller agreed to leave furniture in the property as part of the deal.
     lineage:
