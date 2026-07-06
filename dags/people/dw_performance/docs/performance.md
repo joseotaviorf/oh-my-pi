@@ -70,6 +70,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 | Table | Grain | Links |
 | :--- | :--- | :--- |
 | `dim_committee_meeting` | Current state: one record per committee meeting event | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_committee_meeting,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_committee_meeting.sql) |
+| `dim_cycle_period` | Current state: one row per review-period cycle (Performance Calibration year, or Talent Review year × sub-period), with a contiguous validity window per meeting type | [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_cycle_period.sql) |
 | `dim_performance_evaluation` | Validity window: one record per evaluation per version (each meaningful rating change opens a new version) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_performance_evaluation,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_performance_evaluation.sql) |
 | `dim_performance_calibration` | Validity window: one record per calibration per version | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_performance_calibration,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_performance_calibration.sql) |
 | `dim_performance_variation` | Current state: one record per unique combination of Impact, Behavior, and Leadership variation trends (Increased / Maintained / Decreased) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_performance.dim_performance_variation,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_performance/queries/dw/dim_performance_variation.sql) |
@@ -125,6 +126,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 ### Business Assumptions
 
 * **Calibration meetings lag one calendar year behind the review cycle** : Performa committee meetings for a given review cycle (e.g. cycle year 2024) typically take place in the following calendar year (meeting year 2025). When joining calibration results back to evaluation or goal data by cycle year, account for this offset (meeting_year = cycle_year + 1).
+
+* **`dim_cycle_period` is the source of truth for validity windows** : Each review-period cycle has a contiguous, non-overlapping window (`dt_valid_from` / `dt_valid_to`) per meeting type, so any date maps to exactly one cycle — use it for point-in-time joins. Unlike calibration, Talent Review does **not** carry the one-year lag: it has no separate antecedent cycle, so the meeting itself is the cycle. The `is_released` flag is a manual, PR-controlled gate: an in-progress cycle is present in the DW but stays `is_released = FALSE` (not broadly available for analytics) until it is released in a PR.
 
 ## Attention and Limitations
 

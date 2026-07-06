@@ -22,12 +22,17 @@ workflow:
     fact_performance_calibrations:
       - dim_performance_calibration
       - dim_committee_meeting
+    dim_cycle_period:
+      - dim_committee_meeting
     fact_smoke_detectors:
       - fact_goal_achievements
       - fact_performance_evaluations
       - fact_performance_calibrations
   tables_customization:
     dim_committee_meeting:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_cycle_period:
       vacuum_retention_hours: 168
       vacuum_lite: true
     dim_performance_evaluation:

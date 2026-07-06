@@ -1,0 +1,70 @@
+database_name: dw_performance
+table_name: dim_cycle_period
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: >
+  One row per review-period cycle. A cycle is either a Performance Calibration year or a
+  Talent Review year and sub-period (quarter or half). To find which cycle was operative on
+  a given date, filter by dt_valid_from / dt_valid_to. To get only the latest cycle per
+  meeting type, filter on is_current. By default, filter on is_released = TRUE; only
+  include unreleased cycles when explicitly required.
+columns:
+  sk_cycle_period:
+    description: Surrogate key uniquely identifying a review-period cycle (meeting type, year, and sub-period).
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
+  cycle_name:
+    description: Human-readable cycle label, e.g. "Performa 2024" for calibration or "Talent Review 2025 H1" for talent review.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
+  meeting_type:
+    description: Discriminator classifying the review cycle type.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    categories:
+      performance_calibration: Performance Calibration cycle.
+      talent_review: Talent Review cycle.
+  meeting_year:
+    description: Calendar year of the underlying committee meeting(s) for this cycle.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_year
+  reference_period:
+    description: Sub-annual period of the cycle.
+    lineage:
+    - dw_performance.dim_committee_meeting.reference_period
+    categories:
+      Q1: First quarter Talent Review cycle.
+      Q2: Second quarter Talent Review cycle.
+      Q3: Third quarter Talent Review cycle.
+      Q4: Fourth quarter Talent Review cycle.
+      H1: First half Talent Review cycle.
+      H2: Second half Talent Review cycle.
+  is_current:
+    description: TRUE for the most recent cycle per meeting_type among cycles that are released for analytics. An in-progress, unreleased cycle is never marked as current.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
+  is_released:
+    description: TRUE when the cycle's results are broadly available for analytics. FALSE while a cycle is still in progress — the cycle exists in this dimension but its results should not yet be treated as final or broadly consumed. A cycle must be released before it can be marked is_current.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
+  dt_valid_from:
+    description: First calendar date on which this cycle is the operative one for its meeting_type.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
+  dt_valid_to:
+    description: Last calendar date on which this cycle is operative. 9999-12-31 for the most recent cycle of each meeting_type, whether or not that cycle has been released for analytics.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
+  ts_load:
+    description: Timestamp indicating when the record was loaded into the dimension table.
