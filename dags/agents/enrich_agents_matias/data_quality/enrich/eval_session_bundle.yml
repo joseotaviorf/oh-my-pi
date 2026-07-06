@@ -21,6 +21,7 @@ column_level_validations:
   session_start_ts:
     is_complete:
       severity_level: Error
-  conversation:
-    is_complete:
-      severity_level: Error
+  # No check on `conversation`: it is a doubly-nested ArrayType(StructType(...))
+  # (items embed `traces`, which embed `observations`). Deequ's analyzers reject
+  # nested columns (WrongColumnTypeException) and crash the whole DQ run. The build
+  # coalesces conversation to an empty array, so it is never null anyway.
