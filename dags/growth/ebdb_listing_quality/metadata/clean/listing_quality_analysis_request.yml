@@ -28,3 +28,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.listingqualityanalysisrequest.atualizadoem
     description: Timestamp of the last update applied to the record in EBDB.
+  uploaded_by:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.uploaded_by
+    description: User UUID that upload the information.
