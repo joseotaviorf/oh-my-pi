@@ -23,7 +23,7 @@ from argparse import ArgumentParser, Namespace
 from datetime import date, datetime, timedelta
 from typing import Optional
 
-from pyspark.sql import DataFrame, Window
+from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 from pyspark.sql.functions import broadcast, col, explode, lit, size
 from pyspark.sql.types import (
@@ -193,6 +193,7 @@ def _session_window(
 
 
 def _load_windowed_table(
+    spark: SparkSession,
     table_name: str,
     ts_column: str,
     window_start: datetime,
@@ -213,7 +214,7 @@ def _load_windowed_table(
         )
     else:
         pred = ts_pred
-    return spark.table(table_name).filter(pred)  # type: ignore[name-defined]  # noqa: F821
+    return spark.table(table_name).filter(pred)
 
 
 def _transcript_id_session():
@@ -289,7 +290,11 @@ def _extract_sorted_payloads(sorted_array_col):
 
 # Build eval session bundle
 def build_eval_session_bundle(
-    load_start_date: str, load_end_date: str, *, log_stages: bool = False
+    spark: SparkSession,
+    load_start_date: str,
+    load_end_date: str,
+    *,
+    log_stages: bool = False,
 ) -> DataFrame:
     """Assemble one row per session in [load_start_date, load_end_date] (inclusive)."""
     session_start_dt, session_end_exclusive_dt = _session_window(
@@ -305,6 +310,7 @@ def build_eval_session_bundle(
 
     sessions_all = (
         _load_windowed_table(
+            spark,
             "datalake_chatbot.sessions",
             "ts_created",
             session_start_dt,
@@ -340,6 +346,7 @@ def build_eval_session_bundle(
 
     messages = (
         _load_windowed_table(
+            spark,
             "datalake_chatbot.messages",
             "ts_created",
             session_start_dt,
@@ -382,6 +389,7 @@ def build_eval_session_bundle(
 
     traces_raw = (
         _load_windowed_table(
+            spark,
             "datalake_langfuse_clean.traces",
             "ts_created",
             langfuse_start_dt,
@@ -406,6 +414,7 @@ def build_eval_session_bundle(
 
     observations_ids = (
         _load_windowed_table(
+            spark,
             "datalake_langfuse_clean.observations",
             "ts_started",
             langfuse_start_dt,
@@ -422,6 +431,7 @@ def build_eval_session_bundle(
 
     observations = (
         _load_windowed_table(
+            spark,
             "datalake_langfuse_clean.observations",
             "ts_started",
             langfuse_start_dt,
@@ -561,7 +571,7 @@ def build_eval_session_bundle(
         )
 
     evals = (
-        spark.table("datalake_chatbot.evals")  # type: ignore[name-defined]  # noqa: F821
+        spark.table("datalake_chatbot.evals")
         .join(cohort, "id_langfuse_session", "inner")
         .select(col("id_langfuse_session"), col("evals"))
     )
@@ -650,10 +660,14 @@ def main(args: Optional[Namespace] = None) -> None:
     )
 
     log_stages = args.run_mode == "dev"
+    spark_client = SparkClient(app_name=JOB_NAME)
     output_df = build_eval_session_bundle(
-        args.load_start_date, args.load_end_date, log_stages=log_stages
+        spark_client.conn,
+        args.load_start_date,
+        args.load_end_date,
+        log_stages=log_stages,
     )
-    save_df(SparkClient(), output_df, args)
+    save_df(spark_client, output_df, args)
     logger.info("m=main, msg=Job finished successfully")
 
 
