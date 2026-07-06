@@ -14,15 +14,20 @@ workflow:
   source_database: inspections
   dbutils_secret_key: INSPECTIONS_DB
   lineage_product_database_name: inspections
+  incremental_optimize: true
+  default_clean_partitions: [year, month, day]
+  optimize_parallelism: 8
   tables_customization:
     annotation:
       clean_table_name: annotation
       clean_primary_keys: [uuid_inspection, key]
       raw_primary_keys: [inspection_uuid, key]
+      incremental_optimize: false
     annotation_aud:
       clean_table_name: annotation_aud
       clean_primary_keys: [uuid_inspection, key, rev]
       raw_primary_keys: [inspection_uuid, key, rev]
+      incremental_optimize: false
     appointment_aud:
       clean_table_name: appointment_aud
       clean_primary_keys: [id_appointment, rev]
@@ -43,12 +48,15 @@ workflow:
       clean_table_name: assessment_details
       clean_primary_keys: [id_assessment_detail]
       raw_primary_keys: [id]
-    automatic_invoice: {}
-    automatic_invoice_aud: {}
+    automatic_invoice:
+      incremental_optimize: false
+    automatic_invoice_aud:
+      incremental_optimize: false
     invoice_discount:
       clean_table_name: invoice_discount
       clean_primary_keys: [uuid_discount]
       raw_primary_keys: [discount_uuid]
+      incremental_optimize: false
     budget_approval_payment_preference_aud:
       clean_table_name: budget_approval_payment_preference_aud
       clean_primary_keys: [id_budget_approval_payment_preference, rev]

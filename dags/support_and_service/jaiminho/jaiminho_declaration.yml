@@ -14,6 +14,8 @@ workflow:
   source_schema: jaiminho
   dbutils_secret_key: JAIMINHO_DB
   lineage_product_database_name: jaiminho
+  incremental_optimize: true
+  default_clean_partitions: [year, month, day]
   tables_customization:
     user_notifications:
       clean_table_name: user_notifications
@@ -39,6 +41,7 @@ workflow:
       clean_table_name: notifications_tracking
       raw_primary_keys: [id]
       clean_primary_keys: [id]
+      incremental_optimize: false
     user_contacts:
       clean_table_name: user_contacts
       raw_primary_keys: [id]
