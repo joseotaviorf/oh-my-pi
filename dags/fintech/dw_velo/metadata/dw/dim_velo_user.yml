@@ -1,10 +1,14 @@
 database_name: dw_velo
 table_name: dim_velo_user
-description:
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
   Dimension with details of the user of the Velo Platform system. Sometimes
   the user is the agent of the purpose.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_user:
     lineage:
@@ -17,11 +21,11 @@ columns:
   name:
     lineage:
       - datalake_velo.user.name
-    description: User's name
+    description: Full name of the Velo platform user or guarantee proponent.
   email:
     lineage:
       - datalake_velo.user.email
-    description: User's email
+    description: Contact email registered in the Velo platform or Omie client record.
   user_role:
     lineage:
       - datalake_velo.user.user_role

@@ -1,21 +1,27 @@
 database_name: dw_velo
 table_name: dim_velo_junk
-description: Junk Dimension for the model
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Junk dimension consolidating Velo payment, occurrence, and propose status/type codes
+  into a single denormalized lookup for the QuintoCred (Velo) data warehouse model.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_junk:
     lineage:
     - datalake_velo.junk.id_junk
-    description: Junk SK
+    description: Surrogate key for the Velo junk dimension consolidating payment, occurrence, and propose status codes.
   id_master_type:
     lineage:
     - datalake_velo.junk.id_master_type
-    description: Master Type ID
+    description: Code identifying the junk dimension domain (payment type, occurrence status, propose status, etc.).
   desc_master_type:
     lineage:
     - datalake_velo.junk.desc_master_type
-    description: Description of Master Type
+    description: Human-readable label of the junk dimension domain (payment type, occurrence status, etc.).
     categories:
       Payment Type: ''
       Occurrence Type:  ''
@@ -31,11 +37,11 @@ columns:
   id_lvl_1:
     lineage:
     - datalake_velo.junk.id_lvl_1
-    description: Level 1 object ID
+    description: Numeric code for the level-1 status or type value within the junk domain.
   desc_lvl_1:
     lineage:
     - datalake_velo.junk.desc_lvl_1
-    description: Level 1 object description
+    description: Human-readable label for the level-1 status or type value within the junk domain.
     categories:
       Pendente: ''
       IMPROPER_BILLING: ''
@@ -115,4 +121,4 @@ columns:
       PENDING: ''
       Erro: ''
   ts_load:
-    description: Timestamp of the load into datalake
+    description: Timestamp when this junk dimension row was loaded into the Velo DW table.

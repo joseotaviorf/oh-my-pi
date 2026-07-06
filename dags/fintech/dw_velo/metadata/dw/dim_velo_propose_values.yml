@@ -1,13 +1,19 @@
 database_name: dw_velo
 table_name: dim_velo_propose_values
-description: Dimension with details of values related to the propose
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Pricing and coverage amounts for QuintoCred rental guarantee proposals, including
+  rent, utilities, plan limits, activation fees, and broker commission rates.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_propose_values:
     lineage:
       - datalake_velo.propose_values.id_propose_values
-    description: Propose values id
+    description: Surrogate key linking guarantee proposal pricing, coverage limits, and utility amounts.
   subscription_type:
     lineage:
       - datalake_velo.propose_values.subscription_type
@@ -39,7 +45,7 @@ columns:
     lineage:
       - datalake_velo.propose_values.plan
       - datalake_velo.propose_values_legacy.plan
-    description: Name of the plan
+    description: Commercial guarantee plan name selected for the rental proposal.
   subscription_installments:
     lineage:
       - datalake_velo.propose_values.subscription_installments
@@ -64,42 +70,42 @@ columns:
     lineage:
       - datalake_velo.propose_values.rent_amount
       - datalake_velo.propose_values_legacy.rent_amount
-    description: Rent amount
+    description: Monthly rent amount covered by the guarantee package.
   condo_amount:
     lineage:
       - datalake_velo.propose_values.condo_amount
       - datalake_velo.propose_values_legacy.condo_amount
-    description: Condo amount
+    description: Monthly condominium fee included in the covered rental package.
   light_amount:
     lineage:
       - datalake_velo.propose_values.light_amount
       - datalake_velo.propose_values_legacy.light_amount
-    description: Light amount
+    description: Monthly electricity utility cost included in the guarantee package.
   water_amount:
     lineage:
       - datalake_velo.propose_values.water_amount
       - datalake_velo.propose_values_legacy.water_amount
-    description: Water amount
+    description: Monthly water utility cost included in the guarantee package.
   phone_amount:
     lineage:
       - datalake_velo.propose_values.phone_amount
       - datalake_velo.propose_values_legacy.phone_amount
-    description: Phone amount
+    description: Monthly phone or telecom utility cost included in the guarantee package.
   iptu_amount:
     lineage:
       - datalake_velo.propose_values.iptu_amount
       - datalake_velo.propose_values_legacy.iptu_amount
-    description: IPTU amount
+    description: Annual property tax (IPTU) amount included in the guarantee package.
   other_amount:
     lineage:
       - datalake_velo.propose_values.other_amount
       - datalake_velo.propose_values_legacy.other_amount
-    description: Other amount
+    description: Other monthly costs included in the guarantee package total.
   total_package_amount:
     lineage:
       - datalake_velo.propose_values.total_package_amount
       - datalake_velo.propose_values_legacy.total_package_amount
-    description: Total package amount
+    description: Total monthly cost of rent plus utilities covered by the guarantee.
   plan_percent:
     lineage:
       - datalake_velo.propose_values.plan_percent
@@ -109,21 +115,21 @@ columns:
     lineage:
       - datalake_velo.propose_values.plan_coverage
       - datalake_velo.propose_values_legacy.plan_coverage
-    description: Plan coverage
+    description: Insurance coverage limit defined by the selected guarantee plan.
   plan_damage:
     lineage:
       - datalake_velo.propose_values.plan_damage
       - datalake_velo.propose_values_legacy.plan_damage
-    description: Plan damage
+    description: Maximum property damage amount covered by the guarantee plan.
   plan_commission:
     lineage:
       - datalake_velo.propose_values.plan_commission
       - datalake_velo.propose_values_legacy.plan_commission
-    description: Plan commission
+    description: Broker commission percentage associated with the guarantee plan.
   is_legacy:
     lineage:
       - datalake_velo.propose_values.is_legacy
       - datalake_velo.propose_values_legacy.is_legacy
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
-    description: load date
+    description: Timestamp when this row was loaded into the Velo DW table by the ETL pipeline.

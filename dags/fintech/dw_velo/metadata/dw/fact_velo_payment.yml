@@ -1,80 +1,90 @@
 ---
 database_name: dw_velo
 table_name: fact_velo_payment
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Fact table focused on the Payments context for Velo
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  A Payment is a unique record of a charge, even if it was paid in installments. It can be a charge related to the rent guarantee subscription (e.g., standard monthly IQ payment), or to an Occurrence (e.g., reimbursement by the IQ of what Velo paid to the PP after an IQ default).
+  A Payment must have an associated Contract.
+  A Payment may be associated with an Occurrence.
+
+  Payment invoices for Velo guarantee subscriptions and direct-billing charges,
+  tracking gateway status, due/net amounts, and settlement dates per proposal.
 columns:
   sk_payment:
-    description: Table's unique SK.
+    description: Surrogate key of the Velo payment invoice fact row.
     lineage:
       - datalake_velo.payment.id_payment
   sk_propose:
-    description: SK connecting table to fact_velo_propose table.
+    description: Foreign key to the guarantee proposal associated with this payment.
     lineage:
       - datalake_velo.payment.id_propose
   sk_occurrence:
-    description: SK connecting table to fact_velo_occurrence table.
+    description: Foreign key to the delinquency occurrence linked to this payment, when applicable.
     lineage:
       - datalake_velo.payment.id_occurrence
   sk_propose_values:
-    description: SK connecting table to dim_velo_propose_values table.
+    description: Foreign key to the pricing and coverage amounts of the related proposal.
     lineage:
       - datalake_velo.payment.id_propose_values
   sk_billing_type:
-    description: SK connecting table to dim_velo_junk table.
+    description: Foreign key to the Velo junk dimension for the payment classification code.
     lineage:
       - datalake_velo.payment.id_billing_type
   sk_payment_type:
-    description: SK connecting table to dim_velo_junk table.
+    description: Foreign key to the Velo junk dimension for the payment classification code.
     lineage:
       - datalake_velo.payment.id_payment_type
   sk_status:
-    description: SK connecting table to dim_velo_junk table.
+    description: Foreign key to the Velo junk dimension for the payment classification code.
     lineage:
       - datalake_velo.payment.id_status
   sk_payment_gateway:
-    description: SK connecting table to dim_velo_junk table.
+    description: Foreign key to the Velo junk dimension for the payment classification code.
     lineage:
       - datalake_velo.payment.id_payment_gateway
   sk_payment_category:
-    description: SK connecting table to dim_velo_junk table.
+    description: Foreign key to the Velo junk dimension for the payment classification code.
     lineage:
       - datalake_velo.payment.id_payment_category
   id_customer:
-    description: Business ID for Customer.
+    description: Velo customer identifier in the billing/subscription system.
     lineage:
       - datalake_velo.payment.id_customer
   id_unicid:
-    description: Business ID for UNICID.
+    description: Legacy Unicid system identifier used to reconcile Velo 2.0 records with QuintoCred 3.0.
     lineage:
       - datalake_velo.payment.id_unicid
   id_subscription:
-    description: Business ID for Subscription.
+    description: Subscription identifier when the payment belongs to a recurring guarantee plan.
     lineage:
       - datalake_velo.payment.id_subscription
   billing_type:
-    description: Billing type description.
+    description: Human-readable billing model label (e.g. subscription, direct billing, guarantee fee).
     lineage:
       - datalake_velo.payment.billing_type
   payment_type:
-    description: Payment type description.
+    description: Human-readable payment method or charge type for the invoice.
     lineage:
       - datalake_velo.payment.payment_type
   status:
-    description: Status description.
+    description: Payment invoice status in the Velo billing gateway (e.g. pending, paid, refunded, chargeback).
     lineage:
       - datalake_velo.payment.status
   payment_gateway:
-    description: Payment gateway description.
+    description: Payment gateway provider that processed the invoice (e.g. Asaas, Iugu, Pix).
     lineage:
       - datalake_velo.payment.payment_gateway
   payment_category:
-    description: Payment category description.
+    description: Business category of the charge (e.g. activation, recurring subscription, refund).
     lineage:
       - datalake_velo.payment.payment_category
   invoice_url:
-    description: URL of charged invoice.
+    description: URL of the payment or occurrence invoice generated by the billing gateway.
     lineage:
       - datalake_velo.payment.invoice_url
   description:
@@ -82,7 +92,7 @@ columns:
     lineage:
       - datalake_velo.payment.description
   due_amount:
-    description: Amount that is due.
+    description: Total amount due on the payment or occurrence invoice.
     lineage:
       - datalake_velo.payment.due_amount
   net_amount:
@@ -134,4 +144,4 @@ columns:
     lineage:
       - datalake_velo.payment.ts_updated
   ts_load:
-    description: Load timestamp
+    description: Timestamp when this row was loaded into the Velo DW table by the ETL pipeline.

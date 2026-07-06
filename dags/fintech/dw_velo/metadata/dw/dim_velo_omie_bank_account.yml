@@ -1,9 +1,27 @@
 ---
 database_name: dw_velo
 table_name: dim_velo_omie_bank_account
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Dimension with Bank Account from Velo, registered on OMIE systems.
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Omie is a third-party financial reconciliation service for Velo 2.0. It contains accounts payable and accounts receivable data.
+  Until Jan 31, 2023: Accounts Payable and Accounts Receivable
+  From Feb 01, 2023 onwards: Accounts Receivable. SAP took over Accounts Payable at this point, including for Velo 2.0
+  Accounts Receivable Payment Dates
+  These are the dates the funds are received in the bank:
+  Pix: Instant
+  Boleto: 1 business day
+  Credit card: 30 calendar days after the customer's payment date
+  Accounts Payable Payment Dates
+  These are the dates we actually make the payment:
+  The payment date coincides with the cash settlement date.
+
+  Bank accounts registered in Omie ERP used to settle Velo guarantee receivables,
+  payables, and broker commission transfers.
 columns:
   sk_bank_account:
     description: Bank Account's internal identification number (SK)
@@ -14,7 +32,7 @@ columns:
     lineage:
       - datalake_velo.omie_bank_account.description
   bank_account_number:
-    description: Bank Account's number
+    description: Bank account number registered in Omie for Velo settlement transfers.
     lineage:
       - datalake_velo.omie_bank_account.bank_account_number
   is_active:
@@ -22,4 +40,4 @@ columns:
     lineage:
       - datalake_velo.omie_bank_account.is_active
   ts_load:
-    description: Load timestamp
+    description: Timestamp when this row was loaded into the Velo DW table by the ETL pipeline.

@@ -1,8 +1,14 @@
 database_name: dw_velo
 table_name: dim_velo_transaction_category
-description: Dimension with the details of the category of the transacion entry
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Omie ERP accounting category mapping for Velo transactions, including financial
+  nature and DRE (income statement) classification labels.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_category:
     lineage:
@@ -11,7 +17,7 @@ columns:
   description:
     lineage:
     - datalake_velo.transaction_category.description
-    description: Description of the category
+    description: Omie ERP category name applied to Velo payable/receivable transactions.
   nature_description:
     lineage:
     - datalake_velo.transaction_category.nature_description
@@ -21,4 +27,4 @@ columns:
     - datalake_velo.transaction_category.dre_description
     description: Description of the category when used on DRE Report
   ts_load:
-    description: Timestamp of the load into datalake
+    description: Timestamp when this category row was loaded into the Velo DW table.

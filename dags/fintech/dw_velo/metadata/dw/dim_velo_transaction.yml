@@ -1,13 +1,19 @@
 database_name: dw_velo
 table_name: dim_velo_transaction
-description: Dimension with the general details of the transaction
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Omie ERP payable and receivable transactions linked to Velo guarantee contracts,
+  delinquency recoveries, and broker settlement flows.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_transaction:
     lineage:
     - datalake_velo.transaction_entries.id_transaction
-    description: Transaction ID
+    description: Surrogate key for Omie ERP payable/receivable transactions in the Velo DW model.
   project:
     lineage:
     - datalake_velo.transaction_entries.project
@@ -15,7 +21,7 @@ columns:
   status:
     lineage:
     - datalake_velo.transaction_entries.status
-    description: Status of the transaction
+    description: Omie ERP transaction settlement status (e.g. due, overdue, paid, received).
     categories:
       A VENCER: transaction to be due
       ATRASADO: overdue transaction
@@ -25,14 +31,14 @@ columns:
   transaction_type:
     lineage:
     - datalake_velo.transaction_entries.transaction_type
-    description: Transaction type
+    description: Omie ERP transaction direction (payable vs receivable).
     categories:
       CONTA_A_PAGAR: Payable account
       CONTA_A_RECEBER: Receivable account
   transaction_purpose:
     lineage:
     - datalake_velo.transaction_entries.transaction_purpose
-    description: Purpose of transaction
+    description: Whether the Omie transaction belongs to an active or terminated lease.
     categories:
       ongoing: transaction from an unfinished account
       rescisão: transaction from an finished account
@@ -48,10 +54,10 @@ columns:
   is_project_receivable_created:
     lineage:
     - datalake_velo.transaction_entries.is_project_receivable_created
-    description: Has a transaction receivable created
+    description: Indicates whether project receivable created applies to this financial record.
   is_project_receivable_greater_than_payable:
     lineage:
     - datalake_velo.transaction_entries.is_project_receivable_greater_than_payable
     description: Transaction has the received amount greater than the amount payable
   ts_load:
-    description: Load timestamp
+    description: Timestamp when this row was loaded into the Velo DW table by the ETL pipeline.

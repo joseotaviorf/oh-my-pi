@@ -1,9 +1,18 @@
 ---
 database_name: dw_velo
 table_name: fact_derived_velo_propose_claim_mob
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "This is a derived fact table that materializes the temporal monthly evolution (based on MOB) of a given status of an propose and the claim values related to it. \n MOB (Months on books) definition: which is the number of months that have completed since the reference date (creation date or due date) of an claim"
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Monthly evolution (based on MOB) of a specific proposal status and the related claim amounts.
+
+  Cohort fact table materializing guarantee claim rates and claim values by months on
+  books (MOB) since contract activation. MOB counts completed months from contract
+  start to each claim or observation date.
 columns:
   sk_propose:
     description: Propose's identification number (ID)
@@ -26,200 +35,200 @@ columns:
   cohort_age_mob_actual:
     description: Actual contract age of the contract in months (bases on the current date - dt_contract_started)
   first_claim_mob:
-    description: First mob that this propose had a claim
+    description: Months on books (MOB) at which the propose registered its first guarantee claim.
   is_claim:
     description: If the propose has any claim
   claim_mob0:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 0 since contract activation.
   claim_mob1:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 1 since contract activation.
   claim_mob2:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 2 since contract activation.
   claim_mob3:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 3 since contract activation.
   claim_mob4:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 4 since contract activation.
   claim_mob5:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 5 since contract activation.
   claim_mob6:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 6 since contract activation.
   claim_mob7:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 7 since contract activation.
   claim_mob8:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 8 since contract activation.
   claim_mob9:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 9 since contract activation.
   claim_mob10:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 10 since contract activation.
   claim_mob11:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 11 since contract activation.
   claim_mob12:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 12 since contract activation.
   claim_mob13:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 13 since contract activation.
   claim_mob14:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 14 since contract activation.
   claim_mob15:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 15 since contract activation.
   claim_mob16:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 16 since contract activation.
   claim_mob17:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 17 since contract activation.
   claim_mob18:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 18 since contract activation.
   claim_mob19:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 19 since contract activation.
   claim_mob20:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 20 since contract activation.
   claim_mob21:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 21 since contract activation.
   claim_mob22:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 22 since contract activation.
   claim_mob23:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 23 since contract activation.
   claim_mob24:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 24 since contract activation.
   claim_mob25:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 25 since contract activation.
   claim_mob26:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 26 since contract activation.
   claim_mob27:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 27 since contract activation.
   claim_mob28:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 28 since contract activation.
   claim_mob29:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 29 since contract activation.
   claim_mob30:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 30 since contract activation.
   claim_mob31_more:
-    description: EVER MOB of given month
+    description: Cumulative ever-claim rate at MOB month 31 or later since contract activation.
   mob_has_claim0:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 0 (1) or not (0).
   mob_has_claim1:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 1 (1) or not (0).
   mob_has_claim2:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 2 (1) or not (0).
   mob_has_claim3:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 3 (1) or not (0).
   mob_has_claim4:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 4 (1) or not (0).
   mob_has_claim5:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 5 (1) or not (0).
   mob_has_claim6:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 6 (1) or not (0).
   mob_has_claim7:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 7 (1) or not (0).
   mob_has_claim8:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 8 (1) or not (0).
   mob_has_claim9:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 9 (1) or not (0).
   mob_has_claim10:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 10 (1) or not (0).
   mob_has_claim11:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 11 (1) or not (0).
   mob_has_claim12:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 12 (1) or not (0).
   mob_has_claim13:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 13 (1) or not (0).
   mob_has_claim14:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 14 (1) or not (0).
   mob_has_claim15:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 15 (1) or not (0).
   mob_has_claim16:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 16 (1) or not (0).
   mob_has_claim17:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 17 (1) or not (0).
   mob_has_claim18:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 18 (1) or not (0).
   mob_has_claim19:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 19 (1) or not (0).
   mob_has_claim20:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 20 (1) or not (0).
   mob_has_claim21:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 21 (1) or not (0).
   mob_has_claim22:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 22 (1) or not (0).
   mob_has_claim23:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 23 (1) or not (0).
   mob_has_claim24:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 24 (1) or not (0).
   mob_has_claim25:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 25 (1) or not (0).
   mob_has_claim26:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 26 (1) or not (0).
   mob_has_claim27:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 27 (1) or not (0).
   mob_has_claim28:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 28 (1) or not (0).
   mob_has_claim29:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 29 (1) or not (0).
   mob_has_claim30:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 30 (1) or not (0).
   mob_has_claim31_more:
-    description: MOB of given month  (0 or 1 if this MOB had a claim)
+    description: Flag indicating whether a guarantee claim was registered at MOB month 31 or later (1) or not (0).
   claim_value_mob0:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 0 for this propose cohort.
   claim_value_mob1:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 1 for this propose cohort.
   claim_value_mob2:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 2 for this propose cohort.
   claim_value_mob3:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 3 for this propose cohort.
   claim_value_mob4:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 4 for this propose cohort.
   claim_value_mob5:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 5 for this propose cohort.
   claim_value_mob6:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 6 for this propose cohort.
   claim_value_mob7:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 7 for this propose cohort.
   claim_value_mob8:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 8 for this propose cohort.
   claim_value_mob9:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 9 for this propose cohort.
   claim_value_mob10:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 10 for this propose cohort.
   claim_value_mob11:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 11 for this propose cohort.
   claim_value_mob12:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 12 for this propose cohort.
   claim_value_mob13:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 13 for this propose cohort.
   claim_value_mob14:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 14 for this propose cohort.
   claim_value_mob15:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 15 for this propose cohort.
   claim_value_mob16:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 16 for this propose cohort.
   claim_value_mob17:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 17 for this propose cohort.
   claim_value_mob18:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 18 for this propose cohort.
   claim_value_mob19:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 19 for this propose cohort.
   claim_value_mob20:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 20 for this propose cohort.
   claim_value_mob21:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 21 for this propose cohort.
   claim_value_mob22:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 22 for this propose cohort.
   claim_value_mob23:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 23 for this propose cohort.
   claim_value_mob24:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 24 for this propose cohort.
   claim_value_mob25:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 25 for this propose cohort.
   claim_value_mob26:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 26 for this propose cohort.
   claim_value_mob27:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 27 for this propose cohort.
   claim_value_mob28:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 28 for this propose cohort.
   claim_value_mob29:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 29 for this propose cohort.
   claim_value_mob30:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 30 for this propose cohort.
   claim_value_mob31_more:
-    description: MOB Claim value of given month (if existant)
+    description: Total claim amount registered at MOB month 31 or later for this propose cohort.
   ts_load:
     description: Moment (timestamp) when the table was last loaded

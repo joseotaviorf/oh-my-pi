@@ -1,9 +1,14 @@
 database_name: dw_velo
 table_name: dim_velo_propose_company
-description: Dimension with details of the company that signed the contract (existance
-  optional)
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Corporate entity (PJ) registered on a QuintoCred guarantee proposal when the
+  rental contract is signed by a company rather than a natural person.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_company:
     lineage:
