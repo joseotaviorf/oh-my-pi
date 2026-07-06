@@ -1,0 +1,41 @@
+---
+table_name: metric_fintech.daily_recovery_pipe_to_pipe_segmentation
+alert_channel: FINTECH_INMETRO_ALERTS
+column_level_validations:
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  segment:
+    is_complete:
+      severity_level: Error
+  dt_pipe_period_start:
+    is_complete:
+      severity_level: Error
+  n_contracts_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_contracts_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_invoices_DT2_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_invoices_DT2_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  due_amount_DT2_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  due_amount_DT2_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  recovered_amount_DT2_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
