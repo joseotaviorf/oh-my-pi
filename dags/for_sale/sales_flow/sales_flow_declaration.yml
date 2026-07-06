@@ -14,10 +14,6 @@ workflow:
   custom_schema: sales_flow
   dbutils_secret_key: SALESFLOW_DB
   tables_customization:
-    addendums_aud:
-      clean_table_name: addendums_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     addendums:
       clean_table_name: addendums
       raw_primary_keys: ["id"]
@@ -26,10 +22,6 @@ workflow:
       clean_table_name: address_data
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    address_data_aud:
-      clean_table_name: address_data_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     ai_legal_analysis_document_extraction:
       clean_table_name: ai_legal_analysis_document_extraction
       raw_primary_keys: ["id"]
@@ -58,26 +50,14 @@ workflow:
       clean_table_name: bypass
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    bypass_aud:
-      clean_table_name: bypass_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     card_noting:
       clean_table_name: card_noting
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_card_noting"]
-    card_noting_aud:
-      clean_table_name: card_noting_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_card_noting", "rev"]
     cash_payment:
       clean_table_name: cash_payment
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_cash_payment"]
-    cash_payment_aud:
-      clean_table_name: cash_payment_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_cash_payment_aud", "rev"]
     ccv:
       clean_table_name: ccv
       raw_primary_keys: ["id"]
@@ -114,10 +94,6 @@ workflow:
       clean_table_name: closing_type
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    closing_type_aud:
-      clean_table_name: closing_type_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     ccv_flow:
       clean_table_name: ccv_flow
       raw_primary_keys: ["id"]
@@ -130,26 +106,10 @@ workflow:
       clean_table_name: ccv_party
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    ccv_party_aud:
-      clean_table_name: ccv_party_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     ccv_rule:
       clean_table_name: ccv_rule
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_ccv_rule"]
-    ccv_rule_aud:
-      clean_table_name: ccv_rule_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_ccv_rule_aud", "rev"]
-    contact:
-      clean_table_name: contact
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_contact"]
-    contact_aud:
-      clean_table_name: contact_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_contact", "rev"]
     diligence:
       clean_table_name: diligence
       raw_primary_keys: ["id"]
@@ -162,10 +122,6 @@ workflow:
       clean_table_name: diligence_appointment
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_diligence_appointment"]
-    diligence_appointment_aud:
-      clean_table_name: diligence_appointment_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_diligence_appointment_aud", "rev"]
     house_aud:
       clean_table_name: house_aud
       raw_primary_keys: ["id", "rev"]
@@ -182,26 +138,14 @@ workflow:
       clean_table_name: invoice_tracking
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    invoice_tracking_aud:
-      clean_table_name: invoice_tracking_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     listing_fee:
       clean_table_name: listing_fee
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    listing_fee_aud:
-      clean_table_name: listing_fee_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     microstatus_order:
       clean_table_name: microstatus_order
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    microstatus_order_aud:
-      clean_table_name: microstatus_order_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     mortgage:
       clean_table_name: mortgage
       raw_primary_keys: ["id"]
@@ -214,18 +158,10 @@ workflow:
       clean_table_name: monthly_discount_quota
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    monthly_discount_quota_aud:
-      clean_table_name: monthly_discount_quota_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     monthly_discount_quota_registry:
       clean_table_name: monthly_discount_quota_registry
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    monthly_discount_quota_registry_aud:
-      clean_table_name: monthly_discount_quota_registry_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     negotiation:
       clean_table_name: negotiation
       raw_primary_keys: ["id"]
@@ -238,10 +174,6 @@ workflow:
       clean_table_name: note
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_note"]
-    note_aud:
-      clean_table_name: note_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_note_aud", "rev"]
     notary:
       clean_table_name: notary
       raw_primary_keys: ["id"]
@@ -258,14 +190,6 @@ workflow:
       clean_table_name: offer_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-    offer_fee_rule:
-      clean_table_name: offer_fee_rule
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
-    offer_fee_rule_aud:
-      clean_table_name: offer_fee_rule_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     payment_aud:
       clean_table_name: payment_aud
       raw_primary_keys: ["id", "rev"]
@@ -278,10 +202,6 @@ workflow:
       clean_table_name: reject_reason
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    reject_reason_aud:
-      clean_table_name: reject_reason_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     revinfo:
       clean_table_name: rev_info
       raw_primary_keys: ["id"]
@@ -294,10 +214,6 @@ workflow:
       clean_table_name: sales_flow_contact
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_sales_flow_contact"]
-    sales_flow_contact_aud:
-      clean_table_name: sales_flow_contact_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id_sales_flow_contact", "rev"]
     sales_flow_details:
       clean_table_name: sales_flow_details
       raw_primary_keys: ["id"]
@@ -318,10 +234,6 @@ workflow:
       clean_table_name: sales_flow_pendency
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    sales_flow_pendency_aud:
-      clean_table_name: sales_flow_pendency_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     sales_flow_tag:
       clean_table_name: sales_flow_tag
       raw_primary_keys: ["id"]
@@ -330,10 +242,6 @@ workflow:
       clean_table_name: sales_flow_users
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    sales_flow_users_aud:
-      clean_table_name: sales_flow_users_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     sales_flow_relation:
       clean_table_name: sales_flow_relation
       raw_primary_keys: ["id"]
@@ -386,26 +294,14 @@ workflow:
       clean_table_name: status
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    status_aud:
-      clean_table_name: status_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     status_order:
       clean_table_name: status_order
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    status_order_aud:
-      clean_table_name: status_order_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     status_record:
       clean_table_name: status_record
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    status_record_aud:
-      clean_table_name: status_record_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     subtask:
       clean_table_name: subtask
       raw_primary_keys: ["id"]
@@ -414,10 +310,6 @@ workflow:
       clean_table_name: tag
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    tag_aud:
-      clean_table_name: tag_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     task:
       clean_table_name: task
       raw_primary_keys: ["id"]
@@ -430,14 +322,6 @@ workflow:
       clean_table_name: task_manager_info
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    task_manager_info_aud:
-      clean_table_name: task_manager_info_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
-    users_aud:
-      clean_table_name: users_aud
-      raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
     backoffice_journey_status:
       clean_table_name: backoffice_journey_status
       raw_primary_keys: ["id"]
