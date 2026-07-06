@@ -43,6 +43,8 @@ WITH
                 ELSE 'inativo'
             END AS status,
             NULLIF(cc.vertical, '-1') AS vertical,
+            NULLIF(cc.owner_l1_name, '-1') AS l1_cc,
+            NULLIF(cc.owner_l2_name, '-1') AS l2_cc,
             LOWER(cc.hrbp_work_email) AS hrbp,
             COALESCE(ahc.active_hc, 0) AS active_hc,
             COALESCE(ihc.inactive_hc, 0) AS inactive_hc,
@@ -78,6 +80,8 @@ SELECT
     cc_code,
     status,
     vertical,
+    l1_cc,
+    l2_cc,
     hrbp,
     active_hc,
     inactive_hc,
