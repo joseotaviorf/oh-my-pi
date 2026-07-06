@@ -13,13 +13,15 @@ validation:
   cluster:
     type: emr_7_12_consolidation_xs_memory_cluster
     custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
       core_nodes:
         instance_count: 2
       task_nodes:
         instance_count: 1
-      master_node_type_id: m6g.xlarge
+      master_node_type_id: r6g.2xlarge
       spark_conf:
-        spark.driver.memory: 3g
-        spark.driver.memoryOverhead: 1g
-        spark.yarn.am.memory: 512m
+        spark.driver.memory: 12g
+        spark.driver.memoryOverhead: 4g
+        spark.yarn.am.memory: 2g
   allow_custom_spark_job: true
