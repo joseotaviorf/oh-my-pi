@@ -39,3 +39,31 @@ workflow:
       clean_table_name: house
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
+    buyer_data:
+      clean_table_name: buyer_data
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_buyer"]
+    seller_data:
+      clean_table_name: seller_data
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_seller"]
+    brokerage:
+      clean_table_name: brokerage
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_brokerage"]
+    ccv:
+      clean_table_name: ccv
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    ccv_flow:
+      clean_table_name: ccv_flow
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_ccv_flow"]
+    task_manager_info:
+      clean_table_name: task_manager_info
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    ccv_termination:
+      clean_table_name: ccv_termination
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_ccv_termination"]

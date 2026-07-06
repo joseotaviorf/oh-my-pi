@@ -1,37 +1,3 @@
----
 database_name: datalake_sales_flow_raw
 table_name: specialist
 domain: For Sale
-owner: helder.rodrigues@quintoandar.com.br
-description: Raw CDC replica of the `specialist` table from the Sales Flow application's PostgreSQL database (applications/sales-flow in backend-services). Each row assigns a QuintoAndar staff member (or automated/referral role) to a functional responsibility, such as deal maker, credit analyst, or mortgage specialist, on a given sales flow.
-columns:
-  id:
-    description: Primary key of the specialist record in the source database.
-  sales_flow_id:
-    description: Foreign key referencing the sales flow this specialist is assigned to.
-  user_id:
-    description: Foreign key referencing the users table for the staff member assigned as specialist. Can be null when the role is not yet assigned to a specific person.
-  kind:
-    description: Functional role of the specialist on the deal. Values include AGENT, AUTONOMOUS_AGENT, FIFTY_AGENT, AGENT_LEAD_REFERRAL, CREDIT, CRI, CRN, DEAL_MAKER, LEGAL_RISK, MORTGAGE_START, MORTGAGE_FUP, MORTGAGE_END, PRE, POST, POST_DD, and TEAM_LEAD.
-  created_at:
-    description: Timestamp when the record was created in the source database.
-  updated_at:
-    description: Timestamp when the record was last updated in the source database.
-  op_cdc:
-    description: CDC operation type captured by Debezium (insert, update, or delete).
-  ts_cdc_transaction:
-    description: Timestamp when the change was captured by the CDC pipeline.
-  ts_database_transaction:
-    description: Timestamp of the database transaction in the source system.
-  cdc_transaction_id:
-    description: Source database transaction identifier for the CDC event.
-  cdc_binlog_position:
-    description: Postgres logical sequence number (LSN) for the CDC event ordering.
-  year:
-    description: Year partition derived from the CDC ingestion timestamp.
-  month:
-    description: Month partition derived from the CDC ingestion timestamp.
-  day:
-    description: Day partition derived from the CDC ingestion timestamp.
-  hour:
-    description: Hour partition derived from the CDC ingestion timestamp.

@@ -1,0 +1,8 @@
+database_name: datalake_sales_flow_raw
+table_name: ccv_termination
+domain: For Sale
+columns:
+  approval_email:
+    tags:
+      - PII
+      - Confidential

@@ -3770,8 +3770,6 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-brokerage:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-ccv-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-diligence-appointment:first-run-of-day
   - bietlejuice.sales_flow:load-clean-diligence:first-run-of-day
   - bietlejuice.sales_flow:load-clean-mortgage:first-run-of-day
@@ -3783,6 +3781,8 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.sales_flow:load-clean-sales-flow-details:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow-tag:first-run-of-day
   - bietlejuice.sales_flow:load-clean-tag:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-brokerage:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-ccv-flow:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-payment:first-run-of-day
@@ -3793,9 +3793,7 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder-reference:first-run-of-day
   - bietlejuice.docx:load-clean-folder:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-buyer-data:first-run-of-day
   - bietlejuice.sales_flow:load-clean-cash-payment:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-ccv-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-closing-type:first-run-of-day
   - bietlejuice.sales_flow:load-clean-diligence-appointment:first-run-of-day
   - bietlejuice.sales_flow:load-clean-diligence:first-run-of-day
@@ -3810,15 +3808,18 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-sales-flow-pendency:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow-tag:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow-users:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-seller-data:first-run-of-day
   - bietlejuice.sales_flow:load-clean-status-order:first-run-of-day
   - bietlejuice.sales_flow:load-clean-status-record:first-run-of-day
   - bietlejuice.sales_flow:load-clean-status:first-run-of-day
   - bietlejuice.sales_flow:load-clean-tag:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-brokerage:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-buyer-data:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-ccv-flow:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-offer:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-payment:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-sales-flow:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-seller-data:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-specialist:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-users:first-run-of-day
 bietlejuice.enrich_sale_ongoing_listings:
@@ -4698,10 +4699,10 @@ bietlejuice.reverse_kyc:
   - bietlejuice.dw_user:load-dw-rent-dim-owner-category:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-buyer-data:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-ccv:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-seller-data:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-buyer-data:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-ccv:first-run-of-day
   - bietlejuice.sales_flow_fast_lane:load-clean-sales-flow:first-run-of-day
+  - bietlejuice.sales_flow_fast_lane:load-clean-seller-data:first-run-of-day
   - bietlejuice.vans:load-clean-payment:first-run-of-day
 bietlejuice.reverse_listing_quality_access:
   - bietlejuice.reverse_listing_quality_load:load-reverse-listing-quality:first-run-of-day

@@ -30,18 +30,10 @@ workflow:
       clean_table_name: ai_legal_analysis_lego_contract_execution
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    brokerage:
-      clean_table_name: brokerage
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_brokerage"]
     brokerage_aud:
       clean_table_name: brokerage_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id_brokerage_aud", "rev"]
-    buyer_data:
-      clean_table_name: buyer_data
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_buyer"]
     buyer_data_aud:
       clean_table_name: buyer_data_aud
       raw_primary_keys: ["id", "rev"]
@@ -58,10 +50,6 @@ workflow:
       clean_table_name: cash_payment
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_cash_payment"]
-    ccv:
-      clean_table_name: ccv
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
     ccv_aud:
       clean_table_name: ccv_aud
       raw_primary_keys: ["id", "rev"]
@@ -78,10 +66,6 @@ workflow:
       clean_table_name: ccv_edition_reason_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-    ccv_termination:
-      clean_table_name: ccv_termination
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_ccv_termination"]
     clause_message:
       clean_table_name: clause_message
       raw_primary_keys: ["id"]
@@ -94,10 +78,6 @@ workflow:
       clean_table_name: closing_type
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    ccv_flow:
-      clean_table_name: ccv_flow
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_ccv_flow"]
     ccv_flow_aud:
       clean_table_name: ccv_flow_aud
       raw_primary_keys: ["id", "rev"]
@@ -270,10 +250,6 @@ workflow:
       clean_table_name: screening_seller
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    seller_data:
-      clean_table_name: seller_data
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_seller"]
     seller_data_aud:
       clean_table_name: seller_data_aud
       raw_primary_keys: ["id", "rev"]
@@ -316,10 +292,6 @@ workflow:
       clean_primary_keys: ["id"]
     task_association:
       clean_table_name: task_association
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
-    task_manager_info:
-      clean_table_name: task_manager_info
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
     backoffice_journey_status:
