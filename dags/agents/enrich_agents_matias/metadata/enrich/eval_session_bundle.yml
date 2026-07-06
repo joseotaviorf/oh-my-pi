@@ -1,0 +1,87 @@
+---
+database_name: datalake_agents_matias
+table_name: eval_session_bundle
+description: |
+  One row per Matias broker chatbot session (bot=dominic) within the load window.
+  Assembles a full bundle for offline evaluation: session metadata, a conversation
+  array (one item per message in chronological order), the Langfuse traces that
+  occurred in each user turn (user-turn anchor logic), and per-session eval scores.
+  Merge key: id_session. Partitioned by year/month/day of session_start_ts.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_session:
+    description: >
+      Canonical session identifier used as merge key. Derived from id_sauron_session
+      (cast to string) when present, falling back to id_sss_session.
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+      - datalake_chatbot.sessions.id_sss_session
+  id_copilot_session:
+    description: Copilot Service session id (id_session cast to string before the transcript-key coalesce).
+    lineage:
+      - datalake_chatbot.sessions.id_session
+  id_langfuse_session:
+    description: Langfuse external session identifier used to join traces and evals. Non-null (sessions without it are excluded from the cohort).
+    lineage:
+      - datalake_chatbot.sessions.id_langfuse_session
+  bot:
+    description: Bot name that handled the session (always "dominic" in this table).
+    lineage:
+      - datalake_chatbot.sessions.bot
+  session_start_ts:
+    description: Timestamp when the session was created (ts_created from chatbot.sessions).
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+  is_escalated:
+    description: Whether the session was escalated to human support.
+    lineage:
+      - datalake_chatbot.sessions.is_escalated
+  channel:
+    description: Communication channel of the session (e.g. whatsapp, web).
+    lineage:
+      - datalake_chatbot.sessions.channel
+  session_date:
+    description: Calendar date of session_start_ts.
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+  conversation:
+    description: >
+      Chronologically ordered array of conversation items. Each item contains:
+      message_ts (timestamp), message_id (session-scoped sequential id),
+      message_sender (user/bot/analyst/system), message (text content),
+      and traces (array of Langfuse traces that fired during that user turn,
+      each with its observations filtered to the agent whitelist).
+    lineage:
+      - datalake_chatbot.messages.ts_created
+      - datalake_chatbot.messages.role
+      - datalake_chatbot.messages.message
+      - datalake_langfuse_clean.traces.id_trace
+      - datalake_langfuse_clean.traces.name
+      - datalake_langfuse_clean.traces.input
+      - datalake_langfuse_clean.traces.output
+      - datalake_langfuse_clean.traces.tags
+      - datalake_langfuse_clean.observations.id_observation
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.type
+      - datalake_langfuse_clean.observations.output
+  evals:
+    description: >
+      Eval scores array from datalake_chatbot.evals for this session's id_langfuse_session.
+      Null when no eval record exists.
+    lineage:
+      - datalake_chatbot.evals.evals
+  ts_load:
+    description: Timestamp when this row was written to the table.
+  year:
+    description: Partition year derived from session_start_ts.
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+  month:
+    description: Partition month derived from session_start_ts.
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+  day:
+    description: Partition day derived from session_start_ts.
+    lineage:
+      - datalake_chatbot.sessions.ts_created
