@@ -4,7 +4,7 @@ table_name: quality_closing_ongoing
 description: >-
   Monthly closing quality analysis records tracked in the Fechamento mensal
   Google Sheet tab for Fintech closing operations monitoring.
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   competence:

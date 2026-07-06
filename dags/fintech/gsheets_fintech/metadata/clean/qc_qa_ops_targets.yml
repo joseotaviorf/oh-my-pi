@@ -1,106 +1,145 @@
 database_name: datalake_gsheets_clean
 table_name: qc_qa_ops_targets
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for qc qa
+  ops targets. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   sla_claim_total:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_total
+    description: Value from the Google Sheets source column mapped to sla_claim_total for qc_qa_ops_targets planning.
   sla_claim_15_days:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_15dias
+    description: Value from the Google Sheets source column mapped to sla_claim_15_days for qc_qa_ops_targets planning.
   sla_claim_2_days:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_2dias
+    description: Value from the Google Sheets source column mapped to sla_claim_2_days for qc_qa_ops_targets planning.
   sla_claim_termination:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_rescisao
+    description: Value from the Google Sheets source column mapped to sla_claim_termination for qc_qa_ops_targets planning.
   sla_claim_simple:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamento_simples
+    description: Value from the Google Sheets source column mapped to sla_claim_simple for qc_qa_ops_targets planning.
   dsat_claim_total:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_total
+    description: Value from the Google Sheets source column mapped to dsat_claim_total for qc_qa_ops_targets planning.
   dsat_claim_15_days:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_15dias
+    description: Value from the Google Sheets source column mapped to dsat_claim_15_days for qc_qa_ops_targets planning.
   dsat_claim_2_days:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_2dias
+    description: Value from the Google Sheets source column mapped to dsat_claim_2_days for qc_qa_ops_targets planning.
   dsat_claim_termination:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_rescisao
+    description: Value from the Google Sheets source column mapped to dsat_claim_termination for qc_qa_ops_targets planning.
   avg_lt_claim_total:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_total
+    description: Value from the Google Sheets source column mapped to avg_lt_claim_total for qc_qa_ops_targets planning.
   avg_lt_claim_15_days:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_15dias
+    description: Value from the Google Sheets source column mapped to avg_lt_claim_15_days for qc_qa_ops_targets planning.
   avg_lt_claim_2_days:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_2dias
+    description: Value from the Google Sheets source column mapped to avg_lt_claim_2_days for qc_qa_ops_targets planning.
   avg_lt_claim_termination:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_rescisao
+    description: Value from the Google Sheets source column mapped to avg_lt_claim_termination for qc_qa_ops_targets planning.
   score_monitoring_claim:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.nota_monitoria_acionamentos
+    description: Value from the Google Sheets source column mapped to score_monitoring_claim for qc_qa_ops_targets planning.
   sla_credit_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_credito_qc
+    description: Value from the Google Sheets source column mapped to sla_credit_qc for qc_qa_ops_targets planning.
   sla_closing_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_closing_qc
+    description: Value from the Google Sheets source column mapped to sla_closing_qc for qc_qa_ops_targets planning.
   dsat_closing_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_closing_qc
+    description: Value from the Google Sheets source column mapped to dsat_closing_qc for qc_qa_ops_targets planning.
   sla_credit_qa:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_credito_qa
+    description: Value from the Google Sheets source column mapped to sla_credit_qa for qc_qa_ops_targets planning.
   sla_ca2cc_qa:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_ca2cc_qa
+    description: Value from the Google Sheets source column mapped to sla_ca2cc_qa for qc_qa_ops_targets planning.
   sla_cc2cs_qa:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_cc2cs_qa
+    description: Value from the Google Sheets source column mapped to sla_cc2cs_qa for qc_qa_ops_targets planning.
   sla_ca2cs_qa:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_ca2cs_qa
+    description: Value from the Google Sheets source column mapped to sla_ca2cs_qa for qc_qa_ops_targets planning.
   dsat_closing_qa:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_closing_qa
+    description: Value from the Google Sheets source column mapped to dsat_closing_qa for qc_qa_ops_targets planning.
   dsat_credit_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_credito_qc
+    description: Value from the Google Sheets source column mapped to dsat_credit_qc for qc_qa_ops_targets planning.
   credit_auditing_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.auditoria_credito_qc
+    description: Value from the Google Sheets source column mapped to credit_auditing_qc for qc_qa_ops_targets planning.
   monitoring_docs_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.monitoria_docs_qc
+    description: Value from the Google Sheets source column mapped to monitoring_docs_qc for qc_qa_ops_targets planning.
   leadtime_docs_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.leadtime_docs_qc
+    description: Value from the Google Sheets source column mapped to leadtime_docs_qc for qc_qa_ops_targets planning.
   sla_docs_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.sla_docs_qc
+    description: Value from the Google Sheets source column mapped to sla_docs_qc for qc_qa_ops_targets planning.
   renewal_conversion_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.conversao_renovacoes_qc
+    description: Value from the Google Sheets source column mapped to renewal_conversion_qc for qc_qa_ops_targets planning.
   dsat_renewal_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_renovacoes_qc
+    description: Value from the Google Sheets source column mapped to dsat_renewal_qc for qc_qa_ops_targets planning.
   reference_month_weekly_target:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.mes_de_referencia_tgt_semanal
+    description: Value from the Google Sheets source column mapped to reference_month_weekly_target for qc_qa_ops_targets planning.
   dt_reference:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dia
+    description: Calendar date associated with reference in the financial workflow.
   critical_error_total:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.critical_error_total
+    description: Value from the Google Sheets source column mapped to critical_error_total for qc_qa_ops_targets planning.
   critical_error_simple:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.critical_error_simples
+    description: Value from the Google Sheets source column mapped to critical_error_simple for qc_qa_ops_targets planning.
   critical_error_rescission:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.critical_error_rescisao
+    description: Value from the Google Sheets source column mapped to critical_error_rescission for qc_qa_ops_targets planning.

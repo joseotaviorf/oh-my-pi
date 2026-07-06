@@ -1,145 +1,198 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_coincident_targets
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred coincident targets. One row per planning or control record used
+  in financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   evaluation_started:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.evaluation_started
+    description: Value from the Google Sheets source column mapped to evaluation_started for quintocred_coincident_targets planning.
   credit_approved:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.credit_approved
+    description: Value from the Google Sheets source column mapped to credit_approved for quintocred_coincident_targets planning.
   new_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.new_contract
+    description: Value from the Google Sheets source column mapped to new_contract for quintocred_coincident_targets planning.
   ended_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.ended_contract
+    description: Value from the Google Sheets source column mapped to ended_contract for quintocred_coincident_targets planning.
   ongoing_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.ongoing_contract
+    description: Value from the Google Sheets source column mapped to ongoing_contract for quintocred_coincident_targets planning.
   gmv_new_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.gmv_new_contract
+    description: Value from the Google Sheets source column mapped to gmv_new_contract for quintocred_coincident_targets planning.
   gmv_ongoing_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.gmv_ongoing_contract
+    description: Value from the Google Sheets source column mapped to gmv_ongoing_contract for quintocred_coincident_targets planning.
   gmv_ended_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.gmv_ended_contract
+    description: Value from the Google Sheets source column mapped to gmv_ended_contract for quintocred_coincident_targets planning.
   avg_ticket_new_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_new_contract
+    description: Value from the Google Sheets source column mapped to avg_ticket_new_contract for quintocred_coincident_targets planning.
   avg_ticket_ended_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_ended_contract
+    description: Value from the Google Sheets source column mapped to avg_ticket_ended_contract for quintocred_coincident_targets planning.
   avg_ticket_ongoing_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_ongoing_contract
+    description: Value from the Google Sheets source column mapped to avg_ticket_ongoing_contract for quintocred_coincident_targets planning.
   activation_fee:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.activation_fee
+    description: Value from the Google Sheets source column mapped to activation_fee for quintocred_coincident_targets planning.
   revenue_new_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.revenue_new_contract
+    description: Value from the Google Sheets source column mapped to revenue_new_contract for quintocred_coincident_targets planning.
   revenue_ongoing_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.revenue_ongoing_contract
+    description: Value from the Google Sheets source column mapped to revenue_ongoing_contract for quintocred_coincident_targets planning.
   take_rate_new_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.take_rate_new_contract
+    description: Value from the Google Sheets source column mapped to take_rate_new_contract for quintocred_coincident_targets planning.
   take_rate_ongoing_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.take_rate_ongoing_contract
+    description: Value from the Google Sheets source column mapped to take_rate_ongoing_contract for quintocred_coincident_targets planning.
   monthly_brokers_w_evaluation_accumulated:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.monthly_brokers_w_evaluation_accumulated
+    description: Value from the Google Sheets source column mapped to monthly_brokers_w_evaluation_accumulated for quintocred_coincident_targets planning.
   daily_brokers_w_evaluation:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.daily_brokers_w_evaluation
+    description: Value from the Google Sheets source column mapped to daily_brokers_w_evaluation for quintocred_coincident_targets planning.
   monthly_active_brokers_accumulated:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.monthly_active_brokers_accumulated
+    description: Value from the Google Sheets source column mapped to monthly_active_brokers_accumulated for quintocred_coincident_targets planning.
   daily_active_brokers:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.daily_active_brokers
+    description: Value from the Google Sheets source column mapped to daily_active_brokers for quintocred_coincident_targets planning.
   total_active_brokers_w_evaluation_accumulated:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.total_active_brokers_w_evaluation_accumulated
+    description: Value from the Google Sheets source column mapped to total_active_brokers_w_evaluation_accumulated for quintocred_coincident_targets planning.
   daily_total_active_brokers_w_evaluation:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.daily_total_active_brokers_w_evaluation
+    description: Value from the Google Sheets source column mapped to daily_total_active_brokers_w_evaluation for quintocred_coincident_targets planning.
   total_active_brokers:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.total_active_brokers
+    description: Value from the Google Sheets source column mapped to total_active_brokers for quintocred_coincident_targets planning.
   first_active_brokers:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.first_active_brokers
+    description: Value from the Google Sheets source column mapped to first_active_brokers for quintocred_coincident_targets planning.
   pre_active_brokers_w_evaluation:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.pre_active_brokers_w_evaluation
+    description: Value from the Google Sheets source column mapped to pre_active_brokers_w_evaluation for quintocred_coincident_targets planning.
   claims_total:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.claims_total
+    description: Value from the Google Sheets source column mapped to claims_total for quintocred_coincident_targets planning.
   claims_active:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.claims_active
+    description: Value from the Google Sheets source column mapped to claims_active for quintocred_coincident_targets planning.
   claims_termination:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.claims_termination
+    description: Value from the Google Sheets source column mapped to claims_termination for quintocred_coincident_targets planning.
   avg_ticket_claims_total:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_claims_total
+    description: Value from the Google Sheets source column mapped to avg_ticket_claims_total for quintocred_coincident_targets planning.
   avg_ticket_claims_active:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_claims_active
+    description: Value from the Google Sheets source column mapped to avg_ticket_claims_active for quintocred_coincident_targets planning.
   avg_ticket_claims_termination:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_claims_termination
+    description: Value from the Google Sheets source column mapped to avg_ticket_claims_termination for quintocred_coincident_targets planning.
   claims_created_tickets:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.claims_created_tickets
+    description: Value from the Google Sheets source column mapped to claims_created_tickets for quintocred_coincident_targets planning.
   collections_total_projected:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.collections_total_projected
+    description: Value from the Google Sheets source column mapped to collections_total_projected for quintocred_coincident_targets planning.
   collections_active_projected:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.collections_active_projected
+    description: Value from the Google Sheets source column mapped to collections_active_projected for quintocred_coincident_targets planning.
   collections_termination_projected:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.collections_termination_projected
+    description: Value from the Google Sheets source column mapped to collections_termination_projected for quintocred_coincident_targets planning.
   evictions_resolved_cases:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.evictions_resolved_cases
+    description: Value from the Google Sheets source column mapped to evictions_resolved_cases for quintocred_coincident_targets planning.
   evictions_new_cases:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.evictions_new_cases
+    description: Value from the Google Sheets source column mapped to evictions_new_cases for quintocred_coincident_targets planning.
   evictions_ongoing_cases:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.evictions_ongoing_cases
+    description: Value from the Google Sheets source column mapped to evictions_ongoing_cases for quintocred_coincident_targets planning.
   new_business_appointments:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.new_business_appointments
+    description: Value from the Google Sheets source column mapped to new_business_appointments for quintocred_coincident_targets planning.
   new_business_opportunities:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.new_business_opportunities
+    description: Value from the Google Sheets source column mapped to new_business_opportunities for quintocred_coincident_targets planning.
   new_business_registration:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.new_business_registration
+    description: Value from the Google Sheets source column mapped to new_business_registration for quintocred_coincident_targets planning.
   month:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   quarter:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.quarter
-  halfyear:
-    lineage:
-      - datalake_gsheets_raw.quintocred_coincident_targets.halfyear
+    description: Value from the Google Sheets source column mapped to quarter for quintocred_coincident_targets planning.
   year:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.year
-  date:
-    lineage:
-      - datalake_gsheets_raw.quintocred_coincident_targets.date
-  week_start:
-    lineage:
-      - datalake_gsheets_raw.quintocred_coincident_targets.week_start
+    description: Year partition derived from the source event timestamp for incremental loading.
+  half_year:
+    lineage: []
+    description: Value from the Google Sheets source column mapped to half_year for quintocred_coincident_targets planning.
+  dt_reference:
+    lineage: []
+    description: Calendar date associated with reference in the financial workflow.
+  dt_week:
+    lineage: []
+    description: Calendar date associated with week in the financial workflow.

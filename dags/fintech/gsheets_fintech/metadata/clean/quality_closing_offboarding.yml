@@ -4,7 +4,7 @@ table_name: quality_closing_offboarding
 description: >-
   Offboarding closing quality analysis records sourced from the Dados Google
   Sheet tab for Fintech ops monitoring.
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   competence:

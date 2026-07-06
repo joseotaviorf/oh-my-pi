@@ -1,111 +1,154 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_collections_targets
-owner: ae-finance-fintech@quintoandar.com.br
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred collections targets. One row per planning or control record used
+  in financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   claims_recovery:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.claims_recovery
+    description: Value from the Google Sheets source column mapped to claims_recovery for quintocred_collections_targets planning.
   subscriptions_recovery:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.subscriptions_recovery
+    description: Value from the Google Sheets source column mapped to subscriptions_recovery for quintocred_collections_targets planning.
   claims_fct:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.claims_fct
+    description: Value from the Google Sheets source column mapped to claims_fct for quintocred_collections_targets planning.
   recovery_over_claims:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.recovery_over_claims
+    description: Value from the Google Sheets source column mapped to recovery_over_claims for quintocred_collections_targets planning.
   pct_active_recovery:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_recovery
+    description: Value from the Google Sheets source column mapped to pct_active_recovery for quintocred_collections_targets planning.
   pct_active_rec_001_030:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_001_030
+    description: Value from the Google Sheets source column mapped to pct_active_rec_001_030 for quintocred_collections_targets planning.
   pct_active_rec_031_060:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_031_060
+    description: Value from the Google Sheets source column mapped to pct_active_rec_031_060 for quintocred_collections_targets planning.
   pct_active_rec_061_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_061_090
+    description: Value from the Google Sheets source column mapped to pct_active_rec_061_090 for quintocred_collections_targets planning.
   pct_active_rec_091_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_091_180
+    description: Value from the Google Sheets source column mapped to pct_active_rec_091_180 for quintocred_collections_targets planning.
   pct_active_rec_over_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_over_180
+    description: Value from the Google Sheets source column mapped to pct_active_rec_over_180 for quintocred_collections_targets planning.
   pct_active_rec_001_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_001_180
+    description: Value from the Google Sheets source column mapped to pct_active_rec_001_180 for quintocred_collections_targets planning.
   pct_active_rec_001_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_001_090
+    description: Value from the Google Sheets source column mapped to pct_active_rec_001_090 for quintocred_collections_targets planning.
   pct_active_rec_over_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_over_090
+    description: Value from the Google Sheets source column mapped to pct_active_rec_over_090 for quintocred_collections_targets planning.
   pct_termination_recovery:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_recovery
+    description: Value from the Google Sheets source column mapped to pct_termination_recovery for quintocred_collections_targets planning.
   pct_termination_rec_001_030:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_001_030
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_001_030 for quintocred_collections_targets planning.
   pct_termination_rec_031_060:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_031_060
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_031_060 for quintocred_collections_targets planning.
   pct_termination_rec_061_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_061_090
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_061_090 for quintocred_collections_targets planning.
   pct_termination_rec_091_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_091_180
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_091_180 for quintocred_collections_targets planning.
   pct_termination_rec_over_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_over_180
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_over_180 for quintocred_collections_targets planning.
   pct_termination_rec_001_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_001_180
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_001_180 for quintocred_collections_targets planning.
   pct_termination_rec_001_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_001_090
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_001_090 for quintocred_collections_targets planning.
   pct_termination_rec_over_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_over_090
+    description: Value from the Google Sheets source column mapped to pct_termination_rec_over_090 for quintocred_collections_targets planning.
   pct_subscription_recovery:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_recovery
+    description: Value from the Google Sheets source column mapped to pct_subscription_recovery for quintocred_collections_targets planning.
   pct_subscription_rec_001_030:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_001_030
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_001_030 for quintocred_collections_targets planning.
   pct_subscription_rec_031_060:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_031_060
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_031_060 for quintocred_collections_targets planning.
   pct_subscription_rec_061_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_061_090
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_061_090 for quintocred_collections_targets planning.
   pct_subscription_rec_091_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_091_180
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_091_180 for quintocred_collections_targets planning.
   pct_subscription_rec_over_180:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_over_180
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_over_180 for quintocred_collections_targets planning.
   pct_subscription_rec_031_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_031_090
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_031_090 for quintocred_collections_targets planning.
   pct_subscription_rec_001_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_001_090
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_001_090 for quintocred_collections_targets planning.
   pct_subscription_rec_over_090:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_over_090
+    description: Value from the Google Sheets source column mapped to pct_subscription_rec_over_090 for quintocred_collections_targets planning.
   week:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.seman
+    description: Value from the Google Sheets source column mapped to week for quintocred_collections_targets planning.
   month:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.mes
+    description: Month partition derived from the source event timestamp for incremental loading.
   business_day:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.dia_util
+    description: Value from the Google Sheets source column mapped to business_day for quintocred_collections_targets planning.
   dt_reference:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_targets.date
+    description: Calendar date associated with reference in the financial workflow.

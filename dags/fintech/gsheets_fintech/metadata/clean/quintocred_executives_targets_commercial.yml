@@ -1,88 +1,124 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: quintocred_executives_targets_commercial
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred executives targets commercial. One row per planning or control
+  record used in financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   portfolio:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.portfolio
+    description: Value from the Google Sheets source column mapped to portfolio for quintocred_executives_targets_commercial planning.
   team:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.team
+    description: Value from the Google Sheets source column mapped to team for quintocred_executives_targets_commercial planning.
   executive:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.executivo
+    description: Value from the Google Sheets source column mapped to executive for quintocred_executives_targets_commercial planning.
   effective_contacts_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.effective_contacts_target
+    description: Value from the Google Sheets source column mapped to effective_contacts_target for quintocred_executives_targets_commercial planning.
   effective_contacts_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.effective_contacts_actual
+    description: Value from the Google Sheets source column mapped to effective_contacts_actual for quintocred_executives_targets_commercial planning.
   unique_effective_contact_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.unique_effective_contact_target
+    description: Value from the Google Sheets source column mapped to unique_effective_contact_target for quintocred_executives_targets_commercial planning.
   unique_effective_contact_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.unique_effective_contact_actual
+    description: Value from the Google Sheets source column mapped to unique_effective_contact_actual for quintocred_executives_targets_commercial planning.
   total_brokers_wes_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.total_brokers_wes_target
+    description: Value from the Google Sheets source column mapped to total_brokers_wes_target for quintocred_executives_targets_commercial planning.
   monthly_active_brokers_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.monthly_active_brokers_target
+    description: Value from the Google Sheets source column mapped to monthly_active_brokers_target for quintocred_executives_targets_commercial planning.
   evaluation_started_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.evaluation_started_target
+    description: Value from the Google Sheets source column mapped to evaluation_started_target for quintocred_executives_targets_commercial planning.
   credit_approved_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.credit_approved_target
+    description: Value from the Google Sheets source column mapped to credit_approved_target for quintocred_executives_targets_commercial planning.
   new_contracts_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.new_contracts_target
+    description: Value from the Google Sheets source column mapped to new_contracts_target for quintocred_executives_targets_commercial planning.
   es2nc_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.es2nc_target
+    description: Value from the Google Sheets source column mapped to es2nc_target for quintocred_executives_targets_commercial planning.
   registrations_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.registrations_target
+    description: Value from the Google Sheets source column mapped to registrations_target for quintocred_executives_targets_commercial planning.
   activations_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.activations_target
+    description: Value from the Google Sheets source column mapped to activations_target for quintocred_executives_targets_commercial planning.
   activations_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.activations_actual
+    description: Value from the Google Sheets source column mapped to activations_actual for quintocred_executives_targets_commercial planning.
   calls_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.calls_target
+    description: Value from the Google Sheets source column mapped to calls_target for quintocred_executives_targets_commercial planning.
   calls_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.calls_actual
+    description: Value from the Google Sheets source column mapped to calls_actual for quintocred_executives_targets_commercial planning.
   online_time_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.online_time_target
+    description: Value from the Google Sheets source column mapped to online_time_target for quintocred_executives_targets_commercial planning.
   online_time_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.online_time_actual
+    description: Value from the Google Sheets source column mapped to online_time_actual for quintocred_executives_targets_commercial planning.
   appointments_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.appointments_target
+    description: Value from the Google Sheets source column mapped to appointments_target for quintocred_executives_targets_commercial planning.
   appointments_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.appointments_actual
+    description: Value from the Google Sheets source column mapped to appointments_actual for quintocred_executives_targets_commercial planning.
   opportunities_target:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.opportunities_target
+    description: Value from the Google Sheets source column mapped to opportunities_target for quintocred_executives_targets_commercial planning.
   opportunities_actual:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.opportunities_actual
+    description: Value from the Google Sheets source column mapped to opportunities_actual for quintocred_executives_targets_commercial planning.
   date:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.date
+    description: Value from the Google Sheets source column mapped to date for quintocred_executives_targets_commercial planning.
   month:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   year:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.year
 
 
+    description: Year partition derived from the source event timestamp for incremental loading.

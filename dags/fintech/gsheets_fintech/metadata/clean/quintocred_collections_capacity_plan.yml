@@ -1,35 +1,53 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_collections_capacity_plan
-owner: ae-finance-fintech@quintoandar.com.br
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred collections capacity plan. One row per planning or control record
+  used in financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   internal_team:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.internal_team
+    description: Value from the Google Sheets source column mapped to internal_team for quintocred_collections_capacity_plan planning.
   outsourcing:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.outsourcing
+    description: Value from the Google Sheets source column mapped to outsourcing for quintocred_collections_capacity_plan planning.
   iaf_subscriptions:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_subscriptions
+    description: Value from the Google Sheets source column mapped to iaf_subscriptions for quintocred_collections_capacity_plan planning.
   iaf_active:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_active
+    description: Value from the Google Sheets source column mapped to iaf_active for quintocred_collections_capacity_plan planning.
   iaf_termination:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_termination
+    description: Value from the Google Sheets source column mapped to iaf_termination for quintocred_collections_capacity_plan planning.
   iaf_evictions:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_evictions
+    description: Value from the Google Sheets source column mapped to iaf_evictions for quintocred_collections_capacity_plan planning.
   week:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.seman
+    description: Value from the Google Sheets source column mapped to week for quintocred_collections_capacity_plan planning.
   month:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.mes
+    description: Month partition derived from the source event timestamp for incremental loading.
   business_day:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.dia_util
+    description: Value from the Google Sheets source column mapped to business_day for quintocred_collections_capacity_plan planning.
   dt_reference:
     lineage:
       - datalake_gsheets_raw.quintocred_collections_capacity_plan.data
+    description: Calendar date associated with reference in the financial workflow.

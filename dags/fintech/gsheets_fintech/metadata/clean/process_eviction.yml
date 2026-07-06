@@ -1,145 +1,197 @@
 database_name: datalake_gsheets_clean
 table_name: process_eviction
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for process
+  eviction. One row per planning or control record used in financial reporting
+  and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_house_listing:
     lineage:
       - datalake_gsheets_raw.process_eviction.house_listing
+    description: Identifier for the house listing referenced by this financial record.
   agreement_status:
     lineage:
       - datalake_gsheets_raw.process_eviction.agreement_status
+    description: Value from the Google Sheets source column mapped to agreement_status for process_eviction planning.
   check_abandonment:
     lineage:
       - datalake_gsheets_raw.process_eviction.check_abandonment
+    description: Value from the Google Sheets source column mapped to check_abandonment for process_eviction planning.
   city:
     lineage:
       - datalake_gsheets_raw.process_eviction.city
+    description: Value from the Google Sheets source column mapped to city for process_eviction planning.
   condo_internalization_status:
     lineage:
       - datalake_gsheets_raw.process_eviction.condo_internalization_status
+    description: Value from the Google Sheets source column mapped to condo_internalization_status for process_eviction planning.
   contract_ended_reason:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_ended_reason
+    description: Value from the Google Sheets source column mapped to contract_ended_reason for process_eviction planning.
   contract_status:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_status
+    description: Value from the Google Sheets source column mapped to contract_status for process_eviction planning.
   cs_eviction_code:
     lineage:
       - datalake_gsheets_raw.process_eviction.cs_eviction_code
+    description: Value from the Google Sheets source column mapped to cs_eviction_code for process_eviction planning.
   cs_status:
     lineage:
       - datalake_gsheets_raw.process_eviction.cs_status
+    description: Value from the Google Sheets source column mapped to cs_status for process_eviction planning.
   eviction_code:
     lineage:
       - datalake_gsheets_raw.process_eviction.eviction_code
+    description: Value from the Google Sheets source column mapped to eviction_code for process_eviction planning.
   eviction_status:
     lineage:
       - datalake_gsheets_raw.process_eviction.eviction_status
+    description: Value from the Google Sheets source column mapped to eviction_status for process_eviction planning.
   general_comments:
     lineage:
       - datalake_gsheets_raw.process_eviction.general_comments
+    description: Value from the Google Sheets source column mapped to general_comments for process_eviction planning.
   guarantee:
     lineage:
       - datalake_gsheets_raw.process_eviction.guarantee
+    description: Value from the Google Sheets source column mapped to guarantee for process_eviction planning.
   landlord_emails:
     lineage:
       - datalake_gsheets_raw.process_eviction.landlord_emails
+    description: Value from the Google Sheets source column mapped to landlord_emails for process_eviction planning.
   landlord_names:
     lineage:
       - datalake_gsheets_raw.process_eviction.landlord_names
+    description: Value from the Google Sheets source column mapped to landlord_names for process_eviction planning.
   landlord_ticket_number:
     lineage:
       - datalake_gsheets_raw.process_eviction.landlord_ticket_number
+    description: Value from the Google Sheets source column mapped to landlord_ticket_number for process_eviction planning.
   last_communication_subject:
     lineage:
       - datalake_gsheets_raw.process_eviction.last_communication_subject
+    description: Value from the Google Sheets source column mapped to last_communication_subject for process_eviction planning.
   last_settlement_communication_subject:
     lineage:
       - datalake_gsheets_raw.process_eviction.last_settlement_communication_subject
+    description: Value from the Google Sheets source column mapped to last_settlement_communication_subject for process_eviction planning.
   offboarding_status:
     lineage:
       - datalake_gsheets_raw.process_eviction.offboarding_status
+    description: Value from the Google Sheets source column mapped to offboarding_status for process_eviction planning.
   office_judge:
     lineage:
       - datalake_gsheets_raw.process_eviction.office_judge
+    description: Value from the Google Sheets source column mapped to office_judge for process_eviction planning.
   order_type:
     lineage:
       - datalake_gsheets_raw.process_eviction.order_type
+    description: Value from the Google Sheets source column mapped to order_type for process_eviction planning.
   procedure:
     lineage:
       - datalake_gsheets_raw.process_eviction.procedure
+    description: Value from the Google Sheets source column mapped to procedure for process_eviction planning.
   resident_emails:
     lineage:
       - datalake_gsheets_raw.process_eviction.resident_emails
+    description: Value from the Google Sheets source column mapped to resident_emails for process_eviction planning.
   responsible_office:
     lineage:
       - datalake_gsheets_raw.process_eviction.responsible_office
+    description: Value from the Google Sheets source column mapped to responsible_office for process_eviction planning.
   settlement_ticket_number:
     lineage:
       - datalake_gsheets_raw.process_eviction.settlement_ticket_number
+    description: Value from the Google Sheets source column mapped to settlement_ticket_number for process_eviction planning.
   tenant_emails:
     lineage:
       - datalake_gsheets_raw.process_eviction.tenant_emails
+    description: Value from the Google Sheets source column mapped to tenant_emails for process_eviction planning.
   tenant_names:
     lineage:
       - datalake_gsheets_raw.process_eviction.tenant_names
+    description: Value from the Google Sheets source column mapped to tenant_names for process_eviction planning.
   tenant_ticket_number:
     lineage:
       - datalake_gsheets_raw.process_eviction.tenant_ticket_number
+    description: Value from the Google Sheets source column mapped to tenant_ticket_number for process_eviction planning.
   is_fraud:
     lineage:
       - datalake_gsheets_raw.process_eviction.is_fraud
+    description: Indicates whether fraud applies to this financial record.
   is_repeat_offender:
     lineage:
       - datalake_gsheets_raw.process_eviction.is_repeat_offender
+    description: Indicates whether repeat offender applies to this financial record.
   dt_agreement_settlement:
     lineage:
       - datalake_gsheets_raw.process_eviction.agreement_settlement_date
+    description: Calendar date associated with agreement settlement in the financial workflow.
   dt_agreement_start:
     lineage:
       - datalake_gsheets_raw.process_eviction.agreement_start_date
+    description: Calendar date associated with agreement start in the financial workflow.
   dt_broken_agreement:
     lineage:
       - datalake_gsheets_raw.process_eviction.broken_agreement_date
+    description: Calendar date associated with broken agreement in the financial workflow.
   dt_competency_month:
     lineage:
       - datalake_gsheets_raw.process_eviction.competency_month
+    description: Calendar date associated with competency month in the financial workflow.
   dt_contract_ended:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_ended_date
+    description: Calendar date associated with contract ended in the financial workflow.
   dt_contract_ended_status_change:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_ended_status_change_date
+    description: Calendar date associated with contract ended status change in the financial workflow.
   dt_contract_ending:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_ending_date
+    description: Calendar date associated with contract ending in the financial workflow.
   dt_contract_ending_status_change:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_ending_status_change_date
+    description: Calendar date associated with contract ending status change in the financial workflow.
   dt_contract_start:
     lineage:
       - datalake_gsheets_raw.process_eviction.contract_start_date
+    description: Calendar date associated with contract start in the financial workflow.
   dt_cs_distribution:
     lineage:
       - datalake_gsheets_raw.process_eviction.cs_distribution_date
+    description: Calendar date associated with cs distribution in the financial workflow.
   dt_cs_verdict:
     lineage:
       - datalake_gsheets_raw.process_eviction.cs_verdict_date
+    description: Calendar date associated with cs verdict in the financial workflow.
   dt_distribution:
     lineage:
       - datalake_gsheets_raw.process_eviction.distribution_date
+    description: Calendar date associated with distribution in the financial workflow.
   dt_final_verdict:
     lineage:
       - datalake_gsheets_raw.process_eviction.final_verdict_date
+    description: Calendar date associated with final verdict in the financial workflow.
   dt_settlement_without_agreement:
     lineage:
       - datalake_gsheets_raw.process_eviction.settlement_without_agreement_date
+    description: Calendar date associated with settlement without agreement in the financial workflow.
   dt_sheet_insertion:
     lineage:
       - datalake_gsheets_raw.process_eviction.sheet_insertion_date
+    description: Calendar date associated with sheet insertion in the financial workflow.
   dt_verdict:
     lineage:
       - datalake_gsheets_raw.process_eviction.verdict_date
+    description: Calendar date associated with verdict in the financial workflow.

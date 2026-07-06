@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: provider_pricing
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Cleaned and standardized provider pricing data with validated types, dates, and boolean values for financial product pricing analysis
 columns:
