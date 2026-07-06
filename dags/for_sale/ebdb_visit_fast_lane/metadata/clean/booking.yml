@@ -88,10 +88,6 @@ columns:
     description: Visitor's stated intention or purpose for the property visit (e.g., serious buyer, just browsing, investment consideration, rental interest).
     lineage:
       - datalake_ebdb_raw.agendamento.intention
-  checkin_status:
-    description: Current check-in status of the visitor for their appointment (e.g., pending, checked-in, no-show, completed).
-    lineage:
-      - datalake_ebdb_raw.agendamento.checkinstatus
   visitor_id_date_slot:
     description: Combined identifier linking visitor with specific date and time slot. Used to prevent double-bookings and manage visitor schedules efficiently.
     lineage:

@@ -13,7 +13,7 @@ columns:
   id_country:
     lineage:
     - datalake_ebdb_listing.house.id_country
-    description: Country identifier.
+    description: Identifier of the country where the booked house is located, sourced from the listing house dimension.
   id_rescheduled_booking:
     lineage:
     - datalake_ebdb_clean.booking.id_rescheduled_booking
@@ -25,7 +25,7 @@ columns:
   id_visit:
     lineage:
     - datalake_ebdb_clean.booking.id_visit
-    description: Key of visit.
+    description: Identifier of visit entity linked to the booking schedule in EBDB.
   id_user_creation:
     lineage:
     - datalake_ebdb_clean.visit_status_log.id_author_user
@@ -76,7 +76,7 @@ columns:
     lineage:
     - datalake_ebdb_clean.booking.id_visitor
     - datalake_ebdb_clean.booking.id_house
-    description: Key of sale flow
+    description: Synthetic sale-flow key built by concatenating visitor and house identifiers to represent the buyer-house pairing in For Sale.
   id_real_estate_agent_rating:
     lineage:
     - datalake_ebdb_clean.visit.id_real_estate_agent_rating
@@ -112,7 +112,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_listing.house.country_code
-    description: Country code of the booking
+    description: Country code of the booked listing used for regional segmentation and downstream country-level joins.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
@@ -174,35 +174,10 @@ columns:
       Talvez: ''
       VaiNegociar: ''
       VisitouSozinho: ''
-  checkin_code:
-    lineage:
-      - datalake_ebdb_clean.booking.visit_checkin
-    description: Buyer checkin code.
-    categories:
-      FAILED: ''
-      PENDING: ''
-      COMPLETED: ''
-  checkin_fail_reason:
-    lineage:
-      - datalake_ebdb_clean.booking.checkin_fail_reason
-    description: Checkin fail reason
-  checkin_fail_commentary:
-    lineage:
-      - datalake_ebdb_clean.booking.checkin_fail_commentary
-    description: Checkin fail commentary made by the agent in the app.
-  visit_checkin_status:
-    lineage:
-      - datalake_ebdb_clean.booking.checkin_status
-    description: Checkin status
   slot_day:
     lineage:
     - datalake_ebdb_clean.booking.slot_day
     description: Gives the slot to visit schedulled hour
-  checkin_status:
-    lineage:
-    - datalake_ebdb_clean.booking.checkin_status
-    description: Show status of whatsapp confirmation of visit. Only visits booked
-      2 days or more in advance need a whatsapp confirmation
   user_creation_email:
     lineage:
     - datalake_ebdb_user.user.email
@@ -685,7 +660,8 @@ columns:
     lineage:
       - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
     description: >
-      Final attribution origin of the booking.
+      Marketing channel surface credited for the booking visit attribution, such as App, Web, CX, or Secretaria.
+      Sourced from cross-channel attribution when available; otherwise set to old_attribution for the legacy Amplitude model.
     categories:
       App: >
         ''
@@ -737,7 +713,3 @@ columns:
     description: Boolean column indicating if he visit was completed by the visitor. The confirmation event is not registered yet.
   is_house_rented:
     description: Boolean column indicating if the sale visit was scheduled on a house that was rented inside QuintoAndar by the time the visit was scheduled to happen
-  ts_checkin:
-    lineage:
-    - datalake_ebdb_clean.visit_checkin.ts_checkin
-    description: Checkin timestamp

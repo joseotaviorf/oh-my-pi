@@ -153,16 +153,24 @@ reschedules AS (
         id_rescheduled_booking -- guaranteeing there are no future duplication on Product
 ),
 status_log AS (
+  WITH status_log_ranked AS (
+    SELECT
+      id_schedule,
+      id_author_user,
+      ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) AS rn
+    FROM
+      datalake_ebdb_clean.visit_status_log
+    WHERE
+      event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+      AND ts_created >= '2024-08-01'
+  )
   SELECT
     id_schedule,
     id_author_user
   FROM
-    datalake_ebdb_clean.visit_status_log
+    status_log_ranked
   WHERE
-    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
-    AND ts_created >= '2024-08-01'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1
+    rn = 1
 ),
 first_booking_author_sc AS (
     SELECT DISTINCT
@@ -177,7 +185,7 @@ first_booking_author_sc AS (
         datalake_ebdb_clean.booking AS b
             ON bsc.id_booking = b.id
     WHERE
-        (b.type = 'Visita' AND bsc.ts_created::date < '2025-09-01')
+        (b.type = 'Visita' AND DATE(bsc.ts_created) < '2025-09-01')
         OR (b.type != 'Visita')
 ),
 first_booking_author AS (
@@ -329,17 +337,25 @@ booking_hub_agent AS (
         AND CAST(b.ts_created AS DATE) >= '2021-07-19'
 ),
 secretariat_on_visit_date AS (
+    WITH secretariat_on_visit_date_ranked AS (
+        SELECT
+            b.id,
+            bsc.id_external_responsible AS id_user_secretariat_on_visit_date,
+            ROW_NUMBER() OVER(PARTITION BY b.id ORDER BY bsc.ts_assigned DESC) AS rn
+        FROM
+            datalake_ebdb_clean.booking AS b
+        JOIN
+            datalake_hub_services.buyer_secretariat_changes AS bsc
+                ON b.id_visitor = bsc.id_external_lead
+                AND b.dt_booking BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, GREATEST(NOW(), b.dt_booking))
+    )
     SELECT
-        b.id,
-        bsc.id_external_responsible AS id_user_secretariat_on_visit_date
+        id,
+        id_user_secretariat_on_visit_date
     FROM
-        datalake_ebdb_clean.booking AS b
-    JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
-            ON b.id_visitor = bsc.id_external_lead
-            AND b.dt_booking BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, GREATEST(NOW(), b.dt_booking))
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY b.id ORDER BY bsc.ts_assigned DESC) = 1
+        secretariat_on_visit_date_ranked
+    WHERE
+        rn = 1
 ),
 last_secretariat as (
     SELECT
@@ -353,23 +369,34 @@ last_secretariat as (
             AND bsc.is_last_responsible
 ),
 visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
+    WITH visit_fup_vsl_ranked AS (
+        SELECT
+            id_visit,
+            id_schedule,
+            CASE
+                WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
+                WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
+                WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
+            END AS visit_fup,
+            IF(reason = 'SUPPLY_DID_NOT_ATTEND_VISIT', 'LandlordNoShow', reason) AS reason,
+            ts_created AS ts_visit_fup,
+            ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) AS rn
+        FROM
+            datalake_ebdb_clean.visit_status_log
+        WHERE
+            DATE(ts_created) >= '2025-01-01'
+            AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
+    )
     SELECT
         id_visit,
         id_schedule,
-        CASE
-            WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
-            WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
-            WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
-        END AS visit_fup,
-        IF(reason = 'SUPPLY_DID_NOT_ATTEND_VISIT', 'LandlordNoShow', reason) AS reason,
-        ts_created AS ts_visit_fup
+        visit_fup,
+        reason,
+        ts_visit_fup
     FROM
-        datalake_ebdb_clean.visit_status_log
+        visit_fup_vsl_ranked
     WHERE
-        ts_created::DATE >= '2025-01-01'
-        AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
+        rn = 1
 ),
 base_booking AS (
     SELECT
@@ -412,12 +439,7 @@ base_booking AS (
         b.buyer_intention,
         b.type,
         COALESCE(b.visit_fup, fup_vsl.visit_fup) AS visit_fup,
-        v_cin.checkin_code,
-        v_cin.checkin_status AS visit_checkin_status,
-        v_cin.checkin_fail_reason,
-        v_cin.checkin_fail_commentary,
         b.slot_day,
-        b.checkin_status,
         u.email AS user_creation_email,
         vou.first_update_source,
         vou.code,
@@ -581,8 +603,7 @@ base_booking AS (
             WHEN fba.id_user_creation = 194233 THEN True
             ELSE False
         END AS is_first_booking_auto,
-        brh.is_house_rented,
-        v_cin.ts_checkin
+        brh.is_house_rented
     FROM
         datalake_ebdb_clean.booking AS b
     LEFT JOIN
@@ -647,9 +668,6 @@ base_booking AS (
         datalake_ebdb_clean.country AS ct
             ON ct.code = hl.country_code
     LEFT JOIN
-        datalake_ebdb_clean.visit_checkin AS v_cin
-            ON v_cin.id_visit = b.id_visit
-    LEFT JOIN
         secretariat_on_visit_date AS sod
             ON sod.id = b.id
     LEFT JOIN
@@ -659,6 +677,23 @@ base_booking AS (
 --CTE Cross channel
 --This CTE is being created because for some reason this table was duplicated and consequently is duplicating the quantity of booking and disturbing some Fintech metrics. We are investigating this for now.
 cross_channel AS (
+  WITH cross_channel_ranked AS (
+    SELECT
+      visit_code,
+      event_name,
+      final_attribution_app_type,
+      final_attribution_media_source,
+      final_attribution_source,
+      final_attribution_medium,
+      final_attribution_campaign,
+      final_attribution_content,
+      final_attribution_term,
+      final_attribution_branded,
+      final_attribution_origin,
+      ROW_NUMBER() OVER (PARTITION BY visit_code ORDER BY ts_event DESC) AS rn
+    FROM
+      datalake_tracked_events.attribution_cross_channel
+  )
   SELECT
     visit_code,
     event_name,
@@ -672,9 +707,9 @@ cross_channel AS (
     final_attribution_branded,
     final_attribution_origin
   FROM
-    datalake_tracked_events.attribution_cross_channel
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY visit_code ORDER BY ts_event DESC) = 1
+    cross_channel_ranked
+  WHERE
+    rn = 1
 )
 -- custom columns that need pre-calculated ones
 SELECT
@@ -714,12 +749,7 @@ SELECT
     bb.buyer_intention,
     bb.type,
     bb.visit_fup,
-    bb.checkin_code,
-    bb.visit_checkin_status,
-    bb.checkin_fail_reason,
-    bb.checkin_fail_commentary,
     bb.slot_day,
-    bb.checkin_status,
     bb.user_creation_email,
     bb.first_update_source,
     bb.code,
@@ -769,7 +799,6 @@ SELECT
     bb.has_owner_arrived,
     bb.is_first_booking_auto,
     bb.is_house_rented,
-    bb.ts_checkin,
     TO_UTC_TIMESTAMP(bb.ts_booking_local_tz, default_timezone) AS ts_booking_utc,
     FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone) AS ts_first_canceled_local_tz,
     FROM_UTC_TIMESTAMP(bb.ts_first_canceled_unevaluated, default_timezone) AS ts_first_canceled_unevaluated_local_tz,

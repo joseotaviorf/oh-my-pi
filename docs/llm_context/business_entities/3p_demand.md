@@ -108,9 +108,6 @@ The window stays open until a subsequent NBP / RBP event for the same `(sk_buyer
                                          ts_visit_last_rescheduled, nbr_reschedule)
 [Visit Last Confirmed]                  (dim_visit.ts_visit_last_confirmed)
         ↓
-[Visit Check-in]                        (fact_visits.ts_visit_checkin — For Sale only;
-                                         dim_booking.visit_checkin_status, checkin_fail_reason)
-        ↓
 [Visit Performed]                       (dim_booking.performed; visitor_arrived / agent_arrived /
                                          owner_arrived; successful_entrance)
         ↓

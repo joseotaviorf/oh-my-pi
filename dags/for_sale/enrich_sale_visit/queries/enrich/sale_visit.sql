@@ -1,26 +1,44 @@
 WITH buyer_review AS (
+    WITH buyer_review_ranked AS (
+        SELECT
+            id_reviewed,
+            id_reviewer,
+            dt_creation,
+            ROW_NUMBER() OVER (PARTITION BY id_reviewed, id_reviewer ORDER BY dt_creation ASC) AS rn
+        FROM
+            datalake_insider_clean.review
+        WHERE
+            type = 'tenant_visit'
+    )
     SELECT
         id_reviewed,
         id_reviewer,
         dt_creation
     FROM
-        datalake_insider_clean.review
+        buyer_review_ranked
     WHERE
-        type = 'tenant_visit'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_reviewed, id_reviewer ORDER BY dt_creation ASC) = 1
+        rn = 1
 ),
 status_log AS (
+  WITH status_log_ranked AS (
+    SELECT
+      id_schedule,
+      id_author_user,
+      ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) AS rn
+    FROM
+      datalake_ebdb_clean.visit_status_log
+    WHERE
+      event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+      AND ts_created >= '2024-08-01'
+  )
   SELECT
     id_schedule,
     id_author_user
   FROM
-    datalake_ebdb_clean.visit_status_log
+    status_log_ranked
   WHERE
-    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
-    AND ts_created >= '2024-08-01'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1)
+    rn = 1
+)
 SELECT DISTINCT
     b.id AS id_booking,
     b.id_sale_flow,
@@ -64,7 +82,6 @@ SELECT DISTINCT
     b.ts_first_canceled AS ts_visit_canceled,
     IF(b.is_visit_completed, b.ts_booking_utc, NULL) AS ts_visit_completed,
     b.ts_visit_fup AS ts_visit_follow_up,
-    b.ts_checkin AS ts_visit_checkin,
     br.dt_creation AS ts_buyer_review_rating,
     NOW() AS ts_load
 FROM

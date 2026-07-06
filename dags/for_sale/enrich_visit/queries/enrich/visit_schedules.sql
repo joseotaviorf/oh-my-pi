@@ -68,7 +68,7 @@ WITH schedule AS (
       datalake_ebdb_clean.visit AS v
         ON vse.id_visit = v.id
     WHERE
-      v.ts_created::DATE >= '2024-11-01'
+      DATE(v.ts_created) >= '2024-11-01'
     GROUP BY 1, 2
   ),
   old AS (
@@ -91,7 +91,7 @@ WITH schedule AS (
         ON bsc.id_booking = b.id
     WHERE
       b.type = 'Visita'
-      AND v.ts_created::DATE < '2024-11-01'
+      AND DATE(v.ts_created) < '2024-11-01'
     GROUP BY 1,2
   )
   SELECT
@@ -191,43 +191,74 @@ agent_schedule AS (
   GROUP BY 1
 ),
 schedule_enriched AS (
+  WITH schedule_enriched_ranked AS (
+    SELECT
+      schedule.id_visit,
+      schedule.id_schedule,
+      schedule.id_user_creator,
+      schedule.user_role_creator,
+      schedule.first_confirmed_channel,
+      schedule.first_confirmed_user_role,
+      schedule.channel_creation,
+      schedule.application_source_creation,
+      schedule.ts_event_tenant,
+      schedule.ts_schedule_created,
+      schedule.ts_next_schedule_created,
+      schedule.ts_schedule_requested,
+      schedule.ts_schedule_rescheduled,
+      schedule.ts_schedule_confirmed,
+      schedule.schedule_origin,
+      schedule.id_succeed_schedule,
+      schedule.last_confirm_answer_supply,
+      schedule.last_confirm_answer_demand,
+      schedule.last_confirm_answer_agent,
+      schedule.last_confirm_answer_tenant_living,
+      schedule.channel_confirmed_supply,
+      schedule.channel_confirmed_demand,
+      schedule.channel_confirmed_agent,
+      schedule.channel_confirmed_tenant_living,
+      CASE
+        WHEN schedule.source_schedule = 'NEW' THEN va.ts_visit
+        WHEN schedule.source_schedule = 'OLD' THEN MAKE_TIMESTAMP(EXTRACT(YEAR FROM schedule.dt_schedule_visit), EXTRACT(MONTH FROM schedule.dt_schedule_visit), EXTRACT(DAY FROM schedule.dt_schedule_visit), (schedule.slot_schedule/4) + 11, (schedule.slot_schedule%4)*15, 0)
+      END AS ts_schedule_visit,
+      ROW_NUMBER() OVER(PARTITION BY schedule.id_schedule ORDER BY va.ts_created) AS rn
+    FROM
+      schedule
+    LEFT JOIN
+      visit_aud AS va
+        ON va.id_visit = schedule.id_visit
+        AND va.ts_created > schedule.ts_schedule_created
+  )
   SELECT
-    schedule.id_visit,
-    schedule.id_schedule,
-    schedule.id_user_creator,
-    schedule.user_role_creator,
-    schedule.first_confirmed_channel,
-    schedule.first_confirmed_user_role,
-    schedule.channel_creation,
-    schedule.application_source_creation,
-    schedule.ts_event_tenant,
-    schedule.ts_schedule_created,
-    schedule.ts_next_schedule_created,
-    schedule.ts_schedule_requested,
-    schedule.ts_schedule_rescheduled,
-    schedule.ts_schedule_confirmed,
-    schedule.schedule_origin,
-    schedule.id_succeed_schedule,
-    schedule.last_confirm_answer_supply,
-    schedule.last_confirm_answer_demand,
-    schedule.last_confirm_answer_agent,
-    schedule.last_confirm_answer_tenant_living,
-    schedule.channel_confirmed_supply,
-    schedule.channel_confirmed_demand,
-    schedule.channel_confirmed_agent,
-    schedule.channel_confirmed_tenant_living,
-    CASE
-      WHEN schedule.source_schedule = 'NEW' THEN va.ts_visit
-      WHEN schedule.source_schedule = 'OLD' THEN MAKE_TIMESTAMP(EXTRACT(YEAR FROM schedule.dt_schedule_visit), EXTRACT(MONTH FROM schedule.dt_schedule_visit), EXTRACT(DAY FROM schedule.dt_schedule_visit), (schedule.slot_schedule/4) + 11, (schedule.slot_schedule%4)*15, 0)
-    END AS ts_schedule_visit
+    id_visit,
+    id_schedule,
+    id_user_creator,
+    user_role_creator,
+    first_confirmed_channel,
+    first_confirmed_user_role,
+    channel_creation,
+    application_source_creation,
+    ts_event_tenant,
+    ts_schedule_created,
+    ts_next_schedule_created,
+    ts_schedule_requested,
+    ts_schedule_rescheduled,
+    ts_schedule_confirmed,
+    schedule_origin,
+    id_succeed_schedule,
+    last_confirm_answer_supply,
+    last_confirm_answer_demand,
+    last_confirm_answer_agent,
+    last_confirm_answer_tenant_living,
+    channel_confirmed_supply,
+    channel_confirmed_demand,
+    channel_confirmed_agent,
+    channel_confirmed_tenant_living,
+    ts_schedule_visit
   FROM
-    schedule
-  LEFT JOIN
-    visit_aud AS va
-      ON va.id_visit = schedule.id_visit
-      AND va.ts_created > schedule.ts_schedule_created
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY schedule.id_schedule ORDER BY va.ts_created) = 1
+    schedule_enriched_ranked
+  WHERE
+    rn = 1
 ),
 visit_model AS (
   SELECT
@@ -326,7 +357,6 @@ SELECT DISTINCT
   IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.ts_post_visit_agent, NULL) AS ts_schedule_unsuccessful,
   vcu.ts_created AS ts_schedule_canceled,
   s.ts_schedule_visit,
-  v_cin.ts_checkin AS ts_visit_checkin,
   NOW() AS ts_load
 FROM
   schedule_enriched AS s
@@ -345,9 +375,6 @@ LEFT JOIN
 LEFT JOIN
   agent_schedule AS agent
     ON agent.id_schedule = s.id_schedule
-LEFT JOIN
-  datalake_ebdb_clean.visit_checkin AS v_cin
-    ON v_cin.id_visit = s.id_visit
 LEFT JOIN
   datalake_visit.post_visit_agent_unified AS pva
     ON s.id_schedule = pva.id_schedule

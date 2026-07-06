@@ -19,7 +19,6 @@ SELECT
   durationinslots AS slots_duration,
   businesscontext AS business_context,
   intention AS buyer_intention,
-  checkinstatus AS checkin_status,
   visitordatetime AS visitor_id_date_slot,
   status,
   preferecontato AS contact_preference,

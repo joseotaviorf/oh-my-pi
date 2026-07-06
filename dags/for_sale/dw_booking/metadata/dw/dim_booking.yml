@@ -440,40 +440,6 @@ columns:
         'The listing address was incorrect.'
       WrongPassword: >
         'The password for the electronic lock entered was incorrect.'
-  checkin_status:
-    lineage:
-      - datalake_booking.booking.checkin_status
-    description: >
-      Show status of whatsapp confirmation of visit. Only visits booked 2 days or more in advance need a whatsapp confirmation.
-  checkin_code:
-    lineage:
-      - datalake_booking.booking.checkin_code
-    description: Checkin code sent to buyer
-  visit_checkin_status:
-    lineage:
-      - datalake_booking.booking.visit_checkin_status
-    description: Buyer checkin status
-  checkin_fail_reason:
-    lineage:
-      - datalake_booking.booking.checkin_fail_reason
-    description: Checkin fail reason
-  checkin_fail_commentary:
-    lineage:
-      - datalake_booking.booking.checkin_fail_commentary
-    description: Checkin fail commentary made by the agent in the app.
-    categories:
-      CANCELED: >
-        ''
-      CONFIRMATION_NOT_REQUIRED: >
-        ''
-      CONFIRMED: >
-        ''
-      PENDING_PROCESS: >
-        ''
-      PENDING_SEND_REQUEST: >
-        ''
-      WAITING_CONFIRMATION: >
-        ''
   user_sale_booking_creator:
     lineage:
       - datalake_booking.booking.user_sale_booking_creator
@@ -566,7 +532,7 @@ columns:
     lineage:
       - datalake_booking.booking.final_attribution_origin
     description: >
-      Final attribution origin of the booking.
+      Marketing channel surface credited for the booking visit attribution, such as App, Web, CX, or Secretaria.
     categories:
       App: >
         ''

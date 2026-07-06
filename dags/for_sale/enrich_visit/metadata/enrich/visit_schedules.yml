@@ -287,9 +287,5 @@ columns:
     description: Timestamp when the visit was scheduled for each id_schedule (UTC).
       The slot starts with 0 at 11:00 AM (UTC) and each unit is 15 minutes.
       Data since 2015.
-  ts_visit_checkin:
-    lineage:
-      - datalake_ebdb_clean.visit_checkin.ts_checkin
-    description: Visit checkin timestamp. Data since 2023.
   ts_load:
     description: Timestamp of the ingestion.

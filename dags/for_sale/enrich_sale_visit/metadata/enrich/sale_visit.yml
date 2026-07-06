@@ -7,7 +7,7 @@ columns:
   id_booking:
     lineage:
     - datalake_booking.booking.id
-    description: ID of the booking.
+    description: Primary key of the For Sale booking schedule in enrich booking, with one row per sale visit booking.
   id_sale_flow:
     lineage:
     - datalake_booking.booking.id_sale_flow
@@ -15,7 +15,7 @@ columns:
   id_house:
     lineage:
     - datalake_booking.booking.id_house
-    description: ID of the house.
+    description: Identifier of the house associated with the sale visit booking.
   id_region:
     lineage:
     - datalake_ebdb_clean.house.id_region
@@ -111,11 +111,11 @@ columns:
   id_visit:
     lineage:
     - datalake_booking.booking.id_visit
-    description: ID of the visit.
+    description: Identifier visit entity linked to the sale booking in EBDB.
   visit_code:
     lineage:
     - datalake_booking.booking.code
-    description: Code of the visit.
+    description: Human-readable visit code from booking used to match buyer reviews and marketing attribution events.
   id_buyer_booking_review:
     lineage:
     - datalake_booking.booking.id
@@ -140,11 +140,11 @@ columns:
   days_visit_cancelled_to_visit:
     lineage:
     - datalake_booking.booking.days_visit_cancelled_to_visit
-    description: Days between the visit cancelled and the visit.
+    description: Number of days between the booking cancellation timestamp and the scheduled visit date in local timezone.
   days_visit_booked_to_visit:
     lineage:
     - datalake_booking.booking.days_visit_booked_to_visit
-    description: Days between the visit booked and the visit.
+    description: Number of days between booking creation and the scheduled visit date in local timezone.
   days_visit_booked_to_visit_cancelled:
     lineage:
     - datalake_booking.booking.days_visit_booked_to_visit_cancelled
@@ -173,10 +173,6 @@ columns:
     lineage:
     - datalake_booking.booking.ts_visit_fup
     description: Timestamp of the visit follow up.
-  ts_visit_checkin:
-    lineage:
-    - datalake_booking.booking.ts_checkin
-    description: Visit checkin timestamp
   ts_buyer_review_rating:
     lineage:
     - datalake_insider_clean.review.dt_creation

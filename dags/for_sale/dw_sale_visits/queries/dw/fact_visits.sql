@@ -1,13 +1,23 @@
 WITH offer_after_booking AS (
+    WITH offer_after_booking_ranked AS (
+        SELECT
+            id_booking,
+            id_offer,
+            hours_booking_to_offer,
+            hours_visit_to_offer,
+            ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY ts_offer_submitted) AS rn
+        FROM
+            datalake_sale_offer.sale_offer
+    )
     SELECT
         id_booking,
         id_offer,
         hours_booking_to_offer,
         hours_visit_to_offer
     FROM
-        datalake_sale_offer.sale_offer
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY ts_offer_submitted) = 1
+        offer_after_booking_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     COALESCE(sv.id_booking, -1) AS sk_booking,
@@ -42,7 +52,6 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_completed, 'yyyyMMdd')), -1) AS sk_visit_completed_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_follow_up, 'yyyyMMdd')), -1) AS sk_visit_follow_up_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_buyer_review_rating, 'yyyyMMdd')), -1) AS sk_buyer_review_rating_date,
-    COALESCE(BIGINT(DATE_FORMAT(ts_visit_checkin, 'yyyyMMdd')), -1) AS sk_visit_checkin_date,
     hub_agent_region,
     partner_3p_demand,
     partner_3p_supply,
@@ -64,7 +73,6 @@ SELECT
     ts_visit_canceled,
     ts_visit_completed,
     ts_visit_follow_up,
-    ts_visit_checkin,
     ts_buyer_review_rating,
     NOW() AS ts_load
 FROM

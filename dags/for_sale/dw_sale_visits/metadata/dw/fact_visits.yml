@@ -143,10 +143,6 @@ columns:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating
     description: Date key to be joined with dim_date. Key to identify date of buyer
       booking review.
-  sk_visit_checkin_date:
-    lineage:
-    - datalake_sale_visit.sale_visit.ts_visit_checkin
-    description: Date key to be joined with dim_date. Key to identify the checkin date.
   hub_agent_region:
     lineage:
     - datalake_sale_visit.sale_visit.hub_agent_region
@@ -232,10 +228,6 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit..ts_visit_follow_up
     description: Timestamp of the visit follow up.
-  ts_visit_checkin:
-    lineage:
-    - datalake_sale_visit.sale_visit.ts_visit_checkin
-    description: Timestamp when the buyer or agent checked in at the property for the scheduled For Sale visit, when check-in was recorded.
   ts_buyer_review_rating:
     lineage:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating

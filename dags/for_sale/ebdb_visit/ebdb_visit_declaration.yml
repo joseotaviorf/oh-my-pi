@@ -52,10 +52,6 @@ workflow:
     Visita_AUD:
       clean_table_name: visit_aud
       clean_primary_keys: [id_visit, rev]
-    VisitCheckin:
-      clean_table_name: visit_checkin
-    VisitCheckin_AUD:
-      clean_table_name: visit_checkin_aud
     VisitFitting:
       clean_table_name: visit_fitting
     Visitor:
