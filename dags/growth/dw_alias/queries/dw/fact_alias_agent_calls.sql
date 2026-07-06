@@ -69,9 +69,9 @@ obs_base AS (
         TRY_CAST(io.cost_details.input AS DOUBLE) AS cost_input_usd,
         TRY_CAST(io.cost_details.output AS DOUBLE) AS cost_output_usd,
         TRY_CAST(io.cost_details.total AS DOUBLE) AS cost_total_usd,
-        NULL AS input_tokens,
-        NULL AS output_tokens,
-        LOWER(COALESCE(io.output, '')) LIKE '%error%' AS has_error,
+        CAST(NULL AS BIGINT) AS input_tokens,
+        CAST(NULL AS BIGINT) AS output_tokens,
+        LOWER(COALESCE(io.output, '')) LIKE '%error%' AS had_error,
         CASE
             WHEN LOWER(COALESCE(io.output, '')) LIKE '%error%' THEN io.output
         END AS error_message,
