@@ -59,13 +59,15 @@ columns:
     lineage:
     - datalake_copilot_service_clean.message.channel
   channel:
-    description: 'Communication channel for the session'
+    description: 'Communication channel for the session. Derived from the linked Sauron/SSS session source; falls back to the Copilot Service message channel when no Sauron/SSS session record exists (e.g. SSS-backed sessions with no matching support_session row)'
     categories:
       whatsapp: 'WhatsApp'
       in app: 'In-app chat'
       unknown: 'Unknown channel'
     lineage:
     - datalake_sauron_clean.session.source
+    - datalake_support_session_service_clean.support_session.source
+    - datalake_copilot_service_clean.message.channel
   whatsapp_number:
     description: 'WhatsApp number type (main or other)'
     categories:

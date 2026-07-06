@@ -49,6 +49,7 @@ chatbot_sessions_ranked AS (
       WHEN m.channel LIKE '%ISAIAS%' THEN 'isaias'
       ELSE 'unknown'
     END AS bot,
+    m.channel AS msg_channel,
     COALESCE(sss.source, s.source) AS source,
     COALESCE(sss.source_env, s.source_environment) AS source_environment,
     COALESCE(sss.status, s.status) AS status,
@@ -84,6 +85,7 @@ chatbot_sessions AS (
     id_sauron_session,
     id_user,
     bot,
+    msg_channel,
     source,
     source_environment,
     status,
@@ -167,6 +169,8 @@ SELECT
   CASE
     WHEN s.source = 'whatsapp' THEN 'whatsapp'
     WHEN s.source = 'internal_chat' THEN 'in app'
+    WHEN s.msg_channel LIKE 'WHATSAPP_%' THEN 'whatsapp'
+    WHEN s.msg_channel = 'IN_APP_SUPPORT_CHAT' THEN 'in app'
     ELSE 'unknown'
   END AS channel,
   CASE
