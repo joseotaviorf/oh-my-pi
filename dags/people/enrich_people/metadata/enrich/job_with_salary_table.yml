@@ -61,9 +61,9 @@ columns:
       Possible values: Brazil, Portugal, Mexico, Argentina, Peru, Ecuador, Panama, Uruguay, United States.
       Detection logic:
       - Special cases: "Deel" = United States, "Classifieds Geral" = Uruguay
-      - Country codes detected when at the end of the table name: "PT" = Portugal, "MX" = Mexico, "ARG" = Argentina, "PER" = Peru, "ECU" = Ecuador, "PAN" = Panama
-      - Examples: "Corp PT" → Portugal, "Classifieds - Sales L ARG" → Argentina
-      - Tables without country suffix or with country code in the middle (e.g., "Corp ARG - Dridco S.A.U") default to Brazil
+      - Country codes detected at the end of the table name or before a separator (space/hyphen), e.g. suffix " ARG", middle token "Corp ARG - Dridco S.A.U"
+      - Examples: "Corp PT" → Portugal, "Classifieds - Sales L ARG" → Argentina, "Tech ARG - Dridco S.A.U" → Argentina
+      - Tables without a recognizable country token default to Brazil
     lineage:
       - datalake_pin_core_clean.grade_ladder_translation.name
   salary_table_group:
