@@ -1,0 +1,134 @@
+---
+table_name: dw_employee_details.dim_job
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
+    severity_level: Warning
+
+column_level_validations:
+  sk_job_version:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Warning
+  job_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  job_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  active_current_jobs_have_job_family:
+    custom:
+      # Ensure job_family is not null for current active jobs
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_employee_details.dim_job
+         WHERE is_current = TRUE
+           AND is_active = TRUE
+           AND job_family IS NULL
+        ) = 0
+      severity_level: Warning
+  employment_type_allowed_values_and_job_family_mapping:
+    custom:
+      # NULL only when job_family is NULL; allowed set and job_family mapping for current active jobs
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_employee_details.dim_job
+         WHERE (
+             employment_type IS NULL
+             AND job_family IS NOT NULL
+           )
+           OR (
+             employment_type IS NOT NULL
+             AND employment_type NOT IN ('clt', 'intern', 'young apprentice')
+           )
+           OR (
+             is_current = TRUE
+             AND is_active = TRUE
+             AND employment_type IS NOT NULL
+             AND employment_type <> CASE
+               WHEN job_family = 'Jovem Aprendiz' THEN 'young apprentice'
+               WHEN job_family = 'Estagiario' THEN 'intern'
+               WHEN job_family IS NOT NULL THEN 'clt'
+             END
+           )
+        ) = 0
+      severity_level: Warning
+  active_current_jobs_have_band:
+    custom:
+      # Ensure band is not null for current active jobs
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_employee_details.dim_job
+         WHERE is_current = TRUE
+           AND is_active = TRUE
+           AND band IS NULL
+        ) = 0
+      severity_level: Warning
+  is_leadership_job:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  is_active:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_valid_from:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  job_history_versions_do_not_overlap:
+    custom:
+      # Ensure no overlapping SCD Type 2 versions for the same job (grouped by the real
+      # natural key id_job, not by splitting the MD5 sk_job_version hash).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             id_job,
+             dt_valid_from,
+             dt_valid_to,
+             LAG(dt_valid_to) OVER (PARTITION BY id_job ORDER BY dt_valid_from) AS prev_dt_valid_to
+           FROM dw_employee_details.dim_job
+         )
+         WHERE prev_dt_valid_to IS NOT NULL
+           AND dt_valid_from < prev_dt_valid_to
+        ) = 0
+      severity_level: Error
+  # DW dimension non-SK: has_null_count (not is_complete). Up to one NULL for the default/unknown row.
+  dt_valid_to:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  is_current:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  matching_sk_job_version_fact_and_dimension:
+    custom:
+      # Referential integrity: every sk_job_version referenced by fact_assignment_snapshots must
+      # resolve in dim_job (proves the time-travel join actually works). Excludes the '-1' unknown
+      # FK sentinel and MD5('') (assignments with no id_job / dt_valid_from in the source).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT DISTINCT f.sk_job_version
+           FROM dw_employee_details.fact_assignment_snapshots AS f
+           WHERE f.sk_job_version NOT IN ('-1', MD5(''))
+         ) AS f
+         WHERE NOT EXISTS (
+           SELECT 1
+           FROM dw_employee_details.dim_job AS d
+           WHERE d.sk_job_version = f.sk_job_version
+         )
+        ) = 0
+      severity_level: Warning

@@ -1,0 +1,131 @@
+database_name: dw_employee_details
+table_name: dim_job
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Job dimension with title, family, band, and work-arrangement attributes, without any compensation data.
+  Each row represents a unique version of a job; a new version is created whenever any attribute changes.
+  Consecutive periods with identical attributes are automatically consolidated into a single version.
+
+  The unique key is `sk_job_version` (MD5 hash of job ID + valid from date). It matches the same key on
+  `fact_assignment_snapshots.sk_job_version`, enabling historical ("time travel") job analysis for HR consumers
+  who have access to `dw_employee_details` but not `dw_compensation`.
+  `id_job` is the source system job ID, not unique across versions.
+
+  Compensation attributes (salary table, salary range, PLR/RVV/SOP targets) are intentionally excluded from this
+  table; consult `dw_compensation.dim_job` (access-restricted) when that information is needed.
+  Open-ended job versions use `dt_valid_to` = `9999-12-31`.
+columns:
+  sk_job_version:
+    description: Unique key for each job version. MD5 hash generated from job ID and valid from date. Matches fact_assignment_snapshots.sk_job_version for time-travel joins.
+    lineage:
+      - datalake_pin_core_clean.job.id_job
+      - datalake_pin_core_clean.job.dt_effective_started
+  id_job:
+    description: Job ID from the source system. Natural key for the job entity, not unique across versions.
+    lineage:
+      - datalake_pin_core_clean.job.id_job
+  job_code:
+    description: Business code for the job (e.g., "00033", "00134").
+    lineage:
+      - datalake_pin_core_clean.job.job_code
+  job_name:
+    description: Job title in English (US).
+    lineage:
+      - datalake_pin_core_clean.job_translation.name
+  job_family:
+    description: Job family name grouping similar jobs (e.g., Analistas, Gerentes).
+    lineage:
+      - datalake_pin_core_clean.job_family_translation.job_family_name
+  employment_type:
+    description: |
+      Employment relationship type derived from job_family for workforce analytics.
+      Maps Jovem Aprendiz to young apprentice, Estagiario to intern, and all other non-null families to clt.
+      NULL when job_family is NULL (unknown dimension row).
+    lineage:
+      - datalake_pin_core_clean.job_family_translation.job_family_name
+    categories:
+      clt: Standard CLT employment (default for non-apprentice, non-intern job families).
+      intern: Internship (job_family = Estagiario).
+      young apprentice: Young apprentice program (job_family = Jovem Aprendiz).
+  band:
+    description: |
+      Salary/seniority band for the job (e.g., "5", "6", "7", "Assist", "JA").
+      Represents the hierarchical level or seniority of the position.
+      Higher numeric bands usually indicate greater seniority.
+    lineage:
+      - datalake_pin_core_clean.grade_translation.name
+      - datalake_pin_core_clean.valid_grades.id_grade
+  job_business_unit_group:
+    description: Business unit from set identifiers.
+    lineage:
+      - datalake_pin_core_clean.set_identifiers.set_name
+  brazilian_occupation_code:
+    description: CBO - Classificação Brasileira de Ocupações.
+    lineage:
+      - datalake_pin_core_clean.job_legislative.brazilian_occupation_code
+  working_hours_regime:
+    description: Work arrangement or legal working hours regime.
+    lineage:
+      - datalake_pin_core_clean.job.work_arrangement
+  workload:
+    description: Weekly working hours.
+    lineage:
+      - datalake_pin_core_clean.job.weekly_hours
+  has_clock_in:
+    description: Whether the job requires clock-in/clock-out.
+    lineage:
+      - datalake_pin_core_clean.job.is_time_clocking_required
+  is_leadership_job:
+    description: Flag indicating whether the job is a leadership role, derived from contribution level.
+    lineage:
+      - datalake_pin_core_clean.job.contribution_level
+  is_active:
+    description: Whether the job is currently active in the system.
+    lineage:
+      - datalake_pin_core_clean.job.is_active
+  is_current:
+    description: Whether this is the active version as of the load date. Filter by is_current = TRUE for current data.
+    lineage:
+      - datalake_pin_core_clean.job.dt_effective_started
+      - datalake_pin_core_clean.valid_grades.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
+      - datalake_pin_core_clean.rates.dt_effective_started
+      - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_started
+      - datalake_pin_core_clean.job.dt_effective_ended
+      - datalake_pin_core_clean.valid_grades.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
+      - datalake_pin_core_clean.rates.dt_effective_ended
+      - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
+  dt_valid_from:
+    description: Date when this job version became effective. Use for historical analysis and tracking attribute changes over time.
+    lineage:
+      - datalake_pin_core_clean.job.dt_effective_started
+      - datalake_pin_core_clean.valid_grades.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
+      - datalake_pin_core_clean.rates.dt_effective_started
+      - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_started
+  dt_valid_to:
+    description: |
+      End of the validity interval for this job version (SCD Type 2; no NULLs in DW).
+      `9999-12-31` means no scheduled end date (normalized from enrich NULL or Oracle `4712-12-31`).
+    lineage:
+      - datalake_pin_core_clean.job.dt_effective_ended
+      - datalake_pin_core_clean.valid_grades.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
+      - datalake_pin_core_clean.rates.dt_effective_ended
+      - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
+  ts_load:
+    description: Timestamp recording when data was loaded into the table.

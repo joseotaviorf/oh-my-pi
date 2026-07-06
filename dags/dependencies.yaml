@@ -713,6 +713,7 @@ bietlejuice.dw_employee_details:
   - bietlejuice.enrich_people:load-enrich-assignment-snapshots:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-event-definition:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-management-hierarchy:first-run-of-day
   - bietlejuice.pin_core:load-clean-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day

@@ -12,7 +12,7 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.sk_cost_center_version
   sk_job_version:
-    description: Job identifier. Use to get job title and details from dim_job.
+    description: Job identifier. Use to get job title, family, and band from dw_employee_details.dim_job (no compensation data; see dw_compensation.dim_job for that, access-restricted).
     lineage:
       - datalake_people.assignment_snapshots.sk_job_version
   sk_compensation_version:
