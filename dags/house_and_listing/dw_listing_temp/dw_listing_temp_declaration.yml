@@ -1,9 +1,0 @@
-dag:
-  name: dw_listing_temp
-  schedule_start_date: 2021,08,02
-  owner: Data House and Listing
-workflow:
-  type: query_delta
-  layer: dw
-  custom_schema: public
-  default_partitions: [country_code]

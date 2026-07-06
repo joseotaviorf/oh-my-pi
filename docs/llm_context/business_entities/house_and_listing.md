@@ -245,7 +245,6 @@ Sale has **no business listing versioning** — only `order_version` **0** (edit
 - Don't union rent and sale listing dims without normalizing keys and `business_context`.
 - Don't join `obt_supply` to listing tables without dedup.
 - Don't expect `sk_broker` on `dim_house_listing`.
-- Don't use `dw_public.dim_house_listing` for new For Rent work.
 
 ## Golden Queries
 

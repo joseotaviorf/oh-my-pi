@@ -2,18 +2,18 @@
 
 Replace placeholders before execution:
 
-| Placeholder | Example |
-| --- | --- |
-| `{catalog}` | `quintoandar_prod` |
-| `{schema}` | `dw_public` |
-| `{table}` | `dim_house_listing` |
-| `{replacement_schema}` | `dw_rent` |
-| `{replacement_table}` | `dim_house_listing` |
-| `{start_90d}` | `2026-03-18` |
-| `{end_90d}` | `2026-06-16` |
-| `{start_30d}` | `2026-05-17` |
-| `{table_full_uc}` | `quintoandar_prod.dw_public.dim_house_listing` |
-| `{id_lake_table}` | `dw_public.dim_house_listing` |
+| Placeholder | Example                                      |
+| --- |----------------------------------------------|
+| `{catalog}` | `quintoandar_prod`                           |
+| `{schema}` | `dw_public`                                  |
+| `{table}` | `dim_house_listing`                          |
+| `{replacement_schema}` | `dw_rent`                                    |
+| `{replacement_table}` | `dim_house_listing`                          |
+| `{start_90d}` | `2026-03-18`                                 |
+| `{end_90d}` | `2026-06-16`                                 |
+| `{start_30d}` | `2026-05-17`                                 |
+| `{table_full_uc}` | `quintoandar_prod.dw_rent.dim_house_listing` |
+| `{id_lake_table}` | `dw_rent.dim_house_listing`                |
 
 Engine: **Databricks Spark SQL** (Commands API via `scripts/run_governance_batch.py`). Do not run these via Trino MCP.
 
@@ -130,7 +130,7 @@ Save as `replacement_equivalence_diff.csv`.
 
 #### Row-level parity (optional — passthrough / identical layout)
 
-When both tables share the same business columns (typical `dw_listing_temp` mirrors):
+When both tables share the same business columns:
 
 ```sql
 SELECT COUNT(*) AS rows_only_in_source FROM (
