@@ -1,9 +1,9 @@
 cluster:
-  type: emr_7_12_min_general_2_workers_cluster
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 50
     spark_conf:
-      spark.driver.memory: 8g
-      spark.driver.memoryOverhead: 2g
-      spark.executor.memory: 8g
+      spark.driver.memory: 16g
+      spark.driver.memoryOverhead: 4g
+      spark.executor.memory: 16g
