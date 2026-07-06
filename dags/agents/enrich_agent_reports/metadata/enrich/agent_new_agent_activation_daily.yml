@@ -3,25 +3,28 @@ database_name: datalake_agent_reports
 table_name: agent_new_agent_activation_daily
 description: |
   Daily activation fact for newly accredited agents. One row per (id_agent, dt_reference)
-  from agent creation through the earlier of the load window end or
-  ``max_tracking_days_after_creation`` (default 90) after creation; agents drop out of
+  from accreditation through the earlier of the load window end or
+  ``max_tracking_days_after_creation`` (default 90) after accreditation; agents drop out of
   the pipeline once that cap is passed. ``is_eligible`` tags whether the day is still
-  inside the activation window. Cohort: agents created on/after the ``cohort_start_date``
-  job parameter (2025-01-01), excluding Vistoria / VistoriaQuarteirizada / SessaoFotos
-  personas, while their tracking window overlaps the load interval.
-  Activation: at least one CIQ valid first listing, TQC self-referral, or VCBA (completed visit
-  booked by the agent, id_user_creation = id_user_agent) within ``activation_window_weeks``
-  (4) after creation. ``is_activated`` is as-of-day; ``activation_reason`` / ``dt_activated``
-  come from the earliest qualifying event (tie-break CIQ > TQC > VCBA). Capacity split via
-  ``is_passive_lead_receiver`` reconstructed daily from the agent_data audit history.
-  Partitioned by year/month/day; merged on (id_agent, dt_reference).
+  inside the activation window. Cohort: agents whose earliest agent-level
+  ``AGENT_ACTIVATED`` event (``agent_event_log``, ``id_capability IS NULL``) falls on/after
+  the ``cohort_start_date`` job parameter (2025-01-01), excluding Vistoria /
+  VistoriaQuarteirizada / SessaoFotos personas, while their tracking window overlaps the
+  load interval. Activation: at least one CIQ valid first listing, TQC self-referral, or VCBA
+  (completed visit booked by the agent, id_user_creation = id_user_agent) within
+  ``activation_window_weeks`` (4) after accreditation. ``is_activated`` is as-of-day;
+  ``activation_reason`` / ``dt_activated`` come from the earliest qualifying event
+  (tie-break CIQ > TQC > VCBA). Capacity split via ``is_passive_lead_receiver`` reconstructed
+  daily from the agent_data audit history. Partitioned by year/month/day; merged on
+  (id_agent, dt_reference).
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_data.id
-    description: Unique identifier of the Demand agent (agent_data). Non-null.
+      - datalake_ebdb_clean.agent_event_log.id_agent
+    description: Unique identifier of the Demand agent. Non-null.
   id_user:
     lineage:
       - datalake_ebdb_user.user.id
@@ -75,12 +78,14 @@ columns:
       Agents that never activated within the window stay false. Non-null.
   dt_reference:
     lineage:
-      - datalake_ebdb_clean.agent_data.ts_created
-    description: Reference calendar date of the daily snapshot row.
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+    description: Reference calendar date of the daily snapshot row (spine from accreditation date).
   dt_activation_deadline:
     lineage:
-      - datalake_ebdb_clean.agent_data.ts_created
-    description: Last day of the activation window (creation date + activation_window_weeks * 7 days). Non-null.
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+    description: >
+      Last day of the activation window (accreditation date + activation_window_weeks * 7 days).
+      Non-null.
   dt_activated:
     description: >
       Date of the first qualifying activation event within the window (CIQ, TQC or VCBA).
@@ -91,8 +96,10 @@ columns:
       - datalake_visit.visit_schedules.ts_schedule_visit
   ts_agent_created:
     lineage:
-      - datalake_ebdb_clean.agent_data.ts_created
-    description: When the Demand agent record was created (cohort anchor). Non-null.
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+    description: >
+      Agent accreditation timestamp: earliest agent-level AGENT_ACTIVATED event
+      (id_capability IS NULL) in agent_event_log. Not agent_data row creation time. Non-null.
   year:
     description: Partition year derived from dt_reference.
   month:

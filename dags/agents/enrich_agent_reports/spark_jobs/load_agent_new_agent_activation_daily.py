@@ -13,8 +13,10 @@
 # min(load_end_date, creation + max_tracking_days_after_creation). After that
 # cap the agent drops out of the cohort (no further rows merged).
 #
-# Cohort: newly accredited agents — ``agent_data.ts_created >= cohort_start_date``
-# (default 2025-01-01), excluding Vistoria / VistoriaQuarteirizada / SessaoFotos.
+# Cohort: newly accredited agents — accreditation timestamp (earliest
+# ``AGENT_ACTIVATED`` event in ``agent_event_log``, ``id_capability IS NULL``)
+# on/after ``cohort_start_date`` (default 2025-01-01), excluding
+# Vistoria / VistoriaQuarteirizada / SessaoFotos.
 # Source reads are bounded by the load interval (default 14 days) and ``load_end_date``;
 # activation still uses events from ``cohort_start_date`` through ``load_end_date``.
 #
@@ -104,8 +106,11 @@ TABLE_USER = "datalake_ebdb_user.user"
 TABLE_OFFER_SPECIALISTS = "datalake_sale_offer_flows.offer_specialists"
 TABLE_CIQ_FIRST_LISTING = "datalake_tiers.ciq_first_listing"
 TABLE_VISIT_SCHEDULES = "datalake_visit.visit_schedules"
+TABLE_AGENT_EVENT_LOG = "datalake_ebdb_clean.agent_event_log"
 
 EXCLUDED_AGENT_TYPES = ["Vistoria", "VistoriaQuarteirizada", "SessaoFotos"]
+# Accreditation is the earliest agent-level AGENT_ACTIVATED event (not row creation).
+AGENT_ACCREDITATION_EVENT_TYPE = "AGENT_ACTIVATED"
 
 REASON_CIQ = "CIQ"
 REASON_TQC = "TQC"
@@ -200,39 +205,49 @@ def _cohort_df(
 ) -> DataFrame:
     """One row per new agent: id_agent, id_user, ts_agent_created, current passive flag.
 
+    ``ts_agent_created`` is the agent's accreditation timestamp — the earliest
+    agent-level ``AGENT_ACTIVATED`` event (``id_capability IS NULL``) in
+    ``agent_event_log`` — not ``agent_data.ts_created`` (the row-creation time).
     Excludes vistoria/foto personas and agents outside the cohort start or load window.
-    Agents whose tracking window (creation … creation + max_tracking_days) no longer
-    overlaps [load_start, load_end] are excluded.
+    Agents whose tracking window (accreditation … accreditation + max_tracking_days) no
+    longer overlaps [load_start, load_end] are excluded.
     ``id_user`` resolved via the user table (min id per agent, ignoring -1).
     """
     cohort_floor = max(
         datetime.strptime(cohort_start_date, "%Y-%m-%d").date(),
         load_start - timedelta(days=max_tracking_days),
     ).isoformat()
-    agents = (
-        spark.table(TABLE_AGENT_DATA)
-        .filter(col("ts_created").isNotNull())
-        .filter(~col("agent_type").isin(EXCLUDED_AGENT_TYPES))
-        .filter(to_date(col("ts_created")) >= lit(cohort_floor))
-        .filter(to_date(col("ts_created")) >= lit(cohort_start_date))
-        .filter(to_date(col("ts_created")) <= lit(load_end.isoformat()))
+    accreditation = (
+        spark.table(TABLE_AGENT_EVENT_LOG)
+        .filter(col("id_capability").isNull())
+        .filter(col("event_type") == lit(AGENT_ACCREDITATION_EVENT_TYPE))
+        .filter(col("ts_occurred").isNotNull())
+        .groupBy("id_agent")
+        .agg(spark_min("ts_occurred").alias("ts_agent_created"))
+        .filter(to_date(col("ts_agent_created")) >= lit(cohort_floor))
+        .filter(to_date(col("ts_agent_created")) >= lit(cohort_start_date))
+        .filter(to_date(col("ts_agent_created")) <= lit(load_end.isoformat()))
         .filter(
-            date_add(to_date(col("ts_created")), max_tracking_days)
+            date_add(to_date(col("ts_agent_created")), max_tracking_days)
             >= lit(load_start.isoformat())
         )
+    )
+    agents = (
+        spark.table(TABLE_AGENT_DATA)
+        .filter(~col("agent_type").isin(EXCLUDED_AGENT_TYPES))
         .select(
             col("id").alias("id_agent"),
-            col("ts_created").alias("ts_agent_created"),
             col("is_passive_lead_receiver").alias("_current_passive"),
         )
     )
+    cohort = accreditation.join(agents, on="id_agent", how="inner")
     users = (
         spark.table(TABLE_USER)
         .filter(col("id") != -1)
         .groupBy(col("id_agent").alias("usr_id_agent"))
         .agg(spark_min("id").alias("id_user"))
     )
-    return agents.join(users, col("id_agent") == col("usr_id_agent"), "left").drop(
+    return cohort.join(users, col("id_agent") == col("usr_id_agent"), "left").drop(
         "usr_id_agent"
     )
 
