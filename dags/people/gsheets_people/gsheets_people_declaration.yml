@@ -25,6 +25,9 @@ workflow:
     team_formation_product_tech:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    few_shot_phrases:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
   custom_schema: gsheets_people
   default_table_privileges:
     people-team:

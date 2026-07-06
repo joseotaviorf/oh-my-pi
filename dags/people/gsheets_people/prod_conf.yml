@@ -28,3 +28,9 @@ sheets_info:
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: team_formation_tech_active
+
+  few_shot_phrases:
+    clean_table_name: few_shot_phrases
+    sheet_context: people
+    sheet_id: 1nASkCdoLPDP88qjBOr2uR6MBdXvWNOqymhb4klyuCa8
+    sheet_name: phrases

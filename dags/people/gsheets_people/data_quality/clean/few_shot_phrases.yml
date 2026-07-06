@@ -1,0 +1,22 @@
+---
+table_name: datalake_gsheets_people_clean.few_shot_phrases
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+
+column_level_validations:
+  phrase:
+    is_complete:
+      severity_level: Error
+  pillar:
+    is_complete:
+      severity_level: Warning
+  sentiment:
+    is_complete:
+      severity_level: Warning
+  complexity:
+    is_complete:
+      severity_level: Warning

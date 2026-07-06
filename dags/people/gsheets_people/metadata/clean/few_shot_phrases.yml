@@ -1,0 +1,34 @@
+database_name: datalake_gsheets_people_clean
+table_name: few_shot_phrases
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Reference table of categorized phrases used as few-shot examples for AI-based text classification in the AI Teva
+  engagement tool, grouping statements by strategic pillar, reference point, sentiment, and complexity level.
+columns:
+  pillar:
+    description: Strategic pillar or category under which the phrase is classified, grouping related organizational topics
+      such as strategy, goals, or leadership.
+    lineage:
+    - datalake_gsheets_people_raw.few_shot_phrases.pillar
+  points_reference:
+    description: Specific sub-topic or reference point within the pillar that the phrase illustrates, used to focus few-shot
+      classification on particular themes.
+    lineage:
+    - datalake_gsheets_people_raw.few_shot_phrases.points_reference
+  sentiment:
+    description: Sentiment label associated with the phrase (e.g. Positive, Negative, Neutral), used to train AI classifiers
+      for employee engagement text analysis.
+    lineage:
+    - datalake_gsheets_people_raw.few_shot_phrases.sentiment
+  complexity:
+    description: Complexity tier of the phrase (e.g. Standard, Complex), indicating how nuanced the statement is for AI classification
+      model fine-tuning.
+    lineage:
+    - datalake_gsheets_people_raw.few_shot_phrases.complexity
+  phrase:
+    description: Example sentence or statement drawn from real employee feedback, used as a labeled few-shot prompt to guide
+      AI text classification in the AI Teva tool.
+    lineage:
+    - datalake_gsheets_people_raw.few_shot_phrases.phrase
+  ts_load:
+    description: Timestamp when this row was ingested from the Google Sheets source into the People lake.
