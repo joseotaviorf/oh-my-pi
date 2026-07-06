@@ -1,40 +1,21 @@
 #!/usr/bin/env python3
-"""
-Script to check if there are changes in core model related paths.
+"""Check whether there are changes in core-model related paths.
 
-This script:
-1. Uses git diff to identify changed files
-2. Filters for files matching core model paths (see CORE_MODEL_PATHS below;
-   must stay in sync with `&core_model_tests_path` in `.woodpecker/tests.yml`)
-3. Returns exit code 0 if no relevant changes, 1 if changes exist
+Exit code 1 = changes found (tests should run); exit code 0 = no changes (skip).
+Path classification is delegated to ``core_model_scope`` so it stays in sync with
+``check_core_model_coverage.py``.
 
-NOTE: After the multi-package restructure, `bietlejuice/base/core_models/` and
-`tests/core_model_dags/` no longer exist at the repo root. The canonical locations
-are under `packages/bietlejuice-runtime/`. Path patterns below must stay in sync with
-the `&core_model_tests_path` anchor on `core-model-tests-and-coverage` in `.woodpecker/tests.yml`.
+NOTE: After the multi-package restructure, ``bietlejuice/base/core_models/`` and
+``tests/core_model_dags/`` no longer exist at the repo root. The canonical
+locations are under ``packages/bietlejuice-runtime/``. The path patterns live in
+``core_model_scope`` and must stay in sync with the ``&core_model_tests_path``
+anchor on ``core-model-tests-and-coverage`` in ``.woodpecker/tests.yml``.
 """
 
 import argparse
 import sys
-from pathlib import Path
-from typing import List, Tuple
 
-# Import GitService for git-based change detection
-sys.path.append(str(Path(__file__).parent.parent.parent))
-from services.git_service import GitService
-
-from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
-
-# Path patterns to check for changes (matched via str.startswith against git-diff paths)
-CORE_MODEL_PATHS = [
-    "dags/core/",
-    "packages/bietlejuice-runtime/test/core_model_dags/",
-    "packages/bietlejuice-runtime/test/unit/base/core_models/",
-    "packages/bietlejuice-runtime/src/bietlejuice/base/core_models/",
-    "packages/bietlejuice-airflow/src/bietlejuice/base/core_models/",
-    "packages/bietlejuice-core/src/bietlejuice/base/core_models/",
-    "packages/bietlejuice-compiler/scripts/ci_cd/core_models/",
-]
+from core_model_scope import get_changed_core_model_files
 
 
 def parse_args():
@@ -56,107 +37,39 @@ def parse_args():
         action="store_true",
         required=False,
     )
-    args = parser.parse_args()
-    branch = args.branch
-    all_files = args.all_files
-    verbose = args.verbose
-    mode = None
-    if branch:
-        mode = "branch"
-    if all_files:
-        mode = "all_files"
-    return mode, (branch or all_files), verbose
-
-
-def matches_core_model_path(file_path: str) -> bool:
-    """
-    Check if a file path matches any of the core model path patterns.
-
-    Args:
-        file_path: The file path to check
-
-    Returns:
-        True if the path matches any core model pattern, False otherwise
-    """
-    if file_path.endswith("_cluster.yml"):
-        return False
-    for pattern in CORE_MODEL_PATHS:
-        if file_path.startswith(pattern):
-            return True
-    return False
-
-
-def get_changed_files(mode, input) -> List[Tuple[str, str]]:
-    """
-    Get list of changed files based on mode.
-
-    Returns:
-        List of tuples (file_path, status)
-    """
-    files = []
-    if mode == "all_files":
-        # Always return that changes exist
-        return [("all", "A")]
-    elif mode == "branch":
-        git_service = GitService()
-        from_branch = resolve_diff_from_ref(input)
-
-        # Get all changed files
-        changed_files = git_service.get_modified_files_from_diff(from_branch, "HEAD")
-
-        # Filter for files matching core model paths
-        for file_path, status in changed_files.items():
-            if status in GitService.UPSERT_STATUS_CODES:
-                if matches_core_model_path(file_path):
-                    files.append((file_path, status))
-
-    return files
-
-
-def check_core_model_changes(mode="all_files", input=None, verbose=False) -> bool:
-    """
-    Check if there are changes in core model related paths.
-
-    Returns:
-        True if changes exist, False otherwise
-    """
-    if mode == "all_files":
-        if verbose:
-            print("🔍 Checking all files mode - changes will be detected")
-        return True
-    elif mode == "branch":
-        if verbose:
-            print(f"🔍 Checking for core model changes in branch: {input}")
-
-    # Get changed files
-    changed_files = get_changed_files(mode, input)
-
-    if not changed_files:
-        if verbose:
-            print("✅ No core model related changes detected")
-        return False
-
-    if verbose:
-        print(f"📁 Found {len(changed_files)} changed file(s) in core model paths:")
-        for file_path, status in changed_files:
-            print(f"   - {file_path} ({status})")
-    else:
-        print(f"📁 Found {len(changed_files)} changed file(s) in core model paths")
-
-    return True
+    return parser.parse_args()
 
 
 def main():
     """Main entry point."""
-    mode, input, verbose = parse_args()
-    has_changes = check_core_model_changes(mode, input, verbose)
+    args = parse_args()
 
-    if has_changes:
+    if args.all_files:
+        if args.verbose:
+            print("🔍 Checking all files mode - changes will be detected")
         print("✅ Core model changes detected - tests should run")
-        sys.exit(1)  # Exit code 1 means changes found
-    else:
+        sys.exit(1)
+
+    if args.verbose:
+        print(f"🔍 Checking for core model changes in branch: {args.branch}")
+
+    changed = get_changed_core_model_files(args.branch)
+
+    if not changed:
+        if args.verbose:
+            print("✅ No core model related changes detected")
         print("ℹ️  No core model changes detected - skipping tests")
-        sys.exit(0)  # Exit code 0 means no changes
+        sys.exit(0)
+
+    if args.verbose:
+        print(f"📁 Found {len(changed)} changed file(s) in core model paths:")
+        for path, status in changed:
+            print(f"   - {path} ({status})")
+    else:
+        print(f"📁 Found {len(changed)} changed file(s) in core model paths")
+
+    print("✅ Core model changes detected - tests should run")
+    sys.exit(1)
 
 
 if __name__ == "__main__":

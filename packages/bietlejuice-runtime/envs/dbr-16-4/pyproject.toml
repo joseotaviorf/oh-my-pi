@@ -81,6 +81,10 @@ override-dependencies = [
 dev = [
     "pytest==8.3.5",
     "pytest-cov",
+    # diff-cover: gates the core-model CI step on coverage of CHANGED lines only
+    # (see scripts/ci_cd/core_models/check_core_model_coverage.py). Inert for
+    # every other consumer of this env.
+    "diff-cover",
     "pytest-testmon",
     "moto[s3]",
     # bietlejuice-core is needed at test time only — runtime's tests import a
