@@ -1,0 +1,60 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: listing_score_aud
+description: |
+  Hibernate Envers audit history for `listing_score` (raw: tb_listing_score_aud): history of demand scores per property revision.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Business id of the listing score row this audit entry refers to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.id
+  rev:
+    description: Envers revision at which this snapshot became active.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.rev
+  rev_end:
+    description: Envers revision at which this snapshot ended; null when current.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.revend
+  rev_type:
+    description: Envers change type code for this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.revtype
+  id_property:
+    description: Property foreign key at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.property_id
+  demand_score_sale:
+    description: Demand score for sale context at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.demand_score_sale
+  demand_score_rent:
+    description: Demand score for rent context at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.demand_score_rent
+  mod_id_property:
+    description: Envers modified flag for property_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.property_id_mod
+  mod_demand_score_sale:
+    description: Envers modified flag for demand_score_sale.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.demand_score_sale_mod
+  mod_demand_score_rent:
+    description: Envers modified flag for demand_score_rent.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.demand_score_rent_mod
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score_aud.day

@@ -1,0 +1,65 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: daily_visit_property
+description: |
+  Per-property daily visit metrics and embedded visit payload list used for scheduling and reporting of
+  visits in Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the daily visit aggregate row for a property and schedule date.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.id
+  id_property:
+    description: Foreign key to the property this daily visit summary belongs to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.property_id
+  dt_scheduled:
+    description: Calendar date for which visit counts and payloads are aggregated.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.scheduled_to
+  confirmed_count:
+    description: Count of visits confirmed for the scheduled date.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.confirmed_count
+  waiting_confirmation_count:
+    description: Count of visits awaiting confirmation for the scheduled date.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.waiting_confirmation_count
+  canceled_count:
+    description: Count of visits canceled for the scheduled date.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.canceled_count
+  concluded_count:
+    description: Count of visits concluded for the scheduled date.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.concluded_count
+  visits:
+    description: JSON array of visit structures with identifiers and status for the scheduled date.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.visits
+  version:
+    description: Optimistic locking version for concurrent updates to the aggregate row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.version
+  ts_created:
+    description: Timestamp when the daily visit row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.created_at
+  ts_updated:
+    description: Timestamp of the last update to the daily visit row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_daily_visit_property.day

@@ -1,0 +1,37 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: related_as
+description: |
+  Dictionary describing how an external related entity is interpreted in ownership rows (owner, agent,
+  company reference, etc.) within Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the related-as dictionary row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.id
+  related_as_type:
+    description: Enum code describing the relationship semantics (e.g. LISTING_OWNER).
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.type
+  ts_created:
+    description: Timestamp when the dictionary row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.created_at
+  ts_updated:
+    description: Timestamp of the last update to the dictionary row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_related_as.day

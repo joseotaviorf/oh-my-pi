@@ -1,0 +1,121 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: accepted_rent_offer_aud
+description: |
+  Hibernate Envers audit history for `accepted_rent_offer` (raw: tb_accepted_rent_offer_aud): history of accepted rent offers, proposal and
+  contract document states.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Business id of the accepted rent offer row this audit entry refers to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.id
+  rev:
+    description: Envers revision at which this snapshot became active.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.rev
+  rev_end:
+    description: Envers revision at which this snapshot ended; null when current.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.revend
+  rev_type:
+    description: Envers change type code for this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.revtype
+  id_property:
+    description: Property foreign key at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.property_id
+  id_proposal_external:
+    description: External proposal identifier at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.proposal_external_id
+  processed_events:
+    description: JSON map of processed offer events at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.processed_events
+  proposal_status:
+    description: Rent proposal status enum at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.proposal_status
+  contract_document_status:
+    description: Contract document status enum at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.contract_document_status
+  demand_document_status:
+    description: Demand-side documentation status at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.demand_document_status
+  supply_document_status:
+    description: Supply-side documentation status at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.supply_document_status
+  demand_contract_document_status:
+    description: Demand actor contract document status at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.demand_contract_document_status
+  supply_contract_document_status:
+    description: Supply actor contract document status at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.supply_contract_document_status
+  ts_contract_deadline:
+    description: Contract signing deadline at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.contract_deadline
+  ts_updated:
+    description: Row `updated_at` captured for this audit entry.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.updated_at
+  mod_id_property:
+    description: Envers modified flag for property_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.property_id_mod
+  mod_id_proposal_external:
+    description: Envers modified flag for proposal_external_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.proposal_external_id_mod
+  mod_processed_events:
+    description: Envers modified flag for processed_events.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.processed_events_mod
+  mod_proposal_status:
+    description: Envers modified flag for proposal_status.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.proposal_status_mod
+  mod_contract_document_status:
+    description: Envers modified flag for contract_document_status.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.contract_document_status_mod
+  mod_demand_document_status:
+    description: Envers modified flag for demand_document_status.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.demand_document_status_mod
+  mod_supply_document_status:
+    description: Envers modified flag for supply_document_status.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.supply_document_status_mod
+  mod_demand_contract_document_status:
+    description: Envers modified flag for demand_contract_document_status.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.demand_contract_document_status_mod
+  mod_supply_contract_document_status:
+    description: Envers modified flag for supply_contract_document_status.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.supply_contract_document_status_mod
+  mod_ts_contract_deadline:
+    description: Envers modified flag for contract_deadline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.contract_deadline_mod
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer_aud.day

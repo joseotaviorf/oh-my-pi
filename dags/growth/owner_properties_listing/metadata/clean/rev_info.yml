@@ -1,0 +1,29 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: rev_info
+description: |
+  Hibernate Envers revision registry: monotonic revision id and wall-clock timestamp (epoch millis) for
+  correlating `tb_*_aud` rows in Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  rev:
+    description: Envers revision identifier; foreign key target from audit tables.
+    lineage:
+      - datalake_owner_properties_listing_raw.revinfo.rev
+  ts_created:
+    description: UTC timestamp when the Envers revision was recorded in the source database (from revtstmp epoch millis).
+    lineage:
+      - datalake_owner_properties_listing_raw.revinfo.revtstmp
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.revinfo.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.revinfo.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.revinfo.day

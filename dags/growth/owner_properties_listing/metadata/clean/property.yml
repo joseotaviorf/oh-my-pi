@@ -1,0 +1,93 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: property
+description: |
+  Owner Properties Listing core property row: listing contexts, processed domain events, address and media
+  payloads, and links to priority listing status and main property identity used in supply workflows.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the property row in the Owner Properties Listing database.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.id
+  id_owner:
+    description: Identifier of the owner (contract person) associated with this listing property.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.owner_id
+  id_priority_listing_status:
+    description: Foreign key to the listing status considered highest priority for this property.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.priority_listing_status_id
+  id_main_property:
+    description: Canonical main property identifier used when multiple rows represent the same listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.main_property_id
+  version:
+    description: Optimistic locking version for concurrent updates to the property aggregate.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.version
+  processed_events:
+    description: JSON map of domain events already processed for idempotency and audit of inbound changes.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.processed_events
+  rent_context:
+    description: JSON document with rent-side listing context (CRM ids, publication flags, business fields).
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.rent_context
+  sale_context:
+    description: JSON document with sale-side listing context (CRM ids, publication flags, business fields).
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.sale_context
+  visit:
+    description: JSON document describing visit scheduling state and related metadata for the property.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.visit
+  photo_job:
+    description: JSON document for the current or last photo job associated with the listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.photo_job
+  address:
+    description: Structured address JSON for the listed property; may contain personal location data.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.address
+  cover_image:
+    description: Reference or URL for the cover image used when presenting the listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.cover_image
+  house_type:
+    description: Enumerated house type classification for the property listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.house_type
+  access_type:
+    description: JSON document describing access constraints or instructions for visits and operations.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.access_type
+  priority_context:
+    description: Business context (rent vs sale) that owns the priority listing status on this row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.priority_context
+  id_lead:
+    description: External lead identifier linked to the listing when supplied by upstream acquisition flows.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.lead_id
+  ts_created:
+    description: Timestamp when the property row was first created in Owner Properties Listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.created_at
+  ts_updated:
+    description: Timestamp of the last update to the property row in Owner Properties Listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property.day

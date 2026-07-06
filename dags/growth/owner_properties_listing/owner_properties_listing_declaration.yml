@@ -1,0 +1,113 @@
+dag:
+  name: owner_properties_listing
+  schedule_start_date: 2026, 4, 28
+  schedule_interval: 0 0 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Ingests the owner-properties-listing PostgreSQL database into the datalake (transactional → raw → clean) via CDC.
+      Owner Properties Listing aggregates properties and related data (ownership, listing status/score, offers, visits)
+      for owner listing experiences.
+
+      Backend service: applications/owner-properties-listing in backend-services.
+      Debezium, Kafka Connect and S3 sink are provisioned in kafka-conn-cluster
+      (kcc-owner-properties-listing-dbz + kcc-s3-owner-properties-listing).
+      This DAG reads landing data from s3://5a-datalake-incoming-prod/owner-properties-listing/ and materializes Delta
+      tables in datalake_owner_properties_listing_raw / datalake_owner_properties_listing_clean.
+
+      Raw layer keeps OLTP names (`tb_*`, `revinfo`). Clean layer drops the `tb_` prefix and applies lake
+      column naming (`id_*`, `ts_*`, `mod_*`) — see `owner_properties_listing.md` for the full raw→clean map.
+
+      Hibernate Envers tables (`revinfo`, `*_aud`) are ingested for audit-time travel alongside core domain tables.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  custom_schema: owner_properties_listing
+  source_database: owner-properties-listing
+  source_schema: public
+  lineage_product_database_name: owner-properties-listing
+  tables_customization:
+    revinfo:
+      clean_table_name: rev_info
+      clean_primary_keys: [rev]
+      raw_primary_keys: [rev]
+    tb_accepted_rent_offer:
+      clean_table_name: accepted_rent_offer
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_accepted_rent_offer_aud:
+      clean_table_name: accepted_rent_offer_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_daily_visit_property:
+      clean_table_name: daily_visit_property
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_listing_relationship:
+      clean_table_name: listing_relationship
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_listing_relationship_aud:
+      clean_table_name: listing_relationship_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_listing_score:
+      clean_table_name: listing_score
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_listing_score_aud:
+      clean_table_name: listing_score_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_listing_status:
+      clean_table_name: listing_status
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_ownership:
+      clean_table_name: ownership
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_ownership_aud:
+      clean_table_name: ownership_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_property:
+      clean_table_name: property
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_property_aud:
+      clean_table_name: property_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_related_as:
+      clean_table_name: related_as
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_related_as_aud:
+      clean_table_name: related_as_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_source_type:
+      clean_table_name: source_type
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_source_type_aud:
+      clean_table_name: source_type_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    tb_status_offer:
+      clean_table_name: status_offer
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_user:
+      clean_table_name: listing_user
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+    tb_user_type:
+      clean_table_name: user_type
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

@@ -1,0 +1,153 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: property_aud
+description: |
+  Hibernate Envers audit history for `property` (raw: tb_property_aud): validity-window history of listing aggregate fields and
+  Envers modification flags for changed attributes.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Business id of the property row this audit entry refers to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.id
+  rev:
+    description: Envers revision at which this snapshot became active.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.rev
+  rev_end:
+    description: Envers revision at which this snapshot ended (validity strategy); null when current.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.revend
+  rev_type:
+    description: Envers change type code for this revision (insert/update/delete semantics).
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.revtype
+  id_owner:
+    description: Owner (contract person) identifier at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.owner_id
+  processed_events:
+    description: JSON map of processed domain events at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.processed_events
+  rent_context:
+    description: Rent-side listing context JSON at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.rent_context
+  sale_context:
+    description: Sale-side listing context JSON at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.sale_context
+  visit:
+    description: Visit scheduling JSON at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.visit
+  photo_job:
+    description: Photo job JSON at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.photo_job
+  address:
+    description: Structured address JSON at this revision; may contain personal location data.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.address
+  cover_image:
+    description: Cover image reference at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.cover_image
+  house_type:
+    description: House type enum string at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.house_type
+  access_type:
+    description: Access-type JSON at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.access_type
+  id_priority_listing_status:
+    description: Priority listing status foreign key at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.priority_listing_status_id
+  priority_context:
+    description: Business context owning the priority listing status at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.priority_context
+  id_lead:
+    description: External lead identifier at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.lead_id
+  id_main_property:
+    description: Canonical main property id at this revision.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.main_property_id
+  ts_updated:
+    description: Property `updated_at` captured for this audit row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.updated_at
+  mod_processed_events:
+    description: Envers modified flag for processed_events.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.processed_events_mod
+  mod_id_owner:
+    description: Envers modified flag for owner_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.owner_id_mod
+  mod_rent_context:
+    description: Envers modified flag for rent_context.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.rent_context_mod
+  mod_sale_context:
+    description: Envers modified flag for sale_context.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.sale_context_mod
+  mod_visit:
+    description: Envers modified flag for visit.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.visit_mod
+  mod_photo_job:
+    description: Envers modified flag for photo_job.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.photo_job_mod
+  mod_address:
+    description: Envers modified flag for address.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.address_mod
+  mod_cover_image:
+    description: Envers modified flag for cover_image.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.cover_image_mod
+  mod_house_type:
+    description: Envers modified flag for house_type.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.house_type_mod
+  mod_access_type:
+    description: Envers modified flag for access_type.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.access_type_mod
+  mod_id_priority_listing_status:
+    description: Envers modified flag for priority_listing_status_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.priority_listing_status_id_mod
+  mod_priority_context:
+    description: Envers modified flag for priority_context.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.priority_context_mod
+  mod_id_lead:
+    description: Envers modified flag for lead_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.lead_id_mod
+  mod_id_main_property:
+    description: Envers modified flag for main_property_id.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.main_property_id_mod
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_property_aud.day

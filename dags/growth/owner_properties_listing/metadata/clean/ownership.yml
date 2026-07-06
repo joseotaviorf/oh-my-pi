@@ -1,0 +1,57 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: ownership
+description: |
+  Ownership edge between a property and an external related identifier (agent, company, person ref),
+  qualified by business context and source/type dictionaries in Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the ownership row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.id
+  id_house_listing_relation:
+    description: Optional link to the house-listing relation identifier in core listing systems when present.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.house_listing_relation_id
+  id_source_type:
+    description: Foreign key to source_type describing how id_related should be interpreted.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.source_type_id
+  id_related_as:
+    description: Foreign key to related_as describing the role of the related entity for this edge.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.related_as_id
+  id_related:
+    description: External identifier of the related party (agent id, company id, etc.) as a string key.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.related_id
+  id_property:
+    description: Foreign key to the property row this ownership edge applies to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.property_id
+  listing_business_context:
+    description: Business context dimension (e.g. rent vs sale) for this ownership link.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.listing_business_context
+  ts_created:
+    description: Timestamp when the ownership row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.created_at
+  ts_updated:
+    description: Timestamp of the last update to the ownership row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_ownership.day

@@ -1,0 +1,86 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: accepted_rent_offer
+description: |
+  Rent accepted-offer workflow state per property and external proposal id, including documentation and
+  contract milestones tracked by Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the accepted rent offer row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.id
+  id_property:
+    description: Foreign key to the property this accepted offer applies to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.property_id
+  id_proposal_external:
+    description: External proposal identifier from the rent negotiation platform.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.proposal_external_id
+  processed_events:
+    description: JSON map of processed domain events for idempotency on this offer lifecycle.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.processed_events
+  proposal_status:
+    description: Current status of the rent proposal in the offer workflow.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.proposal_status
+  contract_document_status:
+    description: >
+      End-to-end rent contract document milestone for this accepted offer (e.g. pending generation,
+      awaiting signatures, or completed). Summarizes contract paperwork readiness before the deal moves
+      to execution; distinct from per-party demand/supply document checks below.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.contract_document_status
+  demand_document_status:
+    description: >
+      Tenant-side (demand) documentation checklist status in the offer flow — whether required identity,
+      income, or rental documents were submitted and approved before contract steps.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.demand_document_status
+  supply_document_status:
+    description: >
+      Landlord-side (supply) documentation checklist status in the offer flow — whether property-owner
+      paperwork required for the rental contract was submitted and approved.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.supply_document_status
+  demand_contract_document_status:
+    description: >
+      Tenant-side rent contract document status only — tracks signature and validation of the contract
+      file for the demand actor, within the overall contract_document_status lifecycle.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.demand_contract_document_status
+  supply_contract_document_status:
+    description: >
+      Landlord-side rent contract document status only — tracks signature and validation of the contract
+      file for the supply actor, within the overall contract_document_status lifecycle.
+  ts_contract_deadline:
+    description: Deadline timestamp for contract completion associated with this offer when set.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.contract_deadline
+  version:
+    description: Optimistic locking version for concurrent updates to the offer row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.version
+  ts_created:
+    description: Timestamp when the accepted rent offer row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.created_at
+  ts_updated:
+    description: Timestamp of the last update to the accepted rent offer row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_accepted_rent_offer.day

@@ -1,0 +1,33 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: listing_status
+description: |
+  Reference data for listing lifecycle statuses (priorities and enum labels) used to rank and explain
+  publication state of owner listings in Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the listing status dictionary row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_status.id
+  listing_status_type:
+    description: Stable enum name of the listing status (e.g. LISTED, LISTING_SUSPENDED).
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_status.type
+  listing_status_priority:
+    description: Numeric priority used when ordering statuses for presentation and business rules.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_status.priority
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_status.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_status.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_status.day

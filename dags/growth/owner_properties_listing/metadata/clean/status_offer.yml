@@ -1,0 +1,49 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: status_offer
+description: |
+  Offer status aggregate per property and status value, including embedded offer list JSON for Owner
+  Properties Listing rent/sale offer tracking.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the status-offer aggregate row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.id
+  version:
+    description: Optimistic locking version for concurrent updates to the offer aggregate.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.version
+  id_property:
+    description: Foreign key to the property this offer status row belongs to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.property_id
+  offer_status:
+    description: High-level offer pipeline status label for this property row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.status
+  offers:
+    description: JSON array of offer structures with identifiers and amounts for this status slice.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.offers
+  ts_created:
+    description: Timestamp when the status-offer row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.created_at
+  ts_updated:
+    description: Timestamp of the last update to the status-offer row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_status_offer.day

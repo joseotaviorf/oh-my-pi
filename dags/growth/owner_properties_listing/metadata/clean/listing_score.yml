@@ -1,0 +1,45 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: listing_score
+description: |
+  Demand listing scores for sale and rent contexts per property as computed and stored by Owner Properties
+  Listing for ranking and prioritization use cases.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the listing score row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.id
+  id_property:
+    description: Foreign key to the property these scores apply to.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.property_id
+  demand_score_sale:
+    description: Numeric demand score for the sale context when available.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.demand_score_sale
+  demand_score_rent:
+    description: Numeric demand score for the rent context when available.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.demand_score_rent
+  ts_created:
+    description: Timestamp when the listing score row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.created_at
+  ts_updated:
+    description: Timestamp of the last update to the listing score row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_score.day

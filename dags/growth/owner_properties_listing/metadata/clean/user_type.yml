@@ -1,0 +1,29 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: user_type
+description: |
+  Dictionary of user roles/types (owner agent, contract person, partner profiles, etc.) that qualify
+  rows in the listing_user table within Owner Properties Listing.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the user type dictionary row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user_type.id
+  user_type_code:
+    description: Enum code identifying the user type (e.g. CONTRACT_PERSON_OWNER, ASP).
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user_type.type
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user_type.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user_type.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user_type.day

@@ -1,0 +1,41 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: listing_relationship
+description: |
+  Many-to-many style link between a listing_user and a property, representing access or association of
+  that user to the owner listing record.
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the user-to-property relationship row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.id
+  id_user:
+    description: Foreign key to listing_user for the associated application user.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.user_id
+  id_property:
+    description: Foreign key to property for the associated owner listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.property_id
+  ts_created:
+    description: Timestamp when the relationship row was created.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.created_at
+  ts_updated:
+    description: Timestamp of the last update to the relationship row.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.updated_at
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_listing_relationship.day

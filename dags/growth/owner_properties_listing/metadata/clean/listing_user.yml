@@ -1,0 +1,33 @@
+---
+database_name: datalake_owner_properties_listing_clean
+table_name: listing_user
+description: |
+  Application user rows linking an external platform identifier to a user type for Owner Properties Listing
+  access control and relationship modeling (not the QuintoAndar Person service).
+domain: Growth
+owner: beatriz.yordaky@quintoandar.com.br
+columns:
+  id:
+    description: Primary key of the listing user row in Owner Properties Listing.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user.id
+  id_external:
+    description: External user identifier from the upstream identity or platform system.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user.external_id
+  id_user_type:
+    description: Foreign key to user_type describing the role of this user in the service.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user.user_type_id
+  year:
+    description: CDC partition year derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user.year
+  month:
+    description: CDC partition month derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user.month
+  day:
+    description: CDC partition day derived from the ingestion pipeline.
+    lineage:
+      - datalake_owner_properties_listing_raw.tb_user.day
