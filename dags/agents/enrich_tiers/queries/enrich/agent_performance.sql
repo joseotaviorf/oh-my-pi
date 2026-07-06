@@ -272,6 +272,18 @@ agent_performance_for_output AS (
                 AND valid_row.is_valid IS TRUE
         )
 ),
+earliest_agent_activation AS (
+    SELECT
+        ael.id_agent,
+        MIN(ael.ts_occurred) AS ts_first_agent_activated
+    FROM
+        datalake_ebdb_clean.agent_event_log AS ael
+    WHERE
+        ael.id_capability IS NULL
+        AND ael.event_type = 'AGENT_ACTIVATED'
+    GROUP BY
+        ael.id_agent
+),
 latest_agent_by_metric_period AS (
     SELECT
         mpp.id_metric_period,
@@ -294,10 +306,13 @@ latest_agent_by_metric_period AS (
         MONTH(mpp.dt_metric_period_started) AS month,
         DAY(mpp.dt_metric_period_started) AS day
     FROM
-        datalake_agent_accreditation.agent AS a
+        earliest_agent_activation AS eaa
     JOIN
         metric_period_process AS mpp
-            ON DATE(a.ts_created) <= mpp.dt_metric_period_ended
+            ON DATE(eaa.ts_first_agent_activated) <= mpp.dt_metric_period_ended
+    JOIN
+        datalake_agent_accreditation.agent AS a
+            ON a.id_agent = eaa.id_agent
 )
 SELECT
     lmp.id_user,

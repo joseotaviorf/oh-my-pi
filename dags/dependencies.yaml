@@ -4205,6 +4205,7 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:
+  - bietlejuice.ebdb_agent:load-clean-agent-event-log:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
   - bietlejuice.enrich_ciq:load-enrich-ciq-agents:first-run-of-day
   - bietlejuice.enrich_ciq:load-enrich-ciq-users:first-run-of-day
