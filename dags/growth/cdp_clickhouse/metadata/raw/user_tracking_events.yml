@@ -1,0 +1,113 @@
+---
+database_name: datalake_cdp_raw
+table_name: user_tracking_events
+description: |
+  Raw Delta mirror of CDP user-tracking events from the ClickHouse user_tracking_events
+  view (staged from events_api). Loaded incrementally by the cdp_clickhouse Spark job
+  using timestamp_dt. Partitioned by event date (year, month, day). Source for
+  datalake_cdp_clean.user_tracking_events.
+domain: Growth
+owner: bruno.sbrito@quintoandar.com
+columns:
+  id_event:
+    description: Unique event identifier from the CDP ClickHouse events_api table.
+  id_person:
+    description: Person UUID from the CDP identity graph when resolved.
+  id_user:
+    description: Application user identifier attached to the event.
+  id_domain_user:
+    description: Domain-scoped user identifier from user_properties JSON.
+  id_anonymous:
+    description: Anonymous device identifier before identity resolution.
+  event_name:
+    description: User-tracking event name from the application or SDK.
+  application:
+    description: Lowercased application or product surface that generated the event.
+  platform:
+    description: Client platform from event_properties or user_properties.
+  country:
+    description: Market or country code from event_properties.
+  city:
+    description: City from event_properties address JSON.
+  region:
+    description: Region from event_properties.
+  app_type:
+    description: Operating system name from event_properties.
+  device_info:
+    description: Device manufacturer from event_properties.
+  ip_address:
+    description: Client IP address from event_properties.
+  latitude:
+    description: Latitude from event_properties address JSON.
+  longitude:
+    description: Longitude from event_properties address JSON.
+  egw_initial_gclid:
+    description: Initial Google click identifier from user_properties.
+  egw_initial_fbclid:
+    description: Initial Facebook click identifier from user_properties.
+  egw_initial_gbraid:
+    description: Initial Google enhanced conversions identifier from user_properties.
+  egw_initial_wbraid:
+    description: Initial Google web-to-app identifier from user_properties.
+  egw_gclid:
+    description: Google click identifier from user_properties.
+  egw_fbclid:
+    description: Facebook click identifier from user_properties.
+  egw_gbraid:
+    description: Google enhanced conversions identifier from user_properties.
+  egw_wbraid:
+    description: Google web-to-app identifier from user_properties.
+  egw_rdt_cid:
+    description: Reddit click identifier from user_properties.
+  egw_initial_rdt_cid:
+    description: Initial Reddit click identifier from user_properties.
+  egw_msclkid:
+    description: Microsoft click identifier from user_properties.
+  egw_initial_msclkid:
+    description: Initial Microsoft click identifier from user_properties.
+  egw_apps_flyer_id:
+    description: AppsFlyer identifier from user_properties.
+  egw_initial_utm_campaign:
+    description: Initial UTM campaign from user_properties.
+  egw_initial_utm_content:
+    description: Initial UTM content from user_properties.
+  egw_initial_utm_medium:
+    description: Initial UTM medium from user_properties.
+  egw_initial_utm_source:
+    description: Initial UTM source from user_properties.
+  egw_initial_utm_term:
+    description: Initial UTM term from user_properties.
+  egw_utm_campaign:
+    description: UTM campaign from user_properties.
+  egw_utm_content:
+    description: UTM content from user_properties.
+  egw_utm_medium:
+    description: UTM medium from user_properties.
+  egw_utm_source:
+    description: UTM source from user_properties.
+  egw_utm_term:
+    description: UTM term from user_properties.
+  egw_initial_attribution_time:
+    description: Initial attribution timestamp from user_properties.
+  egw_last_attribution_time:
+    description: Last attribution timestamp from user_properties.
+  egw_linked_devices:
+    description: Linked devices JSON from user_properties.
+  event_properties:
+    description: JSON string of event-specific properties.
+  user_properties:
+    description: JSON string of user-level properties at capture time.
+  ts_event:
+    description: Client-reported event time in UTC.
+  ts_egw:
+    description: Event Gateway ingestion time in UTC.
+  _ingested_at:
+    description: ClickHouse ingestion timestamp retained from events_api.
+  timestamp_dt:
+    description: Event timestamp in UTC; drives incremental load windows on ClickHouse reads.
+  year:
+    description: Partition column derived from ts_event at load time.
+  month:
+    description: Partition column derived from ts_event at load time.
+  day:
+    description: Partition column derived from ts_event at load time.

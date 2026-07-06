@@ -1,0 +1,37 @@
+SELECT
+    raw.id_event,
+    raw.id_person,
+    raw.id_user,
+    raw.id_domain_user,
+    raw.id_anonymous,
+    raw.id_dispatch,
+    raw.user_type,
+    raw.channel,
+    raw.comms_type,
+    raw.comms_typology,
+    raw.comms_journey_step,
+    raw.comms_status,
+    raw.comms_name,
+    raw.comms_rule,
+    raw.comms_action,
+    raw.comms_template,
+    raw.comms_source,
+    raw.event_properties,
+    raw.user_properties,
+    raw.event_name,
+    MAKE_TIMESTAMP(
+        YEAR(raw.ts_event),
+        MONTH(raw.ts_event),
+        DAY(raw.ts_event),
+        HOUR(raw.ts_event),
+        MINUTE(raw.ts_event),
+        0
+    ) AS ts_kafka,
+    raw.ts_event,
+    raw.ts_egw,
+    CURRENT_TIMESTAMP() AS ts_load,
+    raw.year,
+    raw.month,
+    raw.day
+FROM
+    datalake_cdp_raw.comms_events AS raw

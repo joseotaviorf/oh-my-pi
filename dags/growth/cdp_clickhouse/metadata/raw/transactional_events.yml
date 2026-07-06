@@ -1,0 +1,47 @@
+---
+database_name: datalake_cdp_raw
+table_name: transactional_events
+description: |
+  Raw Delta mirror of CDP transactional events from the ClickHouse transactional_events
+  view (staged from events_api). Loaded incrementally by the cdp_clickhouse Spark job
+  using timestamp_dt. Partitioned by event date (year, month, day). Source for
+  datalake_cdp_clean.transactional_events.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_event:
+    description: Unique event identifier from the CDP ClickHouse events_api table.
+  id_person:
+    description: Person UUID from the CDP identity graph when resolved.
+  id_user:
+    description: Application user identifier attached to the event.
+  id_domain_user:
+    description: Domain-scoped user identifier from user_properties JSON.
+  id_entity:
+    description: Device or entity identifier that generated the event.
+  id_house:
+    description: House identifier from event_properties JSON.
+  application:
+    description: Lowercased application or product surface that generated the event.
+  journey_step:
+    description: Funnel or journey step label associated with the event.
+  event_name:
+    description: Lowercased transactional event name.
+  event_properties:
+    description: JSON string of event-specific properties.
+  user_properties:
+    description: JSON string of user-level properties at capture time.
+  ts_event:
+    description: Client-reported event time in UTC.
+  ts_egw:
+    description: Event Gateway ingestion time in UTC.
+  _ingested_at:
+    description: ClickHouse ingestion timestamp retained from events_api.
+  timestamp_dt:
+    description: Event timestamp in UTC; drives incremental load windows on ClickHouse reads.
+  year:
+    description: Partition column derived from ts_event at load time.
+  month:
+    description: Partition column derived from ts_event at load time.
+  day:
+    description: Partition column derived from ts_event at load time.

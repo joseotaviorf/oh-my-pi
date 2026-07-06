@@ -1,0 +1,57 @@
+dag:
+  name: cdp_clickhouse
+  owner: Data Growth
+  schedule_start_date: 2026, 6, 1
+  schedule_interval: "0 0 * * *"
+  documentation:
+    dag_purpose: |
+      Ingests CDP events from ClickHouse views (transactional_events, user_tracking_events,
+      comms_events) built on events_api. Each view applies typed staging transformations in
+      ClickHouse; the Spark job loads incrementally using timestamp_dt into raw Delta tables,
+      then clean tasks add ts_kafka and ts_load. Schemas mirror customer-data-platform
+      stream_*_clean workflows, merged on id_event, event_name and date partitions.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: cdp
+  load_spark_job: load_cdp_clickhouse
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{schema}"
+    - "{table_name}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  tables_customization:
+    transactional_events:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      clean_extraction_type: incremental
+      clean_partitions: [year, month, day]
+      merge_on: [id_event, event_name, year, month, day]
+      when_matched_update_condition: source.ts_egw >= target.ts_egw
+      clean_z_order_by: [event_name, id_user]
+    user_tracking_events:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      clean_extraction_type: incremental
+      clean_partitions: [year, month, day]
+      merge_on: [id_event, event_name, year, month, day]
+      when_matched_update_condition: source.ts_egw >= target.ts_egw
+      clean_z_order_by: [event_name, id_user]
+    comms_events:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      clean_extraction_type: incremental
+      clean_partitions: [year, month, day]
+      merge_on: [id_event, event_name, year, month, day]
+      when_matched_update_condition: source.ts_egw >= target.ts_egw
+      clean_z_order_by: [event_name, id_user]

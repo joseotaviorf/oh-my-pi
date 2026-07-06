@@ -1,0 +1,11 @@
+---
+clickhouse_protocol: https
+clickhouse_http_port: 8443
+clickhouse_ssl: true
+clickhouse_ssl_mode: NONE
+clickhouse_database: forno
+clickhouse_incremental_column: timestamp_dt
+partition_columns:
+  - year
+  - month
+  - day

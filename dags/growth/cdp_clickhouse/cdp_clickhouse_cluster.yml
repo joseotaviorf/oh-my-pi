@@ -1,0 +1,10 @@
+cluster:
+  type: emr_7_12_med_general_cluster
+  custom_configurations:
+    init_scripts:
+      - s3:
+          destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_cdp.sh"
+        args:
+          - "{{ var.value.artifacts_bucket }}"
+          - "{{ var.value.databricks_s3_bucket }}"
+          - "{{ dag.dag_id }}"
