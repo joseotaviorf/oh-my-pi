@@ -9,7 +9,7 @@ description: |
   Conversational XP team. Partitioned by year/month/day for efficient time-range queries.
 columns:
   ids:
-    description: "JSON object with identifier keys used to join and deduplicate records: id_recset, id_recset_fix, id_house, id_user, id_session, id_amplitude, and id_device."
+    description: "JSON object with identifier keys used to join and deduplicate records: id_recset, id_recset_fix, id_house, id_user, id_session, id_amplitude, id_device, and id_agent (the human broker agent who created the first visit when it was agent-booked, null when user-booked)."
     lineage:
       - datalake_search.recs_impressions.recset_id
       - datalake_search.recs_impressions.recset_id_fix
@@ -18,8 +18,10 @@ columns:
       - datalake_search.recs_impressions.id_session
       - datalake_search.recs_impressions.id_amplitude
       - datalake_search.recs_impressions.id_device
+      - datalake_search.rent_flow_past_30_days.id_agent
+      - datalake_search.sale_flow_past_30_days.id_agent
   dimensions:
-    description: "JSON object with analysis dimensions: business_context, city, platform, position, showcase, listing_age (days since publication), is_classified, and is_outlier_user."
+    description: "JSON object with analysis dimensions: business_context, city, platform, position, showcase, listing_age (days since publication), is_classified, is_outlier_user, and visit_creation_origin (the channel where the first attributed visit was created)."
     lineage:
       - datalake_search.recs_impressions.business_context
       - datalake_search.recs_impressions.platform
@@ -30,6 +32,8 @@ columns:
       - wonka.house_main.is_classified
       - datalake_search.rent_outlier_users_past_30_days.id_user
       - datalake_search.sale_outlier_users_past_30_days.id_user
+      - datalake_search.rent_flow_past_30_days.visit_creation_origin
+      - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:
     description: "JSON object mapping each active experiment_name to the variant_standard_name assigned to the user at recommendation time."
     lineage:

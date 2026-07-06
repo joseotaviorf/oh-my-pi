@@ -102,14 +102,16 @@ global_tof_metrics AS (
         TO_JSON(
             NAMED_STRUCT(
                 'id_house', COALESCE(rent_flow.id_house, sale_flow.id_house),
-                'id_user', tof_users.id_user
+                'id_user', tof_users.id_user,
+                'id_agent', COALESCE(rent_flow.id_agent, sale_flow.id_agent)
             )
         ) AS ids,
         TO_JSON(
             NAMED_STRUCT(
                 'business_context', tof_users.business_context,
                 'city', house_cities.city,
-                'is_outlier_user', tof_users.is_outlier_user
+                'is_outlier_user', tof_users.is_outlier_user,
+                'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
             )
         ) AS dimensions,
         tof_users.variants,

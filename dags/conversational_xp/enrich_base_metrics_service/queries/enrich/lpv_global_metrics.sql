@@ -113,7 +113,8 @@ global_lpv_metrics AS (
         TO_JSON(
             NAMED_STRUCT(
                 'id_house', lpv_users.id_house,
-                'id_user', lpv_users.id_user
+                'id_user', lpv_users.id_user,
+                'id_agent', COALESCE(rent_flow.id_agent, sale_flow.id_agent)
             )
         ) AS ids,
         TO_JSON(
@@ -124,7 +125,8 @@ global_lpv_metrics AS (
                 CASE
                     WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1
                     ELSE 0
-                END
+                END,
+                'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
             )
         ) AS dimensions,
         COALESCE(experiment_lpvs.variants, '{{}}') AS variants,

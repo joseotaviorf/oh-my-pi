@@ -63,7 +63,8 @@ global_user_metrics AS (
            to_json(
               named_struct(
                 'id_house', COALESCE(rent_flow.id_house, sale_flow.id_house),
-                'id_user', all_users.id_user
+                'id_user', all_users.id_user,
+                'id_agent', COALESCE(rent_flow.id_agent, sale_flow.id_agent)
               )
             ) AS ids,
 
@@ -72,7 +73,8 @@ global_user_metrics AS (
               named_struct(
                 'business_context', all_users.business_context,
                 'city', house_cities.city,
-                'is_outlier_user', all_users.is_outlier_user
+                'is_outlier_user', all_users.is_outlier_user,
+                'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
               )
             ) AS dimensions,
 
@@ -228,7 +230,8 @@ global_house_metrics AS (
     to_json(
        named_struct(
          'id_house', houses_published.id_house,
-         'id_user', get_json_object(global_user_metrics.ids, '$.id_user')
+         'id_user', get_json_object(global_user_metrics.ids, '$.id_user'),
+         'id_agent', get_json_object(global_user_metrics.ids, '$.id_agent')
        )
      ) AS ids,
 
@@ -237,7 +240,8 @@ global_house_metrics AS (
             named_struct(
                 'business_context', houses_published.business_context,
                 'city', house_cities.city,
-                'is_outlier_user', get_json_object(global_user_metrics.dimensions, '$.is_outlier_user')
+                'is_outlier_user', get_json_object(global_user_metrics.dimensions, '$.is_outlier_user'),
+                'visit_creation_origin', get_json_object(global_user_metrics.dimensions, '$.visit_creation_origin')
             )
     ) AS dimensions,
 
@@ -335,7 +339,7 @@ house_published_all AS (
 ------------------------------------------------------------------------------------
 -- By doing this we will have duplicated entries for the same offer as in one table we are looking in the user POI and in the other
 -- we are looking at the house POI. Yet, if we do the correct group by we will be able to calculate any global metric.
-SELECT 
+SELECT
     ids,
     dimensions,
     variants,
@@ -348,7 +352,7 @@ SELECT
     week
 FROM global_user_metrics
 UNION
-SELECT 
+SELECT
     ids,
     dimensions,
     variants,
@@ -361,7 +365,7 @@ SELECT
     week
 FROM global_house_metrics
 UNION
-SELECT 
+SELECT
     ids,
     dimensions,
     variants,

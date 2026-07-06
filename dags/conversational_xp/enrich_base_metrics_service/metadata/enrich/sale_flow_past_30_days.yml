@@ -16,6 +16,21 @@ columns:
     description: QuintoAndar property identifier for the house involved in the sale flow event.
     lineage:
       - datalake_sale_flows.sale_flow.id_house
+  id_visit:
+    description: The id of the first sale visit booked for the sale flow, ordered by creation timestamp.
+    lineage:
+      - datalake_booking.booking.id_visit
+  id_agent:
+    description: Identifies the human broker agent who created the first visit when that first visit was agent-booked, and is null when the first visit was user-booked.
+    lineage:
+      - datalake_booking.booking.id_agent
+      - datalake_booking.booking.first_update_source
+  visit_creation_origin:
+    description: |
+      Channel or source where the first sale visit booking was created, such as a user self-service channel or an agent channel.
+      This field is tied only to the first visit in the flow to identify who found the house; subsequent visits can have different booking origins.
+    lineage:
+      - datalake_booking.booking.first_update_source
   ts_visit_booked:
     description: The timestamp in which a visit was booked.
     lineage:

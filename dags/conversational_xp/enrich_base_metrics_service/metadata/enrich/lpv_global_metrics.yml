@@ -10,21 +10,27 @@ columns:
       A json with the identifiers that define the LPV global metrics grain.
       `id_house` identifies the property/listing viewed in the Listing Page Viewed event.
       `id_user` identifies the user who viewed that property/listing.
+      `id_agent` identifies the human broker agent who created the first visit when that first visit was agent-booked, and is null when the first visit was user-booked.
     lineage:
       - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
       - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
       - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
+      - datalake_search.rent_flow_past_30_days.id_agent
+      - datalake_search.sale_flow_past_30_days.id_agent
   dimensions:
     description: |
       A json with business dimensions for the LPV event.
       `business_context` indicates whether the viewed listing belongs to the rent or sale experience.
       `city` identifies the latest known city of the viewed property/listing.
       `is_outlier_user` flags users classified as rent or sale outliers in the past 30 days.
+      `visit_creation_origin` identifies the channel or source where that first attributed visit was created. It refers only to the first visit, because later visits may be booked by a different user or agent; it is used to identify who found the house.
     lineage:
       - datalake_amplitude_clean.170698_listing_page_viewed_events.business_context
       - datalake_search.rent_outlier_users_past_30_days.id_user
       - datalake_search.sale_outlier_users_past_30_days.id_user
       - wonka.house_main.city
+      - datalake_search.rent_flow_past_30_days.visit_creation_origin
+      - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:
     description: A json mapping experiment names to the variant allocated to the user at the LPV event time.
     lineage:

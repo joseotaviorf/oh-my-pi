@@ -18,11 +18,11 @@ WITH duplicate_experiment_recs AS (
         ON experiments.variant_name = get_json_object(recs_impressions.user_properties, CONCAT('$.', experiments.experiment_name))
         AND ts_recommendation >= experiments.begin_date
         AND (
-            experiments.end_date IS NULL 
+            experiments.end_date IS NULL
             OR ts_recommendation <= experiments.end_date
             )
     WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-    GROUP BY 1,2,3,4,5 
+    GROUP BY 1,2,3,4,5
 ),
 
 experiment_recs AS (
@@ -52,7 +52,7 @@ clicks AS (
 --House Published
 
 recs_house_published AS (
-    SELECT 
+    SELECT
         recs_impressions.id_house,
         recs_impressions.business_context,
         recs_impressions.recset_id,
@@ -65,7 +65,7 @@ recs_house_published AS (
         ON house_publication_dates.id_house = recs_impressions.id_house
         AND UPPER(house_publication_dates.business_context) = recs_impressions.business_context
         AND house_publication_dates.ts_house_published <= recs_impressions.ts_recommendation
-    LEFT JOIN wonka.house_main 
+    LEFT JOIN wonka.house_main
         ON house_main.id = recs_impressions.id_house
     WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     GROUP BY 1,2,3,4
@@ -74,7 +74,7 @@ recs_house_published AS (
 -----------------
 -- Final Query
 
-SELECT
+SELECT DISTINCT
     --ids
     to_json(
         named_struct(
@@ -84,7 +84,8 @@ SELECT
             'id_user', recs_impressions.id_user,
             'id_session', recs_impressions.id_session,
             'id_amplitude', recs_impressions.id_amplitude,
-            'id_device', recs_impressions.id_device
+            'id_device', recs_impressions.id_device,
+            'id_agent', COALESCE(rent_flow.id_agent, sale_flow.id_agent)
         )
     ) AS ids,
 
@@ -98,7 +99,8 @@ SELECT
             'showcase', recs_impressions.showcase,
             'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT),
             'is_classified', recs_house_published.is_classified,
-            'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END
+            'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END,
+            'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
         )
     ) AS dimensions,
 
@@ -143,7 +145,7 @@ SELECT
     WEEKOFYEAR(MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day)) AS week
 
 FROM datalake_search.recs_impressions
-LEFT JOIN recs_house_published 
+LEFT JOIN recs_house_published
     ON recs_impressions.id_house = recs_house_published.id_house
     AND recs_impressions.business_context = recs_house_published.business_context
     AND recs_impressions.recset_id_fix = recs_house_published.recset_id_fix
@@ -167,4 +169,3 @@ LEFT JOIN datalake_search.sale_outlier_users_past_30_days as sale_outlier_users
     ON recs_impressions.id_user = sale_outlier_users.id_user
     AND recs_impressions.business_context = 'SALE'
 WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-GROUP BY ALL

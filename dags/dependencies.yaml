@@ -1725,6 +1725,7 @@ bietlejuice.enrich_base_metrics_service:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status:first-run-of-day
+  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
 bietlejuice.enrich_betopera:

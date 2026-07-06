@@ -21,7 +21,6 @@ This pipeline produces the following output table on enrich layer:
 - `recs_impressions_processed`
 - `global_metrics`
 - `recs_global_metrics`
-- `lpv_global_metrics`
 - `tof_global_metrics`
 - `lpv_global_metrics`
 - `experiment_config`

@@ -10,7 +10,9 @@ description: |
   efficient time-range queries.
 columns:
   ids:
-    description: A json with all relevant ids for search analysis. Ex. id_user, id_house, id_search, id_amplitude, ...
+    description: |
+      A json with all relevant ids for search analysis. Ex. id_user, id_house, id_search, id_amplitude, ...
+      `id_agent` identifies the human broker agent who created the first visit when that first visit was agent-booked, and is null when the first visit was user-booked.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.event_properties
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.event_properties
@@ -22,8 +24,12 @@ columns:
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
+      - datalake_search.rent_flow_past_30_days.id_agent
+      - datalake_search.sale_flow_past_30_days.id_agent
   dimensions:
-    description: A json with all relevant dimensions for search analysis. Ex. business_context, city, ...
+    description: |
+      A JSON object with dimensions for search analysis, including business context, property city, ranking context, listing attributes, and outlier classification.
+      `visit_creation_origin` identifies the channel or source where that first attributed visit was created. It refers only to the first visit, because later visits may be booked by a different user or agent; it is used to identify who found the house.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.event_properties
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.event_properties
@@ -34,6 +40,8 @@ columns:
       - datalake_search.house_publication_dates.ts_house_published
       - datalake_search.rent_outlier_users_past_30_days.id_user
       - datalake_search.sale_outlier_users_past_30_days.id_user
+      - datalake_search.rent_flow_past_30_days.visit_creation_origin
+      - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:
     description: A json mapping `experiment_name` to `variant` the user was on that search.
     lineage:

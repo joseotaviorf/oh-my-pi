@@ -307,6 +307,7 @@ SELECT
             'id_session', searches.id_session,
             'id_amplitude', searches.id_amplitude,
             'id_device', searches.id_device,
+            'id_agent', COALESCE(rent_flow.id_agent, sale_flow.id_agent),
             'copilot_session_id', searches.copilot_session_id
         )
     ) AS ids,
@@ -326,7 +327,8 @@ SELECT
             'page_position', exploded_houses.page_position,
             'listing_age', exploded_houses.listing_age,
             'is_classified', exploded_houses.is_classified,
-            'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END
+            'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END,
+            'visit_creation_origin', COALESCE(rent_flow.visit_creation_origin, sale_flow.visit_creation_origin)
         )
     ) AS dimensions,
 

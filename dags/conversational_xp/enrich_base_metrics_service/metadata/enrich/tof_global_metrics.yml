@@ -10,23 +10,29 @@ columns:
       A JSON object identifying the entities used to connect the first Top of Funnel action to later rent or sale funnel events:
       - `id_user`: user who performed the Top of Funnel action.
       - `id_house`: attributed property linked to the subsequent funnel event, when available.
+      - `id_agent`: identifies the human broker agent who created the first visit when that first visit was agent-booked, and is null when the first visit was user-booked.
     lineage:
       - datalake_search.search_impressions.ids
       - datalake_search.recs_impressions_processed.ids
       - datalake_search.lpv_global_metrics.ids
       - datalake_search.rent_flow_past_30_days.id_house
       - datalake_search.sale_flow_past_30_days.id_house
+      - datalake_search.rent_flow_past_30_days.id_agent
+      - datalake_search.sale_flow_past_30_days.id_agent
   dimensions:
     description: |
       A JSON object describing the business context of the Top of Funnel action:
       - `business_context`: journey context for the action, either rent or sale.
       - `city`: attributed property city linked to the subsequent funnel event, when available.
       - `is_outlier_user`: flag indicating whether the user is treated as an outlier in the source ToF event.
+      - `visit_creation_origin`: channel or source where the first attributed visit was created. The attribution refers only to the first visit, because later visits may be booked by a different user or agent; it identifies who found the house.
     lineage:
       - datalake_search.search_impressions.dimensions
       - datalake_search.recs_impressions_processed.dimensions
       - datalake_search.lpv_global_metrics.dimensions
       - wonka.house_main.city
+      - datalake_search.rent_flow_past_30_days.visit_creation_origin
+      - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:
     description: A json mapping experiment names to the variant allocated to the user at the ToF action time.
     lineage:

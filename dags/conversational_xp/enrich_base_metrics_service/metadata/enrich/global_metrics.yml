@@ -6,20 +6,28 @@ description: |
   Table with ids, dimensions, metrics and timestamps related to user and house global metrics datasets.
 columns:
   ids:
-    description: Ids such as id_user or id_house
+    description: |
+      Ids such as id_user or id_house.
+      `id_agent` identifies the human broker agent who created the first visit when that first visit was agent-booked, and is null when the first visit was user-booked.
     lineage:
       - datalake_search.search_impressions.ids
       - datalake_search.rent_flow_past_30_days.id_house
       - datalake_search.sale_flow_past_30_days.id_house
       - datalake_search.house_publication_dates.id_house
       - wonka.house_main.id
+      - datalake_search.rent_flow_past_30_days.id_agent
+      - datalake_search.sale_flow_past_30_days.id_agent
   dimensions:
-    description: A json with all relevant dimensions for user analysis. Ex. business_context and city
+    description: |
+      A JSON object with dimensions for global user analysis, including business context, property city, and outlier classification.
+      `visit_creation_origin` identifies the channel or source where that first attributed visit was created. It refers only to the first visit, because later visits may be booked by a different user or agent; it is used to identify who found the house.
     lineage:
       - datalake_search.search_impressions.dimensions
       - datalake_search.rent_flow_past_30_days.id_house
       - datalake_search.sale_flow_past_30_days.id_house
       - wonka.house_main.city
+      - datalake_search.rent_flow_past_30_days.visit_creation_origin
+      - datalake_search.sale_flow_past_30_days.visit_creation_origin
   variants:
     description: A json mapping `experiment_name` to `variant` the user was allocated to.
     lineage:
