@@ -133,6 +133,8 @@ columns:
       FR_ONBOARDING: The entity is an onboarding process, with its id_entity mapping directly to the id from the Onboarding table in EBDB database.
       FR_CREDIT_EVALUATION: The entity is a credit evaluation, with its id_entity mapping directly to the id_credit_evaluation from the Credit Evaluation core model.
       FR_RESERVATION: The entity is a reservation, with its id_entity mapping directly to the id from the Reservation table in the Kill Queue system.
+      FR_REPAIR_ONGOING: The entity is an ongoing repair request, with its id_entity mapping directly to the id from the repair request tables in the repairs domain.
+      FR_REPAIR_OFFBOARDING: The entity is an offboarding repair request, with its id_entity mapping directly to the id from the repair request tables in the inspection services domain.
       FR_INVOICE: The entity is an invoice, with its id_entity mapping directly to the id from the Invoice table in the Retsuko system.
       PHOTO_SESSION: The entity is a photo session, with its id_entity mapping directly to the id from the Photographer Job table in EBDB database.
       HOUSE_DRAFT: The entity is a house draft, with its id_entity mapping directly to the id from the House Draft table in BOB system, representing property registration drafts created through the self-service flow by owners.

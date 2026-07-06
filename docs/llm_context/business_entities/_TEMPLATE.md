@@ -31,8 +31,6 @@ data architecture, upstream source systems, and pointers to related entities.
 - **Source systems:** {Upstream operational systems feeding this entity (e.g. Retsuko, Zendesk, Trato Feito).}
 - **Related entities:** For {adjacent concept}, see [`{sibling}.md`]({sibling}.md).
 
-DW schemas described here: **`{dw_schema_a}`** and **`{dw_schema_b}`** (add or remove as needed).
-
 ---
 
 ## Synonyms
@@ -67,67 +65,19 @@ No DataHub links here — those are auto-generated.
 
 ---
 
-## `{dw_schema_name}`
+## Key Metrics
 
 <!--
-One H2 section per DW schema. State purpose and pipeline cadence.
+List the most important metrics for this entity — the WHAT, not the HOW.
+These orient TARS and analysts on what can be measured; exact calculation
+details live in metric_entities/ docs.
+Use bullet points: metric name, brief description, and canonical column or
+table reference. Include 3–8 metrics.
 -->
 
-**Purpose:** {One sentence on what this schema covers.}
-
-**Pipeline:** `query_delta`, layer `dw`, schema **`{dw_schema_name}`**, {full / incremental} load. Triggered {daily / hourly} by {trigger name}.
-
-### `{fact_table_name}`
-
-<!--
-Grain is the most important thing TARS needs to know. State it in bold.
-Then list key field groups in a two-column table.
-Call out critical filter flags as blockquotes.
--->
-
-Grain: **one row per {grain description, e.g. invoice × contract × dt_reference (daily)}**.
-`{sk_primary_key}` is hashed from {hash source fields}.
-
-> **Filter:** always apply `{dedup_flag} = true` for {use-case, e.g. "month-end cuts to get one row per invoice per month"}.
-
-| Topic | Fields |
-|-------|--------|
-| Keys / links | `{sk_primary}`, `{id_foreign}`, `{sk_other_dim}` |
-| {Topic, e.g. Status} | `{field_a}`, `{field_b}` (**`{enum_field}`**: {value1}, {value2}, {value3}) |
-| {Topic, e.g. Amounts} | `{amount_field}`, `{net_amount_field}` |
-| {Topic, e.g. Flags} | `{is_flag}`, `{has_flag}` |
-| {Topic, e.g. Dates} | `{dt_field}`, `{ts_field}` |
-
-### `{dim_table_name}`
-
-Grain: **one row per {grain description}**.
-
-| Topic | Fields |
-|-------|--------|
-| Keys | `{sk_key}` |
-| Attributes | `{attr_a}`, `{attr_b}` |
-
----
-
-## `{dw_schema_name_2}`
-
-<!--
-Add additional H2 sections for each DW schema. Remove this block if there is
-only one schema.
--->
-
-**Purpose:** {One sentence.}
-
-**Pipeline:** `query_delta`, schema **`{dw_schema_name_2}`**, full load.
-
-### `{table_name}`
-
-Grain: **one row per {grain description}**.
-
-| Topic | Fields |
-|-------|--------|
-| Keys | `{sk_key}`, `{id_key}` |
-| Attributes | `{field}` |
+- **{Metric name}:** {One-line description. Reference the canonical column, e.g. `fact_table.column_name`.}
+- **{Metric name 2}:** {One-line description.}
+- **{Metric name 3}:** {One-line description.}
 
 ---
 

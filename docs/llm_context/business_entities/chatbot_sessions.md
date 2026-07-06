@@ -120,6 +120,12 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 
 **`dw_customer_support.fact_chat_messages`** is the primary DW table for message-level analysis — one row per message. It covers the **entire session**: bot-side messages (pre-escalation) and human-side messages (post-escalation). Everything in `datalake_chatbot.messages` is also present here. Use `user_type` (`User`, `Analyst`, `Bot`) to filter by sender role — no join needed. Link via `sk_session` (Sauron session id) or `sk_task` (Twilio task id). To get the ticket from a session, join through `dw_customer_support.fact_tickets` using `sk_session`. See `business_entities/contact.md` for full column reference and golden queries.
 
+### CDP (N:1 — user state beyond the chat session)
+
+- When the question needs **what else the user is involved in** (visits, offers, contracts) or **active persona**, not session/message grain → `business_entities/cdp.md` (`datalake_transactional_entities.entities`, `datalake_cdp.persona`).
+- Join on `datalake_chatbot.sessions.id_user` = CDP `id_user` when `id_user` is populated.
+- Do not use CDP tables for global bot escalation rate or session volume — keep those on `datalake_chatbot.sessions`.
+
 ### Matthew (collections AI agent)
 
 - For Matthew-specific session analysis (collections context, escalation pillars, outbound replies, tool/helper flags), use `datalake_ai_collections_quintoandar.sessions` / `observation` / `messages` and the OBT `dw_collection_ai_agents.fact_ai_agents_interaction`.
@@ -198,3 +204,7 @@ GROUP BY
 ORDER BY
     escalated_sessions DESC
 ```
+
+## DataHub catalog
+
+> Added automatically by the agent after Step 7 — do not fill in manually.

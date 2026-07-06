@@ -121,6 +121,12 @@ When investigating escalations, decompose hierarchically:
 - `dw_collection_ai_agents.fact_ai_agents_interaction` already joins `fact_user_wallet_timeline` on `sk_user = id_user` and `dt_reference = dt_session_created`.
 - For ad-hoc joins from `sessions`: `fuwt.sk_user = s.id_user AND fuwt.dt_reference = s.dt_session_created`.
 
+### CDP (N:1 — user journey and persona outside session grain)
+
+- For **cross-entity user context** (visits, offers, contracts, invoices in one row set for Domi/Matthew-style products) → `datalake_transactional_entities.entities` on `sessions.id_user = entities.id_user`; see `business_entities/cdp.md`.
+- For **current platform role / journey step** → `datalake_cdp.persona` on `id_user` (not `datalake_cdp_personas.persona` unless the question is historical).
+- Session-level chatbot metrics stay in this doc and `business_entities/chatbot_sessions.md` — CDP does not replace `datalake_chatbot.sessions`.
+
 ### Support Tickets (1:1 — one ticket per escalated session)
 
 - `s.id_ticket` populated when `is_escalation = TRUE`.
@@ -286,3 +292,7 @@ WHERE matthew_version IN ('V2', 'V3')
 GROUP BY 1
 ORDER BY 1
 ```
+
+## DataHub catalog
+
+> Added automatically by the agent after Step 7 — do not fill in manually.

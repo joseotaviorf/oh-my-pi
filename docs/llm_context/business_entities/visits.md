@@ -84,6 +84,7 @@ Daily **schedule** grain: one row per appointment attempt.
 - Don't count `sk_schedule` as unique visits; a user may reschedule the same visit 3 times, generating 3 schedules but only 1 `sk_visit`.
 - Don't assume `visit_status = 'cancelled'` implies a system error; use `cancellation_reason` in `dim_visit` to distinguish between demand-led, supply-led, or broker-led cancellations.
 - Don't mix `house_entrance` data with visit status without validating if the entrance model was available at the time of the visit.
+- Don't use `datalake_cdp_clean.transactional` or `datalake_transactional_entities.entities` for VB2VC, funnel KPIs, or visit dimensions — use `dw_visits.*`. For governed EGW `visit_*` **events** or tracking attribution, see `business_entities/cdp.md`.
 
 ## Golden queries
 

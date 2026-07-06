@@ -129,6 +129,11 @@ Prompt-to-query mapping for this specific active test:
 - Use this recs guide when the request is about recommendation carousels, recommendation sets, showcase, or `datalake_search.recs_impressions_processed`.
 - Both entities expose JSON payloads named `ids`, `dimensions`, `variants`, `metrics`, and `timestamps`, but the grains are different: recs is listing impression per recommendation set; search is listing impression per search result.
 
+### CDP (N:1 via `id_user` — attribution only)
+
+- **UTM and click IDs** before or after recs exposure → `datalake_cdp_clean.user_tracking` on `ids.id_user` (event grain); see `business_entities/cdp.md`.
+- Recs impression and CTR metrics stay on `datalake_search.recs_impressions_processed` — do not substitute CDP event tables.
+
 ### Visits (N:1 via user-house journey keys)
 
 - Use `ids.id_user`, `ids.id_house`, and `json_extract_scalar(dimensions, '$.business_context')` as the journey keys exposed by `datalake_search.recs_impressions_processed`.
@@ -579,3 +584,7 @@ GROUP BY
 ORDER BY
     business_context
 ```
+
+## DataHub catalog
+
+> Added automatically by the agent after Step 7 — do not fill in manually.
