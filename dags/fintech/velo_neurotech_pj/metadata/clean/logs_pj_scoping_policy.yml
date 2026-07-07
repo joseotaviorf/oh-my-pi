@@ -1,20 +1,30 @@
 ---
 database_name: datalake_velo_neurotech_pj_clean
 table_name: logs_pj_scoping_policy
+description:
+  Neurotech service discontinued in October 2025. One row per logs pj scoping policy from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_proposal:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_scoping_policy.codigo_proposta
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   id_operation:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_scoping_policy.codigo_operacao
+    description: Identifier for the operation referenced by this financial record.
   year:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_scoping_policy.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_scoping_policy.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_scoping_policy.day
+    description: Day partition derived from the source event timestamp for incremental loading.

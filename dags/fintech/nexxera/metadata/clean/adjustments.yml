@@ -1,153 +1,203 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: adjustments
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing adjustments data from nexxera files (id_registration = 12). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_registration:
     lineage:
       - datalake_nexxera_raw.adjustments.col_1
+    description: Identifier for the registration referenced by this financial record.
   acquirer_name:
     lineage:
       - datalake_nexxera_raw.adjustments.col_2
+    description: Financial attribute representing acquirer name on the adjustments dataset.
   establishment_cnpj:
     lineage:
       - datalake_nexxera_raw.adjustments.col_3
+    description: Financial attribute representing establishment cnpj on the adjustments dataset.
   adjusted_pos:
     lineage:
       - datalake_nexxera_raw.adjustments.col_4
+    description: Financial attribute representing adjusted pos on the adjustments dataset.
   original_pos:
     lineage:
       - datalake_nexxera_raw.adjustments.col_5
+    description: Financial attribute representing original pos on the adjustments dataset.
   current_summary_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_6
+    description: Financial attribute representing current summary number on the adjustments dataset.
   original_summary_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_7
+    description: Financial attribute representing original summary number on the adjustments dataset.
   nsu_cv:
     lineage:
       - datalake_nexxera_raw.adjustments.col_8
+    description: Financial attribute representing nsu cv on the adjustments dataset.
   id_authorization:
     lineage:
       - datalake_nexxera_raw.adjustments.col_9
+    description: Identifier for the authorization referenced by this financial record.
   dt_sale_adjustment:
     lineage:
       - datalake_nexxera_raw.adjustments.col_10
+    description: Calendar date associated with sale adjustment in the financial workflow.
   installment_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_11
+    description: Financial attribute representing installment number on the adjustments dataset.
   adjustment_value:
     lineage:
       - datalake_nexxera_raw.adjustments.col_12
+    description: Financial attribute representing adjustment value on the adjustments dataset.
   dt_adjustment_launch:
     lineage:
       - datalake_nexxera_raw.adjustments.col_13
+    description: Calendar date associated with adjustment launch in the financial workflow.
   launch_type:
     lineage:
       - datalake_nexxera_raw.adjustments.col_14
+    description: Financial attribute representing launch type on the adjustments dataset.
   installment_gross_amount:
     lineage:
       - datalake_nexxera_raw.adjustments.col_15
+    description: Financial attribute representing installment gross amount on the adjustments dataset.
   adjustment_original_reason:
     lineage:
       - datalake_nexxera_raw.adjustments.col_16
+    description: Financial attribute representing adjustment original reason on the adjustments dataset.
   id_nexxera_adjustment:
     lineage:
       - datalake_nexxera_raw.adjustments.col_17
+    description: Identifier for the nexxera adjustment referenced by this financial record.
   receipt_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_18
+    description: Financial attribute representing receipt number on the adjustments dataset.
   id_transaction:
     lineage:
       - datalake_nexxera_raw.adjustments.col_19
+    description: Identifier for the transaction referenced by this financial record.
   nexxera_detail_adjustment_code:
     lineage:
       - datalake_nexxera_raw.adjustments.col_20
+    description: Financial attribute representing nexxera detail adjustment code on the adjustments dataset.
   id_occurrence:
     lineage:
       - datalake_nexxera_raw.adjustments.col_21
+    description: Identifier for the occurrence referenced by this financial record.
   launch_status:
     lineage:
       - datalake_nexxera_raw.adjustments.col_22
+    description: Financial attribute representing launch status on the adjustments dataset.
   dt_sent_to_bank:
     lineage:
       - datalake_nexxera_raw.adjustments.col_23
+    description: Calendar date associated with sent to bank in the financial workflow.
   summary_net_amount:
     lineage:
       - datalake_nexxera_raw.adjustments.col_24
+    description: Financial attribute representing summary net amount on the adjustments dataset.
   summary_discount_value:
     lineage:
       - datalake_nexxera_raw.adjustments.col_25
+    description: Financial attribute representing summary discount value on the adjustments dataset.
   id_bank_compensation:
     lineage:
       - datalake_nexxera_raw.adjustments.col_26
+    description: Identifier for the bank compensation referenced by this financial record.
   deposit_agency:
     lineage:
       - datalake_nexxera_raw.adjustments.col_27
+    description: Financial attribute representing deposit agency on the adjustments dataset.
   deposit_account:
     lineage:
       - datalake_nexxera_raw.adjustments.col_28
+    description: Financial attribute representing deposit account on the adjustments dataset.
   id_bank_grouper:
     lineage:
       - datalake_nexxera_raw.adjustments.col_29
+    description: Identifier for the bank grouper referenced by this financial record.
   dt_summary_adjustment:
     lineage:
       - datalake_nexxera_raw.adjustments.col_30
+    description: Calendar date associated with summary adjustment in the financial workflow.
   card_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_31
+    description: Financial attribute representing card number on the adjustments dataset.
   service_charge_value:
     lineage:
       - datalake_nexxera_raw.adjustments.col_32
+    description: Financial attribute representing service charge value on the adjustments dataset.
   process_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_33
+    description: Financial attribute representing process number on the adjustments dataset.
   reference_number:
     lineage:
       - datalake_nexxera_raw.adjustments.col_34
+    description: Financial attribute representing reference number on the adjustments dataset.
   dt_reference_negotiation:
     lineage:
       - datalake_nexxera_raw.adjustments.col_35
+    description: Calendar date associated with reference negotiation in the financial workflow.
   capture_type:
     lineage:
       - datalake_nexxera_raw.adjustments.col_36
+    description: Financial attribute representing capture type on the adjustments dataset.
   id_acquirer:
     lineage:
       - datalake_nexxera_raw.adjustments.col_37
+    description: Identifier for the acquirer referenced by this financial record.
   total_installments:
     lineage:
       - datalake_nexxera_raw.adjustments.col_38
+    description: Financial attribute representing total installments on the adjustments dataset.
   id_flag:
     lineage:
       - datalake_nexxera_raw.adjustments.col_39
+    description: Identifier for the flag referenced by this financial record.
   tef_pos:
     lineage:
       - datalake_nexxera_raw.adjustments.col_40
+    description: Financial attribute representing tef pos on the adjustments dataset.
   id_bpag:
     lineage:
       - datalake_nexxera_raw.adjustments.col_41
+    description: Identifier for the bpag referenced by this financial record.
   id_erp:
     lineage:
       - datalake_nexxera_raw.adjustments.col_42
+    description: Identifier for the erp referenced by this financial record.
   id_product:
     lineage:
       - datalake_nexxera_raw.adjustments.col_43
+    description: Identifier for the product referenced by this financial record.
   product_name:
     lineage:
       - datalake_nexxera_raw.adjustments.col_44
+    description: Financial attribute representing product name on the adjustments dataset.
   id_hash:
     lineage:
       - datalake_nexxera_raw.adjustments.col_45
+    description: Identifier for the hash referenced by this financial record.
   year:
     lineage:
       - datalake_nexxera_raw.adjustments.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.adjustments.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.adjustments.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.adjustments.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.

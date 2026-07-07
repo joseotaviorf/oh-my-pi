@@ -1,93 +1,123 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: batch_header
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing all batch headers from financial extract files from itaú and bradesco with layout 030 and 050 and segment 'e'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_bank:
     lineage:
       - datalake_nexxera_raw.ext.col_1
+    description: Identifier for the bank referenced by this financial record.
   id_service_batch:
     lineage:
       - datalake_nexxera_raw.ext.col_2
+    description: Identifier for the service batch referenced by this financial record.
   record_type:
     lineage:
       - datalake_nexxera_raw.ext.col_3
+    description: Financial attribute representing record type on the batch_header dataset.
   operation_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing operation type on the batch_header dataset.
   service_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing service type on the batch_header dataset.
   launch_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing launch type on the batch_header dataset.
   file_layout_version:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing file layout version on the batch_header dataset.
   company_register_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company register type on the batch_header dataset.
   company_register_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company register number on the batch_header dataset.
   account_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing account type on the batch_header dataset.
   bank_insurance_code:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing bank insurance code on the batch_header dataset.
   company_agency_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company agency number on the batch_header dataset.
   company_agency_digit:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company agency digit on the batch_header dataset.
   company_account_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company account number on the batch_header dataset.
   company_account_digit:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company account digit on the batch_header dataset.
   agency_account_digit:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing agency account digit on the batch_header dataset.
   company_name:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company name on the batch_header dataset.
   second_line_extract:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing second line extract on the batch_header dataset.
   inicial_balance_value:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing inicial balance value on the batch_header dataset.
   inicial_balance_situation:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing inicial balance situation on the batch_header dataset.
   inicial_balance_position:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing inicial balance position on the batch_header dataset.
   extract_currency:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing extract currency on the batch_header dataset.
   extract_sequence_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing extract sequence number on the batch_header dataset.
   cnab_reserved_field:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing cnab reserved field on the batch_header dataset.
   dt_inicial_balance:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Calendar date associated with inicial balance in the financial workflow.
   year:
     lineage:
       - datalake_nexxera_raw.ext.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.ext.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.ext.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.ext.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.

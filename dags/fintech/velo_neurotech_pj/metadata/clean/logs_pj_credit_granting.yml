@@ -1,273 +1,376 @@
 ---
 database_name: datalake_velo_neurotech_pj_clean
 table_name: logs_pj_credit_granting
+description:
+  Neurotech service discontinued in October 2025. One row per logs pj credit granting from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_proposal:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.codigo_proposta
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   id_operation:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.codigo_operacao
+    description: Identifier for the operation referenced by this financial record.
   proposal_number:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_num_proposta
+    description: Velo platform attribute describing proposal number for condominium billing reconciliation.
   ts_operation:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.instante
+    description: Timestamp when operation occurred in the upstream fintech system.
   bigdata_entities_employed_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_entidades_empregadas_bureau
+    description: Velo platform attribute describing bigdata entities employed bureau for condominium billing reconciliation.
   bigdata_related_entities_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_entidades_relacionadas_bureau
+    description: Velo platform attribute describing bigdata related entities bureau for condominium billing reconciliation.
   bigdata_age_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_idade_bureau
+    description: Velo platform attribute describing bigdata age bureau for condominium billing reconciliation.
   bigdata_partners_list:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_lista_socios
+    description: Velo platform attribute describing bigdata partners list for condominium billing reconciliation.
   bigdata_origin_charges_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_origens_cobrancas_bureau
+    description: Velo platform attribute describing bigdata origin charges bureau for condominium billing reconciliation.
   bigdataboost_company_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdataboost_empresas_idade
+    description: Velo platform attribute describing bigdataboost company age for condominium billing reconciliation.
   bigdataboost_has_sanctions:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdataboost_empresas_possui_sancoes
+    description: Velo platform attribute describing bigdataboost has sanctions for condominium billing reconciliation.
   bigdataboost_has_lawsuits:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdataboost_processos_judiciais_reu
+    description: Velo platform attribute describing bigdataboost has lawsuits for condominium billing reconciliation.
   blocklist:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_blocklist
+    description: Velo platform attribute describing blocklist for condominium billing reconciliation.
   blocklist_pj:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_blocklist_pj
+    description: Velo platform attribute describing blocklist pj for condominium billing reconciliation.
   blocklist_return_message:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_blocklist_retorno
+    description: Velo platform attribute describing blocklist return message for condominium billing reconciliation.
   company_cnae:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cnae
+    description: Velo platform attribute describing company cnae for condominium billing reconciliation.
   is_company_approved:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_comp_aprov
+    description: Indicates whether company approved applies to this financial record.
   company_partner_cpf:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj
+    description: Velo platform attribute describing company partner cpf for condominium billing reconciliation.
   company_partner_cpf_1:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj1
+    description: Velo platform attribute describing company partner cpf 1 for condominium billing reconciliation.
   company_partner_cpf_2:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj2
+    description: Velo platform attribute describing company partner cpf 2 for condominium billing reconciliation.
   company_partner_cpf_3:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj3
+    description: Velo platform attribute describing company partner cpf 3 for condominium billing reconciliation.
   company_partner_cpf_4:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj4
+    description: Velo platform attribute describing company partner cpf 4 for condominium billing reconciliation.
   decision_status:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_decisao_status
+    description: Velo platform attribute describing decision status for condominium billing reconciliation.
   dti_calculated:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_dti_apurado
+    description: Velo platform attribute describing dti calculated for condominium billing reconciliation.
   dti_limit:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_dti_limite
+    description: Velo platform attribute describing dti limit for condominium billing reconciliation.
   dti_max:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_dti_maximo
+    description: Velo platform attribute describing dti max for condominium billing reconciliation.
   calculated_presumed_revenue:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_faturamento_presumido_calculado
+    description: Velo platform attribute describing calculated presumed revenue for condominium billing reconciliation.
   filter_pj:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_filtro_pj
+    description: Velo platform attribute describing filter pj for condominium billing reconciliation.
   fraud:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_fraude
+    description: Velo platform attribute describing fraud for condominium billing reconciliation.
   min_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_idade_minima
+    description: Velo platform attribute describing min age for condominium billing reconciliation.
   pj_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_idade_pj
+    description: Velo platform attribute describing pj age for condominium billing reconciliation.
   rating_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_idade_rating
+    description: Velo platform attribute describing rating age for condominium billing reconciliation.
   minor_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_menor_idade
+    description: Velo platform attribute describing minor age for condominium billing reconciliation.
   income_model_betas:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_modelo_renda_betas
+    description: Velo platform attribute describing income model betas for condominium billing reconciliation.
   model_total_income:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_modelo_renda_total
+    description: Velo platform attribute describing model total income for condominium billing reconciliation.
   pep:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_pep
+    description: Velo platform attribute describing pep for condominium billing reconciliation.
   pf_score_quinto:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_quinto_cred_score_pf
+    description: Velo platform attribute describing pf score quinto for condominium billing reconciliation.
   activity_branch_accountant:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_ramo_atividade_contador
+    description: Velo platform attribute describing activity branch accountant for condominium billing reconciliation.
   activity_branch_list:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_ramo_atividade_lista
+    description: Velo platform attribute describing activity branch list for condominium billing reconciliation.
   activity_branch_permitted:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_ramo_atividade_permitida
+    description: Velo platform attribute describing activity branch permitted for condominium billing reconciliation.
   pf_rating:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rating_pf
+    description: Velo platform attribute describing pf rating for condominium billing reconciliation.
   pj_rating:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rating_pj
+    description: Velo platform attribute describing pj rating for condominium billing reconciliation.
   matrix_rating_status_a:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rating_status_matriz_a
+    description: Velo platform attribute describing matrix rating status a for condominium billing reconciliation.
   elected_presumed_income:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_renda_presumida_eleita
+    description: Velo platform attribute describing elected presumed income for condominium billing reconciliation.
   serasa_total_income:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_renda_serasa_total
+    description: Velo platform attribute describing serasa total income for condominium billing reconciliation.
   federal_person_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rfpf_idade
+    description: Velo platform attribute describing federal person age for condominium billing reconciliation.
   federal_company_age:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rfpj_idade
+    description: Velo platform attribute describing federal company age for condominium billing reconciliation.
   federal_company_status:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rfpj_situacao_cadastral
+    description: Velo platform attribute describing federal company status for condominium billing reconciliation.
   serasa_pj_presumed_revenue:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_faturamento_presumido
+    description: Velo platform attribute describing serasa pj presumed revenue for condominium billing reconciliation.
   serasa_pj_restriction_reason:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_motivo_restricao
+    description: Velo platform attribute describing serasa pj restriction reason for condominium billing reconciliation.
   serasa_pj_score:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_score
+    description: Velo platform attribute describing serasa pj score for condominium billing reconciliation.
   serasa_pj_has_restriction:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_tem_restricao
+    description: Velo platform attribute describing serasa pj has restriction for condominium billing reconciliation.
   serasa_score_csba_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_score_csba_bureau
+    description: Velo platform attribute describing serasa score csba bureau for condominium billing reconciliation.
   serasa_score_hspn_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_score_hspn_bureau
+    description: Velo platform attribute describing serasa score hspn bureau for condominium billing reconciliation.
   has_lawsuit:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_tem_acao
+    description: Indicates whether lawsuit applies to this financial record.
   has_occurrence:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_tem_ocorrencia
+    description: Indicates whether occurrence applies to this financial record.
   has_protest:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_tem_protesto
+    description: Indicates whether protest applies to this financial record.
   transunion_decl_rest_3_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_decl_rest_3_bureau
+    description: Velo platform attribute describing transunion decl rest 3 bureau for condominium billing reconciliation.
   transunion_indic_seg_6_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_indic_seg_6_bureau
+    description: Velo platform attribute describing transunion indic seg 6 bureau for condominium billing reconciliation.
   transunion_percent_schooling_04_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_percent_escol_04_bureau
+    description: Velo platform attribute describing transunion percent schooling 04 bureau for condominium billing reconciliation.
   transunion_employer_size_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_porte_empregador_bureau
+    description: Velo platform attribute describing transunion employer size bureau for condominium billing reconciliation.
   transunion_number_addresses_bureau:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_qtd_endereco_bureau
+    description: Velo platform attribute describing transunion number addresses bureau for condominium billing reconciliation.
   lawsuit_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_acao
+    description: Velo platform attribute describing lawsuit amount for condominium billing reconciliation.
   minimum_package_value:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_minimo_pacote
+    description: Velo platform attribute describing minimum package value for condominium billing reconciliation.
   occurrence_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_ocorrencia
+    description: Velo platform attribute describing occurrence amount for condominium billing reconciliation.
   protest_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_protesto
+    description: Velo platform attribute describing protest amount for condominium billing reconciliation.
   eligible_pf:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.flx_elegibilidade_pf
+    description: Velo platform attribute describing eligible pf for condominium billing reconciliation.
   eligible_pj:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.flx_elegibilidade_pj
+    description: Velo platform attribute describing eligible pj for condominium billing reconciliation.
   main_proponent:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.flx_principal
+    description: Velo platform attribute describing main proponent for condominium billing reconciliation.
   proposal_city:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_cidade
+    description: Velo platform attribute describing proposal city for condominium billing reconciliation.
   proposal_cnpj:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_cnpj
+    description: Velo platform attribute describing proposal cnpj for condominium billing reconciliation.
   proposal_cpfs:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_cpf_titular
+    description: Velo platform attribute describing proposal cpfs for condominium billing reconciliation.
   proposal_company_email:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_email_empresa
+    description: Velo platform attribute describing proposal company email for condominium billing reconciliation.
   proposal_main_email:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_email_titular
+    description: Velo platform attribute describing proposal main email for condominium billing reconciliation.
   proposal_proposal_state:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_estado
+    description: Velo platform attribute describing proposal proposal state for condominium billing reconciliation.
   proposal_company_phone:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_fone_empresa
+    description: Velo platform attribute describing proposal company phone for condominium billing reconciliation.
   proponent_phone:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_fone_titular
+    description: Velo platform attribute describing proponent phone for condominium billing reconciliation.
   proposal_birth_date_proponents:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_nasc_titular
+    description: Velo platform attribute describing proposal birth date proponents for condominium billing reconciliation.
   proposal_company_name:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_nome_empresa
+    description: Velo platform attribute describing proposal company name for condominium billing reconciliation.
   proposal_name_real_state_company:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_nome_imob
+    description: Velo platform attribute describing proposal name real state company for condominium billing reconciliation.
   proposal_property_type:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_tipo_imovel
+    description: Velo platform attribute describing proposal property type for condominium billing reconciliation.
   proposal_rent_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_aluguel
+    description: Velo platform attribute describing proposal rent amount for condominium billing reconciliation.
   proposal_condo_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_condominio
+    description: Velo platform attribute describing proposal condo amount for condominium billing reconciliation.
   proposal_iptu_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_iptu
+    description: Velo platform attribute describing proposal iptu amount for condominium billing reconciliation.
   proposal_package_amount:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_pacote
+    description: Velo platform attribute describing proposal package amount for condominium billing reconciliation.
   proposal_declared_income:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_renda_declarada
+    description: Velo platform attribute describing proposal declared income for condominium billing reconciliation.
   proposal_resubmission:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_resubmissao
+    description: Velo platform attribute describing proposal resubmission for condominium billing reconciliation.
   system_response_serasa_pj_hfp1:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.rgr_serasa_pj_hfp1_sistema_responde
+    description: Velo platform attribute describing system response serasa pj hfp1 for condominium billing reconciliation.
   system_response_serasa_pj_hpj8:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.rgr_serasa_pj_hpj8_sistema_responde
 
+    description: Velo platform attribute describing system response serasa pj hpj8 for condominium billing reconciliation.
+  year:
+    lineage: []
+    description: Year partition derived from the source event timestamp for incremental loading.
+  month:
+    lineage: []
+    description: Month partition derived from the source event timestamp for incremental loading.
+  day:
+    lineage: []
+    description: Day partition derived from the source event timestamp for incremental loading.

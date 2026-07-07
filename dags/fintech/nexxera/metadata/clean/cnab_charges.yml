@@ -1,24 +1,31 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: cnab_charges
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing charges data from CNAB files. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   record_type:
     lineage:
       - datalake_nexxera_raw.cnab_charges.record_type
+    description: Financial attribute representing record type on the cnab_charges dataset.
   description:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Human-readable description of the financial transaction or ledger entry.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.cnab_charges.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_nexxera_raw.cnab_charges.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.cnab_charges.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.cnab_charges.day
+    description: Day partition derived from the source event timestamp for incremental loading.

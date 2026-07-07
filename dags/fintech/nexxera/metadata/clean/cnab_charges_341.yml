@@ -1,129 +1,171 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: cnab_charges_341
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing Itaú (341) charges data from CNAB files. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_bank:
     lineage:
       - datalake_nexxera_raw.cnab_charges.file_name
+    description: Identifier for the bank referenced by this financial record.
   id_document_type:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Identifier for the document type referenced by this financial record.
   id_wallet:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Identifier for the wallet referenced by this financial record.
   id_bank_clearinghouse:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Identifier for the bank clearinghouse referenced by this financial record.
   id_liquidated:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Identifier for the liquidated referenced by this financial record.
   id_cancel_instruction:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Identifier for the cancel instruction referenced by this financial record.
   record_type:
     lineage:
       - datalake_nexxera_raw.cnab_charges.record_type
+    description: Financial attribute representing record type on the cnab_charges_341 dataset.
   cpf_cnpj:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing cpf cnpj on the cnab_charges_341 dataset.
   bank_agency:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing bank agency on the cnab_charges_341 dataset.
   bank_account:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing bank account on the cnab_charges_341 dataset.
   account_verification_digit:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing account verification digit on the cnab_charges_341 dataset.
   company_use:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing company use on the cnab_charges_341 dataset.
   our_number:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing our number on the cnab_charges_341 dataset.
   our_number_verification_digit:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing our number verification digit on the cnab_charges_341 dataset.
   wallet_number:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing wallet number on the cnab_charges_341 dataset.
   occurrence_code:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing occurrence code on the cnab_charges_341 dataset.
   document_number:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing document number on the cnab_charges_341 dataset.
   our_number_confirmation:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing our number confirmation on the cnab_charges_341 dataset.
   agency_liquidated:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing agency liquidated on the cnab_charges_341 dataset.
   agency_liquidated_verification_digit:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing agency liquidated verification digit on the cnab_charges_341 dataset.
   charge_type:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing charge type on the cnab_charges_341 dataset.
   payers_name:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing payers name on the cnab_charges_341 dataset.
   notice:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing notice on the cnab_charges_341 dataset.
   sequential_number:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing sequential number on the cnab_charges_341 dataset.
   file_name:
     lineage:
       - datalake_nexxera_raw.cnab_charges.file_name
+    description: Financial attribute representing file name on the cnab_charges_341 dataset.
   is_dda_bill:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Indicates whether dda bill applies to this financial record.
   due_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing due amount on the cnab_charges_341 dataset.
   interest_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing interest amount on the cnab_charges_341 dataset.
   net_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing net amount on the cnab_charges_341 dataset.
   billing_fee_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing billing fee amount on the cnab_charges_341 dataset.
   iof_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing iof amount on the cnab_charges_341 dataset.
   rebate_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing rebate amount on the cnab_charges_341 dataset.
   discount_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing discount amount on the cnab_charges_341 dataset.
   others_credit_amount:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Financial attribute representing others credit amount on the cnab_charges_341 dataset.
   dt_due:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Calendar date associated with due in the financial workflow.
   dt_credit:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Calendar date associated with credit in the financial workflow.
   dt_occurrence_code:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
+    description: Calendar date associated with occurrence code in the financial workflow.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.cnab_charges.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_nexxera_raw.cnab_charges.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.cnab_charges.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.cnab_charges.day
+    description: Day partition derived from the source event timestamp for incremental loading.
