@@ -1,24 +1,37 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: delinquency_has_agreement
-owner: athos.sampayo@quintoandar.com.br
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per delinquency has agreement in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_delinquency:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_has_agreement.delinquency_id
+    description: Identifier for the delinquency referenced by this financial record.
   id_agreement:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_has_agreement.agreement_id
+    description: Identifier for the agreement referenced by this financial record.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_has_agreement.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_has_agreement.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_has_agreement.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_has_agreement.day
+    description: Day partition derived from the source event timestamp for incremental loading.

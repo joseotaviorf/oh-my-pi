@@ -1,55 +1,68 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: entry_aud
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per entry aud in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   type:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.type
+    description: QuintoCred rental guarantee attribute describing type in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   invoice:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.invoice
+    description: QuintoCred rental guarantee attribute describing invoice in the policy lifecycle.
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.propose
+    description: QuintoCred rental guarantee attribute describing propose in the policy lifecycle.
   amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   mod_created_at:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.created_at_mod
+    description: QuintoCred rental guarantee attribute describing mod created at in the policy lifecycle.
   mod_invoice:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.invoice_mod
+    description: QuintoCred rental guarantee attribute describing mod invoice in the policy lifecycle.
   mod_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.propose_mod
+    description: QuintoCred rental guarantee attribute describing mod propose in the policy lifecycle.
   mod_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.amount_mod
+    description: QuintoCred rental guarantee attribute describing mod amount in the policy lifecycle.
   mod_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.type_mod
+    description: QuintoCred rental guarantee attribute describing mod type in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry_aud.created_at
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.entry_aud.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.entry_aud.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.entry_aud.day
+    description: Timestamp when created occurred in the upstream fintech system.

@@ -1,41 +1,61 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: entry
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per entry in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_billing_report:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.billing_report
+    description: Identifier for the billing report referenced by this financial record.
   type:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.type
+    description: QuintoCred rental guarantee attribute describing type in the policy lifecycle.
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.propose
+    description: QuintoCred rental guarantee attribute describing propose in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   installment:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.installment
+    description: QuintoCred rental guarantee attribute describing installment in the policy lifecycle.
   amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.day
+    description: Day partition derived from the source event timestamp for incremental loading.
