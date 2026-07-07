@@ -1,21 +1,22 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: boleto
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: |
-  Boleto table containing information about the boleto transactions.
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Boleto transactions issued and managed through Seu Barriga.
 columns:
   id:
-    description: "Boleto ID number"
+    description: Financial attribute representing id on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.id
   id_external:
-    description: "External ID number"
+    description: Identifier for the external referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.boleto.external_id
   id_invoice:
-    description: "Invoice ID number"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko_raw.boleto.invoice_id
   id_checkout_boleto:
@@ -27,35 +28,35 @@ columns:
     lineage:
       - datalake_retsuko_raw.boleto.pix_emv
   identifier:
-    description: "Identifier number"
+    description: Financial attribute representing identifier on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.identifier
   status:
-    description: "Boleto status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_retsuko_raw.boleto.status
   due_amount:
-    description: "Boleto due amount"
+    description: Financial attribute representing due amount on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.due_amount
   our_number:
-    description: "Our number"
+    description: Financial attribute representing our number on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.our_number
   our_number_digit:
-    description: "Our number digit"
+    description: Financial attribute representing our number digit on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.our_number_digit
   wallet_number:
-    description: "Wallet number"
+    description: Financial attribute representing wallet number on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.wallet_number
   barcode:
-    description: "Barcode number"
+    description: Financial attribute representing barcode on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.barcode
   inputtable_line:
-    description: "Inputtable line"
+    description: Financial attribute representing inputtable line on the boleto dataset.
     lineage:
       - datalake_retsuko_raw.boleto.inputtable_line
   external_source:
@@ -63,15 +64,15 @@ columns:
     lineage:
       - datalake_retsuko_raw.boleto.external_source
   ts_due:
-    description: "Due timestamp"
+    description: Timestamp when due occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_raw.boleto.due_date
   ts_issued:
-    description: "Issued timestamp"
+    description: Timestamp when issued occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_raw.boleto.issue_date
   ts_created:
-    description: "Created timestamp"
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_raw.boleto.created_at
   ts_retsuko_created:

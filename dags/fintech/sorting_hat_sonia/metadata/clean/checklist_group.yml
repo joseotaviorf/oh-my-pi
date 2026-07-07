@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: checklist_group
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Groups items within a checklist with subject, comments, and compliance status in Sorting Hat.
 columns:

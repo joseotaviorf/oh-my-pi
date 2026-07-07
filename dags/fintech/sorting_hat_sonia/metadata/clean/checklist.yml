@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: checklist
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Checklist instance for an analysis request (status, type, result, current version flag) in Sorting Hat.
 columns:

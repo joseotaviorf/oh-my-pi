@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: agreement
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Financial agreements linked to contracts (installments, accrual periods, billing rules).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Financial agreements linked to contracts (installments, accrual periods, billing rules).
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -109,6 +109,6 @@ columns:
     lineage:
       - datalake_retsuko_raw.agreement.day
   hour:
-    description: "Partition hour"
+    description: Financial attribute representing hour on the agreement dataset.
     lineage:
       - datalake_retsuko_raw.agreement.hour

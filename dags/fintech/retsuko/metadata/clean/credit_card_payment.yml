@@ -1,50 +1,68 @@
 database_name: datalake_retsuko_clean
 table_name: credit_card_payment
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Credit card payment records processed in Seu Barriga.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.id
+    description: Financial attribute representing id on the credit_card_payment dataset.
   id_external:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.external_id
+    description: Identifier for the external referenced by this financial record.
   id_invoice:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.invoice_id
+    description: Invoice identifier in the billing or payments platform.
   id_acquirer_transaction:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_transaction_id
+    description: Identifier for the acquirer transaction referenced by this financial record.
   id_recurrent_credit_card:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.recurrent_credit_card_id
+    description: Identifier for the recurrent credit card referenced by this financial record.
   acquirer_auth_code:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_auth_code
+    description: Financial attribute representing acquirer auth code on the credit_card_payment dataset.
   acquirer_nsu:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_nsu
+    description: Financial attribute representing acquirer nsu on the credit_card_payment dataset.
   brand_name:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.brand_name
+    description: Financial attribute representing brand name on the credit_card_payment dataset.
   status:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   installments:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.installments
+    description: Financial attribute representing installments on the credit_card_payment dataset.
   acquirer_fee_amount:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.acquirer_fee_amount
+    description: Financial attribute representing acquirer fee amount on the credit_card_payment dataset.
   advance_fee_amount:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.advance_fee_amount
+    description: Financial attribute representing advance fee amount on the credit_card_payment dataset.
   charged_amount:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.charged_amount
+    description: Financial attribute representing charged amount on the credit_card_payment dataset.
   is_recurrent:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.is_recurrent
+    description: Indicates whether recurrent applies to this financial record.
   ts_created:
     lineage:
       - datalake_retsuko_raw.credit_card_payment.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

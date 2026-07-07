@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: proposal
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Current rental credit proposal row with model scores, risk levels, home attributes, and analyst fields in Sorting Hat.
 columns:
@@ -123,10 +124,6 @@ columns:
     lineage:
       - datalake_sorting_hat_raw.proposal.process_date
     description: Timestamp when batch processing last refreshed derived fields.
-  is_home_exclusive_5A:
-    lineage:
-      - datalake_sorting_hat_raw.proposal.home_exclusive_5a
-    description: Indicates the listing belongs to the exclusive 5A inventory tier.
   ts_home_last_published:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_last_published_at
@@ -147,3 +144,7 @@ columns:
     lineage:
       - datalake_sorting_hat_raw.proposal.proposal_source
     description: Channel or product surface that originated this proposal record.
+  is_home_exclusive_5a:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_exclusive_5a
+    description: Indicates whether home exclusive 5a applies to this financial record.

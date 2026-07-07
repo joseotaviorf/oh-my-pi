@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: agreement_entry
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Links agreements to accounting entries per installment and accrual period.
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Links agreements to accounting entries per installment and accrual period.
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.agreement_entry.agreement_external_id
   id_from_entry_external:
-    description: "External id of the source entry"
+    description: Identifier for the from entry external referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.agreement_entry.from_entry_external_id
   id_to_entry_external:

@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: checklist_item
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Individual checklist inputs (values, sources, compliance) under a checklist group in Sorting Hat.
 columns:

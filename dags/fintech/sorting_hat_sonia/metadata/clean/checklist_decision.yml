@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: checklist_decision
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: This table stores the decision of the checklist after the analysis request flow.
 columns:
@@ -10,7 +11,7 @@ columns:
   id_checklist:
     lineage:
       - datalake_sorting_hat_raw.checklistdecision.checklist_id
-    description: Checklist ID.
+    description: Identifier for the checklist referenced by this financial record.
   id_input_source:
     lineage:
       - datalake_sorting_hat_raw.checklistdecision.input_source_id
@@ -22,7 +23,7 @@ columns:
   input_source_type:
     lineage:
       - datalake_sorting_hat_raw.checklistdecision.input_source_type
-    description: Type of the input source responsible to the checklist decision.
+    description: Financial attribute representing input source type on the checklist_decision dataset.
   decision:
     lineage:
       - datalake_sorting_hat_raw.checklistdecision.decision

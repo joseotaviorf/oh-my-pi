@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: credit_analysis
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Current credit analysis for a proposal (analyst decision, variant, category, bypass) in Sorting Hat.
 columns:

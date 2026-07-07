@@ -1,10 +1,13 @@
 database_name: datalake_retsuko_clean
 table_name: audit
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Audit events capturing user actions and changes performed in Seu Barriga.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
-    description: "Audit ID"
+    description: Financial attribute representing id on the audit dataset.
     lineage:
       - datalake_retsuko_raw.audit.id
   email:

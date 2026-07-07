@@ -1,12 +1,13 @@
 database_name: datalake_sorting_hat_clean
 table_name: proponent
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: Table with information about the proponent.
+description: One row per proponent in the Fintech clean layer, sourced from datalake_sorting_hat_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.proponent.id
-    description: Proponent ID
+    description: Financial attribute representing id on the proponent dataset.
   name:
     lineage:
       - datalake_sorting_hat_raw.proponent.name
@@ -14,7 +15,7 @@ columns:
   cpf:
     lineage:
       - datalake_sorting_hat_raw.proponent.cpf
-    description: Proponent's CPF
+    description: Brazilian individual taxpayer registry number (CPF) used for identity verification (PII).
   income_nature:
     lineage:
       - datalake_sorting_hat_raw.proponent.income_nature
@@ -30,7 +31,7 @@ columns:
   gender:
     lineage:
       - datalake_sorting_hat_raw.proponent.gender
-    description: Proponent's gender
+    description: Financial attribute representing gender on the proponent dataset.
   dt_admitted:
     lineage:
       - datalake_sorting_hat_raw.proponent.admission_date
@@ -42,15 +43,15 @@ columns:
   phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.phone
-    description: Proponent's phone
+    description: Financial attribute representing phone on the proponent dataset.
   email:
     lineage:
       - datalake_sorting_hat_raw.proponent.email
-    description: Proponent's email
+    description: Financial attribute representing email on the proponent dataset.
   monthly_income:
     lineage:
       - datalake_sorting_hat_raw.proponent.monthly_income
-    description: Proponent monthly income
+    description: Financial attribute representing monthly income on the proponent dataset.
   is_going_to_reside:
     lineage:
       - datalake_sorting_hat_raw.proponent.will_reside
@@ -58,7 +59,7 @@ columns:
   location_motive:
     lineage:
       - datalake_sorting_hat_raw.proponent.location_motive
-    description: Proponent location motive
+    description: Financial attribute representing location motive on the proponent dataset.
   second_doc_type:
     lineage:
       - datalake_sorting_hat_raw.proponent.second_doc_type
@@ -78,7 +79,7 @@ columns:
   nationality:
     lineage:
       - datalake_sorting_hat_raw.proponent.nationality
-    description: Proponent's nationality
+    description: Financial attribute representing nationality on the proponent dataset.
   dt_birthday:
     lineage:
       - datalake_sorting_hat_raw.proponent.birthday
@@ -94,7 +95,7 @@ columns:
   address:
     lineage:
       - datalake_sorting_hat_raw.proponent.address
-    description: Proponent's address
+    description: Financial attribute representing address on the proponent dataset.
   address_number:
     lineage:
       - datalake_sorting_hat_raw.proponent.address_number
@@ -122,43 +123,43 @@ columns:
   residence_time:
     lineage:
       - datalake_sorting_hat_raw.proponent.residence_time
-    description: Residence time
+    description: Financial attribute representing residence time on the proponent dataset.
   profession:
     lineage:
       - datalake_sorting_hat_raw.proponent.profession
-    description: Proponent's profession
+    description: Financial attribute representing profession on the proponent dataset.
   employer_name:
     lineage:
       - datalake_sorting_hat_raw.proponent.employer_name
-    description: Employer name
+    description: Financial attribute representing employer name on the proponent dataset.
   employer_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.employer_phone
-    description: Employer phone number
+    description: Financial attribute representing employer phone on the proponent dataset.
   extra_income_origin:
     lineage:
       - datalake_sorting_hat_raw.proponent.extra_income_origin
-    description: Origin of extra income
+    description: Financial attribute representing extra income origin on the proponent dataset.
   extra_income_value:
     lineage:
       - datalake_sorting_hat_raw.proponent.extra_income_value
-    description: Extra income value
+    description: Financial attribute representing extra income value on the proponent dataset.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.proponent.proposal_id
-    description: Proposal ID
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   boavista_score:
     lineage:
       - datalake_sorting_hat_raw.proponent.boavista_score
-    description: Boavista Score
+    description: Financial attribute representing boavista score on the proponent dataset.
   serasa_score:
     lineage:
       - datalake_sorting_hat_raw.proponent.serasa_score
-    description: Serasa Score
+    description: Financial attribute representing serasa score on the proponent dataset.
   id_screening_result:
     lineage:
       - datalake_sorting_hat_raw.proponent.screening_result_id
-    description: Screening result ID
+    description: Identifier for the screening result referenced by this financial record.
   scr_income:
     lineage:
       - datalake_sorting_hat_raw.proponent.scr_income
