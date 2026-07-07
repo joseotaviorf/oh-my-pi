@@ -1,41 +1,61 @@
 database_name: datalake_lead
 table_name: conversion_lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Enriched conversion lead with coalesced conversion timestamp (ts_converted) for analytics, sourced from datalake_ebdb_clean.conversion_lead.
 columns:
   id:
     lineage:
       - datalake_ebdb_clean.conversion_lead.id
+    description: Conversion record primary key from clean conversion_lead.
   id_house:
     lineage:
       - datalake_ebdb_clean.conversion_lead.id_house
+    description: Foreign key to the converted house.
   id_converted_lead:
     lineage:
       - datalake_ebdb_clean.conversion_lead.id_converted_lead
+    description: Foreign key to the lead that was converted.
   id_sales_rep:
     lineage:
       - datalake_ebdb_clean.conversion_lead.id_sales_rep
+    description: Foreign key to the sales rep credited with the conversion.
   id_account_manager:
     lineage:
       - datalake_ebdb_clean.conversion_lead.id_account_manager
+    description: Foreign key to the account manager for the conversion.
   is_validated:
     lineage:
       - datalake_ebdb_clean.conversion_lead.is_validated
+    description: Flag indicating the conversion was validated.
   status:
     lineage:
       - datalake_ebdb_clean.conversion_lead.status
+    description: Conversion workflow status.
+    categories:
+      Concluido: Conversion completed and validated in the workflow.
+      Pendente: Conversion pending validation or completion.
   type:
     lineage:
       - datalake_ebdb_clean.conversion_lead.type
+    description: Conversion type classification.
+    categories:
+      Lead: Standard lead conversion credited to the lead channel.
+      InsideSales: Conversion handled by the inside sales team.
   ts_conversion:
     lineage:
       - datalake_ebdb_clean.conversion_lead.ts_conversion
+    description: Timestamp when the lead was converted (dataConversao).
   ts_converted:
     lineage:
       - datalake_ebdb_clean.conversion_lead.ts_created
       - datalake_ebdb_clean.conversion_lead.ts_conversion
+    description: Best-available conversion timestamp. COALESCE(ts_created, ts_conversion) for analytics.
   ts_created:
     lineage:
       - datalake_ebdb_clean.conversion_lead.ts_created
+    description: Timestamp when the conversion record was created.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.conversion_lead.ts_updated
+    description: Timestamp when the conversion record was last updated.

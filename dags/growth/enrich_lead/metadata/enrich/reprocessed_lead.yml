@@ -1,11 +1,15 @@
 database_name: datalake_lead
 table_name: reprocessed_lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Subset of leads with source Reprocessado and non-empty extra_infos. Parses the origin lead identifier from extra_infos to link the duplicate row back to the first lead (~91% parse success in production).
 columns:
   id:
     lineage:
       - datalake_ebdb_clean.lead.id
+    description: Lead identifier for the reprocessed (duplicate) lead row (EBDB.Lead.id).
   id_origin_lead:
     lineage:
       - datalake_ebdb_clean.lead.extra_infos
       - datalake_ebdb_clean.lead.id
+    description: Origin lead identifier parsed from extra_infos, pointing to the first lead before reprocessing. Nullable when extra_infos does not match a known reprocessing pattern.

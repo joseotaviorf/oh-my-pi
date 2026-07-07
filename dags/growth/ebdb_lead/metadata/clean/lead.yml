@@ -1,251 +1,444 @@
 database_name: datalake_ebdb_clean
 table_name: lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: This table has information related to QuintoAndar's leads.
+description: Clean layer for property listing leads from EBDB Main Lead. One row per owner supply lead captured via PWA, price calculator, classifieds, affiliates, apps, and other acquisition channels, with advertiser contact, property attributes, capture workflow status, UTM attribution, and affiliate or referral links. Feeds enrich_lead and supply acquisition funnels.
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.lead.id
+    description: Lead primary key from EBDB Main Lead.
   id_agent:
     lineage:
       - datalake_ebdb_raw.lead.dadosagente_id
+    description: Foreign key to agent data (DadosAgente) associated with the lead.
   id_salesforce:
     lineage:
       - datalake_ebdb_raw.lead.salesforceid
+    description: Salesforce record identifier linked to this lead for CRM sync.
   id_state:
     lineage:
       - datalake_ebdb_raw.lead.estado_id
+    description: EBDB state identifier (estado_id) for the lead property address.
   id_region:
     lineage:
       - datalake_ebdb_raw.lead.region_id
+    description: QuintoAndar region identifier for the lead property location.
   id_external:
     lineage:
       - datalake_ebdb_raw.lead.externalid
+    description: Rene Descartes house_lead.id linked to this EBDB lead. Joins to datalake_rene_descartes_clean.house_lead.id for most populated records (~84% match rate in production).
   id_owner_device:
     lineage:
       - datalake_ebdb_raw.lead.ownerdeviceid
+    description: Device identifier of the owner app registration, when captured on the lead.
   id_lead_owner:
     lineage:
       - datalake_ebdb_raw.lead.proprietariolead_id
+    description: Foreign key to OwnerLead (proprietarioLead) for the listing owner contact.
   id_real_estate_agency:
     lineage:
       - datalake_ebdb_raw.lead.imobiliaria_id
+    description: Foreign key to partner real estate agency (imobiliaria) when applicable.
   id_agent_has_indicated:
     lineage:
       - datalake_ebdb_raw.lead.corretorqueindicou_id
+    description: Foreign key to the referring agent (corretorQueIndicou).
   id_account_manager:
     lineage:
       - datalake_ebdb_raw.lead.gerentecontas_id
+    description: Foreign key to account manager (gerenteContas) overseeing conversion.
   id_affiliate_has_indicated:
     lineage:
       - datalake_ebdb_raw.lead.afiliadoqueindicou_id
+    description: Foreign key to affiliate data (DadosAfiliado) when referred by an affiliate.
   id_leads_grouped_by_phone:
     lineage:
       - datalake_ebdb_raw.lead.agrupamentoleadsportelefone_id
+    description: Foreign key to phone-based lead grouping for duplicate detection.
   total_area:
     lineage:
       - datalake_ebdb_raw.lead.areatotal
+    description: Total property area in square meters as reported in the classified ad.
   address:
     lineage:
       - datalake_ebdb_raw.lead.endereco
+    description: Street address of the advertised property (PII).
   house_number:
     lineage:
       - datalake_ebdb_raw.lead.numero
+    description: Street number of the advertised property (PII).
   complement:
     lineage:
       - datalake_ebdb_raw.lead.complemento
+    description: Address complement (apartment, block, etc.) for the advertised property.
   neighborhood:
     lineage:
       - datalake_ebdb_raw.lead.bairro
+    description: Neighborhood (bairro) of the advertised property.
   city:
     lineage:
       - datalake_ebdb_raw.lead.cidade
+    description: City (cidade) of the advertised property.
   zip_code:
     lineage:
       - datalake_ebdb_raw.lead.cep
+    description: Postal code (CEP) of the advertised property.
   address_picked_up:
     lineage:
       - datalake_ebdb_raw.lead.enderecocaptado
+    description: Address text as captured by the listing collector during pickup.
   advertiser_name:
     lineage:
       - datalake_ebdb_raw.lead.nomeanunciante
+    description: Advertiser or owner name from the classified listing (PII).
   bathrooms:
     lineage:
       - datalake_ebdb_raw.lead.numerobanheiros
+    description: Number of bathrooms reported in the classified ad.
   bedrooms:
     lineage:
       - datalake_ebdb_raw.lead.numeroquartos
+    description: Number of bedrooms reported in the classified ad.
   suites:
     lineage:
       - datalake_ebdb_raw.lead.numerosuites
+    description: Number of suites reported in the classified ad.
   ad_url:
     lineage:
       - datalake_ebdb_raw.lead.urlanuncio
+    description: URL of the original classified advertisement.
   rent:
     lineage:
       - datalake_ebdb_raw.lead.valor
+    description: Rent price (valor) reported in the classified ad. Nullable on sale-only leads; may also be populated when is_for_sale is true.
   advertiser_phone:
     lineage:
       - datalake_ebdb_raw.lead.telefoneanunciante
+    description: Primary advertiser phone number from the listing (PII).
   rent_per_square_meter:
     lineage:
       - datalake_ebdb_raw.lead.valorpormetroquad
+    description: Rent divided by total area, as reported in the ad.
   rent_per_bedroom:
     lineage:
       - datalake_ebdb_raw.lead.valorporquartos
+    description: Rent divided by bedroom count, as reported in the ad.
   type:
     lineage:
       - datalake_ebdb_raw.lead.tipo
+    description: Lead acquisition type classification from EBDB (tipo). Distinct from source (origem); describes the capture mechanism or partner channel.
+    categories:
+      Afiliado: Lead referred through the affiliate program.
+      LandingMarketing: Lead captured via a marketing landing page.
+      Organic: Lead from organic or unattributed traffic.
+      Inbound: Lead from an inbound contact channel.
+      LandingOpenLink: Lead from an open marketing landing link.
+      OngoingLead: Lead from the ongoing-lead nurture flow.
+      Proporparceria: Lead from the partnership proposal form.
+      Marketing: Lead from a general marketing campaign.
+      Porteiro: Lead referred by a doorman (porteiro) partner.
+      Repechage: Lead re-engaged through the repechage flow.
+      OLX: Lead sourced from OLX classifieds integration.
+      LeadPro: Lead from the LeadPro partner channel.
+      Facebook: Lead sourced from Facebook acquisition.
+      Outros: Other or unmapped lead type.
+      UmDoisTresI: Lead from the UmDoisTresI partner integration.
+      CadastroImobiliario: Lead from the real estate registration form.
+      ReturnToCart: Lead from a return-to-cart abandoned flow.
+      ChavesNaMao: Lead from the Chaves na Mão partner.
+      ImovelWeb: Lead sourced from ImovelWeb classifieds.
+      B2BOpenLink: Lead from a B2B partner open link.
+      BrokenOpenLink: Lead captured from a broken or invalid open link.
+      CanalDoImovel: Lead from the Canal do Imóvel partner.
+      OpenLink: Lead from a generic open-link referral.
+      I24Touchpoint: Lead from the i24 touchpoint integration.
+      Agente: Lead sourced directly by a real estate agent.
   email:
     lineage:
       - datalake_ebdb_raw.lead.email
+    description: Advertiser email address from the listing (PII).
   extra_infos:
     lineage:
       - datalake_ebdb_raw.lead.infosextras
+    description: Unstructured extra metadata string from the lead capture flow.
   pick_up_email:
     lineage:
       - datalake_ebdb_raw.lead.emailcaptador
+    description: Email used by the listing collector during lead pickup (PII).
   advertiser_second_phone:
     lineage:
       - datalake_ebdb_raw.lead.telefoneanunciantedois
+    description: Secondary advertiser phone from the listing (PII).
   advertiser_third_phone:
     lineage:
       - datalake_ebdb_raw.lead.telefoneanunciantetres
+    description: Tertiary advertiser phone from the listing (PII).
   pick_up_phone:
     lineage:
       - datalake_ebdb_raw.lead.telefonecaptador
+    description: Phone used by the listing collector during pickup (PII).
   lat:
     lineage:
       - datalake_ebdb_raw.lead.lat
+    description: Latitude of the property location from the lead record.
   lng:
     lineage:
       - datalake_ebdb_raw.lead.lng
+    description: Longitude of the property location from the lead record.
   lat_bkp:
     lineage:
       - datalake_ebdb_raw.lead.latbkp
+    description: First backup latitude value stored when primary geocoding fails.
   lng_bkp:
     lineage:
       - datalake_ebdb_raw.lead.lngbkp
+    description: First backup longitude value stored when primary geocoding fails.
   lat_bkp2:
     lineage:
       - datalake_ebdb_raw.lead.latbkp2
+    description: Second backup latitude value for geocoding fallback.
   lng_bkp2:
     lineage:
       - datalake_ebdb_raw.lead.lngbkp2
+    description: Second backup longitude value for geocoding fallback.
   condo_price:
     lineage:
       - datalake_ebdb_raw.lead.condominio
+    description: Monthly condominium fee (condominio) reported in the ad.
   iptu:
     lineage:
       - datalake_ebdb_raw.lead.iptu
+    description: Annual property tax (IPTU) amount reported in the ad.
   reason:
     lineage:
       - datalake_ebdb_raw.lead.reason
+    description: Lead discard or status reason code from EBDB (reason). Populated mainly on discarded leads; maps to operational discard taxonomy. Human-readable groupings also available via datalake_gsheets_clean.historical_lead_reason.
+    categories:
+      DUPLICATED_LEAD: Lead discarded as duplicate of an existing record.
+      ForaArea: Property outside QuintoAndar operation area (legacy Portuguese code).
+      OWNER_DIDNT_ANSWER_PHONE: Owner did not answer outbound phone contact.
+      CONTACT_WASNT_THE_HOUSE_OWNER: Contact person was not the property owner.
+      CONTACT_DIDNT_EXIST: Contact phone or channel did not exist.
+      HOUSE_ALREADY_RENTED: Property was already rented elsewhere.
+      HOUSE_ALREADY_PUBLISHED: Property was already published on QuintoAndar.
+      CONTACT_ON_BLOCK_LIST: Contact is on the outbound block list.
+      OWNER_DIDNT_LISTEN_TO_PITCH: Owner did not listen to the sales pitch.
+      OWNER_GAVE_UP_RENTING: Owner gave up renting the property.
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: House outside rent operation regions.
+      ImovelRepetido: Duplicate property already in the pipeline (legacy Portuguese code).
+      CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT: Contact was a real estate broker or agent.
+      OWNER_DIDNT_WANT_RECEIVE_CALL: Owner declined to receive outbound calls.
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: Property classified as commercial real estate.
+      OWNER_DIDNT_WANT_ADMINISTRATION: Owner declined QuintoAndar administration.
+      CONTACT_IS_A_REAL_ESTATE_AGENT: Contact identified as a real estate agent.
+      OWNER_WONT_ANSWER_PHONE: Owner consistently refuses to answer the phone.
+      HOUSE_ALREADY_SOLD: Property was already sold.
+      HOUSE_ONLY_FOR_SELLING: Property available for sale only, not rent.
+      CONTACT_KNOW_OWNER: Contact knows the owner but is not the owner.
+      HOUSE_UNDER_EXCLUSIVITY_CONTRACT: Property under an exclusivity contract elsewhere.
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS_HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: Property outside both rent and sale operation regions.
+      ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS: Property has entrance or access condition issues.
+      ProprietarioNuncaAtende: Owner never answers contact attempts (legacy Portuguese code).
+      Outros: Other discard reason not mapped to a specific code.
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: Apartment outside apartment rent regions.
+      HOUSE_UNDER_MAJOR_RENOVATION: Property under major renovation.
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: House outside sale operation regions.
+      PROPERTY_IN_OFFPLANT: Property is off-plan or under construction (planta).
+      OWNER_WITH_PRIME_PROFILE: Owner profile flagged as prime and routed differently.
+      ForaDoPadrao5A: Property outside QuintoAndar quality standards (legacy Portuguese code).
+      CONTACT_IS_A_REAL_ESTATE_BROKER: Contact identified as a real estate broker.
+      ContatoIncorreto: Incorrect contact information (legacy Portuguese code).
+      RepetidoPublicacao: Duplicate publication attempt (legacy Portuguese code).
+      ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING: Only part of the property was available for rent.
+      ProprietarioRecusou: Owner refused the offer (legacy Portuguese code).
+      ImovelOcupado: Property is occupied and not available (legacy Portuguese code).
+      SEASONAL_RENT: Property offered as seasonal rent only.
+      OWNER_EVALUATING: Owner is still evaluating the offer.
+      HOUSE_WITH_BAD_CONDITIONS: Property condition below acceptance threshold.
+      ProprietarioNaoAtende: Owner does not answer contact attempts (legacy Portuguese code).
+      CONTACT_WAS_NO_LONGER_THE_HOUSE_OWNER: Contact was no longer the property owner.
+      ProprietarioVaiAnunciar: Owner plans to self-publish elsewhere (legacy Portuguese code).
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: Owner rejected due to brokerage fee.
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: Rent or sale price outside acceptable bounds.
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: Owner rejected due to administration fee.
+      ImovelParaVenda: Property listed for sale only (legacy Portuguese code).
+      OWNER_DISAGREE_CHARGES_PAYMENTS: Owner disagreed with charges or payment terms.
+      OWNER_UNAVAILABLE: Owner unavailable for contact or conversion.
+      CONTACT_WAS_FROM_HOUSE_TENANT: Contact was the current tenant, not the owner.
+      DISCARDED_DUE_TO_REFERRAL_FSS: Lead discarded due to referral FSS business rule.
+      ForaPreco: Price outside acceptable range (legacy Portuguese code).
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: Owner declined the online onboarding process.
+      Exclusivo: Property under exclusivity elsewhere (legacy Portuguese code).
+      ProprietarioAvaliando: Owner evaluating the offer (legacy Portuguese code).
+      OWNER_UNAVAILABLE_SCHEDULE: Owner unavailable due to schedule constraints.
+      ISSUES_WITH_HOUSE_DOCUMENTATION: Property has documentation issues.
+      TipoInvalido: Invalid lead or property type (legacy Portuguese code).
+      OWNER_REQUESTING_ASSISTANCE: Owner requested human assistance instead of self-service.
+      HOUSE_UNDER_RENOVATION: Property under renovation.
+      EnderecoIncorreto: Incorrect address information (legacy Portuguese code).
+      OWNER_DISAGREE_PAYMENT_TIMING: Owner disagreed with payment timing terms.
+      OWNER_NEED_SCHEDULE_PHOTOS: Owner needs to schedule photos before proceeding.
+      FaltaDados: Missing required lead data (legacy Portuguese code).
+      HOUSE_ALREADY_RENTED_FOR_MORE_THAN_3_MONTHS: Property rented elsewhere for more than three months.
+      OWNER_DIDNT_ACCEPT_SELF_CONDO_PAYMENT_MODEL: Owner rejected the self condo payment model.
+      OWNER_FINISHING_SELFSERVICE: Owner still completing self-service registration.
+      AFFILIATE_LEAD_DISTINCT_COUNTRY: Affiliate lead from an unsupported country.
+      OWNER_REFUSED_TERMS: Owner refused QuintoAndar terms.
+      PROPERTY_IN_JUDICIAL_INVENTORY: Property in judicial inventory or legal dispute.
+      PARTNER_LISTING_DUPLICATED: Partner listing flagged as duplicate.
+      OWNER_GAVE_UP_SELLING: Owner gave up selling the property.
   status:
     lineage:
       - datalake_ebdb_raw.lead.status
+    description: Lead workflow status in the EBDB capture pipeline.
+    categories:
+      Descartado: Lead was discarded during capture or qualification.
+      Convertido: Lead was converted to a listing or downstream supply entity.
+      Novo: Newly created lead not yet processed.
+      Prospeccao: Lead under active prospection by operations or partners.
   source:
     lineage:
       - datalake_ebdb_raw.lead.origem
+    description: Acquisition source or channel (origem) for the lead. Distinct from type (tipo); identifies the product surface or integration that created the record.
   reference:
     lineage:
       - datalake_ebdb_raw.lead.referencia
+    description: External reference code (referencia) attached to the lead.
   url_source:
     lineage:
       - datalake_ebdb_raw.lead.urlsource
+    description: Landing page or referrer URL that originated the lead.
   utm_medium:
     lineage:
       - datalake_ebdb_raw.lead.utmmedium
+    description: UTM medium parameter from the acquisition URL.
   utm_campaign:
     lineage:
       - datalake_ebdb_raw.lead.utmcampaign
+    description: UTM campaign parameter from the acquisition URL.
   utm_source:
     lineage:
       - datalake_ebdb_raw.lead.utmsource
+    description: UTM source parameter from the acquisition URL.
   other_neighborhood:
     lineage:
       - datalake_ebdb_raw.lead.outrobairro
+    description: Free-text neighborhood when the standard bairro field does not apply.
   other_city:
     lineage:
       - datalake_ebdb_raw.lead.outracidade
+    description: Free-text city when the standard 'city' field does not apply.
   recurring_status_count:
     lineage:
       - datalake_ebdb_raw.lead.recurringstatuscount
+    description: Count of recurring status transitions for this lead.
   real_estate_agency_code:
     lineage:
       - datalake_ebdb_raw.lead.codigoimobiliaria
+    description: Partner real estate agency code (codigoImobiliaria).
   unbounce_page_name:
     lineage:
       - datalake_ebdb_raw.lead.unbouncepagename
+    description: Unbounce landing page name for inbound marketing leads.
   unbounce_page_variant:
     lineage:
       - datalake_ebdb_raw.lead.unbouncepagevariant
+    description: Unbounce page variant (A/B test arm) for the landing page.
   unbounce_page_uri:
     lineage:
       - datalake_ebdb_raw.lead.unbouncepageuri
+    description: Full URI of the Unbounce landing page that captured the lead.
   sale_price:
     lineage:
       - datalake_ebdb_raw.lead.saleprice
+    description: Sale price (salePrice) when the lead is for property sale.
   affiliate_type:
     lineage:
       - datalake_ebdb_raw.lead.affiliatetype
+    description: Affiliate program type when the lead was referred by an affiliate. Null when the lead has no affiliate referral (~36% of production rows).
+    categories:
+      Standard: Standard affiliate program referral.
+      Agent: Real estate agent affiliate referral.
+      Doorman: Doorman (porteiro) affiliate program referral.
+      B2BPartner: B2B partner affiliate referral.
   has_sent_email_from_classifieds:
     lineage:
       - datalake_ebdb_raw.lead.sistemaenviouemailviaclassificado
+    description: Flag indicating an automated email was sent via classifieds integration.
   has_sent_presentation_email_after_registration:
     lineage:
       - datalake_ebdb_raw.lead.envioemailapresentacaopos
+    description: Flag indicating post-registration presentation email was sent.
   has_sent_presentation_email_before_registration:
     lineage:
       - datalake_ebdb_raw.lead.envioemailapresentacaopre
+    description: Flag indicating pre-registration presentation email was sent.
   has_processed:
     lineage:
       - datalake_ebdb_raw.lead.processado
+    description: Flag indicating the lead has been processed by the capture workflow.
   has_automatically_discarded:
     lineage:
       - datalake_ebdb_raw.lead.automaticallydiscarded
+    description: Flag indicating the lead was discarded automatically by business rules.
   is_generated_from_duplication:
     lineage:
       - datalake_ebdb_raw.lead.geradoapartirdeduplicacao
+    description: Flag indicating this lead was created from a duplicate record.
   is_inside_operation_area:
     lineage:
       - datalake_ebdb_raw.lead.dentroareaatuacao
+    description: Flag indicating the property is within QuintoAndar operation area.
   is_hot:
     lineage:
       - datalake_ebdb_raw.lead.hot
+    description: Flag marking the lead as high-priority (hot) for outbound contact.
   is_to_be_mentioned:
     lineage:
       - datalake_ebdb_raw.lead.mencionar
+    description: Flag indicating the affiliate referrer should be mentioned to the owner.
   is_from_roof_topper:
     lineage:
       - datalake_ebdb_raw.lead.fromrooftopper
+    description: Flag indicating the lead originated from Roof Topper partner channel.
   is_exclusivity_intent:
     lineage:
       - datalake_ebdb_raw.lead.exclusivityintent
+    description: Flag indicating owner expressed intent for exclusivity contract.
   is_enriched_data:
     lineage:
       - datalake_ebdb_raw.lead.isenricheddata
+    description: Flag indicating lead attributes were enriched beyond the original ad.
   is_for_rent:
     lineage:
       - datalake_ebdb_raw.lead.forrent
+    description: Flag indicating the lead includes a for-rent business context. Not mutually exclusive with is_for_sale; both can be true on the same lead.
   is_for_sale:
     lineage:
       - datalake_ebdb_raw.lead.forsale
+    description: Flag indicating the lead includes a for-sale business context. Not mutually exclusive with is_for_rent; both can be true on the same lead.
   dt_ad_created:
     lineage:
       - datalake_ebdb_raw.lead.anunciocriadoem
+    description: Date when the classified advertisement was created (anuncioCriadoEm).
   dt_picked_up:
     lineage:
       - datalake_ebdb_raw.lead.captadoem
+    description: Date when the lead was picked up by a listing collector (captadoEm).
   ts_next_follow_up:
     lineage:
       - datalake_ebdb_raw.lead.proximofollowup
+    description: Scheduled timestamp for the next outbound follow-up contact.
   ts_last_status_updated:
     lineage:
       - datalake_ebdb_raw.lead.lastupdatestatusdate
+    description: Timestamp of the most recent lead status change.
   ts_created:
     lineage:
       - datalake_ebdb_raw.lead.criadoem
+    description: Timestamp when the lead record was created in EBDB (criadoEm).
   ts_updated:
     lineage:
       - datalake_ebdb_raw.lead.atualizadoem
+    description: Timestamp when the lead record was last updated in EBDB (atualizadoEm).

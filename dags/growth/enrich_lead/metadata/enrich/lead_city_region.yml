@@ -1,10 +1,14 @@
 database_name: datalake_lead
 table_name: lead_city_region
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Lead-to-region lookup inferred by matching normalized lead city name to datalake_region.region city names (is_city = true). Built from datalake_ebdb_clean.lead, not from enrich_lead. Covers ~93% of enrich leads; leads with null city or unmatched city names are omitted.
 columns:
   id_lead:
     lineage:
       - datalake_ebdb_clean.lead.id
+    description: EBDB lead identifier from datalake_ebdb_clean.lead.
   id_region:
     lineage:
       - datalake_region.region.id
+    description: QuintoAndar region identifier inferred from city-name match. Differs from lead.id_region on EBDB in most records; use for city-based regional reporting.

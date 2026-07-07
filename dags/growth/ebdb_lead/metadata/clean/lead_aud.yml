@@ -1,248 +1,340 @@
 database_name: datalake_ebdb_clean
 table_name: lead_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: This table has audit information related to QuintoAndar's leads.
+description: 'Hibernate Envers audit history for EBDB `Lead`. One row per revision capturing field values and mod_* change flags for lead status, discard reason, location, and outreach attributes. Join rev to user_revision_entity for change attribution.'
 columns:
   id_lead:
     lineage:
       - datalake_ebdb_raw.lead_aud.id
+    description: Lead identifier (Lead.id) for this audit row.
   rev:
     lineage:
       - datalake_ebdb_raw.lead_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_ebdb_clean.user_revision_entity.id; join on rev to retrieve who performed the change, when, and why.
   rev_type:
     lineage:
       - datalake_ebdb_raw.lead_aud.revtype
+    description: 'Hibernate Envers operation type for this audit row: 0=insert, 1=update. Delete (2) is supported by Envers but not observed in production data.'
   dt_ad_created:
     lineage:
       - datalake_ebdb_raw.lead_aud.anunciocriadoem
+    description: Date when the classified advertisement was created (anuncioCriadoEm). Value captured in this audit revision.
   total_area:
     lineage:
       - datalake_ebdb_raw.lead_aud.areatotal
+    description: Total property area in square meters as reported in the classified ad. Value captured in this audit revision.
   neighborhood:
     lineage:
       - datalake_ebdb_raw.lead_aud.bairro
+    description: Neighborhood (bairro) of the advertised property. Value captured in this audit revision.
   dt_picked_up:
     lineage:
       - datalake_ebdb_raw.lead_aud.captadoem
+    description: Date when the lead was picked up by a listing collector (captadoEm). Value captured in this audit revision.
   zip_code:
     lineage:
       - datalake_ebdb_raw.lead_aud.cep
+    description: Postal code (CEP) of the advertised property. Value captured in this audit revision.
   city:
     lineage:
       - datalake_ebdb_raw.lead_aud.cidade
+    description: City (cidade) of the advertised property. Value captured in this audit revision.
   complement:
     lineage:
       - datalake_ebdb_raw.lead_aud.complemento
+    description: Address complement (apartment, block, etc.) for the advertised property. Value captured in this audit revision.
   condo_price:
     lineage:
       - datalake_ebdb_raw.lead_aud.condominio
+    description: Monthly condominium fee (condominio) reported in the ad. Value captured in this audit revision.
   is_inside_operation_area:
     lineage:
       - datalake_ebdb_raw.lead_aud.dentroareaatuacao
+    description: Flag indicating the property is within QuintoAndar operation area. Value captured in this audit revision.
   address:
     lineage:
       - datalake_ebdb_raw.lead_aud.endereco
+    description: Street address of the advertised property (PII). Value captured in this audit revision.
   address_picked_up:
     lineage:
       - datalake_ebdb_raw.lead_aud.enderecocaptado
+    description: Address text as captured by the listing collector during pickup. Value captured in this audit revision.
   has_generated_from_duplication:
     lineage:
       - datalake_ebdb_raw.lead_aud.geradoapartirdeduplicacao
+    description: Flag indicating the lead was generated from duplication. Value captured in this audit revision.
   is_hot:
     lineage:
       - datalake_ebdb_raw.lead_aud.hot
+    description: Flag marking the lead as high-priority (hot) for outbound contact. Value captured in this audit revision.
   extra_infos:
     lineage:
       - datalake_ebdb_raw.lead_aud.infosextras
+    description: Unstructured extra metadata string from the lead capture flow. Value captured in this audit revision.
   iptu:
     lineage:
       - datalake_ebdb_raw.lead_aud.iptu
+    description: Annual property tax (IPTU) amount reported in the ad. Value captured in this audit revision.
   lat:
     lineage:
       - datalake_ebdb_raw.lead_aud.lat
+    description: Latitude of the property location from the lead record. Value captured in this audit revision.
   lng:
     lineage:
       - datalake_ebdb_raw.lead_aud.lng
+    description: Longitude of the property location from the lead record. Value captured in this audit revision.
   house_number:
     lineage:
       - datalake_ebdb_raw.lead_aud.numero
+    description: Street number of the advertised property (PII). Value captured in this audit revision.
   bathrooms:
     lineage:
       - datalake_ebdb_raw.lead_aud.numerobanheiros
+    description: Number of bathrooms reported in the classified ad. Value captured in this audit revision.
   bedrooms:
     lineage:
       - datalake_ebdb_raw.lead_aud.numeroquartos
+    description: Number of bedrooms reported in the classified ad. Value captured in this audit revision.
   suites:
     lineage:
       - datalake_ebdb_raw.lead_aud.numerosuites
+    description: Number of suites reported in the classified ad. Value captured in this audit revision.
   reason:
     lineage:
       - datalake_ebdb_raw.lead_aud.reason
+    description: Lead discard or status reason code from EBDB (reason). Value captured in this audit revision. Same enum as datalake_ebdb_clean.lead.reason; see that column metadata for the full category list.
   mod_reason:
     lineage:
       - datalake_ebdb_raw.lead_aud.reason_mod
+    description: Audit flag indicating whether discard reason changed in this revision (Hibernate Envers _mod column).
   id_salesforce:
     lineage:
       - datalake_ebdb_raw.lead_aud.salesforceid
+    description: Salesforce record identifier linked to this lead for CRM sync. Value captured in this audit revision.
   ad_url:
     lineage:
       - datalake_ebdb_raw.lead_aud.urlanuncio
+    description: URL of the original classified advertisement. Value captured in this audit revision.
   rent:
     lineage:
       - datalake_ebdb_raw.lead_aud.valor
+    description: Rent price (valor) reported in the classified ad. Value captured in this audit revision; nullable on sale-only leads.
   id_state:
     lineage:
       - datalake_ebdb_raw.lead_aud.estado_id
+    description: EBDB state identifier (estado_id) for the lead property address. Value captured in this audit revision.
   advertiser_name:
     lineage:
       - datalake_ebdb_raw.lead_aud.nomeanunciante
+    description: Advertiser or owner name from the classified listing (PII). Value captured in this audit revision.
   advertiser_phone:
     lineage:
       - datalake_ebdb_raw.lead_aud.telefoneanunciante
+    description: Primary advertiser phone number from the listing (PII). Value captured in this audit revision.
   rent_per_square_meter:
     lineage:
       - datalake_ebdb_raw.lead_aud.valorpormetroquad
+    description: Rent divided by total area, as reported in the ad. Value captured in this audit revision.
   rent_per_bedroom:
     lineage:
       - datalake_ebdb_raw.lead_aud.valorporquartos
+    description: Rent divided by bedroom count, as reported in the ad. Value captured in this audit revision.
   type:
     lineage:
       - datalake_ebdb_raw.lead_aud.tipo
+    description: Lead acquisition type classification from EBDB (tipo). Value captured in this audit revision. Same enum as datalake_ebdb_clean.lead.type; see that column metadata for category definitions.
   email:
     lineage:
       - datalake_ebdb_raw.lead_aud.email
+    description: Advertiser email address from the listing (PII). Value captured in this audit revision.
   pick_up_email:
     lineage:
       - datalake_ebdb_raw.lead_aud.emailcaptador
+    description: Email used by the listing collector during lead pickup (PII). Value captured in this audit revision.
   advertiser_second_phone:
     lineage:
       - datalake_ebdb_raw.lead_aud.telefoneanunciantedois
+    description: Secondary advertiser phone from the listing (PII). Value captured in this audit revision.
   advertiser_third_phone:
     lineage:
       - datalake_ebdb_raw.lead_aud.telefoneanunciantetres
+    description: Tertiary advertiser phone from the listing (PII). Value captured in this audit revision.
   pick_up_phone:
     lineage:
       - datalake_ebdb_raw.lead_aud.telefonecaptador
+    description: Phone used by the listing collector during pickup (PII). Value captured in this audit revision.
   id_lead_owner:
     lineage:
       - datalake_ebdb_raw.lead_aud.proprietariolead_id
+    description: Foreign key to OwnerLead (proprietarioLead) for the listing owner contact. Value captured in this audit revision.
   id_affiliate_has_indicated:
     lineage:
       - datalake_ebdb_raw.lead_aud.afiliadoqueindicou_id
+    description: Foreign key to affiliate data (DadosAfiliado) when referred by an affiliate. Value captured in this audit revision.
   has_sent_email_from_classifieds:
     lineage:
       - datalake_ebdb_raw.lead_aud.sistemaenviouemailviaclassificado
+    description: Flag indicating an automated email was sent via classifieds integration. Value captured in this audit revision.
   status:
     lineage:
       - datalake_ebdb_raw.lead_aud.status
+    description: Lead workflow status value captured in this audit revision, not necessarily the current status on lead.
+    categories:
+      Descartado: Lead was discarded during capture or qualification.
+      Convertido: Lead was converted to a listing or downstream supply entity.
+      Novo: Newly created lead not yet processed.
+      Prospeccao: Lead under active prospection by operations or partners.
   mod_status:
     lineage:
       - datalake_ebdb_raw.lead_aud.status_mod
+    description: Audit flag indicating whether workflow status changed in this revision (Hibernate Envers _mod column).
   has_sent_presentation_email_after_registration:
     lineage:
       - datalake_ebdb_raw.lead_aud.envioemailapresentacaopos
+    description: Flag indicating post-registration presentation email was sent. Value captured in this audit revision.
   mod_has_sent_presentation_email_after_registration:
     lineage:
       - datalake_ebdb_raw.lead_aud.envioemailapresentacaopos_mod
+    description: Audit flag indicating whether post-registration presentation email flag changed in this revision (Hibernate Envers _mod column).
   has_sent_presentation_email_before_registration:
     lineage:
       - datalake_ebdb_raw.lead_aud.envioemailapresentacaopre
+    description: Flag indicating pre-registration presentation email was sent. Value captured in this audit revision.
   mod_has_sent_presentation_email_before_registration:
     lineage:
       - datalake_ebdb_raw.lead_aud.envioemailapresentacaopre_mod
+    description: Audit flag indicating whether pre-registration presentation email flag changed in this revision (Hibernate Envers _mod column).
   has_processed:
     lineage:
       - datalake_ebdb_raw.lead_aud.processado
+    description: Flag indicating the lead has been processed by the capture workflow. Value captured in this audit revision.
   mod_has_processed:
     lineage:
       - datalake_ebdb_raw.lead_aud.processado_mod
+    description: Audit flag indicating whether processed flag changed in this revision (Hibernate Envers _mod column).
   source:
     lineage:
       - datalake_ebdb_raw.lead_aud.origem
+    description: Acquisition source or channel (origem) for the lead. Value captured in this audit revision. Same enum as datalake_ebdb_clean.lead.source; see that column metadata for category definitions.
   id_external:
     lineage:
       - datalake_ebdb_raw.lead_aud.externalid
+    description: Rene Descartes house_lead.id linked to this EBDB lead. Value captured in this audit revision.
   is_to_be_mentioned:
     lineage:
       - datalake_ebdb_raw.lead_aud.mencionar
+    description: Flag indicating the affiliate referrer should be mentioned to the owner. Value captured in this audit revision.
   reference:
     lineage:
       - datalake_ebdb_raw.lead_aud.referencia
+    description: External reference code (referencia) attached to the lead. Value captured in this audit revision.
   has_automatically_discarded:
     lineage:
       - datalake_ebdb_raw.lead_aud.automaticallydiscarded
+    description: Flag indicating the lead was discarded automatically by business rules. Value captured in this audit revision.
   id_region:
     lineage:
       - datalake_ebdb_raw.lead_aud.region_id
+    description: QuintoAndar region identifier for the lead property location. Value captured in this audit revision.
   mod_region:
     lineage:
       - datalake_ebdb_raw.lead_aud.region_mod
+    description: Audit flag indicating whether region identifier changed in this revision (Hibernate Envers _mod column).
   url_source:
     lineage:
       - datalake_ebdb_raw.lead_aud.urlsource
+    description: Landing page or referrer URL that originated the lead. Value captured in this audit revision.
   utm_medium:
     lineage:
       - datalake_ebdb_raw.lead_aud.utmmedium
+    description: UTM medium parameter from the acquisition URL. Value captured in this audit revision.
   utm_campaign:
     lineage:
       - datalake_ebdb_raw.lead_aud.utmcampaign
+    description: UTM campaign parameter from the acquisition URL. Value captured in this audit revision.
   utm_source:
     lineage:
       - datalake_ebdb_raw.lead_aud.utmsource
+    description: UTM source parameter from the acquisition URL. Value captured in this audit revision.
   is_from_roof_topper:
     lineage:
       - datalake_ebdb_raw.lead_aud.fromrooftopper
+    description: Flag indicating the lead originated from Roof Topper partner channel. Value captured in this audit revision.
   mod_is_from_roof_topper:
     lineage:
       - datalake_ebdb_raw.lead_aud.fromrooftopper_mod
+    description: Audit flag indicating whether Roof Topper origin flag changed in this revision (Hibernate Envers _mod column).
   other_neighborhood:
     lineage:
       - datalake_ebdb_raw.lead_aud.outrobairro
+    description: Free-text neighborhood when the standard 'bairro' field does not apply. Value captured in this audit revision.
   other_city:
     lineage:
       - datalake_ebdb_raw.lead_aud.outracidade
+    description: Free-text city when the standard 'cidade' field does not apply. Value captured in this audit revision.
   ts_last_status_updated:
     lineage:
       - datalake_ebdb_raw.lead_aud.lastupdatestatusdate
+    description: Timestamp of the most recent lead status change. Value captured in this audit revision.
   mod_ts_last_status_updated:
     lineage:
       - datalake_ebdb_raw.lead_aud.lastupdatestatusdate_mod
+    description: Audit flag indicating whether last status update timestamp changed in this revision (Hibernate Envers _mod column).
   recurring_status_count:
     lineage:
       - datalake_ebdb_raw.lead_aud.recurringstatuscount
+    description: Count of recurring status transitions for this lead. Value captured in this audit revision.
   mod_recurring_status_count:
     lineage:
       - datalake_ebdb_raw.lead_aud.recurringstatuscount_mod
+    description: Audit flag indicating whether recurring status count changed in this revision (Hibernate Envers _mod column).
   real_estate_agency_code:
     lineage:
       - datalake_ebdb_raw.lead_aud.codigoimobiliaria
+    description: Partner real estate agency code (codigoImobiliaria). Value captured in this audit revision.
   is_exclusivity_intent:
     lineage:
       - datalake_ebdb_raw.lead_aud.exclusivityintent
+    description: Flag indicating owner expressed intent for exclusivity contract. Value captured in this audit revision.
   id_owner_device:
     lineage:
       - datalake_ebdb_raw.lead_aud.ownerdeviceid
+    description: Device identifier of the owner app registration, when captured on the lead. Value captured in this audit revision.
   unbounce_page_name:
     lineage:
       - datalake_ebdb_raw.lead_aud.unbouncepagename
+    description: Unbounce landing page name for inbound marketing leads. Value captured in this audit revision.
   unbounce_page_variant:
     lineage:
       - datalake_ebdb_raw.lead_aud.unbouncepagevariant
+    description: Unbounce page variant (A/B test arm) for the landing page. Value captured in this audit revision.
   unbounce_page_uri:
     lineage:
       - datalake_ebdb_raw.lead_aud.unbouncepageuri
+    description: Full URI of the Unbounce landing page that captured the lead. Value captured in this audit revision.
   sale_price:
     lineage:
       - datalake_ebdb_raw.lead_aud.saleprice
+    description: Sale price (salePrice) when the lead is for property sale. Value captured in this audit revision.
   is_for_rent:
     lineage:
       - datalake_ebdb_raw.lead_aud.forrent
+    description: Flag indicating the lead includes a for-rent business context. Value captured in this audit revision; not mutually exclusive with is_for_sale.
   is_for_sale:
     lineage:
       - datalake_ebdb_raw.lead_aud.forsale
+    description: Flag indicating the lead includes a for-sale business context. Value captured in this audit revision; not mutually exclusive with is_for_rent.
   affiliate_type:
     lineage:
       - datalake_ebdb_raw.lead_aud.affiliatetype
+    description: Affiliate program type when the lead was referred by an affiliate. Value captured in this audit revision.
+    categories:
+      Standard: Standard affiliate program referral.
+      Agent: Real estate agent affiliate referral.
+      Doorman: Doorman (porteiro) affiliate program referral.
+      B2BPartner: B2B partner affiliate referral.
   id_agent:
     lineage:
       - datalake_ebdb_raw.lead_aud.dadosagente_id
+    description: Foreign key to agent data (DadosAgente) associated with the lead. Value captured in this audit revision.

@@ -1,185 +1,269 @@
 database_name: datalake_lead
 table_name: lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Enriched lead view combining EBDB clean lead with region and country, affiliate and owner context, historical lead reason mapping, Rene Descartes geocoding, B2B source detection, and follow-up deadline buckets for outbound contact planning.
 columns:
   id:
     lineage:
       - datalake_ebdb_clean.lead.id
+    description: Lead primary key; grain of the enriched lead table.
   id_country:
     lineage:
       - datalake_region.region.id_country
+    description: Country identifier from region dimension, with Rene Descartes fallback.
   id_agent:
     lineage:
       - datalake_ebdb_clean.lead.id_agent
+    description: Foreign key to agent data (DadosAgente) associated with the lead.
   id_region:
     lineage:
       - datalake_ebdb_clean.lead.id_region
+    description: QuintoAndar region identifier for the lead property location.
   id_external:
     lineage:
       - datalake_ebdb_clean.lead.id_external
+    description: Rene Descartes house_lead.id linked to this EBDB lead. Joins to datalake_rene_descartes_clean.house_lead.id for geocoding and country fallback.
   id_lead_owner:
     lineage:
       - datalake_ebdb_clean.lead.id_lead_owner
+    description: Foreign key to OwnerLead (proprietarioLead) for the listing owner contact.
   id_user_has_indicated:
     lineage:
       - datalake_ebdb_clean.user.id
+    description: EBDB user id of the affiliate who referred the lead.
   id_affiliate_has_indicated:
     lineage:
       - datalake_ebdb_clean.lead.id_affiliate_has_indicated
+    description: Foreign key to affiliate data (DadosAfiliado) when referred by an affiliate.
   country_code:
     lineage:
       - datalake_region.region.country_code
       - datalake_rene_descartes_clean.address.country_code
+    description: ISO country code from Rene Descartes address geocoding, with region dimension fallback. Defaults to Undefined when neither source resolves a country (~17% of rows).
+    categories:
+      BR: Brazil; dominant value for domestic supply leads.
+      MX: Mexico; resolved mainly via Rene Descartes address geocoding.
+      Undefined: Country could not be resolved from Rene address or region dimension.
   address:
     lineage:
       - datalake_ebdb_clean.lead.address
+    description: Street address of the advertised property (PII).
   house_number:
     lineage:
       - datalake_ebdb_clean.lead.house_number
+    description: Street number of the advertised property (PII).
   complement:
     lineage:
       - datalake_ebdb_clean.lead.complement
+    description: Address complement (apartment, block, etc.) for the advertised property.
   neighborhood:
     lineage:
       - datalake_ebdb_clean.lead.neighborhood
+    description: Neighborhood (bairro) of the advertised property.
   zip_code:
     lineage:
       - datalake_ebdb_clean.lead.zip_code
+    description: Postal code (CEP) of the advertised property.
   city:
     lineage:
       - datalake_ebdb_clean.lead.city
+    description: City (cidade) of the advertised property.
   total_area:
     lineage:
       - datalake_ebdb_clean.lead.total_area
+    description: Total property area in square meters as reported in the classified ad.
   advertiser_name:
     lineage:
       - datalake_ebdb_clean.lead.advertiser_name
+    description: Advertiser or owner name from the classified listing (PII).
   bathrooms:
     lineage:
       - datalake_ebdb_clean.lead.bathrooms
+    description: Number of bathrooms reported in the classified ad.
   bedrooms:
     lineage:
       - datalake_ebdb_clean.lead.bedrooms
+    description: Number of bedrooms reported in the classified ad.
   suites:
     lineage:
       - datalake_ebdb_clean.lead.suites
+    description: Number of suites reported in the classified ad.
   ad_url:
     lineage:
       - datalake_ebdb_clean.lead.ad_url
+    description: URL of the original classified advertisement.
   advertiser_phone:
     lineage:
       - datalake_ebdb_clean.lead.advertiser_phone
+    description: Primary advertiser phone number from the listing (PII).
   type:
     lineage:
       - datalake_ebdb_clean.lead.type
+    description: Lead acquisition type classification from EBDB (tipo). Distinct from source; describes the capture mechanism or partner channel.
   email:
     lineage:
       - datalake_ebdb_clean.lead.email
+    description: Advertiser email address from the listing (PII).
   pick_up_email:
     lineage:
       - datalake_ebdb_clean.lead.pick_up_email
+    description: Email used by the listing collector during lead pickup (PII).
   pick_up_phone:
     lineage:
       - datalake_ebdb_clean.lead.pick_up_phone
+    description: Phone used by the listing collector during pickup (PII).
   lat:
     lineage:
       - datalake_ebdb_clean.lead.lat
       - datalake_rene_descartes_clean.address.lat
+    description: Property latitude; prefers Rene Descartes geocoding over EBDB lead coordinates.
   lng:
     lineage:
       - datalake_ebdb_clean.lead.lng
       - datalake_rene_descartes_clean.address.lng
+    description: Property longitude; prefers Rene Descartes geocoding over EBDB lead coordinates.
   condo_price:
     lineage:
       - datalake_ebdb_clean.lead.condo_price
+    description: Monthly condominium fee (condominio) reported in the ad.
   iptu:
     lineage:
       - datalake_ebdb_clean.lead.iptu
+    description: Annual property tax (IPTU) amount reported in the ad.
   status:
     lineage:
       - datalake_ebdb_clean.lead.status
+    description: Lead workflow status in the EBDB capture pipeline.
+    categories:
+      Descartado: Lead was discarded during capture or qualification.
+      Convertido: Lead was converted to a listing or downstream supply entity.
+      Novo: Newly created lead not yet processed.
+      Prospeccao: Lead under active prospection by operations or partners.
   source:
     lineage:
       - datalake_ebdb_clean.lead.source
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+    description: Acquisition source or channel (origem). When EBDB source is Other and Rene OwnerPropertyRegistration origin is available, the Rene value replaces Other (~1k rows).
   unbounce_page_variant:
     lineage:
       - datalake_ebdb_clean.lead.unbounce_page_variant
+    description: Unbounce page variant (A/B test arm) for the landing page.
   unbounce_page_name:
     lineage:
       - datalake_ebdb_clean.lead.unbounce_page_name
+    description: Unbounce landing page name for inbound marketing leads.
   original_reason:
     lineage:
       - datalake_ebdb_clean.lead.reason
+    description: Raw discard reason code from EBDB lead before historical_lead_reason mapping. Same enum as datalake_ebdb_clean.lead.reason; see that column metadata for the full category list.
   reason:
     lineage:
       - datalake_ebdb_clean.lead.reason
       - datalake_gsheets_clean.historical_lead_reason.reason
+    description: Mapped discard reason group from historical_lead_reason (reason), falling back to the raw EBDB code when no mapping exists.
   reason_detail:
     lineage:
       - datalake_gsheets_clean.historical_lead_reason.reason_detail
+    description: Granular discard reason code from historical_lead_reason mapping. Populated when EBDB reason matches reason_detail in the sheet join; drives deadline_of_new_contact buckets.
   lead_owner_name:
     lineage:
       - datalake_ebdb_clean.ownerlead.name
+    description: Owner contact name from OwnerLead (proprietarioLead).
   lead_owner_email:
     lineage:
       - datalake_ebdb_clean.ownerlead.email
+    description: Owner contact email from OwnerLead (PII).
   affiliate_type:
     lineage:
       - datalake_ebdb_clean.lead.affiliate_type
+    description: Affiliate program type when the lead was referred by an affiliate. Null when the lead has no affiliate referral (~36% of rows).
+    categories:
+      Standard: Standard affiliate program referral.
+      Agent: Real estate agent affiliate referral.
+      Doorman: Doorman (porteiro) affiliate program referral.
+      B2BPartner: B2B partner affiliate referral.
   affiliate_operation_city:
     lineage:
       - datalake_ebdb_clean.affiliate_data.operation_city
+    description: Affiliate operation city from affiliate_data.
   utm_medium:
     lineage:
       - datalake_ebdb_clean.lead.utm_medium
+    description: UTM medium parameter from the acquisition URL.
   utm_campaign:
     lineage:
       - datalake_ebdb_clean.lead.utm_campaign
+    description: UTM campaign parameter from the acquisition URL.
   utm_source:
     lineage:
       - datalake_ebdb_clean.lead.utm_source
+    description: UTM source parameter from the acquisition URL.
   real_estate_agency_code:
     lineage:
       - datalake_ebdb_clean.lead.real_estate_agency_code
+    description: Partner real estate agency code (codigoImobiliaria).
   sale_price:
     lineage:
       - datalake_ebdb_clean.lead.sale_price
+    description: Sale price (salePrice) when the lead is for property sale.
+  deadline_of_new_contact:
+    lineage:
+      - datalake_gsheets_clean.historical_lead_reason.reason_detail
+    description: Follow-up deadline bucket derived from reason_detail for outbound contact planning. Null when reason_detail is unmapped or absent (~3% of rows with a discard reason).
+    categories:
+      Nunca: Do not recontact; permanent or hard discard (duplicates, block list, out of area, unavailable property).
+      Curto Prazo: Short-term recontact window; owner may reconsider after fees, exclusivity, or access issues.
+      Longo Prazo: Long-term recontact window; owner may reconsider after renovation, timing, or rental intent changes.
   is_b2b:
     lineage:
       - datalake_ebdb_clean.lead.extra_infos
+    description: Flag indicating the lead originated from a B2B partner source (extra_infos contains source=b2b_*).
   is_inside_operation_area:
     lineage:
       - datalake_ebdb_clean.lead.is_inside_operation_area
+    description: Flag indicating the property is within QuintoAndar operation area.
   is_enriched_data:
     lineage:
       - datalake_ebdb_clean.lead.is_enriched_data
+    description: Flag indicating lead attributes were enriched beyond the original ad.
   is_to_be_mentioned:
     lineage:
       - datalake_ebdb_clean.lead.is_to_be_mentioned
+    description: Flag indicating the affiliate referrer should be mentioned to the owner.
   is_for_rent:
     lineage:
       - datalake_ebdb_clean.lead.is_for_rent
+    description: Rental intent flag; COALESCE defaults to TRUE when null in EBDB. Not mutually exclusive with is_for_sale.
   is_for_sale:
     lineage:
       - datalake_ebdb_clean.lead.is_for_sale
+    description: For-sale intent flag from EBDB. Not mutually exclusive with is_for_rent; both can be true on the same lead.
   has_processed:
     lineage:
       - datalake_ebdb_clean.lead.has_processed
+    description: Flag indicating the lead has been processed by the capture workflow.
   has_automatically_discarded:
     lineage:
       - datalake_ebdb_clean.lead.has_automatically_discarded
+    description: Flag indicating the lead was discarded automatically by business rules.
   dt_picked_up:
     lineage:
       - datalake_ebdb_clean.lead.dt_picked_up
+    description: Date when the lead was picked up by a listing collector (captadoEm).
   dt_ad_created:
     lineage:
       - datalake_ebdb_clean.lead.dt_ad_created
+    description: Date when the classified advertisement was created (anuncioCriadoEm).
   ts_affiliate_operation_start:
     lineage:
       - datalake_ebdb_clean.affiliate_data.ts_operation_start
+    description: Timestamp when the referring affiliate operation started.
   ts_created:
     lineage:
       - datalake_ebdb_clean.lead.ts_created
+    description: Timestamp when the lead record was created in EBDB (criadoEm).
   ts_updated:
     lineage:
       - datalake_ebdb_clean.lead.ts_updated
+    description: Timestamp when the lead record was last updated in EBDB (atualizadoEm).

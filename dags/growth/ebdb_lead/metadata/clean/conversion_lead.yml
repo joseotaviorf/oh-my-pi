@@ -1,38 +1,56 @@
 database_name: datalake_ebdb_clean
 table_name: conversion_lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: This table has information related to QuintoAndar's lead conversions.
+description: 'Clean layer for lead-to-listing conversion records from EBDB `ConversaoLead`. Links a captured lead to the converted house (Imovel), sales rep, and account manager, with validation status and conversion timestamps.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.conversaolead.id
+    description: Conversion record primary key from EBDB ConversaoLead.
   id_house:
     lineage:
       - datalake_ebdb_raw.conversaolead.imovel_id
+    description: Foreign key to the converted house (Imovel.id).
   id_converted_lead:
     lineage:
       - datalake_ebdb_raw.conversaolead.leadconvertido_id
+    description: Foreign key to the lead (Lead.id) that was converted. Matches datalake_ebdb_clean.lead.id for ~98% of records in production.
   id_sales_rep:
     lineage:
       - datalake_ebdb_raw.conversaolead.vendedor_id
+    description: Foreign key to sales rep (DadosVendedor) credited with the conversion.
   id_account_manager:
     lineage:
       - datalake_ebdb_raw.conversaolead.gerentecontas_id
+    description: Foreign key to account manager (gerenteContas) for the conversion.
   is_validated:
     lineage:
       - datalake_ebdb_raw.conversaolead.validado
+    description: Flag indicating the conversion was validated by operations.
   status:
     lineage:
       - datalake_ebdb_raw.conversaolead.status
+    description: Conversion workflow status in EBDB.
+    categories:
+      Concluido: Conversion completed and validated in the workflow.
+      Pendente: Conversion pending validation or completion.
   type:
     lineage:
       - datalake_ebdb_raw.conversaolead.tipo
+    description: Conversion type classification (tipo) in EBDB.
+    categories:
+      Lead: Standard lead conversion credited to the lead channel.
+      InsideSales: Conversion handled by the inside sales team.
   ts_conversion:
     lineage:
       - datalake_ebdb_raw.conversaolead.dataconversao
+    description: Timestamp when the lead was converted to a listing (dataConversao).
   ts_created:
     lineage:
       - datalake_ebdb_raw.conversaolead.criadoem
+    description: Timestamp when the conversion record was created in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.conversaolead.atualizadoem
+    description: Timestamp when the conversion record was last updated in EBDB.

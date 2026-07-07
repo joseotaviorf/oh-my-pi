@@ -1,41 +1,58 @@
 database_name: datalake_ebdb_clean
 table_name: conversion_lead_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: This table has audit information related to QuintoAndar's lead conversions.
+description: 'Hibernate Envers audit history for EBDB `ConversaoLead`. One row per revision tracking changes to conversion status, validation flag, and conversion date. Join rev to user_revision_entity for change attribution.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.id
+    description: Conversion record identifier for this audit row.
   id_house:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.imovel_id
+    description: House identifier value captured in this audit revision.
   id_converted_lead:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.leadconvertido_id
+    description: Converted lead identifier value captured in this audit revision.
   id_sales_rep:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.vendedor_id
+    description: Sales rep identifier value captured in this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_ebdb_clean.user_revision_entity.id; join on rev to retrieve who performed the change, when, and why.
   rev_type:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.revtype
+    description: Hibernate Envers operation type for this audit row.
+    categories:
+      '0': INSERT — conversion record created in this revision.
+      '1': UPDATE — conversion record modified in this revision.
+      '2': DELETE — conversion record deleted (supported by Envers but not observed in production).
   status:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.status
+    description: Conversion status value captured in this audit revision.
   type:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.tipo
+    description: Conversion type value captured in this audit revision.
   is_validated:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.validado
+    description: Validation flag value captured in this audit revision.
   mod_status:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.status_mod
+    description: Audit flag indicating whether conversion status changed in this revision (Hibernate Envers _mod column).
   mod_is_validated:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.validado_mod
+    description: Audit flag indicating whether validation flag changed in this revision (Hibernate Envers _mod column).
   ts_conversion:
     lineage:
       - datalake_ebdb_raw.conversaolead_aud.dataconversao
+    description: Conversion timestamp value captured in this audit revision.
