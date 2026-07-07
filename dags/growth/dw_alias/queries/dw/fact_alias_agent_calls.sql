@@ -60,68 +60,44 @@ traces_ordered AS (
         AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 7 DAY
         AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) < TIMESTAMP('{load_end_date}')
         AND t.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
-),
-obs_base AS (
-    SELECT
-        io.id_observation AS sk_agent_call,
-        tr.id_langfuse_session,
-        io.id_trace,
-        lsa.uuid_company,
-        io.name AS agent_name,
-        io.type AS observation_type,
-        io.type = 'TOOL' AS is_tool_call,
-        tr.turn_number,
-        CAST((UNIX_TIMESTAMP(io.ts_ended) - UNIX_TIMESTAMP(io.ts_started)) * 1000.0 AS DOUBLE) AS duration_ms,
-        TRY_CAST(io.cost_details.input AS DOUBLE) AS cost_input_usd,
-        TRY_CAST(io.cost_details.output AS DOUBLE) AS cost_output_usd,
-        TRY_CAST(io.cost_details.total AS DOUBLE) AS cost_total_usd,
-        CAST(NULL AS BIGINT) AS input_tokens,
-        CAST(NULL AS BIGINT) AS output_tokens,
-        LOWER(COALESCE(io.output, '')) LIKE '%error%' AS had_error,
-        CASE
-            WHEN LOWER(COALESCE(io.output, '')) LIKE '%error%' THEN io.output
-        END AS error_message,
-        DATE(s.ts_created) AS dt_session,
-        io.ts_started,
-        io.ts_ended
-    FROM
-        incremental_observations AS io
-    INNER JOIN
-        traces_ordered AS tr
-            ON io.id_trace = tr.id_trace
-    INNER JOIN
-        datalake_chatbot.sessions AS s
-            ON tr.id_langfuse_session = s.id_langfuse_session
-    LEFT JOIN
-        datalake_alias.alias_sessions AS lsa
-            ON tr.id_langfuse_session = lsa.id_langfuse_session
 )
 SELECT
-    obs.sk_agent_call,
-    obs.id_langfuse_session,
-    obs.id_trace,
+    io.id_observation AS sk_agent_call,
+    tr.id_langfuse_session,
+    io.id_trace,
     COALESCE(cb.sk_broker, -1) AS sk_broker,
-    obs.agent_name,
-    obs.observation_type,
-    obs.is_tool_call,
-    obs.turn_number,
-    obs.duration_ms,
-    obs.cost_input_usd,
-    obs.cost_output_usd,
-    obs.cost_total_usd,
-    obs.input_tokens,
-    obs.output_tokens,
-    obs.has_error,
-    obs.error_message,
-    obs.dt_session,
-    obs.ts_started,
-    obs.ts_ended,
+    io.name AS agent_name,
+    io.type AS observation_type,
+    io.type = 'TOOL' AS is_tool_call,
+    tr.turn_number,
+    CAST((UNIX_TIMESTAMP(io.ts_ended) - UNIX_TIMESTAMP(io.ts_started)) * 1000.0 AS DOUBLE) AS duration_ms,
+    TRY_CAST(io.cost_details.input AS DOUBLE) AS cost_input_usd,
+    TRY_CAST(io.cost_details.output AS DOUBLE) AS cost_output_usd,
+    TRY_CAST(io.cost_details.total AS DOUBLE) AS cost_total_usd,
+    CAST(NULL AS BIGINT) AS input_tokens,
+    CAST(NULL AS BIGINT) AS output_tokens,
+    LOWER(COALESCE(io.output, '')) LIKE '%error%' AS has_error,
+    CASE
+        WHEN LOWER(COALESCE(io.output, '')) LIKE '%error%' THEN io.output
+    END AS error_message,
+    DATE(s.ts_created) AS dt_session,
+    io.ts_started,
+    io.ts_ended,
     CURRENT_TIMESTAMP() AS ts_load,
-    YEAR(obs.ts_started) AS year,
-    MONTH(obs.ts_started) AS month,
-    DAY(obs.ts_started) AS day
+    YEAR(io.ts_started) AS year,
+    MONTH(io.ts_started) AS month,
+    DAY(io.ts_started) AS day
 FROM
-    obs_base AS obs
+    incremental_observations AS io
+INNER JOIN
+    traces_ordered AS tr
+        ON io.id_trace = tr.id_trace
+INNER JOIN
+    datalake_chatbot.sessions AS s
+        ON tr.id_langfuse_session = s.id_langfuse_session
+LEFT JOIN
+    datalake_alias.alias_sessions AS lsa
+        ON tr.id_langfuse_session = lsa.id_langfuse_session
 LEFT JOIN
     core_brokers.brokers AS cb
-        ON obs.uuid_company = cb.uuid_company
+        ON lsa.uuid_company = cb.uuid_company
