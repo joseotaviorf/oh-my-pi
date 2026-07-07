@@ -1,66 +1,77 @@
 database_name: datalake_atta_clean
 table_name: franchise_info
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Business dimension holding one row per franchise unit (e.g. a Casa Mineira franchised store) operating on Atta, QuintoAndar's mortgage and financing platform. It stores the franchise's identification (name, status, category/type), lead-forwarding configuration (retail vs. Hubs), and the commercial terms of its franchise contract (royalties, marketing-fund percentage, grace periods, contract term, and signature date). It is a core dimension in the For Sale Atta domain, referenced by `partner_info`, `users_info`, `proposal`, `pre_analysis`, and `financing_proposal` (via `id_franchise`) to attribute partners, users, and financing business to the franchise they belong to, and is used for franchise-level royalty and marketing-fund reporting. Technical note - derived from the operational `franquia` table in the Atta raw MySQL database, with columns renamed to English and standardized types in the datalake_atta_clean schema.
 columns:
   id_franchise:
     lineage:
     - datalake_atta_raw.franquia.id
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: "Unique identifier of the franchise unit (e.g. a Casa Mineira franchised store) in Atta. This is the primary key of this table and is referenced as a foreign key by other For Sale Atta clean tables, such as `partner_info`, `proposal`, `pre_analysis`, `financing_proposal`, and `users_info` (via `id_franchise`), to identify which franchise a partner, proposal, or user belongs to. Technical note: sourced from the auto-increment primary key ID (bigint) of the raw franquia table."
   id_registration_user:
     lineage:
     - datalake_atta_raw.franquia.idusucad
-    description: User who registered this franchise record.
+    description: "Internal Atta user who registered this franchise record. Foreign key to the `users_info` table. Technical note sourced from IDUsuCad (bigint)."
   id_franchise_status:
     lineage:
     - datalake_atta_raw.franquia.status
-    description: Current activation status of the franchise unit.
+    description: Current activation status of the franchise unit, controlling whether it can operate and receive/route business in Atta. Technical note sourced from Status (bigint).
+    categories:
+      "0": Inactive - the franchise is deactivated and not operating.
+      "1": No franchisee linked - the franchise unit exists but has no franchisee assigned yet.
+      "2": Active - the franchise is operating normally.
+      "3": Blocked - the franchise is suspended/blocked from operating.
   franchise_name:
     lineage:
     - datalake_atta_raw.franquia.nome
-    description: Commercial name of the Casa Mineira franchise partner organization.
+    description: Commercial (trade) name of the franchise partner organization/store, used to identify the franchise unit in reporting and in the Atta application. Technical note sourced from Nome (varchar).
   franchise_category:
     lineage:
     - datalake_atta_raw.franquia.categoriafranquia
-    description: Franchise tier or category used for royalties and reporting segmentation.
+    description: Franchise tier/category used to segment franchises for royalty calculation rules and reporting. Technical note sourced from CategoriaFranquia (int).
+    categories:
+      "0": "Start - entry-level franchise tier."
+      "1": "Expert - upper franchise tier, typically with different royalty/marketing-fund terms."
   franchise_type:
     lineage:
     - datalake_atta_raw.franquia.tpfranquia
-    description: Type classification of the franchise unit.
+    description: Type classification of the franchise unit as configured in Atta, used internally to differentiate operating models of franchise units. Technical note sourced from TpFranquia (tinyint); no confirmed business mapping of the numeric codes was found in the application source code, so no category values are documented here.
   fowarding:
     lineage:
     - datalake_atta_raw.franquia.despachante
-    description: Franchise forwarding configuration for lead routing in Casa Mineira CRM.
+    description: Flag indicating whether the franchise forwards/routes its leads through the Hubs channel instead of handling them directly as a retail franchise. Used together with `fowarding_type` to configure lead routing for the franchise in the Casa Mineira CRM. Technical note sourced from despachante (bit(1)); true means leads are forwarded (Hubs), false means the franchise handles leads directly (retail).
   fowarding_type:
     lineage:
     - datalake_atta_raw.franquia.despachante
-    description: Type of lead forwarding rule applied by the franchise partner.
+    description: Business label for the lead-forwarding model applied by the franchise, derived from the `fowarding`/despachante flag. Technical note computed in the clean SQL as retail when despachante is false and hubs when despachante is true.
+    categories:
+      retail: The franchise handles its own leads directly (despachante is false).
+      hubs: The franchise forwards/routes its leads through the Hubs channel (despachante is true).
   royalties_percentage_value:
     lineage:
     - datalake_atta_raw.franquia.percroyalties
-    description: Percentage of revenue owed as franchise royalties under contract.
+    description: Percentage of revenue the franchisee owes to the franchisor as royalties under the franchise contract. Technical note sourced from PercRoyalties (decimal(10,0)).
   martketing_fund_percentage:
     lineage:
     - datalake_atta_raw.franquia.percfundomarketing
-    description: Percentage contribution to the franchise marketing fund.
+    description: Percentage of revenue the franchisee contributes to the shared franchise marketing fund under the franchise contract. Technical note sourced from PercFundoMarketing (decimal(10,0)).
   grace_period_royalties:
     lineage:
     - datalake_atta_raw.franquia.carenciaroyalties
-    description: Contractual grace period before royalty payments begin for the franchise.
+    description: Date until which the franchise is exempt from paying royalties under the franchise contract (contractual grace period before royalty payments begin). Technical note sourced from CarenciaRoyalties (datetime), i.e. it stores a cutoff date rather than a duration.
   grace_period_tec:
     lineage:
     - datalake_atta_raw.franquia.carenciatec
-    description: Grace period before technical fee payments apply for the franchise unit.
+    description: Date until which the franchise is exempt from paying the technical/technology fee under the franchise contract (contractual grace period before the technical fee applies). Technical note sourced from CarenciaTec (datetime), i.e. it stores a cutoff date rather than a duration.
   ts_contract_deadline:
     lineage:
     - datalake_atta_raw.franquia.prazocontrato
-    description: Contractual deadline date for the franchise agreement.
+    description: Term/duration of the franchise contract, used to track when the franchise agreement is due for renewal or expiration. Technical note despite the ts_ naming convention, this column is sourced from PrazoContrato (int), which stores a contract-term length rather than a calendar date/timestamp.
   ts_registration:
     lineage:
     - datalake_atta_raw.franquia.dtcadastro
-    description: Timestamp when the franchise was registered in the source system.
+    description: Date and time when the franchise unit was registered in Atta. Technical note sourced from DtCadastro (timestamp).
   ts_franchise_signature:
     lineage:
     - datalake_atta_raw.franquia.dtassinatura
-    description: Date when the franchise contract was signed.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of franchise info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per franchise info record with standardized names and types in datalake_atta_clean.
+    description: Date and time when the franchise contract was signed by the franchisee. Technical note sourced from DtAssinatura (datetime).

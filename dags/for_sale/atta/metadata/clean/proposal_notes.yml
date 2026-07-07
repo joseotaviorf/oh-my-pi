@@ -1,35 +1,58 @@
 database_name: datalake_atta_clean
 table_name: proposal_notes
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Cleaned snapshot of the notes/observations log recorded throughout the lifecycle of a
+  financing proposal in the Atta platform, used to track manual annotations and
+  system-generated remarks (e.g. document requests, status changes, routing to internal
+  teams) associated with a proposal. Granularity is one row per note/observation entry.
+  Used to audit proposal history, analyze internal team workload distribution (via
+  id_shipping_area), and investigate delays or issues in the financing funnel. Foreign
+  key id_proposal links to the `proposal` table and id_user links to `users_info`.
+  Sourced from the `proposta_observacao` table in the Atta operational database.
 columns:
   id:
     lineage:
     - datalake_atta_raw.proposta_observacao.id
-    description: Surrogate primary key of the proposal notes row in the source system.
+    description: Surrogate primary key of the proposal note row, auto-incremented by the source system.
   id_proposal:
     lineage:
     - datalake_atta_raw.proposta_observacao.idproposta
-    description: Foreign key to the financing or sale proposal in the Atta platform.
+    description: |
+      Foreign key to the `proposal` table. Identifies the financing proposal that this
+      note/observation was recorded against.
   id_user:
     lineage:
     - datalake_atta_raw.proposta_observacao.idusuario
-    description: Foreign key to the QuintoAndar user who performed the action.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user who
+      authored the note.
   id_shipping_area:
     lineage:
     - datalake_atta_raw.proposta_observacao.idobsareaenvio
-    description: Foreign key to the sending-area observation category for this proposal note.
+    description: |
+      Identifier of the sending/routing area (department or mailbox) the note was
+      addressed or routed to (e.g. an internal team responsible for acting on the
+      observation), sourced from the `proposta_observacao_area` reference table in Atta.
   id_document:
     lineage:
     - datalake_atta_raw.proposta_observacao.iddocumento
-    description: Foreign key to the document type registry for closing paperwork.
+    description: |
+      Identifier of the document type this note relates to, when the observation concerns
+      a specific piece of closing/registration paperwork.
   proposal_control:
     lineage:
     - datalake_atta_raw.proposta_observacao.ctrlproposta
-    description: Control indicator linking this note to the proposal-level tracking flow.
+    description: |
+      Control code linking this note to a specific control/tracking checkpoint of the
+      proposal workflow at the time the note was created.
   control_notes:
     lineage:
     - datalake_atta_raw.proposta_observacao.ctrlobs
-    description: Control indicator classifying the observation within the proposal note workflow.
+    description: |
+      Control code classifying the type or category of this observation within the
+      proposal note workflow (e.g. distinguishing automatic system notes from manual ones).
   notes:
     lineage:
     - datalake_atta_raw.proposta_observacao.observacao
@@ -37,10 +60,10 @@ columns:
   ts_notes:
     lineage:
     - datalake_atta_raw.proposta_observacao.dtobs
-    description: Date when the observation was recorded on the proposal.
+    description: Timestamp when the observation/note was recorded on the proposal.
   is_internal:
     lineage:
     - datalake_atta_raw.proposta_observacao.interna
-    description: Flag indicating whether the note is internal-only and not visible to the client.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of proposal notes sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per proposal notes record with standardized names and types in datalake_atta_clean.
+    description: |
+      Flag indicating whether the note is internal-only (visible only to Atta/QuintoAndar
+      staff) as opposed to visible to the client or partner.

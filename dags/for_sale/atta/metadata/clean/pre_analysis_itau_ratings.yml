@@ -1,54 +1,54 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_itau_ratings
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Reference/configuration table with the maximum and auto-approval loan-to-value percentages and income-commitment limits that Itau applies per credit-rating bucket, split by residential and commercial financing, and versioned by validity period (vigencia). Used by the pre-analysis workflow to interpret and validate the rating-based results returned in pre_analysis_itau, in support of the credit pre-analysis process that evaluates financing viability before a formal proposal is generated. One row per Itau rating bucket per validity period. Cleaned snapshot of consulta_score_itau_ratings sourced from the Atta operational database, standardized to datalake_atta_clean naming and types.
 columns:
   id_ratings_itau:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.id
-    description: Identifier of the Itau credit-rating parameter row in the pre-analysis scoring rules.
+    description: Primary key identifying a configuration row of Itau approval and income-commitment limits for a given credit-rating bucket and validity period.
   id_user_started:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.idusuarioini
-    description: Identifier of the user who opened the validity period for this Itau rating rule.
+    description: User who created/opened the validity period for this Itau rating configuration. Foreign key to the `users_info` table.
   id_user_ended:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.idusuariofim
-    description: Identifier of the user who closed the validity period for this Itau rating rule.
+    description: User who closed the validity period for this Itau rating configuration (set when the rule is superseded by a new one). Foreign key to the `users_info` table.
   rating:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.rating
-    description: Itau credit-rating bucket that the approval and income-commitment limits below apply to.
+    description: Itau credit-rating bucket code that this configuration row applies to. The approval and income-commitment limits below are defined per rating bucket and are the same buckets returned as r_score/r_bhv values in the pre_analysis_itau table.
   apr_max_res_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.percaprmaxres
-    description: Maximum residential financing approval percentage allowed for this Itau rating bucket.
+    description: Maximum loan-to-value approval percentage allowed for residential financing under this Itau rating bucket.
   apr_auto_res_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.peraprautores
-    description: Residential financing percentage eligible for automatic approval under this Itau rating bucket.
+    description: Loan-to-value percentage for residential financing that is eligible for automatic (no manual review) approval under this Itau rating bucket.
   apr_max_com_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.percaprmaxcom
-    description: Maximum commercial financing approval percentage allowed for this Itau rating bucket.
+    description: Maximum loan-to-value approval percentage allowed for commercial financing under this Itau rating bucket.
   apr_auto_com_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.peraprautocom
-    description: Commercial financing percentage eligible for automatic approval under this Itau rating bucket.
+    description: Loan-to-value percentage for commercial financing that is eligible for automatic (no manual review) approval under this Itau rating bucket.
   cpmr_income_res_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.percpmrrendares
-    description: Maximum share of income committable to the residential installment for this Itau rating bucket.
+    description: Maximum share of the client's income that can be committed to the residential financing installment for this Itau rating bucket.
   cpmr_income_com_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.percpmrrendacom
-    description: Maximum share of income committable to the commercial installment for this Itau rating bucket.
+    description: Maximum share of the client's income that can be committed to the commercial financing installment for this Itau rating bucket.
   ts_started:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.dtinivigencia
-    description: Start of the validity period during which this Itau rating rule is effective.
+    description: Timestamp from which this Itau rating configuration becomes effective.
   ts_ended:
     lineage:
     - datalake_atta_raw.consulta_score_itau_ratings.dtfimvigencia
-    description: End of the validity period after which this Itau rating rule no longer applies.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis itau ratings sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis itau ratings record with standardized names and types in datalake_atta_clean.
+    description: Timestamp after which this Itau rating configuration is no longer effective (null while the rule is active).

@@ -1,34 +1,59 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis
 domain: For Sale
-description: Clean table containing mortgage pre-analysis information from score consultations, including client details, financing values, status, and archival information.
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Cleaned snapshot of mortgage pre-analysis (credit score consultation) requests in the
+  Atta platform for For Sale home purchases. One row per pre-analysis request, capturing
+  the requesting client, partner, franchise, and consultant, the property/financing
+  values being evaluated, and the request's situation and status as it advances toward
+  becoming a formal financing proposal (see `proposal.id_pre_analysis`). Consumers use
+  this table to analyze top-of-funnel credit intake volume, conversion from pre-analysis
+  to proposal, archival/drop-off reasons, and turnaround time for multibank form
+  completion. Related control tables `pre_analysis_ctrl` and `pre_analysis_client_ctrl`
+  track the bank suppliers consulted and client income composition for each request.
+  Sourced from the `consulta_score` table in the Atta operational database.
 columns:
   id_pre_analysis:
-    description: Unique identifier for the pre-analysis record.
+    description: |
+      Primary key of the pre-analysis (credit score consultation) record, requested
+      before a formal financing proposal is created.
     lineage:
     - datalake_atta_raw.consulta_score.id
   id_franchise:
-    description: Identifier of the franchise associated with the pre-analysis.
+    description: |
+      Foreign key to the `franchise_info` table. Identifies the franchise unit that
+      originated the pre-analysis request.
     lineage:
     - datalake_atta_raw.consulta_score.idfranquia
   id_partner:
-    description: Identifier of the partner associated with the pre-analysis.
+    description: |
+      Foreign key to the `partner_info` table. Identifies the brokerage/financing
+      partner organization associated with the pre-analysis.
     lineage:
     - datalake_atta_raw.consulta_score.idparceiro
   id_client:
-    description: Identifier of the client who requested the pre-analysis.
+    description: |
+      Foreign key to the `client_info` table. Identifies the client who requested the
+      pre-analysis.
     lineage:
     - datalake_atta_raw.consulta_score.id_cliente
   id_consultant:
-    description: Identifier of the consultant attributed to the pre-analysis.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user
+      (consultant) attributed to the pre-analysis.
     lineage:
     - datalake_atta_raw.consulta_score.attributedconsultant
   id_offer:
-    description: External identifier linking the pre-analysis to an offer.
+    description: |
+      Natural/external identifier linking the pre-analysis to the corresponding offer
+      record in Sales Flow or other upstream sales services.
     lineage:
     - datalake_atta_raw.consulta_score.idpreanaliseext
   id_registration_user:
-    description: Identifier of the user who registered the pre-analysis.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user who
+      registered the pre-analysis request.
     lineage:
     - datalake_atta_raw.consulta_score.idusuario
   client_cpf:
@@ -36,43 +61,90 @@ columns:
     lineage:
     - datalake_atta_raw.consulta_score.cpf
   status:
-    description: Current status of the pre-analysis record.
+    description: |
+      Current funnel/approval-pipeline step (esteira) that the pre-analysis is going
+      through. Encoded with the same STATUS_ISOLVE enum used by the `proposal` table's
+      id_proposal_status column, since pre-analysis is the earliest step of that same
+      workflow.
+    categories:
+      "1": PRE_ANALISE (pre-analysis)
+      "2": CARTA_CREDITO (credit letter)
+      "3": VISTORIA (property inspection)
+      "4": CONTRATACAO (contracting)
+      "5": CONTRATADO (contracted)
+      "6": CHECKLIST (checklist)
+      "7": CONF_EMISSAO (issuance confirmation)
+      "8": DOCUMENTO_CADASTRO (registration document, legacy/unused)
+      "9": DADOS_CADASTRO (registration data, legacy/unused)
+      "10": COMISSAO_CADASTRO (commission registration, legacy/unused)
+      "11": ASSINATURA_CONTRATO (contract signature, legacy/unused)
+      "30": DOCUMENTO_ENVIADO_PARA_ASSINATURA (document sent for signature, legacy/unused)
+      "31": DOCUMENTO_ASSINADO (document signed, legacy/unused)
+      "32": CARTORIO (notary office)
     lineage:
     - datalake_atta_raw.consulta_score.status
   created_source:
-    description: Source system or channel where the pre-analysis was created.
+    description: |
+      Channel or system through which the pre-analysis was created. Encoded with the
+      PreAnalisysSource enum from the Atta source application.
+    categories:
+      "0": iSolve (created by default from the iSolve platform)
+      "1": PartnerLink (created via a shared link from the iSolve platform)
+      "2": BuyerOfferSent (offer/OS sent from Sales)
+      "3": Cash_Converted (converted from a cash to a financing purchase)
+      "4": Recreated
+      "5": Closing (created at closing when a proposal is found in the bank's file but does not exist in iSolve)
+      "6": MortgageManagementService (created by the Mortgage Management Service)
     lineage:
     - datalake_atta_raw.consulta_score.created_source
   priority_status:
-    description: Priority level assigned to the pre-analysis.
+    description: |
+      Numeric priority level assigned to the pre-analysis, used to sort/triage which
+      requests should be worked on first. No documented fixed enum was found in the
+      Atta source code for this field.
     lineage:
     - datalake_atta_raw.consulta_score.priority
   situation:
-    description: Current situation or state of the pre-analysis.
+    description: |
+      Business situation of the pre-analysis within the credit score request workflow.
+      Encoded with the SITUACAO_PRE_ANALISE enum from the Atta source application.
+    categories:
+      "1": EM_PREENCHIMENTO (being filled in by the client)
+      "2": PROPOSTA_NAO_GERADA (proposal not yet generated)
+      "3": PROPOSTA_GERADA (proposal generated)
+      "4": LINK_GERADO (self-service link generated)
+      "5": LINK_EXPIRADO (self-service link expired)
+      "6": LINK_FINALIZADO (self-service link completed)
+      "7": LINK_COPIADO (self-service link copied/shared)
+      "8": CCV_CANCELADO (purchase and sale agreement cancelled)
     lineage:
     - datalake_atta_raw.consulta_score.situacao
   archive_reason:
-    description: Reason why the pre-analysis was archived, if applicable.
+    description: |
+      Free-text reason why the pre-analysis was archived, when applicable. No fixed set
+      of values; recorded as free text by the source application.
     lineage:
     - datalake_atta_raw.consulta_score.ArchiveReason
   archive_complement:
-    description: Additional complement information about the archive reason.
+    description: Additional free-text complement/detail about the archive reason.
     lineage:
     - datalake_atta_raw.consulta_score.ArchiveComplement
   down_payment_amount:
-    description: Down payment amount in Brazilian Reais for the financing.
+    description: Down payment amount, in Brazilian Reais, that the client intends to contribute toward the purchase.
     lineage:
     - datalake_atta_raw.consulta_score.vlrentrada
   financing_value:
-    description: Total financing value in Brazilian Reais.
+    description: Total financing value requested, in Brazilian Reais.
     lineage:
     - datalake_atta_raw.consulta_score.vlrfinanciado
   house_value:
-    description: Total house value in Brazilian Reais.
+    description: Total value of the property being financed, in Brazilian Reais.
     lineage:
     - datalake_atta_raw.consulta_score.vlrimovel
   is_archived:
-    description: Boolean flag indicating whether the pre-analysis has been archived.
+    description: |
+      Boolean flag indicating whether the pre-analysis has been archived (removed from
+      active work queues).
     lineage:
     - datalake_atta_raw.consulta_score.archived
   ts_archived:
@@ -84,16 +156,19 @@ columns:
     lineage:
     - datalake_atta_raw.consulta_score.data_solicitacao
   mortgage_intention_uuid:
-    description: Unique identifier (UUID) for the mortgage intention associated with the pre-analysis.
+    description: |
+      Unique identifier (UUID) for the mortgage intention associated with the
+      pre-analysis, used to correlate the request across upstream sales/intention
+      systems.
     lineage:
     - datalake_atta_raw.consulta_score.MortgageIntentionUuid
   ts_multibanks_form_completed:
-    description: Timestamp indicating when the multibanks form was completed.
+    description: Timestamp indicating when the client completed the multibank financing intake form.
     lineage:
     - datalake_atta_raw.consulta_score.FormCompletedAt
   id_user_5a:
-    description: Identifier of the QuintoAndar user associated with the pre-analysis.
+    description: |
+      Foreign key to the `users_info` table. Identifies the QuintoAndar (5a) user
+      associated with the pre-analysis.
     lineage:
     - datalake_atta_raw.consulta_score.userId5a
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre-analysis requests containing credit score inquiries and client attributes for For Sale home purchases via Atta.

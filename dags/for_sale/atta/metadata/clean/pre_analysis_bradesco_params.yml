@@ -1,18 +1,29 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_bradesco_params
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  One row per key-value configuration parameter used by the Bradesco credit pre-analysis
+  integration in the Atta platform, controlling technical and business rules applied when
+  requests are sent to Bradesco (see `pre_analysis_bradesco`). This is a technical
+  configuration table and does not carry a direct relationship to client, partner or franchise
+  entities. Technical note sourced from datalake_atta_raw.consulta_score_bradesco_params, one
+  row per record, with standardized names and types in datalake_atta_clean.
 columns:
   id_pre_analysis_parameters:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_params.id
-    description: Identifier of the Bradesco pre-analysis parameter record sourced from consulta_score_bradesco_params.
+    description: Surrogate primary key of the Bradesco pre-analysis configuration parameter row. Technical note sourced from ID (bigint, auto-increment).
   parameter:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_params.parametro
-    description: Configuration parameter name used in partner pre-analysis rule evaluation.
+    description: |
+      Name (key) of the configuration parameter used to control the behavior of the Bradesco
+      credit pre-analysis integration, such as thresholds or feature toggles applied when
+      evaluating and submitting pre-analysis requests to the bank. This is a technical
+      configuration table with no direct relationship to other pre-analysis business tables.
+      Technical note sourced from Parametro (varchar(50)).
   parameter_value:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_params.valor
-    description: Configured value for the pre-analysis parameter at evaluation time.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis bradesco params sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis bradesco params record with standardized names and types in datalake_atta_clean.
+    description: Value configured for the corresponding Bradesco integration parameter, stored as free text. Technical note sourced from Valor (varchar(255)).

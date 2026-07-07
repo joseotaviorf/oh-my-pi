@@ -1,19 +1,37 @@
 database_name: datalake_atta_clean
 table_name: inspections
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Property inspections ("vistorias") carried out as part of the mortgage/financing decision
+  workflow for a For Sale home purchase, used to validate the property before contracting
+  proceeds. One row per inspection, with its status and start/finish timestamps. Related to
+  the `proposal` table (via `id_proposal`; one inspection per proposal). Sourced from the
+  Atta operational system table `inspections` in datalake_atta_raw.
 columns:
   id:
     lineage:
     - datalake_atta_raw.inspections.id
-    description: Surrogate primary key of the inspections row in the source system.
+    description: |
+      Surrogate primary key identifying a single property inspection ("vistoria") tied to a
+      financing proposal. Auto-incrementing key in the source system.
   id_proposal:
     lineage:
     - datalake_atta_raw.inspections.PropostaId
-    description: Foreign key to the financing or sale proposal in the Atta platform.
+    description: |
+      The mortgage/financing proposal that the property inspection belongs to. Foreign key to
+      the `proposal` table; each proposal has at most one inspection record in the source
+      system (unique constraint on the raw table).
   status:
     lineage:
     - datalake_atta_raw.inspections.status
-    description: Current operational status code governing workflow progression for this record.
+    description: |
+      Current progress status of the property inspection. Encoded with the INSPECTION_STATUS
+      enum from the Atta source application.
+    categories:
+      NotStarted: Inspection has not started yet
+      Ongoing: Inspection is in progress
+      Finished: Inspection has been completed
   ts_started:
     lineage:
     - datalake_atta_raw.inspections.StartedAt
@@ -25,10 +43,8 @@ columns:
   ts_created:
     lineage:
     - datalake_atta_raw.inspections.CreatedAt
-    description: Timestamp when the row was first created in the source operational system.
+    description: Timestamp when the inspection record was first created in the source system.
   ts_updated:
     lineage:
     - datalake_atta_raw.inspections.UpdatedAt
-    description: Timestamp when the row was last updated in the source operational system.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of inspections sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per inspections record with standardized names and types in datalake_atta_clean.
+    description: Timestamp when the inspection record was last updated in the source system.

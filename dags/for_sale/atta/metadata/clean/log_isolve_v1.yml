@@ -1,38 +1,113 @@
 database_name: datalake_atta_clean
 table_name: log_isolve_v1
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  History of status and situation changes of a mortgage/financing proposal as it moves
+  through the Atta credit decision workflow ("esteira de decisão"), also referred to as
+  "isolve". One row per status-change event; each row records the funnel step
+  (`id_current_status`) plus the business situation before and after the change
+  (`id_previous_proposal_situation` / `id_current_proposal_situation`). Related to the
+  `proposal` table (via `id_proposal`) and `users_info` (via `id_user`). Sourced from the
+  Atta operational system table `log_proposta_esteira` in datalake_atta_raw.
 columns:
   id:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.id
-    description: Surrogate primary key of the log isolve v1 row in the source system.
+    description: |
+      Surrogate primary key identifying a single status/situation-change event in a proposal's
+      decision workflow ("esteira") history. Auto-incrementing key in the source system.
   id_proposal:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.idproposta
-    description: Foreign key to the financing or sale proposal in the Atta platform.
+    description: |
+      The mortgage/financing proposal whose status or situation changed. Foreign key to the
+      `proposal` table.
   id_current_status:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.status
-    description: Proposal status code recorded at this log entry.
+    description: |
+      Funnel/approval-pipeline step (esteira) that the proposal was going through at the time
+      this log entry was recorded. Encoded with the STATUS_ISOLVE enum from the Atta source
+      application; sourced from column STATUS (source comment "NrDecisao").
+    categories:
+      "1": PRE_ANALISE (pre-analysis)
+      "2": CARTA_CREDITO (credit letter)
+      "3": VISTORIA (property inspection)
+      "4": CONTRATACAO (contracting)
+      "5": CONTRATADO (contracted)
+      "6": CHECKLIST (checklist)
+      "7": CONF_EMISSAO (issuance confirmation)
+      "8": DOCUMENTO_CADASTRO (registration document, legacy/unused)
+      "9": DADOS_CADASTRO (registration data, legacy/unused)
+      "10": COMISSAO_CADASTRO (commission registration, legacy/unused)
+      "11": ASSINATURA_CONTRATO (contract signature, legacy/unused)
+      "30": DOCUMENTO_ENVIADO_PARA_ASSINATURA (document sent for signature, legacy/unused)
+      "31": DOCUMENTO_ASSINADO (document signed, legacy/unused)
+      "32": CARTORIO (notary office)
   id_previous_proposal_situation:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.sitant
-    description: Proposal situation code before this status change.
+    description: |
+      Business situation (outcome) of the proposal within the isolve workflow immediately
+      before this change. Encoded with the SITUACAO_ISOLVE enum from the Atta source
+      application.
+    categories:
+      "1": ANDAMENTO (in progress)
+      "2": APROVADO (approved)
+      "3": PENDENTE (pending)
+      "4": REPROVADO (rejected)
+      "5": CANCELADO (cancelled)
+      "6": FINALIZADO (finalized)
+      "7": EM_ANALISE (under analysis)
+      "8": ANALISE_ATTA (under Atta internal analysis)
+      "9": ANALISE_BANCO (under bank analysis)
+      "10": ANALISE_BANCO_DUVIDA (bank analysis with pending question)
+      "11": NAO_PASSIVEL_DEFESA (not eligible for appeal)
+      "12": REVISAO (under revision)
+      "13": NAO_PROCESSADO_BANCO (not processed by bank)
+      "14": DIVERGENCIA_CADASTRO (registration data mismatch)
+      "15": NOTAS_DE_EXIGENCIA (bank requirement notes pending)
+      "16": CARTORIO_EXTERNO (external notary office)
+      "17": APROVADO_CONDICIONADO (conditionally approved)
   id_current_proposal_situation:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.sitatu
-    description: Proposal situation code after this status change.
+    description: |
+      Business situation (outcome) of the proposal within the isolve workflow that resulted
+      from this change (the situation right after this log entry). Encoded with the
+      SITUACAO_ISOLVE enum from the Atta source application.
+    categories:
+      "1": ANDAMENTO (in progress)
+      "2": APROVADO (approved)
+      "3": PENDENTE (pending)
+      "4": REPROVADO (rejected)
+      "5": CANCELADO (cancelled)
+      "6": FINALIZADO (finalized)
+      "7": EM_ANALISE (under analysis)
+      "8": ANALISE_ATTA (under Atta internal analysis)
+      "9": ANALISE_BANCO (under bank analysis)
+      "10": ANALISE_BANCO_DUVIDA (bank analysis with pending question)
+      "11": NAO_PASSIVEL_DEFESA (not eligible for appeal)
+      "12": REVISAO (under revision)
+      "13": NAO_PROCESSADO_BANCO (not processed by bank)
+      "14": DIVERGENCIA_CADASTRO (registration data mismatch)
+      "15": NOTAS_DE_EXIGENCIA (bank requirement notes pending)
+      "16": CARTORIO_EXTERNO (external notary office)
+      "17": APROVADO_CONDICIONADO (conditionally approved)
   id_user:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.usuario
-    description: Foreign key to the QuintoAndar user who performed the action.
+    description: |
+      The QuintoAndar/Atta user (analyst, operator, or system account) who performed the
+      action that generated this log entry. Foreign key to the `users_info` table.
   control:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.controle
-    description: Sequence or control marker for ordered proposal status history rows.
+    description: |
+      Sequence/control marker used by the source system to order the status history rows
+      recorded for a proposal.
   ts_current_log:
     lineage:
     - datalake_atta_raw.log_proposta_esteira.dtsitatu
-    description: Timestamp when this proposal status change was logged.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of log isolve v1 sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per log isolve v1 record with standardized names and types in datalake_atta_clean.
+    description: Timestamp when this proposal status/situation change was logged.

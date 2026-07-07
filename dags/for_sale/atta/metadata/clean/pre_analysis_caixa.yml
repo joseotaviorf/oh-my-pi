@@ -1,98 +1,134 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_caixa
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  One row per credit pre-analysis (score) request sent to Caixa Econômica Federal to assess
+  mortgage financing viability for a client before a financing proposal is formalized in the
+  Atta platform, covering the requested product/term, the offered rate and LTV, and the
+  request/response cycle with the bank. Each request is linked to the multi-bank pre-analysis
+  routing table `pre_analysis_ctrl` (and, through it, to `financing_proposal`) via `id_request`,
+  and to the requesting `partner_info` and `franchise_info` records. Technical note sourced from
+  datalake_atta_raw.consulta_score_caixa, one row per record, with standardized names and types
+  in datalake_atta_clean.
 columns:
   id_pre_analysis_caixa:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.id
-    description: Identifier of the Caixa pre-analysis score request record in the atta platform.
+    description: Surrogate primary key of the Caixa credit pre-analysis (score consultation) record. Technical note sourced from ID (bigint, auto-increment).
   id_registration_user:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.id_usuario
-    description: Identifier of the user who registered this Caixa pre-analysis request.
+    description: User who registered/submitted this pre-analysis request to Caixa Econômica Federal on behalf of the client. Foreign key to the `users_info` table. Technical note sourced from ID_USUARIO (bigint).
   id_partner:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.idparceiro
-    description: Foreign key to the financing or brokerage partner organization.
+    description: Partner (brokerage/real-estate organization) that originated the financing request evaluated in this Caixa pre-analysis. Foreign key to the `partner_info` table. Technical note sourced from IDParceiro (bigint).
   id_franchise:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: Casa Mineira franchise unit that served the client for this Caixa pre-analysis. Foreign key to the `franchise_info` table. Technical note sourced from IDFranquia (bigint).
   id_request:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.idsolicitacao
-    description: Foreign key to the financing request that triggered this Caixa pre-analysis.
+    description: Identifier of the multi-bank pre-analysis request that routed this consultation to Caixa Econômica Federal. Foreign key to the `pre_analysis_ctrl` table. Technical note sourced from IDSolicitacao (bigint).
   id_segment:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.id_segmento
-    description: Foreign key to the customer segment classification used in Caixa pre-analysis.
+    description: |
+      Internal business segment classification of the client used when evaluating this Caixa
+      pre-analysis. No fixed value list specific to Caixa was confirmed in the Atta source
+      code, so categories are not documented here. Technical note sourced from id_segmento
+      (int, nullable).
   client_cpf:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.cpf
-    description: Brazilian CPF tax identifier for the primary client in the proposal.
+    description: Brazilian CPF tax identifier of the primary client (first proponent) evaluated in this Caixa pre-analysis. Technical note sourced from CPF (bigint(11) unsigned zerofill).
   client_cpf_secondary:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.cpf2
-    description: Brazilian CPF tax identifier of the secondary client or co-buyer in the proposal.
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer (e.g. spouse) whose income may be combined for this Caixa pre-analysis. Technical note sourced from CPF2 (bigint(11) unsigned zerofill).
   product:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.produto
-    description: Caixa financing product selected for the pre-analysis simulation.
+    description: |
+      Caixa financing product/amortization system selected for the pre-analysis simulation.
+      Encoded with the PRODUTOS_CREDITO_IMOBILIARIO enum from the Atta source application.
+      Technical note sourced from Produto (int).
+    categories:
+      "1": SAC - Sistema de Amortização Constante, constant principal amortization with declining installments.
+      "2": PRICE - French amortization table, fixed installment amount.
+      "3": POUPANCA_MAIS - Poupança Mais savings-indexed amortization product.
   state:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.uf
-    description: Brazilian state (UF) of the property in the Caixa financing request.
+    description: Brazilian state (UF) where the property being financed is located. Technical note sourced from UF (varchar(2)).
   house_type:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.tpimovel
-    description: Property type (residential or commercial) financed in the Caixa request.
+    description: |
+      Purpose/type of the property financed in this Caixa pre-analysis. Encoded with the
+      FINALIDADE_IMOVEL enum from the Atta source application. Technical note sourced from
+      TpImovel (int).
+    categories:
+      "1": RESIDENCIAL - residential property.
+      "2": COMERCIAL - commercial property.
+      "3": TERRENO - land/lot.
   r_name:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.r_nome
-    description: Client name returned by the Caixa scoring response for the pre-analysis.
+    description: Client name returned by Caixa in the scoring response for this pre-analysis. Technical note sourced from R_NOME (varchar(80)).
   r_score:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.r_score
-    description: Credit score returned by Caixa for the client in the pre-analysis response.
+    description: Credit score/rating returned by Caixa for the client in the pre-analysis response. Technical note sourced from R_SCORE (varchar(3)).
   error:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.erro
-    description: Error message returned when partner pre-analysis or submission failed.
+    description: Error message returned when the pre-analysis request or submission to Caixa failed. Technical note sourced from ERRO (text).
   pre_analysis_status:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.status
-    description: Current status of the Caixa pre-analysis request such as pending, approved, or rejected.
+    description: |
+      Processing status of the pre-analysis request as it moves through Caixa's integration
+      workflow, from submission to completion. Encoded with the SCORE_STATUS enum from the
+      Atta source application. Technical note sourced from STATUS (tinyint).
+    categories:
+      "-1": ERRO - request processing failed with an error.
+      "1": ENVIADO - request sent to Caixa.
+      "2": PROCESSANDO - request being processed by Caixa.
+      "3": GRAVANDO_RETORNO - Caixa's return is being recorded (this numeric value is also used as ENVIAR in the source enum).
+      "4": CONCLUIDO - request processing completed.
+      "5": TAXAS_ATUALIZADAS - offered rates were refreshed for the request.
   deadline:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.prazo
-    description: Due date by which the subtask or legal action must be completed.
+    description: Financing term, in months, requested for the mortgage simulation with Caixa (loan repayment period), not a due date. Technical note sourced from PRAZO (int, nullable).
   ltv_value:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.vl_ltv
-    description: Loan-to-value ratio of the financing relative to the property value at Caixa.
+    description: Maximum loan-to-value (LTV) percentage allowed by Caixa for this financing operation, capping how much of the property value can be financed. Technical note sourced from vl_ltv (decimal(15,2)).
   fee_value:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.vl_taxa
-    description: Interest rate quoted by Caixa for the financing in the pre-analysis.
+    description: Annual interest rate (percentage) quoted by Caixa for the financing simulation. Technical note sourced from vl_taxa (decimal(15,2)).
   house_value:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.vlrimovel
-    description: Appraised property value used as the basis for the Caixa financing.
+    description: Property value, in Brazilian Reais (BRL), declared as the basis for this Caixa pre-analysis. Technical note sourced from VlrImovel (float).
   down_payment_value:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.vlrentrada
-    description: Buyer down payment amount committed from own resources.
+    description: Buyer down payment amount, in Brazilian Reais (BRL), committed from own resources for this Caixa financing simulation. Technical note sourced from VlrEntrada (float).
   financing_value:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.vlrfinanciado
-    description: Principal financing amount requested excluding down payment and fees.
+    description: Principal financing amount, in Brazilian Reais (BRL), requested from Caixa, excluding down payment and fees. Technical note sourced from VlrFinanciado (float).
   ts_returned:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.data_retorno
-    description: Date when Caixa returned the pre-analysis scoring response.
+    description: Timestamp when Caixa returned the pre-analysis scoring response. Technical note sourced from DATA_RETORNO (datetime).
   ts_registration:
     lineage:
     - datalake_atta_raw.consulta_score_caixa.data_solicitacao
-    description: Date when the Caixa pre-analysis request was submitted.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis caixa sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis caixa record with standardized names and types in datalake_atta_clean.
+    description: Timestamp when the Caixa pre-analysis request was submitted. Technical note sourced from DATA_SOLICITACAO (timestamp).

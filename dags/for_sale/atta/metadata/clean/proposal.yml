@@ -1,75 +1,155 @@
 database_name: datalake_atta_clean
 table_name: proposal
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Cleaned snapshot of financing/mortgage proposals for For Sale home purchases processed
+  through the Atta platform. This is the central table of the Atta domain: one row per
+  financing proposal, tracking the client, partner, franchise, product, assigned analysts,
+  requested/approved values, and the proposal's situation and status as it moves through
+  the credit approval funnel (pre-analysis, credit letter, inspection, contracting,
+  issuance, and notary steps — see `track_step_detail` for the full per-product funnel
+  definition). Used to analyze mortgage funnel conversion, analyst workload, financing
+  volumes, and cancellation patterns. Links to `client_info`, `partner_info`,
+  `franchise_info`, `product_info`, `users_info`, `providers_info`, `pre_analysis`, and
+  `financing_proposal`. Sourced from the `proposta` table in the Atta operational database.
 columns:
   id_proposal:
     lineage:
     - datalake_atta_raw.proposta.id
-    description: Foreign key to the financing or sale proposal in the Atta platform.
+    description: |
+      Primary key of the financing proposal, the central record of the mortgage/financing
+      workflow for a For Sale home purchase in the Atta platform.
   id_client:
     lineage:
     - datalake_atta_raw.proposta.idcliente
-    description: Foreign key to the client master record in Atta or Sales Flow.
+    description: |
+      Foreign key to the `client_info` table. Identifies the buyer/client requesting the
+      financing proposal.
   id_consultant:
     lineage:
     - datalake_atta_raw.proposta.idconsultor
-    description: Foreign key to the consultant handling the financing proposal.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user (consultant)
+      handling the financing proposal with the client.
   id_pre_analysis:
     lineage:
     - datalake_atta_raw.proposta.idcstimob
-    description: Foreign key to the pre-analysis (credit score consultation) tied to this proposal.
+    description: |
+      Foreign key to the `pre_analysis` table. Identifies the credit pre-analysis (score
+      consultation) performed before this formal proposal was created.
   id_credit_analyst:
     lineage:
     - datalake_atta_raw.proposta.idanalistacredito
-    description: Foreign key to the credit analyst assigned to evaluate the proposal.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user (credit
+      analyst) assigned to evaluate the financial/credit aspects of the proposal.
   id_juridical_analyst:
     lineage:
     - datalake_atta_raw.proposta.idanalistajuridico
-    description: Foreign key to the legal analyst responsible for the proposal review.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user (legal
+      analyst) responsible for the legal/documentation review of the proposal.
   id_emission_provider:
     lineage:
     - datalake_atta_raw.proposta.idfornecemissao
-    description: Foreign key to the provider responsible for issuing the financing contract.
+    description: |
+      Foreign key to the `providers_info` table. Identifies the bank or supplier
+      responsible for issuing (emitting) the financing contract for this proposal.
   id_franchise:
     lineage:
     - datalake_atta_raw.proposta.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: |
+      Foreign key to the `franchise_info` table. Identifies the franchise unit that
+      originated or is serving the client for this proposal.
   id_partner:
     lineage:
     - datalake_atta_raw.proposta.idparceiro
-    description: Foreign key to the financing or brokerage partner organization.
+    description: |
+      Foreign key to the `partner_info` table. Identifies the brokerage/financing partner
+      organization associated with the proposal.
   id_product:
     lineage:
     - datalake_atta_raw.proposta.idproduto
-    description: Foreign key to the financing product chosen for this proposal.
+    description: |
+      Foreign key to the `product_info` table. Identifies the financing product chosen for
+      this proposal (e.g. specific bank/financing line offering).
   id_offer:
     lineage:
     - datalake_atta_raw.proposta.idpropostaext
-    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
+    description: |
+      Natural/external key linking this financing proposal to the corresponding For Sale
+      offer record in Sales Flow or other upstream sales services (e.g. EBDB).
   id_proposal_product:
     lineage:
     - datalake_atta_raw.proposta.idpropostaprd
-    description: Foreign key to the product line attached to the financing proposal.
+    description: |
+      Foreign key to the `financing_proposal` table. Identifies the specific financing
+      proposal (Itaú/multibank) product line attached to this proposal.
   id_multibank_typist_user:
     lineage:
     - datalake_atta_raw.proposta.idusudigitador
-    description: Foreign key to the user who keyed the proposal into the multibank system.
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user who manually
+      keyed (typed) this proposal's data into a multibank bank origination system.
   id_proposal_situation:
     lineage:
     - datalake_atta_raw.proposta.situacao
-    description: Code for the current situation of the financing proposal in its lifecycle.
+    description: |
+      Business situation (outcome) of the financing proposal within its workflow, independent
+      of which funnel step it is currently in. Encoded with the SITUACAO_ISOLVE enum from the
+      Atta source application.
+    categories:
+      "1": ANDAMENTO (in progress)
+      "2": APROVADO (approved)
+      "3": PENDENTE (pending)
+      "4": REPROVADO (rejected)
+      "5": CANCELADO (cancelled)
+      "6": FINALIZADO (finalized)
+      "7": EM_ANALISE (under analysis)
+      "8": ANALISE_ATTA (under Atta internal analysis)
+      "9": ANALISE_BANCO (under bank analysis)
+      "10": ANALISE_BANCO_DUVIDA (bank analysis with pending question)
+      "11": NAO_PASSIVEL_DEFESA (not eligible for appeal)
+      "12": REVISAO (under revision)
+      "13": NAO_PROCESSADO_BANCO (not processed by bank)
+      "14": DIVERGENCIA_CADASTRO (registration data mismatch)
+      "15": NOTAS_DE_EXIGENCIA (bank requirement notes pending)
+      "16": CARTORIO_EXTERNO (external notary office)
+      "17": APROVADO_CONDICIONADO (conditionally approved)
   id_proposal_status:
     lineage:
     - datalake_atta_raw.proposta.status
-    description: Code for the current processing status of the financing proposal.
+    description: |
+      Current funnel/approval-pipeline step (esteira) that the financing proposal is going
+      through, complementary to id_proposal_situation. Encoded with the STATUS_ISOLVE enum
+      from the Atta source application; also documented per product in the track_step_detail
+      table.
+    categories:
+      "1": PRE_ANALISE (pre-analysis)
+      "2": CARTA_CREDITO (credit letter)
+      "3": VISTORIA (property inspection)
+      "4": CONTRATACAO (contracting)
+      "5": CONTRATADO (contracted)
+      "6": CHECKLIST (checklist)
+      "7": CONF_EMISSAO (issuance confirmation)
+      "8": DOCUMENTO_CADASTRO (registration document, legacy/unused)
+      "9": DADOS_CADASTRO (registration data, legacy/unused)
+      "10": COMISSAO_CADASTRO (commission registration, legacy/unused)
+      "11": ASSINATURA_CONTRATO (contract signature, legacy/unused)
+      "30": DOCUMENTO_ENVIADO_PARA_ASSINATURA (document sent for signature, legacy/unused)
+      "31": DOCUMENTO_ASSINADO (document signed, legacy/unused)
+      "32": CARTORIO (notary office)
   created_by:
     lineage:
     - datalake_atta_raw.proposta.CreatedBy
-    description: User or system that created the proposal record.
+    description: |
+      Identifier of the user or system integration that created the proposal record
+      (stored as a raw numeric identifier, not a validated foreign key).
   client_cpf:
     lineage:
     - datalake_atta_raw.proposta.cpf
-    description: Brazilian CPF tax identifier for the primary client in the proposal.
+    description: Brazilian CPF tax identifier for the primary buyer/client in the proposal.
   client_name:
     lineage:
     - datalake_atta_raw.proposta.nome
@@ -77,34 +157,36 @@ columns:
   financing_value:
     lineage:
     - datalake_atta_raw.proposta.valor
-    description: Principal financing amount requested excluding down payment and fees.
+    description: Principal financing amount requested by the client, excluding down payment and fees, in Brazilian Reais.
   status_translation:
     lineage:
     - datalake_atta_raw.proposta.StatusTranslation
-    description: Human-readable label describing the proposal status code.
+    description: |
+      Human-readable, free-text label describing the current status/situation of the
+      proposal, generated by the source system for display in the Atta UI.
   chosen_by:
     lineage:
     - datalake_atta_raw.proposta.ChosenBy
-    description: User who selected this proposal as the chosen financing option.
+    description: |
+      Identifier of the user who selected this proposal as the client's chosen financing
+      option among multiple offers.
   cancellation_reason:
     lineage:
     - datalake_atta_raw.proposta.MotivoCancelamento
-    description: Reason recorded for cancelling the financing proposal.
+    description: Free-text reason recorded for cancelling the financing proposal, when applicable.
   ts_registration:
     lineage:
     - datalake_atta_raw.proposta.dtentrada
-    description: Date when the proposal entered the financing pipeline.
+    description: Timestamp when the proposal entered the financing pipeline (was registered).
   ts_financing_ended:
     lineage:
     - datalake_atta_raw.proposta.dtfinalizacao
-    description: Date when the financing proposal was finalized or closed.
+    description: Timestamp when the financing proposal was finalized or closed, regardless of outcome.
   ts_last_updated:
     lineage:
     - datalake_atta_raw.proposta.dtultatu
-    description: Date of the most recent update to the proposal record.
+    description: Timestamp of the most recent update to the proposal record.
   ts_chosen:
     lineage:
     - datalake_atta_raw.proposta.ChosenAt
-    description: Timestamp when this proposal was selected as the chosen financing option.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of proposal sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per proposal record with standardized names and types in datalake_atta_clean.
+    description: Timestamp when this proposal was selected as the client's chosen financing option.

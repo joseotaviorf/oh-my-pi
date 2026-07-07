@@ -1,26 +1,32 @@
 database_name: datalake_atta_clean
 table_name: providers_info
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Reference dimension holding one row per provider, i.e. the bank or financial institution (such as Itau, Bradesco, Santander, or Caixa) that underwrites/emits the home-financing products offered through Atta, QuintoAndar's mortgage and financing platform. It stores the provider's name, description, and whether it is currently active. It is a core dimension in the For Sale Atta domain, referenced by fact tables such as `proposal` (via `id_emission_provider`) to identify which bank emitted a given financing proposal, supporting provider-level reporting on financing volume, approval rates, and performance. Technical note - derived from the operational `fornecedores` table in the Atta raw MySQL database, with columns renamed to English and standardized types in the datalake_atta_clean schema.
 columns:
   id_provider:
     lineage:
     - datalake_atta_raw.fornecedores.id
-    description: Identifier of the service provider (fornecedor) in the atta platform.
+    description: "Unique identifier of the provider, i.e. the bank or financial institution that emits/underwrites the home-financing product (e.g. Itau, Bradesco, Santander, Caixa). This is the primary key of this table and is referenced as a foreign key by other For Sale Atta clean tables, such as `proposal` (via `id_emission_provider`), to identify which bank a financing proposal was emitted by. Technical note: sourced from the auto-increment primary key ID (bigint) of the raw fornecedores table. A subset of ids are known bank codes from application source code; other ids exist in the table for additional providers/services not covered below."
+    categories:
+      "0": All providers (wildcard/aggregate code used in application filters, not a real bank).
+      "1": Itaú
+      "3": Bradesco
+      "5": Santander
+      "25": Caixa Econômica Federal
   provider_name:
     lineage:
     - datalake_atta_raw.fornecedores.nome
-    description: Name of the service provider.
+    description: Commercial name of the provider (bank/financial institution or service supplier), used to identify it in reporting and in the Atta application. Technical note sourced from Nome (varchar).
   provider_description:
     lineage:
     - datalake_atta_raw.fornecedores.descricao
-    description: Description of the service provider and the services it supplies.
+    description: Longer description of the provider and the financing/credit services it supplies on the Atta platform. Technical note sourced from Descricao (varchar).
   is_active:
     lineage:
     - datalake_atta_raw.fornecedores.ativo
-    description: Whether the party or record remains active in the current sales flow.
+    description: Indicates whether the provider is currently active and available to emit new financing proposals on Atta. Technical note sourced from Ativo (bit(1)); true means active, false means inactive.
   ts_created:
     lineage:
     - datalake_atta_raw.fornecedores.dtcadastro
-    description: Timestamp when the row was first created in the source operational system.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of providers info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per providers info record with standardized names and types in datalake_atta_clean.
+    description: Date and time when the provider was registered in Atta. Technical note sourced from DtCadastro (timestamp).

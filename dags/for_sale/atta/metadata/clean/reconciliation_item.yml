@@ -1,6 +1,16 @@
 database_name: datalake_atta_clean
 table_name: reconciliation_item
-description: Cleaned snapshot of reconciliation item sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per reconciliation item record with standardized names and types in datalake_atta_clean.
+description: |
+  Financial reconciliation of a financing operation against the corresponding bank
+  statement/file during a closing, matching a proposal to the amount effectively paid
+  or confirmed by the bank and flagging any deviations, for For Sale home purchases in
+  the Atta platform. One row per reconciled financing item, linked to the underlying
+  `proposal`, the `closing` period it belongs to, the `closing_file` (bank statement)
+  that supplied the values to reconcile, and the `bank_tracking` record representing
+  the operation inside the bank. Used to compute commissions and validate that
+  financing operations were correctly settled by the bank. Sourced from the
+  `reconciliation_item` table in the Atta operational database, cleaned with
+  standardized names and types in datalake_atta_clean.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -9,23 +19,34 @@ columns:
     lineage:
     - datalake_atta_raw.reconciliation_item.id
   id_proposal:
-    description: Foreign key to the financing or sale proposal in the Atta platform.
+    description: |
+      Foreign key to the `proposal` table. Identifies the financing proposal being
+      reconciled.
     lineage:
     - datalake_atta_raw.reconciliation_item.proposta_id
   id_closing:
-    description: Foreign key to the closing case tracking commissions and document uploads.
+    description: |
+      Foreign key to the `closing` table. Identifies the closing period/case this
+      reconciliation item belongs to.
     lineage:
     - datalake_atta_raw.reconciliation_item.closing_id
   id_closing_file:
-    description: Foreign key to the closing file in datalake_atta_clean.closing_file linked to this reconciliation item.
+    description: |
+      Foreign key to the `closing_file` table. Identifies the bank statement/file from
+      which this reconciliation item's values were extracted.
     lineage:
     - datalake_atta_raw.reconciliation_item.closing_file_id
   id_bank_proposal:
-    description: Id of the proposal in the bank system.
+    description: |
+      Foreign key to the `bank_tracking` table. Identifies the proposal record as
+      tracked inside the partner bank's own system that this reconciliation item
+      corresponds to.
     lineage:
     - datalake_atta_raw.reconciliation_item.proposal_bank_id
   buyer_document:
-    description: Buyer tax document (CPF or CNPJ) recorded on the reconciliation item.
+    description: |
+      Buyer's tax document (CPF or CNPJ) recorded on the reconciliation item, used to
+      match the reconciled record to the correct buyer.
     lineage:
     - datalake_atta_raw.reconciliation_item.buyer_document
   buyer_name:
@@ -33,42 +54,88 @@ columns:
     lineage:
     - datalake_atta_raw.reconciliation_item.buyer_name
   financial_value:
-    description: Financing amount reconciled against the bank statement for this item.
+    description: |
+      Financing amount reconciled against the bank statement for this item, in
+      Brazilian Reais.
     lineage:
     - datalake_atta_raw.reconciliation_item.financial_value
   bank_code:
-    description: Code of the bank that the financing was issued.
+    description: |
+      Banking partner that issued the financing being reconciled. Encoded with the
+      FORNECEDORES enum from the Atta source application.
+    categories:
+      "0": TODOS (all suppliers, used for aggregate/broadcast operations)
+      "1": ITAU
+      "3": BRADESCO
+      "5": SANTANDER
+      "25": CAIXA
     lineage:
     - datalake_atta_raw.reconciliation_item.bank
   status:
-    description: Current operational status code governing workflow progression for this record.
+    description: |
+      Current reconciliation status of this item against the bank statement/file.
+      Encoded with the CONCILIATION_STATUS enum from the Atta source application.
+    categories:
+      "-1": INVALID (item failed reconciliation criteria)
+      "0": NOT_STARTED (reconciliation not started yet)
+      "1": VALID (matches the bank file)
+      "2": INCORRECT_STATUS (incorrect status detected)
+      "3": NOT_FOUND_ISOLVE (proposal not found in Atta)
+      "4": NOT_FOUND_BANK (proposal not found in the bank file)
+      "5": DISPUTED_VALUE (diverging/disputed financial value)
+      "6": VALID_WITH_AUTOMATIC_CORRECTION (valid after automatic correction of fields)
+      "7": CONTESTED (contested by operations)
+      "8": NOT_PAYABLE (not payable)
+      "9": VALID_WITHOUT_DOCUMENT (valid but missing supporting document)
+      "10": VALIDATED_MANUALLY (validated manually by an operator)
     lineage:
     - datalake_atta_raw.reconciliation_item.status
   modality:
-    description: Financing modality of the reconciled credit operation.
+    description: |
+      Origin/ownership modality of the reconciled operation. Encoded with the
+      ConciliationModality enum from the Atta source application.
+    categories:
+      QuintoAndar: Operation originated/owned by QuintoAndar
+      OnY: Operation originated/owned by OnY
+      Partner: Operation originated/owned by a partner
     lineage:
     - datalake_atta_raw.reconciliation_item.modality
   operation_type:
-    description: Type of real estate credit operation.
+    description: |
+      Type of real estate credit operation being reconciled. Encoded with the
+      PRODUTOS_ISOLVE enum from the Atta source application.
+    categories:
+      "11": CREDITO_IMOBILIARIO / ISOLADO / TRANSFERENCIA (mortgage credit / isolated / transfer operation)
+      "15": REPASSE (loan assignment/transfer between institutions)
+      "16": PILOTO (pilot operation)
+      "20": PRE_ANALISE (pre-analysis)
+      "23": CGI (CGI product)
+      "24": SBPE (SBPE savings-funded financing)
+      "25": FGTS_MCMV (FGTS / Minha Casa Minha Vida financing)
+      "26": FGTS_PRO_COTISTA (FGTS Pro Cotista financing)
     lineage:
     - datalake_atta_raw.reconciliation_item.proposal_product
   operation_term:
-    description: Number of months in the financing operation term.
+    description: Number of months in the financing operation term being reconciled.
     lineage:
     - datalake_atta_raw.reconciliation_item.term
   modified_fields:
-    description: The fields that were automatically changed in the reconciliation process.
+    description: |
+      List of fields that were automatically changed by the reconciliation process when
+      correcting the record.
     lineage:
     - datalake_atta_raw.reconciliation_item.modified_fields
   validations:
-    description: Fields that differ from the bank file and their original values.
+    description: |
+      Fields that differ between the internal record and the bank file, including their
+      original values before correction.
     lineage:
     - datalake_atta_raw.reconciliation_item.validations
   observation:
-    description: Observations made.
+    description: Free-text operational notes recorded on the reconciliation item.
     lineage:
     - datalake_atta_raw.reconciliation_item.observation
   dt_signed:
-    description: Date of when the reconciliation was signed.
+    description: Calendar date when the reconciled contract was signed.
     lineage:
     - datalake_atta_raw.reconciliation_item.sign_date

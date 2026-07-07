@@ -1,38 +1,54 @@
 database_name: datalake_atta_clean
 table_name: closing
-description: Cleaned snapshot of closing sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per closing record with standardized names and types in datalake_atta_clean.
+description: |
+  Financial and accounting closing process of a batch of financing/reconciliation
+  operations for a given period, in the Atta platform for For Sale home purchases,
+  tracking who started the process, who finished it, and who completed its financial
+  reconciliation step. One row per closing case; referenced by `closing_file.id_closing`
+  for the documents/statements uploaded during the process and by
+  `reconciliation_item.id_closing` for the individual financing operations reconciled
+  within it. Sourced from the `closing` table in the Atta operational database, cleaned
+  with standardized names and types in datalake_atta_clean.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_closing:
-    description: Foreign key to the closing case tracking commissions and document uploads.
+    description: |
+      Primary key identifying the closing case. Referenced by `closing_file.id_closing`
+      and `reconciliation_item.id_closing`.
     lineage:
     - datalake_atta_raw.closing.id
   id_user_started:
-    description: User who started the closing process for this case.
+    description: |
+      Foreign key to the `users_info` table. Identifies the user who started the
+      closing process for this case.
     lineage:
     - datalake_atta_raw.closing.started_by_user_id
   id_user_finished:
-    description: User who finished the closing process for this case.
+    description: |
+      Foreign key to the `users_info` table. Identifies the user who finished the
+      closing process for this case.
     lineage:
     - datalake_atta_raw.closing.finished_by_user_id
   id_user_conciliation_finished:
-    description: User who finished the financial conciliation step of the closing.
+    description: |
+      Foreign key to the `users_info` table. Identifies the user who finished the
+      financial reconciliation step of the closing.
     lineage:
     - datalake_atta_raw.closing.conciliation_finished_by_user_id
   dt_closing:
-    description: Calendar date when the property closing milestone was reached or recorded.
+    description: Calendar date when the closing milestone was recorded for this case.
     lineage:
     - datalake_atta_raw.closing.closing_date
   ts_started:
-    description: Timestamp of when the closing period started.
+    description: Timestamp when the closing process started.
     lineage:
     - datalake_atta_raw.closing.initialized_at
   ts_ended:
-    description: Timestamp of when the closing period ended.
+    description: Timestamp when the closing process finished.
     lineage:
     - datalake_atta_raw.closing.finished_at
   ts_conciliation_ended:
-    description: Timestamp of when the conciliation ended.
+    description: Timestamp when the financial reconciliation step of the closing finished.
     lineage:
     - datalake_atta_raw.closing.conciliation_finished_at

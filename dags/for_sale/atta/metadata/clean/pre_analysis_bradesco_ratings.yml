@@ -1,54 +1,61 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_bradesco_ratings
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  One row per Bradesco rating bucket configuration, valid for a given period, defining the
+  maximum and automatic loan-to-value approval percentages and the maximum share of income
+  that can be committed to the installment, separately for residential and commercial
+  operations. These limits are looked up, by rating code, when evaluating a client's credit
+  pre-analysis with Bradesco in `pre_analysis_bradesco` (matched via `r_score`). Technical note
+  sourced from datalake_atta_raw.consulta_score_bradesco_ratings, one row per record, with
+  standardized names and types in datalake_atta_clean.
 columns:
   id_ratings_bradesco:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.id
-    description: Identifier of the Bradesco credit-rating parameter row in the pre-analysis scoring rules.
+    description: Surrogate primary key of the Bradesco rating configuration row. Technical note sourced from ID (bigint, auto-increment).
   id_user_started:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.idusuarioini
-    description: Identifier of the user who opened the validity period for this Bradesco rating rule.
+    description: User who created and opened the validity period for this Bradesco rating rule. Foreign key to the `users_info` table. Technical note sourced from IDUsuarioINI (bigint).
   id_user_ended:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.idusuariofim
-    description: Identifier of the user who closed the validity period for this Bradesco rating rule.
+    description: User who closed/ended the validity period for this Bradesco rating rule, when it was superseded by a new configuration. Foreign key to the `users_info` table. Technical note sourced from IDUsuarioFIM (bigint, nullable).
   rating:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.rating
-    description: Bradesco credit-rating bucket that the approval and income-commitment limits below apply to.
+    description: Bradesco credit-rating bucket code that the approval and income-commitment limits in this row apply to; matched against the `r_score` value returned for a client in `pre_analysis_bradesco`. Technical note sourced from Rating (varchar(10)).
   apr_max_res_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.percaprmaxres
-    description: Maximum residential financing approval percentage allowed for this Bradesco rating bucket.
+    description: Maximum percentage of the property value that Bradesco will approve for financing residential operations for clients in this rating bucket. Technical note sourced from PercAprMaxRes (float).
   apr_auto_res_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.peraprautores
-    description: Residential financing percentage eligible for automatic approval under this Bradesco rating bucket.
+    description: Percentage of the residential financing value eligible for automatic (no manual review) approval for clients in this rating bucket. Technical note sourced from PerAprAutoRes (float).
   apr_max_com_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.percaprmaxcom
-    description: Maximum commercial financing approval percentage allowed for this Bradesco rating bucket.
+    description: Maximum percentage of the property value that Bradesco will approve for financing commercial operations for clients in this rating bucket. Technical note sourced from PercAprMaxCom (float).
   apr_auto_com_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.peraprautocom
-    description: Commercial financing percentage eligible for automatic approval under this Bradesco rating bucket.
+    description: Percentage of the commercial financing value eligible for automatic (no manual review) approval for clients in this rating bucket. Technical note sourced from PerAprAutoCom (float).
   cpmr_income_res_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.percpmrrendares
-    description: Maximum share of income committable to the residential installment for this Bradesco rating bucket.
+    description: Maximum share of the client's income that can be committed to the residential installment (comprometimento de renda) for clients in this rating bucket. Technical note sourced from PerCpmrRendaRes (float).
   cpmr_income_com_percentage:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.percpmrrendacom
-    description: Maximum share of income committable to the commercial installment for this Bradesco rating bucket.
+    description: Maximum share of the client's income that can be committed to the commercial installment (comprometimento de renda) for clients in this rating bucket. Technical note sourced from PerCpmrRendaCom (float).
   ts_started:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.dtinivigencia
-    description: Start of the validity period during which this Bradesco rating rule is effective.
+    description: Start of the validity period during which this Bradesco rating rule is effective. Technical note sourced from DtIniVigencia (timestamp, default current timestamp).
   ts_ended:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco_ratings.dtfimvigencia
-    description: End of the validity period after which this Bradesco rating rule no longer applies.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis bradesco ratings sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis bradesco ratings record with standardized names and types in datalake_atta_clean.
+    description: End of the validity period after which this Bradesco rating rule no longer applies, once superseded by a newer configuration. Technical note sourced from DtFimVigencia (datetime, nullable).

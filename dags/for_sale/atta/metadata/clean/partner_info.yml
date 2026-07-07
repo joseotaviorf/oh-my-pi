@@ -1,34 +1,34 @@
 database_name: datalake_atta_clean
 table_name: partner_info
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Business dimension holding one row per partner (real-estate brokerage, financial correspondent, or individual affiliate) that originates or supports home-financing business on Atta, QuintoAndar's mortgage and financing platform. It stores partner identification (name), the franchise it is tied to, the internal users who registered and administer it, and registration/deactivation timestamps used to track the partner's active lifecycle. It is a core dimension in the For Sale Atta domain, referenced by fact tables such as `proposal`, `pre_analysis`, and `financing_proposal` (via `id_partner`) to attribute financing business to the partner that originated it, and related to `partner_category` (partner classification), `franchise_info` (via `id_franchise`), and `users_info` (via `id_admin_user` and `id_registration_user`). Technical note - derived from the operational `parceiro` table in the Atta raw MySQL database, with columns renamed to English and standardized types in the datalake_atta_clean schema.
 columns:
   id_partner:
     lineage:
     - datalake_atta_raw.parceiro.id
-    description: Foreign key to the financing or brokerage partner organization.
+    description: "Unique identifier of the partner (brokerage/financing partner organization or individual affiliate) in Atta. This is the primary key of this table and is referenced as a foreign key by other For Sale Atta clean tables, such as `proposal`, `pre_analysis`, and `financing_proposal` (via `id_partner`), to identify which partner originated a given financing proposal. Technical note: sourced from the auto-increment primary key `id` (bigint) of the raw `parceiro` table."
   id_admin_user:
     lineage:
     - datalake_atta_raw.parceiro.idusuresp
-    description: User responsible for administering this partner account.
+    description: "Internal Atta user responsible for administering/managing this partner account (account owner on the QuintoAndar/Atta side). Foreign key to the `users_info` table, identifying which system user is accountable for the partner relationship. Technical note sourced from IDUsuResp (bigint)."
   id_franchise:
     lineage:
     - datalake_atta_raw.parceiro.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: "Franchise unit that this partner is associated with or operates under. Foreign key to the `franchise_info` table, identifying the franchise responsible for managing or supervising this partner. Technical note sourced from IDFranquia (bigint)."
   id_registration_user:
     lineage:
     - datalake_atta_raw.parceiro.idusucad
-    description: User who registered this partner record.
+    description: "Internal Atta user who originally registered/onboarded this partner record in the system. Foreign key to the `users_info` table. Technical note sourced from idUsuCad (bigint)."
   partner_name:
     lineage:
     - datalake_atta_raw.parceiro.nome
-    description: Legal or commercial name of the financing or brokerage partner entity.
+    description: Legal or commercial (trade) name of the partner entity, i.e. the real-estate brokerage, financial correspondent, or individual affiliate that refers or originates home-financing business to Atta. Technical note sourced from nome (varchar).
   ts_registration:
     lineage:
     - datalake_atta_raw.parceiro.dtcadastro
-    description: Timestamp when the partner was registered in the source system.
+    description: Date and time when the partner was registered/onboarded in Atta, used to measure partner tenure and cohort analyses. Technical note sourced from DtCadastro (timestamp).
   ts_inactive_user:
     lineage:
     - datalake_atta_raw.parceiro.dtinativo
-    description: Timestamp when the partner was marked inactive.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of partner info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per partner info record with standardized names and types in datalake_atta_clean.
+    description: Date and time when the partner was deactivated (stopped operating with Atta), if applicable; a null value indicates the partner is currently active. Technical note sourced from DtInativo (datetime).

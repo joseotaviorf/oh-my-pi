@@ -1,26 +1,31 @@
 database_name: datalake_atta_clean
 table_name: partner_category
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Reference dimension holding one row per partner category, i.e. the business segment or sales channel a partner (`partner_info`) belongs to (for example ForSale, Casa Mineira, Hubs, or Navent). It is used across the For Sale Atta domain to classify partners and, transitively, the financing proposals they originate, enabling segment-level reporting and business rules (e.g. restricting certain analysts or workflows to specific partner segments). Although `partner_info` does not carry a direct foreign key to this table in the current clean model, the partner category id is used by the Atta application to group and filter partners and proposals by segment, and it is registered by an internal user tracked via `id_registration_user` (foreign key to `users_info`). Technical note - derived from the operational `parceiro_categoria` table in the Atta raw MySQL database, with columns renamed to English and standardized types in the datalake_atta_clean schema.
 columns:
   id:
     lineage:
     - datalake_atta_raw.parceiro_categoria.ID
-    description: Surrogate primary key of the partner category row in the source system.
+    description: Unique identifier of the partner category/segment (e.g. the sales channel or business unit a partner belongs to, such as ForSale, Casa Mineira, Hubs, or Navent). This is the primary key of this table and is referenced elsewhere in Atta business logic (application code) as a hard-coded partner category id to filter proposals and control feature access by partner segment. Technical note sourced from the auto-increment primary key ID (bigint) of the raw parceiro_categoria table. Only a subset of ids are known from application code; other ids exist in the table for additional categories.
+    categories:
+      "12": ForSale partner category
+      "13": Casa Mineira partner category
+      "16": Hubs partner category
+      "17": Navent partner category
   id_registration_user:
     lineage:
     - datalake_atta_raw.parceiro_categoria.IDUsuCad
-    description: User who registered this partner category record.
+    description: "Internal Atta user who registered this partner category record. Foreign key to the `users_info` table. Technical note sourced from IDUsuCad (bigint)."
   category:
     lineage:
     - datalake_atta_raw.parceiro_categoria.Categoria
-    description: Business category label grouping reference rows for reporting filters.
+    description: Short business label identifying the partner category/segment (e.g. the partner's sales channel or business unit), used for grouping and filtering partners and their proposals in reporting and in the Atta application. Technical note sourced from Categoria (varchar), which also has a unique key in the raw table.
   category_description:
     lineage:
     - datalake_atta_raw.parceiro_categoria.Descricao
-    description: Longer explanation of the category code shown to operations users.
+    description: Longer, human-readable explanation of the partner category shown to operations users in the Atta back office to clarify what the category label represents. Technical note sourced from Descricao (varchar).
   ts_registration:
     lineage:
     - datalake_atta_raw.parceiro_categoria.DtCadastro
-    description: Timestamp when the partner category was registered.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of partner category sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per partner category record with standardized names and types in datalake_atta_clean.
+    description: Date and time when the partner category record was created/registered in Atta. Technical note sourced from DtCadastro (timestamp).

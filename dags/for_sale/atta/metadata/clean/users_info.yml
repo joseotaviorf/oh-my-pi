@@ -1,42 +1,45 @@
 database_name: datalake_atta_clean
 table_name: users_info
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Business dimension holding one row per internal Atta user (staff member operating the platform, such as credit analysts, legal/juridical analysts, registration analysts, or partner/franchise administrators) within QuintoAndar's mortgage and financing platform. It stores basic identification (name, email), account status, the partner and franchise the user is tied to, and who registered the account. It is a core dimension in the For Sale Atta domain, referenced extensively by fact tables such as `proposal`, `pre_analysis`, `closing`, and `closing_file` to identify which internal user performed, analyzed, or is accountable for a given step of the home-financing workflow, and is related to `partner_info` (via `id_partner`) and `franchise_info` (via `id_franchise`). Technical note - derived from the operational `max_usuarios` table in the Atta raw MySQL database, with columns renamed to English and standardized types in the datalake_atta_clean schema.
 columns:
   id_user:
     lineage:
     - datalake_atta_raw.max_usuarios.id
-    description: Foreign key to the QuintoAndar user who performed the action.
+    description: "Unique identifier of the internal Atta user (e.g. credit analyst, legal/juridical analyst, registration analyst, franchise/partner administrator, or other staff member operating the platform). This is the primary key of this table and is referenced as a foreign key by other For Sale Atta clean tables, such as `proposal`, `pre_analysis`, `closing`, `closing_file`, and `partner_info` (via columns like `id_consultant`, `id_credit_analyst`, `id_juridical_analyst`, `id_admin_user`, etc.), to identify which internal user performed or is responsible for a given action. Technical note: sourced from the auto-increment primary key id (bigint) of the raw max_usuarios table."
   id_user_registration:
     lineage:
     - datalake_atta_raw.max_usuarios.id_usuario_cadastro
-    description: Identifier of the user who registered or created this user account.
+    description: "Internal Atta user who registered/created this user account. Self-referencing foreign key to this same `users_info` table (via `id_user`), used to audit who onboarded a given user. Technical note sourced from id_usuario_cadastro (bigint)."
   id_partner:
     lineage:
     - datalake_atta_raw.max_usuarios.idparceiro
-    description: Foreign key to the financing or brokerage partner organization.
+    description: "Partner organization that this user is associated with (e.g. the brokerage/financial correspondent employing or affiliated with this user). Foreign key to the `partner_info` table. Technical note sourced from IDParceiro (bigint)."
   id_franchise:
     lineage:
     - datalake_atta_raw.max_usuarios.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: "Franchise unit that this user is associated with or operates under. Foreign key to the `franchise_info` table. Technical note sourced from IDFranquia (bigint)."
   user_name:
     lineage:
     - datalake_atta_raw.max_usuarios.nome
-    description: First or given name of the platform user.
+    description: First or given name of the internal Atta user, used to identify the person in the application and in operational reporting. Technical note sourced from nome (varchar).
   user_last_name:
     lineage:
     - datalake_atta_raw.max_usuarios.sobrenome
-    description: Last name or surname of the platform user.
+    description: Last name or surname of the internal Atta user. Technical note sourced from sobrenome (varchar).
   user_email:
     lineage:
     - datalake_atta_raw.max_usuarios.email
-    description: Email address registered for the platform user.
+    description: Email address registered for the internal Atta user, used for login and system notifications. Technical note sourced from email (varchar).
   user_status:
     lineage:
     - datalake_atta_raw.max_usuarios.status
-    description: Account status indicating whether the user is active or inactive.
+    description: Account status indicating whether the user is currently active and allowed to operate in Atta; application code treats it as a boolean flag (combined with a separate "blocked" flag not exposed in this table) to filter which users can be assigned work or shown in user lists. Technical note sourced from status (tinyint(1), used as a boolean in the application).
+    categories:
+      "1": Active - the user account is enabled and can operate in Atta.
+      "0": Inactive - the user account is disabled.
   ts_last_updated:
     lineage:
     - datalake_atta_raw.max_usuarios.data_ultima_atualizacao
-    description: Timestamp of the most recent update to this user record in the source system.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of users info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per users info record with standardized names and types in datalake_atta_clean.
+    description: Date and time of the most recent update to this user record in Atta. Technical note sourced from data_ultima_atualizacao (datetime/timestamp).

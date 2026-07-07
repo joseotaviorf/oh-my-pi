@@ -1,82 +1,144 @@
 database_name: datalake_atta_clean
 table_name: financing_proposal
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Financing proposal submitted by a home buyer to a banking partner (originally Itaú,
+  later extended to multibank submissions) during the mortgage financing journey of a
+  For Sale transaction. One row per financing proposal product, tied to a client,
+  partner, and franchise, capturing the requested financing terms (amounts, down
+  payment, installments, FGTS usage, property type, and fees/costs) and the status of
+  sending the proposal packet to the bank. Referenced as the central financing entity by
+  `proposal.id_proposal_product`, by `pre_analysis_ctrl.id_proposal`, and validated
+  before confirmation by `financing_proposal_check.id_proposal_product`. Sourced from
+  the `proposta_itau` table in the Atta operational database, cleaned with standardized
+  names and types in datalake_atta_clean.
 columns:
   id_proposal_product:
     lineage:
     - datalake_atta_raw.proposta_itau.id
-    description: Foreign key to the product line attached to the financing proposal.
+    description: |
+      Primary key identifying the financing proposal product record, the specific
+      financing proposal submitted to a banking partner (originally Itaú, later
+      extended to multibank submissions). Referenced by `proposal.id_proposal_product`,
+      `pre_analysis_ctrl.id_proposal`, and `financing_proposal_check.id_proposal_product`.
   id_client:
     lineage:
     - datalake_atta_raw.proposta_itau.id_cliente
-    description: Foreign key to the client master record in Atta or Sales Flow.
+    description: |
+      Foreign key to the `client_info` table. Identifies the buyer/client who submitted
+      this financing proposal.
   id_partner:
     lineage:
     - datalake_atta_raw.proposta_itau.idparceiro
-    description: Foreign key to the financing or brokerage partner organization.
+    description: |
+      Foreign key to the `partner_info` table. Identifies the brokerage/financing
+      partner organization associated with this proposal.
   id_franchise:
     lineage:
     - datalake_atta_raw.proposta_itau.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: |
+      Foreign key to the `franchise_info` table. Identifies the franchise unit serving
+      the client for this proposal.
   id_itau:
     lineage:
     - datalake_atta_raw.proposta_itau.id_itau
-    description: Itau bank-side proposal identifier linking to the partner financing record.
+    description: |
+      Identifier of this proposal inside Itaú's own banking systems, used to reconcile
+      the internal financing proposal record with its bank-side counterpart. Distinct
+      from id_proposal_product, which is the internal identifier.
   financing_proposal_status_details:
     lineage:
     - datalake_atta_raw.proposta_itau.status_processo_obs
-    description: Free-text observations describing the current financing proposal process status.
+    description: |
+      Free-text notes entered by operations describing the current status or pending
+      issues of the financing proposal process (e.g. missing documents, reasons for a
+      conditioned approval).
   send_status:
     lineage:
     - datalake_atta_raw.proposta_itau.status_envio
-    description: Status of sending the financing proposal packet to the banking partner.
+    description: |
+      Status of submitting the financing proposal packet to the banking partner,
+      tracking whether it still needs to be sent, has been sent, is awaiting a return,
+      returned successfully, or errored out. Encoded with a status code specific to the
+      `proposta_itau` source table.
+    categories:
+      "0": A ENVIAR (to be sent)
+      "1": ENVIADO (sent)
+      "2": AGUARDANDO RETORNO (awaiting return from the bank)
+      "3": RETORNADO OK (returned successfully)
+      "4": ERRO (error)
   estimated_house_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_preco_estimado_imovel
-    description: Estimated property value used before formal bank appraisal.
+    description: |
+      Estimated market value of the property being financed, in Brazilian Reais, used
+      before the bank's formal appraisal.
   finance_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_valor_a_financiar
-    description: Total amount the buyer intends to finance through the banking partner.
+    description: |
+      Total amount the buyer intends to finance through the banking partner, in
+      Brazilian Reais.
   down_payment_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_valor_entrada
-    description: Buyer down payment amount committed from own resources.
+    description: |
+      Down payment amount the buyer commits from own resources, in Brazilian Reais.
   installments_quantity:
     lineage:
     - datalake_atta_raw.proposta_itau.a_prazo_meses
-    description: Number of monthly installments requested in the financing simulation.
+    description: |
+      Number of monthly installments requested in the financing simulation, up to a
+      maximum of 360 months.
   fgts_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_fgts
-    description: FGTS balance amount applied toward the down payment when eligible.
+    description: |
+      Portion of the buyer's FGTS (Brazilian employment severance guarantee fund)
+      balance applied toward the down payment, in Brazilian Reais, when eligible.
   house_category:
     lineage:
     - datalake_atta_raw.proposta_itau.a_tipo_de_imovel
-    description: Property type or category of the home being financed.
+    description: |
+      Purpose/category of the property being financed. Encoded with the same three-letter
+      codes used by the FINALIDADE_IMOVEL classification in the Atta source application.
+    categories:
+      RES: RESIDENCIAL (residential property)
+      COM: COMERCIAL (commercial property)
+      TER: TERRENO (land/vacant lot)
   to_incorporate_costs_itbi_register_value:
     lineage:
-    - datalake_atta_raw.proposta_itau.a_incorporar_valor_despesas_itbi_registro
-    description: ITBI tax and registration costs to be incorporated into the financed amount.
+    - datalake_atta_raw.proposta_itau.a_incorporar_valor_despesas_ITBI_registro
+    description: |
+      Whether the ITBI property transfer tax and registration costs are incorporated
+      (rolled) into the financed amount rather than paid separately by the buyer. Stored
+      as a boolean flag in the source system, despite the "_value" suffix in this column
+      name.
   to_incorporate_evaluation_fee_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_incorporar_tarifa_de_avaliacao
-    description: Bank appraisal fee to be incorporated into the financed amount.
+    description: |
+      Whether the bank's property appraisal fee is incorporated (rolled) into the
+      financed amount rather than paid separately by the buyer. Stored as a boolean
+      flag in the source system, despite the "_value" suffix in this column name.
   fees_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_valor_tarifas
-    description: Bank and registry fees included in the total financed package.
+    description: |
+      Total bank and registry fees included in the financed package, in Brazilian
+      Reais.
   costs_value:
     lineage:
     - datalake_atta_raw.proposta_itau.a_valor_despesas
-    description: Additional transaction costs rolled into the financing proposal totals.
+    description: |
+      Additional transaction costs rolled into the total financing proposal amount, in
+      Brazilian Reais.
   ts_registration_financing_proposal:
     lineage:
     - datalake_atta_raw.proposta_itau.data_cadastro
-    description: Timestamp when the financing proposal was registered in the source system.
+    description: Timestamp when the financing proposal was first registered in the source system.
   ts_send_financing_proposal:
     lineage:
     - datalake_atta_raw.proposta_itau.data_envio
     description: Timestamp when the financing proposal was sent to the banking partner.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of financing proposal sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per financing proposal record with standardized names and types in datalake_atta_clean.

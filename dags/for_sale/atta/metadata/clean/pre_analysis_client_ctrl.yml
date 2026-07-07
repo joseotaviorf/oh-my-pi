@@ -1,30 +1,49 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_client_ctrl
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Cleaned control table tracking which clients compose the income used to qualify a
+  mortgage pre-analysis request (income composition, or "composição de renda") in the
+  Atta platform for For Sale home purchases. One row per client associated with a
+  pre-analysis request; a single pre-analysis can have multiple clients (e.g. a main
+  buyer plus co-buyers) contributing income. Used to identify all parties considered in
+  a household's creditworthiness evaluation and to determine the main buyer via the
+  `isMainBuyer` source flag. Foreign key id_request links to the `pre_analysis` table
+  and id_client links to `client_info`. Sourced from the `consulta_score_cliente_ctrl`
+  table in the Atta operational database.
 columns:
   id_control:
     lineage:
     - datalake_atta_raw.consulta_score_cliente_ctrl.id_controle
-    description: Identifier of the client pre-analysis control record linking a client to a score request.
+    description: |
+      Primary key of the pre-analysis client control record, linking one client to one
+      pre-analysis (score) request.
   id_client:
     lineage:
     - datalake_atta_raw.consulta_score_cliente_ctrl.id_cliente
-    description: Foreign key to the client master record in Atta or Sales Flow.
+    description: |
+      Foreign key to the `client_info` table. Identifies the client (buyer or co-buyer)
+      included in the income composition of the pre-analysis request.
   id_request:
     lineage:
     - datalake_atta_raw.consulta_score_cliente_ctrl.id_solicitacao
-    description: Foreign key to the pre-analysis request this client control belongs to.
+    description: |
+      Foreign key to the `pre_analysis` table (and related to `pre_analysis_ctrl`).
+      Identifies the pre-analysis request this client control belongs to.
   ts_register:
     lineage:
     - datalake_atta_raw.consulta_score_cliente_ctrl.dt_cadastro
-    description: Date when the client was registered in this pre-analysis control.
+    description: Timestamp when this client was registered against the pre-analysis control record.
   ts_inactive:
     lineage:
     - datalake_atta_raw.consulta_score_cliente_ctrl.dt_inativo
-    description: Date when this client pre-analysis control was deactivated.
+    description: |
+      Timestamp when this client's participation in the pre-analysis control was
+      deactivated (e.g. removed from the income composition), null while still active.
   has_income:
     lineage:
     - datalake_atta_raw.consulta_score_cliente_ctrl.compoerenda
-    description: Flag indicating whether this client contributes income toward qualifying the financing.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis client ctrl sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis client ctrl record with standardized names and types in datalake_atta_clean.
+    description: |
+      Boolean flag indicating whether this client contributes income toward qualifying
+      the financing (income composition / "composição de renda").

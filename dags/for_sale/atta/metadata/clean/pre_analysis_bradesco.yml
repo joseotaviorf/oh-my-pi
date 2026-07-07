@@ -1,138 +1,198 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_bradesco
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  One row per credit pre-analysis (score) request sent to Banco Bradesco to assess mortgage
+  financing viability for a client before a financing proposal is formalized in the Atta
+  platform, covering the request/response cycle, the offered rate and LTV, and the
+  qualification, recommendation and attachment steps of Bradesco's workflow. Each request is
+  linked to the multi-bank pre-analysis routing table `pre_analysis_ctrl` (and, through it, to
+  `financing_proposal`) via `id_request`, and to the requesting `partner_info`, `franchise_info`
+  and `users_info` records. Technical note sourced from datalake_atta_raw.consulta_score_bradesco,
+  one row per record, with standardized names and types in datalake_atta_clean.
 columns:
   id_pre_analysis_bradesco:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.id
-    description: Surrogate primary key of the Bradesco pre-analysis record.
+    description: Surrogate primary key of the Bradesco credit pre-analysis (score consultation) record. Technical note sourced from ID (bigint, auto-increment).
   id_registration_user:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.id_usuario
-    description: User who registered this Bradesco pre-analysis request.
+    description: User who registered/submitted this pre-analysis request to Bradesco on behalf of the client. Foreign key to the `users_info` table. Technical note sourced from ID_USUARIO (bigint).
   id_partner:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.idparceiro
-    description: Foreign key to the financing or brokerage partner organization.
+    description: Partner (brokerage/real-estate organization) that originated the financing request evaluated in this Bradesco pre-analysis. Foreign key to the `partner_info` table. Technical note sourced from IDParceiro (bigint).
   id_franchise:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: Casa Mineira franchise unit that served the client for this Bradesco pre-analysis. Foreign key to the `franchise_info` table. Technical note sourced from IDFranquia (bigint).
   id_request:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.idsolicitacao
-    description: Identifier of the pre-analysis request sent to Bradesco.
+    description: Identifier of the multi-bank pre-analysis request that routed this consultation to Bradesco. Foreign key to the `pre_analysis_ctrl` table. Technical note sourced from IDSolicitacao (bigint).
   id_return_user:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.id_usuarioretorno
-    description: User who registered the bank return for this pre-analysis.
+    description: User who registered Bradesco's return/response for this pre-analysis request. Foreign key to the `users_info` table. Technical note sourced from id_usuarioRetorno (bigint).
   id_segment:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.id_segmento
-    description: Bradesco client segment classification for this pre-analysis.
+    description: |
+      Bradesco commercial segment of the client, used to apply segment-specific approval,
+      LTV and rate rules for the financing simulation. Encoded with the SEGMENTOS_BRADESCO
+      enum from the Atta source application. Technical note sourced from id_segmento (int).
+    categories:
+      "1": PRIME - Bradesco Prime client segment.
+      "2": EXCLUSIVE - Bradesco Exclusive client segment.
+      "3": CLASSIC - Bradesco Classic client segment.
+      "4": NAO_POSSUI_REPASSE_PJ - client without corporate (PJ) fund pass-through; default segment used when none is informed.
   id_approval_user:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.idusuarioautorizacao
-    description: User who authorized or approved this pre-analysis.
+    description: User who authorized this Bradesco pre-analysis request. Foreign key to the `users_info` table. Technical note sourced from IDUsuarioAutorizacao (bigint).
   id_qualification_user:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.idusuario_aptidao
-    description: User who assessed the client qualification for this pre-analysis.
+    description: User who registered the client qualification (aptidão) outcome for this Bradesco pre-analysis. Foreign key to the `users_info` table. Technical note sourced from IDUSUARIO_APTIDAO (bigint).
   client_cpf:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.cpf
-    description: Brazilian CPF tax identifier for the primary client in the proposal.
+    description: Brazilian CPF tax identifier of the primary client (first proponent) evaluated in this Bradesco pre-analysis. Technical note sourced from CPF (bigint(11) unsigned zerofill).
   client_cpf_secondary:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.cpf2
-    description: Brazilian CPF tax identifier of the secondary client or co-buyer.
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer (e.g. spouse) whose income may be combined for this Bradesco pre-analysis. Technical note sourced from CPF2 (bigint(11) unsigned zerofill).
   owner_name:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.nomeprop1
-    description: Name of the primary property owner in the pre-analysis.
+    description: Full name of the primary property owner/seller declared in the Bradesco pre-analysis request. Technical note sourced from NomeProp1 (varchar(220)).
   operation_type:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.tipo_operacao
-    description: Financing operation type such as purchase, refinance, or construction.
+    description: |
+      Type of financing operation being pre-analyzed with Bradesco (e.g. property purchase
+      versus other operation types). In current usage this field is always populated with a
+      single fixed value by the Atta application, so no additional operation types are
+      actively distinguished today. Technical note sourced from tipo_operacao (tinyint,
+      default 0).
   installment_type:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.tipoparcela
-    description: Installment amortization type for the financing simulation.
+    description: |
+      Amortization system requested for the Bradesco financing simulation. Encoded with the
+      PRODUTOS_CREDITO_IMOBILIARIO enum from the Atta source application; in the current
+      integration this is populated with the same value as `product_type`. Technical note
+      sourced from TipoParcela (int, nullable).
+    categories:
+      "1": SAC - Sistema de Amortização Constante, constant principal amortization with declining installments.
+      "2": PRICE - French amortization table, fixed installment amount.
+      "3": POUPANCA_MAIS - Poupança Mais savings-indexed amortization product.
   product_type:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.tipoproduto
-    description: Bank product type selected for the mortgage or financing proposal.
+    description: |
+      Bradesco mortgage product selected for the financing simulation. Encoded with the
+      PRODUTOS_CREDITO_IMOBILIARIO enum from the Atta source application. Technical note
+      sourced from TipoProduto (int, nullable).
+    categories:
+      "1": SAC - Sistema de Amortização Constante, constant principal amortization with declining installments.
+      "2": PRICE - French amortization table, fixed installment amount.
+      "3": POUPANCA_MAIS - Poupança Mais savings-indexed amortization product.
   r_score:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.r_score
-    description: Bradesco credit risk score returned for the client.
+    description: Credit rating/score bucket returned by Bradesco for the client, used to look up the corresponding approval and income-commitment limits in `pre_analysis_bradesco_ratings`. Technical note sourced from R_SCORE (varchar(10), default '-1' before a response is received).
   version_number:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.versao
-    description: Version number of this pre-analysis submission.
+    description: Version number of this Bradesco pre-analysis submission, incremented when the request is resubmitted with updated client or simulation data. Technical note sourced from Versao (int, default 0).
   error:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.erro
-    description: Error message returned when partner pre-analysis or submission failed.
+    description: Error message returned when the pre-analysis request or a subsequent step with Bradesco failed. Technical note sourced from ERRO (text).
   qualification_status:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.status_aptidao
-    description: Outcome of automated or manual credit qualification for the client.
+    description: |
+      Outcome of Bradesco's client qualification (aptidão) assessment, indicating whether the
+      client was found eligible to proceed with the financing. No fixed value list was
+      confirmed in the Atta source code, so categories are not documented here. Technical
+      note sourced from STATUS_APTIDAO (tinyint, nullable).
   request_status:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.status_solicitacao
-    description: Processing status of the pre-analysis request with the partner bank.
+    description: |
+      Processing status of the pre-analysis request as it moves through Bradesco's
+      integration workflow, from submission to completion. Encoded with the SCORE_STATUS
+      enum from the Atta source application. Technical note sourced from STATUS_SOLICITACAO
+      (tinyint).
+    categories:
+      "-1": ERRO - request processing failed with an error.
+      "1": ENVIADO - request sent to Bradesco.
+      "2": PROCESSANDO - request being processed by Bradesco.
+      "3": GRAVANDO_RETORNO - Bradesco's return is being recorded (this numeric value is also used as ENVIAR in the source enum).
+      "4": CONCLUIDO - request processing completed.
+      "5": TAXAS_ATUALIZADAS - offered rates were refreshed for the request.
   recommendation_status:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.status_indicacao
-    description: Status of the client recommendation step with Bradesco.
+    description: |
+      Status of the client recommendation (indicação) step submitted to Bradesco after
+      qualification, part of the workflow that advances the pre-analysis toward a formal
+      financing proposal. No fixed value list was confirmed in the Atta source code, so
+      categories are not documented here. Technical note sourced from STATUS_INDICACAO
+      (tinyint, nullable).
   attachment_status:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.status_anexo
-    description: Status of document attachments for this pre-analysis.
+    description: |
+      Status of the supporting document attachments required by Bradesco for this
+      pre-analysis. No fixed value list was confirmed in the Atta source code, so categories
+      are not documented here. Technical note sourced from STATUS_ANEXO (int, default -1
+      before any attachment status is set).
   ltv_value:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.vl_ltv
-    description: Loan-to-value ratio computed for the financing operation.
+    description: Maximum loan-to-value (LTV) percentage allowed by Bradesco for this financing operation, capping how much of the property value can be financed. Technical note sourced from vl_ltv (decimal(15,2)).
   fee_value:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.vl_taxa
-    description: Interest rate offered by Bradesco for the financing.
+    description: Annual interest rate (percentage) quoted by Bradesco for the financing simulation. Technical note sourced from vl_taxa (decimal(15,2)).
   house_value:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.vlrimovel
-    description: Property value declared for the pre-analysis in Brazilian Reais.
+    description: Property value, in Brazilian Reais (BRL), declared for this Bradesco pre-analysis. Technical note sourced from VlrImovel (decimal(15,2)).
   down_payment_value:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.vlrentrada
-    description: Buyer down payment amount committed from own resources.
+    description: Buyer down payment amount, in Brazilian Reais (BRL), committed from own resources for this Bradesco financing simulation. Technical note sourced from VlrEntrada (decimal(15,2)).
   financing_value:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.vlrfinanciado
-    description: Principal financing amount requested excluding down payment and fees.
+    description: Principal financing amount, in Brazilian Reais (BRL), requested from Bradesco, excluding down payment and fees. Technical note sourced from VlrFinanciado (decimal(15,2)).
   ts_registration_returned:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.data_retorno_solicitacao
-    description: Timestamp when Bradesco returned the pre-analysis request.
+    description: Timestamp when Bradesco returned its response to the pre-analysis request. Technical note sourced from DATA_RETORNO_SOLICITACAO (datetime).
   ts_recommendation:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.data_indicacao
-    description: Timestamp when the client recommendation was submitted.
+    description: Timestamp when the client recommendation (indicação) was submitted to Bradesco. Technical note sourced from DATA_INDICACAO (datetime).
   ts_recommendation_returned:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.data_retorno_indicacao
-    description: Timestamp when Bradesco returned the recommendation result.
+    description: Timestamp when Bradesco returned the result of the client recommendation step. Technical note sourced from DATA_RETORNO_INDICACAO (datetime).
   ts_qualification:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.data_aptidao
-    description: Timestamp when the client qualification was assessed.
+    description: Timestamp when Bradesco's client qualification (aptidão) result was recorded. Technical note sourced from DATA_APTIDAO (datetime).
   ts_attachment:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.data_anexo
-    description: Timestamp when supporting documents were attached.
+    description: Timestamp when supporting documents were attached to this Bradesco pre-analysis. Technical note sourced from DATA_ANEXO (datetime).
   ts_registration:
     lineage:
     - datalake_atta_raw.consulta_score_bradesco.data_solicitacao
-    description: Timestamp when the Bradesco pre-analysis was requested.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis bradesco sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis bradesco record with standardized names and types in datalake_atta_clean.
+    description: Timestamp when the Bradesco pre-analysis request was submitted. Technical note sourced from DATA_SOLICITACAO (timestamp).

@@ -1,42 +1,56 @@
 database_name: datalake_atta_clean
 table_name: closing_file
-description: Cleaned snapshot of closing file sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per closing file record with standardized names and types in datalake_atta_clean.
+description: |
+  Files and documents (e.g. bank statements, supporting attachments) uploaded or
+  generated during a closing process, in the Atta platform for For Sale home purchases.
+  One row per file linked to a `closing` case (via id_closing) and to the reconciliation
+  items it feeds (via `reconciliation_item.id_closing_file`). Sourced from the
+  `closing_file` table in the Atta operational database, cleaned with standardized
+  names and types in datalake_atta_clean.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_file:
-    description: Foreign key to the uploaded closing or legal document metadata row.
+    description: |
+      Primary key identifying the closing file record. Referenced by
+      `reconciliation_item.id_closing_file`.
     lineage:
     - datalake_atta_raw.closing_file.id
   id_closing:
-    description: Foreign key to the closing case tracking commissions and document uploads.
+    description: |
+      Foreign key to the `closing` table. Identifies the closing case this file belongs
+      to.
     lineage:
     - datalake_atta_raw.closing_file.closing_id
   id_user:
-    description: Foreign key to the QuintoAndar user who performed the action.
+    description: |
+      Foreign key to the `users_info` table. Identifies the user who uploaded or
+      generated the file.
     lineage:
     - datalake_atta_raw.closing_file.user_id
   id_document:
-    description: Foreign key to the document type registry for closing paperwork.
+    description: |
+      Foreign key to the `storage_documents` table. Identifies the stored document
+      record associated with this closing file, when applicable.
     lineage:
     - datalake_atta_raw.closing_file.storage_documento_id
   file_key:
-    description: Object storage key locating the uploaded document in the closing bucket.
+    description: Object storage key locating the uploaded file content in the closing files bucket.
     lineage:
     - datalake_atta_raw.closing_file.file_key
   file_hash:
-    description: Content hash verifying integrity of the uploaded closing document file.
+    description: Content hash used to verify the integrity of the uploaded closing file.
     lineage:
     - datalake_atta_raw.closing_file.file_hash
   file_name:
-    description: Original filename of the document uploaded during closing or legal review.
+    description: Original filename of the document uploaded during the closing process.
     lineage:
     - datalake_atta_raw.closing_file.file_name
   comments:
-    description: Operator comments attached to the document, file, or workflow step.
+    description: Operator comments or notes attached to this closing file.
     lineage:
     - datalake_atta_raw.closing_file.comments
   ts_created:
-    description: Timestamp of when the file was created.
+    description: Timestamp when the file was uploaded/created.
     lineage:
     - datalake_atta_raw.closing_file.created_at

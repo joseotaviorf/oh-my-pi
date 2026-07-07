@@ -1,178 +1,191 @@
 database_name: datalake_atta_clean
 table_name: pre_analysis_itau
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: One row per credit pre-analysis (score) request sent to Itau to evaluate the viability of a client's real-estate financing before a formal proposal is generated. Records the request's simulation inputs (property value, down payment, financing amount, term, property type) alongside Itau's scoring response (credit and behavioral scores, approved amount, installments, fees) for the For Sale home-purchase flow. Each row relates to a single financing request via id_request (pre_analysis_ctrl), which also fans out to the equivalent Santander, Bradesco and Caixa pre-analysis tables so the best offer across banks can be selected. Cleaned snapshot of consulta_score_itau sourced from the Atta operational database, standardized to datalake_atta_clean naming and types.
 columns:
   id_pre_analysis_itau:
     lineage:
     - datalake_atta_raw.consulta_score_itau.id
-    description: Identifier of the Itau pre-analysis score request record in the atta platform.
+    description: Primary key identifying an Itau credit pre-analysis (score) request in the Atta mortgage financing platform.
   id_registration_user:
     lineage:
     - datalake_atta_raw.consulta_score_itau.id_usuario
-    description: Identifier of the user who registered this Itau pre-analysis request.
+    description: User who registered this Itau pre-analysis request. Foreign key to the `users_info` table.
   id_return_user:
     lineage:
     - datalake_atta_raw.consulta_score_itau.id_usuarioretorno
-    description: Identifier of the user who recorded the Itau pre-analysis return response.
+    description: User who recorded the Itau pre-analysis return (score response) in the system. Foreign key to the `users_info` table.
   id_partner:
     lineage:
     - datalake_atta_raw.consulta_score_itau.idparceiro
-    description: Foreign key to the financing or brokerage partner organization.
+    description: Brokerage or financing partner organization that originated the client and the Itau pre-analysis. Foreign key to the `partner_info` table.
   id_franchise:
     lineage:
     - datalake_atta_raw.consulta_score_itau.idfranquia
-    description: Foreign key to the Casa Mineira franchise unit serving the client.
+    description: Franchise unit that served the client in this Itau pre-analysis. Foreign key to the `franchise_info` table.
   id_request:
     lineage:
     - datalake_atta_raw.consulta_score_itau.idsolicitacao
-    description: Foreign key to the financing request that triggered this Itau pre-analysis.
+    description: Pre-analysis request that this Itau score consultation belongs to. Foreign key to the `pre_analysis_ctrl` table, which routes a single client request to one or more banks (Itau, Santander, Bradesco, Caixa) for pre-analysis.
   id_segment:
     lineage:
     - datalake_atta_raw.consulta_score_itau.id_segmento
-    description: Foreign key to the customer segment classification used in Itau pre-analysis.
+    description: Internal identifier of the Itau customer segment/tier (e.g. the "Personnalité" high-income segment) used to price and qualify this pre-analysis. Business segment classification internal to Atta, not linked to a customer-facing clean table.
   client_cpf:
     lineage:
     - datalake_atta_raw.consulta_score_itau.cpf
-    description: Brazilian CPF tax identifier for the primary client in the proposal.
+    description: Brazilian CPF tax identifier of the primary client (buyer) evaluated in this Itau pre-analysis.
   client_cpf_secondary:
     lineage:
     - datalake_atta_raw.consulta_score_itau.cpf2
-    description: Brazilian CPF tax identifier of the secondary client or co-buyer in the proposal.
+    description: Brazilian CPF tax identifier of the secondary client or co-buyer (e.g. spouse) included in this Itau pre-analysis.
   client_cpf_masked:
     lineage:
     - datalake_atta_raw.consulta_score_itau.cpf_mascara
-    description: Partially masked client CPF used for display in the Itau pre-analysis.
+    description: Partially masked version of the primary client's CPF, used for display purposes in the Itau pre-analysis screens.
   requester_email:
     lineage:
     - datalake_atta_raw.consulta_score_itau.email_solicitante
-    description: Email address of the requester who submitted the Itau pre-analysis.
+    description: Email address of the person (broker or partner user) who submitted this Itau pre-analysis request.
   product_sac_plus:
     lineage:
     - datalake_atta_raw.consulta_score_itau.produtosacplus
-    description: Indicator of the Itau SAC Plus amortization product offered in the pre-analysis.
+    description: Flag indicating which Itau amortization product was simulated in the pre-analysis. Categorical field.
+    categories:
+      "1": Poupanca Mais (savings-indexed) amortization product
+      "0": Standard SAC (constant amortization) product
   state:
     lineage:
     - datalake_atta_raw.consulta_score_itau.uf
-    description: Brazilian state (UF) of the property in the Itau financing request.
+    description: Brazilian state (UF) where the property to be financed through Itau is located. Two-letter code for one of Brazil's 26 states or the Federal District (e.g. SP, RJ, MG).
   house_type:
     lineage:
     - datalake_atta_raw.consulta_score_itau.tpimovel
-    description: Property type (residential or commercial) financed in the Itau request.
+    description: Simplified property-purpose flag used in the Itau pre-analysis simulation. Categorical field.
+    categories:
+      "1": Residential property
+      "0": Non-residential property (commercial or land); Itau pre-analysis does not support the full residential/commercial/land classification used elsewhere in Atta
   operation_type:
     lineage:
     - datalake_atta_raw.consulta_score_itau.tipo_operacao
-    description: Financing operation type such as purchase, refinance, or construction.
+    description: Financing operation type code recorded for the Itau pre-analysis request. In the current pre-analysis flow this value is always written as 0 by the application; the column is kept for compatibility with the shared pre-analysis schema used across banks.
   r_name:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_nome
-    description: Client name returned by the Itau scoring response for the pre-analysis.
+    description: Client name as returned by Itau in the pre-analysis scoring response (may differ in formatting from the name submitted in the request).
   r_score:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_score
-    description: Primary credit score returned by Itau for the client in the pre-analysis.
+    description: Primary credit score returned by Itau for the client (client_cpf) in the pre-analysis.
   r_score2:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_score2
-    description: Secondary credit score component returned by Itau in the pre-analysis.
+    description: Credit score returned by Itau for the secondary client/co-buyer (client_cpf_secondary) in the pre-analysis.
   r_score3:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_score3
-    description: Tertiary credit score component returned by Itau in the pre-analysis.
+    description: Combined credit score returned by Itau when the pre-analysis considers both proponents (primary and secondary client) together.
   r_origin:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_origem
-    description: Origin or source of the credit score returned by Itau.
+    description: Origin or source system/bureau reported by Itau for the credit score returned in the pre-analysis.
   r_age:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_idade
-    description: Client age returned by Itau and used as a scoring input.
+    description: Client age reported by Itau in the pre-analysis response, used as an input to the bank's scoring.
   r_bhv:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_bhv
-    description: Primary behavior (behavioral) score returned by Itau in the pre-analysis.
+    description: Behavioral score returned by Itau for the primary client (client_cpf) in the pre-analysis, complementing the credit score with the client's payment behavior history.
   r_bhv2:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_bhv2
-    description: Secondary behavior score component returned by Itau in the pre-analysis.
+    description: Behavioral score returned by Itau for the secondary client/co-buyer (client_cpf_secondary) in the pre-analysis.
   r_bhv3:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_bhv3
-    description: Tertiary behavior score component returned by Itau in the pre-analysis.
+    description: Combined behavioral score returned by Itau when the pre-analysis considers both proponents together.
   error:
     lineage:
     - datalake_atta_raw.consulta_score_itau.erro
-    description: Error message returned when partner pre-analysis or submission failed.
+    description: Error message returned by Itau or by the integration layer when the pre-analysis submission or scoring call failed.
   pre_analysis_status:
     lineage:
     - datalake_atta_raw.consulta_score_itau.status
-    description: Current status of the Itau pre-analysis request such as pending, approved, or rejected.
+    description: Processing status of the Itau pre-analysis (score) request in the Atta integration workflow. Categorical field.
+    categories:
+      "-1": Error while processing the request with Itau
+      "1": Request sent to Itau
+      "2": Request being processed by Itau
+      "3": Request queued to be sent, or recording the return, to Itau (shared code in the source system)
+      "4": Request completed
+      "5": Rates/conditions updated after the initial pre-analysis response
   deadline:
     lineage:
     - datalake_atta_raw.consulta_score_itau.prazo
-    description: Due date by which the subtask or legal action must be completed.
+    description: Financing term (loan duration, in months) requested for the Itau financing simulation.
   ltv_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.vl_ltv
-    description: Loan-to-value ratio of the financing relative to the property value at Itau.
+    description: Loan-to-value ratio (percentage of the property value financed) used or approved for the Itau financing simulation.
   fee_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.vl_taxa
-    description: Interest rate quoted by Itau for the financing in the pre-analysis.
+    description: Annual interest rate (percentage) quoted by Itau for the financing in the pre-analysis.
   house_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.vlrimovel
-    description: Appraised property value used as the basis for the Itau financing.
+    description: Property value, in BRL, used as the basis for the Itau financing simulation.
   down_payment_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.vlrentrada
-    description: Buyer down payment amount committed from own resources.
+    description: Down payment amount, in BRL, that the buyer commits from own resources in the Itau financing simulation.
   financing_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.vlrfinanciado
-    description: Principal financing amount requested excluding down payment and fees.
+    description: Principal financing amount requested from Itau, in BRL, excluding down payment and fees.
   r_approved_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.r_vlr_aprovado
-    description: Financing amount approved by Itau in the pre-analysis response.
+    description: Financing amount, in BRL, approved by Itau in the pre-analysis response.
   s_first_installment_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_priparc
-    description: First installment amount in the Itau financing simulation.
+    description: First installment amount, in BRL, in the Itau financing simulation.
   s_last_installment_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_ultparc
-    description: Last installment amount in the Itau financing simulation.
+    description: Last installment amount, in BRL, in the Itau financing simulation.
   s_ribti_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_vlribti
-    description: IBTI charge amount included in the Itau financing simulation.
+    description: IBTI (property-registry related charge) amount, in BRL, included in the Itau financing simulation.
   s_tax_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_vlrtarifa
-    description: Service tariff amount charged in the Itau financing simulation.
+    description: Service tariff amount, in BRL, charged by Itau in the financing simulation.
   s_iof_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_vlriof
-    description: IOF tax amount charged in the Itau financing simulation.
+    description: IOF (Brazilian financial transactions tax) amount, in BRL, charged in the Itau financing simulation.
   s_min_income_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_vlrrendamin
-    description: Minimum income required to qualify for the Itau financing simulation.
+    description: Minimum monthly income, in BRL, required by Itau to qualify for the simulated financing.
   s_fee_value:
     lineage:
     - datalake_atta_raw.consulta_score_itau.s_taxa
-    description: Interest rate applied in the Itau financing simulation.
+    description: Annual interest rate (percentage) applied in the Itau financing simulation.
   is_read:
     lineage:
     - datalake_atta_raw.consulta_score_itau.lido
-    description: Flag indicating whether the Itau pre-analysis return has been read by an operator.
+    description: Flag indicating whether the Itau pre-analysis return has been reviewed/acknowledged by an operator.
   ts_returned:
     lineage:
     - datalake_atta_raw.consulta_score_itau.data_retorno
-    description: Date when Itau returned the pre-analysis scoring response.
+    description: Timestamp when Itau returned the pre-analysis scoring response.
   ts_registration:
     lineage:
     - datalake_atta_raw.consulta_score_itau.data_solicitacao
-    description: Date when the Itau pre-analysis request was submitted.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of pre analysis itau sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per pre analysis itau record with standardized names and types in datalake_atta_clean.
+    description: Timestamp when the Itau pre-analysis request was submitted.

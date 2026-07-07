@@ -1,26 +1,26 @@
 database_name: datalake_atta_clean
 table_name: product_info
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Reference dimension holding one row per financing/credit product offered on Atta, QuintoAndar's mortgage and financing platform (for example, different mortgage/financing product lines made available to clients). It stores the product's name, its associated document profile (used to determine required paperwork), whether it is currently active, and its registration date. It is a core dimension in the For Sale Atta domain, referenced by fact tables such as `proposal` and `financing_proposal` (via `id_product`) to identify which financing product a given proposal was submitted for, supporting product-level reporting on financing volume and performance. Technical note - derived from the operational `produto` table in the Atta raw MySQL database, with columns renamed to English and standardized types in the datalake_atta_clean schema.
 columns:
   id_product:
     lineage:
     - datalake_atta_raw.produto.id
-    description: Identifier of the financing product offered in the atta platform.
+    description: "Unique identifier of the financing/credit product offered on the Atta platform (e.g. a specific type of home-financing offer). This is the primary key of this table and is referenced as a foreign key by other For Sale Atta clean tables, such as `proposal` and `financing_proposal` (via `id_product`), to identify which product a financing proposal is for. Technical note: sourced from the auto-increment primary key ID (bigint) of the raw produto table."
   product_name:
     lineage:
     - datalake_atta_raw.produto.descricao
-    description: Descriptive name of the financing product.
+    description: Descriptive/commercial name of the financing product, used to identify the product in reporting and in the Atta application. Technical note sourced from Descricao (varchar).
   profile_doc:
     lineage:
     - datalake_atta_raw.produto.perfildoc
-    description: Document profile defining the paperwork required for this financing product.
+    description: Identifier of the document profile associated with this product, defining which set of documents/paperwork is required from the client for this type of financing product. According to application source comments, this is the canonical product identifier used to integrate with other Atta services and front-end applications (rather than the internal database id_product surrogate key). Technical note sourced from PerfilDoc (bigint).
   is_active:
     lineage:
     - datalake_atta_raw.produto.ativo
-    description: Whether the party or record remains active in the current sales flow.
+    description: Indicates whether the financing product is currently active and available to be offered/selected in new proposals. Technical note sourced from ativo (bit(1)); true means active, false/null means inactive.
   ts_registration:
     lineage:
     - datalake_atta_raw.produto.dtcadastro
-    description: Date when the financing product was registered in the source system.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of product info sourced from operational systems backing Atta mortgage and financing platform data for For Sale home purchases. One row per product info record with standardized names and types in datalake_atta_clean.
+    description: Date and time when the financing product was registered in Atta. Technical note sourced from DtCadastro (timestamp).
