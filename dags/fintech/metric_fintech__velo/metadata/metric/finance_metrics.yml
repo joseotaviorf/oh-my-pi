@@ -1,34 +1,39 @@
----
-database_name: metric_fintech__velo
+database_name: metric_fintech
 table_name: finance_metrics
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Metrics related to QuintoCred finance numbers"
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Metrics related to QuintoCred finance numbers
 columns:
-    date:
-        description: Date base for each metric
-        dimension: True
-    ended_contracts:
-        description: Quantity of cancelled contracts in the reference date
-        dimension: True
-    new_contracts:
-        description: Number of contracts that have had guarantee deposit activated in the reference date
-        dimension: True
-    plan_percent:
-        description: Total plan percent value on the reference date
-        dimension: True
-    gmv_new_contracts:
-        description: Gross Merchandise Value (GMV) of new contracts on the reference date
-        dimension: True
-    gmv_ended_contracts:
-        description: Gross Merchandise Value (GMV) of cancelled contracts on the reference date
-        dimension: True
-    revenue_new_contracts:
-        description: Revenue of new contracts on the reference date
-        dimension: True
-    revenue_ended_contracts:
-        description: Revenue of cancelled contracts on the reference date
-        dimension: True
-    activation_fee:
-        description: Total activation fee on the reference date
-        dimension: True
+  date:
+    description: Reference calendar date for the Velo finance metric aggregation grain.
+    dimension: true
+  ended_contracts:
+    description: Quantity of cancelled contracts in the reference date
+    dimension: true
+  new_contracts:
+    description: Number of contracts that have had guarantee deposit activated in
+      the reference date
+    dimension: true
+  plan_percent:
+    description: Total plan percent value on the reference date
+    dimension: true
+  gmv_new_contracts:
+    description: Gross Merchandise Value (GMV) of new contracts on the reference date
+    dimension: true
+  gmv_ended_contracts:
+    description: Gross Merchandise Value (GMV) of cancelled contracts on the reference
+      date
+    dimension: true
+  revenue_new_contracts:
+    description: Revenue of new contracts on the reference date
+    dimension: true
+  revenue_ended_contracts:
+    description: Revenue of cancelled contracts on the reference date
+    dimension: true
+  activation_fee:
+    description: Total activation fee on the reference date
+    dimension: true

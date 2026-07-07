@@ -1,35 +1,41 @@
----
-database_name: metric_fintech__velo
+database_name: metric_fintech
 table_name: rating_funnel
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Metric with relation between week, neurotech rating analysis and the acquisition funnel for QuintoCred. \n PS: The rating used is always the LAST one for each propose."
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Metric with relation between week, neurotech rating analysis and the acquisition funnel for QuintoCred.
+  PS: The rating used is always the LAST one for each propose.
 columns:
   date:
-    description: Date base for each metric
-    dimension: True
+    description: Reference calendar date for the Velo rating funnel metric aggregation.
+    dimension: true
   rating:
     description: Level of risk assessed in credit approval
     lineage:
-      - datalake_velo.neurotech_rating.rating
+    - datalake_velo.neurotech_rating.rating
     metric:
       name: Rating Funnel
       description: Level of risk assessed in credit approval
       acronym: RF
-      is_additive: True
+      is_additive: true
       business_stage: Other
       hierarchy: Operation
       approved_by: jessica.aguiar@quintoandar.com.br
-      link_to_metric: "https://metabase.quintoandar.com.br/question/82676-base-cascata-modelada"
+      link_to_metric: https://metabase.quintoandar.com.br/question/82676-base-cascata-modelada
   total_es:
     description: Quantity of proposal arrived at the credit analysis.
-    dimension: True
+    dimension: true
   total_ca:
     description: Quantity of proposals on the moment when it had the credit approved
-    dimension: True
+    dimension: true
   total_cs:
-    description: Contracts that have had guarantee deposit activated in the reference period.
-    dimension: True
+    description: Contracts that have had guarantee deposit activated in the reference
+      period.
+    dimension: true
   distinct_cs:
-    description: Distinct number of contracts that have had guarantee deposit activated in the reference period.
-    dimension: True
+    description: Distinct number of contracts that have had guarantee deposit activated
+      in the reference period.
+    dimension: true
