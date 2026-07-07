@@ -19,13 +19,8 @@ workflow:
       - business_unit
     member_hub_allocation:
       - member_profile
-    agent_hub_alocation:
-      - member_profile
   tables_customization:
     profile:
-      extraction_type: incremental
-      partitions: [year, month, day]
-    agent_hub_alocation:
       extraction_type: incremental
       partitions: [year, month, day]
     business_unit:

@@ -12,7 +12,7 @@ columns:
     id_business_unit:
         description: A business unit identifier (only for sale hubs) has a direct relationship with teams, since a from/to of all sources was made for this standardization.
         lineage:
-            - datalake_hub_services.sale_business_unit_region.id_business_unit
+            - datalake_hub_services.business_unit_region.id_business_unit
             - datalake_hub_services_clean.member_profile.id_business_unit
             - datalake_hub_services_clean.business_unit.id
     id_user_agent:
