@@ -1,69 +1,67 @@
 ---
 database_name: datalake_velo_clean
 table_name: clientes_company
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 description: |
   QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
   In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
   Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
-  One row per clientes company from the Velo property management and
-  condominium billing platform, ingested for QuintoAndar fintech
-  reconciliation and accounts payable analytics.
-owner: guilherme.sacramento@quintoandar.com.br
-domain: Fintech
+  Clean company (legal entity) profiles from the Velo clientes module. Grain: one row per company. Used for legacy QuintoCred corporate customer and billing analytics.
 columns:
   id:
+    description: "Primary key of the company in the legacy Velo clientes module."
     lineage:
       - datalake_velo_raw.clientes_company.id
-    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_user_insert:
+    description: "Velo user id that created the company row."
     lineage:
       - datalake_velo_raw.clientes_company.userinsert
-    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
+    description: "Velo user id that last updated the company row."
     lineage:
       - datalake_velo_raw.clientes_company.userupdate
-    description: Identifier for the user update referenced by this financial record.
   document:
+    description: "CNPJ or tax document number of the company."
     lineage:
       - datalake_velo_raw.clientes_company.document
-    description: Velo platform attribute describing document for condominium billing reconciliation.
   name:
+    description: "Legal name of the company."
     lineage:
       - datalake_velo_raw.clientes_company.name
-    description: Velo platform attribute describing name for condominium billing reconciliation.
   comercial_name:
+    description: "Trade or commercial name of the company."
     lineage:
       - datalake_velo_raw.clientes_company.comercialname
-    description: Velo platform attribute describing comercial name for condominium billing reconciliation.
   foundation:
+    description: "Company foundation or registration reference from Velo."
     lineage:
       - datalake_velo_raw.clientes_company.foundation
-    description: Velo platform attribute describing foundation for condominium billing reconciliation.
   rental:
+    description: "Rental-related flag or reference stored on the company profile in Velo."
     lineage:
       - datalake_velo_raw.clientes_company.rental
-    description: Velo platform attribute describing rental for condominium billing reconciliation.
   complement:
+    description: "Additional company profile notes or complement text."
     lineage:
       - datalake_velo_raw.clientes_company.complement
-    description: Velo platform attribute describing complement for condominium billing reconciliation.
   address:
+    description: "Primary address text associated with the company in Velo."
     lineage:
       - datalake_velo_raw.clientes_company.address
-    description: Velo platform attribute describing address for condominium billing reconciliation.
   phone:
+    description: "Main phone number registered for the company."
     lineage:
       - datalake_velo_raw.clientes_company.phone
-    description: Velo platform attribute describing phone for condominium billing reconciliation.
   is_active:
+    description: "True when the company profile is active in Velo."
     lineage:
       - datalake_velo_raw.clientes_company.active
-    description: Indicates whether active applies to this financial record.
   ts_inserted:
+    description: "Timestamp when the company row was first inserted in Velo."
     lineage:
       - datalake_velo_raw.clientes_company.dateinsert
-    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
+    description: "Timestamp of the last update to the company row in Velo."
     lineage:
       - datalake_velo_raw.clientes_company.dateupdate
-    description: Timestamp when updated occurred in the upstream fintech system.

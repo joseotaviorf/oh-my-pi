@@ -1,77 +1,75 @@
 ---
 database_name: datalake_velo_clean
 table_name: fiancavelo_fianca
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 description: |
   QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
   In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
   Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
-  One row per fiancavelo fianca from the Velo property management and
-  condominium billing platform, ingested for QuintoAndar fintech
-  reconciliation and accounts payable analytics.
-owner: guilherme.sacramento@quintoandar.com.br
-domain: Fintech
+  Rental-guarantee (fiança) contracts issued through FiancaVelo. Grain: one row per guarantee contract. Core fact table for legacy QuintoCred guarantee lifecycle analytics.
 columns:
   id:
+    description: "Primary key of the guarantee contract in FiancaVelo."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.id
-    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_realtor:
+    description: "Broker (corretor) responsible for the guarantee contract."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.realtor
-    description: Identifier for the realtor referenced by this financial record.
   id_realestate:
+    description: "Real-estate agency associated with the contract."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.realestate
-    description: Identifier for the realestate referenced by this financial record.
   id_responsible:
+    description: "Internal Velo user responsible for managing the contract."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.responsible
-    description: Identifier for the responsible referenced by this financial record.
   id_type:
+    description: "Guarantee product type identifier."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.type
-    description: Identifier for the type referenced by this financial record.
   id_status:
+    description: "Current lifecycle status of the guarantee contract."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.status
-    description: Identifier for the status referenced by this financial record.
   id_external:
+    description: "External system reference for the guarantee contract."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.externalref
-    description: Identifier for the external referenced by this financial record.
   id_propose:
+    description: "Foreign key to the originating rental-guarantee proposal."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.propose
-    description: Identifier for the propose referenced by this financial record.
   id_validity:
+    description: "Validity term or period identifier for the guarantee."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.validity
-    description: Identifier for the validity referenced by this financial record.
   id_user_insert:
+    description: "Velo user id that created the contract row."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.userinsert
-    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
+    description: "Velo user id that last updated the contract row."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.userupdate
-    description: Identifier for the user update referenced by this financial record.
   is_active:
+    description: "True when the guarantee contract is marked active in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.active
-    description: Indicates whether active applies to this financial record.
   dt_begin:
+    description: "Start date of the guarantee coverage period."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.begin
-    description: Calendar date associated with begin in the financial workflow.
   dt_ended:
+    description: "End date of the guarantee coverage period."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.end
-    description: Calendar date associated with ended in the financial workflow.
   ts_inserted:
+    description: "Timestamp when the contract row was first inserted in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.dateinsert
-    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
+    description: "Timestamp of the last update to the contract row in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_fianca.dateupdate
-    description: Timestamp when updated occurred in the upstream fintech system.

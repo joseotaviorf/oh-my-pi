@@ -1,49 +1,47 @@
 ---
 database_name: datalake_velo_clean
 table_name: fiancavelo_activator
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 description: |
   QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
   In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
   Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
-  One row per fiancavelo activator from the Velo property management and
-  condominium billing platform, ingested for QuintoAndar fintech
-  reconciliation and accounts payable analytics.
-owner: guilherme.sacramento@quintoandar.com.br
-domain: Fintech
+  Lookup of proposal activation channels in the FiancaVelo rental-guarantee product. Grain: one row per activator. Used to attribute guarantee proposals to campaigns or entry points.
 columns:
   id:
+    description: "Primary key of the activator in FiancaVelo."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.id
-    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_user_insert:
+    description: "Velo user id that created the activator record."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.userinsert
-    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
+    description: "Velo user id that last updated the activator record."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.userupdate
-    description: Identifier for the user update referenced by this financial record.
   name:
+    description: "Display name of the activation channel or campaign."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.name
-    description: Velo platform attribute describing name for condominium billing reconciliation.
   value:
+    description: "Internal code or value associated with the activator."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.value
-    description: Velo platform attribute describing value for condominium billing reconciliation.
   icon:
+    description: "UI icon identifier for the activator in legacy Velo screens."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.icon
-    description: Velo platform attribute describing icon for condominium billing reconciliation.
   is_active:
+    description: "True when the activator is available for new proposals."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.active
-    description: Indicates whether active applies to this financial record.
   ts_inserted:
+    description: "Timestamp when the activator row was first inserted in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.dateinsert
-    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
+    description: "Timestamp of the last update to the activator row in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_activator.dateupdate
-    description: Timestamp when updated occurred in the upstream fintech system.

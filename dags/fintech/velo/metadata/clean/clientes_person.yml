@@ -1,69 +1,67 @@
 ---
 database_name: datalake_velo_clean
 table_name: clientes_person
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 description: |
   QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
   In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
   Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
-  One row per clientes person from the Velo property management and
-  condominium billing platform, ingested for QuintoAndar fintech
-  reconciliation and accounts payable analytics.
-owner: guilherme.sacramento@quintoandar.com.br
-domain: Fintech
+  Clean natural-person profiles from the Velo clientes module. Grain: one row per person. Supports legacy QuintoCred credit analysis and collections (contains PII).
 columns:
   id:
+    description: "Primary key of the person in the legacy Velo clientes module."
     lineage:
       - datalake_velo_raw.clientes_person.id
-    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_user_insert:
+    description: "Velo user id that created the person row."
     lineage:
       - datalake_velo_raw.clientes_person.userinsert
-    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
+    description: "Velo user id that last updated the person row."
     lineage:
       - datalake_velo_raw.clientes_person.userupdate
-    description: Identifier for the user update referenced by this financial record.
   name:
+    description: "Full name of the person as registered in Velo."
     lineage:
       - datalake_velo_raw.clientes_person.name
-    description: Velo platform attribute describing name for condominium billing reconciliation.
   document:
+    description: "CPF or personal tax document number."
     lineage:
       - datalake_velo_raw.clientes_person.document
-    description: Velo platform attribute describing document for condominium billing reconciliation.
   email:
+    description: "Email address registered for the person in Velo."
     lineage:
       - datalake_velo_raw.clientes_person.email
-    description: Velo platform attribute describing email for condominium billing reconciliation.
   mother:
+    description: "Mother's name collected for credit bureau checks in legacy workflows."
     lineage:
       - datalake_velo_raw.clientes_person.mother
-    description: Velo platform attribute describing mother for condominium billing reconciliation.
   phone:
+    description: "Primary phone number of the person."
     lineage:
       - datalake_velo_raw.clientes_person.phone
-    description: Velo platform attribute describing phone for condominium billing reconciliation.
   rental:
+    description: "Rental-related flag or reference on the person profile."
     lineage:
       - datalake_velo_raw.clientes_person.rental
-    description: Velo platform attribute describing rental for condominium billing reconciliation.
   is_foreigner:
+    description: "True when the person is flagged as foreign (estrangeiro) in Velo."
     lineage:
       - datalake_velo_raw.clientes_person.estrangeiro
-    description: Indicates whether foreigner applies to this financial record.
   is_active:
+    description: "True when the person profile is active in Velo."
     lineage:
       - datalake_velo_raw.clientes_person.active
-    description: Indicates whether active applies to this financial record.
   dt_birth:
+    description: "Date of birth of the person."
     lineage:
       - datalake_velo_raw.clientes_person.birth
-    description: Calendar date associated with birth in the financial workflow.
   ts_inserted:
+    description: "Timestamp when the person row was first inserted in Velo."
     lineage:
       - datalake_velo_raw.clientes_person.dateinsert
-    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
+    description: "Timestamp of the last update to the person row in Velo."
     lineage:
       - datalake_velo_raw.clientes_person.dateupdate
-    description: Timestamp when updated occurred in the upstream fintech system.

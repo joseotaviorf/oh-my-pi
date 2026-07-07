@@ -1,69 +1,67 @@
 ---
 database_name: datalake_velo_clean
 table_name: fiancavelo_colaborador
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 description: |
   QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
   In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
   Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
-  One row per fiancavelo colaborador from the Velo property management and
-  condominium billing platform, ingested for QuintoAndar fintech
-  reconciliation and accounts payable analytics.
-owner: guilherme.sacramento@quintoandar.com.br
-domain: Fintech
+  Real-estate collaborators (brokers and agency staff) registered in FiancaVelo. Grain: one row per collaborator. Links agents to proposals and commissions in legacy QuintoCred flows.
 columns:
   id:
+    description: "Primary key of the collaborator in FiancaVelo."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.id
-    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_person:
+    description: "Foreign key to the Velo person profile for this collaborator."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.person
-    description: Identifier for the person referenced by this financial record.
   id_user:
+    description: "Velo application user account linked to the collaborator."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.user
-    description: QuintoAndar user identifier associated with this financial transaction or account.
   id_type:
+    description: "Collaborator role or type identifier in FiancaVelo."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.type
-    description: Identifier for the type referenced by this financial record.
   id_external:
+    description: "External reference id used to sync the collaborator with partner systems."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.externalref
-    description: Identifier for the external referenced by this financial record.
   id_realestate:
+    description: "Real-estate agency (imobiliária) the collaborator belongs to."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.realestate
-    description: Identifier for the realestate referenced by this financial record.
   id_creci:
+    description: "CRECI registration reference for the broker when applicable."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.creci
-    description: Identifier for the creci referenced by this financial record.
   id_wallet:
+    description: "Digital wallet id used for collaborator payouts in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.walletid
-    description: Identifier for the wallet referenced by this financial record.
   id_user_insert:
+    description: "Velo user id that created the collaborator row."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.userinsert
-    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
+    description: "Velo user id that last updated the collaborator row."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.userupdate
-    description: Identifier for the user update referenced by this financial record.
   apikey:
+    description: "API key issued to the collaborator for Velo integrations (legacy credential)."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.apikey
-    description: Velo platform attribute describing apikey for condominium billing reconciliation.
   is_active:
+    description: "True when the collaborator account is active in FiancaVelo."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.active
-    description: Indicates whether active applies to this financial record.
   ts_inserted:
+    description: "Timestamp when the collaborator row was first inserted in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.dateinsert
-    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
+    description: "Timestamp of the last update to the collaborator row in Velo."
     lineage:
       - datalake_velo_raw.fiancavelo_colaborador.dateupdate
-    description: Timestamp when updated occurred in the upstream fintech system.
