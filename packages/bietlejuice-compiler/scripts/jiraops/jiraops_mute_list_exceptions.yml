@@ -64,6 +64,11 @@ DAGOwner:
       deadline: Never
       created_by: isabella.araujo@quintoandar.com.br
       approved_by: pedro.prates@quintoandar.com.br
+    Data Planning and Performance:
+      reason: "Data Planning and Performance is a business/analytics team, not a technical Data Engineering squad."
+      deadline: Never
+      created_by: gabriel.firmino@quintoandar.com.br
+      approved_by: lucas.bguerra@quintoandar.com.br
     MLOps:
       reason: "MLOps pipelines are fully owned by the MLOps squad; DE on-call engineers have no context, access, or accountability over this domain."
       deadline: Never
