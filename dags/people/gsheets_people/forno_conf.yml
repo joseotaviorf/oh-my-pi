@@ -34,3 +34,45 @@ sheets_info:
     sheet_context: people
     sheet_id: 1nASkCdoLPDP88qjBOr2uR6MBdXvWNOqymhb4klyuCa8
     sheet_name: phrases
+
+  org_health_user_roles:
+    clean_table_name: org_health_user_roles
+    sheet_context: people
+    sheet_id: 16O12KfrMfxZUBbclxMfwzD6AD6mZY5KcRT1fo0TR6PQ
+    sheet_name: roles
+
+  questionnaire_requests:
+    clean_table_name: questionnaire_requests
+    sheet_context: people
+    sheet_id: 1zIF0bBTNYdW3ryUiySqZ6lNp4z7MTo_Nv8w_4IP0nWQ
+    sheet_name: "requisições de questionário"
+
+  survey_answers:
+    clean_table_name: survey_answers
+    sheet_context: people
+    sheet_id: 1zIF0bBTNYdW3ryUiySqZ6lNp4z7MTo_Nv8w_4IP0nWQ
+    sheet_name: "respostas do questionário"
+
+  talent_mapping_base:
+    clean_table_name: talent_mapping_base
+    sheet_context: people
+    sheet_id: 1MFftdl8Eu_nQr_yTh1sAxZAYf5R6QipQn3jwS3TkcEE
+    sheet_name: base_oficial_tm_dbs
+
+  talent_mapping_suggested_plans:
+    clean_table_name: talent_mapping_suggested_plans
+    sheet_context: people
+    sheet_id: 1MFftdl8Eu_nQr_yTh1sAxZAYf5R6QipQn3jwS3TkcEE
+    sheet_name: planos_sugeridos
+
+  team_formation_support:
+    clean_table_name: team_formation_support
+    sheet_context: people
+    sheet_id: 1uyWQMdfjN1AiQ-h5xU6TWKPQO9eiVGPkFck3wHL17AI
+    sheet_name: "2025 Support"
+
+  turnover_user_roles:
+    clean_table_name: turnover_user_roles
+    sheet_context: people
+    sheet_id: 1aplJFw2IT59IUjbAHU7o-9Eo0jOv65KWlPgG1z1NuJc
+    sheet_name: roles

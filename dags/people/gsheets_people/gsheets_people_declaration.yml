@@ -16,7 +16,25 @@ workflow:
     codex_cost_informations:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    few_shot_phrases:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     navent_convenia_like:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    org_health_user_roles:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    questionnaire_requests:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    survey_answers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    talent_mapping_base:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    talent_mapping_suggested_plans:
       vacuum_retention_hours: 168
       vacuum_lite: true
     talent_review:
@@ -25,7 +43,10 @@ workflow:
     team_formation_product_tech:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    few_shot_phrases:
+    team_formation_support:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    turnover_user_roles:
       vacuum_retention_hours: 168
       vacuum_lite: true
   custom_schema: gsheets_people
