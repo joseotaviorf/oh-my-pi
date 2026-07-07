@@ -4,7 +4,7 @@ table_name: dim_supply_recovery_flow
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Table with information about the recovery flows related to supply events, such as the type of reprocessing, reprocessing entity, mailing table.
+  Kimball dimension for supply recovery and reprocessing flows, capturing reprocessing type, entity, mailing table, and hierarchy level for leads re-entering the funnel. Z-ordered by sk_recovery, id_level, and bk_recovery for query performance.
 columns:
   id_level:
     description: Identifier for the level of the recovery flow.

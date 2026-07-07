@@ -4,7 +4,7 @@ table_name: dim_supply_operation_flow
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Table with information about the operations related to supply events, such as the objective, agent, partner, contact medium, and approach.
+  Kimball dimension describing operational flows in the supply funnel, including agent, partner, contact medium, and approach used during lead handling. Z-ordered by sk_ops and bk_ops for query performance.
 columns:
   bk_ops:
     lineage:

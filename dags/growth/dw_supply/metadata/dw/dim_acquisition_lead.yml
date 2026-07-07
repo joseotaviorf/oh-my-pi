@@ -4,7 +4,7 @@ table_name: dim_acquisition_lead
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Table with information about acquisition leads, such as the lead type, source, and campaign.
+  Kimball dimension for acquisition leads in the supply funnel, capturing lead type, supply source, business context, and campaign attribution for each unique acquisition lead. Z-ordered by sk_acquisition_lead and bk_acq_lead for query performance.
 columns:
   sk_supply_lead:
     description: Unique identifier for the supply lead associated with the acquisition.
@@ -63,7 +63,7 @@ columns:
     lineage:
       - datalake_supply_flows.supply_events_tracking.campaign
   tp_lead:
-    description: Type of lead.
+    description: Acquisition channel or source through which the supply lead entered the funnel (e.g. afiliado, landingmarketing, organic, olx, facebook, porteiro), used to route the lead to the appropriate supply pipeline.
     lineage:
       - datalake_supply_flows.supply_events_tracking.lead_type
   ts_updated:

@@ -4,7 +4,7 @@ table_name: dim_supply_discards
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Table with information about the discard reasons for supply events.
+  Kimball dimension cataloguing discard reasons applied to supply funnel events, linking funnel step codes to human-readable discard reason descriptions. Z-ordered by sk_discard and bk_discard for query performance.
 columns:
   bk_discard:
     lineage:

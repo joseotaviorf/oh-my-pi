@@ -4,7 +4,7 @@ table_name: dim_affiliate_tracking
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Table with information about affiliate tracking, such as the affiliate type, start and end dates, and referred user. Its a SCD dimension.
+  Slowly changing dimension tracking affiliate referral relationships for supply leads, including affiliate type, validity period, and referred user identifiers. Z-ordered by sk_user_affiliate for query performance.
 columns:
   sk_user_affiliate:
     lineage:

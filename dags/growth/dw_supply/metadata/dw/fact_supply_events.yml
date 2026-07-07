@@ -4,10 +4,7 @@ table_name: fact_supply_events
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Fact table with one row per supply funnel event. Each record represents a step
-  in the acquisition or conversion flow for a lead or house, enriched with
-  dimension surrogate keys for funnel step, operations, discards, user paths,
-  media setup, and ownership.
+  Fact table with one row per supply funnel event. Each record represents a step in the acquisition or conversion flow for a lead or house, enriched with dimension surrogate keys for funnel step, operations, discards, user paths, media setup, and ownership. Z-ordered by sk_supply, sk_funnel_step, and nm_business_context for query performance.
 columns:
   sk_supply:
     description: Surrogate key that uniquely identifies a supply event, derived from the supply lead and house identifiers.

@@ -3,7 +3,10 @@ database_name: dw_growth
 table_name: dim_supply_user_path
 owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: Dimensional table containing information about the user path in the supply funnel.
+description: |
+  Kimball dimension describing the user journey path in the supply funnel, including origin
+  platform, content page, and path hierarchy level for acquisition and conversion attribution.
+  Z-ordered by sk_user_path, id_level, and bk_user_path for query performance.
 columns:
   id_level:
     description: Identifier for the level of the user path.

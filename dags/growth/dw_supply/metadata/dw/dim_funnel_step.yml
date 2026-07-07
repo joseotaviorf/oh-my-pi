@@ -4,7 +4,7 @@ table_name: dim_funnel_step
 owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
-  Dimensional table containing information about the funnel steps in supply funnel.
+  Kimball dimension defining supply funnel steps and their business event classifications, used to label each event in the acquisition and conversion flows. Z-ordered by sk_funnel_step and bk_funnel_step for query performance.
 columns:
   bk_funnel_step:
     lineage:
