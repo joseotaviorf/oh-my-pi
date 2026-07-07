@@ -1,4 +1,8 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: subhub_regions
+description: |
+  Raw Google Sheets extract mapping subhub subdivisions to business-unit hubs and geographic regions.
+  One row per subhub area with city, neighborhood, hub, and subhub names for agent territory planning.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br

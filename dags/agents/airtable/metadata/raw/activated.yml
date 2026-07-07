@@ -1,28 +1,40 @@
 ---
 database_name: datalake_airtable_raw
 table_name: activated
+description: |
+  Raw Airtable extract of the activated agents registry, one row per agent record from the Data Agents Airtable base.
+  Replaces the legacy aux_agents spreadsheet and feeds the clean activated table for agent lifecycle tracking.
+  Partitioned by year, month, day on the Airtable record extraction date. Always filter on year, month, and day in WHERE clauses to enable partition pruning.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
+    description: QuintoAndar user identifier linked to the activated agent in the Airtable base.
     tags:
       - Confidential
       - PII
   agent_creci:
+    description: Brazilian real-estate broker license number (CRECI) registered for the agent in Airtable.
     tags:
       - Confidential
       - PII
   cpf:
+    description: Brazilian individual taxpayer registry number (CPF) of the agent as stored in Airtable.
     tags:
       - Confidential
       - PII
   email:
+    description: Primary email address registered for the agent in the Airtable activated base.
     tags:
       - Confidential
       - PII
   name:
+    description: Full legal or display name of the agent as recorded in the Airtable activated registry.
     tags:
       - Confidential
       - PII
   phone_number:
+    description: Primary contact phone number registered for the agent in Airtable, used for operational outreach.
     tags:
       - Confidential
+      - PII

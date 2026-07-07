@@ -1,3 +1,8 @@
+---
 database_name: datalake_gsheets_raw
 table_name: ciq_portfolio
+description: |
+  Raw Google Sheets extract of CIQ partner portfolio allocations maintained by the CIQ Experience team.
+  One row per CIQ partner mapping the partner to a cluster and portfolio assignment in the carteira_ciq sheet.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br

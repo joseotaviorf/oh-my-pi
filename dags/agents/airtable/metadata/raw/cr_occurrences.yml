@@ -1,29 +1,40 @@
 ---
 database_name: datalake_airtable_raw
 table_name: cr_occurrences
+description: |
+  Raw Airtable extract of customer-relations (CR) occurrences involving agents, one row per reported incident or complaint.
+  Captures agent misconduct, complaints, and operational issues tracked by the Data Agents team in Airtable.
+  Partitioned by year, month, day on the Airtable record extraction date. Always filter on year, month, and day in WHERE clauses to enable partition pruning.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   ql_id_do_agente:
+    description: Agent identifier in the Airtable CR occurrences base, linking the incident to the involved broker.
     tags:
       - Confidential
       - PII
   descricao:
+    description: Free-text description of the CR occurrence as entered by the reporting team in Airtable.
     tags:
       - Confidential
       - PII
   ql_nome_completo_do_corretor:
+    description: Full name of the agent associated with the CR occurrence as recorded in Airtable.
     tags:
       - Confidential
       - PII
   ql_ql_quem_esta_fazendo_essa_reclamacaodenunciasolicitacao:
+    description: Identity or role of the person filing the complaint, denunciation, or request in the Airtable form.
     tags:
       - Confidential
       - PII
   responsavel:
+    description: Name or identifier of the team member responsible for handling the CR occurrence in Airtable.
     tags:
       - Confidential
       - PII
   resumo:
+    description: Short summary of the CR occurrence including severity and parties involved, as entered in Airtable.
     tags:
       - Confidential
       - PII

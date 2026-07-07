@@ -1,33 +1,45 @@
 ---
 database_name: datalake_airtable_raw
 table_name: jira_tickets
+description: |
+  Raw Airtable extract of Jira-linked agent tickets for suspensions, de-accreditations, and operational requests.
+  One row per ticket synced from the Data Agents Airtable base, feeding the clean jira_tickets table.
+  Partitioned by year, month, day on the Airtable record extraction date. Always filter on year, month, and day in WHERE clauses to enable partition pruning.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_do_corretor:
+    description: Broker identifier in the Airtable Jira tickets base, used to link the ticket to an agent record.
     tags:
       - Confidential
       - PII
   ql_id_do_agente:
+    description: Agent identifier in the Airtable Jira tickets view, cross-referencing the activated agents base.
     tags:
       - Confidential
       - PII
   cpf_from_ativos:
+    description: Agent CPF pulled from the activated (ativos) linked records in Airtable for identity verification.
     tags:
       - Confidential
       - PII
   descricao:
+    description: Free-text description of the Jira ticket issue or request as recorded in the Airtable base.
     tags:
       - Confidential
       - PII
   ql_nome_completo_do_corretor:
+    description: Full name of the agent associated with the Jira ticket as stored in Airtable.
     tags:
       - Confidential
       - PII
   responsavel:
+    description: Name or identifier of the team member assigned to resolve the Jira ticket in Airtable.
     tags:
       - Confidential
       - PII
   resumo:
+    description: Brief summary of the Jira ticket including issue type and outcome, as entered in Airtable.
     tags:
       - Confidential
       - PII

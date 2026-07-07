@@ -1,3 +1,8 @@
+---
 database_name: datalake_gsheets_raw
 table_name: agents_targets_tracking
+description: |
+  Raw Google Sheets extract of regional agent performance targets for visit flow, growth, and engagement metrics.
+  One row per region, agent type, and reference month with target KPIs used by the agents operations team.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br

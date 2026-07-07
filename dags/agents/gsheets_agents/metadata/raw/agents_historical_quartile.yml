@@ -1,3 +1,8 @@
+---
 database_name: datalake_gsheets_raw
 table_name: agents_historical_quartile
+description: |
+  Raw Google Sheets extract of historical agent performance quartiles maintained by the Data Agents team.
+  One row per agent per reference month with quartile ranking (1=lowest, 4=highest performance).
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br

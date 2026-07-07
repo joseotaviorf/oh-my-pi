@@ -1,3 +1,8 @@
-database_name: datalake_gsheets_clean
+---
+database_name: datalake_gsheets_raw
 table_name: ciq_tiers_sale
+description: |
+  Raw Google Sheets extract of CIQ tier calculations and quarterly revenue-share values for the Sale business context.
+  One row per CIQ partner per audit period with tier and VGV metrics maintained by the CIQ Experience team.
 domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
