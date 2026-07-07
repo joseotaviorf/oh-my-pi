@@ -13,21 +13,21 @@ domain: Fintech
 columns:
   id:
     lineage:
-    - datalake_velo_raw.customer_propose.id
+      - datalake_velo_raw.customer_propose.id
     description: Velo platform attribute describing id for condominium billing reconciliation.
   id_customer:
     lineage:
-    - datalake_velo_raw.customer_propose.customer
+      - datalake_velo_raw.customer_propose.customer
     description: Identifier for the customer referenced by this financial record.
   id_propose:
     lineage:
-    - datalake_velo_raw.customer_propose.propose
+      - datalake_velo_raw.customer_propose.propose
     description: Identifier for the propose referenced by this financial record.
   ts_inserted:
     lineage:
-    - datalake_velo_raw.customer_propose.dateinsert
+      - datalake_velo_raw.customer_propose.dateinsert
     description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
-    - datalake_velo_raw.customer_propose.dateupdate
+      - datalake_velo_raw.customer_propose.dateupdate
     description: Timestamp when updated occurred in the upstream fintech system.
