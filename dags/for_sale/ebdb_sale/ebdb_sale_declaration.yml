@@ -14,22 +14,16 @@ workflow:
   source_schema: ebdb
   custom_schema: ebdb
   dbutils_secret_key: EBDB_DB
-  incremental_optimize: true
   tables_customization:
     SaleOperationManagement:
       clean_table_name: sale_operation_management
-      incremental_optimize: false
     ShopWindow:
       clean_table_name: shop_window
-      incremental_optimize: false
     ShopWindow_AUD:
       clean_table_name: shop_window_aud
-      incremental_optimize: false
     ShopWindow_ListingBusinessContext:
       clean_table_name: shop_window_listing_business_context
-      incremental_optimize: false
     ShopWindow_ListingBusinessContext_AUD:
       clean_table_name: shop_window_listing_business_context_aud
-      incremental_optimize: false
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
