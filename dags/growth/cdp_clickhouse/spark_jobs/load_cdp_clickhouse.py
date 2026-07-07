@@ -75,6 +75,7 @@ if __name__ == "__main__":
     os.environ["ENVIRONMENT"] = args.environment
 
     config_service = ConfigurationService(args.dag_name)
+    clickhouse_host = config_service.get_config("clickhouse_host")
     clickhouse_protocol = config_service.get_config("clickhouse_protocol")
     clickhouse_http_port = config_service.get_config("clickhouse_http_port")
     clickhouse_ssl = config_service.get_config("clickhouse_ssl")
@@ -91,7 +92,6 @@ if __name__ == "__main__":
         dbutils.secrets.get("cdp", "CLICKHOUSE_SERVICE_ACCOUNT")
     )
     env_prefix = args.environment.upper()
-    clickhouse_host = clickhouse_secret[f"CLICKHOUSE_{env_prefix}_HOST"]
     clickhouse_user = clickhouse_secret[f"CLICKHOUSE_{env_prefix}_USERNAME"]
     clickhouse_password = clickhouse_secret[f"CLICKHOUSE_{env_prefix}_PASSWORD"]
 
@@ -101,8 +101,8 @@ if __name__ == "__main__":
     load_end_ts = datetime.strptime(args.load_end_date, "%Y-%m-%d")
     logger.info(
         f"Reading from ClickHouse view {clickhouse_database}.{clickhouse_table} "
-        f"with pushed filters on {clickhouse_incremental_column} "
-        f"in [{load_start_ts}, {load_end_ts})"
+        f"at host {clickhouse_host} with pushed filters on "
+        f"{clickhouse_incremental_column} in [{load_start_ts}, {load_end_ts})"
     )
     clickhouse_read_filter = (
         col(clickhouse_incremental_column) >= lit(load_start_ts)

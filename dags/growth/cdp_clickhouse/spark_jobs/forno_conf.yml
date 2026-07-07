@@ -1,4 +1,5 @@
 ---
+clickhouse_host: bs0tgymemi.us-east-1.vpce.aws.clickhouse.cloud
 clickhouse_protocol: https
 clickhouse_http_port: 8443
 clickhouse_ssl: true
