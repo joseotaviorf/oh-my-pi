@@ -1,6 +1,6 @@
 database_name: datalake_sap_accounting_process
 table_name: monopoly_revenue_share_reverse
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
   Table to track reverse Monopoly (for sale) revenue share accounting transactions, identifying

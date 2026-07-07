@@ -1,9 +1,9 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_revenue_accounting
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
-  Table to track revenue accounts provision, so it's follow the invoices' route between source (SeuBarriga/Retsuko) and SAP, considering sap gateway payload system.
+  Table to track revenue accounting accounts (fines, interest, credit card revenue, and related entries), following the route between source (Seu Barriga/Retsuko) and SAP, considering SAP Gateway payload system.
   It applies business rules for IPO to assess completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates).
   The final output includes a status classification and failure reason to support monitoring and root-cause analysis.
 columns:

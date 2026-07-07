@@ -1,6 +1,6 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_invoice_unified_reverse
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
   Reverse straw failure monitoring for unified invoices generated from Retsuko
@@ -30,19 +30,13 @@ columns:
     lineage:
       - datalake_retsuko_clean.sap_entity.version
   business_unit:
-    description: Business unit label.
-    lineage:
-      - "'for rent' constant"
+    description: Business unit label (for rent).
   source_name:
-    description: Source system for accounting record.
-    lineage:
-      - "'S4' constant"
+    description: Source system for accounting record (S4).
   accounting_type:
     description: Accounting record type (unified invoice).
-    lineage:
-      - "'unified invoice' constant"
   account_number:
-    description: SAP account number for the unified invoice mapping.
+    description: Controllership SAP account number for unified invoice service-fee entries (420005), used to match ledger rows in reverse straw failure cases.
     lineage:
       - datalake_accounting_funnel.ledger.account_number
   accounting_name:
@@ -55,8 +49,6 @@ columns:
       - datalake_accounting_funnel.ledger.accrual_year_month
   accounting_process_status:
     description: Process classification for reverse cases (reverse straw failure).
-    lineage:
-      - "'reverse straw failure' constant"
   error_description:
     description: Reason for failure based on presence across SAP entity and gateway.
     lineage:
@@ -65,20 +57,12 @@ columns:
       - datalake_sap_gateway_clean.consolidated_invoice.doc_entry
   is_completeness:
     description: Indicates whether there is a corresponding source and SAP record (reverse cases set to FALSE).
-    lineage:
-      - "FALSE constant"
   is_correctness:
     description: Indicates whether source and SAP amounts match within tolerance (reverse cases set to FALSE).
-    lineage:
-      - "FALSE constant"
   is_temporality:
     description: Indicates whether SAP reference date is within tolerance from source trigger (reverse cases set to FALSE).
-    lineage:
-      - "FALSE constant"
   is_compliance:
     description: TRUE when completeness, correctness, and temporality are all TRUE (reverse cases set to FALSE).
-    lineage:
-      - "FALSE constant"
   source_amount:
     description: Amount from the Retsuko source system.
     lineage:
@@ -101,5 +85,4 @@ columns:
     description: Reference date in SAP accounting system.
     lineage:
       - datalake_accounting_funnel.ledger.dt_reference
-
 

@@ -1,13 +1,13 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_third_parties_reverse
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
   Table to track reverse third parties accounts (brokerage and pro guarantor) accounting transactions,
   identifying cases where entries exist in SAP Ledger but do not have a corresponding match in the
-  SeuBarriga/Retsuko source system. These are classified as 'reverse straw failure' transactions,
+  Seu Barriga/Retsuko source system. These are classified as 'reverse straw failure' transactions,
   indicating potential data inconsistencies or manual entries in SAP that were not originated from
-  the SeuBarriga/Retsuko system. The table supports monitoring and root-cause analysis for these
+  the Seu Barriga/Retsuko system. The table supports monitoring and root-cause analysis for these
   reverse third parties entries. Note that transactions with error_description 'source-rental-guarantee'
   or 'manual transaction' are excluded from the final output.
 columns:
