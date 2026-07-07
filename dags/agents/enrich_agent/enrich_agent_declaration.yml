@@ -20,7 +20,6 @@ workflow:
       - qualification_step
       - contract_process
     agent:
-      - agent_capability
       - prospect_agent
       - agent_event_log
     agent_daily:

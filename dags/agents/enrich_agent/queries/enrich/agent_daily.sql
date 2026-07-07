@@ -1,3 +1,7 @@
+-- ponytail: point-in-time store of agent attributes the Type-1 `agent` dim overwrites;
+-- fact_agent_daily COALESCEs these over current-dim values. CURRENT_DATE snapshot is
+-- deliberately NOT backfillable — reprocessing a past day stamps it with today's values.
+-- Do not "fix" by rebuilding from `agent` (loses history). Proper fix = SCD-2 upstream.
 SELECT
     MD5(CONCAT(id_agent, CURRENT_DATE)) AS id_agent_daily,
     id_agent,

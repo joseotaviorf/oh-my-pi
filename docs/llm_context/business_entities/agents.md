@@ -19,7 +19,7 @@
 
 These are the functions business teams mean by "demand agent", "TQC", and "CIQ". One agent can hold several at once; they are NOT mutually exclusive and are separate from `profile`.
 
-| Function | Also called | What they own | Capability (`agent_capability.type`) | Earns (in `agent_revenue_share`) |
+| Function | Also called | What they own | Capability (`capability.type`) | Earns (in `agent_revenue_share`) |
 |---|---|---|---|---|
 | **Demand / conversion** | demand agent, visit agent | Conduct the visit **and convert** the deal | `DEMAND_VISIT_MANAGEMENT` (RENT/SALE) | `revenue_role = DEMAND`, `brokerage_percentage`; BigAgent `DEMAND_CONVERSION_*` |
 | **Demand acquisition** | **TQC** (Trás Quem Compra) | Bring / qualify the buyer lead | `DEMAND_ACQUISITION` | `tqc_percentage`, `has_tqc_revenue_share = true` (bonus on the `DEMAND` row); BigAgent `DEMAND_ACQUISITION_*` |
@@ -70,7 +70,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **VBBA / VCBA** | Visits Booked / Completed Booked **By Agent** | `sk_author_creator = sk_user_agent` in `dw_visit.fact_visit_schedules` (+ `is_completed = 1` for VCBA). |
 | **Hub / Business Unit** | Regional agent grouping | `hub_name`, `id_business_unit` in `member_hub_allocation`. |
 | **EN / Negotiation Executive** | QA staff responsible for an agent's hub | NE = parent member (`id_parent_user`, `user_parent_*`) in `member_hub_allocation`; `id_negotiation_executive_user` in `agent`. |
-| **Capability / capacidade** | Fine-grained permission | `agent_capability.type + status`; prefer over legacy subtype jargon. |
+| **Capability / capacidade** | Fine-grained permission | `capability.type + status` (raw source `datalake_ebdb_clean.capability`); for booleans use `agent.is_allow_*`. Prefer over legacy subtype jargon. |
 | **Primeira listagem / first listing** | ⚠ "any first listing" vs "valid first listing" (dedup-gated) | Valid first listing gated by `datalake_listing_deduplication.valid_first_listing`; used for CIQ payment eligibility and activation. Default to valid for CIQ/activation, confirm. |
 | **Valid First Listing** | A first listing that survives property **deduplication** — a re-listed / duplicated property does NOT count again | Custom QuintoAndar concept; lives in `datalake_listing_deduplication`. ⚠ Metric definition still evolving — see schema section. |
 | **Compra de Carteira / CIQ listing purchase** | CIQ_FULL rent **listing-purchase** fact — payment eligibility, pricing segment, portfolio loss | Analyst table: `dw_ciq.fact_ciq_listing_purchase`; enrich source: `datalake_ciq.ciq_listing_purchase`. Grain: house × listing version × partner × CIQ user. |
@@ -84,7 +84,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | You need… | Schema / table |
 |-----------|----------------|
 | Canonical agent identity, status, capability flags | `datalake_agent_accreditation.agent` |
-| Fine-grained capabilities (per type, business context) | `datalake_agent_accreditation.agent_capability` |
+| Fine-grained capabilities (per type, business context) | `datalake_ebdb_clean.capability` (+ `demand_visit_management_capability_settings` for business_context/passive-lead). Boolean rollups on `datalake_agent_accreditation.agent.is_allow_*`. |
 | Prospect onboarding ops queue (CRECI / contract / signup / EN) | `datalake_agent_accreditation.prospect_step_validation` |
 | Sign-up funnel blocking events (Amplitude) | `datalake_agent_accreditation.signup_profile_conflict` |
 | Agent geo-region assignment history | `datalake_agent_accreditation.agent_major_region_code` |
@@ -132,11 +132,13 @@ Grain: **one row per `id_agent`** (canonical identity). `id_agent` is the cross-
 | Partnership | `is_1p_partnership`, `is_3p_partnership`, `is_reactivated` |
 | Lifecycle timing | `days_in_current_status`, `ts_created`, `ts_last_status_changed`, `ts_updated` |
 
-> Use `is_allow_*` for quick boolean capability checks on one table; use `agent_capability` for status-per-type and `business_context` detail.
+> Use `is_allow_*` for quick boolean capability checks on one table. For status-per-type / `business_context` detail there is no longer a published `agent_capability` table — query the raw source `datalake_ebdb_clean.capability` (join `demand_visit_management_capability_settings` for business_context and passive-lead).
 
-### `agent_capability`
+### Capabilities (per type / business_context)
 
-Grain: **one row per `(id_agent, type, business_context)`**. `DEMAND_VISIT_MANAGEMENT` has two rows per agent (RENT + SALE); other types have null `business_context`.
+> ⚠ There is **no longer** a published `datalake_agent_accreditation.agent_capability` table — it was folded into `agent` (its logic now lives inline in the `agent` query). For per-type / business_context detail query the raw source `datalake_ebdb_clean.capability` (join `datalake_ebdb_clean.demand_visit_management_capability_settings` on `capability.id = ...id_capability` for `business_context` + `is_passive_lead_receiver`). For boolean rollups use `agent.is_allow_*`.
+
+Grain of the raw source: **one row per `(id_agent, type, business_context)`**. `DEMAND_VISIT_MANAGEMENT` has two rows per agent (RENT + SALE); other types have null `business_context`.
 
 | type | status values | business_context |
 |---|---|---|
@@ -368,6 +370,8 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 ### `fact_agent_daily` — reliable daily agent snapshot
 
 Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`. Each agent is expanded from creation through the load window using `aux_date`; activation and capability flags are **reconstructed from agent event-log history** (point-in-time accurate per day), and profile attributes are enriched from `agent_daily` when available for the same agent-day. This is the **reliable, current source for per-day agent state** — prefer it over the stale `fact_visit_agent_performance`.
+
+> **Event timing:** the event-log intervals (`ts_started`/`ts_ended`) are keyed on **`ts_occurred`** — when the event actually happened — not `ts_created` (row insert time). For any as-of-date / status-history question, `ts_occurred` is the correct event clock.
 
 | Topic | Fields |
 |-------|--------|

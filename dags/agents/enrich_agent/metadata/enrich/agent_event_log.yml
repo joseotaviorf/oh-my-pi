@@ -58,12 +58,12 @@ columns:
     description: Type of event that occurred in the agent or capability lifecycle.
   ts_started:
     lineage:
-      - datalake_ebdb_clean.agent_event_log.ts_created
-    description: Timestamp when the event started.
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+    description: Timestamp when the event occurred (event start).
   ts_ended:
     lineage:
-      - datalake_ebdb_clean.agent_event_log.ts_updated
-    description: Timestamp when the event ended.
+      - datalake_ebdb_clean.agent_event_log.ts_occurred
+    description: Timestamp when the next event for the same agent/capability occurred (event end).
   ts_updated:
     lineage:
       - datalake_ebdb_clean.agent_event_log.ts_updated

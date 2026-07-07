@@ -130,10 +130,10 @@ agent_log AS (
         SELECT
             id_agent,
             event_type = 'AGENT_REACTIVATED' AS is_reactivated,
-            LAG(ts_created) OVER(PARTITION BY id_agent ORDER BY ts_created) AS ts_previous_event_agent,
-            ts_created AS ts_last_status_changed,
-            TIMESTAMPDIFF(DAY, ts_created, NOW()) AS days_in_current_status,
-            ROW_NUMBER() OVER(PARTITION BY id_agent ORDER BY ts_created DESC) AS rn
+            LAG(ts_started) OVER(PARTITION BY id_agent ORDER BY ts_started) AS ts_previous_event_agent,
+            ts_started AS ts_last_status_changed,
+            TIMESTAMPDIFF(DAY, ts_started, NOW()) AS days_in_current_status,
+            ROW_NUMBER() OVER(PARTITION BY id_agent ORDER BY ts_started DESC) AS rn
         FROM
             datalake_agent_accreditation.agent_event_log
         WHERE
@@ -151,6 +151,20 @@ agent_log AS (
     WHERE
         rn = 1
 ),
+agent_capability AS (
+    SELECT
+        c.id_agent,
+        c.type,
+        c.status,
+        cs.business_context,
+        cs.is_passive_lead_receiver,
+        c.ts_created
+    FROM
+        datalake_ebdb_clean.capability AS c
+    LEFT JOIN
+        datalake_ebdb_clean.demand_visit_management_capability_settings AS cs
+            ON c.id = cs.id_capability
+),
 capability_by_agent AS (
     SELECT
         id_agent,
@@ -161,7 +175,7 @@ capability_by_agent AS (
         MAX(business_context) FILTER(WHERE type = 'DEMAND_VISIT_MANAGEMENT' AND business_context = 'RENT') IS NOT NULL AS is_allow_demand_rent,
         MAX(is_passive_lead_receiver) FILTER(WHERE type = 'DEMAND_VISIT_MANAGEMENT') IS TRUE AS is_passive_lead_receiver
     FROM
-        datalake_agent_accreditation.agent_capability
+        agent_capability
     WHERE
         status = 'ENABLED'
     GROUP BY 1

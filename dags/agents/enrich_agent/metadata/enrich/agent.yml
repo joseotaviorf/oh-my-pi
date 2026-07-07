@@ -73,33 +73,33 @@ columns:
     description: True when the agent was reactivated.
   is_allow_supply_acquisition:
     lineage:
-      - datalake_agent_accreditation.agent_capability.ts_created
-      - datalake_agent_accreditation.agent_capability.type
+      - datalake_ebdb_clean.capability.ts_created
+      - datalake_ebdb_clean.capability.type
     description: True when the agent is allowed to perform supply acquisition.
   is_allow_demand_acquisition:
     lineage:
-      - datalake_agent_accreditation.agent_capability.ts_created
-      - datalake_agent_accreditation.agent_capability.type
+      - datalake_ebdb_clean.capability.ts_created
+      - datalake_ebdb_clean.capability.type
     description: True when the agent is allowed to perform demand acquisition.
   is_allow_visit:
     lineage:
-      - datalake_agent_accreditation.agent_capability.ts_created
-      - datalake_agent_accreditation.agent_capability.type
+      - datalake_ebdb_clean.capability.ts_created
+      - datalake_ebdb_clean.capability.type
     description: True when the agent is allowed to perform visit.
   is_allow_demand_sale:
     lineage:
-      - datalake_agent_accreditation.agent_capability.ts_created
-      - datalake_agent_accreditation.agent_capability.type
+      - datalake_ebdb_clean.demand_visit_management_capability_settings.business_context
+      - datalake_ebdb_clean.capability.type
     description: True when the agent is allowed to perform demand sale.
   is_allow_demand_rent:
     lineage:
-      - datalake_agent_accreditation.agent_capability.ts_created
-      - datalake_agent_accreditation.agent_capability.type
+      - datalake_ebdb_clean.demand_visit_management_capability_settings.business_context
+      - datalake_ebdb_clean.capability.type
     description: True when the agent is allowed to perform demand rent.
   is_passive_lead_receiver:
     lineage:
-      - datalake_agent_accreditation.agent_capability.ts_created
-      - datalake_agent_accreditation.agent_capability.type
+      - datalake_ebdb_clean.demand_visit_management_capability_settings.is_passive_lead_receiver
+      - datalake_ebdb_clean.capability.type
     description: True when the agent is configured to receive passive leads.
   is_1p_partnership:
     lineage:
