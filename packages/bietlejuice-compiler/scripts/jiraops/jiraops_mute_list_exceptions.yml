@@ -37,10 +37,10 @@ DAG:
       created_by: anne.macedo@quintoandar.com.br
       approved_by: carolina.cavalcante@quintoandar.com.br
     bietlejuice.dw_datamarts_:
-      reason: "TODO: document why alerts for this DAGs are muted."
+      reason: "These DAGs generate analytical assets owned and maintained by domain teams. Failures should be routed to the respective owners, not the DE on-call."
       deadline: Never
-      created_by: user@quintoandar.com.br
-      approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
+      created_by: carolina.cavalcante@quintoandar.com.br
+      approved_by: jeniffer.freitas@quintoandar.com.br
 
 DAGOwner:
   equals:
@@ -50,15 +50,15 @@ DAGOwner:
       created_by: user@quintoandar.com.br
       approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
     Data Governance:
-      reason: "TODO: document why alerts for this DAGOwner are muted."
+      reason: "These DAGs handle non-critical pipelines. Since failures do not impact production SLAs, they do not require DE on-call intervention."
       deadline: Never
-      created_by: user@quintoandar.com.br
-      approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
+      created_by: carolina.cavalcante@quintoandar.com.br
+      approved_by: jeniffer.freitas@quintoandar.com.br
     Data Life Cycle:
-      reason: "TODO: document why alerts for this DAGOwner are muted."
+      reason: "These DAGs manage routine and background maintenance. Because they do not impact immediate data availability, they do not trigger DE on-call alerts."
       deadline: Never
-      created_by: user@quintoandar.com.br
-      approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
+      created_by: carolina.cavalcante@quintoandar.com.br
+      approved_by: mario.abreu@quintoandar.com.br
     Data People:
       reason: "People Data pipelines handle sensitive HR, compensation, and payroll data. Access to the data and code is strictly restricted to the People Data squad, so DE on-call engineers cannot investigate or remediate failures without violating access controls."
       deadline: Never
@@ -70,10 +70,10 @@ DAGOwner:
       created_by: isadora.gallerani@quintoandar.com.br
       approved_by: isadora.gallerani@quintoandar.com.br
     Ops POC:
-      reason: "TODO: document why alerts for this DAGOwner are muted."
+      reason: "These DAGs are experimental, non-production pipelines owned entirely by Operations. Since they fall outside DE scope, they are excluded from DE on-call alerts."
       deadline: Never
-      created_by: user@quintoandar.com.br
-      approved_by: user2@quintoandar.com.br, user3@quintoandar.com.br
+      created_by: carolina.cavalcante@quintoandar.com.br
+      approved_by: jeniffer.freitas@quintoandar.com.br
     Tech Platform Cyber Security:
       reason: "Security and identity management pipelines are fully owned by the Tech Platform Cyber Security squad; DE on-call engineers have no context, access, or accountability over this domain."
       deadline: Never
