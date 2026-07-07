@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: product
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the product.
+description: One row per product in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,11 +12,11 @@ columns:
   uuid:
     lineage:
       - datalake_lending_raw.product.uuid
-    description: UUID of the product.
+    description: Financial attribute representing uuid on the product dataset.
   name:
     lineage:
       - datalake_lending_raw.product.name
-    description: Name of the product.
+    description: Financial attribute representing name on the product dataset.
   type:
     lineage:
       - datalake_lending_raw.product.type

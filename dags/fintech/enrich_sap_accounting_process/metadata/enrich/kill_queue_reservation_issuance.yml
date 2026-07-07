@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sap_accounting_process
 table_name: kill_queue_reservation_issuance
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Enriched data from kill queue reservation issuance process, tracking compliance between source and SAP accounting data"
 columns:
@@ -11,29 +11,21 @@ columns:
       - datalake_kill_queue_clean.reservation.id
       - datalake_accounting_funnel.ledger.account_number
   id_business_entity:
-    description: "Business entity ID from kill queue reservation"
+    description: Identifier for the business entity referenced by this financial record.
     lineage:
       - datalake_kill_queue_clean.reservation.id_tenant
   id_finance_entity:
-    description: "Finance entity ID from kill queue reservation"
+    description: Identifier for the finance entity referenced by this financial record.
     lineage:
       - datalake_kill_queue_clean.reservation.id
   id_finance_entity_entry:
     description: "Finance entity entry ID (currently NULL)"
-    lineage:
-      - "NULL value"
   business_unit:
     description: "Business unit identifier (for rent)"
-    lineage:
-      - "'for rent' constant"
   source_name:
     description: "Source system name (kill queue)"
-    lineage:
-      - "'kill queue' constant"
   accounting_type:
     description: "Type of accounting record (invoice)"
-    lineage:
-      - "'invoice' constant"
   account_number:
     description: "SAP account number (420006 for reservation fee)"
     lineage:

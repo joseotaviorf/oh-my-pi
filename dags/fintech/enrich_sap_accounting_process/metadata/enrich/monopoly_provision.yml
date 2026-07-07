@@ -1,6 +1,6 @@
 database_name: datalake_sap_accounting_process
 table_name: monopoly_provision
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
   Table to track Monopoly (for sale) provision accounting, following the route from
@@ -99,5 +99,4 @@ columns:
     description: Creation date of transaction in SAP.
     lineage:
       - datalake_pas.ledger.dt_created
-
 

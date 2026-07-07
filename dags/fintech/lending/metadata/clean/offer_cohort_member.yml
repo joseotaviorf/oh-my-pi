@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: offer_cohort_member
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the offer cohort member.
+description: One row per offer cohort member in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,15 +12,15 @@ columns:
   id_offer_cohort:
     lineage:
       - datalake_lending_raw.offer_cohort_member.offer_cohort_id
-    description: ID of the offer cohort.
+    description: Identifier for the offer cohort referenced by this financial record.
   uuid_person:
     lineage:
       - datalake_lending_raw.offer_cohort_member.person_uuid
-    description: UUID of the person.
+    description: Financial attribute representing uuid person on the offer_cohort_member dataset.
   id_contract:
     lineage:
       - datalake_lending_raw.offer_cohort_member.contract_id
-    description: ID of the contract
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   ts_created:
     lineage:
       - datalake_lending_raw.offer_cohort_member.created_at

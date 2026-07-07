@@ -24,7 +24,7 @@ columns:
   type:
     lineage:
       - datalake_lending_raw.webhook_request.type
-    description: Type of the webhook request.
+    description: Financial attribute representing type on the webhook_request dataset.
   source:
     lineage:
       - datalake_lending_raw.webhook_request.source

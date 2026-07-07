@@ -1,100 +1,100 @@
 ---
 database_name: datalake_sap_accounting_process
 table_name: for_rent_bank_settlement
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per for rent bank settlement synced from SAP S/4HANA or the SAP gateway, supporting accounting postings, journal entries, and financial close processes.
 columns:
   id_business_entity:
-    description: ''
+    description: Identifier for the business entity referenced by this financial record.
     lineage:
     - .create_compliance_columns.id_business_entity
   id_finance_entity:
-    description: ''
+    description: Identifier for the finance entity referenced by this financial record.
     lineage:
     - .create_compliance_columns.id_finance_entity
   company_use:
-    description: ''
+    description: Financial attribute representing company use on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.company_use
   version:
-    description: ''
+    description: Financial attribute representing version on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.version
   billing_source:
-    description: ''
+    description: Financial attribute representing billing source on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.billing_source
   payment_source:
-    description: ''
+    description: Financial attribute representing payment source on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.payment_source
   bank_source:
-    description: ''
+    description: Financial attribute representing bank source on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.bank_source
   bank_account_number:
-    description: ''
+    description: Financial attribute representing bank account number on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.bank_account_number
   sap_account_number:
-    description: ''
+    description: Financial attribute representing sap account number on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.sap_account_number
   accrual_year_month:
-    description: ''
+    description: Financial attribute representing accrual year month on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.accrual_year_month
   billing_amount:
-    description: ''
+    description: Financial attribute representing billing amount on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.billing_amount
   payment_source_amount:
-    description: ''
+    description: Financial attribute representing payment source amount on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.payment_source_amount
   bank_amount:
-    description: ''
+    description: Financial attribute representing bank amount on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.bank_amount
   sap_amount:
-    description: ''
+    description: Financial attribute representing sap amount on the for_rent_bank_settlement dataset.
     lineage:
     - .create_compliance_columns.sap_amount
   is_completeness_compliance:
-    description: ''
+    description: Indicates whether completeness compliance applies to this financial record.
     lineage:
     - .create_compliance_columns.is_completeness_compliance
   is_correctness_compliance:
-    description: ''
+    description: Indicates whether correctness compliance applies to this financial record.
     lineage:
     - .create_compliance_columns.is_correctness_compliance
   is_temporality_compliance:
-    description: ''
+    description: Indicates whether temporality compliance applies to this financial record.
     lineage:
     - .create_compliance_columns.is_temporality_compliance
   is_compliance:
-    description: ''
+    description: Indicates whether compliance applies to this financial record.
     lineage:
     - .create_compliance_columns.CASE WHEN is_completeness_compliance = TRUE AND is_correctness_compliance
       = TRUE AND is_temporality_compliance = TRUE THEN TRUE ELSE FALSE END
   dt_billing:
-    description: ''
+    description: Calendar date associated with billing in the financial workflow.
     lineage:
     - .create_compliance_columns.dt_billing
   dt_payment_source:
-    description: ''
+    description: Calendar date associated with payment source in the financial workflow.
     lineage:
     - .create_compliance_columns.dt_payment_source
   dt_bank_paid:
-    description: ''
+    description: Calendar date associated with bank paid in the financial workflow.
     lineage:
     - .create_compliance_columns.dt_bank_paid
   dt_sap_created:
-    description: ''
+    description: Calendar date associated with sap created in the financial workflow.
     lineage:
     - .create_compliance_columns.dt_sap_created
   dt_sap_reference:
-    description: ''
+    description: Calendar date associated with sap reference in the financial workflow.
     lineage:
     - .create_compliance_columns.dt_sap_reference

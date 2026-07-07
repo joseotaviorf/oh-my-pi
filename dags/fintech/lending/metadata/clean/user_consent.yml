@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: user_consent
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the user consent.
+description: One row per user consent in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,27 +12,27 @@ columns:
   id_deal:
     lineage:
       - datalake_lending_raw.user_consent.deal_id
-    description: ID of the deal.
+    description: Identifier for the deal referenced by this financial record.
   uuid:
     lineage:
       - datalake_lending_raw.user_consent.uuid
-    description: UUID of the user consent.
+    description: Financial attribute representing uuid on the user_consent dataset.
   uuid_person:
     lineage:
       - datalake_lending_raw.user_consent.person_uuid
-    description: UUID of the person.
+    description: Financial attribute representing uuid person on the user_consent dataset.
   ip:
     lineage:
       - datalake_lending_raw.user_consent.ip
-    description: IP of the user consent.
+    description: Financial attribute representing ip on the user_consent dataset.
   type:
     lineage:
       - datalake_lending_raw.user_consent.type
-    description: Type of the user consent.
+    description: Financial attribute representing type on the user_consent dataset.
   user_agent:
     lineage:
       - datalake_lending_raw.user_consent.user_agent
-    description: User agent of the user consent.
+    description: Financial attribute representing user agent on the user_consent dataset.
   ts_created:
     lineage:
       - datalake_lending_raw.user_consent.created_at
