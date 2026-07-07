@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: conversion_events
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table is responsible to consolidate all conversion and drop events, applying rules to identify |
+description: |
+  Supply conversion and drop events with business rules applied to classify funnel transitions from qualified through first listing stages. Z-ordered by id_entity and business_context for query performance.
   the conversion and drop funnel step and the business context. Here we join with 3P and 1P events to fill missing events.
 columns:
   id_lead:

@@ -1,12 +1,13 @@
 database_name: datalake_supply_flows
 table_name: inbound_attribution
 domain: Growth
-owner: vinicius.araujo@quintoandar.com.br
-description: This table contains attribution data that combines information extracted from the René Descartes service with information from messaging services for a specific case of leads coming from inbound processes with the Inside Sales team.
+owner: gabriel.salla@quintoandar.com
+description: |
+  Inbound lead attribution combining René Descartes taxonomy data with messaging service metadata for Inside Sales leads entering the supply funnel. Z-ordered by id_lead for query performance.
 columns:
   id_lead_ebdb:
     description: The unique identifier for each lead in the dataset.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.house_lead.id
   id_session:
     description: The ID for the chat session in Sauron.
@@ -16,7 +17,7 @@ columns:
       - datalake_support_session_service_clean.support_session.id
   id_task:
     description: The ID for the lead creation task.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_customer_support.chats.id_task
       - datalake_customer_support.calls.id_task
@@ -65,7 +66,6 @@ columns:
       - datalake_support_session_service_clean.support_session.metadata
   ts_created:
     description: The timestamp of the session when was the lead creation.
-    lineage: 
+    lineage:
       - datalake_sauron_clean.session.ts_created
       - datalake_support_session_service_clean.support_session.ts_created
-  

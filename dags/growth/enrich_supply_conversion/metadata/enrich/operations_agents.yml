@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: operations_agents
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table is responsible to store the operations agents involved in the operational process related to the event.
+description: |
+  Operations agents involved in supply conversion events, mapping user identifiers to agent names and teams for operational performance reporting. Z-ordered by id_user for query performance.
 columns:
   id_user:
     description: This column represents the unique identifier for each user

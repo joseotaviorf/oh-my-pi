@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: last_pj_attribution
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table is responsible to store the last photo job attribution for each house in determined business context.
+description: |
+  Last photo job attribution record per house and business context, linking conversion events to the most recent listing photography session.
 columns:
   id_house:
     description: This column represents the unique identifier for each house

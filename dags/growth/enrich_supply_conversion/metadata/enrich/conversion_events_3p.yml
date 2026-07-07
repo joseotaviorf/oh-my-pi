@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: conversion_events_3p
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table is reposnsible for join qualified, available qualified and opportunity events for 3p leads. |
+description: |
+  Third-party supply conversion events joining qualified, available qualified, and opportunity stages for 3P leads in the supply funnel. Z-ordered by id_house and business_context for query performance.
   Listing events will be modeled by conversion_events table (1P).
 columns:
   sk_supply_lead:

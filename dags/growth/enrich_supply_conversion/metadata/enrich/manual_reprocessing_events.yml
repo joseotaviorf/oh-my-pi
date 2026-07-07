@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: manual_reprocessing_events
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table is responsible to consolidate all manual reprocessing events. |
+description: |
+  Manual reprocessing events in the supply conversion funnel, capturing leads and houses re-entered into the pipeline through operator-initiated workflows. Z-ordered by id_entity and business_context for query performance.
   In this table we are going to process data from Olos to identify the mailing and conversion events from Reprocessing Flows. |
 columns:
   id_entity:

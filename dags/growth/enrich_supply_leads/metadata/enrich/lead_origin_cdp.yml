@@ -1,8 +1,9 @@
 database_name: datalake_supply_flows
 table_name: lead_origin_cdp
 domain: Growth
-owner: henrique.paulo@quintoandar.com.br
-description: Enriched lead attribution table with one row per lead. UTM columns (campaign, medium, source, term, content) are resolved via a COALESCE chain online_attribution (CDI tracking layer) first, then Amplitude, then Facebook API via inbound leads. Provides multi-source attribution context for supply leads along with ops metadata and tracking database provenance columns.
+owner: gabriel.salla@quintoandar.com
+description: |
+  Enriched lead attribution table with one row per lead. UTM columns are resolved via a COALESCE chain across online attribution, Amplitude, and Facebook API sources. Z-ordered by id_lead for query performance.
 columns:
   id_lead:
     description: The unique identifier for each lead in the dataset.
@@ -92,9 +93,19 @@ columns:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.platform
   lead_type:
-    description: The type of lead.
+    description: Lead acquisition entry-point type extracted from the acquisition campaign payload (`$.type` in Rene Descartes).
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+    categories:
+      landingopenlink: Lead created after opening a landing page through a direct open link.
+      ongoinglead: Lead created while continuing an in-progress lead registration flow.
+      returntocart: Lead created when returning to an abandoned listing or lead cart flow.
+      landingmarketing: Lead created from a marketing landing page entry point.
+      afiliado: Lead sourced through an affiliate acquisition channel.
+      organic: Lead acquired through organic (non-paid) traffic.
+      inbound: Lead created through an inbound contact channel (e.g. WhatsApp).
+      brokenopenlink: Lead created from a broken or malformed open link entry point.
+      facebook: Lead attributed to Facebook acquisition.
   detailed_route:
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable.
     lineage:

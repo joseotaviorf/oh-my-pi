@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: recovered_region_leads
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: 'Table with the leads that were recovered from the region enrichment process, only for 1P leads'
+description: |
+  First-party leads recovered through region enrichment when the original submission lacked a valid geographic region assignment. Z-ordered by id_lead for query performance.
 columns:
   id_lead:
     description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.

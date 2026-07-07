@@ -2,10 +2,11 @@ database_name: datalake_supply_flows
 table_name: leads_sks
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: 'This table generate the SKs for the leads in the supply tables.'
+description: |
+  Surrogate key mapping for supply leads across 1P, 3P, and CIQ source tables, enabling consistent lead identification in downstream supply pipelines. Z-ordered by id_lead and source for query performance.
 columns:
   id_lead:
-    lineage: 
+    lineage:
       - datalake_rene_descartes.house_lead.id
     description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
   ts_created:

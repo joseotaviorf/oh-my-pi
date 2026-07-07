@@ -1,8 +1,9 @@
 database_name: datalake_supply_flows
 table_name: lead_origin
 domain: Growth
-owner: henrique.paulo@quintoandar.com.br
-description: This table contains acquisition data extracted from the René Descartes and Amplitude service that will be used to track our leads in the supply domain.
+owner: gabriel.salla@quintoandar.com
+description: |
+  Lead acquisition origin data from René Descartes and Amplitude, providing UTM and channel attribution for supply domain lead tracking. Z-ordered by id_lead for query performance.
 columns:
   id_lead:
     description: The unique identifier for each lead in the dataset.
@@ -93,7 +94,7 @@ columns:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.platform
   lead_type:
-    description: The type of lead
+    description: Classification of the lead source type in the supply acquisition funnel (e.g. 1P direct, 3P classified, CIQ integration).
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   detailed_route:

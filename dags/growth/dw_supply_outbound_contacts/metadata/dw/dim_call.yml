@@ -6,7 +6,7 @@ domain: Growth
 owner: gabriel.salla@quintoandar.com
 columns:
   sk_outbound_contact:
-    lineage:
+    lineage:  
     - datalake_supply_outbound_flows.supply_outbound_contacts.id_outbound_contact
     description: The unique contact request identiier.
   call_output:
